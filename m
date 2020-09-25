@@ -2,153 +2,86 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB14DC4727E
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 19:22:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2186BC4727E
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 19:24:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EC66221EC
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 19:22:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7B329221EC
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 19:24:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J9EPE6KB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EC66221EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M7WhL15J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B329221EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLtIR-00056v-Bd
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 15:22:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60638)
+	id 1kLtKf-0006u8-BP
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 15:24:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32916)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kLtHN-0003ZA-4v
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 15:21:13 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35829)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kLtJi-0006SJ-7b
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 15:23:38 -0400
+Received: from mail-lj1-x22d.google.com ([2a00:1450:4864:20::22d]:38152)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kLtHL-0004hL-In
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 15:21:12 -0400
-Received: by mail-wm1-x341.google.com with SMTP id y15so132790wmi.0
- for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 12:21:07 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kLtJe-0004tO-4G
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 15:23:37 -0400
+Received: by mail-lj1-x22d.google.com with SMTP id w3so3374560ljo.5
+ for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 12:23:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:from:to:cc:references:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=L/pzefyJ25CKH85Mwwy5U5hUNuCbOk3X7pV33MQbmIE=;
- b=J9EPE6KBuh5h17BZwcQJW5Obcm+eNzPw7MOaPQtE87rcmL1tiDoxFscEkzPJ5z6KpB
- /J/vBm6R7e83o4nY63lovlSvuJJE+de0WZU6MzNhqq0cUGaAYennHrNnF4gz1IvZPTat
- JV9Vosh4jtHOaj5xh/trH8tbDQqXXRlU5z3B4EXv0z9fRkfUIjOpqSCFDbZOlsng/yId
- p6iN5ew+95sToMh5OHCTtrWHq6esQGXBFAoLhd2K5KUgP/x+ciyH2dvOeYtTiYCusHy+
- zW9lMYZsBrGYTX9Khi0/OgqYpWtmx69mUI5gz8mcJiCfgmBBJrnKVKTQ+Dbx8ziuwqDL
- 6SaQ==
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=veHmGfRPLEJAXe3w8tMhHVaHExXuW7WV+Zdtv1Nl1Tk=;
+ b=M7WhL15Jx/dKHaLFL/yCKGOwZ38KCLM54EZdx/r71XHn1eiMlQF4bpl15fVVwMrDzY
+ krU8FkkosSVkjVmSESepWn9gNYLvqRvctCvO5WDA3yqaLz4UDFyTQiRnV5BQEm+SqGu8
+ QX4gmXRtix8I7eatsM6c5avKsUarmJ3AAcaeCcgu5LCD9eY9jn4nfghAR8iPYZm7bQLp
+ NUX6DOI3VVMK1ng3EEotiN8WaqCBiUCvS0RHAjF0w1jCxj9ludOXQbnl9u9G/gzz+8ZL
+ jbwq5bjy7N6HJD9oy9/QFRI1Nr0U2un9afWN7taeDr8jhGfAtn7lBdCole9xZPsL0Qce
+ wKjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:from:to:cc:references:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=L/pzefyJ25CKH85Mwwy5U5hUNuCbOk3X7pV33MQbmIE=;
- b=FIjCWuP5+9mowTVROU9bgURCFx7S/ovc1SHo+5Duth2g0ABXK97Vb8hzgWLyEb8ciO
- 8Di/hqdnNAbI4IWH6TfFrGuzWbcX6ndxAhRoBeSP0LbhotipjMurkXlWcRB3T9FFEgfy
- pSzOceqJ8X/S9LfZpwgZEdssuPzyi7drpS8iiBJWIHD2fe/wKFU+sP9yXCuNJ0VM5epH
- ujpAI15FK2g9H+s771km4ceJklT1XjCOYFLodrPB+ULG5g7nBrFc6O/ntZkxXI0vI7z3
- z75Gvy+ZZ4EVRtSDO1MKNEX8a6ulwX8XAS3Sz1gLDU7pXSspX248U3VwichHXeUQqPoW
- Ewzg==
-X-Gm-Message-State: AOAM531wJ7pGgj6Bl/E/9uNDaBNNZIrhekt+JUdlpTMHzcM/bkEL+vYF
- kBgd9NbP50zrnffoh7bhCf6jnrwiT5c=
-X-Google-Smtp-Source: ABdhPJziYEZDtYZ21+gC5RaQybHy7kK1jLTnAtremsVQEtbwoT3XzY3Yq2sf4dzt1mNC2Sc5YVSDtw==
-X-Received: by 2002:a1c:96cf:: with SMTP id y198mr113880wmd.104.1601061666381; 
- Fri, 25 Sep 2020 12:21:06 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ec9b:111a:97e3:4baf?
- ([2001:b07:6468:f312:ec9b:111a:97e3:4baf])
- by smtp.googlemail.com with ESMTPSA id t17sm4028251wrx.82.2020.09.25.12.21.05
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 25 Sep 2020 12:21:05 -0700 (PDT)
-Subject: Re: [PATCH] target/i386: support KVM_FEATURE_ASYNC_PF_INT
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>, qemu-devel@nongnu.org
-References: <20200908141206.357450-1-vkuznets@redhat.com>
- <f0c66049-57c0-4955-bac8-f7f090f7e12e@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
- uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <eff476d4-d991-8532-723a-d6c5199b8f74@redhat.com>
-Date: Fri, 25 Sep 2020 21:21:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=veHmGfRPLEJAXe3w8tMhHVaHExXuW7WV+Zdtv1Nl1Tk=;
+ b=n9FCce9hYooTEtoZPsGiFz2MwrkIpPWr/EZM/Vv/iAP/Lagrtb+EDP5Qaj++RQhCWT
+ i1vhZFVLQIAQL16sB9lWap8wqNh1NwTvrxPCc33MUSS41s4droZwLzRoLToy8aOU4Krz
+ jrY5rq3D0SVnQDTBgHEtGj3JoDACZGlrA2kY+U0EI1d6Gw5bLkOrU0uotG9CvvFFtkl3
+ 0bZzqzsgIcFcL+zxxCRM/zCfiJ58SeFrHxPV9cXY34UdJxn5O6qG4xa1m0A7tqH9ffOx
+ PYJvwY1I6NO4hxYRS+27EtQf9m9/3yFRSmp/gkmAsPa0jG9wXrxTujWTpD7eAvgCGbtT
+ 8VqA==
+X-Gm-Message-State: AOAM533DHQl3u72ZyzEePgFyRmA/MwxNSr5qJmQrokNEkxQkizfbquTP
+ A4dPcYy9pF8XeRp9RMgjwADwdjOIGNZmatVkDaQ=
+X-Google-Smtp-Source: ABdhPJxv7ovrdw6kvCmCk9Xzmf7vCLNgjsZf7LMF3rLlHgrCrgdNdH4YV0WNo/xjW8UzbWjkYo614WlAEF0QpHbl4NQ=
+X-Received: by 2002:a2e:854c:: with SMTP id u12mr1788096ljj.120.1601061812391; 
+ Fri, 25 Sep 2020 12:23:32 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <f0c66049-57c0-4955-bac8-f7f090f7e12e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x341.google.com
+References: <CAE2XoE-PpsaqJOfEq0iUSkH6N8skkqFAY+2QkSbnENiszA0xQg@mail.gmail.com>
+ <a50bc12c-7aa1-19a3-c39e-02328aeaca38@redhat.com>
+In-Reply-To: <a50bc12c-7aa1-19a3-c39e-02328aeaca38@redhat.com>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Sat, 26 Sep 2020 03:23:21 +0800
+Message-ID: <CAE2XoE9F5_gGsiFutW99mbPUbUb2rmG+2+9pEDKrhvu9QRwYvw@mail.gmail.com>
+Subject: Re: I wanna fixes plugin on windows, any suggestion
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000009753a705b0284061"
+Received-SPF: pass client-ip=2a00:1450:4864:20::22d;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x22d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -19
-X-Spam_score: -2.0
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.248, NICE_REPLY_A=-0.238,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -162,22 +95,420 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marcelo Tosatti <mtosatti@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Reply-To: luoyonggang@gmail.com
+Cc: qemu-level <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/09/20 08:02, Paolo Bonzini wrote:
-> @@ -4209,6 +4209,7 @@ static PropValue kvm_default_props[] = {
->      { "kvmclock", "on" },
->      { "kvm-nopiodelay", "on" },
->      { "kvm-asyncpf", "on" },
-> +    { "kvm-asyncpf-int", "on" },
->      { "kvm-steal-time", "on" },
->      { "kvm-pv-eoi", "on" },
+--0000000000009753a705b0284061
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This would warn on old kernels.  I removed it.
+On Sat, Sep 26, 2020 at 3:20 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 25/09/20 21:12, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:
+> > currently the empty.c plugin are failed of linkage error
+> >
+> > The fowlloing are the failing message:
+> > Compiling C object tests/plugin/libbb.dll.p/bb.c.obj
+> > Linking target tests/plugin/libempty.dll
+> > Linking target tests/plugin/libinsn.dll
+> > Linking target tests/plugin/libmem.dll
+> > ../tests/plugin/bb.c: In function 'vcpu_tb_exec':
+> > ../tests/plugin/bb.c:75:29: error: cast from pointer to integer of
+> > different size [-Werror=3Dpointer-to-int-cast]
+> >    75 |     unsigned long n_insns =3D (unsigned long)udata;
+> >       |                             ^
+> > ../tests/plugin/bb.c: In function 'vcpu_tb_trans':
+> > ../tests/plugin/bb.c:95:46: error: cast to pointer from integer of
+> > different size [-Werror=3Dint-to-pointer-cast]
+> >    95 |                                              (void *)n_insns);
+> >       |                                              ^
+>
+> Plugins cannot work on Windows, because they would be specific to one
+> executable as far as I know.  Plugins would have to link with the
+> emulator's import library, but there would be one import library per
+> emulator.
+That's what I am tring to fixes? what does  one import library per
+emulator, can we do this like NodeJS does?
+ NodeJS have NAPI support across platform. They create a windows .lib from
+node.exe
+>
+> Paolo
+>
+> >
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+> > tests/plugin/libempty.dll.p/empty.c.obj: in function
+`qemu_plugin_install':
+> > C:\work\xemu\qemu\build/../tests/plugin/empty.c:30: undefined reference
+> > to `qemu_plugin_register_vcpu_tb_trans_cb'
+> > cc1.exe: all warnings being treated as errors
+> > collect2.exe: error: ld returned 1 exit status
+> > make: *** [Makefile.ninja:2433=EF=BC=9Atests/plugin/libempty.dll] =E9=
+=94=99=E8=AF=AF 1
+> > make: *** =E6=AD=A3=E5=9C=A8=E7=AD=89=E5=BE=85=E6=9C=AA=E5=AE=8C=E6=88=
+=90=E7=9A=84=E4=BB=BB=E5=8A=A1....
+> > make: *** [Makefile.ninja:2420=EF=BC=9Atests/plugin/libbb.dll.p/bb.c.ob=
+j] =E9=94=99=E8=AF=AF 1
+> >
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+> > tests/plugin/libinsn.dll.p/insn.c.obj: in function `vcpu_tb_trans':
+> > C:\work\xemu\qemu\build/../tests/plugin/insn.c:29: undefined reference
+> > to `qemu_plugin_tb_n_insns'
+> >
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+> > C:\work\xemu\qemu\build/../tests/plugin/insn.c:33: undefined reference
+> > to `qemu_plugin_tb_get_insn'
+> >
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+> > C:\work\xemu\qemu\build/../tests/plugin/insn.c:36: undefined reference
+> > to `qemu_plugin_register_vcpu_insn_exec_inline'
+> >
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+> > C:\work\xemu\qemu\build/../tests/plugin/insn.c:39: undefined reference
+> > to `qemu_plugin_register_vcpu_insn_exec_cb'
+> >
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+> > tests/plugin/libinsn.dll.p/insn.c.obj: in function `plugin_exit':
+> > C:\work\xemu\qemu\build/../tests/plugin/insn.c:48: undefined reference
+> > to `qemu_plugin_outs'
+> >
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+> > tests/plugin/libinsn.dll.p/insn.c.obj: in function
+`qemu_plugin_install':
+> > C:\work\xemu\qemu\build/../tests/plugin/insn.c:59: undefined reference
+> > to `qemu_plugin_register_vcpu_tb_trans_cb'
+> >
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+> > C:\work\xemu\qemu\build/../tests/plugin/insn.c:60: undefined reference
+> > to `qemu_plugin_register_atexit_cb'
+> > collect2.exe: error: ld returned 1 exit status
+> >
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+> > tests/plugin/libmem.dll.p/mem.c.obj: in function `plugin_exit':
+> > C:\work\xemu\qemu\build/../tests/plugin/mem.c:33: undefined reference t=
+o
+> > `qemu_plugin_outs'
+> >
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+> > tests/plugin/libmem.dll.p/mem.c.obj: in function `vcpu_mem':
+> > C:\work\xemu\qemu\build/../tests/plugin/mem.c:41: undefined reference t=
+o
+> > `qemu_plugin_get_hwaddr'
+> >
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+> > C:\work\xemu\qemu\build/../tests/plugin/mem.c:42: undefined reference t=
+o
+> > `qemu_plugin_hwaddr_is_io'
+> >
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+> > tests/plugin/libmem.dll.p/mem.c.obj: in function `vcpu_tb_trans':
+> > C:\work\xemu\qemu\build/../tests/plugin/mem.c:54: undefined reference t=
+o
+> > `qemu_plugin_tb_n_insns'
+> >
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+> > C:\work\xemu\qemu\build/../tests/plugin/mem.c:58: undefined reference t=
+o
+> > `qemu_plugin_tb_get_insn'
+> >
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+> > C:\work\xemu\qemu\build/../tests/plugin/mem.c:61: undefined reference t=
+o
+> > `qemu_plugin_register_vcpu_mem_inline'
+> >
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+> > C:\work\xemu\qemu\build/../tests/plugin/mem.c:65: undefined reference t=
+o
+> > `qemu_plugin_register_vcpu_mem_cb'
+> >
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+> > tests/plugin/libmem.dll.p/mem.c.obj: in function `qemu_plugin_install':
+> > C:\work\xemu\qemu\build/../tests/plugin/mem.c:96: undefined reference t=
+o
+> > `qemu_plugin_register_vcpu_tb_trans_cb'
+> >
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+> > C:\work\xemu\qemu\build/../tests/plugin/mem.c:97: undefined reference t=
+o
+> > `qemu_plugin_register_atexit_cb'
+> > make: *** [Makefile.ninja:2440=EF=BC=9Atests/plugin/libinsn.dll] =E9=94=
+=99=E8=AF=AF 1
+> > collect2.exe: error: ld returned 1 exit status
+> > make: *** [Makefile.ninja:2447=EF=BC=9Atests/plugin/libmem.dll] =E9=94=
+=99=E8=AF=AF 1
+> > make -C /c/work/xemu/qemu/slirp
+> > BUILD_DIR=3D"/c/work/xemu/qemu/build/slirp" PKG_CONFIG=3D"pkg-config"
+> > CC=3D"cc" AR=3D"ar" LD=3D"ld" RANLIB=3D"ranlib" CFLAGS=3D"-m64 -mcx16
+> > -D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE
+> > -Wstrict-prototypes -Wredundant-decls -Wundef -Wwrite-strings
+> > -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv
+> >  -Wold-style-declaration -Wold-style-definition -Wtype-limits
+> > -Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers
+> > -Wempty-body -Wnested-externs -Wendif-labels -Wexpansion-to-defined
+> > -Wno-missing-include-dirs -Wno-shift-negative-value -Wno-psabi
+> > -fstack-protector-strong -g -fno-pie -mthreads -std=3Dgnu99 -Wall"
+> > LDFLAGS=3D"-Wl,--warn-common -m64  -fstack-protector-strong"
+> > make[1]: =E8=BF=9B=E5=85=A5=E7=9B=AE=E5=BD=95=E2=80=9C/c/work/xemu/qemu=
+/slirp=E2=80=9D
+> > make[1]: =E5=AF=B9=E2=80=9Call=E2=80=9D=E6=97=A0=E9=9C=80=E5=81=9A=E4=
+=BB=BB=E4=BD=95=E4=BA=8B=E3=80=82
+> > make[1]: =E7=A6=BB=E5=BC=80=E7=9B=AE=E5=BD=95=E2=80=9C/c/work/xemu/qemu=
+/slirp=E2=80=9D
+> > make -I/c/work/xemu/qemu/dtc VPATH=3D/c/work/xemu/qemu/dtc -C dtc V=3D"=
+1"
+> > LIBFDT_lib=3D"" CPPFLAGS=3D"-I/c/work/xemu/qemu/dtc/libfdt" CFLAGS=3D"-=
+g
+> > -fno-pie -mthreads -std=3Dgnu99 -Wall -m64 -mcx16 -D_GNU_SOURCE
+> > -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE -Wstrict-prototypes
+> > -Wredundant-decls -Wundef -Wwrite-strings -Wmissing-prototypes
+> > -fno-strict-aliasing -fno-common -fwrapv  -Wold-style-declaration
+> > -Wold-style-definition -Wtype-limits -Wformat-security -Wformat-y2k
+> > -Winit-self -Wignored-qualifiers -Wempty-body -Wnested-externs
+> > -Wendif-labels -Wexpansion-to-defined -Wno-missing-include-dirs
+> > -Wno-shift-negative-value -Wno-psabi -fstack-protector-strong"
+> > LDFLAGS=3D"-Wl,--warn-common -m64  -fstack-protector-strong" ARFLAGS=3D=
+"rv"
+> > CC=3D"cc" AR=3D"ar" LD=3D"ld"  libfdt
+> > make[1]: =E8=BF=9B=E5=85=A5=E7=9B=AE=E5=BD=95=E2=80=9C/c/work/xemu/qemu=
+/build/dtc=E2=80=9D
+> > make[1]: =E5=AF=B9=E2=80=9Clibfdt=E2=80=9D=E6=97=A0=E9=9C=80=E5=81=9A=
+=E4=BB=BB=E4=BD=95=E4=BA=8B=E3=80=82
+> > make[1]: =E7=A6=BB=E5=BC=80=E7=9B=AE=E5=BD=95=E2=80=9C/c/work/xemu/qemu=
+/build/dtc=E2=80=9D
+> > "C:/CI-Tools/msys64/mingw64/bin/python3.exe"
+> > "C:/work/xemu/qemu/meson/meson.py" "--internal" "exe" "--capture"
+> > "qemu-version.h" "--" "sh" "C:/work/xemu/qemu/scripts/qemu-version.sh"
+> > "C:/work/xemu/qemu" "" "5.1.50" && if test -e qemu-version.h; then
+> > printf '%s\n' qemu-version.h > qemu-version.h.stamp; fi
+> > "ar" csrD libqemuutil.a @libqemuutil.a.rsp
+> > "C:/CI-Tools/msys64/mingw64/bin/python3.exe"
+> > "C:/work/xemu/qemu/meson/meson.py" "--internal" "exe" "--unpickle"
+> >
+"C:/work/xemu/qemu/build/meson-private/meson_exe_python3.exe_2b18a272e12652=
+a9e7600847543c3524867d85d7.dat"
+> > && if test -e block.syms; then printf '%s\n' block.syms >
+> > block.syms.stamp; fi
+> > "ar" csrD libblock.fa @libblock.fa.rsp
+> > "C:/CI-Tools/msys64/mingw64/bin/python3.exe"
+> > "C:/work/xemu/qemu/meson/meson.py" "--internal" "exe" "--unpickle"
+> >
+"C:/work/xemu/qemu/build/meson-private/meson_exe_python3.exe_269c5ec9ac7976=
+b6693320b9cb25885f5b2f71c7.dat"
+> > && if test -e qemu.syms; then printf '%s\n' qemu.syms >
+qemu.syms.stamp; fi
+> > "c++" @qemu-system-ppc.exe.rsp
+> >
+> > --
+> >          =E6=AD=A4=E8=87=B4
+> > =E7=A4=BC
+> > =E7=BD=97=E5=8B=87=E5=88=9A
+> > Yours
+> >     sincerely,
+> > Yonggang Luo
+>
 
-Paolo
+
+--
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
+
+--0000000000009753a705b0284061
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><br><br>On Sat, Sep 26, 2020 at 3:20 AM Paolo Bonzini &lt;=
+<a href=3D"mailto:pbonzini@redhat.com">pbonzini@redhat.com</a>&gt; wrote:<b=
+r>&gt;<br>&gt; On 25/09/20 21:12, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo)=
+ wrote:<br>&gt; &gt; currently the empty.c plugin are failed of linkage err=
+or<br>&gt; &gt;<br>&gt; &gt; The fowlloing are the failing message:<br>&gt;=
+ &gt; Compiling C object tests/plugin/libbb.dll.p/bb.c.obj<br>&gt; &gt; Lin=
+king target tests/plugin/libempty.dll<br>&gt; &gt; Linking target tests/plu=
+gin/libinsn.dll<br>&gt; &gt; Linking target tests/plugin/libmem.dll<br>&gt;=
+ &gt; ../tests/plugin/bb.c: In function &#39;vcpu_tb_exec&#39;:<br>&gt; &gt=
+; ../tests/plugin/bb.c:75:29: error: cast from pointer to integer of<br>&gt=
+; &gt; different size [-Werror=3Dpointer-to-int-cast]<br>&gt; &gt; =C2=A0 =
+=C2=A075 | =C2=A0 =C2=A0 unsigned long n_insns =3D (unsigned long)udata;<br=
+>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ^<br>&gt; &gt; ../=
+tests/plugin/bb.c: In function &#39;vcpu_tb_trans&#39;:<br>&gt; &gt; ../tes=
+ts/plugin/bb.c:95:46: error: cast to pointer from integer of<br>&gt; &gt; d=
+ifferent size [-Werror=3Dint-to-pointer-cast]<br>&gt; &gt; =C2=A0 =C2=A095 =
+| =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0(void *)n_insns);<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0^<br>&gt;<br>&gt; Plugins cannot work on Windows, because they would =
+be specific to one<br>&gt; executable as far as I know.=C2=A0 Plugins would=
+ have to link with the<br>&gt; emulator&#39;s import library, but there wou=
+ld be one import library per<br>&gt; emulator.<div>That&#39;s what I am tri=
+ng to fixes? what does=C2=A0 one import library per<br>emulator, can we do =
+this like NodeJS does?</div><div>=C2=A0NodeJS have NAPI support across plat=
+form. They create a windows .lib from</div><div>node.exe<br>&gt;<br>&gt; Pa=
+olo<br>&gt;<br>&gt; &gt; C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w=
+64-mingw32/10.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe:<br>&gt; &gt; t=
+ests/plugin/libempty.dll.p/empty.c.obj: in function `qemu_plugin_install&#3=
+9;:<br>&gt; &gt; C:\work\xemu\qemu\build/../tests/plugin/empty.c:30: undefi=
+ned reference<br>&gt; &gt; to `qemu_plugin_register_vcpu_tb_trans_cb&#39;<b=
+r>&gt; &gt; cc1.exe: all warnings being treated as errors<br>&gt; &gt; coll=
+ect2.exe: error: ld returned 1 exit status<br>&gt; &gt; make: *** [Makefile=
+.ninja:2433=EF=BC=9Atests/plugin/libempty.dll] =E9=94=99=E8=AF=AF 1<br>&gt;=
+ &gt; make: *** =E6=AD=A3=E5=9C=A8=E7=AD=89=E5=BE=85=E6=9C=AA=E5=AE=8C=E6=
+=88=90=E7=9A=84=E4=BB=BB=E5=8A=A1....<br>&gt; &gt; make: *** [Makefile.ninj=
+a:2420=EF=BC=9Atests/plugin/libbb.dll.p/bb.c.obj] =E9=94=99=E8=AF=AF 1<br>&=
+gt; &gt; C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.=
+0/../../../../x86_64-w64-mingw32/bin/ld.exe:<br>&gt; &gt; tests/plugin/libi=
+nsn.dll.p/insn.c.obj: in function `vcpu_tb_trans&#39;:<br>&gt; &gt; C:\work=
+\xemu\qemu\build/../tests/plugin/insn.c:29: undefined reference<br>&gt; &gt=
+; to `qemu_plugin_tb_n_insns&#39;<br>&gt; &gt; C:/CI-Tools/msys64/mingw64/b=
+in/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../../../x86_64-w64-mingw32/bin/=
+ld.exe:<br>&gt; &gt; C:\work\xemu\qemu\build/../tests/plugin/insn.c:33: und=
+efined reference<br>&gt; &gt; to `qemu_plugin_tb_get_insn&#39;<br>&gt; &gt;=
+ C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../=
+../../x86_64-w64-mingw32/bin/ld.exe:<br>&gt; &gt; C:\work\xemu\qemu\build/.=
+./tests/plugin/insn.c:36: undefined reference<br>&gt; &gt; to `qemu_plugin_=
+register_vcpu_insn_exec_inline&#39;<br>&gt; &gt; C:/CI-Tools/msys64/mingw64=
+/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../../../x86_64-w64-mingw32/bi=
+n/ld.exe:<br>&gt; &gt; C:\work\xemu\qemu\build/../tests/plugin/insn.c:39: u=
+ndefined reference<br>&gt; &gt; to `qemu_plugin_register_vcpu_insn_exec_cb&=
+#39;<br>&gt; &gt; C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-ming=
+w32/10.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe:<br>&gt; &gt; tests/pl=
+ugin/libinsn.dll.p/insn.c.obj: in function `plugin_exit&#39;:<br>&gt; &gt; =
+C:\work\xemu\qemu\build/../tests/plugin/insn.c:48: undefined reference<br>&=
+gt; &gt; to `qemu_plugin_outs&#39;<br>&gt; &gt; C:/CI-Tools/msys64/mingw64/=
+bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../../../x86_64-w64-mingw32/bin=
+/ld.exe:<br>&gt; &gt; tests/plugin/libinsn.dll.p/insn.c.obj: in function `q=
+emu_plugin_install&#39;:<br>&gt; &gt; C:\work\xemu\qemu\build/../tests/plug=
+in/insn.c:59: undefined reference<br>&gt; &gt; to `qemu_plugin_register_vcp=
+u_tb_trans_cb&#39;<br>&gt; &gt; C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x=
+86_64-w64-mingw32/10.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe:<br>&gt;=
+ &gt; C:\work\xemu\qemu\build/../tests/plugin/insn.c:60: undefined referenc=
+e<br>&gt; &gt; to `qemu_plugin_register_atexit_cb&#39;<br>&gt; &gt; collect=
+2.exe: error: ld returned 1 exit status<br>&gt; &gt; C:/CI-Tools/msys64/min=
+gw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../../../x86_64-w64-mingw3=
+2/bin/ld.exe:<br>&gt; &gt; tests/plugin/libmem.dll.p/mem.c.obj: in function=
+ `plugin_exit&#39;:<br>&gt; &gt; C:\work\xemu\qemu\build/../tests/plugin/me=
+m.c:33: undefined reference to<br>&gt; &gt; `qemu_plugin_outs&#39;<br>&gt; =
+&gt; C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/..=
+/../../../x86_64-w64-mingw32/bin/ld.exe:<br>&gt; &gt; tests/plugin/libmem.d=
+ll.p/mem.c.obj: in function `vcpu_mem&#39;:<br>&gt; &gt; C:\work\xemu\qemu\=
+build/../tests/plugin/mem.c:41: undefined reference to<br>&gt; &gt; `qemu_p=
+lugin_get_hwaddr&#39;<br>&gt; &gt; C:/CI-Tools/msys64/mingw64/bin/../lib/gc=
+c/x86_64-w64-mingw32/10.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe:<br>&=
+gt; &gt; C:\work\xemu\qemu\build/../tests/plugin/mem.c:42: undefined refere=
+nce to<br>&gt; &gt; `qemu_plugin_hwaddr_is_io&#39;<br>&gt; &gt; C:/CI-Tools=
+/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../../../x86_64=
+-w64-mingw32/bin/ld.exe:<br>&gt; &gt; tests/plugin/libmem.dll.p/mem.c.obj: =
+in function `vcpu_tb_trans&#39;:<br>&gt; &gt; C:\work\xemu\qemu\build/../te=
+sts/plugin/mem.c:54: undefined reference to<br>&gt; &gt; `qemu_plugin_tb_n_=
+insns&#39;<br>&gt; &gt; C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w6=
+4-mingw32/10.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe:<br>&gt; &gt; C:=
+\work\xemu\qemu\build/../tests/plugin/mem.c:58: undefined reference to<br>&=
+gt; &gt; `qemu_plugin_tb_get_insn&#39;<br>&gt; &gt; C:/CI-Tools/msys64/ming=
+w64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../../../x86_64-w64-mingw32=
+/bin/ld.exe:<br>&gt; &gt; C:\work\xemu\qemu\build/../tests/plugin/mem.c:61:=
+ undefined reference to<br>&gt; &gt; `qemu_plugin_register_vcpu_mem_inline&=
+#39;<br>&gt; &gt; C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-ming=
+w32/10.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe:<br>&gt; &gt; C:\work\=
+xemu\qemu\build/../tests/plugin/mem.c:65: undefined reference to<br>&gt; &g=
+t; `qemu_plugin_register_vcpu_mem_cb&#39;<br>&gt; &gt; C:/CI-Tools/msys64/m=
+ingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../../../x86_64-w64-ming=
+w32/bin/ld.exe:<br>&gt; &gt; tests/plugin/libmem.dll.p/mem.c.obj: in functi=
+on `qemu_plugin_install&#39;:<br>&gt; &gt; C:\work\xemu\qemu\build/../tests=
+/plugin/mem.c:96: undefined reference to<br>&gt; &gt; `qemu_plugin_register=
+_vcpu_tb_trans_cb&#39;<br>&gt; &gt; C:/CI-Tools/msys64/mingw64/bin/../lib/g=
+cc/x86_64-w64-mingw32/10.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe:<br>=
+&gt; &gt; C:\work\xemu\qemu\build/../tests/plugin/mem.c:97: undefined refer=
+ence to<br>&gt; &gt; `qemu_plugin_register_atexit_cb&#39;<br>&gt; &gt; make=
+: *** [Makefile.ninja:2440=EF=BC=9Atests/plugin/libinsn.dll] =E9=94=99=E8=
+=AF=AF 1<br>&gt; &gt; collect2.exe: error: ld returned 1 exit status<br>&gt=
+; &gt; make: *** [Makefile.ninja:2447=EF=BC=9Atests/plugin/libmem.dll] =E9=
+=94=99=E8=AF=AF 1<br>&gt; &gt; make -C /c/work/xemu/qemu/slirp<br>&gt; &gt;=
+ BUILD_DIR=3D&quot;/c/work/xemu/qemu/build/slirp&quot; PKG_CONFIG=3D&quot;p=
+kg-config&quot;<br>&gt; &gt; CC=3D&quot;cc&quot; AR=3D&quot;ar&quot; LD=3D&=
+quot;ld&quot; RANLIB=3D&quot;ranlib&quot; CFLAGS=3D&quot;-m64 -mcx16<br>&gt=
+; &gt; -D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE<br>&gt; &=
+gt; -Wstrict-prototypes -Wredundant-decls -Wundef -Wwrite-strings<br>&gt; &=
+gt; -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv<br>&gt; &=
+gt; =C2=A0-Wold-style-declaration -Wold-style-definition -Wtype-limits<br>&=
+gt; &gt; -Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers<br=
+>&gt; &gt; -Wempty-body -Wnested-externs -Wendif-labels -Wexpansion-to-defi=
+ned<br>&gt; &gt; -Wno-missing-include-dirs -Wno-shift-negative-value -Wno-p=
+sabi<br>&gt; &gt; -fstack-protector-strong -g -fno-pie -mthreads -std=3Dgnu=
+99 -Wall&quot;<br>&gt; &gt; LDFLAGS=3D&quot;-Wl,--warn-common -m64 =C2=A0-f=
+stack-protector-strong&quot;<br>&gt; &gt; make[1]: =E8=BF=9B=E5=85=A5=E7=9B=
+=AE=E5=BD=95=E2=80=9C/c/work/xemu/qemu/slirp=E2=80=9D<br>&gt; &gt; make[1]:=
+ =E5=AF=B9=E2=80=9Call=E2=80=9D=E6=97=A0=E9=9C=80=E5=81=9A=E4=BB=BB=E4=BD=
+=95=E4=BA=8B=E3=80=82<br>&gt; &gt; make[1]: =E7=A6=BB=E5=BC=80=E7=9B=AE=E5=
+=BD=95=E2=80=9C/c/work/xemu/qemu/slirp=E2=80=9D<br>&gt; &gt; make -I/c/work=
+/xemu/qemu/dtc VPATH=3D/c/work/xemu/qemu/dtc -C dtc V=3D&quot;1&quot;<br>&g=
+t; &gt; LIBFDT_lib=3D&quot;&quot; CPPFLAGS=3D&quot;-I/c/work/xemu/qemu/dtc/=
+libfdt&quot; CFLAGS=3D&quot;-g<br>&gt; &gt; -fno-pie -mthreads -std=3Dgnu99=
+ -Wall -m64 -mcx16 -D_GNU_SOURCE<br>&gt; &gt; -D_FILE_OFFSET_BITS=3D64 -D_L=
+ARGEFILE_SOURCE -Wstrict-prototypes<br>&gt; &gt; -Wredundant-decls -Wundef =
+-Wwrite-strings -Wmissing-prototypes<br>&gt; &gt; -fno-strict-aliasing -fno=
+-common -fwrapv =C2=A0-Wold-style-declaration<br>&gt; &gt; -Wold-style-defi=
+nition -Wtype-limits -Wformat-security -Wformat-y2k<br>&gt; &gt; -Winit-sel=
+f -Wignored-qualifiers -Wempty-body -Wnested-externs<br>&gt; &gt; -Wendif-l=
+abels -Wexpansion-to-defined -Wno-missing-include-dirs<br>&gt; &gt; -Wno-sh=
+ift-negative-value -Wno-psabi -fstack-protector-strong&quot;<br>&gt; &gt; L=
+DFLAGS=3D&quot;-Wl,--warn-common -m64 =C2=A0-fstack-protector-strong&quot; =
+ARFLAGS=3D&quot;rv&quot;<br>&gt; &gt; CC=3D&quot;cc&quot; AR=3D&quot;ar&quo=
+t; LD=3D&quot;ld&quot; =C2=A0libfdt<br>&gt; &gt; make[1]: =E8=BF=9B=E5=85=
+=A5=E7=9B=AE=E5=BD=95=E2=80=9C/c/work/xemu/qemu/build/dtc=E2=80=9D<br>&gt; =
+&gt; make[1]: =E5=AF=B9=E2=80=9Clibfdt=E2=80=9D=E6=97=A0=E9=9C=80=E5=81=9A=
+=E4=BB=BB=E4=BD=95=E4=BA=8B=E3=80=82<br>&gt; &gt; make[1]: =E7=A6=BB=E5=BC=
+=80=E7=9B=AE=E5=BD=95=E2=80=9C/c/work/xemu/qemu/build/dtc=E2=80=9D<br>&gt; =
+&gt; &quot;C:/CI-Tools/msys64/mingw64/bin/python3.exe&quot;<br>&gt; &gt; &q=
+uot;C:/work/xemu/qemu/meson/meson.py&quot; &quot;--internal&quot; &quot;exe=
+&quot; &quot;--capture&quot;<br>&gt; &gt; &quot;qemu-version.h&quot; &quot;=
+--&quot; &quot;sh&quot; &quot;C:/work/xemu/qemu/scripts/qemu-version.sh&quo=
+t;<br>&gt; &gt; &quot;C:/work/xemu/qemu&quot; &quot;&quot; &quot;5.1.50&quo=
+t; &amp;&amp; if test -e qemu-version.h; then<br>&gt; &gt; printf &#39;%s\n=
+&#39; qemu-version.h &gt; qemu-version.h.stamp; fi<br>&gt; &gt; &quot;ar&qu=
+ot; csrD libqemuutil.a @libqemuutil.a.rsp<br>&gt; &gt; &quot;C:/CI-Tools/ms=
+ys64/mingw64/bin/python3.exe&quot;<br>&gt; &gt; &quot;C:/work/xemu/qemu/mes=
+on/meson.py&quot; &quot;--internal&quot; &quot;exe&quot; &quot;--unpickle&q=
+uot;<br>&gt; &gt; &quot;C:/work/xemu/qemu/build/meson-private/meson_exe_pyt=
+hon3.exe_2b18a272e12652a9e7600847543c3524867d85d7.dat&quot;<br>&gt; &gt; &a=
+mp;&amp; if test -e block.syms; then printf &#39;%s\n&#39; block.syms &gt;<=
+br>&gt; &gt; block.syms.stamp; fi<br>&gt; &gt; &quot;ar&quot; csrD libblock=
+.fa @libblock.fa.rsp<br>&gt; &gt; &quot;C:/CI-Tools/msys64/mingw64/bin/pyth=
+on3.exe&quot;<br>&gt; &gt; &quot;C:/work/xemu/qemu/meson/meson.py&quot; &qu=
+ot;--internal&quot; &quot;exe&quot; &quot;--unpickle&quot;<br>&gt; &gt; &qu=
+ot;C:/work/xemu/qemu/build/meson-private/meson_exe_python3.exe_269c5ec9ac79=
+76b6693320b9cb25885f5b2f71c7.dat&quot;<br>&gt; &gt; &amp;&amp; if test -e q=
+emu.syms; then printf &#39;%s\n&#39; qemu.syms &gt; qemu.syms.stamp; fi<br>=
+&gt; &gt; &quot;c++&quot; @qemu-system-ppc.exe.rsp<br>&gt; &gt;<br>&gt; &gt=
+; --<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=B4<br>&=
+gt; &gt; =E7=A4=BC<br>&gt; &gt; =E7=BD=97=E5=8B=87=E5=88=9A<br>&gt; &gt; Yo=
+urs<br>&gt; &gt; =C2=A0 =C2=A0 sincerely,<br>&gt; &gt; Yonggang Luo<br>&gt;=
+<br><br><br>--<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=B4<br>=
+=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincerel=
+y,<br>Yonggang Luo</div></div>
+
+--0000000000009753a705b0284061--
 
