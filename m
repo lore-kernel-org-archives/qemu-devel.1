@@ -2,87 +2,90 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CA94C4727E
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 22:05:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44076C4727E
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 22:07:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0F592074B
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 22:05:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B171A20759
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 22:07:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ueZvpjBG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0F592074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vo1SCyaL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B171A20759
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLvqh-0000uj-E3
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 18:05:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36964)
+	id 1kLvro-0001tv-R7
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 18:07:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37156)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kLvpQ-0000TM-Ed
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 18:04:32 -0400
-Received: from mail-ed1-x52f.google.com ([2a00:1450:4864:20::52f]:38394)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kLvqQ-00010Z-PX
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 18:05:34 -0400
+Received: from mail-lf1-x12e.google.com ([2a00:1450:4864:20::12e]:41181)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kLvpM-0006tt-OY
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 18:04:31 -0400
-Received: by mail-ed1-x52f.google.com with SMTP id c8so4060809edv.5
- for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 15:04:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=yG0e0qFJzFjFg1wvozInXCMKoskixBF8iD4ScRIlFYw=;
- b=ueZvpjBG/SllWPPhN6ngyzz+fjQn73vlTSTAJu6ufKBCUikVMIkHW5mOoA+kTBXaNR
- AtYB5qWnV+RP+ggh1VMATD7H+jjjPHh9bSCaoLUrd+J4RsYhygcYY0mzfSpiB/QNhZud
- jU5TQ08Yxy/vJKBIay+R1fIE5e8KjanopcxQU9tgSfsFpZNlJ0pZGEC7k0RfM4fePE9m
- dWp2y0Rnj4T1peaerH3osqZTQXSVG9XtyhbHkve+8ATE2m+p8GvPS5ar8IuLz9hkJoBr
- GilZuBigHM7LWgZGudJmHMPSXIKlAJjfKkODixeKQ8hj93OA7eoDWlA6s24ne3ESy3uw
- wD+g==
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kLvqO-000736-GZ
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 18:05:34 -0400
+Received: by mail-lf1-x12e.google.com with SMTP id y17so4410484lfa.8
+ for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 15:05:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=B6Ll+GPJvZlWNhoW+uRlnRwgAZ7hPRSUQQ9vgkTUr6s=;
+ b=Vo1SCyaLxIbNLEUrCborxHPIc426dLoyqzdk5lc3T/aMbTTni8/hyy+fnFADO2ZIpV
+ odKK6hYRmm52w4nk+r9QokBElHXpX3whv9QLaxjnsTcXMw3Ts8yDwjBdK28jf9Suf9U5
+ rDu7szDOX8+m186A5cVDh+2h0ZsiZZSRs8zdBqu1koZ1RdkT91xjzwB/j00f2W7goXHD
+ ZN2zxOfVpZKqSt6bysMJcNMsgmL3a6x8p4/ME60fTBHHwv5VXa+BMMm5FxfBzuAJUbaI
+ nGCmtkANzkicFs+9JtGzEjcFPXFYj/haqqY95Ehin/uDcpUCS3I64Bgbk4QqLmH8uSXg
+ 8sDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=yG0e0qFJzFjFg1wvozInXCMKoskixBF8iD4ScRIlFYw=;
- b=s70prlhVWsfd5pVu82AsVVPW6IaTMzrnvOfq+r49Sy17sYcjCfosSXF9qX5EGEwVsB
- yHvM0OYvSpYuP3y0UmNhX9VjWeLvCLGZsjQ0sqTs5sT7gGsNyqfKIsgh0hqgEfG8f/0i
- 4TKEj/kiT/d2dKEttB8r5pJts8yTLZXChEtVzlbIfWPjveGqhg/uxY4wU490TDktn9Ta
- afAB0sbz3S+6CW18m5yYfnWcQZFe3LdYZNtcr550FSNhsu8fpmS4Td3I4ikcUcRomQVx
- MnzRSif8BGokb7ErKczcjnczUvjXh4Nl48vdlJOT5Yn2mKmUzkOMsMzqFA6bhcG+eeUo
- m/Zg==
-X-Gm-Message-State: AOAM533FpUMHvU55BUu0ggEpMKDBhmLHjfrKV0XHQod1TQb8W81v0KvX
- 2SoAEmj8oC5tXRfr4BdksQ+cs/7OBvG7s4fWskd1+g==
-X-Google-Smtp-Source: ABdhPJzOYb1BI05yR3uwQCwvoDKF9810a6NMlpXTZx3EWdEWDmakjqgu53T/KP1/cCgjJlKr+VRa6kFcVG0o6oBXMmU=
-X-Received: by 2002:a05:6402:202a:: with SMTP id
- ay10mr3768863edb.36.1601071466671; 
- Fri, 25 Sep 2020 15:04:26 -0700 (PDT)
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=B6Ll+GPJvZlWNhoW+uRlnRwgAZ7hPRSUQQ9vgkTUr6s=;
+ b=JYVc7aQ/MWsbNvQ4deuma7j0CmleFtvb2q9mTIcuv9BMXJav/pWrL7ecEl48pgu1Az
+ 6Tcoy4lIGL77IXQr0/VfVKBa32mqYjrQitY6oMwDl5Nhxi8nnCm7FohSGBM5JMlHs9fR
+ 3sx6B54Le0tCnTdrFzOHUahCDt+Yk7rEDj8kK8rFEQ3jijQHQFiMMlODqPRj3GlPPG9D
+ 4jItiZSUBF79xUnZ1DJGIv0ReA76tE1wCqsnrYOXffpb6H4E+J1IxuCQ0RZnIPj+EunN
+ vROQvF+gWtnxarSo9Rj6+HF52tZMvKIz8b0rphiVtpCZk89XgJ1FVCqrEcPSYX3cy9u9
+ 9GNg==
+X-Gm-Message-State: AOAM532LR1K7UhkJMVDdLGiWxo44VoYpwib1VG0+4q7W9ecpiKXXHair
+ ZFGs9YkPhbAd53Xut7mn7v+b2IMkeY6U93KP8uY=
+X-Google-Smtp-Source: ABdhPJx+TdNfQ5rgJXia9DnvIpVTKyzgG2GoAtF7d7n7+exzteJuSsMK3/SfGoGX2Fb6lPWIFD+F2G71AlVNje1JqfU=
+X-Received: by 2002:a19:484d:: with SMTP id v74mr268561lfa.382.1601071529521; 
+ Fri, 25 Sep 2020 15:05:29 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200925194737.2148096-1-pbonzini@redhat.com>
-In-Reply-To: <20200925194737.2148096-1-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 25 Sep 2020 23:04:15 +0100
-Message-ID: <CAFEAcA8d9upaWzQp_Ux9jaTBWOS1C0Xf_8ibDh5vcyB56+PFrA@mail.gmail.com>
-Subject: Re: [PULL v6 00/87] Misc patches for 2020-09-24
+References: <CAE2XoE-PpsaqJOfEq0iUSkH6N8skkqFAY+2QkSbnENiszA0xQg@mail.gmail.com>
+ <a50bc12c-7aa1-19a3-c39e-02328aeaca38@redhat.com>
+ <CAE2XoE9F5_gGsiFutW99mbPUbUb2rmG+2+9pEDKrhvu9QRwYvw@mail.gmail.com>
+ <a808929b-f93c-f68d-da4e-02133b4fcb54@redhat.com>
+ <c0eee78e-9336-65e2-bd12-a762aab78c3e@linaro.org>
+ <56d6a3f9-8740-2274-5489-2d80aecf9387@redhat.com>
+In-Reply-To: <56d6a3f9-8740-2274-5489-2d80aecf9387@redhat.com>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Sat, 26 Sep 2020 06:04:57 +0800
+Message-ID: <CAE2XoE9iryf+BBN9u1VGqG=fyXBVi6yqqBiu8fm5qHziaKbcug@mail.gmail.com>
+Subject: Re: I wanna fixes plugin on windows, any suggestion
 To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::52f;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x52f.google.com
+Content-Type: multipart/alternative; boundary="000000000000c6f8bb05b02a837f"
+Received-SPF: pass client-ip=2a00:1450:4864:20::12e;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x12e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,103 +99,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: luoyonggang@gmail.com
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ qemu-level <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 25 Sep 2020 at 20:51, Paolo Bonzini <pbonzini@redhat.com> wrote:
+--000000000000c6f8bb05b02a837f
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Sat, Sep 26, 2020 at 4:59 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> The following changes since commit 8c1c07929feae876202ba26f07a540c5115c18=
-cd:
+> On 25/09/20 22:50, Richard Henderson wrote:
+> > On 9/25/20 12:25 PM, Paolo Bonzini wrote:
+> >> On 25/09/20 21:23, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:
+> >>> That's what I am tring to fixes? what does  one import library per
+> >>> emulator, can we do this like NodeJS does?
+> >>>  NodeJS have NAPI support across platform. They create a windows .lib
+from
+> >>> node.exe
+> >>
+> >> You'd have to create a .lib for qemu-system-aarch64.exe, one for
+> >> qemu-system-arm.exe, etc.  On Linux the same plugin will work for all
+> >> emulators.
+> >
+> > Which is clearly silly.
+> >
+> > So what you'd do is create a common .lib that all of the plugins link
+to, and
+> > so do all of the qemu-foo.exe.
+> >
+> > This would probably involve creating a set of call-backs that
+qemu-foo.exe
+> > would need to pass to the common .lib at startup.  It's harder to do
+with
+> > windows than linux, but it's not impossible.
 >
->   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request'=
- into staging (2020-09-24 18:48:45 +0100)
+> Yes, or you can skip the .lib/.dll completely; you just place pointers
+> to the callbacks in a struct and pass it to the plugin when it's loaded,
+> through qemu_info_t.
+I also got another idea to resolve this issue by loading these API by
+dl_sym(NULL, "qemu_plug_api_function_name"),
+so we won't change any current API. And creating a plugin_api.lib for
+static linkage to(only for windows).
 >
-> are available in the Git repository at:
+> Paolo
 >
->   https://gitlab.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to f19fc40acf2a4481f56165228f788f322d947f60:
->
->   hw/net/can: Correct Kconfig dependencies (2020-09-25 15:21:30 -0400)
->
-> ----------------------------------------------------------------
-> * SCSI fix (Dmitry, Li Feng, Li Qiang)
-> * memory API fixes (Eduardo)
-> * removal of deprecated '-numa node', 'cpu-add', '-smp' (Igor)
-> * ACPI fix for VMBus (Jon)
-> * relocatable install (myself)
-> * always remove docker containers (myself)
-> * serial cleanups (Philippe)
-> * vmware cpuid leaf for tsc and apic frequency (Sunil)
-> * KVM_FEATURE_ASYNC_PF_INT support (Vitaly)
-> * i386 XSAVE bugfix (Xiaoyao)
-> * QOM developer documentation in docs/devel (Eduardo)
-> * new checkpatch tests (Dov)
-> * x86_64 syscall fix (Douglas)
-> * interrupt-based APF fix (Vitaly)
-> * always create kvmclock (Vitaly)
-> * fix bios-tables-test (Eduardo)
-> * KVM PV features cleanup (myself)
-> * CAN FD (Pavel)
->
-> meson:
-> * fixes (Marc-Andr=C3=A9, Max, Stefan, Alexander, myself)
-> * moved libmpathpersist, cocoa, malloc tests (myself)
-> * support for 0.56 introspected test dependencies (myself)
 
-This version fails on the BSDs:
 
-Library util found: YES
-Found pkg-config: /usr/local/bin/pkg-config (1.7.3)
-Run-time dependency pixman-1 found: YES 0.40.0
-Library pam found: YES
-Library aio found: NO
-Run-time dependency zlib found: YES 1.2.10
-Run-time dependency xkbcommon found: YES 0.10.0
-Library rt found: YES
+--
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
 
-../src/meson.build:274:3: ERROR: Unknown variable "target_os".
+--000000000000c6f8bb05b02a837f
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-A full log can be found at
-/usr/home/qemu/qemu-test.5nusiE/build/meson-logs/meson-log.txt
+<div dir=3D"ltr"><br><br>On Sat, Sep 26, 2020 at 4:59 AM Paolo Bonzini &lt;=
+<a href=3D"mailto:pbonzini@redhat.com">pbonzini@redhat.com</a>&gt; wrote:<b=
+r>&gt;<br>&gt; On 25/09/20 22:50, Richard Henderson wrote:<br>&gt; &gt; On =
+9/25/20 12:25 PM, Paolo Bonzini wrote:<br>&gt; &gt;&gt; On 25/09/20 21:23, =
+=E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:<br>&gt; &gt;&gt;&gt; That&=
+#39;s what I am tring to fixes? what does =C2=A0one import library per<br>&=
+gt; &gt;&gt;&gt; emulator, can we do this like NodeJS does?<br>&gt; &gt;&gt=
+;&gt; =C2=A0NodeJS have NAPI support across platform. They create a windows=
+ .lib from<br>&gt; &gt;&gt;&gt; node.exe<br>&gt; &gt;&gt;<br>&gt; &gt;&gt; =
+You&#39;d have to create a .lib for qemu-system-aarch64.exe, one for<br>&gt=
+; &gt;&gt; qemu-system-arm.exe, etc.=C2=A0 On Linux the same plugin will wo=
+rk for all<br>&gt; &gt;&gt; emulators.<br>&gt; &gt;<br>&gt; &gt; Which is c=
+learly silly.<br>&gt; &gt;<br>&gt; &gt; So what you&#39;d do is create a co=
+mmon .lib that all of the plugins link to, and<br>&gt; &gt; so do all of th=
+e qemu-foo.exe.<br>&gt; &gt;<br>&gt; &gt; This would probably involve creat=
+ing a set of call-backs that qemu-foo.exe<br>&gt; &gt; would need to pass t=
+o the common .lib at startup.=C2=A0 It&#39;s harder to do with<br>&gt; &gt;=
+ windows than linux, but it&#39;s not impossible.<br>&gt;<br>&gt; Yes, or y=
+ou can skip the .lib/.dll completely; you just place pointers<br>&gt; to th=
+e callbacks in a struct and pass it to the plugin when it&#39;s loaded,<br>=
+&gt; through qemu_info_t.<br>I also got another idea to resolve this issue =
+by loading these API by dl_sym(NULL, &quot;qemu_plug_api_function_name&quot=
+;),<br>so we won&#39;t change any current API. And creating a plugin_api.li=
+b for static linkage to(only for windows).<br>&gt;<br>&gt; Paolo<br>&gt;<br=
+><br><br>--<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=B4<br>=E7=
+=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincerely,<=
+br>Yonggang Luo<br></div>
 
-ERROR: meson setup failed
-
-Windows crossbuild produces the meson.build error but then
-somehow proceeds to link executables and succeed anyway(?!) :
-
-C++ compiler for the host machine: i686-w64-mingw32.shared-g++ (gcc
-5.5.0 "i686-w64-mingw32.shared-g++ (GCC) 5.5.0")
-C++ linker for the host machine: i686-w64-mingw32.shared-g++ ld.bfd 2.28
-Library m found: YES
-Library util found: NO
-Library ws2_32 found: YES
-Library winmm found: YES
-Windows resource compiler: GNU windres (GNU Binutils) 2.28
-Dependency pixman-1 found: YES 0.33.6 (cached)
-Library aio found: NO
-Dependency zlib found: YES 1.2.11 (cached)
-Found pkg-config: /usr/lib/mxe/usr/bin/i686-w64-mingw32.shared-pkg-config (=
-0.28)
-Run-time dependency xkbcommon found: NO (tried pkgconfig)
-Library rt found: NO
-
-../../meson.build:274:3: ERROR: Unknown variable "target_os".
-
-A full log can be found at
-/home/petmay01/qemu-for-merges/build/w32/meson-logs/meson-log.txt
-Generating qemu-version.h with a meson_exe.py custom command
-Compiling C object libqemu-i386-softmmu.fa.p/target_i386_cpu.c.obj
-Compiling C object libqemu-x86_64-softmmu.fa.p/target_i386_cpu.c.obj
-Linking target qemu-system-i386.exe
-Linking target qemu-system-i386w.exe
-Linking target qemu-system-x86_64.exe
-Linking target qemu-system-x86_64w.exe
-make: Leaving directory '/home/petmay01/qemu-for-merges/build/w32'
-OK DONE windows crossbuilds
-
-thanks
--- PMM
+--000000000000c6f8bb05b02a837f--
 
