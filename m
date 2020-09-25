@@ -2,88 +2,76 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13242C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 16:04:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7497C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 16:07:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B525520759
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 16:04:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3CE6823718
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 16:07:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Fvv0fb6Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B525520759
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=euphon.net header.i=fam@euphon.net header.b="BloabVd9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CE6823718
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=euphon.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLqDN-0000hP-Nx
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 12:04:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36076)
+	id 1kLqFc-0003Qf-Br
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 12:07:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37280)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kLpq1-0002sS-0r
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:40:45 -0400
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:33559)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kLppz-0007dC-C1
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:40:44 -0400
-Received: by mail-wm1-x336.google.com with SMTP id e11so2152525wme.0
- for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 08:40:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=X7bddl+nfV1LEnfasUkpHrBmJA8Qf82YzRcmiRjcnEs=;
- b=Fvv0fb6QVcj+/2IYYwI2Tqv7vEMUecaGZYgEjmZgE0MopFbf+D5ZRTwcDF2W+8B/Mm
- SQiB5YujpQ/Cqqhri4/jJH2puoFFdfie5AtOqjJI85NOSdJee8Vicewin6iTJ0Jv6WFs
- +Bupkim+rc2QldbJpPMYo7zARPgP5AWZgHKMK2upApcJjWhFi1cWcuEfnAbbE3kW2YRN
- //VwJaGnZK2ZNiDHntABn4rpbwFVd9+sy/rqPzsVrrPrQDliOr9djz3l8XyZytGvnphk
- Cc/IlNtxBGXYzVo4HNgdBN4nYuUmeHzEXpmACoaES/fCPwcsEZlMsGIta0QSQCtKUXL5
- miaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=X7bddl+nfV1LEnfasUkpHrBmJA8Qf82YzRcmiRjcnEs=;
- b=ruqyshyV/KYFlD80LOO9DKrArwzpPGeGvIHyf3CCoMcFfTHTxIoF3PmrFAHVyAw+ch
- eHz+QG1BhbyQyE/esumJafwZkztrZpKE+fIhuTkk6OtbupKIueuFCzIYpcpXSsc10W5X
- JE2Bdv1lgMXID3HD4iyGRexHrtzMHgjsWjYCfMRjq6sMFOy4m2HNaivrtWRkNFkGJgoA
- aRlfpokH4+WmwSXEKS6UScRvld5Z9WGRPLKcgZBSsw996CyJlCaQ4/vQwkqON4cGNl6v
- 2wXCalVwNzPVctLMAow9I+gDHRmKl+RdIaBR5esrwdiyPpcTl6HwKMT4xoy0swmgdClQ
- APsw==
-X-Gm-Message-State: AOAM531rctNDnAURoto3s9FsoDXnnYDoBlA/dMfC7k3KiDNsICLJbnFv
- qJBHj2h69bxsSYLhBC16TlQpxg==
-X-Google-Smtp-Source: ABdhPJxHsVtqjERGlj5OZEyi3Iu0MdVdm+94pbD6Uro6koH8k7XQn9Fli34wJj6tjFRACQ4CXXmuiQ==
-X-Received: by 2002:a7b:cd88:: with SMTP id y8mr3728495wmj.24.1601048438811;
- Fri, 25 Sep 2020 08:40:38 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 9sm3189318wmf.7.2020.09.25.08.40.30
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 25 Sep 2020 08:40:36 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id EB4941FF91;
- Fri, 25 Sep 2020 16:40:28 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 05/15] travis.yml: Drop the default softmmu builds
-Date: Fri, 25 Sep 2020 16:40:17 +0100
-Message-Id: <20200925154027.12672-6-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200925154027.12672-1-alex.bennee@linaro.org>
-References: <20200925154027.12672-1-alex.bennee@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::336;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x336.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+ (Exim 4.90_1) (envelope-from <fam@euphon.net>)
+ id 1kLpup-00085I-VP; Fri, 25 Sep 2020 11:45:43 -0400
+Received: from sender2-op-o12.zoho.com.cn ([163.53.93.243]:17676)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <fam@euphon.net>)
+ id 1kLpuk-0008Ln-T2; Fri, 25 Sep 2020 11:45:43 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1601048713; cv=none; d=zoho.com.cn; s=zohoarc; 
+ b=o4f9nPP2cEfaHIqfnPj2LpFYtd13hecQTT7e5pkEoblCrjGI3tTY+gG7Ey6nLbworu0IcB1enM8aSP5XHGsp5FiK9XhS7deSA9vayIZo1TCx0CCbOaCYeZpo6UYVH87NEhpKyYsg9DGVL9cs+rG1xnKWLdganbEDNVg6V8X+hUY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com.cn;
+ s=zohoarc; t=1601048713;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To;
+ bh=nOLlc46LeGvX3hMrdauzB7cLVPSOZZKUFDgSdUkJ3M4=; 
+ b=q6KrbCYo+5ZeUb3lIR0hmNxbEBd2pGD8+q230Q2jfoSA1JeaHN5I/ZaOMxjV/BMxT5QkphaLJ8SFm0zKFCh8oVbr+KbtJFaAEMYnXGENpQl8tJC2tq1yUOTAZ5aP+189jfB3fC6EtY0z/GiIbVxiXz9hlEuxQ8vTIYB+u5al/LQ=
+ARC-Authentication-Results: i=1; mx.zoho.com.cn;
+ dkim=pass  header.i=euphon.net;
+ spf=pass  smtp.mailfrom=fam@euphon.net;
+ dmarc=pass header.from=<fam@euphon.net> header.from=<fam@euphon.net>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1601048713; 
+ s=zoho; d=euphon.net; i=fam@euphon.net;
+ h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:Content-Type:Mime-Version:Content-Transfer-Encoding;
+ bh=nOLlc46LeGvX3hMrdauzB7cLVPSOZZKUFDgSdUkJ3M4=;
+ b=BloabVd9FpKgXTtKiasJ0QzbczDv8ctDKsN9wRShVFhMWzuV6giuoOP29QwEI83a
+ 9fD3l/v5r1xxSiZ/joXGiq6KzwnhcqorqJPO12FAidRbJlShTduaoZuhDwZpChM8Zqf
+ wNd2F953gh2k0yr4oC7EpxRK4lRjt8qTdr6Qp2y8=
+Received: from u60bdefc337955a.ant.amazon.com (54.239.6.186 [54.239.6.186]) by
+ mx.zoho.com.cn with SMTPS id 1601048710761943.7317003896499;
+ Fri, 25 Sep 2020 23:45:10 +0800 (CST)
+Message-ID: <6ed38e381e57237c1dc84cc07d54f48895ccd517.camel@euphon.net>
+Subject: Re: [RFC 1/3] util/vfio-helpers: Collect IOVA reserved regions
+From: Fam Zheng <fam@euphon.net>
+To: Auger Eric <eric.auger@redhat.com>
+Date: Fri, 25 Sep 2020 16:44:57 +0100
+In-Reply-To: <c2a4750a-dd33-2170-d450-3879e98210b5@redhat.com>
+References: <20200925134845.21053-1-eric.auger@redhat.com>
+ <20200925134845.21053-2-eric.auger@redhat.com>
+ <20200925144307.GA3809989@dev>
+ <c2a4750a-dd33-2170-d450-3879e98210b5@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-ZohoCNMailClient: External
+Received-SPF: pass client-ip=163.53.93.243; envelope-from=fam@euphon.net;
+ helo=sender2-op-o12.zoho.com.cn
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 10:43:47
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -103,60 +91,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: lvivier@redhat.com, kwolf@redhat.com, cohuck@redhat.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com, alex.williamson@redhat.com,
+ qemu-arm@nongnu.org, stefanha@redhat.com, philmd@redhat.com,
+ eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+On Fri, 2020-09-25 at 17:23 +0200, Auger Eric wrote:
+> > > @@ -365,8 +430,12 @@ static int qemu_vfio_init_pci(QEMUVFIOState
+> > > *s, const char *device,
+> > >      if (ret) {
+> > >          goto fail;
+> > >      }
+> > > +    g_free(iommu_info);
+> > >      return 0;
+> > >  fail:
+> > > +    g_free(s->usable_iova_ranges);
+> > 
+> > Set s->usable_iova_ranges to NULL to avoid double free?
+> 
+> I think I did at the beginning of qemu_vfio_init_pci()
 
-The total runtime of all Travis jobs is very long and we are testing
-all softmmu targets in the gitlab-CI already - so we can speed up the
-Travis testing a little bit by not testing the softmmu targets here
-anymore.
+Yes, but I mean clearing the pointer will make calling
+qemu_vfio_close() safe, there is also a g_free() on this one.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Acked-by: Alex Bennée <alex.bennee@linaro.org>
-Acked-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20200918103430.297167-5-thuth@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
----
- .travis.yml | 14 --------------
- 1 file changed, 14 deletions(-)
+Fam
 
-diff --git a/.travis.yml b/.travis.yml
-index c75221dca3e7..1fc49b07464d 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -123,20 +123,6 @@ jobs:
-         - CONFIG="--disable-system --static"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
- 
--
--    # we split the system builds as it takes a while to build them all
--    - name: "GCC (main-softmmu)"
--      env:
--        - CONFIG="--disable-user --target-list=${MAIN_SOFTMMU_TARGETS}"
--        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
--
--
--    - name: "GCC (other-softmmu)"
--      env:
--       - CONFIG="--disable-user --target-list-exclude=${MAIN_SOFTMMU_TARGETS}"
--        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
--
--
-     # Just build tools and run minimal unit and softfloat checks
-     - name: "GCC check-unit and check-softfloat"
-       env:
--- 
-2.20.1
+> 
+> Thanks
+> 
+> Eric
+> > 
+> > > +    s->nb_iova_ranges = 0;
+> > > +    g_free(iommu_info);
+> > >      close(s->group);
+> > >  fail_container:
+> > >      close(s->container);
+> > > @@ -716,6 +785,8 @@ void qemu_vfio_close(QEMUVFIOState *s)
+> > >          qemu_vfio_undo_mapping(s, &s->mappings[i], NULL);
+> > >      }
+> > >      ram_block_notifier_remove(&s->ram_notifier);
+> > > +    g_free(s->usable_iova_ranges);
+> > > +    s->nb_iova_ranges = 0;
+> > >      qemu_vfio_reset(s);
+> > >      close(s->device);
+> > >      close(s->group);
+> > > -- 
+> > > 2.21.3
+> > > 
+> > > 
+> > 
+> > Fam
+> > 
+> 
+> 
 
 
