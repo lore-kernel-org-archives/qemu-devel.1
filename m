@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0C2EC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 16:34:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5CFBC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 16:37:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3129522B2D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 16:34:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1DF29206BE
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 16:37:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hgqentZ6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3129522B2D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ILhYsBqm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DF29206BE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLqg2-0002gL-Rv
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 12:34:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47852)
+	id 1kLqis-00067F-5G
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 12:37:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47968)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kLqVM-0006ao-Gh
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 12:23:28 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43317)
+ id 1kLqVT-0006ja-Tb
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 12:23:36 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36391)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kLqVK-0006nl-Mt
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 12:23:28 -0400
-Received: by mail-wr1-x441.google.com with SMTP id k15so4191666wrn.10
- for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 09:23:26 -0700 (PDT)
+ id 1kLqVS-0006pJ-8t
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 12:23:35 -0400
+Received: by mail-wr1-x441.google.com with SMTP id z1so4249287wrt.3
+ for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 09:23:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=VdZoU9e76kBSToXFVSJBVTmzL794wmNQ6KcV8zhQ7b4=;
- b=hgqentZ6khbnd6AymvelNIDUhwdbfYAEnXEI+BtAb1q7Rc3+kgO6ud70hOqkSq/0cl
- zHMawED5WhPTUXwa+89A8N+ZiBmCt1vbhRlA6YKk9mn9wfEaeHmjPPsMj9lHrB0j0G0n
- TdO5NadrjLPVS4VoMuNp8Fx90B+54tjMHX4WI6rx0Hc4TCjtn/4OVAnnbC3a0EqcNVFg
- WH1F+e8NfPXq/rHlRwgkreVhC0tcUONoZUyFWm0mK+4DpzYopJa42f+0WRE047jf4Eja
- EQIh7pKdiDLikGik1XJPLlYqXf0jmyOXNVH78V7+MVhgle3MoKPvDEepRVlKdKXrvw/C
- +D0w==
+ bh=2fo9KhPCNYW+F0sc33/RwPCGaMMzyxHJl2mjQCHcWVQ=;
+ b=ILhYsBqm/G3LakPho1BoLo9PHmXUYJUJBYE5V0pHW3b7W/Rb56wkyFLqjKsLF2GjJt
+ oE/UFSqvdVbwCuDhSDzdWidtPWR+CZOY84TAM+js+LOItPPgIvw/SWU8KRnGsjyc8px9
+ uhYgtAn6ObsG5SQl960Yssa9cCUKGG42N1ejJHXubtErLhCUsEf0ivvkBYbvjuX8rZ5l
+ Wklg8xRVkGql/x8gQPPBBQC6oDH9kWYFI4S5uwLLHRcbNxzbkkl+bnmAtPKM1HlLLDBo
+ Ra7yTo5QuYKRINhYR+yh/etqUG0TXURd2clU6PSbYwT5BIRbg9K5BH2366Kb7Bm2ie1q
+ /RGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=VdZoU9e76kBSToXFVSJBVTmzL794wmNQ6KcV8zhQ7b4=;
- b=BYHo6VimWj3HDuBftK8FrcJRozsiwvlNo1/xiFMh+GNgJsZORiGUeNjAVy77FkBM/q
- rgSKU0XrHxBNu7msh3oZhiEw2F1kT7GCgimDSA8zs6pnAYIcsVNeKriK1juj5QU+BWAk
- 7CPyi5aXL9LcyefYGX75dCbZCik0Y+x9s2ZqNJ0hVIjSogarU+3mLKLvuQPNvZPvkaDp
- eAJCkoxbZFQYGQf9StuslREnCqqG8I1zObdQfqYzaXbcF/5fipQNKTbbmqLTmu5brGt4
- /y5wjrdWxBwGu5Y876b3ECL8DopnR/JQtKSbTfXzTgVW0VmUmJ9uswdXCSzKZriD8m29
- ubbw==
-X-Gm-Message-State: AOAM530GKcsX6NeVikoicw513gmuEEO7ADvzvDQLCvYkie0yxc6jiZNz
- KT6SYvw4g9v0rViNEe/kIA9LOfAT3PA6i2t+
-X-Google-Smtp-Source: ABdhPJwNSMLT6kSE8jCC8mah4/1KBNfT1WZvvm9uygtr0joveaeiDV027UiFnqNDW5+S+lAT250UCw==
-X-Received: by 2002:adf:a35d:: with SMTP id d29mr5326261wrb.307.1601051004929; 
- Fri, 25 Sep 2020 09:23:24 -0700 (PDT)
+ bh=2fo9KhPCNYW+F0sc33/RwPCGaMMzyxHJl2mjQCHcWVQ=;
+ b=iKm8xa3S/9yupv2sudNQKuUoITEgLtSBTlEmfHRrOOx39JMEyqu6ZOpNSwqADr3qx4
+ A/WEqCSMnl51ATArBUjuL+r1JSztqlb+7dSkCcgt+OwvR/rV60bK3j8LqhLWQbSBOJ6T
+ /MK3A0n0hoKzPOXirSOfD14nWh0CLFF3UC0nffWGbJ1R+cwngGfw8AF65PurAI5/MUpo
+ q+M6mMRvBXZxnCOsWAeuMziZCtKXwrJ0xOGDFDFStB6ZmS0sbrPmE/QRQN/l+FIskF/j
+ b6GFNWVxYzyEmBWY4bct9SCwn4JF02EbC+eJT9bG38t5iXwKUCkVZnCY24p+G+rCqNMU
+ YBYQ==
+X-Gm-Message-State: AOAM532+KqoXoERtvyZESylS0AskmSAffhyMcvj83ksJIKBpTnvJJcxX
+ nb7Mfuk1dOiwjVTT/BWSWHhH9CDl+rSV3nV6
+X-Google-Smtp-Source: ABdhPJymVcifPlwdaXncrMZQk3zFji1MGfBUxOHM34fO6zeF+X0bGouwxhS9Adgq2+0ThsGhzsJjiA==
+X-Received: by 2002:adf:e304:: with SMTP id b4mr5155282wrj.141.1601051012628; 
+ Fri, 25 Sep 2020 09:23:32 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id d6sm3565824wrq.67.2020.09.25.09.23.24
+ by smtp.gmail.com with ESMTPSA id d6sm3565824wrq.67.2020.09.25.09.23.31
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 25 Sep 2020 09:23:24 -0700 (PDT)
+ Fri, 25 Sep 2020 09:23:32 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 06/21] qapi/machine.json: Escape a literal '*' in doc
- comment
-Date: Fri, 25 Sep 2020 17:23:01 +0100
-Message-Id: <20200925162316.21205-7-peter.maydell@linaro.org>
+Subject: [PATCH v6 12/21] tests/qapi-schema: Convert doc-good.json to
+ rST-style strong/emphasis
+Date: Fri, 25 Sep 2020 17:23:07 +0100
+Message-Id: <20200925162316.21205-13-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200925162316.21205-1-peter.maydell@linaro.org>
 References: <20200925162316.21205-1-peter.maydell@linaro.org>
@@ -105,33 +105,74 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For rST, '*' is a kind of inline markup (for emphasis), so
-"*-softmmu" is a syntax error because of the missing closing '*'.
-Escape the '*' with a '\'.
+doc-good.json currently uses the old *strong* and _emphasis_ markup.
+As part of the conversion to rST this needs to switch to **strong**
+and *emphasis*, because rST uses underscores as part of its markup
+of hyperlinks and will otherwise warn about the syntax error.
 
-The texinfo document generator will leave the '\' in the
-output, which is not ideal, but that generator is going to
-go away in a subsequent commit.
+In commit a660eed482063b we fixed up the in-tree uses of the
+old markup:
+ 1) _this_ was replaced with *this*
+ 2) the only in-tree use of *this* was left alone (turning
+    a 'strong' into an 'emphasis')
+(and so currently in-tree nothing is using either new-style
+**strong** or old-style _emphasis_).
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Update doc-good.json in a similar way:
+ 1) replace _this_ with *this*
+ 2) remove the usage of old-style *this*
+
+(This slightly reduces the coverage for the old Texinfo generator,
+which is about to go away, but is fine for the new rST generator
+because that does not need to handle strong/emphasis itself because
+it is simply passing the entire text as raw rST to Sphinx.)
+
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- qapi/machine.json | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/qapi-schema/doc-good.json | 2 +-
+ tests/qapi-schema/doc-good.out  | 2 +-
+ tests/qapi-schema/doc-good.texi | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/qapi/machine.json b/qapi/machine.json
-index 0ac1880e4a4..9c45b04363c 100644
---- a/qapi/machine.json
-+++ b/qapi/machine.json
-@@ -13,7 +13,7 @@
+diff --git a/tests/qapi-schema/doc-good.json b/tests/qapi-schema/doc-good.json
+index c6822145c49..e9af0857db7 100644
+--- a/tests/qapi-schema/doc-good.json
++++ b/tests/qapi-schema/doc-good.json
+@@ -10,7 +10,7 @@
  #
- # The comprehensive enumeration of QEMU system emulation ("softmmu")
- # targets. Run "./configure --help" in the project root directory, and
--# look for the *-softmmu targets near the "--target-list" option. The
-+# look for the \*-softmmu targets near the "--target-list" option. The
- # individual target constants are not documented here, for the time
- # being.
+ # == Subsection
  #
+-# *strong* _with emphasis_
++# *with emphasis*
+ # @var {in braces}
+ #
+ # * List item one
+diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.out
+index b7e3f4313da..419284dae29 100644
+--- a/tests/qapi-schema/doc-good.out
++++ b/tests/qapi-schema/doc-good.out
+@@ -73,7 +73,7 @@ doc freeform
+     body=
+ == Subsection
+ 
+-*strong* _with emphasis_
++*with emphasis*
+ @var {in braces}
+ 
+ * List item one
+diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good.texi
+index 12808989ffb..29abef33e98 100644
+--- a/tests/qapi-schema/doc-good.texi
++++ b/tests/qapi-schema/doc-good.texi
+@@ -4,7 +4,7 @@
+ 
+ @subsection Subsection
+ 
+-@strong{strong} @emph{with emphasis}
++@strong{with emphasis}
+ @code{var} @{in braces@}
+ 
+ @itemize @bullet
 -- 
 2.20.1
 
