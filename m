@@ -2,68 +2,91 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEB72C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 03:52:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05C18C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 04:29:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D8B72086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 03:52:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6DE6620888
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 04:29:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="iKCH1GfG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D8B72086A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CF9bEA0Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DE6620888
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLemI-0001BG-D6
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 23:52:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54930)
+	id 1kLfLx-00071G-F2
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 00:29:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60924)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kLejF-0004yu-JZ; Thu, 24 Sep 2020 23:49:01 -0400
-Received: from ozlabs.org ([203.11.71.1]:38511)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kLejB-0004Nc-78; Thu, 24 Sep 2020 23:49:01 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4ByHvg1Qqjz9sSn; Fri, 25 Sep 2020 13:48:46 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1601005727;
- bh=oEqPO8N+6pn0spgwlvqMaaV5LG58LWG4+g4PdpRWsI8=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=iKCH1GfGVnmGD97tinCMsNZgJ1ydVsUS3OYe0TrXady1jLD3pOtBih4ST7/adCPzg
- SBdPPoO+dvLjdq2bOOTCm0/28llqP/i9mrE5i2ep7PHSxuZ1PKBWD4vw4xHjKOS0IZ
- m2FrYmOve9IE02UD0ISBAdEtgAPRYQsU66lQU6II=
-Date: Fri, 25 Sep 2020 13:39:45 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Daniel Henrique Barboza <danielhb413@gmail.com>
-Subject: Re: [PATCH v2 5/6] spapr_numa: consider user input when defining
- associativity
-Message-ID: <20200925033945.GT2298@yekko.fritz.box>
-References: <20200924195058.362984-1-danielhb413@gmail.com>
- <20200924195058.362984-6-danielhb413@gmail.com>
+ (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
+ id 1kLfLI-0006bd-2v
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 00:28:20 -0400
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:34510)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
+ id 1kLfLF-0000T8-Lz
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 00:28:19 -0400
+Received: by mail-io1-xd44.google.com with SMTP id m17so1406867ioo.1
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 21:28:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=wR4H4Y2nHt/Vl5c+Snggk/KwIir8bq5iQK/I5Iw0+ew=;
+ b=CF9bEA0YIQ06i6AGcr7YlrPpbikFyVNQCyZzPEKyJLrJq84XCJSCejMq7kgMUXg1GO
+ B7Qhv7seQ3o9Sp03gGzADlndAceoPpCoDPTI1UzvKL+vxxbygODj0kXFxF/a9i6Jzun2
+ eNdCWQbwLmktSIPEUHhEAYXkF5McTSOqYeBfqMdL7u2vmKs8meSTLTXR7AryDa+UBdM8
+ GxQYzslvyX0GrJpfsmVvhMsk50HKcgMARSDiQVQWxaCJObDwg3hgHC0MllCKKxxk6H/f
+ ucPgj00fY1JEVWsUa6Pfolu4mBXcjoRCL2cppxGa4b7l3bOVmxPJ/l9tfrfvgzdlMxlz
+ oSJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=wR4H4Y2nHt/Vl5c+Snggk/KwIir8bq5iQK/I5Iw0+ew=;
+ b=px7QobB6otnKoV1tOnP/ImJAjsQre69/n7vvowmWKCZSTkLAwMM4f+JhuiVjzBXBmR
+ tmlddkohqSJTJWdhKs+6dViEh4yBlLN6g6uNHZVnj62M0WBLS7bAiGXHRfZ/vfAXDCft
+ tpkhM/xuUC8DTGjcgiQxlWK5pLX8FwG7laA0XlKSNtMjyfHQb/n1E4Dx+tuaULKq9Dxm
+ x/8WMyR2nReTLqzd+b1d/9cuu88bSHjes8ZURDkVUKptNURw0vF3v/l0nnXop0gdN9Pt
+ sLx4+gQnvOzpQzRvVpHPUknUf0NZ9His4StRBBueyNFu+OjK5H6Xht+3Cet7BQ0j3ieA
+ T7Ew==
+X-Gm-Message-State: AOAM530CcMVS5rvQGdyo0GAF0KR3bK3cXmy5hY7RvX+Z7PiDIp2n68p3
+ sGZObxFy3I4xyxkUURya5X8PZCp2esV0PChh/do=
+X-Google-Smtp-Source: ABdhPJyCFLAS/d68Yl/TnWlXnriSHkC1jS9S66+5rwrADjyHNvSsmSNc5pGuAtKCI14v1RHVOM4Rug0vZieubjmw8C0=
+X-Received: by 2002:a6b:f413:: with SMTP id i19mr1921338iog.125.1601008095944; 
+ Thu, 24 Sep 2020 21:28:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="WQ40utMgiyDduspJ"
-Content-Disposition: inline
-In-Reply-To: <20200924195058.362984-6-danielhb413@gmail.com>
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 23:48:48
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.248,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+References: <1600222344-16808-1-git-send-email-chenhc@lemote.com>
+ <1600222344-16808-7-git-send-email-chenhc@lemote.com>
+ <c3804617-7c65-4082-de76-81e718f6d139@amsat.org>
+ <CAAhV-H5OysVNvGzD066eVqA+-k2+GJDjwSGR0hJT0VUh3Ld83A@mail.gmail.com>
+ <4a461bbc-3765-4d3c-7e7b-952dab564af1@amsat.org>
+In-Reply-To: <4a461bbc-3765-4d3c-7e7b-952dab564af1@amsat.org>
+From: Huacai Chen <chenhuacai@gmail.com>
+Date: Fri, 25 Sep 2020 12:28:02 +0800
+Message-ID: <CAAhV-H5UXE-BWgrF89kQMMsP1s0uzoRq05Jf2SxN5j72_quCPA@mail.gmail.com>
+Subject: Re: [PATCH V9 6/6] hw/mips: Add Loongson-3 machine support
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
+ envelope-from=chenhuacai@gmail.com; helo=mail-io1-xd44.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,284 +99,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org
+Cc: Huacai Chen <zltjiangshi@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi, Philippe,
 
---WQ40utMgiyDduspJ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Thu, Sep 24, 2020 at 11:40 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+>
+> On 9/16/20 11:49 AM, Huacai Chen wrote:
+> > Hi, Philippe,
+> >
+> > On Wed, Sep 16, 2020 at 3:56 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsa=
+t.org> wrote:
+> >>
+> >> Hi Huacai,
+> >>
+> >> On 9/16/20 4:12 AM, Huacai Chen wrote:
+> ...
+> >> hw/mips/loongson3_virt.c:373:15: note: each undeclared identifier is
+> >> reported only once for each function it appears in
+> >> hw/mips/loongson3_virt.c:373:15: error: excess elements in struct
+> >> initializer [-Werror]
+> >> hw/mips/loongson3_virt.c:373:15: note: (near initialization for 'freq_=
+reg')
+> >> hw/mips/loongson3_virt.c:374:9: error: unknown field 'addr' specified =
+in
+> >> initializer
+> >>          .addr =3D (uintptr_t)(&freq)
+> >>          ^
+> >> hw/mips/loongson3_virt.c:374:17: error: excess elements in struct
+> >> initializer [-Werror]
+> >>          .addr =3D (uintptr_t)(&freq)
+> >>                  ^
+> >> hw/mips/loongson3_virt.c:374:17: note: (near initialization for 'freq_=
+reg')
+> >> hw/mips/loongson3_virt.c:372:24: error: storage size of 'freq_reg' isn=
+'t
+> >> known
+> >>      struct kvm_one_reg freq_reg =3D {
+> >>                         ^
+> >> hw/mips/loongson3_virt.c:380:41: error: 'KVM_GET_ONE_REG' undeclared
+> >> (first use in this function)
+> >>          ret =3D kvm_vcpu_ioctl(first_cpu, KVM_GET_ONE_REG, &freq_reg)=
+;
+> >>                                          ^
+> >> hw/mips/loongson3_virt.c:372:24: error: unused variable 'freq_reg'
+> >> [-Werror=3Dunused-variable]
+> >>      struct kvm_one_reg freq_reg =3D {
+> >>                         ^
+> >> hw/mips/loongson3_virt.c: In function 'init_loongson_params':
+> >> hw/mips/loongson3_virt.c:467:25: error: cast from pointer to integer o=
+f
+> >> different size [-Werror=3Dpointer-to-int-cast]
+> >>      lp->memory_offset =3D (unsigned long long)init_memory_map(p)
+> >>                          ^
+> > I guess this happens on a 32bit platform where pointer is 32bit, and
+> > could you please suggest a best solution for this? Maybe use uintptr_t
+> > instead of unsigned long long?
+>
+> Since the machine doesn't have to know the EFI structures
+> layout, I'd change your method to fill EFI structures as i.e.:
+>
+> /*
+>  * @ptr: Pointer to fill
+>  * @size: Buffer size available at @ptr
+>  * Returns: Structure size filled on success, -1 on error.
+>  */
+> size_t fill_efi_memory_map_loongson(char *ptr, size_t size);
+>
+> And move that to hw/mips/loongson_efi.{c,h}.
+>
+> Then you don't need to worry about host pointer size, you just
+> exchange buffer/size, then caller can round up and increment an
+> offset.
+All boot parameters are located in a small region, so a uint32_t seems
+enough for xxx_offset, so uintptr_t is just OK, I think.
 
-On Thu, Sep 24, 2020 at 04:50:57PM -0300, Daniel Henrique Barboza wrote:
-> This patch puts all the pieces together to finally allow user
-> input when defining the NUMA topology of the spapr guest.
->=20
-> We have one more kernel restriction to handle in this patch:
-> the associativity array of node 0 must be filled with zeroes
-> [1]. The strategy below ensures that this will happen.
+>
+> BTW the EFI helpers are not endian safe.
+>
+> You should use the helpers described in docs/devel/loads-stores.rst:
+>
+> stw_le_p, stl_le_p(), ... (as I don't expect big-endian guests).
+This seems like a very big project, but I will do it in the next version.
 
-Can you clarify exactly what "node 0" means?  Qemu and the guest
-kernel each have node numberings, which I don't think are necessarily
-the same.  With PAPR's scheme, it's not totally clear what "node 0"
-even means.
-
-> spapr_numa_define_associativity_domains() will read the distance
-> (already PAPRified) between the nodes from numa_state and determine
-> the appropriate NUMA level. The NUMA domains, processed in ascending
-> order, are going to be matched via NUMA levels, and the lowest
-> associativity domain value is assigned to that specific level for
-> both.
->=20
-> This will create an heuristic where the associativities of the first
-> nodes have higher priority and are re-used in new matches, instead of
-> overwriting them with a new associativity match. This is necessary
-> because neither QEMU, nor the pSeries kernel, supports multiple
-> associativity domains for each resource, meaning that we have to
-> decide which associativity relation is relevant.
-
-Hmm.  I find that a bit hard to follow.  So IIUC, what's going on is
-you start out by treating every node as as distant as possible from
-every other: they have a unique value at every level of the
-associativity array.  Then you collapse together nodes that are
-supposed to be closer by making some of their associativity entries
-match.  Is that right?
-
-> Ultimately, all of this results in a best effort approximation for
-> the actual NUMA distances the user input in the command line. Given
-> the nature of how PAPR itself interprets NUMA distances versus the
-> expectations risen by how ACPI SLIT works, there might be better
-> algorithms but, in the end, it'll also result in another way to
-> approximate what the user really wanted.
->=20
-> To keep this commit message no longer than it already is, the next
-> patch will update the existing documentation in ppc-spapr-numa.rst
-> with more in depth details and design considerations/drawbacks.
->=20
-> [1] https://lore.kernel.org/linuxppc-dev/5e8fbea3-8faf-0951-172a-b41a2138=
-fbcf@gmail.com/
->=20
-> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-> ---
->  hw/ppc/spapr_numa.c | 101 +++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 100 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
-> index ea33439a15..21cae3f799 100644
-> --- a/hw/ppc/spapr_numa.c
-> +++ b/hw/ppc/spapr_numa.c
-> @@ -80,12 +80,99 @@ static void spapr_numa_PAPRify_distances(MachineState=
- *ms)
->      }
->  }
-> =20
-> +static uint8_t spapr_numa_get_numa_level(uint8_t distance)
-> +{
-> +    uint8_t numa_level;
-
-This function reinforces my feeling that pre-PAPRizing the distances
-might not be the best idea.  It could go directly from the user
-distance to level just as easily.
-
-> +
-> +    switch (distance) {
-> +    case 10:
-> +        numa_level =3D 0x4;
-> +        break;
-> +    case 20:
-> +        numa_level =3D 0x3;
-> +        break;
-> +    case 40:
-> +        numa_level =3D 0x2;
-> +        break;
-> +    case 80:
-> +        numa_level =3D 0x1;
-> +        break;
-> +    default:
-> +        numa_level =3D 0;
-> +    }
-> +
-> +    return numa_level;
-> +}
-> +
-> +static void spapr_numa_define_associativity_domains(SpaprMachineState *s=
-papr)
-> +{
-> +    MachineState *ms =3D MACHINE(spapr);
-> +    NodeInfo *numa_info =3D ms->numa_state->nodes;
-> +    int nb_numa_nodes =3D ms->numa_state->num_nodes;
-> +    int src, dst;
-> +
-> +    for (src =3D 0; src < nb_numa_nodes; src++) {
-> +        for (dst =3D src; dst < nb_numa_nodes; dst++) {
-> +            /*
-> +             * This is how the associativity domain between A and B
-> +             * is calculated:
-> +             *
-> +             * - get the distance between them
-> +             * - get the correspondent NUMA level for this distance
-> +             * - the arrays were initialized with their own numa_ids,
-> +             * and we're calculating the distance in node_id ascending o=
-rder,
-> +             * starting from node 0. This will have a cascade effect in =
-the
-> +             * algorithm because the associativity domains that node 0 d=
-efines
-> +             * will be carried over to the other nodes, and node 1
-> +             * associativities will be carried over unless there's alrea=
-dy a
-> +             * node 0 associativity assigned, and so on. This happens be=
-cause
-> +             * we'll assign the lowest value of assoc_src and assoc_dst =
-to be
-> +             * the associativity domain of both, for the given NUMA leve=
-l.
-
-Ok, I follow this description better than the one in the commit message.
-
-> +             * The PPC kernel expects the associativity domains of node =
-0 to
-> +             * be always 0, and this algorithm will grant that by defaul=
-t.
-> +             */
-> +            uint8_t distance =3D numa_info[src].distance[dst];
-> +            uint8_t n_level =3D spapr_numa_get_numa_level(distance);
-> +            uint32_t assoc_src, assoc_dst;
-> +
-> +            /*
-> +             * n_level =3D 0 means that the distance is greater than our=
- last
-> +             * rounded value (120). In this case there is no NUMA level =
-match
-> +             * between src and dst and we can skip the remaining of the =
-loop.
-> +             *
-> +             * The Linux kernel will assume that the distance between sr=
-c and
-> +             * dst, in this case of no match, is 10 (local distance) dou=
-bled
-> +             * for each NUMA it didn't match. We have MAX_DISTANCE_REF_P=
-OINTS
-> +             * levels (4), so this gives us 10*2*2*2*2 =3D 160.
-> +             *
-> +             * This logic can be seen in the Linux kernel source code, a=
-s of
-> +             * v5.9, in arch/powerpc/mm/numa.c, function __node_distance=
-().
-> +             */
-> +            if (n_level =3D=3D 0) {
-> +                continue;
-> +            }
-> +
-> +            assoc_src =3D be32_to_cpu(spapr->numa_assoc_array[src][n_lev=
-el]);
-> +            assoc_dst =3D be32_to_cpu(spapr->numa_assoc_array[dst][n_lev=
-el]);
-> +
-> +            if (assoc_src < assoc_dst) {
-
-So, I don't think you need this logic.  It doesn't really matter which
-associativity value you let win, as long as you're consistent.  So you
-can just base it on src < dst, rather than assooc_src < assoc_dst.
-But src <=3D dst always, because of the way you've constructed the loops.
-
-> +                spapr->numa_assoc_array[dst][n_level] =3D cpu_to_be32(as=
-soc_src);
-> +            } else {
-> +                spapr->numa_assoc_array[src][n_level] =3D cpu_to_be32(as=
-soc_dst);
-> +            }
-
-Don't you need to match the values a all levels >=3D n_level, rather
-than just n_level?  AFAICT it doesn't make sense for two components to
-be in the same associativity domain at one level, but different
-domains at "bigger" levels (i.e. something like two cores sharing an
-L2 cache, but not an L3 cache).
-
-> +        }
-> +    }
-> +
-> +}
-> +
->  void spapr_numa_associativity_init(SpaprMachineState *spapr,
->                                     MachineState *machine)
->  {
->      SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
->      int nb_numa_nodes =3D machine->numa_state->num_nodes;
->      int i, j, max_nodes_with_gpus;
-> +    bool using_legacy_numa =3D spapr_machine_using_legacy_numa(spapr);
-> =20
->      /*
->       * For all associativity arrays: first position is the size,
-> @@ -99,6 +186,17 @@ void spapr_numa_associativity_init(SpaprMachineState =
-*spapr,
->      for (i =3D 0; i < nb_numa_nodes; i++) {
->          spapr->numa_assoc_array[i][0] =3D cpu_to_be32(MAX_DISTANCE_REF_P=
-OINTS);
->          spapr->numa_assoc_array[i][MAX_DISTANCE_REF_POINTS] =3D cpu_to_b=
-e32(i);
-> +
-> +        /*
-> +         * Fill all associativity domains of non-zero NUMA nodes with
-> +         * node_id. This is required because the default value (0) is
-> +         * considered a match with associativity domains of node 0.
-> +         */
-> +        if (!using_legacy_numa && i !=3D 0) {
-> +            for (j =3D 1; j < MAX_DISTANCE_REF_POINTS; j++) {
-> +                spapr->numa_assoc_array[i][j] =3D cpu_to_be32(i);
-> +            }
-> +        }
->      }
-> =20
->      /*
-> @@ -128,7 +226,7 @@ void spapr_numa_associativity_init(SpaprMachineState =
-*spapr,
->       * 1 NUMA node) will not benefit from anything we're going to do
->       * after this point.
->       */
-> -    if (spapr_machine_using_legacy_numa(spapr)) {
-> +    if (using_legacy_numa) {
->          return;
->      }
-> =20
-> @@ -139,6 +237,7 @@ void spapr_numa_associativity_init(SpaprMachineState =
-*spapr,
->      }
-> =20
->      spapr_numa_PAPRify_distances(machine);
-> +    spapr_numa_define_associativity_domains(spapr);
->  }
-> =20
->  void spapr_numa_write_associativity_dt(SpaprMachineState *spapr, void *f=
-dt,
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---WQ40utMgiyDduspJ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9tZn8ACgkQbDjKyiDZ
-s5IbdQ/5AfH/h8xdBjBZ+Hht4Gozpz2BxkYZhI70LAFW1F+iSSvTxoaiyl9voFUL
-fRWQZj3nCMKjPFvQNGvcs/Qn/VdIZXzuoZumjG1qlaUtzegw28gtKSp4F2nKG0zf
-aYj3q2Kvzdmkm9LRCM1yr3/VWgj1nGeMw/P0G/eSxDx/hUXnB3VRb8pf989OB9I9
-5d66oET5VSoWR6YmpxwQUxsfQA1bcBk8eZbesEaXSI5i5gWo4g3aNWzaE7to0GXT
-WT4jdyStuXK30ey0SyLAClZIQHgiytgDm0sP8kUWtzua24k3JqIP5Khd+ulMOf69
-pAIOIJlyO9WqlJz2aYc2L6V5y7mPY0tgGWhPWDGxZc37L5DHnvmBUIbJuKAXvT0e
-YlCktwaYqUc1yij2nzYeBxHyHuxOx2Uqp50w+ZJGtwF3wWK3ZyPRb++HG+NXdp0u
-UtbJ/WwPnyr0xpg4D9dOcVBtBvA47tV9MSz6+fjbmi91U1oOqK/xBHx8hpsbZaUF
-vKxqmHi4fwMkYbNSNxior7yJ+c9NJffqAa7nWRTzuXXws4vV+NfEmGTJ9lK9zN8Q
-L2/CWMOaLmCh1zfHYO8swXbRxaV/HF3acZ5epA8lwAGZ47+th98gbWU7/7FPW0rp
-1Nyag22tR+42/PK3Xf0TXvNWmhn9YgjfjVOGHqS9Hg0C2OOxMLk=
-=jCGC
------END PGP SIGNATURE-----
-
---WQ40utMgiyDduspJ--
+Huacai
+>
+> Regards,
+>
+> Phil.
 
