@@ -2,90 +2,91 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CF5CC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 15:30:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6F43C4727D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 15:30:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E7C1235F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 15:30:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 511F9235F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 15:30:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SvR7Fdt4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E7C1235F9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OiKnVN91"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 511F9235F9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53696 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLpfq-0001FY-Pb
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 11:30:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32978)
+	id 1kLpfs-0001Ie-Dp
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 11:30:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59794)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLpcj-0007V5-9e
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:27:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44554)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLpce-000608-Mb
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:26:59 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601047614;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Z0aAjiEtVKflvNPNUmcX9DtyJuRpNn//Z3u1D3l1s7c=;
- b=SvR7Fdt4VsjmeA6ayY/p13enE2KIJjsLLpV4XEFjp592z2bWgLiHuVwh4P11gdCqpS3hti
- 634Qe9s/10XUchRsbZL8x87jvPNQp6287sI7sGAMnE0eYGLp9RKvaGk273zDuDHES5vs4G
- aPEsuAtJT7UJbzdWdG12UgGEruE6hEk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-102-VpgI5QKPOgamfRnjzV-jDw-1; Fri, 25 Sep 2020 11:26:52 -0400
-X-MC-Unique: VpgI5QKPOgamfRnjzV-jDw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1197F807344
- for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 15:26:52 +0000 (UTC)
-Received: from [10.10.119.140] (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6470F5D9F3;
- Fri, 25 Sep 2020 15:26:51 +0000 (UTC)
-Subject: Re: [PATCH v3 12/47] qapi: enforce import order/styling with isort
-To: Markus Armbruster <armbru@redhat.com>
-References: <20200925002900.465855-1-jsnow@redhat.com>
- <20200925002900.465855-13-jsnow@redhat.com>
- <87imc2w6uf.fsf@dusky.pond.sub.org>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <8baab976-1dfd-a7b4-1a1e-47480cf0c4b6@redhat.com>
-Date: Fri, 25 Sep 2020 11:26:50 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kLpWt-00013i-RT
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:20:59 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:35903)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kLpWs-0005RI-1A
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:20:59 -0400
+Received: by mail-pf1-x441.google.com with SMTP id d9so3520005pfd.3
+ for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 08:20:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=UqQqsLP6qYPuAh+FMkFGchn7mynGi7GNJsDQP3A30QE=;
+ b=OiKnVN91aBweyamlSCjk0SaZouoMY1iYZUf3pZWoda1TxCUEC8IdUtYaH6L1nrFCYY
+ KP32aPS1nYAv52mgEJimPKWzySn4WHNheeizJlD0oEz/Tg2bxbsA30+7hAPAeqn6nve9
+ Cfxb1qfVzXfrz9GGjv/Jt+v0ODO1nOP1N8OjRLDry29TnEHfz4GQ1nVrfYe8Fazot11I
+ 17y+i7u6zd3/uNg/QaGQBJyikSVVVBXWdLroV7LGhSLNfHjaV7PU5SezhvwUjNnF05EP
+ G8O2bNFj+EOv1TiuAsZqvkXz3Zeo47VUYS9VJsFUMinXbU1ZNRWLs+QaNwxkJ/oZIYTZ
+ dPLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=UqQqsLP6qYPuAh+FMkFGchn7mynGi7GNJsDQP3A30QE=;
+ b=FnnTlZxGxKkCvUuvCoXzVH8LMeddDIlC2gFwAWQzUxSEhw2nho8khVgNorcZlLd4Yr
+ MfRziTFWUliB0kkQBDDN56ltmLKWHvCMO8mnAfaEmlaMJX7+qSukgsJ6hQ9hiNV+yWkK
+ kTdkaZSVQQErwUvB3bC0Qwcj+fO4XTxEIGF07pH8b5caGZ/0pyFKlNkAYKJpM6SldYzk
+ RNjGFPSUeqRhXBO+Cpq5g/r/KPOvHgw6inYv+UnGv+GsitrTmf2P7Y+R9aF6BZVuLZHZ
+ 5JmiHRgmymyCMCn6B9C3EUyKEsg33VsPjifeGZnSlKkXEgDmfxus1Pf4EYVX6LDccL4g
+ CT6g==
+X-Gm-Message-State: AOAM531tBsIJnHcV8hpZYzdeomsaN89bs4rtoi5Ckgkzj1ThzdZPUI61
+ XERRQcCtyRYC5tRj388PciWGbzKH1lOK6A==
+X-Google-Smtp-Source: ABdhPJzOcwpx0gcIDdFnWkfdUPaWe5iqpKyxO3QIEuYD2zJ0NfzhA1wuSM0E+9G4Ony0d3WI4+3FSQ==
+X-Received: by 2002:a62:7b94:0:b029:142:2501:35e4 with SMTP id
+ w142-20020a627b940000b0290142250135e4mr4582809pfc.68.1601047256226; 
+ Fri, 25 Sep 2020 08:20:56 -0700 (PDT)
+Received: from localhost.localdomain ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id a5sm2717859pgk.13.2020.09.25.08.20.55
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 25 Sep 2020 08:20:55 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 05/10] softfloat: Inline pick_nan_muladd into its caller
+Date: Fri, 25 Sep 2020 08:20:42 -0700
+Message-Id: <20200925152047.709901-6-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200925152047.709901-1-richard.henderson@linaro.org>
+References: <20200925152047.709901-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <87imc2w6uf.fsf@dusky.pond.sub.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 01:07:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -34
-X-Spam_score: -3.5
-X-Spam_bar: ---
-X-Spam_report: (-3.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.238, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,164 +100,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: bharata@linux.ibm.com, alex.bennee@linaro.org, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/25/20 5:20 AM, Markus Armbruster wrote:
-> John Snow <jsnow@redhat.com> writes:
-> 
->> While we're mucking around with imports, we might as well formalize the
->> style we use. Let's use isort to do it for us.
->>
->> force_sort_within_sections: Intermingles "from x" and "import x" style
->> statements, such that sorting is always performed strictly on the module
->> name itself.
->>
->> force_grid_wrap=4: Four or more imports from a single module will force
->> the one-per-line style that's more git-friendly. This will generally
->> happen for 'typing' imports.
->>
->> multi_line_output=3: Uses the one-per-line indented style for long
->> imports.
->>
->> include_trailing_comma: Adds a comma to the last import in a group,
->> which makes git conflicts nicer to deal with, generally.
->>
->> Suggested-by: Cleber Rosa <crosa@redhat.com>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>   scripts/qapi/.isort.cfg    | 5 +++++
->>   scripts/qapi/commands.py   | 6 +-----
->>   scripts/qapi/doc.py        | 2 +-
->>   scripts/qapi/expr.py       | 4 ++--
->>   scripts/qapi/introspect.py | 3 +--
->>   scripts/qapi/main.py       | 1 -
->>   scripts/qapi/parser.py     | 2 +-
->>   scripts/qapi/schema.py     | 2 +-
->>   scripts/qapi/types.py      | 1 -
->>   9 files changed, 12 insertions(+), 14 deletions(-)
->>   create mode 100644 scripts/qapi/.isort.cfg
->>
->> diff --git a/scripts/qapi/.isort.cfg b/scripts/qapi/.isort.cfg
->> new file mode 100644
->> index 0000000000..b0aeffec26
->> --- /dev/null
->> +++ b/scripts/qapi/.isort.cfg
->> @@ -0,0 +1,5 @@
->> +[settings]
->> +force_sort_within_sections=True
->> +force_grid_wrap=4
->> +multi_line_output=3
->> +include_trailing_comma=True
->> diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
->> index e1df0e341f..64ed5278f9 100644
->> --- a/scripts/qapi/commands.py
->> +++ b/scripts/qapi/commands.py
->> @@ -13,11 +13,7 @@
->>   See the COPYING file in the top-level directory.
->>   """
->>   
->> -from .common import (
->> -    build_params,
->> -    c_name,
->> -    mcgen,
->> -)
->> +from .common import build_params, c_name, mcgen
->>   from .gen import QAPIGenCCode, QAPISchemaModularCVisitor, ifcontext
-> 
-> Squash this hunk into the previous commit, please.
-> 
+Because of FloatParts, there will only ever be one caller.
+Inlining allows us to re-use abc_mask for the snan test.
 
-Yes, OK.
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ fpu/softfloat.c | 75 +++++++++++++++++++++++--------------------------
+ 1 file changed, 35 insertions(+), 40 deletions(-)
 
->>   
->>   
->> diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
->> index b764a8ccc0..1acb773e0a 100644
->> --- a/scripts/qapi/doc.py
->> +++ b/scripts/qapi/doc.py
->> @@ -5,9 +5,9 @@
->>   """This script produces the documentation of a qapi schema in texinfo format"""
->>   
->>   import re
->> +
->>   from .gen import QAPIGenDoc, QAPISchemaVisitor
->>   
->> -
-> 
-> Do you delete the blank line to keep isort happy?
-> 
-
-isort offers to actually edit your files for you, it isn't just a 
-checker, it actually rewrites.
-
-By default, it leaves one space below imports. You can configure it to 
-add two. I didn't really have a strong preference, so I left it at the 
-default.
-
-I'm going to leave it at the default for now, but I can change it if you 
-have a preference.
-
-> More of the same below.
-> 
->>   _MSG = '''
->>   @deftypefn {type} {{}} {name}
->>   
->> diff --git a/scripts/qapi/expr.py b/scripts/qapi/expr.py
->> index 03b31ecfc1..3e952a1462 100644
->> --- a/scripts/qapi/expr.py
->> +++ b/scripts/qapi/expr.py
->> @@ -14,12 +14,12 @@
->>   # This work is licensed under the terms of the GNU GPL, version 2.
->>   # See the COPYING file in the top-level directory.
->>   
->> -import re
->>   from collections import OrderedDict
->> +import re
->> +
->>   from .common import c_name
->>   from .error import QAPISemError
->>   
->> -
->>   # Names must be letters, numbers, -, and _.  They must start with letter,
->>   # except for downstream extensions which must start with __RFQDN_.
->>   # Dots are only valid in the downstream extension prefix.
->> diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
->> index b036fcf9ce..2850121cbd 100644
->> --- a/scripts/qapi/introspect.py
->> +++ b/scripts/qapi/introspect.py
->> @@ -17,8 +17,7 @@
->>       mcgen,
->>   )
->>   from .gen import QAPISchemaMonolithicCVisitor
->> -from .schema import (QAPISchemaArrayType, QAPISchemaBuiltinType,
->> -                     QAPISchemaType)
->> +from .schema import QAPISchemaArrayType, QAPISchemaBuiltinType, QAPISchemaType
-> 
-> Line is rather long for my taste.
-> 
-
-78 chars and three names, so it didn't trigger the grid-wrap condition 
-of isort.
-
-If you have an arbitrarily smaller number you'd like to use, I can feed 
-that to isort's config file. 72?
-
-> So far, we didn't even try to have a consistent Python style in QEMU, so
-> I've enforced a consistent style I like within QAPI.
-> 
-
-I am now trying!
-
-> Having a consistent Python style in QEMU would be worth letting go of
-> personal preferences.  Do you intend to pursue it?
-> 
-
-100%.
-
---js
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 3e625c47cd..e038434a07 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -929,45 +929,6 @@ static FloatParts pick_nan(FloatParts a, FloatParts b, float_status *s)
+     return a;
+ }
+ 
+-static FloatParts pick_nan_muladd(FloatParts a, FloatParts b, FloatParts c,
+-                                  bool inf_zero, float_status *s)
+-{
+-    int which;
+-
+-    if (is_snan(a.cls) || is_snan(b.cls) || is_snan(c.cls)) {
+-        s->float_exception_flags |= float_flag_invalid;
+-    }
+-
+-    which = pickNaNMulAdd(a.cls, b.cls, c.cls, inf_zero, s);
+-
+-    if (s->default_nan_mode) {
+-        /* Note that this check is after pickNaNMulAdd so that function
+-         * has an opportunity to set the Invalid flag.
+-         */
+-        which = 3;
+-    }
+-
+-    switch (which) {
+-    case 0:
+-        break;
+-    case 1:
+-        a = b;
+-        break;
+-    case 2:
+-        a = c;
+-        break;
+-    case 3:
+-        return parts_default_nan(s);
+-    default:
+-        g_assert_not_reached();
+-    }
+-
+-    if (is_snan(a.cls)) {
+-        return parts_silence_nan(a, s);
+-    }
+-    return a;
+-}
+-
+ /*
+  * Returns the result of adding or subtracting the values of the
+  * floating-point values `a' and `b'. The operation is performed
+@@ -1366,7 +1327,41 @@ static FloatParts muladd_floats(FloatParts a, FloatParts b, FloatParts c,
+      * off to the target-specific pick-a-NaN routine.
+      */
+     if (unlikely(abc_mask & float_cmask_anynan)) {
+-        return pick_nan_muladd(a, b, c, inf_zero, s);
++        int which;
++
++        if (unlikely(abc_mask & float_cmask_snan)) {
++            float_raise(float_flag_invalid, s);
++        }
++
++        which = pickNaNMulAdd(a.cls, b.cls, c.cls, inf_zero, s);
++
++        if (s->default_nan_mode) {
++            /*
++             * Note that this check is after pickNaNMulAdd so that function
++             * has an opportunity to set the Invalid flag for inf_zero.
++             */
++            which = 3;
++        }
++
++        switch (which) {
++        case 0:
++            break;
++        case 1:
++            a = b;
++            break;
++        case 2:
++            a = c;
++            break;
++        case 3:
++            return parts_default_nan(s);
++        default:
++            g_assert_not_reached();
++        }
++
++        if (is_snan(a.cls)) {
++            return parts_silence_nan(a, s);
++        }
++        return a;
+     }
+ 
+     if (unlikely(inf_zero)) {
+-- 
+2.25.1
 
 
