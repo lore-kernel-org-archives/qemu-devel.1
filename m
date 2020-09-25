@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20E84C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 03:50:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A9D0C4727E
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 03:50:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2223206CC
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 03:50:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4F50F206CC
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 03:50:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="SEnVw+m3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2223206CC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="E94OS26X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F50F206CC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46110 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLekK-0006aM-MH
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 23:50:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54900)
+	id 1kLekL-0006ah-AZ
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 23:50:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54928)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kLejD-0004yW-Se; Thu, 24 Sep 2020 23:48:59 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:58071)
+ id 1kLejF-0004yo-BL; Thu, 24 Sep 2020 23:49:01 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:57799 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kLejB-0004Ne-GU; Thu, 24 Sep 2020 23:48:59 -0400
+ id 1kLejB-0004Na-UY; Thu, 24 Sep 2020 23:49:01 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4ByHvf6sjyz9sSf; Fri, 25 Sep 2020 13:48:46 +1000 (AEST)
+ id 4ByHvf3lwSz9sSJ; Fri, 25 Sep 2020 13:48:45 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1601005726;
- bh=aztyh5kRnN3IjMd+gwz8A9KzQM5vU2R11UVtnsH8Mzk=;
+ bh=MdW6sXukn7vg5MJvG2HlZEd0/aOSKSG9CbfcB31TQd0=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=SEnVw+m3PR/ZsORGzgF0FSrmH2IldAr4Y/RKa8WhqKS2bMTQukE7Sezh0ftiy6Z8t
- jsMgqV0PAvwxGaE7FKa0TgjldOixZxrnRj3ZTVv9PTItmfSHceQwuyHkZRg1pYT1Uq
- eK9xJhoIq7T6ZCjTYxkuxkBXUqslj+tJcwJ6F50U=
-Date: Fri, 25 Sep 2020 12:38:43 +1000
+ b=E94OS26XB7wsufEqZTbbX1Sjo4uaWAEnx0D6QRy4HE45jvWr4tlOkWn1l723Z+Rqn
+ 7IS46gntmgvxeE4YtPDTNixP5fnpWMCfMxu7bzvXyN/x3Vc3nlKIvStqcNu/oC/8x6
+ 55WwsmOpsOoaBCqO0toYyTqCG/2HNQxb8Iwqqsq8=
+Date: Fri, 25 Sep 2020 12:35:24 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Daniel Henrique Barboza <danielhb413@gmail.com>
-Subject: Re: [PATCH v2 4/6] spapr_numa: change reference-points and maxdomain
- settings
-Message-ID: <20200925023843.GS2298@yekko.fritz.box>
+Subject: Re: [PATCH v2 3/6] spapr_numa: translate regular NUMA distance to
+ PAPR distance
+Message-ID: <20200925023524.GQ2298@yekko.fritz.box>
 References: <20200924195058.362984-1-danielhb413@gmail.com>
- <20200924195058.362984-5-danielhb413@gmail.com>
+ <20200924195058.362984-4-danielhb413@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="9wW3yB/H9ZmnRBtb"
+ protocol="application/pgp-signature"; boundary="3wfpuDtTLg8/Vq6g"
 Content-Disposition: inline
-In-Reply-To: <20200924195058.362984-5-danielhb413@gmail.com>
+In-Reply-To: <20200924195058.362984-4-danielhb413@gmail.com>
 Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
@@ -82,104 +82,130 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---9wW3yB/H9ZmnRBtb
+--3wfpuDtTLg8/Vq6g
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 24, 2020 at 04:50:56PM -0300, Daniel Henrique Barboza wrote:
-> This is the first guest visible change introduced in
-> spapr_numa.c. The previous settings of both reference-points
-> and maxdomains were too restrictive, but enough for the
-> existing associativity we're setting in the resources.
+On Thu, Sep 24, 2020 at 04:50:55PM -0300, Daniel Henrique Barboza wrote:
+> QEMU allows the user to set NUMA distances in the command line.
+> For ACPI architectures like x86, this means that user input is
+> used to populate the SLIT table, and the guest perceives the
+> distances as the user chooses to.
 >=20
-> We'll change that in the following patches, populating the
-> associativity arrays based on user input. For those changes
-> to be effective, reference-points and maxdomains must be
-> more flexible. After this patch, we'll have 4 distinct
-> levels of NUMA (0x4, 0x3, 0x2, 0x1) and maxdomains will
-> allow for any type of configuration the user intends to
-> do - under the scope and limitations of PAPR itself, of
-> course.
+> PPC64 does not work that way. In the PAPR concept of NUMA,
+> associativity relations between the NUMA nodes are provided by
+> the device tree, and the guest kernel is free to calculate the
+> distances as it sees fit. Given how ACPI architectures works,
+> this puts the pSeries machine in a strange spot - users expect
+> to define NUMA distances like in the ACPI case, but QEMU does
+> not have control over it. To give pSeries users a similar
+> experience, we'll need to bring kernel specifics to QEMU
+> to approximate the NUMA distances.
+>=20
+> The pSeries kernel works with the NUMA distance range 10,
+> 20, 40, 80 and 160. The code starts at 10 (local distance) and
+> searches for a match in the first NUMA level between the
+> resources. If there is no match, the distance is doubled and
+> then it proceeds to try to match in the next NUMA level. Rinse
+> and repeat for MAX_DISTANCE_REF_POINTS levels.
+>=20
+> This patch introduces a spapr_numa_PAPRify_distances() helper
+> that translates the user distances to kernel distance, which
+> we're going to use to determine the associativity domains for
+> the NUMA nodes.
 >=20
 > Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+The idea of rounding the distances like this seems pretty good to me.
+Since each level is a multiple of a distance from the preivous one it
+might be more theoretically correct to place the thresholds at the
+geometric mean between each level, rather than the arithmetic mean.  I
+very much doubt it makes much different in practice though, and this
+is simpler.
 
-Although..
+There is one nit, I'm less happy with though..
 
 > ---
->  hw/ppc/spapr_numa.c | 40 ++++++++++++++++++++++++++++++++--------
->  1 file changed, 32 insertions(+), 8 deletions(-)
+>  hw/ppc/spapr_numa.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 44 insertions(+)
 >=20
 > diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
-> index 990a5fce08..ea33439a15 100644
+> index fe395e80a3..990a5fce08 100644
 > --- a/hw/ppc/spapr_numa.c
 > +++ b/hw/ppc/spapr_numa.c
-> @@ -222,24 +222,48 @@ int spapr_numa_write_assoc_lookup_arrays(SpaprMachi=
-neState *spapr, void *fdt,
->   */
->  void spapr_numa_write_rtas_dt(SpaprMachineState *spapr, void *fdt, int r=
-tas)
->  {
-> +    MachineState *ms =3D MACHINE(spapr);
->      SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
->      uint32_t refpoints[] =3D {
->          cpu_to_be32(0x4),
-> -        cpu_to_be32(0x4),
-> +        cpu_to_be32(0x3),
->          cpu_to_be32(0x2),
-> +        cpu_to_be32(0x1),
->      };
->      uint32_t nr_refpoints =3D ARRAY_SIZE(refpoints);
-> -    uint32_t maxdomain =3D cpu_to_be32(spapr->gpu_numa_id > 1 ? 1 : 0);
-> +    uint32_t maxdomain =3D ms->numa_state->num_nodes + spapr->gpu_numa_i=
-d;
->      uint32_t maxdomains[] =3D {
->          cpu_to_be32(4),
-> -        maxdomain,
-> -        maxdomain,
-> -        maxdomain,
-> -        cpu_to_be32(spapr->gpu_numa_id),
-> +        cpu_to_be32(maxdomain),
-> +        cpu_to_be32(maxdomain),
-> +        cpu_to_be32(maxdomain),
-> +        cpu_to_be32(maxdomain)
->      };
+> @@ -37,6 +37,49 @@ static bool spapr_numa_is_symmetrical(MachineState *ms)
+>      return true;
+>  }
 > =20
-> -    if (smc->pre_5_1_assoc_refpoints) {
-> -        nr_refpoints =3D 2;
-> +    if (spapr_machine_using_legacy_numa(spapr)) {
-> +        uint32_t legacy_refpoints[] =3D {
-> +            cpu_to_be32(0x4),
-> +            cpu_to_be32(0x4),
-> +            cpu_to_be32(0x2),
-> +        };
-> +        uint32_t legacy_maxdomain =3D spapr->gpu_numa_id > 1 ? 1 : 0;
-> +        uint32_t legacy_maxdomains[] =3D {
-> +            cpu_to_be32(4),
-> +            cpu_to_be32(legacy_maxdomain),
-> +            cpu_to_be32(legacy_maxdomain),
-> +            cpu_to_be32(legacy_maxdomain),
-> +            cpu_to_be32(spapr->gpu_numa_id),
-> +        };
+> +/*
+> + * This function will translate the user distances into
+> + * what the kernel understand as possible values: 10
+> + * (local distance), 20, 40, 80 and 160. Current heuristic
+> + * is:
+> + *
+> + *  - distances between 11 and 30 inclusive -> rounded to 20
+> + *  - distances between 31 and 60 inclusive -> rounded to 40
+> + *  - distances between 61 and 120 inclusive -> rounded to 80
+> + *  - everything above 120 -> 160
+> + *
+> + * This step can also be done in the same time as the NUMA
+> + * associativity domains calculation, at the cost of extra
+> + * complexity. We chose to keep it simpler.
+> + *
+> + * Note: this will overwrite the distance values in
+> + * ms->numa_state->nodes.
+> + */
+> +static void spapr_numa_PAPRify_distances(MachineState *ms)
+> +{
+> +    int src, dst;
+> +    int nb_numa_nodes =3D ms->numa_state->num_nodes;
+> +    NodeInfo *numa_info =3D ms->numa_state->nodes;
 > +
-> +        nr_refpoints =3D 3;
+> +    for (src =3D 0; src < nb_numa_nodes; src++) {
+> +        for (dst =3D src; dst < nb_numa_nodes; dst++) {
+> +            uint8_t distance =3D numa_info[src].distance[dst];
+> +            uint8_t rounded_distance =3D 160;
 > +
-> +        memcpy(refpoints, legacy_refpoints, sizeof(legacy_refpoints));
-> +        memcpy(maxdomains, legacy_maxdomains, sizeof(legacy_maxdomains));
+> +            if (distance > 11 && distance <=3D 30) {
+> +                rounded_distance =3D 20;
+> +            } else if (distance > 31 && distance <=3D 60) {
+> +                rounded_distance =3D 40;
+> +            } else if (distance > 61 && distance <=3D 120) {
+> +                rounded_distance =3D 80;
+> +            }
+> +
+> +            numa_info[src].distance[dst] =3D rounded_distance;
+> +            numa_info[dst].distance[src] =3D rounded_distance;
 
-It would be nice to have a G_STATIC_ASSERT() or QEMU_BUILD_BUG_MSG()
-ro ensure that the two structures are the same size, if they became
-different the memcpy is wildly unsafe.
+=2E.I don't love the fact that we alter the distance table in place.
+Even though it was never exposed to the guest, I'd prefer not to
+destroy the information the user passed in.  It could lead to
+surprising results with QMP introspection, and it may make future
+extensions more difficult.
 
-> +        /* pseries-5.0 and older reference-points array is {0x4, 0x4} */
-> +        if (smc->pre_5_1_assoc_refpoints) {
-> +            nr_refpoints =3D 2;
+So I'd prefer to either (a) just leave the table as is and round
+on-demand with a paprify_distance(NN) -> {20,40,80,..} type function,
+or (b) create a parallel, spapr local, table with the rounded
+distances
+
 > +        }
+> +    }
+> +}
+> +
+>  void spapr_numa_associativity_init(SpaprMachineState *spapr,
+>                                     MachineState *machine)
+>  {
+> @@ -95,6 +138,7 @@ void spapr_numa_associativity_init(SpaprMachineState *=
+spapr,
+>          exit(EXIT_FAILURE);
 >      }
 > =20
->      _FDT(fdt_setprop(fdt, rtas, "ibm,associativity-reference-points",
+> +    spapr_numa_PAPRify_distances(machine);
+>  }
+> =20
+>  void spapr_numa_write_associativity_dt(SpaprMachineState *spapr, void *f=
+dt,
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -187,25 +213,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---9wW3yB/H9ZmnRBtb
+--3wfpuDtTLg8/Vq6g
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9tWDMACgkQbDjKyiDZ
-s5L+GRAAr1ea5lQLFDxTfHHq4i5gNeSqara9px6eUzctxtQPQ5AN61hoe5OriYBi
-rwFdNDlCNvP4Dw0XZamgfahN353rBDhMaIjPxaJ8IPDK84/H4JBIENjCW3W5CNCL
-V367byA9dH/85AKHtmQoqx3kavj/TNG+7bXzv4bcZGr2xoWF3olcg3BSpdMhIfax
-SO2bmK9+diE3uUxIAg9rUJe1wu7tjG9ywpTpmvmzZJUDxF2Y5iQuGIeU1bjY5FdB
-Bb0nqoFEcfzMktXRRMRal42I2suYXWpzmT2OL4/YHA8aw8OW5B7DcKU5HgXksTIj
-wDeT/DVghTrACQl0hv1aGc0DYaakFM/1AFu5mNZbKsjZZ8G+ratvOY9xOLGfXzSp
-nZfkF+WHgJRF7OQ1+kloBBuyipO5CcQgqDBGpQcBIInJ55MsXgBNi3UOKNx2lTm2
-V09xZWyhBz5HPW7DnvMVnvMMwtOIrdI+nGtLZ2U02Dfs0AdHYWhqhRZiiX0fZVAC
-H0MOjmMEeblpoQQFLD835cqwSzQRKSKR7P/LlrbfYeZ+e3sdYD25SillzZXzMseQ
-0KSYzZn8cMitOm44i1A0QJmYbDFUaD6if+B2bPm0BAXEcJel9+5/ciSZgXyGUi1v
-6pEoXWAEiwHbwaTKx2hkGLlIYQ5UgnrW6IfDsNNctf3RRwz4LV0=
-=vH/R
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9tV2oACgkQbDjKyiDZ
+s5L1SBAAr5rajD4yKA4Isc/oeVGgQq1HCtHaHQC6qyBcaekV3DivDmbUbQRjSrRN
+HiiLMC4/6Q5qhPmaOGIiRNaQegv0ZccucT34z9k7MoiUeDdOYp56rVHXS4NS8xhN
+iAn7s8Llk88q2at1nO8Wkl8uEj7X0Poa1NfsOc2Yb9ETdWE3eDoObvEPfT8elt1C
+dDE8TF07a2QU0PF0wtcNEMQa5zvo6Bz6NkbyJrhi/lJbZD4iUuEBh+4ZLRnNGq6p
+soaTYg5+pk2SXz42ljVoMJsfZxCeoUsbN3+TA8/NX9MUWVVzIENpbb2c3mAgWS8n
+o9fxE32/uywrcpwz0L41Aq35JxdUwzDUGlAenerI5+UYNBYK7MDF+aMCn/pQxVj4
+a4icenwM9xoNFOlDIUViYbcNABOmOpL+Xe+SVSdKBQUoe25XVUQ0oXxFZNWDghYF
+E7TX2J6KVvZ+iJl7hfB5sR9MLxR3cvGIwtNfSDmAQ4KT+/vwCQE0LYSr730D3gvh
+jT+7MI5h2pyIx/FlNcIQ0USz3x/fQgSTCRCLud7VHB0a1pmkQON+4+ZcHBxs6+rW
+HS7RGcFGUrkccRIv563bdgKYRc7IQAuhx/oj2WOjouCAaZ/qawIfvMyJ7SnRRmCf
+NSB7rtFr8TGaAOngPJ+UVn+o7g8oS3p5gfy3I8NHKQHO6Y8CEmA=
+=pOAB
 -----END PGP SIGNATURE-----
 
---9wW3yB/H9ZmnRBtb--
+--3wfpuDtTLg8/Vq6g--
 
