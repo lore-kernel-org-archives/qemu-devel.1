@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5FBCC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 17:33:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C64BC4727F
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 17:33:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D8FB2086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 17:33:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DE8122086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 17:33:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jT4zaWRI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D8FB2086A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dwvd/73k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE8122086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLrbO-0002a6-5e
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 13:33:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35178)
+	id 1kLrbQ-0002cS-1h
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 13:33:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35192)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLrUB-0002NJ-7l
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 13:26:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50502)
+ id 1kLrUD-0002TE-Fu
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 13:26:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42277)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLrU8-0007BV-U5
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 13:26:18 -0400
+ id 1kLrUB-0007Bx-H8
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 13:26:21 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601054776;
+ s=mimecast20190719; t=1601054778;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=dBNCCiCzyYyKKYPSo5jU6dgdBar99zKyX5RHFc77kmI=;
- b=jT4zaWRIXreU0KXHJxxQIdUyke3b16pFwOZ7EDF9QIUCsDj+ffWPG0Z8JWMfFDUhVR8YPr
- Ek9eyYb0aJAbzBM4sjKLe1bd8LeOOlH/4zobxRzAdErov1IGzymX2XqRVkIJcxdUqA/LGR
- bgkGwHfKHsVB8RP4wk83+KbSwrBcZO8=
+ bh=Pt5SqnBPWAurqH7od5/LojSGd2ksGXHGLBemqG3ZaZc=;
+ b=Dwvd/73kg9wrPuYaFhKXWb6rg39yrEd0kMlvyC6DcEB8Bujy3hS0bpPsYdqYIOHaCOkvUz
+ uSYn8XJsHQgDQG1v9F4DIhfQ5hpor+deaGUJJlRLcen4rGB2Wkz8y5NM67OopnMyWxT2Nq
+ BnLDMudkYQHRqc8DoRz5oPe2+5V/Zvs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-240-f7tWWXISNBOITv0fPq6Kbw-1; Fri, 25 Sep 2020 13:26:13 -0400
-X-MC-Unique: f7tWWXISNBOITv0fPq6Kbw-1
+ us-mta-58-L5GL7B-LOPOnskjCa6nRng-1; Fri, 25 Sep 2020 13:26:14 -0400
+X-MC-Unique: L5GL7B-LOPOnskjCa6nRng-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD56A1902EBB;
- Fri, 25 Sep 2020 17:26:12 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7C8B810BBECF;
+ Fri, 25 Sep 2020 17:26:13 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 69EB05D9F3;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0A5C35D9F3;
  Fri, 25 Sep 2020 17:26:12 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 08/10] scsi/scsi_bus: Add scsi_device_get
-Date: Fri, 25 Sep 2020 13:26:02 -0400
-Message-Id: <20200925172604.2142227-9-pbonzini@redhat.com>
+Subject: [PATCH 09/10] virtio-scsi: use scsi_device_get
+Date: Fri, 25 Sep 2020 13:26:03 -0400
+Message-Id: <20200925172604.2142227-10-pbonzini@redhat.com>
 In-Reply-To: <20200925172604.2142227-1-pbonzini@redhat.com>
 References: <20200925172604.2142227-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -104,56 +104,107 @@ Sender: "Qemu-devel"
 
 From: Maxim Levitsky <mlevitsk@redhat.com>
 
-Add scsi_device_get which finds the scsi device
-and takes a reference to it.
+This will help us to avoid the scsi device disappearing
+after we took a reference to it.
+
+It doesn't by itself forbid case when we try to access
+an unrealized device
 
 Suggested-by: Stefan Hajnoczi <stefanha@gmail.com>
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Message-Id: <20200913160259.32145-8-mlevitsk@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20200913160259.32145-9-mlevitsk@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
-	Compared to Maxim's patch, I am avoiding the extra argument
-	to do_scsi_device_find by moving the RCU_READ_LOCK_GUARD()
-	out of do_scsi_device_find itself.
+ hw/scsi/virtio-scsi.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
- hw/scsi/scsi-bus.c     | 11 +++++++++++
- include/hw/scsi/scsi.h |  1 +
- 2 files changed, 12 insertions(+)
-
-diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index 7599113efe..eda8cb7e70 100644
---- a/hw/scsi/scsi-bus.c
-+++ b/hw/scsi/scsi-bus.c
-@@ -73,6 +73,17 @@ SCSIDevice *scsi_device_find(SCSIBus *bus, int channel, int id, int lun)
-     return do_scsi_device_find(bus, channel, id, lun, false);
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index 971afbb217..3db9a8aae9 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -33,7 +33,7 @@ static inline int virtio_scsi_get_lun(uint8_t *lun)
+     return ((lun[2] << 8) | lun[3]) & 0x3FFF;
  }
  
-+SCSIDevice *scsi_device_get(SCSIBus *bus, int channel, int id, int lun)
-+{
-+    SCSIDevice *d;
-+    RCU_READ_LOCK_GUARD();
-+    d = do_scsi_device_find(bus, channel, id, lun, false);
-+    if (d) {
-+        object_ref(d);
-+    }
-+    return d;
-+}
-+
- static void scsi_device_realize(SCSIDevice *s, Error **errp)
+-static inline SCSIDevice *virtio_scsi_device_find(VirtIOSCSI *s, uint8_t *lun)
++static inline SCSIDevice *virtio_scsi_device_get(VirtIOSCSI *s, uint8_t *lun)
  {
-     SCSIDeviceClass *sc = SCSI_DEVICE_GET_CLASS(s);
-diff --git a/include/hw/scsi/scsi.h b/include/hw/scsi/scsi.h
-index 7a55cdbd74..09fa5c9d2a 100644
---- a/include/hw/scsi/scsi.h
-+++ b/include/hw/scsi/scsi.h
-@@ -190,6 +190,7 @@ int scsi_device_get_sense(SCSIDevice *dev, uint8_t *buf, int len, bool fixed);
- int scsi_SG_IO_FROM_DEV(BlockBackend *blk, uint8_t *cmd, uint8_t cmd_size,
-                         uint8_t *buf, uint8_t buf_size);
- SCSIDevice *scsi_device_find(SCSIBus *bus, int channel, int target, int lun);
-+SCSIDevice *scsi_device_get(SCSIBus *bus, int channel, int target, int lun);
+     if (lun[0] != 1) {
+         return NULL;
+@@ -41,7 +41,7 @@ static inline SCSIDevice *virtio_scsi_device_find(VirtIOSCSI *s, uint8_t *lun)
+     if (lun[2] != 0 && !(lun[2] >= 0x40 && lun[2] < 0x80)) {
+         return NULL;
+     }
+-    return scsi_device_find(&s->bus, 0, lun[1], virtio_scsi_get_lun(lun));
++    return scsi_device_get(&s->bus, 0, lun[1], virtio_scsi_get_lun(lun));
+ }
  
- /* scsi-generic.c. */
- extern const SCSIReqOps scsi_generic_req_ops;
+ void virtio_scsi_init_req(VirtIOSCSI *s, VirtQueue *vq, VirtIOSCSIReq *req)
+@@ -256,7 +256,7 @@ static inline void virtio_scsi_ctx_check(VirtIOSCSI *s, SCSIDevice *d)
+  *  case of async cancellation. */
+ static int virtio_scsi_do_tmf(VirtIOSCSI *s, VirtIOSCSIReq *req)
+ {
+-    SCSIDevice *d = virtio_scsi_device_find(s, req->req.tmf.lun);
++    SCSIDevice *d = virtio_scsi_device_get(s, req->req.tmf.lun);
+     SCSIRequest *r, *next;
+     BusChild *kid;
+     int target;
+@@ -370,10 +370,10 @@ static int virtio_scsi_do_tmf(VirtIOSCSI *s, VirtIOSCSIReq *req)
+ 
+         rcu_read_lock();
+         QTAILQ_FOREACH_RCU(kid, &s->bus.qbus.children, sibling) {
+-             d = SCSI_DEVICE(kid->child);
+-             if (d->channel == 0 && d->id == target) {
+-                qdev_reset_all(&d->qdev);
+-             }
++            SCSIDevice *d1 = SCSI_DEVICE(kid->child);
++            if (d1->channel == 0 && d1->id == target) {
++                qdev_reset_all(&d1->qdev);
++            }
+         }
+         rcu_read_unlock();
+ 
+@@ -386,14 +386,17 @@ static int virtio_scsi_do_tmf(VirtIOSCSI *s, VirtIOSCSIReq *req)
+         break;
+     }
+ 
++    object_unref(OBJECT(d));
+     return ret;
+ 
+ incorrect_lun:
+     req->resp.tmf.response = VIRTIO_SCSI_S_INCORRECT_LUN;
++    object_unref(OBJECT(d));
+     return ret;
+ 
+ fail:
+     req->resp.tmf.response = VIRTIO_SCSI_S_BAD_TARGET;
++    object_unref(OBJECT(d));
+     return ret;
+ }
+ 
+@@ -564,7 +567,7 @@ static int virtio_scsi_handle_cmd_req_prepare(VirtIOSCSI *s, VirtIOSCSIReq *req)
+         }
+     }
+ 
+-    d = virtio_scsi_device_find(s, req->req.cmd.lun);
++    d = virtio_scsi_device_get(s, req->req.cmd.lun);
+     if (!d) {
+         req->resp.cmd.response = VIRTIO_SCSI_S_BAD_TARGET;
+         virtio_scsi_complete_cmd_req(req);
+@@ -580,10 +583,12 @@ static int virtio_scsi_handle_cmd_req_prepare(VirtIOSCSI *s, VirtIOSCSIReq *req)
+             req->sreq->cmd.xfer > req->qsgl.size)) {
+         req->resp.cmd.response = VIRTIO_SCSI_S_OVERRUN;
+         virtio_scsi_complete_cmd_req(req);
++        object_unref(OBJECT(d));
+         return -ENOBUFS;
+     }
+     scsi_req_ref(req->sreq);
+     blk_io_plug(d->conf.blk);
++    object_unref(OBJECT(d));
+     return 0;
+ }
+ 
 -- 
 2.26.2
 
