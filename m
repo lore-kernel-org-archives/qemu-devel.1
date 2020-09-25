@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32429C4727C
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 15:25:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 434E5C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 15:25:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88A9E2311D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 15:25:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A7CFC206A4
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 15:25:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="S3ekjQ6a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88A9E2311D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ko3LEYbf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7CFC206A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLpb2-00059p-JT
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 11:25:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59750)
+	id 1kLpbW-0005vE-Mj
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 11:25:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59884)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kLpWp-0000vX-VW
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:20:55 -0400
-Received: from mail-pg1-x52a.google.com ([2607:f8b0:4864:20::52a]:44608)
+ id 1kLpX5-0001Cg-4Q
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:21:12 -0400
+Received: from mail-pg1-x535.google.com ([2607:f8b0:4864:20::535]:34081)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kLpWo-0005Qj-0K
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:20:55 -0400
-Received: by mail-pg1-x52a.google.com with SMTP id 7so2840604pgm.11
- for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 08:20:53 -0700 (PDT)
+ id 1kLpX2-0005TI-SV
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:21:10 -0400
+Received: by mail-pg1-x535.google.com with SMTP id u24so2879597pgi.1
+ for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 08:21:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=5Xncpr5K+BGk/N6uEu+J3gIdvJF6CZ9YQEmHEPvJu74=;
- b=S3ekjQ6aLH8wOrUE4kLcFniubnlsZLqpez/Uqxc2Z8e7wFAnrGsI0SYBoX2C8auwxQ
- iKSlL7szeEh5EpPZAg2vdbGohpr0DpzAAqiDdxcxgOlFiFRBBOxtSbWXaYFji7vBMGfB
- LAfsM+ncrbJP3Gzzh6Nu3hhZ54KkYs+crNaYOKVbAjATIo0lNVId/ekmRvruFjWQ9gJ1
- D2+HN6eYS5Mh04naQf6bG668FX+K9FwUChAdxLMdiBrPAanhiiAzN6n/U0RA4GcUCSOr
- cz7hs9pXIXWKfDCuVAhIH0LzsP6SjwL41W2h+jgNyBi6aWeE9FKRDiSSYHYGWLeOgh/O
- LA1A==
+ bh=xmBcp07NP8phRH9qOFxSa7PTiYpPJFfrWoI6zCboVds=;
+ b=ko3LEYbfIrE/DeacDsw+Wid2M96lbzNGTN80dOSZQJrsPw4lzYW6jFQx9n5QxrRlLJ
+ QCRElx8aYddKN2gtEUajC51/uylClb++mJuZVYzTnO3tU4Jg2vJTp1EtYd1LYVG1PcuP
+ USsqc7xCWG8takqxo2jTyH0qcV/wGuZYNC+o/c4JptMiMuhmi/7302n+515PN/U7Iehb
+ zNOJzNr9llMTmvYW8myrdwqd8jFD3C6QTnTjwk9xYJkcuvNkqHyw2NRmZI2X7mODOo2s
+ 0R4vjl0CyWvdO97prv9FUnhnY37JrpiTZMU5qy2KQRI2kukM+zZhsJDh3cYiQVzFp26l
+ yK6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=5Xncpr5K+BGk/N6uEu+J3gIdvJF6CZ9YQEmHEPvJu74=;
- b=M6/yYlR6RHnRzmffzwWggpDbOOSjVgnaTjvO2IGAdpehAt/ePkVKetbDDsWSv0hqe0
- Wx1O19oYF/uTLP5pfzYLuX1IsXZVzEckD00C2yCpAnrQ1dKeqBklQZzkZ4N8dugFUBxN
- vEOGduVGWpU3msXKIZQfDe5Pm9uI6F2tw5p/vb1bFVq9bGguueQDuVvjSBNM6Zd1B75B
- uOfZqcmwoHs5zCkniTtn0qMk1pgTeH0yswjEpPmAedQiTBKQl4lvZqwmF55IxvIjW4Wy
- SMiYuIoD8LguWiGq7dVf7BZ5ziLY60PVKHiJcvkiTN271oKT3Fx+GSsUq/4sdAYmyNgg
- KWGg==
-X-Gm-Message-State: AOAM531tQuqhORGOx8WuWOH4l1z+wVlxfTPgVPJgIeawa2dkOua4W10F
- eV3m3jY3FDyUpjw2XvmsGi0UT6eoXA0f5w==
-X-Google-Smtp-Source: ABdhPJxo1WOePL/GCL3Du4qDIOLKkYQVdJH1oQk6RGAc15uFYZ53FKy8mlVZJRcQA4izz6Fh8fW8EQ==
-X-Received: by 2002:a62:178d:0:b029:13e:d13d:a0f8 with SMTP id
- 135-20020a62178d0000b029013ed13da0f8mr4495253pfx.20.1601047251820; 
- Fri, 25 Sep 2020 08:20:51 -0700 (PDT)
+ bh=xmBcp07NP8phRH9qOFxSa7PTiYpPJFfrWoI6zCboVds=;
+ b=NE+aLgneg+q+f8hWuLcsiMkQys6UPVRpJnTjf3anlzY3TnTCJvHbzZu6RKRqyiGl8A
+ h+jW4GSgl+UgR3Ct+caqAGz11lQJDmF6Y6lsgH/TSreXpqd+I8PPEYAubx9TlRUYs3sx
+ txNBttZlX1xOg6Tq9tHZWU6siK9Zh4sazaZjaJdJsMgSSjgOig7cq9IuDhTYex+6qHWu
+ kR/Rr4oZ7PDXwkGp8zfKa/y0odfMIWRApcGau4cXjERBPGa1YjX9bX1MFZ0HNRi3xjmA
+ yMpt5ULuTxpEt4jPkGhmplAdlfXqT01k71PqQJgKWSIooAGJqg5j7RBaePzFxv5GbcnN
+ wNFg==
+X-Gm-Message-State: AOAM533Keq6Smtb8mWF/dOjnaRf9kFNy0OHAk2WX7Vh//MaNdyAMLa/+
+ npR6Il3kTiqEhNimdhrRM9zcchF4xmGRzA==
+X-Google-Smtp-Source: ABdhPJz4AwxGcDbWaX/mrrOvsZtcZK54EF53hd4dWti6BHsNytk2mG8Cvja39VqRwcygiVKhcpRElA==
+X-Received: by 2002:a17:902:82c2:b029:d1:f36a:ab97 with SMTP id
+ u2-20020a17090282c2b02900d1f36aab97mr5042903plz.64.1601047264057; 
+ Fri, 25 Sep 2020 08:21:04 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id a5sm2717859pgk.13.2020.09.25.08.20.50
+ by smtp.gmail.com with ESMTPSA id a5sm2717859pgk.13.2020.09.25.08.21.02
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 25 Sep 2020 08:20:51 -0700 (PDT)
+ Fri, 25 Sep 2020 08:21:03 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 02/10] softfloat: Use int128.h for some operations
-Date: Fri, 25 Sep 2020 08:20:39 -0700
-Message-Id: <20200925152047.709901-3-richard.henderson@linaro.org>
+Subject: [PATCH v2 10/10] softfloat: Use ppc64 assembly for {add, sub}{192,
+ 256}
+Date: Fri, 25 Sep 2020 08:20:47 -0700
+Message-Id: <20200925152047.709901-11-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200925152047.709901-1-richard.henderson@linaro.org>
 References: <20200925152047.709901-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::52a;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x52a.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::535;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x535.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,92 +106,96 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use our Int128, which wraps the compiler's __int128_t,
-instead of open-coding left shifts and arithmetic.
-We'd need to extend Int128 to have unsigned operations
-to replace more than these three.
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/fpu/softfloat-macros.h | 39 +++++++++++++++++-----------------
- 1 file changed, 20 insertions(+), 19 deletions(-)
+ include/fpu/softfloat-macros.h | 14 ++++++++++++++
+ fpu/softfloat.c                | 27 +++++++++++++++++++++++++++
+ 2 files changed, 41 insertions(+)
 
 diff --git a/include/fpu/softfloat-macros.h b/include/fpu/softfloat-macros.h
-index 57845f8af0..95d88d05b8 100644
+index 969a486fd2..d26cfaf267 100644
 --- a/include/fpu/softfloat-macros.h
 +++ b/include/fpu/softfloat-macros.h
-@@ -84,6 +84,7 @@ this code that are retained.
+@@ -449,6 +449,13 @@ static inline void
+         : "=&r"(*z0Ptr), "=&r"(*z1Ptr), "=&r"(*z2Ptr)
+         : "rZ"(a0), "rZ"(a1), "rZ"(a2), "rZ"(b0), "rZ"(b1), "rZ"(b2)
+         : "cc");
++#elif defined(__powerpc64__)
++    asm("addc %2, %5, %8\n\t"
++        "adde %1, %4, %7\n\t"
++        "adde %0, %3, %6"
++        : "=r"(*z0Ptr), "=&r"(*z1Ptr), "=&r"(*z2Ptr)
++        : "r"(a0), "r"(a1), "r"(a2), "r"(b0), "r"(b1), "r"(b2)
++        : "ca");
+ #else
+     uint64_t z0, z1, z2;
+     int8_t carry0, carry1;
+@@ -521,6 +528,13 @@ static inline void
+         : "=&r"(*z0Ptr), "=&r"(*z1Ptr), "=&r"(*z2Ptr)
+         : "rZ"(a0), "rZ"(a1), "rZ"(a2), "rZ"(b0), "rZ"(b1), "rZ"(b2)
+         : "cc");
++#elif defined(__powerpc64__)
++    asm("subfc %2, %8, %5\n\t"
++        "subfe %1, %7, %4\n\t"
++        "subfe %0, %6, %3"
++        : "=&r"(*z0Ptr), "=&r"(*z1Ptr), "=&r"(*z2Ptr)
++        : "r"(a0), "r"(a1), "r"(a2), "r"(b0), "r"(b1), "r"(b2)
++        : "ca");
+ #else
+     uint64_t z0, z1, z2;
+     int8_t borrow0, borrow1;
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 07dc17caad..9af75b9146 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -7370,6 +7370,18 @@ static void sub256(UInt256 *r, UInt256 *a, UInt256 *b)
+           [b0] "rZ"(b->w[0]), [b1] "rZ"(b->w[1]),
+           [b2] "rZ"(b->w[2]), [b3] "rZ"(b->w[3])
+         : "cc");
++#elif defined(__powerpc64__)
++    asm("subfc %[r3], %[b3], %[a3]\n\t"
++        "subfe %[r2], %[b2], %[a2]\n\t"
++        "subfe %[r1], %[b1], %[a1]\n\t"
++        "subfe %[r0], %[b0], %[a0]"
++        : [r0] "=&r"(r->w[0]), [r1] "=&r"(r->w[1]),
++          [r2] "=&r"(r->w[2]), [r3] "=&r"(r->w[3])
++        : [a0] "r"(a->w[0]), [a1] "r"(a->w[1]),
++          [a2] "r"(a->w[2]), [a3] "r"(a->w[3]),
++          [b0] "r"(b->w[0]), [b1] "r"(b->w[1]),
++          [b2] "r"(b->w[2]), [b3] "r"(b->w[3])
++        : "ca");
+ #else
+     bool borrow = false;
  
- #include "fpu/softfloat-types.h"
- #include "qemu/host-utils.h"
-+#include "qemu/int128.h"
+@@ -7407,6 +7419,13 @@ static void neg256(UInt256 *a)
+         "ngc  %0, %0"
+         : "+r"(a->w[0]), "+r"(a->w[1]), "+r"(a->w[2]), "+r"(a->w[3])
+         : : "cc");
++#elif defined(__powerpc64__)
++    asm("subfic %3, %3, 0\n\t"
++        "subfze %2, %2\n\t"
++        "subfze %1, %1\n\t"
++        "subfze %0, %0"
++        : "+r"(a->w[0]), "+r"(a->w[1]), "+r"(a->w[2]), "+r"(a->w[3])
++        : : "ca");
+ #else
+     /*
+      * Recall that -X - 1 = ~X, and that since this is negation,
+@@ -7457,6 +7476,14 @@ static void add256(UInt256 *a, UInt256 *b)
+         : "+r"(a->w[0]), "+r"(a->w[1]), "+r"(a->w[2]), "+r"(a->w[3])
+         : "rZ"(b->w[0]), "rZ"(b->w[1]), "rZ"(b->w[2]), "rZ"(b->w[3])
+         : "cc");
++#elif defined(__powerpc64__)
++    asm("addc %3, %3, %7\n\t"
++        "adde %2, %2, %6\n\t"
++        "adde %1, %1, %5\n\t"
++        "adde %0, %0, %4"
++        : "+r"(a->w[0]), "+r"(a->w[1]), "+r"(a->w[2]), "+r"(a->w[3])
++        :  "r"(b->w[0]),  "r"(b->w[1]),  "r"(b->w[2]),  "r"(b->w[3])
++        : "ca");
+ #else
+     bool carry = false;
  
- /*----------------------------------------------------------------------------
- | Shifts `a' right by the number of bits given in `count'.  If any nonzero
-@@ -352,13 +353,11 @@ static inline void shortShift128Left(uint64_t a0, uint64_t a1, int count,
- static inline void shift128Left(uint64_t a0, uint64_t a1, int count,
-                                 uint64_t *z0Ptr, uint64_t *z1Ptr)
- {
--    if (count < 64) {
--        *z1Ptr = a1 << count;
--        *z0Ptr = count == 0 ? a0 : (a0 << count) | (a1 >> (-count & 63));
--    } else {
--        *z1Ptr = 0;
--        *z0Ptr = a1 << (count - 64);
--    }
-+    Int128 a = int128_make128(a1, a0);
-+    Int128 z = int128_lshift(a, count);
-+
-+    *z0Ptr = int128_gethi(z);
-+    *z1Ptr = int128_getlo(z);
- }
- 
- /*----------------------------------------------------------------------------
-@@ -405,15 +404,15 @@ static inline void
- *----------------------------------------------------------------------------*/
- 
- static inline void
-- add128(
--     uint64_t a0, uint64_t a1, uint64_t b0, uint64_t b1, uint64_t *z0Ptr, uint64_t *z1Ptr )
-+add128(uint64_t a0, uint64_t a1, uint64_t b0, uint64_t b1,
-+       uint64_t *z0Ptr, uint64_t *z1Ptr)
- {
--    uint64_t z1;
--
--    z1 = a1 + b1;
--    *z1Ptr = z1;
--    *z0Ptr = a0 + b0 + ( z1 < a1 );
-+    Int128 a = int128_make128(a1, a0);
-+    Int128 b = int128_make128(b1, b0);
-+    Int128 z = int128_add(a, b);
- 
-+    *z0Ptr = int128_gethi(z);
-+    *z1Ptr = int128_getlo(z);
- }
- 
- /*----------------------------------------------------------------------------
-@@ -463,13 +462,15 @@ static inline void
- *----------------------------------------------------------------------------*/
- 
- static inline void
-- sub128(
--     uint64_t a0, uint64_t a1, uint64_t b0, uint64_t b1, uint64_t *z0Ptr, uint64_t *z1Ptr )
-+sub128(uint64_t a0, uint64_t a1, uint64_t b0, uint64_t b1,
-+       uint64_t *z0Ptr, uint64_t *z1Ptr)
- {
-+    Int128 a = int128_make128(a1, a0);
-+    Int128 b = int128_make128(b1, b0);
-+    Int128 z = int128_sub(a, b);
- 
--    *z1Ptr = a1 - b1;
--    *z0Ptr = a0 - b0 - ( a1 < b1 );
--
-+    *z0Ptr = int128_gethi(z);
-+    *z1Ptr = int128_getlo(z);
- }
- 
- /*----------------------------------------------------------------------------
 -- 
 2.25.1
 
