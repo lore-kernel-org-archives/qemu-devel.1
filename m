@@ -7,84 +7,84 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BF8DC4727C
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:57:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCFF6C4727D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:57:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 960DE2072E
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:57:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 67429206DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:57:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PLLxusxh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 960DE2072E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eb6ALVdn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67429206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54766 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLnI1-00070L-LR
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 08:57:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48284)
+	id 1kLnIF-0007Xc-IP
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 08:57:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48324)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kLnCs-0007o4-Cs
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:52:10 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39623)
+ id 1kLnCt-0007pi-Uo
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:52:11 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46531)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kLnCq-0001Ql-8P
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:52:10 -0400
-Received: by mail-wm1-x343.google.com with SMTP id b79so3165742wmb.4
- for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 05:52:07 -0700 (PDT)
+ id 1kLnCr-0001Qz-4I
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:52:11 -0400
+Received: by mail-wr1-x441.google.com with SMTP id o5so3429359wrn.13
+ for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 05:52:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=DYHqy58UJZR46wXpvs59hJagcJIqgUuvxLRDNUapKkI=;
- b=PLLxusxhPFqPGcofHMPBU7+IrVX7cQrLqgbuFwawPTVl20xOtV1nU3phv+B+iZ4AHa
- g6keJCPtstcNtkR9uvaZR6JJFaC+CjknldAUPdPCKsKEqqQdWg7LQ/K64hl5HabyR+I2
- XSZC8zZAAoQbmjDZS9YNLV94KZuLi3xRHX0VLG/Fck6PAhVxCTdnu5nWkj+h3JthSgFt
- /DM5h3kfoW2vgHw+PVqreYUPDkb5qTvo2xXHv7fcmFtCsNdZ/1Wv5+Bqip7AwK31O8Vt
- TwzJnYZQXcWYdG2MOygKPCTZz2aVxUEYC/IWxxydBRUNyRiC7pnfkoDkJoL/Yb8CwfVz
- LUDw==
+ bh=9eI5ySrz2OiQLFHfiZ2ocnjA2ayiRqTZ1gQtwjJhv6Q=;
+ b=eb6ALVdnmFHCTlliFN8w9QQPFweSJ6Di6etcFIdumY21j+3VWYHbhdRz7orrZd4HNW
+ BC4nCBlDbhKhp6XnTOh2XkBcX/rpHXp3DeYZ34PeLz4kqPPrY/F5SNXgz7NrQCyoBNGy
+ KNB1ehCec9b7w+DJrxTUXT2jfRP2isSynh5wWCGH7z+PirCFWe6mkr56BuMx3N/o4LaE
+ PNOprC+3WFDvrcMxerUHXbCs0Sb7JsONYWNzLbecNDWZuHuTaveLGuI7HmFLAXC2FOxF
+ DmT1faygi6/tecLZE2OKcL89BFE2X2kCsFiu3TRkNllSt59innjb3U6sG8Sy3jpE5FZQ
+ EulQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=DYHqy58UJZR46wXpvs59hJagcJIqgUuvxLRDNUapKkI=;
- b=qauUn9YTiIZ29QaG9zlffh9DQEymYDQXh5lXJbjJFnEZ25SE5F+2XKDoMFo8rMA9nj
- xDN5TmbEdmn34c8yJaUK7AsBM53xX2llnqHlkHZK+dN5oRblrprgpBexm+QcWYSd2367
- WmYPk7EfKLGqkt69lD2h3lNQKV2aQe/s0HQJ7izseufxSUulVJGItfgjbjlKh/yyV+ra
- 3ktswvQkZZaC1WZI2limO8TXtCW/fLvVCNIkGe7K67n7giE3rJgPDVK3q8TlwAIsxQQP
- RZvKGjs2hx1WVVraK758DwyUbLDDqaRcd0bea2AOE6Lzd6EzjIo6/dhSH6+6eko7kqsq
- jrkw==
-X-Gm-Message-State: AOAM533VbynN63xu/oKej6wX15RxLYT7HHBqItYw0pRsPHEVxrwZduBg
- sK83FWepZM5jL+TvZWzI6MeaYw==
-X-Google-Smtp-Source: ABdhPJzzqmM6H2FagwjjJuJz8oyzXp/4kjhdAn5abuNmGND89rNn/daHMZEIYFS4dnMv23kcecepaA==
-X-Received: by 2002:a1c:4455:: with SMTP id r82mr2957959wma.60.1601038326726; 
- Fri, 25 Sep 2020 05:52:06 -0700 (PDT)
+ bh=9eI5ySrz2OiQLFHfiZ2ocnjA2ayiRqTZ1gQtwjJhv6Q=;
+ b=TMPCoS0OgteJYyAYWLS+7UFF53dCZtLqLcFrUOhcwV2k122KefkRrT7vJsPdCamrMc
+ TXV+DXAe49CfXu7p9KQCoUC5d4pjIJ+OWyvkaF3R9+wMNwwxBaeq0J8MlX3CcTtwHzjs
+ PgQyVBNSwxPr+Qwr37bcEa9GOY3Hmal3j37VJVNjHdOilUvQqYAVmQeStdKcjRstXKY1
+ Ua22fDu8uKg7bT5brlW2RpiZz4oTXVrHArjJtF6h89Am9GM55vHw/Zk6nHS7TGQ5HLXI
+ 2Jnvz23pxzW0vq6AiEH/CCz3sLVavSfo8n2ZVJAIfZQr4X5XV55tWlVVddmrARFACqbn
+ 3qpg==
+X-Gm-Message-State: AOAM533yKkaNHs3KkwhHmY9jQQrjP/9VAakezPY2OKPp7XLVmFqTDTkb
+ ysvZj7+XVewOm2bH4V1k2Uzmtw==
+X-Google-Smtp-Source: ABdhPJwrBoyZaa9ySYnxA8u48SmELYctXq1T0Fdj46EQTS15QzgJZGB+uHCKPTfkdtsZGNMxEX84TA==
+X-Received: by 2002:a05:6000:7:: with SMTP id h7mr4620923wrx.16.1601038327710; 
+ Fri, 25 Sep 2020 05:52:07 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id m12sm2708543wml.38.2020.09.25.05.51.54
+ by smtp.gmail.com with ESMTPSA id v9sm3129761wrv.35.2020.09.25.05.51.55
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Fri, 25 Sep 2020 05:52:00 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 173971FF98;
+ by zen.linaroharston (Postfix) with ESMTP id 41FCB1FF9A;
  Fri, 25 Sep 2020 13:51:49 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org, maxim.uvarov@linaro.org, joakim.bech@linaro.org,
  ilias.apalodimas@linaro.org, tomas.winkler@intel.com, yang.huang@intel.com,
  bing.zhu@intel.com, Matti.Moell@opensynergy.com, hmo@opensynergy.com
-Subject: [RFC PATCH 09/19] tools/vhost-user-rpmb: add a --verbose/debug flags
- for logging
-Date: Fri, 25 Sep 2020 13:51:37 +0100
-Message-Id: <20200925125147.26943-10-alex.bennee@linaro.org>
+Subject: [RFC PATCH 11/19] tools/vhost-user-rpmb: add --flash-path for backing
+ store
+Date: Fri, 25 Sep 2020 13:51:39 +0100
+Message-Id: <20200925125147.26943-12-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200925125147.26943-1-alex.bennee@linaro.org>
 References: <20200925125147.26943-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -114,71 +114,142 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This gives us two levels of informational output when tracing what the
-daemon is doing.
+We will need to store the data somewhere so add the option to point to
+the file where we will keep the data.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tools/vhost-user-rpmb/main.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ tools/vhost-user-rpmb/main.c | 58 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 57 insertions(+), 1 deletion(-)
 
 diff --git a/tools/vhost-user-rpmb/main.c b/tools/vhost-user-rpmb/main.c
-index 269c86cbb633..1be0d4b8a567 100644
+index 7b3b29ccfc5b..64bd7e79f573 100644
 --- a/tools/vhost-user-rpmb/main.c
 +++ b/tools/vhost-user-rpmb/main.c
-@@ -6,6 +6,9 @@
-  * SPDX-License-Identifier: GPL-2.0-or-later
-  */
- 
-+#define G_LOG_DOMAIN "vhost-user-rpmb"
-+#define G_LOG_USE_STRUCTURED 1
-+
- #include <glib.h>
+@@ -13,9 +13,15 @@
  #include <gio/gio.h>
  #include <gio/gunixsocketaddress.h>
-@@ -25,12 +28,16 @@
+ #include <glib-unix.h>
++#include <glib/gstdio.h>
+ #include <stdio.h>
+ #include <string.h>
+ #include <inttypes.h>
++#include <fcntl.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <sys/mman.h>
++#include <unistd.h>
+ 
+ #include "contrib/libvhost-user/libvhost-user-glib.h"
+ #include "contrib/libvhost-user/libvhost-user.h"
+@@ -27,6 +33,7 @@
+ #endif
+ 
  static gchar *socket_path;
++static char *flash_path;
  static gint socket_fd = -1;
  static gboolean print_cap;
-+static gboolean verbose;
-+static gboolean debug;
- 
+ static gboolean verbose;
+@@ -35,6 +42,7 @@ static gboolean debug;
  static GOptionEntry options[] =
  {
      { "socket-path", 0, 0, G_OPTION_ARG_FILENAME, &socket_path, "Location of vhost-user Unix domain socket, incompatible with --fd", "PATH" },
++    { "flash-path", 0, 0, G_OPTION_ARG_FILENAME, &flash_path, "Location of raw flash image file", "PATH" },
      { "fd", 0, 0, G_OPTION_ARG_INT, &socket_fd, "Specify the file-descriptor of the backend, incompatible with --socket-path", "FD" },
      { "print-capabilities", 0, 0, G_OPTION_ARG_NONE, &print_cap, "Output to stdout the backend capabilities in JSON format and exit", NULL},
-+    { "verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose, "Be more verbose in output", NULL},
-+    { "debug", 0, 0, G_OPTION_ARG_NONE, &debug, "Include debug output", NULL},
-     { NULL }
+     { "verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose, "Be more verbose in output", NULL},
+@@ -47,6 +55,8 @@ enum {
  };
  
-@@ -84,6 +91,7 @@ static void vrpmb_panic(VuDev *dev, const char *msg)
+ /* These structures are defined in the specification */
++#define KiB     (1UL << 10)
++#define MAX_RPMB_SIZE (KiB * 128 * 256)
  
- static uint64_t vrpmb_get_features(VuDev *dev)
- {
-+    g_info("%s: replying", __func__);
+ struct virtio_rpmb_config {
+     uint8_t capacity;
+@@ -75,6 +85,8 @@ typedef struct VuRpmb {
+     VugDev dev;
+     struct virtio_rpmb_config virtio_config;
+     GMainLoop *loop;
++    int flash_fd;
++    void *flash_map;
+ } VuRpmb;
+ 
+ struct virtio_rpmb_ctrl_command {
+@@ -116,6 +128,8 @@ vrpmb_get_config(VuDev *dev, uint8_t *config, uint32_t len)
+     VuRpmb *r = container_of(dev, VuRpmb, dev.parent);
+     g_return_val_if_fail(len <= sizeof(struct virtio_rpmb_config), -1);
+     memcpy(config, &r->virtio_config, len);
++
++    g_info("%s: done", __func__);
      return 0;
  }
  
-@@ -209,6 +217,17 @@ int main (int argc, char *argv[])
-         exit(EXIT_FAILURE);
-     }
+@@ -192,6 +206,41 @@ static const VuDevIface vuiface = {
+     .set_config = vrpmb_set_config,
+ };
  
-+    if (verbose || debug) {
-+        g_log_set_handler(NULL, G_LOG_LEVEL_MASK, g_log_default_handler, NULL);
-+        if (debug) {
-+            g_setenv("G_MESSAGES_DEBUG", "all", true);
-+        }
-+    } else {
-+        g_log_set_handler(NULL,
-+                          G_LOG_LEVEL_WARNING | G_LOG_LEVEL_CRITICAL | G_LOG_LEVEL_ERROR,
-+                          g_log_default_handler, NULL);
++static bool vrpmb_load_flash_image(VuRpmb *r, char *img_path)
++{
++    GStatBuf statbuf;
++    size_t map_size;
++
++    if (g_stat(img_path, &statbuf) < 0) {
++        g_error("couldn't stat %s", img_path);
++        return false;
 +    }
 +
-     /*
-      * Now create a vhost-user socket that we will receive messages
-      * on. Once we have our handler set up we can enter the glib main
++    r->flash_fd = g_open(img_path, O_RDWR, 0);
++    if (r->flash_fd < 0) {
++        g_error("couldn't open %s (%s)", img_path, strerror(errno));
++        return false;
++    }
++
++    if (statbuf.st_size > MAX_RPMB_SIZE) {
++        g_warning("%s larger than maximum size supported", img_path);
++        map_size = MAX_RPMB_SIZE;
++    } else {
++        map_size = statbuf.st_size;
++    }
++    r->virtio_config.capacity = map_size / (128 *KiB);
++    r->virtio_config.max_wr_cnt = 1;
++    r->virtio_config.max_rd_cnt = 1;
++
++    r->flash_map = mmap(NULL, map_size, PROT_READ, MAP_SHARED, r->flash_fd, 0);
++    if (r->flash_map == MAP_FAILED) {
++        g_error("failed to mmap file");
++        return false;
++    }
++
++    return true;
++}
++
+ static void vrpmb_destroy(VuRpmb *r)
+ {
+     vug_deinit(&r->dev);
+@@ -216,7 +265,7 @@ static gboolean hangup(gpointer user_data)
+     return true;
+ }
+ 
+-int main (int argc, char *argv[])
++int main(int argc, char *argv[])
+ {
+     GError *error = NULL;
+     GOptionContext *context;
+@@ -236,6 +285,13 @@ int main (int argc, char *argv[])
+         exit(0);
+     }
+ 
++    if (!flash_path || !g_file_test(flash_path, G_FILE_TEST_EXISTS)) {
++        g_printerr("Please specify a valid --flash-path for the flash image\n");
++        exit(EXIT_FAILURE);
++    } else {
++        vrpmb_load_flash_image(&rpmb, flash_path);
++    }
++
+     if (!socket_path && socket_fd < 0) {
+         g_printerr("Please specify either --fd or --socket-path\n");
+         exit(EXIT_FAILURE);
 -- 
 2.20.1
 
