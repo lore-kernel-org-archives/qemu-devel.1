@@ -2,94 +2,92 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 225D3C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 16:01:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D1A6C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 16:04:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 89FFA2311D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 16:01:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB69220759
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 16:04:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BRVTziPR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89FFA2311D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hySQGyAS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB69220759
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLqAG-0004w0-Cf
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 12:01:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35988)
+	id 1kLqCb-0007YV-Im
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 12:04:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36304)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kLpps-0002ia-1t
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:40:36 -0400
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:40996)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kLppp-0007am-EX
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:40:35 -0400
-Received: by mail-wr1-x42c.google.com with SMTP id w5so4062847wrp.8
- for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 08:40:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Eq5ug6TQ+UWKEm8ljjwiAREdUaKCvushWVwVKg/Ob2M=;
- b=BRVTziPRh3r1hZaLn45/uI8UP8IS0MV7348lJ87Z7216xOiuLlR+t50yDY9VtdAD/J
- +KkFL8yQJiDZVPZw52MVPQdnIJ45NDlz28F8xVnBARIztGi3VxhJmvAzFeauHTMXap0U
- x44a0AGIjVeA7SmpMtxeDyV8ugb57Eau+Z+jviot4xrVRabVvN0fddMRjcZVncMHgAnO
- BgS24KyFUXJhhJ0IK3aEdmKQkmDC70fCu+t+dcQ+IiwgGK/RFVyZV4qUm25Gfcz7UPv/
- q2QyhCitwPUZMsEiLuLG0Km+je5YNWzy+4bsLLSeL4J7kQGBdf6ewYZiJvXVtdeQlDdE
- FaIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Eq5ug6TQ+UWKEm8ljjwiAREdUaKCvushWVwVKg/Ob2M=;
- b=r5+/+GtWdKHYPngHk9nwI1K6aauzYsWGqIW2wy8C5apdMjvHwthq/JKLzD68BBOYXl
- CS6Y1euscJPJ1ktMCQ5UWKGJOs81wjreYrolvag+IrBCpx+Oc+2YeuDcFyqxVDAOstWc
- rHOTFpE1vSrxjNZgOSBLMP7/T0M050REV0KmFFU1RLfLlYwRHKbHXV+DbYQaTrwjpwD5
- BFiuX2kNuZUQxTL9xHdrbQF2WeJ5+OEasMipBOHPfUc2ci87w8s/7jDlXY+4v61dwZyW
- 7s07hqgAlcWisMDJUvFjVXKSPP9Uf+sPxthVfYBmEW0v0Yq9eY+7BPpjG4/UBovEB4K7
- V5NQ==
-X-Gm-Message-State: AOAM532uXej44zCLGa6UVrmzspaW7e/5fsICDMnvb+lY8kjpNs+bNgHa
- /4FbYi4eih6No9jzmlVhI7yWPQ==
-X-Google-Smtp-Source: ABdhPJx3VDNvBieNUSpj4GcSQL/a58+tJTbC2CwqBSV1W6U0xwhMVW/bKE3pdbe2W0uJmLvKuM+I4g==
-X-Received: by 2002:a5d:4a0c:: with SMTP id m12mr5185502wrq.83.1601048431705; 
- Fri, 25 Sep 2020 08:40:31 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id o4sm3155020wru.55.2020.09.25.08.40.28
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 25 Sep 2020 08:40:30 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 6CB4B1FF8C;
- Fri, 25 Sep 2020 16:40:28 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 02/15] meson: move libudev test
-Date: Fri, 25 Sep 2020 16:40:14 +0100
-Message-Id: <20200925154027.12672-3-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200925154027.12672-1-alex.bennee@linaro.org>
-References: <20200925154027.12672-1-alex.bennee@linaro.org>
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLpqY-0003Up-Pb
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:41:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58404)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLpqV-0007mV-SX
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:41:18 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601048470;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=QJb9Tg2lFdosXaJfa0yJ1a4Cb76DC1SSNQ0tdLZBAdo=;
+ b=hySQGyASIsTOvCku956jSgjHiSGl75Jr1WHRGUSjOvjqm9g4tEdKIwSWIGPQYI7HzLpS09
+ FJ26fLb23xwQf1IIJIUgn8qb/SiZKS277vn/n/DMnvaXsLAVDw+JdOu2zJO3vLkSXsNnVo
+ g6206hpVpf+0/r54lpf/Q/YAR3rGH3g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-51-oFm1JOp7OiudmbCnIl59oA-1; Fri, 25 Sep 2020 11:41:09 -0400
+X-MC-Unique: oFm1JOp7OiudmbCnIl59oA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B3F261084D74;
+ Fri, 25 Sep 2020 15:41:07 +0000 (UTC)
+Received: from [10.10.119.140] (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 017B15C1C2;
+ Fri, 25 Sep 2020 15:41:06 +0000 (UTC)
+Subject: Re: [PATCH v2 09/38] qapi/common.py: Add indent manager
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200922210101.4081073-1-jsnow@redhat.com>
+ <20200922210101.4081073-10-jsnow@redhat.com>
+ <20200923145530.GI191229@localhost.localdomain>
+ <50d8aa85-665e-5dd1-43d3-aeef1817df73@redhat.com>
+ <87o8lut6jp.fsf@dusky.pond.sub.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <4f7f5cd8-fea5-4158-5a66-5873b871012f@redhat.com>
+Date: Fri, 25 Sep 2020 11:41:06 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42c.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <87o8lut6jp.fsf@dusky.pond.sub.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 02:48:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -34
+X-Spam_score: -3.5
+X-Spam_bar: ---
+X-Spam_report: (-3.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.238, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,96 +101,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+ Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+On 9/25/20 7:55 AM, Markus Armbruster wrote:
+> John Snow <jsnow@redhat.com> writes:
+> 
+>> On 9/23/20 10:55 AM, Cleber Rosa wrote:
+>>> Do you have a use case for returning the level?  If not, I'd go
+>>> without it, and add a "level" property instead, as it'd serve more
+>>> cases.
+>>
+>> __int__ is doing that lifting. I can remove the return.
+> 
+> I like my functions to return something useful.
+> 
+> Use your judgement.
+> 
+> 
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20200916162621.100141-2-pbonzini@redhat.com>
-Message-Id: <20200918103430.297167-2-thuth@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- configure   | 14 --------------
- meson.build |  7 ++++---
- 2 files changed, 4 insertions(+), 17 deletions(-)
+Eh, Cleber had a point. Nothing uses it.
+(AKA: I already made the edit ...)
 
-diff --git a/configure b/configure
-index e8e8e984f245..48bf437021f6 100755
---- a/configure
-+++ b/configure
-@@ -908,7 +908,6 @@ Linux)
-   linux_user="yes"
-   kvm="yes"
-   QEMU_INCLUDES="-isystem ${source_path}/linux-headers -Ilinux-headers $QEMU_INCLUDES"
--  libudev="yes"
- ;;
- esac
- 
-@@ -6283,15 +6282,6 @@ if test "$libnfs" != "no" ; then
- fi
- 
- ##########################################
--# Do we have libudev
--if test "$libudev" != "no" ; then
--  if $pkg_config libudev && test "$static" != "yes"; then
--    libudev="yes"
--    libudev_libs=$($pkg_config --libs libudev)
--  else
--    libudev="no"
--  fi
--fi
- 
- # Exclude --warn-common with TSan to suppress warnings from the TSan libraries.
- if test "$solaris" = "no" && test "$tsan" = "no"; then
-@@ -7460,10 +7450,6 @@ if test "$gcov" = "yes" ; then
-   echo "CONFIG_GCOV=y" >> $config_host_mak
- fi
- 
--if test "$libudev" != "no"; then
--    echo "CONFIG_LIBUDEV=y" >> $config_host_mak
--    echo "LIBUDEV_LIBS=$libudev_libs" >> $config_host_mak
--fi
- if test "$fuzzing" != "no"; then
-     echo "CONFIG_FUZZ=y" >> $config_host_mak
- fi
-diff --git a/meson.build b/meson.build
-index f4d1ab109680..48724988972d 100644
---- a/meson.build
-+++ b/meson.build
-@@ -252,8 +252,8 @@ if 'CONFIG_CURL' in config_host
-                             link_args: config_host['CURL_LIBS'].split())
- endif
- libudev = not_found
--if 'CONFIG_LIBUDEV' in config_host
--  libudev = declare_dependency(link_args: config_host['LIBUDEV_LIBS'].split())
-+if target_os == 'linux'
-+  libudev = dependency('libudev', static: enable_static)
- endif
- brlapi = not_found
- if 'CONFIG_BRLAPI' in config_host
-@@ -435,6 +435,7 @@ has_gettid = cc.has_function('gettid')
- 
- # Create config-host.h
- 
-+config_host_data.set('CONFIG_LIBUDEV', libudev.found())
- config_host_data.set('CONFIG_SDL', sdl.found())
- config_host_data.set('CONFIG_SDL_IMAGE', sdl_image.found())
- config_host_data.set('CONFIG_VNC', vnc.found())
-@@ -1515,7 +1516,7 @@ summary_info += {'sheepdog support':  config_host.has_key('CONFIG_SHEEPDOG')}
- summary_info += {'capstone':          config_host.has_key('CONFIG_CAPSTONE')}
- summary_info += {'libpmem support':   config_host.has_key('CONFIG_LIBPMEM')}
- summary_info += {'libdaxctl support': config_host.has_key('CONFIG_LIBDAXCTL')}
--summary_info += {'libudev':           config_host.has_key('CONFIG_LIBUDEV')}
-+summary_info += {'libudev':           libudev.found()}
- summary_info += {'default devices':   config_host['CONFIG_MINIKCONF_MODE'] == '--defconfig'}
- summary_info += {'plugin support':    config_host.has_key('CONFIG_PLUGIN')}
- summary_info += {'fuzzing support':   config_host.has_key('CONFIG_FUZZ')}
--- 
-2.20.1
+Like you say, we'll figure out the truly beautiful way to do code 
+generation when we tackle this all together, holistically. What I've got 
+works for now (and isn't terribly complex), let's just roll with it 
+while we fry the bigger fish.
+
+--js
 
 
