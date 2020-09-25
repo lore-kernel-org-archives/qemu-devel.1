@@ -2,83 +2,79 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ED68C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 13:22:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96161C4727D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 13:22:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A25A723976
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 13:22:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2724C239EC
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 13:22:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K9lyV6Ga"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A25A723976
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AM7WO/vJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2724C239EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLnfu-0004es-OH
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 09:22:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54152)
+	id 1kLngc-0004tz-8d
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 09:22:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53810)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kLna2-0005Jz-A8
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 09:16:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39605)
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1kLnYC-0003Qf-Bc
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 09:14:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53984)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kLna0-0004R3-BF
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 09:16:05 -0400
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1kLnYA-00048b-Fl
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 09:14:12 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601039763;
+ s=mimecast20190719; t=1601039649;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=nBmyhzNnhDBnIhdj903UpYR3zTgYFKYFjQqwYt5dJOQ=;
- b=K9lyV6GagDPWNgnDTzGzlz7GFm4k4pJYx0iAgUfr1e9Ntb4kqfr+dSGaVKyWNqQ1NDJlpv
- cZlzk8KgHMv19yMihGSqljPZhqbuksOTn4jSlvYHrr1G79vBLKGbpmc5+fjdvrJSKD2U3h
- hb754riazAFkvn7gh0U6hi9kZQcbz9I=
+ bh=4W4WiY1o7CPnavQCkXEkrrwg6Rky8QFo7TYJ6WKwrts=;
+ b=AM7WO/vJLEMKEHVwuXGds3HfmqhDgXhWImfCdYuZhZq9xm0/FCNf0eKMB0WL9V7Bpq6JWe
+ AxK+h/MT6XCmkgv4xIzJdFJkDIMXw0LbrFE6BzRCpQUsHSyfu3B3MPt4DgwwXdsRL2tAVg
+ bCb6TAPIBMTzAOOcu5T0YR0iw6MBM5g=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-568-o3vX4a0tNlKIXJyX9cKPIg-1; Fri, 25 Sep 2020 09:16:00 -0400
-X-MC-Unique: o3vX4a0tNlKIXJyX9cKPIg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-321-I87u5zjaNhKdledP2YhgZw-1; Fri, 25 Sep 2020 09:14:05 -0400
+X-MC-Unique: I87u5zjaNhKdledP2YhgZw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD0FD10BBED4;
- Fri, 25 Sep 2020 13:15:58 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-70.ams2.redhat.com
- [10.36.112.70])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9769C73667;
- Fri, 25 Sep 2020 13:15:58 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 23856113865F; Fri, 25 Sep 2020 15:15:57 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Cleber Rosa <crosa@redhat.com>
-Subject: Re: [PATCH v2 28/38] qapi/gen.py: update write() to be more idiomatic
-References: <20200922210101.4081073-1-jsnow@redhat.com>
- <20200922210101.4081073-29-jsnow@redhat.com>
- <20200923152624.GO3312949@habkost.net>
- <c0b8ed9e-c66a-a6fa-43e1-c3c61581d928@redhat.com>
- <20200924155959.GC191229@localhost.localdomain>
-Date: Fri, 25 Sep 2020 15:15:57 +0200
-In-Reply-To: <20200924155959.GC191229@localhost.localdomain> (Cleber Rosa's
- message of "Thu, 24 Sep 2020 11:59:59 -0400")
-Message-ID: <87r1qqro8i.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73A448018A4;
+ Fri, 25 Sep 2020 13:14:04 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-116-239.rdu2.redhat.com [10.10.116.239])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EC1FF7B7A2;
+ Fri, 25 Sep 2020 13:13:56 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+ id 7C5CB222FC0; Fri, 25 Sep 2020 09:13:56 -0400 (EDT)
+Date: Fri, 25 Sep 2020 09:13:56 -0400
+From: Vivek Goyal <vgoyal@redhat.com>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: virtiofs vs 9p performance
+Message-ID: <20200925131356.GD132653@redhat.com>
+References: <20200918213436.GA3520@redhat.com>
+ <46D726A6-72F3-40FE-9382-A189513F783D@intel.com>
+ <20200924221023.GB132653@redhat.com> <17216624.eqST2d0sUl@silver>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <17216624.eqST2d0sUl@silver>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=vgoyal@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=vgoyal@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 01:07:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 02:48:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -32
 X-Spam_score: -3.3
@@ -99,63 +95,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, John Snow <jsnow@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: "Shinde, Archana M" <archana.m.shinde@intel.com>, "Venegas Munoz,
+ Jose Carlos" <jose.carlos.venegas.munoz@intel.com>, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ virtio-fs-list <virtio-fs@redhat.com>, Greg Kurz <groug@kaod.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ "cdupontd@redhat.com" <cdupontd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cleber Rosa <crosa@redhat.com> writes:
+On Fri, Sep 25, 2020 at 10:06:41AM +0200, Christian Schoenebeck wrote:
+> On Freitag, 25. September 2020 00:10:23 CEST Vivek Goyal wrote:
+> > In my testing, with cache=none, virtiofs performed better than 9p in
+> > all the fio jobs I was running. For the case of cache=auto  for virtiofs
+> > (with xattr enabled), 9p performed better in certain write workloads. I
+> > have identified root cause of that problem and working on
+> > HANDLE_KILLPRIV_V2 patches to improve WRITE performance of virtiofs
+> > with cache=auto and xattr enabled.
+> 
+> Please note, when it comes to performance aspects, you should set a reasonable 
+> high value for 'msize' on 9p client side:
+> https://wiki.qemu.org/Documentation/9psetup#msize
 
-> On Wed, Sep 23, 2020 at 02:37:27PM -0400, John Snow wrote:
->> On 9/23/20 11:26 AM, Eduardo Habkost wrote:
->> > On Tue, Sep 22, 2020 at 05:00:51PM -0400, John Snow wrote:
->> > > Make the file handling here just a tiny bit more idiomatic.
->> > > (I realize this is heavily subjective.)
->> > > 
->> > > Use exist_ok=True for os.makedirs and remove the exception,
->> > > use fdopen() to wrap the file descriptor in a File-like object,
->> > > and use a context manager for managing the file pointer.
->> > > 
->> > > Signed-off-by: John Snow <jsnow@redhat.com>
->> > 
->> > Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
->> > 
->> > I really miss a comment below explaining why we use
->> > open(os.open(pathname, ...), ...) instead of open(pathname, ...).
+Interesting. I will try that. What does "msize" do? 
 
-This code:
+> 
+> I'm also working on performance optimizations for 9p BTW. There is plenty of 
+> headroom to put it mildly. For QEMU 5.2 I started by addressing readdir 
+> requests:
+> https://wiki.qemu.org/ChangeLog/5.2#9pfs
 
-        fd = os.open(pathname, os.O_RDWR | os.O_CREAT, 0o666)
-        f = open(fd, 'r+', encoding='utf-8')
+Nice. I guess this performance comparison between 9p and virtiofs is good.
+Both the projects can try to identify weak points and improve performance.
 
->> Not known to me. It was introduced in 907b846653 as part of an effort to
->> reduce rebuild times. Maybe this avoids a modification time change if the
->> file already exists?
->> 
->> Markus?
->
-> AFACIT the change on 907b846653 is effective because of the "is new
-> text different from old text?" conditional.  I can not see how the
-> separate/duplicate open/fdopen would contribute to that.
->
-> But, let's hear from Markus.
-
-This was my best attempt to open the file read/write, creating it if it
-doesn't exist.
-
-Plain
-
-        f = open(pathname, "r+", encoding='utf-8')
-
-fails instead of creates, and
-
-        f = open(pathname, "w+", encoding='utf-8')
-
-truncates.
-
-If you know a better way, tell me!
+Thanks
+Vivek
 
 
