@@ -7,34 +7,34 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BA2DC4727C
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 10:20:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3C73C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 10:21:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0AA421D91
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 10:20:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3EDC521D91
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 10:21:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lmichel.fr header.i=@lmichel.fr header.b="bQh+xYff"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0AA421D91
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lmichel.fr header.i=@lmichel.fr header.b="cJyQHSPw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EDC521D91
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=lmichel.fr
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLkpx-0004qa-Ne
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 06:20:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42688)
+	id 1kLkqe-00061k-7o
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 06:21:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42674)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luc@lmichel.fr>)
- id 1kLknJ-00015W-9T; Fri, 25 Sep 2020 06:17:37 -0400
-Received: from pharaoh.lmichel.fr ([149.202.28.74]:58230)
+ id 1kLknF-00014J-2A; Fri, 25 Sep 2020 06:17:36 -0400
+Received: from pharaoh.lmichel.fr ([149.202.28.74]:58106)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luc@lmichel.fr>)
- id 1kLknD-0007Ri-Si; Fri, 25 Sep 2020 06:17:36 -0400
+ id 1kLkn8-0007QK-BA; Fri, 25 Sep 2020 06:17:32 -0400
 Received: from sekoia-pc.bar.greensocs.com (sekoia-pc.home.lmichel.fr
  [192.168.61.100])
- by pharaoh.lmichel.fr (Postfix) with ESMTPS id 52DAEC60F1E;
+ by pharaoh.lmichel.fr (Postfix) with ESMTPS id 073DDC60F1A;
  Fri, 25 Sep 2020 10:17:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr; s=pharaoh; 
  t=1601029040;
@@ -42,17 +42,17 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr; s=pharaoh;
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=FcBIzmQAZtEmj8qCZRpqLApGyCCP0+6Pwhqm+5t6clU=;
- b=bQh+xYffT7DzsX3tbkSjp6Whl4VXzh71EhhJjvDnZ6MR7F6aT/RYhphYo7IGk2Pq2ULAHf
- JW0GZkNLT8vn7SHIMVkTgvt8uoYAEC1i3jMGNHnWRWERguzHZCP2za1hmiG7F5PRf6Enxy
- 2S3l+W82/8VM0XqihegViKe/i+BrCBCvo3D5jIRJEcXve6Cjf7kPurWAcfAd+ocestfSlS
- r/nLRimb7+c2aBJao2FQ7cxZO+OOiHGS4iDUOJQd71AoYoOPpdut5+hUy6CRmaAZtPhFmH
- iG8MdWHfFIW+D6B+bH9bDe5Q+o757jriRGk5nHL4NJ6mmkuJjzJC87i+mZlFag==
+ bh=P5QEx3f68QGQra+kkPmQWR7B9ok9n9lJElCkekR6j6I=;
+ b=cJyQHSPwYc0jPIEc5WYgPEdghMrGnoHcDzlKGtijwg8U2m8ra0U+B2iEjGexwPAmrGmEOT
+ 6wdx0Qt32iC0ZKmRjc+tHhp7scWTEVGE+M8d/DREubzg/SGtzhdvWKFP1pN8uvl57eoX41
+ Bie68X/6kmcmbw+cLAgcjBEvyng1f9oklGUPiHH9TGISz+IDnQlBz53sz140aGppQoZopq
+ XGXCYWksy4BlZwbrRgS71+7FotIX1E6VsE0400+48W33ep911FdYzeKRXRwn8qoq1wpFko
+ Ho4QOVEIfBU8rPMpWE9FtM7RNSkUzYXn77cWmrAF6+BEdNH+DuM6d38aZ7SQHg==
 From: Luc Michel <luc@lmichel.fr>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 06/14] hw/misc/bcm2835_cprman: implement PLLs behaviour
-Date: Fri, 25 Sep 2020 12:17:23 +0200
-Message-Id: <20200925101731.2159827-7-luc@lmichel.fr>
+Subject: [PATCH 02/14] hw/core/clock: trace clock values in Hz instead of ns
+Date: Fri, 25 Sep 2020 12:17:19 +0200
+Message-Id: <20200925101731.2159827-3-luc@lmichel.fr>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200925101731.2159827-1-luc@lmichel.fr>
 References: <20200925101731.2159827-1-luc@lmichel.fr>
@@ -64,14 +64,14 @@ ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr;
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=FcBIzmQAZtEmj8qCZRpqLApGyCCP0+6Pwhqm+5t6clU=;
- b=MQQy2NJkSTrUBjcMLhmMkVPWGC+M8WLIuBYVh0TRq94RJXuTM+nS6TRFZtE3aei+DGlIP2
- kMzaFZCFGAwjTxcfnSfi0k8sjSut+UEqSD4mDRYU8IIiPmDlEVwpC+Ng8jHc94Q2HOAdJe
- shCbn5U8QjR+00WV74DoH8JY2DKaE+wTfDTCm2V/qdsMJJHW6h7eWzYdyuqOhnzMddLD/c
- phbm38Lz5aW+Tcd4zckcbwPDhlFBGUcz0I+gecJJB4Ev+ZymZgBg0Rj56oyDDVOwvLDft7
- VAnRw8CLgoXICY1amOn1NQAKo5BwKh46P1hdaU4LZ85/TU1WNyIsbnYjk21otw==
+ bh=P5QEx3f68QGQra+kkPmQWR7B9ok9n9lJElCkekR6j6I=;
+ b=f12niBetxYie6Uj4j014WsbRL0aGVpQJS53vKG8obFag71VTm89vjxK5HIYif0RjjKQimI
+ caXeKnaV1Tqv2XgeFT9XU79NJ3R1EyhQFV23VR99bzfrGrhSepGDysL1RF4JMsK5HpD37F
+ GNHMx+fs8Lw+phNO1lROB7+KlHUzJs8n/OqR3+I4P/i0Pg9+8vd8UH8coVF/JZlycg1xGt
+ LURn2PKMMEDFbFSAylV/1vkaglV7zWNxRgrB1xXlj9D4wXSAhJ11OC6aqHgQG91y9VWe1r
+ RgRuPc2tfiEz9pe0klesELtazt2XY1hg+usRe9ykTzFbNBgbqokWX5UTUnBNGw==
 ARC-Seal: i=1; s=pharaoh; d=lmichel.fr; t=1601029040; a=rsa-sha256; cv=none;
- b=ABKocZKBspjBpwdV3Vm9KlcAHubFk7ylIe5IyrJMfKd3vcZtHDKswXM6H8en/v5MJ1hxMJP5czI3dOdYmH3C6r97LH8cSXhMobIqeder0oRDr84yohDb+iNJj9PBlOyqq+IL0dRA3UxzKEAof+1RexBGa+s5voi2gcDlMitr1gJozy+wivj/Qc/D5X7aAZALrbBQK0Mp2cYjAcRdTV8+jkepepBqyJHcMuD9ZdLwbVwOCe7HdREvEdaBM1JivNT6Egl7O/Vd5pqYg/2D87lQ6cxczJlvWiCRwtFZyd31Or+knCgV8kFuJGqGzICZCKvZl9qfmk2LNJ+UvMQTd4dkqw==
+ b=CWzyzcThJ1xsiy8bC89xELDhW5e4djNdwcPfJVZmO4/MjJKg7esbnVLYRvpt3ToM3gJXFhR1J5krgpchxIRmmyDg+32xJwmH1SB/2ef6R2OhIJHgOE8DEl/pTSm9xCfLW+DJrgy5QHREUfrVAlqSTMlHgUwz1AThua8rr45ULsYj8QCSjeQBGvHb1sTsZLU7NnXQ5P2xle5VnVqHjGd1j2mvvDHilPr+AfmGjLZBsHJH6vB6LHk1sIrU3ae9FGmiUFinodH5wBZ1c3xkjWkb78i9TPMr+BNrKvZFjyinQHzCA6OhVHkP8BdZsCctGV+6zz2tpxMog5+y+sgFrOIg6g==
 ARC-Authentication-Results: i=1;
 	pharaoh.lmichel.fr
 Received-SPF: pass client-ip=149.202.28.74; envelope-from=luc@lmichel.fr;
@@ -96,153 +96,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- Luc Michel <luc@lmichel.fr>,
+Cc: Damien Hedde <damien.hedde@greensocs.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Luc Michel <luc@lmichel.fr>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>
+ Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The cprman PLLs generate a clock based on a prescaler, a multiplier and
-a divider. The prescaler doubles the parent (xosc) frequency, then the
-multiplier/divider are applied. The multiplier has an integer and a
-fractionnal part.
+The nanosecond unit greatly limits the dynamic range we can display in
+clock value traces, for values in the order of 1GHz and more. The
+internal representation can go way beyond this value and it is quite
+common for today's clocks to be within those ranges.
 
-This commit also implements the cprman CM_LOCK register. This register
-reports which PLL is currently locked. We consider a PLL has being
-locked as soon as it is enabled (on real hardware, there is a delay
-after turning a PLL on, for it to stabilise).
+For example, a frequency between 500MHz+ and 1GHz will be displayed as
+1ns. Beyond 1GHz, it will show up as 0ns.
+
+Replace nanosecond periods traces with frequencies in the Hz unit
+to have more dynamic range in the trace output.
 
 Signed-off-by: Luc Michel <luc@lmichel.fr>
 ---
- include/hw/misc/bcm2835_cprman_internals.h |  8 +++
- hw/misc/bcm2835_cprman.c                   | 64 +++++++++++++++++++++-
- 2 files changed, 71 insertions(+), 1 deletion(-)
+ hw/core/clock.c      | 6 +++---
+ hw/core/trace-events | 4 ++--
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/include/hw/misc/bcm2835_cprman_internals.h b/include/hw/misc/bcm2835_cprman_internals.h
-index 5cfa849492..22a2500ab0 100644
---- a/include/hw/misc/bcm2835_cprman_internals.h
-+++ b/include/hw/misc/bcm2835_cprman_internals.h
-@@ -98,10 +98,18 @@ REG32(A2W_PLLA_FRAC, 0x1200)
- REG32(A2W_PLLC_FRAC, 0x1220)
- REG32(A2W_PLLD_FRAC, 0x1240)
- REG32(A2W_PLLH_FRAC, 0x1260)
- REG32(A2W_PLLB_FRAC, 0x12e0)
- 
-+/* misc registers */
-+REG32(CM_LOCK, 0x114)
-+    FIELD(CM_LOCK, FLOCKH, 12, 1)
-+    FIELD(CM_LOCK, FLOCKD, 11, 1)
-+    FIELD(CM_LOCK, FLOCKC, 10, 1)
-+    FIELD(CM_LOCK, FLOCKB, 9, 1)
-+    FIELD(CM_LOCK, FLOCKA, 8, 1)
-+
- /*
-  * This field is common to all registers. Each register write value must match
-  * the CPRMAN_PASSWORD magic value in its 8 MSB.
-  */
- FIELD(CPRMAN, PASSWORD, 24, 8)
-diff --git a/hw/misc/bcm2835_cprman.c b/hw/misc/bcm2835_cprman.c
-index ad71d30a86..ba82522eb1 100644
---- a/hw/misc/bcm2835_cprman.c
-+++ b/hw/misc/bcm2835_cprman.c
-@@ -48,13 +48,51 @@
- #include "hw/misc/bcm2835_cprman_internals.h"
- #include "trace.h"
- 
- /* PLL */
- 
-+static bool pll_is_locked(const CprmanPLLState *pll)
-+{
-+    return !FIELD_EX32(*pll->reg_a2w_ctrl, A2W_PLLx_CTRL, PWRDN)
-+        && !FIELD_EX32(*pll->reg_cm, CM_PLLx, ANARST);
-+}
-+
- static void pll_update(CprmanPLLState *pll)
+diff --git a/hw/core/clock.c b/hw/core/clock.c
+index 7066282f7b..81184734e0 100644
+--- a/hw/core/clock.c
++++ b/hw/core/clock.c
+@@ -37,12 +37,12 @@ void clock_clear_callback(Clock *clk)
+ bool clock_set(Clock *clk, uint64_t period)
  {
--    clock_update(pll->out, 0);
-+    uint64_t freq, ndiv, fdiv, pdiv;
-+
-+    if (!pll_is_locked(pll)) {
-+        clock_update(pll->out, 0);
-+        return;
-+    }
-+
-+    pdiv = FIELD_EX32(*pll->reg_a2w_ctrl, A2W_PLLx_CTRL, PDIV);
-+
-+    if (!pdiv) {
-+        clock_update(pll->out, 0);
-+        return;
-+    }
-+
-+    ndiv = FIELD_EX32(*pll->reg_a2w_ctrl, A2W_PLLx_CTRL, NDIV);
-+    fdiv = FIELD_EX32(*pll->reg_a2w_frac, A2W_PLLx_FRAC, FRAC);
-+
-+    if (pll->reg_a2w_ana[1] & pll->prediv_mask) {
-+        /* The prescaler doubles the parent frequency */
-+        ndiv *= 2;
-+        fdiv *= 2;
-+    }
-+
-+    /*
-+     * We have a multiplier with an integer part (ndiv) and a fractional part
-+     * (fdiv), and a divider (pdiv).
-+     */
-+    freq = clock_get_hz(pll->xosc_in) *
-+        ((ndiv << R_A2W_PLLx_FRAC_FRAC_LENGTH) + fdiv);
-+    freq /= pdiv;
-+    freq >>= R_A2W_PLLx_FRAC_FRAC_LENGTH;
-+
-+    clock_update_hz(pll->out, freq);
+     if (clk->period == period) {
+         return false;
+     }
+-    trace_clock_set(CLOCK_PATH(clk), CLOCK_PERIOD_TO_NS(clk->period),
+-                    CLOCK_PERIOD_TO_NS(period));
++    trace_clock_set(CLOCK_PATH(clk), CLOCK_PERIOD_TO_HZ(clk->period),
++                    CLOCK_PERIOD_TO_HZ(period));
+     clk->period = period;
+ 
+     return true;
  }
  
- static void pll_xosc_update(void *opaque)
- {
-     pll_update(CPRMAN_PLL(opaque));
-@@ -94,18 +132,42 @@ static const TypeInfo cprman_pll_info = {
- };
+@@ -52,11 +52,11 @@ static void clock_propagate_period(Clock *clk, bool call_callbacks)
  
+     QLIST_FOREACH(child, &clk->children, sibling) {
+         if (child->period != clk->period) {
+             child->period = clk->period;
+             trace_clock_update(CLOCK_PATH(child), CLOCK_PATH(clk),
+-                               CLOCK_PERIOD_TO_NS(clk->period),
++                               CLOCK_PERIOD_TO_HZ(clk->period),
+                                call_callbacks);
+             if (call_callbacks && child->callback) {
+                 child->callback(child->callback_opaque);
+             }
+             clock_propagate_period(child, call_callbacks);
+diff --git a/hw/core/trace-events b/hw/core/trace-events
+index 1ac60ede6b..6f96d8bfd0 100644
+--- a/hw/core/trace-events
++++ b/hw/core/trace-events
+@@ -29,8 +29,8 @@ resettable_phase_exit_end(void *obj, const char *objtype, unsigned count) "obj=%
+ resettable_transitional_function(void *obj, const char *objtype) "obj=%p(%s)"
  
- /* CPRMAN "top level" model */
- 
-+static uint32_t get_cm_lock(const BCM2835CprmanState *s)
-+{
-+    static const int CM_LOCK_MAPPING[] = {
-+        [CPRMAN_PLLA] = R_CM_LOCK_FLOCKA_SHIFT,
-+        [CPRMAN_PLLC] = R_CM_LOCK_FLOCKC_SHIFT,
-+        [CPRMAN_PLLD] = R_CM_LOCK_FLOCKD_SHIFT,
-+        [CPRMAN_PLLH] = R_CM_LOCK_FLOCKH_SHIFT,
-+        [CPRMAN_PLLB] = R_CM_LOCK_FLOCKB_SHIFT,
-+    };
-+
-+    uint32_t r = 0;
-+    size_t i;
-+
-+    for (i = 0; i < CPRMAN_NUM_PLL; i++) {
-+        r |= pll_is_locked(&s->plls[i]) << CM_LOCK_MAPPING[i];
-+    }
-+
-+    return r;
-+}
-+
- static uint64_t cprman_read(void *opaque, hwaddr offset,
-                                     unsigned size)
- {
-     BCM2835CprmanState *s = CPRMAN(opaque);
-     uint64_t r = 0;
-     size_t idx = offset / sizeof(uint32_t);
- 
-     switch (idx) {
-+    case R_CM_LOCK:
-+        r = get_cm_lock(s);
-+        break;
-+
-     default:
-         r = s->regs[idx];
-     }
- 
-     trace_bcm2835_cprman_read(offset, r);
+ # clock.c
+ clock_set_source(const char *clk, const char *src) "'%s', src='%s'"
+ clock_disconnect(const char *clk) "'%s'"
+-clock_set(const char *clk, uint64_t old, uint64_t new) "'%s', ns=%"PRIu64"->%"PRIu64
++clock_set(const char *clk, uint64_t old, uint64_t new) "'%s', %"PRIu64"hz->%"PRIu64"hz"
+ clock_propagate(const char *clk) "'%s'"
+-clock_update(const char *clk, const char *src, uint64_t val, int cb) "'%s', src='%s', ns=%"PRIu64", cb=%d"
++clock_update(const char *clk, const char *src, uint64_t hz, int cb) "'%s', src='%s', val=%"PRIu64"hz cb=%d"
 -- 
 2.28.0
 
