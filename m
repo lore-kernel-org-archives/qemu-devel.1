@@ -2,110 +2,90 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D3C5C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 11:33:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4465C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 11:35:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 980CF21741
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 11:33:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4DD44206C9
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 11:35:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hSseRNT2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 980CF21741
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ce8LlW+i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DD44206C9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLlyG-0003PB-IT
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 07:33:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58638)
+	id 1kLm0j-0004uY-BE
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 07:35:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59358)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLlwI-0002VM-Lr
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 07:30:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29705)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kLlzw-0004OS-Fc
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 07:34:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41125)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLlwF-0008Ab-83
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 07:30:58 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kLlzu-00005k-83
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 07:34:44 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601033451;
+ s=mimecast20190719; t=1601033680;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zKZZrcTTUfCrWEB2p75YHwDXbFiTqANqvHc9qq8r3UY=;
- b=hSseRNT27DTGEwDFEGm6MrkaIH7W3MW56613nwXi3jxyiuSuncnpkaL42ajPsnjr1klOaw
- KSEBjGwNCuhwm8ONaJiix4JIWQgWiFWVPyymWhQ1RnwTVx3rhL6BpCk0XJh0jTHzGOoLqb
- jgk3TLcigNJ60X05RKZGKINj7OncLeU=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-16-06k6euowPBi68IsVlo-kTQ-1; Fri, 25 Sep 2020 07:30:49 -0400
-X-MC-Unique: 06k6euowPBi68IsVlo-kTQ-1
-Received: by mail-wm1-f69.google.com with SMTP id a7so983191wmc.2
- for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 04:30:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=zKZZrcTTUfCrWEB2p75YHwDXbFiTqANqvHc9qq8r3UY=;
- b=hUx7lKAQwuuUN7s6FFmCsDj82vH9Cf3hmzDMAc/vHLdghJH3WUalTKo5Nl32Vy/14I
- AiSwMNfQkzE4S6d0JAaWFwtmZsW44rxTcLdGepCqAclkpcK4WKLr1NjJPt/dutwUk0Aa
- 7puhyotKzOwiWBJsBemLZrWWrvcZuhyShbewxrKAQkxxJ/CacLuI7mJtQXlE+BO4QXIZ
- 3qjQiCiR/Thb2c1SfK+qf/ocyr8ZAYgPyybVALBXH5ndc9/uWsjxfZZnvYFB+gZkabWM
- 5UvIOIbl0tHQtoStDjTaA2q4T6ZJzmGJIk4vtifpriDi5sX1PtLJPlqs+vcSqAE+kOsE
- b7AA==
-X-Gm-Message-State: AOAM532cHHnvo1SV2L2YX5CO12Cr1EYamTvbX3TrJmTuDlPPc0sTwENy
- oDku+yjckpQa9Vgs8QDyU/6b7VULa9VspMCZyWZI6ICeQeUOxUzVB1J4XQ09T27Z6zO6tY5X0/V
- yrXgHOChBw0hciSU=
-X-Received: by 2002:a1c:9ecb:: with SMTP id h194mr2568599wme.140.1601033448376; 
- Fri, 25 Sep 2020 04:30:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxYlEnMigaSfYf4niUOTn8wzsJKGGNYQ+L9QkSW6nP6LehIdxmuyOdwJwH/9U+D+m+1OrP96g==
-X-Received: by 2002:a1c:9ecb:: with SMTP id h194mr2568570wme.140.1601033448045; 
- Fri, 25 Sep 2020 04:30:48 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ec9b:111a:97e3:4baf?
- ([2001:b07:6468:f312:ec9b:111a:97e3:4baf])
- by smtp.gmail.com with ESMTPSA id b18sm2694079wrn.21.2020.09.25.04.30.47
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 25 Sep 2020 04:30:47 -0700 (PDT)
-Subject: Re: [PULL v2 00/92] Misc patches for 2020-09-24
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200925102257.1848666-1-pbonzini@redhat.com>
- <CAFEAcA-okvLfrjtvVVUWJWunzOSC8kgAEUuMM1JXciebfSJ0pg@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cd81135c-8374-1b43-ed3b-b09b6d577cc7@redhat.com>
-Date: Fri, 25 Sep 2020 13:30:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ bh=2tdPJ5EKowE8mjiA2GEYq3JC4e1DV/J3PJ42fjXpJPI=;
+ b=Ce8LlW+iRmJQLsIeaJi8ODN3T4gF6KaUPKcNleRz5JYsmupouS4elAylnS6kOBiLXpGR5O
+ KS1LHZXYYyFFNF2Bcqoy12Z48dfKFlRl8FfwG7x6yxMhX+hA6FqzJCrRpdiDKF46HAl6sO
+ TaFn84XMRxB8hmePsVGIPc4AKu2QANk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-526-9F_N25HnMNCFNzpE8HOz9A-1; Fri, 25 Sep 2020 07:34:37 -0400
+X-MC-Unique: 9F_N25HnMNCFNzpE8HOz9A-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B77D10BBEDA;
+ Fri, 25 Sep 2020 11:34:36 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-70.ams2.redhat.com
+ [10.36.112.70])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 31FEC7368C;
+ Fri, 25 Sep 2020 11:34:36 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id B204B113865F; Fri, 25 Sep 2020 13:34:34 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>
+Subject: Re: [PATCH v2 02/38] qapi-gen: Separate arg-parsing from generation
+References: <20200922210101.4081073-1-jsnow@redhat.com>
+ <20200922210101.4081073-3-jsnow@redhat.com>
+ <20200923000031.GB191229@localhost.localdomain>
+Date: Fri, 25 Sep 2020 13:34:34 +0200
+In-Reply-To: <20200923000031.GB191229@localhost.localdomain> (Cleber Rosa's
+ message of "Tue, 22 Sep 2020 20:00:31 -0400")
+Message-ID: <87zh5et7hx.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-okvLfrjtvVVUWJWunzOSC8kgAEUuMM1JXciebfSJ0pg@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+Content-Type: text/plain
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 01:07:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -34
-X-Spam_score: -3.5
+X-Spam_score_int: -32
+X-Spam_score: -3.3
 X-Spam_bar: ---
-X-Spam_report: (-3.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
+X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.238, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,63 +98,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, John Snow <jsnow@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 25/09/20 12:45, Peter Maydell wrote:
-> On Fri, 25 Sep 2020 at 11:33, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> The following changes since commit 8c1c07929feae876202ba26f07a540c5115c18cd:
->>
->>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2020-09-24 18:48:45 +0100)
->>
->> are available in the Git repository at:
->>
->>   https://gitlab.com/bonzini/qemu.git tags/for-upstream
->>
->> for you to fetch changes up to 24c146dec201c64552b20eec5a442687b65fd93d:
->>
->>   hw/net/can: Correct Kconfig dependencies (2020-09-25 06:18:57 -0400)
->>
->> ----------------------------------------------------------------
->> * SCSI fix (Dmitry, Li Feng, Li Qiang)
->> * memory API fixes (Eduardo)
->> * removal of deprecated '-numa node', 'cpu-add', '-smp' (Igor)
->> * ACPI fix for VMBus (Jon)
->> * relocatable install (myself)
->> * always remove docker containers (myself)
->> * serial cleanups (Philippe)
->> * vmware cpuid leaf for tsc and apic frequency (Sunil)
->> * KVM_FEATURE_ASYNC_PF_INT support (Vitaly)
->> * i386 XSAVE bugfix (Xiaoyao)
->> * QOM developer documentation in docs/devel (Eduardo)
->> * new checkpatch tests (Dov)
->> * x86_64 syscall fix (Douglas)
->> * interrupt-based APF fix (Vitaly)
->> * always create kvmclock (Vitaly)
->> * fix bios-tables-test (Eduardo)
->> * KVM PV features cleanup (myself)
->> * CAN FD (Pavel)
->>
->> meson:
->> * fixes (Marc-André, Max, Stefan, Alexander, myself)
->> * submodule and environment CFLAGS overhaul (myself)
->> * moved libmpathpersist, cocoa, malloc tests (myself)
->> * support for 0.56 introspected test dependencies (myself)
-> 
->  Date: Fri Sep 25 11:41:22 2020 +0100
->     Signed-off-by: Philippe Mathieu-DaudÃ© <f4bug@amsat.org>
-> ERROR: pull request includes tag with UTF-8 error in person name
-> 
-> (that's "configure: Do not intent to build WHPX on 32-bit host")
-> 
-> (I will run the merge through the other tests to see if there's
-> any other issues with it.)
+Cleber Rosa <crosa@redhat.com> writes:
 
-Thanks, I have pushed again and sent v3.
+> On Tue, Sep 22, 2020 at 05:00:25PM -0400, John Snow wrote:
+>> This is a minor re-work of the entrypoint script. It isolates a
+>> generate() method from the actual command-line mechanism.
+>> 
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  scripts/qapi-gen.py | 87 ++++++++++++++++++++++++++++++++-------------
+>>  1 file changed, 63 insertions(+), 24 deletions(-)
+>> 
+>> diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
+>> index 4b03f7d53b..59becba3e1 100644
+>> --- a/scripts/qapi-gen.py
+>> +++ b/scripts/qapi-gen.py
+>> @@ -1,9 +1,13 @@
+>>  #!/usr/bin/env python3
+>> -# QAPI generator
+>> -#
+>> +
+>>  # This work is licensed under the terms of the GNU GPL, version 2 or later.
+>>  # See the COPYING file in the top-level directory.
+>>  
+>> +"""
+>> +QAPI Generator
+>> +
+>> +This script is the main entry point for generating C code from the QAPI schema.
+>> +"""
+>>  
+>>  import argparse
+>>  import re
+>> @@ -11,21 +15,65 @@
+>>  
+>>  from qapi.commands import gen_commands
+>>  from qapi.doc import gen_doc
+>> +from qapi.error import QAPIError
+>>  from qapi.events import gen_events
+>>  from qapi.introspect import gen_introspect
+>> -from qapi.schema import QAPIError, QAPISchema
+>> +from qapi.schema import QAPISchema
+>>  from qapi.types import gen_types
+>>  from qapi.visit import gen_visit
+>>  
+>>  
+>> -def main(argv):
+>> +DEFAULT_OUTPUT_DIR = ''
+>> +DEFAULT_PREFIX = ''
+>
+> I did not understand the purpose of these.  If they're used only as
+> the default value for the command line option parsing, I'd suggest
+> dropping them.
+>
+>> +
+>> +
+>> +def generate(schema_file: str,
+>> +             output_dir: str,
+>> +             prefix: str,
+>> +             unmask: bool = False,
+>> +             builtins: bool = False) -> None:
+>> +    """
+>> +    generate uses a given schema to produce C code in the target directory.
+>> +
+>> +    :param schema_file: The primary QAPI schema file.
+>> +    :param output_dir: The output directory to store generated code.
+>> +    :param prefix: Optional C-code prefix for symbol names.
+>> +    :param unmask: Expose non-ABI names through introspection?
+>> +    :param builtins: Generate code for built-in types?
+>> +
+>> +    :raise QAPIError: On failures.
+>> +    """
+>> +    match = re.match(r'([A-Za-z_.-][A-Za-z0-9_.-]*)?', prefix)
+>> +    if match and match.end() != len(prefix):
+>
+> Nice catch with the extra check here.  Maybe worth mentioning and/or
+> splitting the change?
 
-Paolo
+Please do not sneak additional checking into patches advertized as pure
+refactoring.  It makes me look for more sneakery with a microscope.
+
+This re.match() cannot possibly fail.  Three cases:
+
+* First character is funny
+
+  The regexp matches the empty string.  There's a reason the regexp ends
+  with '?'.
+
+* Non-first character is funny
+
+  The regexp matches the non-funny prefix.
+
+* No character is funny
+
+  The regexp matches the complete string.
+
+Checking impossible conditions as if they were possible is confusing.
+Please drop the additional check.
+
+We can talk about checking this impossible condition with
+
+        assert(match)
+
+if you believe it makes the code easier to understand (it does not
+improve its behavior).
+
+>> +        msg = "funny character '{:s}' in prefix '{:s}'".format(
+>> +            prefix[match.end()], prefix)
+>> +        raise QAPIError('', None, msg)
+>> +
+>> +    schema = QAPISchema(schema_file)
+>> +    gen_types(schema, output_dir, prefix, builtins)
+>> +    gen_visit(schema, output_dir, prefix, builtins)
+>> +    gen_commands(schema, output_dir, prefix)
+>> +    gen_events(schema, output_dir, prefix)
+>> +    gen_introspect(schema, output_dir, prefix, unmask)
+>> +    gen_doc(schema, output_dir, prefix)
+>> +
+>> +
+>> +def main() -> int:
+>
+> One extra Pythonic touch would be to use a bool here, and then:
+>
+>   sys.exit(0 if main() else 1)
+>
+> But that's probably overkill.
+
+Yuck :)
+
+>> +    """
+>> +    gapi-gen shell script entrypoint.
+>> +    Expects arguments via sys.argv, see --help for details.
+>> +
+>> +    :return: int, 0 on success, 1 on failure.
+>> +    """
+>>      parser = argparse.ArgumentParser(
+>>          description='Generate code from a QAPI schema')
+>>      parser.add_argument('-b', '--builtins', action='store_true',
+>>                          help="generate code for built-in types")
+>> -    parser.add_argument('-o', '--output-dir', action='store', default='',
+>> +    parser.add_argument('-o', '--output-dir', action='store',
+>> +                        default=DEFAULT_OUTPUT_DIR,
+>>                          help="write output to directory OUTPUT_DIR")
+>> -    parser.add_argument('-p', '--prefix', action='store', default='',
+>> +    parser.add_argument('-p', '--prefix', action='store',
+>> +                        default=DEFAULT_PREFIX,
+>>                          help="prefix for symbols")
+>>      parser.add_argument('-u', '--unmask-non-abi-names', action='store_true',
+>>                          dest='unmask',
+>> @@ -33,26 +81,17 @@ def main(argv):
+>>      parser.add_argument('schema', action='store')
+>>      args = parser.parse_args()
+>>  
+>> -    match = re.match(r'([A-Za-z_.-][A-Za-z0-9_.-]*)?', args.prefix)
+>> -    if match.end() != len(args.prefix):
+>> -        print("%s: 'funny character '%s' in argument of --prefix"
+>> -              % (sys.argv[0], args.prefix[match.end()]),
+>> -              file=sys.stderr)
+>> -        sys.exit(1)
+>> -
+>>      try:
+>> -        schema = QAPISchema(args.schema)
+>> +        generate(args.schema,
+>> +                 output_dir=args.output_dir,
+>> +                 prefix=args.prefix,
+>> +                 unmask=args.unmask,
+>> +                 builtins=args.builtins)
+>>      except QAPIError as err:
+>> -        print(err, file=sys.stderr)
+>> -        exit(1)
+>> -
+>
+> Glad to see that this "quitter" is gone in favor of one and only
+> sys.exit().
+
+I'm totally fine with having multiple sys.exit() in main().  They become
+icky only when buried too deeply.
+
+I'm fine with John's patch regardless.
+
+[...]
 
 
