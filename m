@@ -2,89 +2,98 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2893BC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 08:46:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0174FC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 08:50:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64FCC20878
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 08:46:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3073B208B6
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 08:50:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UH4Zm0md"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64FCC20878
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ND+XpwDK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3073B208B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLjN2-0005GI-6G
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 04:46:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51496)
+	id 1kLjQt-0007YJ-4N
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 04:50:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52542)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kLjM9-0004l0-Q1
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 04:45:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30326)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kLjM7-0004cZ-TL
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 04:45:29 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601023526;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=3LHJiy8weVYxlFI8NtJls1pPZFILxQrGjeO4fr+5XmE=;
- b=UH4Zm0mdlT7zSKJQS4GYJyGyLHepHKL3i/uX8qBm4YFGOeNUspKUSI/r8kfybsLf3JDVey
- 6jxQDQ5YURe7L22qJWfmtxB2thD/Wp5GedW7Hz+heEC3N+4SxX3vz8A/g6tAz6YTmpXAwU
- mo6DpH8aDBl9M+0oFpb2OKBVk07LXxk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-250-p6hnfKS8OeuQ7mmKfFPcDQ-1; Fri, 25 Sep 2020 04:45:22 -0400
-X-MC-Unique: p6hnfKS8OeuQ7mmKfFPcDQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E128718BA284;
- Fri, 25 Sep 2020 08:45:21 +0000 (UTC)
-Received: from localhost (ovpn-113-240.ams2.redhat.com [10.36.113.240])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 862539CBA;
- Fri, 25 Sep 2020 08:45:21 +0000 (UTC)
-Date: Fri, 25 Sep 2020 09:45:20 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH v2 00/31] block/export: Add infrastructure and QAPI for
- block exports
-Message-ID: <20200925084520.GC33068@stefanha-x1.localdomain>
-References: <20200924152717.287415-1-kwolf@redhat.com>
- <160096811541.10265.13762738300010781996@66eaa9a8a123>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kLjQ3-0006BU-Fs
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 04:49:31 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34887)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kLjQ1-00055j-6C
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 04:49:31 -0400
+Received: by mail-wr1-x444.google.com with SMTP id e16so2702276wrm.2
+ for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 01:49:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:references:cc:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=OIG3ioBMUvSSwqYiPcw4dMqr0pYCRpm2bB017m6nl9A=;
+ b=ND+XpwDKQrskPJehavdtDOk9TNyfODe4XnuOZH4INhyVrXMxB0pGTZP6VEmuHnETeY
+ uj4/RMT7sKVK3aKXwTgarhF8/h9aV3YlxJ1bjn0aqua/UzxkHe2k+vnONQCfB/zMa1JX
+ dy6Z00HWFxvjevIHbsPSac+4Jzkd8zCnnEwCwhYxuaKYjQ/JWHN/HvKcAfYTcwNyynM9
+ a7tyFNmRenFRw3lqMgervKQr2Ht6ILkk15xMR1Vy9C4g5MLQMsrdEfHHjI+kJUYFnzjN
+ bMXZuPcV363uGWD4Iyho4Y+R5VS53RqW3URVi8Lp7Vixfz50vpczn7QJuaMLnqEZ0ChV
+ B9Ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:references:cc:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=OIG3ioBMUvSSwqYiPcw4dMqr0pYCRpm2bB017m6nl9A=;
+ b=mCJnoXdZIEeyepv7jI/7Kc0q9HJSbI47ad+RRdCwX23vPwHOWp0It4vqF627p0z/Lb
+ YFIq8gFZ+wdPuWi67En7XXokhnTiUzzAfnejii0ozJsl3thQFrTcpcC8/xe9JKTQ5tQD
+ h4tPp2IvBvuc7+P6+lSg3G5pcHtkCxtEQ/tuZOS286OLd0DhUP449DB1M6t+uh0Dw/O7
+ w8OhPU751zYPfZ/2TNmG0AFaOKvq0/YTXlcN9zy+AEH5pKRQCptEsHsx7iqoqyAqqEwR
+ wIUu5ulMjUSwOTkoVo8aZjGL0qm30oQQUQJ0DoI/kS6I+y543eDSBV3nG93EoFYoPiRe
+ NgdQ==
+X-Gm-Message-State: AOAM531LEds5dRQrHpFHMJ9JY0g8erbkwoyq+O1xXrBUuTX6C0lYi+4y
+ okrz5VAOTnhbOBHE7Rx0yjs=
+X-Google-Smtp-Source: ABdhPJwyV1TS1iqFQ4pdtLRO+sxUgv57Jix4xyIAwyKavyYQp6tGj95bwIkVTCGcppXSx5jrmTOsNQ==
+X-Received: by 2002:a5d:40cd:: with SMTP id b13mr3255421wrq.297.1601023767367; 
+ Fri, 25 Sep 2020 01:49:27 -0700 (PDT)
+Received: from [192.168.1.34] (234.red-88-10-103.dynamicip.rima-tde.net.
+ [88.10.103.234])
+ by smtp.gmail.com with ESMTPSA id b64sm1905308wmh.13.2020.09.25.01.49.26
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 25 Sep 2020 01:49:26 -0700 (PDT)
+Subject: Re: [PATCH] tests/vm: Add Haiku test based on their vagrant images
+To: Alexander von Gluck IV <kallisti5@unixzen.com>, qemu-devel@nongnu.org
+References: <20200906143439.1924930-1-kallisti5@unixzen.com>
+ <00452072441b963bd56bcc9a8b758bfc@unixzen.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <1d836472-8f5d-438f-2c4a-e09d3cbe1e87@amsat.org>
+Date: Fri, 25 Sep 2020 10:49:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <160096811541.10265.13762738300010781996@66eaa9a8a123>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="3siQDZowHQqNOShm"
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 01:07:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -32
-X-Spam_score: -3.3
-X-Spam_bar: ---
-X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+In-Reply-To: <00452072441b963bd56bcc9a8b758bfc@unixzen.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -19
+X-Spam_score: -2.0
+X-Spam_bar: --
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.248, NICE_REPLY_A=-0.214,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,43 +106,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+Cc: Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---3siQDZowHQqNOShm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Hi Alexander,
 
-On Thu, Sep 24, 2020 at 10:21:56AM -0700, no-reply@patchew.org wrote:
-> ERROR: "(foo*)" should be "(foo *)"
-> #156: FILE: blockdev-nbd.c:224:
-> +    return (BlockExport*) exp;
-[...]
-> ERROR: "(foo*)" should be "(foo *)"
-> #49: FILE: blockdev-nbd.c:239:
-> +    blk_exp_unref((BlockExport*) exp);
+On 9/6/20 4:41 PM, Alexander von Gluck IV wrote:
+> September 6, 2020 9:35 AM, "Alexander von Gluck IV" <kallisti5@unixzen.com> wrote:
+>> Signed-off-by: Alexander von Gluck IV <kallisti5@unixzen.com>
+>> ---
+>> tests/keys/vagrant | 27 +++++++++
+>> tests/keys/vagrant.pub | 1 +
+>> tests/vm/basevm.py | 5 +-
+>> tests/vm/haiku.x86_64 | 121 +++++++++++++++++++++++++++++++++++++++++
+>> 4 files changed, 152 insertions(+), 2 deletions(-)
+>> create mode 100644 tests/keys/vagrant
+>> create mode 100644 tests/keys/vagrant.pub
+>> create mode 100755 tests/vm/haiku.x86_64
+>>
+>> diff --git a/tests/keys/vagrant b/tests/keys/vagrant
+>> new file mode 100644
+>> index 0000000000..7d6a083909
+>> --- /dev/null
+>> +++ b/tests/keys/vagrant
+>> @@ -0,0 +1,27 @@
+>> +-----BEGIN RSA PRIVATE KEY-----
+>> +MIIEogIBAAKCAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzI
+>>
+>> diff --git a/tests/keys/vagrant.pub b/tests/keys/vagrant.pub
+>> new file mode 100644
+>> index 0000000000..18a9c00fd5
+>> --- /dev/null
+>> +++ b/tests/keys/vagrant.pub
+>> @@ -0,0 +1 @@
+>> +ssh-rsa
+>> AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oX
+> 
+> A little background information for context. These are the Vagrant SSH keys which are packed with every vagrant OS image and allow OS access for automation.  The python vm tester knowing of these lets it leverage Vagrant OS images for testing without much work.
 
-These can be fixed when merging the patches.
+Please add this information as comment in the source files.
 
-Stefan
+> 
+> 
+> 
+>> --- a/tests/vm/basevm.py
+>> +++ b/tests/vm/basevm.py
+>> @@ -44,6 +44,7 @@ DEFAULT_CONFIG = {
+>> 'machine' : 'pc',
+>> 'guest_user' : "qemu",
+>> 'guest_pass' : "qemupass",
+>> + 'root_user' : "root",
+>> 'root_pass' : "qemupass",
+>> 'ssh_key_file' : SSH_KEY_FILE,
+>> 'ssh_pub_key_file': SSH_PUB_KEY_FILE,
+>> @@ -245,13 +246,13 @@ class BaseVM(object):
+>> return self._ssh_do(self._config["guest_user"], cmd, False)
+>>
+>> def ssh_root(self, *cmd):
+>> - return self._ssh_do("root", cmd, False)
+>> + return self._ssh_do(self._config["root_user"], cmd, False)
+>>
+>> def ssh_check(self, *cmd):
+>> self._ssh_do(self._config["guest_user"], cmd, True)
+>>
+>> def ssh_root_check(self, *cmd):
+>> - self._ssh_do("root", cmd, True)
+>> + self._ssh_do(self._config["root_user"], cmd, True)
+>>
+>> def build_image(self, img):
+>> raise NotImplementedError
+> 
+> 
+> Haiku's user is UID 0, so essentially our root user isn't named root.
+> This adds the (optional) ability to override the root username.
 
---3siQDZowHQqNOShm
-Content-Type: application/pgp-signature; name="signature.asc"
+Ditto.
 
------BEGIN PGP SIGNATURE-----
+> 
+> 
+>> diff --git a/tests/vm/haiku.x86_64 b/tests/vm/haiku.x86_64
+>> new file mode 100755
+>> index 0000000000..9777722f51
+>> --- /dev/null
+>> +++ b/tests/vm/haiku.x86_64
+>> @@ -0,0 +1,121 @@
+>> +#!/usr/bin/env python3
+>> +#
+>> +# Haiku VM image
+>> +#
+>> +# Copyright 2020 Haiku, Inc.
+>> +#
+>> +# Authors:
+>> +# Alexander von Gluck IV <kallisti5@unixzen.com>
+>> +#
+>> +# This code is licensed under the GPL version 2 or later. See
+>> +# the COPYING file in the top-level directory.
+>> +#
+> 
+> 
+> This build script works as expected, transferring the qemu archive over
+> via the virtio block device and building it.
+> 
+> More information here (including output of tools):
+> https://bugs.launchpad.net/qemu/+bug/1715203
+> 
+> This purpose of this is trying to prevent the need to remove
+> upstream qemu support for Haiku.
+> 
+> We have some out-of-tree patches to fix the error seen in our ports, i'll
+> work on upstreaming these.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9triAACgkQnKSrs4Gr
-c8gdSgf/X8kQ254qRZSSUfiQsDWirPW0GgvOLXhzxroGzJ6F8QopC6wawDaCHs3m
-J2sq1TTdt7DzVf3xaO5MbTJvWT4327aY5dRx/N0BtEtnBzRvXNcMBjkJ8du+VdpN
-uoioPgVpH/duivaBgyv7Kjn4yoP/cmyPPVGnqJGNdr5tkBX319+eR8qQ8M2krgrV
-jvBTFNHMWn5SSJsXyWu04kWEq6N1TlpRll5TusAkinuy/Nl5QQ0NpgkTthEI+TZ3
-EVjMx4xPhQz39WyTlj+yawcLYYkaHaNoHqX2IulK3lCaWjGyla3X33eETiLUhIt4
-x5SlZgHK4HTfNA7+ZaZfTR9EiEKlvA==
-=6Dvw
------END PGP SIGNATURE-----
+Please do, because so far this fail before compiling the 10th file:
 
---3siQDZowHQqNOShm--
+slirp/src/tftp.c: In function 'tftp_read_data':
+slirp/src/tftp.c:113:50: error: 'O_BINARY' undeclared (first use in this
+function); did you mean 'L_INCR'?
+         spt->fd = open(spt->filename, O_RDONLY | O_BINARY);
+                                                  ^~~~~~~~
+                                                  L_INCR
 
+To avoid using 4GB of temporary storage in my HOMEDIR I had
+to do this change:
+
+-- >8 --
+--- a/tests/vm/haiku.x86_64
++++ b/tests/vm/haiku.x86_64
+@@ -93,17 +93,15 @@ class HaikuVM(basevm.BaseVM):
+
+     def build_image(self, img):
+         self.print_step("Downloading disk image")
+-        cvg = self._download_with_cache(self.link, sha256sum=self.csum)
+-        cgz = cvg + ".tar.gz"
+-        img_tmp = "./box.img"
++        tarball = self._download_with_cache(self.link, sha256sum=self.csum)
++
++        self.print_step("Extracting disk image")
++
++        subprocess.check_call(["tar", "xzf", tarball, "./box.img", "-O"],
++                              stdout=open(img, 'wb'))
+
+         self.print_step("Preparing disk image")
+-
+-        subprocess.check_call(["cp", "-f", cvg, cgz])
+-        subprocess.check_call(["tar", "xvzf", cgz, img_tmp])
+-        subprocess.check_call(["chmod", "666", img_tmp])
+-
+-        self.boot(img_tmp)
++        self.boot(img)
+
+         # Wait for ssh to be available.
+         self.wait_ssh(wait_root=True, cmd="exit 0")
+@@ -112,9 +110,6 @@ class HaikuVM(basevm.BaseVM):
+         self.ssh_root("pkgman install -y %s" % " ".join(self.requirements))
+         self.graceful_shutdown()
+
+-        if os.path.exists(cgz):
+-            os.remove(cgz)
+-        subprocess.check_call(["mv", img_tmp, img])
+         self.print_step("All done")
+
+ if __name__ == "__main__":
+---
+
+Note that something is not working well in your script because
+the image is extracted/reinstalled each time. This has to be
+done once, then we reuse the image for the builds.
+
+Also, please address Thomas comment.
+
+Thanks,
+
+Phil.
 
