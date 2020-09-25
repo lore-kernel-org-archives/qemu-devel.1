@@ -2,86 +2,91 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C459C4727D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 16:28:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 529DEC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 16:29:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8569221EC
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 16:28:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9EC83206E5
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 16:29:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ScPFmgtX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8569221EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Oem/5z2S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EC83206E5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLqa5-0003Uf-QU
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 12:28:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43916)
+	id 1kLqbX-0005cl-JG
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 12:29:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47940)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kLqGT-0005N2-1C
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 12:08:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26582)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kLqGQ-0004Lq-0E
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 12:08:04 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601050080;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=iw1gWC5GW3AuHGJTIbuLqmMQjqTiUSF+r9QKoQ/zpYw=;
- b=ScPFmgtX6y8W+VwzN9zP6hUDtjn6yyzK+bTvAw8n29slxNXbMOfRmg+O1qLSiGyFPyv2fG
- bdBLsqUgzkWL3WFbXu5yv5Ohnc/0FSL0XurxhA2AaoNpVkFaE1gzCHQj6OD03BlRMJLjXh
- MJp+nOed41K9I9IVtYuDh2A9okukHX0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-410--nUvBH1LNYGJKEOIpXKQyA-1; Fri, 25 Sep 2020 12:07:57 -0400
-X-MC-Unique: -nUvBH1LNYGJKEOIpXKQyA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B0531882FB3;
- Fri, 25 Sep 2020 16:07:56 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-83.ams2.redhat.com [10.36.114.83])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ED09B60CCC;
- Fri, 25 Sep 2020 16:07:51 +0000 (UTC)
-Date: Fri, 25 Sep 2020 18:07:50 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH v7 13/13] block: Convert 'block_resize' to coroutine
-Message-ID: <20200925160750.GJ5731@linux.fritz.box>
-References: <20200909151149.490589-1-kwolf@redhat.com>
- <20200909151149.490589-14-kwolf@redhat.com>
- <20200915145733.GF629589@stefanha-x1.localdomain>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kLqVR-0006hO-QI
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 12:23:33 -0400
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:50349)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kLqVQ-0006of-2M
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 12:23:33 -0400
+Received: by mail-wm1-x336.google.com with SMTP id e17so3637443wme.0
+ for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 09:23:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=6jDfZ800Wl3nx3KWVZmGyBEziqyPjN03/nUW4cQFzOE=;
+ b=Oem/5z2SGcWKYvmOaHULvPMdjmAL+XrLoA+HQUw9GQVDzFrcLPxgi5FJrIDPFzUUCb
+ OlpzxDqA3JEU+c9bhuxvTB/w3aEkpDLaRsqidW8TBjknKbHUY7Q9jb3udt2AmjhleTsm
+ +nRzKo+bfLzB4j8Mv869/uKohgDx/ko4lPYC0jCNe/5Cwl0dMG7k+cfaAVJWyoubKZj3
+ G0NcU/pd2/uFnGcadaXxHBLlNZGIlpyyGKvmAE/lNpsaPWtT4aXhv5fuY0Fo7LE263//
+ 6nzoJcSC1+iFePP28b5yAQW/90sLQsd7W2c/pQ6dJFXeQtRldoq5nPfKSx+qH1M0GE6Y
+ ODgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=6jDfZ800Wl3nx3KWVZmGyBEziqyPjN03/nUW4cQFzOE=;
+ b=ql+g9PWzo3Q85axlv0zKQZMS0UrNeH/YLs0UrZ0Lt67jYWr9zFnGDBxhyfe4TPIgIF
+ NrlAbwC9LxKaIo7Dqcgg7WNhRQIwadbd80ubNjbH0OTDqf/a0JxBy0UFMmawYN/AdI7G
+ Nu4WFbb5InNPWdw/FkORZYBlrFLw8qM6EoXjsy0paheBhQp5VxDb2a65LRw5b+ueC9gW
+ ZD5H+VhRNAwwdEynnWWZ2f4Uw4l3gd9YHDBOP/zN+/FbNu6M3JUXHcyV56cFiAK1cJLO
+ 5+TdU7ppocDpYgl9ipCGExNPqRAfrvU1GMntA8VA6mpA1bRlz3pT8fczXUC08JBIpvoP
+ 9WtQ==
+X-Gm-Message-State: AOAM531xr5U7D7AjHsOXiJZM5FI846s9zZVc/Wpfs06mByUrphe+pisU
+ xsQa/r+SxZMjGAduP0DQlqSpK/XFyp6GnYcU
+X-Google-Smtp-Source: ABdhPJyU7qz9Cb4BVNMzPkQ50PH5uMTq6zv6xUzmiKgzda2qo5UxmiEInkwx20RM5ZcoXEIiBgrdtA==
+X-Received: by 2002:a1c:6a11:: with SMTP id f17mr3721924wmc.143.1601051010442; 
+ Fri, 25 Sep 2020 09:23:30 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id d6sm3565824wrq.67.2020.09.25.09.23.29
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 25 Sep 2020 09:23:29 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6 10/21] qapi: Use rST markup for literal blocks
+Date: Fri, 25 Sep 2020 17:23:05 +0100
+Message-Id: <20200925162316.21205-11-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200925162316.21205-1-peter.maydell@linaro.org>
+References: <20200925162316.21205-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200915145733.GF629589@stefanha-x1.localdomain>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="MfFXiAuoTsnnDAfZ"
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 01:07:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -32
-X-Spam_score: -3.3
-X-Spam_bar: ---
-X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::336;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x336.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,97 +99,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@gmail.com, armbru@redhat.com,
- qemu-block@nongnu.org, dgilbert@redhat.com
+Cc: John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---MfFXiAuoTsnnDAfZ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+There are exactly two places in our json doc comments where we
+use the markup accepted by the texi doc generator where a '|' in
+the first line of a doc comment means the line should be emitted
+as a literal block (fixed-width font, whitespace preserved).
 
-Am 15.09.2020 um 16:57 hat Stefan Hajnoczi geschrieben:
-> On Wed, Sep 09, 2020 at 05:11:49PM +0200, Kevin Wolf wrote:
-> > @@ -2456,8 +2456,7 @@ void qmp_block_resize(bool has_device, const char=
- *device,
-> >          return;
-> >      }
-> > =20
-> > -    aio_context =3D bdrv_get_aio_context(bs);
-> > -    aio_context_acquire(aio_context);
-> > +    old_ctx =3D bdrv_co_move_to_aio_context(bs);
-> > =20
-> >      if (size < 0) {
-> >          error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "size", "a >0 s=
-ize");
->=20
-> Is it safe to call blk_new() outside the BQL since it mutates global stat=
-e?
->=20
-> In other words, could another thread race with us?
+Since we use this syntax so rarely, instead of making the rST
+generator support it, instead just convert the two uses to
+rST-format literal blocks, which are indented and introduced
+with '::'.
 
-Hm, probably not.
+(The rST generator doesn't complain about the old style syntax,
+it just emits it with the '|' and with the whitespace not
+preserved, which looks odd, but means we can safely leave this
+change until after we've stopped generating texinfo.)
 
-Would it be safer to have the bdrv_co_move_to_aio_context() call only
-immediately before the drain?
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ qapi/block-core.json  | 16 +++++++++-------
+ qapi/qapi-schema.json |  6 ++++--
+ 2 files changed, 13 insertions(+), 9 deletions(-)
 
-> > @@ -2479,8 +2478,8 @@ void qmp_block_resize(bool has_device, const char=
- *device,
-> >      bdrv_drained_end(bs);
-> > =20
-> >  out:
-> > +    aio_co_reschedule_self(old_ctx);
-> >      blk_unref(blk);
-> > -    aio_context_release(aio_context);
->=20
-> The following precondition is violated by the blk_unref -> bdrv_drain ->
-> AIO_WAIT_WHILE() call if blk->refcnt is 1 here:
->=20
->  * The caller's thread must be the IOThread that owns @ctx or the main lo=
-op
->  * thread (with @ctx acquired exactly once).
->=20
-> blk_unref() is called from the main loop thread without having acquired
-> blk's AioContext.
->=20
-> Normally blk->refcnt will be > 1 so bdrv_drain() won't be called, but
-> I'm not sure if that can be guaranteed.
->=20
-> The following seems safer although it's uglier:
->=20
->   aio_context =3D bdrv_get_aio_context(bs);
->   aio_context_acquire(aio_context);
->   blk_unref(blk);
->   aio_context_release(aio_context);
-
-May we actually acquire aio_context if blk is in the main thread? I
-think we must only do this if it's in a different iothread because we'd
-end up with a recursive lock and drain would hang.
-
-Kevin
-
---MfFXiAuoTsnnDAfZ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEE3D3rFZqa+V09dFb+fwmycsiPL9YFAl9uFdYACgkQfwmycsiP
-L9ZhaxAAtYSZCrYXKple59TV8i2cfoVccDk6ARiveCa80lJCRRzonkV2qysaOR9v
-FdZwImJ/CHQUDvrjKxINGkXQqiUQKV+mvGiwlPmsyPDrYMxttd21qSrdcdag+2yk
-NF5F5jn0mBFWd51O9Kk8yp4w5ahihENPtbnh9n/2x7sGe6eo02Ay3ueN7gLpIaPf
-J6+esFWZRqbmvGDGnIdwtgjGLEyKd+hyCMCNOSoDjtzEz/2slkuLGm/vOGL/uawK
-2gq3lXUoYFoyOV62yFbA54suskgfEqzafmfmcNiBstM/QIdm/N6jibkT4Oqy5MM2
-+3idIK6Sw3xg8i1x17ZrXYKJQDvB+JOGFdqM573KjCRPhqd0Jy8gAMASnXPvrWx7
-dFFCWHwL6BVvWa8AU4GrEPwPqpOVa/2DnQ8NphZdKCkXbk1r+7J67PCIISZv+WkD
-VmEHV4h6mvuk+Djy5H6i5lqY1rNdcZWQwQ4Hy9yqtXusDrTBYtC5GDzGWSyjhJ/V
-la3Ntwf0Dr2dwE+CxSIJM44IxKBdHEpOHBEizNx2cE1hq5Rpg5aInT8scRBaBgKV
-IrU5lnL/IxBzDDexIay8MttF8rU6fPCUCu+c7GtQwyN9UxBSA25Tj/m3U79AQms1
-P+JfolcZ7hjQDg7jQShqW6vj0hV01WGVvWe7HwfLuG1psi+W2ko=
-=GZaf
------END PGP SIGNATURE-----
-
---MfFXiAuoTsnnDAfZ--
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index dd77a91174c..86ed72ef9fa 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -570,13 +570,15 @@
+ #        For the example above, @bins may be something like [3, 1, 5, 2],
+ #        and corresponding histogram looks like:
+ #
+-# |      5|           *
+-# |      4|           *
+-# |      3| *         *
+-# |      2| *         *    *
+-# |      1| *    *    *    *
+-# |       +------------------
+-# |           10   50   100
++# ::
++#
++#        5|           *
++#        4|           *
++#        3| *         *
++#        2| *         *    *
++#        1| *    *    *    *
++#         +------------------
++#             10   50   100
+ #
+ # Since: 4.0
+ ##
+diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
+index f03ff91ceb5..6bafa81b727 100644
+--- a/qapi/qapi-schema.json
++++ b/qapi/qapi-schema.json
+@@ -21,8 +21,10 @@
+ #
+ # Example:
+ #
+-# | -> data issued by the Client
+-# | <- Server data response
++# ::
++#
++#   -> data issued by the Client
++#   <- Server data response
+ #
+ # Please, refer to the QMP specification (docs/interop/qmp-spec.txt) for
+ # detailed information on the Server command and response formats.
+-- 
+2.20.1
 
 
