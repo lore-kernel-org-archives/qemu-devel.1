@@ -4,69 +4,68 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0DF2C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:14:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F107C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:16:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 453C52083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:14:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2336A2086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:16:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ojqhya/e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 453C52083B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IdJw76QA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2336A2086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLmc5-0003UL-6N
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 08:14:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38188)
+	id 1kLme5-0006M0-Ud
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 08:16:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38404)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kLmVn-0002Ve-0x
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:07:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36349)
+ id 1kLmWI-0003dS-8E
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:08:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48880)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kLmVl-0004EU-6L
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:07:38 -0400
+ id 1kLmWD-0004Hz-GX
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:08:09 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601035655;
+ s=mimecast20190719; t=1601035684;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pTjngOD6M5Zs+XGR87KKIEPcXJdlyB8CuV33zY5x0Wo=;
- b=Ojqhya/er/l0Gzxv89Api4uMbYU6wFW/A9RcFr7pf/KWKHEniwh8H9tcXfWUPtgDwFrewl
- o8q4dcGEKmARdx1eZf/RaHSrYMBukkZYaW28xSA3Z/BAMre1GLzNy8ZwkwiMl0hILtUZ6C
- J+y9VbXIgc3487PXXKHqw8tK7xkFBm4=
+ bh=UTt8X+r2NAe5sUSIUqOrvCV6Cqr7EQkVjHlDWo/HZE8=;
+ b=IdJw76QARrlHM+qNlD2fsbhwGo0nG8CUFwoIPlEfPP7nRW9wafl0nb6ySB3d1WSrtnI8jV
+ tpR0OyFOk4GYktpyBa3DQ4dN0E+M7JtP9jl+cNH9RsR38FDpj6fJymDgAuq+86BDRU4Krf
+ IJSkrJm4n+63iEDEvb14jxjVPWEpUhE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-193-5Vlo2-GKNRiYjYpKipgvPw-1; Fri, 25 Sep 2020 08:07:31 -0400
-X-MC-Unique: 5Vlo2-GKNRiYjYpKipgvPw-1
+ us-mta-139-wIQFGDGLPAOWInNTFozYEQ-1; Fri, 25 Sep 2020 08:08:00 -0400
+X-MC-Unique: wIQFGDGLPAOWInNTFozYEQ-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 113412FD03;
- Fri, 25 Sep 2020 12:07:30 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D022186DD44;
+ Fri, 25 Sep 2020 12:07:59 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-114-177.ams2.redhat.com
  [10.36.114.177])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BBE9073692;
- Fri, 25 Sep 2020 12:07:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 29FC673695;
+ Fri, 25 Sep 2020 12:07:54 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, zhengchuan@huawei.com, dovmurik@linux.vnet.ibm.com,
  hgcoin@gmail.com, zhangjiachen.jaycee@bytedance.com, lvivier@redhat.com,
  peterx@redhat.com, stefanha@redhat.com, vgoyal@redhat.com,
  jinyan12@huawei.com, ann.zhuangyanying@huawei.com
-Subject: [PULL 07/26] migration/dirtyrate: move RAMBLOCK_FOREACH_MIGRATABLE
- into ram.h
-Date: Fri, 25 Sep 2020 13:06:36 +0100
-Message-Id: <20200925120655.295142-8-dgilbert@redhat.com>
+Subject: [PULL 15/26] migration: Truncate state file in xen-save-devices-state
+Date: Fri, 25 Sep 2020 13:06:44 +0100
+Message-Id: <20200925120655.295142-16-dgilbert@redhat.com>
 In-Reply-To: <20200925120655.295142-1-dgilbert@redhat.com>
 References: <20200925120655.295142-1-dgilbert@redhat.com>
 MIME-Version: 1.0
@@ -105,83 +104,34 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Chuan Zheng <zhengchuan@huawei.com>
+From: Dov Murik <dovmurik@linux.vnet.ibm.com>
 
-RAMBLOCK_FOREACH_MIGRATABLE is need in dirtyrate measure,
-move the existing definition up into migration/ram.h
+When running the xen-save-devices-state QMP command, if the filename
+already exists it will be truncated before dumping the devices' state
+into it.
 
-Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
+Signed-off-by: Dov Murik <dovmurik@linux.vnet.ibm.com>
+Message-Id: <20200921094830.114028-1-dovmurik@linux.vnet.ibm.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: David Edmondson <david.edmondson@oracle.com>
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
-Message-Id: <1600237327-33618-6-git-send-email-zhengchuan@huawei.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/dirtyrate.c |  1 +
- migration/ram.c       | 11 +----------
- migration/ram.h       | 10 ++++++++++
- 3 files changed, 12 insertions(+), 10 deletions(-)
+ migration/savevm.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-index 94c4e173bc..10315f7a63 100644
---- a/migration/dirtyrate.c
-+++ b/migration/dirtyrate.c
-@@ -20,6 +20,7 @@
- #include "qemu/rcu_queue.h"
- #include "qapi/qapi-commands-migration.h"
- #include "migration.h"
-+#include "ram.h"
- #include "dirtyrate.h"
+diff --git a/migration/savevm.c b/migration/savevm.c
+index ee21e981ba..34e4b71052 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2803,7 +2803,8 @@ void qmp_xen_save_devices_state(const char *filename, bool has_live, bool live,
+     vm_stop(RUN_STATE_SAVE_VM);
+     global_state_store_running();
  
- static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
-diff --git a/migration/ram.c b/migration/ram.c
-index c5f36aeae5..433489d633 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -158,21 +158,12 @@ out:
-     return ret;
- }
- 
--static bool ramblock_is_ignored(RAMBlock *block)
-+bool ramblock_is_ignored(RAMBlock *block)
- {
-     return !qemu_ram_is_migratable(block) ||
-            (migrate_ignore_shared() && qemu_ram_is_shared(block));
- }
- 
--/* Should be holding either ram_list.mutex, or the RCU lock. */
--#define RAMBLOCK_FOREACH_NOT_IGNORED(block)            \
--    INTERNAL_RAMBLOCK_FOREACH(block)                   \
--        if (ramblock_is_ignored(block)) {} else
--
--#define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
--    INTERNAL_RAMBLOCK_FOREACH(block)                   \
--        if (!qemu_ram_is_migratable(block)) {} else
--
- #undef RAMBLOCK_FOREACH
- 
- int foreach_not_ignored_block(RAMBlockIterFunc func, void *opaque)
-diff --git a/migration/ram.h b/migration/ram.h
-index 2eeaacfa13..011e85414e 100644
---- a/migration/ram.h
-+++ b/migration/ram.h
-@@ -37,6 +37,16 @@ extern MigrationStats ram_counters;
- extern XBZRLECacheStats xbzrle_counters;
- extern CompressionStats compression_counters;
- 
-+bool ramblock_is_ignored(RAMBlock *block);
-+/* Should be holding either ram_list.mutex, or the RCU lock. */
-+#define RAMBLOCK_FOREACH_NOT_IGNORED(block)            \
-+    INTERNAL_RAMBLOCK_FOREACH(block)                   \
-+        if (ramblock_is_ignored(block)) {} else
-+
-+#define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
-+    INTERNAL_RAMBLOCK_FOREACH(block)                   \
-+        if (!qemu_ram_is_migratable(block)) {} else
-+
- int xbzrle_cache_resize(int64_t new_size, Error **errp);
- uint64_t ram_bytes_remaining(void);
- uint64_t ram_bytes_total(void);
+-    ioc = qio_channel_file_new_path(filename, O_WRONLY | O_CREAT, 0660, errp);
++    ioc = qio_channel_file_new_path(filename, O_WRONLY | O_CREAT | O_TRUNC,
++                                    0660, errp);
+     if (!ioc) {
+         goto the_end;
+     }
 -- 
 2.26.2
 
