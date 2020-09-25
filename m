@@ -6,70 +6,70 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DD02C4346E
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 01:08:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8F2AC4346E
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 01:09:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC6672076B
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 01:08:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B1EC2076B
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 01:09:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i4VHo3GH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC6672076B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RrnzAc9J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B1EC2076B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLcEB-0005o8-QN
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 21:08:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54528)
+	id 1kLcEu-0006vV-Af
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 21:09:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54814)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kLbwn-0007PR-3C
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 20:50:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47772)
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kLbyU-0000WO-0S
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 20:52:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39373)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kLbwj-0002m7-W7
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 20:50:48 -0400
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kLbyQ-0002wN-AZ
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 20:52:33 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600995045;
+ s=mimecast20190719; t=1600995149;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=y3uCgNgeQ/PAPtZW3gDF2g8oCDnwvW7deiVRsnLVDAQ=;
- b=i4VHo3GHABi7VSyvQ32wBA3chCN6mhp7zPj+S13N7HpSboUDWi2tRYqI8PIU/qJz1amYYz
- gZEasSUNfITTsQn6m/Hizy/lLX1FxbxIDJj01H23OatB5hV6w2/q7qxL+s7AJ2etXd387e
- cRaDJT2ZkCuuvnMeofK8V66eOeVgOOw=
+ bh=QwpEpGvm2c2M4s8Ph9I4hY8O+KEvkdLE3kVGqihPpTk=;
+ b=RrnzAc9JFCSI5uUARPqgf6ULH3QLUS+3QubUaIb19iBLYW4jlWQ7rSZywX6koL+Kk379S6
+ 6nL92Mt8KSIk7huk88dW7SD0ydWQ34eB6T/Rgb62JEU7XSPYCnIe8LCmWWXK7pkZ+y/pDu
+ zyzSu8Nsqg5F6/w/x91328Sf8T25dts=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-411-dVRFLPfcP0-lk02NzvmURg-1; Thu, 24 Sep 2020 20:50:40 -0400
-X-MC-Unique: dVRFLPfcP0-lk02NzvmURg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-379-2RvLrZHcPum0i1XTtRTCQQ-1; Thu, 24 Sep 2020 20:52:26 -0400
+X-MC-Unique: 2RvLrZHcPum0i1XTtRTCQQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF640425DD;
- Fri, 25 Sep 2020 00:50:39 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE7E6801AAB;
+ Fri, 25 Sep 2020 00:52:25 +0000 (UTC)
 Received: from localhost.localdomain (ovpn-119-55.rdu2.redhat.com
  [10.10.119.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 431E41002C0D;
- Fri, 25 Sep 2020 00:50:39 +0000 (UTC)
-Date: Thu, 24 Sep 2020 20:50:37 -0400
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 26C855C1C7;
+ Fri, 25 Sep 2020 00:52:25 +0000 (UTC)
+Date: Thu, 24 Sep 2020 20:52:23 -0400
 From: Cleber Rosa <crosa@redhat.com>
 To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH 09/16] qapi/expr.py: rewrite check_if
-Message-ID: <20200925005037.GB368253@localhost.localdomain>
+Subject: Re: [PATCH 10/16] qapi/expr.py: Remove single-letter variable
+Message-ID: <20200925005223.GC368253@localhost.localdomain>
 References: <20200922211313.4082880-1-jsnow@redhat.com>
- <20200922211313.4082880-10-jsnow@redhat.com>
+ <20200922211313.4082880-11-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200922211313.4082880-10-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200922211313.4082880-11-jsnow@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="GID0FwUMdk1T2AWN"
+ protocol="application/pgp-signature"; boundary="+nBD6E3TurpgldQp"
 Content-Disposition: inline
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=crosa@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
@@ -101,45 +101,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---GID0FwUMdk1T2AWN
+--+nBD6E3TurpgldQp
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 22, 2020 at 05:13:06PM -0400, John Snow wrote:
-> This is a only minor rewrite to address some minor style nits.  Don't
-> compare against the empty list to check for the empty condition, and
-> move the normalization forward to unify the check on the now-normalized
-> structure.
->=20
+On Tue, Sep 22, 2020 at 05:13:07PM -0400, John Snow wrote:
 > Signed-off-by: John Snow <jsnow@redhat.com>
 
 Reviewed-by: Cleber Rosa <crosa@redhat.com>
 
-And just to make sure there was not change in the logic:
-
-Tested-by: Cleber Rosa <crosa@redhat.com>
-
---GID0FwUMdk1T2AWN
+--+nBD6E3TurpgldQp
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl9tPtkACgkQZX6NM6Xy
-CfNM3RAAiRkdxe3/KaDzyu58Gw9B/GzbXtVp6JEzRzlXzEwDYOM/DJFkwyLBil7B
-PbYqds9+3yNuqjjOpdSiRNeJNvVIWDiZthcM6e9j42PE7r0qEHOusoEdMadUxjc3
-GFbiGlOckItlVM4rPTAFQ+JzLR522Nysvvth78qSFY2XoUDeZEtOFRwrOLbhJnsI
-6WrzRtVbXLeGDHZFx74Cq3hau0gi+nuUVWfIJRtmm1Ml52hkSdB+YhdoQT7fcd1Q
-a9asZGIIiGzvt69mq4IoFv6Y11/DICRdRiN0UU7kXLzqDAB0Stk0QwAEwlA6g3VI
-2fCy5cCWYNnX7EYopiSyvm4I4skOBzLOvIdrC83U+rQGhHJfkqJmT1BpyTR828Fp
-s5fC9U1Qmg5wV/BltC9qe4FVw9isAUUzK2vUukWf2KGdPNcW8If8z90KbjlSDFJi
-Jl4Yf9erIDJzsiBO7p2Xc05ZfmKDR30V3QZ7uSGanwKHi7GgzNHnGaSbYWdMmxN2
-cblZ8MKF5Ed/3XMAVDifwT1Hk0GiPwSLGDb25acdxAKbaGmE6TqnfjmcIlTSMzHA
-hvBU4RlpxROn2vTNNG2aZTwJ2hUuzJv3S0peUQ9NVhZxn2KSM49c5/o7VbzRhkSY
-SgMnKye67A+mqy73bx56X7LTIqagT6I8OOzBwoUk/E4UrLq0j7w=
-=USLk
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl9tP0cACgkQZX6NM6Xy
+CfOBeg//WmxLPdOsPuzPtYFE7S0+M/RKyjg3Dfw4fFlYRgZ2nefX6aRhPu+9uOUy
+xPd1lY397DgJpmttqM9EnjtUhN928w+ydokmqkpXcV+ymfsnfm0fQwehStdopg4s
+jP57mQeUzpP5gusOxeXktfOGZP+vaZd/8jVg7OuA9z6v9eMpnarKe+7cRVbBjqYv
+AClUFefOSNKrdibn+zhCXxGYmvkIl5PyYdWQEPkn0GJhIBFJtycQslCIInlB72hB
+gFzeRlZKau3pleuX7Uu9OCzmUJfbmvWx5bpv/3qZj07ZHc/WtMPyvsC6PirrI9qZ
+bx3srPUDdXOSHvHIoNMfRYSsGA8xUqRnxJnysuRbjcI0a6pTUhG7lOXCKOIr5uRY
+WdnMkR88apyn+rKWkdh5ewVEDcoLCHzdrXTCb56tmFvyU67+vBxUIqb8KmOgSJfd
+Uw8vUTqJhQDUubkZf2zgD/EkuYbjxR6dirWuag6V9mEmfM2siZlTr4uB50WgN3O7
+KjBk2IkgH3BWLgSy6+rbdIimhYTJlOznmAjaenoFyVRaow3gx+ZgQVPkTkrPVhno
+ND/yNFc0GANqNbtpoVkp5BX70tPrk1FlMSBFI+1R3FL5Wcw99xd5ysMTF4miSZdv
+/QVN5SAT3uTdUMYP5Ad8ankwMxkBz/znzJJvPdrvZq/LNkDM7gA=
+=OI67
 -----END PGP SIGNATURE-----
 
---GID0FwUMdk1T2AWN--
+--+nBD6E3TurpgldQp--
 
 
