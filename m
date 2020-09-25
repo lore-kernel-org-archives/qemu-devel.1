@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F364FC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:11:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A26EC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:11:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A3DF2083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:11:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0E58D2083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:11:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iJvuxiA9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A3DF2083B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MFCnccRG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E58D2083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLmZ7-0007i2-93
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 08:11:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38254)
+	id 1kLmZE-00082O-W6
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 08:11:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38144)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kLmW0-0002xz-C8
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:07:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28737)
+ id 1kLmVg-0002J9-4v
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:07:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22245)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kLmVy-0004Ff-DS
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:07:52 -0400
+ id 1kLmVe-0004Dy-7p
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:07:31 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601035669;
+ s=mimecast20190719; t=1601035649;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=bIx+v7hX+Kc77yn6My0x4/VOcV0NpTk52duItW9+GBA=;
- b=iJvuxiA9bA8hjgAE3Pfvlvunr8+Uf1gD6b1EKF0Heom8ZzW+yqdpi/TkE+Cq3yvf/PSNme
- 79h988C/BX1TaAZr0byEOpANRPyHXDLnxUBT4aKIvCcV3cxVKn5XErcASZFgv06K0cn8yz
- QbsynxPYs8WovlbgUS9hnnEYQpmv4ic=
+ bh=c+p4cUwbZBePSB0cV+zQje3NVEUYNiC8OKPJnj/bUL4=;
+ b=MFCnccRG2jI83Lwv7d2nDxFqMdslC2hG4tdoRE6wSl64Elo6YNXXkUnYKxocLQV6mxqp5J
+ FMGy+jFpzqFQwWIbn/XXpEwgCZ6kMC4yI2QVlOwgKuUW52I7Jasd9QX5JJLIcy520deU8+
+ J+dYN+jhYKSquO/QzGFHPx4zji3Y+7Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-296-sHAIuk48NxKTyZrsY18tGA-1; Fri, 25 Sep 2020 08:07:47 -0400
-X-MC-Unique: sHAIuk48NxKTyZrsY18tGA-1
+ us-mta-562-UpBs0oYDPgS2dZujpYroGw-1; Fri, 25 Sep 2020 08:07:27 -0400
+X-MC-Unique: UpBs0oYDPgS2dZujpYroGw-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EEB4B871805;
- Fri, 25 Sep 2020 12:07:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 701C6186DD3D;
+ Fri, 25 Sep 2020 12:07:26 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-114-177.ams2.redhat.com
  [10.36.114.177])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 008AE73693;
- Fri, 25 Sep 2020 12:07:40 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6316A73692;
+ Fri, 25 Sep 2020 12:07:21 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, zhengchuan@huawei.com, dovmurik@linux.vnet.ibm.com,
  hgcoin@gmail.com, zhangjiachen.jaycee@bytedance.com, lvivier@redhat.com,
  peterx@redhat.com, stefanha@redhat.com, vgoyal@redhat.com,
  jinyan12@huawei.com, ann.zhuangyanying@huawei.com
-Subject: [PULL 11/26] migration/dirtyrate: Implement set_sample_page_period()
- and is_sample_period_valid()
-Date: Fri, 25 Sep 2020 13:06:40 +0100
-Message-Id: <20200925120655.295142-12-dgilbert@redhat.com>
+Subject: [PULL 06/26] migration/dirtyrate: Add dirtyrate statistics series
+ functions
+Date: Fri, 25 Sep 2020 13:06:35 +0100
+Message-Id: <20200925120655.295142-7-dgilbert@redhat.com>
 In-Reply-To: <20200925120655.295142-1-dgilbert@redhat.com>
 References: <20200925120655.295142-1-dgilbert@redhat.com>
 MIME-Version: 1.0
@@ -107,72 +107,90 @@ Sender: "Qemu-devel"
 
 From: Chuan Zheng <zhengchuan@huawei.com>
 
-Implement is_sample_period_valid() to check if the sample period is vaild and
-do set_sample_page_period() to sleep specific time between sample actions.
+Add dirtyrate statistics functions to record/update dirtyrate info.
 
 Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: David Edmondson <david.edmondson@oracle.com>
 Reviewed-by: Li Qiang <liq3ea@gmail.com>
-Message-Id: <1600237327-33618-10-git-send-email-zhengchuan@huawei.com>
+Message-Id: <1600237327-33618-5-git-send-email-zhengchuan@huawei.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/dirtyrate.c | 24 ++++++++++++++++++++++++
- migration/dirtyrate.h |  6 ++++++
- 2 files changed, 30 insertions(+)
+ migration/dirtyrate.c | 32 ++++++++++++++++++++++++++++++++
+ migration/dirtyrate.h | 12 ++++++++++++
+ 2 files changed, 44 insertions(+)
 
 diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-index ee47e2bc27..20216c5f09 100644
+index 3edf000f45..94c4e173bc 100644
 --- a/migration/dirtyrate.c
 +++ b/migration/dirtyrate.c
-@@ -27,6 +27,30 @@
- static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
- static struct DirtyRateStat DirtyStat;
+@@ -23,6 +23,7 @@
+ #include "dirtyrate.h"
  
-+static int64_t set_sample_page_period(int64_t msec, int64_t initial_time)
-+{
-+    int64_t current_time;
-+
-+    current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-+    if ((current_time - initial_time) >= msec) {
-+        msec = current_time - initial_time;
-+    } else {
-+        g_usleep((msec + initial_time - current_time) * 1000);
-+    }
-+
-+    return msec;
-+}
-+
-+static bool is_sample_period_valid(int64_t sec)
-+{
-+    if (sec < MIN_FETCH_DIRTYRATE_TIME_SEC ||
-+        sec > MAX_FETCH_DIRTYRATE_TIME_SEC) {
-+        return false;
-+    }
-+
-+    return true;
-+}
-+
+ static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
++static struct DirtyRateStat DirtyStat;
+ 
  static int dirtyrate_set_state(int *state, int old_state, int new_state)
  {
-     assert(new_state < DIRTY_RATE_STATUS__MAX);
+@@ -34,6 +35,37 @@ static int dirtyrate_set_state(int *state, int old_state, int new_state)
+     }
+ }
+ 
++static void reset_dirtyrate_stat(void)
++{
++    DirtyStat.total_dirty_samples = 0;
++    DirtyStat.total_sample_count = 0;
++    DirtyStat.total_block_mem_MB = 0;
++    DirtyStat.dirty_rate = -1;
++    DirtyStat.start_time = 0;
++    DirtyStat.calc_time = 0;
++}
++
++static void update_dirtyrate_stat(struct RamblockDirtyInfo *info)
++{
++    DirtyStat.total_dirty_samples += info->sample_dirty_count;
++    DirtyStat.total_sample_count += info->sample_pages_count;
++    /* size of total pages in MB */
++    DirtyStat.total_block_mem_MB += (info->ramblock_pages *
++                                     TARGET_PAGE_SIZE) >> 20;
++}
++
++static void update_dirtyrate(uint64_t msec)
++{
++    uint64_t dirtyrate;
++    uint64_t total_dirty_samples = DirtyStat.total_dirty_samples;
++    uint64_t total_sample_count = DirtyStat.total_sample_count;
++    uint64_t total_block_mem_MB = DirtyStat.total_block_mem_MB;
++
++    dirtyrate = total_dirty_samples * total_block_mem_MB *
++                1000 / (total_sample_count * msec);
++
++    DirtyStat.dirty_rate = dirtyrate;
++}
+ 
+ static void calculate_dirtyrate(struct DirtyRateConfig config)
+ {
 diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
-index be5b8ec2b1..6ec429534d 100644
+index 8707df852d..312debca6f 100644
 --- a/migration/dirtyrate.h
 +++ b/migration/dirtyrate.h
-@@ -29,6 +29,12 @@
-  */
- #define MIN_RAMBLOCK_SIZE                         128
+@@ -42,5 +42,17 @@ struct RamblockDirtyInfo {
+     uint32_t *hash_result; /* array of hash result for sampled pages */
+ };
  
 +/*
-+ * Take 1s as minimum time for calculation duration
++ * Store calculation statistics for each measure.
 + */
-+#define MIN_FETCH_DIRTYRATE_TIME_SEC              1
-+#define MAX_FETCH_DIRTYRATE_TIME_SEC              60
++struct DirtyRateStat {
++    uint64_t total_dirty_samples; /* total dirty sampled page */
++    uint64_t total_sample_count; /* total sampled pages */
++    uint64_t total_block_mem_MB; /* size of total sampled pages in MB */
++    int64_t dirty_rate; /* dirty rate in MB/s */
++    int64_t start_time; /* calculation start time in units of second */
++    int64_t calc_time; /* time duration of two sampling in units of second */
++};
 +
- struct DirtyRateConfig {
-     uint64_t sample_pages_per_gigabytes; /* sample pages per GB */
-     int64_t sample_period_seconds; /* time duration between two sampling */
+ void *get_dirtyrate_thread(void *arg);
+ #endif
 -- 
 2.26.2
 
