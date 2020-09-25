@@ -7,82 +7,81 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 562E9C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 15:59:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DA5FC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 15:59:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D659F21D91
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 15:58:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8776221D91
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 15:59:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Y4ock7aV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D659F21D91
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wjwB3VAg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8776221D91
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLq7e-0003Vd-SS
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 11:58:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36122)
+	id 1kLq8U-00047T-Gb
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 11:59:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36140)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kLpq3-0002vI-Em
+ id 1kLpq5-0002wJ-0V
  for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:40:49 -0400
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:42148)
+Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:51066)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kLpq0-0007di-QC
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:40:47 -0400
-Received: by mail-wr1-x435.google.com with SMTP id c18so4061595wrm.9
- for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 08:40:44 -0700 (PDT)
+ id 1kLpq3-0007eG-FB
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:40:48 -0400
+Received: by mail-wm1-x332.google.com with SMTP id e17so3502815wme.0
+ for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 08:40:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=qNevELBFUrx1/zkHkvDIKUavrcR36IpGOTSGaduJWAw=;
- b=Y4ock7aVUNpat4nASkxJfdebG0EijZM32uHLiryI9VqmcnwbB/+TyDCU5iVmuEi6hR
- FD8CEBb7gjC8+bAjCfZYL3SSWM1c652H1eDr7H5lSHhwxmTDt4SYUhaERLSEt8LQYQIa
- C+Ws1d6aiLVAW9QtzfIDN1JvGZI4RX4qhKQltwCAyoFB5x4X6w7dWCVv4OJ2dwZXU3vx
- yYvkg/+7qribN7PDSouHRUqLVoR78/gjwW0PQK0fKrRkU76Och+Q9ZcW1x2BvWWZqUws
- xnMAy+osBT3qwMNpKMtMzkfmlckUlVYBdZMWM4rpcwEjzE8Hgr+goEsJBmPa6/EmCnK5
- YV3A==
+ bh=7uJYNbe5lkb51q2+AyPUZmp3kp5cS3cpbQny1Ymo9K0=;
+ b=wjwB3VAgAU77vyL2OTnMzaRayFuCaZ0kCBfL1J9jDeWLtAxCjSTNYf9FWUMuI5ExGB
+ ifRciv4oeeMQe1Gh84AIC8MfEeBKHrzaroLSdRd/wE+I6KLF+bnX+TXSZWOs3lnkXiMm
+ Z89IW9w7AnrFSdSwYrDKdo7SzzIpxsa4XYSL+OLdgDh6nLoRglVkz2NYXPIWJygWsa+D
+ F1DFVRq4N8xNVDMWHxh/jdzSlHzwq6jk5dFPLMdTQ8D7ynZKBrqt3K5OG7aoq2pQ7fpu
+ lnn2dJ/e5rLOVG4kBNFVgkmkhlgbNWiaBjSPBZuxTaT5SF8f/r1RnbA9o0TVMleKV1Ef
+ c7Tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=qNevELBFUrx1/zkHkvDIKUavrcR36IpGOTSGaduJWAw=;
- b=ZS9FvZbOcgyX7nCy754IQieA047XciXOYacbgbrKfdcdfnLl+c+G7BzaUWM9Q0jpBN
- Rg2now/0da6Fhp1m5fcXGyulEkCqZpA6nWtWr4x3chC6d7BRxWc3JAzFjVR0AcGicQu4
- sQVyX3gq9ymXLgxIh4QfTTofohDOPGyvyFJyzGIft4lPAeqtJXrXQvtWS6riq96st2oj
- ZSzoAZcboXbKkQQ5TnlRGTXpfxq7tdONyRW0e6NRHXiASO2jLiF6+PWBUotYj9ZzAHrz
- sbWSDLmzI2gLHwlb3DwIpq+JffDCCNq66Mav/4atph1ol3DypHOftrBa0LdDg9+wXbNZ
- GlZw==
-X-Gm-Message-State: AOAM5334GCFLbH+qdp/opL/hk9NbJoC0AbkjzS/gtDvW8gebnqU7uwzG
- f40/9IgKExS0e6q1/8CGZNGdXg==
-X-Google-Smtp-Source: ABdhPJwXHtx1n8nSysJ/vhAlnqXUYZ+JhShZurmCJkL+ro5UsVAZ0Dg9+vbOpM55XmWo3CFQIUaM/A==
-X-Received: by 2002:adf:90a2:: with SMTP id i31mr5651404wri.276.1601048443416; 
- Fri, 25 Sep 2020 08:40:43 -0700 (PDT)
+ bh=7uJYNbe5lkb51q2+AyPUZmp3kp5cS3cpbQny1Ymo9K0=;
+ b=tXivXqY1chtmct40ZqCeWmC1mvEDbS+3IVPrrHXHgnGEca0oZ0nSzpw4Ck4xM4uXhZ
+ Ir4Np94EEfSXY+2npQ7n16K1dftro3UaBtvrvbaxxz6h5PHlweE0h9bAdfAC2g1AkVV/
+ zdUG8kGhuOKGamX6Jaut52w3kBe6h6I7/DocSj1C5H+/DCZF99GFDTsmq3xILhgCq0RU
+ AqUSq306p9NNrKgkGP25CniZY5FmryTJU3ZLdcUVBWGMjVzLaTA7e8gsts4yl5wr2R71
+ IFhEoamxVG3knZok9WmvT0pzplOj05MOsAwRgUcEHO4YXNLV0oVdJxu19QfLRUMSveU9
+ zZ8w==
+X-Gm-Message-State: AOAM531cO2g2GbpRBsnimtT7qD2f4/2BT1+WZL8qAqwiKSd/I82W0nSw
+ 93RYiTxff+6+uvikGnsTKecn0NoLaY7BOQ==
+X-Google-Smtp-Source: ABdhPJykRqXnarAjkd2p7nIp/t2a9UE+Xqm1ELOXvi8hr6LDT64Cvxym2O0inPPaJp2TVckiXkMTag==
+X-Received: by 2002:a7b:cf27:: with SMTP id m7mr3784148wmg.74.1601048445823;
+ Fri, 25 Sep 2020 08:40:45 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id q12sm3245681wrp.17.2020.09.25.08.40.30
+ by smtp.gmail.com with ESMTPSA id k84sm3353801wmf.6.2020.09.25.08.40.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Fri, 25 Sep 2020 08:40:37 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 1BDA01FF92;
+ by zen.linaroharston (Postfix) with ESMTP id 6362B1FF96;
  Fri, 25 Sep 2020 16:40:29 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 06/15] travis.yml: Update Travis to use Bionic and Focal
- instead of Xenial
-Date: Fri, 25 Sep 2020 16:40:18 +0100
-Message-Id: <20200925154027.12672-7-alex.bennee@linaro.org>
+Subject: [PATCH  v1 08/15] travis.yml: Drop the Python 3.5 build
+Date: Fri, 25 Sep 2020 16:40:20 +0100
+Message-Id: <20200925154027.12672-9-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200925154027.12672-1-alex.bennee@linaro.org>
 References: <20200925154027.12672-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::435;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x435.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::332;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x332.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,139 +106,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Fam Zheng <fam@euphon.net>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Cleber Rosa <crosa@redhat.com>
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Thomas Huth <thuth@redhat.com>
 
-According to our support policy, we do not support Xenial anymore.
-Time to switch the bigger parts of the builds to Focal instead.
-Some few jobs have to be updated to Bionic instead, since they are
-currently still failing on Focal otherwise. Also "--disable-pie" is
-causing linker problems with newer versions of Ubuntu ... so remove
-that switch from the jobs now (we still test it in a gitlab CI job,
-so we don't lose much test coverage here).
+We are soon going to remove the support for Python 3.5. So remove
+the CI job now.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20200918103430.297167-6-thuth@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
-Tested-by: Cleber Rosa <crosa@redhat.com>
+Message-Id: <20200922070441.48844-1-thuth@redhat.com>
 ---
- .travis.yml | 24 +++++++++++++-----------
- 1 file changed, 13 insertions(+), 11 deletions(-)
+ .travis.yml | 9 ---------
+ 1 file changed, 9 deletions(-)
 
 diff --git a/.travis.yml b/.travis.yml
-index 1fc49b07464d..80da4ebc8ea8 100644
+index 023fcf71190c..b6fee288bec2 100644
 --- a/.travis.yml
 +++ b/.travis.yml
-@@ -2,7 +2,7 @@
- # Additional builds with specific requirements for a full VM need to
- # be added as additional matrix: entries later on
- os: linux
--dist: xenial
-+dist: focal
- language: c
- compiler:
-   - gcc
-@@ -10,7 +10,7 @@ cache:
-   # There is one cache per branch and compiler version.
-   # characteristics of each job are used to identify the cache:
-   # - OS name (currently only linux)
--  # - OS distribution (for Linux, xenial, trusty, or precise)
-+  # - OS distribution (for Linux, bionic or focal)
-   # - Names and values of visible environment variables set in .travis.yml or Settings panel
-   timeout: 1200
-   ccache: true
-@@ -27,7 +27,7 @@ addons:
-       - libattr1-dev
-       - libbrlapi-dev
-       - libcap-ng-dev
--      - libgcc-4.8-dev
-+      - libgcc-7-dev
-       - libgnutls28-dev
-       - libgtk-3-dev
-       - libiscsi-dev
-@@ -211,8 +211,10 @@ jobs:
+@@ -254,15 +254,6 @@ jobs:
+         - TEST_CMD=""
  
-     # gprof/gcov are GCC features
-     - name: "GCC gprof/gcov"
-+      dist: bionic
-       env:
--        - CONFIG="--enable-gprof --enable-gcov --disable-pie --target-list=${MAIN_SOFTMMU_TARGETS}"
-+        - CONFIG="--enable-gprof --enable-gcov --disable-libssh
-+                  --target-list=${MAIN_SOFTMMU_TARGETS}"
-       after_success:
-         - ${SRC_DIR}/scripts/travis/coverage-summary.sh
  
-@@ -271,6 +273,7 @@ jobs:
- 
+-    # Python builds
+-    - name: "GCC Python 3.5 (x86_64-softmmu)"
+-      env:
+-        - CONFIG="--target-list=x86_64-softmmu"
+-        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
+-      language: python
+-      python: 3.5
+-
+-
      # Using newer GCC with sanitizers
      - name: "GCC9 with sanitizers (softmmu)"
-+      dist: bionic
-       addons:
-         apt:
-           update: true
-@@ -286,7 +289,7 @@ jobs:
-             - libattr1-dev
-             - libbrlapi-dev
-             - libcap-ng-dev
--            - libgnutls-dev
-+            - libgnutls28-dev
-             - libgtk-3-dev
-             - libiscsi-dev
-             - liblttng-ust-dev
-@@ -294,14 +297,13 @@ jobs:
-             - libncurses5-dev
-             - libnss3-dev
-             - libpixman-1-dev
--            - libpng12-dev
-+            - libpng-dev
-             - librados-dev
-             - libsdl2-dev
-             - libsdl2-image-dev
-             - libseccomp-dev
-             - libspice-protocol-dev
-             - libspice-server-dev
--            - libssh-dev
-             - liburcu-dev
-             - libusb-1.0-0-dev
-             - libvte-2.91-dev
-@@ -311,11 +313,11 @@ jobs:
-       compiler: none
-       env:
-         - COMPILER_NAME=gcc CXX=g++-9 CC=gcc-9
--        - CONFIG="--cc=gcc-9 --cxx=g++-9 --disable-pie --disable-linux-user"
-+        - CONFIG="--cc=gcc-9 --cxx=g++-9 --disable-linux-user"
-         - TEST_CMD=""
-       before_script:
-         - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
--        - ${SRC_DIR}/configure ${CONFIG} --extra-cflags="-g3 -O0 -Wno-error=stringop-truncation -fsanitize=thread" --extra-ldflags="-fuse-ld=gold" || { cat config.log && exit 1; }
-+        - ${SRC_DIR}/configure ${CONFIG} --extra-cflags="-g3 -O0 -fsanitize=thread" || { cat config.log && exit 1; }
- 
- 
-     # Run check-tcg against linux-user
-@@ -357,7 +359,7 @@ jobs:
- 
-     - name: "[aarch64] GCC check-tcg"
-       arch: arm64
--      dist: xenial
-+      dist: focal
-       addons:
-         apt_packages:
-           - libaio-dev
-@@ -390,7 +392,7 @@ jobs:
- 
-     - name: "[ppc64] GCC check-tcg"
-       arch: ppc64le
--      dist: xenial
-+      dist: focal
-       addons:
-         apt_packages:
-           - libaio-dev
+       dist: bionic
 -- 
 2.20.1
 
