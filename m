@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 434E5C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 15:25:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1205DC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 15:26:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7CFC206A4
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 15:25:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 974B7235F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 15:26:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ko3LEYbf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7CFC206A4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nXEM8fOL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 974B7235F9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLpbW-0005vE-Mj
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 11:25:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59884)
+	id 1kLpcb-00071V-Kl
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 11:26:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59762)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kLpX5-0001Cg-4Q
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:21:12 -0400
-Received: from mail-pg1-x535.google.com ([2607:f8b0:4864:20::535]:34081)
+ id 1kLpWr-0000yB-4q
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:20:57 -0400
+Received: from mail-pf1-x42c.google.com ([2607:f8b0:4864:20::42c]:43416)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kLpX2-0005TI-SV
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:21:10 -0400
-Received: by mail-pg1-x535.google.com with SMTP id u24so2879597pgi.1
- for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 08:21:05 -0700 (PDT)
+ id 1kLpWp-0005R0-E4
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:20:56 -0400
+Received: by mail-pf1-x42c.google.com with SMTP id f18so3499295pfa.10
+ for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 08:20:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=xmBcp07NP8phRH9qOFxSa7PTiYpPJFfrWoI6zCboVds=;
- b=ko3LEYbfIrE/DeacDsw+Wid2M96lbzNGTN80dOSZQJrsPw4lzYW6jFQx9n5QxrRlLJ
- QCRElx8aYddKN2gtEUajC51/uylClb++mJuZVYzTnO3tU4Jg2vJTp1EtYd1LYVG1PcuP
- USsqc7xCWG8takqxo2jTyH0qcV/wGuZYNC+o/c4JptMiMuhmi/7302n+515PN/U7Iehb
- zNOJzNr9llMTmvYW8myrdwqd8jFD3C6QTnTjwk9xYJkcuvNkqHyw2NRmZI2X7mODOo2s
- 0R4vjl0CyWvdO97prv9FUnhnY37JrpiTZMU5qy2KQRI2kukM+zZhsJDh3cYiQVzFp26l
- yK6g==
+ bh=TRndLkCMxWNns7qPLAeoWU7hdSJPyNTmzGBqCDb04fk=;
+ b=nXEM8fOLG1Tb0+hXhrGrxw11JS7PRU7sqoRTjUOLanQONpskeLnwGEvg4Z+3p/OojD
+ xTEaDaebTLPE6jJ7JZpQUPv69muEsQ76haj1fkGnnCcUK3RxLgf8tHyfEr67/8GYXXu9
+ PeUN9YT3Z82K+ltRLbrEqP2uQhF18KaFlykK2/YRqmOF7Wxk5J26i6qd+F3bgpprALV5
+ oKEvQsmubScFWU1l5QnytiBzgJitqTXqkju1U6HqgzzYpbQPREn8k4MJxWiKHvcLvM7A
+ t5Ik3AlZGCEy3oYiWKEDp3Sxun0I1T22Fg4gU4BQeqPYn3bFuUsdGsGm/97nRLvVObiW
+ p68Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=xmBcp07NP8phRH9qOFxSa7PTiYpPJFfrWoI6zCboVds=;
- b=NE+aLgneg+q+f8hWuLcsiMkQys6UPVRpJnTjf3anlzY3TnTCJvHbzZu6RKRqyiGl8A
- h+jW4GSgl+UgR3Ct+caqAGz11lQJDmF6Y6lsgH/TSreXpqd+I8PPEYAubx9TlRUYs3sx
- txNBttZlX1xOg6Tq9tHZWU6siK9Zh4sazaZjaJdJsMgSSjgOig7cq9IuDhTYex+6qHWu
- kR/Rr4oZ7PDXwkGp8zfKa/y0odfMIWRApcGau4cXjERBPGa1YjX9bX1MFZ0HNRi3xjmA
- yMpt5ULuTxpEt4jPkGhmplAdlfXqT01k71PqQJgKWSIooAGJqg5j7RBaePzFxv5GbcnN
- wNFg==
-X-Gm-Message-State: AOAM533Keq6Smtb8mWF/dOjnaRf9kFNy0OHAk2WX7Vh//MaNdyAMLa/+
- npR6Il3kTiqEhNimdhrRM9zcchF4xmGRzA==
-X-Google-Smtp-Source: ABdhPJz4AwxGcDbWaX/mrrOvsZtcZK54EF53hd4dWti6BHsNytk2mG8Cvja39VqRwcygiVKhcpRElA==
-X-Received: by 2002:a17:902:82c2:b029:d1:f36a:ab97 with SMTP id
- u2-20020a17090282c2b02900d1f36aab97mr5042903plz.64.1601047264057; 
- Fri, 25 Sep 2020 08:21:04 -0700 (PDT)
+ bh=TRndLkCMxWNns7qPLAeoWU7hdSJPyNTmzGBqCDb04fk=;
+ b=Gg6OR7nKJXf0q7KdIZFMqv3wfaSpPVdfvKAYgNtP3fWWuJ8uHkTrHatPv17qq4gw7D
+ k50/9p8yHiBWu/hjSViI0DM58+/qvE40wKjdsEPdFN/9EusDI1Lv7PsUryTvH9n3i3fi
+ 9bkoxYHUlGK9XSSK2UXo8FySM7bxEwd1XLPgMJWaLA5j6OgDbzVuWzOgY3h7oH3sd7Dx
+ 0LlYRKnwWDfsC7xhsGbAAn/I9NuJji0psgleV19HKvE0yalBa3PS7OPMs9mTkupdTY4s
+ 9B1pXBsdhUvSzYOEAePwRf1G2osK5q0gmznl3brhODjhInWHqRoVyLtG1CcH0LmP+IKm
+ am6g==
+X-Gm-Message-State: AOAM532CdhH0UJqqSujYeUEF4T6Grgw2b72J63j+rMIEnGjVJ/4u49z2
+ qEeI9CGpgRIF0Bpo/wxsPL6Z7JTEcbxJgA==
+X-Google-Smtp-Source: ABdhPJxrc/9QZK8apML+2H7vI0n/LwuC05152Xoh5IO8jR7SMZ7x7C9Szs/t/+wEtXyqIxR4D+1jng==
+X-Received: by 2002:a62:6444:0:b029:13e:d13d:a12d with SMTP id
+ y65-20020a6264440000b029013ed13da12dmr4527850pfb.21.1601047253573; 
+ Fri, 25 Sep 2020 08:20:53 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id a5sm2717859pgk.13.2020.09.25.08.21.02
+ by smtp.gmail.com with ESMTPSA id a5sm2717859pgk.13.2020.09.25.08.20.52
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 25 Sep 2020 08:21:03 -0700 (PDT)
+ Fri, 25 Sep 2020 08:20:52 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 10/10] softfloat: Use ppc64 assembly for {add, sub}{192,
- 256}
-Date: Fri, 25 Sep 2020 08:20:47 -0700
-Message-Id: <20200925152047.709901-11-richard.henderson@linaro.org>
+Subject: [PATCH v2 03/10] softfloat: Tidy a * b + inf return
+Date: Fri, 25 Sep 2020 08:20:40 -0700
+Message-Id: <20200925152047.709901-4-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200925152047.709901-1-richard.henderson@linaro.org>
 References: <20200925152047.709901-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::535;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x535.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::42c;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x42c.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,95 +105,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+No reason to set values in 'a', when we already
+have float_class_inf in 'c', and can flip that sign.
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/fpu/softfloat-macros.h | 14 ++++++++++++++
- fpu/softfloat.c                | 27 +++++++++++++++++++++++++++
- 2 files changed, 41 insertions(+)
+ fpu/softfloat.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/include/fpu/softfloat-macros.h b/include/fpu/softfloat-macros.h
-index 969a486fd2..d26cfaf267 100644
---- a/include/fpu/softfloat-macros.h
-+++ b/include/fpu/softfloat-macros.h
-@@ -449,6 +449,13 @@ static inline void
-         : "=&r"(*z0Ptr), "=&r"(*z1Ptr), "=&r"(*z2Ptr)
-         : "rZ"(a0), "rZ"(a1), "rZ"(a2), "rZ"(b0), "rZ"(b1), "rZ"(b2)
-         : "cc");
-+#elif defined(__powerpc64__)
-+    asm("addc %2, %5, %8\n\t"
-+        "adde %1, %4, %7\n\t"
-+        "adde %0, %3, %6"
-+        : "=r"(*z0Ptr), "=&r"(*z1Ptr), "=&r"(*z2Ptr)
-+        : "r"(a0), "r"(a1), "r"(a2), "r"(b0), "r"(b1), "r"(b2)
-+        : "ca");
- #else
-     uint64_t z0, z1, z2;
-     int8_t carry0, carry1;
-@@ -521,6 +528,13 @@ static inline void
-         : "=&r"(*z0Ptr), "=&r"(*z1Ptr), "=&r"(*z2Ptr)
-         : "rZ"(a0), "rZ"(a1), "rZ"(a2), "rZ"(b0), "rZ"(b1), "rZ"(b2)
-         : "cc");
-+#elif defined(__powerpc64__)
-+    asm("subfc %2, %8, %5\n\t"
-+        "subfe %1, %7, %4\n\t"
-+        "subfe %0, %6, %3"
-+        : "=&r"(*z0Ptr), "=&r"(*z1Ptr), "=&r"(*z2Ptr)
-+        : "r"(a0), "r"(a1), "r"(a2), "r"(b0), "r"(b1), "r"(b2)
-+        : "ca");
- #else
-     uint64_t z0, z1, z2;
-     int8_t borrow0, borrow1;
 diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 07dc17caad..9af75b9146 100644
+index 67cfa0fd82..9db55d2b11 100644
 --- a/fpu/softfloat.c
 +++ b/fpu/softfloat.c
-@@ -7370,6 +7370,18 @@ static void sub256(UInt256 *r, UInt256 *a, UInt256 *b)
-           [b0] "rZ"(b->w[0]), [b1] "rZ"(b->w[1]),
-           [b2] "rZ"(b->w[2]), [b3] "rZ"(b->w[3])
-         : "cc");
-+#elif defined(__powerpc64__)
-+    asm("subfc %[r3], %[b3], %[a3]\n\t"
-+        "subfe %[r2], %[b2], %[a2]\n\t"
-+        "subfe %[r1], %[b1], %[a1]\n\t"
-+        "subfe %[r0], %[b0], %[a0]"
-+        : [r0] "=&r"(r->w[0]), [r1] "=&r"(r->w[1]),
-+          [r2] "=&r"(r->w[2]), [r3] "=&r"(r->w[3])
-+        : [a0] "r"(a->w[0]), [a1] "r"(a->w[1]),
-+          [a2] "r"(a->w[2]), [a3] "r"(a->w[3]),
-+          [b0] "r"(b->w[0]), [b1] "r"(b->w[1]),
-+          [b2] "r"(b->w[2]), [b3] "r"(b->w[3])
-+        : "ca");
- #else
-     bool borrow = false;
- 
-@@ -7407,6 +7419,13 @@ static void neg256(UInt256 *a)
-         "ngc  %0, %0"
-         : "+r"(a->w[0]), "+r"(a->w[1]), "+r"(a->w[2]), "+r"(a->w[3])
-         : : "cc");
-+#elif defined(__powerpc64__)
-+    asm("subfic %3, %3, 0\n\t"
-+        "subfze %2, %2\n\t"
-+        "subfze %1, %1\n\t"
-+        "subfze %0, %0"
-+        : "+r"(a->w[0]), "+r"(a->w[1]), "+r"(a->w[2]), "+r"(a->w[3])
-+        : : "ca");
- #else
-     /*
-      * Recall that -X - 1 = ~X, and that since this is negation,
-@@ -7457,6 +7476,14 @@ static void add256(UInt256 *a, UInt256 *b)
-         : "+r"(a->w[0]), "+r"(a->w[1]), "+r"(a->w[2]), "+r"(a->w[3])
-         : "rZ"(b->w[0]), "rZ"(b->w[1]), "rZ"(b->w[2]), "rZ"(b->w[3])
-         : "cc");
-+#elif defined(__powerpc64__)
-+    asm("addc %3, %3, %7\n\t"
-+        "adde %2, %2, %6\n\t"
-+        "adde %1, %1, %5\n\t"
-+        "adde %0, %0, %4"
-+        : "+r"(a->w[0]), "+r"(a->w[1]), "+r"(a->w[2]), "+r"(a->w[3])
-+        :  "r"(b->w[0]),  "r"(b->w[1]),  "r"(b->w[2]),  "r"(b->w[3])
-+        : "ca");
- #else
-     bool carry = false;
+@@ -1380,9 +1380,8 @@ static FloatParts muladd_floats(FloatParts a, FloatParts b, FloatParts c,
+             s->float_exception_flags |= float_flag_invalid;
+             return parts_default_nan(s);
+         } else {
+-            a.cls = float_class_inf;
+-            a.sign = c.sign ^ sign_flip;
+-            return a;
++            c.sign ^= sign_flip;
++            return c;
+         }
+     }
  
 -- 
 2.25.1
