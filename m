@@ -2,134 +2,87 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68F88C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 10:18:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AB8AC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 10:19:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5EA221741
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 10:18:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F088921741
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 10:19:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S3b2xbwC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5EA221741
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lmichel.fr header.i=@lmichel.fr header.b="jG7Mlc5B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F088921741
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=lmichel.fr
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLknu-0001GW-Jn
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 06:18:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42442)
+	id 1kLkow-0002nu-0c
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 06:19:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42656)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kLkmT-0000do-Di
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 06:16:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33045)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kLkmM-0007MX-F7
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 06:16:45 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601028996;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=hFE3C7S8wOYjIVgL8Wi7/w3j4KwH2VXtHn2LwqWW+oc=;
- b=S3b2xbwCVR6cwfABITwFBuFST7Wo+WPunLf73Fnzu/10O6ZMlX6ijPR7Zhi8XLGw0uBvKc
- kmaKEUC+kh2NhUpbtWeCU9qIxuymrLsfkodj3r+em2exgZbfvt7u9pvbRBnz+e7ibmQ16T
- 3f/xXzZUOMNJQHdSZg1vLzG2QHucWz8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-36-9x_UmF9IOBCC6HQU-CHxYA-1; Fri, 25 Sep 2020 06:16:32 -0400
-X-MC-Unique: 9x_UmF9IOBCC6HQU-CHxYA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D9F2980ED92;
- Fri, 25 Sep 2020 10:16:31 +0000 (UTC)
-Received: from [10.36.112.211] (ovpn-112-211.ams2.redhat.com [10.36.112.211])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 919DC60C04;
- Fri, 25 Sep 2020 10:16:27 +0000 (UTC)
-Subject: Re: [PATCH v1 0/5] virtio-mem: block size and address-assignment
- optimizations
+ (Exim 4.90_1) (envelope-from <luc@lmichel.fr>)
+ id 1kLknD-000131-SW; Fri, 25 Sep 2020 06:17:31 -0400
+Received: from pharaoh.lmichel.fr ([149.202.28.74]:58110)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <luc@lmichel.fr>)
+ id 1kLkn8-0007QI-Bb; Fri, 25 Sep 2020 06:17:31 -0400
+Received: from sekoia-pc.bar.greensocs.com (sekoia-pc.home.lmichel.fr
+ [192.168.61.100])
+ by pharaoh.lmichel.fr (Postfix) with ESMTPS id 00207C60F18;
+ Fri, 25 Sep 2020 10:17:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr; s=pharaoh; 
+ t=1601029040;
+ h=from:from:sender:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=eHG3gOOfzWKUSsScEIEjr33P+R1FlB8vtIzUKO1MkuU=;
+ b=jG7Mlc5BbIrGtqCQe2bSsyUPLWmzT8fZ2eFENXB3MSzQuOSNzfP8r9jXebL2e2R+nC4znA
+ IIDU3IH90XvoIFJtY2EU5CU3B9V+pi9JWqkeiPoti3U0A2rJCsIsPlVUGPhw6FBNay8y9m
+ D6jZRUVAfWK4JxUi3cV1FiX6hwAEQ2JYVQvL106ybXOo5yAbmOijjNZnA5xRfcv8+wugGX
+ aQ29yn/ojH8QY2ZaPrWR8Lld1s2PwSlvpzlxK11zc3+ERbl/D7vrjSDEuZe9+WSzmxvNuZ
+ n2ilotIRXKhc/TK3Ebch/qblCPZo1YTszDNg0/lV+KKHYGsVwWnsOOTFq74vaQ==
+From: Luc Michel <luc@lmichel.fr>
 To: qemu-devel@nongnu.org
-References: <20200923113900.72718-1-david@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat GmbH
-Message-ID: <ec904d36-eb52-5b50-8943-67df82407fb5@redhat.com>
-Date: Fri, 25 Sep 2020 12:16:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+Subject: [PATCH 01/14] hw/core/clock: provide the VMSTATE_ARRAY_CLOCK macro
+Date: Fri, 25 Sep 2020 12:17:18 +0200
+Message-Id: <20200925101731.2159827-2-luc@lmichel.fr>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20200925101731.2159827-1-luc@lmichel.fr>
+References: <20200925101731.2159827-1-luc@lmichel.fr>
 MIME-Version: 1.0
-In-Reply-To: <20200923113900.72718-1-david@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=david@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 01:07:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -34
-X-Spam_score: -3.5
-X-Spam_bar: ---
-X-Spam_report: (-3.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.214, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 8bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr;
+ s=pharaoh; t=1601029040;
+ h=from:from:sender:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=eHG3gOOfzWKUSsScEIEjr33P+R1FlB8vtIzUKO1MkuU=;
+ b=ZDEbLfzepCVtKAYPvw/E5Wd/Dfqo+sfmNjXfjWnRjQUbtrUBn4a5ISHCf+3kE3GT19/sNF
+ R6Tufv32GN5BXpwEO1fIdchuYsyzTBwH2eglrEkCcwevgB5UoNB7C6kpb8aADgSay1kmpP
+ i9P44oayX1yEDUCLAKO6PKhYT3B7uFJbcxEGXuz5kkzJPPxp9zKHsWHpSjmwnK0UU869jF
+ HGmC39sETRAGEPPlcec7D47K5DIslnGa9ZzidmFT9ISQplZ54UwN5CHHIBJkr+9rAzBSB+
+ MVK7uPeGTlXd5+Vl2ZZvttHcYFYOGiLMGuC+T5PMGxLKJTk+I/fDzJGfIo7eow==
+ARC-Seal: i=1; s=pharaoh; d=lmichel.fr; t=1601029040; a=rsa-sha256; cv=none;
+ b=FJmGm+h++qPtwsov66hcRhRWgMNyEIYmlcTupRvfNvvSUxKu3vjMIxhPuuCJQgJbrfrgujKXP7JCHaah2xg2FyPUz0plkq5Ba6CYppzvsBP0o0d+OMfebOGDr9Rfck2rAreG/Jmj/aDUG+SOaQOytQsWpLk9DNTebt5OWHRak7kXjWZ6ocpnqQa1HFICvPlssPcTa2+x4lBHEusHJJTHkm2HWtogEYfYdRvwCnTAEvsbQiksZxPyBknzQI9dU+V8zmGeofQOWhBaHNWu9LP97YVACcE0rn0OqQoQmj98xUBvfk8nWGRp/UVKmBJEDTWNilf2y39Pcky2gpA24AYg4g==
+ARC-Authentication-Results: i=1;
+	pharaoh.lmichel.fr
+Received-SPF: pass client-ip=149.202.28.74; envelope-from=luc@lmichel.fr;
+ helo=pharaoh.lmichel.fr
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 06:17:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -143,41 +96,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>,
- Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
- Wei Yang <richardw.yang@linux.intel.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Damien Hedde <damien.hedde@greensocs.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Luc Michel <luc@lmichel.fr>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 23.09.20 13:38, David Hildenbrand wrote:
-> Let's try to detect the actual THP size and use it as default block size
-> (unless the page size of the backend is bigger). Handle large block sizes
-> better, avoiding a virtio-spec violation and optimizing address
-> auto-detection.
-> 
-> David Hildenbrand (5):
->   virtio-mem: Probe THP size to determine default block size
->   virtio-mem: Check that "memaddr" is multiples of the block size
->   memory-device: Support big alignment requirements
->   memory-device: Add get_min_alignment() callback
->   virito-mem: Implement get_min_alignment()
-> 
->  hw/mem/memory-device.c         | 20 ++++---
->  hw/virtio/virtio-mem-pci.c     | 14 +++++
->  hw/virtio/virtio-mem.c         | 95 ++++++++++++++++++++++++++++++++--
->  include/hw/mem/memory-device.h | 11 ++++
->  4 files changed, 130 insertions(+), 10 deletions(-)
-> 
+Signed-off-by: Luc Michel <luc@lmichel.fr>
+---
+ include/hw/clock.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Just noticed that spring cleaning due to meson change removed my
-cc-cmd.sh script, so adding people manually to the cover for context.
-
+diff --git a/include/hw/clock.h b/include/hw/clock.h
+index d357594df9..c93e6113cd 100644
+--- a/include/hw/clock.h
++++ b/include/hw/clock.h
+@@ -79,10 +79,15 @@ struct Clock {
+ extern const VMStateDescription vmstate_clock;
+ #define VMSTATE_CLOCK(field, state) \
+     VMSTATE_CLOCK_V(field, state, 0)
+ #define VMSTATE_CLOCK_V(field, state, version) \
+     VMSTATE_STRUCT_POINTER_V(field, state, version, vmstate_clock, Clock)
++#define VMSTATE_ARRAY_CLOCK(field, state, num) \
++    VMSTATE_ARRAY_CLOCK_V(field, state, num, 0)
++#define VMSTATE_ARRAY_CLOCK_V(field, state, num, version)          \
++    VMSTATE_ARRAY_OF_POINTER_TO_STRUCT(field, state, num, version, \
++                                       vmstate_clock, Clock)
+ 
+ /**
+  * clock_setup_canonical_path:
+  * @clk: clock
+  *
 -- 
-Thanks,
-
-David / dhildenb
+2.28.0
 
 
