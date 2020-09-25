@@ -7,83 +7,83 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4CE6C4727E
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 21:27:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83FD7C4727E
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 21:38:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B26621741
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 21:27:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B7A56204FD
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 21:38:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sSQJ6B+G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B26621741
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bNmDNV/2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7A56204FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLvFB-0002eq-Ca
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 17:27:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58486)
+	id 1kLvPo-0005Q0-Lf
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 17:38:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60150)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kLvE8-0001me-Vq
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 17:26:00 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:33705)
+ id 1kLvOc-0004xJ-5w
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 17:36:50 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:39367)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kLvE7-0002hc-Ag
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 17:26:00 -0400
-Received: by mail-pg1-x542.google.com with SMTP id o25so3680230pgm.0
- for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 14:25:58 -0700 (PDT)
+ id 1kLvOa-0003pq-Aq
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 17:36:49 -0400
+Received: by mail-pg1-x543.google.com with SMTP id d13so3677602pgl.6
+ for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 14:36:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=QsjyM/cO3i5yVWHNiAmViT/L05joNfQdUK/RhFNsoyU=;
- b=sSQJ6B+GJWVJ0yWFYaVv/2aOjKGKDmUkmdBfyAm1nztyO+vLxHhvtmwacfQHqBzEBH
- b7FtGxOs0gTKm/d0RbOLuToSPiuz8F8sc/yzDF0OwP9hCOA8jHiLjE3iIjCd/K5ScROa
- Agk02bbmq/45kov/vi6t0UR87EfGxN7rnEeC6x7W5ge4e0oJHssYaOZWcY/1jD9hB59r
- 5pOYuij1Vl7cboC+e4w0X0eiN+SXD8yfzgsVSwu1Pgs+54vbwTXEcQRMO3JLnI+1oxOu
- 1O9XwqV2LL+jnWfBhpBQgHzT91RXhAp4HGaS2xG7g2BivAT43qShyqDK1o9HQAlEicYk
- SvMQ==
+ bh=437+k7V+C5+AGiO0yrFwb5Yb0aoN9KJMityORokIo80=;
+ b=bNmDNV/28Gf8hdymws8VaQ4qkq7aRwzOKNFGyOqPmbtaLhslXOLwzHfzzd0qqy1TUT
+ oBA5BTMKK5q+U8EG9qK1LTWIaN6pQRaorGG9Rjmxd8gQ/vNKbPpbPFcD38hBewmzFfzQ
+ rh6gsZWTkIRBxgkq37j/ZCXbEU67aNOeRUtWuusDWY7gnMBB4DO7rAhEaOzsMLrnUoab
+ adP2mpXHLDXTxpEQTo2zn12H2fdG8ECfYwkCcOBQyD5YnUXB26Mjrd0aGEu29H8wTT1t
+ cJ4BxDlz8mu0uewIsoY+n0HMYDFyjwsqVPEqugJPy933dZ8PuCptskPFzgc1EJxjK5iQ
+ S5QQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=QsjyM/cO3i5yVWHNiAmViT/L05joNfQdUK/RhFNsoyU=;
- b=bMIyh1P0+ELBwYzuLgSz8ajLDPJ/5gGHn7/jL7lz3vD/1onhTG/WG9cgGmbwdqcoP8
- 6u8zZborCji4y3/FwrN+xzaoTd7OG8wqmpUaFZEFxunNj/MQqnutsY4a4bo7d6PZwlfn
- hmbOHdJsLoYWIO34/AEnHCRi3sfi3mLxlh4xfglk/XVLgRTsos5UBr59gcQ48oKqQfVC
- fSRA/uGvcdi6CoqlLVRdpoxt64XYrmaE8yLx1/8FcT5pLfZIVYfp3MoZj2juUbDeq4mZ
- b+Qg4W2HiADpRGOtXFj5VZmaqf38kaeIfOUGlbKvs2EzOiYymxnMC9D8VK71JjMx+VMH
- 9fLw==
-X-Gm-Message-State: AOAM5308hE723CLZxYwLirIXQ+YRuHEJh+iV7fQfvo/fLJx1DhLrTLRK
- 3knZ7uIGlWZ5dk/7cyePd7ibfw==
-X-Google-Smtp-Source: ABdhPJzidcqp4IET+dtnuzm0p0XaluUTwp0jXxd2bfojUB7ZcN79WZo4X6POp1yBiQOUFAx903NHpg==
-X-Received: by 2002:a17:902:b7c4:b029:d0:b7a2:d16 with SMTP id
- v4-20020a170902b7c4b02900d0b7a20d16mr1327415plz.11.1601069157847; 
- Fri, 25 Sep 2020 14:25:57 -0700 (PDT)
+ bh=437+k7V+C5+AGiO0yrFwb5Yb0aoN9KJMityORokIo80=;
+ b=tbcJohMSWZ4WpMh6llxycyof8EelILW56rpXbvyrahptiEnSZiUwKzvx5AJCVok1hD
+ ITSxf8tG8Stt8YlWx4knXfnK8CthuuyGg5kspifYjXSxboGDSlexCjI9w3LI6iYGEkwe
+ Q7tMY6HqvzDygWrvWqHfsYLMfCjccl+IHSbzS5av6LSDLf5lWjoKt5Ueu9XBNjj1qMjd
+ FQNZuC//xNna8eYmj3Fz9sXdjHGZx1zMv61CYav6p9Pa03dLEP/5S2KNkb9UagJt0Qvh
+ N+6OgFAJAiXHu7l0raTEbgZiukkwdbXmqbi35QGvYMP7afUlXNqQuQpssLu+6XUyqPzL
+ Dc0A==
+X-Gm-Message-State: AOAM5322pz7MLkhivxP+ZHJBcE6UgGVETjnwzl9J4ANMl3H94tY5J0Wl
+ Qzbnv8bVZU50u5w14YDYv1RRXg==
+X-Google-Smtp-Source: ABdhPJwkNYm3NHMEir1yA19VBV2X9Zdc6LxBiaoKGfurm1OMYvqQtYbUOGQogD2/XZ6hiSEfSuGtHg==
+X-Received: by 2002:a17:902:9884:b029:d2:4276:1b64 with SMTP id
+ s4-20020a1709029884b02900d242761b64mr1339081plp.76.1601069806590; 
+ Fri, 25 Sep 2020 14:36:46 -0700 (PDT)
 Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id gg13sm127227pjb.3.2020.09.25.14.25.56
+ by smtp.gmail.com with ESMTPSA id f4sm3516722pfa.125.2020.09.25.14.36.45
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 25 Sep 2020 14:25:57 -0700 (PDT)
-Subject: Re: [PATCH v1 2/8] s390x/tcg: Implement SUBTRACT HALFWORD (SGH)
+ Fri, 25 Sep 2020 14:36:45 -0700 (PDT)
+Subject: Re: [PATCH v1 3/8] s390x/tcg: Implement MULTIPLY (MG, MGRK)
 To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
 References: <20200922103129.12824-1-david@redhat.com>
- <20200922103129.12824-3-david@redhat.com>
+ <20200922103129.12824-4-david@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <697aea1b-1d02-e2d4-fe4d-71c9b341263f@linaro.org>
-Date: Fri, 25 Sep 2020 14:25:52 -0700
+Message-ID: <9def3734-d562-4591-ad6b-6a82e989e471@linaro.org>
+Date: Fri, 25 Sep 2020 14:36:43 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200922103129.12824-3-david@redhat.com>
+In-Reply-To: <20200922103129.12824-4-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x543.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -22
@@ -112,12 +112,14 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 9/22/20 3:31 AM, David Hildenbrand wrote:
-> Easy to wire up.
+> Multiply two signed 64bit values and store the 128bit result in r1 (0-63)
+> and r1 + 1 (64-127).
 > 
 > Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  target/s390x/insn-data.def | 1 +
->  1 file changed, 1 insertion(+)
+>  target/s390x/insn-data.def |  2 ++
+>  target/s390x/translate.c   | 13 +++++++++++++
+>  2 files changed, 15 insertions(+)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
