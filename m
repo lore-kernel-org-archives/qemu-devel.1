@@ -2,107 +2,126 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F697C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 09:13:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE14AC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 09:18:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7AB3B2083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 09:13:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 16324206E5
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 09:18:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iuLK51J1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AB3B2083B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L91FId8N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16324206E5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLjn4-0006qv-BS
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 05:13:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56896)
+	id 1kLjrn-0008Pt-TO
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 05:18:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57970)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kLjll-00057J-EF
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 05:11:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46081)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kLjrE-00080r-2S
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 05:17:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28512)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kLjlj-0007uw-C3
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 05:11:57 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kLjrC-00005k-7B
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 05:17:35 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601025114;
+ s=mimecast20190719; t=1601025453;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=9ystAv+0v/nlnX9GNJ6gaDGICgwZ4J3YwxnSH82OSRg=;
- b=iuLK51J1tVw8zBNjl/0MnfnOsTVl/gNtepLvUmyQxqLenk3UmeHVmsP3kZdL01BRw52uc7
- XIFpQOhj7suis9GjZYiO6rUch4gZ+vnPXraAvTvmdHrJw9f1Zsph4Rwla9LgNzctExVhJk
- vEOZokGPHfRMXGXAW9VsaN11V17eISU=
+ bh=KXB3T9Xtk0NwFng/841U/BVwzUN8ft2jsMT5UuUuNa0=;
+ b=L91FId8N1hSHBpyZJc/kA4q/8VgiL/zZKBWghxhMzGo/b2cI7MoOasNTU8IFwO6zR68aGR
+ CsEQD+dqDel10Fj4j96xrnO/BXVysg6MI+vJH7U41N4Ysc5DmJArEZzM1rmvjWxpp3SaQX
+ 36ZGsdu7zeDA7WQ9upt+Nr8FKEQ+quo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-365-R_24nVMaPtefeJ5yBuP2WA-1; Fri, 25 Sep 2020 05:11:52 -0400
-X-MC-Unique: R_24nVMaPtefeJ5yBuP2WA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-283-AUvyWpouPEmiK2VDTI2Sew-1; Fri, 25 Sep 2020 05:17:31 -0400
+X-MC-Unique: AUvyWpouPEmiK2VDTI2Sew-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AB0C188C132;
- Fri, 25 Sep 2020 09:11:51 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-113.ams2.redhat.com
- [10.36.113.113])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 376635D9F1;
- Fri, 25 Sep 2020 09:11:46 +0000 (UTC)
-Subject: Re: [PATCH v6 11/15] iotests: add 298 to test new preallocate filter
- driver
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200918181951.21752-1-vsementsov@virtuozzo.com>
- <20200918181951.21752-12-vsementsov@virtuozzo.com>
- <1d202398-7a0e-9e72-6f9d-c04b7f887a0a@redhat.com>
- <33d1a996-f212-eac7-ab78-659a4025c069@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <d36a27c8-0f2c-ede5-6f97-e134093dcf6e@redhat.com>
-Date: Fri, 25 Sep 2020 11:11:44 +0200
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A48987A831;
+ Fri, 25 Sep 2020 09:17:30 +0000 (UTC)
+Received: from [10.36.112.211] (ovpn-112-211.ams2.redhat.com [10.36.112.211])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3D4D87367E;
+ Fri, 25 Sep 2020 09:17:29 +0000 (UTC)
+Subject: Re: [PATCH 6/8] softfloat: Implement float128_muladd
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200924012453.659757-1-richard.henderson@linaro.org>
+ <20200924012453.659757-7-richard.henderson@linaro.org>
+ <7045a238-b702-0031-735a-caa6d726e160@redhat.com>
+ <ad092b60-dd41-33f0-9530-75fba4309c3c@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+ dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+ QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+ XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+ Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+ PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+ WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+ UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+ jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+ B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABtCREYXZpZCBIaWxk
+ ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT6JAlgEEwEIAEICGwMGCwkIBwMCBhUIAgkKCwQW
+ AgMBAh4BAheAAhkBFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl8Ox4kFCRKpKXgACgkQTd4Q
+ 9wD/g1oHcA//a6Tj7SBNjFNM1iNhWUo1lxAja0lpSodSnB2g4FCZ4R61SBR4l/psBL73xktp
+ rDHrx4aSpwkRP6Epu6mLvhlfjmkRG4OynJ5HG1gfv7RJJfnUdUM1z5kdS8JBrOhMJS2c/gPf
+ wv1TGRq2XdMPnfY2o0CxRqpcLkx4vBODvJGl2mQyJF/gPepdDfcT8/PY9BJ7FL6Hrq1gnAo4
+ 3Iv9qV0JiT2wmZciNyYQhmA1V6dyTRiQ4YAc31zOo2IM+xisPzeSHgw3ONY/XhYvfZ9r7W1l
+ pNQdc2G+o4Di9NPFHQQhDw3YTRR1opJaTlRDzxYxzU6ZnUUBghxt9cwUWTpfCktkMZiPSDGd
+ KgQBjnweV2jw9UOTxjb4LXqDjmSNkjDdQUOU69jGMUXgihvo4zhYcMX8F5gWdRtMR7DzW/YE
+ BgVcyxNkMIXoY1aYj6npHYiNQesQlqjU6azjbH70/SXKM5tNRplgW8TNprMDuntdvV9wNkFs
+ 9TyM02V5aWxFfI42+aivc4KEw69SE9KXwC7FSf5wXzuTot97N9Phj/Z3+jx443jo2NR34XgF
+ 89cct7wJMjOF7bBefo0fPPZQuIma0Zym71cP61OP/i11ahNye6HGKfxGCOcs5wW9kRQEk8P9
+ M/k2wt3mt/fCQnuP/mWutNPt95w9wSsUyATLmtNrwccz63W5Ag0EVcufkQEQAOfX3n0g0fZz
+ Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
+ T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
+ 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
+ CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
+ NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
+ 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
+ 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
+ lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
+ AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
+ N7eop7uh+6bezi+rugUI+w6DABEBAAGJAjwEGAEIACYCGwwWIQQb2cqtc1xMOkYN/MpN3hD3
+ AP+DWgUCXw7HsgUJEqkpoQAKCRBN3hD3AP+DWrrpD/4qS3dyVRxDcDHIlmguXjC1Q5tZTwNB
+ boaBTPHSy/Nksu0eY7x6HfQJ3xajVH32Ms6t1trDQmPx2iP5+7iDsb7OKAb5eOS8h+BEBDeq
+ 3ecsQDv0fFJOA9ag5O3LLNk+3x3q7e0uo06XMaY7UHS341ozXUUI7wC7iKfoUTv03iO9El5f
+ XpNMx/YrIMduZ2+nd9Di7o5+KIwlb2mAB9sTNHdMrXesX8eBL6T9b+MZJk+mZuPxKNVfEQMQ
+ a5SxUEADIPQTPNvBewdeI80yeOCrN+Zzwy/Mrx9EPeu59Y5vSJOx/z6OUImD/GhX7Xvkt3kq
+ Er5KTrJz3++B6SH9pum9PuoE/k+nntJkNMmQpR4MCBaV/J9gIOPGodDKnjdng+mXliF3Ptu6
+ 3oxc2RCyGzTlxyMwuc2U5Q7KtUNTdDe8T0uE+9b8BLMVQDDfJjqY0VVqSUwImzTDLX9S4g/8
+ kC4HRcclk8hpyhY2jKGluZO0awwTIMgVEzmTyBphDg/Gx7dZU1Xf8HFuE+UZ5UDHDTnwgv7E
+ th6RC9+WrhDNspZ9fJjKWRbveQgUFCpe1sa77LAw+XFrKmBHXp9ZVIe90RMe2tRL06BGiRZr
+ jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
+ WNyWQQ==
+Organization: Red Hat GmbH
+Message-ID: <9ced60b8-41d3-5c81-cbe8-92f219ba6978@redhat.com>
+Date: Fri, 25 Sep 2020 11:17:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <33d1a996-f212-eac7-ab78-659a4025c069@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <ad092b60-dd41-33f0-9530-75fba4309c3c@linaro.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="LT6oe7aTsO845J6aZMtPytF6V5XB5oPeu"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mreitz@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=david@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 02:48:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -126,251 +145,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- stefanha@redhat.com, den@openvz.org
+Cc: alex.bennee@linaro.org, bharata@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---LT6oe7aTsO845J6aZMtPytF6V5XB5oPeu
-Content-Type: multipart/mixed; boundary="jgT40TOTtdRRaaO4cTluHxTivqDJPxBDZ"
+On 24.09.20 15:30, Richard Henderson wrote:
+> On 9/24/20 12:56 AM, David Hildenbrand wrote:
+>> I do wonder if a type for Int256 would make sense - instead of > manually passing these arrays.
+> 
+> I could do that.  It does name better, I suppose, in passing.  So long as
+> you're happy having the guts of the type be public, and not wrapping everything
+> like we do for Int128...
 
---jgT40TOTtdRRaaO4cTluHxTivqDJPxBDZ
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+We can do that once we have hardware+compiler support for 256bit ;)
 
-On 25.09.20 10:49, Vladimir Sementsov-Ogievskiy wrote:
-> 25.09.2020 11:26, Max Reitz wrote:
->> On 18.09.20 20:19, Vladimir Sementsov-Ogievskiy wrote:
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>> ---
->>> =C2=A0 tests/qemu-iotests/298=C2=A0=C2=A0=C2=A0=C2=A0 | 186 +++++++++++=
-++++++++++++++++++++++++++
->>> =C2=A0 tests/qemu-iotests/298.out |=C2=A0=C2=A0 5 +
->>> =C2=A0 tests/qemu-iotests/group=C2=A0=C2=A0 |=C2=A0=C2=A0 1 +
->>> =C2=A0 3 files changed, 192 insertions(+)
->>> =C2=A0 create mode 100644 tests/qemu-iotests/298
->>> =C2=A0 create mode 100644 tests/qemu-iotests/298.out
+> 
+> Either is better than the softfloat style, which would pass 12 arguments to
+> these helpers... ;-)
 
-[...]
+Indeed
 
->>> +class TestTruncate(iotests.QMPTestCase):
+> 
+>>> +static void shortShift256Left(uint64_t p[4], unsigned count)
+>>> +{
+>>> +    int negcount = -count & 63;
 >>
->> The same decorator could be placed here, although this class doesn=E2=80=
-=99t
->> start a VM, and so is unaffected by the allowlist.=C2=A0 Still may be
->> relevant in case of block modules, I don=E2=80=99t know.
->=20
-> Or just global test skip at file top
+>> That's the same as "64 - count", right? (which I find easier to get)
+> 
+> In this case, yes.
+> 
+> Of course, more hosts have a "neg" instruction than they do a
+> "subtract-from-immediate" instruction.  When the shift instruction only
+> examines the low N bits, the "& 63" is optimized away, so this can result in 1
+> fewer instruction in the end.
+> 
+> Which is why I almost always use this form, and it's already all over the code
+> inherited from upstream.
+> 
+>> Wow, that's a beast :)
+> 
+> But not much worse than muladd_floats(), I'm pleased to say.
 
-Hm.  Like verify_quorum()?  Is there a generic function for that already?
-
-[...]
-
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Probably we'll want preal=
-locate filter to keep align to
->>> cluster when
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # shrink preallocation, so,=
- ignore small differece
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.assertLess(abs(stat.st=
-_size - refstat.st_size), 64 * 1024)
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Preallocate filter may le=
-ak some internal clusters (for
->>> example, if
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # guest write far over EOF,=
- skipping some clusters - they
->>> will remain
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # fallocated, preallocate f=
-ilter don't care about such
->>> leaks, it drops
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # only trailing preallocati=
-on.
->>
->> True, but that isn=E2=80=99t what=E2=80=99s happening here.=C2=A0 (We on=
-ly write 10M at 0, so
->> there are no gaps.)=C2=A0 Why do we need this 1M margin?
->=20
-> We write 10M, but qcow2 also writes metadata as it wants
-
-Ah, yes, sure.  Shouldn=E2=80=99t result in 1M, but why not.
-
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.assertLess(abs(stat.st=
-_blocks - refstat.st_blocks) * 512,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 1024 =
-* 1024)
->>
->> [...]
->>
->>> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
->>> index ff59cfd2d4..15d5f9619b 100644
->>> --- a/tests/qemu-iotests/group
->>> +++ b/tests/qemu-iotests/group
->>> @@ -307,6 +307,7 @@
->>> =C2=A0 295 rw
->>> =C2=A0 296 rw
->>> =C2=A0 297 meta
->>> +298 auto quick
->>
->> I wouldn=E2=80=99t mark it as quick, there is at least one preallocate=
-=3Dfull of
->> 140M, and one of 40M, plus multiple 10M data writes and falloc
->> preallocations.
->>
->> Also, since you mark it as =E2=80=9Cauto=E2=80=9D, have you run this tes=
-t on all
->> CI-relevant hosts?=C2=A0 (Among other things I can=E2=80=99t predict) I =
-wonder how
->> preallocation behaves on macOS.=C2=A0 Just because that one was always a=
- bit
->> weird about not-really-data areas.
->>
->=20
-> Ofcourse, I didn't run on all hosts. I'm a bit out of sync about this..
-
-Well, someone has to do it.  The background story is that tests are
-added to auto all the time (because =E2=80=9Cwhy not=E2=80=9D), and then th=
-ey fail on
-BSD or macOS.  We have BSD docker test build targets at least, so they
-can be easily tested.  (Well, it takes like half an hour, but you know.)
-
-(We don=E2=80=99t have macOS builds, as far as I can tell, but I personally
-don=E2=80=99t even know why we run the iotests on macOS at all.  (Well, I a=
-lso
-wonder about the BSDs, but given the test build targets, I shouldn=E2=80=99=
-t
-complain, I suppose.))
-
-(Though macOS isn=E2=80=99t part of the gating CI, is it?  I seem to rememb=
-er
-macOS errors are generally only reported to me half a week after the
-pull request is merged, which is even worse.)
-
-Anyway.  I just ran the test for OpenBSD
-(EXTRA_CONFIGURE_OPTS=3D'--target-list=3Dx86_64-softmmu' \
-   make vm-build-openbsd)
-and got some failures:
-
---- /home/qemu/qemu-test.PGo2ls/src/tests/qemu-iotests/298.out  Fri Sep
-25 07:10:31 2020
-+++ /home/qemu/qemu-test.PGo2ls/build/tests/qemu-iotests/298.out.bad
-Fri Sep 25 08:57:56 2020
-@@ -1,5 +1,67 @@
--.............
-+qemu-io: Failed to resize underlying file: Unsupported preallocation
-mode: falloc
-+qemu-io: Failed to resize underlying file: Unsupported preallocation
-mode: falloc
-+FFFF.F...F...
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+FAIL: test_external_snapshot (__main__.TestPreallocateFilter)
- ----------------------------------------------------------------------
-+Traceback (most recent call last):
-+  File "298", line 81, in test_external_snapshot
-+    self.test_prealloc()
-+  File "298", line 78, in test_prealloc
-+    self.check_big()
-+  File "298", line 48, in check_big
-+    self.assertTrue(os.path.getsize(disk) > 100 * MiB)
-+AssertionError: False is not true
-+
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+FAIL: test_prealloc (__main__.TestPreallocateFilter)
-+----------------------------------------------------------------------
-+Traceback (most recent call last):
-+  File "298", line 78, in test_prealloc
-+    self.check_big()
-+  File "298", line 48, in check_big
-+    self.assertTrue(os.path.getsize(disk) > 100 * MiB)
-+AssertionError: False is not true
-+
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+FAIL: test_reopen_opts (__main__.TestPreallocateFilter)
-+----------------------------------------------------------------------
-+Traceback (most recent call last):
-+  File "298", line 119, in test_reopen_opts
-+    self.assertTrue(os.path.getsize(disk) =3D=3D 25 * MiB)
-+AssertionError: False is not true
-+
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+FAIL: test_qemu_img (__main__.TestQemuImg)
-+----------------------------------------------------------------------
-+Traceback (most recent call last):
-+  File "298", line 61, in test_qemu_img
-+    self.check_big()
-+  File "298", line 48, in check_big
-+    self.assertTrue(os.path.getsize(disk) > 100 * MiB)
-+AssertionError: False is not true
-+
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+FAIL: test_truncate_inside_preallocated_area__falloc
-(__main__.TestTruncate)
-+----------------------------------------------------------------------
-+Traceback (most recent call last):
-+  File "298", line 161, in test_truncate_inside_preallocated_area__falloc
-+    self.do_test('falloc', '50M')
-+  File "298", line 135, in do_test
-+    self.assertEqual(ret, 0)
-+AssertionError: 1 !=3D 0
-+
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+FAIL: test_truncate_over_preallocated_area__falloc (__main__.TestTruncate)
-+----------------------------------------------------------------------
-+Traceback (most recent call last):
-+  File "298", line 173, in test_truncate_over_preallocated_area__falloc
-+    self.do_test('falloc', '150M')
-+  File "298", line 135, in do_test
-+    self.assertEqual(ret, 0)
-+AssertionError: 1 !=3D 0
-+
-+----------------------------------------------------------------------
- Ran 13 tests
-
--OK
-+FAILED (failures=3D6)
-
-> If I don't put new test in "auto", is there any chance that test would
-> be automatically run somewhere?
-
-I run all tests before pull requests at least.
-
-Max
+Definitely!
 
 
---jgT40TOTtdRRaaO4cTluHxTivqDJPxBDZ--
+-- 
+Thanks,
 
---LT6oe7aTsO845J6aZMtPytF6V5XB5oPeu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9ttFAACgkQ9AfbAGHV
-z0DbNAgAqv+7kmKKnnNU+aCAmRMqOJrMevf9XeDUNbDBy3mj0EUxRwE8F1e5pL5B
-NtBs7R+oQCzMPhD37SxHtvwl2gf/adPOedLNhdYFboVn7yVNk9RFGKiZkVXOz4Kt
-yyhYJ7NflI2Lz/a/94NWDWsSKkl3KKXNbq5bbFQpOabhc0sIokZ1o0LcK1AaV0gQ
-z0/aHImpTqvDvzxGstBvVgCDEYtcTz9GUMxmnL7/pQuNMIXN5M2AwYx0/JS/brCM
-3U1RYdPY2zGkgMc2EOEnbJOykMN9P+AsWsUTpBT5xc2ir+dwW5Tv6VGguGiys7jU
-16cgERQzTD7KY8AzjmKKVFjMUedn0A==
-=MySr
------END PGP SIGNATURE-----
-
---LT6oe7aTsO845J6aZMtPytF6V5XB5oPeu--
+David / dhildenb
 
 
