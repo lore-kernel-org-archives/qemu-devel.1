@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19786C4346E
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 00:59:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D80ACC4346E
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 00:59:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9384E2075E
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 00:59:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6C8D02075E
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 00:59:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gMfVNQCF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9384E2075E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XmGX8FC8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C8D02075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLc4k-0001Eh-Ia
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 20:59:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51466)
+	id 1kLc4n-0001OR-FJ
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 20:59:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51366)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLbcd-0001Pk-Iq
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 20:30:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30752)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLbcQ-0001Gf-Pn
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 20:29:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44662)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLbcL-0000E6-Or
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 20:29:59 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLbcL-0000Ce-Lk
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 20:29:46 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600993780;
+ s=mimecast20190719; t=1600993767;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=P0W1KPcGQhdHxAYEwHnbpFPklKlEy5OAWGuZ4jXgBJ4=;
- b=gMfVNQCFybLliX1y+Bd77R8ii81HHltWi34fpIi95XX1Q0fSuV6o4+igEOr/qAH+Khv+KV
- a2dvlPGsvJdWdpWEwX3OW7uxthtKZMjKr1X3jqCGeeGxmIOfXHLUXbe2iSNpcK6y3dTPlY
- DfhInWeBbEG4txpENmc0/VdplJrFmGc=
+ bh=JC1bz0wKOCwex/SFfWEIER9tx9xou2AUTwrAn/BNUM8=;
+ b=XmGX8FC8nVWxIXWSuoRqcFQEB72L09of9fXYGWBewOWxFL0OnGBU5B6QmaaMBga1x1rOZ9
+ 1jS2Zvo2bhivBrqJxox+U0MAGdfwWDy2mYJFQoBIdCa7Wmk1qiheLScFREn2w7n21iP/2S
+ 6WL9yyW2QQycTIEHbg7Bg7rV+no31Q8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-346-FaIQe9EuM3yv1ISPi35Xtw-1; Thu, 24 Sep 2020 20:29:39 -0400
-X-MC-Unique: FaIQe9EuM3yv1ISPi35Xtw-1
+ us-mta-499-TXwg1uqEMkGmXpCyO_nA9Q-1; Thu, 24 Sep 2020 20:29:25 -0400
+X-MC-Unique: TXwg1uqEMkGmXpCyO_nA9Q-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D03264091
- for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 00:29:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70D3D188C125
+ for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 00:29:24 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A846B5D9DD;
- Fri, 25 Sep 2020 00:29:37 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CED555D9DD;
+ Fri, 25 Sep 2020 00:29:23 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 41/47] qapi/introspect.py: replace 'extra' dict with
- 'comment' argument
-Date: Thu, 24 Sep 2020 20:28:54 -0400
-Message-Id: <20200925002900.465855-42-jsnow@redhat.com>
+Subject: [PATCH v3 26/47] qapi/commands.py: Don't re-bind to variable of
+ different type
+Date: Thu, 24 Sep 2020 20:28:39 -0400
+Message-Id: <20200925002900.465855-27-jsnow@redhat.com>
 In-Reply-To: <20200925002900.465855-1-jsnow@redhat.com>
 References: <20200925002900.465855-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -71,9 +71,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -32
 X-Spam_score: -3.3
@@ -100,58 +100,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is only used to pass in a dictionary with a comment already set, so
-skip the runaround and just accept the comment.
+Mypy isn't a fan of rebinding a variable with a new data type.
+It's easy enough to avoid.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
 ---
- scripts/qapi/introspect.py | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+ scripts/qapi/commands.py | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
-index 54bc75393c..c444214090 100644
---- a/scripts/qapi/introspect.py
-+++ b/scripts/qapi/introspect.py
-@@ -51,12 +51,11 @@
+diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
+index f67393f871..586774a23c 100644
+--- a/scripts/qapi/commands.py
++++ b/scripts/qapi/commands.py
+@@ -195,14 +195,12 @@ def gen_register_command(name, success_response, allow_oob, allow_preconfig):
+     if not options:
+         options = ['QCO_NO_OPTIONS']
+ 
+-    options = " | ".join(options)
+-
+     ret = mcgen('''
+     qmp_register_command(cmds, "%(name)s",
+                          qmp_marshal_%(c_name)s, %(opts)s);
+ ''',
+                 name=name, c_name=c_name(name),
+-                opts=options)
++                opts=" | ".join(options))
+     return ret
  
  
- def _make_tree(obj: Union[_DObject, str], ifcond: List[str],
--               extra: Optional[Extra] = None
--               ) -> AnnotatedNode:
--    if extra is None:
--        extra = {}
--    if ifcond:
--        extra['if'] = ifcond
-+               comment: Optional[str] = None) -> AnnotatedNode:
-+    extra: Extra = {
-+        'if': ifcond,
-+        'comment': comment,
-+    }
-     return (obj, extra)
- 
- 
-@@ -199,18 +198,18 @@ def _gen_features(cls,
-     def _gen_tree(self, name: str, mtype: str, obj: _DObject,
-                   ifcond: List[str],
-                   features: Optional[List[QAPISchemaFeature]]) -> None:
--        extra: Extra = None
-+        comment: Optional[str] = None
-         if mtype not in ('command', 'event', 'builtin', 'array'):
-             if not self._unmask:
-                 # Output a comment to make it easy to map masked names
-                 # back to the source when reading the generated output.
--                extra = {'comment': '"%s" = %s' % (self._name(name), name)}
-+                comment = f'"{self._name(name)}" = {name}'
-             name = self._name(name)
-         obj['name'] = name
-         obj['meta-type'] = mtype
-         if features:
-             obj['features'] = self._gen_features(features)
--        self._trees.append(_make_tree(obj, ifcond, extra))
-+        self._trees.append(_make_tree(obj, ifcond, comment))
- 
-     def _gen_member(self,
-                     member: QAPISchemaObjectTypeMember) -> AnnotatedNode:
 -- 
 2.26.2
 
