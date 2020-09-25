@@ -2,87 +2,75 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96161C4727D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 13:22:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 115FCC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 13:24:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2724C239EC
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 13:22:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AM7WO/vJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2724C239EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9392823976
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 13:24:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9392823976
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLngc-0004tz-8d
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 09:22:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53810)
+	id 1kLnhk-0006Ob-PI
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 09:24:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54330)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1kLnYC-0003Qf-Bc
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 09:14:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53984)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1kLnYA-00048b-Fl
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 09:14:12 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601039649;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=4W4WiY1o7CPnavQCkXEkrrwg6Rky8QFo7TYJ6WKwrts=;
- b=AM7WO/vJLEMKEHVwuXGds3HfmqhDgXhWImfCdYuZhZq9xm0/FCNf0eKMB0WL9V7Bpq6JWe
- AxK+h/MT6XCmkgv4xIzJdFJkDIMXw0LbrFE6BzRCpQUsHSyfu3B3MPt4DgwwXdsRL2tAVg
- bCb6TAPIBMTzAOOcu5T0YR0iw6MBM5g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-321-I87u5zjaNhKdledP2YhgZw-1; Fri, 25 Sep 2020 09:14:05 -0400
-X-MC-Unique: I87u5zjaNhKdledP2YhgZw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73A448018A4;
- Fri, 25 Sep 2020 13:14:04 +0000 (UTC)
-Received: from horse.redhat.com (ovpn-116-239.rdu2.redhat.com [10.10.116.239])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EC1FF7B7A2;
- Fri, 25 Sep 2020 13:13:56 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
- id 7C5CB222FC0; Fri, 25 Sep 2020 09:13:56 -0400 (EDT)
-Date: Fri, 25 Sep 2020 09:13:56 -0400
-From: Vivek Goyal <vgoyal@redhat.com>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: virtiofs vs 9p performance
-Message-ID: <20200925131356.GD132653@redhat.com>
-References: <20200918213436.GA3520@redhat.com>
- <46D726A6-72F3-40FE-9382-A189513F783D@intel.com>
- <20200924221023.GB132653@redhat.com> <17216624.eqST2d0sUl@silver>
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>)
+ id 1kLnal-00061g-OM; Fri, 25 Sep 2020 09:16:52 -0400
+Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:54417)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>)
+ id 1kLnai-0004VK-Jw; Fri, 25 Sep 2020 09:16:51 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.109.146.59])
+ by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 0C2285EDAFF2;
+ Fri, 25 Sep 2020 15:16:35 +0200 (CEST)
+Received: from kaod.org (37.59.142.104) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Fri, 25 Sep
+ 2020 15:16:34 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-104R0055d6d8ade-ad58-4d72-b4a1-c1d99a967c57,
+ A5F0BA03093B57E977C960A2BE809674B2E579B9) smtp.auth=groug@kaod.org
+Date: Fri, 25 Sep 2020 15:16:33 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Daniel Henrique Barboza <danielhb413@gmail.com>
+Subject: Re: [PATCH v2 4/6] spapr_numa: change reference-points and
+ maxdomain settings
+Message-ID: <20200925151633.12982bf0@bahia.lan>
+In-Reply-To: <20200924195058.362984-5-danielhb413@gmail.com>
+References: <20200924195058.362984-1-danielhb413@gmail.com>
+ <20200924195058.362984-5-danielhb413@gmail.com>
+X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <17216624.eqST2d0sUl@silver>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=vgoyal@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=vgoyal@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 02:48:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -32
-X-Spam_score: -3.3
-X-Spam_bar: ---
-X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [37.59.142.104]
+X-ClientProxiedBy: DAG9EX1.mxp5.local (172.16.2.81) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: 563753aa-4c03-48ec-93c8-174e0490230b
+X-Ovh-Tracer-Id: 17127752334968986080
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrvddtgdeiudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgihesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepfedutdeijeejveehkeeileetgfelteekteehtedtieefffevhffflefftdefleejnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdegnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopegurghvihgusehgihgsshhonhdrughrohhpsggvrghrrdhiugdrrghu
+Received-SPF: pass client-ip=178.32.125.2; envelope-from=groug@kaod.org;
+ helo=smtpout1.mo529.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 09:16:35
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,41 +83,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Shinde, Archana M" <archana.m.shinde@intel.com>, "Venegas Munoz,
- Jose Carlos" <jose.carlos.venegas.munoz@intel.com>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- virtio-fs-list <virtio-fs@redhat.com>, Greg Kurz <groug@kaod.org>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- "cdupontd@redhat.com" <cdupontd@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 25, 2020 at 10:06:41AM +0200, Christian Schoenebeck wrote:
-> On Freitag, 25. September 2020 00:10:23 CEST Vivek Goyal wrote:
-> > In my testing, with cache=none, virtiofs performed better than 9p in
-> > all the fio jobs I was running. For the case of cache=auto  for virtiofs
-> > (with xattr enabled), 9p performed better in certain write workloads. I
-> > have identified root cause of that problem and working on
-> > HANDLE_KILLPRIV_V2 patches to improve WRITE performance of virtiofs
-> > with cache=auto and xattr enabled.
+On Thu, 24 Sep 2020 16:50:56 -0300
+Daniel Henrique Barboza <danielhb413@gmail.com> wrote:
+
+> This is the first guest visible change introduced in
+> spapr_numa.c. The previous settings of both reference-points
+> and maxdomains were too restrictive, but enough for the
+> existing associativity we're setting in the resources.
 > 
-> Please note, when it comes to performance aspects, you should set a reasonable 
-> high value for 'msize' on 9p client side:
-> https://wiki.qemu.org/Documentation/9psetup#msize
-
-Interesting. I will try that. What does "msize" do? 
-
+> We'll change that in the following patches, populating the
+> associativity arrays based on user input. For those changes
+> to be effective, reference-points and maxdomains must be
+> more flexible. After this patch, we'll have 4 distinct
+> levels of NUMA (0x4, 0x3, 0x2, 0x1) and maxdomains will
+> allow for any type of configuration the user intends to
+> do - under the scope and limitations of PAPR itself, of
+> course.
 > 
-> I'm also working on performance optimizations for 9p BTW. There is plenty of 
-> headroom to put it mildly. For QEMU 5.2 I started by addressing readdir 
-> requests:
-> https://wiki.qemu.org/ChangeLog/5.2#9pfs
+> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+> ---
 
-Nice. I guess this performance comparison between 9p and virtiofs is good.
-Both the projects can try to identify weak points and improve performance.
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-Thanks
-Vivek
+>  hw/ppc/spapr_numa.c | 40 ++++++++++++++++++++++++++++++++--------
+>  1 file changed, 32 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
+> index 990a5fce08..ea33439a15 100644
+> --- a/hw/ppc/spapr_numa.c
+> +++ b/hw/ppc/spapr_numa.c
+> @@ -222,24 +222,48 @@ int spapr_numa_write_assoc_lookup_arrays(SpaprMachineState *spapr, void *fdt,
+>   */
+>  void spapr_numa_write_rtas_dt(SpaprMachineState *spapr, void *fdt, int rtas)
+>  {
+> +    MachineState *ms = MACHINE(spapr);
+>      SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
+>      uint32_t refpoints[] = {
+>          cpu_to_be32(0x4),
+> -        cpu_to_be32(0x4),
+> +        cpu_to_be32(0x3),
+>          cpu_to_be32(0x2),
+> +        cpu_to_be32(0x1),
+>      };
+>      uint32_t nr_refpoints = ARRAY_SIZE(refpoints);
+> -    uint32_t maxdomain = cpu_to_be32(spapr->gpu_numa_id > 1 ? 1 : 0);
+> +    uint32_t maxdomain = ms->numa_state->num_nodes + spapr->gpu_numa_id;
+>      uint32_t maxdomains[] = {
+>          cpu_to_be32(4),
+> -        maxdomain,
+> -        maxdomain,
+> -        maxdomain,
+> -        cpu_to_be32(spapr->gpu_numa_id),
+> +        cpu_to_be32(maxdomain),
+> +        cpu_to_be32(maxdomain),
+> +        cpu_to_be32(maxdomain),
+> +        cpu_to_be32(maxdomain)
+>      };
+>  
+> -    if (smc->pre_5_1_assoc_refpoints) {
+> -        nr_refpoints = 2;
+> +    if (spapr_machine_using_legacy_numa(spapr)) {
+> +        uint32_t legacy_refpoints[] = {
+> +            cpu_to_be32(0x4),
+> +            cpu_to_be32(0x4),
+> +            cpu_to_be32(0x2),
+> +        };
+> +        uint32_t legacy_maxdomain = spapr->gpu_numa_id > 1 ? 1 : 0;
+> +        uint32_t legacy_maxdomains[] = {
+> +            cpu_to_be32(4),
+> +            cpu_to_be32(legacy_maxdomain),
+> +            cpu_to_be32(legacy_maxdomain),
+> +            cpu_to_be32(legacy_maxdomain),
+> +            cpu_to_be32(spapr->gpu_numa_id),
+> +        };
+> +
+> +        nr_refpoints = 3;
+> +
+> +        memcpy(refpoints, legacy_refpoints, sizeof(legacy_refpoints));
+> +        memcpy(maxdomains, legacy_maxdomains, sizeof(legacy_maxdomains));
+> +
+> +        /* pseries-5.0 and older reference-points array is {0x4, 0x4} */
+> +        if (smc->pre_5_1_assoc_refpoints) {
+> +            nr_refpoints = 2;
+> +        }
+>      }
+>  
+>      _FDT(fdt_setprop(fdt, rtas, "ibm,associativity-reference-points",
 
 
