@@ -2,151 +2,112 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7280DC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 18:05:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6DF9C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 18:09:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7F872086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 18:05:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1857F2086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 18:09:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="se7gou+v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7F872086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="E2/UseZX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1857F2086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLs6T-0001DS-Nq
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 14:05:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52478)
+	id 1kLs9a-0002bb-4S
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 14:09:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44848)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <beeman.strong@intel.com>)
- id 1kLqnw-0004dF-PQ
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 12:42:42 -0400
-Received: from mga05.intel.com ([192.55.52.43]:22348)
+ (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
+ id 1kLs8O-0001rJ-8S
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 14:07:52 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:40252)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <beeman.strong@intel.com>)
- id 1kLqns-0001J3-NT
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 12:42:40 -0400
-IronPort-SDR: +kyVCUSvjTL18/YOjCcEE3BipkwIGGQMZw023fT907pHKtniWhFGh7pugzBD9K+CG3L7neAzaX
- 8WN1TpYiRFyw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9755"; a="246367710"
-X-IronPort-AV: E=Sophos;i="5.77,302,1596524400"; d="scan'208";a="246367710"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 25 Sep 2020 09:42:28 -0700
-IronPort-SDR: q5kXPhK4qmWcTCA0XQMfF+g8b4McJc81M8pKJP3GBSHcPNPsJQ7gy+EETSRoikNYB47nTw0JO3
- nu8EA6zlOa8A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.77,302,1596524400"; d="scan'208";a="336805429"
-Received: from orsmsx606.amr.corp.intel.com ([10.22.229.19])
- by fmsmga004.fm.intel.com with ESMTP; 25 Sep 2020 09:42:28 -0700
-Received: from orsmsx607.amr.corp.intel.com (10.22.229.20) by
- ORSMSX606.amr.corp.intel.com (10.22.229.19) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Fri, 25 Sep 2020 09:42:28 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx607.amr.corp.intel.com (10.22.229.20) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5
- via Frontend Transport; Fri, 25 Sep 2020 09:42:28 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.175)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.1713.5; Fri, 25 Sep 2020 09:42:27 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iu/CGPKpsw90XJcsfa7M2l4n7maf+9VHoykdywYuEb1bAlLmSpZP1nfeTBPe+J1xRilPo9pgB6KHBaWsumIarOJkwVB4f9klN6NEXvAw1dpVRQGBLNFXckdQnmh88VpeLn9tH9EbnUz9iroEBow1Q2BeyVp3rwhiNMQk4VFoiecfDNoZR7e7t9HPpJTjcurEgAhDv+syw+uZ2J72jnTFOsaBZ8SB0PMyosxrdU+q4E/nuqMT614ALK2DM3aZ1bElmlrEzQHLdK6cu3VRJyoKCP/PQLkbap+7LaTDZC1V0q3i466TEoG5Tb14UPAUTzFB16suZ2143Jzb5D5GjIEctw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EVqxnj/5X52ULdp+Sa23cdITwGFgTv+sxDMNOFM7lkc=;
- b=Xu9K0tUJj1HWmWfCfumMnI7ZPel3FNkgF/fqLKHnr8OBPnnIp1nc5N7DYqRChcVpXZqUaJYhLAcQZX6YUFe7SuetQf2uP7PvJK4G6QKu2UhatdvrixqgPmiRpZtS9EGI0M7hZLmid1tDNlp8G4ziLSkCu8BPs4IA8yaLEGUJR6we5B77SDfp8R3/SRKq/isslQcUauC3QleE2HWp44ddPs7hj17TI8O9XSyQiJCCUsMgmr2ly1PJLjXTSuVY6mqYdnQ3/mi0mDYz1++SvSROCEnFv2NhaHCPXieWS4+6f5NNlb+7m4De6I3csL3iRgvOTWqUWqUNDaO0GCMphcadQg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com; 
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EVqxnj/5X52ULdp+Sa23cdITwGFgTv+sxDMNOFM7lkc=;
- b=se7gou+vRdLwbca2qrWDoq2vMUhCH9L8bBbHfg5Wb5CRQ/gDaDnI4srs+clvRF0CQm9LTxx8Onp4yCubqHUvJ6oDckN+Wt2tvh8AjkHaX2ycVqQGaz8m2AnTGM2l0oOS7AvM+AQxaq6PBMLZCUbTWtNS0dEN/YAqDTWJWjF7BvA=
-Received: from MW3PR11MB4665.namprd11.prod.outlook.com (2603:10b6:303:5d::12)
- by MWHPR11MB1389.namprd11.prod.outlook.com (2603:10b6:300:26::12)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.22; Fri, 25 Sep
- 2020 16:42:26 +0000
-Received: from MW3PR11MB4665.namprd11.prod.outlook.com
- ([fe80::2587:4cd7:ebda:f56c]) by MW3PR11MB4665.namprd11.prod.outlook.com
- ([fe80::2587:4cd7:ebda:f56c%3]) with mapi id 15.20.3412.022; Fri, 25 Sep 2020
- 16:42:26 +0000
-From: "Strong, Beeman" <beeman.strong@intel.com>
-To: Eduardo Habkost <ehabkost@redhat.com>, "Kang, Luwei" <luwei.kang@intel.com>
-Subject: RE: [PATCH v1 1/3] i386: Remove the limitation of IP payloads for
- Intel PT
-Thread-Topic: [PATCH v1 1/3] i386: Remove the limitation of IP payloads for
- Intel PT
-Thread-Index: AQHV6xf7sqMNXR+QQka/GVM/9Eq3kKl62AeAgAAGPhA=
-Date: Fri, 25 Sep 2020 16:42:26 +0000
-Message-ID: <MW3PR11MB46655375CAECC74BA2D7CAECF2360@MW3PR11MB4665.namprd11.prod.outlook.com>
-References: <1582580312-19864-1-git-send-email-luwei.kang@intel.com>
- <1582580312-19864-2-git-send-email-luwei.kang@intel.com>
- <20200925161539.GS3717385@habkost.net>
-In-Reply-To: <20200925161539.GS3717385@habkost.net>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-dlp-version: 11.5.1.3
-authentication-results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [67.171.191.208]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: be0ac8df-7f6b-4922-e1a7-08d86171fc3e
-x-ms-traffictypediagnostic: MWHPR11MB1389:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MWHPR11MB13898995FE969ACF2E027FFBF2360@MWHPR11MB1389.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 7NR2VNUkb8pq1qKZ7PblBboyjsn07VTPZysB8IdirtpELMsaV+55s4jXFnn7scgmZtg3JMRefyjucPQwxVA7zCE96oDv+tCHIfgLVfSbLUgZriZET3gr3dfiVXsktb1BeKOKzT2z85TQl756/VKk/TJ0PD456KnsV9bV4OcsQ1q0NswKFbriHhunv11cumeku4QlApGtyEt+Lrl9XscxvyWavMyiIzBmLXbx8CA65tgecq+HzY5qqdSdv9ZIv7PF8iE2qAn9l60Jq5GcMK0P3iVsT5N2eETIaZf1eGq9z3mktQbUozwLRKWHpryVOxIgzbtF2xEgW8KI2zuoLa1jtQ==
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:MW3PR11MB4665.namprd11.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(346002)(396003)(376002)(136003)(366004)(39860400002)(54906003)(8936002)(186003)(66946007)(76116006)(53546011)(6506007)(316002)(2906002)(6636002)(7696005)(64756008)(478600001)(66476007)(55016002)(110136005)(66446008)(33656002)(26005)(71200400001)(8676002)(66556008)(5660300002)(52536014)(86362001)(83380400001)(9686003)(4326008);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-antispam-messagedata: EaFRIvvHQtByJ0RPzhk4+bnSw+2XT+9udPZMkBCdgrJ38ZO4l3IcXesiU3eYsuMm8ax3tiQ/XZ25O9Pv7Xng92jGenTH/GMaJPPdAGAFQOTRzGm+C6u9gVbbkb1Zlx1JN0spO4YxaSpVNxmn0wP3iYt3GlacnwqUoMpwSO/6yzQjkkA24RAqOT6PjYpIIe6Og0tx0G5U364wEhov9HfnGjiFxJvivEbw9tcZrk/ISSL+n6x8sqpAw7tGrTjoysA2grQhMwgphjc7UK3PHM2fN5zB1p2bcQ5PDK0c7fT5zQPQ6dTT03SI5MgRWBDnpMzZI5De/DUyp9iQDkjP8NSnhvRd6E1dO0ieCFR7fRgnmg9O6k/bNxHIAGcwB8QLfpsPDMNpgNdh2mMLMos9aDejdz68IpAMJgqoETH8VH1+48OiYC0Siz5pD14Mv19HjK2JeitFEIH7s0jVzDpUcMCknk99GHF+OagwQzlRpPxSBM3BuP+qBpcf6RRN1OipMTdu72qAnNniSCEVvrnRF8ivaeyZgWuHEjAMyccSG6zsPH9ju8QtWma23nOIgTOBJC0XyuAkxQ+e98mtV8mAcsKcGD0fbqbDJInu8pCEtYeMa+CCVMYhod2/mNF5ppzkR+iRlAAmCnS18OjtgtShyY0aPw==
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
+ id 1kLs8G-0003tT-Gp
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 14:07:51 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+ by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08PI3cw4116344;
+ Fri, 25 Sep 2020 18:07:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=W/cFEI0EgkdWGwBGHNF1R0zWUmRBp4cacEkR+5uZCn4=;
+ b=E2/UseZXVRAj9e5RCnJ/Vk3drckwkiskIDqx61d74HWQ65POby+Qk08va9PI1kTl5Sa8
+ waZFVQqg6qoDLinSeSVas2d4YLuakYzSed+RZWVU9TXdSe7o6HIQ1aRJPYFRlTWGm/os
+ lXJPLTZjUSu9lpOQcbNbKP1SazKlzGYxpUS4rHWwZ6f8cDJOqSY7o38+yPo4PGXskrWH
+ wy1GE2Vwd9qygwIT0yafcJG39b9Gr5uEhOR1MatJZGQg71dlgSpPx8EK3S479NaI0MvG
+ 4vK6qBLZxlzryPJMbjiircGDu1+irKlM/BDB1JM2noGaSX5CFlJJ7ujmc7S8ru5O3N7s IQ== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by aserp2130.oracle.com with ESMTP id 33qcpuc0ha-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+ Fri, 25 Sep 2020 18:07:40 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08PI6YkY052894;
+ Fri, 25 Sep 2020 18:07:39 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by userp3020.oracle.com with ESMTP id 33nury487e-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 25 Sep 2020 18:07:39 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 08PI7bx2018317;
+ Fri, 25 Sep 2020 18:07:37 GMT
+Received: from [10.39.220.177] (/10.39.220.177)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Fri, 25 Sep 2020 11:07:37 -0700
+Subject: Re: [PATCH V1 10/32] kvmclock: restore paused KVM clock
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
+ <1596122076-341293-11-git-send-email-steven.sistare@oracle.com>
+ <20200911175018.GP3310@work-vm>
+From: Steven Sistare <steven.sistare@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <f9b72218-ca6f-66a5-761d-b4778df016e4@oracle.com>
+Date: Fri, 25 Sep 2020 14:07:33 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW3PR11MB4665.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: be0ac8df-7f6b-4922-e1a7-08d86171fc3e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Sep 2020 16:42:26.2878 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: xCFodqax7tlknA2MnOKqBwxOGIB5E+bYy3+jrcscBbl72GpME60QwQbqAc1Vn8bv8WiarDR+bJsV4+gToI+yuQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1389
-X-OriginatorOrg: intel.com
-Received-SPF: pass client-ip=192.55.52.43;
- envelope-from=beeman.strong@intel.com; helo=mga05.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 12:42:29
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+In-Reply-To: <20200911175018.GP3310@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9755
+ signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ malwarescore=0
+ phishscore=0 mlxlogscore=999 bulkscore=0 mlxscore=0 suspectscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009250127
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9755
+ signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ mlxlogscore=999
+ adultscore=0 bulkscore=0 mlxscore=0 lowpriorityscore=0 priorityscore=1501
+ phishscore=0 spamscore=0 malwarescore=0 clxscore=1015 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009250127
+Received-SPF: pass client-ip=141.146.126.79;
+ envelope-from=steven.sistare@oracle.com; helo=aserp2130.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 14:07:43
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
 X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.238, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
-X-Mailman-Approved-At: Fri, 25 Sep 2020 14:04:06 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -158,69 +119,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "rth@twiddle.net" <rth@twiddle.net>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-TElQPTAgd2lsbCBkaWZmZXIgZnJvbSBMSVA9MSBiZWhhdmlvciBvbmx5IHdoZW4gQ1NiYXNlIGlz
-IG5vbi16ZXJvLCB3aGljaCByZXF1aXJlcyAzMi1iaXQgY29kZS4gIEluIHRoYXQgY2FzZSBhIExJ
-UD0wIGltcGxlbWVudGF0aW9uIHdpbGwgcHJvdmlkZSBvbmx5IHRoZSBFSVAgb2Zmc2V0IGZyb20g
-Q1NiYXNlIGluIElQIHBhY2tldHMgKGxpa2UgVElQIG9yIEZVUCksIHdoaWxlIExJUD0xIGltcGxl
-bWVudGF0aW9uIHdpbGwgcHJvdmlkZSB0aGUgZnVsbCBMSVAgKENTYmFzZSArIEVJUCBvZmZzZXQp
-Lg0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogRWR1YXJkbyBIYWJrb3N0IDxl
-aGFia29zdEByZWRoYXQuY29tPiANClNlbnQ6IEZyaWRheSwgU2VwdGVtYmVyIDI1LCAyMDIwIDk6
-MTYgQU0NClRvOiBLYW5nLCBMdXdlaSA8bHV3ZWkua2FuZ0BpbnRlbC5jb20+DQpDYzogcGJvbnpp
-bmlAcmVkaGF0LmNvbTsgcnRoQHR3aWRkbGUubmV0OyBxZW11LWRldmVsQG5vbmdudS5vcmc7IFN0
-cm9uZywgQmVlbWFuIDxiZWVtYW4uc3Ryb25nQGludGVsLmNvbT4NClN1YmplY3Q6IFJlOiBbUEFU
-Q0ggdjEgMS8zXSBpMzg2OiBSZW1vdmUgdGhlIGxpbWl0YXRpb24gb2YgSVAgcGF5bG9hZHMgZm9y
-IEludGVsIFBUDQoNCk9uIFR1ZSwgRmViIDI1LCAyMDIwIGF0IDA1OjM4OjMwQU0gKzA4MDAsIEx1
-d2VpIEthbmcgd3JvdGU6DQo+IFRoZSBJbnRlbCBQVCBwYWNrZXRzIHdoaWNoIGNvbnRhaW4gSVAg
-cGF5bG9hZHMgd2lsbCBoYXZlIExJUCB2YWx1ZXMsIA0KPiBhbmQgaXQgd2lsbCBpbmNsdWRlIHRo
-ZSBDUyBiYXNlIGNvbXBvbmVudCBpZiB0aGUgDQo+IENQVUlELihFQVg9MTRILEVDWD0wSCkuRUNY
-LltiaXQzMV0NCj4gaXMgc2V0LiBCdXQgaXQgd2lsbCBkaXNhYmxlZCB0aGUgSW50ZWwgUFQgaW4g
-a3ZtIGd1ZXN0IGJlY2F1c2Ugb2YgdGhlIA0KPiBuZWVkIG9mIGxpdmUgbWlncmF0aW9uIHNhZmUo
-YzA3OGNhOSBpMzg2OiBEaXNhYmxlIEludGVsIFBUIGlmIHBhY2tldHMgDQo+IElQIHBheWxvYWRz
-IGhhdmUgTElQIHZhbHVlcykuDQo+IA0KPiBUaGlzIHBhdGNoIHdpbGwgcmV2ZXJ0IHRoZSBwcmV2
-aW91cyBsaW1pdGF0aW9uIGJlY2F1c2UgdGhlIEludGVsIG5ldyANCj4gaGFyZHdhcmUgd2lsbCBz
-ZXQgdGhpcyBiaXQgYW5kIExJUCA9PSBSSVAgZm9yIG1vc3QvYWxsIHJlYWwgY29kZS4NCg0KIndv
-cmtzIG1vc3Qgb2YgdGhlIHRpbWUiIG1pZ2h0IGJlIGdvb2QgZW5vdWdoIGlmIGl0J3MgYSBjb25z
-Y2lvdXMgdXNlciBjaG9pY2UsIGJ1dCBub3QgZm9yIHNvbWV0aGluZyB3ZSBtaWdodCBiZSBlbmFi
-bGluZyBieSBkZWZhdWx0LiAgVW5kZXIgd2hpY2ggY29uZGl0aW9ucyB0aGlzIHdvdWxkbid0IHdv
-cms/ICBDYW4gd2UgZGV0ZWN0IHRob3NlIGNvbmRpdGlvbnMgc29tZWhvdz8NCg0KVG8gYWxsb3cg
-bGl2ZSBtaWdyYXRpb24gYmV0d2VlbiBMSVA9MCBhbmQgTElQPTEgaG9zdHMsIHdlIG5lZWQgS1ZN
-IHRvIGJlIGFibGUgdG8gcHJvcGVybHkgZW11bGF0ZSBMSVA9MCBvbiBMSVA9MSBob3N0cy4gIERv
-ZXMgdGhlIGhhcmR3YXJlIG1ha2UgdGhpcyBwb3NzaWJsZT8NCg0KSWYgS1ZNIGNhbid0IGVtdWxh
-dGUgTElQPTAgb24gYSBMSVA9MSBob3N0LCB3aGF0IHlvdSBjYW4gZG8gaGVyZSBpcyB0byBtYWtl
-IHRoZSBmbGFnIGNvbmZpZ3VyYWJsZSBhbmQgY2hlY2sgaWYgdGhlIGNvbmZpZ3VyZWQgdmFsdWUg
-bWF0Y2hlcyB0aGUgb25lIGluIHRoZSBob3N0LiAgVGhpcyB3YXkgd2UgY2FuIHN1cHBvcnQgYm90
-aCB0eXBlcyBvZiBob3N0cywganVzdCBub3QgYWxsb3cgbGl2ZSBtaWdyYXRpb24gYmV0d2VlbiB0
-aGVtLg0KDQoNCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEx1d2VpIEthbmcgPGx1d2VpLmthbmdAaW50
-ZWwuY29tPg0KPiAtLS0NCj4gIHRhcmdldC9pMzg2L2NwdS5jIHwgNSArLS0tLQ0KPiAgMSBmaWxl
-IGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCA0IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdp
-dCBhL3RhcmdldC9pMzg2L2NwdS5jIGIvdGFyZ2V0L2kzODYvY3B1LmMgaW5kZXggDQo+IDY5ZjUx
-OGEuLjhjMGQxZTQgMTAwNjQ0DQo+IC0tLSBhL3RhcmdldC9pMzg2L2NwdS5jDQo+ICsrKyBiL3Rh
-cmdldC9pMzg2L2NwdS5jDQo+IEBAIC02ODgsOCArNjg4LDYgQEAgc3RhdGljIENQVUNhY2hlSW5m
-byBsZWdhY3lfbDNfY2FjaGUgPSB7DQo+ICAgKiBiaXRbMDJdOiBTdXBwb3J0IFNpbmdsZS1SYW5n
-ZSBPdXRwdXQgc2NoZW1lOw0KPiAgICovDQo+ICAjZGVmaW5lIElOVEVMX1BUX01JTklNQUxfRUNY
-ICAgICAweDcNCj4gLS8qIGdlbmVyYXRlZCBwYWNrZXRzIHdoaWNoIGNvbnRhaW4gSVAgcGF5bG9h
-ZHMgaGF2ZSBMSVAgdmFsdWVzICovDQo+IC0jZGVmaW5lIElOVEVMX1BUX0lQX0xJUCAgICAgICAg
-ICAoMSA8PCAzMSkNCj4gICNkZWZpbmUgSU5URUxfUFRfQUREUl9SQU5HRVNfTlVNIDB4MiAvKiBO
-dW1iZXIgb2YgY29uZmlndXJhYmxlIA0KPiBhZGRyZXNzIHJhbmdlcyAqLyAgI2RlZmluZSBJTlRF
-TF9QVF9BRERSX1JBTkdFU19OVU1fTUFTSyAweDMNCj4gICNkZWZpbmUgSU5URUxfUFRfTVRDX0JJ
-VE1BUCAgICAgICgweDAyNDkgPDwgMTYpIC8qIFN1cHBvcnQgQVJUKDAsMyw2LDkpICovDQo+IEBA
-IC02MjgxLDggKzYyNzksNyBAQCBzdGF0aWMgdm9pZCB4ODZfY3B1X2ZpbHRlcl9mZWF0dXJlcyhY
-ODZDUFUgKmNwdSwgYm9vbCB2ZXJib3NlKQ0KPiAgICAgICAgICAgICAoKGVheF8xICYgSU5URUxf
-UFRfQUREUl9SQU5HRVNfTlVNX01BU0spIDwNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBJTlRFTF9QVF9BRERSX1JBTkdFU19OVU0pIHx8DQo+ICAgICAgICAg
-ICAgICgoZWJ4XzEgJiAoSU5URUxfUFRfUFNCX0JJVE1BUCB8IElOVEVMX1BUX0NZQ0xFX0JJVE1B
-UCkpICE9DQo+IC0gICAgICAgICAgICAgICAgKElOVEVMX1BUX1BTQl9CSVRNQVAgfCBJTlRFTF9Q
-VF9DWUNMRV9CSVRNQVApKSB8fA0KPiAtICAgICAgICAgICAoZWN4XzAgJiBJTlRFTF9QVF9JUF9M
-SVApKSB7DQo+ICsgICAgICAgICAgICAgICAgKElOVEVMX1BUX1BTQl9CSVRNQVAgfCBJTlRFTF9Q
-VF9DWUNMRV9CSVRNQVApKSkgew0KPiAgICAgICAgICAgICAgLyoNCj4gICAgICAgICAgICAgICAq
-IFByb2Nlc3NvciBUcmFjZSBjYXBhYmlsaXRpZXMgYXJlbid0IGNvbmZpZ3VyYWJsZSwgc28gaWYg
-dGhlDQo+ICAgICAgICAgICAgICAgKiBob3N0IGNhbid0IGVtdWxhdGUgdGhlIGNhcGFiaWxpdGll
-cyB3ZSByZXBvcnQgb24NCj4gLS0NCj4gMS44LjMuMQ0KPiANCg0KLS0gDQpFZHVhcmRvDQoNCg==
+On 9/11/2020 1:50 PM, Dr. David Alan Gilbert wrote:
+> * Steve Sistare (steven.sistare@oracle.com) wrote:
+>> If the VM is paused when the KVM clock is serialized to a file, record
+>> that the clock is valid, so the value will be reused rather than
+>> overwritten after cprload with a new call to KVM_GET_CLOCK here:
+>>
+>> kvmclock_vm_state_change()
+>>     if (running)
+>>         ...
+>>     else
+>>         if (s->clock_valid)
+>>             return;         <-- instead, return here
+>>
+>>         kvm_update_clock()
+>>            kvm_vm_ioctl(kvm_state, KVM_GET_CLOCK, &data)  <-- overwritten
+>>
+>> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
+>> ---
+>>  hw/i386/kvm/clock.c | 6 +++++-
+>>  1 file changed, 5 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
+>> index 6428335..161991a 100644
+>> --- a/hw/i386/kvm/clock.c
+>> +++ b/hw/i386/kvm/clock.c
+>> @@ -285,18 +285,22 @@ static int kvmclock_pre_save(void *opaque)
+>>      if (!s->runstate_paused) {
+>>          kvm_update_clock(s);
+>>      }
+>> +    if (!runstate_is_running()) {
+>> +        s->clock_valid = true;
+>> +    }
+>>  
+>>      return 0;
+>>  }
+>>  
+>>  static const VMStateDescription kvmclock_vmsd = {
+>>      .name = "kvmclock",
+>> -    .version_id = 1,
+>> +    .version_id = 2,
+>>      .minimum_version_id = 1,
+>>      .pre_load = kvmclock_pre_load,
+>>      .pre_save = kvmclock_pre_save,
+>>      .fields = (VMStateField[]) {
+>>          VMSTATE_UINT64(clock, KVMClockState),
+>> +        VMSTATE_BOOL_V(clock_valid, KVMClockState, 2),
+>>          VMSTATE_END_OF_LIST()
+> 
+> We always try and avoid bumping version_id unless we're
+> desperate because it breaks backwards migration.
+> 
+> Didn't you already know from the stored migration state
+> (in the globalstate) if the loaded VM was running?
+> 
+> It's also not clear to me why you're avoiding reloading the state;
+> have you preserved that some other way?
+
+This patch was needed only for an early version of cprload which had some gratuitous
+vmstate transitions.  I will happily drop this patch.
+
+- Steve
+
+>>      },
+>>      .subsections = (const VMStateDescription * []) {
+>> -- 
+>> 1.8.3.1
+>>
 
