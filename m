@@ -2,83 +2,79 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F8CCC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 11:53:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4159C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 11:54:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D706E2083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 11:53:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3DF6F2083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 11:54:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BzXAaz5O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D706E2083B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NciuN237"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DF6F2083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLmHs-0003vX-PH
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 07:53:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34688)
+	id 1kLmJ5-0004yM-8f
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 07:54:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34996)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kLmGg-00038M-QQ
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 07:52:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59951)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kLmIW-0004XA-L7
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 07:53:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22128)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kLmGe-0002Dv-Ar
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 07:52:02 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kLmIV-0002LZ-1L
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 07:53:56 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601034719;
+ s=mimecast20190719; t=1601034834;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=MK7hMKWhSJD6AA65xGDrWLw6rLm03l5xSuxgPqqL7ug=;
- b=BzXAaz5Olv3IC5ef6opnCkAOLwSJYQqBtXFALU0RdVLQR+lpVBH1g8q5LyWoyntE+x3x7N
- pYQiZHk4ULq0K52k6iqMCHcF9Q2Gp8M1uLjdouArRQVaJEFULl7+ncTA4aFbVv+CLNkueB
- vsqzGJD7v0v1Tqaye4gPzoq9g9p40mw=
+ bh=1X0NNr0v1XlIMP5BtYYxfVoMOFr62qtxRMGGJaUVVeg=;
+ b=NciuN237yiUGs92rYYQR0MTYc+bKtWFeuBVSraH+6tphiyOozTqMalHxb2mYEjo61DTKmJ
+ DAQC/CM/dA1DXoBdDiOIGkkr1z4+B4SwUSxrmJ5S+Qf/wUelHVVZZC/quBI09CRN1wbsMM
+ E4a/M/r0BiCMs09m4qt80NhXhxTGErw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-272-KDTG5TnIO3Og8-j8d5S_nw-1; Fri, 25 Sep 2020 07:51:58 -0400
-X-MC-Unique: KDTG5TnIO3Og8-j8d5S_nw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-211-bLyspp-oOnSCb5vi_CV0ig-1; Fri, 25 Sep 2020 07:53:52 -0400
+X-MC-Unique: bLyspp-oOnSCb5vi_CV0ig-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C44D110066FE;
- Fri, 25 Sep 2020 11:51:56 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-70.ams2.redhat.com
- [10.36.112.70])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B66078827;
- Fri, 25 Sep 2020 11:51:56 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 0C780113865F; Fri, 25 Sep 2020 13:51:55 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v2 09/38] qapi/common.py: Add indent manager
-References: <20200922210101.4081073-1-jsnow@redhat.com>
- <20200922210101.4081073-10-jsnow@redhat.com>
- <20200922222232.GK2044576@habkost.net>
- <c57afb75-3db9-abec-dd21-c32f9f918104@redhat.com>
-Date: Fri, 25 Sep 2020 13:51:54 +0200
-In-Reply-To: <c57afb75-3db9-abec-dd21-c32f9f918104@redhat.com> (John Snow's
- message of "Wed, 23 Sep 2020 13:29:16 -0400")
-Message-ID: <87sgb6t6p1.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 39B7F88EF06;
+ Fri, 25 Sep 2020 11:53:49 +0000 (UTC)
+Received: from gondolin (ovpn-112-192.ams2.redhat.com [10.36.112.192])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 99A6360C04;
+ Fri, 25 Sep 2020 11:53:32 +0000 (UTC)
+Date: Fri, 25 Sep 2020 13:53:18 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v26 07/17] vfio: Register SaveVMHandlers for VFIO device
+Message-ID: <20200925135318.7afaf234.cohuck@redhat.com>
+In-Reply-To: <1600817059-26721-8-git-send-email-kwankhede@nvidia.com>
+References: <1600817059-26721-1-git-send-email-kwankhede@nvidia.com>
+ <1600817059-26721-8-git-send-email-kwankhede@nvidia.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=cohuck@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 01:07:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 02:48:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -32
 X-Spam_score: -3.3
@@ -99,114 +95,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Cleber Rosa <crosa@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: cjia@nvidia.com, aik@ozlabs.ru, Zhengxiao.zx@Alibaba-inc.com,
+ shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, peterx@redhat.com,
+ eauger@redhat.com, yi.l.liu@intel.com, quintela@redhat.com,
+ ziye.yang@intel.com, armbru@redhat.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, felipe@nutanix.com, zhi.a.wang@intel.com,
+ kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
+ alex.williamson@redhat.com, changpeng.liu@intel.com, eskultet@redhat.com,
+ Ken.Xue@amd.com, jonathan.davies@nutanix.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-John Snow <jsnow@redhat.com> writes:
+On Wed, 23 Sep 2020 04:54:09 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-> On 9/22/20 6:22 PM, Eduardo Habkost wrote:
->> On Tue, Sep 22, 2020 at 05:00:32PM -0400, John Snow wrote:
->>> Code style tools really dislike the use of global keywords, because it
->>> generally involves re-binding the name at runtime which can have strange
->>> effects depending on when and how that global name is referenced in
->>> other modules.
->>>
->>> Make a little indent level manager instead.
->>>
->>> Signed-off-by: John Snow <jsnow@redhat.com>
->>> ---
->>>   scripts/qapi/common.py | 51 +++++++++++++++++++++++++++++-------------
->>>   scripts/qapi/visit.py  |  7 +++---
->>>   2 files changed, 38 insertions(+), 20 deletions(-)
->>>
->>> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
->>> index cee63eb95c..e0c5871b10 100644
->>> --- a/scripts/qapi/common.py
->>> +++ b/scripts/qapi/common.py
->>> @@ -93,33 +93,52 @@ def c_name(name, protect=True):
->>>   pointer_suffix = ' *' + eatspace
->>>     
->>> -def genindent(count):
->>> -    ret = ''
->>> -    for _ in range(count):
->>> -        ret += ' '
->>> -    return ret
->>> +class Indentation:
->>> +    """
->>> +    Indentation level management.
->>>   +    :param initial: Initial number of spaces, default 0.
->>> +    """
->>> +    def __init__(self, initial: int = 0) -> None:
->>> +        self._level = initial
->>>   -indent_level = 0
->>> +    def __int__(self) -> int:
->>> +        return self._level
->>>   +    def __repr__(self) -> str:
->>> +        return "{}({:d})".format(type(self).__name__, self._level)
->>>   -def push_indent(indent_amount=4):
->>> -    global indent_level
->>> -    indent_level += indent_amount
->>> +    def __str__(self) -> str:
->>> +        """Return the current indentation as a string of spaces."""
->>> +        return ' ' * self._level
->>>   +    def __bool__(self) -> bool:
->>> +        """True when there is a non-zero indentation."""
->>> +        return bool(self._level)
->>>   -def pop_indent(indent_amount=4):
->>> -    global indent_level
->>> -    indent_level -= indent_amount
->>> +    def increase(self, amount: int = 4) -> int:
->>> +        """Increase the indentation level by `amount`, default 4."""
->>> +        self._level += amount
->>> +        return self._level
->>> +
->>> +    def decrease(self, amount: int = 4) -> int:
->>> +        """Decrease the indentation level by `amount`, default 4."""
->>> +        if self._level < amount:
->>> +            raise ArithmeticError(
->>> +                f"Can't remove {amount:d} spaces from {self!r}")
->>> +        self._level -= amount
->>> +        return self._level
->>> +
->>> +
->>> +indent = Indentation()
->> Personally, I would keep the push_indent(), pop_indent() API, and
->> introduce an indent() function, to follow the existing API style
->> of plain functions.
->> Something like:
->>    indent_prefixes = []
->>    def push_indent(amount=4):
->>        """Add `amount` spaces to indentation prefix"""
->>        indent_prefixes.push(' '*amount)
->>    def pop_indent():
->>        """Revert the most recent push_indent() call"""
->>        indent_prefixes.pop()
->>    def indent():
->>        """Return the current indentation prefix"""
->>        return ''.join(indent_prefixes)
->> What you did is still an improvement, though, so:
->> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
->> 
->
-> Yeah, there's only one user right now, so ... I just kinda wanted to
-> get rid of the global usage. Maybe if we make the code generator
-> fancier we'll find out what form is best.
+> Define flags to be used as delimeter in migration file stream.
+> Added .save_setup and .save_cleanup functions. Mapped & unmapped migration
+> region from these functions at source during saving or pre-copy phase.
+> Set VFIO device state depending on VM's state. During live migration, VM is
+> running when .save_setup is called, _SAVING | _RUNNING state is set for VFIO
+> device. During save-restore, VM is paused, _SAVING state is set for VFIO device.
+> 
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> ---
+>  hw/vfio/migration.c  | 91 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/vfio/trace-events |  2 ++
+>  2 files changed, 93 insertions(+)
+> 
 
-You don't get rid of the global variable, you just change it from
-integer to a class.  A class can be handier when generating multiple
-things interleaved, because you can have one class instance per thing.
+(...)
 
-Note that we already have a class instance per thing we generate:
-instances of subtypes of QAPIGen.  The thought of moving the indentation
-machinery into QAPIGen or or maybe QAPIGenCCode crossed my mind many
-moons ago, but I had bigger fish to fry, and then I forgot :)
+> +/*
+> + * Flags used as delimiter:
+> + * 0xffffffff => MSB 32-bit all 1s
+> + * 0xef10     => emulated (virtual) function IO
 
-John, I suggest you don't try to make this pretty just yet.  Do what
-needs to be done for the type hint job.  We can make it pretty later.
+Where is this value coming from?
+
+> + * 0x0000     => 16-bits reserved for flags
+> + */
+> +#define VFIO_MIG_FLAG_END_OF_STATE      (0xffffffffef100001ULL)
+> +#define VFIO_MIG_FLAG_DEV_CONFIG_STATE  (0xffffffffef100002ULL)
+> +#define VFIO_MIG_FLAG_DEV_SETUP_STATE   (0xffffffffef100003ULL)
+> +#define VFIO_MIG_FLAG_DEV_DATA_STATE    (0xffffffffef100004ULL)
+
+I think we need some more documentation what these values mean and how
+they are used. From reading ahead a bit, it seems there is always
+supposed to be a pair of DEV_*_STATE and END_OF_STATE framing some kind
+of data?
+
+(...)
 
 
