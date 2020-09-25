@@ -2,87 +2,118 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
-	autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C40AC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 09:12:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F697C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 09:13:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A74C2206B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 09:12:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7AB3B2083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 09:13:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TgdI23yR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A74C2206B5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iuLK51J1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AB3B2083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLjmN-0005Vq-LH
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 05:12:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56812)
+	id 1kLjn4-0006qv-BS
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 05:13:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56896)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1kLjl7-00046Z-I6
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 05:11:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54965)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kLjll-00057J-EF
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 05:11:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46081)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1kLjl5-0007tE-06
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 05:11:17 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kLjlj-0007uw-C3
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 05:11:57 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601025074;
+ s=mimecast20190719; t=1601025114;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=4g6FaaIgv+RPCqB2VEzLKsaQ1g0HLCnSADW4XkUgMxE=;
- b=TgdI23yR+Y6F3LXrNj6IhpJx5lVYDy+xAEVWQXVNtAyK28M9pd8KmTo4hBFhK/vSmr91X6
- L4QNt8LcClXoOQcaYJiqmiX3X2U7QuheyndNZ0dL+Ayj54xVHeHwPUmNOffPuOjqp4+38h
- NZZUSjIQdjMVVlusOP79H8AVZ4TOu00=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=9ystAv+0v/nlnX9GNJ6gaDGICgwZ4J3YwxnSH82OSRg=;
+ b=iuLK51J1tVw8zBNjl/0MnfnOsTVl/gNtepLvUmyQxqLenk3UmeHVmsP3kZdL01BRw52uc7
+ XIFpQOhj7suis9GjZYiO6rUch4gZ+vnPXraAvTvmdHrJw9f1Zsph4Rwla9LgNzctExVhJk
+ vEOZokGPHfRMXGXAW9VsaN11V17eISU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-423-PNkb6RejNjuYtexBIomLuA-1; Fri, 25 Sep 2020 05:11:12 -0400
-X-MC-Unique: PNkb6RejNjuYtexBIomLuA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-365-R_24nVMaPtefeJ5yBuP2WA-1; Fri, 25 Sep 2020 05:11:52 -0400
+X-MC-Unique: R_24nVMaPtefeJ5yBuP2WA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3AC5464097
- for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 09:11:11 +0000 (UTC)
-Received: from thinkpad.redhat.com (ovpn-112-16.ams2.redhat.com [10.36.112.16])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4926C1002C0F;
- Fri, 25 Sep 2020 09:11:08 +0000 (UTC)
-From: Laurent Vivier <lvivier@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 2/2] vhost-vdpa: add trace-events
-Date: Fri, 25 Sep 2020 11:10:55 +0200
-Message-Id: <20200925091055.186023-3-lvivier@redhat.com>
-In-Reply-To: <20200925091055.186023-1-lvivier@redhat.com>
-References: <20200925091055.186023-1-lvivier@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AB0C188C132;
+ Fri, 25 Sep 2020 09:11:51 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-113.ams2.redhat.com
+ [10.36.113.113])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 376635D9F1;
+ Fri, 25 Sep 2020 09:11:46 +0000 (UTC)
+Subject: Re: [PATCH v6 11/15] iotests: add 298 to test new preallocate filter
+ driver
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200918181951.21752-1-vsementsov@virtuozzo.com>
+ <20200918181951.21752-12-vsementsov@virtuozzo.com>
+ <1d202398-7a0e-9e72-6f9d-c04b7f887a0a@redhat.com>
+ <33d1a996-f212-eac7-ab78-659a4025c069@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <d36a27c8-0f2c-ede5-6f97-e134093dcf6e@redhat.com>
+Date: Fri, 25 Sep 2020 11:11:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <33d1a996-f212-eac7-ab78-659a4025c069@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lvivier@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=lvivier@redhat.com;
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="LT6oe7aTsO845J6aZMtPytF6V5XB5oPeu"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mreitz@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 02:48:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -32
-X-Spam_score: -3.3
+X-Spam_score_int: -34
+X-Spam_score: -3.5
 X-Spam_bar: ---
-X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
+X-Spam_report: (-3.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.214, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,365 +126,251 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Cindy Lu <lulu@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add trace functions in vhost-vdpa.c.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--LT6oe7aTsO845J6aZMtPytF6V5XB5oPeu
+Content-Type: multipart/mixed; boundary="jgT40TOTtdRRaaO4cTluHxTivqDJPxBDZ"
 
-All traces from this file can be enabled with '-trace vhost_vdpa*'.
+--jgT40TOTtdRRaaO4cTluHxTivqDJPxBDZ
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
----
- hw/virtio/trace-events | 31 ++++++++++++++
- hw/virtio/vhost-vdpa.c | 92 +++++++++++++++++++++++++++++++++++++++---
- 2 files changed, 118 insertions(+), 5 deletions(-)
+On 25.09.20 10:49, Vladimir Sementsov-Ogievskiy wrote:
+> 25.09.2020 11:26, Max Reitz wrote:
+>> On 18.09.20 20:19, Vladimir Sementsov-Ogievskiy wrote:
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>> ---
+>>> =C2=A0 tests/qemu-iotests/298=C2=A0=C2=A0=C2=A0=C2=A0 | 186 +++++++++++=
+++++++++++++++++++++++++++
+>>> =C2=A0 tests/qemu-iotests/298.out |=C2=A0=C2=A0 5 +
+>>> =C2=A0 tests/qemu-iotests/group=C2=A0=C2=A0 |=C2=A0=C2=A0 1 +
+>>> =C2=A0 3 files changed, 192 insertions(+)
+>>> =C2=A0 create mode 100644 tests/qemu-iotests/298
+>>> =C2=A0 create mode 100644 tests/qemu-iotests/298.out
 
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index 845200bf109d..cf1e59de302a 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -22,6 +22,37 @@ vhost_user_postcopy_waker(const char *rb, uint64_t rb_offset) "%s + 0x%"PRIx64
- vhost_user_postcopy_waker_found(uint64_t client_addr) "0x%"PRIx64
- vhost_user_postcopy_waker_nomatch(const char *rb, uint64_t rb_offset) "%s + 0x%"PRIx64
- 
-+# vhost-vdpa.c
-+vhost_vdpa_dma_map(void *vdpa, int fd, uint32_t msg_type, uint64_t iova, uint64_t size, uint64_t uaddr, uint8_t perm, uint8_t type) "vdpa:%p fd: %d msg_type: %"PRIu32" iova: 0x%"PRIx64" size: 0x%"PRIx64" uaddr: 0x%"PRIx64" perm: 0x%"PRIx8" type: %"PRIu8
-+vhost_vdpa_dma_unmap(void *vdpa, int fd, uint32_t msg_type, uint64_t iova, uint64_t size, uint8_t type) "vdpa:%p fd: %d msg_type: %"PRIu32" iova: 0x%"PRIx64" size: 0x%"PRIx64" type: %"PRIu8
-+vhost_vdpa_listener_region_add(void *vdpa, uint64_t iova, uint64_t llend, void *vaddr, bool readonly) "vdpa: %p iova 0x%"PRIx64" llend 0x%"PRIx64" vaddr: %p read-only: %d"
-+vhost_vdpa_listener_region_del(void *vdpa, uint64_t iova, uint64_t llend) "vdpa: %p iova 0x%"PRIx64" llend 0x%"PRIx64
-+vhost_vdpa_add_status(void *dev, uint8_t status) "dev: %p status: 0x%"PRIx8
-+vhost_vdpa_init(void *dev, void *vdpa) "dev: %p vdpa: %p"
-+vhost_vdpa_cleanup(void *dev, void *vdpa) "dev: %p vdpa: %p"
-+vhost_vdpa_memslots_limit(void *dev, int ret) "dev: %p = 0x%x"
-+vhost_vdpa_set_mem_table(void *dev, uint32_t nregions, uint32_t padding) "dev: %p nregions: %"PRIu32" padding: 0x%"PRIx32
-+vhost_vdpa_dump_regions(void *dev, int i, uint64_t guest_phys_addr, uint64_t memory_size, uint64_t userspace_addr, uint64_t flags_padding) "dev: %p %d: guest_phys_addr: 0x%"PRIx64" memory_size: 0x%"PRIx64" userspace_addr: 0x%"PRIx64" flags_padding: 0x%"PRIx64
-+vhost_vdpa_set_features(void *dev, uint64_t features) "dev: %p features: 0x%"PRIx64
-+vhost_vdpa_get_device_id(void *dev, uint32_t device_id) "dev: %p device_id %"PRIu32
-+vhost_vdpa_reset_device(void *dev, uint8_t status) "dev: %p status: 0x%"PRIx8
-+vhost_vdpa_get_vq_index(void *dev, int idx, int vq_idx) "dev: %p idx: %d vq idx: %d"
-+vhost_vdpa_set_vring_ready(void *dev) "dev: %p"
-+vhost_vdpa_dump_config(void *dev, const char *line) "dev: %p %s"
-+vhost_vdpa_set_config(void *dev, uint32_t offset, uint32_t size, uint32_t flags) "dev: %p offset: %"PRIu32" size: %"PRIu32" flags: 0x%"PRIx32
-+vhost_vdpa_get_config(void *dev, void *config, uint32_t config_len) "dev: %p config: %p config_len: %"PRIu32
-+vhost_vdpa_dev_start(void *dev, bool started) "dev: %p started: %d"
-+vhost_vdpa_set_log_base(void *dev, uint64_t base, unsigned long long size, int refcnt, int fd, void *log) "dev: %p base: 0x%"PRIx64" size: %llu refcnt: %d fd: %d log: %p"
-+vhost_vdpa_set_vring_addr(void *dev, unsigned int index, unsigned int flags, uint64_t desc_user_addr, uint64_t used_user_addr, uint64_t avail_user_addr, uint64_t log_guest_addr) "dev: %p index: %u flags: 0x%x desc_user_addr: 0x%"PRIx64" used_user_addr: 0x%"PRIx64" avail_user_addr: 0x%"PRIx64" log_guest_addr: 0x%"PRIx64
-+vhost_vdpa_set_vring_num(void *dev, unsigned int index, unsigned int num) "dev: %p index: %u num: %u"
-+vhost_vdpa_set_vring_base(void *dev, unsigned int index, unsigned int num) "dev: %p index: %u num: %u"
-+vhost_vdpa_get_vring_base(void *dev, unsigned int index, unsigned int num) "dev: %p index: %u num: %u"
-+vhost_vdpa_set_vring_kick(void *dev, unsigned int index, int fd) "dev: %p index: %u fd: %d"
-+vhost_vdpa_set_vring_call(void *dev, unsigned int index, int fd) "dev: %p index: %u fd: %d"
-+vhost_vdpa_get_features(void *dev, uint64_t features) "dev: %p features: 0x%"PRIx64
-+vhost_vdpa_set_owner(void *dev) "dev: %p"
-+vhost_vdpa_vq_get_addr(void *dev, void *vq, uint64_t desc_user_addr, uint64_t avail_user_addr, uint64_t used_user_addr) "dev: %p vq: %p desc_user_addr: 0x%"PRIx64" avail_user_addr: 0x%"PRIx64" used_user_addr: 0x%"PRIx64
+[...]
+
+>>> +class TestTruncate(iotests.QMPTestCase):
+>>
+>> The same decorator could be placed here, although this class doesn=E2=80=
+=99t
+>> start a VM, and so is unaffected by the allowlist.=C2=A0 Still may be
+>> relevant in case of block modules, I don=E2=80=99t know.
+>=20
+> Or just global test skip at file top
+
+Hm.  Like verify_quorum()?  Is there a generic function for that already?
+
+[...]
+
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Probably we'll want preal=
+locate filter to keep align to
+>>> cluster when
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # shrink preallocation, so,=
+ ignore small differece
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.assertLess(abs(stat.st=
+_size - refstat.st_size), 64 * 1024)
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Preallocate filter may le=
+ak some internal clusters (for
+>>> example, if
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # guest write far over EOF,=
+ skipping some clusters - they
+>>> will remain
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # fallocated, preallocate f=
+ilter don't care about such
+>>> leaks, it drops
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # only trailing preallocati=
+on.
+>>
+>> True, but that isn=E2=80=99t what=E2=80=99s happening here.=C2=A0 (We on=
+ly write 10M at 0, so
+>> there are no gaps.)=C2=A0 Why do we need this 1M margin?
+>=20
+> We write 10M, but qcow2 also writes metadata as it wants
+
+Ah, yes, sure.  Shouldn=E2=80=99t result in 1M, but why not.
+
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.assertLess(abs(stat.st=
+_blocks - refstat.st_blocks) * 512,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 1024 =
+* 1024)
+>>
+>> [...]
+>>
+>>> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+>>> index ff59cfd2d4..15d5f9619b 100644
+>>> --- a/tests/qemu-iotests/group
+>>> +++ b/tests/qemu-iotests/group
+>>> @@ -307,6 +307,7 @@
+>>> =C2=A0 295 rw
+>>> =C2=A0 296 rw
+>>> =C2=A0 297 meta
+>>> +298 auto quick
+>>
+>> I wouldn=E2=80=99t mark it as quick, there is at least one preallocate=
+=3Dfull of
+>> 140M, and one of 40M, plus multiple 10M data writes and falloc
+>> preallocations.
+>>
+>> Also, since you mark it as =E2=80=9Cauto=E2=80=9D, have you run this tes=
+t on all
+>> CI-relevant hosts?=C2=A0 (Among other things I can=E2=80=99t predict) I =
+wonder how
+>> preallocation behaves on macOS.=C2=A0 Just because that one was always a=
+ bit
+>> weird about not-really-data areas.
+>>
+>=20
+> Ofcourse, I didn't run on all hosts. I'm a bit out of sync about this..
+
+Well, someone has to do it.  The background story is that tests are
+added to auto all the time (because =E2=80=9Cwhy not=E2=80=9D), and then th=
+ey fail on
+BSD or macOS.  We have BSD docker test build targets at least, so they
+can be easily tested.  (Well, it takes like half an hour, but you know.)
+
+(We don=E2=80=99t have macOS builds, as far as I can tell, but I personally
+don=E2=80=99t even know why we run the iotests on macOS at all.  (Well, I a=
+lso
+wonder about the BSDs, but given the test build targets, I shouldn=E2=80=99=
+t
+complain, I suppose.))
+
+(Though macOS isn=E2=80=99t part of the gating CI, is it?  I seem to rememb=
+er
+macOS errors are generally only reported to me half a week after the
+pull request is merged, which is even worse.)
+
+Anyway.  I just ran the test for OpenBSD
+(EXTRA_CONFIGURE_OPTS=3D'--target-list=3Dx86_64-softmmu' \
+   make vm-build-openbsd)
+and got some failures:
+
+--- /home/qemu/qemu-test.PGo2ls/src/tests/qemu-iotests/298.out  Fri Sep
+25 07:10:31 2020
++++ /home/qemu/qemu-test.PGo2ls/build/tests/qemu-iotests/298.out.bad
+Fri Sep 25 08:57:56 2020
+@@ -1,5 +1,67 @@
+-.............
++qemu-io: Failed to resize underlying file: Unsupported preallocation
+mode: falloc
++qemu-io: Failed to resize underlying file: Unsupported preallocation
+mode: falloc
++FFFF.F...F...
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++FAIL: test_external_snapshot (__main__.TestPreallocateFilter)
+ ----------------------------------------------------------------------
++Traceback (most recent call last):
++  File "298", line 81, in test_external_snapshot
++    self.test_prealloc()
++  File "298", line 78, in test_prealloc
++    self.check_big()
++  File "298", line 48, in check_big
++    self.assertTrue(os.path.getsize(disk) > 100 * MiB)
++AssertionError: False is not true
 +
- # virtio.c
- virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
- virtqueue_fill(void *vq, const void *elem, unsigned int len, unsigned int idx) "vq %p elem %p len %u idx %u"
-diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
-index 4580f3efd8a2..c43e12551546 100644
---- a/hw/virtio/vhost-vdpa.c
-+++ b/hw/virtio/vhost-vdpa.c
-@@ -20,6 +20,8 @@
- #include "hw/virtio/vhost-vdpa.h"
- #include "qemu/main-loop.h"
- #include "cpu.h"
-+#include "trace.h"
-+#include "qemu-common.h"
- 
- static bool vhost_vdpa_listener_skipped_section(MemoryRegionSection *section)
- {
-@@ -48,6 +50,9 @@ static int vhost_vdpa_dma_map(struct vhost_vdpa *v, hwaddr iova, hwaddr size,
-     msg.iotlb.perm = readonly ? VHOST_ACCESS_RO : VHOST_ACCESS_RW;
-     msg.iotlb.type = VHOST_IOTLB_UPDATE;
- 
-+   trace_vhost_vdpa_dma_map(v, fd, msg.type, msg.iotlb.iova, msg.iotlb.size,
-+                            msg.iotlb.uaddr, msg.iotlb.perm, msg.iotlb.type);
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++FAIL: test_prealloc (__main__.TestPreallocateFilter)
++----------------------------------------------------------------------
++Traceback (most recent call last):
++  File "298", line 78, in test_prealloc
++    self.check_big()
++  File "298", line 48, in check_big
++    self.assertTrue(os.path.getsize(disk) > 100 * MiB)
++AssertionError: False is not true
 +
-     if (write(fd, &msg, sizeof(msg)) != sizeof(msg)) {
-         error_report("failed to write, fd=%d, errno=%d (%s)",
-             fd, errno, strerror(errno));
-@@ -69,6 +74,9 @@ static int vhost_vdpa_dma_unmap(struct vhost_vdpa *v, hwaddr iova,
-     msg.iotlb.size = size;
-     msg.iotlb.type = VHOST_IOTLB_INVALIDATE;
- 
-+    trace_vhost_vdpa_dma_unmap(v, fd, msg.type, msg.iotlb.iova,
-+                               msg.iotlb.size, msg.iotlb.type);
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++FAIL: test_reopen_opts (__main__.TestPreallocateFilter)
++----------------------------------------------------------------------
++Traceback (most recent call last):
++  File "298", line 119, in test_reopen_opts
++    self.assertTrue(os.path.getsize(disk) =3D=3D 25 * MiB)
++AssertionError: False is not true
 +
-     if (write(fd, &msg, sizeof(msg)) != sizeof(msg)) {
-         error_report("failed to write, fd=%d, errno=%d (%s)",
-             fd, errno, strerror(errno));
-@@ -114,6 +122,9 @@ static void vhost_vdpa_listener_region_add(MemoryListener *listener,
-             section->offset_within_region +
-             (iova - section->offset_within_address_space);
- 
-+    trace_vhost_vdpa_listener_region_add(v, iova, int128_get64(llend),
-+                                         vaddr, section->readonly);
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++FAIL: test_qemu_img (__main__.TestQemuImg)
++----------------------------------------------------------------------
++Traceback (most recent call last):
++  File "298", line 61, in test_qemu_img
++    self.check_big()
++  File "298", line 48, in check_big
++    self.assertTrue(os.path.getsize(disk) > 100 * MiB)
++AssertionError: False is not true
 +
-     llsize = int128_sub(llend, int128_make64(iova));
- 
-     ret = vhost_vdpa_dma_map(v, iova, int128_get64(llsize),
-@@ -170,6 +181,8 @@ static void vhost_vdpa_listener_region_del(MemoryListener *listener,
-     llend = int128_add(llend, section->size);
-     llend = int128_and(llend, int128_exts64(TARGET_PAGE_MASK));
- 
-+    trace_vhost_vdpa_listener_region_del(v, iova, int128_get64(llend));
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++FAIL: test_truncate_inside_preallocated_area__falloc
+(__main__.TestTruncate)
++----------------------------------------------------------------------
++Traceback (most recent call last):
++  File "298", line 161, in test_truncate_inside_preallocated_area__falloc
++    self.do_test('falloc', '50M')
++  File "298", line 135, in do_test
++    self.assertEqual(ret, 0)
++AssertionError: 1 !=3D 0
 +
-     if (int128_ge(int128_make64(iova), llend)) {
-         return;
-     }
-@@ -210,6 +223,7 @@ static void vhost_vdpa_add_status(struct vhost_dev *dev, uint8_t status)
- {
-     uint8_t s;
- 
-+    trace_vhost_vdpa_add_status(dev, status);
-     if (vhost_vdpa_call(dev, VHOST_VDPA_GET_STATUS, &s)) {
-         return;
-     }
-@@ -224,6 +238,7 @@ static int vhost_vdpa_init(struct vhost_dev *dev, void *opaque)
-     struct vhost_vdpa *v;
-     uint64_t features;
-     assert(dev->vhost_ops->backend_type == VHOST_BACKEND_TYPE_VDPA);
-+    trace_vhost_vdpa_init(dev, opaque);
- 
-     v = opaque;
-     dev->opaque =  opaque ;
-@@ -243,6 +258,7 @@ static int vhost_vdpa_cleanup(struct vhost_dev *dev)
-     struct vhost_vdpa *v;
-     assert(dev->vhost_ops->backend_type == VHOST_BACKEND_TYPE_VDPA);
-     v = dev->opaque;
-+    trace_vhost_vdpa_cleanup(dev, v);
-     memory_listener_unregister(&v->listener);
- 
-     dev->opaque = NULL;
-@@ -251,13 +267,25 @@ static int vhost_vdpa_cleanup(struct vhost_dev *dev)
- 
- static int vhost_vdpa_memslots_limit(struct vhost_dev *dev)
- {
-+    trace_vhost_vdpa_memslots_limit(dev, INT_MAX);
-     return INT_MAX;
- }
- 
- static int vhost_vdpa_set_mem_table(struct vhost_dev *dev,
-                                     struct vhost_memory *mem)
- {
--
-+    trace_vhost_vdpa_set_mem_table(dev, mem->nregions, mem->padding);
-+    if (trace_event_get_state_backends(TRACE_VHOST_VDPA_SET_MEM_TABLE) &&
-+        trace_event_get_state_backends(TRACE_VHOST_VDPA_DUMP_REGIONS)) {
-+        int i;
-+        for (i = 0; i < mem->nregions; i++) {
-+            trace_vhost_vdpa_dump_regions(dev, i,
-+                                          mem->regions[i].guest_phys_addr,
-+                                          mem->regions[i].memory_size,
-+                                          mem->regions[i].userspace_addr,
-+                                          mem->regions[i].flags_padding);
-+        }
-+    }
-     if (mem->padding) {
-         return -1;
-     }
-@@ -269,6 +297,7 @@ static int vhost_vdpa_set_features(struct vhost_dev *dev,
-                                    uint64_t features)
- {
-     int ret;
-+    trace_vhost_vdpa_set_features(dev, features);
-     ret = vhost_vdpa_call(dev, VHOST_SET_FEATURES, &features);
-     uint8_t status = 0;
-     if (ret) {
-@@ -283,26 +312,34 @@ static int vhost_vdpa_set_features(struct vhost_dev *dev,
- int vhost_vdpa_get_device_id(struct vhost_dev *dev,
-                                    uint32_t *device_id)
- {
--    return vhost_vdpa_call(dev, VHOST_VDPA_GET_DEVICE_ID, device_id);
-+    int ret;
-+    ret = vhost_vdpa_call(dev, VHOST_VDPA_GET_DEVICE_ID, device_id);
-+    trace_vhost_vdpa_get_device_id(dev, *device_id);
-+    return ret;
- }
- 
- static int vhost_vdpa_reset_device(struct vhost_dev *dev)
- {
-+    int ret;
-     uint8_t status = 0;
- 
--    return vhost_vdpa_call(dev, VHOST_VDPA_SET_STATUS, &status);
-+    ret = vhost_vdpa_call(dev, VHOST_VDPA_SET_STATUS, &status);
-+    trace_vhost_vdpa_reset_device(dev, status);
-+    return ret;
- }
- 
- static int vhost_vdpa_get_vq_index(struct vhost_dev *dev, int idx)
- {
-     assert(idx >= dev->vq_index && idx < dev->vq_index + dev->nvqs);
- 
-+    trace_vhost_vdpa_get_vq_index(dev, idx, idx - dev->vq_index);
-     return idx - dev->vq_index;
- }
- 
- static int vhost_vdpa_set_vring_ready(struct vhost_dev *dev)
- {
-     int i;
-+    trace_vhost_vdpa_set_vring_ready(dev);
-     for (i = 0; i < dev->nvqs; ++i) {
-         struct vhost_vring_state state = {
-             .index = dev->vq_index + i,
-@@ -313,6 +350,19 @@ static int vhost_vdpa_set_vring_ready(struct vhost_dev *dev)
-     return 0;
- }
- 
-+static void vhost_vdpa_dump_config(struct vhost_dev *dev, const uint8_t *config,
-+                                   uint32_t config_len)
-+{
-+    int b, len;
-+    char line[QEMU_HEXDUMP_LINE_LEN];
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++FAIL: test_truncate_over_preallocated_area__falloc (__main__.TestTruncate)
++----------------------------------------------------------------------
++Traceback (most recent call last):
++  File "298", line 173, in test_truncate_over_preallocated_area__falloc
++    self.do_test('falloc', '150M')
++  File "298", line 135, in do_test
++    self.assertEqual(ret, 0)
++AssertionError: 1 !=3D 0
 +
-+    for (b = 0; b < config_len; b += 16) {
-+        len = config_len - b;
-+        qemu_hexdump_line(line, b, config, len, false);
-+        trace_vhost_vdpa_dump_config(dev, line);
-+    }
-+}
-+
- static int vhost_vdpa_set_config(struct vhost_dev *dev, const uint8_t *data,
-                                    uint32_t offset, uint32_t size,
-                                    uint32_t flags)
-@@ -320,6 +370,7 @@ static int vhost_vdpa_set_config(struct vhost_dev *dev, const uint8_t *data,
-     struct vhost_vdpa_config *config;
-     int ret;
-     unsigned long config_size = offsetof(struct vhost_vdpa_config, buf);
-+    trace_vhost_vdpa_set_config(dev, offset, size, flags);
-     config = g_malloc(size + config_size);
-     if (config == NULL) {
-         return -1;
-@@ -327,6 +378,10 @@ static int vhost_vdpa_set_config(struct vhost_dev *dev, const uint8_t *data,
-     config->off = offset;
-     config->len = size;
-     memcpy(config->buf, data, size);
-+    if (trace_event_get_state_backends(TRACE_VHOST_VDPA_SET_CONFIG) &&
-+        trace_event_get_state_backends(TRACE_VHOST_VDPA_DUMP_CONFIG)) {
-+        vhost_vdpa_dump_config(dev, data, size);
-+    }
-     ret = vhost_vdpa_call(dev, VHOST_VDPA_SET_CONFIG, config);
-     g_free(config);
-     return ret;
-@@ -339,6 +394,7 @@ static int vhost_vdpa_get_config(struct vhost_dev *dev, uint8_t *config,
-     unsigned long config_size = offsetof(struct vhost_vdpa_config, buf);
-     int ret;
- 
-+    trace_vhost_vdpa_get_config(dev, config, config_len);
-     v_config = g_malloc(config_len + config_size);
-     if (v_config == NULL) {
-         return -1;
-@@ -348,12 +404,17 @@ static int vhost_vdpa_get_config(struct vhost_dev *dev, uint8_t *config,
-     ret = vhost_vdpa_call(dev, VHOST_VDPA_GET_CONFIG, v_config);
-     memcpy(config, v_config->buf, config_len);
-     g_free(v_config);
-+    if (trace_event_get_state_backends(TRACE_VHOST_VDPA_GET_CONFIG) &&
-+        trace_event_get_state_backends(TRACE_VHOST_VDPA_DUMP_CONFIG)) {
-+        vhost_vdpa_dump_config(dev, config, config_len);
-+    }
-     return ret;
-  }
- 
- static int vhost_vdpa_dev_start(struct vhost_dev *dev, bool started)
- {
-     struct vhost_vdpa *v = dev->opaque;
-+    trace_vhost_vdpa_dev_start(dev, started);
-     if (started) {
-         uint8_t status = 0;
-         memory_listener_register(&v->listener, &address_space_memory);
-@@ -375,53 +436,72 @@ static int vhost_vdpa_dev_start(struct vhost_dev *dev, bool started)
- static int vhost_vdpa_set_log_base(struct vhost_dev *dev, uint64_t base,
-                                      struct vhost_log *log)
- {
-+    trace_vhost_vdpa_set_log_base(dev, base, log->size, log->refcnt, log->fd,
-+                                  log->log);
-     return vhost_vdpa_call(dev, VHOST_SET_LOG_BASE, &base);
- }
- 
- static int vhost_vdpa_set_vring_addr(struct vhost_dev *dev,
-                                        struct vhost_vring_addr *addr)
- {
-+    trace_vhost_vdpa_set_vring_addr(dev, addr->index, addr->flags,
-+                                    addr->desc_user_addr, addr->used_user_addr,
-+                                    addr->avail_user_addr,
-+                                    addr->log_guest_addr);
-     return vhost_vdpa_call(dev, VHOST_SET_VRING_ADDR, addr);
- }
- 
- static int vhost_vdpa_set_vring_num(struct vhost_dev *dev,
-                                       struct vhost_vring_state *ring)
- {
-+    trace_vhost_vdpa_set_vring_num(dev, ring->index, ring->num);
-     return vhost_vdpa_call(dev, VHOST_SET_VRING_NUM, ring);
- }
- 
- static int vhost_vdpa_set_vring_base(struct vhost_dev *dev,
-                                        struct vhost_vring_state *ring)
- {
-+    trace_vhost_vdpa_set_vring_base(dev, ring->index, ring->num);
-     return vhost_vdpa_call(dev, VHOST_SET_VRING_BASE, ring);
- }
- 
- static int vhost_vdpa_get_vring_base(struct vhost_dev *dev,
-                                        struct vhost_vring_state *ring)
- {
--    return vhost_vdpa_call(dev, VHOST_GET_VRING_BASE, ring);
-+    int ret;
-+
-+    ret = vhost_vdpa_call(dev, VHOST_GET_VRING_BASE, ring);
-+    trace_vhost_vdpa_get_vring_base(dev, ring->index, ring->num);
-+    return ret;
- }
- 
- static int vhost_vdpa_set_vring_kick(struct vhost_dev *dev,
-                                        struct vhost_vring_file *file)
- {
-+    trace_vhost_vdpa_set_vring_kick(dev, file->index, file->fd);
-     return vhost_vdpa_call(dev, VHOST_SET_VRING_KICK, file);
- }
- 
- static int vhost_vdpa_set_vring_call(struct vhost_dev *dev,
-                                        struct vhost_vring_file *file)
- {
-+    trace_vhost_vdpa_set_vring_call(dev, file->index, file->fd);
-     return vhost_vdpa_call(dev, VHOST_SET_VRING_CALL, file);
- }
- 
- static int vhost_vdpa_get_features(struct vhost_dev *dev,
-                                      uint64_t *features)
- {
--    return vhost_vdpa_call(dev, VHOST_GET_FEATURES, features);
-+    int ret;
-+
-+    ret = vhost_vdpa_call(dev, VHOST_GET_FEATURES, features);
-+    trace_vhost_vdpa_get_features(dev, *features);
-+    return ret;
- }
- 
- static int vhost_vdpa_set_owner(struct vhost_dev *dev)
- {
-+    trace_vhost_vdpa_set_owner(dev);
-     return vhost_vdpa_call(dev, VHOST_SET_OWNER, NULL);
- }
- 
-@@ -432,6 +512,8 @@ static int vhost_vdpa_vq_get_addr(struct vhost_dev *dev,
-     addr->desc_user_addr = (uint64_t)(unsigned long)vq->desc_phys;
-     addr->avail_user_addr = (uint64_t)(unsigned long)vq->avail_phys;
-     addr->used_user_addr = (uint64_t)(unsigned long)vq->used_phys;
-+    trace_vhost_vdpa_vq_get_addr(dev, vq, addr->desc_user_addr,
-+                                 addr->avail_user_addr, addr->used_user_addr);
-     return 0;
- }
- 
--- 
-2.26.2
++----------------------------------------------------------------------
+ Ran 13 tests
+
+-OK
++FAILED (failures=3D6)
+
+> If I don't put new test in "auto", is there any chance that test would
+> be automatically run somewhere?
+
+I run all tests before pull requests at least.
+
+Max
+
+
+--jgT40TOTtdRRaaO4cTluHxTivqDJPxBDZ--
+
+--LT6oe7aTsO845J6aZMtPytF6V5XB5oPeu
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9ttFAACgkQ9AfbAGHV
+z0DbNAgAqv+7kmKKnnNU+aCAmRMqOJrMevf9XeDUNbDBy3mj0EUxRwE8F1e5pL5B
+NtBs7R+oQCzMPhD37SxHtvwl2gf/adPOedLNhdYFboVn7yVNk9RFGKiZkVXOz4Kt
+yyhYJ7NflI2Lz/a/94NWDWsSKkl3KKXNbq5bbFQpOabhc0sIokZ1o0LcK1AaV0gQ
+z0/aHImpTqvDvzxGstBvVgCDEYtcTz9GUMxmnL7/pQuNMIXN5M2AwYx0/JS/brCM
+3U1RYdPY2zGkgMc2EOEnbJOykMN9P+AsWsUTpBT5xc2ir+dwW5Tv6VGguGiys7jU
+16cgERQzTD7KY8AzjmKKVFjMUedn0A==
+=MySr
+-----END PGP SIGNATURE-----
+
+--LT6oe7aTsO845J6aZMtPytF6V5XB5oPeu--
 
 
