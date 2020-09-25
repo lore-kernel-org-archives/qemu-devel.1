@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66D1CC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:14:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0DF2C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:14:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBBF62083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:14:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 453C52083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:14:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IZSmJuLS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBBF62083B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ojqhya/e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 453C52083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33318 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLmc1-0003Lz-TF
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 08:14:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38134)
+	id 1kLmc5-0003UL-6N
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 08:14:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38188)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kLmVe-0002G8-Im
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:07:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51615)
+ id 1kLmVn-0002Ve-0x
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:07:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36349)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kLmVc-0004Dr-8m
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:07:30 -0400
+ id 1kLmVl-0004EU-6L
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:07:38 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601035646;
+ s=mimecast20190719; t=1601035655;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=5RtNjHNs3hEYTQX9+njr/qBDA45DXZrosh4HKnfGnHo=;
- b=IZSmJuLS2DsLKZX0rT49klLiP5HEuGnh+C7Nt2v5mA1d7f1xmSOLcOq02SdA/tXCRvFetf
- ofQZOEE6HkMzJiHp/EQk9C1ENCw+zYAkC4AtOXlyLCR9hMk4mejweKFh3xqAER3BraKXWc
- AIo0atWm6n9rUaX+HyeV0G5Wj845h7Q=
+ bh=pTjngOD6M5Zs+XGR87KKIEPcXJdlyB8CuV33zY5x0Wo=;
+ b=Ojqhya/er/l0Gzxv89Api4uMbYU6wFW/A9RcFr7pf/KWKHEniwh8H9tcXfWUPtgDwFrewl
+ o8q4dcGEKmARdx1eZf/RaHSrYMBukkZYaW28xSA3Z/BAMre1GLzNy8ZwkwiMl0hILtUZ6C
+ J+y9VbXIgc3487PXXKHqw8tK7xkFBm4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-433-rJDnEYYoN32iW2IG99GHQQ-1; Fri, 25 Sep 2020 08:07:22 -0400
-X-MC-Unique: rJDnEYYoN32iW2IG99GHQQ-1
+ us-mta-193-5Vlo2-GKNRiYjYpKipgvPw-1; Fri, 25 Sep 2020 08:07:31 -0400
+X-MC-Unique: 5Vlo2-GKNRiYjYpKipgvPw-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17ACF10066FC;
- Fri, 25 Sep 2020 12:07:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 113412FD03;
+ Fri, 25 Sep 2020 12:07:30 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-114-177.ams2.redhat.com
  [10.36.114.177])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0AC5773692;
- Fri, 25 Sep 2020 12:07:15 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BBE9073692;
+ Fri, 25 Sep 2020 12:07:26 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, zhengchuan@huawei.com, dovmurik@linux.vnet.ibm.com,
  hgcoin@gmail.com, zhangjiachen.jaycee@bytedance.com, lvivier@redhat.com,
  peterx@redhat.com, stefanha@redhat.com, vgoyal@redhat.com,
  jinyan12@huawei.com, ann.zhuangyanying@huawei.com
-Subject: [PULL 05/26] migration/dirtyrate: Add RamblockDirtyInfo to store
- sampled page info
-Date: Fri, 25 Sep 2020 13:06:34 +0100
-Message-Id: <20200925120655.295142-6-dgilbert@redhat.com>
+Subject: [PULL 07/26] migration/dirtyrate: move RAMBLOCK_FOREACH_MIGRATABLE
+ into ram.h
+Date: Fri, 25 Sep 2020 13:06:36 +0100
+Message-Id: <20200925120655.295142-8-dgilbert@redhat.com>
 In-Reply-To: <20200925120655.295142-1-dgilbert@redhat.com>
 References: <20200925120655.295142-1-dgilbert@redhat.com>
 MIME-Version: 1.0
@@ -107,51 +107,81 @@ Sender: "Qemu-devel"
 
 From: Chuan Zheng <zhengchuan@huawei.com>
 
-Add RamblockDirtyInfo to store sampled page info of each ramblock.
+RAMBLOCK_FOREACH_MIGRATABLE is need in dirtyrate measure,
+move the existing definition up into migration/ram.h
 
 Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: David Edmondson <david.edmondson@oracle.com>
 Reviewed-by: Li Qiang <liq3ea@gmail.com>
-Message-Id: <1600237327-33618-4-git-send-email-zhengchuan@huawei.com>
+Message-Id: <1600237327-33618-6-git-send-email-zhengchuan@huawei.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/dirtyrate.h | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ migration/dirtyrate.c |  1 +
+ migration/ram.c       | 11 +----------
+ migration/ram.h       | 10 ++++++++++
+ 3 files changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
-index 84ab9409ac..8707df852d 100644
---- a/migration/dirtyrate.h
-+++ b/migration/dirtyrate.h
-@@ -19,10 +19,28 @@
-  */
- #define DIRTYRATE_DEFAULT_SAMPLE_PAGES            512
+diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+index 94c4e173bc..10315f7a63 100644
+--- a/migration/dirtyrate.c
++++ b/migration/dirtyrate.c
+@@ -20,6 +20,7 @@
+ #include "qemu/rcu_queue.h"
+ #include "qapi/qapi-commands-migration.h"
+ #include "migration.h"
++#include "ram.h"
+ #include "dirtyrate.h"
  
-+/*
-+ * Record ramblock idstr
-+ */
-+#define RAMBLOCK_INFO_MAX_LEN                     256
-+
- struct DirtyRateConfig {
-     uint64_t sample_pages_per_gigabytes; /* sample pages per GB */
-     int64_t sample_period_seconds; /* time duration between two sampling */
- };
+ static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
+diff --git a/migration/ram.c b/migration/ram.c
+index c5f36aeae5..433489d633 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -158,21 +158,12 @@ out:
+     return ret;
+ }
  
-+/*
-+ * Store dirtypage info for each ramblock.
-+ */
-+struct RamblockDirtyInfo {
-+    char idstr[RAMBLOCK_INFO_MAX_LEN]; /* idstr for each ramblock */
-+    uint8_t *ramblock_addr; /* base address of ramblock we measure */
-+    uint64_t ramblock_pages; /* ramblock size in TARGET_PAGE_SIZE */
-+    uint64_t *sample_page_vfn; /* relative offset address for sampled page */
-+    uint64_t sample_pages_count; /* count of sampled pages */
-+    uint64_t sample_dirty_count; /* count of dirty pages we measure */
-+    uint32_t *hash_result; /* array of hash result for sampled pages */
-+};
+-static bool ramblock_is_ignored(RAMBlock *block)
++bool ramblock_is_ignored(RAMBlock *block)
+ {
+     return !qemu_ram_is_migratable(block) ||
+            (migrate_ignore_shared() && qemu_ram_is_shared(block));
+ }
+ 
+-/* Should be holding either ram_list.mutex, or the RCU lock. */
+-#define RAMBLOCK_FOREACH_NOT_IGNORED(block)            \
+-    INTERNAL_RAMBLOCK_FOREACH(block)                   \
+-        if (ramblock_is_ignored(block)) {} else
+-
+-#define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
+-    INTERNAL_RAMBLOCK_FOREACH(block)                   \
+-        if (!qemu_ram_is_migratable(block)) {} else
+-
+ #undef RAMBLOCK_FOREACH
+ 
+ int foreach_not_ignored_block(RAMBlockIterFunc func, void *opaque)
+diff --git a/migration/ram.h b/migration/ram.h
+index 2eeaacfa13..011e85414e 100644
+--- a/migration/ram.h
++++ b/migration/ram.h
+@@ -37,6 +37,16 @@ extern MigrationStats ram_counters;
+ extern XBZRLECacheStats xbzrle_counters;
+ extern CompressionStats compression_counters;
+ 
++bool ramblock_is_ignored(RAMBlock *block);
++/* Should be holding either ram_list.mutex, or the RCU lock. */
++#define RAMBLOCK_FOREACH_NOT_IGNORED(block)            \
++    INTERNAL_RAMBLOCK_FOREACH(block)                   \
++        if (ramblock_is_ignored(block)) {} else
 +
- void *get_dirtyrate_thread(void *arg);
- #endif
++#define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
++    INTERNAL_RAMBLOCK_FOREACH(block)                   \
++        if (!qemu_ram_is_migratable(block)) {} else
++
+ int xbzrle_cache_resize(int64_t new_size, Error **errp);
+ uint64_t ram_bytes_remaining(void);
+ uint64_t ram_bytes_total(void);
 -- 
 2.26.2
 
