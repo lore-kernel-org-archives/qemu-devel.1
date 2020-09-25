@@ -2,112 +2,91 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A59BC4727E
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 22:23:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFE13C4727E
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 22:24:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 300BA2086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 22:23:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 597A62086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 22:24:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Q8mgC1gT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 300BA2086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D+r9tmp4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 597A62086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLw7W-0006x0-3R
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 18:23:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40762)
+	id 1kLw8h-0007wA-7x
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 18:24:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41004)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
- id 1kLw6p-0006Sl-1r
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 18:22:31 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:49300)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
- id 1kLw6m-0000kt-7J
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 18:22:30 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
- by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08PMK1tp114048;
- Fri, 25 Sep 2020 22:22:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : from : to :
- cc : references : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=U0eLCbALDMjPXE8fZiEl8MK8gPYGt4qARcAZVvMNqi4=;
- b=Q8mgC1gTUdSYmKYgihJ3si6+p/tdOqiHY+Wvxdl8bBMDZ1MMZu18jTNTFLrYhR1bue+I
- Lm8Gwmnbg0EabpUlK3yPMvG0IxslGD1OqNLkKlDkJ+46t5xANN7lTarRHfsFoLExkZjv
- z7Ib2yXJNMFsaqnsxKaMQD6xout4h8A9rjuAWu/G933VW6Yj3w31bm9EdXksKKgnk1RC
- I+Z2X3mW+M9WhMQEJtK1rBo5YM8VD/zMNAA9hmqaijCU+D24UihWvt+8nM4tr0MgyLqr
- vgSDuM/LRcDqizg0si8PDOVGzUrvNzyoXg+I1f7p8rkunsTma9KT4fnaCext6EyPfGnP Ig== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by aserp2130.oracle.com with ESMTP id 33qcpucxp9-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Fri, 25 Sep 2020 22:22:23 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08PMKgVx014979;
- Fri, 25 Sep 2020 22:22:23 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by aserp3030.oracle.com with ESMTP id 33s75kcbc3-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 25 Sep 2020 22:22:23 +0000
-Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 08PMMLwd007223;
- Fri, 25 Sep 2020 22:22:21 GMT
-Received: from [10.39.220.177] (/10.39.220.177)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Fri, 25 Sep 2020 15:22:21 -0700
-Subject: Re: [PATCH V1 03/32] savevm: QMP command for cprsave
-From: Steven Sistare <steven.sistare@oracle.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
- <1596122076-341293-4-git-send-email-steven.sistare@oracle.com>
- <20200911164338.GK3310@work-vm>
- <b4172f01-2ad3-4b90-66cf-f810594737bf@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <8baf6618-d8f8-7ee6-81e2-b16be0aae285@oracle.com>
-Date: Fri, 25 Sep 2020 18:22:18 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kLw7s-0007Ru-Hc
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 18:23:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40238)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kLw7q-0000pR-1E
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 18:23:35 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601072612;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=X0ERSg3LEqHLjGakaREUS2/TFm8SSCL8rgYNPOV54tU=;
+ b=D+r9tmp4U8OdBi9P8v98k3NmD1p7a6+CLjEPjfo1RX/vr1llyk4c5RiTbay2ZcERPqQQGn
+ At2IMq/FkxhXGwy6Kwx6SpmnyAm9DLd2LoGfvR59QlG5BEarIM9DC/ON01qUexadYsJM/v
+ +/wTU5gh7LBTox7iXRbRcMI7vDUM2HI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-413-vLasISZkPBOqX1UUPAoVPg-1; Fri, 25 Sep 2020 18:23:30 -0400
+X-MC-Unique: vLasISZkPBOqX1UUPAoVPg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D258A10066FE;
+ Fri, 25 Sep 2020 22:23:27 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 321991002C01;
+ Fri, 25 Sep 2020 22:23:17 +0000 (UTC)
+Date: Fri, 25 Sep 2020 16:23:16 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v26 13/17] vfio: create mapped iova list when vIOMMU is
+ enabled
+Message-ID: <20200925162316.53dbd2b0@x1.home>
+In-Reply-To: <1600817059-26721-14-git-send-email-kwankhede@nvidia.com>
+References: <1600817059-26721-1-git-send-email-kwankhede@nvidia.com>
+ <1600817059-26721-14-git-send-email-kwankhede@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <b4172f01-2ad3-4b90-66cf-f810594737bf@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9755
- signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
- bulkscore=0
- malwarescore=0 adultscore=0 phishscore=0 spamscore=0 mlxscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009250163
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9755
- signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- mlxlogscore=999
- adultscore=0 bulkscore=0 mlxscore=0 lowpriorityscore=0 priorityscore=1501
- phishscore=0 spamscore=0 malwarescore=0 clxscore=1015 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2009250163
-Received-SPF: pass client-ip=141.146.126.79;
- envelope-from=steven.sistare@oracle.com; helo=aserp2130.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 18:22:25
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
+Received-SPF: pass client-ip=216.205.24.124;
+ envelope-from=alex.williamson@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 02:48:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -32
+X-Spam_score: -3.3
+X-Spam_bar: ---
+X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.238, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -120,201 +99,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: cohuck@redhat.com, cjia@nvidia.com, aik@ozlabs.ru,
+ Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com,
+ yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
+ armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
+ felipe@nutanix.com, zhi.a.wang@intel.com, kevin.tian@intel.com,
+ yan.y.zhao@intel.com, dgilbert@redhat.com, changpeng.liu@intel.com,
+ eskultet@redhat.com, Ken.Xue@amd.com, jonathan.davies@nutanix.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/25/2020 2:43 PM, Steven Sistare wrote:
-> On 9/11/2020 12:43 PM, Dr. David Alan Gilbert wrote:
->> * Steve Sistare (steven.sistare@oracle.com) wrote:
->>> To enable live reboot, provide the cprsave QMP command and the VMS_REBOOT
->>> vmstate-saving operation, which saves the state of the virtual machine in a
->>> simple file.
->>>
->>> Syntax:
->>>   {'command':'cprsave', 'data':{'file':'str', 'mode':'str'}}
->>>
->>>   The mode argument must be 'reboot'.  Additional modes will be defined in
->>>   the future.
->>>
->>> Unlike the savevm command, cprsave supports any type of guest image and
->>> block device.  cprsave stops the VM so that guest ram and block devices are
->>> not modified after state is saved.  Guest ram must be mapped to a persistent
->>> memory file such as /dev/dax0.0.  The ram object vmstate handler and block
->>> device handler do not apply to VMS_REBOOT, so restrict them to VMS_MIGRATE
->>> or VMS_SNAPSHOT.  After cprsave completes successfully, qemu exits.
->>>
->>> After issuing cprsave, the caller may update qemu, update the host kernel,
->>> reboot, start qemu using the same arguments as the original process, and
->>> issue the cprload command to restore the guest.  cprload is added by
->>> subsequent patches.
->>>
->>> If the caller suspends the guest instead of stopping the VM, such as by
->>> issuing guest-suspend-ram to the qemu guest agent, then cprsave and cprload
->>> support guests with vfio devices.  The guest drivers suspend methods flush
->>> outstanding requests and re-initialize the devices, and thus there is no
->>> device state to save and restore.
->>>
->>> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
->>> Signed-off-by: Maran Wilson <maran.wilson@oracle.com>
->>
->> Going back a step; could you.....
->>
->>> ---
->>>  include/migration/vmstate.h |  1 +
->>>  include/sysemu/sysemu.h     |  2 ++
->>>  migration/block.c           |  1 +
->>>  migration/ram.c             |  1 +
->>>  migration/savevm.c          | 59 +++++++++++++++++++++++++++++++++++++++++++++
->>>  monitor/qmp-cmds.c          |  6 +++++
->>>  qapi/migration.json         | 14 +++++++++++
->>>  7 files changed, 84 insertions(+)
->>>
->>> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
->>> index fa575f9..c58551a 100644
->>> --- a/include/migration/vmstate.h
->>> +++ b/include/migration/vmstate.h
->>> @@ -161,6 +161,7 @@ typedef enum {
->>>  typedef enum {
->>>      VMS_MIGRATE  = (1U << 1),
->>>      VMS_SNAPSHOT = (1U << 2),
->>> +    VMS_REBOOT   = (1U << 3),
->>>      VMS_MODE_ALL = ~0U
->>>  } VMStateMode;
->>>  
->>> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
->>> index 4b6a5c4..6fe86e6 100644
->>> --- a/include/sysemu/sysemu.h
->>> +++ b/include/sysemu/sysemu.h
->>> @@ -24,6 +24,8 @@ extern bool machine_init_done;
->>>  void qemu_add_machine_init_done_notifier(Notifier *notify);
->>>  void qemu_remove_machine_init_done_notifier(Notifier *notify);
->>>  
->>> +void save_cpr_snapshot(const char *file, const char *mode, Error **errp);
->>> +
->>>  extern int autostart;
->>>  
->>>  typedef enum {
->>> diff --git a/migration/block.c b/migration/block.c
->>> index 737b649..a69accb 100644
->>> --- a/migration/block.c
->>> +++ b/migration/block.c
->>> @@ -1023,6 +1023,7 @@ static SaveVMHandlers savevm_block_handlers = {
->>>      .load_state = block_load,
->>>      .save_cleanup = block_migration_cleanup,
->>>      .is_active = block_is_active,
->>> +    .mode_mask = VMS_MIGRATE | VMS_SNAPSHOT,
->>>  };
->>>  
->>>  void blk_mig_init(void)
->>> diff --git a/migration/ram.c b/migration/ram.c
->>> index 76d4fee..f0d5d9f 100644
->>> --- a/migration/ram.c
->>> +++ b/migration/ram.c
->>> @@ -3795,6 +3795,7 @@ static SaveVMHandlers savevm_ram_handlers = {
->>>      .load_setup = ram_load_setup,
->>>      .load_cleanup = ram_load_cleanup,
->>>      .resume_prepare = ram_resume_prepare,
->>> +    .mode_mask = VMS_MIGRATE | VMS_SNAPSHOT,
->>>  };
->>>  
->>>  void ram_mig_init(void)
->>> diff --git a/migration/savevm.c b/migration/savevm.c
->>> index ce02b6b..ff1a46e 100644
->>> --- a/migration/savevm.c
->>> +++ b/migration/savevm.c
->>> @@ -2680,6 +2680,65 @@ int qemu_load_device_state(QEMUFile *f)
->>>      return 0;
->>>  }
->>>  
->>> +static QEMUFile *qf_file_open(const char *filename, int flags, int mode,
->>> +                              Error **errp)
->>> +{
->>> +    QIOChannel *ioc;
->>> +    int fd = qemu_open(filename, flags, mode);
->>> +
->>> +    if (fd < 0) {
->>> +        error_setg_errno(errp, errno, "%s(%s)", __func__, filename);
->>> +        return NULL;
->>> +    }
->>> +
->>> +    ioc = QIO_CHANNEL(qio_channel_file_new_fd(fd));
->>> +
->>> +    if (flags & O_WRONLY) {
->>> +        return qemu_fopen_channel_output(ioc);
->>> +    }
->>> +
->>> +    return qemu_fopen_channel_input(ioc);
->>> +}
->>> +
->>> +void save_cpr_snapshot(const char *file, const char *mode, Error **errp)
->>> +{
->>> +    int ret = 0;
->>> +    QEMUFile *f;
->>> +    VMStateMode op;
->>> +
->>> +    if (!strcmp(mode, "reboot")) {
->>> +        op = VMS_REBOOT;
->>> +    } else {
->>> +        error_setg(errp, "cprsave: bad mode %s", mode);
->>> +        return;
->>> +    }
->>> +
->>> +    f = qf_file_open(file, O_CREAT | O_WRONLY | O_TRUNC, 0600, errp);
->>> +    if (!f) {
->>> +        return;
->>> +    }
->>> +
->>> +    ret = global_state_store();
->>> +    if (ret) {
->>> +        error_setg(errp, "Error saving global state");
->>> +        qemu_fclose(f);
->>> +        return;
->>> +    }
->>> +
->>> +    vm_stop(RUN_STATE_SAVE_VM);
->>> +
->>> +    ret = qemu_savevm_state(f, op, errp);
->>> +    if ((ret < 0) && !*errp) {
->>> +        error_setg(errp, "qemu_savevm_state failed");
->>> +    }
->>
->> just call qemu_save_device_state(f) there rather than introducing the
->> modes?
->> What you're doing is VERY similar to qmp_xen_save_devices_state and also
->> COLO's device state saving.
->>
->> (and also very similar to migration with the x-ignore-shared flag set).
+On Wed, 23 Sep 2020 04:54:15 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
+
+> Create mapped iova list when vIOMMU is enabled. For each mapped iova
+> save translated address. Add node to list on MAP and remove node from
+> list on UNMAP.
+> This list is used to track dirty pages during migration.
 > 
-> Good idea, calling qemu_save_device_state instead of qemu_savevm_state will factor
-> out the steps that are specific to migration.  I'll still need the mode, though,
-> to exclude savevm_block_handlers, and maybe for other reasons.  I'll try it.
-
-This works and is a keeper. I do not need mode to exclude savevm_block_handlers.  However, 
-I still need mode and mode_mask so my vfio vmstate handler is only applied for the VMS_RESTART
-mode.  I could instead iterate through the vfio devices and do something special on save
-and load, but the mode_mask is cleaner and could have more uses in the future.  Do you agree?
-
-- Steve 
-
->>> +    qemu_fclose(f);
->>> +
->>> +    if (op == VMS_REBOOT) {
->>> +        no_shutdown = 0;
->>> +        qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
->>> +    }
->>> +}
->>> +
-> [...]
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> ---
+>  hw/vfio/common.c              | 58 ++++++++++++++++++++++++++++++++++++++-----
+>  include/hw/vfio/vfio-common.h |  8 ++++++
+>  2 files changed, 60 insertions(+), 6 deletions(-)
 > 
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index d4959c036dd1..dc56cded2d95 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -407,8 +407,8 @@ static bool vfio_listener_skipped_section(MemoryRegionSection *section)
+>  }
+>  
+>  /* Called with rcu_read_lock held.  */
+> -static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
+> -                           bool *read_only)
+> +static bool vfio_get_xlat_addr(IOMMUTLBEntry *iotlb, void **vaddr,
+> +                               ram_addr_t *ram_addr, bool *read_only)
+>  {
+>      MemoryRegion *mr;
+>      hwaddr xlat;
+> @@ -439,8 +439,17 @@ static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
+>          return false;
+>      }
+>  
+> -    *vaddr = memory_region_get_ram_ptr(mr) + xlat;
+> -    *read_only = !writable || mr->readonly;
+> +    if (vaddr) {
+> +        *vaddr = memory_region_get_ram_ptr(mr) + xlat;
+> +    }
+> +
+> +    if (ram_addr) {
+> +        *ram_addr = memory_region_get_ram_addr(mr) + xlat;
+> +    }
+> +
+> +    if (read_only) {
+> +        *read_only = !writable || mr->readonly;
+> +    }
+>  
+>      return true;
+>  }
+> @@ -450,7 +459,6 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+>      VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
+>      VFIOContainer *container = giommu->container;
+>      hwaddr iova = iotlb->iova + giommu->iommu_offset;
+> -    bool read_only;
+>      void *vaddr;
+>      int ret;
+>  
+> @@ -466,7 +474,10 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+>      rcu_read_lock();
+>  
+>      if ((iotlb->perm & IOMMU_RW) != IOMMU_NONE) {
+> -        if (!vfio_get_vaddr(iotlb, &vaddr, &read_only)) {
+> +        ram_addr_t ram_addr;
+> +        bool read_only;
+> +
+> +        if (!vfio_get_xlat_addr(iotlb, &vaddr, &ram_addr, &read_only)) {
+>              goto out;
+>          }
+>          /*
+> @@ -484,8 +495,28 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+>                           "0x%"HWADDR_PRIx", %p) = %d (%m)",
+>                           container, iova,
+>                           iotlb->addr_mask + 1, vaddr, ret);
+> +        } else {
+> +            VFIOIovaRange *iova_range;
+> +
+> +            iova_range = g_malloc0(sizeof(*iova_range));
+> +            iova_range->iova = iova;
+> +            iova_range->size = iotlb->addr_mask + 1;
+> +            iova_range->ram_addr = ram_addr;
+> +
+> +            QLIST_INSERT_HEAD(&giommu->iova_list, iova_range, next);
+>          }
+>      } else {
+> +        VFIOIovaRange *iova_range, *tmp;
+> +
+> +        QLIST_FOREACH_SAFE(iova_range, &giommu->iova_list, next, tmp) {
+> +            if (iova_range->iova >= iova &&
+> +                iova_range->iova + iova_range->size <= iova +
+> +                                                       iotlb->addr_mask + 1) {
+> +                QLIST_REMOVE(iova_range, next);
+> +                g_free(iova_range);
+> +            }
+> +        }
+> +
+
+
+This is some pretty serious overhead... can't we trigger a replay when
+migration is enabled to build this information then?  We're looking at
+potentially thousands of entries, so a list is probably also not a good
+choice.  I don't think it's acceptable to incur this even when not
+migrating (ie. the vast majority of the time).  Thanks,
+
+Alex
+
+>          ret = vfio_dma_unmap(container, iova, iotlb->addr_mask + 1);
+>          if (ret) {
+>              error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
+> @@ -642,6 +673,7 @@ static void vfio_listener_region_add(MemoryListener *listener,
+>              g_free(giommu);
+>              goto fail;
+>          }
+> +        QLIST_INIT(&giommu->iova_list);
+>          QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
+>          memory_region_iommu_replay(giommu->iommu, &giommu->n);
+>  
+> @@ -740,6 +772,13 @@ static void vfio_listener_region_del(MemoryListener *listener,
+>          QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
+>              if (MEMORY_REGION(giommu->iommu) == section->mr &&
+>                  giommu->n.start == section->offset_within_region) {
+> +                VFIOIovaRange *iova_range, *tmp;
+> +
+> +                QLIST_FOREACH_SAFE(iova_range, &giommu->iova_list, next, tmp) {
+> +                    QLIST_REMOVE(iova_range, next);
+> +                    g_free(iova_range);
+> +                }
+> +
+>                  memory_region_unregister_iommu_notifier(section->mr,
+>                                                          &giommu->n);
+>                  QLIST_REMOVE(giommu, giommu_next);
+> @@ -1541,6 +1580,13 @@ static void vfio_disconnect_container(VFIOGroup *group)
+>          QLIST_REMOVE(container, next);
+>  
+>          QLIST_FOREACH_SAFE(giommu, &container->giommu_list, giommu_next, tmp) {
+> +            VFIOIovaRange *iova_range, *itmp;
+> +
+> +            QLIST_FOREACH_SAFE(iova_range, &giommu->iova_list, next, itmp) {
+> +                QLIST_REMOVE(iova_range, next);
+> +                g_free(iova_range);
+> +            }
+> +
+>              memory_region_unregister_iommu_notifier(
+>                      MEMORY_REGION(giommu->iommu), &giommu->n);
+>              QLIST_REMOVE(giommu, giommu_next);
+> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> index 0a1651eda2d0..aa7524fe2cc5 100644
+> --- a/include/hw/vfio/vfio-common.h
+> +++ b/include/hw/vfio/vfio-common.h
+> @@ -89,11 +89,19 @@ typedef struct VFIOContainer {
+>      QLIST_ENTRY(VFIOContainer) next;
+>  } VFIOContainer;
+>  
+> +typedef struct VFIOIovaRange {
+> +    hwaddr iova;
+> +    size_t size;
+> +    ram_addr_t ram_addr;
+> +    QLIST_ENTRY(VFIOIovaRange) next;
+> +} VFIOIovaRange;
+> +
+>  typedef struct VFIOGuestIOMMU {
+>      VFIOContainer *container;
+>      IOMMUMemoryRegion *iommu;
+>      hwaddr iommu_offset;
+>      IOMMUNotifier n;
+> +    QLIST_HEAD(, VFIOIovaRange) iova_list;
+>      QLIST_ENTRY(VFIOGuestIOMMU) giommu_next;
+>  } VFIOGuestIOMMU;
+>  
+
 
