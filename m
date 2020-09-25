@@ -7,65 +7,66 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF508C4727D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:17:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B5F6C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:20:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42B9221D7A
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:17:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A42162086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:20:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T+Ow4eFS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42B9221D7A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L7BK30se"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A42162086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLmfk-0007Ec-VB
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 08:17:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38414)
+	id 1kLmiT-0001Yb-Gj
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 08:20:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38492)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kLmWJ-0003fZ-1Q
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:08:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32654)
+ id 1kLmWT-0003oi-GC
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:08:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20363)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kLmWH-0004IX-0k
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:08:10 -0400
+ id 1kLmWN-0004J7-Ml
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:08:19 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601035688;
+ s=mimecast20190719; t=1601035694;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=C8kuCzwewug5ZS+IEH9Np5RTfbg3mae2wgdLl7KapEs=;
- b=T+Ow4eFSa/tP5nFz2SDTKdOu4lhdNgmfrL0pQcAK/73Tb4UEIaKBlpJBS//8+UMKUBdD/F
- 40OXVResaZGRL8YL8au4vL3BRc2WleMLGsSHn3rgcJCD7hVDGDZScDNEFyrohkNa+zJ3RK
- PZRnI0TUFqjrFrBZzfph3zyu5jHL6H0=
+ bh=qJcE2eKX4MSRYIivfXLil9oVYKvuM5PqU9DzpHd1rCw=;
+ b=L7BK30seZc45QSS/OKR9xPVoCKm15DKBalk4M0E9i1RBJFUURa7hPShxx4Oy/SzYYtBOPF
+ xvk7nJevZBj5ZrhhfUwxsgV4ymFD8wKX2+ZRpKaqTDmgdk/ZRbvuTadmG4ggNLd67E3suE
+ M+wBvPxrthqTasoWabGJk+1d2rgyW4c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-130-4Nh1OWgDOa6u5ML4JSrMIA-1; Fri, 25 Sep 2020 08:08:05 -0400
-X-MC-Unique: 4Nh1OWgDOa6u5ML4JSrMIA-1
+ us-mta-250-mWJxMNN1O9qRroVteRP5DQ-1; Fri, 25 Sep 2020 08:08:11 -0400
+X-MC-Unique: mWJxMNN1O9qRroVteRP5DQ-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8DE16186DD42;
- Fri, 25 Sep 2020 12:08:04 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C3301805EE4;
+ Fri, 25 Sep 2020 12:08:09 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-114-177.ams2.redhat.com
  [10.36.114.177])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 67D2E73697;
- Fri, 25 Sep 2020 12:07:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7912773693;
+ Fri, 25 Sep 2020 12:08:07 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, zhengchuan@huawei.com, dovmurik@linux.vnet.ibm.com,
  hgcoin@gmail.com, zhangjiachen.jaycee@bytedance.com, lvivier@redhat.com,
  peterx@redhat.com, stefanha@redhat.com, vgoyal@redhat.com,
  jinyan12@huawei.com, ann.zhuangyanying@huawei.com
-Subject: [PULL 16/26] migration: increase max-bandwidth to 128 MiB/s (1 Gib/s)
-Date: Fri, 25 Sep 2020 13:06:45 +0100
-Message-Id: <20200925120655.295142-17-dgilbert@redhat.com>
+Subject: [PULL 18/26] migration/tls: extract migration_tls_client_create for
+ common-use
+Date: Fri, 25 Sep 2020 13:06:47 +0100
+Message-Id: <20200925120655.295142-19-dgilbert@redhat.com>
 In-Reply-To: <20200925120655.295142-1-dgilbert@redhat.com>
 References: <20200925120655.295142-1-dgilbert@redhat.com>
 MIME-Version: 1.0
@@ -74,8 +75,8 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 01:07:33
@@ -104,38 +105,105 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Laurent Vivier <lvivier@redhat.com>
+From: Chuan Zheng <zhengchuan@huawei.com>
 
-max-bandwidth is set by default to 32 MiB/s (256 Mib/s)
-since 2008 (5bb7910af031c).
+migration_tls_client_create will be used in multifd-tls, let's
+extract it.
 
-Most of the CPUs can dirty memory faster than that now,
-and this is clearly a problem with POWER where the page
-size is 64 kiB and not 4 KiB.
-
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-Message-Id: <20200921144957.979989-1-lvivier@redhat.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
+Signed-off-by: Yan Jin <jinyan12@huawei.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Message-Id: <1600139042-104593-3-git-send-email-zhengchuan@huawei.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/migration.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ migration/tls.c | 26 ++++++++++++++++++--------
+ migration/tls.h |  6 ++++++
+ 2 files changed, 24 insertions(+), 8 deletions(-)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 827f8be07d..de34c995af 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -57,7 +57,7 @@
- #include "qemu/queue.h"
- #include "multifd.h"
+diff --git a/migration/tls.c b/migration/tls.c
+index 8fbf9ac796..66c6f43221 100644
+--- a/migration/tls.c
++++ b/migration/tls.c
+@@ -22,7 +22,6 @@
+ #include "channel.h"
+ #include "migration.h"
+ #include "tls.h"
+-#include "io/channel-tls.h"
+ #include "crypto/tlscreds.h"
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
+@@ -125,11 +124,10 @@ static void migration_tls_outgoing_handshake(QIOTask *task,
+     object_unref(OBJECT(ioc));
+ }
  
--#define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed throttling */
-+#define MAX_THROTTLE  (128 << 20)      /* Migration transfer speed throttling */
+-
+-void migration_tls_channel_connect(MigrationState *s,
+-                                   QIOChannel *ioc,
+-                                   const char *hostname,
+-                                   Error **errp)
++QIOChannelTLS *migration_tls_client_create(MigrationState *s,
++                                           QIOChannel *ioc,
++                                           const char *hostname,
++                                           Error **errp)
+ {
+     QCryptoTLSCreds *creds;
+     QIOChannelTLS *tioc;
+@@ -137,7 +135,7 @@ void migration_tls_channel_connect(MigrationState *s,
+     creds = migration_tls_get_creds(
+         s, QCRYPTO_TLS_CREDS_ENDPOINT_CLIENT, errp);
+     if (!creds) {
+-        return;
++        return NULL;
+     }
  
- /* Amount of time to allocate to each "chunk" of bandwidth-throttled
-  * data. */
+     if (s->parameters.tls_hostname && *s->parameters.tls_hostname) {
+@@ -145,11 +143,23 @@ void migration_tls_channel_connect(MigrationState *s,
+     }
+     if (!hostname) {
+         error_setg(errp, "No hostname available for TLS");
+-        return;
++        return NULL;
+     }
+ 
+     tioc = qio_channel_tls_new_client(
+         ioc, creds, hostname, errp);
++
++    return tioc;
++}
++
++void migration_tls_channel_connect(MigrationState *s,
++                                   QIOChannel *ioc,
++                                   const char *hostname,
++                                   Error **errp)
++{
++    QIOChannelTLS *tioc;
++
++    tioc = migration_tls_client_create(s, ioc, hostname, errp);
+     if (!tioc) {
+         return;
+     }
+diff --git a/migration/tls.h b/migration/tls.h
+index cdd70001ed..0cfbe368ba 100644
+--- a/migration/tls.h
++++ b/migration/tls.h
+@@ -22,11 +22,17 @@
+ #define QEMU_MIGRATION_TLS_H
+ 
+ #include "io/channel.h"
++#include "io/channel-tls.h"
+ 
+ void migration_tls_channel_process_incoming(MigrationState *s,
+                                             QIOChannel *ioc,
+                                             Error **errp);
+ 
++QIOChannelTLS *migration_tls_client_create(MigrationState *s,
++                                           QIOChannel *ioc,
++                                           const char *hostname,
++                                           Error **errp);
++
+ void migration_tls_channel_connect(MigrationState *s,
+                                    QIOChannel *ioc,
+                                    const char *hostname,
 -- 
 2.26.2
 
