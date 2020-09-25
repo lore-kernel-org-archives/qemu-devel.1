@@ -2,88 +2,115 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15C90C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 07:01:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F99DC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 07:11:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7897D221EB
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 07:01:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C0AA120759
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 07:11:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IzfLYlWP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7897D221EB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fpH1lZmj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0AA120759
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLhjU-0003tJ-GG
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 03:01:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55406)
+	id 1kLhtH-0005qu-Ff
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 03:11:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57414)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kLhie-0003S4-9z
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 03:00:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56571)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kLhsT-0005QB-Bh
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 03:10:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38910)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kLhib-0000Mj-Tm
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 03:00:35 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kLhsQ-0001PK-4H
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 03:10:44 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601017232;
+ s=mimecast20190719; t=1601017840;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=vixRQTLZ6Tslsdjrmu1+jlH7ir1FwEeMqzq6AKOdyUE=;
- b=IzfLYlWPSg9CbqrKiT1PY85oSuGwuVB77oxgQCJeMHS5wV7Vhz4AmB7M4C2DfMHm+MKzif
- /u56XFy5a7+Z8XGYHP3gz9qfQOwINBPWy+e3hpocRv0ymVxDzNzZwUvSgDwFfa9XUGZ5a0
- P8Rwu87WEU7E80cHh3BfyPM2w0iRVFE=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=stmNxtjcfLRxBg8lM5ZUzn3WT2iTopqtVzVW5tNeZRU=;
+ b=fpH1lZmjVM3mVPWedSBOSXBl4QJNTCMSY4IOqbLIC4/SQkr+Q8WIPXmDnc8ftlXsRSMqQh
+ FGwcz6whMXrsZaRbvelrTnPtUcM2xYPAPGJoG4UgBezVfcXsiLeW+/7BEOmnALBr//+srU
+ UByiczBzDM2KViRbFZQrL3Byz9R6eRw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-521-34D7iWb5PEO-AsFTsYipiw-1; Fri, 25 Sep 2020 03:00:28 -0400
-X-MC-Unique: 34D7iWb5PEO-AsFTsYipiw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-153-PbTPHVVsMImYlZpUn0kWEQ-1; Fri, 25 Sep 2020 03:10:38 -0400
+X-MC-Unique: PbTPHVVsMImYlZpUn0kWEQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D608488EF0D;
- Fri, 25 Sep 2020 07:00:25 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-112-178.ams2.redhat.com
- [10.36.112.178])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EB8875D9F3;
- Fri, 25 Sep 2020 07:00:05 +0000 (UTC)
-Subject: Re: [PATCH v5] hw/i386/pc: add max combined fw size as machine
- configuration option
-To: Erich Mcmillan <erich.mcmillan@hp.com>, qemu-devel@nongnu.org
-References: <20200925033623.3968-1-erich.mcmillan@hp.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <8818a3ae-cab6-5de4-adbd-19198d26b6e7@redhat.com>
-Date: Fri, 25 Sep 2020 09:00:04 +0200
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D9CF100945A;
+ Fri, 25 Sep 2020 07:10:36 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-113.ams2.redhat.com
+ [10.36.113.113])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5795A1A918;
+ Fri, 25 Sep 2020 07:10:27 +0000 (UTC)
+Subject: Re: [PATCH v6 10/15] iotests: qemu_io_silent: support --image-opts
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200918181951.21752-1-vsementsov@virtuozzo.com>
+ <20200918181951.21752-11-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <3b535df7-6987-6b0b-3a13-1ef76f0afa57@redhat.com>
+Date: Fri, 25 Sep 2020 09:10:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200925033623.3968-1-erich.mcmillan@hp.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200918181951.21752-11-vsementsov@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lersek@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=lersek@redhat.com;
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="zRFgdnQXKkxZtM28PSG8NWW6dNXotSaaC"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mreitz@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 02:48:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -32
-X-Spam_score: -3.3
+X-Spam_score_int: -34
+X-Spam_score: -3.5
 X-Spam_bar: ---
-X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
+X-Spam_report: (-3.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.214, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,216 +123,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: imammedo@redhat.com, kraxel@redhat.com, dgilbert@redhat.com, mst@redhat.com
+Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Erich,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--zRFgdnQXKkxZtM28PSG8NWW6dNXotSaaC
+Content-Type: multipart/mixed; boundary="3F4WVd9j30fQHGJrrA0M73pM84Q9SnijV"
 
-when processing review feedback, please pay attention to *where* the
-review comments are inserted, in response to your patch email.
+--3F4WVd9j30fQHGJrrA0M73pM84Q9SnijV
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-I'm pointing this out not because I want to annoy you with my
-obsessions, but because I consider this discussion a kind of "git +
-mailing lists" training for you. (In accordance with your first message
-on the topic.)
-
-Please see specifics below:
-
-On 09/25/20 05:36, Erich Mcmillan wrote:
-> From: Erich McMillan <erich.mcmillan@hp.com>
-> 
-> At HPi we have a need for increased fw size to enable testing of our custom fw.
-> 
-> Signed-off-by: Erich McMillan <erich.mcmillan@hp.com>
-> 
-> Change since v4:
->      Add explicit return to pc_machine_set_max_fw_size.
->      Remove /* default */ from max_fw_size initialization.
+On 18.09.20 20:19, Vladimir Sementsov-Ogievskiy wrote:
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
-> 
->  hw/i386/pc.c         | 52 ++++++++++++++++++++++++++++++++++++++++++++
->  hw/i386/pc_sysfw.c   | 13 ++---------
->  include/hw/i386/pc.h |  2 ++
->  3 files changed, 56 insertions(+), 11 deletions(-)
+>  tests/qemu-iotests/iotests.py | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
 
-Please refer to my earlier feedback, archived at the following location:
-
-http://mid.mail-archive.com/8fdbf9f1-5125-1c39-4ec7-f99f017d4345@redhat.com
-
-As I say in that message, the v(n)->v(n+1) changelog belongs 'between
-the "---" separator and the diffstat'. In that message, I marked the
-specific location with [*].
-
-Basically the "---" separator terminates the commit message, and the
-first "diff --git" line starts the code changes. What's between them is
-thrown away, when the patch is applied. So in that throwaway area,
-git-format-patch places the diffstat automatically (because it gives
-reviewers a helpful overview of the patch, but is not useful for patch
-application). And that's also the area where the v(n)->v(n+1) changelog
-should be included. Traditionally, we place that log above the diffstat.
-
-> 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index d11daacc23..6e66cbbc41 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1869,6 +1869,51 @@ static void pc_machine_set_max_ram_below_4g(Object *obj, Visitor *v,
->      pcms->max_ram_below_4g = value;
->  }
->  
-> +static void pc_machine_get_max_fw_size(Object *obj, Visitor *v,
-> +                                       const char *name, void *opaque,
-> +                                       Error **errp)
-> +{
-> +    PCMachineState *pcms = PC_MACHINE(obj);
-> +    uint64_t value = pcms->max_fw_size;
-> +
-> +    visit_type_size(v, name, &value, errp);
-> +}
-> +
-> +static void pc_machine_set_max_fw_size(Object *obj, Visitor *v,
-> +                                       const char *name, void *opaque,
-> +                                       Error **errp)
-> +{
-> +    PCMachineState *pcms = PC_MACHINE(obj);
-> +    Error *error = NULL;
-> +    uint64_t value;
-> +
-> +    visit_type_size(v, name, &value, &error);
-> +    if (error) {
-> +        error_propagate(errp, error);
-> +        return;
-> +    }
-> +
-> +    /*
-> +    * We don't have a theoretically justifiable exact lower bound on the base
-> +    * address of any flash mapping. In practice, the IO-APIC MMIO range is
-> +    * [0xFEE00000..0xFEE01000] -- see IO_APIC_DEFAULT_ADDRESS --, leaving free
-> +    * only 18MB-4KB below 4G. For now, restrict the cumulative mapping to 8MB in
-> +    * size.
-> +    */
-> +    if (value > 16 * MiB) {
-> +        error_setg(errp,
-> +                   "User specified max allowed firmware size %" PRIu64 " is "
-> +                   "greater than 16MiB. If combined firwmare size exceeds "
-> +                   "16MiB the system may not boot, or experience intermittent"
-> +                   "stability issues.",
-> +                   value);
-> +    }
-> +
-> +    pcms->max_fw_size = value;
-> +
-> +    return;
-> +}
-
-This return statement is useless. Please see my review at:
-
-http://mid.mail-archive.com/de343c71-f446-c68b-d0bc-5f9db97b5a00@redhat.com
-
-There I wrote, 'Please put a "return" statement here'. And, my request
-was placed *exactly between* the error_setg() call and the closing brace.
-
-The idea being that, if we take the (value > 16 * MiB) branch, then yes
-we need to set the error, but we also need to abandon the rest of the
-function. If "value" is invalid (out of bounds), then "pcms->max_fw_size
-= value" is exactly the assignment that we do *not* want to reach.
-
-> +
->  static void pc_machine_initfn(Object *obj)
->  {
->      PCMachineState *pcms = PC_MACHINE(obj);
-> @@ -1884,6 +1929,7 @@ static void pc_machine_initfn(Object *obj)
->      pcms->smbus_enabled = true;
->      pcms->sata_enabled = true;
->      pcms->pit_enabled = true;
-> +    pcms->max_fw_size = 8 * MiB;
-
-Thank you for dropping the comment.
-
-Summary:
-
-- the changelog is helpful (thanks!), it's placement is not perfect yet
-- the return statement should be moved so that it terminate the (value >
-16 * MiB) branch.
-
-Also, I think "HPi" (rather than "HP") in the commit message *could* be
-a typo (I'm not sure).
-
-Thanks,
-Laszlo
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
->  
->      pc_system_flash_create(pcms);
->      pcms->pcspk = isa_new(TYPE_PC_SPEAKER);
-> @@ -2004,6 +2050,12 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
->  
->      object_class_property_add_bool(oc, PC_MACHINE_PIT,
->          pc_machine_get_pit, pc_machine_set_pit);
-> +
-> +    object_class_property_add(oc, PC_MACHINE_MAX_FW_SIZE, "size",
-> +        pc_machine_get_max_fw_size, pc_machine_set_max_fw_size,
-> +        NULL, NULL);
-> +    object_class_property_set_description(oc, PC_MACHINE_MAX_FW_SIZE,
-> +        "Maximum combined firmware size");
->  }
->  
->  static const TypeInfo pc_machine_info = {
-> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-> index b6c0822fe3..22450ba0ef 100644
-> --- a/hw/i386/pc_sysfw.c
-> +++ b/hw/i386/pc_sysfw.c
-> @@ -39,15 +39,6 @@
->  #include "hw/block/flash.h"
->  #include "sysemu/kvm.h"
->  
-> -/*
-> - * We don't have a theoretically justifiable exact lower bound on the base
-> - * address of any flash mapping. In practice, the IO-APIC MMIO range is
-> - * [0xFEE00000..0xFEE01000] -- see IO_APIC_DEFAULT_ADDRESS --, leaving free
-> - * only 18MB-4KB below 4G. For now, restrict the cumulative mapping to 8MB in
-> - * size.
-> - */
-> -#define FLASH_SIZE_LIMIT (8 * MiB)
-> -
->  #define FLASH_SECTOR_SIZE 4096
->  
->  static void pc_isa_bios_init(MemoryRegion *rom_memory,
-> @@ -182,10 +173,10 @@ static void pc_system_flash_map(PCMachineState *pcms,
->          }
->          if ((hwaddr)size != size
->              || total_size > HWADDR_MAX - size
-> -            || total_size + size > FLASH_SIZE_LIMIT) {
-> +            || total_size + size > pcms->max_fw_size) {
->              error_report("combined size of system firmware exceeds "
->                           "%" PRIu64 " bytes",
-> -                         FLASH_SIZE_LIMIT);
-> +                         pcms->max_fw_size);
->              exit(1);
->          }
->  
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index fe52e165b2..f7c8e7cbfe 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -43,6 +43,7 @@ struct PCMachineState {
->      bool smbus_enabled;
->      bool sata_enabled;
->      bool pit_enabled;
-> +    uint64_t max_fw_size;
->  
->      /* NUMA information: */
->      uint64_t numa_nodes;
-> @@ -59,6 +60,7 @@ struct PCMachineState {
->  #define PC_MACHINE_SMBUS            "smbus"
->  #define PC_MACHINE_SATA             "sata"
->  #define PC_MACHINE_PIT              "pit"
-> +#define PC_MACHINE_MAX_FW_SIZE      "max-fw-size"
->  
->  /**
->   * PCMachineClass:
-> 
+--3F4WVd9j30fQHGJrrA0M73pM84Q9SnijV--
+
+--zRFgdnQXKkxZtM28PSG8NWW6dNXotSaaC
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9tl+IACgkQ9AfbAGHV
+z0CnkQgAjOGotIgrcTsVLrXE3W9SUH9AXbk8xwFLrlRNc8rFkyTEIeaYigvs2pCl
+CjuGJWMZRBO8wjj5NeU7KnuCgjhF/A4U13ZYZ6Me/z7gYZxkW56ZzgKLRhra8/Qa
+1sZ74uR1VlVGuiMixdGPOvLEoqKnTv2p+14nDnCB9UPaIK9L0LTsq5ovD5kYbbNR
+FEYxihdpl50L6XHidIftYX6YSU0jZMI6Bgkh3FrdxLwIaQsyojFyXvFHSmtKvLpT
+dIxP6wP9WjVVUzMOK5uiQFRodOAbbT0hR+FlAsiLPA/APYCiQ2s/7nrShc40Qaqu
+NK+OBB/EXjTU4cpK4yHVd+KKlMQ7lw==
+=YCcE
+-----END PGP SIGNATURE-----
+
+--zRFgdnQXKkxZtM28PSG8NWW6dNXotSaaC--
 
 
