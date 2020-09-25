@@ -2,79 +2,82 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBA8CC4727D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:31:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A597C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:32:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1EA2E21D91
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:31:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AB13B21D7A
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:32:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LxSAP/43"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EA2E21D91
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J49+MyEc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB13B21D7A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLmtG-0004zn-24
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 08:31:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40376)
+	id 1kLmu4-0005YN-JE
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 08:32:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40632)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kLmfv-0007w4-5s
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:18:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25474)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kLmhl-0001Ms-46
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:20:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27709)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kLmfq-0005XE-GE
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:18:05 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kLmhj-0005d9-Bo
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:20:00 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601036280;
+ s=mimecast20190719; t=1601036398;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=jzeOKpIbd3NUhX/0798vLoI+Bqi7GTZEs9FfYYX5t/g=;
- b=LxSAP/43Dmy5TTBVwL1PGCkpU46CNU+VC06TmPPwVrSjzKn8qAqzxjWYf34VPKBEy4rrDz
- whkRfRw7OjX2a2fnIEs71Ym78DF7TQzKF/AmSG3jkBQzp5Rz7Pq9GRyD1ozYSCWQYH2znI
- tR6g7x0Xpg3uOiql6oq/UUpT+SkNhAw=
+ bh=ZEH6VI9EZI0WB7IP/xooniTqfZZCAukTQa6Rslmvrs4=;
+ b=J49+MyEcnXsK4+wIper3ZRLsnHhcE7Yz4LRkZnmtE7f0WQ8PbtpBS/tjcAOCS7ptCvEqAr
+ vEdIzzNXyeENoBUZYRAFHbn0tC1KFadYyWRpYhf2s1PmIfkS3ECbQio62JLzWZ52bzCZ7h
+ cSg8Cd3JYDflMKGiU6qh/0Eoungwn2Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-508-CJDqexMBOYyLTp_wZ63Wow-1; Fri, 25 Sep 2020 08:17:56 -0400
-X-MC-Unique: CJDqexMBOYyLTp_wZ63Wow-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-325-dorw4QlwMU-4oqHqlWWmLQ-1; Fri, 25 Sep 2020 08:19:56 -0400
+X-MC-Unique: dorw4QlwMU-4oqHqlWWmLQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70DD51882FA1;
- Fri, 25 Sep 2020 12:17:54 +0000 (UTC)
-Received: from gondolin (ovpn-112-192.ams2.redhat.com [10.36.112.192])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 20C2373694;
- Fri, 25 Sep 2020 12:17:40 +0000 (UTC)
-Date: Fri, 25 Sep 2020 14:17:38 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH v26 16/17] vfio: Make vfio-pci device migration capable
-Message-ID: <20200925141738.34c8f4e7.cohuck@redhat.com>
-In-Reply-To: <1600817059-26721-17-git-send-email-kwankhede@nvidia.com>
-References: <1600817059-26721-1-git-send-email-kwankhede@nvidia.com>
- <1600817059-26721-17-git-send-email-kwankhede@nvidia.com>
-Organization: Red Hat GmbH
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8820C802EA3;
+ Fri, 25 Sep 2020 12:19:54 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-70.ams2.redhat.com
+ [10.36.112.70])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5827060C07;
+ Fri, 25 Sep 2020 12:19:54 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id D5FC4113865F; Fri, 25 Sep 2020 14:19:52 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH v2 18/38] qapi/events.py: Move comments into docstrings
+References: <20200922210101.4081073-1-jsnow@redhat.com>
+ <20200922210101.4081073-19-jsnow@redhat.com>
+ <20200923144819.GE3312949@habkost.net>
+Date: Fri, 25 Sep 2020 14:19:52 +0200
+In-Reply-To: <20200923144819.GE3312949@habkost.net> (Eduardo Habkost's message
+ of "Wed, 23 Sep 2020 10:48:19 -0400")
+Message-ID: <87k0wit5ef.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=cohuck@redhat.com;
+Content-Type: text/plain
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 01:07:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 02:48:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -32
 X-Spam_score: -3.3
@@ -95,37 +98,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cjia@nvidia.com, aik@ozlabs.ru, Zhengxiao.zx@Alibaba-inc.com,
- shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, peterx@redhat.com,
- eauger@redhat.com, yi.l.liu@intel.com, quintela@redhat.com,
- ziye.yang@intel.com, armbru@redhat.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, felipe@nutanix.com, zhi.a.wang@intel.com,
- kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
- alex.williamson@redhat.com, changpeng.liu@intel.com, eskultet@redhat.com,
- Ken.Xue@amd.com, jonathan.davies@nutanix.com, pbonzini@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 23 Sep 2020 04:54:18 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-> If the device is not a failover primary device, call
-> vfio_migration_probe() and vfio_migration_finalize() to enable
-> migration support for those devices that support it respectively to
-> tear it down again.
-> Removed vfio_pci_vmstate structure.
-> Removed migration blocker from VFIO PCI device specific structure and use
-> migration blocker from generic structure of  VFIO device.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  hw/vfio/pci.c | 28 ++++++++--------------------
->  hw/vfio/pci.h |  1 -
->  2 files changed, 8 insertions(+), 21 deletions(-)
+> On Tue, Sep 22, 2020 at 05:00:41PM -0400, John Snow wrote:
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  scripts/qapi/events.py | 4 +++-
+>>  1 file changed, 3 insertions(+), 1 deletion(-)
+>> 
+>> diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
+>> index 00a9513c16..e859fd7a52 100644
+>> --- a/scripts/qapi/events.py
+>> +++ b/scripts/qapi/events.py
+>> @@ -52,8 +52,10 @@ def gen_event_send_decl(name: str,
+>>                   proto=build_event_send_proto(name, arg_type, boxed))
+>>  
+>>  
+>> -# Declare and initialize an object 'qapi' using parameters from build_params()
+>>  def gen_param_var(typ: QAPISchemaObjectType) -> str:
+>> +    """
+>> +    Declare and initialize a qapi object, using parameters from `build_params`.
+>
+> The mention of "object 'qapi'" is gone, and this seems correct
+> because there's no object called 'qapi' anywhere in this
+> function.  So:
+>
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>
+> Comments/questions for follow up patches, because it's beyond the
+> scope of this series:
+>
+> - Was the doc string supposed to say "an object 'param'" instead
+>   of "an object 'qapi'", as that's the name of the variable it
+>   declares?
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Checking history... yes.  The variable was renamed from @qapi to @param
+during review.
+
+> - The "using parameters from build_params()" part was confusing to
+>   me.  I thought it meant gen_param_var() would call build_params().
+>   I took a while to notice it actually meant "using the C
+>   function parameters that were previously declared using
+>   build_params() at build_event_send_proto()".  I don't know
+>   how we could make it clearer.
+
+What about:
+
+    Generate a QAPI struct variable holding the event parameters,
+    initialized with the function's arguments.
+
+>> +    """
+>>      assert not typ.variants
+>>      ret = mcgen('''
+>>      %(c_name)s param = {
+>> -- 
+>> 2.26.2
+>> 
 
 
