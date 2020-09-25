@@ -2,97 +2,79 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C73C0C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 14:44:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C633C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 14:47:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 188E021D42
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 14:44:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E20C32074B
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 14:47:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="spSRXJqz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 188E021D42
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=euphon.net header.i=fam@euphon.net header.b="MGKWMvXT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E20C32074B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=euphon.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLoxM-0004cD-VP
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 10:44:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48862)
+	id 1kLp0g-00073G-WC
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 10:47:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49040)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kLowF-0003Mz-CI; Fri, 25 Sep 2020 10:43:07 -0400
-Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:34870)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kLowC-0007gs-KP; Fri, 25 Sep 2020 10:43:07 -0400
-Received: by mail-qk1-x741.google.com with SMTP id q5so3008500qkc.2;
- Fri, 25 Sep 2020 07:43:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=B3j0sC/wOfQbY9BdEkm7z0TbVwmzg8Rz923IXeqG4/Y=;
- b=spSRXJqzSqsOuJq2I7V9UVRitR5v5Gdwty7vYSVDEhG907TqTkTuKPBklH1z3swZsl
- GWJJw6CdSVvi0ZQEBNhTX0uUzQyfI1ENChMx/0cArAPIKbTjUqI8tbZlNdi6b4lM8vwn
- O84ziu+loeVtAvHDWByCAJoLE0flA8rt2PRNYwrqEM5QpKS41z2+byOHUqiVITAhl+aS
- oIq5KGnFyFZ3Mw+sWJohGmOvOlTJIm1ZoMDs4PGMC+VB08aMrCKBC+VRLtIVLthoryv8
- uFomX1mkf+fONUjpR1UUynIeeJXZnzfbpZcKVv4uc+dVA9Clxn67gDuhaDfvV3y3QVYt
- 1YRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=B3j0sC/wOfQbY9BdEkm7z0TbVwmzg8Rz923IXeqG4/Y=;
- b=oF9FjOU+fr9bMYBVNIlJTMZYcJCsoU+ukgbpaZZ9SobvNlENOHm7lni3usGAwHoXkf
- wJj6hIUM8+nNEHr4Ugh+Wna/C/UwIcEe75tOcBi4aVyLh62zM5vvuM1SyPWe0DhmZDJn
- vyHRhqdIOE26CLg+kcdWpxArztr8frjxX6Hcc92KlvRDugEXsHOgaROzujweuZ9vvMUD
- yg0jn9IKZBDBAOdKzfy+Rh2RiXGa75UC+cY9+BjXQLB6kF0uKnFYW0wwE2QtEl2xhdLj
- vcgLSzHa0rnIPM+nSml2pLCxwEq4cFRhWF3it3bg+zAXHOknAFuzRrFYNG2/47vLvnVE
- ekWw==
-X-Gm-Message-State: AOAM531LpABQO5m0yHYdpMFLV3UlbaryRxSQJZYHGju99O8sXCOPAFDR
- y4FQOSrtm9ZtfwkDj3cWlbg=
-X-Google-Smtp-Source: ABdhPJxD7vkwId9ToMZ9uNUif70zZdNCnoZCGN/fOWo3LkgupnMsQdY5CrOaIxddrqXbm7+MlS+d4g==
-X-Received: by 2002:ae9:eb57:: with SMTP id b84mr308099qkg.450.1601044982942; 
- Fri, 25 Sep 2020 07:43:02 -0700 (PDT)
-Received: from ?IPv6:2804:431:c7c7:c625:6c0e:4720:8228:5f68?
- ([2804:431:c7c7:c625:6c0e:4720:8228:5f68])
- by smtp.gmail.com with ESMTPSA id d10sm1817764qkk.1.2020.09.25.07.43.00
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 25 Sep 2020 07:43:01 -0700 (PDT)
-Subject: Re: [PATCH v2 5/6] spapr_numa: consider user input when defining
- associativity
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20200924195058.362984-1-danielhb413@gmail.com>
- <20200924195058.362984-6-danielhb413@gmail.com>
- <20200925033945.GT2298@yekko.fritz.box>
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-ID: <9809a86e-d54e-507c-b9fa-74c4b66b2ed2@gmail.com>
-Date: Fri, 25 Sep 2020 11:42:55 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <fam@euphon.net>)
+ id 1kLoxD-0004fW-5g; Fri, 25 Sep 2020 10:44:07 -0400
+Received: from sender2-op-o12.zoho.com.cn ([163.53.93.243]:17667)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <fam@euphon.net>)
+ id 1kLox8-0007ln-9m; Fri, 25 Sep 2020 10:44:06 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1601045000; cv=none; d=zoho.com.cn; s=zohoarc; 
+ b=qN28VKhlrgkf3TeaJNk1vklm82IFskZcnxAqzbBkX15Pfqi/tj4UDkoEZv/W/qmeuxRdHsqnolb/u7E8/8Ukws5z+5b5fCcmYJ2gzJuOxHDMek2sVbKiYl+E3HMsga+/hzEr2N3akE7IFeus9Z2KtWF2UohOftfY5IdLqcrpcgo=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com.cn;
+ s=zohoarc; t=1601045000;
+ h=Content-Type:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To;
+ bh=sjXskkK9xFDvpdDbRGKHrfLJXfZrRFUl5CRx/1qEXVQ=; 
+ b=o6BjmqMppT8otAHnrF0biLPTnBn217ySHlJyN98fGrBzbFi0TS7GYI4pfjbUwYikeamWjyOupqwZl3YcsvmQ6z80LSToCyrZNOSRVipUITGWVLstYA22slgQw1A1b7ZPsgtLNNt1Ch9+BzFX+yTvTGiFraftk7qwTxg7zK8ePUU=
+ARC-Authentication-Results: i=1; mx.zoho.com.cn;
+ dkim=pass  header.i=euphon.net;
+ spf=pass  smtp.mailfrom=fam@euphon.net;
+ dmarc=pass header.from=<fam@euphon.net> header.from=<fam@euphon.net>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1601045000; 
+ s=zoho; d=euphon.net; i=fam@euphon.net;
+ h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:In-Reply-To;
+ bh=sjXskkK9xFDvpdDbRGKHrfLJXfZrRFUl5CRx/1qEXVQ=;
+ b=MGKWMvXT1FOEVCC3m+Zb8rrLBDPANtJFnV1V50wwGkpYO1pQNjHDIXBqvF7U9/As
+ Nx+MlrijhD+L3mireiei8sv/rPF/hgE8M8sAJy+X5GXZTrULltFaGQ3EaQKNDs/Hdli
+ jTTiIQMAQZaTsib3LDuVbLdNKyjFdzZgg6uWCFAE=
+Received: from localhost (ec2-52-56-101-76.eu-west-2.compute.amazonaws.com
+ [52.56.101.76]) by mx.zoho.com.cn
+ with SMTPS id 1601044996788584.885787622021;
+ Fri, 25 Sep 2020 22:43:16 +0800 (CST)
+Date: Fri, 25 Sep 2020 15:43:07 +0100
+From: Fam Zheng <fam@euphon.net>
+To: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [RFC 1/3] util/vfio-helpers: Collect IOVA reserved regions
+Message-ID: <20200925144307.GA3809989@dev>
+References: <20200925134845.21053-1-eric.auger@redhat.com>
+ <20200925134845.21053-2-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200925033945.GT2298@yekko.fritz.box>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::741;
- envelope-from=danielhb413@gmail.com; helo=mail-qk1-x741.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200925134845.21053-2-eric.auger@redhat.com>
+X-ZohoCNMailClient: External
+Received-SPF: pass client-ip=163.53.93.243; envelope-from=fam@euphon.net;
+ helo=sender2-op-o12.zoho.com.cn
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 10:43:47
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, NICE_REPLY_A=-0.238,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -107,338 +89,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org
+Cc: lvivier@redhat.com, kwolf@redhat.com, cohuck@redhat.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com, alex.williamson@redhat.com,
+ qemu-arm@nongnu.org, stefanha@redhat.com, philmd@redhat.com,
+ eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 9/25/20 12:39 AM, David Gibson wrote:
-> On Thu, Sep 24, 2020 at 04:50:57PM -0300, Daniel Henrique Barboza wrote:
->> This patch puts all the pieces together to finally allow user
->> input when defining the NUMA topology of the spapr guest.
->>
->> We have one more kernel restriction to handle in this patch:
->> the associativity array of node 0 must be filled with zeroes
->> [1]. The strategy below ensures that this will happen.
+On 2020-09-25 15:48, Eric Auger wrote:
+> The IOVA allocator currently ignores host reserved regions.
+> As a result some chosen IOVAs may collide with some of them,
+> resulting in VFIO MAP_DMA errors later on. This happens on ARM
+> where the MSI reserved window quickly is encountered:
+> [0x8000000, 0x8100000]. since 5.4 kernel, VFIO returns the usable
+> IOVA regions. So let's enumerate them in the prospect to avoid
+> them, later on.
 > 
-> Can you clarify exactly what "node 0" means?  Qemu and the guest
-> kernel each have node numberings, which I don't think are necessarily
-> the same.  With PAPR's scheme, it's not totally clear what "node 0"
-> even means.
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  util/vfio-helpers.c | 75 +++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 73 insertions(+), 2 deletions(-)
 > 
->> spapr_numa_define_associativity_domains() will read the distance
->> (already PAPRified) between the nodes from numa_state and determine
->> the appropriate NUMA level. The NUMA domains, processed in ascending
->> order, are going to be matched via NUMA levels, and the lowest
->> associativity domain value is assigned to that specific level for
->> both.
->>
->> This will create an heuristic where the associativities of the first
->> nodes have higher priority and are re-used in new matches, instead of
->> overwriting them with a new associativity match. This is necessary
->> because neither QEMU, nor the pSeries kernel, supports multiple
->> associativity domains for each resource, meaning that we have to
->> decide which associativity relation is relevant.
+> diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
+> index 583bdfb36f..8e91beba95 100644
+> --- a/util/vfio-helpers.c
+> +++ b/util/vfio-helpers.c
+> @@ -40,6 +40,11 @@ typedef struct {
+>      uint64_t iova;
+>  } IOVAMapping;
+>  
+> +struct IOVARange {
+> +    uint64_t start;
+> +    uint64_t end;
+> +};
+> +
+>  struct QEMUVFIOState {
+>      QemuMutex lock;
+>  
+> @@ -49,6 +54,8 @@ struct QEMUVFIOState {
+>      int device;
+>      RAMBlockNotifier ram_notifier;
+>      struct vfio_region_info config_region_info, bar_region_info[6];
+> +    struct IOVARange *usable_iova_ranges;
+> +    uint8_t nb_iova_ranges;
+>  
+>      /* These fields are protected by @lock */
+>      /* VFIO's IO virtual address space is managed by splitting into a few
+> @@ -236,6 +243,36 @@ static int qemu_vfio_pci_write_config(QEMUVFIOState *s, void *buf, int size, int
+>      return ret == size ? 0 : -errno;
+>  }
+>  
+> +static void collect_usable_iova_ranges(QEMUVFIOState *s, void *first_cap)
+> +{
+> +    struct vfio_iommu_type1_info_cap_iova_range *cap_iova_range;
+> +    struct vfio_info_cap_header *cap = first_cap;
+> +    void *offset = first_cap;
+> +    int i;
+> +
+> +    while (cap->id != VFIO_IOMMU_TYPE1_INFO_CAP_IOVA_RANGE) {
+> +        if (cap->next) {
+
+This check looks reversed.
+
+> +            return;
+> +        }
+> +        offset += cap->next;
+
+@offset is unused.
+
+> +        cap = (struct vfio_info_cap_header *)cap;
+
+This assignment is nop.
+
+> +    }
+> +
+> +    cap_iova_range = (struct vfio_iommu_type1_info_cap_iova_range *)cap;
+> +
+> +    s->nb_iova_ranges = cap_iova_range->nr_iovas;
+> +    if (s->nb_iova_ranges > 1) {
+> +        s->usable_iova_ranges =
+> +            g_realloc(s->usable_iova_ranges,
+> +                      s->nb_iova_ranges * sizeof(struct IOVARange));
+> +    }
+> +
+> +    for (i = 0; i <  s->nb_iova_ranges; i++) {
+
+s/  / /
+
+> +        s->usable_iova_ranges[i].start = cap_iova_range->iova_ranges[i].start;
+> +        s->usable_iova_ranges[i].end = cap_iova_range->iova_ranges[i].end;
+> +    }
+> +}
+> +
+>  static int qemu_vfio_init_pci(QEMUVFIOState *s, const char *device,
+>                                Error **errp)
+>  {
+> @@ -243,10 +280,13 @@ static int qemu_vfio_init_pci(QEMUVFIOState *s, const char *device,
+>      int i;
+>      uint16_t pci_cmd;
+>      struct vfio_group_status group_status = { .argsz = sizeof(group_status) };
+> -    struct vfio_iommu_type1_info iommu_info = { .argsz = sizeof(iommu_info) };
+> +    struct vfio_iommu_type1_info *iommu_info = NULL;
+> +    size_t iommu_info_size = sizeof(*iommu_info);
+>      struct vfio_device_info device_info = { .argsz = sizeof(device_info) };
+>      char *group_file = NULL;
+>  
+> +    s->usable_iova_ranges = NULL;
+> +
+>      /* Create a new container */
+>      s->container = open("/dev/vfio/vfio", O_RDWR);
+>  
+> @@ -310,13 +350,38 @@ static int qemu_vfio_init_pci(QEMUVFIOState *s, const char *device,
+>          goto fail;
+>      }
+>  
+> +    iommu_info = g_malloc0(iommu_info_size);
+> +    iommu_info->argsz = iommu_info_size;
+> +
+>      /* Get additional IOMMU info */
+> -    if (ioctl(s->container, VFIO_IOMMU_GET_INFO, &iommu_info)) {
+> +    if (ioctl(s->container, VFIO_IOMMU_GET_INFO, iommu_info)) {
+>          error_setg_errno(errp, errno, "Failed to get IOMMU info");
+>          ret = -errno;
+>          goto fail;
+>      }
+>  
+> +    /*
+> +     * if the kernel does not report usable IOVA regions, choose
+> +     * the legacy [QEMU_VFIO_IOVA_MIN, QEMU_VFIO_IOVA_MAX -1] region
+> +     */
+> +    s->nb_iova_ranges = 1;
+> +    s->usable_iova_ranges = g_new0(struct IOVARange, 1);
+> +    s->usable_iova_ranges[0].start = QEMU_VFIO_IOVA_MIN;
+> +    s->usable_iova_ranges[0].end = QEMU_VFIO_IOVA_MAX - 1;
+> +
+> +    if (iommu_info->argsz > iommu_info_size) {
+> +        void *first_cap;
+> +
+> +        iommu_info_size = iommu_info->argsz;
+> +        iommu_info = g_realloc(iommu_info, iommu_info_size);
+> +        if (ioctl(s->container, VFIO_IOMMU_GET_INFO, iommu_info)) {
+> +            ret = -errno;
+> +            goto fail;
+> +        }
+> +        first_cap = (void *)iommu_info + iommu_info->cap_offset;
+> +        collect_usable_iova_ranges(s, first_cap);
+> +    }
+> +
+>      s->device = ioctl(s->group, VFIO_GROUP_GET_DEVICE_FD, device);
+>  
+>      if (s->device < 0) {
+> @@ -365,8 +430,12 @@ static int qemu_vfio_init_pci(QEMUVFIOState *s, const char *device,
+>      if (ret) {
+>          goto fail;
+>      }
+> +    g_free(iommu_info);
+>      return 0;
+>  fail:
+> +    g_free(s->usable_iova_ranges);
+
+Set s->usable_iova_ranges to NULL to avoid double free?
+
+> +    s->nb_iova_ranges = 0;
+> +    g_free(iommu_info);
+>      close(s->group);
+>  fail_container:
+>      close(s->container);
+> @@ -716,6 +785,8 @@ void qemu_vfio_close(QEMUVFIOState *s)
+>          qemu_vfio_undo_mapping(s, &s->mappings[i], NULL);
+>      }
+>      ram_block_notifier_remove(&s->ram_notifier);
+> +    g_free(s->usable_iova_ranges);
+> +    s->nb_iova_ranges = 0;
+>      qemu_vfio_reset(s);
+>      close(s->device);
+>      close(s->group);
+> -- 
+> 2.21.3
 > 
-> Hmm.  I find that a bit hard to follow.  So IIUC, what's going on is
-> you start out by treating every node as as distant as possible from
-> every other: they have a unique value at every level of the
-> associativity array.  Then you collapse together nodes that are
-> supposed to be closer by making some of their associativity entries
-> match.  Is that right?
 > 
->> Ultimately, all of this results in a best effort approximation for
->> the actual NUMA distances the user input in the command line. Given
->> the nature of how PAPR itself interprets NUMA distances versus the
->> expectations risen by how ACPI SLIT works, there might be better
->> algorithms but, in the end, it'll also result in another way to
->> approximate what the user really wanted.
->>
->> To keep this commit message no longer than it already is, the next
->> patch will update the existing documentation in ppc-spapr-numa.rst
->> with more in depth details and design considerations/drawbacks.
->>
->> [1] https://lore.kernel.org/linuxppc-dev/5e8fbea3-8faf-0951-172a-b41a2138fbcf@gmail.com/
->>
->> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
->> ---
->>   hw/ppc/spapr_numa.c | 101 +++++++++++++++++++++++++++++++++++++++++++-
->>   1 file changed, 100 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
->> index ea33439a15..21cae3f799 100644
->> --- a/hw/ppc/spapr_numa.c
->> +++ b/hw/ppc/spapr_numa.c
->> @@ -80,12 +80,99 @@ static void spapr_numa_PAPRify_distances(MachineState *ms)
->>       }
->>   }
->>   
->> +static uint8_t spapr_numa_get_numa_level(uint8_t distance)
->> +{
->> +    uint8_t numa_level;
-> 
-> This function reinforces my feeling that pre-PAPRizing the distances
-> might not be the best idea.  It could go directly from the user
-> distance to level just as easily.
 
-Yeah, the logic from patch 3 will ended up being folded into this
-function.
-
-> 
->> +
->> +    switch (distance) {
->> +    case 10:
->> +        numa_level = 0x4;
->> +        break;
->> +    case 20:
->> +        numa_level = 0x3;
->> +        break;
->> +    case 40:
->> +        numa_level = 0x2;
->> +        break;
->> +    case 80:
->> +        numa_level = 0x1;
->> +        break;
->> +    default:
->> +        numa_level = 0;
->> +    }
->> +
->> +    return numa_level;
->> +}
->> +
->> +static void spapr_numa_define_associativity_domains(SpaprMachineState *spapr)
->> +{
->> +    MachineState *ms = MACHINE(spapr);
->> +    NodeInfo *numa_info = ms->numa_state->nodes;
->> +    int nb_numa_nodes = ms->numa_state->num_nodes;
->> +    int src, dst;
->> +
->> +    for (src = 0; src < nb_numa_nodes; src++) {
->> +        for (dst = src; dst < nb_numa_nodes; dst++) {
->> +            /*
->> +             * This is how the associativity domain between A and B
->> +             * is calculated:
->> +             *
->> +             * - get the distance between them
->> +             * - get the correspondent NUMA level for this distance
->> +             * - the arrays were initialized with their own numa_ids,
->> +             * and we're calculating the distance in node_id ascending order,
->> +             * starting from node 0. This will have a cascade effect in the
->> +             * algorithm because the associativity domains that node 0 defines
->> +             * will be carried over to the other nodes, and node 1
->> +             * associativities will be carried over unless there's already a
->> +             * node 0 associativity assigned, and so on. This happens because
->> +             * we'll assign the lowest value of assoc_src and assoc_dst to be
->> +             * the associativity domain of both, for the given NUMA level.
-> 
-> Ok, I follow this description better than the one in the commit message.
-> 
->> +             * The PPC kernel expects the associativity domains of node 0 to
->> +             * be always 0, and this algorithm will grant that by default.
->> +             */
->> +            uint8_t distance = numa_info[src].distance[dst];
->> +            uint8_t n_level = spapr_numa_get_numa_level(distance);
->> +            uint32_t assoc_src, assoc_dst;
->> +
->> +            /*
->> +             * n_level = 0 means that the distance is greater than our last
->> +             * rounded value (120). In this case there is no NUMA level match
->> +             * between src and dst and we can skip the remaining of the loop.
->> +             *
->> +             * The Linux kernel will assume that the distance between src and
->> +             * dst, in this case of no match, is 10 (local distance) doubled
->> +             * for each NUMA it didn't match. We have MAX_DISTANCE_REF_POINTS
->> +             * levels (4), so this gives us 10*2*2*2*2 = 160.
->> +             *
->> +             * This logic can be seen in the Linux kernel source code, as of
->> +             * v5.9, in arch/powerpc/mm/numa.c, function __node_distance().
->> +             */
->> +            if (n_level == 0) {
->> +                continue;
->> +            }
->> +
->> +            assoc_src = be32_to_cpu(spapr->numa_assoc_array[src][n_level]);
->> +            assoc_dst = be32_to_cpu(spapr->numa_assoc_array[dst][n_level]);
->> +
->> +            if (assoc_src < assoc_dst) {
-> 
-> So, I don't think you need this logic.  It doesn't really matter which
-> associativity value you let win, as long as you're consistent.  So you
-> can just base it on src < dst, rather than assooc_src < assoc_dst.
-> But src <= dst always, because of the way you've constructed the loops.
-> 
->> +                spapr->numa_assoc_array[dst][n_level] = cpu_to_be32(assoc_src);
->> +            } else {
->> +                spapr->numa_assoc_array[src][n_level] = cpu_to_be32(assoc_dst);
->> +            }
-> 
-> Don't you need to match the values a all levels >= n_level, rather
-> than just n_level?  AFAICT it doesn't make sense for two components to
-> be in the same associativity domain at one level, but different
-> domains at "bigger" levels (i.e. something like two cores sharing an
-> L2 cache, but not an L3 cache).
-
-
-I'm not sure what you meant, so let's go through an example. Let's say we
-have something like:
-
-      0    1     2
-0    10   20   80
-1    20   10   40
-2    80   40   10
-
-Starting arrays are:
-
-    0x1 0x2 0x3 0x4
-0:  0   0   0   0
-1:  1   1   1   1
-2:  2   2   2   2
-
-What the code will do is:
-
-a) distance 0 to 1 is 20 (0x3 match), 0 to 2 is 80 (0x1 match):
-
-    0x1 0x2 0x3 0x4
-0:  0   0   0   0
-1:  1   1   0   1
-2:  0   2   2   2
-
-
-b) distance from 1 to 2 is 40 (0x2 match):
-
-    0x1 0x2 0x3 0x4
-0:  0   0   0   0
-1:  1   1   0   1
-2:  0   1   2   2
-
-What the kernel will do (via __node_distance()) is to stop at the first match.
-So:
-
-- distance 0 to 1: first match at 0x3, distance = 20:
-
-    0x1 0x2 0x3 0x4
-0:  0   0   0*   0
-1:  1   1   0*   1
-
-- distance 0 to 2: first match at 0x1, distance = 80:
-
-    0x1 0x2 0x3 0x4
-0:  0*   0   0   0
-2:  0*   1   2   2
-
-- distance 1 to 2: first match at 0x2, distance = 40:
-
-    0x1 0x2 0x3 0x4
-1:  1   *1   0   1
-2:  0   *1   2   2
-
-
-Note that, for this example, we have an exact match between user input and
-what the kernel calculates.
-
-Back in (a), the reason why I'm not doing matches in all n_levels above the
-first one is because it doesn't matter for the kernel (it'll stop at the
-first match) and it'll lead to unintended matches between the earlier and
-newer nodes due to how I'm cascading the associativity domains.
-
-Let's say we go back to (a) and do this:
-
-a2) distance 0 to 1 is 20 (0x3 match), 0 to 2 is 80 (0x1 match):
-
-    0x1 0x2 0x3 0x4
-0:  0   0   0   0
-1:  0   0   0   1
-2:  0   2   2   2
-
-We forced the match on all n_levels above the first match in the associativity
-array of 1. Then in (b), where we evaluate 1 to 2:
-
-b2) distance 1 to 2 is 40 (0x2 match), cascade the 0 associativity already
-existent:
-
-    0x1 0x2 0x3 0x4
-0:  0   0   0   0
-1:  0   0   0   1
-2:  0   0   2   2
-
-The kernel will read this as:
-
-0 to 1: 20
-0 to 2: 40 <--- this was 80 via user input
-1 to 2: 40
-
-
-In fact, reading what you said again, that sounds more like a vision in line
-with the "Form 0" interpretation of the reference-points, where it would
-represent something more close with the physical SMP topology itself.
-With the "Form 1" format we're using, we're talking about 'near' and 'far'
-resources and most significant boundaries, regardless of any correlation
-of the underlying topology. So instead of thinking
-
-"(i.e. something like two cores sharing an L2 cache, but not an L3 cache)"
-
-We would think "node 0 and 1 most significant performance boundary is on
-the 0x2 position of the reference-points".
-
-
-Hope that clarified a bit.
-
-
-DHB
-
-
-> 
->> +        }
->> +    }
->> +
->> +}
->> +
->>   void spapr_numa_associativity_init(SpaprMachineState *spapr,
->>                                      MachineState *machine)
->>   {
->>       SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
->>       int nb_numa_nodes = machine->numa_state->num_nodes;
->>       int i, j, max_nodes_with_gpus;
->> +    bool using_legacy_numa = spapr_machine_using_legacy_numa(spapr);
->>   
->>       /*
->>        * For all associativity arrays: first position is the size,
->> @@ -99,6 +186,17 @@ void spapr_numa_associativity_init(SpaprMachineState *spapr,
->>       for (i = 0; i < nb_numa_nodes; i++) {
->>           spapr->numa_assoc_array[i][0] = cpu_to_be32(MAX_DISTANCE_REF_POINTS);
->>           spapr->numa_assoc_array[i][MAX_DISTANCE_REF_POINTS] = cpu_to_be32(i);
->> +
->> +        /*
->> +         * Fill all associativity domains of non-zero NUMA nodes with
->> +         * node_id. This is required because the default value (0) is
->> +         * considered a match with associativity domains of node 0.
->> +         */
->> +        if (!using_legacy_numa && i != 0) {
->> +            for (j = 1; j < MAX_DISTANCE_REF_POINTS; j++) {
->> +                spapr->numa_assoc_array[i][j] = cpu_to_be32(i);
->> +            }
->> +        }
->>       }
->>   
->>       /*
->> @@ -128,7 +226,7 @@ void spapr_numa_associativity_init(SpaprMachineState *spapr,
->>        * 1 NUMA node) will not benefit from anything we're going to do
->>        * after this point.
->>        */
->> -    if (spapr_machine_using_legacy_numa(spapr)) {
->> +    if (using_legacy_numa) {
->>           return;
->>       }
->>   
->> @@ -139,6 +237,7 @@ void spapr_numa_associativity_init(SpaprMachineState *spapr,
->>       }
->>   
->>       spapr_numa_PAPRify_distances(machine);
->> +    spapr_numa_define_associativity_domains(spapr);
->>   }
->>   
->>   void spapr_numa_write_associativity_dt(SpaprMachineState *spapr, void *fdt,
-> 
+Fam
 
