@@ -2,75 +2,92 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 115FCC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 13:24:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42A4EC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 13:26:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9392823976
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 13:24:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9392823976
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id B4CB22083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 13:26:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B/Zy5WOS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4CB22083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLnhk-0006Ob-PI
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 09:24:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54330)
+	id 1kLnjp-0000iU-Ix
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 09:26:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56934)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1kLnal-00061g-OM; Fri, 25 Sep 2020 09:16:52 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:54417)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1kLnai-0004VK-Jw; Fri, 25 Sep 2020 09:16:51 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.109.146.59])
- by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 0C2285EDAFF2;
- Fri, 25 Sep 2020 15:16:35 +0200 (CEST)
-Received: from kaod.org (37.59.142.104) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Fri, 25 Sep
- 2020 15:16:34 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-104R0055d6d8ade-ad58-4d72-b4a1-c1d99a967c57,
- A5F0BA03093B57E977C960A2BE809674B2E579B9) smtp.auth=groug@kaod.org
-Date: Fri, 25 Sep 2020 15:16:33 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Daniel Henrique Barboza <danielhb413@gmail.com>
-Subject: Re: [PATCH v2 4/6] spapr_numa: change reference-points and
- maxdomain settings
-Message-ID: <20200925151633.12982bf0@bahia.lan>
-In-Reply-To: <20200924195058.362984-5-danielhb413@gmail.com>
-References: <20200924195058.362984-1-danielhb413@gmail.com>
- <20200924195058.362984-5-danielhb413@gmail.com>
-X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kLniu-0007ik-EO
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 09:25:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26959)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kLnir-0005lq-Sc
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 09:25:16 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601040312;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=nkGifd19yOmg59pMMcDC5W4L+0GufPAEDNr8VMwdTTI=;
+ b=B/Zy5WOSUXr+VS++iP0pZZYQO69S5ve+qa7bE9NMi+p9R3H4WknvFtIfZx68CzPfXd6xiw
+ T21EluIF8SoyKXhiWQgYrW20dUF0SzI5eLf1tdpNa/2vDYlJSkuMFUi3beppsCQcEAXeAK
+ 9hyw0TH4Jq4MMwFr4nD9WRb8zvP6h8w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-405-tDYeFqVeOk2OEu6y1UC6jg-1; Fri, 25 Sep 2020 09:25:04 -0400
+X-MC-Unique: tDYeFqVeOk2OEu6y1UC6jg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B8AE91008559;
+ Fri, 25 Sep 2020 13:25:02 +0000 (UTC)
+Received: from redhat.com (ovpn-114-208.ams2.redhat.com [10.36.114.208])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C52115D9F3;
+ Fri, 25 Sep 2020 13:25:00 +0000 (UTC)
+Date: Fri, 25 Sep 2020 14:24:58 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH v2 28/38] qapi/gen.py: update write() to be more idiomatic
+Message-ID: <20200925132458.GJ2178035@redhat.com>
+References: <20200922210101.4081073-1-jsnow@redhat.com>
+ <20200922210101.4081073-29-jsnow@redhat.com>
+ <20200923152624.GO3312949@habkost.net>
+ <c0b8ed9e-c66a-a6fa-43e1-c3c61581d928@redhat.com>
+ <20200924155959.GC191229@localhost.localdomain>
+ <87r1qqro8i.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.104]
-X-ClientProxiedBy: DAG9EX1.mxp5.local (172.16.2.81) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: 563753aa-4c03-48ec-93c8-174e0490230b
-X-Ovh-Tracer-Id: 17127752334968986080
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrvddtgdeiudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgihesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepfedutdeijeejveehkeeileetgfelteekteehtedtieefffevhffflefftdefleejnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdegnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopegurghvihgusehgihgsshhonhdrughrohhpsggvrghrrdhiugdrrghu
-Received-SPF: pass client-ip=178.32.125.2; envelope-from=groug@kaod.org;
- helo=smtpout1.mo529.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 09:16:35
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <87r1qqro8i.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 02:48:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -32
+X-Spam_score: -3.3
+X-Spam_bar: ---
+X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -83,96 +100,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+ Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 24 Sep 2020 16:50:56 -0300
-Daniel Henrique Barboza <danielhb413@gmail.com> wrote:
-
-> This is the first guest visible change introduced in
-> spapr_numa.c. The previous settings of both reference-points
-> and maxdomains were too restrictive, but enough for the
-> existing associativity we're setting in the resources.
+On Fri, Sep 25, 2020 at 03:15:57PM +0200, Markus Armbruster wrote:
+> Cleber Rosa <crosa@redhat.com> writes:
 > 
-> We'll change that in the following patches, populating the
-> associativity arrays based on user input. For those changes
-> to be effective, reference-points and maxdomains must be
-> more flexible. After this patch, we'll have 4 distinct
-> levels of NUMA (0x4, 0x3, 0x2, 0x1) and maxdomains will
-> allow for any type of configuration the user intends to
-> do - under the scope and limitations of PAPR itself, of
-> course.
+> > On Wed, Sep 23, 2020 at 02:37:27PM -0400, John Snow wrote:
+> >> On 9/23/20 11:26 AM, Eduardo Habkost wrote:
+> >> > On Tue, Sep 22, 2020 at 05:00:51PM -0400, John Snow wrote:
+> >> > > Make the file handling here just a tiny bit more idiomatic.
+> >> > > (I realize this is heavily subjective.)
+> >> > > 
+> >> > > Use exist_ok=True for os.makedirs and remove the exception,
+> >> > > use fdopen() to wrap the file descriptor in a File-like object,
+> >> > > and use a context manager for managing the file pointer.
+> >> > > 
+> >> > > Signed-off-by: John Snow <jsnow@redhat.com>
+> >> > 
+> >> > Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> >> > 
+> >> > I really miss a comment below explaining why we use
+> >> > open(os.open(pathname, ...), ...) instead of open(pathname, ...).
 > 
-> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-> ---
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  hw/ppc/spapr_numa.c | 40 ++++++++++++++++++++++++++++++++--------
->  1 file changed, 32 insertions(+), 8 deletions(-)
+> This code:
 > 
-> diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
-> index 990a5fce08..ea33439a15 100644
-> --- a/hw/ppc/spapr_numa.c
-> +++ b/hw/ppc/spapr_numa.c
-> @@ -222,24 +222,48 @@ int spapr_numa_write_assoc_lookup_arrays(SpaprMachineState *spapr, void *fdt,
->   */
->  void spapr_numa_write_rtas_dt(SpaprMachineState *spapr, void *fdt, int rtas)
->  {
-> +    MachineState *ms = MACHINE(spapr);
->      SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
->      uint32_t refpoints[] = {
->          cpu_to_be32(0x4),
-> -        cpu_to_be32(0x4),
-> +        cpu_to_be32(0x3),
->          cpu_to_be32(0x2),
-> +        cpu_to_be32(0x1),
->      };
->      uint32_t nr_refpoints = ARRAY_SIZE(refpoints);
-> -    uint32_t maxdomain = cpu_to_be32(spapr->gpu_numa_id > 1 ? 1 : 0);
-> +    uint32_t maxdomain = ms->numa_state->num_nodes + spapr->gpu_numa_id;
->      uint32_t maxdomains[] = {
->          cpu_to_be32(4),
-> -        maxdomain,
-> -        maxdomain,
-> -        maxdomain,
-> -        cpu_to_be32(spapr->gpu_numa_id),
-> +        cpu_to_be32(maxdomain),
-> +        cpu_to_be32(maxdomain),
-> +        cpu_to_be32(maxdomain),
-> +        cpu_to_be32(maxdomain)
->      };
->  
-> -    if (smc->pre_5_1_assoc_refpoints) {
-> -        nr_refpoints = 2;
-> +    if (spapr_machine_using_legacy_numa(spapr)) {
-> +        uint32_t legacy_refpoints[] = {
-> +            cpu_to_be32(0x4),
-> +            cpu_to_be32(0x4),
-> +            cpu_to_be32(0x2),
-> +        };
-> +        uint32_t legacy_maxdomain = spapr->gpu_numa_id > 1 ? 1 : 0;
-> +        uint32_t legacy_maxdomains[] = {
-> +            cpu_to_be32(4),
-> +            cpu_to_be32(legacy_maxdomain),
-> +            cpu_to_be32(legacy_maxdomain),
-> +            cpu_to_be32(legacy_maxdomain),
-> +            cpu_to_be32(spapr->gpu_numa_id),
-> +        };
-> +
-> +        nr_refpoints = 3;
-> +
-> +        memcpy(refpoints, legacy_refpoints, sizeof(legacy_refpoints));
-> +        memcpy(maxdomains, legacy_maxdomains, sizeof(legacy_maxdomains));
-> +
-> +        /* pseries-5.0 and older reference-points array is {0x4, 0x4} */
-> +        if (smc->pre_5_1_assoc_refpoints) {
-> +            nr_refpoints = 2;
-> +        }
->      }
->  
->      _FDT(fdt_setprop(fdt, rtas, "ibm,associativity-reference-points",
+>         fd = os.open(pathname, os.O_RDWR | os.O_CREAT, 0o666)
+>         f = open(fd, 'r+', encoding='utf-8')
+> 
+> >> Not known to me. It was introduced in 907b846653 as part of an effort to
+> >> reduce rebuild times. Maybe this avoids a modification time change if the
+> >> file already exists?
+> >> 
+> >> Markus?
+> >
+> > AFACIT the change on 907b846653 is effective because of the "is new
+> > text different from old text?" conditional.  I can not see how the
+> > separate/duplicate open/fdopen would contribute to that.
+> >
+> > But, let's hear from Markus.
+> 
+> This was my best attempt to open the file read/write, creating it if it
+> doesn't exist.
+> 
+> Plain
+> 
+>         f = open(pathname, "r+", encoding='utf-8')
+> 
+> fails instead of creates, and
+> 
+>         f = open(pathname, "w+", encoding='utf-8')
+> 
+> truncates.
+> 
+> If you know a better way, tell me!
+
+IIUC, you need  "a+" as the mode, rather than "w+"
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
