@@ -2,89 +2,91 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49A27C4727E
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 22:55:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DF6FC4727E
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 22:56:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B87942065E
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 22:55:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E371B21D7F
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 22:56:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YFhWV3Gj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B87942065E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AE1fPU4J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E371B21D7F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLwd9-0004l8-Ln
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 18:55:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46062)
+	id 1kLwe5-0005jt-3n
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 18:56:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46234)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLwbu-0004Kf-Hw
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 18:54:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37959)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kLwdT-0005Jr-Ui
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 18:56:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21834)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLwbr-0004DR-Bw
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 18:54:38 -0400
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kLwdR-0004UP-EL
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 18:56:15 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601074474;
+ s=mimecast20190719; t=1601074571;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XjusmB28Xj5463lZynbj6X9pnVuRcdCHyQzOPcBe70Q=;
- b=YFhWV3GjwH+BrR0qOHBqsargE8AYZ18L6Ii/8dXEXS10x2gALTq1xeaj/OMjgdsCelwRj3
- oAPemsUcXkc2oc4ztTCKSefEE4bH9IRGOlHb/RQgwfWFxom2Iz6WCdXGVawtP8J2kZ3a2+
- vaUcKJ3h0y+QUuCGy6Wp5WCRZVQwlSY=
+ bh=MbVRcMww6nX5ibuWMzN+5rXuddI4POdL1RmkX8fIlRE=;
+ b=AE1fPU4JDmSaM1LI4OP2aBP1GMxRvof7qFZEqbQG+F4kKqCEQ1H0l6lycs4X1U3I1AqO91
+ FxENe7PSoHmztTluKsxkpRKhquwZuNSG1VruOQD5cXquc+uhpCgVjxGk2DOK/RDuieiCCY
+ FdWFGjxk2+JKrrxzYphuyXH8L0t7gyo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-362-52rUkcDoNmi3eCoB4-gzBw-1; Fri, 25 Sep 2020 18:54:32 -0400
-X-MC-Unique: 52rUkcDoNmi3eCoB4-gzBw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-581-eCtvzbxOObK8QxznVbMrjA-1; Fri, 25 Sep 2020 18:56:05 -0400
+X-MC-Unique: eCtvzbxOObK8QxznVbMrjA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B15F1007B01;
- Fri, 25 Sep 2020 22:54:31 +0000 (UTC)
-Received: from [10.10.119.140] (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6589B60C84;
- Fri, 25 Sep 2020 22:54:30 +0000 (UTC)
-Subject: Re: [PATCH 00/16] qapi: static typing conversion, pt2
-To: Markus Armbruster <armbru@redhat.com>
-References: <20200922211313.4082880-1-jsnow@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <af9ccbcb-20f3-3bd1-fe3b-912652c560bf@redhat.com>
-Date: Fri, 25 Sep 2020 18:54:29 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 708911084D76;
+ Fri, 25 Sep 2020 22:56:02 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 912951002C24;
+ Fri, 25 Sep 2020 22:55:57 +0000 (UTC)
+Date: Fri, 25 Sep 2020 16:55:56 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v26 17/17] qapi: Add VFIO devices migration stats in
+ Migration stats
+Message-ID: <20200925165556.4aa09aff@x1.home>
+In-Reply-To: <1600817059-26721-18-git-send-email-kwankhede@nvidia.com>
+References: <1600817059-26721-1-git-send-email-kwankhede@nvidia.com>
+ <1600817059-26721-18-git-send-email-kwankhede@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <20200922211313.4082880-1-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124;
+ envelope-from=alex.williamson@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 01:07:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 02:48:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -34
-X-Spam_score: -3.5
+X-Spam_score_int: -32
+X-Spam_score: -3.3
 X-Spam_bar: ---
-X-Spam_report: (-3.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
+X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.238, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,56 +99,256 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: cohuck@redhat.com, cjia@nvidia.com, aik@ozlabs.ru,
+ Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com,
+ yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
+ armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
+ felipe@nutanix.com, zhi.a.wang@intel.com, kevin.tian@intel.com,
+ yan.y.zhao@intel.com, dgilbert@redhat.com, changpeng.liu@intel.com,
+ eskultet@redhat.com, Ken.Xue@amd.com, jonathan.davies@nutanix.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/22/20 5:12 PM, John Snow wrote:
-> based-on: <20200922210101.4081073-1-jsnow@redhat.com>
->            [PATCH v2 00/38] qapi: static typing conversion, pt1
+On Wed, 23 Sep 2020 04:54:19 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
+
+> Added amount of bytes transferred to the target VM by all VFIO devices
 > 
-> Hi, this series adds static type hints to the QAPI module.
-> This is part two!
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> ---
 > 
-> Part 2: https://gitlab.com/jsnow/qemu/-/tree/python-qapi-cleanup-pt2
-> Everything: https://gitlab.com/jsnow/qemu/-/tree/python-qapi-cleanup-pt6
+> Note: Comments from v25 for this patch are not addressed yet.
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg715620.html
 > 
+> Alex, need more pointer on documentation part raised Markus Armbruster.
 
-Thanks for reviews. I will not be re-spinning pt2 until pt1 is fully 
-merged, but I have re-based on pt1-v3 and made some minor adjustments to 
-accommodate new development in pt1.
+I'm not sure what you're asking of me here.  Are we being asked to
+justify that a vfio device has state that needs to be migrated and the
+ability to dirty pages?
+ 
+> 
+>  hw/vfio/common.c            | 20 ++++++++++++++++++++
+>  hw/vfio/migration.c         | 10 ++++++++++
+>  include/qemu/vfio-helpers.h |  3 +++
+>  migration/migration.c       | 14 ++++++++++++++
+>  monitor/hmp-cmds.c          |  6 ++++++
+>  qapi/migration.json         | 17 +++++++++++++++++
+>  6 files changed, 70 insertions(+)
+> 
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 7eeaa368187a..286cdaac8674 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -39,6 +39,7 @@
+>  #include "trace.h"
+>  #include "qapi/error.h"
+>  #include "migration/migration.h"
+> +#include "qemu/vfio-helpers.h"
+>  
+>  VFIOGroupList vfio_group_list =
+>      QLIST_HEAD_INITIALIZER(vfio_group_list);
+> @@ -292,6 +293,25 @@ const MemoryRegionOps vfio_region_ops = {
+>   * Device state interfaces
+>   */
+>  
+> +bool vfio_mig_active(void)
+> +{
+> +    VFIOGroup *group;
+> +    VFIODevice *vbasedev;
+> +
+> +    if (QLIST_EMPTY(&vfio_group_list)) {
+> +        return false;
+> +    }
+> +
+> +    QLIST_FOREACH(group, &vfio_group_list, next) {
+> +        QLIST_FOREACH(vbasedev, &group->device_list, next) {
+> +            if (vbasedev->migration_blocker) {
+> +                return false;
+> +            }
+> +        }
+> +    }
+> +    return true;
+> +}
+> +
+>  static bool vfio_devices_all_stopped_and_saving(VFIOContainer *container)
+>  {
+>      VFIOGroup *group;
+> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+> index 822b68b4e015..c4226fa8b183 100644
+> --- a/hw/vfio/migration.c
+> +++ b/hw/vfio/migration.c
+> @@ -28,6 +28,7 @@
+>  #include "pci.h"
+>  #include "trace.h"
+>  #include "hw/hw.h"
+> +#include "qemu/vfio-helpers.h"
+>  
+>  /*
+>   * Flags used as delimiter:
+> @@ -40,6 +41,8 @@
+>  #define VFIO_MIG_FLAG_DEV_SETUP_STATE   (0xffffffffef100003ULL)
+>  #define VFIO_MIG_FLAG_DEV_DATA_STATE    (0xffffffffef100004ULL)
+>  
+> +static int64_t bytes_transferred;
+> +
+>  static inline int vfio_mig_access(VFIODevice *vbasedev, void *val, int count,
+>                                    off_t off, bool iswrite)
+>  {
+> @@ -289,6 +292,7 @@ static int vfio_save_buffer(QEMUFile *f, VFIODevice *vbasedev, uint64_t *size)
+>          *size = data_size;
+>      }
+>  
+> +    bytes_transferred += data_size;
+>      return ret;
+>  }
+>  
+> @@ -770,6 +774,7 @@ static void vfio_migration_state_notifier(Notifier *notifier, void *data)
+>          }
+>  
+>          vfio_set_dirty_page_tracking(vbasedev, false);
+> +        bytes_transferred = 0;
+>      }
+>  }
+>  
+> @@ -820,6 +825,11 @@ static int vfio_migration_init(VFIODevice *vbasedev,
+>  
+>  /* ---------------------------------------------------------------------- */
+>  
+> +int64_t vfio_mig_bytes_transferred(void)
+> +{
+> +    return bytes_transferred;
+> +}
+> +
+>  int vfio_migration_probe(VFIODevice *vbasedev, Error **errp)
+>  {
+>      VFIOContainer *container = vbasedev->group->container;
+> diff --git a/include/qemu/vfio-helpers.h b/include/qemu/vfio-helpers.h
+> index 1f057c2b9e40..26a7df0767b1 100644
+> --- a/include/qemu/vfio-helpers.h
+> +++ b/include/qemu/vfio-helpers.h
+> @@ -29,4 +29,7 @@ void qemu_vfio_pci_unmap_bar(QEMUVFIOState *s, int index, void *bar,
+>  int qemu_vfio_pci_init_irq(QEMUVFIOState *s, EventNotifier *e,
+>                             int irq_type, Error **errp);
+>  
+> +bool vfio_mig_active(void);
+> +int64_t vfio_mig_bytes_transferred(void);
+> +
+>  #endif
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 58a5452471f9..b204bb1f6cd9 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -56,6 +56,7 @@
+>  #include "net/announce.h"
+>  #include "qemu/queue.h"
+>  #include "multifd.h"
+> +#include "qemu/vfio-helpers.h"
+>  
+>  #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed throttling */
+>  
+> @@ -996,6 +997,17 @@ static void populate_disk_info(MigrationInfo *info)
+>      }
+>  }
+>  
+> +static void populate_vfio_info(MigrationInfo *info)
+> +{
+> +#ifdef CONFIG_LINUX
+> +    if (vfio_mig_active()) {
+> +        info->has_vfio = true;
+> +        info->vfio = g_malloc0(sizeof(*info->vfio));
+> +        info->vfio->transferred = vfio_mig_bytes_transferred();
+> +    }
+> +#endif
+> +}
+> +
+>  static void fill_source_migration_info(MigrationInfo *info)
+>  {
+>      MigrationState *s = migrate_get_current();
+> @@ -1020,6 +1032,7 @@ static void fill_source_migration_info(MigrationInfo *info)
+>          populate_time_info(info, s);
+>          populate_ram_info(info, s);
+>          populate_disk_info(info);
+> +        populate_vfio_info(info);
+>          break;
+>      case MIGRATION_STATUS_COLO:
+>          info->has_status = true;
+> @@ -1028,6 +1041,7 @@ static void fill_source_migration_info(MigrationInfo *info)
+>      case MIGRATION_STATUS_COMPLETED:
+>          populate_time_info(info, s);
+>          populate_ram_info(info, s);
+> +        populate_vfio_info(info);
+>          break;
+>      case MIGRATION_STATUS_FAILED:
+>          info->has_status = true;
+> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+> index 7711726fd222..40d60d6a6651 100644
+> --- a/monitor/hmp-cmds.c
+> +++ b/monitor/hmp-cmds.c
+> @@ -355,6 +355,12 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+>          }
+>          monitor_printf(mon, "]\n");
+>      }
+> +
+> +    if (info->has_vfio) {
+> +        monitor_printf(mon, "vfio device transferred: %" PRIu64 " kbytes\n",
+> +                       info->vfio->transferred >> 10);
+> +    }
+> +
+>      qapi_free_MigrationInfo(info);
+>  }
+>  
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index 675f70bb6734..3535977123d3 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -147,6 +147,18 @@
+>              'active', 'postcopy-active', 'postcopy-paused',
+>              'postcopy-recover', 'completed', 'failed', 'colo',
+>              'pre-switchover', 'device', 'wait-unplug' ] }
+> +##
+> +# @VfioStats:
+> +#
+> +# Detailed VFIO devices migration statistics
+> +#
+> +# @transferred: amount of bytes transferred to the target VM by VFIO devices
+> +#
+> +# Since: 5.1
+> +#
+> +##
+> +{ 'struct': 'VfioStats',
+> +  'data': {'transferred': 'int' } }
+>  
+>  ##
+>  # @MigrationInfo:
+> @@ -208,11 +220,16 @@
+>  #
+>  # @socket-address: Only used for tcp, to know what the real port is (Since 4.0)
+>  #
+> +# @vfio: @VfioStats containing detailed VFIO devices migration statistics,
+> +#        only returned if VFIO device is present, migration is supported by all
+> +#         VFIO devices and status is 'active' or 'completed' (since 5.1)
 
-You can find that staged here:
-https://gitlab.com/jsnow/qemu/-/tree/python-qapi-cleanup-pt2
+This could be clarified a little:
 
+...only returned if all VFIO devices attached to a VM support migration
+and migration status is 'active' or 'completed' (since 5.2)
 
-Here's the review status of pt2:
+Is that accurate?  Thanks,
 
-[01] qapi-expr-py-remove-info       # [SOB] JS [RB] CR,EH
-[02] qapi-expr-py-check-for-dict    # [SOB] JS [RB] CR,EH
-[03] qapi-expr-py-constrain         # [SOB] JS [RB] CR,EH
-[04] qapi-expr-py-add-assertion-for # [SOB] JS [RB] CR,EH
-[05] qapi-expr-py-move-string-check # [SOB] JS [RB] CR,EH
-[06] qapi-expr-py-check-type-of     # [SOB] JS [RB] EH
-[07] qapi-expr-py-add-casts-in-a    # [SOB] JS [RB] CR,EH
-[08] qapi-expr-py-add-notational    # [SOB] JS [RB] CR,EH
-[09] qapi-expr-py-rewrite-check_if  # [SOB] JS [RB] CR,EH [TB] CR
-[10] qapi-expr-py-remove-single     # [SOB] JS [RB] CR,EH
-[11] pylint-enable                  # [SOB] JS [TB] CR,EH [RB] CR,EH
-[12] qapi-expr-py-add-docstrings    # [SOB] JS [RB] CR
-[13] qapi-expr-modify-check_keys-to # [SOB] JS [RB] CR,EH
-[14] qapi-expr-use-tuples-instead   # [SOB] JS [RB] CR,EH
-[15] qapi-expr-move-related-checks  # [SOB] JS [RB] CR
-[16] qapi-expr-use-an-expression    # [SOB] JS [RB] CR,EH
+Alex
 
-As for the difflog so far:
-
-Patches 2, 3, 7, 8 change import orderings (isort)
-Patch 12 sees some docstrings rewritten to pass sphinx.
-Patch 15 addresses Eduardo's review comments.
-
---js
+> +#
+>  # Since: 0.14.0
+>  ##
+>  { 'struct': 'MigrationInfo',
+>    'data': {'*status': 'MigrationStatus', '*ram': 'MigrationStats',
+>             '*disk': 'MigrationStats',
+> +           '*vfio': 'VfioStats',
+>             '*xbzrle-cache': 'XBZRLECacheStats',
+>             '*total-time': 'int',
+>             '*expected-downtime': 'int',
 
 
