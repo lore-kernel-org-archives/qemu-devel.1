@@ -2,87 +2,133 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59EA9C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 10:26:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 225ECC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 10:27:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC47D221EB
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 10:26:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A2722221EB
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 10:27:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lmichel.fr header.i=@lmichel.fr header.b="AVXE/d/X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC47D221EB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=lmichel.fr
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CaqEpGpF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2722221EB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLkwH-0003CQ-Js
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 06:26:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42722)
+	id 1kLkwx-0004D5-Fa
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 06:27:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44130)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc@lmichel.fr>)
- id 1kLknK-00018X-Jl; Fri, 25 Sep 2020 06:17:38 -0400
-Received: from pharaoh.lmichel.fr ([149.202.28.74]:58236)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc@lmichel.fr>)
- id 1kLknF-0007S0-2M; Fri, 25 Sep 2020 06:17:38 -0400
-Received: from sekoia-pc.bar.greensocs.com (sekoia-pc.home.lmichel.fr
- [192.168.61.100])
- by pharaoh.lmichel.fr (Postfix) with ESMTPS id 882DFC60F20;
- Fri, 25 Sep 2020 10:17:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr; s=pharaoh; 
- t=1601029040;
- h=from:from:sender:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=B9F/66Vuw8urIeiKnlqbUW/o4qpDy+MtTRBF5H3Fg5c=;
- b=AVXE/d/XTTIiawt4nUJt41/1Hmz/YG0EH6zFbA1oFPjXxDxJuuHFsxQPgaIgJlZWHR/vW3
- sRbev50NEYQ+uPHTvI583mXhN/gYDtA30rPVnf2pFf7grBLT7zJvfI1/e//RhbzuyvoKk3
- SzLSjiQwE66t4DDMysmqFzLBQCfOqSayU+02qv8AgeDbIOyGOSTtlt5D1ZapleVyLMt2Uh
- JEy/iezn5AVdf5o2AxpmVAbr4w2M2R6WAdHi4Wy3ii4DIriwBpuiFAkRYAw6jwrGtebSpD
- A1BNOanOektZOc1NcC/uRauEduotRcp2LwO30phIPLYhNXCTqsOG6OlsjIHHFw==
-From: Luc Michel <luc@lmichel.fr>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 08/14] hw/misc/bcm2835_cprman: implement PLL channels behaviour
-Date: Fri, 25 Sep 2020 12:17:25 +0200
-Message-Id: <20200925101731.2159827-9-luc@lmichel.fr>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200925101731.2159827-1-luc@lmichel.fr>
-References: <20200925101731.2159827-1-luc@lmichel.fr>
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kLktE-0001FH-Au
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 06:23:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43359)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kLktC-00088P-Jf
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 06:23:44 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601029421;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=5iqal1VyjzcLy9mKgyO/fS6vRumn/l2fUBNtLVV3pxY=;
+ b=CaqEpGpFVNFvG6Mjarlu/FjIzQc8Ea+A8n/0feWdRruuOft+UCegC5kPha95ZhJxOpOHeZ
+ SdwQxoqgHaVh5I+nDqwrrrBg68Y5SLoScY7tajleoyxBsUHuAK/mGPKSO5ahHH+9Uch4CB
+ Tq8n72W9DlRJ3rShldMvrYP2SRqMH+E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-531-I2a9FPkEN1ygr4eiP6Fi1Q-1; Fri, 25 Sep 2020 06:23:40 -0400
+X-MC-Unique: I2a9FPkEN1ygr4eiP6Fi1Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D83B18BA289;
+ Fri, 25 Sep 2020 10:23:39 +0000 (UTC)
+Received: from [10.36.112.211] (ovpn-112-211.ams2.redhat.com [10.36.112.211])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EC33B5D9E2;
+ Fri, 25 Sep 2020 10:23:34 +0000 (UTC)
+Subject: Re: [PATCH] virtio-pmem-pci: force virtio version 1
+To: Pankaj Gupta <pankaj.gupta.linux@gmail.com>, mst@redhat.com
+References: <20200925102251.7216-1-pankaj.gupta.linux@gmail.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat GmbH
+Message-ID: <82784f22-6d1a-2c75-3a5f-841c4eb2122f@redhat.com>
+Date: Fri, 25 Sep 2020 12:23:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr;
- s=pharaoh; t=1601029040;
- h=from:from:sender:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=B9F/66Vuw8urIeiKnlqbUW/o4qpDy+MtTRBF5H3Fg5c=;
- b=cjG8tE9mjEqEETyVlvOrkQk58Ad0Oxr2DJV4YmsqU78TzJvh0BkuyoTUllvyGnjw/y0C/5
- g7t+s8FSYwgpJMS7heYsnkYnbCqLGwBS/XABLZT08EzWIStE49XP9xVdUlhtp2ZaQTIgpY
- gDxF1vcNtMOJxI4teUZkr3vcCJdKODdRJsPdM+iMWCz+ILlK++VLYZxYEpzw4hO+J/mi8V
- b1kp139A0TkO61wu8fp8wFZi36VtYSzLGS8ZV9DqoQ16DWoBwYBgZpSs7Qt3QqQiM4/Xil
- y/BOdZWrgnpQWr3UqOY4wMjjz6Vn6tR+7/DQld+EC5X4M2BIS2xrjZLULp8EOw==
-ARC-Seal: i=1; s=pharaoh; d=lmichel.fr; t=1601029040; a=rsa-sha256; cv=none;
- b=VeYE3jpca0MJWf8Zlf4SpfqlJupuXimZz/NaA+DOUWPnY1wlEo3W35C/e5QeyLe+APuPTnv9mKn+uGOeVkhCEsZK+vUUk5a+zFn2V/gfTi97HKVLJ055GBtMk/QHglr4wJzI3yCu60egR5/v+t0h7SYhbR/cWA5pAyN5tMzsTzRAa80z8VNfT8p3l2ZZ3N4AkeNJyi4uf3AfdNhBz3bb2+hJLv+9GcWyxTUEP8FISaTouRrzzrNRui/fD32dB7ygMlaPMoilQxFCmz0/jKWEIdXfpzT+tY8+y3r/CiaVDAxhxuDoZ7KBaMyIXJ4Jygh3iR3IrNBsRzlz7exnOegWvw==
-ARC-Authentication-Results: i=1;
-	pharaoh.lmichel.fr
-Received-SPF: pass client-ip=149.202.28.74; envelope-from=luc@lmichel.fr;
- helo=pharaoh.lmichel.fr
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 06:17:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+In-Reply-To: <20200925102251.7216-1-pankaj.gupta.linux@gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=david@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 02:48:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -34
+X-Spam_score: -3.5
+X-Spam_bar: ---
+X-Spam_report: (-3.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.214, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,74 +142,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- Luc Michel <luc@lmichel.fr>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A PLL channel is able to further divide the generated PLL frequency. The
-divider is given in the ctrl_a2w register. Some channels have a
-additional fixed divider which is always applied to the signal.
+On 25.09.20 12:22, Pankaj Gupta wrote:
+>  Qemu fails with below error when trying to run with virtio pmem:
+> 
+>  (qemu) qemu-system-x86_64: -device virtio-pmem-pci,memdev=mem1,id=nv1:
+>   device is modern-only, use disable-legacy=on
+>  
+>  This patch fixes this by forcing virtio 1 with virtio-pmem.
+> 
+> fixes: adf0748a49 ("virtio-pci: Proxy for virtio-pmem")
+> Signed-off-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+> ---
+>  hw/virtio/virtio-pmem-pci.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/virtio/virtio-pmem-pci.c b/hw/virtio/virtio-pmem-pci.c
+> index 21a457d151..2b2a0b1eae 100644
+> --- a/hw/virtio/virtio-pmem-pci.c
+> +++ b/hw/virtio/virtio-pmem-pci.c
+> @@ -22,6 +22,7 @@ static void virtio_pmem_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+>      VirtIOPMEMPCI *pmem_pci = VIRTIO_PMEM_PCI(vpci_dev);
+>      DeviceState *vdev = DEVICE(&pmem_pci->vdev);
+>  
+> +    virtio_pci_force_virtio_1(vpci_dev);
+>      qdev_realize(vdev, BUS(&vpci_dev->bus), errp);
+>  }
+>  
+> 
 
-Signed-off-by: Luc Michel <luc@lmichel.fr>
----
- hw/misc/bcm2835_cprman.c | 33 ++++++++++++++++++++++++++++++++-
- 1 file changed, 32 insertions(+), 1 deletion(-)
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-diff --git a/hw/misc/bcm2835_cprman.c b/hw/misc/bcm2835_cprman.c
-index 2c70a3f317..e644aeb2b5 100644
---- a/hw/misc/bcm2835_cprman.c
-+++ b/hw/misc/bcm2835_cprman.c
-@@ -132,13 +132,44 @@ static const TypeInfo cprman_pll_info = {
- };
- 
- 
- /* PLL channel */
- 
-+static bool pll_channel_is_enabled(CprmanPLLChannelState *channel)
-+{
-+    /*
-+     * XXX I'm not sure of the purpose of the LOAD field. The Linux driver does
-+     * not set it when enabling the channel, but does clear it when disabling
-+     * it.
-+     */
-+    return !FIELD_EX32(*channel->reg_a2w_ctrl, A2W_PLLx_CHANNELy, DISABLE)
-+        && !(*channel->reg_cm & channel->hold_mask);
-+}
-+
- static void pll_channel_update(CprmanPLLChannelState *channel)
- {
--    clock_update(channel->out, 0);
-+    uint64_t freq, div;
-+
-+    if (!pll_channel_is_enabled(channel)) {
-+        clock_update(channel->out, 0);
-+        return;
-+    }
-+
-+    div = FIELD_EX32(*channel->reg_a2w_ctrl, A2W_PLLx_CHANNELy, DIV);
-+
-+    if (!div) {
-+        /*
-+         * It seems that when the divider value is 0, it is considered as
-+         * being maximum by the hardware (see the Linux driver).
-+         */
-+        div = R_A2W_PLLx_CHANNELy_DIV_MASK;
-+    }
-+
-+    /* Some channels have an additional fixed divider */
-+    freq = clock_get_hz(channel->pll_in) / (div * channel->fixed_divider);
-+
-+    clock_update_hz(channel->out, freq);
- }
- 
- /* Update a PLL and all its channels */
- static void pll_update_all_channels(BCM2835CprmanState *s,
-                                     CprmanPLLState *pll)
 -- 
-2.28.0
+Thanks,
+
+David / dhildenb
 
 
