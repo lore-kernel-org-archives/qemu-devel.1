@@ -2,109 +2,87 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 345ABC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 08:53:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C8F6C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 08:53:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6FA4420936
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 08:53:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C628920936
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 08:53:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jd7OwjIJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FA4420936
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gdc47KGP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C628920936
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLjTR-0001Lg-Eg
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 04:53:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52834)
+	id 1kLjTU-0001Qy-Sh
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 04:53:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52904)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLjRk-0000CK-23
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 04:51:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36918)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kLjRo-0000I1-1E
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 04:51:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36275)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLjRh-0005PB-J1
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 04:51:15 -0400
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kLjRm-0005Pi-79
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 04:51:19 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601023871;
+ s=mimecast20190719; t=1601023877;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pRG0H7r3cKqQm27cVPcMa1iZkYLiHI2CPy4+qCFW1tM=;
- b=Jd7OwjIJqixs8xvIVrED7zo4rZ2HnIFpJ0v6ouui8RIDQzJdzxU6CvJPkxKHPyJsa2YAmN
- a9p9dLIJzMD84QvPHZpuiC0au03FTXMdNBcJlWFCnzMq/apJbUM9xCH3w6JQt1FcOJvNJQ
- ugV9jbkk6FkcHQ3wg/4sTAkzAkpiOWs=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-144-aT-PYYwfPOSDU_6BYbwecw-1; Fri, 25 Sep 2020 04:51:09 -0400
-X-MC-Unique: aT-PYYwfPOSDU_6BYbwecw-1
-Received: by mail-wm1-f70.google.com with SMTP id s24so583508wmh.1
- for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 01:51:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=pRG0H7r3cKqQm27cVPcMa1iZkYLiHI2CPy4+qCFW1tM=;
- b=HcE2MFVeldU88z28YOWCgPjvnXnXwH8CSC10luf/nIHvCFv7ZaRvvDyBslrLmVvFMO
- s8FZPJ17BvKFTII0qULEUwoiP4q2ISEf3q4H6vFikT/lyQm1sw79F2zgOOSwQzkQg3bQ
- QxAs10lQYdmFmVuZH0uWt8sl7GdUVDjWynFOshrKasrZrkdAl/RYXCRjlaFPOl+jJ3+R
- S0KYaRLAsaulSGvo1b83wodqO99Trnop1PRBnAdUy2sRJLQuakKJyUP46zt1KF/n5Rs3
- uW/B0uTK8rYA5T8d5AipLbW4xf7bwZTARKPVhBU/CnEXnKn+67heDxEWncByf6PfQcm8
- G4AQ==
-X-Gm-Message-State: AOAM532MX9gCZ942gHRQnJUX/XnnjvaaSj6f9aorJYK6/YLcrY8pnokw
- ugYmKHQhgWelJLMgJ0bWMN6k7tyYL9QxKWidsknGNZ+/bYHTqD/OgjeWpTQa0CsEt1D5iw7FCWG
- sUouTPy63L8laSIE=
-X-Received: by 2002:adf:d845:: with SMTP id k5mr3037630wrl.285.1601023867500; 
- Fri, 25 Sep 2020 01:51:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwCfw/mpXmy/j9RdvUPQJBwj94hCzl8r+H9IRq6gYf5nu8Qq2M368LoLovETpecVSxDt/nUUg==
-X-Received: by 2002:adf:d845:: with SMTP id k5mr3037611wrl.285.1601023867241; 
- Fri, 25 Sep 2020 01:51:07 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ec9b:111a:97e3:4baf?
- ([2001:b07:6468:f312:ec9b:111a:97e3:4baf])
- by smtp.gmail.com with ESMTPSA id x10sm2120241wmi.37.2020.09.25.01.51.05
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 25 Sep 2020 01:51:06 -0700 (PDT)
-Subject: Re: SEV guest debugging support for Qemu
-To: Ashish Kalra <ashish.kalra@amd.com>, dgilbert@redhat.com,
- qemu-devel@nongnu.org
-References: <20200922201124.GA6606@ashkalra_ubuntu_server>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5a58509c-5838-f0aa-d9ab-4f85ca0ac35f@redhat.com>
-Date: Fri, 25 Sep 2020 10:51:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ bh=nNk+NFqyEUd99B6oVX3e+DRmCKS0dtGyHIVXwI5ceao=;
+ b=Gdc47KGPltteFiVDgpz7qZEAKcnZjYBQzPOLdu9+F6//mfhWZedDsQa3DY8ggJ+ycqfrI1
+ 5x1blYRJCQ8MkBlLnNt/r+S39SN06Y5aIZynMoDHgfDbA5pyDjJ/OL4eqdlkCTi7O9RGjV
+ xDD0/h+iFIkuZ89jX9kzMPJ2iPSkQSw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-438-07yVMxfbOP-DwHz0KJRPnw-1; Fri, 25 Sep 2020 04:51:15 -0400
+X-MC-Unique: 07yVMxfbOP-DwHz0KJRPnw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 348991084D77;
+ Fri, 25 Sep 2020 08:51:14 +0000 (UTC)
+Received: from localhost (ovpn-113-240.ams2.redhat.com [10.36.113.240])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C5CA555784;
+ Fri, 25 Sep 2020 08:51:13 +0000 (UTC)
+Date: Fri, 25 Sep 2020 09:51:12 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH v2 00/31] block/export: Add infrastructure and QAPI for
+ block exports
+Message-ID: <20200925085112.GD33068@stefanha-x1.localdomain>
+References: <20200924152717.287415-1-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200922201124.GA6606@ashkalra_ubuntu_server>
+In-Reply-To: <20200924152717.287415-1-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="XvKFcGCOAo53UbWW"
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 01:07:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -34
-X-Spam_score: -3.5
+X-Spam_score_int: -32
+X-Spam_score: -3.3
 X-Spam_bar: ---
-X-Spam_report: (-3.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
+X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.214, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -117,45 +95,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thomas.lendacky@amd.com, jon.grimm@amd.com, brijesh.singh@amd.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22/09/20 22:11, Ashish Kalra wrote:
-> This internally invokes the address_space_rw() accessor functions
-> which we had  "fixed" internally (as part of the earlier patch) to
-> invoke memory region specific debug ops. In our earlier approach we
-> were adding debug ops/callbacks to memory regions and as per comments
-> on our earlier patches, Paolo was not happy with this debug API for 
-> MemoryRegions and hence the SEV support for Qemu was merged without
-> the debug support.
+--XvKFcGCOAo53UbWW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-My complaint was only about hooking into address_space_read and
-address_space_write; I think the hook should not touch general-purpose
-(non-debug) code if possible, so something like this:
+On Thu, Sep 24, 2020 at 05:26:46PM +0200, Kevin Wolf wrote:
+> We are planning to add more block export types than just NBD in the near
+> future (e.g. vhost-user-blk and FUSE). This series lays the ground for
+> this with some generic block export infrastructure and QAPI interfaces
+> that will allow managing all of them (for now add/remove/query).
+>=20
+> As a side effect, qemu-storage-daemon can now map --export directly to
+> the block-export-add QMP command, similar to other command line options.
+> The built-in NBD servers also gains new options that bring it at least a
+> little closer to feature parity with qemu-nbd.
+>=20
+> v2:
+> - Rebased on current master
+> - Fixed assumption of &blk_exp_nbd instead of drv in generic code [Max]
+> - Documented blk_exp_request_shutdown() better [Max]
+> - iotests 140: Fixed race between QMP return value and event [Max]
+> - Improved the commit message for patch 26
+> - Removed copy&paste error in deprecated.rst [Max]
+> - iotests: Take Sequence instead of positional arguments in
+>   qemu_tool_pipe_and_status() [Max]
+> - iotests: Separate patch for qemu_nbd_list_log [Max]
+> - iotests 307: [Max]
+>   * Allow more image formats
+>   * Use sock_dir for the socket
+>   * Use f-strings instead of % operator
+>   * Log events after deleting an export
+>   * Test force removing an export
 
-typedef struct MemoryDebugOps {
-    hwaddr (*translate)(CPUState *cpu, target_ulong addr,
-                        MemTxAttrs *attrs);
-    MemTxResult (*read)(AddressSpace *as, hwaddr phys_addr,
-                        MemTxAttrs attrs, void *buf,
-                        hwaddr len);
-    MemTxResult (*write)(AddressSpace *as, hwaddr phys_addr,
-                         MemTxAttrs attrs, const void *buf,
-                         hwaddr len);
-} MemoryDebugOps;
+I rebased and retested the vhost-user-blk-server block exports series on
+top of this:
 
-These ops would be used only by cpu_memory_rw_debug and would default to
+Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-static const MemoryDebugOps default_debug_ops = {
-    .translate = cpu_get_phys_page_attrs_debug,
-    .read = address_space_read,
-    .write = address_space_write_rom
-};
+--XvKFcGCOAo53UbWW
+Content-Type: application/pgp-signature; name="signature.asc"
 
-static const MemoryDebugOps *debug_ops = &default_debug_ops;
+-----BEGIN PGP SIGNATURE-----
 
-Paolo
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9tr4AACgkQnKSrs4Gr
+c8j+Zwf+NOZY/1jKZ8ywOgCmp0GrXVEWFuSUDkiSmTOINK04zJDi1h0x9f7mVJ2G
+coYiffPABqAL6pCyI6nnYL/osi+cwrzVr7RYt34hUfYeWpgNzV4jSXUMOS03MF9U
+iEn304GMkVDopFt5V6AB1tXliqqEcFWRibkLu18eVRVJ4+E0PQ9BZ8TrQOI1TnPG
+5iy3J4uP1FJWiFFcOE0RmF1cMvOAjLNjyYwnRtX3wLCOWG1l99leIu30lbJzp7DW
+jmNnB9jiYZZ3RkQroshdFZT+TjVg9UKgISo/gO/re1nNAo2U+u+MrmDpZuLR3pYt
+EYRNtreGfeWB1kWGyKiMRZ1hiiECsw==
+=kDJC
+-----END PGP SIGNATURE-----
+
+--XvKFcGCOAo53UbWW--
 
 
