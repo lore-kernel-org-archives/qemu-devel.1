@@ -2,93 +2,90 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD2EBC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 15:46:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0D84C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 15:48:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D5F821741
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 15:46:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5E6C321741
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 15:48:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tgHGr84R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D5F821741
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jQ4Z92GI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E6C321741
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLpw0-0000QD-D5
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 11:46:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35954)
+	id 1kLpxx-0001en-90
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 11:48:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36732)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kLppq-0002fY-D6
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:40:34 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41965)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kLppo-0007ag-6D
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:40:33 -0400
-Received: by mail-wr1-x444.google.com with SMTP id w5so4062766wrp.8
- for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 08:40:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=6NYly9DVGNd0iwSQHYlx1RrznyvyAiNTg6sPQ2mc5/4=;
- b=tgHGr84R5wydMnolhzTwswArZh4PrmdnFcY0aICs3QFjpDoi/FBBDXa+8yMMae9hcN
- U/QRm/gRcEvUjSfzychr2T4pWFzfxMAucTFl+hPHQicajB22+uQQy7ENXWYpOytP5Rg5
- aoNA3bVkRH/e02U1tVr1+Eat0JAzcVgBr1X06CJSOMgwHbGdDZe2YT7209B3CCg6F92A
- a7F3dlI4MhHfufkJ5fM+Hen5eTTlPNBYW2pxA7Wd5pUPI+zc2Uwr1f0s2betKFqRa5X0
- 57mN60WzoxFlWVeW1LhCqchKGVhq8QlASy9Z/ZB1mWTfj3574jHD+9o1L7PpzgpXpfTR
- 3w1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=6NYly9DVGNd0iwSQHYlx1RrznyvyAiNTg6sPQ2mc5/4=;
- b=eI5AxKNki6ifW6b2b7GpLr405YmZameWk02LBuho857hYXxGhnK3OCNsW8EUzj5Dn3
- c/y0jp/r5OBmsPZZ8pOmCMQuYnQWSrCVmFAfOapstvpVsohWnhlEOyg3iojuPVOjElFu
- poRgamSe/bN+zg9P+67BeSZtrAybGc563d4PU016ugspj04x3stUHKegDVpyvnoodgBh
- cXLuWMuh42R8W3ihlYC3jHOj7xVo97kbyeoKxuNkASzpprKwUX4bq8tfFxabUhB6UMoc
- +KbvQryaafSpnWzBwhsZZgGVe7hJ0JyV4MkmubvaAu4VPmQ841U7pD2wiUckiA7xhqe6
- qVGQ==
-X-Gm-Message-State: AOAM533q7RDll3lZw7JCaMTtbkm9K4yXq4xrEt2dwxdWFd0qFZDPBmod
- 2UoghXAzfH8biQcozcqhnvKKdg==
-X-Google-Smtp-Source: ABdhPJxh8C6ocfKgJORMR5uDz35eOWmaUht41cXmCBdo6+I9JzVUpujqE20PmnLHmRqNQo2h9OXZYg==
-X-Received: by 2002:adf:e407:: with SMTP id g7mr5116848wrm.349.1601048430451; 
- Fri, 25 Sep 2020 08:40:30 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id w21sm3499960wmk.34.2020.09.25.08.40.28
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 25 Sep 2020 08:40:28 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 17A571FF7E;
- Fri, 25 Sep 2020 16:40:28 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 00/15] testing/next pre-PR (python3.6, check-tcg)
-Date: Fri, 25 Sep 2020 16:40:12 +0100
-Message-Id: <20200925154027.12672-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kLpt9-0006HO-JF
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:43:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56725)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kLpt7-00083R-W6
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:43:59 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601048636;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=WxbwFwT33OGrgK/cs5dtfZ6zGQcuRjeRBdSmr0zZmEo=;
+ b=jQ4Z92GImr9XPcvKbqzqAY+ySOv9mQ3vCQXgqxfq9QB2FaRzyERRCi4nAlwSKj1UDg1f2Q
+ 8ADnHf/aShJ+XsB+ZCbAzBL3ny2Vc0i8im4qa1M9GRX/mQ9+xqIX2Tu7nz/NEiK/ecavee
+ QvEIcG53+ZCb2bY7fhKwfNxwn7q/ni8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-418-ROXynxSYMuGmskKxNKIRrw-1; Fri, 25 Sep 2020 11:43:53 -0400
+X-MC-Unique: ROXynxSYMuGmskKxNKIRrw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6A51F10BBECF;
+ Fri, 25 Sep 2020 15:43:51 +0000 (UTC)
+Received: from gondolin (ovpn-112-192.ams2.redhat.com [10.36.112.192])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0B31C5D9F1;
+ Fri, 25 Sep 2020 15:43:42 +0000 (UTC)
+Date: Fri, 25 Sep 2020 17:43:41 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Subject: Re: [PATCH v6 0/8] s390: Extended-Length SCCB & DIAGNOSE 0x318
+Message-ID: <20200925174341.21fe97af.cohuck@redhat.com>
+In-Reply-To: <20200925173205.288d877b@ibm-vm>
+References: <20200915194416.107460-1-walling@linux.ibm.com>
+ <20200916175300.5c2b6bbb.cohuck@redhat.com>
+ <3f4c28d6-fe5f-2e52-2e51-3190621ea63d@linux.ibm.com>
+ <82f7c31c-16f6-8450-d241-ca8257db6469@linux.ibm.com>
+ <20200925171855.670bd93a.cohuck@redhat.com>
+ <20200925173205.288d877b@ibm-vm>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 01:07:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -32
+X-Spam_score: -3.3
+X-Spam_bar: ---
+X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,72 +98,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Collin Walling <walling@linux.ibm.com>, frankja@linux.ibm.com,
+ mst@redhat.com, david@redhat.com, qemu-devel@nongnu.org, pasic@linux.ibm.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, thuth@redhat.com,
+ pbonzini@redhat.com, sumanthk@linux.ibm.com, mihajlov@linux.ibm.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+On Fri, 25 Sep 2020 17:32:05 +0200
+Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
 
-This is my pre-PR state of testing/next. Mostly it has Thomas'
-python3.6 clean-ups for the various CI bits as well as Paolo's fix for
-the build system to enable check-tcg to work properly again. I should
-cut the PR on Monday.
+> On Fri, 25 Sep 2020 17:18:55 +0200
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+> > On Fri, 25 Sep 2020 11:13:49 -0400
+> > Collin Walling <walling@linux.ibm.com> wrote:
+> >   
+> > > On 9/16/20 1:15 PM, Collin Walling wrote:    
+> > > > On 9/16/20 11:53 AM, Cornelia Huck wrote:
+> > > > 
+> > > > [...]
+> > > >       
+> > > >>>      
+> > > >>
+> > > >> Thanks, applied.
+> > > >>
+> > > >>      
+> > > > 
+> > > > Thanks Conny.
+> > > > 
+> > > > Much appreciated for everyone's patience and review. The only
+> > > > thing I'd like to hold out on for now is for someone to take a
+> > > > peek at patch #3 with respect to the protected virtualization
+> > > > stuff. I don't know too much about it, honestly, and I want to
+> > > > ensure that dynamically allocating memory for the SCCB makes
+> > > > sense there. The alternative would be to allocate a static 4K for
+> > > > the work_sccb.   
+> > > 
+> > > I had someone take a look at the patch for PV and was told
+> > > everything looks sane. Since the patches have already been applied,
+> > > it seems like it's too late to add a reviewed-by from someone?    
+> > 
+> > Have the reviewer reply with their R-b, and I'll happily add it, as I
+> > rebase s390-next before doing a pull req anyway :)  
+> 
+> well it was me :)
+> 
+> you can add a 
+> 
+> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> 
+> for the first 6 patches, and an
+> 
+> Acked-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> 
+> for the last one
+> 
+> 
+> thanks!
+> 
 
-I think Paolo's fixes are also in another PR but I've left them in
-here because a) it makes testing easier and b) it's the 21st century
-and git should cope.
-
-Paolo Bonzini (3):
-  tests/tcg: reinstate or replace desired parts of rules.mak
-  meson: move libudev test
-  meson: move libmpathpersist test
-
-Thomas Huth (12):
-  migration: Silence compiler warning in global_state_store_running()
-  travis.yml: Drop the default softmmu builds
-  travis.yml: Update Travis to use Bionic and Focal instead of Xenial
-  travis.yml: Drop the superfluous Python 3.6 build
-  travis.yml: Drop the Python 3.5 build
-  tests/docker: Use Fedora containers for MinGW cross-builds in the
-    gitlab-CI
-  gitlab-ci: Remove the Debian9-based containers and containers-layer3
-  tests/docker: Update the tricore container to debian 10
-  shippable.yml: Remove the Debian9-based MinGW cross-compiler tests
-  tests/docker: Remove old Debian 9 containers
-  gitlab-ci: Increase the timeout for the cross-compiler builds
-  configure: Bump the minimum required Python version to 3.6
-
- docs/conf.py                                  |  4 +-
- configure                                     | 95 ++-----------------
- meson.build                                   | 85 +++++++++++++++--
- migration/global_state.c                      |  4 +-
- .gitlab-ci.d/containers.yml                   | 38 +++-----
- .gitlab-ci.d/crossbuilds.yml                  |  5 +-
- .gitlab-ci.yml                                |  1 -
- .shippable.yml                                |  4 -
- .travis.yml                                   | 55 +++--------
- meson_options.txt                             |  2 +
- tests/docker/Makefile.include                 |  2 +-
- .../dockerfiles/debian-tricore-cross.docker   |  2 +-
- .../dockerfiles/debian-win32-cross.docker     | 38 --------
- .../dockerfiles/debian-win64-cross.docker     | 45 ---------
- tests/docker/dockerfiles/debian9-mxe.docker   | 21 ----
- tests/docker/dockerfiles/debian9.docker       | 32 -------
- .../dockerfiles/fedora-win32-cross.docker     | 42 ++++++++
- .../dockerfiles/fedora-win64-cross.docker     | 38 ++++++++
- tests/qemu-iotests/iotests.py                 |  2 -
- tests/tcg/Makefile.qemu                       | 13 ++-
- tests/tcg/configure.sh                        |  4 +-
- 21 files changed, 211 insertions(+), 321 deletions(-)
- delete mode 100644 tests/docker/dockerfiles/debian-win32-cross.docker
- delete mode 100644 tests/docker/dockerfiles/debian-win64-cross.docker
- delete mode 100644 tests/docker/dockerfiles/debian9-mxe.docker
- delete mode 100644 tests/docker/dockerfiles/debian9.docker
- create mode 100644 tests/docker/dockerfiles/fedora-win32-cross.docker
- create mode 100644 tests/docker/dockerfiles/fedora-win64-cross.docker
-
--- 
-2.20.1
+Thanks, updated and pushed out.
 
 
