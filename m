@@ -7,66 +7,65 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE25DC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:17:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF508C4727D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:17:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64AE72086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:17:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 42B9221D7A
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:17:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NmpDpMHz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64AE72086A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T+Ow4eFS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42B9221D7A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLmfI-0006wW-H9
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 08:17:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38240)
+	id 1kLmfk-0007Ec-VB
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 08:17:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38414)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kLmVx-0002q5-1b
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:07:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43714)
+ id 1kLmWJ-0003fZ-1Q
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:08:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32654)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kLmVv-0004FO-4B
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:07:48 -0400
+ id 1kLmWH-0004IX-0k
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:08:10 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601035666;
+ s=mimecast20190719; t=1601035688;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ZYwR8v70/BIXXGAJip2JIOAQsBVnpybo/HOqyw1ujpA=;
- b=NmpDpMHzk/n5BfCNMPoUNOhG+bVMoa1uPlexziq6Wsr84rHhMHgKKNl3BPsp2tRHx/5ydF
- /L1MT+j8shh4RYOVm7ZpKFADe8gahIKsrPbprjTS415pltbj5ZqAFK54E1wFnPVz73vibl
- /BtrLno/nGd22CyOwDaKTSy5rQ8kNg8=
+ bh=C8kuCzwewug5ZS+IEH9Np5RTfbg3mae2wgdLl7KapEs=;
+ b=T+Ow4eFSa/tP5nFz2SDTKdOu4lhdNgmfrL0pQcAK/73Tb4UEIaKBlpJBS//8+UMKUBdD/F
+ 40OXVResaZGRL8YL8au4vL3BRc2WleMLGsSHn3rgcJCD7hVDGDZScDNEFyrohkNa+zJ3RK
+ PZRnI0TUFqjrFrBZzfph3zyu5jHL6H0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-94-GiOYJvevNtaY-PTt_Dqwkg-1; Fri, 25 Sep 2020 08:07:42 -0400
-X-MC-Unique: GiOYJvevNtaY-PTt_Dqwkg-1
+ us-mta-130-4Nh1OWgDOa6u5ML4JSrMIA-1; Fri, 25 Sep 2020 08:08:05 -0400
+X-MC-Unique: 4Nh1OWgDOa6u5ML4JSrMIA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9D2410BBECB;
- Fri, 25 Sep 2020 12:07:40 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8DE16186DD42;
+ Fri, 25 Sep 2020 12:08:04 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-114-177.ams2.redhat.com
  [10.36.114.177])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9BCD973692;
- Fri, 25 Sep 2020 12:07:35 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 67D2E73697;
+ Fri, 25 Sep 2020 12:07:59 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, zhengchuan@huawei.com, dovmurik@linux.vnet.ibm.com,
  hgcoin@gmail.com, zhangjiachen.jaycee@bytedance.com, lvivier@redhat.com,
  peterx@redhat.com, stefanha@redhat.com, vgoyal@redhat.com,
  jinyan12@huawei.com, ann.zhuangyanying@huawei.com
-Subject: [PULL 10/26] migration/dirtyrate: skip sampling ramblock with size
- below MIN_RAMBLOCK_SIZE
-Date: Fri, 25 Sep 2020 13:06:39 +0100
-Message-Id: <20200925120655.295142-11-dgilbert@redhat.com>
+Subject: [PULL 16/26] migration: increase max-bandwidth to 128 MiB/s (1 Gib/s)
+Date: Fri, 25 Sep 2020 13:06:45 +0100
+Message-Id: <20200925120655.295142-17-dgilbert@redhat.com>
 In-Reply-To: <20200925120655.295142-1-dgilbert@redhat.com>
 References: <20200925120655.295142-1-dgilbert@redhat.com>
 MIME-Version: 1.0
@@ -105,91 +104,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Chuan Zheng <zhengchuan@huawei.com>
+From: Laurent Vivier <lvivier@redhat.com>
 
-In order to sample real RAM, skip ramblock with size below MIN_RAMBLOCK_SIZE
-which is set as 128M.
+max-bandwidth is set by default to 32 MiB/s (256 Mib/s)
+since 2008 (5bb7910af031c).
 
-Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
-Reviewed-by: David Edmondson <david.edmondson@oracle.com>
+Most of the CPUs can dirty memory faster than that now,
+and this is clearly a problem with POWER where the page
+size is 64 kiB and not 4 KiB.
+
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Message-Id: <20200921144957.979989-1-lvivier@redhat.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
-Message-Id: <1600237327-33618-9-git-send-email-zhengchuan@huawei.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/dirtyrate.c | 21 +++++++++++++++++++++
- migration/dirtyrate.h |  5 +++++
- 2 files changed, 26 insertions(+)
+ migration/migration.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-index 0f78aa3af7..ee47e2bc27 100644
---- a/migration/dirtyrate.c
-+++ b/migration/dirtyrate.c
-@@ -138,6 +138,18 @@ static void get_ramblock_dirty_info(RAMBlock *block,
-     strcpy(info->idstr, qemu_ram_get_idstr(block));
- }
+diff --git a/migration/migration.c b/migration/migration.c
+index 827f8be07d..de34c995af 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -57,7 +57,7 @@
+ #include "qemu/queue.h"
+ #include "multifd.h"
  
-+static bool skip_sample_ramblock(RAMBlock *block)
-+{
-+    /*
-+     * Sample only blocks larger than MIN_RAMBLOCK_SIZE.
-+     */
-+    if (qemu_ram_get_used_length(block) < (MIN_RAMBLOCK_SIZE << 10)) {
-+        return true;
-+    }
-+
-+    return false;
-+}
-+
- static bool record_ramblock_hash_info(struct RamblockDirtyInfo **block_dinfo,
-                                       struct DirtyRateConfig config,
-                                       int *block_count)
-@@ -150,6 +162,9 @@ static bool record_ramblock_hash_info(struct RamblockDirtyInfo **block_dinfo,
-     bool ret = false;
+-#define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed throttling */
++#define MAX_THROTTLE  (128 << 20)      /* Migration transfer speed throttling */
  
-     RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+        if (skip_sample_ramblock(block)) {
-+            continue;
-+        }
-         total_count++;
-     }
- 
-@@ -159,6 +174,9 @@ static bool record_ramblock_hash_info(struct RamblockDirtyInfo **block_dinfo,
-     }
- 
-     RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+        if (skip_sample_ramblock(block)) {
-+            continue;
-+        }
-         if (index >= total_count) {
-             break;
-         }
-@@ -225,6 +243,9 @@ static bool compare_page_hash_info(struct RamblockDirtyInfo *info,
-     RAMBlock *block = NULL;
- 
-     RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+        if (skip_sample_ramblock(block)) {
-+            continue;
-+        }
-         block_dinfo = find_block_matched(block, block_count, info);
-         if (block_dinfo == NULL) {
-             continue;
-diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
-index 312debca6f..be5b8ec2b1 100644
---- a/migration/dirtyrate.h
-+++ b/migration/dirtyrate.h
-@@ -24,6 +24,11 @@
-  */
- #define RAMBLOCK_INFO_MAX_LEN                     256
- 
-+/*
-+ * Minimum RAMBlock size to sample, in megabytes.
-+ */
-+#define MIN_RAMBLOCK_SIZE                         128
-+
- struct DirtyRateConfig {
-     uint64_t sample_pages_per_gigabytes; /* sample pages per GB */
-     int64_t sample_period_seconds; /* time duration between two sampling */
+ /* Amount of time to allocate to each "chunk" of bandwidth-throttled
+  * data. */
 -- 
 2.26.2
 
