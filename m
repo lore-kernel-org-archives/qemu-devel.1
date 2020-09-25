@@ -7,84 +7,84 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCFF6C4727D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:57:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5699C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:57:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67429206DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:57:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 812CE206DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:57:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eb6ALVdn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67429206DB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UHH9XotP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 812CE206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLnIF-0007Xc-IP
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 08:57:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48324)
+	id 1kLnIP-0007rm-GE
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 08:57:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48206)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kLnCt-0007pi-Uo
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:52:11 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46531)
+ id 1kLnCl-0007dK-Ce
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:52:03 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34380)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kLnCr-0001Qz-4I
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:52:11 -0400
-Received: by mail-wr1-x441.google.com with SMTP id o5so3429359wrn.13
- for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 05:52:08 -0700 (PDT)
+ id 1kLnCj-0001Oo-DX
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:52:03 -0400
+Received: by mail-wr1-x443.google.com with SMTP id t10so3526679wrv.1
+ for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 05:52:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=9eI5ySrz2OiQLFHfiZ2ocnjA2ayiRqTZ1gQtwjJhv6Q=;
- b=eb6ALVdnmFHCTlliFN8w9QQPFweSJ6Di6etcFIdumY21j+3VWYHbhdRz7orrZd4HNW
- BC4nCBlDbhKhp6XnTOh2XkBcX/rpHXp3DeYZ34PeLz4kqPPrY/F5SNXgz7NrQCyoBNGy
- KNB1ehCec9b7w+DJrxTUXT2jfRP2isSynh5wWCGH7z+PirCFWe6mkr56BuMx3N/o4LaE
- PNOprC+3WFDvrcMxerUHXbCs0Sb7JsONYWNzLbecNDWZuHuTaveLGuI7HmFLAXC2FOxF
- DmT1faygi6/tecLZE2OKcL89BFE2X2kCsFiu3TRkNllSt59innjb3U6sG8Sy3jpE5FZQ
- EulQ==
+ bh=qsQZO642QNM9thsI3rY2HZwoa6pjzpWob+CVTQWTY9k=;
+ b=UHH9XotPcaYd69YG2moOspEe8L59ggJkDB9j8hC7qbik1KRbkYDtM6C4EsDe/h0MLq
+ Sq4RMjWheINojM95Qcm/GW4lfrhRJINf4TnM+1AinLXgny7ZLW/WYYXl3aEF6GMGS4vE
+ B7UzanlSuTJ+faT1+h1dZiNiabnem737nOmJCmBVT/RvgddxGluHp0DHoyiafjPy78cH
+ kgnXQ61iULB1D2ILTuiZcmEJAvAUx2SOPQjH9uaSeHrUnvhpnV9LVEWBujE/yi1F76mn
+ VZ0+GzOrusr4XWoGZUpP/HvVuqXDStYmZKgkm9FP0Ljkcs7pxxxtNCk7OlbDgnsPjwsO
+ pTVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=9eI5ySrz2OiQLFHfiZ2ocnjA2ayiRqTZ1gQtwjJhv6Q=;
- b=TMPCoS0OgteJYyAYWLS+7UFF53dCZtLqLcFrUOhcwV2k122KefkRrT7vJsPdCamrMc
- TXV+DXAe49CfXu7p9KQCoUC5d4pjIJ+OWyvkaF3R9+wMNwwxBaeq0J8MlX3CcTtwHzjs
- PgQyVBNSwxPr+Qwr37bcEa9GOY3Hmal3j37VJVNjHdOilUvQqYAVmQeStdKcjRstXKY1
- Ua22fDu8uKg7bT5brlW2RpiZz4oTXVrHArjJtF6h89Am9GM55vHw/Zk6nHS7TGQ5HLXI
- 2Jnvz23pxzW0vq6AiEH/CCz3sLVavSfo8n2ZVJAIfZQr4X5XV55tWlVVddmrARFACqbn
- 3qpg==
-X-Gm-Message-State: AOAM533yKkaNHs3KkwhHmY9jQQrjP/9VAakezPY2OKPp7XLVmFqTDTkb
- ysvZj7+XVewOm2bH4V1k2Uzmtw==
-X-Google-Smtp-Source: ABdhPJwrBoyZaa9ySYnxA8u48SmELYctXq1T0Fdj46EQTS15QzgJZGB+uHCKPTfkdtsZGNMxEX84TA==
-X-Received: by 2002:a05:6000:7:: with SMTP id h7mr4620923wrx.16.1601038327710; 
- Fri, 25 Sep 2020 05:52:07 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id v9sm3129761wrv.35.2020.09.25.05.51.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ bh=qsQZO642QNM9thsI3rY2HZwoa6pjzpWob+CVTQWTY9k=;
+ b=TyU6ozxXGMTwTxNx0TiKZknsw803N46xiuqfpeUf5o9ZA2pbJ4YhVnNnpBOJr+5jd2
+ 6KdoVXMdBoE1BGuH7jlPEWmtEfn4EYYWytOKQ4C4/ZhWXjhlS2m/sEfiyOFCafTwG1hW
+ 3eUcfsAhuo2AddoCqzssuNY9ya8TnAmkCSuxEkzr6+FbBwcO5t/OydatjPbtYdkXh7PO
+ go4nhxxWJmF8b0xv6EPxHxZw5bDazH5viXuYpQWUvHWut1d5q4ir5BQC1eIf7TD7R/Cg
+ 2ZmAl435t6vRIE6W3w/E/sASae/KQip/vFjbFXUa+YXSz6riJouYekZnoxEYTlDIZY1p
+ vbvA==
+X-Gm-Message-State: AOAM533ew5Sye41WGa37xzPxi81U0oRm7flhs5wRGgmbqa57Lko/hBqy
+ UyYNmydIBOv7R/jd3/lFYjY/0Q==
+X-Google-Smtp-Source: ABdhPJzxGOLpvB7rUaudCgm/+nAA6NXLFNZlEuBZJJxkQw7M1L981nLdC9hOSy871SGN+c1FCuXWFA==
+X-Received: by 2002:a5d:5261:: with SMTP id l1mr4316749wrc.193.1601038320023; 
  Fri, 25 Sep 2020 05:52:00 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id l18sm2730665wrp.84.2020.09.25.05.51.50
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 25 Sep 2020 05:51:53 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 41FCB1FF9A;
- Fri, 25 Sep 2020 13:51:49 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id C544D1FF92;
+ Fri, 25 Sep 2020 13:51:48 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org, maxim.uvarov@linaro.org, joakim.bech@linaro.org,
  ilias.apalodimas@linaro.org, tomas.winkler@intel.com, yang.huang@intel.com,
  bing.zhu@intel.com, Matti.Moell@opensynergy.com, hmo@opensynergy.com
-Subject: [RFC PATCH 11/19] tools/vhost-user-rpmb: add --flash-path for backing
- store
-Date: Fri, 25 Sep 2020 13:51:39 +0100
-Message-Id: <20200925125147.26943-12-alex.bennee@linaro.org>
+Subject: [RFC PATCH 06/19] tools/vhost-user-rpmb: add boilerplate and initial
+ main
+Date: Fri, 25 Sep 2020 13:51:34 +0100
+Message-Id: <20200925125147.26943-7-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200925125147.26943-1-alex.bennee@linaro.org>
 References: <20200925125147.26943-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -114,142 +114,131 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We will need to store the data somewhere so add the option to point to
-the file where we will keep the data.
+This adds the boilerplate files for a new vhost-user helper called
+vhost-user-rpmb which will support virtio based RPMB (Replay Protected
+Memory Block) devices.
+
+This commit just adds the initial boilerplate for building the binary
+with the common vhost-user options. As of this commit the only useful
+output you get is when running:
+
+  vhost-user-rpmb --help
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tools/vhost-user-rpmb/main.c | 58 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 57 insertions(+), 1 deletion(-)
+ tools/vhost-user-rpmb/main.c               | 37 ++++++++++++++++++++++
+ MAINTAINERS                                |  5 +++
+ tools/meson.build                          |  8 +++++
+ tools/vhost-user-rpmb/50-qemu-rpmb.json.in |  5 +++
+ tools/vhost-user-rpmb/meson.build          | 11 +++++++
+ 5 files changed, 66 insertions(+)
+ create mode 100644 tools/vhost-user-rpmb/main.c
+ create mode 100644 tools/vhost-user-rpmb/50-qemu-rpmb.json.in
+ create mode 100644 tools/vhost-user-rpmb/meson.build
 
 diff --git a/tools/vhost-user-rpmb/main.c b/tools/vhost-user-rpmb/main.c
-index 7b3b29ccfc5b..64bd7e79f573 100644
---- a/tools/vhost-user-rpmb/main.c
+new file mode 100644
+index 000000000000..a40a680a74ca
+--- /dev/null
 +++ b/tools/vhost-user-rpmb/main.c
-@@ -13,9 +13,15 @@
- #include <gio/gio.h>
- #include <gio/gunixsocketaddress.h>
- #include <glib-unix.h>
-+#include <glib/gstdio.h>
- #include <stdio.h>
- #include <string.h>
- #include <inttypes.h>
-+#include <fcntl.h>
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <sys/mman.h>
-+#include <unistd.h>
- 
- #include "contrib/libvhost-user/libvhost-user-glib.h"
- #include "contrib/libvhost-user/libvhost-user.h"
-@@ -27,6 +33,7 @@
- #endif
- 
- static gchar *socket_path;
-+static char *flash_path;
- static gint socket_fd = -1;
- static gboolean print_cap;
- static gboolean verbose;
-@@ -35,6 +42,7 @@ static gboolean debug;
- static GOptionEntry options[] =
- {
-     { "socket-path", 0, 0, G_OPTION_ARG_FILENAME, &socket_path, "Location of vhost-user Unix domain socket, incompatible with --fd", "PATH" },
-+    { "flash-path", 0, 0, G_OPTION_ARG_FILENAME, &flash_path, "Location of raw flash image file", "PATH" },
-     { "fd", 0, 0, G_OPTION_ARG_INT, &socket_fd, "Specify the file-descriptor of the backend, incompatible with --socket-path", "FD" },
-     { "print-capabilities", 0, 0, G_OPTION_ARG_NONE, &print_cap, "Output to stdout the backend capabilities in JSON format and exit", NULL},
-     { "verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose, "Be more verbose in output", NULL},
-@@ -47,6 +55,8 @@ enum {
- };
- 
- /* These structures are defined in the specification */
-+#define KiB     (1UL << 10)
-+#define MAX_RPMB_SIZE (KiB * 128 * 256)
- 
- struct virtio_rpmb_config {
-     uint8_t capacity;
-@@ -75,6 +85,8 @@ typedef struct VuRpmb {
-     VugDev dev;
-     struct virtio_rpmb_config virtio_config;
-     GMainLoop *loop;
-+    int flash_fd;
-+    void *flash_map;
- } VuRpmb;
- 
- struct virtio_rpmb_ctrl_command {
-@@ -116,6 +128,8 @@ vrpmb_get_config(VuDev *dev, uint8_t *config, uint32_t len)
-     VuRpmb *r = container_of(dev, VuRpmb, dev.parent);
-     g_return_val_if_fail(len <= sizeof(struct virtio_rpmb_config), -1);
-     memcpy(config, &r->virtio_config, len);
+@@ -0,0 +1,37 @@
++/*
++ * VIRTIO RPMB Emulation via vhost-user
++ *
++ * Copyright (c) 2020 Linaro Ltd
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
 +
-+    g_info("%s: done", __func__);
-     return 0;
- }
- 
-@@ -192,6 +206,41 @@ static const VuDevIface vuiface = {
-     .set_config = vrpmb_set_config,
- };
- 
-+static bool vrpmb_load_flash_image(VuRpmb *r, char *img_path)
++#include <glib.h>
++
++static gchar *socket_path;
++static gint socket_fd;
++static gboolean print_cap;
++
++static GOptionEntry options[] =
 +{
-+    GStatBuf statbuf;
-+    size_t map_size;
++    { "socket-path", 0, 0, G_OPTION_ARG_FILENAME, &socket_path, "Location of vhost-user Unix domain socket, incompatible with --fd", "PATH" },
++    { "fd", 0, 0, G_OPTION_ARG_INT, &socket_fd, "Specify the file-descriptor of the backend, incompatible with --socket-path", "FD" },
++    { "print-capabilities", 0, 0, G_OPTION_ARG_NONE, &print_cap, "Output to stdout the backend capabilities in JSON format and exit", NULL},
++    { NULL }
++};
 +
-+    if (g_stat(img_path, &statbuf) < 0) {
-+        g_error("couldn't stat %s", img_path);
-+        return false;
++int main (int argc, char *argv[])
++{
++    GError *error = NULL;
++    GOptionContext *context;
++
++    context = g_option_context_new ("vhost-user-rpmb - vhost-user emulation of RPBM device");
++    g_option_context_add_main_entries (context, options, "vhost-user-rpmb");
++    if (!g_option_context_parse (context, &argc, &argv, &error))
++    {
++        g_print ("option parsing failed: %s\n", error->message);
++        exit (1);
 +    }
 +
-+    r->flash_fd = g_open(img_path, O_RDWR, 0);
-+    if (r->flash_fd < 0) {
-+        g_error("couldn't open %s (%s)", img_path, strerror(errno));
-+        return false;
-+    }
 +
-+    if (statbuf.st_size > MAX_RPMB_SIZE) {
-+        g_warning("%s larger than maximum size supported", img_path);
-+        map_size = MAX_RPMB_SIZE;
-+    } else {
-+        map_size = statbuf.st_size;
-+    }
-+    r->virtio_config.capacity = map_size / (128 *KiB);
-+    r->virtio_config.max_wr_cnt = 1;
-+    r->virtio_config.max_rd_cnt = 1;
-+
-+    r->flash_map = mmap(NULL, map_size, PROT_READ, MAP_SHARED, r->flash_fd, 0);
-+    if (r->flash_map == MAP_FAILED) {
-+        g_error("failed to mmap file");
-+        return false;
-+    }
-+
-+    return true;
 +}
-+
- static void vrpmb_destroy(VuRpmb *r)
- {
-     vug_deinit(&r->dev);
-@@ -216,7 +265,7 @@ static gboolean hangup(gpointer user_data)
-     return true;
- }
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 3d17cad19aa0..e325c1024a33 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1873,6 +1873,11 @@ F: hw/virtio/virtio-mem-pci.h
+ F: hw/virtio/virtio-mem-pci.c
+ F: include/hw/virtio/virtio-mem.h
  
--int main (int argc, char *argv[])
-+int main(int argc, char *argv[])
- {
-     GError *error = NULL;
-     GOptionContext *context;
-@@ -236,6 +285,13 @@ int main (int argc, char *argv[])
-         exit(0);
-     }
- 
-+    if (!flash_path || !g_file_test(flash_path, G_FILE_TEST_EXISTS)) {
-+        g_printerr("Please specify a valid --flash-path for the flash image\n");
-+        exit(EXIT_FAILURE);
-+    } else {
-+        vrpmb_load_flash_image(&rpmb, flash_path);
-+    }
++virtio-rpmb
++M: Alex Bennée <alex.bennee@linaro.org>
++S: Supported
++F: tools/vhost-user-rpmb/*
 +
-     if (!socket_path && socket_fd < 0) {
-         g_printerr("Please specify either --fd or --socket-path\n");
-         exit(EXIT_FAILURE);
+ nvme
+ M: Keith Busch <kbusch@kernel.org>
+ M: Klaus Jensen <its@irrelevant.dk>
+diff --git a/tools/meson.build b/tools/meson.build
+index 513bd2ff4fd2..408048c6357c 100644
+--- a/tools/meson.build
++++ b/tools/meson.build
+@@ -8,3 +8,11 @@ have_virtiofsd = (have_system and
+ if have_virtiofsd
+   subdir('virtiofsd')
+ endif
++
++have_virtiorpmb = (have_system and
++    have_tools and
++    'CONFIG_LINUX' in config_host)
++
++if have_virtiorpmb
++  subdir('vhost-user-rpmb')
++endif
+diff --git a/tools/vhost-user-rpmb/50-qemu-rpmb.json.in b/tools/vhost-user-rpmb/50-qemu-rpmb.json.in
+new file mode 100644
+index 000000000000..2b033cda567c
+--- /dev/null
++++ b/tools/vhost-user-rpmb/50-qemu-rpmb.json.in
+@@ -0,0 +1,5 @@
++{
++  "description": "QEMU vhost-user-rpmb",
++  "type": "block",
++  "binary": "@libexecdir@/vhost-user-rpmb"
++}
+diff --git a/tools/vhost-user-rpmb/meson.build b/tools/vhost-user-rpmb/meson.build
+new file mode 100644
+index 000000000000..e0df1b69a3fb
+--- /dev/null
++++ b/tools/vhost-user-rpmb/meson.build
+@@ -0,0 +1,11 @@
++executable('vhost-user-rpmb', files(
++  'main.c'),
++  dependencies: [glib],
++  link_with: [libvhost_user],
++  install: true,
++  install_dir: get_option('libexecdir'))
++
++configure_file(input: '50-qemu-rpmb.json.in',
++               output: '50-qemu-rpmb.json',
++               configuration: config_host,
++               install_dir: qemu_datadir / 'vhost-user')
 -- 
 2.20.1
 
