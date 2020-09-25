@@ -7,74 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EA2EC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 13:59:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A2DFC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 14:01:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A487B2086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 13:59:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 013CB208A9
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 14:01:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MfHEKkxN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A487B2086A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PyEDghOG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 013CB208A9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLoGQ-00007W-I6
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 09:59:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35236)
+	id 1kLoIH-0001zX-45
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 10:01:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36160)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kLo6B-0002ca-2P
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 09:49:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37477)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1kLo9f-0007Y5-QI
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 09:53:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20245)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kLo67-0000l7-K3
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 09:49:18 -0400
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1kLo9d-0001FQ-Qg
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 09:52:55 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601041751;
+ s=mimecast20190719; t=1601041969;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=MhsjaAvcc2A8rxRwS3aD1ncZ7PrT1QP4PmosGTDO3t8=;
- b=MfHEKkxNkuLrZve9tO+3ivk5KhVeSqle9Fe7Wvn+AF4Edy5MgJLG+jAkm5Ba7W3p8r1LIc
- dunyc3GlgvrXOIeL3XQXsuobTYccYWJuBUT2et4tz4mSJGeGNue81ZfKE3z3braO2qc+3y
- z5UvHkFRv56gU1QPP+Dr9kIA0jRjUvI=
+ bh=w4av3mu/X0bQUvY/Z1ZG8P/ZXnjDHHI0bCj1uOdx9N8=;
+ b=PyEDghOGitirRu3E+YK3JaKBIy+N82IIlDEWgeLAg4mulf5E/FLfMRjTIcIvepZLmLhBWW
+ jOwcHdnvywJfQtBqyHq980pGD5E89a+ArAi21U+VDvz6Ien/EtVWrSKh7xRU/TwQhwBGlU
+ fZ0XynWIjwcipq0xk9bUD5wMygnXNog=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-244-eiyasU3IM82UTT2iBI4_eA-1; Fri, 25 Sep 2020 09:49:10 -0400
-X-MC-Unique: eiyasU3IM82UTT2iBI4_eA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-574-jNENJJaYNgO-RBv7uw8YKg-1; Fri, 25 Sep 2020 09:52:47 -0400
+X-MC-Unique: jNENJJaYNgO-RBv7uw8YKg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2417881F00F;
- Fri, 25 Sep 2020 13:49:09 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-113-81.ams2.redhat.com [10.36.113.81])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AEF625D9DC;
- Fri, 25 Sep 2020 13:49:06 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, stefanha@redhat.com, fam@euphon.net,
- philmd@redhat.com, alex.williamson@redhat.com
-Subject: [RFC 2/3] util/vfio-helpers: Dynamically compute the min/max IOVA
-Date: Fri, 25 Sep 2020 15:48:44 +0200
-Message-Id: <20200925134845.21053-3-eric.auger@redhat.com>
-In-Reply-To: <20200925134845.21053-1-eric.auger@redhat.com>
-References: <20200925134845.21053-1-eric.auger@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97D4EAF20B;
+ Fri, 25 Sep 2020 13:52:45 +0000 (UTC)
+Received: from localhost (unknown [10.36.110.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 309E65C1C2;
+ Fri, 25 Sep 2020 13:52:35 +0000 (UTC)
+From: marcandre.lureau@redhat.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 5/6] spice: get monitors physical dimension
+Date: Fri, 25 Sep 2020 17:50:56 +0400
+Message-Id: <20200925135057.291556-6-marcandre.lureau@redhat.com>
+In-Reply-To: <20200925135057.291556-1-marcandre.lureau@redhat.com>
+References: <20200925135057.291556-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=marcandre.lureau@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=eric.auger@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124;
+ envelope-from=marcandre.lureau@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 01:07:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -84,7 +83,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,138 +96,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, kwolf@redhat.com, cohuck@redhat.com, mreitz@redhat.com
+Cc: spice-devel@lists.freedesktop.org, Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently the min/max IOVA are hardcoded to [0x10000, 1 << 39].
-Now we dynamically fetch the info from VFIO, if the kernel supports
-it, let's use the dynamically retrieved value.
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Note that for consistency, we use the same logic as MonitorsConfig to
+figure out the associated monitor. However, I can't find traces of the
+discussion/patches about the "new spice-server" behaviour: it still uses
+the multiple-configurations path in git master.
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- util/vfio-helpers.c | 34 ++++++++++++++++++++--------------
- 1 file changed, 20 insertions(+), 14 deletions(-)
+ include/ui/console.h | 3 +++
+ ui/spice-display.c   | 9 +++++++++
+ 2 files changed, 12 insertions(+)
 
-diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
-index 8e91beba95..567bcf1ded 100644
---- a/util/vfio-helpers.c
-+++ b/util/vfio-helpers.c
-@@ -26,11 +26,11 @@
+diff --git a/include/ui/console.h b/include/ui/console.h
+index 353d2e49a1..e7303d8b98 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -119,6 +119,9 @@ typedef struct DisplaySurface {
+ } DisplaySurface;
  
- #define QEMU_VFIO_DEBUG 0
- 
-+/*
-+ * Min/Max IOVA addresses, only used if VFIO does not report
-+ * the usable IOVA ranges
-+ */
- #define QEMU_VFIO_IOVA_MIN 0x10000ULL
--/* XXX: Once VFIO exposes the iova bit width in the IOMMU capability interface,
-- * we can use a runtime limit; alternatively it's also possible to do platform
-- * specific detection by reading sysfs entries. Until then, 39 is a safe bet.
-- **/
- #define QEMU_VFIO_IOVA_MAX (1ULL << 39)
- 
- typedef struct {
-@@ -56,6 +56,8 @@ struct QEMUVFIOState {
-     struct vfio_region_info config_region_info, bar_region_info[6];
-     struct IOVARange *usable_iova_ranges;
-     uint8_t nb_iova_ranges;
-+    uint64_t max_iova;
-+    uint64_t min_iova;
- 
-     /* These fields are protected by @lock */
-     /* VFIO's IO virtual address space is managed by splitting into a few
-@@ -63,7 +65,7 @@ struct QEMUVFIOState {
-      *
-      * ---------------       <= 0
-      * |xxxxxxxxxxxxx|
--     * |-------------|       <= QEMU_VFIO_IOVA_MIN
-+     * |-------------|       <= min_iova
-      * |             |
-      * |    Fixed    |
-      * |             |
-@@ -75,20 +77,20 @@ struct QEMUVFIOState {
-      * |             |
-      * |    Temp     |
-      * |             |
--     * |-------------|       <= QEMU_VFIO_IOVA_MAX
-+     * |-------------|       <= max_iova
-      * |xxxxxxxxxxxxx|
-      * |xxxxxxxxxxxxx|
-      * ---------------
-      *
--     * - Addresses lower than QEMU_VFIO_IOVA_MIN are reserved as invalid;
-+     * - Addresses lower than min_iova are reserved as invalid;
-      *
-      * - Fixed mappings of HVAs are assigned "low" IOVAs in the range of
--     *   [QEMU_VFIO_IOVA_MIN, low_water_mark).  Once allocated they will not be
-+     *   [min_iova, low_water_mark).  Once allocated they will not be
-      *   reclaimed - low_water_mark never shrinks;
-      *
-      * - IOVAs in range [low_water_mark, high_water_mark) are free;
-      *
--     * - IOVAs in range [high_water_mark, QEMU_VFIO_IOVA_MAX) are volatile
-+     * - IOVAs in range [high_water_mark, max_iova) are volatile
-      *   mappings. At each qemu_vfio_dma_reset_temporary() call, the whole area
-      *   is recycled. The caller should make sure I/O's depending on these
-      *   mappings are completed before calling.
-@@ -271,6 +273,8 @@ static void collect_usable_iova_ranges(QEMUVFIOState *s, void *first_cap)
-         s->usable_iova_ranges[i].start = cap_iova_range->iova_ranges[i].start;
-         s->usable_iova_ranges[i].end = cap_iova_range->iova_ranges[i].end;
+ typedef struct QemuUIInfo {
++    /* physical dimension */
++    uint16_t width_mm;
++    uint16_t height_mm;
+     /* geometry */
+     int       xoff;
+     int       yoff;
+diff --git a/ui/spice-display.c b/ui/spice-display.c
+index b304c13149..a10f72bc5c 100644
+--- a/ui/spice-display.c
++++ b/ui/spice-display.c
+@@ -679,7 +679,16 @@ static int interface_client_monitors_config(QXLInstance *sin,
+         info.width  = mc->monitors[head].width;
+         info.height = mc->monitors[head].height;
      }
-+    s->min_iova = s->usable_iova_ranges[0].start;
-+    s->max_iova = s->usable_iova_ranges[i - 1].end + 1;
- }
++#if SPICE_SERVER_VERSION >= 0x000e04 /* release 0.14.4 */
++    if (mc->flags & VD_AGENT_CONFIG_MONITORS_FLAG_PHYSICAL_SIZE) {
++        VDAgentMonitorMM *mm = (void *)&mc->monitors[mc->num_of_monitors];
  
- static int qemu_vfio_init_pci(QEMUVFIOState *s, const char *device,
-@@ -362,12 +366,14 @@ static int qemu_vfio_init_pci(QEMUVFIOState *s, const char *device,
- 
-     /*
-      * if the kernel does not report usable IOVA regions, choose
--     * the legacy [QEMU_VFIO_IOVA_MIN, QEMU_VFIO_IOVA_MAX -1] region
-+     * the legacy [QEMU_VFIO_IOVA_MIN, QEMU_VFIO_IOVA_MAX - 1] region
-      */
-     s->nb_iova_ranges = 1;
-     s->usable_iova_ranges = g_new0(struct IOVARange, 1);
-     s->usable_iova_ranges[0].start = QEMU_VFIO_IOVA_MIN;
-     s->usable_iova_ranges[0].end = QEMU_VFIO_IOVA_MAX - 1;
-+    s->min_iova = QEMU_VFIO_IOVA_MIN;
-+    s->max_iova = QEMU_VFIO_IOVA_MAX;
- 
-     if (iommu_info->argsz > iommu_info_size) {
-         void *first_cap;
-@@ -484,8 +490,8 @@ static void qemu_vfio_open_common(QEMUVFIOState *s)
-     s->ram_notifier.ram_block_added = qemu_vfio_ram_block_added;
-     s->ram_notifier.ram_block_removed = qemu_vfio_ram_block_removed;
-     ram_block_notifier_add(&s->ram_notifier);
--    s->low_water_mark = QEMU_VFIO_IOVA_MIN;
--    s->high_water_mark = QEMU_VFIO_IOVA_MAX;
-+    s->low_water_mark = s->min_iova;
-+    s->high_water_mark = s->max_iova;
-     qemu_ram_foreach_block(qemu_vfio_init_ramblock, s);
- }
- 
-@@ -734,7 +740,7 @@ int qemu_vfio_dma_reset_temporary(QEMUVFIOState *s)
-         .argsz = sizeof(unmap),
-         .flags = 0,
-         .iova = s->high_water_mark,
--        .size = QEMU_VFIO_IOVA_MAX - s->high_water_mark,
-+        .size = s->max_iova - s->high_water_mark,
-     };
-     trace_qemu_vfio_dma_reset_temporary(s);
-     QEMU_LOCK_GUARD(&s->lock);
-@@ -742,7 +748,7 @@ int qemu_vfio_dma_reset_temporary(QEMUVFIOState *s)
-         error_report("VFIO_UNMAP_DMA failed: %s", strerror(errno));
-         return -errno;
-     }
--    s->high_water_mark = QEMU_VFIO_IOVA_MAX;
-+    s->high_water_mark = s->max_iova;
-     return 0;
- }
- 
++        if (mc->num_of_monitors > head) {
++            info.width_mm = mm[head].width;
++            info.height_mm = mm[head].height;
++        }
++    }
++#endif
+     trace_qemu_spice_ui_info(ssd->qxl.id, info.width, info.height);
+     dpy_set_ui_info(ssd->dcl.con, &info);
+     return 1;
 -- 
-2.21.3
+2.26.2
 
 
