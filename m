@@ -2,95 +2,88 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B415DC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 13:37:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC031C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 13:40:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D65842076D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 13:37:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E5C622076D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 13:40:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZsUnUmPv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D65842076D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nuviainc-com.20150623.gappssmtp.com header.i=@nuviainc-com.20150623.gappssmtp.com header.b="RLWl3Fcz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5C622076D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nuviainc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLnuy-0000rx-ON
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 09:37:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59180)
+	id 1kLnxn-0002nS-1l
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 09:40:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60396)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kLnsE-0007UJ-LT
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 09:34:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50646)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kLnsB-00078j-Lm
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 09:34:54 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601040890;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=gg3kzO1tYh4aYj70+XjYNxuj3ezCUx3J0H/7GGCTmbQ=;
- b=ZsUnUmPvEjmfqsVYHwfbVh7V2IS8kfR7c1jTp6GPPzbyhtDJUPBQ89Pmxdvwl1UEVP8bq2
- fK5bJro9ThglGFDUqLCq2kgXDH0pXpvoTtRogBckPP5aC9VC+uF8ec5vWy4ftNhYGR27k6
- ++kUJKidUJPdOEMSRkxXJ7ASFQ050yU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-5-Y1B2j6XONvODSMYCYJL-5w-1; Fri, 25 Sep 2020 09:34:33 -0400
-X-MC-Unique: Y1B2j6XONvODSMYCYJL-5w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE77064146;
- Fri, 25 Sep 2020 13:34:32 +0000 (UTC)
-Received: from [10.3.114.148] (ovpn-114-148.phx2.redhat.com [10.3.114.148])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0C31927BC3;
- Fri, 25 Sep 2020 13:34:31 +0000 (UTC)
-Subject: Re: [PATCH v2 28/38] qapi/gen.py: update write() to be more idiomatic
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-References: <20200922210101.4081073-1-jsnow@redhat.com>
- <20200922210101.4081073-29-jsnow@redhat.com>
- <20200923152624.GO3312949@habkost.net>
- <c0b8ed9e-c66a-a6fa-43e1-c3c61581d928@redhat.com>
- <20200924155959.GC191229@localhost.localdomain>
- <87r1qqro8i.fsf@dusky.pond.sub.org> <20200925132458.GJ2178035@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <af03463e-b0f4-7468-9c6d-320067e4b60e@redhat.com>
-Date: Fri, 25 Sep 2020 08:34:31 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <graeme@nuviainc.com>)
+ id 1kLnwc-0001vu-6Y
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 09:39:26 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55765)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <graeme@nuviainc.com>)
+ id 1kLnwa-0007h9-8F
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 09:39:25 -0400
+Received: by mail-wm1-x341.google.com with SMTP id d4so3058069wmd.5
+ for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 06:39:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=nuviainc-com.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=LEapBT5lGA8vRx16w4G1jp1xfCgBRVKisEf5jOFHwNk=;
+ b=RLWl3FczdndaCQi72oSqFi7gKVxG4d3TI/DKrEKNspCwS/LDF2qLUaQAh01iiQWhGh
+ BILQvgjftHjqR/mDwjXlzkV/x8Pvzas7ezgn4nUIuOHMKfYLkGXxxY0p3JiIkc7MMMcg
+ 3g5Sswy1YvQW9yTzjOySfBDpOTAtYBYAU1JN89EWMc1ZHQtO2xTuT0EZNY/S/fVIb8i0
+ LXzDj98UbrEOlFIetefcIgJj0dcJawaTGUG0NorQtP4Vd32nex3bq+N+hXob4Twfrcm4
+ 3gcnPr9EqSEjlXNIU6voD7sBqKBeN8rNo8SgCzk4B8lDwich5zKdlEbUCisF38N9LJf9
+ bWuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=LEapBT5lGA8vRx16w4G1jp1xfCgBRVKisEf5jOFHwNk=;
+ b=gnATZRcAO8NaCey+T73z3s/1OqWWYdDi/n54/DwFohSNF9NbD+eOVbA9raE9727hSa
+ QpZxKUMoVhkr+UiS90yzx9CR7KIvc3y4A2YqnSRqgSyJuRHFK4FLyFLS2c/zO8T8y/F2
+ JL+YDW71/azktcMrupq2hgnSsaV2lBZgoT7Yf5pT/O3Q7IdHYyN1ed4wn6NPd3YK1RmN
+ IHbNjhrQXn9+JW0tr9Z4EsGwjFapPBWFYA+A7kZI2+Y53gw5l68pX2Bi0GJyZp+0uOaK
+ 6kspCGneliDs2BY1wA009j8Jv9GN+xd5wzSA1oAM9Lw455cDFUW+li7ofNvk+mCXMimY
+ +xZw==
+X-Gm-Message-State: AOAM530z3Z72xPYtUeuBQUejzuXEew8NJjEAR1KEkkrQcX1H724K0TuG
+ j5qJcICrHTYOZXt2YGx3r27VyQ==
+X-Google-Smtp-Source: ABdhPJz+0ee5DDPSTzodMmcCR3wUh/2zd8CCBLSRxEum+RTwgUd1LwyUPP5xLa+oiu9cGyVAIsNpEw==
+X-Received: by 2002:a1c:9d43:: with SMTP id g64mr3536112wme.16.1601041162147; 
+ Fri, 25 Sep 2020 06:39:22 -0700 (PDT)
+Received: from localhost.localdomain ([2a02:8010:64d6::1d89])
+ by smtp.gmail.com with ESMTPSA id d19sm2860921wmd.0.2020.09.25.06.39.21
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 25 Sep 2020 06:39:21 -0700 (PDT)
+From: Graeme Gregory <graeme@nuviainc.com>
+To: qemu-arm@nongnu.org
+Subject: [PATCH] hw/arm/sbsa-ref : Fix SMMUv3 Initialisation
+Date: Fri, 25 Sep 2020 14:39:02 +0100
+Message-Id: <20200925133902.28349-1-graeme@nuviainc.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20200925132458.GJ2178035@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 02:48:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -34
-X-Spam_score: -3.5
-X-Spam_bar: ---
-X-Spam_report: (-3.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.238, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=graeme@nuviainc.com; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,59 +97,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Graeme Gregory <graeme@nuviainc.com>, peter.maydell@linaro.org,
+ jamie@nuviainc.com, rad@semihalf.com, qemu-devel@nongnu.org, leif@nuviainc.com,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/25/20 8:24 AM, Daniel P. Berrangé wrote:
+SMMUv3 has an error in previous patch where a i was transposed to a 1
+meaning interrupts would not have been correctly assigned to the SMMUv3
+instance.
 
->> This code:
->>
->>          fd = os.open(pathname, os.O_RDWR | os.O_CREAT, 0o666)
->>          f = open(fd, 'r+', encoding='utf-8')
->>
+The code also contained an error in that the IRQs were never allocated
+in the irqmap.
 
->> This was my best attempt to open the file read/write, creating it if it
->> doesn't exist.
->>
->> Plain
->>
->>          f = open(pathname, "r+", encoding='utf-8')
->>
->> fails instead of creates, and
+Fixes: 48ba18e6d3f3 ("hw/arm/sbsa-ref: Simplify by moving the gic in the machine state")
+Signed-off-by: Graeme Gregory <graeme@nuviainc.com>
+---
+ hw/arm/sbsa-ref.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Checking what POSIX says for fopen():
-https://pubs.opengroup.org/onlinepubs/9699919799/functions/fopen.html
-
-Yep, "r+" does not use O_CREAT.
-
->>
->>          f = open(pathname, "w+", encoding='utf-8')
->>
->> truncates.
-
-Yep, "w+" uses O_TRUNC.
-
->>
->> If you know a better way, tell me!
-> 
-> IIUC, you need  "a+" as the mode, rather than "w+"
-
-That uses O_APPEND.  Which is fine if you are only appending and not 
-touching existing contents, but not what you want if you are doing 
-random access.
-
-Yeah, the fopen() interface is rather puny, in that it does not express 
-as many modes as open() supports.
-
+diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
+index 257ada9425..9109fb58be 100644
+--- a/hw/arm/sbsa-ref.c
++++ b/hw/arm/sbsa-ref.c
+@@ -138,6 +138,7 @@ static const int sbsa_ref_irqmap[] = {
+     [SBSA_SECURE_UART_MM] = 9,
+     [SBSA_AHCI] = 10,
+     [SBSA_EHCI] = 11,
++    [SBSA_SMMU] = 12, /* ... to 15 */
+ };
+ 
+ static uint64_t sbsa_ref_cpu_mp_affinity(SBSAMachineState *sms, int idx)
+@@ -530,7 +531,7 @@ static void create_smmu(const SBSAMachineState *sms, PCIBus *bus)
+     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
+     for (i = 0; i < NUM_SMMU_IRQS; i++) {
+         sysbus_connect_irq(SYS_BUS_DEVICE(dev), i,
+-                           qdev_get_gpio_in(sms->gic, irq + 1));
++                           qdev_get_gpio_in(sms->gic, irq + i));
+     }
+ }
+ 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.25.1
 
 
