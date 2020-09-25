@@ -2,83 +2,78 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D99B9C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 08:41:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F083AC4727F
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 08:42:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3999A2086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 08:41:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2FB482086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 08:42:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iqTHLBOc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3999A2086A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IHCMsdRI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FB482086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLjHt-0002PN-72
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 04:41:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50246)
+	id 1kLjJM-0003xB-7S
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 04:42:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50486)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kLjGS-00015Q-Bm
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 04:39:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32453)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kLjIV-0003Hj-NA
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 04:41:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55493)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kLjGQ-0003jm-5g
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 04:39:36 -0400
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kLjIT-00044U-NF
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 04:41:43 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601023173;
+ s=mimecast20190719; t=1601023300;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=M/y31tiJ+4+74mZFCmavOxDlJ8CIUCZMHROgm9V1cXg=;
- b=iqTHLBOcDwC3G9jfKxwEd3LSfDz5KjrfrL5iVpqy4IJBXmNdZsqoSJGiW2LqMv96GnHXYL
- GaAloeuj45EargMT5jYzHb/FnafJ5Bpe7L6IgEdT58otqZis81OpLAXZdcUvJ5wWxFfSvy
- 8dCKQus+RpASvUYIk8f8a2w2P/wBGrU=
+ bh=7zg2mEErwsg5P15hXlGazJt/aU7200y3snGaDHWz9EE=;
+ b=IHCMsdRIgLcxztISaUmn7G1mC+KyoJifV3Fxaq1Yp8Y7lIgU7S0lC6doc7yaxKwtErO7Sa
+ AlmI1FlDCUuOOSN2eUci1TVfZ/ZZTazr8SOUl1HxkLnChmBQeTF116E/K/JMgZHsGsfueo
+ 79p8c5CW97orXpCn3a1KGkVbmbCQ3e8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-446-vkKWMQaiNeKXBbpYOeTnrg-1; Fri, 25 Sep 2020 04:39:28 -0400
-X-MC-Unique: vkKWMQaiNeKXBbpYOeTnrg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-410-3cNTm3ZfPva8J79zrapKig-1; Fri, 25 Sep 2020 04:41:36 -0400
+X-MC-Unique: 3cNTm3ZfPva8J79zrapKig-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D924800E23;
- Fri, 25 Sep 2020 08:39:27 +0000 (UTC)
-Received: from work-vm (ovpn-114-177.ams2.redhat.com [10.36.114.177])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0B8477368F;
- Fri, 25 Sep 2020 08:39:25 +0000 (UTC)
-Date: Fri, 25 Sep 2020 09:39:23 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Ashish Kalra <ashish.kalra@amd.com>
-Subject: Re: SEV guest debugging support for Qemu
-Message-ID: <20200925083923.GB2873@work-vm>
-References: <20200922201124.GA6606@ashkalra_ubuntu_server>
- <20200924135342.GE2792@work-vm>
- <20200924190653.GA8180@ashkalra_ubuntu_server>
- <a35415c9-6e50-5260-e0e6-e36b9f16f2b2@amd.com>
- <20200924215256.GA8562@ashkalra_ubuntu_server>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E016956BE2;
+ Fri, 25 Sep 2020 08:41:34 +0000 (UTC)
+Received: from localhost (ovpn-113-240.ams2.redhat.com [10.36.113.240])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1AE2755767;
+ Fri, 25 Sep 2020 08:41:29 +0000 (UTC)
+Date: Fri, 25 Sep 2020 09:41:23 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: Re: [PULL 00/13] Block patches
+Message-ID: <20200925084123.GB33068@stefanha-x1.localdomain>
+References: <20200923161031.69474-1-stefanha@redhat.com>
+ <160089292579.27646.6143023099150501377@66eaa9a8a123>
 MIME-Version: 1.0
-In-Reply-To: <20200924215256.GA8562@ashkalra_ubuntu_server>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <160089292579.27646.6143023099150501377@66eaa9a8a123>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="/NkBOFFp2J2Af1nK"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 01:07:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -101,119 +96,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, jon.grimm@amd.com,
- Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org,
- thomas.lendacky@amd.com
+Cc: peter.maydell@linaro.org, dgilbert@redhat.com, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Ashish Kalra (ashish.kalra@amd.com) wrote:
-> On Thu, Sep 24, 2020 at 02:37:33PM -0500, Brijesh Singh wrote:
-> > 
-> > On 9/24/20 2:06 PM, Ashish Kalra wrote:
-> > > Hello Dave,
-> > >
-> > > Thanks for your response, please see my replies inline :
-> > >
-> > > On Thu, Sep 24, 2020 at 02:53:42PM +0100, Dr. David Alan Gilbert wrote:
-> > >> * Ashish Kalra (ashish.kalra@amd.com) wrote:
-> > >>> Hello Alan, Paolo,
-> > >>>
-> > >>> I am following up on Brijesh’s patches for SEV guest debugging support for Qemu using gdb and/or qemu monitor.
-> > >>> I believe that last time, Qemu SEV debug patches were not applied and have attached the link to the email thread and Paolo’s feedback below for reference [1].
-> > >>> I wanted to re-start a discussion on the same here with the Qemu community and seek the feedback on the approaches which we are considering :
-> > >>> Looking at Qemu code, I see the following interface is defined, for virtual memory access for debug : cpu_memory_rw_debug(). 
-> > >>> Both gdbstub (target_memory_rw_debug() ) and QMP/HMP (monitor/misc.c : memory_dump() ) use this standard and well-defined interface to access guest memory for debugging purposes. 
-> > >>>
-> > >>> This internally invokes the address_space_rw() accessor functions which we had  "fixed" internally (as part of the earlier patch) to invoke memory region specific debug ops. 
-> > >>> In our earlier approach we were adding debug ops/callbacks to memory regions and as per comments on our earlier patches, Paolo was not happy with this debug API for
-> > >>> MemoryRegions and hence the SEV support for Qemu was merged without the debug support.
-> > >>>
-> > >>> Now, we want to reuse this cpu_memory_rw_debug() interface or alternatively introduce a new generic debug interface/object in the Qemu. This 
-> > >>> debug interface should be controlled through the global machine policy.
-> > >> Let me leave the question of how the memory_rw_debug interface should
-> > >> work to Paolo.
-> > >>
-> > >>> For e.g., 
-> > >>> # $QEMU -machine -debug=<a debug object>
-> > >>> or
-> > >>> # $QEMU -machine -debug=sev-guest-debug
-> > >>>
-> > >>> The QMP and GDB access will be updated to use the generic debug  interface. The generic debug interface or the cpu_memory_rw_debug() interace will introduce hooks to call a 
-> > >>> vendor specific debug object to delegate accessing the data. The vendor specific debug object may do a further checks before and after accessing the memory.
-> > >> I'm not sure that needs a commandline switch for it; since you can
-> > >> already get it from the guest policy in the sev object and I can't think
-> > >> of any other cases that would need something similar.
-> > > Yes, i agree with that, so i am now considering abstracting this vendor
-> > > specific debug interface via CPUClass object instead of doing it via
-> > > MemoryRegions. 
-> > >
-> > >>> Now, looking specifically at cpu_memory_rw_debug() interface, this interface is invoked for all guest memory accesses for debugging purposes and it also does 
-> > >>> guest VA to GPA translation via cpu_get_phys_page_attrs_debug(), so we can again add a vendor specific callback here to do guest VA to GPA translations specific
-> > >>> to SEV as SEV guest debugging will also require accessing guest page table entries and decrypting them via the SEV DBG_DECRYPT APIs and additionally clearing
-> > >>> the C-bit on page table entries (PxEs) before using them further for page table walks.
-> > >>>
-> > >>> There is still an issue with the generic cpu_memory_rw_debug() interface, though it is used for all guest memory accesses for debugging and we can also handle
-> > >>> guest page table walks via it (as mentioned above), there are still other gdb/monitor commands such as tlb_info_xx() and mem_info_xx() which also do guest page
-> > >>> table walks, but they don’t go through any generic guest memory access/debug interface, so these commands will need to be handled additionally for SEV.
-> > >> If some of those should be using the debug interface and aren't then
-> > >> please fix them anyway.
-> > >>
-> > >>> The vendor specific debug object (added as a hook to generic debug object or the generic cpu_memory_rw_debug() interface) will do further checks before and after accessing the memory.
-> > >>>
-> > >>> e.g., in the case of SEV,
-> > >>>
-> > >>> 1. Check the guest policy, if guest policy does not allow debug then return an error.
-> > >>>
-> > >>> 2. If its an MMIO region then access the data.
-> > >>>
-> > >>> 3. If its RAM region then call the PSP commands to decrypt the data.
-> > >>>
-> > >>> 4. If caller asked to read the PTE entry then probably clear the C-bits after reading the PTE entry.
-> > >> Does that work if the guest is currently running?
-> > >>
-> > > I assume you are asking that is this done when guest is being debugged,
-> > > the above steps are only done when the guest is paused and being debugged.
-> > 
-> > 
-> > I don't why we need to pause the guest. Ideally we should be able to
-> > connect to Qemu monitor and run the "x" command to dump memory. IIRC, if
-> > paging is enabled then monitor will walk the guest page table to reach
-> > to gpa. Something like this in the Qemu monitor console should work:
-> > 
-> > x /10i $eip
-> > 
-> > 
-> 
-> Yes that works, what i basically meant that monitor will invoke a set of debugging
-> interfaces to get gpa and then dump guest memory even while guest is
-> running.
+--/NkBOFFp2J2Af1nK
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-OK, I was worried about the bit where you said 'clear the C-bits' - as
-long as that's just clearing it in the copy you've taken rather than the
-in memory version the guest is using then that's OK.
+On Wed, Sep 23, 2020 at 01:28:47PM -0700, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20200923161031.69474-1-stefanha@redhat.com/
 
-Dave
+checkpatch is warning about pre-existing issues.
 
-> Thanks,
-> Ashish
-> 
-> > >
-> > >>> 5. many more checks
-> > >>>
-> > >>> Looking fwd. to your feedback/comments on the above approach or other any other suggestions.
-> > >>>
-> > >>> Thanks,
-> > >>> Ashish
-> > >>>
-> > >>> [1] -> https://nam11.safelinks.protection.outlook.com/?url=http%3A%2F%2Fnext.patchew.org%2FQEMU%2F20180308124901.83533-1-brijesh.singh%40amd.com%2F20180308124901.83533-29-brijesh.singh%40amd.com%2F&amp;data=02%7C01%7Cashish.kalra%40amd.com%7Cd21e40d3527d4dba609c08d86091490e%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637365524404435805&amp;sdata=P%2F6DqPQmUObJipkbbeXcrUdCqulePiqxSU6OB8xUEWo%3D&amp;reserved=0
-> > >>>
-> > >> -- 
-> > >> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > >>
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Stefan
+
+--/NkBOFFp2J2Af1nK
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9trTMACgkQnKSrs4Gr
+c8i74Af/SORATyLFwJJoprHMizQ6dZHFMEMImvHJTVOeZB/XMcu18vcFta6cTovi
+ciQNHaWCMM1ME8U87jHcBFPXwBbfZbRpSNtx8kYLtpZhEWrgOMJHe+m0O+MIYJb6
+AO68s1MEOWG4PQx5Ur/u3gnucDlHfsX6dE6iU8jtGeH3HL2qGlok/irIKaAJtk97
+SdcB6xaSL+1YIeyEfdSSUUVxamP9J0l2s/RnF67oHinOOz3AWuDORRoEA20Ym2lS
+yPgWZ6C9BpEUNZS2gyv6SF56Isf3Iqo/TqgILnTH/x4Yzkh8tXz7XWcf9rDuA/Kx
+yZp8SR6BshVUnG9bHjExOehNUdMg0g==
+=dlGj
+-----END PGP SIGNATURE-----
+
+--/NkBOFFp2J2Af1nK--
 
 
