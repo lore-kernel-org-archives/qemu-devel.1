@@ -2,94 +2,87 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAD00C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 07:50:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73CBCC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 07:58:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 348A9206C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 07:50:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 580752371F
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 07:58:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DKHosU9W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 348A9206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="ATJGQfvt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 580752371F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLiUg-0007gs-Qm
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 03:50:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37546)
+	id 1kLics-0002S8-3p
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 03:58:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39492)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kLiU8-0007GQ-LE
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 03:49:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32684)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kLiU6-00064t-C7
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 03:49:40 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601020177;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=XFWhY6ADkiA2L7gQ47jjDU3nGrb7QML0Rmkmd9wvsVs=;
- b=DKHosU9WUWWEZ9OT4HbnJANC7ovrhxoe0DysM5soU1xDejfMspolX7fGAk8ucRhIbJpTyL
- 5AtcINWKFxS2379Ow4dHKdXKQPp60gI5ocsCi+XrPT5OhHWdClMzKOI3YsExOLKcetQnjZ
- sBJf9Mv/dUv0/JO93ZzU/G4lAb6IBqs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-578-8Mhki_AsMRy4TxobYOwR-A-1; Fri, 25 Sep 2020 03:49:33 -0400
-X-MC-Unique: 8Mhki_AsMRy4TxobYOwR-A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 684B5800E23;
- Fri, 25 Sep 2020 07:49:32 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-70.ams2.redhat.com
- [10.36.112.70])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3794760C07;
- Fri, 25 Sep 2020 07:49:32 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C053A113865F; Fri, 25 Sep 2020 09:49:30 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH 14/37] qapi/common.py: Move comments into docstrings
-References: <20200915224027.2529813-1-jsnow@redhat.com>
- <20200915224027.2529813-15-jsnow@redhat.com>
- <87d02kpizr.fsf@dusky.pond.sub.org>
- <49e28f59-012c-9b7b-02b7-1854f85884b2@redhat.com>
- <20200917191455.GX7594@habkost.net>
- <3b1ce70b-377d-144f-9331-4f6da4c93f6f@redhat.com>
- <87a6xf8b9a.fsf@dusky.pond.sub.org>
- <7a58ccb0-8b54-38e9-316d-c8b7690b6ea1@redhat.com>
-Date: Fri, 25 Sep 2020 09:49:30 +0200
-In-Reply-To: <7a58ccb0-8b54-38e9-316d-c8b7690b6ea1@redhat.com> (John Snow's
- message of "Thu, 24 Sep 2020 12:31:56 -0400")
-Message-ID: <87eemq1ek5.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1kLibT-0001RO-Pe
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 03:57:15 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:46780)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1kLibP-00073S-QO
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 03:57:15 -0400
+Received: by mail-ot1-x342.google.com with SMTP id 95so1449948ota.13
+ for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 00:57:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=WHPS/k8qKUDjaJIS9f8Pmn7sbACtGaa2rqZqCjdT0qM=;
+ b=ATJGQfvtzo83KTBVPMWDjuGIZLj2Ha7tMj0cIUJ8MEqVwYMYtYsJDH9Xf8GHslXFJu
+ BHQo6QQa9WL3QoWL3PiZB1tgmB9yWsJKZVcXYjK84vioNGsOK2jcL+7f3lC6naKm+hWL
+ MPRy3b7URIek4m3QLclCNmQoz0wzTbdPt3N7c3gf2Fclz2DlrsP9zpOJiaTxX96hvzJf
+ QvpS5geQ/lPH8CX2ueoHQlUzB2hwMG0p2rXA1ht0bmVrQTbPVTnzjf8JxT4SDjAuoJ74
+ Jh3r2y8SQEBPPnf+U45WRDFN/rlMgHqQxbwCYXNumeCHLHl6SUFTUFG2sEwDItZ3bHXt
+ yqkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=WHPS/k8qKUDjaJIS9f8Pmn7sbACtGaa2rqZqCjdT0qM=;
+ b=ud/V39Q+DU52VK331UOtU8tzyGc6vPiDb3G7khqdszyxty/DZILk+FzrfWCtGdBNbj
+ KhVYVMc3eZp0nTpTAvbF8chjIKc+FnytCV/kCiV6zhsqcHsY9ZE3bov4GVEtNarYGgwr
+ rqAjKbDj8XpaM6IxFrAuZi+gPumt/f+UOPvv984lkm24ewoiYgz0OkoEmHddeleBIZhZ
+ 6k350ajGD/Pc7+HZswc7dZs7Pr0mPnyJj535ps5njkopaECYPZ2k4+NWnVYKMRpVc4WR
+ r7JD4eYOdTrSgkllVDuX1wSKCgHT/gN52ieqXx74SsticSgT6XCmOZyBjSCM+FQX0zjW
+ W/Og==
+X-Gm-Message-State: AOAM5302c5A0BKNXAisyGRqMhH58UB+o3OdjdDAEU5xo+tSYC5O0Ooie
+ NYiiAXSlSEVDIhsfzkupUrgteYoqcvBcsMxsyBJd0w==
+X-Google-Smtp-Source: ABdhPJwytyU2gL3sWYo3c64NwtkqFBuvjCGOqiq+cgjK17RqLyfITAyxU0s2T80UKONtNxBqPvBjuTY+fKIUofH5f3Y=
+X-Received: by 2002:a05:6830:454:: with SMTP id
+ d20mr2167278otc.139.1601020629328; 
+ Fri, 25 Sep 2020 00:57:09 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 01:07:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -32
-X-Spam_score: -3.3
-X-Spam_bar: ---
-X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200831222945.875453-1-richard.henderson@linaro.org>
+ <20200831222945.875453-2-richard.henderson@linaro.org>
+In-Reply-To: <20200831222945.875453-2-richard.henderson@linaro.org>
+From: Frank Chang <frank.chang@sifive.com>
+Date: Fri, 25 Sep 2020 15:56:58 +0800
+Message-ID: <CAE_xrPibx+=q632CF059GwmbcCTq2ZcONNhpeydcJBu9wKyS6g@mail.gmail.com>
+Subject: Re: [PATCH 1/1] tcg: Adjust simd_desc size encoding
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: multipart/alternative; boundary="000000000000e3c2b205b01ea94f"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
+ envelope-from=frank.chang@sifive.com; helo=mail-ot1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,79 +95,344 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cleber Rosa <crosa@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-John Snow <jsnow@redhat.com> writes:
+--000000000000e3c2b205b01ea94f
+Content-Type: text/plain; charset="UTF-8"
 
-> On 9/24/20 11:06 AM, Markus Armbruster wrote:
->> John Snow <jsnow@redhat.com> writes:
->> 
->>> On 9/17/20 3:14 PM, Eduardo Habkost wrote:
->>>> On Thu, Sep 17, 2020 at 02:44:53PM -0400, John Snow wrote:
->>>> [...]
->>>>> Having said this, I have not found any tool to date that actually *checks*
->>>>> these comments for consistency. The pycharm IDE interactively highlights
->>>>> them when it senses that you have made a mistake, but that cannot be worked
->>>>> into our CI process that I know of - it's a proprietary checker.
->>>>>
->>>>> So right now, they're just plaintext that I am writing to approximate the
->>>>> Sphinx style until such time as I enable autodoc for the module and
->>>>> fine-tune the actual formatting and so on.
->> You are deliberately trying to "approximate" Sphinx style, and ...
->> 
->>>> After applying this series, I only had to make two small tweaks
->>>> to make Sphinx + autodoc happy with the docstrings you wrote.
->>>> With the following patch, "make sphinxdocs" will generate the
->>>> QAPI Python module documentation at docs/devel/qapi.html.
->>>> I had to explicitly skip qapi/doc.py because autodoc thinks the
->>>> string constants are documentation strings.
->>>>
->>>
->>> Awesome!
->> ... actually almost nail it.
->> Please mention your choice of style in the commit message.
->> 
->
-> OK, I'll try to summarize it. I guess I'll do it in this commit
-> message, but it's not likely to be too visible in the future that way,
-> depending on how you run git blame and what you're looking at.
+On Tue, Sep 1, 2020 at 6:29 AM Richard Henderson <
+richard.henderson@linaro.org> wrote:
 
-Thanks!
+> With larger vector sizes, it turns out oprsz == maxsz, and we only
+> need to represent mismatch for oprsz <= 32.  We do, however, need
+> to represent larger oprsz and do so without reducing SIMD_DATA_BITS.
+>
+> Reduce the size of the oprsz field and increase the maxsz field.
+> Steal the oprsz value of 24 to indicate equality with maxsz.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  include/tcg/tcg-gvec-desc.h | 38 ++++++++++++++++++++++++-------------
+>  tcg/tcg-op-gvec.c           | 35 ++++++++++++++++++++++++++--------
+>  2 files changed, 52 insertions(+), 21 deletions(-)
+>
+> diff --git a/include/tcg/tcg-gvec-desc.h b/include/tcg/tcg-gvec-desc.h
+> index 0224ac3e78..704bd86454 100644
+> --- a/include/tcg/tcg-gvec-desc.h
+> +++ b/include/tcg/tcg-gvec-desc.h
+> @@ -20,29 +20,41 @@
+>  #ifndef TCG_TCG_GVEC_DESC_H
+>  #define TCG_TCG_GVEC_DESC_H
+>
+> -/* ??? These bit widths are set for ARM SVE, maxing out at 256 byte
+> vectors. */
+> -#define SIMD_OPRSZ_SHIFT   0
+> -#define SIMD_OPRSZ_BITS    5
+> +/*
+> + * This configuration allows MAXSZ to represent 2048 bytes, and
+> + * OPRSZ to match MAXSZ, or represent the smaller values 8, 16, or 32.
+> + *
+> + * Encode this with:
+> + *   0, 1, 3 -> 8, 16, 32
+> + *   2       -> maxsz
+> + *
+> + * This steals the input that would otherwise map to 24 to match maxsz.
+> + */
+> +#define SIMD_MAXSZ_SHIFT   0
+> +#define SIMD_MAXSZ_BITS    8
+>
+> -#define SIMD_MAXSZ_SHIFT   (SIMD_OPRSZ_SHIFT + SIMD_OPRSZ_BITS)
+> -#define SIMD_MAXSZ_BITS    5
+> +#define SIMD_OPRSZ_SHIFT   (SIMD_MAXSZ_SHIFT + SIMD_MAXSZ_BITS)
+> +#define SIMD_OPRSZ_BITS    2
+>
+> -#define SIMD_DATA_SHIFT    (SIMD_MAXSZ_SHIFT + SIMD_MAXSZ_BITS)
+> +#define SIMD_DATA_SHIFT    (SIMD_OPRSZ_SHIFT + SIMD_OPRSZ_BITS)
+>  #define SIMD_DATA_BITS     (32 - SIMD_DATA_SHIFT)
+>
+>  /* Create a descriptor from components.  */
+>  uint32_t simd_desc(uint32_t oprsz, uint32_t maxsz, int32_t data);
+>
+> -/* Extract the operation size from a descriptor.  */
+> -static inline intptr_t simd_oprsz(uint32_t desc)
+> -{
+> -    return (extract32(desc, SIMD_OPRSZ_SHIFT, SIMD_OPRSZ_BITS) + 1) * 8;
+> -}
+> -
+>  /* Extract the max vector size from a descriptor.  */
+>  static inline intptr_t simd_maxsz(uint32_t desc)
+>  {
+> -    return (extract32(desc, SIMD_MAXSZ_SHIFT, SIMD_MAXSZ_BITS) + 1) * 8;
+> +    return extract32(desc, SIMD_MAXSZ_SHIFT, SIMD_MAXSZ_BITS) * 8 + 8;
+> +}
+> +
+> +/* Extract the operation size from a descriptor.  */
+> +static inline intptr_t simd_oprsz(uint32_t desc)
+> +{
+> +    uint32_t f = extract32(desc, SIMD_OPRSZ_SHIFT, SIMD_OPRSZ_BITS);
+> +    intptr_t o = f * 8 + 8;
+> +    intptr_t m = simd_maxsz(desc);
+> +    return f == 2 ? m : o;
+>  }
+>
+>  /* Extract the operation-specific data from a descriptor.  */
+> diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
+> index 7ebd9e8298..ddbe06b71a 100644
+> --- a/tcg/tcg-op-gvec.c
+> +++ b/tcg/tcg-op-gvec.c
+> @@ -37,11 +37,21 @@ static const TCGOpcode vecop_list_empty[1] = { 0 };
+>     of the operand offsets so that we can check them all at once.  */
+>  static void check_size_align(uint32_t oprsz, uint32_t maxsz, uint32_t ofs)
+>  {
+> -    uint32_t opr_align = oprsz >= 16 ? 15 : 7;
+> -    uint32_t max_align = maxsz >= 16 || oprsz >= 16 ? 15 : 7;
+> -    tcg_debug_assert(oprsz > 0);
+> -    tcg_debug_assert(oprsz <= maxsz);
+> -    tcg_debug_assert((oprsz & opr_align) == 0);
+> +    uint32_t max_align;
+> +
+> +    switch (oprsz) {
+> +    case 8:
+> +    case 16:
+> +    case 32:
+> +        tcg_debug_assert(oprsz <= maxsz);
+> +        break;
+> +    default:
+> +        tcg_debug_assert(oprsz == maxsz);
+> +        break;
+> +    }
+> +    tcg_debug_assert(maxsz <= (8 << SIMD_MAXSZ_BITS));
+> +
+> +    max_align = maxsz >= 16 ? 15 : 7;
+>      tcg_debug_assert((maxsz & max_align) == 0);
+>      tcg_debug_assert((ofs & max_align) == 0);
+>  }
+> @@ -77,12 +87,21 @@ uint32_t simd_desc(uint32_t oprsz, uint32_t maxsz,
+> int32_t data)
+>  {
+>      uint32_t desc = 0;
+>
+> -    assert(oprsz % 8 == 0 && oprsz <= (8 << SIMD_OPRSZ_BITS));
+> -    assert(maxsz % 8 == 0 && maxsz <= (8 << SIMD_MAXSZ_BITS));
+> -    assert(data == sextract32(data, 0, SIMD_DATA_BITS));
+> +    check_size_align(oprsz, maxsz, 0);
+> +    tcg_debug_assert(data == sextract32(data, 0, SIMD_DATA_BITS));
+>
+>      oprsz = (oprsz / 8) - 1;
+>      maxsz = (maxsz / 8) - 1;
+> +
+> +    /*
+> +     * We have just asserted in check_size_align that either
+> +     * oprsz is {8,16,32} or matches maxsz.  Encode the final
+> +     * case with '2', as that would otherwise map to 24.
+> +     */
+> +    if (oprsz == maxsz) {
+> +        oprsz = 2;
+> +    }
+> +
+>      desc = deposit32(desc, SIMD_OPRSZ_SHIFT, SIMD_OPRSZ_BITS, oprsz);
+>      desc = deposit32(desc, SIMD_MAXSZ_SHIFT, SIMD_MAXSZ_BITS, maxsz);
+>      desc = deposit32(desc, SIMD_DATA_SHIFT, SIMD_DATA_BITS, data);
+> --
+> 2.25.1
+>
+>
+Sorry for the late reply, I was blocked by some other stuff recently...
 
-> I want to resurface my other python style patches soon; perhaps a
-> python coding style document should go in alongside those patches.
->
->>> I think I am going to delay explicitly pursuing writing a manual for
->>> the QAPI parser for now, but it's good to know I am not too far
->>> off. I'm going to target the mypy conversions first, because they can
->>> be invasive and full of churn.
->>>
->>> When I get there, though ... I am thinking I should add this as
->>> Devel/QAPI Parser.
->> Doing "actually Sphinx style" instead of "an approximation of Sphinx
->> style" would reduce churn later on.  So, if it's not too distracting...
->> 
->
-> Yes, I just mean in terms of rebasing, docstrings and signatures fight
-> with each other for context and make re-spinning 125 patches a major 
-> chore. I wasn't prepared to have the debate on if we wanted to add
-> Python code into the Sphinx generator and have that entire discussion
-> yet.
->
-> So, I figured it would be a separate series afterwards. I mentioned
-> somewhere else that I anticipated doing it when I removed the 
-> "missing-docstring" warning.
->
-> I will investigate doing it (using Eduardo's patches) as a starting
-> point while reviews continue to filter in. If I figure it out in time,
-> I might squash the formatting changes in, but leave the sphinx
-> enablement patches themselves out.
+However, I've applied this commit and enlarged RV_VLEN_MAX up to 1024-bit
+in my RVV-1.0 patchset.
+It can pass our tests with VLEN settings: 128, 256, 512 and 1024.
+The changes look great!!
 
-Use your judgement.
+Reviewed-by: Frank Chang <frank.chang@sifive.com>
+Tested-by: Frank Chang <frank.chang@sifive.com>
 
+--000000000000e3c2b205b01ea94f
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr">On Tue, Sep 1, 2020 at 6:29 AM Richard He=
+nderson &lt;<a href=3D"mailto:richard.henderson@linaro.org">richard.henders=
+on@linaro.org</a>&gt; wrote:<br></div><div class=3D"gmail_quote"><blockquot=
+e class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px s=
+olid rgb(204,204,204);padding-left:1ex">With larger vector sizes, it turns =
+out oprsz =3D=3D maxsz, and we only<br>
+need to represent mismatch for oprsz &lt;=3D 32.=C2=A0 We do, however, need=
+<br>
+to represent larger oprsz and do so without reducing SIMD_DATA_BITS.<br>
+<br>
+Reduce the size of the oprsz field and increase the maxsz field.<br>
+Steal the oprsz value of 24 to indicate equality with maxsz.<br>
+<br>
+Signed-off-by: Richard Henderson &lt;<a href=3D"mailto:richard.henderson@li=
+naro.org" target=3D"_blank">richard.henderson@linaro.org</a>&gt;<br>
+---<br>
+=C2=A0include/tcg/tcg-gvec-desc.h | 38 ++++++++++++++++++++++++------------=
+-<br>
+=C2=A0tcg/tcg-op-gvec.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 35 ++++++=
+++++++++++++++++++++--------<br>
+=C2=A02 files changed, 52 insertions(+), 21 deletions(-)<br>
+<br>
+diff --git a/include/tcg/tcg-gvec-desc.h b/include/tcg/tcg-gvec-desc.h<br>
+index 0224ac3e78..704bd86454 100644<br>
+--- a/include/tcg/tcg-gvec-desc.h<br>
++++ b/include/tcg/tcg-gvec-desc.h<br>
+@@ -20,29 +20,41 @@<br>
+=C2=A0#ifndef TCG_TCG_GVEC_DESC_H<br>
+=C2=A0#define TCG_TCG_GVEC_DESC_H<br>
+<br>
+-/* ??? These bit widths are set for ARM SVE, maxing out at 256 byte vector=
+s. */<br>
+-#define SIMD_OPRSZ_SHIFT=C2=A0 =C2=A00<br>
+-#define SIMD_OPRSZ_BITS=C2=A0 =C2=A0 5<br>
++/*<br>
++ * This configuration allows MAXSZ to represent 2048 bytes, and<br>
++ * OPRSZ to match MAXSZ, or represent the smaller values 8, 16, or 32.<br>
++ *<br>
++ * Encode this with:<br>
++ *=C2=A0 =C2=A00, 1, 3 -&gt; 8, 16, 32<br>
++ *=C2=A0 =C2=A02=C2=A0 =C2=A0 =C2=A0 =C2=A0-&gt; maxsz<br>
++ *<br>
++ * This steals the input that would otherwise map to 24 to match maxsz.<br=
+>
++ */<br>
++#define SIMD_MAXSZ_SHIFT=C2=A0 =C2=A00<br>
++#define SIMD_MAXSZ_BITS=C2=A0 =C2=A0 8<br>
+<br>
+-#define SIMD_MAXSZ_SHIFT=C2=A0 =C2=A0(SIMD_OPRSZ_SHIFT + SIMD_OPRSZ_BITS)<=
+br>
+-#define SIMD_MAXSZ_BITS=C2=A0 =C2=A0 5<br>
++#define SIMD_OPRSZ_SHIFT=C2=A0 =C2=A0(SIMD_MAXSZ_SHIFT + SIMD_MAXSZ_BITS)<=
+br>
++#define SIMD_OPRSZ_BITS=C2=A0 =C2=A0 2<br>
+<br>
+-#define SIMD_DATA_SHIFT=C2=A0 =C2=A0 (SIMD_MAXSZ_SHIFT + SIMD_MAXSZ_BITS)<=
+br>
++#define SIMD_DATA_SHIFT=C2=A0 =C2=A0 (SIMD_OPRSZ_SHIFT + SIMD_OPRSZ_BITS)<=
+br>
+=C2=A0#define SIMD_DATA_BITS=C2=A0 =C2=A0 =C2=A0(32 - SIMD_DATA_SHIFT)<br>
+<br>
+=C2=A0/* Create a descriptor from components.=C2=A0 */<br>
+=C2=A0uint32_t simd_desc(uint32_t oprsz, uint32_t maxsz, int32_t data);<br>
+<br>
+-/* Extract the operation size from a descriptor.=C2=A0 */<br>
+-static inline intptr_t simd_oprsz(uint32_t desc)<br>
+-{<br>
+-=C2=A0 =C2=A0 return (extract32(desc, SIMD_OPRSZ_SHIFT, SIMD_OPRSZ_BITS) +=
+ 1) * 8;<br>
+-}<br>
+-<br>
+=C2=A0/* Extract the max vector size from a descriptor.=C2=A0 */<br>
+=C2=A0static inline intptr_t simd_maxsz(uint32_t desc)<br>
+=C2=A0{<br>
+-=C2=A0 =C2=A0 return (extract32(desc, SIMD_MAXSZ_SHIFT, SIMD_MAXSZ_BITS) +=
+ 1) * 8;<br>
++=C2=A0 =C2=A0 return extract32(desc, SIMD_MAXSZ_SHIFT, SIMD_MAXSZ_BITS) * =
+8 + 8;<br>
++}<br>
++<br>
++/* Extract the operation size from a descriptor.=C2=A0 */<br>
++static inline intptr_t simd_oprsz(uint32_t desc)<br>
++{<br>
++=C2=A0 =C2=A0 uint32_t f =3D extract32(desc, SIMD_OPRSZ_SHIFT, SIMD_OPRSZ_=
+BITS);<br>
++=C2=A0 =C2=A0 intptr_t o =3D f * 8 + 8;<br>
++=C2=A0 =C2=A0 intptr_t m =3D simd_maxsz(desc);<br>
++=C2=A0 =C2=A0 return f =3D=3D 2 ? m : o;<br>
+=C2=A0}<br>
+<br>
+=C2=A0/* Extract the operation-specific data from a descriptor.=C2=A0 */<br=
+>
+diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c<br>
+index 7ebd9e8298..ddbe06b71a 100644<br>
+--- a/tcg/tcg-op-gvec.c<br>
++++ b/tcg/tcg-op-gvec.c<br>
+@@ -37,11 +37,21 @@ static const TCGOpcode vecop_list_empty[1] =3D { 0 };<b=
+r>
+=C2=A0 =C2=A0 of the operand offsets so that we can check them all at once.=
+=C2=A0 */<br>
+=C2=A0static void check_size_align(uint32_t oprsz, uint32_t maxsz, uint32_t=
+ ofs)<br>
+=C2=A0{<br>
+-=C2=A0 =C2=A0 uint32_t opr_align =3D oprsz &gt;=3D 16 ? 15 : 7;<br>
+-=C2=A0 =C2=A0 uint32_t max_align =3D maxsz &gt;=3D 16 || oprsz &gt;=3D 16 =
+? 15 : 7;<br>
+-=C2=A0 =C2=A0 tcg_debug_assert(oprsz &gt; 0);<br>
+-=C2=A0 =C2=A0 tcg_debug_assert(oprsz &lt;=3D maxsz);<br>
+-=C2=A0 =C2=A0 tcg_debug_assert((oprsz &amp; opr_align) =3D=3D 0);<br>
++=C2=A0 =C2=A0 uint32_t max_align;<br>
++<br>
++=C2=A0 =C2=A0 switch (oprsz) {<br>
++=C2=A0 =C2=A0 case 8:<br>
++=C2=A0 =C2=A0 case 16:<br>
++=C2=A0 =C2=A0 case 32:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_debug_assert(oprsz &lt;=3D maxsz);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
++=C2=A0 =C2=A0 default:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_debug_assert(oprsz =3D=3D maxsz);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
++=C2=A0 =C2=A0 }<br>
++=C2=A0 =C2=A0 tcg_debug_assert(maxsz &lt;=3D (8 &lt;&lt; SIMD_MAXSZ_BITS))=
+;<br>
++<br>
++=C2=A0 =C2=A0 max_align =3D maxsz &gt;=3D 16 ? 15 : 7;<br>
+=C2=A0 =C2=A0 =C2=A0tcg_debug_assert((maxsz &amp; max_align) =3D=3D 0);<br>
+=C2=A0 =C2=A0 =C2=A0tcg_debug_assert((ofs &amp; max_align) =3D=3D 0);<br>
+=C2=A0}<br>
+@@ -77,12 +87,21 @@ uint32_t simd_desc(uint32_t oprsz, uint32_t maxsz, int3=
+2_t data)<br>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0uint32_t desc =3D 0;<br>
+<br>
+-=C2=A0 =C2=A0 assert(oprsz % 8 =3D=3D 0 &amp;&amp; oprsz &lt;=3D (8 &lt;&l=
+t; SIMD_OPRSZ_BITS));<br>
+-=C2=A0 =C2=A0 assert(maxsz % 8 =3D=3D 0 &amp;&amp; maxsz &lt;=3D (8 &lt;&l=
+t; SIMD_MAXSZ_BITS));<br>
+-=C2=A0 =C2=A0 assert(data =3D=3D sextract32(data, 0, SIMD_DATA_BITS));<br>
++=C2=A0 =C2=A0 check_size_align(oprsz, maxsz, 0);<br>
++=C2=A0 =C2=A0 tcg_debug_assert(data =3D=3D sextract32(data, 0, SIMD_DATA_B=
+ITS));<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0oprsz =3D (oprsz / 8) - 1;<br>
+=C2=A0 =C2=A0 =C2=A0maxsz =3D (maxsz / 8) - 1;<br>
++<br>
++=C2=A0 =C2=A0 /*<br>
++=C2=A0 =C2=A0 =C2=A0* We have just asserted in check_size_align that eithe=
+r<br>
++=C2=A0 =C2=A0 =C2=A0* oprsz is {8,16,32} or matches maxsz.=C2=A0 Encode th=
+e final<br>
++=C2=A0 =C2=A0 =C2=A0* case with &#39;2&#39;, as that would otherwise map t=
+o 24.<br>
++=C2=A0 =C2=A0 =C2=A0*/<br>
++=C2=A0 =C2=A0 if (oprsz =3D=3D maxsz) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 oprsz =3D 2;<br>
++=C2=A0 =C2=A0 }<br>
++<br>
+=C2=A0 =C2=A0 =C2=A0desc =3D deposit32(desc, SIMD_OPRSZ_SHIFT, SIMD_OPRSZ_B=
+ITS, oprsz);<br>
+=C2=A0 =C2=A0 =C2=A0desc =3D deposit32(desc, SIMD_MAXSZ_SHIFT, SIMD_MAXSZ_B=
+ITS, maxsz);<br>
+=C2=A0 =C2=A0 =C2=A0desc =3D deposit32(desc, SIMD_DATA_SHIFT, SIMD_DATA_BIT=
+S, data);<br>
+-- <br>
+2.25.1<br>
+<br></blockquote><div><br></div><div>Sorry for the late reply, I was blocke=
+d by some other stuff recently...</div><div><br></div><div>However, I&#39;v=
+e applied this commit and enlarged=C2=A0RV_VLEN_MAX up to 1024-bit in my RV=
+V-1.0 patchset.</div><div>It can pass our tests with VLEN settings: 128, 25=
+6, 512 and 1024.</div><div>The changes look great!!</div><div><br></div><di=
+v><span style=3D"font-family:sans-serif;font-size:13.696px">Reviewed-by: Fr=
+ank Chang &lt;fr</span><a href=3D"mailto:ank.chang@sifive.com">ank.chang@si=
+five.com</a><span style=3D"font-family:sans-serif;font-size:13.696px">&gt;<=
+/span><br></div><div><span style=3D"font-family:sans-serif;font-size:13.696=
+px">Tested-by:=C2=A0</span><span style=3D"font-family:sans-serif;font-size:=
+13.696px">Frank Chang &lt;fr</span><a href=3D"mailto:ank.chang@sifive.com">=
+ank.chang@sifive.com</a><span style=3D"font-family:sans-serif;font-size:13.=
+696px">&gt;</span></div></div></div>
+
+--000000000000e3c2b205b01ea94f--
 
