@@ -2,114 +2,97 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B37F1C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 13:04:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3CE7C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 13:05:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 404CA20756
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 13:04:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 537B520756
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 13:05:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U7uhu8nB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 404CA20756
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZBJZ7pcJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 537B520756
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLnOw-0006tN-6p
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 09:04:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49146)
+	id 1kLnPO-0007hX-Ui
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 09:05:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50202)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kLnGK-0004L3-10
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:55:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43436)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kLnGD-0001vV-Mg
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:55:43 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601038537;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=z+EfLONnbMIwOWHnisDlZ53mle3LNvUOOk+mW6M/4Gs=;
- b=U7uhu8nBsTARWb7NY47f40vcp4pj9Kps0aI2j8tw2srNVjjSEnLSUdv1Pw1/lsralPXTkB
- yprT5AjbrskQGgwviuCY7xtiPMgYWRh40TpudQXvq/iggXvk+m9TOsDbjLMB+OxkmlEccP
- PQ2WbkBaRw2ulnuvKXv3kjBYUR2cb1E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-358-vW98NuQlOKK69jNjThfYPQ-1; Fri, 25 Sep 2020 08:55:32 -0400
-X-MC-Unique: vW98NuQlOKK69jNjThfYPQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E674918A2248;
- Fri, 25 Sep 2020 12:55:31 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-113.ams2.redhat.com
- [10.36.113.113])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 52E0F1002C19;
- Fri, 25 Sep 2020 12:55:27 +0000 (UTC)
-Subject: Re: [PATCH v2 29/31] iotests: Introduce qemu_nbd_list_log()
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200924152717.287415-1-kwolf@redhat.com>
- <20200924152717.287415-30-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <5b8b5aed-6c77-b2a9-29c1-b36d5f0be9e4@redhat.com>
-Date: Fri, 25 Sep 2020 14:55:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kLnJj-0002aU-VH
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:59:16 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:42694)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kLnJg-0002H4-FG
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:59:15 -0400
+Received: by mail-wr1-x431.google.com with SMTP id c18so3486009wrm.9
+ for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 05:59:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=pVKBS48AbwRPMB8Nsn3vDh4qlhS4C2TzgyypcYvasXA=;
+ b=ZBJZ7pcJqJAVmUAbL4bU66vcIwVRIBqHWOASZ/moE0vV9ZZ33zqzmEXlFz4PpHxyJj
+ Uaz50G84KCnXXDED5db8v/So/HcoT41z/5o6kTlmVpJeGh9K1osiMIDL+9ePs+osyjtw
+ ILIJ4EmKoiyejWgBu8wQq6abQvntQ8CYDjEe2HFSomOfk4gmh26KOujkWs9BaIO1BKUR
+ Z1Uh1k1BlhWT/C+rmkcVZk7X5PcR9R/g/YTXKLN7lFCNJhPdxGR+HfwTM8xnlyqrvzDG
+ a+1tkSxfjFM2zda9K6l23VMm3E+YHLGwoij5h5DI9k3dvIDSp0NyuCjHuEyXrR0ZUmiP
+ c69g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=pVKBS48AbwRPMB8Nsn3vDh4qlhS4C2TzgyypcYvasXA=;
+ b=fR5KJ/Cu7kIcb6U5JabxCnHRARqZAXFNnWU2YvtsrIp8mHAWTjExXo3lg03vLcE0mn
+ Im5CKDyJrfB6526d4I4ApURoBMcNoNwCVQ1W9yX8x3jWW3Zr5XfcU9JSMj5j8AmwwVxJ
+ seZXqPH0Dxqc1ru4W3zr6pUvNsE8l7BCkZVfjxFjHCq1P6TPUDpvvdqyoY9Wk4Lz91qK
+ 8zaAQoI7rKmVl5ozYYUziZyu+ybDbiwp+9xGl4wRutYKt7hJCpaQx3kSxwCLE1yCqtvV
+ bCO1spty42A1HGDHgN77kXCQjs0+z92vg0nXPubpoicB298zqihoiPui+QUA8flOG/Su
+ 8AIg==
+X-Gm-Message-State: AOAM531/SLnR/XthWJHigYxhLZFtlQD6Rl4nf826oJIb4Tl0tk2uNoPQ
+ 18X20V5bN35QkFQE4hY5hARGWQ==
+X-Google-Smtp-Source: ABdhPJwCqES0abvcUL6qZHv6FfjWwPBI3DLs8hO10nQV8cxdXD+ajQvsKcdNDT3JetUMn+NKAOi/PQ==
+X-Received: by 2002:a5d:4cc1:: with SMTP id c1mr4416288wrt.122.1601038750650; 
+ Fri, 25 Sep 2020 05:59:10 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id e1sm2891195wrp.49.2020.09.25.05.59.02
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 25 Sep 2020 05:59:02 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 064BC1FF7E;
+ Fri, 25 Sep 2020 13:51:50 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org, maxim.uvarov@linaro.org, joakim.bech@linaro.org,
+ ilias.apalodimas@linaro.org, tomas.winkler@intel.com, yang.huang@intel.com,
+ bing.zhu@intel.com, Matti.Moell@opensynergy.com, hmo@opensynergy.com
+Subject: [RFC PATCH  19/19] docs: add a man page for vhost-user-rpmb
+Date: Fri, 25 Sep 2020 13:51:47 +0100
+Message-Id: <20200925125147.26943-20-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200925125147.26943-1-alex.bennee@linaro.org>
+References: <20200925125147.26943-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200924152717.287415-30-kwolf@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="xLncaaEuCasFnJOedjglV3w7JvzefVcNp"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 01:07:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -34
-X-Spam_score: -3.5
-X-Spam_bar: ---
-X-Spam_report: (-3.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.238, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::431;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x431.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -122,50 +105,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com
+Cc: jean-philippe@linaro.org, takahiro.akashi@linaro.org,
+ virtualization@lists.linuxfoundation.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, arnd@linaro.org,
+ stratos-dev@op-lists.linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---xLncaaEuCasFnJOedjglV3w7JvzefVcNp
-Content-Type: multipart/mixed; boundary="qB4yeQiGRjoChBD0ArqPh43n3PNV6f0id"
+Basic usage and example invocation.
 
---qB4yeQiGRjoChBD0ArqPh43n3PNV6f0id
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ docs/tools/index.rst           |   1 +
+ docs/tools/vhost-user-rpmb.rst | 102 +++++++++++++++++++++++++++++++++
+ 2 files changed, 103 insertions(+)
+ create mode 100644 docs/tools/vhost-user-rpmb.rst
 
-On 24.09.20 17:27, Kevin Wolf wrote:
-> Add a function to list the NBD exports offered by an NBD server.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  tests/qemu-iotests/iotests.py | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---qB4yeQiGRjoChBD0ArqPh43n3PNV6f0id--
-
---xLncaaEuCasFnJOedjglV3w7JvzefVcNp
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9t6L0ACgkQ9AfbAGHV
-z0AwmggAwt1tHPtzMkzWYctJf12HOkTOPJ9A9iv7FjeU3eZpA2yIxdO5xSCFelUP
-MKUMxV7OcrRX8SxCVSTRr7zCky97Dun3n8+39zwbtwKWZ61oXCo0rkga5GGdqoyZ
-B+cm3+Hy3wzItYboQzzdLdgwb5BXfp3zxYuxq5djhdcmqW/aZUHq9sfQ/7j35aqq
-S0cm9mnVa7sFVY41w+XDGAUHJTWiImWqrQiJbIYi4lazVK9HBhN5BYv7a9E5zjEq
-yxcBI/CTXCHPJIa5KIRjhIdsfVKrsMw5meQNIJzrz9OHUUHGAiuVEmm+uM3wVdj7
-1PFYG3S00adFkIg91mamrTeiw/C95w==
-=geF+
------END PGP SIGNATURE-----
-
---xLncaaEuCasFnJOedjglV3w7JvzefVcNp--
+diff --git a/docs/tools/index.rst b/docs/tools/index.rst
+index 232ce9f3e463..488784b3bf1f 100644
+--- a/docs/tools/index.rst
++++ b/docs/tools/index.rst
+@@ -15,3 +15,4 @@ Contents:
+    qemu-trace-stap
+    virtfs-proxy-helper
+    virtiofsd
++   vhost-user-rpmb
+diff --git a/docs/tools/vhost-user-rpmb.rst b/docs/tools/vhost-user-rpmb.rst
+new file mode 100644
+index 000000000000..40d5d3bceb7c
+--- /dev/null
++++ b/docs/tools/vhost-user-rpmb.rst
+@@ -0,0 +1,102 @@
++QEMU vhost-user-rpmb - rpmb emulation backend
++=============================================
++
++Synopsis
++--------
++
++**vhost-user-rpmb** [*OPTIONS*]
++
++Description
++-----------
++
++This program is a vhost-user backed that emulates a VirtIO Replay
++Protected Memory Block device. These are usually special partitions
++that are part of a flash device that offer protection against reply
++attacks. They are used to store secure information in a way that is
++hard to tamper with.
++
++This program is designed to work with QEMU's ``--device
++vhost-user-rpmb-pci`` but should work with any virtual machine
++monitor (VMM) that supports vhost-user. See the Examples section
++below.
++
++This program requires a backing store to persist any data programmed
++into the device. The spec supports devices up 32Mb in size. For the
++daemon this is simply a raw file of the appropriate size. To program
++the device it needs to have a key. This can either be programmed by
++the guest at the start or come from a key file supplied to the daemon.
++
++Options
++-------
++
++.. program:: vhost-user-rpmb
++
++.. option:: -h, --help
++
++  Print help.
++
++.. option:: -V, --version
++
++  Print version.
++
++.. option:: -v, --verbose
++
++   Increase verbosity of output
++            
++.. option:: --debug
++
++  Enable debug output.
++
++.. option:: --socket-path=PATH
++
++  Listen on vhost-user UNIX domain socket at PATH. Incompatible with --fd.
++
++.. option:: --fd=FDNUM
++
++  Accept connections from vhost-user UNIX domain socket file descriptor FDNUM.
++  The file descriptor must already be listening for connections.
++  Incompatible with --socket-path.
++
++.. option:: --flash-path=PATH
++
++  Path to the backing store for the flash image, can be up to 32Mb in size.
++
++.. option:: --key-path=PATH
++
++  Path to the backing store for the key of 32 bytes.
++            
++.. option:: --key-set
++
++  Treat the value of key-path as set meaning the key cannot be
++  reprogrammed by the guest.
++
++.. option:: --initial-counter=N
++
++  Set the initial value of the devices write count. It is
++  incremented by each write operation. 
++
++Examples
++--------
++
++The daemon should be started first:
++
++::
++
++  host# vhost-user-rpmb --socket-path=vrpmb.sock \
++   --flash-path=flash.img \
++   --key-path=key --key-set \
++   --initial-counter=1234
++
++The QEMU invocation needs to create a chardev socket the device can
++use to communicate as well as share the guests memory over a memfd.
++
++::
++
++  host# qemu-system \
++      -chardev socket,path=vrpmb.sock,id=vrpmb \
++      -device vhost-user-rpmb-pci,chardev=vrpmb,id=rpmb \
++      -m 4096 \
++      -object memory-backend-file,id=mem,size=4G,mem-path=/dev/shm,share=on \
++      -numa node,memdev=mem \
++      ...
++
+-- 
+2.20.1
 
 
