@@ -7,66 +7,65 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A26EC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:11:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A46AC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:11:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E58D2083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:11:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 817CB21D7A
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:11:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MFCnccRG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E58D2083B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U4dTRfsH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 817CB21D7A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLmZE-00082O-W6
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 08:11:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38144)
+	id 1kLmZQ-0008Tj-4h
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 08:11:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38112)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kLmVg-0002J9-4v
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:07:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22245)
+ id 1kLmVX-0002Bq-9w
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:07:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57022)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kLmVe-0004Dy-7p
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:07:31 -0400
+ id 1kLmVT-0004DN-TV
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:07:23 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601035649;
+ s=mimecast20190719; t=1601035638;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=c+p4cUwbZBePSB0cV+zQje3NVEUYNiC8OKPJnj/bUL4=;
- b=MFCnccRG2jI83Lwv7d2nDxFqMdslC2hG4tdoRE6wSl64Elo6YNXXkUnYKxocLQV6mxqp5J
- FMGy+jFpzqFQwWIbn/XXpEwgCZ6kMC4yI2QVlOwgKuUW52I7Jasd9QX5JJLIcy520deU8+
- J+dYN+jhYKSquO/QzGFHPx4zji3Y+7Y=
+ bh=8fT5Zma08Owo8hQzAyZxIdi4dLbrYqBsXoHvPgCnfPc=;
+ b=U4dTRfsHzCLr1DFXn2GZ31OGIRu6OE4UNAYnwcxTJy1oflYVZYVPukUqGL5rlt36d2Zfze
+ OFUSHSJ9q5D751G55mpq1G/lwy62epx8rNyNCxqR9ir6YUZfIEoVXMaxk3JRP5akKpekf/
+ YlGrtey0l+PS/OYFsi48Dvu7QCWWGGY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-562-UpBs0oYDPgS2dZujpYroGw-1; Fri, 25 Sep 2020 08:07:27 -0400
-X-MC-Unique: UpBs0oYDPgS2dZujpYroGw-1
+ us-mta-567-DfDVf4bsOmWwYStUY9dzBg-1; Fri, 25 Sep 2020 08:07:14 -0400
+X-MC-Unique: DfDVf4bsOmWwYStUY9dzBg-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 701C6186DD3D;
- Fri, 25 Sep 2020 12:07:26 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18064805EEE;
+ Fri, 25 Sep 2020 12:07:13 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-114-177.ams2.redhat.com
  [10.36.114.177])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6316A73692;
- Fri, 25 Sep 2020 12:07:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C314A73693;
+ Fri, 25 Sep 2020 12:07:10 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, zhengchuan@huawei.com, dovmurik@linux.vnet.ibm.com,
  hgcoin@gmail.com, zhangjiachen.jaycee@bytedance.com, lvivier@redhat.com,
  peterx@redhat.com, stefanha@redhat.com, vgoyal@redhat.com,
  jinyan12@huawei.com, ann.zhuangyanying@huawei.com
-Subject: [PULL 06/26] migration/dirtyrate: Add dirtyrate statistics series
- functions
-Date: Fri, 25 Sep 2020 13:06:35 +0100
-Message-Id: <20200925120655.295142-7-dgilbert@redhat.com>
+Subject: [PULL 03/26] migration/dirtyrate: setup up query-dirtyrate framwork
+Date: Fri, 25 Sep 2020 13:06:32 +0100
+Message-Id: <20200925120655.295142-4-dgilbert@redhat.com>
 In-Reply-To: <20200925120655.295142-1-dgilbert@redhat.com>
 References: <20200925120655.295142-1-dgilbert@redhat.com>
 MIME-Version: 1.0
@@ -77,9 +76,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 01:07:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 02:48:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -32
 X-Spam_score: -3.3
@@ -107,90 +106,112 @@ Sender: "Qemu-devel"
 
 From: Chuan Zheng <zhengchuan@huawei.com>
 
-Add dirtyrate statistics functions to record/update dirtyrate info.
+Add get_dirtyrate_thread() functions to setup query-dirtyrate
+framework.
 
 Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
+Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: David Edmondson <david.edmondson@oracle.com>
 Reviewed-by: Li Qiang <liq3ea@gmail.com>
-Message-Id: <1600237327-33618-5-git-send-email-zhengchuan@huawei.com>
+Message-Id: <1600237327-33618-2-git-send-email-zhengchuan@huawei.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/dirtyrate.c | 32 ++++++++++++++++++++++++++++++++
- migration/dirtyrate.h | 12 ++++++++++++
- 2 files changed, 44 insertions(+)
+ migration/dirtyrate.c | 38 ++++++++++++++++++++++++++++++++++++++
+ migration/dirtyrate.h | 28 ++++++++++++++++++++++++++++
+ migration/meson.build |  2 +-
+ 3 files changed, 67 insertions(+), 1 deletion(-)
+ create mode 100644 migration/dirtyrate.c
+ create mode 100644 migration/dirtyrate.h
 
 diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-index 3edf000f45..94c4e173bc 100644
---- a/migration/dirtyrate.c
+new file mode 100644
+index 0000000000..bf7fd24e75
+--- /dev/null
 +++ b/migration/dirtyrate.c
-@@ -23,6 +23,7 @@
- #include "dirtyrate.h"
- 
- static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
-+static struct DirtyRateStat DirtyStat;
- 
- static int dirtyrate_set_state(int *state, int old_state, int new_state)
- {
-@@ -34,6 +35,37 @@ static int dirtyrate_set_state(int *state, int old_state, int new_state)
-     }
- }
- 
-+static void reset_dirtyrate_stat(void)
-+{
-+    DirtyStat.total_dirty_samples = 0;
-+    DirtyStat.total_sample_count = 0;
-+    DirtyStat.total_block_mem_MB = 0;
-+    DirtyStat.dirty_rate = -1;
-+    DirtyStat.start_time = 0;
-+    DirtyStat.calc_time = 0;
-+}
-+
-+static void update_dirtyrate_stat(struct RamblockDirtyInfo *info)
-+{
-+    DirtyStat.total_dirty_samples += info->sample_dirty_count;
-+    DirtyStat.total_sample_count += info->sample_pages_count;
-+    /* size of total pages in MB */
-+    DirtyStat.total_block_mem_MB += (info->ramblock_pages *
-+                                     TARGET_PAGE_SIZE) >> 20;
-+}
-+
-+static void update_dirtyrate(uint64_t msec)
-+{
-+    uint64_t dirtyrate;
-+    uint64_t total_dirty_samples = DirtyStat.total_dirty_samples;
-+    uint64_t total_sample_count = DirtyStat.total_sample_count;
-+    uint64_t total_block_mem_MB = DirtyStat.total_block_mem_MB;
-+
-+    dirtyrate = total_dirty_samples * total_block_mem_MB *
-+                1000 / (total_sample_count * msec);
-+
-+    DirtyStat.dirty_rate = dirtyrate;
-+}
- 
- static void calculate_dirtyrate(struct DirtyRateConfig config)
- {
-diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
-index 8707df852d..312debca6f 100644
---- a/migration/dirtyrate.h
-+++ b/migration/dirtyrate.h
-@@ -42,5 +42,17 @@ struct RamblockDirtyInfo {
-     uint32_t *hash_result; /* array of hash result for sampled pages */
- };
- 
+@@ -0,0 +1,38 @@
 +/*
-+ * Store calculation statistics for each measure.
++ * Dirtyrate implement code
++ *
++ * Copyright (c) 2020 HUAWEI TECHNOLOGIES CO.,LTD.
++ *
++ * Authors:
++ *  Chuan Zheng <zhengchuan@huawei.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
 + */
-+struct DirtyRateStat {
-+    uint64_t total_dirty_samples; /* total dirty sampled page */
-+    uint64_t total_sample_count; /* total sampled pages */
-+    uint64_t total_block_mem_MB; /* size of total sampled pages in MB */
-+    int64_t dirty_rate; /* dirty rate in MB/s */
-+    int64_t start_time; /* calculation start time in units of second */
-+    int64_t calc_time; /* time duration of two sampling in units of second */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "cpu.h"
++#include "qemu/config-file.h"
++#include "exec/memory.h"
++#include "exec/ramblock.h"
++#include "exec/target_page.h"
++#include "qemu/rcu_queue.h"
++#include "qapi/qapi-commands-migration.h"
++#include "migration.h"
++#include "dirtyrate.h"
++
++static void calculate_dirtyrate(struct DirtyRateConfig config)
++{
++    /* todo */
++    return;
++}
++
++void *get_dirtyrate_thread(void *arg)
++{
++    struct DirtyRateConfig config = *(struct DirtyRateConfig *)arg;
++
++    calculate_dirtyrate(config);
++
++    return NULL;
++}
+diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
+new file mode 100644
+index 0000000000..84ab9409ac
+--- /dev/null
++++ b/migration/dirtyrate.h
+@@ -0,0 +1,28 @@
++/*
++ *  Dirtyrate common functions
++ *
++ *  Copyright (c) 2020 HUAWEI TECHNOLOGIES CO., LTD.
++ *
++ *  Authors:
++ *  Chuan Zheng <zhengchuan@huawei.com>
++ *
++ *  This work is licensed under the terms of the GNU GPL, version 2 or later.
++ *  See the COPYING file in the top-level directory.
++ */
++
++#ifndef QEMU_MIGRATION_DIRTYRATE_H
++#define QEMU_MIGRATION_DIRTYRATE_H
++
++/*
++ * Sample 512 pages per GB as default.
++ * TODO: Make it configurable.
++ */
++#define DIRTYRATE_DEFAULT_SAMPLE_PAGES            512
++
++struct DirtyRateConfig {
++    uint64_t sample_pages_per_gigabytes; /* sample pages per GB */
++    int64_t sample_period_seconds; /* time duration between two sampling */
 +};
 +
- void *get_dirtyrate_thread(void *arg);
- #endif
++void *get_dirtyrate_thread(void *arg);
++#endif
+diff --git a/migration/meson.build b/migration/meson.build
+index ac8ff1419f..b5b71c8060 100644
+--- a/migration/meson.build
++++ b/migration/meson.build
+@@ -37,4 +37,4 @@ softmmu_ss.add(when: ['CONFIG_RDMA', rdma], if_true: files('rdma.c'))
+ softmmu_ss.add(when: 'CONFIG_LIVE_BLOCK_MIGRATION', if_true: files('block.c'))
+ softmmu_ss.add(when: 'CONFIG_ZSTD', if_true: [files('multifd-zstd.c'), zstd])
+ 
+-specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: files('ram.c'))
++specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: files('dirtyrate.c', 'ram.c'))
 -- 
 2.26.2
 
