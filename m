@@ -7,106 +7,107 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87B47C4741F
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 19:06:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7DC8C4727E
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 19:07:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFA23221E5
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 19:06:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3AA41221E5
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 19:07:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="a8dsyG4v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFA23221E5
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="1NMYsxHO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AA41221E5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLt3J-0003Oj-Pu
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 15:06:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57190)
+	id 1kLt3l-0004W9-5v
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 15:07:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57214)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <Thomas.Lendacky@amd.com>)
- id 1kLt1o-0001fa-24
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 15:05:08 -0400
+ id 1kLt1s-0001hC-IO
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 15:05:15 -0400
 Received: from mail-bn8nam11on2089.outbound.protection.outlook.com
  ([40.107.236.89]:10240 helo=NAM11-BN8-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <Thomas.Lendacky@amd.com>)
- id 1kLt1m-0002ju-7W
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 15:05:07 -0400
+ id 1kLt1q-0002ju-SY
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 15:05:12 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mJfBWCAfHmmUL1GzvaL+BulGqmFPS1Ie8YvidOfVjmQh/BUzeue2J7kCmh8zWJ9G1LcePAP/mcm6hi7nDS4qOCySen0ZaQWswp81iXawCODIanGkikJdC/W5C+MYME9yHfq0sQi69urXvliXFft/ucTA/i5DK1HRMG+AdtPvP6wfi1HzLqVYItlM3fLwaVqHEXL0q5S9OP3Gq7rtwy3ZmaZX3rr+QGU/dPpVhMhSFIgPiEJDn6i4jqDgMYVs4s9L+ttFGzS+xKo9KGj5x63G+VyHL2hzti1f/7WhoQ90TACqzzOb95ypp8r34f4B/3hujCn3eP3BYQeJ+nWWVZWFQg==
+ b=X/Um1p3AovVydtswi1qLrr150t3z4GQQmCNZcDBDYXXwg7VyA/Z5hBWG2buJ14FeWJCkj9dmRw7PIs3D1DLxqxUvFkVBdm4eXSJMkBm5ihGOAAJaijnfroZcsY9nlk30aOrm6oErhW4pQ64nNhJouFcDgbV55+Pl0gy3VFiKxZwoE5/qHDaNQ09XTGOqHTzDoPcFfaUak8vy7K+PlyKmxPYHI8TRfI7aRTFvKAjRlW3Q2E/SDr4wG0wF2RjmLnQp6QmZqmdFh+sXeeC4TS4uZKIwbdbBt8hsy5elCIHl7knrHritTuGQ+PoyYAKqxhv/Pj/m6pnqcFJgvLCLjIC6pA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lxrwlL0cR26elBTmRMEa1mNxtYDzDEpSnRjqv5XNVuE=;
- b=fV7mdok+2GM0UMxBV6m5s2jPnCEua2YNpZ4WhBajamgfGE/ZaNl3Sv6Mt6WZZdSeB0avBR5Idt4yg7X1hUmuIknkWIDRVnt6kNGzxV7C+RkKAtVJSKZ95K3aH47BtIonHMMzUMYeV7ybm2X3E2Su8i62trsRKezATKxCePET9a76IdJSO1sgd11r2htNGMQYc70JZ9w0eNTRLwzMPcEf1B7MTbYFzLSIxE8vm2vnjWxS9WNDF/4AGmVJ+UPONnxRG1NGprsfSQyNLBi9uF7pKpePG414HHBJAhxsSw2C7A0qjrJu2zEr/1u/1VeCPX+0tisVWQq0w+bVy1u9/raCXA==
+ bh=TTsr4nd8RWrfRb11z5zIPJohWSIyFWKOcjm5SrLAVyc=;
+ b=FUwOmjDfAGl0ITLro8j8A95v0NicFGye1fFPGAwTxNLEcgUeklajl0sldmEecyke0V9oaqxzHS679rLv/CglBaVOhiNnrL2FCvxEBy8dcXnJt4L/fX+fZSxPu4IXP4CypJotfZrawXhECOZ9f5hHG6dJWTchSoV70U52v3uBxdP1P4ihYB+Ndm2M/NWP5BKhnb2urEUzdXbjoxN5ETdVrTjo+lI1WFu8R4NaidzuKqP8A1xwDmlUU9whlN1mIlYgCXyysqaxuhkrYGLB+pfHefmRHddbyFEmik0K1V1Uq2ZN7PgQycJC3b8RYIpGVVJjEuN6MXkWNMONNk3CGQ4d+w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lxrwlL0cR26elBTmRMEa1mNxtYDzDEpSnRjqv5XNVuE=;
- b=a8dsyG4vjzq23k4y8F6Uxc7D8VSTyyZZ0RFm/XG8ALpWPVBCbwFcBz2/jWv2JzqQLQcjsZ4p681J9w+Ka4ADjjAyBhUrcqTBXztjWB5rylFAoxqVg9c+RfJL+LafcpRK8cDdryxKZmNzmpykjJImqjm7fFQYGu8KDrw2kzTvZ40=
+ bh=TTsr4nd8RWrfRb11z5zIPJohWSIyFWKOcjm5SrLAVyc=;
+ b=1NMYsxHOiUbIikt55f078kcTqSFipLr61pi6BgDvEFTLklRFGtxzc4zxWY6rVD9brVNghH2IAwCRoIkGhCZ2gqzXAIUmhrztQhpzDL2fVzO3cJXCZP+jMudJbAjgCOQGWtvhyAGNzi0UWOXsBRQqcTBTcSIlzNooRCZYUxNtsQk=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
 Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
  DM6PR12MB4297.namprd12.prod.outlook.com (2603:10b6:5:211::20) with
  Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3412.22; Fri, 25 Sep 2020 19:04:40 +0000
+ 15.20.3412.22; Fri, 25 Sep 2020 19:04:48 +0000
 Received: from DM5PR12MB1355.namprd12.prod.outlook.com
  ([fe80::299a:8ed2:23fc:6346]) by DM5PR12MB1355.namprd12.prod.outlook.com
  ([fe80::299a:8ed2:23fc:6346%3]) with mapi id 15.20.3391.024; Fri, 25 Sep 2020
- 19:04:40 +0000
+ 19:04:48 +0000
 From: Tom Lendacky <thomas.lendacky@amd.com>
 To: qemu-devel@nongnu.org,
 	kvm@vger.kernel.org
-Subject: [PATCH v4 3/6] sev/i386: Allow AP booting under SEV-ES
-Date: Fri, 25 Sep 2020 14:03:37 -0500
-Message-Id: <1b65b7dfaceb5c06d3288bd47e712d2eb15a1d1d.1601060620.git.thomas.lendacky@amd.com>
+Subject: [PATCH v4 4/6] sev/i386: Don't allow a system reset under an SEV-ES
+ guest
+Date: Fri, 25 Sep 2020 14:03:38 -0500
+Message-Id: <c40de4c1bf4d14d60942fba86b2827543c19374a.1601060620.git.thomas.lendacky@amd.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <cover.1601060620.git.thomas.lendacky@amd.com>
 References: <cover.1601060620.git.thomas.lendacky@amd.com>
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DM5PR2001CA0010.namprd20.prod.outlook.com
- (2603:10b6:4:16::20) To DM5PR12MB1355.namprd12.prod.outlook.com
+X-ClientProxiedBy: DM5PR20CA0044.namprd20.prod.outlook.com
+ (2603:10b6:3:13d::30) To DM5PR12MB1355.namprd12.prod.outlook.com
  (2603:10b6:3:6e::7)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from tlendack-t1.amd.com (165.204.77.1) by
- DM5PR2001CA0010.namprd20.prod.outlook.com (2603:10b6:4:16::20) with Microsoft
+ DM5PR20CA0044.namprd20.prod.outlook.com (2603:10b6:3:13d::30) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3412.20 via Frontend Transport; Fri, 25 Sep 2020 19:04:39 +0000
+ 15.20.3412.20 via Frontend Transport; Fri, 25 Sep 2020 19:04:47 +0000
 X-Mailer: git-send-email 2.28.0
 X-Originating-IP: [165.204.77.1]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 1d8d30ae-ce3f-4f1b-6046-08d86185dae2
+X-MS-Office365-Filtering-Correlation-Id: eda5e69a-bde3-45dd-b25e-08d86185df89
 X-MS-TrafficTypeDiagnostic: DM6PR12MB4297:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB4297A9FAB5A9D64DA227AD07EC360@DM6PR12MB4297.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:224;
+X-Microsoft-Antispam-PRVS: <DM6PR12MB4297D0B1B35925344B131D56EC360@DM6PR12MB4297.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1002;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: nBO++Vd/NNUVYcINUkmgTye0bumHN5iSr0FWWLFtjV8Q6/3gd+oiyRnjP86UiuzoNCyCh7d3eKoXpxjFQKHpk3wjzJOpBPUyPmCoCQRA1PDb+OHAO9Y8fL3QdchRZx0YCPc/pIYZvA6QmqmAXL04s2f7TgHNyDzGdEP4iYHowq8bFMumd56Ce4oihSGpc5W9//Qptrx4+jqNq/4ZsYClzixk9UiB8eLT2hiaxiMjPy0xClSBpnJwtE/8qu8Zx7Y0rw+60S1+MZGpzDe8Iq3rGOkN+Wpz5TWVcIX0STX6u6n75wTtR+N0HIkrMsZeTD8r8CmVMa2l5mbpeNNy8UWI+tXVWDcC1Vpzg73hZIvYs0bt1Sfu6AUS357rF94433+Z
+X-Microsoft-Antispam-Message-Info: QWklHsCGlz2k1irQtRKW4+XTWpwBpR1EYN4s+8W694UxUjMOERw5Uvnu3oYeNrsMozBRyCXb+nti0uOo74GYqehrlfsHwKCky8AGJcu176+Ecstj5P8w280C4axZSi0vyaNI5pqKIFDECJzVXOm+wN+/cccMpcccI76XsK7KJzejcQvJyoKnLeiVrlI6Z8jPyHxUTld0x+syCSDSb+uvM8bV8HmjCWTuevWvYrDp4Pd8Szy+Cma19yKAtTlvX0zMol2y+qzfT85CwZ8mSWosdnyQ3TAW8sYipsnKQzBiE0vyX/HfPGwvIg1L2SVFbJjS8LVuiYWmLTiCITbkpjuKyiI91EnD8xaxTyMNs5NH0X0+G4Q1X2dtu0gn4RKnufFi
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:DM5PR12MB1355.namprd12.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(346002)(136003)(396003)(376002)(39860400002)(26005)(7416002)(956004)(186003)(16526019)(54906003)(2616005)(6486002)(66556008)(66946007)(36756003)(8936002)(66476007)(86362001)(316002)(478600001)(7696005)(52116002)(2906002)(5660300002)(4326008)(83380400001)(8676002);
+ SFS:(4636009)(366004)(346002)(136003)(396003)(376002)(39860400002)(26005)(7416002)(956004)(186003)(6666004)(16526019)(54906003)(2616005)(6486002)(66556008)(66946007)(36756003)(8936002)(66476007)(86362001)(316002)(478600001)(7696005)(52116002)(2906002)(5660300002)(4326008)(83380400001)(8676002);
  DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData: unr8yxFOOszkFEUKauwYnQjAxgZ2vpk3h1osE8PKCmgFSb8CZ50q5il7F/9n21nTeV5O6uDR12Vv+lsd8NcPVVi66qbiN9Vk+VX+uZfwoXa1+H/fUqMcQsrelvS+JocMPgKz/aWhWlBddIShrfkvGm9NUIt41ftkfoO1tolLmreYJl0ORLSmi0gz52OT19Bwg2J6bjkksnZG9moC43N+SnoeQxzeO0nef/azPaguq4M+eQpNEZtOV6rhxFtqxb9KYWM6/HQOeKvr8775YkecUiNRpgplyIOAY5TPUcLgKitvoz+veLWkHvRMcIjtTKz63AdE/y7rOdU72ptbv3gJjOHx5kH4U/w66X6kHYAn+3oSlHnTk4gQrzOg66xx0sCxElSPCsiHDX7BBz7iaJn+/ch/yAMw4x7AnCATUCJyiT3co0uSUNpUaE0lz+XoshweBRs3HtoZwahiEEAgW/nEoFZHwhAyVnztmWvKrLkXQGa/ybiGU1VS0XVM+R45ibD30JOir28KZaSvxeN31psJsZALtmha8iHyx0BGa747x1aNkYoAejoKzcrCyQjg8BiRgAQsnbMjGP1JdznBpNkiFkgf4743byAvgeBep/T6RMQke5Z1i5mW+Z54MyAwC1aSHpgH/GQCkfUEkR8Sh/dWDA==
+X-MS-Exchange-AntiSpam-MessageData: erUX9xP7UvcEAtZoZrbp6OP7DMItOjj6XR3zcgR+pbF7q9Xi3F5wsadC8Ejb+xI5rq81XpyYgcQVpAVulheIIJoZ46b2bU2pQt8Xi6TtfrROvBppnXrkxFQuYenhfcTDHFawOCZJmhxTn8qO7QzCMqmSGZ8ljbANYHe2QF/Nwt7n9iFXKY6WjOx6W7EokcbduQR6LsrmN2IGlEtFzz5a7jqUYThkXk3I9BZU5vNOItmXZYFifkMngATf1DbRTtFTt1N2eGOJIRMOxEzG/YR6xFkag+JJlJhqxrvIQ38aqzA7w0jjdxuIt8JIqcW6Zf4+y+AV2+xpVA8RnIl9zhvHtqca0u2cp0yrnuCedMtuzkh/XBl2rKORYOAd+2Kyw9ZSJ+EKT4rr+Hg2zXk7ie8vRQ2Dsh41q6l++SbHFrHumYazStHbnHbKGfJXxD10mOUSCzG/e70Y42CK44hGWz1c0fQGlJRhUdAeoRYubeE1qZSmmItZS+FDfOST/c/ldfDTp+6WClr/pcIus7Wr1QbSbAGI32XChldqJFEjuWOLbqL0xc27BMyBAt9ZDaGw5P51w0IzIXoMQOpp7OqtTvFK0e+n3aAArPs4UVFrymVGhBZqe0+IW//wc4UiytqyhaCci6uyTmDOp/Htle25CZ/qmg==
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1d8d30ae-ce3f-4f1b-6046-08d86185dae2
+X-MS-Exchange-CrossTenant-Network-Message-Id: eda5e69a-bde3-45dd-b25e-08d86185df89
 X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2020 19:04:40.6367 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2020 19:04:48.4381 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6FIRNGMim4Uo70FpMxpskNcONnQ/HrVlwwvY4xLOZymaeqoCybGwBoWiewoCAyf8Izb6ELdn1xx8OrnA7Qx9pw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: aPxYTdMnMaOIY4Kys3FEJCjFTRyhX3KYVJEsEJ2gFtpKDiarbQuRGAlLUyuzo5TogATHVzdqxpzRJOiQuZv44A==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4297
 Received-SPF: none client-ip=40.107.236.89;
  envelope-from=Thomas.Lendacky@amd.com;
@@ -132,314 +133,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Brijesh Singh <brijesh.singh@amd.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Connor Kuehl <ckuehl@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Brijesh Singh <brijesh.singh@amd.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Connor Kuehl <ckuehl@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, David Hildenbrand <david@redhat.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Jiri Slaby <jslaby@suse.cz>,
- Richard Henderson <rth@twiddle.net>
+ Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>, Jiri Slaby <jslaby@suse.cz>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Tom Lendacky <thomas.lendacky@amd.com>
 
-When SEV-ES is enabled, it is not possible modify the guests register
-state after it has been initially created, encrypted and measured.
+An SEV-ES guest does not allow register state to be altered once it has
+been measured. When an SEV-ES guest issues a reboot command, Qemu will
+reset the vCPU state and resume the guest. This will cause failures under
+SEV-ES. Prevent that from occuring by introducing an arch-specific
+callback that returns a boolean indicating whether vCPUs are resettable.
 
-Normally, an INIT-SIPI-SIPI request is used to boot the AP. However, the
-hypervisor cannot emulate this because it cannot update the AP register
-state. For the very first boot by an AP, the reset vector CS segment
-value and the EIP value must be programmed before the register has been
-encrypted and measured.
-
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Aurelien Jarno <aurelien@aurel32.net>
+Cc: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: David Hildenbrand <david@redhat.com>
 Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- accel/kvm/kvm-all.c    | 64 ++++++++++++++++++++++++++++++++++++++++++
- accel/stubs/kvm-stub.c |  5 ++++
- hw/i386/pc_sysfw.c     | 10 ++++++-
- include/sysemu/kvm.h   | 16 +++++++++++
- include/sysemu/sev.h   |  3 ++
- target/i386/kvm.c      |  2 ++
- target/i386/sev.c      | 59 ++++++++++++++++++++++++++++++++++++++
- 7 files changed, 158 insertions(+), 1 deletion(-)
+ accel/kvm/kvm-all.c       |  5 +++++
+ include/sysemu/cpus.h     |  2 ++
+ include/sysemu/hw_accel.h |  5 +++++
+ include/sysemu/kvm.h      | 10 ++++++++++
+ softmmu/cpus.c            |  5 +++++
+ softmmu/vl.c              |  5 ++++-
+ target/arm/kvm.c          |  5 +++++
+ target/i386/kvm.c         |  6 ++++++
+ target/mips/kvm.c         |  5 +++++
+ target/ppc/kvm.c          |  5 +++++
+ target/s390x/kvm.c        |  5 +++++
+ 11 files changed, 57 insertions(+), 1 deletion(-)
 
 diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index ad8b315b35..08b66642dd 100644
+index 08b66642dd..a161fff813 100644
 --- a/accel/kvm/kvm-all.c
 +++ b/accel/kvm/kvm-all.c
-@@ -39,6 +39,7 @@
- #include "qemu/main-loop.h"
- #include "trace.h"
- #include "hw/irq.h"
-+#include "sysemu/kvm.h"
- #include "sysemu/sev.h"
- #include "qapi/visitor.h"
- #include "qapi/qapi-types-common.h"
-@@ -120,6 +121,12 @@ struct KVMState
-     /* memory encryption */
-     void *memcrypt_handle;
-     int (*memcrypt_encrypt_data)(void *handle, uint8_t *ptr, uint64_t len);
-+    int (*memcrypt_save_reset_vector)(void *handle, void *flash_ptr,
-+                                      uint64_t flash_size, uint32_t *addr);
-+
-+    uint32_t reset_cs;
-+    uint32_t reset_ip;
-+    bool reset_data_valid;
- 
-     /* For "info mtree -f" to tell if an MR is registered in KVM */
-     int nr_as;
-@@ -239,6 +246,62 @@ int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
-     return 1;
+@@ -2388,6 +2388,11 @@ void kvm_flush_coalesced_mmio_buffer(void)
+     s->coalesced_flush_in_progress = false;
  }
  
-+void kvm_memcrypt_set_reset_vector(CPUState *cpu)
++bool kvm_cpu_check_are_resettable(void)
 +{
-+    X86CPU *x86;
-+    CPUX86State *env;
-+
-+    /* Only update if we have valid reset information */
-+    if (!kvm_state->reset_data_valid) {
-+        return;
-+    }
-+
-+    /* Do not update the BSP reset state */
-+    if (cpu->cpu_index == 0) {
-+        return;
-+    }
-+
-+    x86 = X86_CPU(cpu);
-+    env = &x86->env;
-+
-+    cpu_x86_load_seg_cache(env, R_CS, 0xf000, kvm_state->reset_cs, 0xffff,
-+                           DESC_P_MASK | DESC_S_MASK | DESC_CS_MASK |
-+                           DESC_R_MASK | DESC_A_MASK);
-+
-+    env->eip = kvm_state->reset_ip;
++    return kvm_arch_cpu_check_are_resettable();
 +}
 +
-+int kvm_memcrypt_save_reset_vector(void *flash_ptr, uint64_t flash_size)
-+{
-+    CPUState *cpu;
-+    uint32_t addr;
-+    int ret;
-+
-+    if (kvm_memcrypt_enabled() &&
-+        kvm_state->memcrypt_save_reset_vector) {
-+
-+        addr = 0;
-+        ret = kvm_state->memcrypt_save_reset_vector(kvm_state->memcrypt_handle,
-+                                                    flash_ptr, flash_size,
-+                                                    &addr);
-+        if (ret) {
-+            return ret;
-+        }
-+
-+        if (addr) {
-+            kvm_state->reset_cs = addr & 0xffff0000;
-+            kvm_state->reset_ip = addr & 0x0000ffff;
-+            kvm_state->reset_data_valid = true;
-+
-+            CPU_FOREACH(cpu) {
-+                kvm_memcrypt_set_reset_vector(cpu);
-+            }
-+        }
-+    }
-+
-+    return 0;
-+}
-+
- /* Called with KVMMemoryListener.slots_lock held */
- static KVMSlot *kvm_get_free_slot(KVMMemoryListener *kml)
+ static void do_kvm_cpu_synchronize_state(CPUState *cpu, run_on_cpu_data arg)
  {
-@@ -2193,6 +2256,7 @@ static int kvm_init(MachineState *ms)
-         }
+     if (!cpu->vcpu_dirty) {
+diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
+index 3c1da6a018..d3e6cdf126 100644
+--- a/include/sysemu/cpus.h
++++ b/include/sysemu/cpus.h
+@@ -24,6 +24,8 @@ void dump_drift_info(void);
+ void qemu_cpu_kick_self(void);
+ void qemu_timer_notify_cb(void *opaque, QEMUClockType type);
  
-         kvm_state->memcrypt_encrypt_data = sev_encrypt_data;
-+        kvm_state->memcrypt_save_reset_vector = sev_es_save_reset_vector;
-     }
++bool cpus_are_resettable(void);
++
+ void cpu_synchronize_all_states(void);
+ void cpu_synchronize_all_post_reset(void);
+ void cpu_synchronize_all_post_init(void);
+diff --git a/include/sysemu/hw_accel.h b/include/sysemu/hw_accel.h
+index e128f8b06b..6d387226d4 100644
+--- a/include/sysemu/hw_accel.h
++++ b/include/sysemu/hw_accel.h
+@@ -17,6 +17,11 @@
+ #include "sysemu/hvf.h"
+ #include "sysemu/whpx.h"
  
-     ret = kvm_arch_init(ms, s);
-diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
-index 82f118d2df..3aece9b513 100644
---- a/accel/stubs/kvm-stub.c
-+++ b/accel/stubs/kvm-stub.c
-@@ -114,6 +114,11 @@ int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
-   return 1;
- }
- 
-+int kvm_memcrypt_save_reset_vector(void *flash_ptr, uint64_t flash_size)
++static inline bool cpu_check_are_resettable(void)
 +{
-+    return -ENOSYS;
++    return kvm_enabled() ? kvm_cpu_check_are_resettable() : true;
 +}
 +
- #ifndef CONFIG_USER_ONLY
- int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
+ static inline void cpu_synchronize_state(CPUState *cpu)
  {
-diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-index b6c0822fe3..321ff94261 100644
---- a/hw/i386/pc_sysfw.c
-+++ b/hw/i386/pc_sysfw.c
-@@ -156,7 +156,8 @@ static void pc_system_flash_map(PCMachineState *pcms,
-     PFlashCFI01 *system_flash;
-     MemoryRegion *flash_mem;
-     void *flash_ptr;
--    int ret, flash_size;
-+    uint64_t flash_size;
-+    int ret;
- 
-     assert(PC_MACHINE_GET_CLASS(pcms)->pci_enabled);
- 
-@@ -204,6 +205,13 @@ static void pc_system_flash_map(PCMachineState *pcms,
-             if (kvm_memcrypt_enabled()) {
-                 flash_ptr = memory_region_get_ram_ptr(flash_mem);
-                 flash_size = memory_region_size(flash_mem);
-+
-+                ret = kvm_memcrypt_save_reset_vector(flash_ptr, flash_size);
-+                if (ret) {
-+                    error_report("failed to locate and/or save reset vector");
-+                    exit(1);
-+                }
-+
-                 ret = kvm_memcrypt_encrypt_data(flash_ptr, flash_size);
-                 if (ret) {
-                     error_report("failed to encrypt pflash rom");
+     if (kvm_enabled()) {
 diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 5bbea53883..b7ff481d61 100644
+index b7ff481d61..51a12c83ed 100644
 --- a/include/sysemu/kvm.h
 +++ b/include/sysemu/kvm.h
-@@ -254,6 +254,22 @@ bool kvm_memcrypt_enabled(void);
-  */
- int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len);
+@@ -581,4 +581,14 @@ int kvm_get_max_memslots(void);
+ /* Notify resamplefd for EOI of specific interrupts. */
+ void kvm_resample_fd_notify(int gsi);
  
 +/**
-+ * kvm_memcrypt_set_reset_vector - sets the CS/IP value for the AP if SEV-ES
-+ *                                 is active.
-+ */
-+void kvm_memcrypt_set_reset_vector(CPUState *cpu);
-+
-+/**
-+ * kvm_memcrypt_save_reset_vector - locates and saves the reset vector to be
-+ *                                  used as the initial CS/IP value for APs
-+ *                                  if SEV-ES is active.
++ * kvm_cpu_check_are_resettable - return whether CPUs can be reset
 + *
-+ * Return: 1 SEV-ES is active and failed to locate a valid reset vector
-+ *         0 SEV-ES is not active or successfully located and saved the
-+ *           reset vector address
++ * Returns: true: CPUs are resettable
++ *          false: CPUs are not resettable
 + */
-+int kvm_memcrypt_save_reset_vector(void *flash_prt, uint64_t flash_size);
- 
- #ifdef NEED_CPU_H
- #include "cpu.h"
-diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
-index 98c1ec8d38..5198e5a621 100644
---- a/include/sysemu/sev.h
-+++ b/include/sysemu/sev.h
-@@ -18,4 +18,7 @@
- 
- void *sev_guest_init(const char *id);
- int sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len);
-+int sev_es_save_reset_vector(void *handle, void *flash_ptr,
-+                             uint64_t flash_size, uint32_t *addr);
++bool kvm_cpu_check_are_resettable(void);
++
++bool kvm_arch_cpu_check_are_resettable(void);
 +
  #endif
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 9efb07e7c8..7c2a3a123b 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1913,6 +1913,8 @@ void kvm_arch_reset_vcpu(X86CPU *cpu)
-     }
-     /* enabled by default */
-     env->poll_control_msr = 1;
-+
-+    kvm_memcrypt_set_reset_vector(CPU(cpu));
+diff --git a/softmmu/cpus.c b/softmmu/cpus.c
+index e3b98065c9..ee9c46527c 100644
+--- a/softmmu/cpus.c
++++ b/softmmu/cpus.c
+@@ -927,6 +927,11 @@ void hw_error(const char *fmt, ...)
+     abort();
  }
  
- void kvm_arch_do_init_vcpu(X86CPU *cpu)
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 0d4bd3cd75..9c081173db 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -22,6 +22,7 @@
- #include "qom/object_interfaces.h"
- #include "qemu/base64.h"
- #include "qemu/module.h"
-+#include "qemu/uuid.h"
- #include "sysemu/kvm.h"
- #include "sev_i386.h"
- #include "sysemu/sysemu.h"
-@@ -69,6 +70,21 @@ struct SevGuestState {
- #define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
- #define DEFAULT_SEV_DEVICE      "/dev/sev"
- 
-+/* SEV Information Block GUID = 00f771de-1a7e-4fcb-890e-68c77e2fb44e */
-+static const QemuUUID sev_info_block_guid_le = {
-+    .data = UUID_LE(0x00f771de, 0x1a7e, 0x4fcb,
-+                    0x89, 0x0e, 0x68, 0xc7, 0x7e, 0x2f, 0xb4, 0x4e),
-+};
-+
-+typedef struct __attribute__((__packed__)) SevInfoBlock {
-+    /* SEV-ES Reset Vector Address */
-+    uint32_t reset_addr;
-+
-+    /* SEV Information Block size and GUID */
-+    uint16_t size;
-+    QemuUUID guid;
-+} SevInfoBlock;
-+
- static SevGuestState *sev_guest;
- static Error *sev_mig_blocker;
- 
-@@ -831,6 +847,49 @@ sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len)
-     return 0;
- }
- 
-+int
-+sev_es_save_reset_vector(void *handle, void *flash_ptr, uint64_t flash_size,
-+                         uint32_t *addr)
++bool cpus_are_resettable(void)
 +{
-+    QemuUUID *info_guid;
-+    SevInfoBlock *info;
-+
-+    assert(handle);
-+
-+    /*
-+     * Initialize the address to zero. An address of zero with a successful
-+     * return code indicates that SEV-ES is not active.
-+     */
-+    *addr = 0;
-+    if (!sev_es_enabled()) {
-+        return 0;
-+    }
-+
-+    /*
-+     * Extract the AP reset vector for SEV-ES guests by locating the SEV GUID.
-+     * The SEV GUID is located 32 bytes from the end of the flash. Use this
-+     * address to base the SEV information block.
-+     *
-+     * Because SevInfoBlock is a packed structure, operate on the GUID
-+     * directly to avoid compiler warnings/errors.
-+     */
-+    info_guid = flash_ptr + flash_size - 0x20 - sizeof(*info_guid);
-+    if (!qemu_uuid_is_equal(info_guid, &sev_info_block_guid_le)) {
-+        error_report("SEV information block not found in pflash rom");
-+        return 1;
-+    }
-+
-+    info = flash_ptr + flash_size - 0x20 - sizeof(*info);
-+    if (!info->reset_addr) {
-+        error_report("SEV-ES reset address is zero");
-+        return 1;
-+    }
-+
-+    *addr = info->reset_addr;
-+
-+    return 0;
++    return cpu_check_are_resettable();
 +}
 +
- static void
- sev_register_types(void)
+ void cpu_synchronize_all_states(void)
  {
+     CPUState *cpu;
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index f7b103467c..1f54c6b416 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -1475,7 +1475,10 @@ void qemu_system_guest_crashloaded(GuestPanicInformation *info)
+ 
+ void qemu_system_reset_request(ShutdownCause reason)
+ {
+-    if (no_reboot && reason != SHUTDOWN_CAUSE_SUBSYSTEM_RESET) {
++    if (!cpus_are_resettable()) {
++        error_report("cpus are not resettable, terminating");
++        shutdown_requested = reason;
++    } else if (no_reboot && reason != SHUTDOWN_CAUSE_SUBSYSTEM_RESET) {
+         shutdown_requested = reason;
+     } else {
+         reset_requested = reason;
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index 0dcb9bfe13..f9584a1425 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -1029,3 +1029,8 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
+ {
+     return (data - 32) & 0xffff;
+ }
++
++bool kvm_arch_cpu_check_are_resettable(void)
++{
++    return true;
++}
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 7c2a3a123b..eefd1a11b6 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -26,6 +26,7 @@
+ #include "sysemu/kvm_int.h"
+ #include "sysemu/runstate.h"
+ #include "kvm_i386.h"
++#include "sev_i386.h"
+ #include "hyperv.h"
+ #include "hyperv-proto.h"
+ 
+@@ -4738,3 +4739,8 @@ bool kvm_has_waitpkg(void)
+ {
+     return has_msr_umwait;
+ }
++
++bool kvm_arch_cpu_check_are_resettable(void)
++{
++    return !sev_es_enabled();
++}
+diff --git a/target/mips/kvm.c b/target/mips/kvm.c
+index 72637a1e02..ad612e74c1 100644
+--- a/target/mips/kvm.c
++++ b/target/mips/kvm.c
+@@ -1296,3 +1296,8 @@ int mips_kvm_type(MachineState *machine, const char *vm_type)
+ 
+     return -1;
+ }
++
++bool kvm_arch_cpu_check_are_resettable(void)
++{
++    return true;
++}
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index d85ba8ffe0..d9a4750324 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -2948,3 +2948,8 @@ void kvmppc_svm_off(Error **errp)
+         error_setg_errno(errp, -rc, "KVM_PPC_SVM_OFF ioctl failed");
+     }
+ }
++
++bool kvm_arch_cpu_check_are_resettable(void)
++{
++    return true;
++}
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index f2f75d2a57..f68210373f 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -2543,3 +2543,8 @@ void kvm_s390_stop_interrupt(S390CPU *cpu)
+ 
+     kvm_s390_vcpu_interrupt(cpu, &irq);
+ }
++
++bool kvm_arch_cpu_check_are_resettable(void)
++{
++    return true;
++}
 -- 
 2.28.0
 
