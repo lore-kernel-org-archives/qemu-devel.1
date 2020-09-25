@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB4EDC4363D
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D86B9C4727C
 	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 16:28:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66F2921D7A
+	by mail.kernel.org (Postfix) with ESMTPS id 64A5F206E5
 	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 16:28:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zsjiq9QK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66F2921D7A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ly51b0ni"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64A5F206E5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50112 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLqa5-0003SE-57
+	id 1kLqa5-0003U1-9C
 	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 12:28:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47830)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47798)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kLqVL-0006WK-2S
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 12:23:27 -0400
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:55838)
+ id 1kLqVJ-0006RJ-4z
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 12:23:25 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:50696)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kLqVJ-0006nR-0d
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 12:23:26 -0400
-Received: by mail-wm1-x333.google.com with SMTP id d4so3598733wmd.5
- for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 09:23:24 -0700 (PDT)
+ id 1kLqVG-0006n4-EQ
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 12:23:24 -0400
+Received: by mail-wm1-x341.google.com with SMTP id e17so3636916wme.0
+ for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 09:23:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=sj15rBZcZbKv+lDFIRDA3aSKWbqE5DeyxJYs1f/78+s=;
- b=zsjiq9QKBCY7K0vEygnVbhoAWKBjuMR/fNFmwA80AtO9oEs9XMyzyD5DChesqOi8LT
- 6j35iJksBtkoklpg9RUMZHHyfnZNNl0vQAHBMj8D5TrJy8obrPqahaY2od0syyB32Gqy
- KR1kupSZNGZ5AnbRz2xEEPufT1WJeC2VMl0/fFaWOcwI54Xuzv5EpGapSrQGUr40l9ms
- cux2ydxMYnHOFM4e7exQuPRjUBt8PNPCzSbjOI9nhT6HO0aWUxr9Cj4P9LHe2NXsPY/H
- jHMq7MrU8mSFOP7Krruuatm97gRXS7yXUqRUENDSwjEhDGDg8gac6i41VQgXgPwEiW7z
- K6bw==
+ bh=c4J/ihfjud0tiL/YgbEpbNjAusuDSDtTtmByqn5ExUo=;
+ b=Ly51b0niAPdRMoO9pFuqtLIZV7yDCrCyGQaaCQNb8Rj0SiaYJJMn4/7IM+hGFFAi0S
+ 9/3MBB34rS9Kpang7iFSXoZm7RnPQkNMjxEp1YtwrhdcrOZtOtyjFrv0tDJO+D4k+BLY
+ 14BHQeSSX68yKI+ygYkqBMsCdIud6CYFESE/2VMcf0clA04aMgA33DjFzqGRYEuFzQ7T
+ jLvcOh9Zlk9/59IcuISbes4Y0mhFSO2BrAHIkZBGBhp+ONOYsHuEcq/SIWaQyo3R5zEe
+ 3jNsrntJY35yW5CHNl/VowQsBbTTr5WtCDuiM9DoywPgdCIxuW3tzodk9Rrl8FeWfkE7
+ KtGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=sj15rBZcZbKv+lDFIRDA3aSKWbqE5DeyxJYs1f/78+s=;
- b=KzPWvXk9HXBGKn/W5EEDX8nvY71KGKmtNp1VuQ6PLprivDJScu1sDUOAVQyqRTsa7h
- LquSw5Kgy3gxAteoqRbCHB/qFJBPcrFE/m58ZaV009TAVz4CN6UIjDLaa4yg1AZI6nSS
- biOB2oO+WJytYHtF2uWrPI5oZEksDGFRHBhC8G7qS5wMu7yMpWwaaLR7d/QOMc9rAagL
- b6IXTnCBnxgYCg/C3qP5yAZ5WvoJmTvTp7S32HSJGC5buIoDtg5GfAGPGNUFUBu+MJli
- CNntg/gD2HaYmswbADouhTSvAtSx5U6rka0NOCaAZCdoUSqjCxEKrDoeVA5S1k/jVI4X
- 4u+A==
-X-Gm-Message-State: AOAM532MldLkDgOTOrfWJP7zi0ey12uNMsFzuIrfkXTlR+DZJC5gzBxj
- 3Zrry2xk3pw1ExyMh6LVzBaEqRW3S5zs2L/7
-X-Google-Smtp-Source: ABdhPJykv2BC6dB67kcxMP0frM9Ukqpw+RTiMZfkN2PBVBUIGvK5s5agvfFZ2Vernpc29axjcNzjGw==
-X-Received: by 2002:a1c:7907:: with SMTP id l7mr3925780wme.89.1601051002845;
- Fri, 25 Sep 2020 09:23:22 -0700 (PDT)
+ bh=c4J/ihfjud0tiL/YgbEpbNjAusuDSDtTtmByqn5ExUo=;
+ b=Rn0lCxB6WlJw710Czxl39El/La5mQWuwgsgX9sBDoiNcu/ZOLKUS7HXmEkMQ2Y1/H4
+ TZY3hLiE9KZ8sgWXdQYpyMa01qq8sekI8KTgeXYqSireA9eGUtd7goap0d25g0ciyRS1
+ DPYNbL+TvQ9bf7LmlriH+CwAmmyiylSnWnyTT0SnyDTxd6KFNvYk3KRiazuTGUsdX8Xj
+ jnuTNhk8G2D89diNkO2N1EjE1TTllKic9L2LZ//4VzfMVbmsV0sLE+SKEqxcre5riegJ
+ spkWGsFzjKZn2cJZyOWICuDfNH9Opa7IdlaqYZMb1Gms6CRvB36KRPUfyQUdco6cdhMx
+ fPVg==
+X-Gm-Message-State: AOAM530KTWdW0ZCHowjZ8+pNlWCmv54pdA0q6iKkGbvh1WkMwS66+Dd9
+ a4zOxmIBpLDFQtxZ7f4ScY26udBK5MgNCvWl
+X-Google-Smtp-Source: ABdhPJy0nKQ5ZSNNamO7SIg1g+TOg4lVO7fM5iGWxgVAkuilIEFlcAAnQvuSPCp6XB0qRltN3Q6iPg==
+X-Received: by 2002:a1c:800f:: with SMTP id b15mr3793482wmd.114.1601051000539; 
+ Fri, 25 Sep 2020 09:23:20 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id d6sm3565824wrq.67.2020.09.25.09.23.21
+ by smtp.gmail.com with ESMTPSA id d6sm3565824wrq.67.2020.09.25.09.23.19
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 25 Sep 2020 09:23:22 -0700 (PDT)
+ Fri, 25 Sep 2020 09:23:19 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 04/21] scripts/qapi: Move doc-comment whitespace stripping
- to doc.py
-Date: Fri, 25 Sep 2020 17:22:59 +0100
-Message-Id: <20200925162316.21205-5-peter.maydell@linaro.org>
+Subject: [PATCH v6 02/21] qapi/block.json: Add newline after "Example:" for
+ block-latency-histogram-set
+Date: Fri, 25 Sep 2020 17:22:57 +0100
+Message-Id: <20200925162316.21205-3-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200925162316.21205-1-peter.maydell@linaro.org>
 References: <20200925162316.21205-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::333;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x333.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,146 +105,70 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As we accumulate lines from doc comments when parsing the JSON, the
-QAPIDoc class generally strips leading and trailing whitespace using
-line.strip() when it calls _append_freeform().  This is fine for
-Texinfo, but for rST leading whitespace is significant.  We'd like to
-move to having the text in doc comments be rST format rather than a
-custom syntax, so move the removal of leading whitespace from the
-QAPIDoc class to the texinfo-specific processing code in
-texi_format() in qapi/doc.py.
+The block-latency-histogram-set command is the only one which uses
+the Example/Examples section with the first line of the documentation
+immediately following the ':'. Bring it into line with the rest.
 
-(Trailing whitespace will always be stripped by the rstrip() in
-Section::append regardless.)
+This allows us to avoid special-casing the indentation handling for
+"Examples" sections; instead for Examples as for any other section
+header these two indentations will be equivalent:
 
-In a followup commit we will make the whitespace in the lines of doc
-comment sections more consistently follow the input source.
+Examples:
+Line one
+Line two
 
-There is no change to the generated .texi files before and after this
-commit.
+Examples: Line one
+          Line two
 
-Because the qapi-schema test checks the exact values of the
-documentation comments against a reference, we need to update that
-reference to match the new whitespace.  In the first four places this
-is now correctly checking that we did put in the amount of whitespace
-to pass a rST-formatted list to the backend; in the last two places
-the extra whitespace is 'wrong' and will go away again in the
-following commit.
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- scripts/qapi/doc.py            |  1 +
- scripts/qapi/parser.py         | 12 ++++--------
- tests/qapi-schema/doc-good.out | 12 ++++++------
- 3 files changed, 11 insertions(+), 14 deletions(-)
+ qapi/block.json | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
-index 92f584edcf1..7764de1e4bc 100644
---- a/scripts/qapi/doc.py
-+++ b/scripts/qapi/doc.py
-@@ -79,6 +79,7 @@ def texi_format(doc):
-     inlist = ''
-     lastempty = False
-     for line in doc.split('\n'):
-+        line = line.strip()
-         empty = line == ''
- 
-         # FIXME: Doing this in a single if / elif chain is
-diff --git a/scripts/qapi/parser.py b/scripts/qapi/parser.py
-index 165925ca728..04bf10db378 100644
---- a/scripts/qapi/parser.py
-+++ b/scripts/qapi/parser.py
-@@ -427,10 +427,10 @@ class QAPIDoc:
-                 self._append_line = self._append_various_line
-                 self._append_various_line(line)
-             else:
--                self._append_freeform(line.strip())
-+                self._append_freeform(line)
-         else:
-             # This is a free-form documentation block
--            self._append_freeform(line.strip())
-+            self._append_freeform(line)
- 
-     def _append_args_line(self, line):
-         """
-@@ -463,7 +463,7 @@ class QAPIDoc:
-                 self._append_various_line(line)
-             return
- 
--        self._append_freeform(line.strip())
-+        self._append_freeform(line)
- 
-     def _append_features_line(self, line):
-         name = line.split(' ', 1)[0]
-@@ -482,7 +482,7 @@ class QAPIDoc:
-             self._append_various_line(line)
-             return
- 
--        self._append_freeform(line.strip())
-+        self._append_freeform(line)
- 
-     def _append_various_line(self, line):
-         """
-@@ -505,10 +505,6 @@ class QAPIDoc:
-             line = line[len(name)+1:]
-             self._start_section(name[:-1])
- 
--        if (not self._section.name or
--                not self._section.name.startswith('Example')):
--            line = line.strip()
--
-         self._append_freeform(line)
- 
-     def _start_symbol_section(self, symbols_dict, name):
-diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.out
-index acb00ade17b..9993ffcd89d 100644
---- a/tests/qapi-schema/doc-good.out
-+++ b/tests/qapi-schema/doc-good.out
-@@ -78,20 +78,20 @@ doc freeform
- 
- * List item one
- * Two, multiple
--lines
-+  lines
- 
- * Three
--Still in list
-+  Still in list
- 
- Not in list
- 
- - Second list
--Note: still in list
-+  Note: still in list
- 
- Note: not in list
- 
- 1. Third list
--is numbered
-+   is numbered
- 
- 2. another item
- 
-@@ -159,7 +159,7 @@ doc symbol=Alternate
- 
-     arg=i
- an integer
--@b is undocumented
-+    @b is undocumented
-     arg=b
- 
-     feature=alt-feat
-@@ -174,7 +174,7 @@ doc symbol=cmd
- the first argument
-     arg=arg2
- the second
--argument
-+       argument
-     arg=arg3
- 
-     feature=cmd-feat1
+diff --git a/qapi/block.json b/qapi/block.json
+index c54a393cf3a..a009f7d3a2d 100644
+--- a/qapi/block.json
++++ b/qapi/block.json
+@@ -528,7 +528,8 @@
+ #
+ # Since: 4.0
+ #
+-# Example: set new histograms for all io types with intervals
++# Example:
++# set new histograms for all io types with intervals
+ # [0, 10), [10, 50), [50, 100), [100, +inf):
+ #
+ # -> { "execute": "block-latency-histogram-set",
+@@ -536,7 +537,8 @@
+ #                     "boundaries": [10, 50, 100] } }
+ # <- { "return": {} }
+ #
+-# Example: set new histogram only for write, other histograms will remain
++# Example:
++# set new histogram only for write, other histograms will remain
+ # not changed (or not created):
+ #
+ # -> { "execute": "block-latency-histogram-set",
+@@ -544,7 +546,8 @@
+ #                     "boundaries-write": [10, 50, 100] } }
+ # <- { "return": {} }
+ #
+-# Example: set new histograms with the following intervals:
++# Example:
++# set new histograms with the following intervals:
+ #   read, flush: [0, 10), [10, 50), [50, 100), [100, +inf)
+ #   write: [0, 1000), [1000, 5000), [5000, +inf)
+ #
+@@ -554,7 +557,8 @@
+ #                     "boundaries-write": [1000, 5000] } }
+ # <- { "return": {} }
+ #
+-# Example: remove all latency histograms:
++# Example:
++# remove all latency histograms:
+ #
+ # -> { "execute": "block-latency-histogram-set",
+ #      "arguments": { "id": "drive0" } }
 -- 
 2.20.1
 
