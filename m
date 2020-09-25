@@ -2,69 +2,67 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0E03C4727F
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 17:31:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84B8AC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 17:32:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 847752086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 17:31:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1E1852086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 17:32:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eYggmk9u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 847752086A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KxENK+v9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E1852086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLrYl-0007hS-Ce
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 13:31:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35168)
+	id 1kLrZr-0000AK-1X
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 13:32:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35336)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLrUA-0002Lh-1C
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 13:26:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21569)
+ id 1kLrUx-0003e0-Bh
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 13:27:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22767)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLrU7-0007Az-47
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 13:26:17 -0400
+ id 1kLrUr-0007Ec-TV
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 13:27:06 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601054774;
+ s=mimecast20190719; t=1601054821;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=JTZvVYbHCtKEZqWrhqdVMAWFhECFVonAtlKnivNWpWs=;
- b=eYggmk9u43WqjBIz4XVEEse+CeO/xyXEw/EqNGQwMAXrYfoz5HYX44rfNwVHxTeEngwGsY
- o3ueCktnWqUSQ7a+HDR6IbTMFzSDO3zK4GjX4FvFua7ZC7tvHjooSr8I56RiJ3FZW5+svv
- HCm2W/3Y/0Kg8JL5SKdttH3KXFd+obI=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=66oL3D5lzRUoqWi8bvrMPQnZkzWgskqyagude6h6vlc=;
+ b=KxENK+v9oq2ctPcYWQBvn2GA+DrYPp1EZFbzxnmxjAAZoA+GlTmicnPg4OC4j6JE8fuWR1
+ 9eXaN1iwg7y/gCkYOvnDCpJvf+RCMzmWUqWJfwu+GOAVqFy17eWMTEYdaCbUumzkedyPS0
+ 0LiIl4Ie+WNMjRgNfS5L/XZje5wHfSc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-565-xF1Bchd1OCKQIY_LGIJidA-1; Fri, 25 Sep 2020 13:26:12 -0400
-X-MC-Unique: xF1Bchd1OCKQIY_LGIJidA-1
+ us-mta-501-QPaby4RyMKq50-q6B4oD4A-1; Fri, 25 Sep 2020 13:26:09 -0400
+X-MC-Unique: QPaby4RyMKq50-q6B4oD4A-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB737107B769
- for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 17:26:11 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6393A1902ECE
+ for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 17:26:08 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5AD885D9F3;
- Fri, 25 Sep 2020 17:26:11 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D8DB05D9F7;
+ Fri, 25 Sep 2020 17:26:04 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 06/10] device-core: use atomic_set on .realized property
-Date: Fri, 25 Sep 2020 13:26:00 -0400
-Message-Id: <20200925172604.2142227-7-pbonzini@redhat.com>
-In-Reply-To: <20200925172604.2142227-1-pbonzini@redhat.com>
-References: <20200925172604.2142227-1-pbonzini@redhat.com>
+Subject: [PATCH 00/10] Fix scsi devices plug/unplug races w.r.t virtio-scsi
+ iothread
+Date: Fri, 25 Sep 2020 13:25:54 -0400
+Message-Id: <20200925172604.2142227-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
@@ -101,84 +99,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Maxim Levitsky <mlevitsk@redhat.com>
+This is my take on Maxim's patches.  Mostly I am avoiding the problems with
+"scsi/scsi_bus: switch search direction in scsi_device_find" by adding
+a pre-realize callback for BusState that checks for the device address
+being in use.
 
-Some code might race with placement of new devices on a bus.
-We currently first place a (unrealized) device on the bus
-and then realize it.
+This makes it possible to avoid the tricky search for a preexisting device.
 
-As a workaround, users that scan the child device list, can
-check the realized property to see if it is safe to access such a device.
-Use an atomic write here too to aid with this.
 
-A separate discussion is what to do with devices that are unrealized:
-It looks like for this case we only call the hotplug handler's unplug
-callback and its up to it to unrealize the device.
-An atomic operation doesn't cause harm for this code path though.
+Maxim Levitsky (7):
+  scsi/scsi_bus: switch search direction in scsi_device_find
+  device_core: use drain_call_rcu in in hmp_device_del/qmp_device_add
+  device-core: use RCU for list of children of a bus
+  device-core: use atomic_set on .realized property
+  scsi/scsi_bus: Add scsi_device_get
+  virtio-scsi: use scsi_device_get
+  scsi/scsi_bus: fix races in REPORT LUNS
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20200913160259.32145-6-mlevitsk@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/core/qdev.c         | 19 ++++++++++++++++++-
- include/hw/qdev-core.h |  3 +++
- 2 files changed, 21 insertions(+), 1 deletion(-)
+Paolo Bonzini (3):
+  qdev: add "check if address free" callback for buses
+  scsi: switch to bus->check_address
+  scsi/scsi-bus: scsi_device_find: don't return unrealized devices
 
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 59e5e710b7..fc4daa36fa 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -946,7 +946,25 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
-             }
-        }
- 
-+       qatomic_store_release(&dev->realized, value);
-+
-     } else if (!value && dev->realized) {
-+
-+        /*
-+         * Change the value so that any concurrent users are aware
-+         * that the device is going to be unrealized
-+         *
-+         * TODO: change .realized property to enum that states
-+         * each phase of the device realization/unrealization
-+         */
-+
-+        qatomic_set(&dev->realized, value);
-+        /*
-+         * Ensure that concurrent users see this update prior to
-+         * any other changes done by unrealize.
-+         */
-+        smp_wmb();
-+
-         QLIST_FOREACH(bus, &dev->child_bus, sibling) {
-             qbus_unrealize(bus);
-         }
-@@ -961,7 +979,6 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
-     }
- 
-     assert(local_err == NULL);
--    dev->realized = value;
-     return;
- 
- child_realize_fail:
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 8067497074..39490e76ee 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -163,6 +163,9 @@ struct NamedClockList {
- /**
-  * DeviceState:
-  * @realized: Indicates whether the device has been fully constructed.
-+ *            When accessed without the iothread mutex, consider using
-+ *            qatomic_load_acquire() before accessing any other field in
-+ *            the device.
-  * @reset: ResettableState for the device; handled by Resettable interface.
-  *
-  * This structure should not be accessed directly.  We declare it here
+ hw/core/bus.c          |  28 +++--
+ hw/core/qdev.c         |  73 +++++++++---
+ hw/net/virtio-net.c    |   2 +-
+ hw/scsi/scsi-bus.c     | 262 ++++++++++++++++++++++++++---------------
+ hw/scsi/virtio-scsi.c  |  27 +++--
+ hw/sd/core.c           |   3 +-
+ include/hw/qdev-core.h |  15 ++-
+ include/hw/scsi/scsi.h |   1 +
+ qdev-monitor.c         |  22 ++++
+ 9 files changed, 299 insertions(+), 134 deletions(-)
+
 -- 
 2.26.2
-
 
 
