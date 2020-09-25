@@ -2,116 +2,124 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94113C4727E
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 08:27:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11970C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 08:34:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9A79208A9
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 08:27:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EDFEE20888
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 08:34:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LdCi0Ozl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9A79208A9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="q/FPXJNs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDFEE20888
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLj4p-0002Iw-RK
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 04:27:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45952)
+	id 1kLjBM-0005Rh-QN
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 04:34:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48240)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kLj4E-0001hp-K0
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 04:26:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36201)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kLj4C-00025z-G9
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 04:26:58 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601022415;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=6amoN+weJ/K6AKCFXWNIfAXJfOuVF6bWcGMuLGiFPec=;
- b=LdCi0OzlOOTEr1M37IB7byXAu9Glz+kVBoWrVq3U+Lbd8Y2lY/F5eV/0/jq3rhvldD3iH6
- P94c/tIFttBZI0/KMVbjsQmpeJBEmGwvrYGnEkYWiqWymHGLUxPBhpsuAr5RUMiOlwMH1F
- RIdaapgHDp7ZcMUOrb+eUKbRSz6EeZ0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-291-YBpOPn5DOnygZ0HF-xuEBw-1; Fri, 25 Sep 2020 04:26:52 -0400
-X-MC-Unique: YBpOPn5DOnygZ0HF-xuEBw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A816802EA5;
- Fri, 25 Sep 2020 08:26:51 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-113.ams2.redhat.com
- [10.36.113.113])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C7FEE5D9F3;
- Fri, 25 Sep 2020 08:26:43 +0000 (UTC)
-Subject: Re: [PATCH v6 11/15] iotests: add 298 to test new preallocate filter
- driver
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200918181951.21752-1-vsementsov@virtuozzo.com>
- <20200918181951.21752-12-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <1d202398-7a0e-9e72-6f9d-c04b7f887a0a@redhat.com>
-Date: Fri, 25 Sep 2020 10:26:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kLjA2-0004dF-QF; Fri, 25 Sep 2020 04:32:58 -0400
+Received: from mail-eopbgr80104.outbound.protection.outlook.com
+ ([40.107.8.104]:27495 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kLj9z-0002uh-Rc; Fri, 25 Sep 2020 04:32:57 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GQ6UrwJkuY/zHsXoZPn+iieYE7Bund4PQdT7W/asElPmjY+3z4I+TeGGzAnrpOh2b9ZXVI7VUN1mcJxX2o4G4VX7DlsQemZyX7lVVXWh8tIkNsXDVEvJAtHmu7C1VgdLeWrC/7CZBosQichevm0RfnI6fQgcyTApoomCZc1CvH7xDAIK+HhJV+i03e62xZz/g1Jq9CsubR8hF2Yu0DTAOCzXJaPsc0Q6XpyFC322jpzg6ZSftyywsREjCKRiNVXPn69VioXey4jas04DBPqjSBBe+cnANNjye1CJ2V9B8g0895thVxBsyhqeRuX4ICazkT/DxGe0qA7IbUOYx7To3w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jX4eQbe6FiREfNGi2H2IkuREZNQofxAklPBL+H87kKs=;
+ b=O/uyYnUilRZgFbyzGZckhdq7hkJWTu5FDaQyCJaH0/a6z0CSKjH+w5Ez74Q7d8WbmKAaatzzSS6R1Zpni10kDKfwvpIko+faaQhbpqOS6/NKD9clvUdgBu5KE8gGDJkOn4NkDvRY1+QcrNGFRIEFlf7oQa1nY73uvj6ZtZ73q/Zdb+pFvj2BwU0sSEws1JWeH8Ey8Xd7Q4UNzAKTrQqfddGZdmx5ytS24DIMECR9DCHar1QPEWLnxVC80f2IzxgMbb+pM5I5YJqmfIg5N65GRl192KOCkueYq9r9eymKaYR97li0TCM4GCT7bLGZRDf5+AwcUsBICqjkn/I6leoDSA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jX4eQbe6FiREfNGi2H2IkuREZNQofxAklPBL+H87kKs=;
+ b=q/FPXJNsIqoKDn2oIKlnGn8cI3ynilkLeRvZUcRC7OEJaBNAa2+M5zzL+5pwYsK6oVHUvBOzD63JfS4dXjFDrpZVT/4lP47TsMWGmeG6eopx6tqG4WU8wen1eMmaweGfZfqvh06f0ba7hWbU+4dGYoF/8hOr1llbH4AQSBqmpgQ=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5493.eurprd08.prod.outlook.com (2603:10a6:20b:102::11)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.17; Fri, 25 Sep
+ 2020 08:32:51 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::b179:9641:7589:d692]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::b179:9641:7589:d692%8]) with mapi id 15.20.3370.033; Fri, 25 Sep 2020
+ 08:32:51 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, crosa@redhat.com, ehabkost@redhat.com,
+ fam@euphon.net, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com,
+ den@openvz.org, vsementsov@virtuozzo.com, eblake@redhat.com
+Subject: [PATCH 0.5/7] include/block/block.h: drop non-ascii quotation mark
+Date: Fri, 25 Sep 2020 11:32:29 +0300
+Message-Id: <20200925083229.2528-1-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200924185414.28642-1-vsementsov@virtuozzo.com>
+References: <20200924185414.28642-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FRYP281CA0010.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::20)
+ To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-In-Reply-To: <20200918181951.21752-12-vsementsov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="7JtpRTbvbyi3leFYCXueYooKAvyZdxtfK"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 02:48:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -34
-X-Spam_score: -3.5
-X-Spam_bar: ---
-X-Spam_report: (-3.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.214, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from kvm.sw.ru (185.215.60.94) by
+ FRYP281CA0010.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::20) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3433.13 via Frontend Transport; Fri, 25 Sep 2020 08:32:50 +0000
+X-Mailer: git-send-email 2.21.3
+X-Originating-IP: [185.215.60.94]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 43ffdd21-35fc-4040-c0bd-08d8612d96fb
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5493:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB54939BE513F3EA67C88D0567C1360@AM7PR08MB5493.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4941;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: R7LV3x0/GkbZcdUAtoQwMRbp7X0BJzRtW1IbTNjsUtkL3z/VnIXIFa4ToY2BgnIWOcIZKMxBjb85yX2zdz9F5NG+oZyMIz5CgLCAb/xBnZg7oE9p0GdxruLqwyXhK5Zbm2h6hw3rIMtUG3XR3iCsSBfFOSTHf0mLDEDJ7y3+RsGXzyrCLFlfxWqHhgUJDz9+4xAYKOwY+sVbjD2m93q/Zckq+49xY2LeS3oD+RoOrutCXePf3rGtduawyFz4URZz9xPxjjkA76fjqXYwZq9VQshPw49Q8sUtPjdtwCLaPnv23QxritLUOM32C/lkbXaXWJMk5aF8twJ6iyMSXCyL4WJZla1nBJxgXuQhUzWyKG84sNKfum7advuhWHXHh/9m
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(39850400004)(366004)(136003)(346002)(396003)(376002)(16526019)(26005)(6666004)(6512007)(1076003)(4326008)(6486002)(2906002)(66476007)(66556008)(478600001)(4744005)(83380400001)(36756003)(66946007)(2616005)(86362001)(8936002)(52116002)(316002)(8676002)(5660300002)(6506007)(6916009)(956004)(186003);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: MMXpDwa65pLmi1z1VrGEQu42a3/x/1Jek33PDEEqPw9YkHDbbFQ2ErDUeIWfAO6lMP9S8ahrGuRLtSFaTUBskv9co0k5ztAJSmQlCx0KH0p8xEQjoXpP7/5iYxarQrAU4utzHN8jX0iftnCYN+xy0kMlWXy7Ok/o2jk4I4614kfJ0/J96ZuNZJ1mypSW3R2+WpeO4P6oWG8cYAJjNxxiTqp2s9NgyH+kcsWcHVFkmpkfG61xBw9FSqpXADfUGS0Aff4vwFXNAhYNiDeic6siq9zkzldiH2snBi9X8JwNU/aJg/Ebk5cDL0QvXcBOGOuyQXSGEe/BhX9IQlLbTMVNaHUnlhhQZofux2LBdRRZeITolt86riU7zqb40SoKylxOWwRGleezkDZwIIG8nT8eGQz8/t+O97zKwGrF02OHzL/SHClrSNUk8z/N2FGd+zqhwtVrRLDAgL/ovwS2XbhehT/Zq8s8AY+ZjvmGAkopQckswr1J5ihVIQ/07pN7jar6F/UfsN3LhKg91pTAjOsiXk8RLrk/PICnPShAr9GvxN6TAmpKStLbhrsqsysJikS1juMEx8UL+bvKS73O6oi87Yo/+OqznoKXvi8stJpgOOg9AH30tJNG9hPRyKXRE+zuat08dcMy36wOg3OR3ufdEQ==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 43ffdd21-35fc-4040-c0bd-08d8612d96fb
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2020 08:32:50.9181 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qpOASVNRh4i8P2R1arnf8okoghRqHochWe+dvwu6f75fIpuazZjN1uZiqleWqCsQxj2Ew4SMZlWuNqvYLHHaquEJOphg4swh7Y24iICVn7s=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5493
+Received-SPF: pass client-ip=40.107.8.104;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 04:32:52
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -124,155 +132,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7JtpRTbvbyi3leFYCXueYooKAvyZdxtfK
-Content-Type: multipart/mixed; boundary="BbueRYiqQnutP70Q7GMx6JsqAiAW6wVFR"
+This is the only non-ascii character in the file and it doesn't really
+needed here. Let's use normal "'" symbol for consistency with the rest
+11 occurrences of "'" in the file.
 
---BbueRYiqQnutP70Q7GMx6JsqAiAW6wVFR
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ include/block/block.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 18.09.20 20:19, Vladimir Sementsov-Ogievskiy wrote:
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  tests/qemu-iotests/298     | 186 +++++++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/298.out |   5 +
->  tests/qemu-iotests/group   |   1 +
->  3 files changed, 192 insertions(+)
->  create mode 100644 tests/qemu-iotests/298
->  create mode 100644 tests/qemu-iotests/298.out
->=20
-> diff --git a/tests/qemu-iotests/298 b/tests/qemu-iotests/298
-> new file mode 100644
-> index 0000000000..fef10f6a7a
-> --- /dev/null
-> +++ b/tests/qemu-iotests/298
-
-[...]
-
-> +class TestPreallocateBase(iotests.QMPTestCase):
-
-Perhaps a
-
-@iotests.skip_if_unsupported(['preallocate'])
-
-here?
-
-> +    def setUp(self):
-> +        iotests.qemu_img_create('-f', iotests.imgfmt, disk, str(10 * MiB=
-))
-
-[...]
-
-> +class TestTruncate(iotests.QMPTestCase):
-
-The same decorator could be placed here, although this class doesn=E2=80=99=
-t
-start a VM, and so is unaffected by the allowlist.  Still may be
-relevant in case of block modules, I don=E2=80=99t know.
-
-> +    def setUp(self):
-> +        iotests.qemu_img_create('-f', iotests.imgfmt, disk, str(10 * MiB=
-))
-> +        iotests.qemu_img_create('-f', iotests.imgfmt, refdisk, str(10 * =
-MiB))
-> +
-> +    def tearDown(self):
-> +        os.remove(disk)
-> +        os.remove(refdisk)
-> +
-> +    def do_test(self, prealloc_mode, new_size):
-> +        ret =3D iotests.qemu_io_silent('--image-opts', '-c', 'write 0 10=
-M', '-c',
-> +                                     f'truncate -m {prealloc_mode} {new_=
-size}',
-> +                                     drive_opts)
-> +        self.assertEqual(ret, 0)
-> +
-> +        ret =3D iotests.qemu_io_silent('-f', iotests.imgfmt, '-c', 'writ=
-e 0 10M',
-> +                                     '-c',
-> +                                     f'truncate -m {prealloc_mode} {new_=
-size}',
-> +                                     refdisk)
-> +        self.assertEqual(ret, 0)
-> +
-> +        stat =3D os.stat(disk)
-> +        refstat =3D os.stat(refdisk)
-> +
-> +        # Probably we'll want preallocate filter to keep align to cluste=
-r when
-> +        # shrink preallocation, so, ignore small differece
-> +        self.assertLess(abs(stat.st_size - refstat.st_size), 64 * 1024)
-> +
-> +        # Preallocate filter may leak some internal clusters (for exampl=
-e, if
-> +        # guest write far over EOF, skipping some clusters - they will r=
-emain
-> +        # fallocated, preallocate filter don't care about such leaks, it=
- drops
-> +        # only trailing preallocation.
-
-True, but that isn=E2=80=99t what=E2=80=99s happening here.  (We only write=
- 10M at 0, so
-there are no gaps.)  Why do we need this 1M margin?
-
-> +        self.assertLess(abs(stat.st_blocks - refstat.st_blocks) * 512,
-> +                        1024 * 1024)
-
-[...]
-
-> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-> index ff59cfd2d4..15d5f9619b 100644
-> --- a/tests/qemu-iotests/group
-> +++ b/tests/qemu-iotests/group
-> @@ -307,6 +307,7 @@
->  295 rw
->  296 rw
->  297 meta
-> +298 auto quick
-
-I wouldn=E2=80=99t mark it as quick, there is at least one preallocate=3Dfu=
-ll of
-140M, and one of 40M, plus multiple 10M data writes and falloc
-preallocations.
-
-Also, since you mark it as =E2=80=9Cauto=E2=80=9D, have you run this test o=
-n all
-CI-relevant hosts?  (Among other things I can=E2=80=99t predict) I wonder h=
-ow
-preallocation behaves on macOS.  Just because that one was always a bit
-weird about not-really-data areas.
-
-Max
-
-
---BbueRYiqQnutP70Q7GMx6JsqAiAW6wVFR--
-
---7JtpRTbvbyi3leFYCXueYooKAvyZdxtfK
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9tqcIACgkQ9AfbAGHV
-z0AbCQgAt9fM2CdTEil8/KYKIP937E7+l5Hu865H2aAN7HHGc4/WUW3efMWkJkA3
-lP6FSnClmxBwShRlz5ZLw4N2VSmBH791CLejejAfPqhdTD9MRMHAHHFumYMMeMc0
-tG/Dj5aDzSSPmrHAwWyhAaT9kEITvtqi/nNZQ+xag3vy1vwJ9hl7Sndu4y4uy+hU
-VQzi/QOX+NX+ajun5sJgis6miW5q3VySuUxXv4YuvvHF5E1tmfOCIrI09iyfABQ9
-Ir2Kg4pyYwgJ1Z8jWwGHJJQJm8rwhsUaxcG/UG6Cz8M26QxCzTpON2AwAGmuxJ1n
-Awb8v8b1C7ZgGlmmMP5j9n86ag1o8Q==
-=R8iY
------END PGP SIGNATURE-----
-
---7JtpRTbvbyi3leFYCXueYooKAvyZdxtfK--
+diff --git a/include/block/block.h b/include/block/block.h
+index 8b87df69a1..ce2ac39299 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -304,7 +304,7 @@ enum BdrvChildRoleBits {
+     BDRV_CHILD_FILTERED     = (1 << 2),
+ 
+     /*
+-     * Child from which to read all data that isn’t allocated in the
++     * Child from which to read all data that isn't allocated in the
+      * parent (i.e., the backing child); such data is copied to the
+      * parent through COW (and optionally COR).
+      * This field is mutually exclusive with DATA, METADATA, and
+-- 
+2.21.3
 
 
