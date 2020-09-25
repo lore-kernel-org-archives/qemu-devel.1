@@ -2,133 +2,87 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 225ECC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 10:27:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BE7EC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 10:27:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2722221EB
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 10:27:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 31B95221EB
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 10:27:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CaqEpGpF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2722221EB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lmichel.fr header.i=@lmichel.fr header.b="DW5g0qjJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31B95221EB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=lmichel.fr
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLkwx-0004D5-Fa
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 06:27:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44130)
+	id 1kLkxD-0004kB-5V
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 06:27:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42798)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kLktE-0001FH-Au
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 06:23:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43359)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kLktC-00088P-Jf
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 06:23:44 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601029421;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=5iqal1VyjzcLy9mKgyO/fS6vRumn/l2fUBNtLVV3pxY=;
- b=CaqEpGpFVNFvG6Mjarlu/FjIzQc8Ea+A8n/0feWdRruuOft+UCegC5kPha95ZhJxOpOHeZ
- SdwQxoqgHaVh5I+nDqwrrrBg68Y5SLoScY7tajleoyxBsUHuAK/mGPKSO5ahHH+9Uch4CB
- Tq8n72W9DlRJ3rShldMvrYP2SRqMH+E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-531-I2a9FPkEN1ygr4eiP6Fi1Q-1; Fri, 25 Sep 2020 06:23:40 -0400
-X-MC-Unique: I2a9FPkEN1ygr4eiP6Fi1Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D83B18BA289;
- Fri, 25 Sep 2020 10:23:39 +0000 (UTC)
-Received: from [10.36.112.211] (ovpn-112-211.ams2.redhat.com [10.36.112.211])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EC33B5D9E2;
- Fri, 25 Sep 2020 10:23:34 +0000 (UTC)
-Subject: Re: [PATCH] virtio-pmem-pci: force virtio version 1
-To: Pankaj Gupta <pankaj.gupta.linux@gmail.com>, mst@redhat.com
-References: <20200925102251.7216-1-pankaj.gupta.linux@gmail.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat GmbH
-Message-ID: <82784f22-6d1a-2c75-3a5f-841c4eb2122f@redhat.com>
-Date: Fri, 25 Sep 2020 12:23:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <luc@lmichel.fr>)
+ id 1kLknk-0001Yd-TO; Fri, 25 Sep 2020 06:18:06 -0400
+Received: from pharaoh.lmichel.fr ([149.202.28.74]:58264)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <luc@lmichel.fr>)
+ id 1kLknh-0007Sp-TQ; Fri, 25 Sep 2020 06:18:04 -0400
+Received: from sekoia-pc.bar.greensocs.com (sekoia-pc.home.lmichel.fr
+ [192.168.61.100])
+ by pharaoh.lmichel.fr (Postfix) with ESMTPS id 08C2BC61424;
+ Fri, 25 Sep 2020 10:17:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr; s=pharaoh; 
+ t=1601029041;
+ h=from:from:sender:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=nYIO6oVFxUZV1TH9x+9OCm3cGZXkpXFo/VqRcUn44+U=;
+ b=DW5g0qjJIUMvhhgTBWSkRp+9YOyVNrwX/TP5EYfA9pPjQkKw4xKeLN3MSNEh5ScPFyHrsz
+ NGZkXToXVrQ4VgC6E6iKmkeB8/EqM3i4iydCSaODOPMDqu1xtd0yAgQ+caGy11LnD2Bgjy
+ zE+guOKG/BER9sTPEXjFevFEIs6z0PPPr2tgmwBI2xvGjMZQzDMx5gemd96iAoTjNmTw7a
+ hUlh5VdfCNUMm3sTMOStOyz6Gbsiv+AonGiJzSVMg78KEMq1FWy5UzMp1+UUGCeCkbsCwa
+ e+euD6wI4Cq3DYAsMV1KHVkLxW43dB2B38Szm2apup60oYERn38NACX+1KH52w==
+From: Luc Michel <luc@lmichel.fr>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH 14/14] hw/arm/bcm2835_peripherals: connect the UART clock
+Date: Fri, 25 Sep 2020 12:17:31 +0200
+Message-Id: <20200925101731.2159827-15-luc@lmichel.fr>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20200925101731.2159827-1-luc@lmichel.fr>
+References: <20200925101731.2159827-1-luc@lmichel.fr>
 MIME-Version: 1.0
-In-Reply-To: <20200925102251.7216-1-pankaj.gupta.linux@gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=david@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 02:48:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -34
-X-Spam_score: -3.5
-X-Spam_bar: ---
-X-Spam_report: (-3.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.214, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 8bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr;
+ s=pharaoh; t=1601029041;
+ h=from:from:sender:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=nYIO6oVFxUZV1TH9x+9OCm3cGZXkpXFo/VqRcUn44+U=;
+ b=Aj75JlhH/otuCtkq4rHuO8rkZ1y1YmCKr6nxnldTCBp2pdnqhPc5BMFOeJSXWWviXcJC+f
+ gCne17Goy45PTbFyltcgeJK/zdDvLftHFwbzxh9PhKQKRvQv9Ho+q7jafOuPxmHr3n8Jhl
+ QebBDH2fgUYE0/6NosS2GaaAy5WWM8mtFd9cyGyXCOB1iAeLYtqLCelEt8RLqQdkbUjNFl
+ kH9YGs9GDlm92Xr/ji2olgHyZ+sQDJUoJ3GRWry22EKmM/9qa8yUB6MGaxw9hfhybOvLhb
+ EQqGiaySnlq7hDIUKHTqXELGVIJ2mXfncJHplhXskMvnV9w9980X9vJC8CLFYg==
+ARC-Seal: i=1; s=pharaoh; d=lmichel.fr; t=1601029041; a=rsa-sha256; cv=none;
+ b=dyaLWTww/X8AwLKqegqfKpDMeoo40HdqROuBVcSkNUZvT333OEohA5CHKidBgtgK9MkUQ6nejgfcVPKIC5EGg7kUKQWmUTHfAFGiIaYKOoY7uzQECeY6Ilxv+5AMtLzXSaQoW4pTyM7zIFT9nGZ0ByoM6MqFF7kXcW9YzfNUR+OjaWV5DkQWnJnT2fTjXC0Naq1ZomoUe8bv7kR5Ak+iYZ2JvIJb3FbevTKJx/zb12HXkRjc2udg2mGUOmOOX+m/0GIZna9VPZL1laMBqKmEFwJofyN+AAqJXLfSBX7My0LDYcq3mNpS3A9cz53u0pKfa3+gs/gN5ZNJRcUcq+S8uQ==
+ARC-Authentication-Results: i=1;
+	pharaoh.lmichel.fr
+Received-SPF: pass client-ip=149.202.28.74; envelope-from=luc@lmichel.fr;
+ helo=pharaoh.lmichel.fr
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 06:17:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -142,44 +96,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ Luc Michel <luc@lmichel.fr>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 25.09.20 12:22, Pankaj Gupta wrote:
->  Qemu fails with below error when trying to run with virtio pmem:
-> 
->  (qemu) qemu-system-x86_64: -device virtio-pmem-pci,memdev=mem1,id=nv1:
->   device is modern-only, use disable-legacy=on
->  
->  This patch fixes this by forcing virtio 1 with virtio-pmem.
-> 
-> fixes: adf0748a49 ("virtio-pci: Proxy for virtio-pmem")
-> Signed-off-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-> ---
->  hw/virtio/virtio-pmem-pci.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/virtio/virtio-pmem-pci.c b/hw/virtio/virtio-pmem-pci.c
-> index 21a457d151..2b2a0b1eae 100644
-> --- a/hw/virtio/virtio-pmem-pci.c
-> +++ b/hw/virtio/virtio-pmem-pci.c
-> @@ -22,6 +22,7 @@ static void virtio_pmem_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
->      VirtIOPMEMPCI *pmem_pci = VIRTIO_PMEM_PCI(vpci_dev);
->      DeviceState *vdev = DEVICE(&pmem_pci->vdev);
->  
-> +    virtio_pci_force_virtio_1(vpci_dev);
->      qdev_realize(vdev, BUS(&vpci_dev->bus), errp);
->  }
->  
-> 
+Connect the 'uart-out' clock from the cprman to the PL011 instance.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Luc Michel <luc@lmichel.fr>
+---
+ hw/arm/bcm2835_peripherals.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
+diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
+index 958aadeeb9..9e4e85c3ad 100644
+--- a/hw/arm/bcm2835_peripherals.c
++++ b/hw/arm/bcm2835_peripherals.c
+@@ -167,10 +167,12 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+     if (!sysbus_realize(SYS_BUS_DEVICE(&s->cprman), errp)) {
+         return;
+     }
+     memory_region_add_subregion(&s->peri_mr, CPRMAN_OFFSET,
+                 sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->cprman), 0));
++    qdev_connect_clock_in(DEVICE(&s->uart0), "clk",
++                          qdev_get_clock_out(DEVICE(&s->cprman), "uart-out"));
+ 
+     memory_region_add_subregion(&s->peri_mr, ARMCTRL_IC_OFFSET,
+                 sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->ic), 0));
+     sysbus_pass_irq(SYS_BUS_DEVICE(s), SYS_BUS_DEVICE(&s->ic));
+ 
 -- 
-Thanks,
-
-David / dhildenb
+2.28.0
 
 
