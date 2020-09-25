@@ -4,69 +4,68 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4987C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:09:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27E82C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:10:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F1422083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:09:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 941062074B
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:10:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QMN0oJXh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F1422083B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RyYLb0yl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 941062074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLmXH-0004vX-8g
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 08:09:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38104)
+	id 1kLmYe-0006zw-I7
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 08:10:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38084)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kLmVW-0002Bm-9T
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:07:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35726)
+ id 1kLmVU-0002BQ-9C
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:07:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42597)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kLmVT-0004DQ-To
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:07:21 -0400
+ id 1kLmVQ-0004Cw-Sa
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:07:19 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601035639;
+ s=mimecast20190719; t=1601035634;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=KwoC26LP5CpaPJLEShkXwNEdUVef6paLbONKlxitJ44=;
- b=QMN0oJXhiYCb1kueCFVJbgzr+MFBxUShwoQldfTgt7mbIKKq/UzDJUkSaDaTTaowurlFmV
- T3qF+Ds3x97AzbQga93Sk38CQ934jCuJGV3VKuz0riFJsau4h+scOQjHcaJ66COtfTu865
- tPohydDKEHzu3AJQO1UueLel+8uFOX0=
+ bh=g11t0Rk3ousL47iNjK5Udtv7AJW1FtT5fTYIQ8CPVF0=;
+ b=RyYLb0ylb36dJ46G7NRD37zhN5XT5kO7jMiRBZKoyJSETRfzJb0ggiTOyOI9fVTPprh8R2
+ 5HThK+wpYiYLlyfKHY/YjnlR1ZqfZ9FCHuXQYzd+Q0eiFGUc0FtG7fYhUJaMOLyao63wUD
+ B5Xk74iF9Uy75J1rpfuJ36rIDZzNt/w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-255-TSRwodWsMc-XCZJs2rr5Vw-1; Fri, 25 Sep 2020 08:07:17 -0400
-X-MC-Unique: TSRwodWsMc-XCZJs2rr5Vw-1
+ us-mta-515-pKc3RSS3PTSVFX7rX5ZN6w-1; Fri, 25 Sep 2020 08:07:12 -0400
+X-MC-Unique: pKc3RSS3PTSVFX7rX5ZN6w-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B301B10BBECB;
- Fri, 25 Sep 2020 12:07:15 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 76C6210BBECB;
+ Fri, 25 Sep 2020 12:07:10 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-114-177.ams2.redhat.com
  [10.36.114.177])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6563E78437;
- Fri, 25 Sep 2020 12:07:13 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2EAAB73692;
+ Fri, 25 Sep 2020 12:07:08 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, zhengchuan@huawei.com, dovmurik@linux.vnet.ibm.com,
  hgcoin@gmail.com, zhangjiachen.jaycee@bytedance.com, lvivier@redhat.com,
  peterx@redhat.com, stefanha@redhat.com, vgoyal@redhat.com,
  jinyan12@huawei.com, ann.zhuangyanying@huawei.com
-Subject: [PULL 04/26] migration/dirtyrate: add DirtyRateStatus to denote
- calculation status
-Date: Fri, 25 Sep 2020 13:06:33 +0100
-Message-Id: <20200925120655.295142-5-dgilbert@redhat.com>
+Subject: [PULL 02/26] migration: Rework migrate_send_rp_req_pages() function
+Date: Fri, 25 Sep 2020 13:06:31 +0100
+Message-Id: <20200925120655.295142-3-dgilbert@redhat.com>
 In-Reply-To: <20200925120655.295142-1-dgilbert@redhat.com>
 References: <20200925120655.295142-1-dgilbert@redhat.com>
 MIME-Version: 1.0
@@ -105,92 +104,130 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Chuan Zheng <zhengchuan@huawei.com>
+From: Peter Xu <peterx@redhat.com>
 
-add DirtyRateStatus to denote calculating status.
+We duplicated the logic of maintaining the last_rb variable at both callers of
+this function.  Pass *rb pointer into the function so that we can avoid
+duplicating the logic.  Also, when we have the rb pointer, it's also easier to
+remove the original 2nd & 4th parameters, because both of them (name of the
+ramblock when needed, or the page size) can be fetched from the ramblock
+pointer too.
 
-Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
-Message-Id: <1600237327-33618-3-git-send-email-zhengchuan@huawei.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20200908203022.341615-3-peterx@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-  atomic name fixup
 ---
- migration/dirtyrate.c | 26 ++++++++++++++++++++++++++
- qapi/migration.json   | 17 +++++++++++++++++
- 2 files changed, 43 insertions(+)
+ migration/migration.c    | 26 ++++++++++++++++++--------
+ migration/migration.h    |  4 ++--
+ migration/postcopy-ram.c | 24 ++----------------------
+ 3 files changed, 22 insertions(+), 32 deletions(-)
 
-diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-index bf7fd24e75..3edf000f45 100644
---- a/migration/dirtyrate.c
-+++ b/migration/dirtyrate.c
-@@ -22,6 +22,19 @@
- #include "migration.h"
- #include "dirtyrate.h"
- 
-+static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
-+
-+static int dirtyrate_set_state(int *state, int old_state, int new_state)
-+{
-+    assert(new_state < DIRTY_RATE_STATUS__MAX);
-+    if (qatomic_cmpxchg(state, old_state, new_state) == old_state) {
-+        return 0;
-+    } else {
-+        return -1;
-+    }
-+}
-+
-+
- static void calculate_dirtyrate(struct DirtyRateConfig config)
- {
-     /* todo */
-@@ -31,8 +44,21 @@ static void calculate_dirtyrate(struct DirtyRateConfig config)
- void *get_dirtyrate_thread(void *arg)
- {
-     struct DirtyRateConfig config = *(struct DirtyRateConfig *)arg;
-+    int ret;
-+
-+    ret = dirtyrate_set_state(&CalculatingState, DIRTY_RATE_STATUS_UNSTARTED,
-+                              DIRTY_RATE_STATUS_MEASURING);
-+    if (ret == -1) {
-+        error_report("change dirtyrate state failed.");
-+        return NULL;
-+    }
- 
-     calculate_dirtyrate(config);
- 
-+    ret = dirtyrate_set_state(&CalculatingState, DIRTY_RATE_STATUS_MEASURING,
-+                              DIRTY_RATE_STATUS_MEASURED);
-+    if (ret == -1) {
-+        error_report("change dirtyrate state failed.");
-+    }
-     return NULL;
+diff --git a/migration/migration.c b/migration/migration.c
+index 3495c9e542..827f8be07d 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -314,25 +314,35 @@ error:
+     return ret;
  }
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 675f70bb67..76a59b4f92 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -1720,3 +1720,20 @@
- ##
- { 'event': 'UNPLUG_PRIMARY',
-   'data': { 'device-id': 'str' } }
+ 
+-/* Request a range of pages from the source VM at the given
+- * start address.
+- *   rbname: Name of the RAMBlock to request the page in, if NULL it's the same
+- *           as the last request (a name must have been given previously)
++/* Request one page from the source VM at the given start address.
++ *   rb: the RAMBlock to request the page in
+  *   Start: Address offset within the RB
+  *   Len: Length in bytes required - must be a multiple of pagesize
+  */
+-int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
+-                              ram_addr_t start, size_t len)
++int migrate_send_rp_req_pages(MigrationIncomingState *mis, RAMBlock *rb,
++                              ram_addr_t start)
+ {
+     uint8_t bufc[12 + 1 + 255]; /* start (8), len (4), rbname up to 256 */
+     size_t msglen = 12; /* start + len */
++    size_t len = qemu_ram_pagesize(rb);
+     enum mig_rp_message_type msg_type;
++    const char *rbname;
++    int rbname_len;
+ 
+     *(uint64_t *)bufc = cpu_to_be64((uint64_t)start);
+     *(uint32_t *)(bufc + 8) = cpu_to_be32((uint32_t)len);
+ 
+-    if (rbname) {
+-        int rbname_len = strlen(rbname);
++    /*
++     * We maintain the last ramblock that we requested for page.  Note that we
++     * don't need locking because this function will only be called within the
++     * postcopy ram fault thread.
++     */
++    if (rb != mis->last_rb) {
++        mis->last_rb = rb;
 +
-+##
-+# @DirtyRateStatus:
-+#
-+# An enumeration of dirtyrate status.
-+#
-+# @unstarted: the dirtyrate thread has not been started.
-+#
-+# @measuring: the dirtyrate thread is measuring.
-+#
-+# @measured: the dirtyrate thread has measured and results are available.
-+#
-+# Since: 5.2
-+#
-+##
-+{ 'enum': 'DirtyRateStatus',
-+  'data': [ 'unstarted', 'measuring', 'measured'] }
++        rbname = qemu_ram_get_idstr(rb);
++        rbname_len = strlen(rbname);
++
+         assert(rbname_len < 256);
+ 
+         bufc[msglen++] = rbname_len;
+diff --git a/migration/migration.h b/migration/migration.h
+index bdc7450da3..e74042362d 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -326,8 +326,8 @@ void migrate_send_rp_shut(MigrationIncomingState *mis,
+                           uint32_t value);
+ void migrate_send_rp_pong(MigrationIncomingState *mis,
+                           uint32_t value);
+-int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char* rbname,
+-                              ram_addr_t start, size_t len);
++int migrate_send_rp_req_pages(MigrationIncomingState *mis, RAMBlock *rb,
++                              ram_addr_t start);
+ void migrate_send_rp_recv_bitmap(MigrationIncomingState *mis,
+                                  char *block_name);
+ void migrate_send_rp_resume_ack(MigrationIncomingState *mis, uint32_t value);
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index 1654ff11a5..0a2f88a87d 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -684,14 +684,7 @@ int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *rb,
+                                         qemu_ram_get_idstr(rb), rb_offset);
+         return postcopy_wake_shared(pcfd, client_addr, rb);
+     }
+-    if (rb != mis->last_rb) {
+-        mis->last_rb = rb;
+-        migrate_send_rp_req_pages(mis, qemu_ram_get_idstr(rb),
+-                                  aligned_rbo, pagesize);
+-    } else {
+-        /* Save some space */
+-        migrate_send_rp_req_pages(mis, NULL, aligned_rbo, pagesize);
+-    }
++    migrate_send_rp_req_pages(mis, rb, aligned_rbo);
+     return 0;
+ }
+ 
+@@ -986,20 +979,7 @@ retry:
+              * Send the request to the source - we want to request one
+              * of our host page sizes (which is >= TPS)
+              */
+-            if (rb != mis->last_rb) {
+-                mis->last_rb = rb;
+-                ret = migrate_send_rp_req_pages(mis,
+-                                                qemu_ram_get_idstr(rb),
+-                                                rb_offset,
+-                                                qemu_ram_pagesize(rb));
+-            } else {
+-                /* Save some space */
+-                ret = migrate_send_rp_req_pages(mis,
+-                                                NULL,
+-                                                rb_offset,
+-                                                qemu_ram_pagesize(rb));
+-            }
+-
++            ret = migrate_send_rp_req_pages(mis, rb, rb_offset);
+             if (ret) {
+                 /* May be network failure, try to wait for recovery */
+                 if (ret == -EIO && postcopy_pause_fault_thread(mis)) {
 -- 
 2.26.2
 
