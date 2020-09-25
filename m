@@ -2,102 +2,99 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64781C4727E
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 18:28:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50E83C4727F
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 18:29:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 824D820878
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 18:28:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 824D820878
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id 6CA5320878
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 18:29:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LkdOtJ7h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CA5320878
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLsSF-0007uT-5N
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 14:28:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48882)
+	id 1kLsSu-0000CE-Dd
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 14:29:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49818)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kLsOg-0007Cw-He; Fri, 25 Sep 2020 14:24:42 -0400
-Received: from wnew1-smtp.messagingengine.com ([64.147.123.26]:39047)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kLsOe-000611-2C; Fri, 25 Sep 2020 14:24:42 -0400
-Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
- by mailnew.west.internal (Postfix) with ESMTP id 9D960608;
- Fri, 25 Sep 2020 14:24:35 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
- by compute7.internal (MEProxy); Fri, 25 Sep 2020 14:24:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-type:in-reply-to; s=fm1; bh=t/yIuFHq+Ay9ZnSepNAhjmPFwAg
- HF5ZAin62AJsvyEU=; b=p/Reka1arJ23v5Z6Oc8CtGdQBi8nds06tttdr1XhwqU
- 4FCIkikJM+BV1bvXALfV1YvDbD58f8kiHgMnd9Pv/L0XaxhRPpko1H2FCfKTpV61
- ljQ/yIo4gz+xCmJpNA+KhjYU28MjPSAxT20p1sYieLxlQQHmu/wMwM7FFuvRdXj0
- dlDjztgdpM0Aqb2hItJeCqNe4791pkekkka9xlowZWdeUXc0rc/jZncL53mXkrAb
- yt27y6JFT/2srqcX9Y9qZQx1fbTgSp7YFulue+k+kluvtBFPMkaCMIwmubhOJmQq
- JIuRHPtiYl/L6sP+5Nyk1A2f6vAamkZcJdMivfzXbtg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-type:date:from:in-reply-to
- :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=t/yIuF
- Hq+Ay9ZnSepNAhjmPFwAgHF5ZAin62AJsvyEU=; b=HSEYl9w5JaWz364qMTS89/
- sHOeDm0mN0Hfk/0b7tiGTjeqRXlPa+VneEO76CiUBXjSeMwLkG54RlxGTcNjLX9s
- LzEB51AuwFB/AXBu5A+f7fAyXMpYHpfcOtnqHpBDHhH/o4ZMRvE6UmZ7+S1WqnvZ
- jHkLiZRg+mXAdLiT1JRZrHJ2G48wKTzvUi7Lgmt3IylnNq0s2ANsGmoT4FR8a5ft
- odHZ5Ah8S8OPGXBRSxx/Frbd+gwwgPuDbK/xnJNgHvaEfVahbXi02pE8jEn4z38r
- TWlPAMl5ViCf+JceyKGEsz67VZ/vRLTju/EiOG/L3Rp558M6qUSPj9IngMZYdjXQ
- ==
-X-ME-Sender: <xms:4DVuXzcVVI1FZptKH4oI0eW2sitAWBUUKT6fMUPtZPCUp8tTUxb1Cg>
- <xme:4DVuX5OOhkBHqxmJ50kuPKlDPPgKRs_umesAOxMh_jcC3ga8HeeEsYkS5GnIkAo2g
- Amup_eDTOPjPbIy1dk>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrvddtgdduvdefucetufdoteggodetrfdotf
- fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
- uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
- cujfgurhepfffhvffukfhfgggtuggjsehgtderredttdejnecuhfhrohhmpefmlhgruhhs
- ucflvghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtth
- gvrhhnpeejgeduffeuieetkeeileekvdeuleetveejudeileduffefjeegfffhuddvudff
- keenucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedtne
- curfgrrhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
-X-ME-Proxy: <xmx:4DVuX8geRz4bN3UkdF3PdN0ADrjupT_VRi8J_hU796vr-2BmrRt_vw>
- <xmx:4DVuX083M397vu5lmyr0KbE-To3XPozTyE-lKM-xWRnK-Hd1yMLn3A>
- <xmx:4DVuX_tKl-ezWvdXoPKK-WGjYvQtB27GbkNemaABz1PCTnwm8-ddqw>
- <xmx:4jVuXzFMtm4UVXhIl2OzBSCHcQDp_KpCwHs95nzCqNYT6eLdKGZjj-ybmeA1eqho>
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id BA0AF306467E;
- Fri, 25 Sep 2020 14:24:30 -0400 (EDT)
-Date: Fri, 25 Sep 2020 20:24:25 +0200
-From: Klaus Jensen <its@irrelevant.dk>
-To: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-Subject: Re: [PATCH v4 09/14] hw/block/nvme: Support Zoned Namespace Command
- Set
-Message-ID: <20200925182349.GA1933223@apples.localdomain>
-References: <20200923182021.3724-1-dmitry.fomichev@wdc.com>
- <20200923182021.3724-10-dmitry.fomichev@wdc.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kLsS1-00083g-Ad
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 14:28:09 -0400
+Received: from mail-pf1-x42f.google.com ([2607:f8b0:4864:20::42f]:43285)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kLsRy-0006gh-Ae
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 14:28:09 -0400
+Received: by mail-pf1-x42f.google.com with SMTP id f18so3980997pfa.10
+ for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 11:28:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=tq0Mp12PiH2oU/B1omkMHXYny6gqJjRNnKz1baeJYJg=;
+ b=LkdOtJ7h+wNwVVCEsZczordwyXpaYVkbpCFYwNeeuWjEOeW3LO5CmlLbXBeNbPUiFv
+ QP3MN+VYg13hjXjIqNrEKELMNkCkJrUohexlA0pVwKeNKRRZogV/U5+ssotBqxFwjFe+
+ +uG3QUh9jb9WkGsIky8yzGE7UfZSkC3teTdKV/k1xhSDCXFNv7ipccnwqaEDYMIARs+8
+ 3fP8Ye8Wkc4zQonm6vZdICjBZ3EnqUzztxt5Hy4MQustEBZl8c4x30f//PWygJ9M5O6h
+ VK0k/tO+lttbT+RhZLyoY8ZX3qS7ENF9ZLUBGkJFeSVPVGkc7c2eGLujCCcNPImmEE/Y
+ A7Kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=tq0Mp12PiH2oU/B1omkMHXYny6gqJjRNnKz1baeJYJg=;
+ b=Z54Eej1YdPzvALAxpsCpuTTxuI9CFoUC/sZ7nhMr3yb8zJ99lZvDuL/YRU8GzbaUFr
+ 88B8JrDaLvUwdvQozxIvqU9ZYCe8N4eAlPGPyfLCJukLI/PHjx/awMNslWE8OMUSCzV3
+ mOwGvccIJfh2D7bz5so/GOq9TDrHqmu9CD9ugzCEkSvF1Ww71+WN6R2kj7oUI8jAoYqY
+ NtgxDLyqcO/ybuUaMXQc5gObYgNYFfECRFf+y3bP9jH1yDYLdaOI24BwcyvimuBWddZB
+ O2aTPxRW6Y3/ayvmoVyLfM2dd6VzhxFOdOnF1VgvNA+iGv6B1FYuyjW4RRLO8fac6rY4
+ Pxiw==
+X-Gm-Message-State: AOAM530pDeMEx2CstR5TELtIIkc25jaSYvpQ+ctBRmQerptm3Foj51bx
+ Uiw602G+fy1DR0SuB/mDj+0BpQ==
+X-Google-Smtp-Source: ABdhPJyt2fuBhrLxEj8j3QjT6H8QRR5it6QPaDkfx2PoPJ3zwsvQIuYY2CzG8qWy2KA3N/HrhQXjbA==
+X-Received: by 2002:a63:774e:: with SMTP id s75mr217160pgc.37.1601058484637;
+ Fri, 25 Sep 2020 11:28:04 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id 203sm3360175pfz.131.2020.09.25.11.28.03
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 25 Sep 2020 11:28:03 -0700 (PDT)
+Subject: Re: [RFC v4 17/70] target/riscv: rvv-1.0: configure instructions
+To: Frank Chang <frank.chang@sifive.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>
+References: <20200817084955.28793-1-frank.chang@sifive.com>
+ <20200817084955.28793-18-frank.chang@sifive.com>
+ <CAE_xrPj_fb1NER3a68O1dwzM70wvmb+8+NyDo_9z=POCjYTvQw@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <faf5ad2f-5f00-e80d-761d-6d19b98ec238@linaro.org>
+Date: Fri, 25 Sep 2020 11:28:01 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="LyciRD1jyfeSSjG0"
-Content-Disposition: inline
-In-Reply-To: <20200923182021.3724-10-dmitry.fomichev@wdc.com>
-Received-SPF: pass client-ip=64.147.123.26; envelope-from=its@irrelevant.dk;
- helo=wnew1-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 14:24:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+In-Reply-To: <CAE_xrPj_fb1NER3a68O1dwzM70wvmb+8+NyDo_9z=POCjYTvQw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::42f;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x42f.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -22
+X-Spam_score: -2.3
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.238,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,145 +107,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
- Niklas Cassel <niklas.cassel@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
- qemu-devel@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
- Alistair Francis <alistair.francis@wdc.com>, Keith Busch <kbusch@kernel.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Matias Bjorling <matias.bjorling@wdc.com>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 9/25/20 1:51 AM, Frank Chang wrote:
+> trans_vsetvli() uses gen_goto_tb() to save the computation in the link to the
+> next TB.
+> I know there was a discussion about this back in RVV v0.7.1:
+> https://patchew.org/QEMU/20200103033347.20909-1-zhiwei_liu@c-sky.com/20200103033347.20909-5-zhiwei_liu@c-sky.com/
+> 
+> However, we had encountered an issue that looked like it was caused by the
+> linked TB.
+> The code snippet which cause the issue is:
+> 
+> 00000000000104a8 <loop>: 104a8: 0122ffd7 vsetvli t6,t0,e32,m4,tu,mu,d1 104ac:
+> 02036407 vle32.v v8,(t1) 104b0: 028a0a57 vadd.vv v20,v8,v20 104b4: 41f282b3 sub
+> t0,t0,t6 104b8: 002f9893 slli a7,t6,0x2 104bc: 9346 add t1,t1,a7 104be:
+> fe0295e3 bnez t0,104a8 <loop> 104c2: 012f7057 vsetvli zero,t5,e32,m4,tu,mu,d1
+> .....
+> 
+> If $t0 is given with the value, e.g. 68.
+> <loop> is expected to process 32 elements in each iteration.
+> That's it, the env->vl after vsetvli at 0x104a8 in each iteration would be:
+> 1st iteration: 32 (remaining elements to be processed: 68 - 32 = 36)
+> 2nd iteration: 32 (remaining elements to be processed: 36 - 32 = 4)
+> 3rd iteration: 4 (remaining elements to be processed: 4 - 4 = 0, will leave
+> <loop> after 0x104be)
+> 
+> vadd.vv at 0x104b0 is implemented with gvec for acceleration:
+> 
+> if (a->vm && s->vl_eq_vlmax) {
+>     gvec_fn(s->sew, vreg_ofs(s, a->rd),
+>             vreg_ofs(s, a->rs2), vreg_ofs(s, a->rs1),
+>             MAXSZ(s), MAXSZ(s));
+> } else {
+>     uint32_t data = 0;
+> 
+>     data = FIELD_DP32(data, VDATA, VM, a->vm);
+>     data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
+>     tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),
+>                        vreg_ofs(s, a->rs1), vreg_ofs(s, a->rs2),
+>                        cpu_env, 0, s->vlen / 8, data, fn);
+> }
+> 
+> gvec function is used when a->vm and s->vl_eq_vlmax are both true.
+> However, s->vl_eq_vlmax, for the above case, is only true in 1st and 2nd
+> iterations.
+> In third iteration, env->vl is 4 which is not equal to vlmax = 32.
+> But as the TB where vadd.vv resides are already linked with vsetvli's TB,
+> it won't be retranslated and still use the same gvec function in the third
+> iteration.
+> The total elemented being proceeded would be: 32 + 32 + 32 = 96, instead of 68.
+> 
+> I'm wondering under such conditions, is it still correct to use gen_goto_tb() here?
+> Or we should use lookup_and_goto_ptr() as in trans_vsetvl() to not link the TBs.
 
---LyciRD1jyfeSSjG0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+You're correct -- because of vl_eq_vlmax we can't use goto_tb when using a
+variable input.
 
-On Sep 24 03:20, Dmitry Fomichev wrote:
-> The emulation code has been changed to advertise NVM Command Set when
-> "zoned" device property is not set (default) and Zoned Namespace
-> Command Set otherwise.
->=20
-> Handlers for three new NVMe commands introduced in Zoned Namespace
-> Command Set specification are added, namely for Zone Management
-> Receive, Zone Management Send and Zone Append.
->=20
-> Device initialization code has been extended to create a proper
-> configuration for zoned operation using device properties.
->=20
-> Read/Write command handler is modified to only allow writes at the
-> write pointer if the namespace is zoned. For Zone Append command,
-> writes implicitly happen at the write pointer and the starting write
-> pointer value is returned as the result of the command. Write Zeroes
-> handler is modified to add zoned checks that are identical to those
-> done as a part of Write flow.
->=20
-> The code to support for Zone Descriptor Extensions is not included in
-> this commit and ZDES 0 is always reported. A later commit in this
-> series will add ZDE support.
->=20
-> This commit doesn't yet include checks for active and open zone
-> limits. It is assumed that there are no limits on either active or
-> open zones.
->=20
-> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
-> Signed-off-by: Hans Holmberg <hans.holmberg@wdc.com>
-> Signed-off-by: Ajay Joshi <ajay.joshi@wdc.com>
-> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-> Signed-off-by: Matias Bjorling <matias.bjorling@wdc.com>
-> Signed-off-by: Aravind Ramesh <aravind.ramesh@wdc.com>
-> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
-> Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-> ---
->  block/nvme.c         |    2 +-
->  hw/block/nvme.c      | 1057 ++++++++++++++++++++++++++++++++++++++++--
->  include/block/nvme.h |    6 +-
->  3 files changed, 1026 insertions(+), 39 deletions(-)
->=20
-> diff --git a/block/nvme.c b/block/nvme.c
-> index 05485fdd11..7a513c9a17 100644
-> --- a/block/nvme.c
-> +++ b/block/nvme.c
-> @@ -682,11 +1005,77 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeRequest *=
-req)
->          return status;
->      }
-> =20
-> +    if (n->params.zoned) {
-> +        zone_idx =3D nvme_zone_idx(n, slba);
-> +        assert(zone_idx < n->num_zones);
-> +        zone =3D &ns->zone_array[zone_idx];
-> +
-> +        if (is_write) {
-> +            status =3D nvme_check_zone_write(zone, slba, nlb);
-> +            if (status !=3D NVME_SUCCESS) {
-> +                trace_pci_nvme_err_zone_write_not_ok(slba, nlb, status);
-> +                return status | NVME_DNR;
-> +            }
-> +
-> +            assert(nvme_wp_is_valid(zone));
-> +            if (append) {
-> +                if (unlikely(slba !=3D zone->d.zslba)) {
-> +                    trace_pci_nvme_err_append_not_at_start(slba, zone->d=
-=2Ezslba);
-> +                    return NVME_ZONE_INVALID_WRITE | NVME_DNR;
-> +                }
-> +                if (data_size > (n->page_size << n->zasl)) {
-> +                    trace_pci_nvme_err_append_too_large(slba, nlb, n->za=
-sl);
-> +                    return NVME_INVALID_FIELD | NVME_DNR;
-> +                }
-> +                slba =3D zone->w_ptr;
-> +            } else if (unlikely(slba !=3D zone->w_ptr)) {
-> +                trace_pci_nvme_err_write_not_at_wp(slba, zone->d.zslba,
-> +                                                   zone->w_ptr);
-> +                return NVME_ZONE_INVALID_WRITE | NVME_DNR;
-> +            }
-> +            req->fill_ofs =3D -1LL;
-> +        } else {
-> +            status =3D nvme_check_zone_read(n, zone, slba, nlb,
-> +                                          n->params.cross_zone_read);
-> +            if (status !=3D NVME_SUCCESS) {
-> +                trace_pci_nvme_err_zone_read_not_ok(slba, nlb, status);
-> +                return status | NVME_DNR;
-> +            }
-> +
-> +            if (slba + nlb > zone->w_ptr) {
-> +                /*
-> +                 * All or some data is read above the WP. Need to
-> +                 * fill out the buffer area that has no backing data
-> +                 * with a predefined data pattern (zeros by default)
-> +                 */
-> +                if (slba >=3D zone->w_ptr) {
-> +                    req->fill_ofs =3D 0;
-> +                } else {
-> +                    req->fill_ofs =3D ((zone->w_ptr - slba) << data_shif=
-t);
-> +                }
+It would be possible when using xN,x0 for VLMAX, or x0,x0 for reuse of the
+current vl, but I doubt it's worth special-casing that.
 
-If Read Across Zone Boundaries is enabled and the read in zone A
-includes LBAs above the write pointer, but crossing into a full zone
-(zone B), then you are gonna overwrite the valid data in zone B with the
-fill pattern.
+I wonder if the goto_tb conversation happened before we introduced vl_eq_vlmax
+and forgot to re-evaluate, or if I just missed that in the first place.
+Anyway, thanks for finding this.
 
---LyciRD1jyfeSSjG0
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl9uNdgACgkQTeGvMW1P
-Del2Agf7BfLKjafkQbsIpOqE8hkrnkp3NQu1btrXce97MZiJMTYEggpTbFCtzL3H
-3ZrmpnIhUWIDva+M3PKnjhrdWfRcI4wMma+wo7z1k5A9NyeUYsQfM2D9fFugjrSQ
-gE+ggb4v5shBz2DKbS1uK6mCH29ZjioG+s8oXauwdCEJp3sDgX/C+JpJ86V3APl8
-W8C89e217Dm63Vx4bqk9zzqr16omUzAWJh5PZBtpNo1NDj+M6jjz3Y5LAZrzny7B
-Nn/XAq36+LpcVglUt2j/awxRXE4M116bINHOA0gA2NE24OihzmhvIeloxDHB+7O7
-CtHbC/57DyyFeU0wA2l+KSBglsJYyw==
-=2zoS
------END PGP SIGNATURE-----
-
---LyciRD1jyfeSSjG0--
+r~
 
