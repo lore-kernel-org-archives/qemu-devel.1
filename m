@@ -2,126 +2,93 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B51BC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 08:40:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D99B9C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 08:41:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 884D1208B6
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 08:40:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3999A2086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 08:41:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="LEqRjwLt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 884D1208B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iqTHLBOc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3999A2086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLjHD-0001bA-FC
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 04:40:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50104)
+	id 1kLjHt-0002PN-72
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 04:41:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50246)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kLjG1-0000Ux-Sw; Fri, 25 Sep 2020 04:39:11 -0400
-Received: from mail-eopbgr80107.outbound.protection.outlook.com
- ([40.107.8.107]:20290 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kLjFs-0003gK-JI; Fri, 25 Sep 2020 04:39:07 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SnZlPgtiM2IRxr8vbOidDYyiKAdIQZRGfRgzhupsE0rjWdeuB5+PYtA08xd0H+fslvqcRXO+o551Hr8rxwqRH2JX+OfTeQT5FVyPb8uII3ru78nRmC2K6QOuvz99mDC+mSyfpsz8q+leciM84KbeKc7188xtXZFxpwy044YPV8ouHKPiju4a0/xftXmCwTf3ilwec/HAmemTaJXXX6w+Nj36zEuVponqcRYCneJdPDiLcR8SWE4WVCGQ4eLluiqWL6rBuSQR99vtC/snUXK4446Z81gsPaBPAPvMr5PtolSWbSQHBdHQtGCSeTKMQuzZSxu7tHpCHloJyM3A1P4eoQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fxtF5FEH05zDIHEZ9RGyLR2aluBUetV0fZDVsrj2OMc=;
- b=M36PP5KMQlD0Ev5I0gnbiHIpnw/wZOa8/0BxUjcX16bhAlLXR6c8EUNB3cV7QSpojEJ5S2VfcfccFLzc28C6u1mJRA3ThWlpicm5PdOszsCoFdh5y1goNpC2oO6ap4HU8b/MbkCdRz98E2xoUPeiaSFytGcCLCpAXbu5aopt7m5pFKrO0ZDNP/9IyAdVUaRcfUCpUzDz4xXqiFgJLhXges7rzG7Im96wvpXQ90hhgr8nwlBNhSHstqysNT9HmWW5CQcyzI8eNNvVl07lEYtMKBPDVpcAGmm+6q9W/EXR6Qu6DGmeSrLu6LiNWQ9n+InoCx6EWy0IWDDgWfozaRtBdw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fxtF5FEH05zDIHEZ9RGyLR2aluBUetV0fZDVsrj2OMc=;
- b=LEqRjwLtHPdh4oSzqxU1ScCBY8acIAM24MpRNn510Vw7w40tY+xWOdNy7KffXbMljE0WgmWPF/7gLtEU3k8YFcZqEMeEw45xua27JtMJ54hX5c6rJc+tvDPoL4qERTFMsp0Y9viKBfDG7kpjcs4OFzhyyfoYwRmSXj2Yy8gv7hE=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM5PR0801MB1972.eurprd08.prod.outlook.com (2603:10a6:203:4b::11)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.11; Fri, 25 Sep
- 2020 08:38:57 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::b179:9641:7589:d692]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::b179:9641:7589:d692%8]) with mapi id 15.20.3370.033; Fri, 25 Sep 2020
- 08:38:57 +0000
-Subject: Re: [PATCH v7 0/5] fix & merge block_status_above and
- is_allocated_above
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, fam@euphon.net, stefanha@redhat.com,
- mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, eblake@redhat.com
-References: <160098392391.12744.907656205367112899@66eaa9a8a123>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <c63d576f-193a-e489-d870-54fc9abb9326@virtuozzo.com>
-Date: Fri, 25 Sep 2020 11:38:55 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.2.2
-In-Reply-To: <160098392391.12744.907656205367112899@66eaa9a8a123>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR10CA0046.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:20b:150::26) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kLjGS-00015Q-Bm
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 04:39:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32453)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kLjGQ-0003jm-5g
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 04:39:36 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601023173;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=M/y31tiJ+4+74mZFCmavOxDlJ8CIUCZMHROgm9V1cXg=;
+ b=iqTHLBOcDwC3G9jfKxwEd3LSfDz5KjrfrL5iVpqy4IJBXmNdZsqoSJGiW2LqMv96GnHXYL
+ GaAloeuj45EargMT5jYzHb/FnafJ5Bpe7L6IgEdT58otqZis81OpLAXZdcUvJ5wWxFfSvy
+ 8dCKQus+RpASvUYIk8f8a2w2P/wBGrU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-446-vkKWMQaiNeKXBbpYOeTnrg-1; Fri, 25 Sep 2020 04:39:28 -0400
+X-MC-Unique: vkKWMQaiNeKXBbpYOeTnrg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D924800E23;
+ Fri, 25 Sep 2020 08:39:27 +0000 (UTC)
+Received: from work-vm (ovpn-114-177.ams2.redhat.com [10.36.114.177])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0B8477368F;
+ Fri, 25 Sep 2020 08:39:25 +0000 (UTC)
+Date: Fri, 25 Sep 2020 09:39:23 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Ashish Kalra <ashish.kalra@amd.com>
+Subject: Re: SEV guest debugging support for Qemu
+Message-ID: <20200925083923.GB2873@work-vm>
+References: <20200922201124.GA6606@ashkalra_ubuntu_server>
+ <20200924135342.GE2792@work-vm>
+ <20200924190653.GA8180@ashkalra_ubuntu_server>
+ <a35415c9-6e50-5260-e0e6-e36b9f16f2b2@amd.com>
+ <20200924215256.GA8562@ashkalra_ubuntu_server>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.5] (185.215.60.94) by
- AM0PR10CA0046.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:150::26) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.23 via Frontend
- Transport; Fri, 25 Sep 2020 08:38:56 +0000
-X-Originating-IP: [185.215.60.94]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e88c8f62-fa76-4fe8-f426-08d8612e7142
-X-MS-TrafficTypeDiagnostic: AM5PR0801MB1972:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM5PR0801MB1972D06A5A815BAD4C9267C5C1360@AM5PR0801MB1972.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: p5sQiBaGQPg/60FIjg7bdOx6hr1NWQY9Z/L16ydORHxFv00C9PzM2XN8JkULOIQMUkUpKq8AhVLBApKHUsctmej/FfGmDPe0UpViZ7XPUr8tcuuKIA4liaJSoQWYN/dvDvk2Hsx0cAm/KeyQJ8CjpclKlrJdQd8iUiLzRkTVBVPUCdcu432U2f+tBDYyXQidTTHOFTdpZmlSim7XDgyjBwB1dss0Nz6mBPzA8SWD4Ul6GkoXXcOJncINg3CnOgRO/+78XopVfbKzrTlynkUM6lLWbJw8jfMNvrVAg1KTOK+KDkOh4rp7LvlC1b3pHrcpNSVnm1oSoz8gg42APsPL3zXUVmXUPYoWBM/ST8iEtIIZE04i/Zz6qj8z0p/CgEScFNv4nX7T9zN1VoH69LT74yzmM3nI68ZbVSZPOuKY99+Pq1Ha2ngZp5EPNXqIQxgpT0Nq5SJ5YcU+7iDpgjbsCg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(376002)(136003)(366004)(346002)(39840400004)(396003)(83380400001)(66556008)(26005)(16526019)(966005)(186003)(6916009)(36756003)(8676002)(2906002)(8936002)(16576012)(31686004)(316002)(5660300002)(52116002)(66476007)(956004)(66946007)(2616005)(4326008)(86362001)(478600001)(6486002)(31696002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: YFYVOyC6ooXCHxILBdhsNRLtmxR7Puq8U1eSqGbjPHzbjOhrDzJNKZqgmhW/4FtTJLWPDs88foCScZX/DGDJ+FKa53WREtEs06eKAUbhmteNBfHAcKsIzm3xuioV349L9vBH4RLBmdYTtDeeDtoT6FoBB8mMuey27MoPtHe1+N8bTHc0cDDwsLV1p0d7gzmYcnYx4ZGem0PXlwcogA3rakzwVRk4WG1Hfe0Nf+a3DPRfPnqy2+tM9q5LjLfVS37ni+yn1YuVhlcP64oRqMe2Sym1gzrJHyI/W/VffY5a2ugY27I4Xe7EUmxIFm2n98XkGWgKDt8UE2NFvrmP4UrzAdqyvpwD7sfrzciq5/q/nUgXIWij4AEI5ttzqsZebziOH0B6XEKYQswfMVRK81L8a0/KHV5AGlsh+prwnNfppXce3eoDZ7Si8hRoyPj2Yd/Y5o74fCXHkJVz3F89vIUD+lfZkxCTkfV5RbBaPXty/rlT/BQFn9LfOZB4Aq7sHGK8l3spPxAnuB/EBCtETecExs/rEsbsweFO5bbHbcYiRMhBq+2hM1r0gJ0fIQTUV8hnBKQtdOR/4b1NzFG2/mJIbsDPVopypiymz5o4tMGx2WDxbj7k3miF2oKV0YOwOvOiN6wtE6HsaIr+e1/JPGJX6A==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e88c8f62-fa76-4fe8-f426-08d8612e7142
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2020 08:38:57.0842 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: DQ3Wl1udX+b0E/P2KJMqGE5WgYnEQCIP0VJlX9N2gN7HT3zBTcnaue/5o8zRvu3o8QALe63LHXT5z/nxg8d3/WDD5xUisjfhJES9I8kwt1w=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0801MB1972
-Received-SPF: pass client-ip=40.107.8.107;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 04:38:58
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -22
-X-Spam_score: -2.3
-X-Spam_bar: --
-X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.214, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200924215256.GA8562@ashkalra_ubuntu_server>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 01:07:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -32
+X-Spam_score: -3.3
+X-Spam_bar: ---
+X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -134,65 +101,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: pbonzini@redhat.com, jon.grimm@amd.com,
+ Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org,
+ thomas.lendacky@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It's all because underlying "[PATCH v9 0/7] coroutines: generate wrapper code" series, I've answered in "[PATCH v9 0/7] coroutines: generate wrapper code" thread.
+* Ashish Kalra (ashish.kalra@amd.com) wrote:
+> On Thu, Sep 24, 2020 at 02:37:33PM -0500, Brijesh Singh wrote:
+> > 
+> > On 9/24/20 2:06 PM, Ashish Kalra wrote:
+> > > Hello Dave,
+> > >
+> > > Thanks for your response, please see my replies inline :
+> > >
+> > > On Thu, Sep 24, 2020 at 02:53:42PM +0100, Dr. David Alan Gilbert wrote:
+> > >> * Ashish Kalra (ashish.kalra@amd.com) wrote:
+> > >>> Hello Alan, Paolo,
+> > >>>
+> > >>> I am following up on Brijesh’s patches for SEV guest debugging support for Qemu using gdb and/or qemu monitor.
+> > >>> I believe that last time, Qemu SEV debug patches were not applied and have attached the link to the email thread and Paolo’s feedback below for reference [1].
+> > >>> I wanted to re-start a discussion on the same here with the Qemu community and seek the feedback on the approaches which we are considering :
+> > >>> Looking at Qemu code, I see the following interface is defined, for virtual memory access for debug : cpu_memory_rw_debug(). 
+> > >>> Both gdbstub (target_memory_rw_debug() ) and QMP/HMP (monitor/misc.c : memory_dump() ) use this standard and well-defined interface to access guest memory for debugging purposes. 
+> > >>>
+> > >>> This internally invokes the address_space_rw() accessor functions which we had  "fixed" internally (as part of the earlier patch) to invoke memory region specific debug ops. 
+> > >>> In our earlier approach we were adding debug ops/callbacks to memory regions and as per comments on our earlier patches, Paolo was not happy with this debug API for
+> > >>> MemoryRegions and hence the SEV support for Qemu was merged without the debug support.
+> > >>>
+> > >>> Now, we want to reuse this cpu_memory_rw_debug() interface or alternatively introduce a new generic debug interface/object in the Qemu. This 
+> > >>> debug interface should be controlled through the global machine policy.
+> > >> Let me leave the question of how the memory_rw_debug interface should
+> > >> work to Paolo.
+> > >>
+> > >>> For e.g., 
+> > >>> # $QEMU -machine -debug=<a debug object>
+> > >>> or
+> > >>> # $QEMU -machine -debug=sev-guest-debug
+> > >>>
+> > >>> The QMP and GDB access will be updated to use the generic debug  interface. The generic debug interface or the cpu_memory_rw_debug() interace will introduce hooks to call a 
+> > >>> vendor specific debug object to delegate accessing the data. The vendor specific debug object may do a further checks before and after accessing the memory.
+> > >> I'm not sure that needs a commandline switch for it; since you can
+> > >> already get it from the guest policy in the sev object and I can't think
+> > >> of any other cases that would need something similar.
+> > > Yes, i agree with that, so i am now considering abstracting this vendor
+> > > specific debug interface via CPUClass object instead of doing it via
+> > > MemoryRegions. 
+> > >
+> > >>> Now, looking specifically at cpu_memory_rw_debug() interface, this interface is invoked for all guest memory accesses for debugging purposes and it also does 
+> > >>> guest VA to GPA translation via cpu_get_phys_page_attrs_debug(), so we can again add a vendor specific callback here to do guest VA to GPA translations specific
+> > >>> to SEV as SEV guest debugging will also require accessing guest page table entries and decrypting them via the SEV DBG_DECRYPT APIs and additionally clearing
+> > >>> the C-bit on page table entries (PxEs) before using them further for page table walks.
+> > >>>
+> > >>> There is still an issue with the generic cpu_memory_rw_debug() interface, though it is used for all guest memory accesses for debugging and we can also handle
+> > >>> guest page table walks via it (as mentioned above), there are still other gdb/monitor commands such as tlb_info_xx() and mem_info_xx() which also do guest page
+> > >>> table walks, but they don’t go through any generic guest memory access/debug interface, so these commands will need to be handled additionally for SEV.
+> > >> If some of those should be using the debug interface and aren't then
+> > >> please fix them anyway.
+> > >>
+> > >>> The vendor specific debug object (added as a hook to generic debug object or the generic cpu_memory_rw_debug() interface) will do further checks before and after accessing the memory.
+> > >>>
+> > >>> e.g., in the case of SEV,
+> > >>>
+> > >>> 1. Check the guest policy, if guest policy does not allow debug then return an error.
+> > >>>
+> > >>> 2. If its an MMIO region then access the data.
+> > >>>
+> > >>> 3. If its RAM region then call the PSP commands to decrypt the data.
+> > >>>
+> > >>> 4. If caller asked to read the PTE entry then probably clear the C-bits after reading the PTE entry.
+> > >> Does that work if the guest is currently running?
+> > >>
+> > > I assume you are asking that is this done when guest is being debugged,
+> > > the above steps are only done when the guest is paused and being debugged.
+> > 
+> > 
+> > I don't why we need to pause the guest. Ideally we should be able to
+> > connect to Qemu monitor and run the "x" command to dump memory. IIRC, if
+> > paging is enabled then monitor will walk the guest page table to reach
+> > to gpa. Something like this in the Qemu monitor console should work:
+> > 
+> > x /10i $eip
+> > 
+> > 
+> 
+> Yes that works, what i basically meant that monitor will invoke a set of debugging
+> interfaces to get gpa and then dump guest memory even while guest is
+> running.
 
-25.09.2020 00:45, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20200924194003.22080-1-vsementsov@virtuozzo.com/
-> 
-> 
-> 
-> Hi,
-> 
-> This series failed the docker-quick@centos7 build test. Please find the testing commands and
-> their output below. If you have Docker installed, you can probably reproduce it
-> locally.
-> 
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> make docker-image-centos7 V=1 NETWORK=1
-> time make docker-test-quick@centos7 SHOW_ENV=1 J=14 NETWORK=1
-> === TEST SCRIPT END ===
-> 
-> C linker for the host machine: cc ld.bfd 2.27-43
-> Host machine cpu family: x86_64
-> Host machine cpu: x86_64
-> ../src/meson.build:10: WARNING: Module unstable-keyval has no backwards or forwards compatibility and might not exist in future releases.
-> Program sh found: YES
-> Program python3 found: YES (/usr/bin/python3)
-> Configuring ninjatool using configuration
-> ---
->      return codecs.ascii_decode(input, self.errors)[0]
-> UnicodeDecodeError: 'ascii' codec can't decode byte 0xe2 in position 11406: ordinal not in range(128)
-> Generating 'libqemu-aarch64-softmmu.fa.p/decode-neon-shared.c.inc'.
-> make: *** [block/block-gen.c.stamp] Error 1
-> make: *** Waiting for unfinished jobs....
-> Traceback (most recent call last):
->    File "./tests/docker/docker.py", line 709, in <module>
-> ---
->      raise CalledProcessError(retcode, cmd)
-> subprocess.CalledProcessError: Command '['sudo', '-n', 'docker', 'run', '--rm', '--label', 'com.qemu.instance.uuid=528b329e049d459c994676e3ba6dc69a', '-u', '1003', '--security-opt', 'seccomp=unconfined', '-e', 'TARGET_LIST=', '-e', 'EXTRA_CONFIGURE_OPTS=', '-e', 'V=', '-e', 'J=14', '-e', 'DEBUG=', '-e', 'SHOW_ENV=1', '-e', 'CCACHE_DIR=/var/tmp/ccache', '-v', '/home/patchew2/.cache/qemu-docker-ccache:/var/tmp/ccache:z', '-v', '/var/tmp/patchew-tester-tmp-e72243g9/src/docker-src.2020-09-24-17.42.11.20907:/var/tmp/qemu:z,ro', 'qemu/centos7', '/var/tmp/qemu/run', 'test-quick']' returned non-zero exit status 2.
-> filter=--filter=label=com.qemu.instance.uuid=528b329e049d459c994676e3ba6dc69a
-> make[1]: *** [docker-run] Error 1
-> make[1]: Leaving directory `/var/tmp/patchew-tester-tmp-e72243g9/src'
-> make: *** [docker-run-test-quick@centos7] Error 2
-> 
-> real    3m12.373s
-> user    0m16.084s
-> 
-> 
-> The full log is available at
-> http://patchew.org/logs/20200924194003.22080-1-vsementsov@virtuozzo.com/testing.docker-quick@centos7/?type=message.
-> ---
-> Email generated automatically by Patchew [https://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
-> 
+OK, I was worried about the bit where you said 'clear the C-bits' - as
+long as that's just clearing it in the copy you've taken rather than the
+in memory version the guest is using then that's OK.
 
+Dave
 
+> Thanks,
+> Ashish
+> 
+> > >
+> > >>> 5. many more checks
+> > >>>
+> > >>> Looking fwd. to your feedback/comments on the above approach or other any other suggestions.
+> > >>>
+> > >>> Thanks,
+> > >>> Ashish
+> > >>>
+> > >>> [1] -> https://nam11.safelinks.protection.outlook.com/?url=http%3A%2F%2Fnext.patchew.org%2FQEMU%2F20180308124901.83533-1-brijesh.singh%40amd.com%2F20180308124901.83533-29-brijesh.singh%40amd.com%2F&amp;data=02%7C01%7Cashish.kalra%40amd.com%7Cd21e40d3527d4dba609c08d86091490e%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637365524404435805&amp;sdata=P%2F6DqPQmUObJipkbbeXcrUdCqulePiqxSU6OB8xUEWo%3D&amp;reserved=0
+> > >>>
+> > >> -- 
+> > >> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > >>
+> 
 -- 
-Best regards,
-Vladimir
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
