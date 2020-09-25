@@ -4,61 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98630C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:45:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 873F9C4727D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:49:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2910920BED
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:45:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D099921741
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:49:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d+vblay7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2910920BED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KNwyvKTx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D099921741
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLn67-0001sz-6z
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 08:45:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46106)
+	id 1kLnAd-0005Qk-R5
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 08:49:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47364)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kLn4k-0000EV-MN
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:43:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55435)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kLn9M-0004cB-W1
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:48:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56406)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kLn4j-0000Ds-3V
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:43:46 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kLn9L-0000wW-4w
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:48:32 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601037824;
+ s=mimecast20190719; t=1601038110;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=uvt3lJ+3MHMbSv/PuRGjHopsG++4ex1JUI44nB1Dwsk=;
- b=d+vblay73I43Apwrbp2qntV/oyeAWLu1Gbfz/FVRLbKFxqaqRUEUxJugdl1hyky6lV1XD+
- zfb2J9Ln775oxUikhr1i3FhDy9e1PjYK3KhMXd30qt/9qHcAR6D1uuH9jY0zZB8lVA+s0Q
- DT6djjPJWGHI8elibVXisH6N/i9AB10=
+ bh=o/pkk+tR7fiy5tsWJPZTwKGdlkNmyR+1q6EKE+EHCgc=;
+ b=KNwyvKTxj5DYTtMWTvMdKTvEfUZLxjoyxRuODucGRCsmCS9/JsED4hiITQocgsgPvgSwV+
+ cDKlYkiEKCp3Av0xVBnTOLHJPgMs401HFm79O1/hjnY3v+X3Ux5ObggK0rD9nKEHjLJQRy
+ O36oll7yPk91dM12qp3IuhVxmr2mcjU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-367-nlDHNRjrNfyL6E6Vl0JoFw-1; Fri, 25 Sep 2020 08:43:41 -0400
-X-MC-Unique: nlDHNRjrNfyL6E6Vl0JoFw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-30-bMyymx7_P8urpbhieaQ-qQ-1; Fri, 25 Sep 2020 08:48:27 -0400
+X-MC-Unique: bMyymx7_P8urpbhieaQ-qQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 989EE1902EAD;
- Fri, 25 Sep 2020 12:43:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F034910BBEE1;
+ Fri, 25 Sep 2020 12:48:26 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-113-113.ams2.redhat.com
  [10.36.113.113])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A12F660C15;
- Fri, 25 Sep 2020 12:43:29 +0000 (UTC)
-Subject: Re: [PATCH v2 27/31] nbd: Deprecate nbd-server-add/remove
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 19C1D4061;
+ Fri, 25 Sep 2020 12:48:22 +0000 (UTC)
+Subject: Re: [PATCH v2 28/31] iotests: Factor out qemu_tool_pipe_and_status()
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 References: <20200924152717.287415-1-kwolf@redhat.com>
- <20200924152717.287415-28-kwolf@redhat.com>
+ <20200924152717.287415-29-kwolf@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -84,23 +84,23 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <f5922f34-def9-69d3-a658-bef47476adab@redhat.com>
-Date: Fri, 25 Sep 2020 14:43:28 +0200
+Message-ID: <621c62bc-98e4-bc22-4c6a-bee56120e439@redhat.com>
+Date: Fri, 25 Sep 2020 14:48:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200924152717.287415-28-kwolf@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20200924152717.287415-29-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="A9H03zcGfJBd4svIRsfULQ5Cc5EfHYsbG"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mreitz@redhat.com;
+ boundary="fL9QU9OEmyhc56Ik3mzYyu6MQS20TP0VG"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mreitz@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 02:48:20
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 01:07:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -34
 X-Spam_score: -3.5
@@ -128,45 +128,46 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---A9H03zcGfJBd4svIRsfULQ5Cc5EfHYsbG
-Content-Type: multipart/mixed; boundary="XNqw8VKAOvbZ8pdAum0Tl8RCrLJwKIKsZ"
+--fL9QU9OEmyhc56Ik3mzYyu6MQS20TP0VG
+Content-Type: multipart/mixed; boundary="1K0lAGmjFbs7sTmQaCHezlWliPf1dN12K"
 
---XNqw8VKAOvbZ8pdAum0Tl8RCrLJwKIKsZ
+--1K0lAGmjFbs7sTmQaCHezlWliPf1dN12K
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 24.09.20 17:27, Kevin Wolf wrote:
-> These QMP commands are replaced by block-export-add/del.
+> We have three almost identical functions that call an external process
+> and return its output and return code. Refactor them into small wrappers
+> around a common function.
 >=20
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  qapi/block-export.json     | 11 +++++++++--
->  docs/system/deprecated.rst |  6 ++++++
->  2 files changed, 15 insertions(+), 2 deletions(-)
+>  tests/qemu-iotests/iotests.py | 49 ++++++++++++++++-------------------
+>  1 file changed, 23 insertions(+), 26 deletions(-)
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---XNqw8VKAOvbZ8pdAum0Tl8RCrLJwKIKsZ--
+--1K0lAGmjFbs7sTmQaCHezlWliPf1dN12K--
 
---A9H03zcGfJBd4svIRsfULQ5Cc5EfHYsbG
+--fL9QU9OEmyhc56Ik3mzYyu6MQS20TP0VG
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9t5fAACgkQ9AfbAGHV
-z0Cu+QgAo+6gPmjbp2Rf4xYfUYEPfKlXxprb1UZxsYqNVf0Li/NToYwaWwg3q0Ub
-ubkfupzspYYRN4uiIWGKYEit2redso41ool23YIPL01nUMVvI9KLH/7tpSGJJhuq
-cHBzi5UBpWDK/l9DWQPqlgh499AxB0qtnpr//K4QOTE1oXCp53emucVUih5e+iLB
-YVMz4roEvkRVjL6iXWjDZq4NJ3/s5OvNYbOvyTkVjhupA0mpP82WCC8l03zIeiB4
-T/jrSo5NhgXRxGyjZ2q93jEzccg3EgDtWKORWJ2IMJu9yWvZBSIH+gT7Jfhcv9/j
-SLEJWDQ6oUDzgA15L97EnC6I9FqDWw==
-=H2wF
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9t5xUACgkQ9AfbAGHV
+z0DRVgf/Sd1yd1NvrKkJHie/HkgsHmE+sr/vKpK9qtpJYBMSmE5ZXxHczu8tOZ8B
++pOKx1L/ddEx86Zgbu4vuWvJVYp3jXcdjQY6OlvRNa7EKXN6ot3duxy+ivf1XHvI
+VziuJhGxY1ws4UewnU4iVp1PxH5sA4EATU0Xov3LweAY9B2UtLYXNX9DrrnGHlWR
+ICZI4Pi5cWwL+yoDwjK3eav/UvkWRCx0vaLDknfPKMnjK0jLb/+mSC+uZEZZZraP
+VWebdP+XW1sMRhgfb24iolR00GbDnyYpg/VvE4MF9KnFGJJzndAHGiOcC4MJc6Im
+z6CFpWsu9tchydeFpjoS4fmvktEPkQ==
+=GnZH
 -----END PGP SIGNATURE-----
 
---A9H03zcGfJBd4svIRsfULQ5Cc5EfHYsbG--
+--fL9QU9OEmyhc56Ik3mzYyu6MQS20TP0VG--
 
 
