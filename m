@@ -2,61 +2,83 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE009C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 09:40:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8003AC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 09:45:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2937A206CC
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 09:40:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2937A206CC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 86CBF207C4
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 09:45:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PmpgyupS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86CBF207C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLkDY-0001nG-TH
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 05:40:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33278)
+	id 1kLkI3-00068Z-GO
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 05:45:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34594)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <steven.price@arm.com>)
- id 1kLk9U-0000PG-16
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 05:36:28 -0400
-Received: from foss.arm.com ([217.140.110.172]:32908)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <steven.price@arm.com>) id 1kLk9R-0002R0-V8
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 05:36:27 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2FED61045;
- Fri, 25 Sep 2020 02:36:25 -0700 (PDT)
-Received: from e112269-lin.arm.com (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C4B1C3F718;
- Fri, 25 Sep 2020 02:36:22 -0700 (PDT)
-From: Steven Price <steven.price@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>
-Subject: [PATCH v3 2/2] arm64: kvm: Introduce MTE VCPU feature
-Date: Fri, 25 Sep 2020 10:36:07 +0100
-Message-Id: <20200925093607.3051-3-steven.price@arm.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200925093607.3051-1-steven.price@arm.com>
-References: <20200925093607.3051-1-steven.price@arm.com>
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kLkEN-0003I9-8f
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 05:41:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48362)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kLkEI-00030D-Fh
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 05:41:29 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601026884;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=uG3mT3mIsHXGo/NZ/lagLrVrCF3W5tB7wbo/eGmR8/8=;
+ b=PmpgyupSu35N1SPu+dkogfunpTlIr1cwLyQLjxU46G7c9t8XDtKJOJro4kJyh0P5l+2qoS
+ KhnPzN9sHVvnmBt9B4OFXj8tDJ2TpX8K4KTQnFUX1L4hEilIUaaWVFUIMUMBHOJS0vL61+
+ lYgMA0e55MZUfqWYgkcsfUAyMtjgAwI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-188-tQR-5GWWO-Cpe9fjmIx9og-1; Fri, 25 Sep 2020 05:41:22 -0400
+X-MC-Unique: tQR-5GWWO-Cpe9fjmIx9og-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95BA1186DD46;
+ Fri, 25 Sep 2020 09:41:20 +0000 (UTC)
+Received: from gondolin (ovpn-112-192.ams2.redhat.com [10.36.112.192])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8AD8755786;
+ Fri, 25 Sep 2020 09:41:08 +0000 (UTC)
+Date: Fri, 25 Sep 2020 11:41:05 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Matthew Rosato <mjrosato@linux.ibm.com>
+Subject: Re: [PATCH 4/7] s390x/pci: use a PCI Group structure
+Message-ID: <20200925114105.439c1c7d.cohuck@redhat.com>
+In-Reply-To: <1600529672-10243-5-git-send-email-mjrosato@linux.ibm.com>
+References: <1600529672-10243-1-git-send-email-mjrosato@linux.ibm.com>
+ <1600529672-10243-5-git-send-email-mjrosato@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=217.140.110.172;
- envelope-from=steven.price@arm.com; helo=foss.arm.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 05:36:20
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 01:07:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -32
+X-Spam_score: -3.3
+X-Spam_bar: ---
+X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -69,154 +91,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Rutland <mark.rutland@arm.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Haibo Xu <Haibo.Xu@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, qemu-devel@nongnu.org,
- Dave Martin <Dave.Martin@arm.com>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
- Steven Price <steven.price@arm.com>, James Morse <james.morse@arm.com>,
- Julien Thierry <julien.thierry.kdev@gmail.com>,
- Thomas Gleixner <tglx@linutronix.de>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: thuth@redhat.com, kvm@vger.kernel.org, pmorel@linux.ibm.com,
+ david@redhat.com, schnelle@linux.ibm.com, qemu-s390x@nongnu.org,
+ qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+ alex.williamson@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a new VM feature 'KVM_ARM_CAP_MTE' which enables memory tagging
-for a VM. This exposes the feature to the guest and automatically tags
-memory pages touched by the VM as PG_mte_tagged (and clears the tags
-storage) to ensure that the guest cannot see stale tags, and so that the
-tags are correctly saved/restored across swap.
+On Sat, 19 Sep 2020 11:34:29 -0400
+Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-Signed-off-by: Steven Price <steven.price@arm.com>
----
- arch/arm64/include/asm/kvm_emulate.h |  3 +++
- arch/arm64/include/asm/kvm_host.h    |  3 +++
- arch/arm64/kvm/arm.c                 |  9 +++++++++
- arch/arm64/kvm/mmu.c                 | 15 +++++++++++++++
- arch/arm64/kvm/sys_regs.c            |  6 +++++-
- include/uapi/linux/kvm.h             |  1 +
- 6 files changed, 36 insertions(+), 1 deletion(-)
+> From: Pierre Morel <pmorel@linux.ibm.com>
+> 
+> We use a S390PCIGroup structure to hold the information related to a
+> zPCI Function group.
+> 
+> This allows us to be ready to support multiple groups and to retrieve
+> the group information from the host.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>  hw/s390x/s390-pci-bus.c  | 42 ++++++++++++++++++++++++++++++++++++++++++
+>  hw/s390x/s390-pci-bus.h  | 10 ++++++++++
+>  hw/s390x/s390-pci-inst.c | 22 +++++++++++++---------
+>  3 files changed, 65 insertions(+), 9 deletions(-)
+> 
+> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> index 92146a2..3015d86 100644
+> --- a/hw/s390x/s390-pci-bus.c
+> +++ b/hw/s390x/s390-pci-bus.c
+> @@ -737,6 +737,46 @@ static void s390_pci_iommu_free(S390pciState *s, PCIBus *bus, int32_t devfn)
+>      object_unref(OBJECT(iommu));
+>  }
+>  
+> +static S390PCIGroup *s390_grp_create(int ug)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 49a55be2b9a2..4923a566ae6e 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -79,6 +79,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- 	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
- 	    vcpu_el1_is_32bit(vcpu))
- 		vcpu->arch.hcr_el2 |= HCR_TID2;
-+
-+	if (vcpu->kvm->arch.mte_enabled)
-+		vcpu->arch.hcr_el2 |= HCR_ATA;
- }
- 
- static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 4f4360dd149e..1379300c1487 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -110,6 +110,9 @@ struct kvm_arch {
- 	 * supported.
- 	 */
- 	bool return_nisv_io_abort_to_user;
-+
-+	/* Memory Tagging Extension enabled for the guest */
-+	bool mte_enabled;
- };
- 
- struct kvm_vcpu_fault_info {
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 46dc3d75cf13..624edca0a1fa 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -87,6 +87,12 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		r = 0;
- 		kvm->arch.return_nisv_io_abort_to_user = true;
- 		break;
-+	case KVM_CAP_ARM_MTE:
-+		if (!system_supports_mte() || kvm->created_vcpus)
-+			return -EINVAL;
-+		r = 0;
-+		kvm->arch.mte_enabled = true;
-+		break;
- 	default:
- 		r = -EINVAL;
- 		break;
-@@ -206,6 +212,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		 */
- 		r = 1;
- 		break;
-+	case KVM_CAP_ARM_MTE:
-+		r = system_supports_mte();
-+		break;
- 	default:
- 		r = kvm_arch_vm_ioctl_check_extension(kvm, ext);
- 		break;
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index ba00bcc0c884..befb9e1f0aa6 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1949,6 +1949,21 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (vma_pagesize == PAGE_SIZE && !force_pte)
- 		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
- 							   &pfn, &fault_ipa);
-+	if (system_supports_mte() && kvm->arch.mte_enabled && pfn_valid(pfn)) {
-+		/*
-+		 * VM will be able to see the page's tags, so we must ensure
-+		 * they have been initialised.
-+		 */
-+		struct page *page = pfn_to_page(pfn);
-+		long i, nr_pages = compound_nr(page);
-+
-+		/* if PG_mte_tagged is set, tags have already been initialised */
-+		for (i = 0; i < nr_pages; i++, page++) {
-+			if (!test_and_set_bit(PG_mte_tagged, &page->flags))
-+				mte_clear_page_tags(page_address(page));
-+		}
-+	}
-+
- 	if (writable)
- 		kvm_set_pfn_dirty(pfn);
- 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index a655f172b5ad..5010a47152b4 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1132,7 +1132,8 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- 			val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
- 		val &= ~(0xfUL << ID_AA64PFR0_AMU_SHIFT);
- 	} else if (id == SYS_ID_AA64PFR1_EL1) {
--		val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
-+		if (!vcpu->kvm->arch.mte_enabled)
-+			val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
- 	} else if (id == SYS_ID_AA64ISAR1_EL1 && !vcpu_has_ptrauth(vcpu)) {
- 		val &= ~((0xfUL << ID_AA64ISAR1_APA_SHIFT) |
- 			 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
-@@ -1394,6 +1395,9 @@ static bool access_mte_regs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
- 				   const struct sys_reg_desc *rd)
- {
-+	if (vcpu->kvm->arch.mte_enabled)
-+		return 0;
-+
- 	return REG_HIDDEN_USER | REG_HIDDEN_GUEST;
- }
- 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index f6d86033c4fa..87678ed82ab4 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1035,6 +1035,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_LAST_CPU 184
- #define KVM_CAP_SMALLER_MAXPHYADDR 185
- #define KVM_CAP_S390_DIAG318 186
-+#define KVM_CAP_ARM_MTE 188
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
--- 
-2.20.1
+I think you made the identifiers a bit too compact :)
+s390_group_create() is not that long, and I have no idea what the 'ug'
+(ugh :) parameter is supposed to mean.
+
+> +{
+> +    S390PCIGroup *grp;
+
+group?
+
+> +    S390pciState *s = s390_get_phb();
+> +
+> +    grp = g_new0(S390PCIGroup, 1);
+> +    grp->ug = ug;
+> +    QTAILQ_INSERT_TAIL(&s->zpci_grps, grp, link);
+
+zpci_groups? I think you get the idea :)
+
+> +    return grp;
+> +}
+
+(...)
+
+No objection to the patch in general.
 
 
