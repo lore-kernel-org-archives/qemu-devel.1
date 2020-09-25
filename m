@@ -2,108 +2,86 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ABD4C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 08:34:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 676A4C4727E
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 08:35:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1040208B6
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 08:34:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C77AB208B6
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 08:35:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XZoz/IM9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1040208B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H7pVWsiO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C77AB208B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLjBW-0005iq-QC
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 04:34:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48272)
+	id 1kLjCj-0007Ad-Po
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 04:35:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48338)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <tgolembi@redhat.com>)
- id 1kLjAD-0004qt-DK
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 04:33:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39466)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <tgolembi@redhat.com>)
- id 1kLjAA-0002xb-W1
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 04:33:09 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601022784;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=FJ96mL/0u02WPTL+V8DFTcs4iANZYSJxwbzQtIedfWs=;
- b=XZoz/IM9grTHcawonfrcAVdh3O8oo2vh7trL93gffKNLSnsCIx2F5fDwtlBYdl9NvQT3QP
- GILXTipJ7eojzndfQQ1pOopYf2VGNURIOSjEhvP+r+E74otlgR4SY6pFqtnxc+/AT0DsEm
- bR61R4LbWMjjEz+NVFZWaPBGQF71MFc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-216-JI7j2RDLN--2HjKHIKMQIw-1; Fri, 25 Sep 2020 04:33:02 -0400
-X-MC-Unique: JI7j2RDLN--2HjKHIKMQIw-1
-Received: by mail-wm1-f69.google.com with SMTP id m25so826640wmi.0
- for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 01:33:02 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kele.hwang@gmail.com>)
+ id 1kLjAf-00052B-EB
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 04:33:37 -0400
+Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:35522)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <kele.hwang@gmail.com>)
+ id 1kLjAd-0002yN-Fc
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 04:33:37 -0400
+Received: by mail-pg1-x533.google.com with SMTP id g29so1942753pgl.2
+ for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 01:33:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id;
+ bh=gjXR+j7GzNNm+6zWdWvO4+YL6Cz7kiHndSAXyUow//k=;
+ b=H7pVWsiOrn7GWoJBnJR6yOgysdiq1bycmHGPKsOvlEJzzcDfdx+fOCjX+HsRPykCz9
+ sz3AqZZhyrP4yQi+zRHhIZGuY9oz9vC7aOAfjf79z51QS7bch4VH3pzmtq14dyCTK+70
+ f/u1mX2p12R/dZfojTx/9R6KMxXRURmTmmDmarkQ7dmUTKrpvHxi032B1ApEfj//opfj
+ UO08IerZ7xf+AZ3UkiCtolOjbwevKyWpWwUhn8VbPu9J1VifBRbDvOzdzC2Afs8JQFsd
+ nxjEmlgZ6sDEhODPWqKvD6TMr5jEvMdkDO0bFly1AeLAJ89iGi7KboFEx/HWW48IfuQL
+ 1Hbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=FJ96mL/0u02WPTL+V8DFTcs4iANZYSJxwbzQtIedfWs=;
- b=Vgq9LkuTupUACBGZTDDeJWLQWx4IMN+rF//aXk0h6QbwLcvKUOMdb4P8+NDp5/Cmi0
- GKNuftuQQY1thf0hwTGHItMbj+DDZcEAkUE5deak/XqVcEfrwgwrqOqnwid3e84WJVmf
- KPWbd5OL598Ijo2AJQJhLTVuVn+AaleO9lmIIWObqtpSusBIXYWVNTU5pd2dJU89fSc3
- Fphn9rHKnCDO2CpfBMh+WlbZk+n7oXQulIFV0r2G+0Y9GSu7KGTNgZtXbLZOaJB5nVZv
- d90LWedqhXfJZCQEol5KtbRqznlSDNLpplKIPGN1YqF8xX22FcGuMMyXc3Jb5UccR8xc
- UWjw==
-X-Gm-Message-State: AOAM531CpcO+qGxxYz5w7TepSExF4WTUCSrFgVi+KN5rS8YPLKmw4xpG
- 1s6OrmX7WHTd2jAGBpG2drFgOx6PymvS9Hjte1FG1qppWqVTLRoo5eYF26Qg6p5R1y+r62TIzPF
- ThRS4Nrx0gPk2QCs=
-X-Received: by 2002:a5d:634e:: with SMTP id b14mr3077204wrw.190.1601022781614; 
- Fri, 25 Sep 2020 01:33:01 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyuXa5x5mvTEyRy1W9wWcoaYB9ygPn3IhuIv2QgVbLYSAYwPBvXtgsUvvDpVmtAayRz82rHCg==
-X-Received: by 2002:a5d:634e:: with SMTP id b14mr3077183wrw.190.1601022781347; 
- Fri, 25 Sep 2020 01:33:01 -0700 (PDT)
-Received: from auriga.localdomain (ip-89-176-41-222.net.upcbroadband.cz.
- [89.176.41.222])
- by smtp.gmail.com with ESMTPSA id t203sm2052525wmg.43.2020.09.25.01.33.00
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=gjXR+j7GzNNm+6zWdWvO4+YL6Cz7kiHndSAXyUow//k=;
+ b=UfG4WaN5MMwNAmacDktSocVpGMaVLPcAeVgCO3GEQrMFaA1r73pVcWln8VsxR7JZDc
+ gJpa/hxyVDXiTYEiuON1xFb6cUUuvlyMWg0vMo0jUzQ96An6ppzxtcSQT68HoVmC88zs
+ +0LtVCFiGGyAw+tG86PqQxV2lSTdObrHd+r/K6t9zXlrCXtCzPYXKNLv0XXrd2AU4mEC
+ sNjd9W/tilmqtORZVH46nyqDuIoExToVOhJs2MoZBkdTrO4KvFgkx3yFduSnZ25HPu45
+ favLFHDOpBUDOLiO/10IVCjLKR7IwNpdzvEWb6cPGPizOhoMgOoBWe+/C+9G+oLrBdCc
+ xgjA==
+X-Gm-Message-State: AOAM531yfaMKzV/9wVfi6TFp27zV+SyN1sX0RzNL7l+dhVLKjvbOgTv9
+ msnoTQ49C8fJ7kEoGWff3DpI5uAK3O1Dkg==
+X-Google-Smtp-Source: ABdhPJwFUbTkv0QO0iPtJCW0CKpEdXFD9SsuLpQRo0OZrA/deK6toEUTYM1zSTjV63/8bFLo8FK/tw==
+X-Received: by 2002:a63:1657:: with SMTP id 23mr2724793pgw.168.1601022813499; 
+ Fri, 25 Sep 2020 01:33:33 -0700 (PDT)
+Received: from carbon.loongson.cn ([40.83.95.77])
+ by smtp.gmail.com with ESMTPSA id h12sm1830577pfo.68.2020.09.25.01.33.30
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 25 Sep 2020 01:33:00 -0700 (PDT)
-Date: Fri, 25 Sep 2020 10:32:58 +0200
-From: =?utf-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>,
- Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Yonggang Luo <luoyonggang@gmail.com>
-Subject: Re: [PATCH v2 0/3] qga: add command guest-get-disk
-Message-ID: <20200925083258.7deatpkkuouofjur@auriga.localdomain>
-References: <cover.1599470071.git.tgolembi@redhat.com>
-MIME-Version: 1.0
-In-Reply-To: <cover.1599470071.git.tgolembi@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=tgolembi@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=tgolembi@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 01:07:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -32
-X-Spam_score: -3.3
-X-Spam_bar: ---
-X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ Fri, 25 Sep 2020 01:33:32 -0700 (PDT)
+From: Kele Huang <kele.hwang@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 1/1] accel/tcg: Fix computing of is_write for MIPS
+Date: Fri, 25 Sep 2020 16:33:07 +0800
+Message-Id: <20200925083307.13761-1-kele.hwang@gmail.com>
+X-Mailer: git-send-email 2.17.1
+Received-SPF: pass client-ip=2607:f8b0:4864:20::533;
+ envelope-from=kele.hwang@gmail.com; helo=mail-pg1-x533.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -116,41 +94,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Kele Huang <kele.hwang@gmail.com>, Xu Zou <iwatchnima@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-gentle reminder
+Detect all MIPS store instructions in cpu_signal_handler for all available
+MIPS versions, and set is_write if encountering such store instructions.
 
-On Mon, Sep 07, 2020 at 11:14:39AM +0200, Tomáš Golembiovský wrote:
-> Adds command to list disks of the VM.
-> 
-> The patch does compile on master but to work properly it requires changes to
-> qemu-ga by Thomas Huth in series: Allow guest-get-fsinfo also for non-PCI
-> devices.
-> 
-> v2:
-> - added new struct in API to handle the information
-> - split changes into several patches
-> - for Linux list also slaves, partitions and virtual disks so that the disk
->   hierarchy is preserved
-> - fixed issues pointed out by Michael
-> 
-> Tomáš Golembiovský (3):
->   qga: add command guest-get-disks
->   qga: add implementation of guest-get-disks for Linux
->   qga: add implementation of guest-get-disks for Windows
-> 
->  qga/commands-posix.c | 241 ++++++++++++++++++++++++++++++++++++++++++-
->  qga/commands-win32.c |  91 ++++++++++++++++
->  qga/qapi-schema.json |  29 ++++++
->  3 files changed, 360 insertions(+), 1 deletion(-)
-> 
-> -- 
-> 2.25.0
-> 
+This fixed the error while dealing with self-modified code for MIPS.
 
+Signed-off-by: Kele Huang <kele.hwang@gmail.com>
+Signed-off-by: Xu Zou <iwatchnima@gmail.com>
+---
+ accel/tcg/user-exec.c | 38 +++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 37 insertions(+), 1 deletion(-)
+
+diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
+index bb039eb32d..c4494c93e7 100644
+--- a/accel/tcg/user-exec.c
++++ b/accel/tcg/user-exec.c
+@@ -702,6 +702,10 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+ 
+ #elif defined(__mips__)
+ 
++#if defined(__misp16) || defined(__mips_micromips)
++#error "Unsupported encoding"
++#endif
++
+ int cpu_signal_handler(int host_signum, void *pinfo,
+                        void *puc)
+ {
+@@ -709,9 +713,41 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+     ucontext_t *uc = puc;
+     greg_t pc = uc->uc_mcontext.pc;
+     int is_write;
++    uint32_t insn;
+ 
+-    /* XXX: compute is_write */
++    /* Detect all store instructions at program counter. */
+     is_write = 0;
++    insn = *(uint32_t *)pc;
++    switch((insn >> 26) & 077) {
++    case 050: /* SB */
++    case 051: /* SH */
++    case 052: /* SWL */
++    case 053: /* SW */
++    case 054: /* SDL */
++    case 055: /* SDR */
++    case 056: /* SWR */
++    case 070: /* SC */
++    case 071: /* SWC1 */
++    case 074: /* SCD */
++    case 075: /* SDC1 */
++    case 077: /* SD */
++#if !defined(__mips_isa_rev) || __mips_isa_rev < 6
++    case 072: /* SWC2 */
++    case 076: /* SDC2 */
++#endif
++        is_write = 1;
++        break;
++    case 023: /* COP1X */
++        /* Required in all versions of MIPS64 since 
++           MIPS64r1 and subsequent versions of MIPS32. */
++        switch (insn & 077) {
++        case 010: /* SWXC1 */
++        case 011: /* SDXC1 */
++            is_write = 1;
++        }
++        break;
++    }
++
+     return handle_cpu_signal(pc, info, is_write, &uc->uc_sigmask);
+ }
+ 
 -- 
-Tomáš Golembiovský <tgolembi@redhat.com>
+2.17.1
 
 
