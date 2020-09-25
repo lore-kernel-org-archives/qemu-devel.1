@@ -2,95 +2,91 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1380BC4727D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 16:14:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A60BC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 16:14:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E174235FD
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 16:14:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C1C35235FD
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 16:14:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RuHTMNDq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E174235FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tgk/sgLc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1C35235FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLqMQ-00049v-KC
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 12:14:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38246)
+	id 1kLqMV-0004S6-Pb
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 12:14:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40210)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kLpy8-0002Xs-Tb
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:49:11 -0400
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:38201)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kLpy6-0000V9-Se
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:49:08 -0400
-Received: by mail-wm1-x333.google.com with SMTP id v12so3815210wmh.3
- for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 08:49:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=onYubvnZAptV0g3qVhyvCNtLG7BSB07qR8hJW0/fGsI=;
- b=RuHTMNDqG5bAGY9kkcDg9HN8S0pLpMdgWdNDi89GQlrXY/C6RMnKoJxlasuVzz6psr
- pxxLmv3zf308pqTiyeghIIaKTVhMBxe/SO7BrEgt/+2QgntHTM0X2powvD9eflkSC0RN
- Jwec8oZTyVyjMJmkdQKN8YSDZEs9HvWg1M4nS8a5Uw6EnpUiVbkfxUR0mlQ8JDJ37YIk
- aJ4Sc5sX+cnVs6CxuovqkBXggatOT/58jwSFfcHQjH+ixbxLu60kuqhks/epSKJhlpV4
- oJ8/zxLtbyrIfUMzNCMG7y4F725p6XW+qLV5pntOxJwzIfJt/GaOTbWnMmbv1hlKdlZU
- WFfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=onYubvnZAptV0g3qVhyvCNtLG7BSB07qR8hJW0/fGsI=;
- b=LKc0RvJYqFS4YYv7BAgDz2rgRZd1InMtct7lzby+JmE2ndpmz6PDFsoYiwuD67Wvcw
- qg+Vu077wNpIMdnU3xm+jq5WES9wvGHk9aNJQQzu2HNBM6WMQl6+fcURPh5kFqZAXOqP
- 0nlpwXXSTLzWD3RbECZSyjOQ7CzNpjEsAVzY9NUxIGiyTKTzbbgFEbTNPEBpTqfVQhTV
- Lrso1elkVrmOnnP9+QyKcBvPKcNVqV9HI5Dzj2Xd7+KHw1aOAvjOnnDz67Mb54RDEjj+
- dcahUSlHoAzQ42c7tKr41bAVq6+lhw1CqTziPsm1A5vP14WOX6PB+AzAQN44DyNWc1nw
- aqEw==
-X-Gm-Message-State: AOAM530imTEfGZfjDqIj97nU+i/qZwPe+NkJV0uQKLbCMF/ZzelDaFxI
- ga/MiiPjnnEuSThg/1xjTnptQA==
-X-Google-Smtp-Source: ABdhPJwg3Qt6FTfBMMepdqKtHeZx02g88WW7I1hYbCO9+P/hVvrwwG5YONeteBig8cwFL5mjB7pMxg==
-X-Received: by 2002:a1c:2e17:: with SMTP id u23mr4063399wmu.73.1601048945110; 
- Fri, 25 Sep 2020 08:49:05 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id m23sm3108366wmi.19.2020.09.25.08.49.04
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 25 Sep 2020 08:49:04 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 7B10D1FF7E;
- Fri, 25 Sep 2020 16:40:30 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v1 14/15] gitlab-ci: Increase the timeout for the
- cross-compiler builds
-Date: Fri, 25 Sep 2020 16:40:26 +0100
-Message-Id: <20200925154027.12672-15-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200925154027.12672-1-alex.bennee@linaro.org>
-References: <20200925154027.12672-1-alex.bennee@linaro.org>
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLq4V-0000j7-Ed
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:55:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26916)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLq4R-0001pC-CN
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:55:43 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601049338;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=a7aRo4L2djqOol/3M0gkbO+uTPgV6B2aFuNmBvIwt+0=;
+ b=Tgk/sgLcBSOoaEb0r3a0D6cQhNFyciYVRiuXhlGoIQAKSAFmtNzyXsZjoYFGbfRTnwUvld
+ Osz43SuI9kD6A3tLu83GSCvC+evMruDCC2wruTxUXY6U7wLbqRS9UmzEO+vxHy88oxHrt8
+ KeceOzMWTfGTclj/qYF59eqcjhSbuu4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-418-uQKIhZtsMeSio_6Yf0z8uA-1; Fri, 25 Sep 2020 11:55:34 -0400
+X-MC-Unique: uQKIhZtsMeSio_6Yf0z8uA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6990A807344;
+ Fri, 25 Sep 2020 15:55:33 +0000 (UTC)
+Received: from [10.10.119.140] (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 50BAB73693;
+ Fri, 25 Sep 2020 15:55:32 +0000 (UTC)
+Subject: Re: [PATCH v2 18/38] qapi/events.py: Move comments into docstrings
+To: Markus Armbruster <armbru@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
+References: <20200922210101.4081073-1-jsnow@redhat.com>
+ <20200922210101.4081073-19-jsnow@redhat.com>
+ <20200923144819.GE3312949@habkost.net> <87k0wit5ef.fsf@dusky.pond.sub.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <e9838231-f0b2-f953-448d-3c86e5b4f813@redhat.com>
+Date: Fri, 25 Sep 2020 11:55:31 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::333;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x333.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <87k0wit5ef.fsf@dusky.pond.sub.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 01:07:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -34
+X-Spam_score: -3.5
+X-Spam_bar: ---
+X-Spam_report: (-3.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.238, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,44 +100,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+On 9/25/20 8:19 AM, Markus Armbruster wrote:
+> What about:
+> 
+>      Generate a QAPI struct variable holding the event parameters,
+>      initialized with the function's arguments.
 
-Some of the cross-compiler builds (the mips build and the win64 build
-for example) are quite slow and sometimes hit the 1h time limit.
-Increase the limit a little bit to make sure that we do not get failures
-in the CI runs just because of some few minutes.
+Line length and style-guide limitations; docstrings need a one-liner 
+summary.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20200921174320.46062-7-thuth@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- .gitlab-ci.d/crossbuilds.yml | 1 +
- 1 file changed, 1 insertion(+)
+(Consistency is the hobgoblin, blah blah blah.)
 
-diff --git a/.gitlab-ci.d/crossbuilds.yml b/.gitlab-ci.d/crossbuilds.yml
-index 510cfec03bb7..03ebfabb3fac 100644
---- a/.gitlab-ci.d/crossbuilds.yml
-+++ b/.gitlab-ci.d/crossbuilds.yml
-@@ -2,6 +2,7 @@
- .cross_system_build_job_template: &cross_system_build_job_definition
-   stage: build
-   image: $CI_REGISTRY_IMAGE/qemu/$IMAGE:latest
-+  timeout: 80m
-   script:
-     - mkdir build
-     - cd build
--- 
-2.20.1
+I am writing:
+
+     """
+     Generate a QAPI struct variable with an initializer.
+
+     The QAPI struct describes the event parameters, and the initializer
+     references the function arguments defined in `gen_event_send`.
+     """
 
 
