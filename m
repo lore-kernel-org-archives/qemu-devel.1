@@ -2,95 +2,85 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27018C4727C
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 14:59:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDF8AC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 15:06:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87E3820715
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 14:59:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D33320878
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 15:06:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bT09BuYw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87E3820715
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AqxOCvE1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D33320878
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLpC6-0001IE-AD
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 10:59:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52840)
+	id 1kLpJ4-0006zW-0t
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 11:06:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54486)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kLpAx-0000rh-7P
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 10:58:19 -0400
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:34890)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kLpAv-0001F0-89
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 10:58:18 -0400
-Received: by mail-pj1-x1041.google.com with SMTP id jw11so1893616pjb.0
- for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 07:58:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=3XrI64iHvjaHnUh2CvQVHQtOluqE2drV5W4E+S888ro=;
- b=bT09BuYwa5mjGjCB1Zx/wMPEH8moKBfwxlNYbA1JcWdpYRHPM7GmOqZqku1KBweFTy
- db2DBpDdlLZ4b1Sx9nx4ClMZkIX8lwh5CJPebwpHNk8Bg2LcRXRjozRiGhj2InehyGNc
- oWSTdDGf48enViCJtZfpkvcmuXqj5OgXnPh0Mt21ZazXveaRjJZ02euvZ+rACpfoAtRN
- KH5vmJdh6sj+eNbGjMFYWwBXtMsW+7WtAb09/PYDXUnqH4t/KOlyZdusQbddSmH0ngBz
- Pv+Nl4FA+gVC/eehr0E4PGWka3/wXMaNmzTZF1pOeq1lB7TpexH59k+9VRfwcKFmWpWQ
- g6Vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=3XrI64iHvjaHnUh2CvQVHQtOluqE2drV5W4E+S888ro=;
- b=kzh/bOfulLOcXHyfeNt17Akpv8MdODzA+Y+VDKuaSrkAYpDMaIGscviCJPKdJQOxOw
- KtJWPzPuyDuGtg0ehF61uaLwbrohRTiLmPPdw4uVpxc482BMAjOU7KpF/WnC/2i4Qgvm
- aWf90WSwPJPTDeBb9nnWX4VH8/PBWZG+XKyccCKZXlYCdfHkzufw0iN9IEYH3dR1DmjH
- hKO65Rar2IO+nGMWuQlFUxN1vRqr+kS6DeDpQOQkSL1/57EeQnaYIiMJFLOeR+POKnIi
- SI0lSWAtpKqsAJ5VGZhEscxevL85e7PCDevIafZoTwil1VgMW4/IBINbDfqD0nqiwmGY
- yIaA==
-X-Gm-Message-State: AOAM530KKZuMvLELK8Zk/enOpTULXhQYjRas3X1ZV9rDq0L9qoGq2lhP
- Mwt2nob1ZH/Vm+Tt7S8hP+UBwg==
-X-Google-Smtp-Source: ABdhPJzzWGjeDDFf0QpTzdPs8LxZElk2BeGhNZ6DrE8oHWNlwBPtnTqWzbiNaxgl8JO2KYIi3QaYMA==
-X-Received: by 2002:a17:90a:5a48:: with SMTP id m8mr5479pji.181.1601045895603; 
- Fri, 25 Sep 2020 07:58:15 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id a12sm3034786pfh.154.2020.09.25.07.58.14
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 25 Sep 2020 07:58:14 -0700 (PDT)
-Subject: Re: [PATCH v3 1/1] accel/tcg: Fix computing of is_write for MIPS
-To: Kele Huang <kele.hwang@gmail.com>, qemu-devel@nongnu.org
-References: <20200925083307.13761-1-kele.hwang@gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <1c29d238-b7a0-4ab4-cc38-69a193f328a3@linaro.org>
-Date: Fri, 25 Sep 2020 07:58:12 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kLpEa-00036B-3V
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:02:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34646)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kLpES-00023g-Ve
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 11:02:03 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601046115;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=2ZOOUQ1jdb5Mq1HSDu653tvrD6cEWUY5YrfsKT3iLdA=;
+ b=AqxOCvE1HajIml2Oq99a0+irnYKzDruvDL+sRNTaexrWdraHd3TQCb5hdtm64TuoMODwF4
+ m9gbVSPbEup7tMwiWCK6pS7sE7+ZdNrIHCK35tuYM6xoBW6z8TZt2zEQzHwemvRsuQ6xFT
+ DEBW7dFxitsI1qQAE+Hxo/OMpnqAbOA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-88-SAPuSzc2MceQL76ZhwE9OA-1; Fri, 25 Sep 2020 11:01:51 -0400
+X-MC-Unique: SAPuSzc2MceQL76ZhwE9OA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 572821882FB5;
+ Fri, 25 Sep 2020 15:01:50 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-114-83.ams2.redhat.com [10.36.114.83])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E5CA655785;
+ Fri, 25 Sep 2020 15:01:44 +0000 (UTC)
+Date: Fri, 25 Sep 2020 17:01:42 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH 4/4] block/export: add BlockExportOptions->iothread member
+Message-ID: <20200925150142.GD5731@linux.fritz.box>
+References: <20200925134229.246169-1-stefanha@redhat.com>
+ <20200925134229.246169-5-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200925083307.13761-1-kele.hwang@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -22
-X-Spam_score: -2.3
-X-Spam_bar: --
-X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.238,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200925134229.246169-5-stefanha@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 01:07:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -32
+X-Spam_score: -3.3
+X-Spam_bar: ---
+X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,80 +93,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- Xu Zou <iwatchnima@gmail.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, Coiby Xu <Coiby.Xu@gmail.com>,
+ Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/25/20 1:33 AM, Kele Huang wrote:
-> Detect all MIPS store instructions in cpu_signal_handler for all available
-> MIPS versions, and set is_write if encountering such store instructions.
+Am 25.09.2020 um 15:42 hat Stefan Hajnoczi geschrieben:
+> Make it possible to specify the iothread where the export will run.
 > 
-> This fixed the error while dealing with self-modified code for MIPS.
-> 
-> Signed-off-by: Kele Huang <kele.hwang@gmail.com>
-> Signed-off-by: Xu Zou <iwatchnima@gmail.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  accel/tcg/user-exec.c | 38 +++++++++++++++++++++++++++++++++++++-
->  1 file changed, 37 insertions(+), 1 deletion(-)
+> Note the x-blockdev-set-iothread QMP command can be used to do the same,
+> but not from the command-line. And it requires sending an additional
+> command.
 > 
-> diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
-> index bb039eb32d..c4494c93e7 100644
-> --- a/accel/tcg/user-exec.c
-> +++ b/accel/tcg/user-exec.c
-> @@ -702,6 +702,10 @@ int cpu_signal_handler(int host_signum, void *pinfo,
->  
->  #elif defined(__mips__)
->  
-> +#if defined(__misp16) || defined(__mips_micromips)
-> +#error "Unsupported encoding"
-> +#endif
-> +
->  int cpu_signal_handler(int host_signum, void *pinfo,
->                         void *puc)
->  {
-> @@ -709,9 +713,41 @@ int cpu_signal_handler(int host_signum, void *pinfo,
->      ucontext_t *uc = puc;
->      greg_t pc = uc->uc_mcontext.pc;
->      int is_write;
-> +    uint32_t insn;
->  
-> -    /* XXX: compute is_write */
-> +    /* Detect all store instructions at program counter. */
->      is_write = 0;
-> +    insn = *(uint32_t *)pc;
-> +    switch((insn >> 26) & 077) {
-> +    case 050: /* SB */
-> +    case 051: /* SH */
-> +    case 052: /* SWL */
-> +    case 053: /* SW */
-> +    case 054: /* SDL */
-> +    case 055: /* SDR */
-> +    case 056: /* SWR */
-> +    case 070: /* SC */
-> +    case 071: /* SWC1 */
-> +    case 074: /* SCD */
-> +    case 075: /* SDC1 */
-> +    case 077: /* SD */
-> +#if !defined(__mips_isa_rev) || __mips_isa_rev < 6
-> +    case 072: /* SWC2 */
-> +    case 076: /* SDC2 */
-> +#endif
-> +        is_write = 1;
-> +        break;
-> +    case 023: /* COP1X */
-> +        /* Required in all versions of MIPS64 since 
-> +           MIPS64r1 and subsequent versions of MIPS32. */
-> +        switch (insn & 077) {
-> +        case 010: /* SWXC1 */
-> +        case 011: /* SDXC1 */
-> +            is_write = 1;
+> In the long run vhost-user-blk will support per-virtqueue iothread
+> mappings. But for now a single iothread makes sense and most other
+> transports will just use one iothread anyway.
+> ---
+>  qapi/block-export.json |  4 ++++
+>  block/export/export.c  | 26 +++++++++++++++++++++++++-
+>  2 files changed, 29 insertions(+), 1 deletion(-)
+> 
+> diff --git a/qapi/block-export.json b/qapi/block-export.json
+> index 87ac5117cd..eba6f6eae9 100644
+> --- a/qapi/block-export.json
+> +++ b/qapi/block-export.json
+> @@ -219,11 +219,15 @@
+>  #                export before completion is signalled. (since: 5.2;
+>  #                default: false)
+>  #
+> +# @iothread: The name of the iothread object where the export will run. The
+> +#            default is the main loop thread. (since: 5.2)
 
-Much better.  I just noticed you're missing SUXC1 (COP1X minor 015).  With that
-fixed,
+NBD exports currently switch automatically to a different AioContext if
+another user (usually a guest device using the same node) tries to
+change the AioContext. I believe this is also the most useful mode in
+the context of the system emulator.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+I can see the need for an iothread option in qemu-storage-daemon where
+usually nobody else will move the node into a different AioContext.
 
-r~
+But we need to define the semantics more precisely and specify what
+happens if another user wants to change the AioContext later. Currently,
+the NBD export will allow this and just switch the AioContext - after
+this patch, ignoring what the user set explicitly with this new option.
+
+I see two options to handle this more consistently:
+
+1. If @iothread is set, move the block node into the requested
+   AioContext, and if that fails, block-export-add fails. Other users of
+   the node will be denied to change the AioContext while the export is
+   active.
+
+   If @iothread is not given, it behaves like today: Use whatever
+   AioContext the node is currently in and switch whenever another user
+   requests it.
+
+2. Add a bool option @fixed-iothread that determines whether other users
+   can change the AioContext while the export is active.
+
+   Giving an @iothread and fixed-iothread == true means that we'll
+   enforce the given AioContext during the whole lifetime of the export.
+   With fixed-iothread == false it means that we try to move the block
+   node to the requested iothread if possible (but we won't fail if it
+   isn't possible) and will follow any other user switching the
+   AioContext of the node.
+
+   Not giving @iothread means that we start with the current AioContext
+   of the node, and @fixed-iothread then means the same as before.
+
+Does this make sense to you?
+
+Kevin
+
 
