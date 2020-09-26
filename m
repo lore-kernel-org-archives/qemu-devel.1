@@ -2,99 +2,86 @@ Return-Path: <SRS0=cZnO=DD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57164C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 10:30:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48962C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 10:32:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF27B2072E
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 10:30:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF27B2072E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id AD54E238E2
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 10:32:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I2PvJSTz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD54E238E2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kM7TX-0007Cq-Pd
-	for qemu-devel@archiver.kernel.org; Sat, 26 Sep 2020 06:30:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52082)
+	id 1kM7VF-0008Dx-TO
+	for qemu-devel@archiver.kernel.org; Sat, 26 Sep 2020 06:32:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52340)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kM7Sq-0006ay-Dy; Sat, 26 Sep 2020 06:30:00 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:41238
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kM7Sp-0008A1-0Z; Sat, 26 Sep 2020 06:30:00 -0400
-Received: from host86-184-131-21.range86-184.btcentralplus.com
- ([86.184.131.21] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kM7TU-0000nd-87; Sat, 26 Sep 2020 11:30:40 +0100
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- armbru@redhat.com, david@gibson.dropbear.id.au, atar4qemu@gmail.com,
- qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-References: <20200920082018.16135-1-mark.cave-ayland@ilande.co.uk>
- <20200920082018.16135-5-mark.cave-ayland@ilande.co.uk>
- <0ea7090a-34f0-d437-1c7d-34570b529943@amsat.org>
- <c9ae2d9d-4a4e-8b68-1f58-4e1fe3bbd55a@ilande.co.uk>
- <4bab3a2c-919b-621e-5ba8-6a124f8c642e@amsat.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <992fc3ad-ccca-ecbd-884f-b5e4790ac0ef@ilande.co.uk>
-Date: Sat, 26 Sep 2020 11:29:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ (Exim 4.90_1) (envelope-from <carenas@gmail.com>)
+ id 1kM7Ub-0007gh-18; Sat, 26 Sep 2020 06:31:49 -0400
+Received: from mail-vs1-xe43.google.com ([2607:f8b0:4864:20::e43]:35538)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <carenas@gmail.com>)
+ id 1kM7UY-0008Sq-Sc; Sat, 26 Sep 2020 06:31:48 -0400
+Received: by mail-vs1-xe43.google.com with SMTP id e23so2921642vsk.2;
+ Sat, 26 Sep 2020 03:31:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=DCux6ibpwv2WidxVbb/6aY5wr47jk+W+hdcfe8EreII=;
+ b=I2PvJSTzIp4YOPuDBcfAkOCbpqZXIkzMKVEcNDXvlGeF988SfRxKtroV55v+n1x1aa
+ /mJiFFduR+XTEmX0mNiMq3mhtOcEP7frmk2OlA9Yd7ZdYndgY4Y7vi+UgztECB29xA1+
+ 5RaTCfM8ZoGoa/JGECdZIXS14ubOYKRiFds5y3qynP/yG88m83CVcw/Qjrnz/KbR9p+v
+ bEx4tEzeWjVVR7wFWm1D5+aOzEaD/tOr0Q3HZ5oYBdnUma0rGLPZzGnEsdiawFF0Lnas
+ fmn1ScD0FOFjLS92PvVYlGqohhR3ZFqQs7q9d591K45RmaOVNlpsgRt6NIBMRIU5qI9O
+ rdAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=DCux6ibpwv2WidxVbb/6aY5wr47jk+W+hdcfe8EreII=;
+ b=oQGZfPX6Y5twnRsZ4K6jGcITjeRFuJgpb1KKtHJKDt1q9MmR1/8zqUpMWJ3S9l5Zzl
+ 3VerJvNlKw5Ob66YwwgbJA1XRsRFj9ZBrjUXF3WqFIQXqeHJ7MKeW57SLIDGSZtPtE9e
+ En2Ohe/ccBxfRvzuwS8/xCUBR7XLAlC5ZA/66VkzZ0R2aDmH2rZQWPt/Ixb9Z4sag5Yt
+ WF+oamPLVq7adf1X0sArAIbXz82FA5n/mFjYQhxKbTbx6dv2/dfFZQgXMZBk5keL4E15
+ q6WfmZCJLLZKnBz0X7+DNYhUhlwf6w+r/ALe2PuYEaymNScFdwPUscnXqU3WIvZ4QbW8
+ ujUg==
+X-Gm-Message-State: AOAM531nAyy+0UFkINi1QDHP6tOH9RnNe8ObqrowYkL4Rb0AdhJEw/mw
+ 2UBoDtzJU4p8BQnMKPkuUAi223S1iXoLjsQUnzg=
+X-Google-Smtp-Source: ABdhPJwVrAY7Hw5pGhJpGbNvf3x3TotWvZq55jONHcltYi6l4uo41OVtPvYv/+0jrkwtp1ovfvxRHNWRCn2uwPCZBwU=
+X-Received: by 2002:a67:8802:: with SMTP id k2mr1301197vsd.42.1601116305129;
+ Sat, 26 Sep 2020 03:31:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <4bab3a2c-919b-621e-5ba8-6a124f8c642e@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.184.131.21
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH 4/6] sparc32-ledma: don't reference nd_table directly
- within the device
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
+References: <CA+XhMqxQ3o_h7_Fwho7gu9x9Pw5jCw=z-goVMyzJgQYqZR-cgA@mail.gmail.com>
+ <CAP+75-XwpLiutpW6-J3DLKFGXOVd=tLF2fG2=0=nP9+KZ0UYug@mail.gmail.com>
+ <CA+XhMqwWuMrnUsFx7re5K6Yo7UP5xdF5kNaPmVsabf-4LU9Rfw@mail.gmail.com>
+In-Reply-To: <CA+XhMqwWuMrnUsFx7re5K6Yo7UP5xdF5kNaPmVsabf-4LU9Rfw@mail.gmail.com>
+From: Carlo Arenas <carenas@gmail.com>
+Date: Sat, 26 Sep 2020 03:31:34 -0700
+Message-ID: <CAPUEspiBbM1N_=2or8P7VuFtpHNWvcjD2orkUFNOFOW-ytHx8w@mail.gmail.com>
+Subject: Re: [PATCH 1/3] Include endian.h for Haiku to solve bswap* macros
+ build
+To: David CARLIER <devnexen@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::e43;
+ envelope-from=carenas@gmail.com; helo=mail-vs1-xe43.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.238,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,38 +94,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21/09/2020 18:58, Philippe Mathieu-Daudé wrote:
+FWIW the 32 bit image (haiku-r1beta2-x86_gcc2h-anyboot.zip[1]), uses
+gcc 2.95.3 as system CC
+a newer gcc (the same version that is used for the 64 bit port) is
+provided as an alternative though
 
-> Sorry I guess I got confused by the 2 different sparc32_dma_init()
-> functions.
-> 
-> Since ledma always expose lance, maybe you can use:
-> 
-> diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
-> index 2cbe331959a..9a907a30373 100644
-> --- a/hw/dma/sparc32_dma.c
-> +++ b/hw/dma/sparc32_dma.c
-> @@ -336,18 +336,14 @@ static void sparc32_ledma_device_init(Object *obj)
->                            "ledma-mmio", DMA_SIZE);
-> 
->      object_initialize_child(obj, "lance", &ls->lance, TYPE_LANCE);
-> +    qdev_alias_all_properties(DEVICE(&ls->lance), obj);
->  }
-> 
-> This way you set the properties directly on the ledma and only
-> have to sysbus_map lance.
+Carlo
 
-Thanks for the hint. I've had a look at qdev_alias_all_properties() and for the
-moment I'd prefer to get the reference to the internal lance/esp devices via
-object_resolve_path_component(), since to me it makes it clearer on which device the
-properties really belong from just looking at the code.
-
-
-ATB,
-
-Mark.
+[1] https://www.haiku-os.org/get-haiku/r1beta2/
 
