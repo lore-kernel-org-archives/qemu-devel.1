@@ -2,121 +2,69 @@ Return-Path: <SRS0=cZnO=DD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C93E6C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 07:46:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F729C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 07:52:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24BDF2080A
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 07:46:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 485CC2080A
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 07:52:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QYKocx2a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24BDF2080A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="OfTNhRa1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 485CC2080A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kM4ul-0005OC-Vy
-	for qemu-devel@archiver.kernel.org; Sat, 26 Sep 2020 03:46:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56728)
+	id 1kM50n-0007GR-9P
+	for qemu-devel@archiver.kernel.org; Sat, 26 Sep 2020 03:52:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57824)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kM4tf-0004oQ-1Z; Sat, 26 Sep 2020 03:45:32 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40810)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kM4tc-0006rr-Lg; Sat, 26 Sep 2020 03:45:30 -0400
-Received: by mail-wm1-x343.google.com with SMTP id k18so1620692wmj.5;
- Sat, 26 Sep 2020 00:45:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=vKwbA81sk6rX6ev5TNqVoLexMwgo/hsrVjOOk5dRqc0=;
- b=QYKocx2aqGoNHioctRznVkgoih1KYnYRryiqTd644dQbbR9W7DmgJJDFs8DYhuVsc7
- 5SliTq/ZDE3uc02RozC4LWO5V4cVnBYBPAp1Ov9gNnxEzaCljnxqk99ndHqPSwnyGYqB
- 3QUutJ0OCVEVwZmMjecHjYBvne3Kcuegfzku30UwOOgQnE6ebS0uex41QB0KpWcJ6SrW
- FFdlOD0Hi65wvWmDLEK/+5jiw0hL1dAsKsjrbZTX4TzcaC+IK59Vd/lHWdicl30ttEIK
- r5kPpdvaddIz/bXQT55Fwh4g0lMmoVt0tGHYRAkOlm37uaevPImviSonEZz5UeN17OIw
- cLZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=vKwbA81sk6rX6ev5TNqVoLexMwgo/hsrVjOOk5dRqc0=;
- b=UPuHz1aPB7WUrd0YkOzSThMVG3pQyoiWM+gG5898yQQXLfwaaHClJn7NnFeUKIuNkE
- w1eKdEcpfvCOHQ93cxf8zKcwPRxtfAmFkLJbbNSx6kawJyI6Sj3K5ncTrcBJUw6A4E0/
- 6nCxQMqZKRgyJemw0/ikB5FcDZ2ye6QpdVWiQboSnryBCQ0UXvtInpyIDFhD6JI8H9W0
- 2a3b8zwsXljnY9N1fh55uH+AyEwMxxdgLeg5/OaRwxelPM5/tlrwHbf3ifcEI+FCPPTB
- dF7bBycRV99XqTy9gSFkJWKu1vlOLHeXrfTPQVRsb6e/J01MObtXGLwqvLbnIWuvWG7b
- ZmAw==
-X-Gm-Message-State: AOAM532XJKEl0+AjHlaXNge+aRTM/mYxGJX3hPpOK6kyrLoxZAaS3+vK
- 2dHjJ0AxngAYWtlXS3WLIZI=
-X-Google-Smtp-Source: ABdhPJxBn/vU9wh0O4JWOrD5jN+nAlI4yNESOaFKIH3K9bX4spw5OsekAsEoA8jr3By33jJ4vTrxxw==
-X-Received: by 2002:a7b:cc82:: with SMTP id p2mr1455412wma.46.1601106326339;
- Sat, 26 Sep 2020 00:45:26 -0700 (PDT)
-Received: from [192.168.1.34] (234.red-88-10-103.dynamicip.rima-tde.net.
- [88.10.103.234])
- by smtp.gmail.com with ESMTPSA id w7sm1649242wmc.43.2020.09.26.00.45.24
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 26 Sep 2020 00:45:25 -0700 (PDT)
-Subject: Re: [PATCH] hw/arm/sbsa-ref : Fix SMMUv3 Initialisation
-To: Auger Eric <eric.auger@redhat.com>, Graeme Gregory <graeme@nuviainc.com>, 
- qemu-arm@nongnu.org
-References: <20200925133902.28349-1-graeme@nuviainc.com>
- <f67b75fe-c5ce-8b95-e19b-fc4ce2217b31@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <e548848c-75ac-e82e-f40d-7c1ae70a6e02@amsat.org>
-Date: Sat, 26 Sep 2020 09:45:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1kM506-0006Wc-Ba; Sat, 26 Sep 2020 03:52:11 -0400
+Received: from ozlabs.org ([203.11.71.1]:50711)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1kM503-0007dy-St; Sat, 26 Sep 2020 03:52:10 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4Bz1Ff2LBlz9sSJ; Sat, 26 Sep 2020 17:51:50 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1601106710;
+ bh=i2rkpQ/95M0krRBahXsOsPFK9zZ+jxZeT87+HZiHbuY=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=OfTNhRa1Nxxm8WlnQdwpjapx1mqAi7UkdF7CatsksR9aOtH1/SVl+IkgvuDOyq9Q2
+ 7r3sKwvTMvvqCxLWBxd69HIRyh2n2XkX945YAMDFFiISZEmHQmQtDr+ejFNWKVRf+W
+ 6VJW6coU/0yXFG1R3bDWsSE+Xw08rSUpteo2cyhs=
+Date: Sat, 26 Sep 2020 17:49:16 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Daniel Henrique Barboza <danielhb413@gmail.com>
+Subject: Re: [PATCH v2 2/6] spapr_numa: forbid asymmetrical NUMA setups
+Message-ID: <20200926074916.GC2298@yekko.fritz.box>
+References: <20200924195058.362984-1-danielhb413@gmail.com>
+ <20200924195058.362984-3-danielhb413@gmail.com>
+ <20200925034816.GV2298@yekko.fritz.box>
+ <f787466e-0f39-fb2e-c36f-59a6bc2dde00@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <f67b75fe-c5ce-8b95-e19b-fc4ce2217b31@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -19
-X-Spam_score: -2.0
-X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.248, NICE_REPLY_A=-0.238,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="gVoQHMRaLt/xBMav"
+Content-Disposition: inline
+In-Reply-To: <f787466e-0f39-fb2e-c36f-59a6bc2dde00@gmail.com>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/26 03:51:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.248,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -129,78 +77,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: leif@nuviainc.com, peter.maydell@linaro.org, jamie@nuviainc.com,
- rad@semihalf.com, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Gregory,
 
-On 9/25/20 4:00 PM, Auger Eric wrote:
-> Hi Gregory,
-> 
-> On 9/25/20 3:39 PM, Graeme Gregory wrote:
->> SMMUv3 has an error in previous patch where a i was transposed to a 1
->> meaning interrupts would not have been correctly assigned to the SMMUv3
->> instance.
+--gVoQHMRaLt/xBMav
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This is a first issue, fixing 48ba18e6d3f3.
+On Fri, Sep 25, 2020 at 09:41:02AM -0300, Daniel Henrique Barboza wrote:
+>=20
+>=20
+> On 9/25/20 12:48 AM, David Gibson wrote:
+> > On Thu, Sep 24, 2020 at 04:50:54PM -0300, Daniel Henrique Barboza wrote:
+> > > The pSeries machine does not support asymmetrical NUMA
+> > > configurations. This doesn't make much of a different
+> > > since we're not using user input for pSeries NUMA setup,
+> > > but this will change in the next patches.
+> > >=20
+> > > To avoid breaking existing setups, gate this change by
+> > > checking for legacy NUMA support.
+> > >=20
+> > > Reviewed-by: Greg Kurz <groug@kaod.org>
+> > > Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+> >=20
+> > Having read the rest of the series, I realized there's another type of
+> > configuration that PAPR can't represent, so possibly we should add
+> > logic to catch that as well.  That's what I'm going to call
+> > "non-transitive" configurations, e.g.
+> >=20
+> > Node	0	1	2
+> > 0	10	20	40
+> > 1	20	10	20
+> > 2	40	20	10=09
+> >=20
+> > Basically the closeness of 0 to 1 and 1 to 2 forces them all to be in
+> > the same domain at every PAPR level, even though 0-2 is supposed to be
+> > more expensive.
+>=20
+> Yes, this is correct. I'm not sure how to proceed in this case
+> though. Should we error out?
 
->>
->> The code also contained an error in that the IRQs were never allocated
->> in the irqmap.
+Given that we're already erroring on asymmetric configurations, I
+think it makes sense to error for these as well.
 
-This is another issue, not well explained. IIUC IRQs *are* allocated as
-IRQ #0, right?
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-This fixes commit e9fdf453240 ("hw/arm: Add arm SBSA reference machine,
-devices part"). Can you split this in another patch please? Eventually
-Cc'ing qemu-stable@nongnu.org as suggested by Peter.
+--gVoQHMRaLt/xBMav
+Content-Type: application/pgp-signature; name="signature.asc"
 
->>
->> Fixes: 48ba18e6d3f3 ("hw/arm/sbsa-ref: Simplify by moving the gic in the machine state")
->> Signed-off-by: Graeme Gregory <graeme@nuviainc.com>
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> 
-> Thanks
-> 
-> Eric
-> 
->> ---
->>  hw/arm/sbsa-ref.c | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
->> index 257ada9425..9109fb58be 100644
->> --- a/hw/arm/sbsa-ref.c
->> +++ b/hw/arm/sbsa-ref.c
->> @@ -138,6 +138,7 @@ static const int sbsa_ref_irqmap[] = {
->>      [SBSA_SECURE_UART_MM] = 9,
->>      [SBSA_AHCI] = 10,
->>      [SBSA_EHCI] = 11,
->> +    [SBSA_SMMU] = 12, /* ... to 15 */
->>  };
->>  
->>  static uint64_t sbsa_ref_cpu_mp_affinity(SBSAMachineState *sms, int idx)
->> @@ -530,7 +531,7 @@ static void create_smmu(const SBSAMachineState *sms, PCIBus *bus)
->>      sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
->>      for (i = 0; i < NUM_SMMU_IRQS; i++) {
->>          sysbus_connect_irq(SYS_BUS_DEVICE(dev), i,
->> -                           qdev_get_gpio_in(sms->gic, irq + 1));
->> +                           qdev_get_gpio_in(sms->gic, irq + i));
+-----BEGIN PGP SIGNATURE-----
 
-BTW this fix is already in Peter's queue:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg732819.html
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9u8noACgkQbDjKyiDZ
+s5I3DBAAyb5WjlRti9pkVkPulCbWoMtAIg9VQrj2R5WA9/m9bxusivsWxGP0A2b2
+CY4XYuiZ/qh8giW6u3zCwR6X+RQZcULEgAuGgU5bdcDRV0FXjdUNIpoCJzx9nF+F
+Yiv5DyDdQXmIVLixbjbSp+tAi3ZpzsEPxSQPISBJ4jM9+MAjmuA+RSFuI+IiTryJ
+WbihUKdUgvSCdBv21VV5elTOmQMrtHBgV/GGb3MOWndgM1P7U1ECYl0M8NhA8fCj
+oRVG9AjhQENybqRLODeHdX60MzSZ6MMG/MNhzYTsUxT+11OP/QbxwL5dDcgEL6P0
++1XNhWQN7NLxVQAwPUoN+tJoKOI9lRq1Qr2XcpzFD6KCPzOJ1BMncZD7A/p66wIb
+mWND/5dTcbOwzpAlOff5V2JTVe6CC+05E+zEX16D7Wcwi1oiiXiZoFeiG60Ieip7
++nVvYLcvskWRW6BkNHvqhOEf6wAu5CjXV3BH7bz7Ond80OY8/J3t4x6b7mvMm7wg
+Zgc3gK+CchlzgEoSvGPivkNqoIPMfzE3M9DykysF5Ax2NxK51aJO9NqXiOJSp9xE
+hSKlN0qtB4/mgRr8OI1eY1MLsWsBYdMqb26Dp6xQ7oYfTCDjx+pubx/xvtBZLsWR
+GtbwHNDEOCzjkOWhM1N/Ifwjhs/hOdGiJaokwNlaecfqZmoAvYQ=
+=OqX+
+-----END PGP SIGNATURE-----
 
-Thanks,
-
-Phil.
-
->>      }
->>  }
->>  
->>
-> 
-
+--gVoQHMRaLt/xBMav--
 
