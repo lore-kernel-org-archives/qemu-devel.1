@@ -2,81 +2,85 @@ Return-Path: <SRS0=cZnO=DD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64B4CC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 14:10:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40D21C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 14:10:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C974C2076D
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 14:10:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC6B12076D
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 14:10:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J+NxUoax"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C974C2076D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="szTDjndd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC6B12076D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMAty-00071Q-Uq
-	for qemu-devel@archiver.kernel.org; Sat, 26 Sep 2020 10:10:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54176)
+	id 1kMAuX-0007g2-Nz
+	for qemu-devel@archiver.kernel.org; Sat, 26 Sep 2020 10:10:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54196)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kMAoV-0000Os-FH
- for qemu-devel@nongnu.org; Sat, 26 Sep 2020 10:04:35 -0400
-Received: from mail-pf1-x42b.google.com ([2607:f8b0:4864:20::42b]:39456)
+ id 1kMAoX-0000QP-Cp
+ for qemu-devel@nongnu.org; Sat, 26 Sep 2020 10:04:37 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:44216)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kMAoT-0005Lb-PC
- for qemu-devel@nongnu.org; Sat, 26 Sep 2020 10:04:35 -0400
-Received: by mail-pf1-x42b.google.com with SMTP id n14so5657911pff.6
- for <qemu-devel@nongnu.org>; Sat, 26 Sep 2020 07:04:32 -0700 (PDT)
+ id 1kMAoV-0005Lt-BZ
+ for qemu-devel@nongnu.org; Sat, 26 Sep 2020 10:04:37 -0400
+Received: by mail-pl1-x641.google.com with SMTP id j7so870391plk.11
+ for <qemu-devel@nongnu.org>; Sat, 26 Sep 2020 07:04:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=I6x6otXY7uUyd5hpFd6j3oDYMPCejJZ+VKVh/VFGT2c=;
- b=J+NxUoaxdzRA8jjfh2eDWSFwsjxmI5Pe4A8ZPaMRiBHg4K4m6y/WUm/JPv5Ef3g7Tq
- bDknm74/eofxuG8CsuY+OuVL2fglkGd4rC+GIURQogviZuETc038wczTelRbm/mIsQUz
- 7R8AJzx4F+jc6qmZMWBeetjnUlpEznniDb4dTfPx7sEUN7vQ6JHUJpl4wCCmpbIr2L1D
- DwdgANacK14+Pay0tBfBX/x7g19fb8bVtKulyjeTT5swQetkfy+HSxOOZiiVvnwvmt8C
- tFD2CU/1Axa7+dMLtXaaMsgYi2gOrZCpT1tbWrp4jtYfX298+VQd93WFrZhquRYj7v1V
- ubtA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=g28WcNhsCD1pOggCNiGSa3fCFHjJ9SBe6D8ikmZXRPs=;
+ b=szTDjnddLVwfHUrFtJYMa+J4P48eTcgLe25aJIO49Zt1YtTy4WOEIBrdX3UfWe954G
+ vp1TwkDYuZvwzmFZcMSAEuUT8yH9tXYWUd7tAYgw4jqzvZVarQwwBXjC0Xzt/v+vsAaj
+ nMuU6HDv1NgocG7YzUTz4Iy+fsBNy6I98/PPy7UCLx4uByEeH6ErUn5fRbVGNhjWJGIy
+ IFSEjdBUFjPUrA9zgODCOTVbvSN6dAghWon+EpVjtHmFdef07uwruSk3cnPezlss3+VV
+ 0YsZ2X1m+rGXb50FQa+1Zm9mEeyP9p3rhBRbVQTocl0mcmplOUBpmr9D7BJiasMJ8+nm
+ dStw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=I6x6otXY7uUyd5hpFd6j3oDYMPCejJZ+VKVh/VFGT2c=;
- b=gECo6CKNYGV8f7R4lsRvY/HTllQkEhVg3LKQ6FR8GPYV0YS4yxPL+sAn4GJPM9+h3u
- WuyHaqBXKcHcomV+gu2Q8+y+I87U8V5a7tTg6aX72cNZtH8ZYviR1NYfgF0/IhnGyZpQ
- FEdHPqWZVIi0L3aqHd65YDLiVIvLugWvyUaTB9uxl7sebKWAvGPkMMofRtYi/e6NRliR
- EOgetdUXLgKeyV2ggUqYOU68mO/miM3LPchwPzhKBpN4k5w8dgZ1mZYE7PH6q/bAAoFy
- oI8gUqgr1to+Sw4lfuA4aP2HJlsX111vHUk/pDqjs76NdS4tMm564UHnHs9SA1vFuEWG
- EOTA==
-X-Gm-Message-State: AOAM5310yj/roapMvbs9/2SEIAwSDuth9I3A2Cw/xgvv+B1zLrZuxssm
- KeDEp78/7hhY9Wt67ymhrtVpSKfNRqgzWQTk
-X-Google-Smtp-Source: ABdhPJyQkxMXUhmut9xD1TW1wOUl+w7WUGwx8t97e4iibreAU1ZkZCTbunWBqVpMyh564ycMlAl3hQ==
-X-Received: by 2002:a63:546:: with SMTP id 67mr2833511pgf.347.1601129071151;
- Sat, 26 Sep 2020 07:04:31 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=g28WcNhsCD1pOggCNiGSa3fCFHjJ9SBe6D8ikmZXRPs=;
+ b=FrBtzOMshCnJjReV59bGMiOlOSODYDjeYckzz379UdpXtlfTq8upCB/jNHUorG3n6E
+ og+7Y9JrRiQPq5OGHTzh+HRVMAkEz/GperIutX3RTnHbCbz39lelCJp2+C+bIvzzfvFw
+ WZHCI3IQXMTjS4/3r6RSC0q1bNNfYqyqO+GG38YelpgcJTmb3wuvWA9lAh2Hby28V7I4
+ fCwL8S9LfVXyhJQ06IEG7hHLFrcgH6NJPQVeXAc4boAZzyECmQ5RdVxRaV9XDxNPA1AS
+ baFTqBdkNqWNstMcslrdIdTI+WQWBFPK8rR/Ks1wHa1HYwQEIuGkaWXjpw3B5DaF2T0z
+ 7z2A==
+X-Gm-Message-State: AOAM5335ZEsw1RqoOQ+oxeCSrH1ebYVfNntQ03lac+1jZ8AzdKhps9/0
+ Niwugftv9JU2mISgUzUHTB3RCai2Cd/wqkqU
+X-Google-Smtp-Source: ABdhPJwvcoHnhfM2EhATiYOE8c8HJx5xZiYZIACDdLuP93j1j2koJC/dVVugSKifwVL/klruRRBxnA==
+X-Received: by 2002:a17:90b:350b:: with SMTP id
+ ls11mr2141667pjb.201.1601129073517; 
+ Sat, 26 Sep 2020 07:04:33 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id k3sm6091109pfp.41.2020.09.26.07.04.28
+ by smtp.googlemail.com with ESMTPSA id k3sm6091109pfp.41.2020.09.26.07.04.31
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 26 Sep 2020 07:04:30 -0700 (PDT)
+ Sat, 26 Sep 2020 07:04:32 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/4] Enable plugin support on msys2/mingw
-Date: Sat, 26 Sep 2020 22:04:11 +0800
-Message-Id: <20200926140415.1286-1-luoyonggang@gmail.com>
+Subject: [PATCH 1/4] plugins: Fixes a issue when dlsym failed,
+ the handle not closed.
+Date: Sat, 26 Sep 2020 22:04:12 +0800
+Message-Id: <20200926140415.1286-2-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200926140415.1286-1-luoyonggang@gmail.com>
+References: <20200926140415.1286-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::42b;
- envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x42b.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x641.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,38 +109,24 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add this feature on msys2/mingw by using glib provided cross-platform dlsym=
- f=3D=0D
-unctional.=0D
-=0D
-Yonggang Luo (4):=0D
-  plugins: Fixes a issue when dlsym failed, the handle not closed.=0D
-  plugin: Fixes compiling errors on msys2/mingw=0D
-  Getting qemu-plugin works under win32.=0D
-  cirrus: Enable plugin in cirrus for windows=0D
-=0D
- .cirrus.yml                  |   3 +-=0D
- Makefile                     |   1 -=0D
- configure                    |  71 --------------=0D
- contrib/plugins/hotblocks.c  |   4 +-=0D
- contrib/plugins/hotpages.c   |   2 +=0D
- contrib/plugins/howvec.c     |   2 +=0D
- contrib/plugins/lockstep.c   |   2 +=0D
- include/qemu/qemu-plugin.h   | 184 ++++++++++++++++++++++++++---------=0D
- meson.build                  |   6 +-=0D
- plugins/api.c                |  65 +++++++------=0D
- plugins/core.c               |   7 +-=0D
- plugins/loader.c             |  21 ++++=0D
- plugins/meson.build          |  10 +-=0D
- plugins/qemu-plugins.symbols |  40 --------=0D
- tests/plugin/bb.c            |   6 +-=0D
- tests/plugin/empty.c         |   2 +=0D
- tests/plugin/insn.c          |   2 +=0D
- tests/plugin/mem.c           |   2 +=0D
- 18 files changed, 224 insertions(+), 206 deletions(-)=0D
- delete mode 100644 plugins/qemu-plugins.symbols=0D
-=0D
---=3D20=0D
-2.28.0.windows.1=0D
-=0D
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+---
+ plugins/loader.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/plugins/loader.c b/plugins/loader.c
+index 685d334e1a..8ac5dbc20f 100644
+--- a/plugins/loader.c
++++ b/plugins/loader.c
+@@ -235,6 +235,7 @@ static int plugin_load(struct qemu_plugin_desc *desc, const qemu_info_t *info)
+     return rc;
+ 
+  err_symbol:
++    g_module_close(ctx->handle);
+  err_dlopen:
+     qemu_vfree(ctx);
+     return 1;
+-- 
+2.28.0.windows.1
+
 
