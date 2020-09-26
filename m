@@ -6,62 +6,63 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5617FC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 17:11:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9941FC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 17:17:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C342620789
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 17:11:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C342620789
+	by mail.kernel.org (Postfix) with ESMTPS id 142BF20789
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 17:17:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 142BF20789
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMDjf-0003hf-Tk
-	for qemu-devel@archiver.kernel.org; Sat, 26 Sep 2020 13:11:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54156)
+	id 1kMDom-0005ZY-0W
+	for qemu-devel@archiver.kernel.org; Sat, 26 Sep 2020 13:17:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54700)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kMDir-000383-IL
- for qemu-devel@nongnu.org; Sat, 26 Sep 2020 13:10:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45480)
+ id 1kMDnX-0004tq-7i
+ for qemu-devel@nongnu.org; Sat, 26 Sep 2020 13:15:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45966)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kMDio-0004rb-0T
- for qemu-devel@nongnu.org; Sat, 26 Sep 2020 13:10:57 -0400
+ id 1kMDnV-0005ji-1N
+ for qemu-devel@nongnu.org; Sat, 26 Sep 2020 13:15:46 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kMDim-0001ys-O3
- for <qemu-devel@nongnu.org>; Sat, 26 Sep 2020 17:10:52 +0000
+ id 1kMDnS-0002EI-Kz
+ for <qemu-devel@nongnu.org>; Sat, 26 Sep 2020 17:15:42 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id AFD132E80DB
- for <qemu-devel@nongnu.org>; Sat, 26 Sep 2020 17:10:52 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 98C8F2E80F1
+ for <qemu-devel@nongnu.org>; Sat, 26 Sep 2020 17:15:42 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 26 Sep 2020 17:04:44 -0000
-From: Thomas Huth <1707297@bugs.launchpad.net>
+Date: Sat, 26 Sep 2020 17:08:27 -0000
+From: Thomas Huth <1708215@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Won't Fix; importance=Undecided;
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
  assignee=None; 
+X-Launchpad-Bug-Tags: spice windows
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: eblake jflorian th-huth
-X-Launchpad-Bug-Reporter: John Florian (jflorian)
+X-Launchpad-Bug-Commenters: gunix th-huth
+X-Launchpad-Bug-Reporter: Gheorghe Ungureanu (gunix)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <150127405114.4205.4905957472648540492.malonedeb@gac.canonical.com>
-Message-Id: <160113988523.12687.614220244649646554.malone@soybean.canonical.com>
-Subject: [Bug 1707297] Re: qemu became more picky parsing -m option
+References: <150169387475.3916.9615851037093784733.malonedeb@gac.canonical.com>
+Message-Id: <160114010760.10052.18346160217474349899.malone@chaenomeles.canonical.com>
+Subject: [Bug 1708215] Re: Windows 10 clipboard bug
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="a314d157ca9be8d00eae0214fc0d7dff1cd406e4"; Instance="production"
-X-Launchpad-Hash: b9de9da4f26d5360b1382eb01f1551a38e8a5d5d
+X-Launchpad-Hash: 12dbbd3d2389b9d61c4726bf236e9edc09af563f
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/26 13:05:34
@@ -84,45 +85,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1707297 <1707297@bugs.launchpad.net>
+Reply-To: Bug 1708215 <1708215@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Looks like nobody cared to implement this within 3 years ... and IMHO
-it's maybe even better to not overload the CLI syntax too much ... so
-I'm closing this ticket now.
+This sounds like a bug in Spice, and not like a bug in QEMU. If you
+still face this problem, please report it to the spice project instead
+(see https://www.spice-space.org/support.html).
 
 ** Changed in: qemu
-       Status: New =3D> Won't Fix
+       Status: New =3D> Invalid
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1707297
+https://bugs.launchpad.net/bugs/1708215
 
 Title:
-  qemu became more picky parsing -m option
+  Windows 10 clipboard bug
 
 Status in QEMU:
-  Won't Fix
+  Invalid
 
 Bug description:
-  With qemu-kvm-2.9.0-3.fc26.x86_64 I am no longer to specify the memory
-  size using something like "-m 1.00000GiB" but with qemu-
-  kvm-2.7.1-7.fc25.x86_64 I could without any problem.  I now get an
-  error message like:
+  Hello,
 
-  qemu-system-x86_64: -m 1.00000GiB: Parameter 'size' expects a non-negativ=
-e number below 2^64
-  Optional suffix k, M, G, T, P or E means kilo-, mega-, giga-, tera-, peta-
-  and exabytes, respectively.
+  I am using qemu on arch:
+      pacman -Q libvirt qemu linux virt-manager
+  libvirt 3.5.0-1
+  qemu 2.9.0-2
+  linux 4.12.3-1
+  virt-manager 1.4.1-2
 
-  =
+  I have a windows 10 Guest, with all updates and the following packages in=
+stalled in the guest:
+  - QEMU guest agent 7.3.2
+  - SPICE Guest Tools 0.132
 
-  Is this expected or a regression?
+  When I start the VM, I can copy/paste from the host to the guest.
+  However, after I use COPY inside the VM, copy/paste is not working any
+  more from host to guest. However, I can still copy/paste from guest to
+  host.
+
+  To summarize:
+  - copy/paste from guest to host works always
+  - copy/paste from host to guest works only if copy was not previously use=
+d in guest.
+
+  If this bug needs to be reported using another portal or if I can
+  provide any further information, please contact me.
+
+  Best Regards,
+  gxgung
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1707297/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1708215/+subscriptions
 
