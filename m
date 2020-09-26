@@ -2,85 +2,94 @@ Return-Path: <SRS0=cZnO=DD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD8F9C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 21:24:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E2B7C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 21:27:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 422ED21531
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 21:24:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D4E1021D7F
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 21:27:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vfUF+Mu2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 422ED21531
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="am7DrqXD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4E1021D7F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMHgR-0005Ip-9f
-	for qemu-devel@archiver.kernel.org; Sat, 26 Sep 2020 17:24:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58328)
+	id 1kMHj8-0006Si-1q
+	for qemu-devel@archiver.kernel.org; Sat, 26 Sep 2020 17:27:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58564)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pankaj.gupta.linux@gmail.com>)
- id 1kMHfk-0004sF-Ph
- for qemu-devel@nongnu.org; Sat, 26 Sep 2020 17:24:00 -0400
-Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:46328)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kMHhw-0005t8-Eg; Sat, 26 Sep 2020 17:26:16 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:32870)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <pankaj.gupta.linux@gmail.com>)
- id 1kMHfi-0006sT-2J
- for qemu-devel@nongnu.org; Sat, 26 Sep 2020 17:24:00 -0400
-Received: by mail-il1-x143.google.com with SMTP id l16so5982490ilt.13
- for <qemu-devel@nongnu.org>; Sat, 26 Sep 2020 14:23:57 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kMHhu-0007Bu-Gv; Sat, 26 Sep 2020 17:26:16 -0400
+Received: by mail-wr1-x441.google.com with SMTP id m6so7681873wrn.0;
+ Sat, 26 Sep 2020 14:26:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=HIgQHfdDH+jZriGr+pY/rhbupGSKj8HFyxcXJlNP/WY=;
- b=vfUF+Mu2XGMNrSv8L1yVHYysH/TkyD4/fIvrZS5rvBDhdeNdZi2V6nsSgmk513Ne09
- jIDQ5jChzO7W3+i7p69qTkM3BFjKZSpjgaCauGQYoT+zq2HtugVLcSeMzpB2ARQ1aw19
- gzrdCEF/H03qzOJQ18G6js30wLzXQLDFuUyTktpEWLeqXpGoDWlkmhHOCUtBcIXQoorn
- ynWSHK0+lYQUhhJKvhoofe3jiye0OqcuYnlOdtgWcOdB3WV3M00iMaTO9kVtmjRJbnQH
- PN3soUSsu/yX779Y0h+WZnSuVKnd9CW1Y59DIQeqeT8peHMxOXvcSi7WOgqcW9yAoYpB
- d46A==
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=VyGBqm4CHFJAxG81xmM1b6SMNKSAXm/U5XvX5WLTRNo=;
+ b=am7DrqXDZuWnkxGjV05k06n60aurT+MMeSNn1a+1p0ispURywaG2yFG9EykKvmIb1N
+ UYepu/mvdT7RX7+joxtwuHBqcFfjXJRX5mHiUtCTFRDmiwkVHWOKg88ELPMwz3roOAZk
+ cRfFOElW79JL23Eg76YRU7m4y5Do+NRHMXw7Zfhow/aCfMeld8FDX8rukERD+KkzSTwm
+ 8ZVJ5Bvg+sqXg3mxMgEfaGP9wD7r6ue2qYknlpVRXprtcplvqPiZnrJ1NvLxa0eMfHkW
+ smAT8yfl7ap9LPMFzkWPC9iXWRc/IevB3liPCf0JClOGUjS42EDB7PKYs5T1shKQLYQd
+ 163A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=HIgQHfdDH+jZriGr+pY/rhbupGSKj8HFyxcXJlNP/WY=;
- b=Hxvb0fb/p0UUkc8aGarO1bWn+PGJ3mJQAvEnBPEg4B+oEIpP+nsAHoqZDp/WuTRJuL
- +2APTpA2uG8gq+Y+9WgWvQWqgY1HJ21M34Q0OoIlKY7sgFETvS19E6Dx371SsMCrR9kh
- x136zx+sbLvtO/cYuc3qe4z0YsPvY/q0bt+F2WtRn8z2weMj7Wy4235/HcLh8wcqd8Y2
- cFUE7D54bi2Spb6u75sgzE1LZsVdFn2EenY6t/kAASzOa0fD11IgQRRy7Rb4XxF3PlcO
- SDiswrSkpiS0eRcdbzDfB3qhoK4PgJRXN1Zh86kuA8SB2QP6SHmyzQQfVU5cIJ2PgiAk
- ZV+w==
-X-Gm-Message-State: AOAM533nsWjPba0wZxfBPpa1RReTsZnaJDo0vsxN2uARwWAWcPd2wvWU
- M9RzwDPRhrA6pmucwZRWLS3kf5ZjoPjmddDieZI=
-X-Google-Smtp-Source: ABdhPJyyIqGteU1AF4um/fCQhgqWVL9xfLG4dLrhTX8su4ZD+k3eRKhF0uN8/WuMGSbGf3oygHtax+cubb++z+xImbE=
-X-Received: by 2002:a92:d68d:: with SMTP id p13mr4698484iln.32.1601155437031; 
- Sat, 26 Sep 2020 14:23:57 -0700 (PDT)
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=VyGBqm4CHFJAxG81xmM1b6SMNKSAXm/U5XvX5WLTRNo=;
+ b=sGIlxLzA5l2aVldQj3eb2k6XEZwAKA+3hllUUsNANyHW9hECoe2B5h3BExUCcqXWJo
+ /ZL9NOWKN5ApB+yCIgjf6B3RECe0UWH8ceapF4l7xnnsxRNCgS8nfaK2hSBe2N11DxC+
+ wsG9s+UNnk23Fy5/JtJvo+FxBh9zk7aic5bTNBmuhGlNKA1EpjAJa69Dj/B4UW1lrhWt
+ hqO6TCk4t6Y7IUDXrj+WS+IyxEoF+9yQgSbj+FN9bLzeJEdzZc9NLYGUbi/tQs8Fprq6
+ YFMj5yAmfaRUb2IFCcZYqHehzu2ahD6anRkvq3ZN8QybBupHpTFLfuH8W72nnR0eH0ib
+ Zosw==
+X-Gm-Message-State: AOAM532SbzijFeKjCSQP3YIFwMJnIiJ277tPfMolHemiJ7vo+jYvs31q
+ g07Mwqc09TXRRu1iidcuFFE=
+X-Google-Smtp-Source: ABdhPJwhdojgYIeV0AiPYkEKzUgw+/IU5yb4usfYB1Qisj0d4QL6Qn9KupCNEMSF6a0uVGgoOW4gIg==
+X-Received: by 2002:adf:e690:: with SMTP id r16mr10863848wrm.15.1601155572285; 
+ Sat, 26 Sep 2020 14:26:12 -0700 (PDT)
+Received: from [192.168.1.36] (74.red-83-53-161.dynamicip.rima-tde.net.
+ [83.53.161.74])
+ by smtp.gmail.com with ESMTPSA id g14sm7720332wrv.25.2020.09.26.14.26.11
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 26 Sep 2020 14:26:11 -0700 (PDT)
+Subject: Re: [PATCH 06/14] hw/misc/bcm2835_cprman: implement PLLs behaviour
+To: Luc Michel <luc@lmichel.fr>, qemu-devel@nongnu.org
+References: <20200925101731.2159827-1-luc@lmichel.fr>
+ <20200925101731.2159827-7-luc@lmichel.fr>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <96c1dfff-13ff-cc15-e759-2e8ee794eb22@amsat.org>
+Date: Sat, 26 Sep 2020 23:26:10 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200923113900.72718-1-david@redhat.com>
- <20200923113900.72718-6-david@redhat.com>
-In-Reply-To: <20200923113900.72718-6-david@redhat.com>
-From: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-Date: Sat, 26 Sep 2020 23:23:46 +0200
-Message-ID: <CAM9Jb+iRz2+8QeF8LtEmP+rDy3Tf_oWo9Wy7V8gWgyftCm4+Fw@mail.gmail.com>
-Subject: Re: [PATCH v1 5/5] virito-mem: Implement get_min_alignment()
-To: David Hildenbrand <david@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
- envelope-from=pankaj.gupta.linux@gmail.com; helo=mail-il1-x143.google.com
+In-Reply-To: <20200925101731.2159827-7-luc@lmichel.fr>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-Spam_score_int: -19
+X-Spam_score: -2.0
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-0.213,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -95,82 +104,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>,
- Wei Yang <richardw.yang@linux.intel.com>,
- Qemu Developers <qemu-devel@nongnu.org>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> This allows auto-assignment of a properly aligned address in guest
-> physical address space. For example, when specifying a 2GB block size
-> for a virtio-mem device with 10GB with a memory setup "-m 4G, 20G",
-> we'll no longer fail when realizing.
->
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Wei Yang <richardw.yang@linux.intel.com>
-> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+On 9/25/20 12:17 PM, Luc Michel wrote:
+> The cprman PLLs generate a clock based on a prescaler, a multiplier and
+> a divider. The prescaler doubles the parent (xosc) frequency, then the
+> multiplier/divider are applied. The multiplier has an integer and a
+> fractionnal part.
+
+Typo "fractional".
+
+> 
+> This commit also implements the cprman CM_LOCK register. This register
+> reports which PLL is currently locked. We consider a PLL has being
+> locked as soon as it is enabled (on real hardware, there is a delay
+> after turning a PLL on, for it to stabilise).
+
+Typo "stabilize".
+
+> 
+> Signed-off-by: Luc Michel <luc@lmichel.fr>
 > ---
->  hw/virtio/virtio-mem-pci.c | 14 ++++++++++++++
->  hw/virtio/virtio-mem.c     |  8 ++++++++
->  2 files changed, 22 insertions(+)
->
-> diff --git a/hw/virtio/virtio-mem-pci.c b/hw/virtio/virtio-mem-pci.c
-> index 590cec041b..2bfa2474fb 100644
-> --- a/hw/virtio/virtio-mem-pci.c
-> +++ b/hw/virtio/virtio-mem-pci.c
-> @@ -75,6 +75,19 @@ static void virtio_mem_pci_fill_device_info(const MemoryDeviceState *md,
->      info->type = MEMORY_DEVICE_INFO_KIND_VIRTIO_MEM;
->  }
->
-> +static uint64_t virtio_mem_pci_get_min_alignment(const MemoryDeviceState *md)
+>  include/hw/misc/bcm2835_cprman_internals.h |  8 +++
+>  hw/misc/bcm2835_cprman.c                   | 64 +++++++++++++++++++++-
+>  2 files changed, 71 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/hw/misc/bcm2835_cprman_internals.h b/include/hw/misc/bcm2835_cprman_internals.h
+> index 5cfa849492..22a2500ab0 100644
+> --- a/include/hw/misc/bcm2835_cprman_internals.h
+> +++ b/include/hw/misc/bcm2835_cprman_internals.h
+> @@ -98,10 +98,18 @@ REG32(A2W_PLLA_FRAC, 0x1200)
+>  REG32(A2W_PLLC_FRAC, 0x1220)
+>  REG32(A2W_PLLD_FRAC, 0x1240)
+>  REG32(A2W_PLLH_FRAC, 0x1260)
+>  REG32(A2W_PLLB_FRAC, 0x12e0)
+>  
+> +/* misc registers */
+> +REG32(CM_LOCK, 0x114)
+> +    FIELD(CM_LOCK, FLOCKH, 12, 1)
+> +    FIELD(CM_LOCK, FLOCKD, 11, 1)
+> +    FIELD(CM_LOCK, FLOCKC, 10, 1)
+> +    FIELD(CM_LOCK, FLOCKB, 9, 1)
+> +    FIELD(CM_LOCK, FLOCKA, 8, 1)
+> +
+>  /*
+>   * This field is common to all registers. Each register write value must match
+>   * the CPRMAN_PASSWORD magic value in its 8 MSB.
+>   */
+>  FIELD(CPRMAN, PASSWORD, 24, 8)
+> diff --git a/hw/misc/bcm2835_cprman.c b/hw/misc/bcm2835_cprman.c
+> index ad71d30a86..ba82522eb1 100644
+> --- a/hw/misc/bcm2835_cprman.c
+> +++ b/hw/misc/bcm2835_cprman.c
+> @@ -48,13 +48,51 @@
+>  #include "hw/misc/bcm2835_cprman_internals.h"
+>  #include "trace.h"
+>  
+>  /* PLL */
+>  
+> +static bool pll_is_locked(const CprmanPLLState *pll)
 > +{
-> +    /*
-> +     * If no block size was configured, returns the default block size.
-> +     * Before the device was realized, this might be smaller than the
-> +     * final block size (because it ignores the page size of the memory region).
-> +     * However, the alignment of the memory region properly considers the
-> +     * page size of the memory region.
-> +     */
-> +    return object_property_get_uint(OBJECT(md), VIRTIO_MEM_BLOCK_SIZE_PROP,
-> +                                    &error_abort);
+> +    return !FIELD_EX32(*pll->reg_a2w_ctrl, A2W_PLLx_CTRL, PWRDN)
+> +        && !FIELD_EX32(*pll->reg_cm, CM_PLLx, ANARST);
 > +}
 > +
->  static void virtio_mem_pci_size_change_notify(Notifier *notifier, void *data)
+>  static void pll_update(CprmanPLLState *pll)
 >  {
->      VirtIOMEMPCI *pci_mem = container_of(notifier, VirtIOMEMPCI,
-> @@ -109,6 +122,7 @@ static void virtio_mem_pci_class_init(ObjectClass *klass, void *data)
->      mdc->get_plugged_size = virtio_mem_pci_get_plugged_size;
->      mdc->get_memory_region = virtio_mem_pci_get_memory_region;
->      mdc->fill_device_info = virtio_mem_pci_fill_device_info;
-> +    mdc->get_min_alignment = virtio_mem_pci_get_min_alignment;
->  }
->
->  static void virtio_mem_pci_instance_init(Object *obj)
-> diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
-> index 716eddd792..d8222153cf 100644
-> --- a/hw/virtio/virtio-mem.c
-> +++ b/hw/virtio/virtio-mem.c
-> @@ -805,6 +805,14 @@ static void virtio_mem_get_block_size(Object *obj, Visitor *v, const char *name,
->      const VirtIOMEM *vmem = VIRTIO_MEM(obj);
->      uint64_t value = vmem->block_size;
->
-> +    /*
-> +     * If not configured by the user (and we're not realized yet), use the
-> +     * default block size.
-> +     */
-> +    if (!value) {
-> +        value = virtio_mem_default_block_size();
+> -    clock_update(pll->out, 0);
+> +    uint64_t freq, ndiv, fdiv, pdiv;
+> +
+> +    if (!pll_is_locked(pll)) {
+> +        clock_update(pll->out, 0);
+> +        return;
 > +    }
 > +
->      visit_type_size(v, name, &value, errp);
->  }
->
+> +    pdiv = FIELD_EX32(*pll->reg_a2w_ctrl, A2W_PLLx_CTRL, PDIV);
+> +
+> +    if (!pdiv) {
+> +        clock_update(pll->out, 0);
+> +        return;
+> +    }
+> +
+> +    ndiv = FIELD_EX32(*pll->reg_a2w_ctrl, A2W_PLLx_CTRL, NDIV);
+> +    fdiv = FIELD_EX32(*pll->reg_a2w_frac, A2W_PLLx_FRAC, FRAC);
+> +
+> +    if (pll->reg_a2w_ana[1] & pll->prediv_mask) {
+> +        /* The prescaler doubles the parent frequency */
+> +        ndiv *= 2;
+> +        fdiv *= 2;
+> +    }
+> +
+> +    /*
+> +     * We have a multiplier with an integer part (ndiv) and a fractional part
+> +     * (fdiv), and a divider (pdiv).
+> +     */
+> +    freq = clock_get_hz(pll->xosc_in) *
+> +        ((ndiv << R_A2W_PLLx_FRAC_FRAC_LENGTH) + fdiv);
+> +    freq /= pdiv;
+> +    freq >>= R_A2W_PLLx_FRAC_FRAC_LENGTH;
 
-Reviewed-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> +
+> +    clock_update_hz(pll->out, freq);
+>  }
+>  
+>  static void pll_xosc_update(void *opaque)
+>  {
+>      pll_update(CPRMAN_PLL(opaque));
+> @@ -94,18 +132,42 @@ static const TypeInfo cprman_pll_info = {
+>  };
+>  
+>  
+>  /* CPRMAN "top level" model */
+>  
+> +static uint32_t get_cm_lock(const BCM2835CprmanState *s)
+> +{
+> +    static const int CM_LOCK_MAPPING[] = {
+
+Maybe CM_LOCK_MAPPING[CPRMAN_NUM_PLL].
+
+> +        [CPRMAN_PLLA] = R_CM_LOCK_FLOCKA_SHIFT,
+> +        [CPRMAN_PLLC] = R_CM_LOCK_FLOCKC_SHIFT,
+> +        [CPRMAN_PLLD] = R_CM_LOCK_FLOCKD_SHIFT,
+> +        [CPRMAN_PLLH] = R_CM_LOCK_FLOCKH_SHIFT,
+> +        [CPRMAN_PLLB] = R_CM_LOCK_FLOCKB_SHIFT,
+> +    };
+> +
+> +    uint32_t r = 0;
+> +    size_t i;
+> +
+> +    for (i = 0; i < CPRMAN_NUM_PLL; i++) {
+> +        r |= pll_is_locked(&s->plls[i]) << CM_LOCK_MAPPING[i];
+> +    }
+> +
+> +    return r;
+> +}
+> +
+>  static uint64_t cprman_read(void *opaque, hwaddr offset,
+>                                      unsigned size)
+>  {
+>      BCM2835CprmanState *s = CPRMAN(opaque);
+>      uint64_t r = 0;
+>      size_t idx = offset / sizeof(uint32_t);
+>  
+>      switch (idx) {
+> +    case R_CM_LOCK:
+> +        r = get_cm_lock(s);
+> +        break;
+> +
+>      default:
+>          r = s->regs[idx];
+>      }
+>  
+>      trace_bcm2835_cprman_read(offset, r);
+> 
 
