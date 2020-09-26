@@ -2,66 +2,89 @@ Return-Path: <SRS0=cZnO=DD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1660CC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 14:08:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64B4CC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 14:10:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A225A2076D
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 14:08:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A225A2076D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id C974C2076D
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 14:10:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J+NxUoax"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C974C2076D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMAsC-0004IH-O8
-	for qemu-devel@archiver.kernel.org; Sat, 26 Sep 2020 10:08:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53998)
+	id 1kMAty-00071Q-Uq
+	for qemu-devel@archiver.kernel.org; Sat, 26 Sep 2020 10:10:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54176)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kMAn3-0006b4-82; Sat, 26 Sep 2020 10:03:07 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:41438
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kMAmz-0005HP-JC; Sat, 26 Sep 2020 10:03:04 -0400
-Received: from host86-184-131-21.range86-184.btcentralplus.com
- ([86.184.131.21] helo=kentang.home)
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kMAnV-0001Y4-63; Sat, 26 Sep 2020 15:03:39 +0100
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-To: armbru@redhat.com, david@gibson.dropbear.id.au, atar4qemu@gmail.com,
- qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Date: Sat, 26 Sep 2020 15:02:16 +0100
-Message-Id: <20200926140216.7368-7-mark.cave-ayland@ilande.co.uk>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200926140216.7368-1-mark.cave-ayland@ilande.co.uk>
-References: <20200926140216.7368-1-mark.cave-ayland@ilande.co.uk>
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kMAoV-0000Os-FH
+ for qemu-devel@nongnu.org; Sat, 26 Sep 2020 10:04:35 -0400
+Received: from mail-pf1-x42b.google.com ([2607:f8b0:4864:20::42b]:39456)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kMAoT-0005Lb-PC
+ for qemu-devel@nongnu.org; Sat, 26 Sep 2020 10:04:35 -0400
+Received: by mail-pf1-x42b.google.com with SMTP id n14so5657911pff.6
+ for <qemu-devel@nongnu.org>; Sat, 26 Sep 2020 07:04:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=I6x6otXY7uUyd5hpFd6j3oDYMPCejJZ+VKVh/VFGT2c=;
+ b=J+NxUoaxdzRA8jjfh2eDWSFwsjxmI5Pe4A8ZPaMRiBHg4K4m6y/WUm/JPv5Ef3g7Tq
+ bDknm74/eofxuG8CsuY+OuVL2fglkGd4rC+GIURQogviZuETc038wczTelRbm/mIsQUz
+ 7R8AJzx4F+jc6qmZMWBeetjnUlpEznniDb4dTfPx7sEUN7vQ6JHUJpl4wCCmpbIr2L1D
+ DwdgANacK14+Pay0tBfBX/x7g19fb8bVtKulyjeTT5swQetkfy+HSxOOZiiVvnwvmt8C
+ tFD2CU/1Axa7+dMLtXaaMsgYi2gOrZCpT1tbWrp4jtYfX298+VQd93WFrZhquRYj7v1V
+ ubtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=I6x6otXY7uUyd5hpFd6j3oDYMPCejJZ+VKVh/VFGT2c=;
+ b=gECo6CKNYGV8f7R4lsRvY/HTllQkEhVg3LKQ6FR8GPYV0YS4yxPL+sAn4GJPM9+h3u
+ WuyHaqBXKcHcomV+gu2Q8+y+I87U8V5a7tTg6aX72cNZtH8ZYviR1NYfgF0/IhnGyZpQ
+ FEdHPqWZVIi0L3aqHd65YDLiVIvLugWvyUaTB9uxl7sebKWAvGPkMMofRtYi/e6NRliR
+ EOgetdUXLgKeyV2ggUqYOU68mO/miM3LPchwPzhKBpN4k5w8dgZ1mZYE7PH6q/bAAoFy
+ oI8gUqgr1to+Sw4lfuA4aP2HJlsX111vHUk/pDqjs76NdS4tMm564UHnHs9SA1vFuEWG
+ EOTA==
+X-Gm-Message-State: AOAM5310yj/roapMvbs9/2SEIAwSDuth9I3A2Cw/xgvv+B1zLrZuxssm
+ KeDEp78/7hhY9Wt67ymhrtVpSKfNRqgzWQTk
+X-Google-Smtp-Source: ABdhPJyQkxMXUhmut9xD1TW1wOUl+w7WUGwx8t97e4iibreAU1ZkZCTbunWBqVpMyh564ycMlAl3hQ==
+X-Received: by 2002:a63:546:: with SMTP id 67mr2833511pgf.347.1601129071151;
+ Sat, 26 Sep 2020 07:04:31 -0700 (PDT)
+Received: from localhost.localdomain ([222.95.248.6])
+ by smtp.googlemail.com with ESMTPSA id k3sm6091109pfp.41.2020.09.26.07.04.28
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 26 Sep 2020 07:04:30 -0700 (PDT)
+From: Yonggang Luo <luoyonggang@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/4] Enable plugin support on msys2/mingw
+Date: Sat, 26 Sep 2020 22:04:11 +0800
+Message-Id: <20200926140415.1286-1-luoyonggang@gmail.com>
+X-Mailer: git-send-email 2.28.0.windows.1
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.184.131.21
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PATCH v2 6/6] sabre: don't call sysbus_mmio_map() in sabre_realize()
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::42b;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x42b.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -75,60 +98,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Yonggang Luo <luoyonggang@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The device should not map itself but instead should be mapped to sysbus by the
-sun4u machine.
-
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/pci-host/sabre.c | 8 --------
- hw/sparc64/sun4u.c  | 7 +++++++
- 2 files changed, 7 insertions(+), 8 deletions(-)
-
-diff --git a/hw/pci-host/sabre.c b/hw/pci-host/sabre.c
-index 5ac6283623..5394ad5cd0 100644
---- a/hw/pci-host/sabre.c
-+++ b/hw/pci-host/sabre.c
-@@ -378,16 +378,8 @@ static void sabre_realize(DeviceState *dev, Error **errp)
- {
-     SabreState *s = SABRE(dev);
-     PCIHostState *phb = PCI_HOST_BRIDGE(dev);
--    SysBusDevice *sbd = SYS_BUS_DEVICE(s);
-     PCIDevice *pci_dev;
- 
--    /* sabre_config */
--    sysbus_mmio_map(sbd, 0, s->special_base);
--    /* PCI configuration space */
--    sysbus_mmio_map(sbd, 1, s->special_base + 0x1000000ULL);
--    /* pci_ioport */
--    sysbus_mmio_map(sbd, 2, s->special_base + 0x2000000ULL);
--
-     memory_region_init(&s->pci_mmio, OBJECT(s), "pci-mmio", 0x100000000ULL);
-     memory_region_add_subregion(get_system_memory(), s->mem_base,
-                                 &s->pci_mmio);
-diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index ad5ca2472a..ebb3b89250 100644
---- a/hw/sparc64/sun4u.c
-+++ b/hw/sparc64/sun4u.c
-@@ -588,6 +588,13 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
-                              &error_abort);
-     sysbus_realize_and_unref(SYS_BUS_DEVICE(sabre), &error_fatal);
- 
-+    /* sabre_config */
-+    sysbus_mmio_map(SYS_BUS_DEVICE(sabre), 0, PBM_SPECIAL_BASE);
-+    /* PCI configuration space */
-+    sysbus_mmio_map(SYS_BUS_DEVICE(sabre), 1, PBM_SPECIAL_BASE + 0x1000000ULL);
-+    /* pci_ioport */
-+    sysbus_mmio_map(SYS_BUS_DEVICE(sabre), 2, PBM_SPECIAL_BASE + 0x2000000ULL);
-+
-     /* Wire up PCI interrupts to CPU */
-     for (i = 0; i < IVEC_MAX; i++) {
-         qdev_connect_gpio_out_named(DEVICE(sabre), "ivec-irq", i,
--- 
-2.20.1
-
+Add this feature on msys2/mingw by using glib provided cross-platform dlsym=
+ f=3D=0D
+unctional.=0D
+=0D
+Yonggang Luo (4):=0D
+  plugins: Fixes a issue when dlsym failed, the handle not closed.=0D
+  plugin: Fixes compiling errors on msys2/mingw=0D
+  Getting qemu-plugin works under win32.=0D
+  cirrus: Enable plugin in cirrus for windows=0D
+=0D
+ .cirrus.yml                  |   3 +-=0D
+ Makefile                     |   1 -=0D
+ configure                    |  71 --------------=0D
+ contrib/plugins/hotblocks.c  |   4 +-=0D
+ contrib/plugins/hotpages.c   |   2 +=0D
+ contrib/plugins/howvec.c     |   2 +=0D
+ contrib/plugins/lockstep.c   |   2 +=0D
+ include/qemu/qemu-plugin.h   | 184 ++++++++++++++++++++++++++---------=0D
+ meson.build                  |   6 +-=0D
+ plugins/api.c                |  65 +++++++------=0D
+ plugins/core.c               |   7 +-=0D
+ plugins/loader.c             |  21 ++++=0D
+ plugins/meson.build          |  10 +-=0D
+ plugins/qemu-plugins.symbols |  40 --------=0D
+ tests/plugin/bb.c            |   6 +-=0D
+ tests/plugin/empty.c         |   2 +=0D
+ tests/plugin/insn.c          |   2 +=0D
+ tests/plugin/mem.c           |   2 +=0D
+ 18 files changed, 224 insertions(+), 206 deletions(-)=0D
+ delete mode 100644 plugins/qemu-plugins.symbols=0D
+=0D
+--=3D20=0D
+2.28.0.windows.1=0D
+=0D
 
