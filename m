@@ -2,124 +2,63 @@ Return-Path: <SRS0=cZnO=DD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74A4EC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 13:33:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35820C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 14:04:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE0C8207D8
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 13:33:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="kEsuRFLW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE0C8207D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id AE23121527
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 14:04:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE23121527
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMAKp-0003XX-Ku
-	for qemu-devel@archiver.kernel.org; Sat, 26 Sep 2020 09:33:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49278)
+	id 1kMAo8-0007i7-Lj
+	for qemu-devel@archiver.kernel.org; Sat, 26 Sep 2020 10:04:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53878)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kMAK1-00033U-7O; Sat, 26 Sep 2020 09:33:05 -0400
-Received: from mail-am6eur05on2107.outbound.protection.outlook.com
- ([40.107.22.107]:56032 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kMAmb-0005zQ-Sw; Sat, 26 Sep 2020 10:02:38 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:41380
+ helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kMAJx-0001na-5m; Sat, 26 Sep 2020 09:33:03 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cPtbtFKdkO0Wqm6TR2c5ys6ry4IKbmjEAErFXQWd65E8iYGS9G+6hZHZcmVdwcwDm4bJRZBlFzuaYmAUoTkmDQnuqk3AB3aGkbSgVU4YW8pu+8872Ipd9XFJPbS3+sTgthFKc+4o7Qna8fPSwIpX9YPQkSbZtTYCS1zhIfHoCED+6FtM91vc9k4kYnUWHv9Yx5hmDwrfNbvMyn1tr2dxmK1jDGsWm88hBjsRyft9hgQBDlOoW4B2COmhoDKyyW/+h+k4Y7tQnmWGV4NrIb5eoA+1P1X4bj+MaWgw+8CiS2f7h/yUjcpq0lPJoFJeL+ECVQnwmrAVAPiPYxi+9szZpg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+6xPa7mqo5Q2Mm1RuXHTa6rM3tnYfFENlcRh8+JsUDo=;
- b=i3BToi+NQWDheGcNBbeMCraDt/wdnpi5x3ZLyXun/1u2kfD04LxxSgS5WE+TXSxDjFL8VD3wXQLCVMqN4bi2+8EV8YLbzYZKP+R8cxerkvkvpvqQ6lhQTUE2WGM9dy61keGkygNn7ANJxxm+C6TPQHGQHL0keSF2n8Pl/mXCvuB5gfRgtT79Jn1HUmNDpEoBgtYa2ufrqffqiVa44SEyrsEYUOkaqDXMYKUJzSbyCTGV0HV/rTF6STpz6SJidckyKwfe+kXfqcwPx1YAmvHUB42qREBwQX+51WHFHZOqqw0job6C53sLcSwYN2UlkQeJyS0CVeP8dWijZ+gUDS4Bzg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+6xPa7mqo5Q2Mm1RuXHTa6rM3tnYfFENlcRh8+JsUDo=;
- b=kEsuRFLWl/bapHkXjY7HzRgioyrI4YLzt7SoFET8EeU1BVPuzsVHGzk5z2X6l1OnQLVdoZopvxymvtNu2IHlc+VLOaWrbphHYCyr3+ZR3ZjAZCHI88Voo9Q426k5L0UhzAx/cFAccfBn2HL28ugKdXKpPtWnHPfOu26mAgLbS9o=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
-Received: from VI1PR08MB5503.eurprd08.prod.outlook.com (2603:10a6:803:137::19)
- by VI1PR0801MB1661.eurprd08.prod.outlook.com (2603:10a6:800:56::21)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.25; Sat, 26 Sep
- 2020 13:32:53 +0000
-Received: from VI1PR08MB5503.eurprd08.prod.outlook.com
- ([fe80::c1ba:32cf:cd37:712c]) by VI1PR08MB5503.eurprd08.prod.outlook.com
- ([fe80::c1ba:32cf:cd37:712c%8]) with mapi id 15.20.3412.025; Sat, 26 Sep 2020
- 13:32:53 +0000
-Subject: Re: [PATCH 3/3] nbd: Add 'qemu-nbd -A' to expose allocation depth
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, pkrempa@redhat.com, rjones@redhat.com,
- Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-References: <20200925203249.155705-1-eblake@redhat.com>
- <20200925203249.155705-4-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <ee868912-173e-328d-5138-b1e19a0ca2b1@virtuozzo.com>
-Date: Sat, 26 Sep 2020 16:32:50 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.2.2
-In-Reply-To: <20200925203249.155705-4-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM3PR07CA0095.eurprd07.prod.outlook.com
- (2603:10a6:207:6::29) To VI1PR08MB5503.eurprd08.prod.outlook.com
- (2603:10a6:803:137::19)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kMAmZ-0005F5-D2; Sat, 26 Sep 2020 10:02:37 -0400
+Received: from host86-184-131-21.range86-184.btcentralplus.com
+ ([86.184.131.21] helo=kentang.home)
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kMAn0-0001Y4-OI; Sat, 26 Sep 2020 15:03:07 +0100
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: armbru@redhat.com, david@gibson.dropbear.id.au, atar4qemu@gmail.com,
+ qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Date: Sat, 26 Sep 2020 15:02:10 +0100
+Message-Id: <20200926140216.7368-1-mark.cave-ayland@ilande.co.uk>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.5] (185.215.60.99) by
- AM3PR07CA0095.eurprd07.prod.outlook.com (2603:10a6:207:6::29) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3433.16 via Frontend Transport; Sat, 26 Sep 2020 13:32:52 +0000
-X-Originating-IP: [185.215.60.99]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: facd3408-7451-423f-007e-08d86220abac
-X-MS-TrafficTypeDiagnostic: VI1PR0801MB1661:
-X-Microsoft-Antispam-PRVS: <VI1PR0801MB1661DE7288061007338A85A1C1370@VI1PR0801MB1661.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4714;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: iBo1SIUcmLOHwlOwIaVxiIZSWcM7w9QdZNsSGDkCifjTI3hzJNPfdZG1YkfFmF+eGQrUuvBbEyokfuuR0Olsb95s7RJJ373rW1KRkkzi/E21xTFwxx4g8gsHPfeWEhoKgf7I4xipoQ0osS/uXiDvK6xBGpF0L5SBgI5kCp933VnSTa5od1Tn7mZZq5/9/rn6JtUmvW/6pFIEos+TOK7SiJLHy6TrZHGgvjn67JAeXIb3iyzJ4iXlgKvbs0lI9ri2WfEYUqqxUgRAdLgSYQi5q54qxSPuY4JQS9L7DdX26xCIkPX+rVfa93EuZgnYOd+6NG+RgzwDo//pKCmNqILQsZXdleg2Mnhs8uBumoC00tb5ZB/J0cqSs/cFgWs43zKM7fGfSJdSvhXfaeChDP5MZuSMsfzOZOmE7jtM/cPXZUhyEnbJYTz+g8mu0SPA+WNN
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:VI1PR08MB5503.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(39830400003)(396003)(376002)(346002)(366004)(136003)(66556008)(16576012)(316002)(66946007)(54906003)(66476007)(31686004)(5660300002)(186003)(36756003)(16526019)(6486002)(26005)(4326008)(31696002)(83380400001)(4744005)(2616005)(52116002)(956004)(2906002)(86362001)(8676002)(8936002)(478600001)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 1o4GXMODBHJFijRvwQj8xbF2C5q66Esl0MZqGVE6LEYlnVPUPuLS3g8iQIuSs4Iz+uthEJuDU9yZD+9dt0+ILbv0iG4nRgzOdwJFeh+IMRChhl8Rnqu7/BEXDhDhtebBWBTEaQORag79Tkp5ejxRdMgWm1ANXjsgQfEMZFcjTeXQknKSZVOvpoYoJMNWHi41U+ut4Ov3jBIn2EjEUK+4VFa79W13g7jJXslVWN0W7gbEuXB4OG0Sf/wt0MwcpjbVEhp0eUkoGy/wpgaGEaRYMj2tp2T/UDtPjh8XFYZH7Re//aQZ1YqOdhqgFoRJC9qewrz9JYUIR/CA50HmEGwn+UQUlNDClC1CfhMR+bNILGvM4SX66vfwc0/5YDxXyeOuRAA8VcdMfAuMtdxSbjTjN8xtkrvA7XLvQHwoStE2S5csQDrcxeHMQf/pAzPFVor2678G7Ou+Y/ShLkemAOl8RcXfL02eu2pSOPVrjsYKL8laSOl318dJOM412QVEFSN1CgWne4OkXQzV+D4Tu21qrO8Q8o0BCtJCzs6Euor5HvJMEBlYb0zZiqAFfL2n/pa3swPPKhHHocoBklXDlzr2tr0HCA1r5e4deQhWRcmErWay7VcgYQHB2iLySosOmTB3eKXldGnu1yWrUOr0JMjV/w==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: facd3408-7451-423f-007e-08d86220abac
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR08MB5503.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Sep 2020 13:32:53.3010 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: abpvK6+4soMN5aX/ksOGnGpeGdu9BUahxJbzqhMUTumLlk/X8vtkop2w7MymEZX4C/1p4MQ43OnnV/exE2s1+5G6wOqtN+oqL+dCJP6V1dE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0801MB1661
-Received-SPF: pass client-ip=40.107.22.107;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-AM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/26 09:32:57
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -22
-X-Spam_score: -2.3
-X-Spam_bar: --
-X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.213, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.184.131.21
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: [PATCH v2 0/6] QOM minor fixes
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -137,28 +76,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-25.09.2020 23:32, Eric Blake wrote:
-> Allow the server to expose an additional metacontext to be requested
-> by savvy clients.  qemu-nbd adds a new option -A to expose the
-> qemu:allocation-depth metacontext through NBD_CMD_BLOCK_STATUS; this
-> can also be set via QMP when using nbd-server-add.
-> 
-> qemu as client can be hacked into viewing this new context by using
-> the now-misnamed x-dirty-bitmap option when creating an NBD blockdev;
+This series started off as a fix for the nd_table misuse in the sparc32-ledma
+device as pointed out by Markus, and then I remembered there was similar
+issue around the use of serial_hd() in macio. The last patch is one I've had
+sitting in a local branch for a while and is a mistake I made during the
+original sabre.c split which seems appropriate to include here.
 
-may be rename it to x-block-status ?
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-> although it is worth noting the decoding of how such context
-> information will appear in 'qemu-img map --output=json':
-> 
-> NBD_STATE_DEPTH_UNALLOC => "zero":false, "data":true
-> NBD_STATE_DEPTH_LOCAL => "zero":false, "data":false
-> NBD_STATE_DEPTH_BACKING => "zero":true, "data":true
+v2:
+- Rebase onto master
+- Add R-B tags from Philippe
+- Remove user_creatable=true from patch 5 as pointed out by Zoltan
 
-It wouldn't be so simple if we decide to export exact depth number..
 
+Mark Cave-Ayland (6):
+  sparc32-dma: use object_initialize_child() for espdma and ledma child
+    objects
+  sparc32-ledma: use object_initialize_child() for lance child object
+  sparc32-espdma: use object_initialize_child() for esp child object
+  sparc32-ledma: don't reference nd_table directly within the device
+  macio: don't reference serial_hd() directly within the device
+  sabre: don't call sysbus_mmio_map() in sabre_realize()
+
+ hw/dma/sparc32_dma.c           | 49 +++++++++++++++++-----------------
+ hw/misc/macio/macio.c          |  4 ---
+ hw/pci-host/sabre.c            |  8 ------
+ hw/ppc/mac_newworld.c          |  6 +++++
+ hw/ppc/mac_oldworld.c          |  6 +++++
+ hw/sparc/sun4m.c               | 21 +++++++++------
+ hw/sparc64/sun4u.c             |  7 +++++
+ include/hw/sparc/sparc32_dma.h |  8 +++---
+ 8 files changed, 60 insertions(+), 49 deletions(-)
 
 -- 
-Best regards,
-Vladimir
+2.20.1
+
 
