@@ -2,122 +2,123 @@ Return-Path: <SRS0=cZnO=DD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EAC2C47420
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 13:00:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FB78C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 13:16:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E7F7221ED
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 13:00:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E449C207EA
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 13:16:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="t3p1ecj4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E7F7221ED
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="iPAKQ0T5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E449C207EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kM9oB-0004Iq-0x
-	for qemu-devel@archiver.kernel.org; Sat, 26 Sep 2020 09:00:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43156)
+	id 1kMA42-000731-PT
+	for qemu-devel@archiver.kernel.org; Sat, 26 Sep 2020 09:16:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46670)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kM9mw-0003Zi-SF; Sat, 26 Sep 2020 08:58:54 -0400
-Received: from mail-db8eur05on2102.outbound.protection.outlook.com
- ([40.107.20.102]:56032 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
+ id 1kMA3E-0006bG-BX; Sat, 26 Sep 2020 09:15:44 -0400
+Received: from mail-vi1eur05on2138.outbound.protection.outlook.com
+ ([40.107.21.138]:14371 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kM9ms-0006aK-DB; Sat, 26 Sep 2020 08:58:54 -0400
+ id 1kMA3B-00008S-36; Sat, 26 Sep 2020 09:15:43 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FEEsLOd3jrdmN2I92eoES2R+E0rn3tl01lw46B4OiqKEEPHK6JKy6uoluKdAkC3J+pChoDyZXPwP8nw6nnoXgcDnFZd2QlA/cHMQSf+181Ly6kE5qQt9rDnpQTEs5tDRjREdM3831Q5LufTBmTQ6CP5jsRrz5Lf1GuUUWFTaf7DhcymGyf4thBFmrKsbbkDkBTxsUTRwsBkpsESUuAFoGgWSL0/6Sqy5ABh32PJk6Y77aKls+2jyoPInVaiIXzfNjQtQy8dSS0Q0bxrDxcyTLFcYvrHDMhWRiZPlErcm4LL9FVdZoMoRl+vFjTsLROj/gGwWcUbYLipH/1Lo/PIpzw==
+ b=Bsmo+MLoAxiJshScnWpBtDQad2dR5CmOJBY2cfAd1SI5gdZ4aY08wgxHQ2Cz0hwCTJrdmRlxdRZOoqsL1Iive3ftZFUj/0WMu1Q5d+8aBDhH3rtukL5B9Ow9dKxPZ/IsSo60K2HYox7/xAc6Rgbg7l2PkyDJrXF8qIA/xB3QI992PM/RPPd+gseT4tLYTWk9ekw8k+r+95LvD54ERp1PZtNeDm+7Px+p+e9azHd4M8pylVwBRqUKems+WLeGuWhFCkN+qhrNoNHjWBH7oC6QZbaBDyznFM8dODw8lIN5cub83ZszpMez9ZefFCNDKkzYdJpnCBJ5t2vIWwo4idxaag==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=l4HqXuYUDVRhzpqN09v1CIr9CVrXWTXRxvoSkb0JSE8=;
- b=E0kHRZFfquH/ZHjPDXm1swPl0ab/uazlLR47Bda9Y9g/es1gGVJWb8sbXt5b7eFowLlT64Jc8owv75AL7oa/DwtrmZBAPzwhywEgQoGwgWewxGSy0mx8xH0PzqzOQwIc4zIWPYiFq1EARuRJYW2ZVCbvHJtDv7WJUREQnX4bToJJ8lHDqvot+pG+kzFVd15dVt/l87noFwOM1bMfxASF+6QggLcoOQJy9g4dzXU7M76LLOhMGlJ5MT7do9DXgBg8cHnUS0fdvT2cqrtXlUlrAvAmOxHKxBt5+v9R17fFEnZeuDpt9rNbfSeA+gfZZypvFn9Ormff9LynnYAq96lMGQ==
+ bh=2YBFVIsXh97NBEo6LHkqp90QxJ0TdGRiniWhbutzZCM=;
+ b=h7VgiSFm0RH5PxLhYQ8p9Ahx55JhrwlEBYgZQfVLQRP14VEcR7NSvRrKE6vLxkHiji1YAkUYg64X93z3cvpKzfu928N1HJDi3rcD+Ub8GsFGWGf2mTCZcmcbLd9KwalBrBWXaE6TAptxhj1qSiIiPs9qxpGa/yOV86YJzgFBXXEMcO+ZA3RN22UUtYgXGh7yNaIGzcAXSYxtPvg6xZyXAastPclfMee4MINNphdr5E3rGoqmCQNEKZYvOJFcoJ3TtmND5JhFFlvFNbOjaa5MXdt2IuavE+kMMHq4py7ZPn2xTndUoQJffs1o9njPg3mPYN/QALDNTge+djLE9eDQjQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=l4HqXuYUDVRhzpqN09v1CIr9CVrXWTXRxvoSkb0JSE8=;
- b=t3p1ecj4Mcz6AmEl+vdUI9i2KuifTGWw1Od9NQkSe+SHD04nEPQCG9Zsyma+fd6SHmOEBzZTXF9PAVW4UUgXxqR7JWRvQZCp6x2O5feBkEpkAoMJGcM+net9JIbZW+4HJvUtmy/+7LUaK5U9CNiFXSiN45TUoLukZPSlGrV4g0o=
+ bh=2YBFVIsXh97NBEo6LHkqp90QxJ0TdGRiniWhbutzZCM=;
+ b=iPAKQ0T577d+7sNRnmI/0N9RSQoL9SioE7oZhx8GMkqiH1CJY15fRtL525qhfm5JiqA0bSu9bI+KcOfM0bn3PbaUngqiFJGRGGv9feqXEGjkTtk2rjvM+ndCvIl4hhmAYzx6M9GNWvkMQoTpxp72T+1Zf/RqlwP2laCT7N5pk+A=
 Authentication-Results: redhat.com; dkim=none (message not signed)
  header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
 Received: from VI1PR08MB5503.eurprd08.prod.outlook.com (2603:10a6:803:137::19)
- by VE1PR08MB5054.eurprd08.prod.outlook.com (2603:10a6:803:10d::24)
+ by VI1PR08MB2686.eurprd08.prod.outlook.com (2603:10a6:802:18::29)
  with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.22; Sat, 26 Sep
- 2020 12:58:43 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.24; Sat, 26 Sep
+ 2020 13:15:36 +0000
 Received: from VI1PR08MB5503.eurprd08.prod.outlook.com
  ([fe80::c1ba:32cf:cd37:712c]) by VI1PR08MB5503.eurprd08.prod.outlook.com
  ([fe80::c1ba:32cf:cd37:712c%8]) with mapi id 15.20.3412.025; Sat, 26 Sep 2020
- 12:58:43 +0000
-Subject: Re: [PATCH 1/3] nbd: Simplify meta-context parsing
+ 13:15:36 +0000
+Subject: Re: [PATCH 2/3] nbd: Add new qemu:allocation-depth metacontext
 To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, pkrempa@redhat.com, rjones@redhat.com
+Cc: qemu-block@nongnu.org, pkrempa@redhat.com, rjones@redhat.com,
+ Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
 References: <20200925203249.155705-1-eblake@redhat.com>
- <20200925203249.155705-2-eblake@redhat.com>
+ <20200925203249.155705-3-eblake@redhat.com>
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <403131e3-1712-ce00-63ff-6276cdfa83d7@virtuozzo.com>
-Date: Sat, 26 Sep 2020 15:58:41 +0300
+Message-ID: <5a8e70b2-523b-b0e7-b6ec-6790ad95c312@virtuozzo.com>
+Date: Sat, 26 Sep 2020 16:15:33 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.2.2
-In-Reply-To: <20200925203249.155705-2-eblake@redhat.com>
+In-Reply-To: <20200925203249.155705-3-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR07CA0035.eurprd07.prod.outlook.com
- (2603:10a6:208:ac::48) To VI1PR08MB5503.eurprd08.prod.outlook.com
+X-ClientProxiedBy: AM3PR03CA0065.eurprd03.prod.outlook.com
+ (2603:10a6:207:5::23) To VI1PR08MB5503.eurprd08.prod.outlook.com
  (2603:10a6:803:137::19)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from [192.168.100.5] (185.215.60.99) by
- AM0PR07CA0035.eurprd07.prod.outlook.com (2603:10a6:208:ac::48) with Microsoft
+ AM3PR03CA0065.eurprd03.prod.outlook.com (2603:10a6:207:5::23) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3433.18 via Frontend Transport; Sat, 26 Sep 2020 12:58:42 +0000
+ 15.20.3412.20 via Frontend Transport; Sat, 26 Sep 2020 13:15:34 +0000
 X-Originating-IP: [185.215.60.99]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 840c1004-4c1c-42ff-38d7-08d8621be5c6
-X-MS-TrafficTypeDiagnostic: VE1PR08MB5054:
-X-Microsoft-Antispam-PRVS: <VE1PR08MB5054804459A10A1A71408742C1370@VE1PR08MB5054.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-MS-Office365-Filtering-Correlation-Id: 2d74ffff-1acd-4ff4-3b71-08d8621e4148
+X-MS-TrafficTypeDiagnostic: VI1PR08MB2686:
+X-Microsoft-Antispam-PRVS: <VI1PR08MB26862E84D9CFB36AA0D6F92EC1370@VI1PR08MB2686.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: PIcFFFqPLDSlh5fMvxyAEJusLBFHwK1B007CE0BZDw/fwEh5gmVFEoJf4urTdtWEenfZqEJTVW7j6AklXRpZI3U/Rn734U1EpZGJ0gTj/OYylrCm4aHdgPMDjGpNWMjjiLIT6zHX6wYCLoYSEtn5yczo+8mzzShOm/BTBwe2UNUd1mnYfzY9f2KjYIBKQ6pLpmA66TNPxM/nBaQ7tJtKbibspoS0TOydAHK79N2xtIq5+u+onFgpmb8BVbtBJ6U17/Z044e2BFJnyV+oQDJiLCGrvSLu6HCLoSHRGZ3dF37D315fs9qXz5zkjGWWcxZrqHw6vUaNfltBBLDnrD5hch7kwRCIyQhiQMIlz0V4REs+Wd7DIMsIud8+SkZI4+X1AGXv3K4i93tOQiBQUNaqmprjUYz1gncfgLuyQiGiDjU/HLnHtN27yMjUbAhv+9m5
+X-Microsoft-Antispam-Message-Info: VrIOsyOufli6yroL+F1BBTs9LAL6hDKogphZ4ea6lHTDI1jABrm2XBIVGd9WpDy4tWHDGnPBdqt+6tDwAG0EbGWxvQuTlfmErgHubyd+I+KYgTBKkdfpmPmBXcstbHI9QKPsE8EWlGs0QNczZfvo38470qKCtlWu2sxywlkUcl5MX+00DEDknAJFRHhLqnMVqcx2vZLRtcypm/QCgx5vf93CzBLw17M2tLJ8Y98w4JqvkFEIHG+KAJm4Z5gnfCqdxzCO0FonFYSLN50MRMXQZrVbJQhajWTosZWUpfhlxnQFMOsoEQtmgUPoROieX03VmieTWpFlT+rGz7oXsYald6WdApFzfmdxJkACB27QHzwPJg+dfZ6RL2DJQpoM3yZizcDm8Kz6bQXegEYc8B1H/5r++fgcJuJRjzqkcmyx//ZiswrRmZFRHWACucCEikcq
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:VI1PR08MB5503.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(396003)(346002)(366004)(376002)(39840400004)(136003)(66946007)(8676002)(2616005)(956004)(8936002)(186003)(5660300002)(30864003)(478600001)(26005)(83380400001)(16526019)(86362001)(2906002)(6486002)(66556008)(316002)(66476007)(16576012)(4326008)(52116002)(31686004)(31696002)(36756003)(43740500002);
+ SFS:(4636009)(366004)(136003)(346002)(396003)(376002)(39830400003)(186003)(52116002)(16576012)(316002)(31696002)(54906003)(956004)(2616005)(6486002)(86362001)(478600001)(31686004)(26005)(16526019)(4326008)(83380400001)(5660300002)(2906002)(36756003)(66556008)(66476007)(8936002)(8676002)(66946007)(43740500002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: F51ipsrcJoUeZGWSbaMVag0PwHeFuKD1DfYBtMV1Dln6N/uXoa923JZTOycMtJeHfrxcyxVvT6Jnng4Et1lBntQlEFrMUNUwWM1MZyIRkCIzojxIUZiG+IKJcx32nh10UL8RFdgGMbhg2zK0S0+G+/1FZnNvEkPI54mXJOzPxHmB2YsMBu34Nl1HD4bfrnuO2wj9mBIWFKLrArsSuwcgCKzjzOuhhLPc4eDTD+RBBhHSPZmSWd/guKYydGwLtqrhZhMbna3600Y8WAPBhh2B1vW8pMgUbUslxqTwLFgOvVQTf7LM5bi/nYmTtFYsjladL/07r7VqvjP55Bbq8zXpfBVfVMBC0NhsM7Zj5EMlP8zLFjcqTvh1w8xT4GE68vfWxSPkyhs9EXgGffepG3AmSdacztin3L7ttonfDCQVQ8VyBV4ysHlMb2Lx4rydZAezGqTMShNrUCnxvvHLsSfVo3m3jubmKfZqANmNgRj4fTMBwmXq6tP3iCVtUqhSsulA6HDgGbTKBZ2bmwzxCk2KAZBClFCXpHDQfGgTYsBqnxAluFcCw6aDyzyn/u0Vr27t/7kC+eG9y58HFtio8bsoEVFIi9fNpRdvh60CjPxV2sHvFLu2yehzlUwsy+U4vETUcL7wRlPIBNKolHbCUuor1g==
+X-MS-Exchange-AntiSpam-MessageData: zUFR3hkzaVcVU1T6KNU+uL01J38fiem346203IHqnSl7i/pRsarBPEl8GzXfb015xiMpS46MFsyXw3/BN8P6rHM++bBBRp5xZX6DWADasDufQQn9Gx7BEAOg7//g+3OwMQHpvjLBFdCG5Ts28BT5Us5CQ4AY0D5AktpCUzbxzyUOquPMWb6Aj9RsfANekroBszWZLrZTj6aMg9RToLS6yO2mgO2uNgWza3EOD7Wu/N3NWH8bPDz6BzwFeTdhDcsuwiy3SIFxLPuxxdHhLdUijKV3ppzetiIHQKQpPXO6ENtWBzToeWfKOd+NHk0wJGLiaanLfv8XCianb17eof/HefKQCiewHVKR0dZA80a84QFawmutar2BKrnZNN9PXgzcw0ze/6V4MMDYBin8OrqX2/C8P1qY6jwkPf8Sd82t7XeTxqz4m4UUjVemFOHJv2qIFhASSmrIHyi3/F2Cu+C1LKYxz7imyCT+w1M9s4kklzKvrkGu/aiXn99ofEDjE2Cl0/tcFzE+dbfeM4Jz2oH40ycMxT/82fNzxptNEjeLNum3uZQ1KYNgknnfgnJnbPJpmlKUJmusGN86utmS0mtgGLFBiY34H+/a5Xkf4CvHEDFGrdFZS5aZq7blEsVQl+T7E0JGykOS0dtiKliuPZPQ7A==
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 840c1004-4c1c-42ff-38d7-08d8621be5c6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2d74ffff-1acd-4ff4-3b71-08d8621e4148
 X-MS-Exchange-CrossTenant-AuthSource: VI1PR08MB5503.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Sep 2020 12:58:43.3757 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Sep 2020 13:15:35.9795 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: obuYtlxJAKXkcvRBp1PxY4qn/48E/Zi+CzDPQwI9gGwLIhW0thdigPnPI5wKIt30TwcHudWU61nfz6BUMnoXNE2aWe7vq2vGAecUqp4pw2E=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR08MB5054
-Received-SPF: pass client-ip=40.107.20.102;
+X-MS-Exchange-CrossTenant-UserPrincipalName: VwE8ZCtMKopKrNlT7utUTxbl3A9GGXBL2iY+p59J2BJuIUaD+pptPlhRdDKunbm2nfHtBuawGGp6ykHNmbeE7ZQlwWyGrowAKKvkO6mQSAg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB2686
+Received-SPF: pass client-ip=40.107.21.138;
  envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-DB8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/26 08:58:45
+ helo=EUR05-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/26 09:15:38
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -22
-X-Spam_score: -2.3
-X-Spam_bar: --
-X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_score_int: -29
+X-Spam_score: -3.0
+X-Spam_bar: ---
+X-Spam_report: (-3.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.213, RCVD_IN_DNSWL_NONE=-0.0001,
+ MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.213, RCVD_IN_DNSWL_LOW=-0.7,
  RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -137,453 +138,28 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 25.09.2020 23:32, Eric Blake wrote:
-> We had a premature optimization of trying to read as little from the
-> wire as possible while handling NBD_OPT_SET_META_CONTEXT in phases.
-> But in reality, we HAVE to read the entire string from the client
-> before we can get to the next command, and it is easier to just read
-> it all at once than it is to read it in pieces.  And once we do that,
-> several functions end up no longer performing I/O, and no longer need
-> to return a value.
+> 'qemu-img map' provides a way to determine which extents of an image
+> come from the top layer vs. inherited from a backing chain.  This is
+> useful information worth exposing over NBD.  There is a proposal to
+> add a QMP command block-dirty-bitmap-populate which can create a dirty
+> bitmap that reflects allocation information, at which point
+> qemu:dirty-bitmap:NAME can expose that information via the creation of
+> a temporary bitmap, but we can shorten the effort by adding a new
+> qemu:allocation-depth context that does the same thing without an
+> intermediate bitmap (this patch does not eliminate the need for that
+> proposal, as it will have other uses as well).
 > 
-> While simplifying this, take advantage of g_str_has_prefix for less
-> repetition of boilerplate string length computation.
+> For this patch, I just encoded a tri-state value (unallocated, from
+> this layer, from any of the backing layers); we could instead or in
+> addition report an actual depth count per extent, if that proves more
+> useful.
 > 
-> Our iotests still pass; I also checked that libnbd's testsuite (which
-> covers more corner cases of odd meta context requests) still passes.
+> Note that this patch does not actually enable any way to request a
+> server to enable this context; that will come in the next patch.
 > 
 > Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->   nbd/server.c | 172 ++++++++++++++-------------------------------------
->   1 file changed, 47 insertions(+), 125 deletions(-)
-> 
-> diff --git a/nbd/server.c b/nbd/server.c
-> index 982de67816a7..0d2d7e52058f 100644
-> --- a/nbd/server.c
-> +++ b/nbd/server.c
-> @@ -1,5 +1,5 @@
->   /*
-> - *  Copyright (C) 2016-2018 Red Hat, Inc.
-> + *  Copyright (C) 2016-2020 Red Hat, Inc.
->    *  Copyright (C) 2005  Anthony Liguori <anthony@codemonkey.ws>
->    *
->    *  Network Block Device Server Side
-> @@ -792,135 +792,64 @@ static int nbd_negotiate_send_meta_context(NBDClient *client,
->       return qio_channel_writev_all(client->ioc, iov, 2, errp) < 0 ? -EIO : 0;
->   }
-> 
-> -/* Read strlen(@pattern) bytes, and set @match to true if they match @pattern.
-> - * @match is never set to false.
-> - *
-> - * Return -errno on I/O error, 0 if option was completely handled by
-> - * sending a reply about inconsistent lengths, or 1 on success.
-> - *
-> - * Note: return code = 1 doesn't mean that we've read exactly @pattern.
-> - * It only means that there are no errors.
-> +
-> +/*
-> + * Check @ns with @len bytes, and set @match to true if it matches @pattern,
-> + * or if @len is 0 and the client is performing _LIST_. @match is never set
-> + * to false.
->    */
-> -static int nbd_meta_pattern(NBDClient *client, const char *pattern, bool *match,
-> -                            Error **errp)
-> +static void nbd_meta_empty_or_pattern(NBDClient *client, const char *pattern,
-> +                                      const char *ns, uint32_t len,
 
-ns changed its meaning, it's not just a namespace, but the whole query. I think, better to rename it.
-
-Also, it's unusual to pass length together with nul-terminated string, it seems redundant.
-And, it's used only to compare with zero, strlen(ns) == 0 or ns[0] == 0 is not slower.
-
-Also, errp is unused argument. And it violate Error API recommendation to not create void functions with errp.
-
-Also we can use bool return instead of return through pointer.
-
-> +                                      bool *match, Error **errp)
->   {
-> -    int ret;
-> -    char *query;
-> -    size_t len = strlen(pattern);
-> -
-> -    assert(len);
-> -
-> -    query = g_malloc(len);
-> -    ret = nbd_opt_read(client, query, len, errp);
-> -    if (ret <= 0) {
-> -        g_free(query);
-> -        return ret;
-> -    }
-> -
-> -    if (strncmp(query, pattern, len) == 0) {
-> +    if (len == 0) {
-> +        if (client->opt == NBD_OPT_LIST_META_CONTEXT) {
-> +            *match = true;
-> +        }
-> +        trace_nbd_negotiate_meta_query_parse("empty");
-> +    } else if (strcmp(pattern, ns) == 0) {
->           trace_nbd_negotiate_meta_query_parse(pattern);
->           *match = true;
->       } else {
->           trace_nbd_negotiate_meta_query_skip("pattern not matched");
->       }
-> -    g_free(query);
-> -
-> -    return 1;
-> -}
-> -
-> -/*
-> - * Read @len bytes, and set @match to true if they match @pattern, or if @len
-> - * is 0 and the client is performing _LIST_. @match is never set to false.
-> - *
-> - * Return -errno on I/O error, 0 if option was completely handled by
-> - * sending a reply about inconsistent lengths, or 1 on success.
-> - *
-> - * Note: return code = 1 doesn't mean that we've read exactly @pattern.
-> - * It only means that there are no errors.
-> - */
-> -static int nbd_meta_empty_or_pattern(NBDClient *client, const char *pattern,
-> -                                     uint32_t len, bool *match, Error **errp)
-> -{
-> -    if (len == 0) {
-> -        if (client->opt == NBD_OPT_LIST_META_CONTEXT) {
-> -            *match = true;
-> -        }
-> -        trace_nbd_negotiate_meta_query_parse("empty");
-> -        return 1;
-> -    }
-> -
-> -    if (len != strlen(pattern)) {
-> -        trace_nbd_negotiate_meta_query_skip("different lengths");
-> -        return nbd_opt_skip(client, len, errp);
-> -    }
-> -
-> -    return nbd_meta_pattern(client, pattern, match, errp);
->   }
-> 
->   /* nbd_meta_base_query
->    *
->    * Handle queries to 'base' namespace. For now, only the base:allocation
-> - * context is available.  'len' is the amount of text remaining to be read from
-> - * the current name, after the 'base:' portion has been stripped.
-> - *
-> - * Return -errno on I/O error, 0 if option was completely handled by
-> - * sending a reply about inconsistent lengths, or 1 on success.
-> + * context is available.  @len is the length of @ns, including the 'base:'
-> + * prefix.
->    */
-> -static int nbd_meta_base_query(NBDClient *client, NBDExportMetaContexts *meta,
-> -                               uint32_t len, Error **errp)
-> +static void nbd_meta_base_query(NBDClient *client, NBDExportMetaContexts *meta,
-> +                                const char *ns, uint32_t len, Error **errp)
->   {
-> -    return nbd_meta_empty_or_pattern(client, "allocation", len,
-> -                                     &meta->base_allocation, errp);
-> +    nbd_meta_empty_or_pattern(client, "allocation", ns + 5, len - 5,
-
-This one is correct, but would be simpler, if only subquery (after colon) passed here.
-(Really, no reason to pass 'base:' to _base_ func)
-
-Hmm, I see that it gives a possibility to use meta->exp->export_bitmap_context directly.
-
-> +                              &meta->base_allocation, errp);
->   }
-> 
->   /* nbd_meta_bitmap_query
->    *
->    * Handle query to 'qemu:' namespace.
-> - * @len is the amount of text remaining to be read from the current name, after
-> - * the 'qemu:' portion has been stripped.
-> - *
-> - * Return -errno on I/O error, 0 if option was completely handled by
-> - * sending a reply about inconsistent lengths, or 1 on success. */
-> -static int nbd_meta_qemu_query(NBDClient *client, NBDExportMetaContexts *meta,
-> -                               uint32_t len, Error **errp)
-> + * @len is the length of @ns, including the `qemu:' prefix.
-> + */
-> +static void nbd_meta_qemu_query(NBDClient *client, NBDExportMetaContexts *meta,
-> +                                const char *ns, uint32_t len, Error **errp)
->   {
-> -    bool dirty_bitmap = false;
-> -    size_t dirty_bitmap_len = strlen("dirty-bitmap:");
-> -    int ret;
-> -
->       if (!meta->exp->export_bitmap) {
->           trace_nbd_negotiate_meta_query_skip("no dirty-bitmap exported");
-> -        return nbd_opt_skip(client, len, errp);
-> -    }
-> -
-> -    if (len == 0) {
-> +    } else if (len == 0) {
-
-s/0/5/ ?
-
->           if (client->opt == NBD_OPT_LIST_META_CONTEXT) {
->               meta->bitmap = true;
->           }
->           trace_nbd_negotiate_meta_query_parse("empty");
-> -        return 1;
-> -    }
-> -
-> -    if (len < dirty_bitmap_len) {
-> -        trace_nbd_negotiate_meta_query_skip("not dirty-bitmap:");
-> -        return nbd_opt_skip(client, len, errp);
-> -    }
-> -
-> -    len -= dirty_bitmap_len;
-> -    ret = nbd_meta_pattern(client, "dirty-bitmap:", &dirty_bitmap, errp);
-> -    if (ret <= 0) {
-> -        return ret;
-> -    }
-> -    if (!dirty_bitmap) {
-> +    } else if (!g_str_has_prefix(ns + 5, "dirty-bitmap:")) {
->           trace_nbd_negotiate_meta_query_skip("not dirty-bitmap:");
-> -        return nbd_opt_skip(client, len, errp);
-> +    } else {
-> +        trace_nbd_negotiate_meta_query_parse("dirty-bitmap:");
-> +        nbd_meta_empty_or_pattern(client, meta->exp->export_bitmap_context,
-> +                                  ns, len, &meta->bitmap, errp);
-
-hmm. _empty_ is impossible here, as ns includes "qemu:dirty-bitmap"..
-
->       }
-> -
-> -    trace_nbd_negotiate_meta_query_parse("dirty-bitmap:");
-> -
-> -    return nbd_meta_empty_or_pattern(
-> -            client, meta->exp->export_bitmap_context +
-> -            strlen("qemu:dirty_bitmap:"), len, &meta->bitmap, errp);
->   }
-> 
->   /* nbd_negotiate_meta_query
-> @@ -930,22 +859,13 @@ static int nbd_meta_qemu_query(NBDClient *client, NBDExportMetaContexts *meta,
->    *
->    * The only supported namespaces are 'base' and 'qemu'.
->    *
-> - * The function aims not wasting time and memory to read long unknown namespace
-> - * names.
-> - *
->    * Return -errno on I/O error, 0 if option was completely handled by
->    * sending a reply about inconsistent lengths, or 1 on success. */
->   static int nbd_negotiate_meta_query(NBDClient *client,
->                                       NBDExportMetaContexts *meta, Error **errp)
->   {
-> -    /*
-> -     * Both 'qemu' and 'base' namespaces have length = 5 including a
-> -     * colon. If another length namespace is later introduced, this
-> -     * should certainly be refactored.
-> -     */
->       int ret;
-> -    size_t ns_len = 5;
-> -    char ns[5];
-> +    g_autofree char *ns = NULL;
->       uint32_t len;
-> 
->       ret = nbd_opt_read(client, &len, sizeof(len), errp);
-> @@ -958,27 +878,29 @@ static int nbd_negotiate_meta_query(NBDClient *client,
->           trace_nbd_negotiate_meta_query_skip("length too long");
->           return nbd_opt_skip(client, len, errp);
->       }
-> -    if (len < ns_len) {
-> -        trace_nbd_negotiate_meta_query_skip("length too short");
-> -        return nbd_opt_skip(client, len, errp);
-> -    }
-> 
-> -    len -= ns_len;
-> -    ret = nbd_opt_read(client, ns, ns_len, errp);
-> +    ns = g_malloc(len + 1);
-> +    ret = nbd_opt_read(client, ns, len, errp);
-
-Now ns is not a namespace but the whole query. I'd rename a variable.
-
->       if (ret <= 0) {
->           return ret;
->       }
-> +    ns[len] = '\0';
-> +    if (strlen(ns) != len) {
-> +        return nbd_opt_invalid(client, errp,
-> +                               "Embedded NUL in query for option %s",
-> +                               nbd_opt_lookup(client->opt));
-> +    }
-
-Hmm, that's a new good check. Intersting, is it specified in NBD protocol, that
-NUL shouldn't be in a string.. Probably it can be a separate patch, with
-new nbd_opt_string_read, which will check this thing. But I'm OK with it as is
-in this patch.
-
-> 
-> -    if (!strncmp(ns, "base:", ns_len)) {
-> +    if (g_str_has_prefix(ns, "base:")) {
->           trace_nbd_negotiate_meta_query_parse("base:");
-> -        return nbd_meta_base_query(client, meta, len, errp);
-> -    } else if (!strncmp(ns, "qemu:", ns_len)) {
-> +        nbd_meta_base_query(client, meta, ns, len, errp);
-> +    } else if (g_str_has_prefix(ns, "qemu:")) {
->           trace_nbd_negotiate_meta_query_parse("qemu:");
-> -        return nbd_meta_qemu_query(client, meta, len, errp);
-> +        nbd_meta_qemu_query(client, meta, ns, len, errp);
-
-passing length of string together with string seems redundant (and error prone).
-
-> +    } else {
-> +        trace_nbd_negotiate_meta_query_skip("unknown namespace");
->       }
-> -
-
-Seems you don't like my new-line before final return statement.
-
-> -    trace_nbd_negotiate_meta_query_skip("unknown namespace");
-> -    return nbd_opt_skip(client, len, errp);
-> +    return 1;
->   }
-> 
->   /* nbd_negotiate_meta_queries
-> 
-
-
-To avoid all this pointer arithmetic, what about something like this (I didn't check, just an idea):
-
-/*
-  * Return true if @query matches @pattern of if @query is empty and the client
-  * is performing _LIST_. Otherwise return false.
-  */
-static bool nbd_meta_empty_or_pattern(NBDClient *client, const char *pattern,
-                                       const char *query)
-{
-     if (!strcmp(query, "")) {
-         trace_nbd_negotiate_meta_query_parse("empty");
-         return client->opt == NBD_OPT_LIST_META_CONTEXT;
-     } else if (!strcmp(query, pattern)) {
-         trace_nbd_negotiate_meta_query_parse(pattern);
-         return true;
-     } else {
-         trace_nbd_negotiate_meta_query_skip("pattern not matched");
-         return false;
-     }
-}
-
-bool strshift(const char **str, const char *prefix)
-{
-     if (g_str_has_prefix(*str, prefix)) {
-         *str += strlen(prefix);
-         return true;
-     }
-
-     return false;
-}
-
-/*
-  * nbd_meta_base_query
-  *
-  * If it's 'base' namespace parse the query and return true. If not return
-  * false.
-  */
-static bool nbd_meta_base_query(NBDClient *client, NBDExportMetaContexts *meta,
-                                 const char *query)
-{
-     if (!strshift(&query, "base:")) {
-         return false;
-     }
-     trace_nbd_negotiate_meta_query_parse("base:");
-
-     meta->base_allocation =
-             nbd_meta_empty_or_pattern(client, "allocation", query);
-
-     return true;
-}
-
-/*
-  * nbd_meta_bitmap_query
-  *
-  * If it's 'qemu' namespace parse the query and return true. If not return
-  * false.
-  */
-static bool nbd_meta_qemu_query(NBDClient *client, NBDExportMetaContexts *meta,
-                                 const char *query)
-{
-     if (!strshift(&query, "qemu:")) {
-         return false;
-     }
-     trace_nbd_negotiate_meta_query_parse("qemu:");
-
-     if (!meta->exp->export_bitmap) {
-         trace_nbd_negotiate_meta_query_skip("no dirty-bitmap exported");
-         return true;
-     }
-
-     if (!query[0]) {
-         if (client->opt == NBD_OPT_LIST_META_CONTEXT) {
-             meta->bitmap = true;
-         }
-         trace_nbd_negotiate_meta_query_parse("empty");
-         return true;
-     }
-
-     if (!strshift(&query, "dirty-bitmap:")) {
-         trace_nbd_negotiate_meta_query_skip("not dirty-bitmap:");
-         return true;
-     }
-
-     trace_nbd_negotiate_meta_query_parse("dirty-bitmap:");
-     meta->bitmap = nbd_meta_empty_or_pattern(
-             client, meta->exp->export_bitmap_context +
-             strlen("qemu:dirty-bitmap:"), query);
-
-     return true;
-}
-
-/*
-  * nbd_negotiate_meta_query
-  *
-  * Parse namespace name and call corresponding function to parse body of the
-  * query.
-  *
-  * The only supported namespaces are 'base' and 'qemu'.
-  *
-  * Return -errno on I/O error, 0 if option was completely handled by
-  * sending a reply about inconsistent lengths, or 1 on success.
-  */
-static int nbd_negotiate_meta_query(NBDClient *client,
-                                     NBDExportMetaContexts *meta, Error **errp)
-{
-     int ret;
-     g_autofree char *query = NULL;
-     uint32_t len;
-
-     ret = nbd_opt_read(client, &len, sizeof(len), errp);
-     if (ret <= 0) {
-         return ret;
-     }
-     len = cpu_to_be32(len);
-
-     if (len > NBD_MAX_STRING_SIZE) {
-         trace_nbd_negotiate_meta_query_skip("length too long");
-         return nbd_opt_skip(client, len, errp);
-     }
-
-     query = g_malloc(len + 1);
-     ret = nbd_opt_read(client, query, len, errp);
-     if (ret <= 0) {
-         return ret;
-     }
-     query[len] = '\0';
-     if (strlen(query) != len) {
-         return nbd_opt_invalid(client, errp,
-                                "Embedded NUL in query for option %s",
-                                nbd_opt_lookup(client->opt));
-     }
-
-     if (nbd_meta_base_query(client, meta, query)) {
-         return 1;
-
-     if (nbd_meta_qemu_query(client, meta, query)) {
-         return 1;
-     }
-
-     trace_nbd_negotiate_meta_query_skip("unknown namespace");
-     return 1;
-}
-
-
+Looks good to me overall, need to rebase if patch 01 changed (as I propose or in some better way).
 
 -- 
 Best regards,
