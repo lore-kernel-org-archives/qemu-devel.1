@@ -8,79 +8,78 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40D21C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 14:10:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65198C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 14:12:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC6B12076D
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 14:10:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D24E62168B
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 14:12:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="szTDjndd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC6B12076D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rrjaSurQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D24E62168B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41848 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMAuX-0007g2-Nz
-	for qemu-devel@archiver.kernel.org; Sat, 26 Sep 2020 10:10:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54196)
+	id 1kMAvm-0000fk-Uq
+	for qemu-devel@archiver.kernel.org; Sat, 26 Sep 2020 10:12:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54234)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kMAoX-0000QP-Cp
- for qemu-devel@nongnu.org; Sat, 26 Sep 2020 10:04:37 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:44216)
+ id 1kMAoZ-0000VN-SC
+ for qemu-devel@nongnu.org; Sat, 26 Sep 2020 10:04:39 -0400
+Received: from mail-pl1-x635.google.com ([2607:f8b0:4864:20::635]:40675)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kMAoV-0005Lt-BZ
- for qemu-devel@nongnu.org; Sat, 26 Sep 2020 10:04:37 -0400
-Received: by mail-pl1-x641.google.com with SMTP id j7so870391plk.11
- for <qemu-devel@nongnu.org>; Sat, 26 Sep 2020 07:04:34 -0700 (PDT)
+ id 1kMAoY-0005MG-1c
+ for qemu-devel@nongnu.org; Sat, 26 Sep 2020 10:04:39 -0400
+Received: by mail-pl1-x635.google.com with SMTP id bd2so878963plb.7
+ for <qemu-devel@nongnu.org>; Sat, 26 Sep 2020 07:04:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=g28WcNhsCD1pOggCNiGSa3fCFHjJ9SBe6D8ikmZXRPs=;
- b=szTDjnddLVwfHUrFtJYMa+J4P48eTcgLe25aJIO49Zt1YtTy4WOEIBrdX3UfWe954G
- vp1TwkDYuZvwzmFZcMSAEuUT8yH9tXYWUd7tAYgw4jqzvZVarQwwBXjC0Xzt/v+vsAaj
- nMuU6HDv1NgocG7YzUTz4Iy+fsBNy6I98/PPy7UCLx4uByEeH6ErUn5fRbVGNhjWJGIy
- IFSEjdBUFjPUrA9zgODCOTVbvSN6dAghWon+EpVjtHmFdef07uwruSk3cnPezlss3+VV
- 0YsZ2X1m+rGXb50FQa+1Zm9mEeyP9p3rhBRbVQTocl0mcmplOUBpmr9D7BJiasMJ8+nm
- dStw==
+ bh=EOZ1D2QEBZkHNlw7AF2wWJzGV7XJ3mBIlC+/pAIy1UI=;
+ b=rrjaSurQ7c1hZSrwZX5ift//w0vHEt6TzhxHRC9Tfg/XpcXok+qgltwT9d9+ziepXS
+ qj5YdhnJi0yIkKzQChJ6Yu0T1Gff7xBNcXCkk5Pm1y2rgtLaQ+IdgODHixu5M75fBAyv
+ RjISEwx598EckQnXPAFGotR8ISEx10Rev+lG9BYLn63MGtUs55enMqtBnsnsD0A4nzWI
+ Ye2qGLX1tnsA8fOjy8sSg08yizEgn+YGrsYN97iL3goAEtTQIegOJEQSfqmp3MrBBf7N
+ o6BIolBLuZh3OXwbkrTeEvI/YBCINAuyrCBRbbpMH54+k9CWYrctmR2HRdcbaqoP/8qO
+ 5ipg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=g28WcNhsCD1pOggCNiGSa3fCFHjJ9SBe6D8ikmZXRPs=;
- b=FrBtzOMshCnJjReV59bGMiOlOSODYDjeYckzz379UdpXtlfTq8upCB/jNHUorG3n6E
- og+7Y9JrRiQPq5OGHTzh+HRVMAkEz/GperIutX3RTnHbCbz39lelCJp2+C+bIvzzfvFw
- WZHCI3IQXMTjS4/3r6RSC0q1bNNfYqyqO+GG38YelpgcJTmb3wuvWA9lAh2Hby28V7I4
- fCwL8S9LfVXyhJQ06IEG7hHLFrcgH6NJPQVeXAc4boAZzyECmQ5RdVxRaV9XDxNPA1AS
- baFTqBdkNqWNstMcslrdIdTI+WQWBFPK8rR/Ks1wHa1HYwQEIuGkaWXjpw3B5DaF2T0z
- 7z2A==
-X-Gm-Message-State: AOAM5335ZEsw1RqoOQ+oxeCSrH1ebYVfNntQ03lac+1jZ8AzdKhps9/0
- Niwugftv9JU2mISgUzUHTB3RCai2Cd/wqkqU
-X-Google-Smtp-Source: ABdhPJwvcoHnhfM2EhATiYOE8c8HJx5xZiYZIACDdLuP93j1j2koJC/dVVugSKifwVL/klruRRBxnA==
-X-Received: by 2002:a17:90b:350b:: with SMTP id
- ls11mr2141667pjb.201.1601129073517; 
- Sat, 26 Sep 2020 07:04:33 -0700 (PDT)
+ bh=EOZ1D2QEBZkHNlw7AF2wWJzGV7XJ3mBIlC+/pAIy1UI=;
+ b=e0ssnNxwUz758MwyTHP8KxF2rKjx9BrihDastPZ+0K5snEPjdwYHs4LFBch5KrX25N
+ hbScGVPNuaZ0PNGFMGxzrFmOSHXamXzkRQQJyd/nLI9UXHsMfpMbewGpN1PiSZk7w/Xf
+ AH945SB5YbLrFaDlgl4rawcEojPC79tfQ6fJuAgKW4qfd9XTqS5Por1mvynarscqzXAe
+ GsXQ7VLXGY2W67YV97pqmpNb/0KKuNWHqhoqb0XYGyf2F53JSSj/a62TV9ZwCT9/wCWH
+ U6Faz8Pn3Gq4e+7G/XPeytjzZRrYfRIH6hH3yrcfNCKzG7nTevEFzk2MRXLAcT/N01eg
+ WTNQ==
+X-Gm-Message-State: AOAM530YDp011mYD5TFDcxaEmcSgsOSCaAdPQotAC/wDYjMixjYo4T1B
+ MeQk9BLhVQtkH9U6bhDvEN3ZE+xfrFBvWSN+
+X-Google-Smtp-Source: ABdhPJwtZIj/WwLnJO8m/y3qHvXALXQ0m0EFB8lQPLQZOtNlxC2MBHfDoS/i0sGIr02TrZFnD/X2jg==
+X-Received: by 2002:a17:902:fe88:b029:d2:2a16:254 with SMTP id
+ x8-20020a170902fe88b02900d22a160254mr4152247plm.23.1601129076004; 
+ Sat, 26 Sep 2020 07:04:36 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id k3sm6091109pfp.41.2020.09.26.07.04.31
+ by smtp.googlemail.com with ESMTPSA id k3sm6091109pfp.41.2020.09.26.07.04.33
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 26 Sep 2020 07:04:32 -0700 (PDT)
+ Sat, 26 Sep 2020 07:04:35 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/4] plugins: Fixes a issue when dlsym failed,
- the handle not closed.
-Date: Sat, 26 Sep 2020 22:04:12 +0800
-Message-Id: <20200926140415.1286-2-luoyonggang@gmail.com>
+Subject: [PATCH 2/4] plugin: Fixes compiling errors on msys2/mingw
+Date: Sat, 26 Sep 2020 22:04:13 +0800
+Message-Id: <20200926140415.1286-3-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200926140415.1286-1-luoyonggang@gmail.com>
 References: <20200926140415.1286-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
- envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x641.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::635;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x635.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -111,21 +110,45 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- plugins/loader.c | 1 +
- 1 file changed, 1 insertion(+)
+ contrib/plugins/hotblocks.c | 2 +-
+ tests/plugin/bb.c           | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/plugins/loader.c b/plugins/loader.c
-index 685d334e1a..8ac5dbc20f 100644
---- a/plugins/loader.c
-+++ b/plugins/loader.c
-@@ -235,6 +235,7 @@ static int plugin_load(struct qemu_plugin_desc *desc, const qemu_info_t *info)
-     return rc;
+diff --git a/contrib/plugins/hotblocks.c b/contrib/plugins/hotblocks.c
+index 3942a2ca54..37435a3fc7 100644
+--- a/contrib/plugins/hotblocks.c
++++ b/contrib/plugins/hotblocks.c
+@@ -102,7 +102,7 @@ static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
+ {
+     ExecCount *cnt;
+     uint64_t pc = qemu_plugin_tb_vaddr(tb);
+-    unsigned long insns = qemu_plugin_tb_n_insns(tb);
++    size_t insns = qemu_plugin_tb_n_insns(tb);
+     uint64_t hash = pc ^ insns;
  
-  err_symbol:
-+    g_module_close(ctx->handle);
-  err_dlopen:
-     qemu_vfree(ctx);
-     return 1;
+     g_mutex_lock(&lock);
+diff --git a/tests/plugin/bb.c b/tests/plugin/bb.c
+index e4cc7fdd6e..ef784be78f 100644
+--- a/tests/plugin/bb.c
++++ b/tests/plugin/bb.c
+@@ -72,7 +72,7 @@ static void vcpu_tb_exec(unsigned int cpu_index, void *udata)
+     CPUCount *count = max_cpus ?
+         g_ptr_array_index(counts, cpu_index) : &inline_count;
+ 
+-    unsigned long n_insns = (unsigned long)udata;
++    uint64_t n_insns = (uint64_t)udata;
+     g_mutex_lock(&count->lock);
+     count->insn_count += n_insns;
+     count->bb_count++;
+@@ -81,7 +81,7 @@ static void vcpu_tb_exec(unsigned int cpu_index, void *udata)
+ 
+ static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
+ {
+-    unsigned long n_insns = qemu_plugin_tb_n_insns(tb);
++    size_t n_insns = qemu_plugin_tb_n_insns(tb);
+ 
+     if (do_inline) {
+         qemu_plugin_register_vcpu_tb_exec_inline(tb, QEMU_PLUGIN_INLINE_ADD_U64,
 -- 
 2.28.0.windows.1
 
