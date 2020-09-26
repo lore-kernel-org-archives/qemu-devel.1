@@ -2,91 +2,86 @@ Return-Path: <SRS0=cZnO=DD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99DDDC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 04:37:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9489AC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 05:06:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2B77207C4
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 04:37:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B901D207D8
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Sep 2020 05:06:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mekg15te"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2B77207C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="h2MKUlnd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B901D207D8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kM1y6-0004I8-UQ
-	for qemu-devel@archiver.kernel.org; Sat, 26 Sep 2020 00:37:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36406)
+	id 1kM2PP-0001NR-Fx
+	for qemu-devel@archiver.kernel.org; Sat, 26 Sep 2020 01:06:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39066)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <maxim.cournoyer@gmail.com>)
- id 1kM1xE-0003qk-Ju
- for qemu-devel@nongnu.org; Sat, 26 Sep 2020 00:37:00 -0400
-Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:33965)
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1kM2Od-0000rF-3r
+ for qemu-devel@nongnu.org; Sat, 26 Sep 2020 01:05:19 -0400
+Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:40402)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <maxim.cournoyer@gmail.com>)
- id 1kM1xB-0004nb-QW
- for qemu-devel@nongnu.org; Sat, 26 Sep 2020 00:37:00 -0400
-Received: by mail-qt1-x842.google.com with SMTP id 19so4123697qtp.1
- for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 21:36:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:references:date:in-reply-to:message-id
- :user-agent:mime-version;
- bh=nFrB/hH+6ti1S6Is7ZkdxdpEG/2ncrBgu9Fiyg+xv8s=;
- b=mekg15tekXNYR8n9wj74UA3ZUVh0FKre9liDudDxocs9Hsfil46Nn+P6qsTlyLumMA
- FU1T6QO0XL2TNYE/9VMY/J2bToj+gsqVmn0CgvKL7aP66pXUP/yT62A+pahEYl1P3ZCV
- BPHj8f1LdZkENivw72ixo6tXLuCt0TF8VEVm1pdLbBMIX+bEIZFspN3gXMIqMpAHVF6m
- nqWUSN8BpGDnu0G7uXxzsl5QzamVryTUbf+6CIxJcRSSsx1r3FS2pJ7UBWB5TQzFpFw0
- 3SDNYoHUyWwWuBQg3TvBknbHGZJQjtg1ZvMoLSzXxzhK6xz38gGUui/CAnTjJiK+y5Ay
- q3WQ==
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1kM2Oa-0007eW-O1
+ for qemu-devel@nongnu.org; Sat, 26 Sep 2020 01:05:18 -0400
+Received: by mail-oi1-x235.google.com with SMTP id t76so5091027oif.7
+ for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 22:05:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=UIp+NLYqOH0NJxbG6Yo1Z1acaKCGa7Wj87aMUN9mHh8=;
+ b=h2MKUlndgmbd9i7mCB+FVwbqVuN5e00f7wnk98GB6DYMLnVcPHWVXMee7Grtn8Zr9P
+ 1J0R6ciY1NavZN9uh8rS2NcNDWu+jFBNnCIHGezJLvOb1QkhUJ/JDhf55wDsyinPB/1r
+ Z+YINrXfCVu+fbn1DJ/MQN5EIiwIdw0XroNecaR19mJis5rfdONs34rMlcVFTV4FJoTN
+ 66A7NJq8KHWb3Unc6nYuCNC7yZcCDV08GqUh9/CIHZaq5FAiaMS0IqN6QnmHNGf2fNPB
+ DmOhMWKM9pn6f1Avf4k7Z/kH0HkQwtasjlQ2Ug2uzXidTvWkJL9BBjwC01Z9I7+000gg
+ eQGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:references:date:in-reply-to
- :message-id:user-agent:mime-version;
- bh=nFrB/hH+6ti1S6Is7ZkdxdpEG/2ncrBgu9Fiyg+xv8s=;
- b=PRTlZvfA1/g87Isqnice5/pXW0L4TQcIs6mUv3ookQNJn2P6fC9d7MVVqm4oUKj7IA
- oS59hducPhIx5ZIulV1HmKe5dhf+nyWDE5htI++YZCtOXRl5cMmbQKyjQZPkjOFti4FC
- 5pcFMUz4rxqRV5MyYq/9I+jqKNpKbcMm/gmfJg1LsvDVH3dIV2+/CvK2/7nGZ2W9YiT6
- /4cx3ULAYCyggFQ4U2sD9vMSeqJr3UzgtOLzQbyt9S9sINoOThyASJsKhUbj00txb21D
- hTTssuQNis/FziAteCa+1XLKjdLYKjnL9XSsRe8eCO7hAPt8wE42L2VWX7CvpSQPxcFS
- F3zg==
-X-Gm-Message-State: AOAM532n1rKHjULW3Yc7MxxSoZ/HPHtPVgo1EROt84txGD96tXN034rT
- HOwyoe886qiSmwR2Q7jlVmvsNkZx8RU=
-X-Google-Smtp-Source: ABdhPJxbeG8GvrehCXmSNrYo3O1qjBhDHVQEY9/ROcMssdLvE1lFpyK0wv/XN2AMfxvJV2ULzaVUTQ==
-X-Received: by 2002:aed:2b86:: with SMTP id e6mr3005887qtd.86.1601095016488;
- Fri, 25 Sep 2020 21:36:56 -0700 (PDT)
-Received: from hurd (dsl-10-132-92.b2b2c.ca. [72.10.132.92])
- by smtp.gmail.com with ESMTPSA id s25sm3619015qtc.90.2020.09.25.21.36.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 25 Sep 2020 21:36:55 -0700 (PDT)
-From: Maxim Cournoyer <maxim.cournoyer@gmail.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH] build: Build and install the info manual.
-References: <20200925024143.26492-1-maxim.cournoyer@gmail.com>
- <CAFEAcA_wU73U6eaHU0mwccr-E0EHSKzFJ1yiR++YEKv=1LneJQ@mail.gmail.com>
-Date: Sat, 26 Sep 2020 00:38:17 -0400
-In-Reply-To: <CAFEAcA_wU73U6eaHU0mwccr-E0EHSKzFJ1yiR++YEKv=1LneJQ@mail.gmail.com>
- (Peter Maydell's message of "Fri, 25 Sep 2020 10:45:54 +0100")
-Message-ID: <87mu1dtao6.fsf@gmail.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=UIp+NLYqOH0NJxbG6Yo1Z1acaKCGa7Wj87aMUN9mHh8=;
+ b=pPMq32d6QfkcUQZuCQczO6KJT/63dnaMmPNJiy9eSBHVE9jlBKXQuJsS5hofSK3Yh2
+ PEfCjqVCw7u8pv9Y19uDlju7+gqpzFe+Qssrk/cPnqfJZ0cKNTptSTbXvi+sIwJLsMe7
+ jeFXW9OY6zy7IiE+q/tj4JaPPtS2/xxWnIfwfD/LFdAfqoB/At/yfWOLGaoNuVzht9K6
+ IJkJ5ohA26tBOGdqT0tWS8iUKHWILPBrJENinaOTnjXNT8XmZ5GdAOjvsbSJIlFiItYO
+ oUHZ7FfEEIxYXOIeyfGZZXjKGCr2E2IWeFVCqzCAkLwnv538+o5uE9fsekz7DSoSepCp
+ GjEg==
+X-Gm-Message-State: AOAM530n1jihaGDc+oNFwiF6mhFHN0Hf2dCLueUoPgWota8k0QadwQl3
+ 3vHo6Ck5ZqbqohPFX6XPhkOb1jNbacqPVTS1iiQzNQ==
+X-Google-Smtp-Source: ABdhPJxk3ic6Yapp6UITV0ZlTDQtKUqG+jz1G+cLjZqLeeeNgUNHNSllZJrMuHSXl1v2ZPlwIIkAoWnaVUIsOueG/eQ=
+X-Received: by 2002:aca:cf88:: with SMTP id f130mr458922oig.122.1601096715170; 
+ Fri, 25 Sep 2020 22:05:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Received-SPF: pass client-ip=2607:f8b0:4864:20::842;
- envelope-from=maxim.cournoyer@gmail.com; helo=mail-qt1-x842.google.com
+References: <20200817084955.28793-1-frank.chang@sifive.com>
+ <20200817084955.28793-18-frank.chang@sifive.com>
+ <CAE_xrPj_fb1NER3a68O1dwzM70wvmb+8+NyDo_9z=POCjYTvQw@mail.gmail.com>
+ <faf5ad2f-5f00-e80d-761d-6d19b98ec238@linaro.org>
+In-Reply-To: <faf5ad2f-5f00-e80d-761d-6d19b98ec238@linaro.org>
+From: Frank Chang <frank.chang@sifive.com>
+Date: Sat, 26 Sep 2020 13:05:04 +0800
+Message-ID: <CAE_xrPgN2q_FMaRuk=5mPnD_aaROoBqN=U3TDS_2ciw4s6BDMw@mail.gmail.com>
+Subject: Re: [RFC v4 17/70] target/riscv: rvv-1.0: configure instructions
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: multipart/alternative; boundary="000000000000f58cda05b0306080"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::235;
+ envelope-from=frank.chang@sifive.com; helo=mail-oi1-x235.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -101,88 +96,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello Peter,
+--000000000000f58cda05b0306080
+Content-Type: text/plain; charset="UTF-8"
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+On Sat, Sep 26, 2020 at 2:28 AM Richard Henderson <
+richard.henderson@linaro.org> wrote:
 
-> On Fri, 25 Sep 2020 at 07:27, Maxim Cournoyer <maxim.cournoyer@gmail.com> wrote:
->>
->> Take advantage of the Sphinx texinfo backend to generate a QEMU info
->> manual.  The texinfo format allows for more structure and info readers
->> provide more advanced navigation capabilities compared to manpages
->> readers.
+> On 9/25/20 1:51 AM, Frank Chang wrote:
+> > trans_vsetvli() uses gen_goto_tb() to save the computation in the link
+> to the
+> > next TB.
+> > I know there was a discussion about this back in RVV v0.7.1:
+> >
+> https://patchew.org/QEMU/20200103033347.20909-1-zhiwei_liu@c-sky.com/20200103033347.20909-5-zhiwei_liu@c-sky.com/
+> >
+> > However, we had encountered an issue that looked like it was caused by
+> the
+> > linked TB.
+> > The code snippet which cause the issue is:
+> >
+> > 00000000000104a8 <loop>: 104a8: 0122ffd7 vsetvli t6,t0,e32,m4,tu,mu,d1
+> 104ac:
+> > 02036407 vle32.v v8,(t1) 104b0: 028a0a57 vadd.vv v20,v8,v20 104b4:
+> 41f282b3 sub
+> > t0,t0,t6 104b8: 002f9893 slli a7,t6,0x2 104bc: 9346 add t1,t1,a7 104be:
+> > fe0295e3 bnez t0,104a8 <loop> 104c2: 012f7057 vsetvli
+> zero,t5,e32,m4,tu,mu,d1
+> > .....
+> >
+> > If $t0 is given with the value, e.g. 68.
+> > <loop> is expected to process 32 elements in each iteration.
+> > That's it, the env->vl after vsetvli at 0x104a8 in each iteration would
+> be:
+> > 1st iteration: 32 (remaining elements to be processed: 68 - 32 = 36)
+> > 2nd iteration: 32 (remaining elements to be processed: 36 - 32 = 4)
+> > 3rd iteration: 4 (remaining elements to be processed: 4 - 4 = 0, will
+> leave
+> > <loop> after 0x104be)
+> >
+> > vadd.vv at 0x104b0 is implemented with gvec for acceleration:
+> >
+> > if (a->vm && s->vl_eq_vlmax) {
+> >     gvec_fn(s->sew, vreg_ofs(s, a->rd),
+> >             vreg_ofs(s, a->rs2), vreg_ofs(s, a->rs1),
+> >             MAXSZ(s), MAXSZ(s));
+> > } else {
+> >     uint32_t data = 0;
+> >
+> >     data = FIELD_DP32(data, VDATA, VM, a->vm);
+> >     data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
+> >     tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),
+> >                        vreg_ofs(s, a->rs1), vreg_ofs(s, a->rs2),
+> >                        cpu_env, 0, s->vlen / 8, data, fn);
+> > }
+> >
+> > gvec function is used when a->vm and s->vl_eq_vlmax are both true.
+> > However, s->vl_eq_vlmax, for the above case, is only true in 1st and 2nd
+> > iterations.
+> > In third iteration, env->vl is 4 which is not equal to vlmax = 32.
+> > But as the TB where vadd.vv resides are already linked with vsetvli's TB,
+> > it won't be retranslated and still use the same gvec function in the
+> third
+> > iteration.
+> > The total elemented being proceeded would be: 32 + 32 + 32 = 96, instead
+> of 68.
+> >
+> > I'm wondering under such conditions, is it still correct to use
+> gen_goto_tb() here?
+> > Or we should use lookup_and_goto_ptr() as in trans_vsetvl() to not link
+> the TBs.
 >
-> Not providing an info manual (or indeed any format other than HTML
-> and manpages) was a deliberate design choice. The rationale is that
-> checking that multiple document formats all ended up rendering
-> correctly is more work than people will in practice put in (as
-> demonstrated by various errors in the old HTML rendering, for
-> instance).
-
-It seems to me that any problem found in the texinfo rendering produced
-by Sphinx would be a bug in Sphinx, which could simply be forwarded
-upstream when encountered.  My experience with Sphinx-generated texinfo
-manuals is rather good.  The CMake project allows producing an info
-manual that way, for example, and the result is at least as usable as
-their HTML-based doc (as an avid info user, I'd say more usable, given
-most commands are indexed).
-
->> * configure (infodir): Add the --infodir option, which allows
->> configuring the directory under which the info manuals are installed.
->> * docs/index.rst: Include the top level documents to prevent
->> warnings (treated as errors by sphinx-build).
+> You're correct -- because of vl_eq_vlmax we can't use goto_tb when using a
+> variable input.
 >
-> This isn't the right thing. You should be pointing sphinx-build
-> at each of the individual manuals (system, interop, etc) and
-> generating one info file for each. This is because we generate
-> manuals for each of these including the 'devel' manual, but
-> we don't want to install 'devel', because it's developer-facing
-> and not needed by end-users of QEMU.
-
-Is this the only reason individual manuals are being generated?  It
-makes sense for the manpages (which have their own macros), but
-otherwise (for HTML and info) introduces a lot of complexity for not
-much gain, in my opinion.  Users not wanting to know about devel
-internals can simply skip that section; no harm done.
-
-The individual manuals are all stitched back together using a top
-index.html page (derived from index.html.in), anyway.  That'd be better
-taken care of by Sphinx automatically upon generating the whole doc
-tree, in my opinion, as it seems to be the way it was designed to work
-and simplifies things all around.
-
-I initially went the individual manual route and devised complicated
-Make macros and got individual info manuals produced, only to find out I
-wanted to replicate that index.html.in in the texinfo format (Texinfo is
-as navigable as HTML, so having every QEMU manual under the same node as
-different sections makes more sense in my opinion).  The individually
-produced info manual were also all named 'QEMU Documentation' rather
-than with their own more accurate names, because of directives in the
-included the top-level conf.py.
-
-> won't find you have problems with the orphan top level documents.
+> It would be possible when using xN,x0 for VLMAX, or x0,x0 for reuse of the
+> current vl, but I doubt it's worth special-casing that.
 >
-> (We really need to move those orphan docs into the right places
-> in the manual structure at some point.)
-
-We could simply put them in another section called "Others" as a
-starting point.  For this patch we can also choose to ignore them rather
-than include them, but if someone went to the length of writing those
-docs, I'd argue it was to be read rather than forgotten :-).
-
->> * docs/meson.build (sphinxinfo): Add new target.
+> I wonder if the goto_tb conversation happened before we introduced
+> vl_eq_vlmax
+> and forgot to re-evaluate, or if I just missed that in the first place.
+> Anyway, thanks for finding this.
 >
-> You've forgotten your Signed-off-by: line.
+>
+> r~
+>
 
-I've added it in my local tree; will wait for your feedback on my above
-comments before sending an updated patch.
+Thanks Richard, I'll include the fix in my next version patchset.
 
-Thanks for the review,
+Frank Chang
 
-Maxim
+--000000000000f58cda05b0306080
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr">On Sat, Sep 26, 2020 at 2:28 AM Richard H=
+enderson &lt;<a href=3D"mailto:richard.henderson@linaro.org">richard.hender=
+son@linaro.org</a>&gt; wrote:<br></div><div class=3D"gmail_quote"><blockquo=
+te class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px =
+solid rgb(204,204,204);padding-left:1ex">On 9/25/20 1:51 AM, Frank Chang wr=
+ote:<br>
+&gt; trans_vsetvli() uses gen_goto_tb() to save the computation in the link=
+ to the<br>
+&gt; next TB.<br>
+&gt; I know there was a discussion about this back in RVV v0.7.1:<br>
+&gt; <a href=3D"https://patchew.org/QEMU/20200103033347.20909-1-zhiwei_liu@=
+c-sky.com/20200103033347.20909-5-zhiwei_liu@c-sky.com/" rel=3D"noreferrer" =
+target=3D"_blank">https://patchew.org/QEMU/20200103033347.20909-1-zhiwei_li=
+u@c-sky.com/20200103033347.20909-5-zhiwei_liu@c-sky.com/</a><br>
+&gt; <br>
+&gt; However, we had encountered an issue that looked like it was caused by=
+ the<br>
+&gt; linked TB.<br>
+&gt; The code snippet which cause the issue is:<br>
+&gt; <br>
+&gt; 00000000000104a8 &lt;loop&gt;: 104a8: 0122ffd7 vsetvli t6,t0,e32,m4,tu=
+,mu,d1 104ac:<br>
+&gt; 02036407 vle32.v v8,(t1) 104b0: 028a0a57 vadd.vv v20,v8,v20 104b4: 41f=
+282b3 sub<br>
+&gt; t0,t0,t6 104b8: 002f9893 slli a7,t6,0x2 104bc: 9346 add t1,t1,a7 104be=
+:<br>
+&gt; fe0295e3 bnez t0,104a8 &lt;loop&gt; 104c2: 012f7057 vsetvli zero,t5,e3=
+2,m4,tu,mu,d1<br>
+&gt; .....<br>
+&gt; <br>
+&gt; If $t0 is given with the value, e.g. 68.<br>
+&gt; &lt;loop&gt; is expected to process 32 elements in each iteration.<br>
+&gt; That&#39;s it, the env-&gt;vl after vsetvli at 0x104a8 in each iterati=
+on would be:<br>
+&gt; 1st iteration: 32 (remaining elements to be processed: 68 - 32 =3D 36)=
+<br>
+&gt; 2nd iteration: 32 (remaining elements to be processed: 36 - 32 =3D 4)<=
+br>
+&gt; 3rd iteration: 4=C2=A0(remaining elements to be processed: 4 - 4 =3D 0=
+, will leave<br>
+&gt; &lt;loop&gt; after 0x104be)<br>
+&gt; <br>
+&gt; vadd.vv at 0x104b0 is implemented with gvec for acceleration:<br>
+&gt; <br>
+&gt; if (a-&gt;vm &amp;&amp; s-&gt;vl_eq_vlmax) {<br>
+&gt; =C2=A0 =C2=A0 gvec_fn(s-&gt;sew, vreg_ofs(s, a-&gt;rd),<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 vreg_ofs(s, a-&gt;rs2), vreg=
+_ofs(s, a-&gt;rs1),<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 MAXSZ(s), MAXSZ(s));<br>
+&gt; } else {<br>
+&gt; =C2=A0 =C2=A0 uint32_t data =3D 0;<br>
+&gt; <br>
+&gt; =C2=A0 =C2=A0 data =3D FIELD_DP32(data, VDATA, VM, a-&gt;vm);<br>
+&gt; =C2=A0 =C2=A0 data =3D FIELD_DP32(data, VDATA, LMUL, s-&gt;lmul);<br>
+&gt; =C2=A0 =C2=A0 tcg_gen_gvec_4_ptr(vreg_ofs(s, a-&gt;rd), vreg_ofs(s, 0)=
+,<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0vreg_ofs(s, a-&gt;rs1), vreg_ofs(s, a-&gt;rs2),<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0cpu_env, 0, s-&gt;vlen / 8, data, fn);<br>
+&gt; }<br>
+&gt; <br>
+&gt; gvec function is used when a-&gt;vm and s-&gt;vl_eq_vlmax are both tru=
+e.<br>
+&gt; However, s-&gt;vl_eq_vlmax, for the above case, is only true in 1st an=
+d 2nd<br>
+&gt; iterations.<br>
+&gt; In third iteration, env-&gt;vl is 4 which is not equal to vlmax =3D 32=
+.<br>
+&gt; But as the TB where vadd.vv resides are already linked with vsetvli&#3=
+9;s TB,<br>
+&gt; it won&#39;t be retranslated and still use the same gvec function in t=
+he third<br>
+&gt; iteration.<br>
+&gt; The total elemented being proceeded would be: 32=C2=A0+ 32=C2=A0+ 32 =
+=3D 96, instead of 68.<br>
+&gt; <br>
+&gt; I&#39;m wondering under such conditions, is it still correct to use ge=
+n_goto_tb() here?<br>
+&gt; Or we should use lookup_and_goto_ptr() as in trans_vsetvl() to not lin=
+k the TBs.<br>
+<br>
+You&#39;re correct -- because of vl_eq_vlmax we can&#39;t use goto_tb when =
+using a<br>
+variable input.<br>
+<br>
+It would be possible when using xN,x0 for VLMAX, or x0,x0 for reuse of the<=
+br>
+current vl, but I doubt it&#39;s worth special-casing that.<br>
+<br>
+I wonder if the goto_tb conversation happened before we introduced vl_eq_vl=
+max<br>
+and forgot to re-evaluate, or if I just missed that in the first place.<br>
+Anyway, thanks for finding this.<br>
+<br>
+<br>
+r~<br></blockquote><div><br></div><div>Thanks Richard, I&#39;ll include the=
+ fix in my next version patchset.</div><div><br></div><div>Frank Chang=C2=
+=A0</div></div></div>
+
+--000000000000f58cda05b0306080--
 
