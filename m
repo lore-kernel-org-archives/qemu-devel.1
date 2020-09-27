@@ -2,93 +2,94 @@ Return-Path: <SRS0=PST1=DE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0976CC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 02:21:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F342FC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 03:18:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6313E21789
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 02:21:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 31EC0205ED
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 03:18:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vc4XyksZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6313E21789
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ldZBJHHv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31EC0205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMMK3-00068r-1u
-	for qemu-devel@archiver.kernel.org; Sat, 26 Sep 2020 22:21:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59936)
+	id 1kMNDD-0003nk-84
+	for qemu-devel@archiver.kernel.org; Sat, 26 Sep 2020 23:18:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38918)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <maxim.cournoyer@gmail.com>)
- id 1kMMJO-0005ex-BW
- for qemu-devel@nongnu.org; Sat, 26 Sep 2020 22:21:14 -0400
-Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:36945)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kMNCd-0003NH-Et
+ for qemu-devel@nongnu.org; Sat, 26 Sep 2020 23:18:19 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:37323)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <maxim.cournoyer@gmail.com>)
- id 1kMMJK-0002Nk-Mo
- for qemu-devel@nongnu.org; Sat, 26 Sep 2020 22:21:14 -0400
-Received: by mail-qk1-x744.google.com with SMTP id 16so7076099qkf.4
- for <qemu-devel@nongnu.org>; Sat, 26 Sep 2020 19:21:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:references:date:in-reply-to:message-id
- :user-agent:mime-version;
- bh=orwuIxhcAzfxvrYdPq15IL46wXoZXSVTBAmQieB+P2I=;
- b=vc4XyksZHYo+IWDFs522eKIz6ybQGpCUHMi7NHKsZCZFiGUJdmSH2/iOqeQJBisr1y
- 3Iwy+ufWMUDSyWoevQ/CUcle/JbDQgoKschKRg5lx2UXPJ0hAjkQdxaKyI0eh9F+3bvw
- W2Szjy8UEB5k+gYEYCFOAM//RZK+5qqDnN46sOYLUPDHmssCPddB7J1r43P9zsDo0UUq
- OuDBEtYiAA5I0VFsT1rrj05HU+S/sOx4SZ7x0AhhkkJeCQEKSbfXxCaakZthX47BPhgd
- d6u0q47IxscrGIFdqBXt2hc2GKG0JzDa3201jP6Q3goYG0lrBniHY8bZ5ZWzeRgbQrGn
- vc/w==
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kMNCb-00019k-Q9
+ for qemu-devel@nongnu.org; Sat, 26 Sep 2020 23:18:19 -0400
+Received: by mail-pg1-x544.google.com with SMTP id e18so1828007pgd.4
+ for <qemu-devel@nongnu.org>; Sat, 26 Sep 2020 20:18:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=tEde0oVVjOwaVuHFWk0AGRryI0+4OYZ+7wyx5U2xlVY=;
+ b=ldZBJHHvcl0Me6Rg1lMsKEsybnloCHS/Cu9wgg/spopOl/sCYsdTV1kqBxihFBUv5d
+ 1yU/2MhJtXL6kzSgdnbB/NocXDDRa2UPlbY7/vQph/O6tTuCMIJxc8wE1g2IQJ4SfeOz
+ +m3Ca8am03VN8I1lGy8+6E9u8x6z1U6f6Yx1pA9VAsdSfHZkUjp23qZOXfRz4bAzVSYR
+ YhUO3LDypW3GC0FLTpm4K8EC1qMoTew2IP7McDxWfGs4GNY1Q8CSB9zll7QYrhfXQz4Z
+ T5XForI2sy7CYunCOEMFXPoNAjJseNchYWk7vz6+u42bYDrLLVX/CY7gO8ycsEJK1OYW
+ e0nQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:references:date:in-reply-to
- :message-id:user-agent:mime-version;
- bh=orwuIxhcAzfxvrYdPq15IL46wXoZXSVTBAmQieB+P2I=;
- b=ksJT3xqSCCmvRkIeg45DCrVNzgCvyHKUprqF6yIbAPKS75AkEqRRq5pxJcOH9l1hnW
- lK6IC7VZ8dIE/8mhgQcUr4EbtlT4dRcTVQPUZlEAPHiqL5sAnzBo20S+JWFW63ligYZA
- p0nVLQ/n6uc2WM4YapL4aHJv7qzs0fwevMUVR6doG+iIG6KmpJlMCa1TuNvnRHcwgxn+
- WTVfnRFYsD0HkrVxehREL07W4lRo4bC2Pxb9KcLWWW2OeC6mOqKw32X//QDmZ+PDcHES
- cbmIGXRV6xWdD0sSLzpDX/Dca7P2g9lFVha/h0t2pq19pHS/Qy/SKqMbLjSSdoB2Bbkq
- e1Fg==
-X-Gm-Message-State: AOAM531t7QLEM52gr8l7eNICxqyQeII02K/m082B6xxXFnITphoPMGAO
- YhJu+eLEahVhLwIXkOZS9dmrTMUdTysC+A==
-X-Google-Smtp-Source: ABdhPJw3TIbzxozScAe9Ke9i2CqM3yBEUt8XHXrX7lRnQicXBEjP+mFxotddlwLKmr9aEjJeuPsjMg==
-X-Received: by 2002:ae9:c015:: with SMTP id u21mr6840325qkk.268.1601173269208; 
- Sat, 26 Sep 2020 19:21:09 -0700 (PDT)
-Received: from hurd (dsl-10-132-92.b2b2c.ca. [72.10.132.92])
- by smtp.gmail.com with ESMTPSA id p28sm6076362qta.88.2020.09.26.19.21.08
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 26 Sep 2020 19:21:08 -0700 (PDT)
-From: Maxim Cournoyer <maxim.cournoyer@gmail.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH] build: Build and install the info manual.
-References: <20200925024143.26492-1-maxim.cournoyer@gmail.com>
- <CAFEAcA_wU73U6eaHU0mwccr-E0EHSKzFJ1yiR++YEKv=1LneJQ@mail.gmail.com>
- <87mu1dtao6.fsf@gmail.com>
- <CAFEAcA_4wXqGeOgsY2GbY1mk==DCz--j-jhs+OdGQnOHEf+D_A@mail.gmail.com>
-Date: Sat, 26 Sep 2020 22:22:33 -0400
-In-Reply-To: <CAFEAcA_4wXqGeOgsY2GbY1mk==DCz--j-jhs+OdGQnOHEf+D_A@mail.gmail.com>
- (Peter Maydell's message of "Sat, 26 Sep 2020 22:34:22 +0100")
-Message-ID: <87wo0grmae.fsf@gmail.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=tEde0oVVjOwaVuHFWk0AGRryI0+4OYZ+7wyx5U2xlVY=;
+ b=dU9iS5pTcznBflzjAifYqUKdQLRhJDd9uNmodO3JqBlCrBpr4IByFrWAw/SXe1FypY
+ xAGeIx5g//xz43HK48wUJT3/2KNxwWVP4atG6dsSgWB8xbl1nmxUNvZxZ2E4u9BOZO5z
+ klnyNt8SsoCsr1qXiKgpnu1je79x1k8f6uEZnXYno6S0SZwQ+J75KgdHTvtSkFjGWsVR
+ mYr7dTmNP4aN0Hj4D3Ig9ZJWPPW2cF2rzuv1lhYFNA+Gy8y86DiUtvs3z0mQaFz9RfvO
+ S7WaZXeahuHlfFdFaNmMESAHsEe1ip7R88L6lRtLKmWXJpgIeX+IgPcY+YCqAlrI4+ge
+ QWNw==
+X-Gm-Message-State: AOAM532YkqmWvL4ka26hktewjX5zG2wq7VYYrw3afVJrGm8S0BOCN9vL
+ dzpUbtHg53uwZcCVK2+EBjJzag==
+X-Google-Smtp-Source: ABdhPJz5GuOynhgUJFEV3ep3WX4gq0gGCdBd2ebCSiZ7ihWdti6oa67yYdZpq0PBxyOZdwiH0Tm/iQ==
+X-Received: by 2002:a63:c74e:: with SMTP id v14mr4423240pgg.186.1601176695960; 
+ Sat, 26 Sep 2020 20:18:15 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id 72sm6640360pfx.79.2020.09.26.20.18.14
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 26 Sep 2020 20:18:15 -0700 (PDT)
+Subject: Re: [PATCH 2/4] plugin: Fixes compiling errors on msys2/mingw
+To: Yonggang Luo <luoyonggang@gmail.com>, qemu-devel@nongnu.org
+References: <20200926140415.1286-1-luoyonggang@gmail.com>
+ <20200926140415.1286-3-luoyonggang@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <b6e76dcf-187c-4e49-a82c-ed0b637d07b1@linaro.org>
+Date: Sat, 26 Sep 2020 20:18:13 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain
-Received-SPF: pass client-ip=2607:f8b0:4864:20::744;
- envelope-from=maxim.cournoyer@gmail.com; helo=mail-qk1-x744.google.com
+In-Reply-To: <20200926140415.1286-3-luoyonggang@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-Spam_score_int: -22
+X-Spam_score: -2.3
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.213,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -103,151 +104,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello Peter,
+On 9/26/20 7:04 AM, Yonggang Luo wrote:
+> @@ -72,7 +72,7 @@ static void vcpu_tb_exec(unsigned int cpu_index, void *udata)
+>      CPUCount *count = max_cpus ?
+>          g_ptr_array_index(counts, cpu_index) : &inline_count;
+>  
+> -    unsigned long n_insns = (unsigned long)udata;
+> +    uint64_t n_insns = (uint64_t)udata;
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+This needs to be uintptr_t.
 
-> On Sat, 26 Sep 2020 at 05:36, Maxim Cournoyer <maxim.cournoyer@gmail.com> wrote:
->> > This isn't the right thing. You should be pointing sphinx-build
->> > at each of the individual manuals (system, interop, etc) and
->> > generating one info file for each. This is because we generate
->> > manuals for each of these including the 'devel' manual, but
->> > we don't want to install 'devel', because it's developer-facing
->> > and not needed by end-users of QEMU.
->>
->> Is this the only reason individual manuals are being generated?  It
->> makes sense for the manpages (which have their own macros), but
->> otherwise (for HTML and info) introduces a lot of complexity for not
->> much gain, in my opinion.  Users not wanting to know about devel
->> internals can simply skip that section; no harm done.
->
-> It is the best way we found for getting Sphinx to do what we wanted.
-> I agree that it would be nicer to have one manual with all the user
-> facing parts in it, but it is apparently not possible to do that without
-> shipping the devel docs to users, which we didn't want to do.
-
-I personally don't understand the rationale of hiding the devel section
-from users, especially given the kind of users QEMU is likely to attract
-(e.g, teksavvy people, perhaps themselves developers that could be
-curious peeking into that section to deepen their understanding of
-QEMU's architecture and internals).
-
-But if you feel strongly about it, I'd suggest the following, which
-excludes the devel section from being built when calling Sphinx from the
-top level:
-
---8<---------------cut here---------------start------------->8---
-7 files changed, 13 insertions(+), 4 deletions(-)
-docs/conf.py                 | 5 ++++-
-docs/cpu-hotplug.rst         | 2 ++
-docs/index.rst               | 3 ---
-docs/microvm.rst             | 2 ++
-docs/pr-manager.rst          | 2 ++
-docs/virtio-net-failover.rst | 2 ++
-docs/virtio-pmem.rst         | 1 +
-
-modified   docs/conf.py
-@@ -116,7 +116,10 @@ language = None
- # List of patterns, relative to source directory, that match files and
- # directories to ignore when looking for source files.
- # This patterns also effect to html_static_path and html_extra_path
--exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-+exclude_patterns = ['_build',
-+                    'Thumbs.db',
-+                    '.DS_Store',
-+                    'devel/*']
-
- # The name of the Pygments (syntax highlighting) style to use.
- pygments_style = 'sphinx'
-modified   docs/cpu-hotplug.rst
-@@ -1,3 +1,5 @@
-+:orphan:
-+
- ===================
- Virtual CPU hotplug
- ===================
-modified   docs/index.rst
-@@ -9,12 +9,9 @@ Welcome to QEMU's documentation!
- .. toctree::
-    :maxdepth: 2
-    :caption: Contents:
--   :glob:
-
-    system/index
-    user/index
-    tools/index
-    interop/index
-    specs/index
--   devel/index
--   *
-modified   docs/microvm.rst
-@@ -1,3 +1,5 @@
-+:orphan:
-+
- ====================
- microvm Machine Type
- ====================
-modified   docs/pr-manager.rst
-@@ -1,3 +1,5 @@
-+:orphan:
-+
- ======================================
- Persistent reservation managers
- ======================================
-modified   docs/virtio-net-failover.rst
-@@ -1,3 +1,5 @@
-+:orphan:
-+
- ======================================
- QEMU virtio-net standby (net_failover)
- ======================================
-modified   docs/virtio-pmem.rst
-@@ -1,3 +1,4 @@
-+:orphan:
-
- ========================
- QEMU virtio pmem
---8<---------------cut here---------------end--------------->8---
-
-With this change, the top level node of "info qemu" reads as:
-
---8<---------------cut here---------------start------------->8---
-QEMU Documentation
-******************
-
-     QEMU , Sep 26, 2020
-
-     The QEMU Project Developers
-
-     Copyright (C) 2020, The QEMU Project Developers
-
-* Menu:
-
-* QEMU System Emulation User's Guide::
-* QEMU User Mode Emulation User's Guide::
-* QEMU Tools Guide::
-* QEMU System Emulation Management and Interoperability Guide::
-* QEMU System Emulation Guest Hardware Specifications::
-* Index::
---8<---------------cut here---------------end--------------->8---
-
-I'd still prefer to include the developer's manual as the last section
-of the info manual, if you don't mind, for the reason explained above.
-
-The scheme used above to exclude the devel section could also be used to
-simplify building the HTML manual (e.g., build it by calling sphinx on
-the top level with a correctly defined index.rst instead of individually
-for each of its constituting sections before stitching them back
-together with a custom index.html).
-
-What do you think?
-
-Thanks again,
-
-Maxim
+r~
 
