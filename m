@@ -4,60 +4,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D31D6C4346E
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 12:19:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59CA7C4346E
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 12:21:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C6B423718
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 12:19:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EE42123718
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 12:21:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="Rjjgy3n8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C6B423718
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="TqvZ2ijj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE42123718
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMVel-0003vF-G3
-	for qemu-devel@archiver.kernel.org; Sun, 27 Sep 2020 08:19:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53024)
+	id 1kMVgP-0005HL-Tr
+	for qemu-devel@archiver.kernel.org; Sun, 27 Sep 2020 08:21:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53208)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
- (envelope-from <b40b46794184fc18bbd39d8aa7f01ca3ee1fbb2f@lizzy.crudebyte.com>)
- id 1kMVdK-0002c0-ES
- for qemu-devel@nongnu.org; Sun, 27 Sep 2020 08:18:26 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:52907)
+ (envelope-from <265f5d9a0fb10ce5e782455839d1baf678dbac48@lizzy.crudebyte.com>)
+ id 1kMVeL-0003bd-5z
+ for qemu-devel@nongnu.org; Sun, 27 Sep 2020 08:19:29 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:44541)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
- (envelope-from <b40b46794184fc18bbd39d8aa7f01ca3ee1fbb2f@lizzy.crudebyte.com>)
- id 1kMVdI-0006jf-PH
- for qemu-devel@nongnu.org; Sun, 27 Sep 2020 08:18:26 -0400
+ (envelope-from <265f5d9a0fb10ce5e782455839d1baf678dbac48@lizzy.crudebyte.com>)
+ id 1kMVeJ-0006o8-Dn
+ for qemu-devel@nongnu.org; Sun, 27 Sep 2020 08:19:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
  d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
  Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
- Content-Description; bh=RpchxIRjTMmMwFMZr0cf7veocelrms95TEq16l9UbCI=; b=Rjjgy
- 3n8LaAjKpQam7Z0TBI/9EcjqbYlPQmWY9dOfl3gxKaDIC7g/1mH+lcO9+Dn0TO8lzft2tXVZKWVXB
- oW6QYp1US/T7rdTwQd7uGO9KpLzcLE6OPk5z1OLyZVd6sLKt36G8y69l/tlFl1PMGC4UJUu/Y/16O
- G9yOVAnZv02POuRfBA70/FnJ2ya5duQgWDKdMzYJ5RlzXmcLV4sPvZ3PKajNJ5tmTdqoKDNgLVGZy
- 3TzZoVnjoqs7QXqUQh1Ur3VrYNMxKrZ6bWZ3kkIXp+Gd6lo9OYpdOgjiR5VcHJUCo0r5xOhRU0/gk
- CUkeVlMY9e22kJBIG2+bXbdx/XaNA==;
-Message-Id: <b40b46794184fc18bbd39d8aa7f01ca3ee1fbb2f.1601203436.git.qemu_oss@crudebyte.com>
+ Content-Description; bh=JWoDBnO+yolHB04O/0j0yUtvrSSuKrhkfcd+BHmO3/0=; b=TqvZ2
+ ijjVaAt1vRlgfAVeuwU2FXL/fHor/PiL3MtR5iDZBvbtnkxmWKXm6F071mNhfOxvWoBl4GfkK/7qs
+ PRgU/0YnnCqw+3KgLbn0dQQhDaVqbTdUePB34qYgq0EXwXnXs4htFapSrPd2dqrXjZNxHXYCsQAB/
+ v8meCysIxYEu+fjbKn4EpLkQ1GPVTqjKOlVbnFfEq0eWlAJujJHR9ET0pcUjrC+JvqvoZrbky3yGk
+ nqIC9o5P9GHABYCFkugBDqZwaJS2DIEfJH233oGR2bqSog8LvR3v/912AYmNriW+nHm+E7gv9OkDu
+ 6dvnnFClSjI9RIa/RzMIVlelKkOoA==;
+Message-Id: <265f5d9a0fb10ce5e782455839d1baf678dbac48.1601203436.git.qemu_oss@crudebyte.com>
 In-Reply-To: <cover.1601203436.git.qemu_oss@crudebyte.com>
 References: <cover.1601203436.git.qemu_oss@crudebyte.com>
 From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Date: Sun, 27 Sep 2020 12:39:17 +0200
-Subject: [PATCH 03/12] tests/qtest/qos: add qos_dump_graph()
+Date: Sun, 27 Sep 2020 12:40:34 +0200
+Subject: [PATCH 08/12] tests/9pfs: refactor test names and test devices
 To: qemu-devel@nongnu.org
 Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
  Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
  Greg Kurz <groug@kaod.org>
 Received-SPF: none client-ip=91.194.90.13;
- envelope-from=b40b46794184fc18bbd39d8aa7f01ca3ee1fbb2f@lizzy.crudebyte.com;
+ envelope-from=265f5d9a0fb10ce5e782455839d1baf678dbac48@lizzy.crudebyte.com;
  helo=lizzy.crudebyte.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/27 07:42:27
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -83,108 +83,123 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This new function is purely for debugging purposes. It prints the
-current qos graph to stdout and allows to identify problems in the
-created qos graph e.g. when writing new qos tests.
+Rename all 9pfs tests and devices they create for running their tests
+from 'virtio*' -> 'virtio*-synth'.
+
+In order for the tests still to work after this renaming, use the
+newly added function qos_node_create_driver_named() instead of
+qos_node_create_driver(). That new function allows to assign a name
+to a device that differs from the actual QEMU driver it's using.
 
 Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
 ---
- tests/qtest/libqos/qgraph.c | 54 +++++++++++++++++++++++++++++++++++++
- tests/qtest/libqos/qgraph.h | 20 ++++++++++++++
- 2 files changed, 74 insertions(+)
+ tests/qtest/libqos/virtio-9p.c | 29 ++++++++++++++-------------
+ tests/qtest/virtio-9p-test.c   | 36 +++++++++++++++++-----------------
+ 2 files changed, 33 insertions(+), 32 deletions(-)
 
-diff --git a/tests/qtest/libqos/qgraph.c b/tests/qtest/libqos/qgraph.c
-index 61faf6b27d..e70635750e 100644
---- a/tests/qtest/libqos/qgraph.c
-+++ b/tests/qtest/libqos/qgraph.c
-@@ -805,3 +805,57 @@ void qos_delete_cmd_line(const char *name)
-         node->command_line = NULL;
+diff --git a/tests/qtest/libqos/virtio-9p.c b/tests/qtest/libqos/virtio-9p.c
+index 9f099737f9..1bda5403ff 100644
+--- a/tests/qtest/libqos/virtio-9p.c
++++ b/tests/qtest/libqos/virtio-9p.c
+@@ -62,10 +62,10 @@ static void virtio_9p_device_start_hw(QOSGraphObject *obj)
+ static void *virtio_9p_get_driver(QVirtio9P *v_9p,
+                                          const char *interface)
+ {
+-    if (!g_strcmp0(interface, "virtio-9p")) {
++    if (!g_strcmp0(interface, "virtio-9p-synth")) {
+         return v_9p;
      }
+-    if (!g_strcmp0(interface, "virtio")) {
++    if (!g_strcmp0(interface, "virtio-synth")) {
+         return v_9p->vdev;
+     }
+ 
+@@ -159,22 +159,23 @@ static void virtio_9p_register_nodes(void)
+         .before_cmd_line = "-fsdev synth,id=fsdev0",
+     };
+ 
+-    /* virtio-9p-device */
++    /* virtio-9p-device-synth */
+     opts.extra_device_opts = str_simple,
+-    qos_node_create_driver("virtio-9p-device", virtio_9p_device_create);
+-    qos_node_consumes("virtio-9p-device", "virtio-bus", &opts);
+-    qos_node_produces("virtio-9p-device", "virtio");
+-    qos_node_produces("virtio-9p-device", "virtio-9p");
++    qos_node_create_driver_named("virtio-9p-device-synth", "virtio-9p-device",
++                                 virtio_9p_device_create);
++    qos_node_consumes("virtio-9p-device-synth", "virtio-bus", &opts);
++    qos_node_produces("virtio-9p-device-synth", "virtio-synth");
++    qos_node_produces("virtio-9p-device-synth", "virtio-9p-synth");
+ 
+-    /* virtio-9p-pci */
++    /* virtio-9p-pci-synth */
+     opts.extra_device_opts = str_addr;
+     add_qpci_address(&opts, &addr);
+-    qos_node_create_driver("virtio-9p-pci", virtio_9p_pci_create);
+-    qos_node_consumes("virtio-9p-pci", "pci-bus", &opts);
+-    qos_node_produces("virtio-9p-pci", "pci-device");
+-    qos_node_produces("virtio-9p-pci", "virtio");
+-    qos_node_produces("virtio-9p-pci", "virtio-9p");
+-
++    qos_node_create_driver_named("virtio-9p-pci-synth", "virtio-9p-pci",
++                                 virtio_9p_pci_create);
++    qos_node_consumes("virtio-9p-pci-synth", "pci-bus", &opts);
++    qos_node_produces("virtio-9p-pci-synth", "pci-device");
++    qos_node_produces("virtio-9p-pci-synth", "virtio-synth");
++    qos_node_produces("virtio-9p-pci-synth", "virtio-9p-synth");
  }
-+
-+#define RED(txt) (    \
-+    "\033[0;91m" txt  \
-+    "\033[0m"         \
-+)
-+
-+#define GREEN(txt) (    \
-+    "\033[0;92m" txt  \
-+    "\033[0m"         \
-+)
-+
-+void qos_dump_graph(void)
-+{
-+    GList *keys;
-+    GList *l;
-+    QOSGraphEdgeList *list;
-+    QOSGraphEdge *e, *next;
-+    QOSGraphNode *dest_node, *node;
-+
-+    printf("ALL QGRAPH EDGES: {\n");
-+    keys = g_hash_table_get_keys(edge_table);
-+    for (l = keys; l != NULL; l = l->next) {
-+        const gchar *key = l->data;
-+        printf("\t src='%s'\n", key);
-+        list = get_edgelist(key);
-+        QSLIST_FOREACH_SAFE(e, list, edge_list, next) {
-+            dest_node = g_hash_table_lookup(node_table, e->dest);
-+            printf("\t\t|-> dest='%s' type=%d (node=%p)",
-+                   e->dest, e->type, dest_node);
-+            if (!dest_node) {
-+                printf(RED(" <------- ERROR !"));
-+            }
-+            printf("\n");
-+        }
-+    }
-+    g_list_free(keys);
-+    printf("}\n");
-+
-+    printf("ALL QGRAPH NODES: {\n");
-+    keys = g_hash_table_get_keys(node_table);
-+    for (l = keys; l != NULL; l = l->next) {
-+        const gchar *key = l->data;
-+        node = g_hash_table_lookup(node_table, key);
-+        printf("\t name='%s' ", key);
-+        if (node->qemu_name) {
-+            printf("qemu_name='%s' ", node->qemu_name);
-+        }
-+        printf("type=%d cmd_line='%s' [%s]\n",
-+               node->type, node->command_line,
-+               node->available ? GREEN("available") : RED("UNAVAILBLE"));
-+    }
-+    g_list_free(keys);
-+    printf("}\n");
-+}
-diff --git a/tests/qtest/libqos/qgraph.h b/tests/qtest/libqos/qgraph.h
-index f472949f68..07a32535f1 100644
---- a/tests/qtest/libqos/qgraph.h
-+++ b/tests/qtest/libqos/qgraph.h
-@@ -586,5 +586,25 @@ QOSGraphObject *qos_machine_new(QOSGraphNode *node, QTestState *qts);
- QOSGraphObject *qos_driver_new(QOSGraphNode *node, QOSGraphObject *parent,
-                                QGuestAllocator *alloc, void *arg);
  
-+/**
-+ * Just for debugging purpose: prints all currently existing nodes and
-+ * edges to stdout.
-+ *
-+ * All qtests add themselves to the overall qos graph by calling qgraph
-+ * functions that add device nodes and edges between the individual graph
-+ * nodes for tests. As the actual graph is assmbled at runtime by the qos
-+ * subsystem, it is sometimes not obvious how the overall graph looks like.
-+ * E.g. when writing new tests it may happen that those new tests are simply
-+ * ignored by the qtest framework.
-+ *
-+ * This function allows to identify problems in the created qgraph. Keep in
-+ * mind: only tests with a path down from the actual test case node (leaf) up
-+ * to the graph's root node are actually executed by the qtest framework. And
-+ * the qtest framework uses QMP to automatically check which QEMU drivers are
-+ * actually currently available, and accordingly qos marks certain pathes as
-+ * 'unavailable' in such cases (e.g. when QEMU was compiled without support for
-+ * a certain feature).
-+ */
-+void qos_dump_graph(void);
+ libqos_init(virtio_9p_register_nodes);
+diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
+index f7505396f3..d46d675309 100644
+--- a/tests/qtest/virtio-9p-test.c
++++ b/tests/qtest/virtio-9p-test.c
+@@ -897,27 +897,27 @@ static void fs_readdir_split_512(void *obj, void *data,
  
- #endif
+ static void register_virtio_9p_test(void)
+ {
+-    qos_add_test("config", "virtio-9p", pci_config, NULL);
+-    qos_add_test("fs/version/basic", "virtio-9p", fs_version, NULL);
+-    qos_add_test("fs/attach/basic", "virtio-9p", fs_attach, NULL);
+-    qos_add_test("fs/walk/basic", "virtio-9p", fs_walk, NULL);
+-    qos_add_test("fs/walk/no_slash", "virtio-9p", fs_walk_no_slash,
++    /* selects the 9pfs 'synth' filesystem driver for the respective test */
++    const char *synth_driver = "virtio-9p-synth";
++
++    qos_add_test("config", synth_driver, pci_config, NULL);
++    qos_add_test("fs/version/basic", synth_driver, fs_version, NULL);
++    qos_add_test("fs/attach/basic", synth_driver, fs_attach, NULL);
++    qos_add_test("fs/walk/basic", synth_driver, fs_walk, NULL);
++    qos_add_test("fs/walk/no_slash", synth_driver, fs_walk_no_slash, NULL);
++    qos_add_test("fs/walk/dotdot_from_root", synth_driver, fs_walk_dotdot,
+                  NULL);
+-    qos_add_test("fs/walk/dotdot_from_root", "virtio-9p",
+-                 fs_walk_dotdot, NULL);
+-    qos_add_test("fs/lopen/basic", "virtio-9p", fs_lopen, NULL);
+-    qos_add_test("fs/write/basic", "virtio-9p", fs_write, NULL);
+-    qos_add_test("fs/flush/success", "virtio-9p", fs_flush_success,
++    qos_add_test("fs/lopen/basic", synth_driver, fs_lopen, NULL);
++    qos_add_test("fs/write/basic", synth_driver, fs_write, NULL);
++    qos_add_test("fs/flush/success", synth_driver, fs_flush_success, NULL);
++    qos_add_test("fs/flush/ignored", synth_driver, fs_flush_ignored, NULL);
++    qos_add_test("fs/readdir/basic", synth_driver, fs_readdir, NULL);
++    qos_add_test("fs/readdir/split_512", synth_driver, fs_readdir_split_512,
+                  NULL);
+-    qos_add_test("fs/flush/ignored", "virtio-9p", fs_flush_ignored,
++    qos_add_test("fs/readdir/split_256", synth_driver, fs_readdir_split_256,
++                 NULL);
++    qos_add_test("fs/readdir/split_128", synth_driver, fs_readdir_split_128,
+                  NULL);
+-    qos_add_test("fs/readdir/basic", "virtio-9p", fs_readdir, NULL);
+-    qos_add_test("fs/readdir/split_512", "virtio-9p",
+-                 fs_readdir_split_512, NULL);
+-    qos_add_test("fs/readdir/split_256", "virtio-9p",
+-                 fs_readdir_split_256, NULL);
+-    qos_add_test("fs/readdir/split_128", "virtio-9p",
+-                 fs_readdir_split_128, NULL);
+ }
+ 
+ libqos_init(register_virtio_9p_test);
 -- 
 2.20.1
 
