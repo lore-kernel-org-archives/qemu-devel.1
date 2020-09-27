@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F2E8C4346E
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 15:00:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A56A0C4346E
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 15:01:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B66112080C
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 15:00:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 18C1F23899
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 15:01:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fq9ofA/1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B66112080C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fSES/4Ca"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18C1F23899
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMYAF-0007fG-PP
-	for qemu-devel@archiver.kernel.org; Sun, 27 Sep 2020 11:00:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49190)
+	id 1kMYBJ-0008K0-4T
+	for qemu-devel@archiver.kernel.org; Sun, 27 Sep 2020 11:01:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49124)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kMY8y-0006QE-57
- for qemu-devel@nongnu.org; Sun, 27 Sep 2020 10:59:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36410)
+ id 1kMY8U-0005bY-O1
+ for qemu-devel@nongnu.org; Sun, 27 Sep 2020 10:58:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20552)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kMY8w-0006Vq-IQ
- for qemu-devel@nongnu.org; Sun, 27 Sep 2020 10:59:15 -0400
+ id 1kMY8T-0006Tq-1X
+ for qemu-devel@nongnu.org; Sun, 27 Sep 2020 10:58:46 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601218754;
+ s=mimecast20190719; t=1601218724;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=EWT3eeP8M1S4mF5jrWBk/Kh6soLRKqtXBG4/bKeL4bg=;
- b=Fq9ofA/1hqmSVobVHEsNCzIAVkfkjEh4laXgIwbbh5KFKEFSQemDW4rRlrI3aPnsSAycWl
- cMliBkXCqWwO2sv1XSCI2hRDFQbuQVBqVPwYtw3MFF/O8WkpWn5GC6oUJtm86ERXvgFwwJ
- cppe6Bdv7Q5WRQ8XXVUTFljrS+bSfXE=
+ bh=hNLcghou2JIIFL8nOu0gOdDNzxKgsPO8BGkR410M6LI=;
+ b=fSES/4Cas0OthixwQM55GDrXZVuBH77IjnnIYUAjcR7vlFIrupJ06DDVW70mNyGQXRTnR6
+ PcsLvF8cAiU7gbULD94z+GOjNUog5b/orj/xmYA9gjDvZfMTzXIrfooUC+0NOWObnDZEVf
+ 4d0hhYjL5bwzKCXTq3398EJCs0dcs5w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-381-Xq8ATs5mOLmMQx8X147b_g-1; Sun, 27 Sep 2020 10:59:09 -0400
-X-MC-Unique: Xq8ATs5mOLmMQx8X147b_g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-593-aKgGuxWjPr-Q2HZlDuMVUw-1; Sun, 27 Sep 2020 10:58:41 -0400
+X-MC-Unique: aKgGuxWjPr-Q2HZlDuMVUw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92680807322;
- Sun, 27 Sep 2020 14:59:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF8AA807331;
+ Sun, 27 Sep 2020 14:58:40 +0000 (UTC)
 Received: from localhost (unknown [10.36.110.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5BBFA78801;
- Sun, 27 Sep 2020 14:58:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 10DAA5D9CA;
+ Sun, 27 Sep 2020 14:58:27 +0000 (UTC)
 From: marcandre.lureau@redhat.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 5/6] spice: get monitors physical dimension
-Date: Sun, 27 Sep 2020 18:57:50 +0400
-Message-Id: <20200927145751.365446-6-marcandre.lureau@redhat.com>
+Subject: [PATCH v3 3/6] ui: add getter for UIInfo
+Date: Sun, 27 Sep 2020 18:57:48 +0400
+Message-Id: <20200927145751.365446-4-marcandre.lureau@redhat.com>
 In-Reply-To: <20200927145751.365446-1-marcandre.lureau@redhat.com>
 References: <20200927145751.365446-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=marcandre.lureau@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -105,47 +105,59 @@ Sender: "Qemu-devel"
 
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-With upcoming Spice server version 0.14.4, the monitor configuration can
-contain additional fields for the monitor physical dimensions.
+The following patch is going to introduce extra fields / details to
+UIInfo. Add a getter and keep the current values, instead of memset(0)
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- include/ui/console.h | 3 +++
- ui/spice-display.c   | 7 +++++++
- 2 files changed, 10 insertions(+)
+ include/ui/console.h | 1 +
+ ui/console.c         | 7 +++++++
+ ui/spice-display.c   | 2 +-
+ 3 files changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/include/ui/console.h b/include/ui/console.h
-index 353d2e49a1..e7303d8b98 100644
+index 79e301f946..353d2e49a1 100644
 --- a/include/ui/console.h
 +++ b/include/ui/console.h
-@@ -119,6 +119,9 @@ typedef struct DisplaySurface {
- } DisplaySurface;
+@@ -264,6 +264,7 @@ void update_displaychangelistener(DisplayChangeListener *dcl,
+ void unregister_displaychangelistener(DisplayChangeListener *dcl);
  
- typedef struct QemuUIInfo {
-+    /* physical dimension */
-+    uint16_t width_mm;
-+    uint16_t height_mm;
-     /* geometry */
-     int       xoff;
-     int       yoff;
+ bool dpy_ui_info_supported(QemuConsole *con);
++const QemuUIInfo *dpy_get_ui_info(const QemuConsole *con);
+ int dpy_set_ui_info(QemuConsole *con, QemuUIInfo *info);
+ 
+ void dpy_gfx_update(QemuConsole *con, int x, int y, int w, int h);
+diff --git a/ui/console.c b/ui/console.c
+index 7592c3c324..54a74c0b16 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -1516,6 +1516,13 @@ bool dpy_ui_info_supported(QemuConsole *con)
+     return con->hw_ops->ui_info != NULL;
+ }
+ 
++const QemuUIInfo *dpy_get_ui_info(const QemuConsole *con)
++{
++    assert(con != NULL);
++
++    return &con->ui_info;
++}
++
+ int dpy_set_ui_info(QemuConsole *con, QemuUIInfo *info)
+ {
+     assert(con != NULL);
 diff --git a/ui/spice-display.c b/ui/spice-display.c
-index b304c13149..0178d5766d 100644
+index 19632fdf6c..625d9232b9 100644
 --- a/ui/spice-display.c
 +++ b/ui/spice-display.c
-@@ -678,6 +678,13 @@ static int interface_client_monitors_config(QXLInstance *sin,
-     if (mc->num_of_monitors > head) {
-         info.width  = mc->monitors[head].width;
-         info.height = mc->monitors[head].height;
-+#if SPICE_SERVER_VERSION >= 0x000e04 /* release 0.14.4 */
-+        if (mc->flags & VD_AGENT_CONFIG_MONITORS_FLAG_PHYSICAL_SIZE) {
-+            VDAgentMonitorMM *mm = (void *)&mc->monitors[mc->num_of_monitors];
-+            info.width_mm = mm[head].width;
-+            info.height_mm = mm[head].height;
-+        }
-+#endif
+@@ -672,7 +672,7 @@ static int interface_client_monitors_config(QXLInstance *sin,
+         return 1;
      }
  
-     trace_qemu_spice_ui_info(ssd->qxl.id, info.width, info.height);
+-    memset(&info, 0, sizeof(info));
++    info = *dpy_get_ui_info(ssd->dcl.con);
+ 
+     if (mc->num_of_monitors == 1) {
+         /*
 -- 
 2.26.2
 
