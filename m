@@ -2,95 +2,84 @@ Return-Path: <SRS0=PST1=DE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67383C4346E
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 13:59:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F12D0C4346E
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 14:59:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8AC2221EC
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 13:59:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4087523899
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 14:59:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="l3AiGlac"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8AC2221EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UEIb/IgD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4087523899
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMXDK-0001V1-2Y
-	for qemu-devel@archiver.kernel.org; Sun, 27 Sep 2020 09:59:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39526)
+	id 1kMY8q-0005uK-3i
+	for qemu-devel@archiver.kernel.org; Sun, 27 Sep 2020 10:59:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49076)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=5325bd5c7=alistair.francis@wdc.com>)
- id 1kMXAw-0006xK-Ol
- for qemu-devel@nongnu.org; Sun, 27 Sep 2020 09:57:14 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:35119)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=5325bd5c7=alistair.francis@wdc.com>)
- id 1kMXAv-0000N8-3E
- for qemu-devel@nongnu.org; Sun, 27 Sep 2020 09:57:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1601215032; x=1632751032;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=OeMxlU99iPdNNbIiRbMZWU89GNi9nzVJwZpprmXgZF8=;
- b=l3AiGlacw++82BUO7ctn4tamiRz7KZUCz84ECocCZBz/7bOb4Wrhy2Hc
- fc1mlk9wMksULjiYbFDDel/eGWA8vGwB9KwEQXfQpLROume4g2wcOolqD
- SNGC6lo/a6Icjae2PYZ065Z+OQey4ssgGDbBQqYuT6c8sga0rQAtuevsJ
- xaDMbGuNlaZIXIe4Hm0QieAXmtfYKa6zmQJxCd7HSl8b6KTFOj2+kKn1M
- e0V3oICh9QC9KzMid2n9AnfLrh2s9RnbzsbIl1EQB3bO/2JX2pAA+eFSa
- 2+IwGMvjcvrvn++A92Hze7iSyAezvEPVyXVg706mkhaXVucN3HbkVZo7u g==;
-IronPort-SDR: t6TyMuF/5NMBm57vJJ0QbyU3d/kOKV6NapmTGiHskd+rudLYu0XvjSzY7c+XW98cafc3d7chmf
- Fr4k4Ddjr1Z9cvQR3Be0YlgnxWFck00FXMXHKbR7WbrOe1RscYzFRc185IpptnSIHaP8bAKV1N
- bY4xo74kO7r2xA66p5OdbL1sS6apL1qwk0jM06FHiWGGgJ70xUF9UZZGdOX0HI1HiRN7r7jHpp
- j9yopOF8yoHlG+sdfhpRtMZIWikuq+TSmiQbXQpDAzatbXzpx08AP8RZQFPDF6edw5Gtq2/m42
- rog=
-X-IronPort-AV: E=Sophos;i="5.77,310,1596470400"; d="scan'208";a="148291512"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
- ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 27 Sep 2020 21:57:07 +0800
-IronPort-SDR: GoIx6DazgXGkq515AH5XgF4/Ab2ToKOm2dHOq511GE0cSvRbAYVbiowxT6vzZ9hUFiiNdAFOY0
- txSrI4i5DW9g==
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 27 Sep 2020 06:44:03 -0700
-IronPort-SDR: FM8VWuOZnNk1mp3BdJJXYmuWJubIo05cdIcNQSsNzu7e6P18ovBQ5xee3bCfjxoXlBCihtdBQg
- t/aKlS38todw==
-WDCIronportException: Internal
-Received: from usa003000.ad.shared (HELO risc6-mainframe.hgst.com)
- ([10.86.60.38])
- by uls-op-cesaip01.wdc.com with ESMTP; 27 Sep 2020 06:57:06 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1kMY7v-0005Fo-M5
+ for qemu-devel@nongnu.org; Sun, 27 Sep 2020 10:58:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:53750)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1kMY7t-0006Ry-Fr
+ for qemu-devel@nongnu.org; Sun, 27 Sep 2020 10:58:10 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601218687;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=emFydObY5sOmzVU7aR2Oxn+24L3b3rXtNM8x9eSycYY=;
+ b=UEIb/IgDc+wZxixa0WD1Y40ww1my6xYW88SeIhWdCHcmePYn0b9doG9AYNPVliFAQlmrFY
+ ktIkWaxAP5Klvg7IXFb+udZFr5y0gu5oV3HpM9HIhZKFjwRQ7o7IPVFEH1tomQVlKNDzgM
+ 1Yy405ZiJw6NVRclz1hgUY44zkPHJLk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-364-NwAf63WvN329U0R4_XFiRA-1; Sun, 27 Sep 2020 10:58:05 -0400
+X-MC-Unique: NwAf63WvN329U0R4_XFiRA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0215C1DDE2;
+ Sun, 27 Sep 2020 14:58:04 +0000 (UTC)
+Received: from localhost (unknown [10.36.110.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8CD1C55777;
+ Sun, 27 Sep 2020 14:57:54 +0000 (UTC)
+From: marcandre.lureau@redhat.com
 To: qemu-devel@nongnu.org
-Subject: [PULL 2/2] core/register: Specify instance_size in the TypeInfo
-Date: Sun, 27 Sep 2020 06:46:09 -0700
-Message-Id: <20200927134609.2358960-3-alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200927134609.2358960-1-alistair.francis@wdc.com>
-References: <20200927134609.2358960-1-alistair.francis@wdc.com>
+Subject: [PATCH v3 0/6] Add physical display dimensions to spice/virtio-gpu
+Date: Sun, 27 Sep 2020 18:57:45 +0400
+Message-Id: <20200927145751.365446-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.154.42;
- envelope-from=prvs=5325bd5c7=alistair.francis@wdc.com;
- helo=esa4.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/27 09:57:06
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=marcandre.lureau@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=63.128.21.124;
+ envelope-from=marcandre.lureau@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/27 10:58:07
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -36
+X-Spam_score: -3.7
+X-Spam_bar: ---
+X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.576,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,78 +92,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, Alistair Francis <alistair.francis@wdc.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: spice-devel@lists.freedesktop.org, Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reported-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <4cf1beb7dafb9143c261d266557d3173bf160524.1598376594.git.alistair.francis@wdc.com>
----
- hw/core/register.c | 31 +++++++++++++------------------
- 1 file changed, 13 insertions(+), 18 deletions(-)
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>=0D
 
-diff --git a/hw/core/register.c b/hw/core/register.c
-index ddf91eb445..31038bd7cc 100644
---- a/hw/core/register.c
-+++ b/hw/core/register.c
-@@ -176,17 +176,6 @@ void register_reset(RegisterInfo *reg)
-     }
- }
- 
--void register_init(RegisterInfo *reg)
--{
--    assert(reg);
--
--    if (!reg->data || !reg->access) {
--        return;
--    }
--
--    object_initialize((void *)reg, sizeof(*reg), TYPE_REGISTER);
--}
--
- void register_write_memory(void *opaque, hwaddr addr,
-                            uint64_t value, unsigned size)
- {
-@@ -269,13 +258,18 @@ static RegisterInfoArray *register_init_block(DeviceState *owner,
-         int index = rae[i].addr / data_size;
-         RegisterInfo *r = &ri[index];
- 
--        *r = (RegisterInfo) {
--            .data = data + data_size * index,
--            .data_size = data_size,
--            .access = &rae[i],
--            .opaque = owner,
--        };
--        register_init(r);
-+        if (data + data_size * index == 0 || !&rae[i]) {
-+            continue;
-+        }
-+
-+        /* Init the register, this will zero it. */
-+        object_initialize((void *)r, sizeof(*r), TYPE_REGISTER);
-+
-+        /* Set the properties of the register */
-+        r->data = data + data_size * index;
-+        r->data_size = data_size;
-+        r->access = &rae[i];
-+        r->opaque = owner;
- 
-         r_array->r[i] = r;
-     }
-@@ -329,6 +323,7 @@ static const TypeInfo register_info = {
-     .name  = TYPE_REGISTER,
-     .parent = TYPE_DEVICE,
-     .class_init = register_class_init,
-+    .instance_size = sizeof(RegisterInfo),
- };
- 
- static void register_register_types(void)
--- 
-2.28.0
+Hi,=0D
+=0D
+This series improves the support for HiDPI displays with Spice.=0D
+The related spice series have already been merged.=0D
+=0D
+v3:=0D
+ - simplify the handling of Spice monitor configuration (Frediano)=0D
+v2:=0D
+ - add a patch to "spice: remove the single monitor config logic" (Gerd)=0D
+=0D
+Marc-Andr=C3=A9 Lureau (6):=0D
+  edid: fix physical display size computation=0D
+  edid: use physical dimensions if available=0D
+  ui: add getter for UIInfo=0D
+  spice: remove the single monitor config logic=0D
+  spice: get monitors physical dimension=0D
+  virtio-gpu: set physical dimensions for EDID=0D
+=0D
+ hw/display/edid-generate.c     | 36 +++++++++++++++++++++++-----------=0D
+ hw/display/virtio-gpu-base.c   |  2 ++=0D
+ hw/display/virtio-gpu.c        |  2 ++=0D
+ include/hw/display/edid.h      |  5 ++++-=0D
+ include/hw/virtio/virtio-gpu.h |  1 +=0D
+ include/ui/console.h           |  4 ++++=0D
+ qemu-edid.c                    | 11 +++++++++--=0D
+ ui/console.c                   |  7 +++++++=0D
+ ui/spice-display.c             | 35 ++++++++++++---------------------=0D
+ 9 files changed, 66 insertions(+), 37 deletions(-)=0D
+=0D
+--=20=0D
+2.26.2=0D
+=0D
 
 
