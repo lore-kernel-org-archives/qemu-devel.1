@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98186C4346E
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 14:59:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F2E8C4346E
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 15:00:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28FFC2389F
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 14:59:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B66112080C
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 15:00:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C90xHP4q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28FFC2389F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fq9ofA/1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B66112080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMY93-0006H5-9k
-	for qemu-devel@archiver.kernel.org; Sun, 27 Sep 2020 10:59:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49104)
+	id 1kMYAF-0007fG-PP
+	for qemu-devel@archiver.kernel.org; Sun, 27 Sep 2020 11:00:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49190)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kMY8D-0005Qy-FH
- for qemu-devel@nongnu.org; Sun, 27 Sep 2020 10:58:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43106)
+ id 1kMY8y-0006QE-57
+ for qemu-devel@nongnu.org; Sun, 27 Sep 2020 10:59:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36410)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kMY88-0006TJ-I6
- for qemu-devel@nongnu.org; Sun, 27 Sep 2020 10:58:28 -0400
+ id 1kMY8w-0006Vq-IQ
+ for qemu-devel@nongnu.org; Sun, 27 Sep 2020 10:59:15 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601218702;
+ s=mimecast20190719; t=1601218754;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8Y86zsB51YRxIrGPaBaJ0OMrK6jcKF47UHG43z60HUs=;
- b=C90xHP4qVTT/BJOHnMY/0TxoR97eilhWmkTaZRXWVoqdZq5nqbnQ6Ith3AE9eHBvFGTuAY
- kHDmskH8dp+++7NdgfoTljjBHamRtdV+iIoo442daGEwfmFXQ0ZN5xjwhJEulCYpeu7ugY
- +46noDpZ/tLWQvauSJ4nxngHMzqKnjI=
+ bh=EWT3eeP8M1S4mF5jrWBk/Kh6soLRKqtXBG4/bKeL4bg=;
+ b=Fq9ofA/1hqmSVobVHEsNCzIAVkfkjEh4laXgIwbbh5KFKEFSQemDW4rRlrI3aPnsSAycWl
+ cMliBkXCqWwO2sv1XSCI2hRDFQbuQVBqVPwYtw3MFF/O8WkpWn5GC6oUJtm86ERXvgFwwJ
+ cppe6Bdv7Q5WRQ8XXVUTFljrS+bSfXE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-195-6AhkGRkrP32wLC_Dwu1F7g-1; Sun, 27 Sep 2020 10:58:19 -0400
-X-MC-Unique: 6AhkGRkrP32wLC_Dwu1F7g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-381-Xq8ATs5mOLmMQx8X147b_g-1; Sun, 27 Sep 2020 10:59:09 -0400
+X-MC-Unique: Xq8ATs5mOLmMQx8X147b_g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A6EF1005E5C;
- Sun, 27 Sep 2020 14:58:18 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92680807322;
+ Sun, 27 Sep 2020 14:59:08 +0000 (UTC)
 Received: from localhost (unknown [10.36.110.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 34ECF60C84;
- Sun, 27 Sep 2020 14:58:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5BBFA78801;
+ Sun, 27 Sep 2020 14:58:59 +0000 (UTC)
 From: marcandre.lureau@redhat.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 1/6] edid: fix physical display size computation
-Date: Sun, 27 Sep 2020 18:57:46 +0400
-Message-Id: <20200927145751.365446-2-marcandre.lureau@redhat.com>
+Subject: [PATCH v3 5/6] spice: get monitors physical dimension
+Date: Sun, 27 Sep 2020 18:57:50 +0400
+Message-Id: <20200927145751.365446-6-marcandre.lureau@redhat.com>
 In-Reply-To: <20200927145751.365446-1-marcandre.lureau@redhat.com>
 References: <20200927145751.365446-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=marcandre.lureau@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -105,30 +105,47 @@ Sender: "Qemu-devel"
 
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Divide the resolution by the DPI, and multiply to mm.
-
-Note the computation done for edid[21/22] is correct (in cm).
+With upcoming Spice server version 0.14.4, the monitor configuration can
+contain additional fields for the monitor physical dimensions.
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- hw/display/edid-generate.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/ui/console.h | 3 +++
+ ui/spice-display.c   | 7 +++++++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/hw/display/edid-generate.c b/hw/display/edid-generate.c
-index e58472fde5..618c74e1df 100644
---- a/hw/display/edid-generate.c
-+++ b/hw/display/edid-generate.c
-@@ -208,8 +208,8 @@ static void edid_desc_timing(uint8_t *desc,
-                              uint32_t dpi)
- {
-     /* physical display size */
--    uint32_t xmm = xres * dpi / 254;
--    uint32_t ymm = yres * dpi / 254;
-+    uint32_t xmm = xres * 254 / 10 / dpi;
-+    uint32_t ymm = yres * 254 / 10 / dpi;
+diff --git a/include/ui/console.h b/include/ui/console.h
+index 353d2e49a1..e7303d8b98 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -119,6 +119,9 @@ typedef struct DisplaySurface {
+ } DisplaySurface;
  
-     /* pull some realistic looking timings out of thin air */
-     uint32_t xfront = xres * 25 / 100;
+ typedef struct QemuUIInfo {
++    /* physical dimension */
++    uint16_t width_mm;
++    uint16_t height_mm;
+     /* geometry */
+     int       xoff;
+     int       yoff;
+diff --git a/ui/spice-display.c b/ui/spice-display.c
+index b304c13149..0178d5766d 100644
+--- a/ui/spice-display.c
++++ b/ui/spice-display.c
+@@ -678,6 +678,13 @@ static int interface_client_monitors_config(QXLInstance *sin,
+     if (mc->num_of_monitors > head) {
+         info.width  = mc->monitors[head].width;
+         info.height = mc->monitors[head].height;
++#if SPICE_SERVER_VERSION >= 0x000e04 /* release 0.14.4 */
++        if (mc->flags & VD_AGENT_CONFIG_MONITORS_FLAG_PHYSICAL_SIZE) {
++            VDAgentMonitorMM *mm = (void *)&mc->monitors[mc->num_of_monitors];
++            info.width_mm = mm[head].width;
++            info.height_mm = mm[head].height;
++        }
++#endif
+     }
+ 
+     trace_qemu_spice_ui_info(ssd->qxl.id, info.width, info.height);
 -- 
 2.26.2
 
