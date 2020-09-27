@@ -2,100 +2,81 @@ Return-Path: <SRS0=PST1=DE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F342FC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 03:18:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99438C47426
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 04:30:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31EC0205ED
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 03:18:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ldZBJHHv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31EC0205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E55EB221EC
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 04:30:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E55EB221EC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMNDD-0003nk-84
-	for qemu-devel@archiver.kernel.org; Sat, 26 Sep 2020 23:18:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38918)
+	id 1kMOKP-0005DC-P5
+	for qemu-devel@archiver.kernel.org; Sun, 27 Sep 2020 00:30:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46354)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kMNCd-0003NH-Et
- for qemu-devel@nongnu.org; Sat, 26 Sep 2020 23:18:19 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:37323)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kMOJq-0004md-Uo
+ for qemu-devel@nongnu.org; Sun, 27 Sep 2020 00:29:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53636)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kMNCb-00019k-Q9
- for qemu-devel@nongnu.org; Sat, 26 Sep 2020 23:18:19 -0400
-Received: by mail-pg1-x544.google.com with SMTP id e18so1828007pgd.4
- for <qemu-devel@nongnu.org>; Sat, 26 Sep 2020 20:18:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=tEde0oVVjOwaVuHFWk0AGRryI0+4OYZ+7wyx5U2xlVY=;
- b=ldZBJHHvcl0Me6Rg1lMsKEsybnloCHS/Cu9wgg/spopOl/sCYsdTV1kqBxihFBUv5d
- 1yU/2MhJtXL6kzSgdnbB/NocXDDRa2UPlbY7/vQph/O6tTuCMIJxc8wE1g2IQJ4SfeOz
- +m3Ca8am03VN8I1lGy8+6E9u8x6z1U6f6Yx1pA9VAsdSfHZkUjp23qZOXfRz4bAzVSYR
- YhUO3LDypW3GC0FLTpm4K8EC1qMoTew2IP7McDxWfGs4GNY1Q8CSB9zll7QYrhfXQz4Z
- T5XForI2sy7CYunCOEMFXPoNAjJseNchYWk7vz6+u42bYDrLLVX/CY7gO8ycsEJK1OYW
- e0nQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=tEde0oVVjOwaVuHFWk0AGRryI0+4OYZ+7wyx5U2xlVY=;
- b=dU9iS5pTcznBflzjAifYqUKdQLRhJDd9uNmodO3JqBlCrBpr4IByFrWAw/SXe1FypY
- xAGeIx5g//xz43HK48wUJT3/2KNxwWVP4atG6dsSgWB8xbl1nmxUNvZxZ2E4u9BOZO5z
- klnyNt8SsoCsr1qXiKgpnu1je79x1k8f6uEZnXYno6S0SZwQ+J75KgdHTvtSkFjGWsVR
- mYr7dTmNP4aN0Hj4D3Ig9ZJWPPW2cF2rzuv1lhYFNA+Gy8y86DiUtvs3z0mQaFz9RfvO
- S7WaZXeahuHlfFdFaNmMESAHsEe1ip7R88L6lRtLKmWXJpgIeX+IgPcY+YCqAlrI4+ge
- QWNw==
-X-Gm-Message-State: AOAM532YkqmWvL4ka26hktewjX5zG2wq7VYYrw3afVJrGm8S0BOCN9vL
- dzpUbtHg53uwZcCVK2+EBjJzag==
-X-Google-Smtp-Source: ABdhPJz5GuOynhgUJFEV3ep3WX4gq0gGCdBd2ebCSiZ7ihWdti6oa67yYdZpq0PBxyOZdwiH0Tm/iQ==
-X-Received: by 2002:a63:c74e:: with SMTP id v14mr4423240pgg.186.1601176695960; 
- Sat, 26 Sep 2020 20:18:15 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id 72sm6640360pfx.79.2020.09.26.20.18.14
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 26 Sep 2020 20:18:15 -0700 (PDT)
-Subject: Re: [PATCH 2/4] plugin: Fixes compiling errors on msys2/mingw
-To: Yonggang Luo <luoyonggang@gmail.com>, qemu-devel@nongnu.org
-References: <20200926140415.1286-1-luoyonggang@gmail.com>
- <20200926140415.1286-3-luoyonggang@gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b6e76dcf-187c-4e49-a82c-ed0b637d07b1@linaro.org>
-Date: Sat, 26 Sep 2020 20:18:13 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kMOJo-0008J6-Te
+ for qemu-devel@nongnu.org; Sun, 27 Sep 2020 00:29:50 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kMOJm-0000Ca-R8
+ for <qemu-devel@nongnu.org>; Sun, 27 Sep 2020 04:29:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id BB8762E80F1
+ for <qemu-devel@nongnu.org>; Sun, 27 Sep 2020 04:29:46 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200926140415.1286-3-luoyonggang@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -22
-X-Spam_score: -2.3
-X-Spam_bar: --
-X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.213,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 27 Sep 2020 04:17:28 -0000
+From: Launchpad Bug Tracker <1256122@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: vfio
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: anti-connard janitor th-huth
+X-Launchpad-Bug-Reporter: Val532 (anti-connard)
+X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
+References: <20131128221327.32583.75260.malonedeb@gac.canonical.com>
+Message-Id: <160118024821.16940.13796290633010748066.malone@loganberry.canonical.com>
+Subject: [Bug 1256122] Re: vfio bug with all no VGA card
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a314d157ca9be8d00eae0214fc0d7dff1cd406e4"; Instance="production"
+X-Launchpad-Hash: 5cb98756a9d1515539e2da993d46eccc6ad503d0
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/27 00:29:47
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -104,21 +85,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Reply-To: Bug 1256122 <1256122@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/26/20 7:04 AM, Yonggang Luo wrote:
-> @@ -72,7 +72,7 @@ static void vcpu_tb_exec(unsigned int cpu_index, void *udata)
->      CPUCount *count = max_cpus ?
->          g_ptr_array_index(counts, cpu_index) : &inline_count;
->  
-> -    unsigned long n_insns = (unsigned long)udata;
-> +    uint64_t n_insns = (uint64_t)udata;
+[Expired for QEMU because there has been no activity for 60 days.]
 
-This needs to be uintptr_t.
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-r~
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1256122
+
+Title:
+  vfio bug with all no VGA card
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  Hello,
+
+  I whant to report to you a realy big bug.
+
+  vfio passthrough work only with VGA card ! When i try to use vfio with
+  any other PCI or PCI-E card it does not work.
+
+  When i use vfio for VGA i can reboot (or shutdown and start again) my
+  VM with out problem, but for any other PCI card the VM refuse to
+  reboot.
+
+  In dmesg i have this error :
+
+  dmar: DRHD: handling fault status reg 2
+  dmar: DMAR:[DMA Read] Request device [xx:xx.x] fault addr 2affde000
+  DMAR:[fault reason 06] PTE Read access is not set
+
+  and some time the same but for Write and not Read.
+
+  I found a kind of work around but it's ugly. Just detach your devices
+  from vfio, re-atach to his normal driver and bind again to vfio.
+
+  For information i use an Asrock Z87 Extrem 6 with a CoreI5 4570S
+  My kernel is 3.12 and Qemu is 1.7-rc0
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1256122/+subscriptions
 
