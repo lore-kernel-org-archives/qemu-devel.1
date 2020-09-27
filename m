@@ -2,67 +2,62 @@ Return-Path: <SRS0=PST1=DE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8444EC4346E
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 12:16:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38A8CC4346E
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 12:16:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A79123718
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 12:16:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AB9B523718
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Sep 2020 12:16:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="MLbpzQIO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A79123718
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="PmZjNk0L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB9B523718
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMVbH-0007rI-UN
-	for qemu-devel@archiver.kernel.org; Sun, 27 Sep 2020 08:16:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52372)
+	id 1kMVbS-00086R-Ow
+	for qemu-devel@archiver.kernel.org; Sun, 27 Sep 2020 08:16:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52454)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kMVZs-0006cw-KC
- for qemu-devel@nongnu.org; Sun, 27 Sep 2020 08:14:52 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:60455)
+ (Exim 4.90_1)
+ (envelope-from <e19ada89f61345a2260f2b6ebd07fda9ed6458ce@lizzy.crudebyte.com>)
+ id 1kMVaF-0006wg-W8
+ for qemu-devel@nongnu.org; Sun, 27 Sep 2020 08:15:16 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:45003)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kMVZr-0006O2-1s
- for qemu-devel@nongnu.org; Sun, 27 Sep 2020 08:14:52 -0400
+ (Exim 4.90_1)
+ (envelope-from <e19ada89f61345a2260f2b6ebd07fda9ed6458ce@lizzy.crudebyte.com>)
+ id 1kMVaD-0006Mz-Kz
+ for qemu-devel@nongnu.org; Sun, 27 Sep 2020 08:15:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=Jzw1/KRabcxEaqNqC1KBDx3WhsVlJkj13T/W///NaNA=; b=MLbpzQIO41v6DDPt+mpLK8/962
- B4vkjOVq4HFlL/L2Djl4s29R1SObNg9CUGt1r2Bkng7EaJTL1SB/0e25oWSoGYqiaTAomJU3B6lXe
- WJ/snIanzVn9RoJtvQQ+6u2Q4rtoHibqlU6qx3FHrM74rN9jqip1zjynHd/DTjBYNfS7pfbIT+1pM
- x3D4bUyZuOFCMbnvwNracb9YkkY7ekqVNkAKYU9gEAFFyA8iCmEJD8pZ0H7SA+xz4tnunD47ssAdK
- rck/u8ZqsihsgWcPi1JxX5Cm/DeUuzhsDNYDe3D9SwY7n8lyzSytLO8aIIga1bC5T+Bo3+kLIpzje
- xEp5jS5A==;
+ d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
+ Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
+ Content-Description; bh=u38o6Urrjnc7Jg5615IWWJbb5xaiKnTL1nkmnv3/K9c=; b=PmZjN
+ k0LK2vP+JqanH5bn77zJ89uC9JByY/m9klei9Wo1k0ESGnMDYxVUctplxoreyqi3dX40wJQ1i2MYk
+ HyfI45UKukZrzNOqv61aBVuWDD9oql58zJPufC6/F5HssyUWSm/jleb51osIX3fGG1sT935SzGp40
+ y7km85xP4luGxL7wZIbCEgwiP9bMxoyMA8u09bgTiqcrL7tIe4ewrYQefYWUJwjrHmpT44tHHfiTU
+ VRnVmqEXnuqjZGulTwlMsomss4rP91MHkZELCIu/gE4g4bW+E8R1GGelfLrhNfNRN88nLiqD3egAE
+ EvnTeBRQTHA3AMYafSDNHQG92t5sg==;
+Message-Id: <e19ada89f61345a2260f2b6ebd07fda9ed6458ce.1601203436.git.qemu_oss@crudebyte.com>
+In-Reply-To: <cover.1601203436.git.qemu_oss@crudebyte.com>
+References: <cover.1601203436.git.qemu_oss@crudebyte.com>
 From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Date: Sun, 27 Sep 2020 12:39:00 +0200
+Subject: [PATCH 02/12] tests/qtest/qgraph: add qos_node_create_driver_named()
 To: qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Venegas Munoz,
- Jose Carlos" <jose.carlos.venegas.munoz@intel.com>,
- "cdupontd@redhat.com" <cdupontd@redhat.com>,
- virtio-fs-list <virtio-fs@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- "Shinde, Archana M" <archana.m.shinde@intel.com>,
- Vivek Goyal <vgoyal@redhat.com>
-Subject: Re: virtiofs vs 9p performance(Re: tools/virtiofs: Multi threading
- seems to hurt performance)
-Date: Sun, 27 Sep 2020 14:14:43 +0200
-Message-ID: <66718708.HdZnNlUTFG@silver>
-In-Reply-To: <20200925185147.GS2873@work-vm>
-References: <20200918213436.GA3520@redhat.com> <7085634.CctCyd8GvG@silver>
- <20200925185147.GS2873@work-vm>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
+Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
+ Greg Kurz <groug@kaod.org>
+Received-SPF: none client-ip=91.194.90.13;
+ envelope-from=e19ada89f61345a2260f2b6ebd07fda9ed6458ce@lizzy.crudebyte.com;
  helo=lizzy.crudebyte.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/27 07:42:27
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -71,7 +66,7 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -88,74 +83,144 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Freitag, 25. September 2020 20:51:47 CEST Dr. David Alan Gilbert wrote:
-> * Christian Schoenebeck (qemu_oss@crudebyte.com) wrote:
-> > On Freitag, 25. September 2020 15:05:38 CEST Dr. David Alan Gilbert wrote:
-> > > > > 9p ( mount -t 9p -o trans=virtio kernel /mnt
-> > > > > -oversion=9p2000.L,cache=mmap,msize=1048576 ) test: (g=0):
-> > > > > rw=randrw,
-> > > > 
-> > > > Bottleneck ------------------------------^
-> > > > 
-> > > > By increasing 'msize' you would encounter better 9P I/O results.
-> > > 
-> > > OK, I thought that was bigger than the default;  what number should I
-> > > use?
-> > 
-> > It depends on the underlying storage hardware. In other words: you have to
-> > try increasing the 'msize' value to a point where you no longer notice a
-> > negative performance impact (or almost). Which is fortunately quite easy
-> > to test on> 
-> > guest like:
-> > 	dd if=/dev/zero of=test.dat bs=1G count=12
-> > 	time cat test.dat > /dev/null
-> > 
-> > I would start with an absolute minimum msize of 10MB. I would recommend
-> > something around 100MB maybe for a mechanical hard drive. With a PCIe
-> > flash
-> > you probably would rather pick several hundred MB or even more.
-> > 
-> > That unpleasant 'msize' issue is a limitation of the 9p protocol: client
-> > (guest) must suggest the value of msize on connection to server (host).
-> > Server can only lower, but not raise it. And the client in turn obviously
-> > cannot see host's storage device(s), so client is unable to pick a good
-> > value by itself. So it's a suboptimal handshake issue right now.
-> 
-> It doesn't seem to be making a vast difference here:
-> 
-> 
-> 
-> 9p mount -t 9p -o trans=virtio kernel /mnt
-> -oversion=9p2000.L,cache=mmap,msize=104857600
-> 
-> Run status group 0 (all jobs):
->    READ: bw=62.5MiB/s (65.6MB/s), 62.5MiB/s-62.5MiB/s (65.6MB/s-65.6MB/s),
-> io=3070MiB (3219MB), run=49099-49099msec WRITE: bw=20.9MiB/s (21.9MB/s),
-> 20.9MiB/s-20.9MiB/s (21.9MB/s-21.9MB/s), io=1026MiB (1076MB),
-> run=49099-49099msec
-> 
-> 9p mount -t 9p -o trans=virtio kernel /mnt
-> -oversion=9p2000.L,cache=mmap,msize=1048576000
-> 
-> Run status group 0 (all jobs):
->    READ: bw=65.2MiB/s (68.3MB/s), 65.2MiB/s-65.2MiB/s (68.3MB/s-68.3MB/s),
-> io=3070MiB (3219MB), run=47104-47104msec WRITE: bw=21.8MiB/s (22.8MB/s),
-> 21.8MiB/s-21.8MiB/s (22.8MB/s-22.8MB/s), io=1026MiB (1076MB),
-> run=47104-47104msec
-> 
-> 
-> Dave
+So far the qos subsystem of the qtest framework had the limitation
+that only one instance of the same official QEMU (QMP) driver name
+could be created for qtests. That's because a) the created qos
+node names must always be unique, b) the node name must match the
+official QEMU driver name being instantiated and c) all nodes are
+in a global space shared by all tests.
 
-Is that benchmark tool honoring 'iounit' to automatically run with max. I/O 
-chunk sizes? What's that benchmark tool actually? And do you also see no 
-improvement with a simple
+This patch removes this limitation by introducing a new function
+qos_node_create_driver_named() which allows test case authors to
+specify a node name being different from the actual associated
+QEMU driver name. It fills the new 'qemu_name' field of
+QOSGraphNode for that purpose.
 
-	time cat largefile.dat > /dev/null
+build_driver_cmd_line() and qos_graph_node_set_availability() had
+to be adjusted to correctly deal with either accessing node name
+vs. node's qemu_name correctly.
 
-?
+Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+---
+ tests/qtest/libqos/qgraph.c | 53 ++++++++++++++++++++++++++++++++++---
+ tests/qtest/libqos/qgraph.h | 16 +++++++++++
+ 2 files changed, 66 insertions(+), 3 deletions(-)
 
-Best regards,
-Christian Schoenebeck
-
+diff --git a/tests/qtest/libqos/qgraph.c b/tests/qtest/libqos/qgraph.c
+index e42f3eaafa..61faf6b27d 100644
+--- a/tests/qtest/libqos/qgraph.c
++++ b/tests/qtest/libqos/qgraph.c
+@@ -287,7 +287,8 @@ static void build_machine_cmd_line(QOSGraphNode *node, const char *args)
+  */
+ static void build_driver_cmd_line(QOSGraphNode *node)
+ {
+-    node->command_line = g_strconcat(" -device ", node->name, NULL);
++    const char *name = node->qemu_name ?: node->name;
++    node->command_line = g_strconcat(" -device ", name, NULL);
+ }
+ 
+ /* qos_print_cb(): callback prints all path found by the DFS algorithm. */
+@@ -632,6 +633,15 @@ void qos_node_create_driver(const char *name, QOSCreateDriverFunc function)
+     node->u.driver.constructor = function;
+ }
+ 
++void qos_node_create_driver_named(const char *name, const char *qemu_name,
++                                  QOSCreateDriverFunc function)
++{
++    QOSGraphNode *node = create_node(name, QNODE_DRIVER);
++    node->qemu_name = g_strdup(qemu_name);
++    build_driver_cmd_line(node);
++    node->u.driver.constructor = function;
++}
++
+ void qos_node_contains(const char *container, const char *contained,
+                        QOSGraphEdgeOptions *opts, ...)
+ {
+@@ -664,7 +674,7 @@ void qos_node_consumes(const char *consumer, const char *interface,
+     add_edge(interface, consumer, QEDGE_CONSUMED_BY, opts);
+ }
+ 
+-void qos_graph_node_set_availability(const char *node, bool av)
++static void qos_graph_node_set_availability_explicit(const char *node, bool av)
+ {
+     QOSGraphEdgeList *elist;
+     QOSGraphNode *n = search_node(node);
+@@ -679,9 +689,46 @@ void qos_graph_node_set_availability(const char *node, bool av)
+     }
+     QSLIST_FOREACH_SAFE(e, elist, edge_list, next) {
+         if (e->type == QEDGE_CONTAINS || e->type == QEDGE_PRODUCES) {
+-            qos_graph_node_set_availability(e->dest, av);
++            qos_graph_node_set_availability_explicit(e->dest, av);
++        }
++    }
++}
++
++/*
++ * Behaves as qos_graph_node_set_availability_explicit(), except that the
++ * former always matches by node name only, whereas this function matches both
++ * by node name and node's optional 'qemu_name' field.
++ */
++void qos_graph_node_set_availability(const char *node, bool av)
++{
++    GList *l;
++    QOSGraphEdgeList *elist;
++    QOSGraphEdge *e, *next;
++    QOSGraphNode *n;
++    GList *keys = g_hash_table_get_keys(node_table);
++
++    for (l = keys; l != NULL; l = l->next) {
++        const gchar *key = l->data;
++        n = g_hash_table_lookup(node_table, key);
++        /*
++         * node's 'qemu_name' is set if there is more than one device with
++         * the same QEMU (QMP) device name
++         */
++        const char *node_name = n->qemu_name ?: n->name;
++        if (g_strcmp0(node_name, node) == 0) {
++            n->available = av;
++            elist = get_edgelist(n->name);
++            if (elist) {
++                QSLIST_FOREACH_SAFE(e, elist, edge_list, next) {
++                    if (e->type == QEDGE_CONTAINS || e->type == QEDGE_PRODUCES)
++                    {
++                        qos_graph_node_set_availability_explicit(e->dest, av);
++                    }
++                }
++            }
+         }
+     }
++    g_list_free(keys);
+ }
+ 
+ void qos_graph_foreach_test_path(QOSTestCallback fn)
+diff --git a/tests/qtest/libqos/qgraph.h b/tests/qtest/libqos/qgraph.h
+index 5f63d352ca..f472949f68 100644
+--- a/tests/qtest/libqos/qgraph.h
++++ b/tests/qtest/libqos/qgraph.h
+@@ -452,6 +452,22 @@ void qos_node_create_machine_args(const char *name,
+  */
+ void qos_node_create_driver(const char *name, QOSCreateDriverFunc function);
+ 
++/**
++ * Behaves as qos_node_create_driver() with the extension of allowing to
++ * specify a different node name vs. associated QEMU device name.
++ *
++ * Use this function instead of qos_node_create_driver() if you need to create
++ * several instances of the same QEMU device. You are free to choose a custom
++ * node name, however the chosen node name must always be unique.
++ *
++ * @param name: custom, unique name of the node to be created
++ * @param qemu_name: actual (official) QEMU driver name the node shall be
++ *                   associated with
++ * @param function: driver constructor
++ */
++void qos_node_create_driver_named(const char *name, const char *qemu_name,
++                                  QOSCreateDriverFunc function);
++
+ /**
+  * qos_node_contains(): creates one or more edges of type QEDGE_CONTAINS
+  * and adds them to the edge list mapped to @container in the
+-- 
+2.20.1
 
 
