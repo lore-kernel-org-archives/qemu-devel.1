@@ -7,62 +7,63 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E050C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 09:18:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3448C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 09:19:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E19F21D7F
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 09:18:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E19F21D7F
+	by mail.kernel.org (Postfix) with ESMTPS id 6DD5321D7F
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 09:19:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DD5321D7F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMpIp-0005Xu-13
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 05:18:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46982)
+	id 1kMpJD-0005o8-Gi
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 05:18:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47092)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kMpGY-0003om-Ra; Mon, 28 Sep 2020 05:16:14 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:34017)
+ id 1kMpGg-0003rG-Cd; Mon, 28 Sep 2020 05:16:22 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:44089)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kMpGW-0002WX-Ke; Mon, 28 Sep 2020 05:16:14 -0400
+ id 1kMpGc-0002Xr-Oz; Mon, 28 Sep 2020 05:16:21 -0400
 Received: from localhost.localdomain ([82.252.129.222]) by
  mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MV2Sk-1jy7Np0ROg-00S6t8; Mon, 28 Sep 2020 11:16:07 +0200
+ id 1Movrq-1kmW6m2GR4-00qUMU; Mon, 28 Sep 2020 11:16:11 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 1/8] vhost-vdpa: fix indentation in vdpa_ops
-Date: Mon, 28 Sep 2020 11:15:55 +0200
-Message-Id: <20200928091602.383870-2-laurent@vivier.eu>
+Subject: [PULL 5/8] vhost-vdpa: remove useless variable
+Date: Mon, 28 Sep 2020 11:15:59 +0200
+Message-Id: <20200928091602.383870-6-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200928091602.383870-1-laurent@vivier.eu>
 References: <20200928091602.383870-1-laurent@vivier.eu>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:77b7UHhIOGlSHExCgtdoqDOYMOVylEBGVMeCX20yI9eIcnBjVpn
- nxAlv5HMRSFdLkffrBfk50EwFop2c8xkpsfJzq7UjfcrY39LcMVyAL6qzNJU4LjJSaH+oTv
- Aw2hMPf8y19ovABjDeNwFsH8D9dHOUrqmGxZHzCuNRlpJisLVLwqCXe4WIECIL1Dzd24m3V
- Q5ZM5xo3I4hepHhvqhJrQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:BZqoKIMwtQg=:Bq4UVQ5Cjj7yu8IqbOwdHy
- i2Jbj4zQGshLBCZpEq9JqW+4dCCOy1w8cQpv4z8K8vVyjYQT52hxUHycnKARI+qCpwM8WULcN
- GEPL/Noq7jOlvHRPR2uhUCVQf5dKWfWq2hmRl0qz1EyR9ik62bR/L/V+gCetAPFEZPmg3q8Ac
- LENZfloTGmF0vFb8YHUa+rTpfU7DoduJ2pc9GXE6emzOYkvDT5qjOf0Swrs91CTyZ2VsjaFC7
- DVDUJXSiPpkZfWLIu0JgVvgg8e2Fo/4LxsdN2xyal3goqGDI7xmdw+1HMNSuWjEprwdmZBqXx
- 5UT+RMeJvQ8CQIMFgaxApCO/XL1OlDwup5KK/EpTwIJTXotAsGMgzxokHI1XcBMNZo4JRQxBk
- MVABTXzEZB4Fa4tEGw9QElbIi8kCl7mJt89clCY6iATUhXLsMS1MStCP59ZX1EVOczHkDRpON
- +7CuKsjItwMVCtRgm60bmixtDLZntGJfFF/6hncXhPcZZozo6WU3E2MDMuMq/7Lr2vH/S0y6q
- b9orJDf/30ggwQOUmJUBT/o/gOAL4/81rR+fEcH6PnYpldC8cLbIPY2GeiWYH1R+w2e39ld67
- E3BXqe+7aCh77sLC6bGCZCVZinhNnTdBbhkEdqVBAi9XjriMUprkON1KuBZu3Lvg3UHlb3gKe
- f/N+IWq8bsEXa37rbwXfbVhKg5ZO+H4IWOt1W+5rkZU+UVgXS7e4lh17UXF6xWGz5+Sjh3ByG
- HMHeEsiVAYYAQ1rRL5flhOc9erJ12tDaP68gbPPf59PLD8Pq6kSgTtEEzfDRvozhOTT/G2BVU
- qPO39Z5YY88CvYiCtPNW3k084sY33HD0/XNaw9U8FieZAGNF8Muo0TMfhDXt6g10s2gI2Dj
-Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:wJWrYVUu+QB9tF1t59MC8P8/2ARDgjDwbNMCs86f4jAoT24lCAv
+ pFx6JizTH4bdFpvoY22YpxEXfhsv/2MKtbHjJ52HFsSCY7H/p+a2BnHbSzqvfuF0hPgJLD8
+ rtLQzNrBEmpKA5DX7ZQ65oKNfSOowUrfnukRwJJ4TXs38mhgznWiAJIOvg68SXTRJ6Wv2BK
+ MY3K9iSYPau5FRdlet2KA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:KJJI/RSHP88=:aQ6dnUa2BA68BEthZ2ZHQX
+ 79BmE2Uk6LOdoyKcD5ipvXrGWr72ubwY24YGy0dL5JQVykxcsefn0HFSDKPCd59WWgiVCsXdh
+ pel1WM/ErdG3JED8xkZuIihmcR1T0brnTrTg1DZHyqwDETTiDJQegT/JE+R1GtjIm3GkaYHRv
+ RaJw0KCG+icEg/GQyK2riYZkFwnjjt2uAoWQZu9OozMf7TH08Ab8qkOtgTXLrB5bd59qJVGzN
+ /Xa7SQqNAmOMNKkT8br0BTsgU8SPXtQeeadpyiy6hgwF4n1J0ZrJ0A7pDRZhrJzXs2mv0iL8z
+ cjLiqivYkvxvKlvZJU7bhx2suOzpUCTAyaGksWgB9qNa7T9QFX5ZqWEsiLpWlFyERjJZlsT2J
+ t9D7RSedGCXjK0EFBZUoFflxxVnF26n7czUySjLmXpeRDcG3l9kPGgdi2Gre28fvoaqFbYidK
+ FVF7pjbqBl3IFLxCNR2dL+62E1ewNUQBr06g4aEne4XMavNZdpDScTlh5Kh6c27WMtSt5mF/N
+ gQT46GPQLZLALmn/6MZsfOXgnywlwSKatk10lBh0wVVyP+28mqNm9opmQ6ByDnjZK3bp2Ycu6
+ 8fbE/tJ1Y7vGiyX0QYgU+oogSAkH2myoHpWow7n0VRHtRLzG2SoA5/80IElAxImZlecXdJez/
+ z0GDcsx4SkBSGmBHnS0K9DEFDg6bbFm8UFOPor6f0KLVsvKvyaCebwVEyoGAFCixQrO5N4cBI
+ ZRfVUl8UdPHWdqSCO4WwO1GIVDxKzOjLXMMYaEp6pK1ROvfcgWi42Q4p/OpWq7JHvMI58NgFy
+ Mhxr8NlsCoesp7HbI6DaZNYOzuYi75+5gUfm7nW61AD7SXsDa21yh+zcGFsMTHdfwKVVmWb
+Received-SPF: none client-ip=212.227.126.135; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 05:16:07
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 05:16:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -23
 X-Spam_score: -2.4
@@ -82,41 +83,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Li Qiang <liq3ea@gmail.com>,
- Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
- Stefano Garzarella <sgarzare@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, qemu-trivial@nongnu.org,
+ Michael Tokarev <mjt@tls.msk.ru>, Li Qiang <liq3ea@gmail.com>,
+ Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefano Garzarella <sgarzare@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
 
-This patch fixes wrong indentation of some vdpa_ops fields introduced
-with the initial commit 108a64818e ("vhost-vdpa: introduce vhost-vdpa
-backend")
+in vhost_vdpa_listener_region_del(), try_unmap is always true and so,
+vhost_vdpa_dma_unmap() is always called. We can remove the variable
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Li Qiang <liq3ea@gmail.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200916152634.56917-1-sgarzare@redhat.com>
+Message-Id: <20200920152024.860172-1-lvivier@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/virtio/vhost-vdpa.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/virtio/vhost-vdpa.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
 diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
-index 4580f3efd8a2..e123837a55de 100644
+index 97f4b2e353ab..aedc52c4d791 100644
 --- a/hw/virtio/vhost-vdpa.c
 +++ b/hw/virtio/vhost-vdpa.c
-@@ -469,6 +469,6 @@ const VhostOps vdpa_ops = {
-         .vhost_send_device_iotlb_msg = NULL,
-         .vhost_dev_start = vhost_vdpa_dev_start,
-         .vhost_get_device_id = vhost_vdpa_get_device_id,
--         .vhost_vq_get_addr = vhost_vdpa_vq_get_addr,
--         .vhost_force_iommu = vhost_vdpa_force_iommu,
-+        .vhost_vq_get_addr = vhost_vdpa_vq_get_addr,
-+        .vhost_force_iommu = vhost_vdpa_force_iommu,
- };
+@@ -153,7 +153,6 @@ static void vhost_vdpa_listener_region_del(MemoryListener *listener,
+     hwaddr iova;
+     Int128 llend, llsize;
+     int ret;
+-    bool try_unmap = true;
+ 
+     if (vhost_vdpa_listener_skipped_section(section)) {
+         return;
+@@ -176,11 +175,9 @@ static void vhost_vdpa_listener_region_del(MemoryListener *listener,
+ 
+     llsize = int128_sub(llend, int128_make64(iova));
+ 
+-    if (try_unmap) {
+-        ret = vhost_vdpa_dma_unmap(v, iova, int128_get64(llsize));
+-        if (ret) {
+-            error_report("vhost_vdpa dma unmap error!");
+-        }
++    ret = vhost_vdpa_dma_unmap(v, iova, int128_get64(llsize));
++    if (ret) {
++        error_report("vhost_vdpa dma unmap error!");
+     }
+ 
+     memory_region_unref(section->mr);
 -- 
 2.26.2
 
