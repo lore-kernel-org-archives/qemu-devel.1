@@ -2,95 +2,76 @@ Return-Path: <SRS0=Z1O7=DF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04243C4727C
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:56:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC6FAC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:57:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8ED8121548
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:56:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3B78D21548
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:57:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NymI8jyU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8ED8121548
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ae/sKckr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B78D21548
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMte6-0006PJ-M0
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 09:56:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60488)
+	id 1kMtf5-0007Ut-BP
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 09:57:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40732)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kMt4W-0000ho-Hj
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 09:20:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59719)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kMtXz-0007pX-4Q
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 09:50:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43600)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kMt4Q-0002no-92
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 09:20:01 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kMtXv-0006gG-4p
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 09:50:30 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601299196;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/GuNNoh6nkdsrmjKbQNZ/H8CBCcsX4tPVisO++gKbE0=;
- b=NymI8jyUMD9t3Z4oqWb/HWUJfPuJwtj3X6PJPKu5YAG3DUC+YVxuAAVblxZSs8A1sTd5vN
- EVOpDL2pORJZCiwUd2Z0Mnd5JmDZsBdLH2oFFqNOzRMKfKTyCUcVg9cSTbWkjNVkwQqRVQ
- DiaayKuKZbqQgVZUt75Uc8c9rWHAEGM=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-545-MlqOGRoeMzyeJCfi71QOng-1; Mon, 28 Sep 2020 09:19:54 -0400
-X-MC-Unique: MlqOGRoeMzyeJCfi71QOng-1
-Received: by mail-wr1-f72.google.com with SMTP id d13so389425wrr.23
- for <qemu-devel@nongnu.org>; Mon, 28 Sep 2020 06:19:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=/GuNNoh6nkdsrmjKbQNZ/H8CBCcsX4tPVisO++gKbE0=;
- b=qo7tW22pxSVOH81OETb74e6ySEyiU4XuRAZ+PLtwAlwiHXVUA5JtvG/Rw4RlwJjJ+Y
- HsUUv+UxxvVFcaJHx6SB/z9+647obDOqbib+RTIv2SkH/d8qfBVL1sHtI1lVRQ0T7QC+
- MJ+SOW+8KeUkZdg9S5/NyZ3ueaa78dwixswmZQOZhjJ+H/P2QKj6WZF+DE4gtsQ+SLZN
- vpNTPRMW38fXVFd1ZNgWiewejhRdTUgYJBK4kD0IIQA4XyMVmEhjHEucq3iPMlkhxOy7
- VAzvCengpC5NYM9rr4oYJ0jNewySMHqR0SSeBR/4cagNaRnKLGGTkPuHN2psniEh7yl7
- A1Zg==
-X-Gm-Message-State: AOAM5330MnRkwhwnZ4Yv++WFHRk6j5e5vPcy41xfGuyJGdVi0+Xpg0wn
- 3mKYCDNRYFOnZoRm2j0u5IwcipOEp+I6rIopT08oxz6hM4I4IBZ4SCdJvxbMDC+cmHsiktPyqeP
- jCKpixW8yyqacAi4=
-X-Received: by 2002:a7b:c84a:: with SMTP id c10mr1597334wml.139.1601299193214; 
- Mon, 28 Sep 2020 06:19:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyat1laQPxulibnFjOJctKDEtgKO4pKfyi/4oZgnhBrfdQVkb9kh6nVGm0ZFsSjsDUCiOH5sw==
-X-Received: by 2002:a7b:c84a:: with SMTP id c10mr1597319wml.139.1601299193024; 
- Mon, 28 Sep 2020 06:19:53 -0700 (PDT)
-Received: from localhost.localdomain (74.red-83-53-161.dynamicip.rima-tde.net.
- [83.53.161.74])
- by smtp.gmail.com with ESMTPSA id z83sm1392284wmb.4.2020.09.28.06.19.51
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 28 Sep 2020 06:19:52 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 3/8] qemu/bswap: Replace bswapXXs() by compiler
- __builtin_bswap()
-Date: Mon, 28 Sep 2020 15:19:29 +0200
-Message-Id: <20200928131934.739451-4-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200928131934.739451-1-philmd@redhat.com>
-References: <20200928131934.739451-1-philmd@redhat.com>
+ s=mimecast20190719; t=1601301023;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type; bh=ipvPW611OrDCvB3SbdRMt8cKP/3naZupo4AIySzu3r8=;
+ b=ae/sKckrrbDThRj0ZpkfDyEzkZ4f7Aq4W/PuZgzveAAuzCtjvHPXbRV3mxaKbeS3sMoC6O
+ a5xcT41fRo2fm0FaZd23B71d8ldXTcZeLqcJTCBa1HuSUavqzgYf5G6DScMcHFMyfnkIKD
+ HwRXiF04/LCIQCjRKqzrjoNvf8l5xIs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-536-l659EukePbetM9mDxjpY8g-1; Mon, 28 Sep 2020 09:50:08 -0400
+X-MC-Unique: l659EukePbetM9mDxjpY8g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0DCCE80733A;
+ Mon, 28 Sep 2020 13:50:07 +0000 (UTC)
+Received: from redhat.com (ovpn-114-24.ams2.redhat.com [10.36.114.24])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 500107366E;
+ Mon, 28 Sep 2020 13:50:02 +0000 (UTC)
+Date: Mon, 28 Sep 2020 14:49:58 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+Subject: Publishing docs for formal releases
+Message-ID: <20200928134958.GG2230076@redhat.com>
 MIME-Version: 1.0
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 03:29:35
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 03:47:08
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
@@ -111,65 +92,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Kamil Rytarowski <kamil@netbsd.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- include/qemu/bswap.h | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+We currently have a cronjob publishing:
 
-diff --git a/include/qemu/bswap.h b/include/qemu/bswap.h
-index 41131d3d76e..fed96dddd7a 100644
---- a/include/qemu/bswap.h
-+++ b/include/qemu/bswap.h
-@@ -38,29 +38,31 @@ static inline uint64_t bswap64(uint64_t x)
- 
- static inline void bswap16s(uint16_t *s)
- {
--    *s = bswap16(*s);
-+    *s = __builtin_bswap16(*s);
- }
- 
- static inline void bswap32s(uint32_t *s)
- {
--    *s = bswap32(*s);
-+    *s = __builtin_bswap32(*s);
- }
- 
- static inline void bswap64s(uint64_t *s)
- {
--    *s = bswap64(*s);
-+    *s = __builtin_bswap64(*s);
- }
- 
- #if defined(HOST_WORDS_BIGENDIAN)
- #define be_bswap(v, size) (v)
--#define le_bswap(v, size) glue(bswap, size)(v)
-+#define le_bswap(v, size) glue(__builtin_bswap, size)(v)
- #define be_bswaps(v, size)
--#define le_bswaps(p, size) do { *p = glue(bswap, size)(*p); } while(0)
-+#define le_bswaps(p, size) \
-+            do { *p = glue(__builtin_bswap, size)(*p); } while (0)
- #else
- #define le_bswap(v, size) (v)
--#define be_bswap(v, size) glue(bswap, size)(v)
-+#define be_bswap(v, size) glue(__builtin_bswap, size)(v)
- #define le_bswaps(v, size)
--#define be_bswaps(p, size) do { *p = glue(bswap, size)(*p); } while(0)
-+#define be_bswaps(p, size) \
-+            do { *p = glue(__builtin_bswap, size)(*p); } while (0)
- #endif
- 
- /**
+   https://www.qemu.org/docs/master/
+
+The URL was chosen such that we would also publish docs for each release
+at URLs like
+
+   https://www.qemu.org/docs/5.0.0
+
+The latter part has not happened yet.
+
+IIUC, we first introduced the new docs approach in 4.0.0, so ideally we
+would publish our historical docs for 4.0.0 releases onwards, including
+each minor point release on stable branches. So this means 4.0.0, 4.0.1
+4.1.0, 4.1.1, 4.2.0, 4.2.1, 5.0.0, 5.0.1 and 5.1.0.
+
+What needs to happen to turn this into reality ? On IRC it was sugggested
+that this be done as part of the release process handled by Michael Roth.
+
+Is there anything blocking this ?
+
+One we have docs publishing happening, then we'll want to also update
+
+  https://www.qemu.org/documentation/
+
+to link people to the docs for each release when making a release.
+
+Regards,
+Daniel
 -- 
-2.26.2
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
