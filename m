@@ -7,66 +7,67 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 301B2C4741F
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 10:49:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91DBAC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 10:51:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8344A2080A
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 10:49:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D47992074B
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 10:51:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wit0VfQG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8344A2080A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GvsUuYIX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D47992074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMqib-0006rA-H6
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 06:49:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43824)
+	id 1kMqkH-00089o-V2
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 06:51:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44020)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kMqcm-0007iH-Ii
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 06:43:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43343)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kMqct-00080a-Lp
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 06:43:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26904)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kMqci-0006H3-0q
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 06:43:16 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kMqcq-0006JP-1T
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 06:43:23 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601289791;
+ s=mimecast20190719; t=1601289799;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=DzuHHKR6tmXSjEbMqJkV/4p/aqbq2kdpVntF34U3/qo=;
- b=Wit0VfQGnEqiRVtx34H3KC0QuxPrY/2ofaIk124iI5/9mSc2N3HnxyuUmAOlgy590hP3qA
- 6YkrlAiyOezTD65mPQG4/aWGraC7u9IqXJ9neMN1VcDyXOS+uEgmvDMPxwNfXI5DZbpzZN
- KwkJFEannqjtUqHTK20W39Sa0HXlm9g=
+ bh=+WSygC6kySUPz9u+rwH4GRNfyUq92oz4OUXHFwamiQI=;
+ b=GvsUuYIXKmNLkb1FZZOW3MCTCkIHeI+3ZVcDBkm5eZKlOVkbjn/8HOx2/K/BSs2Idy0i3t
+ s4/nh3TTvC4UoYiviI8M1pMhd071fiEkVvTISzfV/ZXrBqhxdozn21h9dDcncXM6LlCM2x
+ PaqMBg5SKTpPabhCH4DyLZCnAIHHcS8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-64-9fh5eRzZPgmUg5OydNU0uQ-1; Mon, 28 Sep 2020 06:43:09 -0400
-X-MC-Unique: 9fh5eRzZPgmUg5OydNU0uQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-92-jSq0nZUSM0-mQthePMZ5Lg-1; Mon, 28 Sep 2020 06:43:17 -0400
+X-MC-Unique: jSq0nZUSM0-mQthePMZ5Lg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E27D1DDFE;
- Mon, 28 Sep 2020 10:43:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EDD68802B61;
+ Mon, 28 Sep 2020 10:43:15 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
  [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AFDD81002C26;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 82C1760C84;
  Mon, 28 Sep 2020 10:43:07 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id C104140DD0; Mon, 28 Sep 2020 12:42:56 +0200 (CEST)
+ id A4ED840846; Mon, 28 Sep 2020 12:42:56 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 11/12] acpi/gpex: no reason to use a method for _CRS
-Date: Mon, 28 Sep 2020 12:42:55 +0200
-Message-Id: <20200928104256.9241-12-kraxel@redhat.com>
+Subject: [PATCH v3 08/12] tests/acpi: add empty
+ tests/data/acpi/microvm/DSDT.pcie file
+Date: Mon, 28 Sep 2020 12:42:52 +0200
+Message-Id: <20200928104256.9241-9-kraxel@redhat.com>
 In-Reply-To: <20200928104256.9241-1-kraxel@redhat.com>
 References: <20200928104256.9241-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -108,48 +109,16 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-... just to return something which is constant anyway.
-
--            Method (_CRS, 0, NotSerialized)  // _CRS: Current Resource Settings
--            {
--                Return (ResourceTemplate ()
--                {
--                    WordBusNumber (ResourceProducer, MinFixed, MaxFixed, PosDecode,
-[ ... ]
-
-+            Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
-+            {
-+                WordBusNumber (ResourceProducer, MinFixed, MaxFixed, PosDecode,
-[ ... ]
-
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/pci-host/gpex-acpi.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ tests/data/acpi/microvm/DSDT.pcie | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 tests/data/acpi/microvm/DSDT.pcie
 
-diff --git a/hw/pci-host/gpex-acpi.c b/hw/pci-host/gpex-acpi.c
-index 6fb951a0c19f..dbb350a837f8 100644
---- a/hw/pci-host/gpex-acpi.c
-+++ b/hw/pci-host/gpex-acpi.c
-@@ -57,7 +57,6 @@ void acpi_dsdt_add_gpex(Aml *scope, struct GPEXConfig *cfg)
-     aml_append(method, aml_return(aml_int(cfg->ecam.base)));
-     aml_append(dev, method);
- 
--    method = aml_method("_CRS", 0, AML_NOTSERIALIZED);
-     Aml *rbuf = aml_resource_template();
-     aml_append(rbuf,
-         aml_word_bus_number(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE,
-@@ -89,8 +88,7 @@ void acpi_dsdt_add_gpex(Aml *scope, struct GPEXConfig *cfg)
-                                     0x0000,
-                                     cfg->mmio64.size));
-     }
--    aml_append(method, aml_return(rbuf));
--    aml_append(dev, method);
-+    aml_append(dev, aml_name_decl("_CRS", rbuf));
- 
-     /* Declare an _OSC (OS Control Handoff) method */
-     aml_append(dev, aml_name_decl("SUPP", aml_int(0)));
+diff --git a/tests/data/acpi/microvm/DSDT.pcie b/tests/data/acpi/microvm/DSDT.pcie
+new file mode 100644
+index 000000000000..e69de29bb2d1
 -- 
 2.27.0
 
