@@ -2,88 +2,95 @@ Return-Path: <SRS0=Z1O7=DF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9154EC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 14:10:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E28D8C4727E
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 14:13:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00B552072E
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 14:10:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6C77721924
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 14:13:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GJPzBCHg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00B552072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tf164XzK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C77721924
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMtrl-0001wP-14
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 10:10:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47946)
+	id 1kMtuc-0004hp-CS
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 10:13:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48712)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <devnexen@gmail.com>)
- id 1kMtq8-0000g1-2o
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 10:09:16 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:42935)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <devnexen@gmail.com>)
- id 1kMtq6-0001ZI-Ao
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 10:09:15 -0400
-Received: by mail-ed1-x543.google.com with SMTP id j2so1469040eds.9
- for <qemu-devel@nongnu.org>; Mon, 28 Sep 2020 07:09:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=+n6XMSerxV/mN+MG6lr65ui0/eANuaTQ2b8kAEOSL8Y=;
- b=GJPzBCHgwGOtqtijV8yT1ieBqpSbVCV4skRG+MKxhb7UQW9PVI9qQz6hXveeUCZ9UX
- 4LcthltyQBA6uN6tgarEY/itbt0OgI3Y6HQdoWM+i6zM9kmPQqftAry8kpB4aL3Z7+fC
- W8lEufEOJ3wl6HJCWqFyZmSYcC5OPAlS2rMB2FRc045916SjVTQM5pmd5fHD7lcCN+tl
- bmFCy17srbuAvB/JkCwRXwOHUfpFJne4ppEsZb0gptlUp8ttIg/hUzOjFhLswGglxju7
- hhYqGOUrsQv90O+KM0E4dmIrj07S1K5uE6g3n1OS5o3DZRsklH0JfBRPOImsGiyxq75Q
- jeUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=+n6XMSerxV/mN+MG6lr65ui0/eANuaTQ2b8kAEOSL8Y=;
- b=MXA71zsspe1dE6M3ihxWWLoVRF8z2TPZqnhhHnb3D9UqQh1uZLzv6ibVsSE0OHi0zN
- 9FGVo389loZlRXtB02FNpfN4IdJ5eaPt5xMsUPFVOLBm8aFa9/6wnCpAATxoVyqFepGP
- wCr6KvQ8pSTg5l++aTYcj0VsNH0lkuiWHkFoJkwNjaAkGzAGu04aOWv1FjT96na/XxF8
- NAcsl4D8ED1VdA7YS0T6zTCLM4CCvqZsFAeSpmvzpu19ObfCjAaeITjiRsVoUvBQE+nH
- /gU0r010Ac5fsrzHDTqmvocIqoIFCjz58RSKUEkLL4N1bYb0b7B25+H9FgDfgyo6agoN
- 18XA==
-X-Gm-Message-State: AOAM533vY8fWtgYMUSiHCsV1PBKQL6gZP+iNKOgkLlbbwTtoERaeJRol
- Xo4zKpV5QQsyBb/dHiy26uTFsn4T7BcxsCDWD2w=
-X-Google-Smtp-Source: ABdhPJxsN418OFJrcWh97pVjk/fYBWlEA7nwZOLmmsr0PfKvaL8eWgVBqKQKS48Hm+QNRNyvPiq8thWYMB1LZp4rVJo=
-X-Received: by 2002:a50:9e6a:: with SMTP id z97mr2097404ede.32.1601302151796; 
- Mon, 28 Sep 2020 07:09:11 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kMttO-0003od-OS
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 10:12:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50746)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kMttM-00021R-Dp
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 10:12:38 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601302354;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=ai/OZEB9D06J/gCOEHXhqd03HTxxeOYLvBemG2ruPXs=;
+ b=Tf164XzKlvRuEsYYkvZSzq+LAoiMTT3Uv1T0lDpiwYssJqEgjjde481VkpmWbxlys+s5VG
+ 4Sv3TepRwJIl+fJhSvBewhNa9jbOo0Yos+MVouiZfdPk1e6+6Fhje2Q1n38DQ/z2DJS/qm
+ yz/YHi1PX1HCUmyGOA6syEPwrKcQVvk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-517-Azq3hd8cPcajYz85HC1UHA-1; Mon, 28 Sep 2020 10:12:30 -0400
+X-MC-Unique: Azq3hd8cPcajYz85HC1UHA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 327F6192AB6E;
+ Mon, 28 Sep 2020 14:12:29 +0000 (UTC)
+Received: from localhost (unknown [10.10.67.5])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E832E55763;
+ Mon, 28 Sep 2020 14:12:28 +0000 (UTC)
+Date: Mon, 28 Sep 2020 10:12:28 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: "Kang, Luwei" <luwei.kang@intel.com>
+Subject: Re: [PATCH v1 1/3] i386: Remove the limitation of IP payloads for
+ Intel PT
+Message-ID: <20200928141228.GW3717385@habkost.net>
+References: <1582580312-19864-2-git-send-email-luwei.kang@intel.com>
+ <20200925161539.GS3717385@habkost.net>
+ <MW3PR11MB46655375CAECC74BA2D7CAECF2360@MW3PR11MB4665.namprd11.prod.outlook.com>
+ <20200925165415.GT3717385@habkost.net>
+ <036ba624-670c-d6b7-721c-ad5c9d648c1f@redhat.com>
+ <20200925202956.GV3717385@habkost.net>
+ <db31a0fa-c6cf-4730-6d64-f81228948d30@redhat.com>
+ <CY4PR11MB1447C4CA6B6D455EE33F724D80350@CY4PR11MB1447.namprd11.prod.outlook.com>
+ <d85a3245-c774-5098-5d14-2e3b3a2eda18@redhat.com>
+ <CY4PR11MB1447BB55E8AF4915CD56655980350@CY4PR11MB1447.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-References: <20200928131934.739451-1-philmd@redhat.com>
- <20200928131934.739451-6-philmd@redhat.com>
-In-Reply-To: <20200928131934.739451-6-philmd@redhat.com>
-From: David CARLIER <devnexen@gmail.com>
-Date: Mon, 28 Sep 2020 15:09:01 +0100
-Message-ID: <CA+XhMqxdb9Y6HL_0Og4Px5OwdTqK5EKJcnKdafd790nJb8yYEQ@mail.gmail.com>
-Subject: Re: [PATCH v2 5/8] qemu/bswap: Use compiler __builtin_bswap() on Haiku
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::543;
- envelope-from=devnexen@gmail.com; helo=mail-ed1-x543.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <CY4PR11MB1447BB55E8AF4915CD56655980350@CY4PR11MB1447.namprd11.prod.outlook.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 03:29:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,51 +103,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- Richard Henderson <richard.henderson@linaro.org>,
- qemu-devel <qemu-devel@nongnu.org>, Carlo Arenas <carenas@gmail.com>,
- Kamil Rytarowski <kamil@netbsd.org>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, "Strong,
+ Beeman" <beeman.strong@intel.com>, "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Unfortunately it breaks the build.
-Regards.
+On Mon, Sep 28, 2020 at 12:42:37PM +0000, Kang, Luwei wrote:
+> > >>>> No, it's not possible.  KVM doesn't have a say on what the
+> > >>>> processor writes in the tracing packets.
+> > >>> Can KVM refuse to enable packet generation if CSbase is not zero and
+> > >>> CPUID.(EAX=14H,ECX=0)[bit 31] seen by guest is different from host?
+> > >>
+> > >> Yes, but the processor could change operating mode (and hence CSbase)
+> > >> while tracing is active.  This is very unlikely, since it would
+> > >> require nonzero CS-base and a 32-bit host, but in principle not
+> > >> impossible (could be a firmware call, for example).
+> > >>
+> > >> The only solution is for KVM to accept both, and for QEMU to refuse a
+> > >> setting that does not match the host.
+> > >>
+> > >
+> > > So I need to add a patch in KVM to disabled the Intel PT when the
+> > > CSbase is not zero and the guest LIP different from the host. And this
+> > > limitation in qemu (disabled the PT when LIP is enabled in the host)
+> > > can be remove. Is that right?
+> > 
+> > No, if a feature cannot be emulated, that means it cannot be enabled unless it
+> > matches the host.  That's generally not a problem since Intel PT is usually used
+> > only with "-cpu host".
+> > 
+> 
+> The limitation of LIP in qemu will mask off the Intel PT in KVM
+> guest even with "-cpu host". e.g. This bit will be set in
+> SnowRidge HW and later.
 
-On Mon, 28 Sep 2020 at 14:20, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
->
-> Since commit efc6c070aca ("configure: Add a test for the minimum
-> compiler version") the minimum compiler version required for GCC
-> is 4.8, which supports __builtin_bswap().
-> Remove the Haiku specific ifdef'ry.
->
-> This reverts commit 652a46ebba970017c7a23767dcc983265cdb8eb7
-> ("bswap.h: Include <endian.h> on Haiku for bswap operations").
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-> Cc: David Carlier <devnexen@gmail.com>
-> Cc: Carlo Arenas <carenas@gmail.com>
-> ---
->  include/qemu/bswap.h | 2 --
->  1 file changed, 2 deletions(-)
->
-> diff --git a/include/qemu/bswap.h b/include/qemu/bswap.h
-> index 55916670d39..719d620bfe6 100644
-> --- a/include/qemu/bswap.h
-> +++ b/include/qemu/bswap.h
-> @@ -8,8 +8,6 @@
->  # include <machine/bswap.h>
->  #elif defined(__FreeBSD__)
->  # include <sys/endian.h>
-> -#elif defined(__HAIKU__)
-> -# include <endian.h>
->  #else
->  #undef  bswap16
->  #define bswap16(_x) __builtin_bswap16(_x)
-> --
-> 2.26.2
->
+This behavior can and should be changed.
+
+> 
+> How about "-cpu cpu_model, +intel-pt" use case? The current
+> value of Intel PT CPUID is a constant. Can we make the ICX
+> CPUID as basic inforation(LIP is 0) and using "+intel-pt-lip"
+> to make Intel PT work on the CPU which LIP is 1 on the host? As
+> you mentioned before, Intel PT cannot be enabled in guest
+> unless it matches the host.
+
+This makes sense, but you can also make each CPU model set a
+default for the LIP bit.  "-cpu SnowRidge,+intel-pt" could set
+LIP=1 by default.
+
+-- 
+Eduardo
+
 
