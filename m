@@ -2,136 +2,84 @@ Return-Path: <SRS0=Z1O7=DF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 065BBC4346E
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 02:34:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14F68C4346E
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 02:38:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4488F21582
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 02:34:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8788622207
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 02:38:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="AsItMM6w";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="H4cj8M0X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4488F21582
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="XeieRb8c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8788622207
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58572 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMiza-0005qD-5j
-	for qemu-devel@archiver.kernel.org; Sun, 27 Sep 2020 22:34:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45880)
+	id 1kMj3O-0008Rk-KA
+	for qemu-devel@archiver.kernel.org; Sun, 27 Sep 2020 22:38:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46264)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
- (envelope-from <prvs=5334b480d=Dmitry.Fomichev@wdc.com>)
- id 1kMiya-0005KS-UZ; Sun, 27 Sep 2020 22:33:17 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:28758)
+ (envelope-from <prvs=5334b480d=dmitry.fomichev@wdc.com>)
+ id 1kMj0v-0006Ul-Ua; Sun, 27 Sep 2020 22:35:41 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:21617)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
- (envelope-from <prvs=5334b480d=Dmitry.Fomichev@wdc.com>)
- id 1kMiyX-00035e-62; Sun, 27 Sep 2020 22:33:16 -0400
+ (envelope-from <prvs=5334b480d=dmitry.fomichev@wdc.com>)
+ id 1kMj0s-0003LT-5B; Sun, 27 Sep 2020 22:35:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1601260676; x=1632796676;
- h=from:to:cc:subject:date:message-id:references:
- in-reply-to:content-transfer-encoding:mime-version;
- bh=Qwgb1N9Fq1IKuxjsTJ9u6k8NvaP6xp8AHNgrPhcn9oE=;
- b=AsItMM6w5Yen6oNfy5cyc8RsQ87Ny7OPLuGKkpXTa9f8cLKiDBCqNASH
- 9gxB90EQrfEqixL4Bt/7LdRoUQ8RErgVQgHL1gljBQawG1HAZNNHtJSB+
- TqABqhgmhBMA5fjNmV8Z4UiC7FFaQMvtL6QFqw7nL/VapEzkBchDjsn/A
- ATvVqPatA8TcnLxADO9m5OYNg+OKbECSAejqi7+lrTsOPsKOcaVhlvjgC
- 1ScItBjMfucqDAMOzNhe/uzZ5uB8Q+v54DS72MJtEY9nDNLuTTYAXKIBl
- KdlseYPw/9mc1rZ+p6aRWteG5KP5R+zLl6K3ey0hy2djkalSLJAEXayn1 Q==;
-IronPort-SDR: e8IZRnentePKvbY8Bs/rE90AMg061cmJ3G6Bso4OY7SCFZEx1n+Aq0kVe+YFbnn8ZmzbzbvHZU
- ZxswR5oT5vmNx6Xq8Va4mp0mR+J30Vl29I0hp0Etu5EXZ+BsSmM2DPQ8SO5rWIbv/i4H2M2PGe
- rf2TyxMgAlMnGummVXOMgaljHVKiBqweJCHUSnBKfD/nUcSbm08HK3w1WVvSTn5efWCgG64tvQ
- HaAJPr1prD0S0A7JxjW/YuexXteIM7VKk9UkTndU15BmovnLcVx2G508ee5JEz/95JL0zo8gvC
- FTY=
-X-IronPort-AV: E=Sophos;i="5.77,312,1596470400"; d="scan'208";a="251795743"
-Received: from mail-bn8nam12lp2177.outbound.protection.outlook.com (HELO
- NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.177])
- by ob1.hgst.iphmx.com with ESMTP; 28 Sep 2020 10:37:48 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=edmHi9QadhqUDlHIb/xsJcXNfDN4vxRp+uW47s/bxkh1E0F9fcx2KFR5LJUieQjD3ZhNROyLYZ1dnX4+TNC9hn96apaqiSQId5gX/avmGES60hy4XOmsFNNI86ZmsHXVTQxziwWqttcemWkKfkCxuQUyiNZdYqmUHet8ht5V48IyyR8Sa/QMDDaUsEki+n8i7UfCwGg7dc156u7YAJcHL8SsQXU4b0/qorG1+hmej1mDI73cjznfIN9rzOU+iWsCcDoRmw1PgeqeuEgUsTlBk3vYzadm360/4kN4wWWUMJ8zUzFkjWQvHAlI5/cB9ZTD9Wm/AeJ6NugUArzMwbEMpA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Qwgb1N9Fq1IKuxjsTJ9u6k8NvaP6xp8AHNgrPhcn9oE=;
- b=W71cvfCMVTk9+zKLmCmV+LDTUqenuMN85NyQcfkMYa9RYb2w/DLtrU4Lsn+/Mv4N7C4uFxpscrm3UguJPrt6ncndxZvnHp/FODfUFdmt+66GER9ttsrr7K7yCAyo6jofnkYSChMTu2YD8v3wjV0TSyTTi11lURABa599+ANxkosb4rqfCNjTJIEAN77kfRkNlwzjibvRVi2qOsOod6asKt8YIIWPh5vSXgi2njMa8CRbamUvyTOCYigu2rvjp4a+JQYjdte2czfLkj+v7JwJ/tbNd7LVqWE6KmAaxamY1IEroe6oGWIMKJZN5pPyfNL6KhxkJHUdwSUVgnJTBbLZJA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Qwgb1N9Fq1IKuxjsTJ9u6k8NvaP6xp8AHNgrPhcn9oE=;
- b=H4cj8M0X6pB8oAnaHLzZ8TGh0k3tMEQ751jxn6DLre/8UUdeYKC1b6ifmNNJ6S/bB5HMWwUV8IPjmXcow8c7V+WfzMbhwUn5WmDn/9DyMzWOg3GsXRBKxcBjtzB2yDgEOwXrW/4HtpYlqLAlIjfshuxmD4Z4W1PNx2RWYYzv2VY=
-Received: from MN2PR04MB5951.namprd04.prod.outlook.com (2603:10b6:208:3f::13)
- by MN2PR04MB6159.namprd04.prod.outlook.com (2603:10b6:208:e6::19)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.24; Mon, 28 Sep
- 2020 02:33:06 +0000
-Received: from MN2PR04MB5951.namprd04.prod.outlook.com
- ([fe80::44d8:522e:db29:bb94]) by MN2PR04MB5951.namprd04.prod.outlook.com
- ([fe80::44d8:522e:db29:bb94%6]) with mapi id 15.20.3412.029; Mon, 28 Sep 2020
- 02:33:06 +0000
-From: Dmitry Fomichev <Dmitry.Fomichev@wdc.com>
-To: Klaus Jensen <its@irrelevant.dk>, Keith Busch <kbusch@kernel.org>, Damien
- Le Moal <Damien.LeMoal@wdc.com>
-Subject: RE: [PATCH v4 00/14] hw/block/nvme: Support Namespace Types and Zoned
+ t=1601260537; x=1632796537;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=GQFJcT0tqdfgzB0pfES5pQMDQuVRGQjaex0/CdkNm9w=;
+ b=XeieRb8cQfx4bumpx/gPqckW1a2yWf0jZAL9BASOoEzp9ySEMFkM3+QA
+ fQbyg6GrO7ZkhFw3GZcNR6WWHAgW+7+ZLkzDdvsOTV1c7GEcasRPE8Lw/
+ 30EqLiyGiOEhcN6pvF8HU+rxpWgl8OMmVf7Mzvvhn+LL4L28UIiSM0uW1
+ QRbtXC1lnhNu9Nim+vIivBZ9bOPd+ZZlLUxcOy2jBEUQKcSc2R3f3AHAI
+ yswq0Ew/uDOQkTkJwvuoax9iNzBQt5kWBrgxKra8MaOHIa0zsTUZPP6fo
+ wOxlvUhOcuPxSFzUNgoxJF7wgziPwnVzPLl65FKFZBxeJ0cFD5WrSsAvv A==;
+IronPort-SDR: fp8V5FkEv9QFa5e5n86cAQVmT28KVW8lmwtrY7x5GnN96L828Okw3LlLwh30CuAcb5d9yUPcup
+ Kw8Oog3MuLOtebO6a722Ohh4WaS1H4oMBCSL+nKB8dEbzO/UKN/sw7SCHKXK8wyov+WHC15Le4
+ EeMPtvhL13yptdudi3EtFGsoxTDpICZtIPetPH/GE1iwqeOEUlcaQVfuUtzpubIo9uIhrA3X/o
+ CQq66+Xm+hoDmMYpAaSgRcyG2b5FiKtLsvsGo6k4Ad5mIl+qV9KfSyEu3QnlkSHt2Q8DkwWRFr
+ 1kU=
+X-IronPort-AV: E=Sophos;i="5.77,312,1596470400"; d="scan'208";a="258125223"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 28 Sep 2020 10:35:34 +0800
+IronPort-SDR: om4mXwkuMYz5q/lyl4DbTxGMQvoZR0ccaP5tgLJW4KCaNiRRm+NS+9wD4XeeyCOg/GSPbKbHeI
+ sVHly9XpnfmQ==
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 27 Sep 2020 19:22:30 -0700
+IronPort-SDR: rNTmBQHLBuiKZ8wudalKTiYTmkby4x9YH6w4JqpfnhMxqmrlrEUFh79B1/FXGwL4wDPyk1xlK6
+ iRr28VDlVX0g==
+WDCIronportException: Internal
+Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
+ by uls-op-cesaip02.wdc.com with ESMTP; 27 Sep 2020 19:35:33 -0700
+From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+To: Keith Busch <kbusch@kernel.org>, Klaus Jensen <k.jensen@samsung.com>,
+ Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>, Fam Zheng <fam@euphon.net>
+Subject: [PATCH v5 00/14] hw/block/nvme: Support Namespace Types and Zoned
  Namespace Command Set
-Thread-Topic: [PATCH v4 00/14] hw/block/nvme: Support Namespace Types and
- Zoned Namespace Command Set
-Thread-Index: AQHWkdZJY2r+3+EgB0+n1uDhiCCmB6l4SdmAgAEvKJA=
-Date: Mon, 28 Sep 2020 02:33:06 +0000
-Message-ID: <MN2PR04MB59515B1EA1238861DFF3236AE1350@MN2PR04MB5951.namprd04.prod.outlook.com>
-References: <20200923182021.3724-1-dmitry.fomichev@wdc.com>
- <20200924210751.GD1738917@apples.localdomain>
-In-Reply-To: <20200924210751.GD1738917@apples.localdomain>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: irrelevant.dk; dkim=none (message not signed)
- header.d=none;irrelevant.dk; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [199.255.45.62]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 87b50ec8-c85f-4801-ea49-08d86356d4f9
-x-ms-traffictypediagnostic: MN2PR04MB6159:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MN2PR04MB6159AC39E7BE5D24AC3EE67FE1350@MN2PR04MB6159.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:6108;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: e7EJgmBgnB3XZl6WvKWvrcwBofFZEY51P3gRYK8mV0hfhLTjBIF1QIUIy6MsmONQYNVyxzdIEA7XnBtlbB6fm8LO/vixWfGv1qijqBx+LujBeJoTKoMBOslSQxjzMrBvviEOg7ybwEoH1tmdr1yFlBINCH1dwK5Kgnavsg2z4Jx9HvGthJ+iyxMC4AvXGr9u+/V3We9392ONMG23F5tnEWUv5yv7X55/mak4cHxqe89s0UvJ7B1OE7r8XZG5dCaFmjqEG6TNB6bseUWwUEEW1E1cJxXfgEWN3tONoVyxly+AfTQoklu2HdxehfsvcftBYqG0bGEHUL5FPsDbQyx70rKCgrGWMBUwU75JUMIsCEm6yD8XyDrnTi7KHUTgz4LrImaxdBImDWalZDD2gdJo79cNYv4y+QQgie57vIN/EzQ3KnNfbrmXbHdKse+KJ5KbtLGaXUOfP8VOlyqiS+a3lg==
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:MN2PR04MB5951.namprd04.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(136003)(39860400002)(396003)(366004)(376002)(346002)(66476007)(66556008)(64756008)(66446008)(76116006)(71200400001)(52536014)(54906003)(6636002)(110136005)(316002)(9686003)(186003)(83380400001)(86362001)(5660300002)(33656002)(966005)(66946007)(8936002)(478600001)(55016002)(2906002)(8676002)(7696005)(6506007)(53546011)(26005)(4326008);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-antispam-messagedata: ZmtdLTJtPgXw0cvr1O+l6janW/4yUSAmIlKsuT6r/N2pMYsfyqo+nGHHgiB9IEtyc5CA7Q9VK75WR3ugaXq1AC9Db4SQJtQtrD5IgchhNUW5iDdnJNPmOkha8GpcireaO+MZ3hpyEB4IQwD53vSpTBeE5EdXjiYFAU5O30lxCc0jcWOLs8sd9vpVlOICCTByCQoQKpCf0KGgfiI4+swITiJLCeQYmEEUd8xh29hqJlkfFHgWni57c5AaPZj+KMQef8WTZo9GHdR6zLO6VaHcMomwjGxcgKzAdaCgWXwJIJKE4AIYD0Uub9F64uFiiZAywLJqBrsrK4w0wAOSnmN5LLf8n+uxDkRA0fY+lobsEFO4jXTd5S0KbRR7aw1HJCbU3W6PHDa+ynYL7+fLpAKXeETcGq2OUIsAxPieQyiWZjyn5YHlBgmFM/hqp+5e5kMxRWN8mz2FDgo8oA56kxEHyKm6tHgVLUe+iuJT+6570yMZc82MI2n+5BE2wy9PLuwXgTXkDgOklU7ew0YThV8TdoxEMi3RJz5gWvFUjwF5UNr5k1W+MieyooCOBkfHBjbsi4m8l2VAml8KBSH2R4y2KXoAcat2ARgEGigft9Mf+XveQSmmiiVrki08aCRJ0M2sL2m9QS3sULACrzLUX2Mm/A==
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Date: Mon, 28 Sep 2020 11:35:14 +0900
+Message-Id: <20200928023528.15260-1-dmitry.fomichev@wdc.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR04MB5951.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 87b50ec8-c85f-4801-ea49-08d86356d4f9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Sep 2020 02:33:06.2062 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: dBLaXJ0XsJGHJUk4464jz/emXCEkuzBquK9EKWLEqZ9Dj1gMdxHBJIOPu8KNyHsZLNxLwOoecyZuDilN3gyJdQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB6159
-Received-SPF: pass client-ip=68.232.143.124;
- envelope-from=prvs=5334b480d=Dmitry.Fomichev@wdc.com; helo=esa2.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/27 22:33:09
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=68.232.141.245;
+ envelope-from=prvs=5334b480d=dmitry.fomichev@wdc.com; helo=esa1.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/27 22:35:35
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
 X-Spam_score_int: -43
 X-Spam_score: -4.4
@@ -152,96 +100,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- Niklas Cassel <Niklas.Cassel@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Maxim Levitsky <mlevitsk@redhat.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
- Matias Bjorling <Matias.Bjorling@wdc.com>
+Cc: Niklas Cassel <niklas.cassel@wdc.com>,
+ Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
+ Dmitry Fomichev <dmitry.fomichev@wdc.com>, qemu-devel@nongnu.org,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Matias Bjorling <matias.bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBLbGF1cyBKZW5zZW4gPGl0c0Bp
-cnJlbGV2YW50LmRrPg0KPiBTZW50OiBUaHVyc2RheSwgU2VwdGVtYmVyIDI0LCAyMDIwIDU6MDgg
-UE0NCj4gVG86IERtaXRyeSBGb21pY2hldiA8RG1pdHJ5LkZvbWljaGV2QHdkYy5jb20+DQo+IENj
-OiBLZWl0aCBCdXNjaCA8a2J1c2NoQGtlcm5lbC5vcmc+OyBLbGF1cyBKZW5zZW4NCj4gPGsuamVu
-c2VuQHNhbXN1bmcuY29tPjsgS2V2aW4gV29sZiA8a3dvbGZAcmVkaGF0LmNvbT47IFBoaWxpcHBl
-DQo+IE1hdGhpZXUtRGF1ZMOpIDxwaGlsbWRAcmVkaGF0LmNvbT47IE1heGltIExldml0c2t5DQo+
-IDxtbGV2aXRza0ByZWRoYXQuY29tPjsgRmFtIFpoZW5nIDxmYW1AZXVwaG9uLm5ldD47IE5pa2xh
-cyBDYXNzZWwNCj4gPE5pa2xhcy5DYXNzZWxAd2RjLmNvbT47IERhbWllbiBMZSBNb2FsIDxEYW1p
-ZW4uTGVNb2FsQHdkYy5jb20+Ow0KPiBxZW11LWJsb2NrQG5vbmdudS5vcmc7IHFlbXUtZGV2ZWxA
-bm9uZ251Lm9yZzsgQWxpc3RhaXIgRnJhbmNpcw0KPiA8QWxpc3RhaXIuRnJhbmNpc0B3ZGMuY29t
-PjsgTWF0aWFzIEJqb3JsaW5nIDxNYXRpYXMuQmpvcmxpbmdAd2RjLmNvbT4NCj4gU3ViamVjdDog
-UmU6IFtQQVRDSCB2NCAwMC8xNF0gaHcvYmxvY2svbnZtZTogU3VwcG9ydCBOYW1lc3BhY2UgVHlw
-ZXMNCj4gYW5kIFpvbmVkIE5hbWVzcGFjZSBDb21tYW5kIFNldA0KPiANCj4gT24gU2VwIDI0IDAz
-OjIwLCBEbWl0cnkgRm9taWNoZXYgd3JvdGU6DQo+ID4gdjMgLT4gdjQNCj4gPg0KPiA+ICAtIEZp
-eCBidWdzIGludHJvZHVjZWQgaW4gdjIvdjMgZm9yIFFEID4gMSBvcGVyYXRpb24uIE5vdywgYWxs
-IHdyaXRlcw0KPiA+ICAgIHRvIGEgem9uZSBoYXBwZW4gYXQgdGhlIG5ldyB3cml0ZSBwb2ludGVy
-IHZhcmlhYmxlLCB6b25lLT53X3B0ciwNCj4gPiAgICB0aGF0IGlzIGFkdmFuY2VkIHJpZ2h0IGFm
-dGVyIHN1Ym1pdHRpbmcgdGhlIGJhY2tlbmQgaS9vLiBUaGUgZXhpc3RpbmcNCj4gPiAgICB6b25l
-LT5kLndwIHZhcmlhYmxlIGlzIHVwZGF0ZWQgdXBvbiB0aGUgc3VjY2Vzc2Z1bCB3cml0ZSBjb21w
-bGV0aW9uDQo+ID4gICAgYW5kIGl0IGlzIHVzZWQgZm9yIHpvbmUgcmVwb3J0aW5nLiBTb21lIGNv
-ZGUgaGFzIGJlZW4gc3BsaXQgZnJvbQ0KPiA+ICAgIG52bWVfZmluYWxpemVfem9uZWRfd3JpdGUo
-KSBmdW5jdGlvbiB0byBhIG5ldyBmdW5jdGlvbiwNCj4gPiAgICBudm1lX2FkdmFuY2Vfem9uZV93
-cCgpLg0KPiA+DQo+IA0KPiBTYW1lIGFwcHJvYWNoIHRoYXQgSSd2ZSB1c2VkLCArMS4NCj4gDQo+
-ID4gIC0gTWFrZSB0aGUgY29kZSBjb21waWxlIHVuZGVyIG1pbmd3LiBTd2l0Y2ggdG8gdXNpbmcg
-UUVNVSBBUEkgZm9yDQo+ID4gICAgbW1hcC9tc3luYywgaS5lLiBtZW1vcnlfcmVnaW9uLi4uKCku
-IFNpbmNlIG1tYXAgaXMgbm90IGF2YWlsYWJsZSBpbg0KPiA+ICAgIG1pbmd3IChldmVuIHRob3Vn
-aCB0aGVyZSBpcyBtbWFuLXdpbjMyIGxpYnJhcnkgYXZhaWxhYmxlIG9uIEdpdGh1YiksDQo+ID4g
-ICAgY29uZGl0aW9uYWwgY29tcGlsYXRpb24gaXMgYWRkZWQgYXJvdW5kIHRoZXNlIGNhbGxzIHRv
-IGF2b2lkDQo+ID4gICAgdW5kZWZpbmVkIHN5bWJvbHMgdW5kZXIgbWluZ3cuIEEgYmV0dGVyIGZp
-eCB3b3VsZCBiZSB0byBhZGQgc3R1Yg0KPiA+ICAgIGZ1bmN0aW9ucyB0byBzb2Z0bW11L21lbW9y
-eS5jIGZvciB0aGUgY2FzZSB3aGVuIENPTkZJR19QT1NJWCBpcyBub3QNCj4gPiAgICBkZWZpbmVk
-LCBidXQgc3VjaCBjaGFuZ2UgaXMgYmV5b25kIHRoZSBzY29wZSBvZiB0aGlzIHBhdGNoc2V0IGFu
-ZCBpdA0KPiA+ICAgIGNhbiBiZSBtYWRlIGluIGEgc2VwYXJhdGUgcGF0Y2guDQo+ID4NCj4gDQo+
-IEV3d3d3Lg0KPiANCj4gVGhpcyBmZWVscyBsaWtlIGEgaGFjayBvciBhdCB0aGUgdmVyeSBsZWFz
-dCBhbiBhYnVzZSBvZiB0aGUgcGh5c2ljYWwNCj4gbWVtb3J5IG1hbmFnZW1lbnQgQVBJLg0KPiAN
-Cj4gSWYgaXQgcmVhbGx5IG5lZWRzIHRvIGJlIG1lbW9yeSBtYXBwZWQsIHRoZW4gSSB0aGluayBh
-IGhvc3RtZW0tYmFzZWQNCj4gYXBwcm9hY2ggc2ltaWxhciB0byB3aGF0IEFuZHJ6ZWogZGlkIGZv
-ciBQTVIgaXMgbmVlZGVkIChJIHRoaW5rIHRoYXQNCj4gd2lsbCBnZXQgcmlkIG9mIHRoZSBDT05G
-SUdfUE9TSVggaWZkZWYgYXQgbGVhc3QsIGJ1dCBzdGlsbCBsZWF2ZSBpdA0KPiBzbGlnaHRseSB0
-cmlja3kgdG8gZ2V0IGl0IHRvIHdvcmsgb24gYWxsIHBsYXRmb3JtcyBBRkFJSykuDQoNCk9rLCBp
-dCBsb29rcyB0aGF0IHVzaW5nIHRoZSBIb3N0TWVtb3J5QmFja2VuZEZpbGUgYmFja2VuZCB3aWxs
-IGJlDQptb3JlIGFwcHJvcHJpYXRlLiBUaGlzIHdpbGwgcmVtb3ZlIHRoZSBuZWVkIGZvciBjb25k
-aXRpb25hbCBjb21waWxlLg0KDQpUaGUgbW1hcCgpIHBvcnRhYmlsaXR5IGlzIHByZXR0eSBkZWNl
-bnQgYWNyb3NzIHNvZnR3YXJlIHBsYXRmb3Jtcy4NCkFueSBwb29yIFdpbmRvd3MgdXNlciB3aG8g
-aXMgZm9yY2VkIHRvIGVtdWxhdGUgWk5TIG9uIG1pbmd3IHdpbGwgYmUNCmFibGUgdG8gZG8gc28s
-IGp1c3Qgd2l0aG91dCBoYXZpbmcgem9uZSBzdGF0ZSBwZXJzaXN0ZW5jeS4gQ29uc2lkZXJpbmcN
-CmhvdyBzcGVjaWFsaXplZCB0aGlzIHN0dWZmIGlzIGluIGZpcnN0IHBsYWNlLCBJIGVzdGltYXRl
-IHRoZSBudW1iZXIgb2YgdXNlcnMNCmFmZmVjdGVkIGJ5IHRoaXMgImxpbWl0YXRpb24iIHRvIGJl
-IGV4YWN0bHkgemVyby4NCg0KPiBCdXQgcmVhbGx5LA0KPiBzaW5jZSB3ZSBkbyBub3QgcmVxdWly
-ZSBtZW1vcnkgc2VtYW50aWNzIGZvciB0aGlzLCB0aGVuIEkgdGhpbmsgdGhlDQo+IGFic3RyYWN0
-aW9uIGlzIGZ1bmRhbWVudGFsbHkgd3JvbmcuDQo+IA0KDQpTZXJpb3VzbHksIHdoYXQgaXMgd3Jv
-bmcgd2l0aCB1c2luZyBtbWFwIDopID8gSXQgaXMgdXNlZCBzdWNjZXNzZnVsbHkgZm9yDQpzaW1p
-bGFyIGFwcGxpY2F0aW9ucywgZm9yIGV4YW1wbGUgLQ0KaHR0cHM6Ly9naXRodWIuY29tL29wZW4t
-aXNjc2kvdGNtdS1ydW5uZXIvYmxvYi9tYXN0ZXIvZmlsZV96YmMuYw0KDQo+IEkgYW0sIG9mIGNv
-dXJzZSwgYmxvd2luZyBteSBvd24gaG9ybiwgc2luY2UgbXkgaW1wbGVtZW50YXRpb24gdXNlcyBh
-DQo+IHBvcnRhYmxlIGJsb2NrZGV2IGZvciB0aGlzLg0KPiANCg0KWW91IGFyZSBtYWtpbmcgaXQg
-c291bmQgbGlrZSB0aGUgZW50aXJlIFdEQyBzZXJpZXMgcmVsaWVzIG9uIHRoaXMgYXBwcm9hY2gu
-DQpBY3R1YWxseSwgdGhlIHBlcnNpc3RlbmN5IGlzIGludHJvZHVjZWQgaW4gdGhlIHNlY29uZCB0
-byBsYXN0IHBhdGNoIGluIHRoZQ0Kc2VyaWVzIGFuZCBpdCBvbmx5IGFkZHMgYSBjb3VwbGUgb2Yg
-bGluZXMgb2YgY29kZSBpbiB0aGUgaS9vIHBhdGggdG8gbWFyaw0Kem9uZXMgZGlydHkuIFRoaXMg
-aXMgcG9zc2libGUgYmVjYXVzZSBvZiB1c2luZyBtbWFwKCkgYW5kIEkgZmluZCB0aGUgd2F5DQpp
-dCBpcyBkb25lIHRvIGJlIHF1aXRlIGVsZWdhbnQsIG5vdCB1Z2x5IDopDQoNCj4gQW5vdGhlciBp
-c3N1ZSBpcyB0aGUgY29tcGxldGUgbGFjayBvZiBlbmRpYW4gY29udmVyc2lvbnMuIERvZXMgaXQN
-Cj4gbWF0dGVyPyBJdCBkZXBlbmRzLiBXaWxsIGFueW9uZSBldmVyIHVzZSB0aGlzIG9uIGEgYmln
-IGVuZGlhbiBob3N0IGFuZA0KPiBtb3ZlIHRoZSBtZXRhIGRhdGEgYmFja2luZyBmaWxlIHRvIGEg
-bGl0dGxlIGVuZGlhbiBob3N0PyBQcm9iYWJseSBub3QuDQo+IFNvIGRvZXMgaXQgcmVhbGx5IG1h
-dHRlcj8gUHJvYmFibHkgbm90LCBidXQgaXQgaXMgY3V0dGluZyBjb3JuZXJzLg0KPiANCg0KR3Jl
-YXQgcG9pbnQgb24gZW5kaWFubmVzcyEgTmF0dXJhbGx5LCBhbGwgZmlsZSBiYWNrZWQgdmFsdWVz
-IGFyZSBzdG9yZWQgaW4NCnRoZWlyIG5hdGl2ZSBlbmRpYW5uZXNzLiBUaGlzIHdheSwgdGhlcmUg
-aXMgbm8gZXh0cmEgb3ZlcmhlYWQgb24gYmlnIGVuZGlhbg0KaGFyZHdhcmUgYXJjaGl0ZWN0dXJl
-cy4gUG9ydGFiaWxpdHkgY29uY2VybnMgY2FuIGJlIGVhc2lseSBhZGRyZXNzZWQgYnkNCnN0b3Jp
-bmcgbWV0YWRhdGEgZW5kaWFubmVzcyBhcyBhIGJ5dGUgZmxhZyBpbiBpdHMgaGVhZGVyLiBUaGVu
-LCBkdXJpbmcNCmluaXRpYWxpemF0aW9uLCB0aGUgbWV0YWRhdGEgdmFsaWRhdGlvbiBjb2RlIGNh
-biBkZXRlY3QgdGhlIHBvc3NpYmxlDQpkaXNjcmVwYW5jeSBpbiBlbmRpYW5uZXNzIGFuZCBhdXRv
-bWF0aWNhbGx5IGNvbnZlcnQgdGhlIG1ldGFkYXRhIHRvIHRoZQ0KZW5kaWFubmVzcyBvZiB0aGUg
-aG9zdC4gVGhpcyBwYXJ0IGlzIG91dCBvZiBzY29wZSBvZiB0aGlzIHNlcmllcywgYnV0IEkgd291
-bGQNCmJlIGFibGUgdG8gY29udHJpYnV0ZSBzdWNoIGEgc29sdXRpb24gYXMgYW4gZW5oYW5jZW1l
-bnQgaW4gdGhlIGZ1dHVyZS4NCg0KPiA+ICAtIE1ha2UgdGhlIGxpc3Qgb2YgcmV2aWV3IGNvbW1l
-bnRzIGFkZHJlc3NlZCBpbiB2MiBvZiB0aGUgc2VyaWVzDQo+ID4gICAgKHNlZSBiZWxvdykuDQo+
-ID4NCj4gDQo+IFZlcnkgZGV0YWlsZWQhIFRoYW5rcyENCg==
+v4 -> v5
+
+ - Rebase to the current qemu-nvme.
+
+ - Use HostMemoryBackendFile as the backing storage for persistent
+   zone metadata.
+
+ - Fix the issue with filling the valid data in the next zone if RAZBi
+   is enabled.
+
+v3 -> v4
+
+ - Fix bugs introduced in v2/v3 for QD > 1 operation. Now, all writes
+   to a zone happen at the new write pointer variable, zone->w_ptr,
+   that is advanced right after submitting the backend i/o. The existing
+   zone->d.wp variable is updated upon the successful write completion
+   and it is used for zone reporting. Some code has been split from
+   nvme_finalize_zoned_write() function to a new function,
+   nvme_advance_zone_wp().
+
+ - Make the code compile under mingw. Switch to using QEMU API for
+   mmap/msync, i.e. memory_region...(). Since mmap is not available in
+   mingw (even though there is mman-win32 library available on Github),
+   conditional compilation is added around these calls to avoid
+   undefined symbols under mingw. A better fix would be to add stub
+   functions to softmmu/memory.c for the case when CONFIG_POSIX is not
+   defined, but such change is beyond the scope of this patchset and it
+   can be made in a separate patch.
+
+ - Correct permission mask used to open zone metadata file.
+
+ - Fold "Define 64 bit cqe.result" patch into ZNS commit.
+
+ - Use clz64/clz32 instead of defining nvme_ilog2() function.
+
+ - Simplify rpt_empty_id_struct() code, move nvme_fill_data() back
+   to ZNS patch.
+
+ - Fix a power-on processing bug.
+
+ - Rename NVME_CMD_ZONE_APND to NVME_CMD_ZONE_APPEND.
+
+ - Make the list of review comments addressed in v2 of the series
+   (see below).
+
+v2 -> v3:
+
+ - Moved nvme_fill_data() function to the NSTypes patch as it is
+   now used there to output empty namespace identify structs.
+ - Fixed typo in Maxim's email address.
+
+v1 -> v2:
+
+ - Rebased on top of qemu-nvme/next branch.
+ - Incorporated feedback from Klaus and Alistair.
+    * Allow a subset of CSE log to be read, not the entire log
+    * Assign admin command entries in CSE log to ACS fields
+    * Set LPA bit 1 to indicate support of CSE log page
+    * Rename CC.CSS value CSS_ALL_NSTYPES (110b) to CSS_CSI
+    * Move the code to assign lbaf.ds to a separate patch
+    * Remove the change in firmware revision
+    * Change "driver" to "device" in comments and annotations
+    * Rename ZAMDS to ZASL
+    * Correct a few format expressions and some wording in
+      trace event definitions
+    * Remove validation code to return NVME_CAP_EXCEEDED error
+    * Make ZASL to be equal to MDTS if "zone_append_size_limit"
+      module parameter is not set
+    * Clean up nvme_zoned_init_ctrl() to make size calculations
+      less confusing
+    * Avoid changing module parameters, use separate n/s variables
+      if additional calculations are necessary to convert parameters
+      to running values
+    * Use NVME_DEFAULT_ZONE_SIZE to assign the default zone size value
+    * Use default 0 for zone capacity meaning that zone capacity will
+      be equal to zone size by default
+    * Issue warnings if user MAR/MOR values are too large and have
+      to be adjusted
+    * Use unsigned values for MAR/MOR
+ - Dropped "Simulate Zone Active excursions" patch.
+   Excursion behavior may depend on the internal controller
+   architecture and therefore be vendor-specific.
+ - Dropped support for Zone Attributes and zoned AENs for now.
+   These features can be added in a future series.
+ - NS Types support is extended to handle active/inactive namespaces.
+ - Update the write pointer after backing storage I/O completion, not
+   before. This makes the emulation to run correctly in case of
+   backing device failures.
+ - Avoid division in the I/O path if the device zone size is
+   a power of two (the most common case). Zone index then can be
+   calculated by using bit shift.
+ - A few reported bugs have been fixed.
+ - Indentation in function definitions has been changed to make it
+   the same as the rest of the code.
+
+
+Zoned Namespace (ZNS) Command Set is a newly introduced command set
+published by the NVM Express, Inc. organization as TP 4053. The main
+design goals of ZNS are to provide hardware designers the means to
+reduce NVMe controller complexity and to allow achieving a better I/O
+latency and throughput. SSDs that implement this interface are
+commonly known as ZNS SSDs.
+
+This command set is implementing a zoned storage model, similarly to
+ZAC/ZBC. As such, there is already support in Linux, allowing one to
+perform the majority of tasks needed for managing ZNS SSDs.
+
+The Zoned Namespace Command Set relies on another TP, known as
+Namespace Types (NVMe TP 4056), which introduces support for having
+multiple command sets per namespace.
+
+Both ZNS and Namespace Types specifications can be downloaded by
+visiting the following link -
+
+https://nvmexpress.org/wp-content/uploads/NVM-Express-1.4-Ratified-TPs.zip
+
+This patch series adds Namespace Types support and zoned namespace
+emulation capability to the existing NVMe PCI device.
+
+The patchset is organized as follows -
+
+The first several patches are preparatory and are added to allow for
+an easier review of the subsequent commits. The group of patches that
+follows adds NS Types support with only NVM Command Set being
+available. Finally, the last group of commits makes definitions and
+adds new code to support Zoned Namespace Command Set.
+
+Based-on: <20200922084533.1273962-1-its@irrelevant.dk>
+
+Dmitry Fomichev (11):
+  hw/block/nvme: Report actual LBA data shift in LBAF
+  hw/block/nvme: Add Commands Supported and Effects log
+  hw/block/nvme: Define trace events related to NS Types
+  hw/block/nvme: Make Zoned NS Command Set definitions
+  hw/block/nvme: Define Zoned NS Command Set trace events
+  hw/block/nvme: Support Zoned Namespace Command Set
+  hw/block/nvme: Introduce max active and open zone limits
+  hw/block/nvme: Support Zone Descriptor Extensions
+  hw/block/nvme: Add injection of Offline/Read-Only zones
+  hw/block/nvme: Use zone metadata file for persistence
+  hw/block/nvme: Document zoned parameters in usage text
+
+Niklas Cassel (3):
+  hw/block/nvme: Introduce the Namespace Types definitions
+  hw/block/nvme: Add support for Namespace Types
+  hw/block/nvme: Add support for active/inactive namespaces
+
+ block/nvme.c          |    2 +-
+ hw/block/nvme-ns.c    |  610 ++++++++++++++++++-
+ hw/block/nvme-ns.h    |  206 +++++++
+ hw/block/nvme.c       | 1332 +++++++++++++++++++++++++++++++++++++++--
+ hw/block/nvme.h       |   10 +
+ hw/block/trace-events |   39 ++
+ include/block/nvme.h  |  210 ++++++-
+ 7 files changed, 2332 insertions(+), 77 deletions(-)
+
+-- 
+2.21.0
+
 
