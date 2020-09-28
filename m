@@ -2,75 +2,97 @@ Return-Path: <SRS0=Z1O7=DF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02D33C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 14:53:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CEADC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 14:57:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 235052083B
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 14:53:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 235052083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6134521974
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 14:57:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RVNazbaR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6134521974
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49690 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMuWe-0005yi-US
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 10:53:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34008)
+	id 1kMub6-0007vC-6C
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 10:57:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36584)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <like.xu@intel.com>) id 1kMuUu-0004yr-5G
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 10:51:24 -0400
-Received: from mga03.intel.com ([134.134.136.65]:2410)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <like.xu@intel.com>) id 1kMuUq-0007ec-Pw
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 10:51:23 -0400
-IronPort-SDR: oquxd3BBbcx4X+//naTmEejL3isuO8zJfzPiN/sNCYICbT5sC6rC9rdvuKEXRvZCuAlUNmX+Xb
- EiFtT4DyHVgA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9757"; a="162062206"
-X-IronPort-AV: E=Sophos;i="5.77,313,1596524400"; d="scan'208";a="162062206"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
- by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 28 Sep 2020 07:51:10 -0700
-IronPort-SDR: O0nEHJpYcFIlu1+zYAh87da7H5rsqUK4Fhbv/N6U0NYtNrQp/D9CeJdxyD99d1t+adRDjmALOx
- jWDDJ4idAABA==
-X-IronPort-AV: E=Sophos;i="5.77,313,1596524400"; d="scan'208";a="488607952"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.249.168.219])
- ([10.249.168.219])
- by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 28 Sep 2020 07:51:05 -0700
-Subject: Re: [PATCH] target/i386: add -cpu,lbr=true support to enable guest LBR
-To: Eduardo Habkost <ehabkost@redhat.com>, Like Xu <like.xu@linux.intel.com>
-References: <20200726153229.27149-1-like.xu@linux.intel.com>
- <20200726153229.27149-3-like.xu@linux.intel.com>
- <20200924220523.GL3717385@habkost.net>
-From: "Xu, Like" <like.xu@intel.com>
-Organization: Intel OTC
-Message-ID: <958128c6-39e8-96fe-34d8-7be1888f4144@intel.com>
-Date: Mon, 28 Sep 2020 22:51:03 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kMuZn-0007Hs-QP
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 10:56:27 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:54005)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kMuZk-0000EP-MO
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 10:56:27 -0400
+Received: by mail-wm1-x343.google.com with SMTP id x23so1445017wmi.3
+ for <qemu-devel@nongnu.org>; Mon, 28 Sep 2020 07:56:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=Hgo0RKH7kfv/VZXAyKSjnZwmz0wK7Kq2I6jTccm7HsI=;
+ b=RVNazbaRa/pZo8NJ4yYb1ufCc7zojO9HqwnMzPUJUpiGfescBV2zi3idKQyvZ8omW2
+ 0npFjuDjHqpSs1Z6INq2SfpW4g0nFkecNYT21zOEYqakNwLWix/i5z53UYqemwrNInXb
+ +tYDKXnxpe1PL11ZPd+eKy4P6CqrVNiF8fatElmlUjOWeKj94lMvYEpDgx/0H6UFosFJ
+ y1ffOPi8IrbDYvtPgPzvUh8lyeRfi4GSWg2kd7kGHN4OgiJByiB4iv8mUm3TTKmPEJKa
+ tDA0lJf+rQmVJvAV9cfw8OwxUR6zCt6dpHe85d1tJvgJ9ayd2mKu0KDG1bbTfOjqWNTV
+ o+vQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=Hgo0RKH7kfv/VZXAyKSjnZwmz0wK7Kq2I6jTccm7HsI=;
+ b=OKA11k9Z5XuUvUm1xxii2pt1lkZ4RcXIxfj8AgPGoUUL2udCMTmzD7wNJd+KpglJBP
+ 1ibh/nRy6bxP7e5JUvjRH+46ljA5WPz+gcJxTzTXdDc8NUtLQHRmNtSaXiUgMizWyPv3
+ a2nfS01ln37Swbc21Ln3WesObpSsIvtNv45khF7SPALs8KZO+34mKbRowu2ZzcjdXC24
+ /+MogrVM6UEzZDCkYwAB3ZXz5bjmHmGbc/sY1kfgF+YLtVw5JFrmRJFUjuB3P29mq8Cz
+ riX0KlQT3INDfNSfg/QtjkwWyOJD6uYQA72ED0g7AnXsH+JEBKkr5otuBo5rMXMnqwsd
+ 9SIQ==
+X-Gm-Message-State: AOAM533xdKWufSzx3DRSIFte4tys2rTmT54lgsiTJLljZ3QFp5ZiS6hV
+ GPgdjgURBoRh22F77xEM3Yx7gA==
+X-Google-Smtp-Source: ABdhPJwbZ/8+xJ+thp9Tr9tVsaTVTYfpmESj1Rlgm4ma6QsNnTigPc5bhAady8L09l84lgirDPxyIg==
+X-Received: by 2002:a7b:c95a:: with SMTP id i26mr2157894wml.25.1601304982238; 
+ Mon, 28 Sep 2020 07:56:22 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id 88sm1955595wrl.76.2020.09.28.07.56.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 28 Sep 2020 07:56:19 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 428B71FF7E;
+ Mon, 28 Sep 2020 15:56:19 +0100 (BST)
+References: <20200925125147.26943-1-alex.bennee@linaro.org>
+ <20200925125147.26943-16-alex.bennee@linaro.org>
+ <20200928135201.GA9143@goby>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Joakim Bech <joakim.bech@linaro.org>
+Subject: Re: [RFC PATCH  15/19] tools/vhost-user-rpmb: implement
+ VIRTIO_RPMB_REQ_DATA_WRITE
+In-reply-to: <20200928135201.GA9143@goby>
+Date: Mon, 28 Sep 2020 15:56:19 +0100
+Message-ID: <875z7yq7ak.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200924220523.GL3717385@habkost.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=134.134.136.65; envelope-from=like.xu@intel.com;
- helo=mga03.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 10:51:11
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -84,262 +106,238 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: like.xu@intel.com
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- "Michael S. Tsirkin" <mst@redhat.com>, Joerg Roedel <joro@8bytes.org>,
- Marcelo Tosatti <mtosatti@redhat.com>, linux-kernel@vger.kernel.org,
- Sean Christopherson <sean.j.christopherson@intel.com>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Jim Mattson <jmattson@google.com>
+Cc: jean-philippe@linaro.org, maxim.uvarov@linaro.org, bing.zhu@intel.com,
+ Matti.Moell@opensynergy.com, virtualization@lists.linuxfoundation.org,
+ ilias.apalodimas@linaro.org, qemu-devel@nongnu.org, arnd@linaro.org,
+ takahiro.akashi@linaro.org, tomas.winkler@intel.com,
+ stratos-dev@op-lists.linaro.org, hmo@opensynergy.com, yang.huang@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Eduardo,
 
-Thanks for your detailed review.
+Joakim Bech <joakim.bech@linaro.org> writes:
 
-On 2020/9/25 6:05, Eduardo Habkost wrote:
-> I've just noticed this on my review queue (apologies for the long
-> delay).  Comments below:
->
-> On Sun, Jul 26, 2020 at 11:32:20PM +0800, Like Xu wrote:
->> The LBR feature would be enabled on the guest if:
->> - the KVM is enabled and the PMU is enabled and,
->> - the msr-based-feature IA32_PERF_CAPABILITIES is supporterd and,
->> - the supported returned value for lbr_fmt from this msr is not zero.
->>
->> The LBR feature would be disabled on the guest if:
->> - the msr-based-feature IA32_PERF_CAPABILITIES is unsupporterd OR,
->> - qemu set the IA32_PERF_CAPABILITIES msr feature without lbr_fmt values OR,
->> - the requested guest vcpu model doesn't support PDCM.
->>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Richard Henderson <rth@twiddle.net>
->> Cc: Eduardo Habkost <ehabkost@redhat.com>
->> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
->> Cc: Marcelo Tosatti <mtosatti@redhat.com>
->> Cc: qemu-devel@nongnu.org
->> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> On Fri, Sep 25, 2020 at 01:51:43PM +0100, Alex Benn=C3=A9e wrote:
+>> With this command we are finally updating data to the backing store
+>> and cycling the write_count and each successful write. We also include
+>> the write count in all response frames as the spec is a little unclear
+>> but the example test code expected it.
+>>=20
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 >> ---
->>   hw/i386/pc.c      |  1 +
->>   target/i386/cpu.c | 24 ++++++++++++++++++++++--
->>   target/i386/cpu.h |  2 ++
->>   target/i386/kvm.c |  7 ++++++-
->>   4 files changed, 31 insertions(+), 3 deletions(-)
->>
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index 3d419d5991..857aff75bb 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -318,6 +318,7 @@ GlobalProperty pc_compat_1_5[] = {
->>       { "Nehalem-" TYPE_X86_CPU, "min-level", "2" },
->>       { "virtio-net-pci", "any_layout", "off" },
->>       { TYPE_X86_CPU, "pmu", "on" },
->> +    { TYPE_X86_CPU, "lbr", "on" },
-> Why is this line here?
-I'll remove it.
->
->>       { "i440FX-pcihost", "short_root_bus", "0" },
->>       { "q35-pcihost", "short_root_bus", "0" },
->>   };
->> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> index 588f32e136..c803994887 100644
->> --- a/target/i386/cpu.c
->> +++ b/target/i386/cpu.c
->> @@ -1142,8 +1142,8 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->>       [FEAT_PERF_CAPABILITIES] = {
->>           .type = MSR_FEATURE_WORD,
->>           .feat_names = {
->> -            NULL, NULL, NULL, NULL,
->> -            NULL, NULL, NULL, NULL,
->> +            "lbr-fmt-bit-0", "lbr-fmt-bit-1", "lbr-fmt-bit-2", "lbr-fmt-bit-3",
->> +            "lbr-fmt-bit-4", "lbr-fmt-bit-5", NULL, NULL,
-> What about a separate "lbr-fmt" int property instead of
-> individual bit properties?
-
-I'm not sure if you mean adding a "separate lbr-fmt int property"
-like "uint64_t tcg_features" to 'struct FeatureWordInfo'.
-
-Would you mind providing more implementation hints,
-considering the PEBS_FMT will be added later ?
-
->
-> What happens if LBR_FMT on the host (returned by
-> kvm_arch_get_supported_msr_feature(MSR_IA32_PERF_CAPABILITIES) is
-> different than the one configured for the guest?
-To enable guest LBR, guest LBR_FMT must be the same as host LBR_FMT.
-> Can KVM emulate
-> a CPU with different LBR_FMT, or it must match the host?
-It must match the host since the LBR registers are model specified.
->
-> If LBR_FMT must always match the host, the feature needs to block
-> live migration.
-It's migrable enough of the perf cap LBR version matches,
-don't need full model number match.
-
-For example it's fine to migrate from SKY to CLX.
-> I guess this is already the case because PDCM is
-> cleared if !cpu->enable_pmu.  Adding PDCM to .unmigratable_flags
-> is probably a good idea, though.
-I'm trying to make LBR migration-friendly as much as possible w/ your help.
-
-If Arch LBR is enabled for SPR guest, the situation will be different
-hence adding PDCM to .unmigratable_flags may not help it.
->
->
->
->>               NULL, NULL, NULL, NULL,
->>               NULL, "full-width-write", NULL, NULL,
->>               NULL, NULL, NULL, NULL,
->> @@ -4224,6 +4224,12 @@ static bool lmce_supported(void)
->>       return !!(mce_cap & MCG_LMCE_P);
->>   }
->>   
->> +static inline bool lbr_supported(void)
+>>  tools/vhost-user-rpmb/main.c | 111 +++++++++++++++++++++++++++++++++--
+>>  1 file changed, 105 insertions(+), 6 deletions(-)
+>>=20
+>> diff --git a/tools/vhost-user-rpmb/main.c b/tools/vhost-user-rpmb/main.c
+>> index 88747c50fa44..a17c3b4bcc4e 100644
+>> --- a/tools/vhost-user-rpmb/main.c
+>> +++ b/tools/vhost-user-rpmb/main.c
+>> @@ -62,6 +62,7 @@ enum {
+>>  #define KiB     (1UL << 10)
+>>  #define MAX_RPMB_SIZE (KiB * 128 * 256)
+>>  #define RPMB_KEY_MAC_SIZE 32
+>> +#define RPMB_BLOCK_SIZE 256
+>>=20=20
+>>  /* RPMB Request Types */
+>>  #define VIRTIO_RPMB_REQ_PROGRAM_KEY        0x0001
+>> @@ -100,7 +101,7 @@ struct virtio_rpmb_config {
+>>  struct virtio_rpmb_frame {
+>>      uint8_t stuff[196];
+>>      uint8_t key_mac[RPMB_KEY_MAC_SIZE];
+>> -    uint8_t data[256];
+>> +    uint8_t data[RPMB_BLOCK_SIZE];
+>>      uint8_t nonce[16];
+>>      /* remaining fields are big-endian */
+>>      uint32_t write_counter;
+>> @@ -124,6 +125,7 @@ typedef struct VuRpmb {
+>>      uint8_t  last_nonce[16];
+>>      uint16_t last_result;
+>>      uint16_t last_reqresp;
+>> +    uint16_t last_address;
+>>      uint32_t write_count;
+>>  } VuRpmb;
+>>=20=20
+>> @@ -239,17 +241,30 @@ vrpmb_set_config(VuDev *dev, const uint8_t *data,
+>>   * which itself uses a 3 clause BSD chunk of code.
+>>   */
+>>=20=20
+>> +static const int rpmb_frame_dlen =3D (sizeof(struct virtio_rpmb_frame) -
+>> +                                    offsetof(struct virtio_rpmb_frame, =
+data));
+>> +
+>>  static void vrpmb_update_mac_in_frame(VuRpmb *r, struct virtio_rpmb_fra=
+me *frm)
+>>  {
+>>      hmac_sha256_ctx ctx;
+>> -    static const int dlen =3D (sizeof(struct virtio_rpmb_frame) -
+>> -                             offsetof(struct virtio_rpmb_frame, data));
+>>=20=20
+>>      hmac_sha256_init(&ctx, r->key, RPMB_KEY_MAC_SIZE);
+>> -    hmac_sha256_update(&ctx, frm->data, dlen);
+>> +    hmac_sha256_update(&ctx, frm->data, rpmb_frame_dlen);
+>>      hmac_sha256_final(&ctx, &frm->key_mac[0], 32);
+>>  }
+>>=20=20
+>> +static bool vrpmb_verify_mac_in_frame(VuRpmb *r, struct virtio_rpmb_fra=
+me *frm)
 >> +{
->> +    return kvm_enabled() && (kvm_arch_get_supported_msr_feature(kvm_state,
->> +        MSR_IA32_PERF_CAPABILITIES) & PERF_CAP_LBR_FMT);
->> +}
-> You can rewrite this is an accelerator-independent way as:
->    (x86_cpu_get_supported_feature_word(FEAT_PERF_CAPABILITIES) & PERF_CAP_LBR_FMT)
-Thanks, I'll apply it.
->
-> However, is this really supposed to return false if LBR_FMT is 000000?
-I think it's fine to return false if LBR_FMT is 000000.
->
+>> +    hmac_sha256_ctx ctx;
+>> +    uint8_t calculated_mac[RPMB_KEY_MAC_SIZE];
 >> +
->>   #define CPUID_MODEL_ID_SZ 48
->>   
->>   /**
->> @@ -4327,6 +4333,9 @@ static void max_x86_cpu_initfn(Object *obj)
->>       }
->>   
->>       object_property_set_bool(OBJECT(cpu), "pmu", true, &error_abort);
->> +    if (lbr_supported()) {
->> +        object_property_set_bool(OBJECT(cpu), "lbr", true, &error_abort);
-> Why is this necessary?
->
-> If kvm_arch_get_supported_msr_feature(MSR_IA32_PERF_CAPABILITIES)
-> return the PERF_CAP_LBR_FMT bits set,
-> x86_cpu_get_supported_feature_word() will return those bits, and
-> they will be automatically set at
-> env->features[FEAT_PERF_CAPABILITIES].
-Thanks, I'll remove it.
->> +    }
->>   }
->>   
->>   static const TypeInfo max_x86_cpu_type_info = {
->> @@ -5535,6 +5544,10 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->>           }
->>           if (!cpu->enable_pmu) {
->>               *ecx &= ~CPUID_EXT_PDCM;
->> +            if (cpu->enable_lbr) {
->> +                warn_report("LBR is unsupported since guest PMU is disabled.");
->> +                exit(1);
->> +            }
->>           }
->>           break;
->>       case 2:
->> @@ -6553,6 +6566,12 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
->>           }
->>       }
->> +    if (!cpu->max_features && cpu->enable_lbr &&
-> Why do we need to check for !cpu->max_features here?
-I'll remove it.
->
->> +        !(env->features[FEAT_1_ECX] & CPUID_EXT_PDCM)) {
->> +        warn_report("requested vcpu model doesn't support PDCM for LBR.");
->> +        exit(1);
-> Please report errors using error_setg(errp, ...) instead.
-I'll apply it.
->
->> +    }
+>> +    hmac_sha256_init(&ctx, r->key, RPMB_KEY_MAC_SIZE);
+>> +    hmac_sha256_update(&ctx, frm->data, rpmb_frame_dlen);
+>> +    hmac_sha256_final(&ctx, calculated_mac, RPMB_KEY_MAC_SIZE);
 >> +
->>       if (cpu->ucode_rev == 0) {
->>           /* The default is the same as KVM's.  */
->>           if (IS_AMD_CPU(env)) {
->> @@ -7187,6 +7206,7 @@ static Property x86_cpu_properties[] = {
->>   #endif
->>       DEFINE_PROP_INT32("node-id", X86CPU, node_id, CPU_UNSET_NUMA_NODE_ID),
->>       DEFINE_PROP_BOOL("pmu", X86CPU, enable_pmu, false),
->> +    DEFINE_PROP_BOOL("lbr", X86CPU, enable_lbr, false),
-> When exactly do we want to set lbr=off explicitly?  What's the
-> expected outcome when lbr=off?
-We set pmu=off explicitly, so does lbr=off.
-
-When set lbr=off, the LBR-related registers accesses from guest bring #GP
-and expected outcome is just like pmu=off.
->
->>   
->>       DEFINE_PROP_UINT32("hv-spinlocks", X86CPU, hyperv_spinlock_attempts,
->>                          HYPERV_SPINLOCK_NEVER_RETRY),
->> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
->> index e1a5c174dc..a059913e26 100644
->> --- a/target/i386/cpu.h
->> +++ b/target/i386/cpu.h
->> @@ -357,6 +357,7 @@ typedef enum X86Seg {
->>   #define ARCH_CAP_TSX_CTRL_MSR		(1<<7)
->>   
->>   #define MSR_IA32_PERF_CAPABILITIES      0x345
->> +#define PERF_CAP_LBR_FMT      0x3f
->>   
->>   #define MSR_IA32_TSX_CTRL		0x122
->>   #define MSR_IA32_TSCDEADLINE            0x6e0
->> @@ -1702,6 +1703,7 @@ struct X86CPU {
->>        * capabilities) directly to the guest.
->>        */
->>       bool enable_pmu;
->> +    bool enable_lbr;
-> This is a good place to document what enable_lbr=true|false
-> means (see questions above).
->
-I'll document it here.
->>   
->>       /* LMCE support can be enabled/disabled via cpu option 'lmce=on/off'. It is
->>        * disabled by default to avoid breaking migration between QEMU with
->> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->> index b8455c89ed..feb33d5472 100644
->> --- a/target/i386/kvm.c
->> +++ b/target/i386/kvm.c
->> @@ -2690,8 +2690,10 @@ static void kvm_msr_entry_add_perf(X86CPU *cpu, FeatureWordArray f)
->>       uint64_t kvm_perf_cap =
->>           kvm_arch_get_supported_msr_feature(kvm_state,
->>                                              MSR_IA32_PERF_CAPABILITIES);
->> -
->>       if (kvm_perf_cap) {
->> +        if (!cpu->enable_lbr) {
->> +            kvm_perf_cap &= ~PERF_CAP_LBR_FMT;
->> +        }
-> Why is this necessary?  If enable_lbr is false,
-> f[FEAT_PERF_CAPABILITIES] should not have those bits set at all.
-I'll remove it.
->
->>           kvm_msr_entry_add(cpu, MSR_IA32_PERF_CAPABILITIES,
->>                           kvm_perf_cap & f[FEAT_PERF_CAPABILITIES]);
->>       }
->> @@ -2731,6 +2733,9 @@ static void kvm_init_msrs(X86CPU *cpu)
->>   
->>       if (has_msr_perf_capabs && cpu->enable_pmu) {
->>           kvm_msr_entry_add_perf(cpu, env->features);
->> +    } else if (!has_msr_perf_capabs && cpu->enable_lbr) {
->> +        warn_report("KVM doesn't support MSR_IA32_PERF_CAPABILITIES for LBR.");
->> +        exit(1);
-> This is not the appropriate place to check for unsupported
-> features.  x86_cpu_realizefn() and/or x86_cpu_filter_features()
-> is.
-Thanks, I'll apply it in the x86_cpu_filter_features().
-
-Please let me if you have more comments.
-
-Thanks,
-Like Xu
->>       }
->>   
->>       if (has_msr_ucode_rev) {
->> -- 
->> 2.21.3
+>> +    return memcmp(calculated_mac, frm->key_mac, RPMB_KEY_MAC_SIZE) =3D=
+=3D 0;
 >>
+> I'd prefer using a constant time comparison function for this one
+> instead of memcmp (regardless if it's used for simulation or not) to
+> prevent eventual timing attacks.
 
+Could you recommend such a function for this?
+
+>
+>> +}
+>> +
+>>  /*
+>>   * Handlers for individual control messages
+>>   */
+>> @@ -324,6 +339,82 @@ vrpmb_handle_get_write_counter(VuDev *dev, struct v=
+irtio_rpmb_frame *frame)
+>>      return resp;
+>>  }
+>>=20=20
+>> +/*
+>> + * vrpmb_handle_write:
+>> + *
+>> + * We will report the success/fail on receipt of
+>> + * VIRTIO_RPMB_REQ_RESULT_READ. Returns the number of extra frames
+>> + * processed in the request.
+>> + */
+>> +static int vrpmb_handle_write(VuDev *dev, struct virtio_rpmb_frame *fra=
+me)
+>> +{
+>> +    VuRpmb *r =3D container_of(dev, VuRpmb, dev.parent);
+>> +    int extra_frames =3D 0;
+>> +    uint16_t block_count =3D be16toh(frame->block_count);
+>> +    uint32_t write_counter =3D be32toh(frame->write_counter);
+>> +    size_t offset;
+>> +
+>> +    r->last_reqresp =3D VIRTIO_RPMB_RESP_DATA_WRITE;
+>> +    r->last_address =3D be16toh(frame->address);
+>> +    offset =3D  r->last_address * RPMB_BLOCK_SIZE;
+>> +
+>> +    /*
+>> +     * Run the checks from:
+>> +     * 5.12.6.1.3 Device Requirements: Device Operation: Data Write
+>> +     */
+>> +    if (!r->key) {
+>> +        g_warning("no key programmed");
+>> +        r->last_result =3D VIRTIO_RPMB_RES_NO_AUTH_KEY;
+>> +    } else if (block_count =3D=3D 0 ||
+>> +               block_count > r->virtio_config.max_wr_cnt) {
+>> +        r->last_result =3D VIRTIO_RPMB_RES_GENERAL_FAILURE;
+>> +    } else if (false /* what does an expired write counter mean? */) {
+>>
+> IIRC, the counter has room for a 32-bit value and the counter will never
+> wrap around. So once the counter have reached max for uint32_t, then
+> there is an additional bit set (permanently) in the operation result.
+> I.e., writes are no longer possible once that has happened. That is
+> probably what you're referring to here I suppose.
+
+That would make sense. I'll see if I can make the spec language a bit
+clearer as well.
+
+>
+>> +        r->last_result =3D VIRTIO_RPMB_RES_WRITE_COUNTER_EXPIRED;
+>> +    } else if (offset > (r->virtio_config.capacity * (128 * KiB))) {
+>> +        r->last_result =3D VIRTIO_RPMB_RES_ADDR_FAILURE;
+>> +    } else if (!vrpmb_verify_mac_in_frame(r, frame)) {
+>> +        r->last_result =3D VIRTIO_RPMB_RES_AUTH_FAILURE;
+>> +    } else if (write_counter !=3D r->write_count) {
+>> +        r->last_result =3D VIRTIO_RPMB_RES_COUNT_FAILURE;
+>> +    } else {
+>> +        int i;
+>> +        /* At this point we have a valid authenticated write request
+>> +         * so the counter can incremented and we can attempt to
+>> +         * update the backing device.
+>> +         */
+>> +        r->write_count++;
+>> +        for (i =3D 0; i < block_count; i++) {
+>> +            void *blk =3D r->flash_map + offset;
+>> +            g_debug("%s: writing block %d", __func__, i);
+>> +            if (mprotect(blk, RPMB_BLOCK_SIZE, PROT_WRITE) !=3D 0) {
+>> +                r->last_result =3D  VIRTIO_RPMB_RES_WRITE_FAILURE;
+>> +                break;
+>> +            }
+>> +            memcpy(blk, frame[i].data, RPMB_BLOCK_SIZE);
+>> +            if (msync(blk, RPMB_BLOCK_SIZE, MS_SYNC) !=3D 0) {
+>> +                g_warning("%s: failed to sync update", __func__);
+>> +                r->last_result =3D VIRTIO_RPMB_RES_WRITE_FAILURE;
+>> +                break;
+>> +            }
+>> +            if (mprotect(blk, RPMB_BLOCK_SIZE, PROT_READ) !=3D 0) {
+>> +                g_warning("%s: failed to re-apply read protection", __f=
+unc__);
+>> +                r->last_result =3D VIRTIO_RPMB_RES_GENERAL_FAILURE;
+>> +                break;
+>> +            }
+>> +            offset +=3D RPMB_BLOCK_SIZE;
+>> +        }
+>> +        r->last_result =3D VIRTIO_RPMB_RES_OK;
+>> +        extra_frames =3D i - 1;
+>> +    }
+>> +
+>> +    g_info("%s: %s (%x, %d extra frames processed), write_count=3D%d", =
+__func__,
+>> +           r->last_result =3D=3D VIRTIO_RPMB_RES_OK ? "successful":"fai=
+led",
+>> +           r->last_result, extra_frames, r->write_count);
+>> +
+>> +    return extra_frames;
+>> +}
+>> +
+>> +
+>>  /*
+>>   * Return the result of the last message. This is only valid if the
+>>   * previous message was VIRTIO_RPMB_REQ_PROGRAM_KEY or
+>> @@ -339,10 +430,14 @@ static struct virtio_rpmb_frame * vrpmb_handle_res=
+ult_read(VuDev *dev)
+>>      g_info("%s: for request:%x result:%x", __func__,
+>>             r->last_reqresp, r->last_result);
+>>=20=20
+>> -    if (r->last_reqresp =3D=3D VIRTIO_RPMB_RESP_PROGRAM_KEY ||
+>> -        r->last_reqresp =3D=3D VIRTIO_RPMB_REQ_DATA_WRITE) {
+>> +    if (r->last_reqresp =3D=3D VIRTIO_RPMB_RESP_PROGRAM_KEY) {
+>>          resp->result =3D htobe16(r->last_result);
+>>          resp->req_resp =3D htobe16(r->last_reqresp);
+>> +    } else if (r->last_reqresp =3D=3D VIRTIO_RPMB_RESP_DATA_WRITE) {
+>> +        resp->result =3D htobe16(r->last_result);
+>> +        resp->req_resp =3D htobe16(r->last_reqresp);
+>> +        resp->write_counter =3D htobe32(r->write_count);
+>> +        resp->address =3D htobe16(r->last_address);
+>>      } else {
+>>          resp->result =3D htobe16(VIRTIO_RPMB_RES_GENERAL_FAILURE);
+>>      }
+>> @@ -445,6 +540,10 @@ vrpmb_handle_ctrl(VuDev *dev, int qidx)
+>>                                __func__);
+>>                  }
+>>                  break;
+>> +            case VIRTIO_RPMB_REQ_DATA_WRITE:
+>> +                /* we can have multiple blocks handled */
+>> +                n +=3D vrpmb_handle_write(dev, f);
+>> +                break;
+>>              default:
+>>                  g_debug("un-handled request: %x", f->req_resp);
+>>                  break;
+>> --=20
+>> 2.20.1
+>>=20
+
+Thanks!
+
+--=20
+Alex Benn=C3=A9e
 
