@@ -2,126 +2,73 @@ Return-Path: <SRS0=Z1O7=DF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3F18C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 18:23:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0DF5C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 18:27:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C12AE20757
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 18:23:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hp.com header.i=@hp.com header.b="df3jjyuy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C12AE20757
-Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id 39F09206C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 18:27:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39F09206C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMxoO-00037G-MZ
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 14:23:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38486)
+	id 1kMxsS-0006Xl-7H
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 14:27:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39574)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <erich.mcmillan@hp.com>)
- id 1kMxmy-0002cL-8p
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 14:22:16 -0400
-Received: from us-smtp-delivery-162.mimecast.com ([216.205.24.162]:33200)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <erich.mcmillan@hp.com>)
- id 1kMxmn-00081o-S4
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 14:22:15 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hp.com;
- s=mimecast20180716; t=1601317322;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=PKB6b9wxcRgU8jOt3OHlukGzllJi8tu+ElDhye69qug=;
- b=df3jjyuytmt9z4UQzNTqlVi9UnFpnKGv8lcKV6KTjiw5zeImSerT4QsVgdLRu3mjzTitQI
- P1rp2C8i5D18YYi0diDA8JJpq+vTvXJJJJnlh1ytw8vj0a12E14wxI9q3hsRCLkp6yqTl8
- Ou6+jSj1E6e5XgA7F2IM2urBvyRdYcQ=
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com
- (mail-dm6nam12lp2169.outbound.protection.outlook.com [104.47.59.169])
- (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-401-UriaGBnbPrG6MG4fbsq8iA-1; Mon, 28 Sep 2020 14:22:00 -0400
-X-MC-Unique: UriaGBnbPrG6MG4fbsq8iA-1
-Received: from CS1PR8401MB0327.NAMPRD84.PROD.OUTLOOK.COM
- (2a01:111:e400:7507::9) by CS1PR8401MB0806.NAMPRD84.PROD.OUTLOOK.COM
- (2a01:111:e400:750c::13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.20; Mon, 28 Sep
- 2020 18:21:58 +0000
-Received: from CS1PR8401MB0327.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::40df:1118:3bef:736c]) by CS1PR8401MB0327.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::40df:1118:3bef:736c%12]) with mapi id 15.20.3412.029; Mon, 28 Sep
- 2020 18:21:58 +0000
-To: Laszlo Ersek <lersek@redhat.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>
-CC: "dgilbert@redhat.com" <dgilbert@redhat.com>, "mst@redhat.com"
- <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>,
- "imammedo@redhat.com" <imammedo@redhat.com>, "kraxel@redhat.com"
- <kraxel@redhat.com>
-Subject: Re: [PATCH v5] hw/i386/pc: add max combined fw size as machine
- configuration option
-Thread-Topic: [PATCH v5] hw/i386/pc: add max combined fw size as machine
- configuration option
-Thread-Index: AQHWku0OoWna5JUJm06gLz/BlWUPe6l47SIAgACq8vCABMeBgIAAAnQy
-Date: Mon, 28 Sep 2020 18:21:58 +0000
-Message-ID: <CS1PR8401MB032797F2CC0B524DB60A1087F3350@CS1PR8401MB0327.NAMPRD84.PROD.OUTLOOK.COM>
-References: <20200925033623.3968-1-erich.mcmillan@hp.com>
- <8818a3ae-cab6-5de4-adbd-19198d26b6e7@redhat.com>
- <CS1PR8401MB0327982D7F9414360E440656F3360@CS1PR8401MB0327.NAMPRD84.PROD.OUTLOOK.COM>,
- <a5050849-2b66-3d90-3e89-70be07a53c0d@redhat.com>
-In-Reply-To: <a5050849-2b66-3d90-3e89-70be07a53c0d@redhat.com>
-Accept-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [76.199.17.212]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 66ed0ebf-9bb8-4bd6-7c4b-08d863db632d
-x-ms-traffictypediagnostic: CS1PR8401MB0806:
-x-microsoft-antispam-prvs: <CS1PR8401MB08065FC3E464B7CE5256A4AEF3350@CS1PR8401MB0806.NAMPRD84.PROD.OUTLOOK.COM>
-x-ms-oob-tlc-oobclassifiers: OLM:4502
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0
-x-microsoft-antispam-message-info: 3lJZqgFMkt2H/qahLbiqLHUvh1STzPCAw2ohavkA7bJLwEa7zr1iP0Ournc60NDfxPP/JcqH0lSHousn/9Kg/5AZeU3njOCRdkOX0mu+yltfb/bquWLVG12Fak4KiYIeTHk0FZX9VX+BQlHVZifMSnZBOn15EZsukKUKbSr4celE+nCeXY8rut6snOLi0BwPDROrpOqfsTrPAz/ZcxVeCEzbH2LdVWwlPq3VI6MD8JUEIWhlcaJLQpSTF1Qcw17RFbMc25sKzwRIcbP+5SW9KKjKBPOkP8ZpbQ85zLAmNN3WLX9GBVPLYkVS7rf0BcQbFrVVFBnABM06RYXwyYFEn5pSjN6aCoi753SYD87lZBmN+8N40qYFZOE3gbAr+OH4pfvyuBgCiIpB51EFPRTyKoSQx2cP43oWImIdUP+XistyTNCm9MvlHLOLW8ds+P9fCUuLNLKdTcvxomM95LPDAA==
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:CS1PR8401MB0327.NAMPRD84.PROD.OUTLOOK.COM; PTR:; CAT:NONE;
- SFS:(136003)(396003)(346002)(39860400002)(366004)(376002)(66446008)(5660300002)(66556008)(66476007)(86362001)(71200400001)(8936002)(64756008)(8676002)(33656002)(166002)(76116006)(83380400001)(2906002)(966005)(26005)(6506007)(53546011)(186003)(54906003)(110136005)(7696005)(316002)(66946007)(52536014)(478600001)(19627405001)(55016002)(9686003)(4326008);
- DIR:OUT; SFP:1102
-x-ms-exchange-antispam-messagedata: 5aTuQkafEgIdREehFg21aYfQguCOO9tYqf4YCMk7HVso60Od/7e9rnKeXfcSFgMBcWnjgZsYB8oudMRm20c5Rkqd2hn1IAUFlz6RParCC7zxoAS5W5zY9RhqaCIu3slC/LWpe/Dzka0JiFa/Md2kEaAM9pxh1EFuEusWEYsvLSRrOU8mv59ujpzZu31vEhE3nrIo4tuzxq9AeT6pm/IwuFuumV9cVVFRAU40TPk5X4k2gZdxvJeosprzXYLRprF/NSHlueagloVrn+Es8yHBHg7pU4AzUf6M+WSZdhKLeNlLOhq0ZputA3HWJn8rWye78GKjW0U4I0oAbSkCRI8+3ZLIdldIhUROQ1OwxuTRpj3uxeMBC1WooB+UPLjFo8Ptd7D3kab8/8IyrPCptuKhXWHEV7lBXzUNwKUoIcsw51aLIHQppk8fhICdyKjTZNNIif9pi9ZHBqhO794dpD8HlqKA8lpmHp+1M+Eo+QR0YBC1RXARcgVtYSE3XkcPypftUd3bh4K135Pxyiv3sFYJygmYozCIdJoXra2s2rY6W9tMgTayQu3LekBFgFUffzSo0TUcVD0sc6Zin03NX6aK212l29uhPILTmQ+d2IBQjJcsHzqDieQhNXyXdm1xuSRi3obJ4jsy8NmtWc19Q+z9mw==
-x-ms-exchange-transport-forked: True
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kMxri-00066D-6Z
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 14:27:10 -0400
+Resent-Date: Mon, 28 Sep 2020 14:27:10 -0400
+Resent-Message-Id: <E1kMxri-00066D-6Z@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21398)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kMxrf-0000J9-MA
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 14:27:09 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1601317620; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=GyjLSMdn83NhfI+ywSkHA1K01Sejz9fr2pEAz9JkfhccMTkaj1l4a4AIHi/yuCAlRBAaYl7jsXiWGQZP6y1kMGxegyh75PY02mBErz19lVMZTROpeQZLCFhC9JtReXgofAKi5/VuhyN51FYbXQ5JyEip6Fr9wqwVY8/CarJE+m8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1601317620;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=fdTYKfy9IoNX0wUVdnO6QYjPmmOAo2EzKmz2NKlKXlM=; 
+ b=JjfoNzeYSOT4A4e+7mMlKYJN9hCm3Guq5D+bawC6A/ubZ9l9WfGX8WjQXz+rCmXnGigajTk2mR9FUcEsrwYEfhp3qyoJeSAqsjK34ELy4JF/K2AAA3l2oIrMupZB3sj7FboJa5/D5zPEGNpUdmhoSZYw8cfYAPqSob/VDmYjkxw=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1601317619859797.9103679111385;
+ Mon, 28 Sep 2020 11:26:59 -0700 (PDT)
+Subject: Re: [PULL 0/5] Usb 20200928 patches
+Message-ID: <160131761873.11341.6952810964250272966@66eaa9a8a123>
+In-Reply-To: <20200928131638.9486-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: hp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CS1PR8401MB0327.NAMPRD84.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 66ed0ebf-9bb8-4bd6-7c4b-08d863db632d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Sep 2020 18:21:58.4628 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: ca7981a2-785a-463d-b82a-3db87dfc3ce6
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4YNb+F+1Wsvi/gqA9i93XD+iP770jxJfACPC0JF7vfZ7d9qR/g3NvlTyrMmgDzbpmMrID4MUfKc9QgY2i5YqRQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CS1PR8401MB0806
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA62A171 smtp.mailfrom=erich.mcmillan@hp.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: hp.com
-Content-Language: en-US
-Content-Type: multipart/alternative;
- boundary="_000_CS1PR8401MB032797F2CC0B524DB60A1087F3350CS1PR8401MB0327_"
-Received-SPF: pass client-ip=216.205.24.162;
- envelope-from=erich.mcmillan@hp.com; helo=us-smtp-delivery-162.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 14:22:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -33
-X-Spam_score: -3.4
-X-Spam_bar: ---
-X-Spam_report: (-3.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.614,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: kraxel@redhat.com
+Date: Mon, 28 Sep 2020 11:26:59 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 14:27:05
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -134,151 +81,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: "McMillan, Erich" <erich.mcmillan@hp.com>
-From: "McMillan, Erich" via <qemu-devel@nongnu.org>
 
---_000_CS1PR8401MB032797F2CC0B524DB60A1087F3350CS1PR8401MB0327_
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-
-Laszlo,
-
-Thanks double checking the archives. I did end up finding them the next day=
-.
-
-With regards to PATCH v6, I missed removing the squash commit message, so t=
-hat will need to be fixed in v7 apologies for that.
-
--Erich
-________________________________
-From: Laszlo Ersek <lersek@redhat.com>
-Sent: Monday, September 28, 2020 1:10 PM
-To: McMillan, Erich <erich.mcmillan@hp.com>; qemu-devel@nongnu.org <qemu-de=
-vel@nongnu.org>
-Cc: dgilbert@redhat.com <dgilbert@redhat.com>; mst@redhat.com <mst@redhat.c=
-om>; marcel.apfelbaum@gmail.com <marcel.apfelbaum@gmail.com>; imammedo@redh=
-at.com <imammedo@redhat.com>; kraxel@redhat.com <kraxel@redhat.com>
-Subject: Re: [PATCH v5] hw/i386/pc: add max combined fw size as machine con=
-figuration option
-
-On 09/25/20 19:14, McMillan, Erich wrote:
-
-> On an unrelated note, it seems that my patches are no longer appearing in=
- https://lists.nongnu.org/archive/html/qemu-devel/2020-09/index.html<https:=
-//lists.nongnu.org/archive/html/qemu-devel/2020-09/index.html> is this beca=
-use I need to cc qemu-devel@nongnu.org<mailto:qemu-devel@nongnu.org> rather=
- than =96to?
-
-Cc: and To: are equally fine. I can see both your v5 and v6 postings there:
-
-https://lists.nongnu.org/archive/html/qemu-devel/2020-09/msg09212.html<http=
-s://lists.nongnu.org/archive/html/qemu-devel/2020-09/msg09212.html>
-https://lists.nongnu.org/archive/html/qemu-devel/2020-09/msg09577.html<http=
-s://lists.nongnu.org/archive/html/qemu-devel/2020-09/msg09577.html>
-
-The qemu-devel list is very busy, plus <https://lists.nongnu.org/<https://l=
-ists.nongnu.org>> hosts
-a very large number of other lists -- so updates to the WebUI are done
-in batches (I think once every 30 minutes, but I could be out of date on
-that). A fresh posting almost never shows up immediately on the WebUI.
-(I believe it may be delivered to subscribers via actual email more
-quickly.)
-
-Thanks
-Laszlo
-
---_000_CS1PR8401MB032797F2CC0B524DB60A1087F3350CS1PR8401MB0327_
-Content-Type: text/html; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-
-<html>
-<head>
-<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3DWindows-1=
-252">
-<style type=3D"text/css" style=3D"display:none;"> P {margin-top:0;margin-bo=
-ttom:0;} </style>
-</head>
-<body dir=3D"ltr">
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);">
-Laszlo,</div>
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);">
-<br>
-</div>
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);">
-Thanks double checking the archives. I did end up finding them the next day=
-.</div>
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);">
-<br>
-</div>
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);">
-With regards to PATCH v6, I missed removing the squash commit message, so t=
-hat will need to be fixed in v7 apologies for that.</div>
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);">
-<br>
-</div>
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);">
--Erich<br>
-</div>
-<div id=3D"appendonsend"></div>
-<hr style=3D"display:inline-block;width:98%" tabindex=3D"-1">
-<div id=3D"divRplyFwdMsg" dir=3D"ltr"><font face=3D"Calibri, sans-serif" st=
-yle=3D"font-size:11pt" color=3D"#000000"><b>From:</b> Laszlo Ersek &lt;lers=
-ek@redhat.com&gt;<br>
-<b>Sent:</b> Monday, September 28, 2020 1:10 PM<br>
-<b>To:</b> McMillan, Erich &lt;erich.mcmillan@hp.com&gt;; qemu-devel@nongnu=
-.org &lt;qemu-devel@nongnu.org&gt;<br>
-<b>Cc:</b> dgilbert@redhat.com &lt;dgilbert@redhat.com&gt;; mst@redhat.com =
-&lt;mst@redhat.com&gt;; marcel.apfelbaum@gmail.com &lt;marcel.apfelbaum@gma=
-il.com&gt;; imammedo@redhat.com &lt;imammedo@redhat.com&gt;; kraxel@redhat.=
-com &lt;kraxel@redhat.com&gt;<br>
-<b>Subject:</b> Re: [PATCH v5] hw/i386/pc: add max combined fw size as mach=
-ine configuration option</font>
-<div>&nbsp;</div>
-</div>
-<div>On 09/25/20 19:14, McMillan, Erich wrote:<br>
-<br>
-&gt; On an unrelated note, it seems that my patches are no longer appearing=
- in <a href=3D"https://lists.nongnu.org/archive/html/qemu-devel/2020-09/ind=
-ex.html">
-https://lists.nongnu.org/archive/html/qemu-devel/2020-09/index.html</a> is =
-this because I need to cc qemu-devel@nongnu.org&lt;mailto:qemu-devel@nongnu=
-.org&gt; rather than =96to?<br>
-<br>
-Cc: and To: are equally fine. I can see both your v5 and v6 postings there:=
-<br>
-<br>
-<a href=3D"https://lists.nongnu.org/archive/html/qemu-devel/2020-09/msg0921=
-2.html">https://lists.nongnu.org/archive/html/qemu-devel/2020-09/msg09212.h=
-tml</a><br>
-<a href=3D"https://lists.nongnu.org/archive/html/qemu-devel/2020-09/msg0957=
-7.html">https://lists.nongnu.org/archive/html/qemu-devel/2020-09/msg09577.h=
-tml</a><br>
-<br>
-The qemu-devel list is very busy, plus &lt;<a href=3D"https://lists.nongnu.=
-org">https://lists.nongnu.org/</a>&gt; hosts<br>
-a very large number of other lists -- so updates to the WebUI are done<br>
-in batches (I think once every 30 minutes, but I could be out of date on<br=
->
-that). A fresh posting almost never shows up immediately on the WebUI.<br>
-(I believe it may be delivered to subscribers via actual email more<br>
-quickly.)<br>
-<br>
-Thanks<br>
-Laszlo<br>
-</div>
-</body>
-</html>
-
---_000_CS1PR8401MB032797F2CC0B524DB60A1087F3350CS1PR8401MB0327_--
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkyODEzMTYzOC45NDg2
+LTEta3JheGVsQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2Nr
+ZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
+YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
+LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9MSBORVRX
+T1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9MSBKPTE0
+IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKQyBsaW5rZXIgZm9yIHRoZSBob3N0
+IG1hY2hpbmU6IGNjIGxkLmJmZCAyLjI3LTQzCkhvc3QgbWFjaGluZSBjcHUgZmFtaWx5OiB4ODZf
+NjQKSG9zdCBtYWNoaW5lIGNwdTogeDg2XzY0Ci4uL3NyYy9tZXNvbi5idWlsZDoxMDogV0FSTklO
+RzogTW9kdWxlIHVuc3RhYmxlLWtleXZhbCBoYXMgbm8gYmFja3dhcmRzIG9yIGZvcndhcmRzIGNv
+bXBhdGliaWxpdHkgYW5kIG1pZ2h0IG5vdCBleGlzdCBpbiBmdXR1cmUgcmVsZWFzZXMuClByb2dy
+YW0gc2ggZm91bmQ6IFlFUwpQcm9ncmFtIHB5dGhvbjMgZm91bmQ6IFlFUyAoL3Vzci9iaW4vcHl0
+aG9uMykKQ29uZmlndXJpbmcgbmluamF0b29sIHVzaW5nIGNvbmZpZ3VyYXRpb24KLS0tCnFlbXUt
+c3lzdGVtLWFhcmNoNjQ6IGNhbm5vdCBzZXQgdXAgZ3Vlc3QgbWVtb3J5ICdzYnNhLXJlZi5yYW0n
+OiBDYW5ub3QgYWxsb2NhdGUgbWVtb3J5CkJyb2tlbiBwaXBlCi4uL3NyYy90ZXN0cy9xdGVzdC9s
+aWJxdGVzdC5jOjE2Njoga2lsbF9xZW11KCkgdHJpZWQgdG8gdGVybWluYXRlIFFFTVUgcHJvY2Vz
+cyBidXQgZW5jb3VudGVyZWQgZXhpdCBzdGF0dXMgMSAoZXhwZWN0ZWQgMCkKRVJST1IgcXRlc3Qt
+YWFyY2g2NDogdGVzdC1obXAgLSB0b28gZmV3IHRlc3RzIHJ1biAoZXhwZWN0ZWQgNzIsIGdvdCAx
+MikKbWFrZTogKioqIFtydW4tdGVzdC0xNzFdIEVycm9yIDEKbWFrZTogKioqIFdhaXRpbmcgZm9y
+IHVuZmluaXNoZWQgam9icy4uLi4KTG9va2luZyBmb3IgZXhwZWN0ZWQgZmlsZSAndGVzdHMvZGF0
+YS9hY3BpL3ZpcnQvR1REVCcKVXNpbmcgZXhwZWN0ZWQgZmlsZSAndGVzdHMvZGF0YS9hY3BpL3Zp
+cnQvR1REVCcKLS0tClVzaW5nIGV4cGVjdGVkIGZpbGUgJ3Rlc3RzL2RhdGEvYWNwaS92aXJ0L0RT
+RFQnCnNvY2tldF9hY2NlcHQgZmFpbGVkOiBSZXNvdXJjZSB0ZW1wb3JhcmlseSB1bmF2YWlsYWJs
+ZQoqKgpFUlJPUjouLi9zcmMvdGVzdHMvcXRlc3QvbGlicXRlc3QuYzozMDE6cXRlc3RfaW5pdF93
+aXRob3V0X3FtcF9oYW5kc2hha2U6IGFzc2VydGlvbiBmYWlsZWQ6IChzLT5mZCA+PSAwICYmIHMt
+PnFtcF9mZCA+PSAwKQouLi9zcmMvdGVzdHMvcXRlc3QvbGlicXRlc3QuYzoxNjY6IGtpbGxfcWVt
+dSgpIHRyaWVkIHRvIHRlcm1pbmF0ZSBRRU1VIHByb2Nlc3MgYnV0IGVuY291bnRlcmVkIGV4aXQg
+c3RhdHVzIDEgKGV4cGVjdGVkIDApCkVSUk9SIHF0ZXN0LXg4Nl82NDogYmlvcy10YWJsZXMtdGVz
+dCAtIEJhaWwgb3V0ISBFUlJPUjouLi9zcmMvdGVzdHMvcXRlc3QvbGlicXRlc3QuYzozMDE6cXRl
+c3RfaW5pdF93aXRob3V0X3FtcF9oYW5kc2hha2U6IGFzc2VydGlvbiBmYWlsZWQ6IChzLT5mZCA+
+PSAwICYmIHMtPnFtcF9mZCA+PSAwKQptYWtlOiAqKiogW3J1bi10ZXN0LTEzOF0gRXJyb3IgMQog
+IFRFU1QgICAgaW90ZXN0LXFjb3cyOiAwMTMKCkxvb2tpbmcgZm9yIGV4cGVjdGVkIGZpbGUgJ3Rl
+c3RzL2RhdGEvYWNwaS92aXJ0L0ZBQ1AubnVtYW1lbScKLS0tCiAgVEVTVCAgICBpb3Rlc3QtcWNv
+dzI6IDAxOApzb2NrZXRfYWNjZXB0IGZhaWxlZDogUmVzb3VyY2UgdGVtcG9yYXJpbHkgdW5hdmFp
+bGFibGUKKioKRVJST1I6Li4vc3JjL3Rlc3RzL3F0ZXN0L2xpYnF0ZXN0LmM6MzAxOnF0ZXN0X2lu
+aXRfd2l0aG91dF9xbXBfaGFuZHNoYWtlOiBhc3NlcnRpb24gZmFpbGVkOiAocy0+ZmQgPj0gMCAm
+JiBzLT5xbXBfZmQgPj0gMCkKLi4vc3JjL3Rlc3RzL3F0ZXN0L2xpYnF0ZXN0LmM6MTY2OiBraWxs
+X3FlbXUoKSB0cmllZCB0byB0ZXJtaW5hdGUgUUVNVSBwcm9jZXNzIGJ1dCBlbmNvdW50ZXJlZCBl
+eGl0IHN0YXR1cyAxIChleHBlY3RlZCAwKQpFUlJPUiBxdGVzdC14ODZfNjQ6IHB4ZS10ZXN0IC0g
+QmFpbCBvdXQhIEVSUk9SOi4uL3NyYy90ZXN0cy9xdGVzdC9saWJxdGVzdC5jOjMwMTpxdGVzdF9p
+bml0X3dpdGhvdXRfcW1wX2hhbmRzaGFrZTogYXNzZXJ0aW9uIGZhaWxlZDogKHMtPmZkID49IDAg
+JiYgcy0+cW1wX2ZkID49IDApCm1ha2U6ICoqKiBbcnVuLXRlc3QtMTEwXSBFcnJvciAxCnNvY2tl
+dF9hY2NlcHQgZmFpbGVkOiBSZXNvdXJjZSB0ZW1wb3JhcmlseSB1bmF2YWlsYWJsZQoqKgpFUlJP
+UjouLi9zcmMvdGVzdHMvcXRlc3QvbGlicXRlc3QuYzozMDE6cXRlc3RfaW5pdF93aXRob3V0X3Ft
+cF9oYW5kc2hha2U6IGFzc2VydGlvbiBmYWlsZWQ6IChzLT5mZCA+PSAwICYmIHMtPnFtcF9mZCA+
+PSAwKQouLi9zcmMvdGVzdHMvcXRlc3QvbGlicXRlc3QuYzoxNjY6IGtpbGxfcWVtdSgpIHRyaWVk
+IHRvIHRlcm1pbmF0ZSBRRU1VIHByb2Nlc3MgYnV0IGVuY291bnRlcmVkIGV4aXQgc3RhdHVzIDEg
+KGV4cGVjdGVkIDApCkVSUk9SIHF0ZXN0LXg4Nl82NDogbWlncmF0aW9uLXRlc3QgLSBCYWlsIG91
+dCEgRVJST1I6Li4vc3JjL3Rlc3RzL3F0ZXN0L2xpYnF0ZXN0LmM6MzAxOnF0ZXN0X2luaXRfd2l0
+aG91dF9xbXBfaGFuZHNoYWtlOiBhc3NlcnRpb24gZmFpbGVkOiAocy0+ZmQgPj0gMCAmJiBzLT5x
+bXBfZmQgPj0gMCkKbWFrZTogKioqIFtydW4tdGVzdC0xNDhdIEVycm9yIDEKICBURVNUICAgIGlv
+dGVzdC1xY293MjogMDE5CiAgVEVTVCAgICBpb3Rlc3QtcWNvdzI6IDAyMAogIFRFU1QgICAgaW90
+ZXN0LXFjb3cyOiAwMjEKLS0tCiAgVEVTVCAgICBpb3Rlc3QtcWNvdzI6IDAyNApzb2NrZXRfYWNj
+ZXB0IGZhaWxlZDogUmVzb3VyY2UgdGVtcG9yYXJpbHkgdW5hdmFpbGFibGUKKioKRVJST1I6Li4v
+c3JjL3Rlc3RzL3F0ZXN0L2xpYnF0ZXN0LmM6MzAxOnF0ZXN0X2luaXRfd2l0aG91dF9xbXBfaGFu
+ZHNoYWtlOiBhc3NlcnRpb24gZmFpbGVkOiAocy0+ZmQgPj0gMCAmJiBzLT5xbXBfZmQgPj0gMCkK
+Li4vc3JjL3Rlc3RzL3F0ZXN0L2xpYnF0ZXN0LmM6MTY2OiBraWxsX3FlbXUoKSB0cmllZCB0byB0
+ZXJtaW5hdGUgUUVNVSBwcm9jZXNzIGJ1dCBlbmNvdW50ZXJlZCBleGl0IHN0YXR1cyAxIChleHBl
+Y3RlZCAwKQpFUlJPUiBxdGVzdC1hYXJjaDY0OiBtaWdyYXRpb24tdGVzdCAtIEJhaWwgb3V0ISBF
+UlJPUjouLi9zcmMvdGVzdHMvcXRlc3QvbGlicXRlc3QuYzozMDE6cXRlc3RfaW5pdF93aXRob3V0
+X3FtcF9oYW5kc2hha2U6IGFzc2VydGlvbiBmYWlsZWQ6IChzLT5mZCA+PSAwICYmIHMtPnFtcF9m
+ZCA+PSAwKQptYWtlOiAqKiogW3J1bi10ZXN0LTE2NF0gRXJyb3IgMQogIFRFU1QgICAgaW90ZXN0
+LXFjb3cyOiAwMjUKCkxvb2tpbmcgZm9yIGV4cGVjdGVkIGZpbGUgJ3Rlc3RzL2RhdGEvYWNwaS92
+aXJ0L0ZBQ1AubWVtaHAnCi0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUs
+IGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICct
+bicsICdkb2NrZXInLCAncnVuJywgJy0tcm0nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5j
+ZS51dWlkPTBkZGJmYTgxY2RmNjQ5MDE4YjJjMTFmMzVhNTJiZTlhJywgJy11JywgJzEwMDEnLCAn
+LS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy1lJywgJ1RBUkdFVF9MSVNU
+PScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0x
+NCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScsICctZScsICdDQ0FDSEVfRElS
+PS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Ly5jYWNoZS9xZW11LWRvY2tl
+ci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0
+ZXItdG1wLTBueHZubWZvL3NyYy9kb2NrZXItc3JjLjIwMjAtMDktMjgtMTQuMDkuNDQuMzE1MTQ6
+L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXUvY2VudG9zNycsICcvdmFyL3RtcC9xZW11L3J1bics
+ICd0ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0t
+LWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPTBkZGJmYTgxY2RmNjQ5MDE4YjJj
+MTFmMzVhNTJiZTlhCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBM
+ZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTBueHZubWZvL3Ny
+YycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9zN10gRXJyb3IgMgoKcmVh
+bCAgICAxN20xNC4xNDZzCnVzZXIgICAgMG0yMi4zMjRzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWls
+YWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDkyODEzMTYzOC45NDg2LTEta3Jh
+eGVsQHJlZGhhdC5jb20vdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdl
+LgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9w
+YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
+cmVkaGF0LmNvbQ==
 
