@@ -2,93 +2,91 @@ Return-Path: <SRS0=Z1O7=DF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EE09C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 06:40:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45978C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 06:49:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF477206BE
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 06:40:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF477206BE
+	by mail.kernel.org (Postfix) with ESMTPS id 995FB23119
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 06:49:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 995FB23119
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMmq1-0001E4-Fp
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 02:40:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42614)
+	id 1kMmy3-0003SN-Af
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 02:48:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44574)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kMmmS-00009L-D7; Mon, 28 Sep 2020 02:37:00 -0400
-Received: from new3-smtp.messagingengine.com ([66.111.4.229]:55303)
+ id 1kMmtv-0002QS-1p; Mon, 28 Sep 2020 02:44:43 -0400
+Received: from new3-smtp.messagingengine.com ([66.111.4.229]:58265)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kMmmP-0000V2-Ji; Mon, 28 Sep 2020 02:37:00 -0400
+ id 1kMmtq-0001SX-IY; Mon, 28 Sep 2020 02:44:42 -0400
 Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
- by mailnew.nyi.internal (Postfix) with ESMTP id 1E9935802E1;
- Mon, 28 Sep 2020 02:36:55 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
- by compute7.internal (MEProxy); Mon, 28 Sep 2020 02:36:55 -0400
+ by mailnew.nyi.internal (Postfix) with ESMTP id 9D1765801DA;
+ Mon, 28 Sep 2020 02:44:37 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+ by compute7.internal (MEProxy); Mon, 28 Sep 2020 02:44:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
  h=date:from:to:cc:subject:message-id:references:mime-version
- :content-type:in-reply-to; s=fm1; bh=xCbi4BcIgYwAvx036YHd9kWuUQ4
- 3zgSxD12XE9cnioA=; b=V4Vm1OENoRxEnCyL2MfbE7B+5IGa9oj8NutWGMTCJRB
- 3LQeyO32FMic4HUqUzEM9KDa6XgNTlZeupnEt5DJYDXcd4I6QVJxbW4fzZEgHDMa
- FRxcPKpIljgLz/1LyrA4RMg57jo9eHpfxQRuuITayKqgdyTvKUz/ASNUmEO4nqN/
- ZWn0hQqF1+TdPdlMyT+6RmjaBzVxUA/AzC2sEz3RONEGau/m/cc/tUaIKIjTzrof
- tIYGGeJB/zSAz+9w8/rnPL2hfQXhuxmRr5rxIowjRrP5XarkmaymGJvMZ7Uiwlpj
- fFTCtcyQ9JY6kZY0B3rZNXHB1YdoSaDTcAsMQ+OFpMA==
+ :content-type:in-reply-to; s=fm1; bh=0REE54PKNGGn0ZEWlvffak9GQgj
+ 3rccrULRr8yJMrW8=; b=enuPnkSy5/+vTOj9qFfNikMtry5JCz2kOMwPE7/eKFz
+ t55+H9dGUDwoxx5tzKPapvqdZsBygOEHFhA3r3plJYiq/ZccOJXoANMrV13UsPhh
+ vK3w+tmphj888+Up3fkSqj6YeJIA3J0OfTaIYsRdn6cTx5b894l4teLvg7T6ifwW
+ Eji90jaVhXTswCzYNkKvJcQUWFbQZGk4COceNFpetZoM2lwwl6M52gJV5+2xDrne
+ fMqZXErLIKoFsD/r7m8XoAKOKRAaJHTr2EfdV24XdXQs+Nj6b4Q5DSlfUYVjZJ4Q
+ tkJDJm2dL9BQeE2qv2Ef/nuN7WMC0bWmLeRWg3mmEJg==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
  messagingengine.com; h=cc:content-type:date:from:in-reply-to
  :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=xCbi4B
- cIgYwAvx036YHd9kWuUQ43zgSxD12XE9cnioA=; b=Z2qvu+G1svg6aTkZjjndyB
- qa8jQ2G/fV8b3bq0qcekorQnHGHTz3tJrMyQ9fNOxuQrUQVYRMfFOEoqfKwUOnlm
- 4geBHXNnpcdijpSVLPCHJ8eziQq+gEGXHbWiNPQcXi6XVWrDe6He4qbZsCIuNxGJ
- 1pfBUqtglhFgyDfhkcgP+Qpbg72dNm0uTiCnaBAyBr4Sz9jZgaW2cqkSWKEHarIv
- sYI65ZKsqM/R0astEBCZ6RL7RsFJbRlv3w/OrDmvjBTc4juojQF5gXJ1eoJ+Uruw
- d3+U7/n9DhjClaoL+uzK4S8pP1p48qUQdD0eyqn7oz0oRZ8jL3KsMihsqDZMduOQ
+ :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=0REE54
+ PKNGGn0ZEWlvffak9GQgj3rccrULRr8yJMrW8=; b=uGUAnGg1nnfj22QgWhCI/n
+ odkl1sUDOpvHcLzO16BNBwZEpZMizCHTqn2KmxONFvnU36tnCUU9ETOUhLTiavDe
+ KGZ3cuVbenfZchUpVzun0c5BHZT5CwKmt7FD4c3eSEVZAbRaG1EG6mOG1s2q96OH
+ RpUQa2Q4BwX4jw9/zObh3EhYJNUDsK8s9VNAZGx6M7vRhp15AzLx1fKWvlcNIRfa
+ Z3Gg/IaLrAdsVbbC9dgwjh6/I4osNSKHUxaaYSXsDVhEJEkGnyNsVgDoeaCDlXW1
+ AYxV6IA05/EHzf1YyJB/NjL1H/2vSd8pp+XEV82zToo4sVgfkLg5WxFHmVlzdx8g
  ==
-X-ME-Sender: <xms:hIRxXzwq99bXC-CiXXFV5gS7h8WqF7KKthNPla1fdWyGPnhai2YZew>
- <xme:hIRxX7T_dNZP9dFQMQAh09EAdPnj_CJRNWP3HpjUdPu-MX3I_WnAuTJJG2pE6g1Hk
- P763BFxDqrofi1iHmQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrvdehgdduudduucetufdoteggodetrfdotf
+X-ME-Sender: <xms:VIZxXzqGyvw3Mu4aNmPHZMPTuaLwZxznoprXVQgiIZonJ683pTs8NQ>
+ <xme:VIZxX9peQegeh_9pHmIrl52Vw7J9dmaeMOaOH-UVR6D5zC8L-H6JTla1Ycfwc0L4c
+ ZutDVmpOCvuNsB60ck>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrvdehgdduuddvucetufdoteggodetrfdotf
  fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
  uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
  cujfgurhepfffhvffukfhfgggtuggjsehgtderredttdejnecuhfhrohhmpefmlhgruhhs
  ucflvghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtth
- gvrhhnpedtleekfedtueejueehledtudeugfdutdeigeegieehhfdvtedtgeetfefggfdu
- keenucffohhmrghinhepghhithhhuhgsrdgtohhmnecukfhppeektddrudeijedrleekrd
- duledtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhep
- ihhtshesihhrrhgvlhgvvhgrnhhtrdgukh
-X-ME-Proxy: <xmx:hIRxX9Xv3DacNIpr0mfIk8UFASnodtwn5aU1NHnOn656ht1pDDmZyg>
- <xmx:hIRxX9jnyu7UVGOxIgTvETMAM4WOJ2FED13C2lWbhjhuLMc3Z6Qo2w>
- <xmx:hIRxX1CLFEAaBWZProgpemYrGEXqhDZKm1ogNEMtrgzH6e7RTmU5wQ>
- <xmx:hoRxX6L8G1-40DdgbAM7cBLI6wVkHgSVbe_yHaw52ut5XhNvP5dtCHKv-c0>
+ gvrhhnpeejgeduffeuieetkeeileekvdeuleetveejudeileduffefjeegfffhuddvudff
+ keenucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedtne
+ curfgrrhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
+X-ME-Proxy: <xmx:VIZxXwOXZROjqXRzy7djXJn6LZOr03Fwz8dPJTZ2G96uOlDKQZcLMQ>
+ <xmx:VIZxX25qlZ0qCfz-3EJQrpqqcSf51_54fAjJv47bycMkRsru7qmHrQ>
+ <xmx:VIZxXy7p6BM3diaNQaObsbTR5vtaonWTxM0ATM-s5vFxOfKHQqNs7w>
+ <xmx:VYZxX6hVb88oB-PgzQVJJInDVtShpLhK2jQLXOzlNVszxSg1Rjc2qjrgdJA>
 Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id BC6A9306467E;
- Mon, 28 Sep 2020 02:36:50 -0400 (EDT)
-Date: Mon, 28 Sep 2020 08:36:48 +0200
+ by mail.messagingengine.com (Postfix) with ESMTPA id DCAEB328005D;
+ Mon, 28 Sep 2020 02:44:34 -0400 (EDT)
+Date: Mon, 28 Sep 2020 08:44:32 +0200
 From: Klaus Jensen <its@irrelevant.dk>
-To: Dmitry Fomichev <Dmitry.Fomichev@wdc.com>
-Subject: Re: [PATCH v4 00/14] hw/block/nvme: Support Namespace Types and
- Zoned Namespace Command Set
-Message-ID: <20200928063648.GA1967@apples.localdomain>
-References: <20200923182021.3724-1-dmitry.fomichev@wdc.com>
- <20200924210751.GD1738917@apples.localdomain>
- <MN2PR04MB59515B1EA1238861DFF3236AE1350@MN2PR04MB5951.namprd04.prod.outlook.com>
+To: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Subject: Re: [PATCH v5 09/14] hw/block/nvme: Support Zoned Namespace Command
+ Set
+Message-ID: <20200928064432.GB1967@apples.localdomain>
+References: <20200928023528.15260-1-dmitry.fomichev@wdc.com>
+ <20200928023528.15260-10-dmitry.fomichev@wdc.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="h31gzZEtNLTqOjlF"
+ protocol="application/pgp-signature"; boundary="24zk1gE8NUlDmwG9"
 Content-Disposition: inline
-In-Reply-To: <MN2PR04MB59515B1EA1238861DFF3236AE1350@MN2PR04MB5951.namprd04.prod.outlook.com>
+In-Reply-To: <20200928023528.15260-10-dmitry.fomichev@wdc.com>
 Received-SPF: pass client-ip=66.111.4.229; envelope-from=its@irrelevant.dk;
  helo=new3-smtp.messagingengine.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 02:36:55
@@ -112,134 +110,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Damien Le Moal <Damien.LeMoal@wdc.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- Niklas Cassel <Niklas.Cassel@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Maxim Levitsky <mlevitsk@redhat.com>,
- Alistair Francis <Alistair.Francis@wdc.com>, Keith Busch <kbusch@kernel.org>,
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
+ Niklas Cassel <niklas.cassel@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
+ qemu-devel@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>, Keith Busch <kbusch@kernel.org>,
  Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Matias Bjorling <Matias.Bjorling@wdc.com>
+ Matias Bjorling <matias.bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---h31gzZEtNLTqOjlF
+--24zk1gE8NUlDmwG9
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sep 28 02:33, Dmitry Fomichev wrote:
-> > -----Original Message-----
-> > From: Klaus Jensen <its@irrelevant.dk>
-> >
-> > If it really needs to be memory mapped, then I think a hostmem-based
-> > approach similar to what Andrzej did for PMR is needed (I think that
-> > will get rid of the CONFIG_POSIX ifdef at least, but still leave it
-> > slightly tricky to get it to work on all platforms AFAIK).
+On Sep 28 11:35, Dmitry Fomichev wrote:
+> The emulation code has been changed to advertise NVM Command Set when
+> "zoned" device property is not set (default) and Zoned Namespace
+> Command Set otherwise.
 >=20
-> Ok, it looks that using the HostMemoryBackendFile backend will be
-> more appropriate. This will remove the need for conditional compile.
+> Handlers for three new NVMe commands introduced in Zoned Namespace
+> Command Set specification are added, namely for Zone Management
+> Receive, Zone Management Send and Zone Append.
 >=20
-> The mmap() portability is pretty decent across software platforms.
-> Any poor Windows user who is forced to emulate ZNS on mingw will be
-> able to do so, just without having zone state persistency. Considering
-> how specialized this stuff is in first place, I estimate the number of us=
-ers
-> affected by this "limitation" to be exactly zero.
+> Device initialization code has been extended to create a proper
+> configuration for zoned operation using device properties.
 >=20
-
-QEMU is a cross platform project - we should strive for portability.
-
-Alienating developers that use a Windows platform and calling them out
-as "poor" is not exactly good for the zoned ecosystem.
-
-> > But really,
-> > since we do not require memory semantics for this, then I think the
-> > abstraction is fundamentally wrong.
-> >=20
+> Read/Write command handler is modified to only allow writes at the
+> write pointer if the namespace is zoned. For Zone Append command,
+> writes implicitly happen at the write pointer and the starting write
+> pointer value is returned as the result of the command. Write Zeroes
+> handler is modified to add zoned checks that are identical to those
+> done as a part of Write flow.
 >=20
-> Seriously, what is wrong with using mmap :) ? It is used successfully for
-> similar applications, for example -
-> https://github.com/open-iscsi/tcmu-runner/blob/master/file_zbc.c
+> The code to support for Zone Descriptor Extensions is not included in
+> this commit and ZDES 0 is always reported. A later commit in this
+> series will add ZDE support.
 >=20
-
-There is nothing fundamentally wrong with mmap. I just think it is the
-wrong abstraction here (and it limits portability for no good reason).
-For PMR there is a good reason - it requires memory semantics.
-
-> > I am, of course, blowing my own horn, since my implementation uses a
-> > portable blockdev for this.
-> >=20
+> This commit doesn't yet include checks for active and open zone
+> limits. It is assumed that there are no limits on either active or
+> open zones.
 >=20
-> You are making it sound like the entire WDC series relies on this approac=
-h.
-> Actually, the persistency is introduced in the second to last patch in the
-> series and it only adds a couple of lines of code in the i/o path to mark
-> zones dirty. This is possible because of using mmap() and I find the way
-> it is done to be quite elegant, not ugly :)
+> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
+> Signed-off-by: Hans Holmberg <hans.holmberg@wdc.com>
+> Signed-off-by: Ajay Joshi <ajay.joshi@wdc.com>
+> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+> Signed-off-by: Matias Bjorling <matias.bjorling@wdc.com>
+> Signed-off-by: Aravind Ramesh <aravind.ramesh@wdc.com>
+> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
+> Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+> ---
+>  block/nvme.c         |   2 +-
+>  hw/block/nvme-ns.c   | 185 ++++++++-
+>  hw/block/nvme-ns.h   |   6 +-
+>  hw/block/nvme.c      | 872 +++++++++++++++++++++++++++++++++++++++++--
+>  include/block/nvme.h |   6 +-
+>  5 files changed, 1033 insertions(+), 38 deletions(-)
 >=20
+> diff --git a/block/nvme.c b/block/nvme.c
+> index 05485fdd11..7a513c9a17 100644
+> --- a/block/nvme.c
+> +++ b/block/nvme.c
+> @@ -1040,18 +1318,468 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeRequest=
+ *req)
+>          goto invalid;
+>      }
+> =20
+> +    if (ns->params.zoned) {
+> +        zone_idx =3D nvme_zone_idx(ns, slba);
+> +        assert(zone_idx < ns->num_zones);
+> +        zone =3D &ns->zone_array[zone_idx];
+> +
+> +        if (is_write) {
+> +            status =3D nvme_check_zone_write(zone, slba, nlb);
+> +            if (status !=3D NVME_SUCCESS) {
+> +                trace_pci_nvme_err_zone_write_not_ok(slba, nlb, status);
+> +                goto invalid;
+> +            }
+> +
+> +            assert(nvme_wp_is_valid(zone));
+> +            if (append) {
+> +                if (unlikely(slba !=3D zone->d.zslba)) {
+> +                    trace_pci_nvme_err_append_not_at_start(slba, zone->d=
+=2Ezslba);
+> +                    status =3D NVME_ZONE_INVALID_WRITE | NVME_DNR;
+> +                    goto invalid;
+> +                }
+> +                if (data_size > (n->page_size << n->zasl)) {
+> +                    trace_pci_nvme_err_append_too_large(slba, nlb, n->za=
+sl);
+> +                    status =3D NVME_INVALID_FIELD | NVME_DNR;
+> +                    goto invalid;
+> +                }
+> +                slba =3D zone->w_ptr;
+> +            } else if (unlikely(slba !=3D zone->w_ptr)) {
+> +                trace_pci_nvme_err_write_not_at_wp(slba, zone->d.zslba,
+> +                                                   zone->w_ptr);
+> +                status =3D NVME_ZONE_INVALID_WRITE | NVME_DNR;
+> +                goto invalid;
+> +            }
+> +            req->fill_ofs =3D -1LL;
+> +        } else {
+> +            status =3D nvme_check_zone_read(ns, zone, slba, nlb);
+> +            if (status !=3D NVME_SUCCESS) {
+> +                trace_pci_nvme_err_zone_read_not_ok(slba, nlb, status);
+> +                goto invalid;
+> +            }
+> +
+> +            if (slba + nlb > zone->w_ptr) {
+> +                /*
+> +                 * All or some data is read above the WP. Need to
+> +                 * fill out the buffer area that has no backing data
+> +                 * with a predefined data pattern (zeros by default)
+> +                 */
+> +                if (slba >=3D zone->w_ptr) {
+> +                    req->fill_ofs =3D 0;
+> +                } else {
+> +                    req->fill_ofs =3D nvme_l2b(ns, zone->w_ptr - slba);
+> +                }
+> +                req->fill_len =3D nvme_l2b(ns,
+> +                    nvme_zone_rd_boundary(ns, zone) - slba);
 
-No, I understand that your implementation works fine without
-persistance, but persistance is key. That is why my series adds it in
-the first patch. Without persistence it is just a toy. And the QEMU
-device is not just an "NVMe-version" of null_blk.
+OK then. Next edge case.
 
-And I don't think I ever called the use of mmap ugly. I called out the
-physical memory API shenanigans as a hack.
+Now what happens if the read crosses into a partially written zone and
+reads above the write pointer in that zone?
 
-> > Another issue is the complete lack of endian conversions. Does it
-> > matter? It depends. Will anyone ever use this on a big endian host and
-> > move the meta data backing file to a little endian host? Probably not.
-> > So does it really matter? Probably not, but it is cutting corners.
-> >=20
-
-After I had replied this, I considered a follow-up, because there are
-probably QEMU developers that would call me out on this.
-
-This definitely DOES matter to QEMU.
-
->=20
-> Great point on endianness! Naturally, all file backed values are stored in
-> their native endianness. This way, there is no extra overhead on big endi=
-an
-> hardware architectures. Portability concerns can be easily addressed by
-> storing metadata endianness as a byte flag in its header. Then, during
-> initialization, the metadata validation code can detect the possible
-> discrepancy in endianness and automatically convert the metadata to the
-> endianness of the host. This part is out of scope of this series, but I w=
-ould
-> be able to contribute such a solution as an enhancement in the future.
->=20
-
-It is not out of scope. I don't see why we should merge something that
-is arguably buggy.
-
-Bottomline is that I just don't see why we should accept an
-implementation that
-
-  a) excludes some platforms (Windows) from using persistence; and
-  b) contains endianness conversion issues
-
-when there is a portable implementation posted that at least tries to
-convert endianness as needed.
-
---h31gzZEtNLTqOjlF
+--24zk1gE8NUlDmwG9
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl9xhHwACgkQTeGvMW1P
-Demzmgf+JHlOdeiSscyGJHa/M4e4Cx/JbxfvAoqcpcYJVNOW+BWz4oh+LHpdro/U
-TJ/EQ7Ki9KZYW6TKdx1H5Tz6XHsPV/whyB3zAtQ4b7oRvy+Tb7Eged+3v+oISyIu
-V91JPr8jXubD3X59O2p97Lh2Y8+8WaoUkv/uivRuJ5Inbtgg5j7ew7Px9i4LZHJT
-sMAIYyqeEsV11oOs811zbjSscUU9bMKdyzNyGMkIb+59oOVc+OE/j+aHdzO/IAYD
-zkCScO9judfXN6mQhk5LJWUC/rrEaLCEkisgzeTb2sm0Uv19t3MoNcpl4mhBXmE/
-6PhoEzj1kWiNPOKLGHxv0tfpzMAuTg==
-=mxmm
+iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl9xhk4ACgkQTeGvMW1P
+DekLOwf/UNRKqNQ4BN4BqJI2VQmhtH1+k+hQjiRNGf39wOLwNQH/4AgJUD6/iqpd
+S0v6kqHq6VJfbr4Ld6H/X/+J8JLBRvqKmr0m/D6RJQT4pAKI/cA9FObnVBDLx5Hx
+4UZUV85mhy4cmuPf++Z9KLDSjiotkNMSU4cxBSOnzENTt40Wq1Rbxxa+4FO+KhS2
++fz6faOu/YyT+qIZXJNvJgP9uPfSS9ueMqrMt+5l53kv+dxArA9LDmGJhTLyR0UJ
+VwgCeEb/QSia+lwRKFwUtlI1ugsSlEmq77fvyVteRKyLn/Q9zsMsBvvj5xzf6CQg
+JAiItZqqizj+sx1P5WvkEoLF5bV89w==
+=UwaT
 -----END PGP SIGNATURE-----
 
---h31gzZEtNLTqOjlF--
+--24zk1gE8NUlDmwG9--
 
