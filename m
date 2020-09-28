@@ -7,67 +7,66 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91DBAC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 10:51:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9915C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 10:52:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D47992074B
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 10:51:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1D0C92080A
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 10:52:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GvsUuYIX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D47992074B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fpIQ4P9b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D0C92080A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMqkH-00089o-V2
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 06:51:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44020)
+	id 1kMqlI-0000ye-2b
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 06:52:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43846)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kMqct-00080a-Lp
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 06:43:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26904)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kMqcn-0007kl-Gb
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 06:43:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43135)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kMqcq-0006JP-1T
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 06:43:23 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kMqci-0006H5-6k
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 06:43:17 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601289799;
+ s=mimecast20190719; t=1601289791;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=+WSygC6kySUPz9u+rwH4GRNfyUq92oz4OUXHFwamiQI=;
- b=GvsUuYIXKmNLkb1FZZOW3MCTCkIHeI+3ZVcDBkm5eZKlOVkbjn/8HOx2/K/BSs2Idy0i3t
- s4/nh3TTvC4UoYiviI8M1pMhd071fiEkVvTISzfV/ZXrBqhxdozn21h9dDcncXM6LlCM2x
- PaqMBg5SKTpPabhCH4DyLZCnAIHHcS8=
+ bh=x0No8/lNHDWses2JAiQOSnCsiaQe0Jlum0U1EgQFNxA=;
+ b=fpIQ4P9blHRLN9UkiLhUSycNjBa31beviY/TCHJwWXmR4ux1JLwgmZNxJ8dQG8CwF2fc8L
+ dQPLb9aMjsHgyF0SGVyofEPYByMk7LX5OPIL581GZPrpcl+BmzXd+asoVP+DriEvUYySi9
+ dyEPmuWUM/VFfkK952c2xQaLo2bPBeM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-92-jSq0nZUSM0-mQthePMZ5Lg-1; Mon, 28 Sep 2020 06:43:17 -0400
-X-MC-Unique: jSq0nZUSM0-mQthePMZ5Lg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-550-ChHKRiu2MGmPSBwv7sJs2A-1; Mon, 28 Sep 2020 06:43:09 -0400
+X-MC-Unique: ChHKRiu2MGmPSBwv7sJs2A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EDD68802B61;
- Mon, 28 Sep 2020 10:43:15 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 23D9B1074657;
+ Mon, 28 Sep 2020 10:43:08 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
  [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 82C1760C84;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B4A291002C03;
  Mon, 28 Sep 2020 10:43:07 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id A4ED840846; Mon, 28 Sep 2020 12:42:56 +0200 (CEST)
+ id B7D0A40DCF; Mon, 28 Sep 2020 12:42:56 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 08/12] tests/acpi: add empty
- tests/data/acpi/microvm/DSDT.pcie file
-Date: Mon, 28 Sep 2020 12:42:52 +0200
-Message-Id: <20200928104256.9241-9-kraxel@redhat.com>
+Subject: [PATCH v3 10/12] tests/acpi: add microvm pcie test
+Date: Mon, 28 Sep 2020 12:42:54 +0200
+Message-Id: <20200928104256.9241-11-kraxel@redhat.com>
 In-Reply-To: <20200928104256.9241-1-kraxel@redhat.com>
 References: <20200928104256.9241-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -112,13 +111,42 @@ Sender: "Qemu-devel"
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- tests/data/acpi/microvm/DSDT.pcie | 0
- 1 file changed, 0 insertions(+), 0 deletions(-)
- create mode 100644 tests/data/acpi/microvm/DSDT.pcie
+ tests/qtest/bios-tables-test.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/tests/data/acpi/microvm/DSDT.pcie b/tests/data/acpi/microvm/DSDT.pcie
-new file mode 100644
-index 000000000000..e69de29bb2d1
+diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
+index cc4579d914e7..bf34be5decf3 100644
+--- a/tests/qtest/bios-tables-test.c
++++ b/tests/qtest/bios-tables-test.c
+@@ -1063,6 +1063,18 @@ static void test_acpi_microvm_tcg(void)
+     free_test_data(&data);
+ }
+ 
++static void test_acpi_microvm_pcie_tcg(void)
++{
++    test_data data;
++
++    test_acpi_microvm_prepare(&data);
++    data.variant = ".pcie";
++    data.tcg_only = true; /* need constant host-phys-bits */
++    test_acpi_one(" -machine microvm,acpi=on,rtc=off,pcie=on",
++                  &data);
++    free_test_data(&data);
++}
++
+ static void test_acpi_virt_tcg_numamem(void)
+ {
+     test_data data = {
+@@ -1181,6 +1193,9 @@ int main(int argc, char *argv[])
+         qtest_add_func("acpi/piix4/acpihmat", test_acpi_piix4_tcg_acpi_hmat);
+         qtest_add_func("acpi/q35/acpihmat", test_acpi_q35_tcg_acpi_hmat);
+         qtest_add_func("acpi/microvm", test_acpi_microvm_tcg);
++        if (strcmp(arch, "x86_64") == 0) {
++            qtest_add_func("acpi/microvm/pcie", test_acpi_microvm_pcie_tcg);
++        }
+     } else if (strcmp(arch, "aarch64") == 0) {
+         qtest_add_func("acpi/virt", test_acpi_virt_tcg);
+         qtest_add_func("acpi/virt/numamem", test_acpi_virt_tcg_numamem);
 -- 
 2.27.0
 
