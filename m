@@ -2,87 +2,94 @@ Return-Path: <SRS0=Z1O7=DF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BE04C4741F
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 09:48:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B878EC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 09:50:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCD3C221E8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 09:48:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 10B60204EA
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 09:50:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i3jqujBN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCD3C221E8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ROp/EksF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10B60204EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59284 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMpm2-0004eH-T8
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 05:48:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54348)
+	id 1kMpni-0005ex-5g
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 05:50:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55024)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kMpks-00047U-PD
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 05:47:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36365)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kMpkr-0006Oh-9I
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 05:47:34 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601286452;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=tsQGfwFCHLF9/t4j8scyCPzc/d98n5fx83nIiDLfTZc=;
- b=i3jqujBN6y2uPJd3p6BFo8y+V96pJmd4XcO1jiaj8vEAR4Mx9BzDNirm72pDfjcXc6xqwk
- 1WZxsaOyevL40QZQOGtz+uh6ll/V/4ySza/xNfBmBeeGKGCXD8xEwD3AjG4MSvHzb2oSGP
- YbhEVTvjMMxKZuO7kS97IL8Rsj+8U+A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-329-1aS7slj_MvClvVtjYx_YQQ-1; Mon, 28 Sep 2020 05:47:27 -0400
-X-MC-Unique: 1aS7slj_MvClvVtjYx_YQQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A081785C706;
- Mon, 28 Sep 2020 09:47:26 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-193.ams2.redhat.com [10.36.114.193])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4EAA0614F5;
- Mon, 28 Sep 2020 09:47:22 +0000 (UTC)
-Date: Mon, 28 Sep 2020 11:47:20 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH v7 00/13] monitor: Optionally run handlers in coroutines
-Message-ID: <20200928094720.GB5451@linux.fritz.box>
-References: <20200909151149.490589-1-kwolf@redhat.com>
- <20200910132439.GE45048@stefanha-x1.localdomain>
- <20200925171541.GK5731@linux.fritz.box>
- <20200928084609.GC43571@stefanha-x1.localdomain>
+ (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
+ id 1kMpn6-0005Cw-MS
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 05:49:52 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:37874)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
+ id 1kMpn3-0006as-UY
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 05:49:52 -0400
+Received: by mail-pg1-x543.google.com with SMTP id e18so402239pgd.4
+ for <qemu-devel@nongnu.org>; Mon, 28 Sep 2020 02:49:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=bo5XciDsqQi5+9KIOiGkCCsyRX86bRdi4QFH1T4bBJk=;
+ b=ROp/EksFWtgsXiag73xnHWxJfBF0ri1mioOVjdLHfbHSx/0jtLmNwN7IMzDnBVSF5A
+ J73jUAWL1ocARmfxTF9QKNIDZGsZGJJxwZ+8l1tMV5WCb7HLQTRVaQECHbW/QreU7uej
+ u/dWguFXV73sqoIKH865WRSpsFzS0SAcGMIMEPLWmDzSqrw8BMC5Kud4iWz/pwvAb/kq
+ km3REc366ay/sG90QEnngh4Uwl9I975FsCAvAyYTWveM44fNPrFlOTmrdxAJ3uxrDqyW
+ nyKkNHmbXZNNgftj/TgDQJbLuyBS2J0TvEg5UURe+keFlLjnW3duRXMF3goNFy8k4gNN
+ QHDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=bo5XciDsqQi5+9KIOiGkCCsyRX86bRdi4QFH1T4bBJk=;
+ b=TjOIj1IF/85ZSLfpwGwdbU6r/sozCPHe/PRQkVB1l9PRUxLfbB+MaIBIR72XkL9jUg
+ f4vPXDp3m/gEwiAAFTWLrQyoH7CXeQDZKj9U6xHxzDpALo4O2rHJCN8UjaIIRNc/zVU4
+ 0IpaYhYQh2gOTCdzSmSrhEsd1zn2MSGO3I4Y+JtWG/7Ps0B+IVpIpdxMxiDxl3z2nEcR
+ V2UqbnMp0l1e1UHylAYzgAUfHz1LQ6n4gKqalJfT1Y3/q3O+mGwXKIf46N1B4/1ovbgn
+ z8uBXoiJ7pt11+S6ovbQqPGa2lcmLZ7fm9V3itVbn55SY84ViDjE3mzq0Z7Nh2jK1qCN
+ gFRA==
+X-Gm-Message-State: AOAM533l9Q53eTAa9cjTxrK2Gp13Al78Wq/t8FLBIPFEhmxm1tGargTl
+ y5qAYsLUe+TNixbxPDVQkcg=
+X-Google-Smtp-Source: ABdhPJzH3dZCuJ65DhQFapSstZOwuPdBb+7J8WxE8FIKv4sqyjSXorh70f8w/Db2KwwV94jjELpvDg==
+X-Received: by 2002:aa7:9e43:0:b029:142:2501:34e3 with SMTP id
+ z3-20020aa79e430000b0290142250134e3mr682142pfq.60.1601286587747; 
+ Mon, 28 Sep 2020 02:49:47 -0700 (PDT)
+Received: from software.domain.org ([45.77.13.216])
+ by smtp.gmail.com with ESMTPSA id j4sm865417pfj.143.2020.09.28.02.49.43
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 28 Sep 2020 02:49:46 -0700 (PDT)
+From: Huacai Chen <zltjiangshi@gmail.com>
+X-Google-Original-From: Huacai Chen <chenhc@lemote.com>
+To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Subject: [PATCH V12 0/8] mips: Add Loongson-3 machine support
+Date: Mon, 28 Sep 2020 17:49:38 +0800
+Message-Id: <1601286586-1810-1-git-send-email-chenhc@lemote.com>
+X-Mailer: git-send-email 2.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200928084609.GC43571@stefanha-x1.localdomain>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="IJpNTDwzlM2Ie8A6"
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 03:29:35
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -36
-X-Spam_score: -3.7
-X-Spam_bar: ---
-X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.576,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
+ envelope-from=zltjiangshi@gmail.com; helo=mail-pg1-x543.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,95 +102,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@gmail.com, armbru@redhat.com,
- qemu-block@nongnu.org, dgilbert@redhat.com
+Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Huacai Chen <chenhuacai@gmail.com>, qemu-devel@nongnu.org,
+ Huacai Chen <chenhc@lemote.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---IJpNTDwzlM2Ie8A6
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Loongson-3 CPU family include Loongson-3A R1/R2/R3/R4 and Loongson-3B
+R1/R2. Loongson-3A R1 is the oldest and its ISA is the smallest, while
+Loongson-3A R4 is the newest and its ISA is almost the superset of all
+others. To reduce complexity, in QEMU we just define two CPU types:
 
-Am 28.09.2020 um 10:46 hat Stefan Hajnoczi geschrieben:
-> On Fri, Sep 25, 2020 at 07:15:41PM +0200, Kevin Wolf wrote:
-> > Am 10.09.2020 um 15:24 hat Stefan Hajnoczi geschrieben:
-> > > On Wed, Sep 09, 2020 at 05:11:36PM +0200, Kevin Wolf wrote:
-> > > > Some QMP command handlers can block the main loop for a relatively =
-long
-> > > > time, for example because they perform some I/O. This is quite nast=
-y.
-> > > > Allowing such handlers to run in a coroutine where they can yield (=
-and
-> > > > therefore release the BQL) while waiting for an event such as I/O
-> > > > completion solves the problem.
-> > > >=20
-> > > > This series adds the infrastructure to allow this and switches
-> > > > block_resize to run in a coroutine as a first example.
-> > > >=20
-> > > > This is an alternative solution to Marc-Andr=E9's "monitor: add
-> > > > asynchronous command type" series.
-> > >=20
-> > > Please clarify the following in the QAPI documentation:
-> > >  * Is the QMP monitor suspended while the command is pending?
-> >=20
-> > Suspended as in monitor_suspend()? No.
-> >=20
-> > >  * Are QMP events reported while the command is pending?
-> >=20
-> > Hm, I don't know to be honest. But I think so.
-> >=20
-> > Does it matter, though? I don't think events have a defined order
-> > compared to command results, and the client can't respond to the event
-> > anyway until the current command has completed.
->=20
-> You're right, I don't think it matters because the client must expect
-> QMP events at any time.
->=20
-> I was trying to understand the semantics of coroutine monitor commands
-> from two perspectives:
->=20
-> 1. The QMP client - do coroutine commands behave differently from
->    non-coroutine commands? I think the answer is no. The monitor will
->    not process more commands until the coroutine finishes?
+1, "Loongson-3A1000" CPU which is corresponding to Loongson-3A R1. It is
+   suitable for TCG because Loongson-3A R1 has fewest ASE.
+2, "Loongson-3A4000" CPU which is corresponding to Loongson-3A R4. It is
+   suitable for KVM because Loongson-3A R4 has the VZ ASE.
 
-No, on the wire, things should look exactly the same. If you consider
-more than the QMP traffic and the client communicates with the guest, it
-might see that the guest isn't blocked any more, of course.
+Loongson-3 lacks English documents. I've tried to translated them with
+translate.google.com, and the machine translated documents (together
+with their original Chinese versions) are available here.
 
-> 2. The command implementation - which thread does the coroutine run in?
->    I guess it runs in the main loop thread with the BQL and the
->    AioContext acquired?
+Loongson-3A R1 (Loongson-3A1000)
+User Manual Part 1:
+http://ftp.godson.ac.cn/lemote/3A1000_p1.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A1000_processor_user_manual_P1.pdf (Chinese Version)
+User Manual Part 2:
+http://ftp.godson.ac.cn/lemote/3A1000_p2.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A1000_processor_user_manual_P2.pdf (Chinese Version)
 
-By default, yes. But the coroutine can reschedule itself to another
-thread. Block-related handlers will want to reschedule themselves to
-bs->aio_context because you can't just hold the AioContext lock from
-another thread across yields. This is what block_resize does after this
-series.
+Loongson-3A R2 (Loongson-3A2000)
+User Manual Part 1:
+http://ftp.godson.ac.cn/lemote/3A2000_p1.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A2000_user1.pdf (Chinese Version)
+User Manual Part 2:
+http://ftp.godson.ac.cn/lemote/3A2000_p2.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A2000_user2.pdf (Chinese Version)
 
-Kevin
+Loongson-3A R3 (Loongson-3A3000)
+User Manual Part 1:
+http://ftp.godson.ac.cn/lemote/3A3000_p1.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A3000_3B3000usermanual1.pdf (Chinese Version)
+User Manual Part 2:
+http://ftp.godson.ac.cn/lemote/3A3000_p2.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A3000_3B3000usermanual2.pdf (Chinese Version)
 
---IJpNTDwzlM2Ie8A6
-Content-Type: application/pgp-signature; name="signature.asc"
+Loongson-3A R4 (Loongson-3A4000)
+User Manual Part 1:
+http://ftp.godson.ac.cn/lemote/3A4000_p1.pdf
+http://ftp.godson.ac.cn/lemote/3A4000user.pdf (Chinese Version)
+User Manual Part 2:
+I'm sorry that it is unavailable now.
 
------BEGIN PGP SIGNATURE-----
+And human-translated documents (W.I.P) are available here now:
+https://github.com/loongson-community/docs/tree/master/English-translation-of-Loongson-manual
 
-iQIzBAEBCAAdFiEE3D3rFZqa+V09dFb+fwmycsiPL9YFAl9xsSgACgkQfwmycsiP
-L9ZPNQ//awis3NuIbLiEZeIiUnkijCWgzCyLQf6cWGbk2snNtw3JXw5OM/M79dlM
-2gjvxLYPNZizztU0MAXcdaqfdWV1pjixCYOS4vE1a0Dchm/g50DbgCjbG6e4QnjE
-Lx5UnMZ85KNBIRpHpTW9iFs3fkMqr6pd9k2EUmUj695YLS9kYbVp6DIW7psYEbTh
-a5k5YpYau2A/L6lCy+Opivd3ecqZ33jNM89Xp3ibfdgU8eCLYdf20MprDNkIvVCw
-IMwR+HJzhwr2JPYkrwZecZ+Yt4mWFlLR8tYvqpSfnIjIxwEhkopuVRFImx2VdboF
-CvFr19NoJYStUesFIWA58Sc8JS/GFeANdptFqfxiuWwEuTzxpLRTJD2XYxRuwyzS
-HkDYXGIILxTCM5oR4xJ4CZqB7qndXY2TYG0N8J6oKlEky6veRz2xWMO3257kRcMF
-/D2elC68g5asOvoKR2556oi0gKMRnItClrH3z7+J3X1VftAC3gXXnZFOOm6aPgag
-mlnbV8Wwzub+B0bGl6b5uPiwKao8EemG4LVEIWePxVpnZW1PlDzpNw3TukrlnynA
-FU975mmIv1Gkln/h5iLxHoaSKR55casVxJZpVyunBniFq+Y0JWQ8Pdr0UgTukUJO
-4pe/mGXHNfIyEDU1FF6JwVGdu8n0KtxIXxm3IknBdRjHYWENXB8=
-=1H8A
------END PGP SIGNATURE-----
+Both KVM and TCG are available now!
 
---IJpNTDwzlM2Ie8A6--
+We now already have a full functional Linux kernel (based on Linux-5.4.x
+LTS, the kvm host side and guest side have both been upstream for Linux-
+5.9, but Linux-5.9 has not been released yet) here:
 
+https://github.com/chenhuacai/linux
+
+Of course the upstream kernel is also usable (though it is "unstable"
+now):
+
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+
+How to use QEMU/Loongson-3?
+1, Download kernel source from the above URL;
+2, Build a kernel with arch/mips/configs/loongson3_{def,hpc}config;
+3, Boot a Loongson-3A4000 host with this kernel (for KVM mode);
+4, Build QEMU-master with this patchset;
+5, modprobe kvm (only necessary for KVM mode);
+6, Use QEMU with TCG:
+       qemu-system-mips64el -M loongson3-virt,accel=tcg -cpu Loongson-3A1000 -kernel <path_to_kernel> -append ...
+   Use QEMU with KVM:
+       qemu-system-mips64el -M loongson3-virt,accel=kvm -cpu Loongson-3A4000 -kernel <path_to_kernel> -append ...
+
+   The "-cpu" parameter is optional here and QEMU will use the correct type for TCG/KVM automatically.
+
+V1 -> V2:
+1, Add a cover letter;
+2, Improve CPU definitions;
+3, Remove LS7A-related things (Use GPEX instead);
+4, Add a description of how to run QEMU/Loongson-3.
+
+V2 -> V3:
+1, Fix all possible checkpatch.pl errors and warnings.
+
+V3 -> V4:
+1, Sync code with upstream;
+2, Remove merged patches;
+3, Fix build failure without CONFIG_KVM;
+4, Add Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>.
+
+V4 -> V5:
+1, Improve coding style;
+2, Remove merged patches;
+3, Rename machine name from "loongson3" to "loongson3-virt";
+4, Rework the "loongson3-virt" machine to drop any ISA things;
+5, Rework "hw/mips: Implement the kvm_type() hook in MachineClass";
+6, Add Jiaxun Yang as a reviewer of Loongson-3.
+
+V5 -> V6:
+1, Fix license preamble;
+2, Improve commit messages;
+3, Add hw/intc/loongson_liointc.c to MAINTAINERS;
+4, Fix all possible checkpatch.pl errors and warnings.
+
+V7 and V8 have only one patch (machine definition) with some minor improvements.
+
+V8 -> V9:
+1, Update KVM type definition from kernel;
+2, Fix PageMask with variable page size for TCG;
+3, Add TCG support (add Loongson-EXT instructions).
+
+V9 -> V10:
+1, Split fw_cfg to a separate patch;
+2, Split boot parameters definition to a local header;
+3, Update MIPS machine documentation;
+4, Many other improvements suggested by Philippe Mathieu-Daudé.
+
+V10 -> V11:
+1, Fix some typos;
+2, Add Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>.
+
+V11 -> V12:
+1, Split boot parameter helpers to loongson3_bootp.c;
+2, Support both BE and LE host (Loongson guests are always LE).
+
+Huacai Chen and Jiaxun Yang (8):
+ linux-headers: Update MIPS KVM type defintition
+ target/mips: Fix PageMask with variable page size
+ target/mips: Add loongson-ext lswc2 group of instructions (Part 1)
+ target/mips: Add loongson-ext lswc2 group of instructions (Part 2)
+ target/mips: Add loongson-ext lsdc2 group of instructions
+ hw/mips: Implement fw_cfg_arch_key_name()
+ hw/mips: Add Loongson-3 machine support
+ docs/system: Update MIPS machine documentation
+
+Signed-off-by: Huacai Chen <chenhc@lemote.com>
+---
+ default-configs/mips64el-softmmu.mak |   1 +
+ docs/system/cpu-models-mips.rst.inc  |  10 +-
+ docs/system/target-mips.rst          |  10 +
+ hw/mips/Kconfig                      |  12 +
+ hw/mips/fw_cfg.c                     |  35 ++
+ hw/mips/fw_cfg.h                     |  19 ++
+ hw/mips/loongson3_bootp.c            | 162 +++++++++
+ hw/mips/loongson3_bootp.h            | 225 +++++++++++++
+ hw/mips/loongson3_virt.c             | 615 +++++++++++++++++++++++++++++++++++
+ hw/mips/meson.build                  |   3 +-
+ linux-headers/linux/kvm.h            |   5 +-
+ target/mips/cp0_helper.c             |  36 +-
+ target/mips/cpu.h                    |   1 +
+ target/mips/translate.c              | 443 +++++++++++++++++++++++++
+ 14 files changed, 1565 insertions(+), 12 deletions(-)
+ create mode 100644 hw/mips/fw_cfg.c
+ create mode 100644 hw/mips/fw_cfg.h
+ create mode 100644 hw/mips/loongson3_bootp.c
+ create mode 100644 hw/mips/loongson3_bootp.h
+ create mode 100644 hw/mips/loongson3_virt.c
+--
+2.7.0
 
