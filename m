@@ -2,91 +2,95 @@ Return-Path: <SRS0=Z1O7=DF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 900EDC4741F
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 09:33:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51F55C4727F
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 09:37:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30D0A221E8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 09:33:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A026B21D95
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 09:37:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JFgD6xKX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30D0A221E8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nuviainc-com.20150623.gappssmtp.com header.i=@nuviainc-com.20150623.gappssmtp.com header.b="NOm68y4G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A026B21D95
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nuviainc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMpXe-0003Io-6Z
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 05:33:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50276)
+	id 1kMpaf-00069l-LA
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 05:37:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51620)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kMpUw-0000xN-Sk
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 05:31:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60209)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kMpUv-0004OI-4v
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 05:31:06 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601285464;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=qjFSxgGPc4uJspVv/nn4QjkKEB+bvI8NQqu3idIZa3k=;
- b=JFgD6xKXr7GVNvlEwE+Wsr4LzoYWFnfPy26LUbdh3P7jsDfTLbNe7XZXyYJaKPUL/fbETw
- jOvhJpFWUp0XNPKlQvdqr40FarRpSjGyMwHghpV2bF/TVmhWkLEgXsIYT43w/7Zf1GS/Ug
- OZMkqc3wRpRuvk8oBTvC3Vb1m0fxqWY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-271-vXZOCL4FPOWoSlps0vhwig-1; Mon, 28 Sep 2020 05:31:01 -0400
-X-MC-Unique: vXZOCL4FPOWoSlps0vhwig-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 139BC1091067;
- Mon, 28 Sep 2020 09:31:00 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-70.ams2.redhat.com
- [10.36.112.70])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9E4FD6715F;
- Mon, 28 Sep 2020 09:30:56 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 24992113865F; Mon, 28 Sep 2020 11:30:55 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH v7 00/13] monitor: Optionally run handlers in coroutines
-References: <20200909151149.490589-1-kwolf@redhat.com>
- <20200910132439.GE45048@stefanha-x1.localdomain>
- <20200925171541.GK5731@linux.fritz.box>
-Date: Mon, 28 Sep 2020 11:30:55 +0200
-In-Reply-To: <20200925171541.GK5731@linux.fritz.box> (Kevin Wolf's message of
- "Fri, 25 Sep 2020 19:15:41 +0200")
-Message-ID: <87zh5ajlio.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <graeme@nuviainc.com>)
+ id 1kMpZe-0005aq-DY
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 05:35:58 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37462)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <graeme@nuviainc.com>)
+ id 1kMpZb-00052R-Sv
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 05:35:58 -0400
+Received: by mail-wm1-x343.google.com with SMTP id a9so411772wmm.2
+ for <qemu-devel@nongnu.org>; Mon, 28 Sep 2020 02:35:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=nuviainc-com.20150623.gappssmtp.com; s=20150623;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:content-transfer-encoding:in-reply-to;
+ bh=ynyAuloBqMxpWXLnS0x1CRYgjLxv7glQL157MRYGbaQ=;
+ b=NOm68y4GdOW95blTIQOEA3PlCVuKuVXVjrKBDXAbxFjkC7fgtvoxvgRK2DeuGk3dJx
+ vKJcauN1XSCD7BLZv/H4dlw2UQ8Zqpm0kx5m5/tk7RC31JkmbYBhulp372x7e4fxXqSA
+ D1BiAS9UHDx9UPtoIb17zkfcyWniYZOf1QA5dmRtof6VG3Z/ueIkcRBoCs+ZNjz0R8zk
+ oP343K+HiO46/LmGCESPKE69Y2+a1xF+ebx884SU8lYvtSbrKb02bbUWG588CtHMIyxH
+ KieOIFuPzAJ8p7WY5moIx163tHSxHHEF/GTu5vNjpNMmkdHCVdo7VP0LwKEYXvEwMSNM
+ syBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=ynyAuloBqMxpWXLnS0x1CRYgjLxv7glQL157MRYGbaQ=;
+ b=tiJIeP/UXP32csErpn9p5xzSpR3AFK+z0yrFXcIKgVWou5554RLTiXNHxtg5nlhwrN
+ ms6gxxf5v9FhMvUEG90Y3D6vRjnpiMFJ0LVTrpUqSmWi3VhP5mJe3qB4Qt3yazayqvtS
+ dangLDPZD9OZ+Pdl/sxQZCq3a+vUpfr9OoplkIzGJ9offH5l6aGeejVyyNAl4bhEfI/B
+ 6R0a2b/HBJZF0Ha2dhHl/VJGgHd5Rg+1CMtie//SouvHUi8C3hU2VVYHhrhPXbopIqDd
+ pGrckYsqf8VTlwn5EdzP93HKjvP5oZ/xhvAZerw89jhwn91yF2Sj25lPeh9VTDPgcvUE
+ zwtg==
+X-Gm-Message-State: AOAM531V4GCe7VKbucOZSYGG6WSjDpPvb4ld9bdN9GFIoBYt/5H9UYdd
+ zW7uXtCF0N8SFMQF4591onSEUQ==
+X-Google-Smtp-Source: ABdhPJxujOKGhgndeeleUHszQoLOrCfkJ/3Hvd9F9W+vJezWEA3CL0ZPdZysVuunxFesYXnzl1wg6w==
+X-Received: by 2002:a7b:c090:: with SMTP id r16mr734026wmh.56.1601285753984;
+ Mon, 28 Sep 2020 02:35:53 -0700 (PDT)
+Received: from xora-monster ([2a02:8010:64d6::1d89])
+ by smtp.gmail.com with ESMTPSA id d13sm672886wrp.44.2020.09.28.02.35.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 28 Sep 2020 02:35:53 -0700 (PDT)
+Date: Mon, 28 Sep 2020 10:35:50 +0100
+From: Graeme Gregory <graeme@nuviainc.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PATCH] hw/arm/sbsa-ref : Fix SMMUv3 Initialisation
+Message-ID: <20200928093550.epbudrvdk2v47bct@xora-monster>
+References: <20200925133902.28349-1-graeme@nuviainc.com>
+ <f67b75fe-c5ce-8b95-e19b-fc4ce2217b31@redhat.com>
+ <e548848c-75ac-e82e-f40d-7c1ae70a6e02@amsat.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 03:29:35
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -36
-X-Spam_score: -3.7
-X-Spam_bar: ---
-X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.576,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e548848c-75ac-e82e-f40d-7c1ae70a6e02@amsat.org>
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=graeme@nuviainc.com; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,85 +103,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, armbru@redhat.com, dgilbert@redhat.com,
- qemu-devel@nongnu.org, marcandre.lureau@gmail.com,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: peter.maydell@linaro.org, jamie@nuviainc.com, rad@semihalf.com,
+ qemu-devel@nongnu.org, Auger Eric <eric.auger@redhat.com>, qemu-arm@nongnu.org,
+ leif@nuviainc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kevin Wolf <kwolf@redhat.com> writes:
+On Sat, Sep 26, 2020 at 09:45:24AM +0200, Philippe Mathieu-Daudé wrote:
+> Hi Gregory,
+> 
+> On 9/25/20 4:00 PM, Auger Eric wrote:
+> > Hi Gregory,
+> > 
+> > On 9/25/20 3:39 PM, Graeme Gregory wrote:
+> >> SMMUv3 has an error in previous patch where a i was transposed to a 1
+> >> meaning interrupts would not have been correctly assigned to the SMMUv3
+> >> instance.
+> 
+> This is a first issue, fixing 48ba18e6d3f3.
+> 
+> >>
+> >> The code also contained an error in that the IRQs were never allocated
+> >> in the irqmap.
+> 
+> This is another issue, not well explained. IIUC IRQs *are* allocated as
+> IRQ #0, right?
+> 
+> This fixes commit e9fdf453240 ("hw/arm: Add arm SBSA reference machine,
+> devices part"). Can you split this in another patch please? Eventually
+> Cc'ing qemu-stable@nongnu.org as suggested by Peter.
+> 
 
-> Am 10.09.2020 um 15:24 hat Stefan Hajnoczi geschrieben:
->> On Wed, Sep 09, 2020 at 05:11:36PM +0200, Kevin Wolf wrote:
->> > Some QMP command handlers can block the main loop for a relatively lon=
-g
->> > time, for example because they perform some I/O. This is quite nasty.
->> > Allowing such handlers to run in a coroutine where they can yield (and
->> > therefore release the BQL) while waiting for an event such as I/O
->> > completion solves the problem.
->> >=20
->> > This series adds the infrastructure to allow this and switches
->> > block_resize to run in a coroutine as a first example.
->> >=20
->> > This is an alternative solution to Marc-Andr=C3=A9's "monitor: add
->> > asynchronous command type" series.
->>=20
->> Please clarify the following in the QAPI documentation:
->>  * Is the QMP monitor suspended while the command is pending?
->
-> Suspended as in monitor_suspend()? No.
+Ok I will split and issue v2 ASAP
 
-A suspended monitor doesn't read monitor input.
+Thanks
 
-We suspend
+Graeme
 
-* a QMP monitor while the request queue is full
-
-* an HMP monitor while it executes a command
-
-* a multiplexed HMP monitor while the "mux-focus" is elsewhere
-
-* an HMP monitor when it executes command "quit", forever
-
-* an HMP monitor while it executes command "migrate" without -d
-
-Let me explain the first item in a bit more detail.  Before OOB, a QMP
-monitor was also suspended while it executed a command.  To make OOB
-work, we moved the QMP monitors to an I/O thread and added a request
-queue, drained by the main loop.  QMP monitors continue to read
-commands, execute right away if OOB, else queue, suspend when queue gets
-full, resume when it gets non-full.
-
-The "run command in coroutine context" feature does not affect any of
-this.
-
-qapi-code-gen.txt does not talk about monitor suspension at all.  It's
-instead discussed in qmp-spec.txt section 2.3.1 Out-of-band execution.
-
-Stefan, what would you like us to clarify, and where?
-
->>  * Are QMP events reported while the command is pending?
->
-> Hm, I don't know to be honest. But I think so.
-
-Yes, events should be reported while a command is being executed.
-
-Sending events takes locks.  Their critical sections are all
-short-lived.  Another possible delay is the underlying character device
-failing the send with EAGAIN.  That's all.
-
-Fine print: qapi_event_emit() takes @monitor_lock.  It sends to each QMP
-monitor with qmp_send_response(), which uses monitor_puts(), which takes
-the monitor's @mon_lock.
-
-The "run command in coroutine context" feature does not affect any of
-this.
-
-> Does it matter, though? I don't think events have a defined order
-> compared to command results, and the client can't respond to the event
-> anyway until the current command has completed.
-
-Stefan, what would you like us to clarify, and where?
-
+> >>
+> >> Fixes: 48ba18e6d3f3 ("hw/arm/sbsa-ref: Simplify by moving the gic in the machine state")
+> >> Signed-off-by: Graeme Gregory <graeme@nuviainc.com>
+> > Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> > 
+> > Thanks
+> > 
+> > Eric
+> > 
+> >> ---
+> >>  hw/arm/sbsa-ref.c | 3 ++-
+> >>  1 file changed, 2 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
+> >> index 257ada9425..9109fb58be 100644
+> >> --- a/hw/arm/sbsa-ref.c
+> >> +++ b/hw/arm/sbsa-ref.c
+> >> @@ -138,6 +138,7 @@ static const int sbsa_ref_irqmap[] = {
+> >>      [SBSA_SECURE_UART_MM] = 9,
+> >>      [SBSA_AHCI] = 10,
+> >>      [SBSA_EHCI] = 11,
+> >> +    [SBSA_SMMU] = 12, /* ... to 15 */
+> >>  };
+> >>  
+> >>  static uint64_t sbsa_ref_cpu_mp_affinity(SBSAMachineState *sms, int idx)
+> >> @@ -530,7 +531,7 @@ static void create_smmu(const SBSAMachineState *sms, PCIBus *bus)
+> >>      sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
+> >>      for (i = 0; i < NUM_SMMU_IRQS; i++) {
+> >>          sysbus_connect_irq(SYS_BUS_DEVICE(dev), i,
+> >> -                           qdev_get_gpio_in(sms->gic, irq + 1));
+> >> +                           qdev_get_gpio_in(sms->gic, irq + i));
+> 
+> BTW this fix is already in Peter's queue:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg732819.html
+> 
+> Thanks,
+> 
+> Phil.
+> 
+> >>      }
+> >>  }
+> >>  
+> >>
+> > 
+> 
 
