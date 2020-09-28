@@ -6,79 +6,95 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D93FC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 12:09:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE1A1C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 12:10:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E21420774
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 12:09:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D01320774
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 12:10:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="vsV8nY7I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E21420774
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HuS2CRsO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D01320774
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMryD-0001bd-AB
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 08:09:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43740)
+	id 1kMrz6-0002c8-4Y
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 08:10:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43984)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lekiravi@yandex-team.ru>)
- id 1kMrwu-00018T-DF
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 08:08:08 -0400
-Received: from forwardcorp1o.mail.yandex.net ([2a02:6b8:0:1a2d::193]:36006)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lekiravi@yandex-team.ru>)
- id 1kMrwp-00028v-HT
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 08:08:07 -0400
-Received: from sas1-5717c3cea310.qloud-c.yandex.net
- (sas1-5717c3cea310.qloud-c.yandex.net
- [IPv6:2a02:6b8:c14:3616:0:640:5717:c3ce])
- by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 27AF12E14F5;
- Mon, 28 Sep 2020 15:07:58 +0300 (MSK)
-Received: from localhost (localhost [::1])
- by sas1-5717c3cea310.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id
- qaNmDTLtwA-7vweCksx; Mon, 28 Sep 2020 15:07:58 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1601294878; bh=TFeXi1yU/KhtkMoxsA6GIFFOCOLN9YqLHbiZxNk4mmU=;
- h=References:Date:Message-Id:Cc:Subject:To:From;
- b=vsV8nY7IqPhMgN1pPys5gnzMEWvxQ4KbIoYrMXZphLLe3N6wHX0XZ49HAvV51Kzw3
- Nd2H7WPEVhw6SQEMUL7e7IXDshOHu4ZpdnKLaoe05+U2BbSv3lJujRLZvUCvoD9y/r
- azzBmenRks9mrhhfNB0dlUEONsEHdY/oK+yiPD28=
-Authentication-Results: sas1-5717c3cea310.qloud-c.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-X-Yandex-Sender-Uid: 1120000000161690
-Received: by sas1-841c59a7ad31.qloud-c.yandex.net with HTTP;
- Mon, 28 Sep 2020 15:07:57 +0300
-From: Alexey Kirillov <lekiravi@yandex-team.ru>
-To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>
-References: <20200921191912.105305-1-lekiravi@yandex-team.ru>
- <f5c36663-0845-c9fa-1e3b-636aef2ccd4a@yandex-team.ru>
-Subject: Re: [PATCH v4 0/4] Introducing QMP query-netdev command
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kMry4-0001kL-7X
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 08:09:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44063)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kMry2-0002EX-0U
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 08:09:19 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601294956;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=e01QiacAf9ds8/1M4IWX6n2VQBFRcWDinqdCXPD8zJs=;
+ b=HuS2CRsO5uDxDcnXAngKFttK4TFkcAU62XJnyFT/MlQ1uIBM0v7yr2wQ6w923P9yKwOrdI
+ R9DkWZW/n23VYKN/Z0gMTyhu6Zr0Q+pAg6KEiG4UCyhUdKlWHrFjX/mzYu9nJcvRiOKv+Y
+ XRANXCiT91tbIa147gQunYoXzceG1Ys=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-213-hnFD_IzGOHqNNnrnNCW0WA-1; Mon, 28 Sep 2020 08:09:15 -0400
+X-MC-Unique: hnFD_IzGOHqNNnrnNCW0WA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ACD86E77A;
+ Mon, 28 Sep 2020 12:09:13 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-70.ams2.redhat.com
+ [10.36.112.70])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 79D8F5C1A3;
+ Mon, 28 Sep 2020 12:09:13 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 2B90F113865F; Mon, 28 Sep 2020 14:09:12 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH v2 28/38] qapi/gen.py: update write() to be more idiomatic
+References: <20200922210101.4081073-1-jsnow@redhat.com>
+ <20200922210101.4081073-29-jsnow@redhat.com>
+ <20200923152624.GO3312949@habkost.net>
+ <c0b8ed9e-c66a-a6fa-43e1-c3c61581d928@redhat.com>
+ <20200924155959.GC191229@localhost.localdomain>
+ <87r1qqro8i.fsf@dusky.pond.sub.org>
+ <20200925132458.GJ2178035@redhat.com>
+ <874knmq7yg.fsf@dusky.pond.sub.org>
+ <ee3b6aca-2e2d-c562-6b3e-e9344682694b@redhat.com>
+Date: Mon, 28 Sep 2020 14:09:12 +0200
+In-Reply-To: <ee3b6aca-2e2d-c562-6b3e-e9344682694b@redhat.com> (Eric Blake's
+ message of "Fri, 25 Sep 2020 10:47:18 -0500")
+Message-ID: <87y2kugl1z.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-X-Mailer: Yamail [ http://yandex.ru ] 5.0
-Date: Mon, 28 Sep 2020 15:07:57 +0300
-Message-Id: <65531601293775@mail.yandex-team.ru>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset=utf-8
-Received-SPF: pass client-ip=2a02:6b8:0:1a2d::193;
- envelope-from=lekiravi@yandex-team.ru; helo=forwardcorp1o.mail.yandex.net
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 03:29:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,116 +103,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Stefan Weil <sw@weilnetz.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Vincenzo Maffione <v.maffione@gmail.com>,
- "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping
+Eric Blake <eblake@redhat.com> writes:
 
-21.09.2020 22:19, Alexey Kirillov writes:
-> This patch series introduces a new QMP command "query-netdev" to get
-> information about currently attached backend network devices (netdevs).
-> Also, since the "info_str" field of "NetClientState" is now deprecated,
-> we no longer use it for netdevs, only for NIC/hubports.
-> The HMP command "info network" now also uses the new QMP command inside.
+> On 9/25/20 8:52 AM, Markus Armbruster wrote:
 >
-> Usage example:
+>>>> This was my best attempt to open the file read/write, creating it if it
+>>>> doesn't exist.
+>>>>
+>>>> Plain
+>>>>
+>>>>          f = open(pathname, "r+", encoding='utf-8')
+>>>>
+>>>> fails instead of creates, and
+>>>>
+>>>>          f = open(pathname, "w+", encoding='utf-8')
+>>>>
+>>>> truncates.
+>>>>
+>>>> If you know a better way, tell me!
+>>>
+>>> IIUC, you need  "a+" as the mode, rather than "w+"
+>> Sure this lets me do
+>>              f.seek(0)
+>>              f.truncate(0)
+>>              f.write(text)
+>> to overwrite the old contents on all systems?
 >
-> -> { "execute": "query-netdev" }
-> <- { "return": [
->          {
->              "listen": "127.0.0.1:90",
->              "type": "socket",
->              "peer-id": "hub0port1",
->              "id": "__org.qemu.net1"
->          },
->          {
->              "script": "/etc/qemu-ifup",
->              "downscript": "/etc/qemu-ifdown",
->              "ifname": "tap0",
->              "type": "tap",
->              "peer-id": "net5",
->              "vnet_hdr": true,
->              "id": "tap0"
->          },
->          {
->              "ipv6": true,
->              "ipv4": true,
->              "host": "10.0.2.2",
->              "ipv6-dns": "fec0::3",
->              "ipv6-prefix": "fec0::",
->              "net": "10.0.2.0/255.255.255.0",
->              "ipv6-host": "fec0::2",
->              "type": "user",
->              "peer-id": "net0",
->              "dns": "10.0.2.3",
->              "hostfwd": [
->                  {
->                      "str": "tcp::20004-:22"
->                  }
->              ],
->              "ipv6-prefixlen": 64,
->              "id": "netdev0",
->              "restrict": false
->          }
->      ]
->    }
->
-> v3->v4:
-> - Rename "query-netdevs" to "query-netdev".
-> - Copy netdev drivers to new QAPI enum "NetBackend".
->
-> v2->v3:
-> - Remove NIC and hubports from query-netdevs.
-> - Remove several fields from NetdevInfo since they are unnecessary.
-> - Rename field @peer to @peer-id.
-> - Add support of vhost-vdpa.
-> - Keep "info_str" for NIC/hubports, but remove it for netdevs.
->
-> v1->v2:
-> - Rewrite HMP "info network" to get information from results of QMP command.
-> - Remove obsolete field "info_str" from "NetClientState".
->
-> Alexey Kirillov (4):
->  qapi: net: Add query-netdev command
->  tests: Add tests for query-netdev command
->  hmp: Use QMP query-netdev in hmp_info_network
->  net: Do not use legacy info_str for backends
->
->  include/net/net.h              |  4 +-
->  net/clients.h                  |  1 +
->  net/hub.c                      |  4 +-
->  net/hub.h                      |  2 +-
->  net/l2tpv3.c                    |  21 +++-
->  net/net.c                      | 213 +++++++++++++++++++++++++++++++-
->  net/netmap.c                    |  13 ++
->  net/slirp.c                    | 128 ++++++++++++++++++-
->  net/socket.c                    |  91 ++++++++++----
->  net/tap-win32.c                |  10 +-
->  net/tap.c                      | 107 ++++++++++++++--
->  net/vde.c                      |  39 +++++-
->  net/vhost-user.c                |  20 ++-
->  net/vhost-vdpa.c                |  15 ++-
->  qapi/net.json                  |  80 ++++++++++++
->  tests/qtest/meson.build        |  3 +
->  tests/qtest/test-query-netdev.c | 115 +++++++++++++++++
->  17 files changed, 807 insertions(+), 59 deletions(-)
->  create mode 100644 tests/qtest/test-query-netdev.c
->
-> --
-> 2.25.1
+> As long as you do a single pass over the output (you issue a stream of
+> f.write() after the truncate, but never a seek), then this will work.
 
-P.S. Sorry for double-ping (first message was with "Content-Type: text/html", my mistake).
+Well, I do seek(), right before the truncate.
 
--- 
-Alexey Kirillov
-Yandex.Cloud
+>> Documentation cautions:
+>>      [...] 'a' for appending (which on some Unix systems, means that
+>> all
+>>      writes append to the end of the file regardless of the current seek
+>>      position).
+>
+> Yes, that means that random access is impossible on such a stream.
+> But not all file creation patterns require random access.
+
+To be honest, I still prefer the code I wrote, because there the reader
+only wonders why I didn't just open(), while here we get to argue about
+subtleties of mode "a+".
 
 
