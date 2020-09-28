@@ -2,99 +2,71 @@ Return-Path: <SRS0=Z1O7=DF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCF3DC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 20:34:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8A8FC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 20:35:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30AFC2080A
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 20:34:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M2U9KaA+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30AFC2080A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 579E82080A
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 20:35:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 579E82080A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMzqr-0000Bs-Rz
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 16:34:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42052)
+	id 1kMzrZ-0001K2-AY
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 16:35:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42108)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <wrampazz@redhat.com>)
- id 1kMzq8-0007hW-WD
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 16:33:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57363)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <wrampazz@redhat.com>)
- id 1kMzq6-0002Dt-0g
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 16:33:40 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601325214;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=vPz6APpWCoxl1UibsooudA0bCD57PzP7LngryeyzQ/k=;
- b=M2U9KaA+X8t3nt6qNruduPZJXOXdj40avKfnByz8D0P/25jUf1Ze29LWG9YV1uodH7UU8L
- FMRTThkHRRUyxrYbaIaH8//A4QKkEHRUmCRL/S031O4cXyoRALoeEmI8jZjALhFJXEwfXG
- bAODFgYAk15bhbFuRQhfy45LclRD9DM=
-Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com
- [209.85.217.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-135-0PXG0Ss4PIacoHfrmebDwA-1; Mon, 28 Sep 2020 16:33:29 -0400
-X-MC-Unique: 0PXG0Ss4PIacoHfrmebDwA-1
-Received: by mail-vs1-f71.google.com with SMTP id d21so817863vsf.16
- for <qemu-devel@nongnu.org>; Mon, 28 Sep 2020 13:33:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=vPz6APpWCoxl1UibsooudA0bCD57PzP7LngryeyzQ/k=;
- b=fuQGNBWoigJ4D/tTQRDSZrApb/mrc6P1wwfgVKHhd/0juJE15kYmdF1rrhheFkwEaB
- Lop8VViA+B2N2NF7rF1BP09PnSiGvzizDDtx4iWzEzarr7h0ArNitR8fuXSawIAP8EKG
- Wzv/MwCgJCpquWPitk5Km517b9uiKOemAfUdDI2xgkX7IEljEd7wwohSMIcx6RUBwUuJ
- nYK4FgzVfeqq+n/bAl4zxqnZJ7/Lk6bZ+Y5WATnbCGP8TF3Rt82rl5dJxWRl46yaJreE
- 1rC2nHCWZG1voTXjeVQPuwq547Tyx+Nt9kcr6zFkfn+pmR/E1BZOSjtNhwuA56wqgHsz
- 2iKA==
-X-Gm-Message-State: AOAM530XlohhZ2aIa/2L2boa5hpIDw3STiScMUMz6V7hg7+o9EHP4hMx
- f4vHJ+CPpQf9JtO7WDDQNk9Dld3ABw3+jENheTzo+yy9V7ZSWeh4ZJ4OG+4NoIUNqxFSlQZFdNY
- Q+sOa/t3GHSnlOE/W2NRVAa0UT22mo9k=
-X-Received: by 2002:a1f:1e04:: with SMTP id e4mr839711vke.11.1601325208369;
- Mon, 28 Sep 2020 13:33:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyCNv8Kl6NNjrWnlPX9ogm25Eh6g5oAhVucdmw178jIuCFWnL1qNNh7nzgNcSgRV8P6KIQSI9fj6QTBzKOsQSc=
-X-Received: by 2002:a1f:1e04:: with SMTP id e4mr839694vke.11.1601325208047;
- Mon, 28 Sep 2020 13:33:28 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kMzqP-000875-O2; Mon, 28 Sep 2020 16:33:57 -0400
+Resent-Date: Mon, 28 Sep 2020 16:33:57 -0400
+Resent-Message-Id: <E1kMzqP-000875-O2@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21702)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kMzqM-0002EZ-FZ; Mon, 28 Sep 2020 16:33:57 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1601325211; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=UNs1H/qdVbyaLP0B9psoepEtr2Jj6Dmz5zspIe5En52o/w02/6kP4wlFUpp3DpNnVOm/HFSqOeSACWYJBvK32zIYh8rYU1jm8JpUI+N/k836UbtqBR1k/E9Wtz7kphb3mslczVz9j1N0xJDoux7Fgmv7xUta2NeKb9YdtOSijH4=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1601325211;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=mLr37FDY3YDx1X5PzBrWh12PqZLwNiOylHPT/w7nvRw=; 
+ b=IpDhBeWlx3qWDk2Y+JLYh2ev/9nD8/lNyZjTnA59gnf/9WwqOrKQW8dtq1Bx8zKPoGQRcop7YKoUYCS+sBosDhK9YSOP8LsBZH9I/HY+GsavYfKxYfFXugfjOArLIUQXKRDjbCZHRyUEr+OLzx8/kgyu67+yjhuGK8VLByes1fY=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 160132521072659.93211959348912;
+ Mon, 28 Sep 2020 13:33:30 -0700 (PDT)
+Subject: Re: [PATCH v9 0/9] Apply COR-filter to the block-stream permanently
+Message-ID: <160132520866.11341.5214779024425803660@66eaa9a8a123>
+In-Reply-To: <1601298001-774096-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 MIME-Version: 1.0
-References: <20200928171539.788309-1-f4bug@amsat.org>
- <20200928171539.788309-17-f4bug@amsat.org>
-In-Reply-To: <20200928171539.788309-17-f4bug@amsat.org>
-From: Willian Rampazzo <wrampazz@redhat.com>
-Date: Mon, 28 Sep 2020 17:33:17 -0300
-Message-ID: <CAKJDGDbowgUtu8Ap7K6vm_sksW3-maHU0bk3uib7BNY-5YxMdQ@mail.gmail.com>
-Subject: Re: [PATCH 16/16] tests/acceptance: Test the MIPSsim machine
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=wrampazz@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=wrampazz@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 03:29:35
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: qemu-devel@nongnu.org
+Date: Mon, 28 Sep 2020 13:33:30 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 16:33:51
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -24
+X-Spam_score: -2.5
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.614, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,168 +79,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>,
- Huacai Chen <zltjiangshi@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Paul Burton <paulburton@kernel.org>,
- Thomas Huth <huth@tuxfamily.org>, qemu-devel <qemu-devel@nongnu.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Cleber Rosa <crosa@redhat.com>, Huacai Chen <chenhc@lemote.com>,
- "Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
+ qemu-block@nongnu.org, armbru@redhat.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com, stefanha@redhat.com, andrey.shinkevich@virtuozzo.com,
+ den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 28, 2020 at 2:31 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
->
-> Add a test for the mipssim machine, based on the recommended
-> test setup from Thomas Huth:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg606846.html
->
-> The test is quick and can be run as:
->
->   $ avocado --show=3Dconsole run -t machine:mipssim tests/acceptance/
->    (1/1) tests/acceptance/machine_mips_mipssim.py:MipsSimMachine.test_mip=
-ssim_linux_console:
->   console: Linux version 3.6.11 (root@711bb8ba16a7) (gcc version 4.8.3 (B=
-uildroot 2014.11) ) #2 Sun Sep 27 13:39:35 UTC 2020
->   console: Setting default memory size 0x02000000
->   console: bootconsole [early0] enabled
->   console: CPU revision is: 00019300 (MIPS 24Kc)
->   console: FPU revision is: 00739300
->   ...
->   console: CPU frequency 12.00 MHz
->   console: Calibrating delay loop... 950.27 BogoMIPS (lpj=3D4751360)
->   ...
->   console: MIPSNet Ethernet driver. Version: 2007-11-17. (c)2005 MIPS Tec=
-hnologies, Inc.
->   ...
->   console: Welcome to Buildroot
->   console: buildroot login: root
->   console: # root
->   console: -sh: root: not found
->   console: # ping -c 3 10.0.2.2
->   console: PING 10.0.2.2 (10.0.2.2): 56 data bytes
->   console: 64 bytes from 10.0.2.2: seq=3D0 ttl=3D255 time=3D48.231 ms
->   console: 64 bytes from 10.0.2.2: seq=3D1 ttl=3D255 time=3D9.407 ms
->   console: 64 bytes from 10.0.2.2: seq=3D2 ttl=3D255 time=3D2.298 ms
->   console: --- 10.0.2.2 ping statistics ---
->   console: 3 packets transmitted, 3 packets received, 0% packet loss
->   PASS (7.99 s)
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
-> Cc: Thomas Huth <huth@tuxfamily.org>
-> ---
->  MAINTAINERS                              |  1 +
->  tests/acceptance/machine_mips_mipssim.py | 56 ++++++++++++++++++++++++
->  2 files changed, 57 insertions(+)
->  create mode 100644 tests/acceptance/machine_mips_mipssim.py
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 5eed1e692b4..17d8a012b0e 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -240,6 +240,7 @@ F: include/hw/misc/mips_*
->  F: include/hw/timer/mips_gictimer.h
->  F: tests/acceptance/linux_ssh_mips_malta.py
->  F: tests/acceptance/machine_mips_malta.py
-> +F: tests/acceptance/machine_mips_mipssim.py
->  F: tests/tcg/mips/
->  K: ^Subject:.*(?i)mips
->
-> diff --git a/tests/acceptance/machine_mips_mipssim.py b/tests/acceptance/=
-machine_mips_mipssim.py
-> new file mode 100644
-> index 00000000000..b2749917b08
-> --- /dev/null
-> +++ b/tests/acceptance/machine_mips_mipssim.py
-> @@ -0,0 +1,56 @@
-> +# Functional tests for the MIPS simulator (MIPSsim machine)
-> +#
-> +# Copyright (c) 2020 Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> +#
-> +# This work is licensed under the terms of the GNU GPL, version 2 or lat=
-er.
-> +# See the COPYING file in the top-level directory.
-> +#
-> +# SPDX-License-Identifier: GPL-2.0-or-later
-> +
-> +import os
-> +import logging
-> +import time
-> +
-> +from avocado import skipUnless
-> +from avocado_qemu import Test
-> +from avocado_qemu import exec_command_and_wait_for_pattern
-> +from avocado_qemu import interrupt_interactive_console_until_pattern
-> +from avocado_qemu import wait_for_console_pattern
-> +
-> +class MipsSimMachine(Test):
-> +
-> +    timeout =3D 30
-> +    KERNEL_COMMON_COMMAND_LINE =3D 'printk.time=3D0 '
-> +
-> +    @skipUnless(os.getenv('AVOCADO_ALLOW_UNTRUSTED_CODE'), 'untrusted co=
-de')
-> +    def test_mipssim_linux_console(self):
-> +        """
-> +        Boots the Linux kernel and checks that the console is operationa=
-l
-> +        :avocado: tags=3Darch:mipsel
-> +        :avocado: tags=3Dmachine:mipssim
-> +        :avocado: tags=3Ddevice:mipsnet
-> +        """
-> +        kernel_url =3D ('https://github.com/philmd/qemu-testing-blob/raw=
-/'
-> +                      '32ea5764e1de8fffa0d59366c44822cd06d7c8e0/'
-> +                      'mips/mipssim/mipsel/vmlinux')
-
-So, are you willing to maintain some images on your GitHub to avoid
-the image changes when they are not found?
-
-> +        kernel_hash =3D '0f9aeca3a2e25b5b0cc4999571f39a7ad58cdc43'
-> +        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
-_hash)
-> +
-> +        initrd_url =3D ('https://github.com/philmd/qemu-testing-blob/raw=
-/'
-> +                      '32ea5764e1de8fffa0d59366c44822cd06d7c8e0/'
-> +                      'mips/mipssim/mipsel/rootfs.cpio')
-> +        initrd_hash =3D 'b20359bdfae66387e5a17d6692686d59c189417b'
-> +        initrd_path =3D self.fetch_asset(initrd_url, asset_hash=3Dinitrd=
-_hash)
-> +
-> +        self.vm.set_console()
-> +        self.vm.add_args('-kernel', kernel_path,
-> +                         '-initrd', initrd_path,
-> +                         '-append', self.KERNEL_COMMON_COMMAND_LINE)
-> +        self.vm.launch()
-> +
-> +        wait_for_console_pattern(self, 'Welcome to Buildroot')
-> +        interrupt_interactive_console_until_pattern(self,
-> +                                                    interrupt_string=3D'=
-root\r',
-> +                                                    success_message=3D'#=
-')
-> +        pattern =3D '3 packets transmitted, 3 packets received, 0% packe=
-t loss'
-> +        exec_command_and_wait_for_pattern(self, 'ping -c 3 10.0.2.2', pa=
-ttern)
-> --
-> 2.26.2
->
->
-
-IMHO, although the solution of spreading images over personal
-repositories is not the best, I don't have a strong opinion to block
-this, so
-
-Reviewed-by: Willian Rampazzo (willianr@redhat.com)
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNjAxMjk4MDAxLTc3NDA5Ni0x
+LWdpdC1zZW5kLWVtYWlsLWFuZHJleS5zaGlua2V2aWNoQHZpcnR1b3p6by5jb20vCgoKCkhpLAoK
+VGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBs
+ZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElm
+IHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0
+CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhIC9iaW4vYmFzaApleHBvcnQg
+QVJDSD14ODZfNjQKbWFrZSBkb2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBt
+YWtlIGRvY2tlci10ZXN0LW1pbmd3QGZlZG9yYSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJ
+UFQgRU5EID09PQoKSG9zdCBtYWNoaW5lIGNwdTogeDg2XzY0ClRhcmdldCBtYWNoaW5lIGNwdSBm
+YW1pbHk6IHg4NgpUYXJnZXQgbWFjaGluZSBjcHU6IHg4Nl82NAouLi9zcmMvbWVzb24uYnVpbGQ6
+MTA6IFdBUk5JTkc6IE1vZHVsZSB1bnN0YWJsZS1rZXl2YWwgaGFzIG5vIGJhY2t3YXJkcyBvciBm
+b3J3YXJkcyBjb21wYXRpYmlsaXR5IGFuZCBtaWdodCBub3QgZXhpc3QgaW4gZnV0dXJlIHJlbGVh
+c2VzLgpQcm9ncmFtIHNoIGZvdW5kOiBZRVMKUHJvZ3JhbSBweXRob24zIGZvdW5kOiBZRVMgKC91
+c3IvYmluL3B5dGhvbjMpCkNvbmZpZ3VyaW5nIG5pbmphdG9vbCB1c2luZyBjb25maWd1cmF0aW9u
+Ci0tLQpDb21waWxpbmcgQyBvYmplY3QgbGliYmxvY2suZmEucC9ibG9ja19ib2Nocy5jLm9iagpD
+b21waWxpbmcgQyBvYmplY3QgbGliYmxvY2suZmEucC9ibG9ja19maWx0ZXItY29tcHJlc3MuYy5v
+YmoKQ29tcGlsaW5nIEMgb2JqZWN0IGxpYmJsb2NrLmZhLnAvYmxvY2tfcWNvdzIuYy5vYmoKLi4v
+c3JjL2Jsb2NrL2NvcHktb24tcmVhZC5jOjI5OjEwOiBmYXRhbCBlcnJvcjogYmxvY2svY29weS1v
+bi1yZWFkLmg6IE5vIHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkKICAgMjkgfCAjaW5jbHVkZSAiYmxv
+Y2svY29weS1vbi1yZWFkLmgiCiAgICAgIHwgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fgpjb21waWxhdGlvbiB0ZXJtaW5hdGVkLgptYWtlOiAqKiogW01ha2VmaWxlLm5pbmphOjg4Nzog
+bGliYmxvY2suZmEucC9ibG9ja19jb3B5LW9uLXJlYWQuYy5vYmpdIEVycm9yIDEKbWFrZTogKioq
+IFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KVHJhY2ViYWNrIChtb3N0IHJlY2VudCBj
+YWxsIGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgNzA5LCBp
+biA8bW9kdWxlPgotLS0KICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQp
+CnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAn
+ZG9ja2VyJywgJ3J1bicsICctLXJtJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVp
+ZD0wMjZkNTFhMjJkODY0OWZmODMxYTlhYjhhOTdmZmZmMCcsICctdScsICcxMDAzJywgJy0tc2Vj
+dXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctZScsICdUQVJHRVRfTElTVD0nLCAn
+LWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAn
+LWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPScsICctZScsICdDQ0FDSEVfRElSPS92YXIv
+dG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2Nh
+Y2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRt
+cC1fNXlpbzN5aC9zcmMvZG9ja2VyLXNyYy4yMDIwLTA5LTI4LTE2LjI4LjU1Ljg0Njk6L3Zhci90
+bXAvcWVtdTp6LHJvJywgJ3FlbXUvZmVkb3JhJywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3Qt
+bWluZ3cnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVy
+PWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9MDI2ZDUxYTIyZDg2NDlmZjgzMWE5YWI4YTk3
+ZmZmZjAKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcg
+ZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtXzV5aW8zeWgvc3JjJwptYWtl
+OiAqKiogW2RvY2tlci1ydW4tdGVzdC1taW5nd0BmZWRvcmFdIEVycm9yIDIKCnJlYWwgICAgNG0z
+My40MzBzCnVzZXIgICAgMG0xOC45NzBzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApo
+dHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8xNjAxMjk4MDAxLTc3NDA5Ni0xLWdpdC1zZW5kLWVtYWls
+LWFuZHJleS5zaGlua2V2aWNoQHZpcnR1b3p6by5jb20vdGVzdGluZy5kb2NrZXItbWluZ3dAZmVk
+b3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQ
+YXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sg
+dG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
