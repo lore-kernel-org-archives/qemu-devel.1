@@ -2,91 +2,58 @@ Return-Path: <SRS0=Z1O7=DF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEF20C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:19:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2859C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:21:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9336F2076D
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:19:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N4QxoJ8L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9336F2076D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 74D7420774
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:21:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74D7420774
+Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMt4A-0008Ry-Cx
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 09:19:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56558)
+	id 1kMt61-0002Wn-Gq
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 09:21:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55758)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kMspn-0007IN-4T
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 09:04:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49171)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kMsph-0000pV-No
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 09:04:50 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601298285;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=j9eXQH222IF4z/5+ryWHdc3O+aVHS/WKifvlWGjCSSU=;
- b=N4QxoJ8LL7stjGrroGOfQr9Fu4B3FZUUc1t2Z+488NfBRXqWxYNlGlfN2AWpnoX0yRdNxM
- gck5cqKadH/ZFZRgw991Z8oRDZpQ6NfxHZyU5xkP28/o3HHADuwZRKLxJuoZjRDoeBy3AQ
- kuW7LU648uVfd125OREOQhUDwu+i5ho=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-245-oGLH_cG3Nf2dXwAWA1JEkQ-1; Mon, 28 Sep 2020 09:04:42 -0400
-X-MC-Unique: oGLH_cG3Nf2dXwAWA1JEkQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C8B73873112;
- Mon, 28 Sep 2020 13:04:41 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-70.ams2.redhat.com
- [10.36.112.70])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 84A9C183AB;
- Mon, 28 Sep 2020 13:04:41 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 0E00C113865F; Mon, 28 Sep 2020 15:04:40 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v6 00/21] Convert QAPI doc comments to generate rST
- instead of texinfo
-References: <20200925162316.21205-1-peter.maydell@linaro.org>
- <160106193961.10465.12078546060105198824@66eaa9a8a123>
- <CAFEAcA8uWY+MCDToz9an+zsrMVrctkBmgpMV82iUR2ZZOgA3Vg@mail.gmail.com>
-Date: Mon, 28 Sep 2020 15:04:40 +0200
-In-Reply-To: <CAFEAcA8uWY+MCDToz9an+zsrMVrctkBmgpMV82iUR2ZZOgA3Vg@mail.gmail.com>
- (Peter Maydell's message of "Fri, 25 Sep 2020 22:37:56 +0100")
-Message-ID: <87h7rif3x3.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 03:29:35
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1kMsn9-0005L9-2C; Mon, 28 Sep 2020 09:02:08 -0400
+Received: from relay.sw.ru ([185.231.240.75]:58840 helo=relay3.sw.ru)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1kMsn7-0000SJ-13; Mon, 28 Sep 2020 09:02:06 -0400
+Received: from [172.16.25.136] (helo=localhost.sw.ru)
+ by relay3.sw.ru with esmtp (Exim 4.94)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1kMsmY-001tba-Fm; Mon, 28 Sep 2020 16:01:30 +0300
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com,
+ stefanha@redhat.com, fam@euphon.net, jsnow@redhat.com, armbru@redhat.com,
+ eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com,
+ andrey.shinkevich@virtuozzo.com
+Subject: [PATCH v9 4/9] copy-on-read: pass base node name to COR driver
+Date: Mon, 28 Sep 2020 15:59:56 +0300
+Message-Id: <1601298001-774096-5-git-send-email-andrey.shinkevich@virtuozzo.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1601298001-774096-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+References: <1601298001-774096-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Received-SPF: pass client-ip=185.231.240.75;
+ envelope-from=andrey.shinkevich@virtuozzo.com; helo=relay3.sw.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 09:00:28
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,44 +66,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+From: Andrey Shinkevich via <qemu-devel@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+To limit the guest's COR operations by the base node in the backing
+chain during stream job, pass the base node name to the copy-on-read
+driver. The rest of the functionality will be implemented in the patch
+that follows.
 
-> On Fri, 25 Sep 2020 at 20:25, <no-reply@patchew.org> wrote:
->
->> In file included from ../src/qapi/qapi-schema.json:78:
->> ../src/qapi/migration.json:1747:1: unexpected de-indent (expected at least 13 spaces)
->
-> This is yet another mis-indented line in a change to the QAPI
-> doc-comments (commit 4c437254b807). It hit master in the
-> latest migration pull after I'd sent out this patchseries
-> but before patchew got round to testing..
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+---
+ block/copy-on-read.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-Obvious fixup for your PATCH 01:
-
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 7d9342c064..7f5e6fd681 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -1744,9 +1744,9 @@
- # Information about current dirty page rate of vm.
- #
- # @dirty-rate: @dirtyrate describing the dirty page rate of vm
--#          in units of MB/s.
--#          If this field returns '-1', it means querying has not
--#          yet started or completed.
-+#              in units of MB/s.
-+#              If this field returns '-1', it means querying has not
-+#              yet started or completed.
- #
- # @status: status containing dirtyrate query status includes
- #          'unstarted' or 'measuring' or 'measured'
-
-Happy to fix it up in my tree.
+diff --git a/block/copy-on-read.c b/block/copy-on-read.c
+index 3c8231f..e04092f 100644
+--- a/block/copy-on-read.c
++++ b/block/copy-on-read.c
+@@ -24,19 +24,23 @@
+ #include "block/block_int.h"
+ #include "qemu/module.h"
+ #include "qapi/error.h"
++#include "qapi/qmp/qerror.h"
+ #include "qapi/qmp/qdict.h"
+ #include "block/copy-on-read.h"
+ 
+ 
+ typedef struct BDRVStateCOR {
+     bool active;
++    BlockDriverState *base_bs;
+ } BDRVStateCOR;
+ 
+ 
+ static int cor_open(BlockDriverState *bs, QDict *options, int flags,
+                     Error **errp)
+ {
++    BlockDriverState *base_bs = NULL;
+     BDRVStateCOR *state = bs->opaque;
++    const char *base_node = qdict_get_try_str(options, "base");
+ 
+     bs->file = bdrv_open_child(NULL, options, "file", bs, &child_of_bds,
+                                BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY,
+@@ -52,7 +56,16 @@ static int cor_open(BlockDriverState *bs, QDict *options, int flags,
+         ((BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_NO_FALLBACK) &
+             bs->file->bs->supported_zero_flags);
+ 
++    if (base_node) {
++        qdict_del(options, "base");
++        base_bs = bdrv_lookup_bs(NULL, base_node, errp);
++        if (!base_bs) {
++            error_setg(errp, QERR_BASE_NOT_FOUND, base_node);
++            return -EINVAL;
++        }
++    }
+     state->active = true;
++    state->base_bs = base_bs;
+ 
+     /*
+      * We don't need to call bdrv_child_refresh_perms() now as the permissions
+-- 
+1.8.3.1
 
 
