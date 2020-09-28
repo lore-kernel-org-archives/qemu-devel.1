@@ -4,80 +4,78 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFDE0C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 19:17:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF544C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 19:19:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC5D220719
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 19:17:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F1FE820719
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 19:19:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ebOx+hg4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC5D220719
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b2KIYqT/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1FE820719
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMyeg-0003Ez-GF
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 15:17:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52982)
+	id 1kMyfq-0004X3-T8
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 15:18:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53388)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kMydA-0002hL-Jl
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 15:16:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59756)
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kMyek-0003h2-Dw
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 15:17:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44968)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kMyd5-00080E-CR
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 15:16:12 -0400
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kMyei-0008HZ-FE
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 15:17:50 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601320565;
+ s=mimecast20190719; t=1601320667;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2htF4tIUalmgiMd+fjvED40Bfau6xvMYt+YoPQciekE=;
- b=ebOx+hg4UIT9uJpYPG3DqXutenPSwW/LinamDoUpS+vKmvOsS+yxefRcRZb4q6NnUkWG4b
- sK3syuy/itFKnjAbKtaHIBEgAfpKOxqwCxGQufx5J3oriDuvthZrNTuExzA+u0Jpcr0iA6
- JzjqTvw4dgK43OE5ftioGoQCB8JantY=
+ bh=V1ga7OFZ/sAzylxOBqjSQ4DGiWMhaTiF3OKIU1qzq7A=;
+ b=b2KIYqT/56JfpGrOfpw4ozEpJIec+0mVWeuCWZzqwUly8urpgHxV+i+ktn19zban5ogOED
+ e3+4enUxFgNo2jRvYrXUM8gvfQ1NtNDk9PKZ61c2pPWjAkwjuUCbUVB0o0dpvS/CBH/7Ph
+ oXmD/j3K3oNYPEACCXi0Lw3EFhvoK6c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-526-5Qw13wmeNdqbktMTDE1-yQ-1; Mon, 28 Sep 2020 15:15:30 -0400
-X-MC-Unique: 5Qw13wmeNdqbktMTDE1-yQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-109-HNxXrqwYN-uSAzjV37nQ6g-1; Mon, 28 Sep 2020 15:17:45 -0400
+X-MC-Unique: HNxXrqwYN-uSAzjV37nQ6g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C34C1084C84;
- Mon, 28 Sep 2020 19:15:29 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-70.ams2.redhat.com
- [10.36.112.70])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F3B95C1BD;
- Mon, 28 Sep 2020 19:15:28 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 2D1AC113865F; Mon, 28 Sep 2020 21:15:27 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v6 05/21] scripts/qapi/parser.py: improve doc comment
- indent handling
-References: <20200925162316.21205-1-peter.maydell@linaro.org>
- <20200925162316.21205-6-peter.maydell@linaro.org>
-Date: Mon, 28 Sep 2020 21:15:27 +0200
-In-Reply-To: <20200925162316.21205-6-peter.maydell@linaro.org> (Peter
- Maydell's message of "Fri, 25 Sep 2020 17:23:00 +0100")
-Message-ID: <874knhbtm8.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A35F8D6443;
+ Mon, 28 Sep 2020 19:17:44 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-113-138.ams2.redhat.com
+ [10.36.113.138])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1190C60DA0;
+ Mon, 28 Sep 2020 19:17:37 +0000 (UTC)
+Subject: Re: [PATCH v6] hw/i386/pc: add max combined fw size as machine
+ configuration option
+To: Erich Mcmillan <erich.mcmillan@hp.com>, qemu-devel@nongnu.org
+References: <20200925175751.4017-1-erich.mcmillan@hp.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <05c27a62-e4b4-94a8-6e5c-a05b988ec809@redhat.com>
+Date: Mon, 28 Sep 2020 21:17:36 +0200
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200925175751.4017-1-erich.mcmillan@hp.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lersek@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=lersek@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 03:47:08
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 03:29:35
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
@@ -98,345 +96,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>
+Cc: imammedo@redhat.com, kraxel@redhat.com, dgilbert@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> Make the handling of indentation in doc comments more sophisticated,
-> so that when we see a section like:
->
-> Notes: some text
->        some more text
->           indented line 3
->
-> we save it for the doc-comment processing code as:
->
-> some text
-> some more text
->    indented line 3
->
-> and when we see a section with the heading on its own line:
->
-> Notes:
->
-> some text
-> some more text
->    indented text
->
-> we also accept that and save it in the same form.
->
-> If we detect that the comment document text is not indented as much
-> as we expect it to be, we throw a parse error.  (We don't complain
-> about over-indented sections, because for rST this can be legitimate
-> markup.)
->
-> The golden reference for the doc comment text is updated to remove
-> the two 'wrong' indents; these now form a test case that we correctly
-> stripped leading whitespace from an indented multi-line argument
-> definition.
->
-> We update the documentation in docs/devel/qapi-code-gen.txt to
-> describe the new indentation rules.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On 09/25/20 19:57, Erich Mcmillan wrote:
+> From: Erich McMillan <erich.mcmillan@hp.com>
+> 
+> At Hewlett Packard Inc. we have a need for increased fw size to enable testing of our custom fw.
+> Move return statement for early return
+> 
+> Signed-off-by: Erich McMillan <erich.mcmillan@hp.com>
 > ---
->  docs/devel/qapi-code-gen.txt          | 23 +++++++
->  scripts/qapi/parser.py                | 93 +++++++++++++++++++++------
->  tests/qapi-schema/doc-bad-indent.err  |  1 +
->  tests/qapi-schema/doc-bad-indent.json |  8 +++
->  tests/qapi-schema/doc-bad-indent.out  |  0
->  tests/qapi-schema/doc-good.out        |  4 +-
->  tests/qapi-schema/meson.build         |  1 +
->  7 files changed, 109 insertions(+), 21 deletions(-)
->  create mode 100644 tests/qapi-schema/doc-bad-indent.err
->  create mode 100644 tests/qapi-schema/doc-bad-indent.json
->  create mode 100644 tests/qapi-schema/doc-bad-indent.out
->
-> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-> index 9eede44350c..69eaffac376 100644
-> --- a/docs/devel/qapi-code-gen.txt
-> +++ b/docs/devel/qapi-code-gen.txt
-> @@ -901,6 +901,22 @@ commands and events), member (for structs and unions), branch (for
->  alternates), or value (for enums), and finally optional tagged
->  sections.
+> 
+> Changes since v5:
+> 
+>      Move return statement for pc_machine_set_max_fw_size() to follow error_setg() as early return.
+> 
+>  hw/i386/pc.c         | 51 ++++++++++++++++++++++++++++++++++++++++++++
+>  hw/i386/pc_sysfw.c   | 13 ++---------
+>  include/hw/i386/pc.h |  2 ++
+>  3 files changed, 55 insertions(+), 11 deletions(-)
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index d11daacc23..70c8c9adcf 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1869,6 +1869,50 @@ static void pc_machine_set_max_ram_below_4g(Object *obj, Visitor *v,
+>      pcms->max_ram_below_4g = value;
+>  }
 >  
-> +Descriptions of arguments can span multiple lines. The description
-> +text can start on the line following the '@argname:', in which case
-> +it must not be indented at all. It can also start on the same line
-> +as the '@argname:'. In this case if it spans multiple lines then
-> +second and subsequent lines must be indented to line up with the
-> +first character of the first line of the description:
-
-Please put two spaces after sentence-ending punctuation, for local
-consistency, and to keep Emacs sentence commands working.
-
-Can touch this up in my tree, of course.
-
+> +static void pc_machine_get_max_fw_size(Object *obj, Visitor *v,
+> +                                       const char *name, void *opaque,
+> +                                       Error **errp)
+> +{
+> +    PCMachineState *pcms = PC_MACHINE(obj);
+> +    uint64_t value = pcms->max_fw_size;
 > +
-> +# @argone:
-> +# This is a two line description
-> +# in the first style.
-> +#
-> +# @argtwo: This is a two line description
-> +#          in the second style.
+> +    visit_type_size(v, name, &value, errp);
+> +}
 > +
-> +The number of spaces between the ':' and the text is not significant.
+> +static void pc_machine_set_max_fw_size(Object *obj, Visitor *v,
+> +                                       const char *name, void *opaque,
+> +                                       Error **errp)
+> +{
+> +    PCMachineState *pcms = PC_MACHINE(obj);
+> +    Error *error = NULL;
+> +    uint64_t value;
 > +
->  FIXME: the parser accepts these things in almost any order.
->  FIXME: union branches should be described, too.
->  
-> @@ -911,6 +927,13 @@ A tagged section starts with one of the following words:
->  "Note:"/"Notes:", "Since:", "Example"/"Examples", "Returns:", "TODO:".
->  The section ends with the start of a new section.
->  
-> +The text of a section can start on a new line, in
-> +which case it must not be indented at all.  It can also start
-> +on the same line as the 'Note:', 'Returns:', etc tag.  In this
-> +case if it spans multiple lines then second and subsequent
-> +lines must be indented to match the first, in the same way as
-> +multiline argument descriptions.
+> +    visit_type_size(v, name, &value, &error);
+> +    if (error) {
+> +        error_propagate(errp, error);
+> +        return;
+> +    }
 > +
->  A 'Since: x.y.z' tagged section lists the release that introduced the
->  definition.
->  
-> diff --git a/scripts/qapi/parser.py b/scripts/qapi/parser.py
-> index 04bf10db378..6c3455b41f3 100644
-> --- a/scripts/qapi/parser.py
-> +++ b/scripts/qapi/parser.py
-> @@ -319,17 +319,32 @@ class QAPIDoc:
->      """
->  
->      class Section:
-> -        def __init__(self, name=None):
-> +        def __init__(self, parser, name=None, indent=0):
-> +            # parser, for error messages about indentation
-> +            self._parser = parser
->              # optional section name (argument/member or section name)
->              self.name = name
->              self.text = ''
-> +            # the expected indent level of the text of this section
-> +            self._indent = indent
->  
->          def append(self, line):
-> +            # Strip leading spaces corresponding to the expected indent level
-> +            # Blank lines are always OK.
-> +            if line:
-> +                indent = re.match(r'\s*', line).end()
-> +                if indent < self._indent:
-> +                    raise QAPIParseError(
-> +                        self._parser,
-> +                        "unexpected de-indent (expected at least %d spaces)" %
-> +                        self._indent)
-> +                line = line[self._indent:]
+> +    /*
+> +    * We don't have a theoretically justifiable exact lower bound on the base
+> +    * address of any flash mapping. In practice, the IO-APIC MMIO range is
+> +    * [0xFEE00000..0xFEE01000] -- see IO_APIC_DEFAULT_ADDRESS --, leaving free
+> +    * only 18MB-4KB below 4G. For now, restrict the cumulative mapping to 8MB in
+> +    * size.
+> +    */
+> +    if (value > 16 * MiB) {
+> +        error_setg(errp,
+> +                   "User specified max allowed firmware size %" PRIu64 " is "
+> +                   "greater than 16MiB. If combined firwmare size exceeds "
+> +                   "16MiB the system may not boot, or experience intermittent"
+> +                   "stability issues.",
+> +                   value);
+> +        return;
+> +    }
 > +
->              self.text += line.rstrip() + '\n'
->  
->      class ArgSection(Section):
-> -        def __init__(self, name):
-> -            super().__init__(name)
-> +        def __init__(self, parser, name, indent=0):
-> +            super().__init__(parser, name, indent)
->              self.member = None
->  
->          def connect(self, member):
-> @@ -343,7 +358,7 @@ class QAPIDoc:
->          self._parser = parser
->          self.info = info
->          self.symbol = None
-> -        self.body = QAPIDoc.Section()
-> +        self.body = QAPIDoc.Section(parser)
->          # dict mapping parameter name to ArgSection
->          self.args = OrderedDict()
->          self.features = OrderedDict()
-> @@ -447,8 +462,21 @@ class QAPIDoc:
->          name = line.split(' ', 1)[0]
->  
->          if name.startswith('@') and name.endswith(':'):
-> -            line = line[len(name)+1:]
-> -            self._start_args_section(name[1:-1])
-> +            # If line is "@arg:   first line of description", find the
-> +            # index of 'f', which is the indent we expect for any
-> +            # following lines. We then remove the leading "@arg:" from line
-
-PEP 8: You should use two spaces after a sentence-ending period in
-multi-sentence comments, except after the final sentence.
-
-More of the same below.  Can touch it up in my tree.
-
-> +            # and replace it with spaces so that 'f' has the same index
-> +            # as it did in the original line and can be handled the same
-> +            # way we will handle following lines.
-> +            indent = re.match(r'@\S*:\s*', line).end()
-> +            line = line[indent:]
-> +            if not line:
-> +                # Line was just the "@arg:" header; following lines
-> +                # are not indented
-> +                indent = 0
-> +            else:
-> +                line = ' ' * indent + line
-> +            self._start_args_section(name[1:-1], indent)
->          elif self._is_section_tag(name):
->              self._append_line = self._append_various_line
->              self._append_various_line(line)
-> @@ -469,8 +497,21 @@ class QAPIDoc:
->          name = line.split(' ', 1)[0]
->  
->          if name.startswith('@') and name.endswith(':'):
-> -            line = line[len(name)+1:]
-> -            self._start_features_section(name[1:-1])
-> +            # If line is "@arg:   first line of description", find the
-> +            # index of 'f', which is the indent we expect for any
-> +            # following lines. We then remove the leading "@arg:" from line
-> +            # and replace it with spaces so that 'f' has the same index
-> +            # as it did in the original line and can be handled the same
-> +            # way we will handle following lines.
-> +            indent = re.match(r'@\S*:\s*', line).end()
-> +            line = line[indent:]
-> +            if not line:
-> +                # Line was just the "@arg:" header; following lines
-> +                # are not indented
-> +                indent = 0
-> +            else:
-> +                line = ' ' * indent + line
-> +            self._start_features_section(name[1:-1], indent)
->          elif self._is_section_tag(name):
->              self._append_line = self._append_various_line
->              self._append_various_line(line)
-> @@ -502,12 +543,25 @@ class QAPIDoc:
->                                   "'%s' can't follow '%s' section"
->                                   % (name, self.sections[0].name))
->          if self._is_section_tag(name):
-> -            line = line[len(name)+1:]
-> -            self._start_section(name[:-1])
-> +            # If line is "Section:   first line of description", find the
-> +            # index of 'f', which is the indent we expect for any
-> +            # following lines. We then remove the leading "Section:" from line
-> +            # and replace it with spaces so that 'f' has the same index
-> +            # as it did in the original line and can be handled the same
-> +            # way we will handle following lines.
-> +            indent = re.match(r'\S*:\s*', line).end()
-> +            line = line[indent:]
-> +            if not line:
-> +                # Line was just the "Section:" header; following lines
-> +                # are not indented
-> +                indent = 0
-> +            else:
-> +                line = ' ' * indent + line
-
-We may want to de-triplicate.  Not today.
-
-> +            self._start_section(name[:-1], indent)
->  
->          self._append_freeform(line)
->  
-> -    def _start_symbol_section(self, symbols_dict, name):
-> +    def _start_symbol_section(self, symbols_dict, name, indent):
->          # FIXME invalid names other than the empty string aren't flagged
->          if not name:
->              raise QAPIParseError(self._parser, "invalid parameter name")
-> @@ -516,21 +570,21 @@ class QAPIDoc:
->                                   "'%s' parameter name duplicated" % name)
->          assert not self.sections
->          self._end_section()
-> -        self._section = QAPIDoc.ArgSection(name)
-> +        self._section = QAPIDoc.ArgSection(self._parser, name, indent)
->          symbols_dict[name] = self._section
->  
-> -    def _start_args_section(self, name):
-> -        self._start_symbol_section(self.args, name)
-> +    def _start_args_section(self, name, indent):
-> +        self._start_symbol_section(self.args, name, indent)
->  
-> -    def _start_features_section(self, name):
-> -        self._start_symbol_section(self.features, name)
-> +    def _start_features_section(self, name, indent):
-> +        self._start_symbol_section(self.features, name, indent)
->  
-> -    def _start_section(self, name=None):
-> +    def _start_section(self, name=None, indent=0):
->          if name in ('Returns', 'Since') and self.has_section(name):
->              raise QAPIParseError(self._parser,
->                                   "duplicated '%s' section" % name)
->          self._end_section()
-> -        self._section = QAPIDoc.Section(name)
-> +        self._section = QAPIDoc.Section(self._parser, name, indent)
->          self.sections.append(self._section)
->  
->      def _end_section(self):
-> @@ -553,7 +607,8 @@ class QAPIDoc:
->      def connect_member(self, member):
->          if member.name not in self.args:
->              # Undocumented TODO outlaw
-> -            self.args[member.name] = QAPIDoc.ArgSection(member.name)
-> +            self.args[member.name] = QAPIDoc.ArgSection(self._parser,
-> +                                                        member.name)
->          self.args[member.name].connect(member)
->  
->      def connect_feature(self, feature):
-> diff --git a/tests/qapi-schema/doc-bad-indent.err b/tests/qapi-schema/doc-bad-indent.err
-> new file mode 100644
-> index 00000000000..67844539bd2
-> --- /dev/null
-> +++ b/tests/qapi-schema/doc-bad-indent.err
-> @@ -0,0 +1 @@
-> +doc-bad-indent.json:6:1: unexpected de-indent (expected at least 4 spaces)
-> diff --git a/tests/qapi-schema/doc-bad-indent.json b/tests/qapi-schema/doc-bad-indent.json
-> new file mode 100644
-> index 00000000000..edde8f21dc7
-> --- /dev/null
-> +++ b/tests/qapi-schema/doc-bad-indent.json
-> @@ -0,0 +1,8 @@
-> +# Multiline doc comments should have consistent indentation
+> +    pcms->max_fw_size = value;
+> +}
 > +
-> +##
-> +# @foo:
-> +# @a: line one
-> +# line two is wrongly indented
-> +##
-> +{ 'command': 'foo', 'data': { 'a': 'int' } }
-> diff --git a/tests/qapi-schema/doc-bad-indent.out b/tests/qapi-schema/doc-bad-indent.out
-> new file mode 100644
-> index 00000000000..e69de29bb2d
-> diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.out
-> index 9993ffcd89d..b7e3f4313da 100644
-> --- a/tests/qapi-schema/doc-good.out
-> +++ b/tests/qapi-schema/doc-good.out
-> @@ -159,7 +159,7 @@ doc symbol=Alternate
+>  static void pc_machine_initfn(Object *obj)
+>  {
+>      PCMachineState *pcms = PC_MACHINE(obj);
+> @@ -1884,6 +1928,7 @@ static void pc_machine_initfn(Object *obj)
+>      pcms->smbus_enabled = true;
+>      pcms->sata_enabled = true;
+>      pcms->pit_enabled = true;
+> +    pcms->max_fw_size = 8 * MiB;
 >  
->      arg=i
->  an integer
-> -    @b is undocumented
-> +@b is undocumented
->      arg=b
+>      pc_system_flash_create(pcms);
+>      pcms->pcspk = isa_new(TYPE_PC_SPEAKER);
+> @@ -2004,6 +2049,12 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
 >  
->      feature=alt-feat
-> @@ -174,7 +174,7 @@ doc symbol=cmd
->  the first argument
->      arg=arg2
->  the second
-> -       argument
-> +argument
->      arg=arg3
+>      object_class_property_add_bool(oc, PC_MACHINE_PIT,
+>          pc_machine_get_pit, pc_machine_set_pit);
+> +
+> +    object_class_property_add(oc, PC_MACHINE_MAX_FW_SIZE, "size",
+> +        pc_machine_get_max_fw_size, pc_machine_set_max_fw_size,
+> +        NULL, NULL);
+> +    object_class_property_set_description(oc, PC_MACHINE_MAX_FW_SIZE,
+> +        "Maximum combined firmware size");
+>  }
 >  
->      feature=cmd-feat1
-> diff --git a/tests/qapi-schema/meson.build b/tests/qapi-schema/meson.build
-> index f1449298b07..83a0a68389b 100644
-> --- a/tests/qapi-schema/meson.build
-> +++ b/tests/qapi-schema/meson.build
-> @@ -53,6 +53,7 @@ schemas = [
->    'doc-bad-enum-member.json',
->    'doc-bad-event-arg.json',
->    'doc-bad-feature.json',
-> +  'doc-bad-indent.json',
->    'doc-bad-section.json',
->    'doc-bad-symbol.json',
->    'doc-bad-union-member.json',
+>  static const TypeInfo pc_machine_info = {
+> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+> index b6c0822fe3..22450ba0ef 100644
+> --- a/hw/i386/pc_sysfw.c
+> +++ b/hw/i386/pc_sysfw.c
+> @@ -39,15 +39,6 @@
+>  #include "hw/block/flash.h"
+>  #include "sysemu/kvm.h"
+>  
+> -/*
+> - * We don't have a theoretically justifiable exact lower bound on the base
+> - * address of any flash mapping. In practice, the IO-APIC MMIO range is
+> - * [0xFEE00000..0xFEE01000] -- see IO_APIC_DEFAULT_ADDRESS --, leaving free
+> - * only 18MB-4KB below 4G. For now, restrict the cumulative mapping to 8MB in
+> - * size.
+> - */
+> -#define FLASH_SIZE_LIMIT (8 * MiB)
+> -
+>  #define FLASH_SECTOR_SIZE 4096
+>  
+>  static void pc_isa_bios_init(MemoryRegion *rom_memory,
+> @@ -182,10 +173,10 @@ static void pc_system_flash_map(PCMachineState *pcms,
+>          }
+>          if ((hwaddr)size != size
+>              || total_size > HWADDR_MAX - size
+> -            || total_size + size > FLASH_SIZE_LIMIT) {
+> +            || total_size + size > pcms->max_fw_size) {
+>              error_report("combined size of system firmware exceeds "
+>                           "%" PRIu64 " bytes",
+> -                         FLASH_SIZE_LIMIT);
+> +                         pcms->max_fw_size);
+>              exit(1);
+>          }
+>  
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index fe52e165b2..f7c8e7cbfe 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -43,6 +43,7 @@ struct PCMachineState {
+>      bool smbus_enabled;
+>      bool sata_enabled;
+>      bool pit_enabled;
+> +    uint64_t max_fw_size;
+>  
+>      /* NUMA information: */
+>      uint64_t numa_nodes;
+> @@ -59,6 +60,7 @@ struct PCMachineState {
+>  #define PC_MACHINE_SMBUS            "smbus"
+>  #define PC_MACHINE_SATA             "sata"
+>  #define PC_MACHINE_PIT              "pit"
+> +#define PC_MACHINE_MAX_FW_SIZE      "max-fw-size"
+>  
+>  /**
+>   * PCMachineClass:
+> 
 
-With trivial whitespace touch-ups:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 
 
