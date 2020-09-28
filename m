@@ -2,102 +2,82 @@ Return-Path: <SRS0=Z1O7=DF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E774C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 11:09:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16C49C4741F
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 11:14:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5FE42080A
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 11:09:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5FE42080A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id 738422080A
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 11:14:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JA1jW+ri"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 738422080A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMr1z-0003Vi-HS
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 07:09:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45660)
+	id 1kMr77-0007sz-Bw
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 07:14:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48648)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kMqkm-0000tD-At; Mon, 28 Sep 2020 06:51:32 -0400
-Received: from new2-smtp.messagingengine.com ([66.111.4.224]:37421)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kMqkj-0007LH-0d; Mon, 28 Sep 2020 06:51:32 -0400
-Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
- by mailnew.nyi.internal (Postfix) with ESMTP id E54C3580189;
- Mon, 28 Sep 2020 06:51:25 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
- by compute7.internal (MEProxy); Mon, 28 Sep 2020 06:51:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-type:in-reply-to; s=fm1; bh=7gsnOsYfE/ntIeAZF3xHpNaTiDq
- faTSMi3VRMKUkL4E=; b=jGsO8KYOrSukWYccM/N1xkkP369m8uiWJrVNyxwLsFs
- v5oVe3IjQDx7bs5UVS5oJy47WxSPm/YX5B4w0orDPqFp9zIs7DhblyZ5sujwaP3r
- IEVhudHeSCGHMUAEl4xj9O/H2SvVn49Y4BdweOBPs9yA63Z+Z9i/qOzgsoDdru2q
- t3bAmiEpIU9N37dv/TLQ1SgqbL3UHikM8pukMuyJ/TGliHSQMSavFYckT7DsWPUb
- CB52U7zFEovtnpJcnFxps4D34IRncSCR7MJ8zs4vXmt9JKSto93KbcT/7dCXFlaG
- SLtBFFr5u7idWdWgIGvq/0zIzTlcka43KjJ5iozlwPw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-type:date:from:in-reply-to
- :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=7gsnOs
- YfE/ntIeAZF3xHpNaTiDqfaTSMi3VRMKUkL4E=; b=VA0PYziO76EFg/zONWN9ox
- 4/hDr+inhW1yojt5rDDFHUYLw21qaMTt9f1hTbnkoIIqlkaLFVxDkoB9dPgF2W+c
- t6Olj854jAL3ssVYZxCA7HR9HkTcpp2nT0o9eytvdDMtOzXA72LBuWA8OUlH9TKb
- 5PW+z18oPQ6zApuILt+v/K9OE3E5MDX2zjOGX2s2qQSwwEWNLGHH6HSD80qQNgtG
- QuqkwA3B1fw7zXFfgj0O5lmsvhCj0sq4vHdfENXm/5w2L8YdrZBOFEcRoMfbAwQ1
- o47meEnzAT40sB+hMIlc2lX4M2HosNKpXLhX/xUUbLfavjbM21IDcONrOIdkXoyQ
- ==
-X-ME-Sender: <xms:LMBxXxBRuktaa-8C1IrnIhy3PvyyZRl-8v7YqM977mxnjietb4Ixjw>
- <xme:LMBxX_j_3oU_1HMa-R_gPIISLj-34ElA_LRPFxFufH2YAZjch-hgKRkiNBfecH3NJ
- I7h-OnRVIw_U7ZVF98>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrvdeigdefudcutefuodetggdotefrodftvf
- curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
- uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
- fjughrpeffhffvuffkfhggtggujgesghdtreertddtjeenucfhrhhomhepmfhlrghushcu
- lfgvnhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrdgukheqnecuggftrfgrthhtvg
- hrnhepkeehheffheejuddvtedutdfftdehkedvheetueehtedujedvkeduhffhueethefg
- necuffhomhgrihhnpehkvghrnhgvlhdrohhrghdpihhnfhhrrgguvggrugdrohhrghenuc
- fkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedtnecurfgr
- rhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
-X-ME-Proxy: <xmx:LMBxX8kk7Fkn91wM9fYha0_qj0Cz0q-gVAEW9U-1cTU0Dcc-Ir-wrQ>
- <xmx:LMBxX7yrx-7l_VcZPMfYxIBCU42cnHyROIyKlu-sxKVpWCZP7ECQgQ>
- <xmx:LMBxX2TL4qQthhBHSFXb7wUDOSd-NcfkT0pJ-4zUQN8XD0qosOG9Yw>
- <xmx:LcBxX8PJEPAB6TxSLwQ7VKjYpHnMi4bn8K97InRM9Zj5xqyxkRgbYQ>
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id 5207F328005A;
- Mon, 28 Sep 2020 06:51:23 -0400 (EDT)
-Date: Mon, 28 Sep 2020 12:51:21 +0200
-From: Klaus Jensen <its@irrelevant.dk>
-To: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
-Subject: Re: [PATCH v6] nvme: allow cmb and pmr emulation on same device
-Message-ID: <20200928105121.GC33043@apples.localdomain>
-References: <20200729220107.37758-1-andrzej.jakowski@linux.intel.com>
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1kMqys-0002Q9-Sk
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 07:06:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27327)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1kMqww-0000T7-2N
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 07:06:06 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601291044;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=o6uiB+TlV39M0ocAphko+kBfqFPm20MI5KRCBhawtF0=;
+ b=JA1jW+rih9MKiai6vkomDvzPt4kDwR625U+d4mTmgj2Ypa11oekfsPZIhRCAiTtRAfIitg
+ zMGR2vvzKNwynyrrVJ39nykeUekC063bDBa7k0SBIPbMDTjgADOh3CF9F21OrXQX6rirm1
+ PGNawnlThw59nV2HdThwC2m+FxyYAGs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-424-lxv0CGFSMlKZfiBx6D7O2A-1; Mon, 28 Sep 2020 07:03:59 -0400
+X-MC-Unique: lxv0CGFSMlKZfiBx6D7O2A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D2E9D1DDED;
+ Mon, 28 Sep 2020 11:03:57 +0000 (UTC)
+Received: from kaapi (unknown [10.74.8.87])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 19CC81002C0B;
+ Mon, 28 Sep 2020 11:03:50 +0000 (UTC)
+Date: Mon, 28 Sep 2020 16:33:48 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+X-X-Sender: pjp@kaapi
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH] pci: check bus pointer before dereference
+In-Reply-To: <CAFEAcA8Y+sJkapmrjNOdWP4xXa9kWTmSyXpthkvdb6QgUyDh5Q@mail.gmail.com>
+Message-ID: <nycvar.YSQ.7.78.906.2009281616200.10832@xnncv>
+References: <20200827114917.1851111-1-ppandit@redhat.com>
+ <CAKXe6SJNio2cy05ecr_DyB0Z6WjxHN_X8ZiOU5By0jwdRq12fg@mail.gmail.com>
+ <b0859f8a-1224-66d0-7e32-091caa5cfcbe@redhat.com>
+ <nycvar.YSQ.7.78.906.2009161152040.10832@xnncv>
+ <CAFEAcA8Y+sJkapmrjNOdWP4xXa9kWTmSyXpthkvdb6QgUyDh5Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="raC6veAxrt5nqIoY"
-Content-Disposition: inline
-In-Reply-To: <20200729220107.37758-1-andrzej.jakowski@linux.intel.com>
-Received-SPF: pass client-ip=66.111.4.224; envelope-from=its@irrelevant.dk;
- helo=new2-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 06:43:03
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=ppandit@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 03:47:08
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
-X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,101 +89,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kbusch@kernel.org, kwolf@redhat.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, mreitz@redhat.com
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Li Qiang <liq3ea@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Alexander Bulekov <alxndr@bu.edu>, Ruhr-University <bugs-syssec@rub.de>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+  Hello,
 
---raC6veAxrt5nqIoY
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
++-- On Wed, 16 Sep 2020, Peter Maydell wrote --+
+| On Wed, 16 Sep 2020 at 07:28, P J P <ppandit@redhat.com> wrote:
+| > -> https://ruhr-uni-bochum.sciebo.de/s/NNWP2GfwzYKeKwE?path=%2Flsi_nullptr1
+| > ==1183858==Hint: address points to the zero page.
+| > #0 pci_change_irq_level hw/pci/pci.c:259
+| > #1 pci_irq_handler hw/pci/pci.c:1445
+| > #2 pci_set_irq hw/pci/pci.c:1463
+| > #3 lsi_set_irq hw/scsi/lsi53c895a.c:488
+| > #4 lsi_update_irq hw/scsi/lsi53c895a.c:523
+| > #5 lsi_script_scsi_interrupt hw/scsi/lsi53c895a.c:554
+| > #6 lsi_execute_script hw/scsi/lsi53c895a.c:1149
+| > #7 lsi_reg_writeb hw/scsi/lsi53c895a.c:1984
+| > #8 lsi_io_write hw/scsi/lsi53c895a.c:2146
+...
+| Generally we don't bother to assert() that pointers that shouldn't be NULL 
+| really are NULL immediately before dereferencing them, because the 
+| dereference provides an equally easy-to-debug crash to the assert, and so 
+| the assert doesn't provide anything extra. assert()ing that a pointer is 
+| non-NULL is more useful if it is done in a place that identifies the problem 
+| at an earlier and easier-to-debug point in execution rather than at a later 
+| point which is distantly removed from the place where the bogus pointer was 
+| introduced.
 
-On Jul 29 15:01, Andrzej Jakowski wrote:
-> Resending series recently posted on mailing list related to nvme device
-> extension with couple of fixes after review.
->=20
-> This patch series does following:
->  - Fixes problem where CMBS bit was not set in controller capabilities
->    register, so support for CMB was not correctly advertised to guest.
->    This is resend of patch that has been submitted and reviewed by
->    Klaus [1]
->  - Introduces BAR4 sharing between MSI-X vectors and CMB. This allows
->    to have CMB and PMR emulated on the same device. This extension
->    was indicated by Keith [2]
->=20
-> v6:
->  - instead of using memory_region_to_absolute_addr() function local helpe=
-r has
->    been defined (nvme_cmb_to_absolute_addr()) to calculate absolute addre=
-ss of
->    CMB in simplified way. Also a number of code style changes has been do=
-ne
->    (function rename, use literal instead of macro definition, etc.)
->=20
-> v5:
->  - fixed problem introduced in v4 where CMB buffer was represented as
->    subregion of BAR4 memory region. In that case CMB address was used
->    incorrectly as it was relative to BAR4 and not absolute. Appropriate
->    changes were added to v5 to calculate CMB address properly ([6])
->=20
-> v4:
->  - modified BAR4 initialization, so now it consists of CMB, MSIX and
->    PBA memory regions overlapping on top of it. This reduces patch
->    complexity significantly (Klaus [5])
->=20
-> v3:
->  - code style fixes including: removal of spurious line break, moving
->    define into define section and code alignment (Klaus [4])
->  - removed unintended code reintroduction (Klaus [4])
->=20
-> v2:
->  - rebase on Kevin's latest block branch (Klaus [3])
->  - improved comments section (Klaus [3])
->  - simplified calculation of BAR4 size (Klaus [3])
->=20
-> v1:
->  - initial push of the patch
->=20
-> [1]: https://lore.kernel.org/qemu-devel/20200408055607.g2ii7gwqbnv6cd3w@a=
-pples.localdomain/
-> [2]: https://lore.kernel.org/qemu-devel/20200330165518.GA8234@redsun51.ss=
-a.fujisawa.hgst.com/
-> [3]: https://lore.kernel.org/qemu-devel/20200605181043.28782-1-andrzej.ja=
-kowski@linux.intel.com/
-> [4]: https://lore.kernel.org/qemu-devel/20200618092524.posxi5mysb3jjtpn@a=
-pples.localdomain/
-> [5]: https://lore.kernel.org/qemu-devel/20200626055033.6vxqvi4s5pll7som@a=
-pples.localdomain/
-> [6]: https://lore.kernel.org/qemu-devel/9143a543-d32d-f3e7-c37b-b3df7f853=
-952@linux.intel.com/
->=20
+* The NULL dereference above occurs because the 'pci_dev->qdev->parent_bus' 
+  address gets overwritten (with 0x0) during scsi 'Memory Move' operation in
 
-Hi Andrzej,
+ ../hw/scsi/lsi53c895a.c
+  #define LSI_BUF_SIZE 4096
 
-Any chance you can respin this on git.infradead.org/qemu-nvme.git
-nvme-next branch?
+lsi_mmio_write
+ lsi_reg_writeb
+  lsi_execute_script
+   static void lsi_memcpy(LSIState *s, ... int count=12MB)
+   {
+      int n;
+      uint8_t buf[LSI_BUF_SIZE];
 
+      while (count) {
+        n = (count > LSI_BUF_SIZE) ? LSI_BUF_SIZE : count;
+        lsi_mem_read(s, src, buf, n);          <== read from DMA memory
+        lsi_mem_write(s, dest, buf, n);        <== write to I/O memory
+        src += n;
+        dest += n;
+        count -= n;
+     }
+   }
+-> https://www.manualslib.com/manual/1407578/Lsi-Lsi53c895a.html?page=254#manual
 
-Thanks,
-Klaus
+* Above loop moves data between DMA memory to i/o address space.
 
---raC6veAxrt5nqIoY
-Content-Type: application/pgp-signature; name="signature.asc"
+* Going through the manual above, it seems 'Memory Move' can move upto 16MB of 
+  data between memory spaces.
 
------BEGIN PGP SIGNATURE-----
+* I tried to see a suitable fix, but couldn't get one.
 
-iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl9xwCQACgkQTeGvMW1P
-Del5yggAmILQXpeRnLQfg28VtbcOkjc9q7JmyRJkLbMfzBgmsVSpvmzPwQDJYhSV
-7snKQsv4pAIDIk+RSeVsxYtLdYri6GrmIGMQ117SjTrGAgwkMqk/Z774Bgh22WZy
-/N5/624twAEH2it4RLXsZ9Aa8s0hrkjRm6VOYkLz4kyONGIPkBMJ6m5Smft4Ki8e
-FRmDOci9guAnawBdLoeyDOuavilhIqSiyjAkiD+3EzsKv7jwQtWgRJx06gjd+gnk
-hm6gxbpRZSLGaF2TQUlvwokbzCgb2HNDPViivdRK0RlRNtxp2ZOwI3nscleh1kyv
-TJUbQfyCIRmU0Y9274RTNVggxzgNHg==
-=TIgK
------END PGP SIGNATURE-----
+  - Limiting 'count' value does not seem right, as allowed value is upto 16MB.
 
---raC6veAxrt5nqIoY--
+  - Manual above talks about moving data via 'dma_buf'. But it doesn't seem to 
+    be used here.
+
+* During above loop, 'dest' address moves past its 'MemoryRegion mr' and 
+  overwrites the adjacent 'mr' memory area, overwritting 'parent_bus' value.
+
+Any thoughts/hints please...?
+
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
+
 
