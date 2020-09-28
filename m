@@ -2,105 +2,99 @@ Return-Path: <SRS0=Z1O7=DF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17DAEC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 22:00:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD983C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 22:48:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49FD421D7F
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 22:00:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49FD421D7F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=netbsd.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1785223A51
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 22:48:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1785223A51
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=invisiblethingslab.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kN1Br-0006BL-MA
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 18:00:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57912)
+	id 1kN1wY-0000B6-6g
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 18:48:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38314)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kamil@netbsd.org>) id 1kN16r-0004td-0E
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 17:55:01 -0400
-Received: from mail.netbsd.org ([199.233.217.200]:61625)
+ (Exim 4.90_1) (envelope-from <marmarek@invisiblethingslab.com>)
+ id 1kN1vY-00088T-3A
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 18:47:25 -0400
+Received: from wout1-smtp.messagingengine.com ([64.147.123.24]:39417)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kamil@netbsd.org>) id 1kN16m-0004a9-Rl
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 17:55:00 -0400
-Received: from [IPv6:::1] (localhost [127.0.0.1])
- by mail.netbsd.org (Postfix) with ESMTP id E327784C71;
- Mon, 28 Sep 2020 21:54:48 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200928131934.739451-1-philmd@redhat.com>
- <20200928131934.739451-8-philmd@redhat.com>
-From: Kamil Rytarowski <kamil@netbsd.org>
-Autocrypt: addr=kamil@netbsd.org; keydata=
- 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
-Subject: Re: [PATCH v2 7/8] qemu/bswap: Use compiler __builtin_bswap() on
- NetBSD
-Message-ID: <dcb7bb1f-eaec-7039-1cbd-80e50d298707@netbsd.org>
-Date: Mon, 28 Sep 2020 23:51:47 +0200
-User-Agent: Mozilla/5.0 (X11; NetBSD amd64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.90_1) (envelope-from <marmarek@invisiblethingslab.com>)
+ id 1kN1vU-00033x-S7
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 18:47:23 -0400
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+ by mailout.west.internal (Postfix) with ESMTP id 310C1EAD;
+ Mon, 28 Sep 2020 18:47:17 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+ by compute3.internal (MEProxy); Mon, 28 Sep 2020 18:47:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-type:date:from:in-reply-to
+ :message-id:mime-version:references:subject:to:x-me-proxy
+ :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=dQn+ZL
+ rb/tD+FJFEsWzjYlApsJJk+Oj2SAzOurPFeiA=; b=rwqdBVeZtNgKGX9jhYX7+I
+ Sltt8eEpWnSXjj3nQTCqrTuSTcPRubJIQtMEbGJEf7uYGXGq9RuuiLhk/e4IuyO2
+ LmA0ivm2qzUAv6Jf6c4UxDI4CDdIKWexKRUdjQV1dcwUcL+u4fzfAjxf2YxaQq7a
+ qy5Mki7/Ng/VDh3QzU5/h/a3I4uTiXs8hfRmUnDqU4NSuO/B3O42BBoZbgncBE5j
+ LHvyJA6M3dCgEHx4fkGKjLXEkGV7m/WwqINPywrTj7k5X3//RfIvLKAsZj1XZQKc
+ P4K6BeQy6viSUPvYioQivm/WzmBPgcxH6kak5gMkGSuNcPC88fN2F8qih1N5iu0A
+ ==
+X-ME-Sender: <xms:9GdyXz4jzo7Cq-rAHP2BAg2RqgMg9OCUFe4UYBI_hel5E-tNU6dSWg>
+ <xme:9GdyX47RjIrKFPoJJ-YZPT9WG3-1Wh23LdBYQZwgAcIDavtW74InjwrDFXKl7sjOh
+ iPUBcdwU2W3Ug>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrvdejgddugecutefuodetggdotefrodftvf
+ curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+ uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+ fjughrpeffhffvuffkfhggtggujgesghdtreertddtjeenucfhrhhomhepofgrrhgvkhcu
+ ofgrrhgtiiihkhhofihskhhiqdfikphrvggtkhhiuceomhgrrhhmrghrvghksehinhhvih
+ hsihgslhgvthhhihhnghhslhgrsgdrtghomheqnecuggftrfgrthhtvghrnhepteevffei
+ gffhkefhgfegfeffhfegveeikeettdfhheevieehieeitddugeefteffnecukfhppeelud
+ drieegrddujedtrdekleenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgr
+ ihhlfhhrohhmpehmrghrmhgrrhgvkhesihhnvhhishhisghlvghthhhinhhgshhlrggsrd
+ gtohhm
+X-ME-Proxy: <xmx:9GdyX6clg8xal_iB2NGUO_A7dlpTuK50vhL8p1eazdeil1xaHyyu5g>
+ <xmx:9GdyX0J-grTMKEKSnQsukiBYXvX4fk2wVYGM5dGsyyyKEVljsy5QJA>
+ <xmx:9GdyX3LSGvZHUrTaenWF7ZoshURhB5pMzvlYk92o1F-X1nrP9l6eWQ>
+ <xmx:9GdyX_0HrMxUTVJ8F95YnHaqhbjTDb2jtF7LQMtiWOxi8G_d64zp2w>
+Received: from mail-itl (ip5b40aa59.dynamic.kabel-deutschland.de
+ [91.64.170.89])
+ by mail.messagingengine.com (Postfix) with ESMTPA id 305023280060;
+ Mon, 28 Sep 2020 18:47:15 -0400 (EDT)
+Date: Tue, 29 Sep 2020 00:47:11 +0200
+From: Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>
+To: Anthony PERARD <anthony.perard@citrix.com>
+Subject: Re: [PATCH] migration: Truncate state file in xen-save-devices-state
+Message-ID: <20200928224711.GY1482@mail-itl>
+References: <20200921094830.114028-1-dovmurik@linux.vnet.ibm.com>
+ <20200921111723.GF3221@work-vm>
+ <20200928164618.GK2024@perard.uk.xensource.com>
 MIME-Version: 1.0
-In-Reply-To: <20200928131934.739451-8-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=199.233.217.200; envelope-from=kamil@netbsd.org;
- helo=mail.netbsd.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 17:54:52
-X-ACL-Warn: Detected OS   = ???
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="QNuYedFeXxEqrKRj"
+Content-Disposition: inline
+In-Reply-To: <20200928164618.GK2024@perard.uk.xensource.com>
+Received-SPF: none client-ip=64.147.123.24;
+ envelope-from=marmarek@invisiblethingslab.com;
+ helo=wout1-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 18:47:18
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
+X-Spam_bar: --
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -113,88 +107,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- Richard Henderson <richard.henderson@linaro.org>,
- Kamil Rytarowski <kamil@netbsd.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: sstabellini@kernel.org, Paul Durrant <paul@xen.org>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Dov Murik <dovmurik@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 28.09.2020 15:19, Philippe Mathieu-Daudé wrote:
-> Since commit efc6c070aca ("configure: Add a test for the minimum
-> compiler version") the minimum compiler version required for GCC
-> is 4.8, which supports __builtin_bswap().
-> Remove the NetBSD specific ifdef'ry.
-> 
-> This reverts commit 1360677cfe3ca8f945fa1de77823df21a77e4500
-> ("makes NetBSD use the native bswap functions").
-> 
 
-Personally, I prefer using the system headers. but if you want to use
-the GCC builtins, please go for it.
+--QNuYedFeXxEqrKRj
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH] migration: Truncate state file in xen-save-devices-state
 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  configure            | 15 ---------------
->  include/qemu/bswap.h |  5 -----
->  2 files changed, 20 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index bff787daea7..1b0a02a0af8 100755
-> --- a/configure
-> +++ b/configure
-> @@ -4886,18 +4886,6 @@ if test "$docs" != "no" ; then
->    fi
->  fi
->  
-> -# Search for bswap32 function
-> -bswap_h=no
-> -cat > $TMPC << EOF
-> -#include <sys/endian.h>
-> -#include <sys/types.h>
-> -#include <machine/bswap.h>
-> -int main(void) { return bswap32(0); }
-> -EOF
-> -if compile_prog "" "" ; then
-> -  bswap_h=yes
-> -fi
-> -
->  ##########################################
->  # Do we have libiscsi >= 1.9.0
->  if test "$libiscsi" != "no" ; then
-> @@ -6779,9 +6767,6 @@ fi
->  if test "$st_atim" = "yes" ; then
->    echo "HAVE_STRUCT_STAT_ST_ATIM=y" >> $config_host_mak
->  fi
-> -if test "$bswap_h" = "yes" ; then
-> -  echo "CONFIG_MACHINE_BSWAP_H=y" >> $config_host_mak
-> -fi
->  if test "$curl" = "yes" ; then
->    echo "CONFIG_CURL=y" >> $config_host_mak
->    echo "CURL_CFLAGS=$curl_cflags" >> $config_host_mak
-> diff --git a/include/qemu/bswap.h b/include/qemu/bswap.h
-> index 1a297bfec22..7e586531c09 100644
-> --- a/include/qemu/bswap.h
-> +++ b/include/qemu/bswap.h
-> @@ -3,17 +3,12 @@
->  
->  #include "fpu/softfloat-types.h"
->  
-> -#ifdef CONFIG_MACHINE_BSWAP_H
-> -# include <sys/endian.h>
-> -# include <machine/bswap.h>
-> -#else
->  #undef  bswap16
->  #define bswap16(_x) __builtin_bswap16(_x)
->  #undef  bswap32
->  #define bswap32(_x) __builtin_bswap32(_x)
->  #undef  bswap64
->  #define bswap64(_x) __builtin_bswap64(_x)
-> -#endif /* ! CONFIG_MACHINE_BSWAP_H */
->  
->  static inline void bswap16s(uint16_t *s)
->  {
-> 
+On Mon, Sep 28, 2020 at 05:46:18PM +0100, Anthony PERARD wrote:
+> On Mon, Sep 21, 2020 at 12:17:23PM +0100, Dr. David Alan Gilbert wrote:
+> > * Dov Murik (dovmurik@linux.vnet.ibm.com) wrote:
+> > > When running the xen-save-devices-state QMP command, if the filename
+> > > already exists it will be truncated before dumping the devices' state
+> > > into it.
+> > >=20
+> > > Signed-off-by: Dov Murik <dovmurik@linux.vnet.ibm.com>
+> > > ---
+> > >  migration/savevm.c | 3 ++-
+> > >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > >=20
+> > > diff --git a/migration/savevm.c b/migration/savevm.c
+> > > index 304d98ff78..e1b26672cc 100644
+> > > --- a/migration/savevm.c
+> > > +++ b/migration/savevm.c
+> > > @@ -2803,7 +2803,8 @@ void qmp_xen_save_devices_state(const char *fil=
+ename, bool has_live, bool live,
+> > >      vm_stop(RUN_STATE_SAVE_VM);
+> > >      global_state_store_running();
+> > > =20
+> > > -    ioc =3D qio_channel_file_new_path(filename, O_WRONLY | O_CREAT, =
+0660, errp);
+> > > +    ioc =3D qio_channel_file_new_path(filename, O_WRONLY | O_CREAT |=
+ O_TRUNC,
+> > > +                                    0660, errp);
+> > >      if (!ioc) {
+> > >          goto the_end;
+> > >      }
+>=20
+> Hi Marek,
+>=20
+> Do you know if the above patch is going to work in a linux stubdomain?
+> Can we truncate the "save file" which seems to be stubdomain's console 1?
 
+No, truncate won't work on the stubdomain's console. I mean, the
+operation won't fail, but the actual file connected to the console on
+the other end won't get truncated. But I think in case of stubdomain,
+toolstack should connect the console to an empty file, so it shouldn't
+be a problem.
+
+--=20
+Best Regards,
+Marek Marczykowski-G=C3=B3recki
+Invisible Things Lab
+A: Because it messes up the order in which people normally read text.
+Q: Why is top-posting such a bad thing?
+
+--QNuYedFeXxEqrKRj
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhrpukzGPukRmQqkK24/THMrX1ywFAl9yZ/AACgkQ24/THMrX
+1ywJegf9FdbbxZyKqbkAXWV6OoTHTgNwoA7SawiM+w3NfM77AFY+lXtCbtICtOjC
+EWSTAK3BnIOjV3cDxFIArO3u7i+WaYRe3YNCGEMIqQn5JdRiLGjEY8goLzlk1TKm
+tnqA9vTJZ+cWodo/9XL1grejdBe+rMYRVMYfrR2F7NgSYiKDz83PUGUDd/pe39ss
+I0T30mmTaOkuEByxxTA5nbYAy7g30Yt5BAtdZT1eU6qsd5qOw3gR4FxwEXtc1tcD
+xmr5KlCf4Yd1XxPsaVboXJJSFcKX8TmUjmz04hz2NpYILI26C+qgLgFOjfANaWYV
+wLW8cvdf6/fwj2EgJRjCQai53RpHGg==
+=ySPE
+-----END PGP SIGNATURE-----
+
+--QNuYedFeXxEqrKRj--
 
