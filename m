@@ -2,99 +2,72 @@ Return-Path: <SRS0=Z1O7=DF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 573F6C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:46:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3624BC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:48:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF71F208FE
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:46:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D205208FE
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:48:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JdLVr2xG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF71F208FE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="cuX8185p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D205208FE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMtTr-0002cI-QQ
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 09:46:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60358)
+	id 1kMtVm-0004u0-NJ
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 09:48:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36708)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kMt4A-0000ZM-QG
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 09:19:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21559)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kMt49-0002md-10
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 09:19:42 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601299180;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=+FPpktj5THBEK2/QYdCd2kiR5oibLPS/OVWFHv6de4o=;
- b=JdLVr2xGG9GpkVZc1oNRGuI309D7ehgnFvj9KYQpaLYn4D75blGUJ6l25D5Y7IPq3WtGlY
- WnJr0CWYbVVK/rA4IYceXoSq7cjuU6voZpv03Ux6jpLtg3FgjivrRYDd+SERIFVxcqnpCy
- RZG7uWCn9hX7JBgByHnP5IidcT7FRdk=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-299-VOo2GQmHOtKkBTg8kKdTIQ-1; Mon, 28 Sep 2020 09:19:38 -0400
-X-MC-Unique: VOo2GQmHOtKkBTg8kKdTIQ-1
-Received: by mail-wm1-f69.google.com with SMTP id b14so345463wmj.3
- for <qemu-devel@nongnu.org>; Mon, 28 Sep 2020 06:19:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=+FPpktj5THBEK2/QYdCd2kiR5oibLPS/OVWFHv6de4o=;
- b=CfG7WjaqNcp07uYH27Vf5t42IERQhO9LxhiD+8nPsV7pq8yF1e4JpnSb/RjmAYqi86
- /fNFdyuEb2qHENUKPbwj+kj52zh0D03WHPMlbxKJqiI9F3GroaZjlVOuOPk+4vOmSPnk
- r+yopB20aDbqE3M52yN6N0ZKOFP+Ucriaf43d2L7hxpTP5sabpncaExARBfYM7E2IQDI
- Q4dloaza1eu7i11Ja52wd0GUIcTW5d7PX2sPCqraZ0aMHDBYyROeT0JZrVn7Vvv1gSv+
- 7ncvqWesrWlDnYHBKgSIFm4etxtIpG9nt4s6/L1NUDF4qOYmemG41DPWizy6maFyuR2e
- Kj/g==
-X-Gm-Message-State: AOAM532NCca7qrWO1vAoTMO+hID1eRAvALfo0tJEPSxPJ0bO9aUrX5hW
- bcqNFwI6m9sZuOeTm/t5UIK8HdJGvMGUBLSn1pnT7vVOdSer+U0QTKOq5I6hrayGpSYOXL+cJNd
- KDJH8GeLTikmEvAc=
-X-Received: by 2002:a1c:7215:: with SMTP id n21mr1720360wmc.154.1601299177406; 
- Mon, 28 Sep 2020 06:19:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwdMqjqkMzycwHv7g2uqjOhInjyuyFkPZe57OXnWZZ4SLLwHTMl2i+2Oqr9ydys7nGcitUV0w==
-X-Received: by 2002:a1c:7215:: with SMTP id n21mr1720340wmc.154.1601299177219; 
- Mon, 28 Sep 2020 06:19:37 -0700 (PDT)
-Received: from localhost.localdomain (74.red-83-53-161.dynamicip.rima-tde.net.
- [83.53.161.74])
- by smtp.gmail.com with ESMTPSA id k8sm1549945wrl.42.2020.09.28.06.19.35
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 28 Sep 2020 06:19:36 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1kMtJb-0000Xe-E2
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 09:35:39 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:56739)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1kMtJT-0004py-Np
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 09:35:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=Vjl2y5hmP0OR0/obOCmJkeUf/SHoy5w4FKtOsO4BFgY=; b=cuX8185pvNKPZReQH43EUZBtbC
+ BpXYgMQ21uTWilEfy1fGYen9z0jYJ2L+6jcy99CVZMdegpaSpvgmqLgza6y4tHh/py6PHutHxBBkM
+ HbTFHYh/WX6ZIvwE3kbGoYoIG6OYaVRxw2UKxYMlq0MBtNTDoULM1CnQKfc7abzBzs0i7FdBaJ1Gh
+ 4vlx9XduUfJ0yzNCf9n0L+pVJANt47S/agpreROpxPUFktAoBcP3SIx7P+DKeURkocFAK8I5+POrl
+ gnsmKwgJiYdHuC8PrIc9iH+fIRjJmEplY9W8jagWkHir7yeqTWgZmLkkPNVcDgHTBOfMXkMV9HXs8
+ 9HHa8enA==;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 0/8] qemu/bswap: Use compiler __builtin_bswap()
-Date: Mon, 28 Sep 2020 15:19:26 +0200
-Message-Id: <20200928131934.739451-1-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.2
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>,
+ Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
+ Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH 08/12] tests/9pfs: refactor test names and test devices
+Date: Mon, 28 Sep 2020 15:35:26 +0200
+Message-ID: <9648157.mzsJ5Dm3EP@silver>
+In-Reply-To: <95ef57d0-b35e-f16a-f957-06bc3692cb7c@redhat.com>
+References: <cover.1601203436.git.qemu_oss@crudebyte.com>
+ <3365834.oEZqtqHOuS@silver> <95ef57d0-b35e-f16a-f957-06bc3692cb7c@redhat.com>
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 03:29:35
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
+ helo=lizzy.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 07:56:16
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,50 +80,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Kamil Rytarowski <kamil@netbsd.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Implement Richard's suggestion to use __builtin_bswap().
+On Montag, 28. September 2020 14:42:48 CEST Paolo Bonzini wrote:
+> On 28/09/20 13:56, Christian Schoenebeck wrote:
+> >> The implementation in patches 1 and 2 is reasonable, but what is the
+> >> advantage of this as opposed to specifying the fsdev in the edge options
+> >> for the test (similar to virtio-net)?  I was expecting both
+> >> virtio-9p-device-synth and virtio-9p-device-local to produce virtio-9p,
+> >> so that the existing tests would be reused automatically by the qos
+> >> graph walk.
+> >> 
+> >> As things stand, I don't see any reason to have separate devices for
+> >> different backends.
+> > 
+> > I thought to fix the problem at its root, by removing that singular device
+> > limitation in qos. That would also allow to cleanly separate tests suites
+> > that are not related to each other instead of having to depend on each
+> > other, taking care about other one's command line skeleton and more.
+> 
+> As I said, the first two patches make total sense.  They would be useful
+> for testing both packed and split virtqueues, for example.  However, I
+> think the (useful) feature is being misused here.
 
-const_XX() not updated. We could use le_bswap() definitions
-but they are undefined, not sure yet what is the best way.
-Meanwhile I figure this out, these patches are ready for review.
+I haven't understood why my suggested mult-device use case imposes a misusage, 
+but okay, unless I hear different opinions, I'll prepare a v2 with that (IMO 
+hackish) CL fiddling instead in couple days or so.
 
-Since v1:
-- Remove the Haiku/BSD ifdef'ry (Peter)
-- Include the Haiku VM image from Alexander
+@Greg: If that's the way to go, then I probably change the test names, e.g.
 
-Alexander von Gluck IV (1):
-  tests/vm: Add Haiku test based on their vagrant images
+	"fs/version/basic" -> "synth/version/basic"
+	...
+	"fs/create_dir" -> "local/create_dir"
 
-Philippe Mathieu-Daudé (7):
-  qemu/bswap: Remove unused qemu_bswap_len()
-  qemu/bswap: Replace bswapXX() by compiler __builtin_bswap()
-  qemu/bswap: Replace bswapXXs() by compiler __builtin_bswap()
-  qemu/bswap: Remove <byteswap.h> dependency
-  qemu/bswap: Use compiler __builtin_bswap() on Haiku
-  qemu/bswap: Use compiler __builtin_bswap() on FreeBSD
-  qemu/bswap: Use compiler __builtin_bswap() on NetBSD
+to be able to easily distinguish 'synth' driver tests from 'local' driver 
+tests, as they would then popup with the same device name in v2, unlike in 
+this v1 where they have separate device names.
 
- configure                 |  28 ---------
- include/qemu/bswap.h      |  79 +++++---------------------
- tests/keys/vagrant        |  27 +++++++++
- tests/keys/vagrant.pub    |   1 +
- tests/vm/Makefile.include |   3 +-
- tests/vm/basevm.py        |   5 +-
- tests/vm/haiku.x86_64     | 116 ++++++++++++++++++++++++++++++++++++++
- 7 files changed, 164 insertions(+), 95 deletions(-)
- create mode 100644 tests/keys/vagrant
- create mode 100644 tests/keys/vagrant.pub
- create mode 100755 tests/vm/haiku.x86_64
+> > So your suggested solution is fine for appending extra arguments past the
+> > command line. However I would not be able to prepend something (easily) in
+> > front of '-device virtio-9p-pci'.
+> > 
+> > So I would be forced to parse the existing command line in modifycmdline()
+> > callback and then insert the required arguments appropriately. I would not
+> > find that very clean.
+> 
+> IIRC -fsdev can be added to the end of the command line and it still
+> works.  But if you think that is ugly, you can also use g_string_prepend.
 
--- 
-2.26.2
+Yes, "-fsdev ..." and "-device ..." sequence could theoretically be flipped, 
+qemu would accept it that is.
+
+> Also, looking at future plans for qgraph, adding a generic "plug/socket"
+> mechanism to QOSGraph was an idea that we couldn't do in time for GSoC.
+> With that model, virtio-9p would provide a "socket" of type fsdev and
+> the tests would have to provide a "plug" of the same type.  Likewise
+> there would be sockets of type disk or network.  QOSGraphEdgeOpts fits
+> better with that plan, compared to duplicating the devices.
+
+Sounds like that would require huge changes for all existing qtests on initial 
+thought at least.
+
+I find the suggested multi-device approach much simpler, as it does not 
+require changes to existing tests, nor people having to get used to a new 
+qtest model.
+
+Best regards,
+Christian Schoenebeck
+
 
 
