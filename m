@@ -2,133 +2,102 @@ Return-Path: <SRS0=Z1O7=DF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43957C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 11:07:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E774C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 11:09:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B8052080A
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 11:07:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="VOhlBXLs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B8052080A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	by mail.kernel.org (Postfix) with ESMTPS id B5FE42080A
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 11:09:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5FE42080A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMr04-0002ws-CY
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 07:07:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48586)
+	id 1kMr1z-0003Vi-HS
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 07:09:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45660)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar@xilinx.com>) id 1kMqyT-0002Lm-O8
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 07:05:41 -0400
-Received: from mail-bn7nam10on2068.outbound.protection.outlook.com
- ([40.107.92.68]:49427 helo=NAM10-BN7-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kMqkm-0000tD-At; Mon, 28 Sep 2020 06:51:32 -0400
+Received: from new2-smtp.messagingengine.com ([66.111.4.224]:37421)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar@xilinx.com>) id 1kMqwW-0000Qs-Oc
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 07:05:41 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ivuIsVLT24Km39xpAKRJNocrgMLsQl45ilm8bGWAXG2i0fSdYwvuDYLA7vyXho+QydP/crw8LNQP14ehupGweNnq+cEAtRZoHVk1DicOMg3zf5/IomCsIxI6z7rPjS4DE2+vxx5pGVtaj9JDSL/DxeuREEIQ9tdqDkZU7TsoR5vcNfSzBJFbcw/kFbdmUuIx8vtM0WQFjLn4+tKgm1g7Bd9ilW3WBIWW6ZkBfueZrr9h1y6FhCwe1VMDyMdSiTzWJZA4vx+78CsaWTy+n0/Zy6jd7eSn2XJ3mHSXQzHEYu9Hbv7fSX+c2R72olO7pdm6QU7T3cnji8yS9z4a+i9tEw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zqbKCwUU+A8z0WMAqIE9kmcm0g3ERfKUhWxARMe8ojI=;
- b=UaGz9iXrKNbRvYSfsFfhTEHSAs3Rbt5Lxucov8Q/jQ3ouj22f4tu4HboSPpQ1wz0TNu7rEsEqv4tFO+5xW7OrmyItqvaZDUpTa8Ff5iIB6Yvpzghx3pCV1+c4//mAod353MaxMrgFUfwnON8zc062t1m/srfFfeUw+IIlAB+2WJ5WCE0LqbPJ24SQvNYxGSyXqz71VWadr7bbU98Kapb9lsLMU+T0Oq9vTPzRkpfcS8XE0igMfUGJ1vUexoXkoViumrteo//zCQX9cqMxtT0D8Mkr9m7cnk9pGm46TX6iP68ajKY5Oy5suytecs8utjpPlhFPEWa+48FOq/AYwoF3w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 149.199.60.83) smtp.rcpttodomain=greensocs.com smtp.mailfrom=xilinx.com;
- dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
- not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zqbKCwUU+A8z0WMAqIE9kmcm0g3ERfKUhWxARMe8ojI=;
- b=VOhlBXLsenluAoqLQ0S5KUydWYvE8qenmSJvnUwKvPacqkT99Ukz+Z87+dJ14d922FtdfYoRKumpqiG0UkakgTEkBBRkNeGZCDtAengEYE64IarFNr9wa2zMHtNBBTBDZEgRDTbhZACoW/4fBRycigvI2kbtEbHZf/1inrLcclE=
-Received: from MN2PR01CA0050.prod.exchangelabs.com (2603:10b6:208:23f::19) by
- SN6PR02MB5072.namprd02.prod.outlook.com (2603:10b6:805:6f::26) with
- Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3412.25; Mon, 28 Sep 2020 10:48:35 +0000
-Received: from BL2NAM02FT041.eop-nam02.prod.protection.outlook.com
- (2603:10b6:208:23f:cafe::b1) by MN2PR01CA0050.outlook.office365.com
- (2603:10b6:208:23f::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.22 via Frontend
- Transport; Mon, 28 Sep 2020 10:48:35 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
- smtp.mailfrom=xilinx.com; greensocs.com; dkim=none (message not signed)
- header.d=none;greensocs.com; dmarc=bestguesspass action=none
- header.from=xilinx.com;
-Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
- 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
-Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- BL2NAM02FT041.mail.protection.outlook.com (10.152.77.122) with Microsoft SMTP
- Server id 15.20.3412.21 via Frontend Transport; Mon, 28 Sep 2020 10:48:34
- +0000
-Received: from [149.199.38.66] (port=42926 helo=smtp.xilinx.com)
- by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
- (envelope-from <edgar@xilinx.com>)
- id 1kMqhX-0004Pp-Jt; Mon, 28 Sep 2020 03:48:11 -0700
-Received: from [127.0.0.1] (helo=xsj-pvapsmtp01)
- by smtp.xilinx.com with esmtp (Exim 4.63)
- (envelope-from <edgar@xilinx.com>)
- id 1kMqhu-000315-BG; Mon, 28 Sep 2020 03:48:34 -0700
-Received: from [10.71.116.235] (helo=localhost)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <edgar@xilinx.com>)
- id 1kMqht-00030y-S5; Mon, 28 Sep 2020 03:48:34 -0700
-Date: Mon, 28 Sep 2020 12:48:33 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-To: Damien Hedde <damien.hedde@greensocs.com>
-Subject: Re: [PATCH 3/3] hw/qdev-clock: Display error hint when clock is
- missing from device
-Message-ID: <20200928104833.GE17122@toto>
-References: <20200927090820.61859-1-f4bug@amsat.org>
- <20200927090820.61859-4-f4bug@amsat.org>
- <20200928075300.q5ngcywiz5fyu6du@sekoia-pc.home.lmichel.fr>
- <20f0ab00-8ca4-1a8f-43de-3b86dacc2124@greensocs.com>
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kMqkj-0007LH-0d; Mon, 28 Sep 2020 06:51:32 -0400
+Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
+ by mailnew.nyi.internal (Postfix) with ESMTP id E54C3580189;
+ Mon, 28 Sep 2020 06:51:25 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+ by compute7.internal (MEProxy); Mon, 28 Sep 2020 06:51:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-type:in-reply-to; s=fm1; bh=7gsnOsYfE/ntIeAZF3xHpNaTiDq
+ faTSMi3VRMKUkL4E=; b=jGsO8KYOrSukWYccM/N1xkkP369m8uiWJrVNyxwLsFs
+ v5oVe3IjQDx7bs5UVS5oJy47WxSPm/YX5B4w0orDPqFp9zIs7DhblyZ5sujwaP3r
+ IEVhudHeSCGHMUAEl4xj9O/H2SvVn49Y4BdweOBPs9yA63Z+Z9i/qOzgsoDdru2q
+ t3bAmiEpIU9N37dv/TLQ1SgqbL3UHikM8pukMuyJ/TGliHSQMSavFYckT7DsWPUb
+ CB52U7zFEovtnpJcnFxps4D34IRncSCR7MJ8zs4vXmt9JKSto93KbcT/7dCXFlaG
+ SLtBFFr5u7idWdWgIGvq/0zIzTlcka43KjJ5iozlwPw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-type:date:from:in-reply-to
+ :message-id:mime-version:references:subject:to:x-me-proxy
+ :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=7gsnOs
+ YfE/ntIeAZF3xHpNaTiDqfaTSMi3VRMKUkL4E=; b=VA0PYziO76EFg/zONWN9ox
+ 4/hDr+inhW1yojt5rDDFHUYLw21qaMTt9f1hTbnkoIIqlkaLFVxDkoB9dPgF2W+c
+ t6Olj854jAL3ssVYZxCA7HR9HkTcpp2nT0o9eytvdDMtOzXA72LBuWA8OUlH9TKb
+ 5PW+z18oPQ6zApuILt+v/K9OE3E5MDX2zjOGX2s2qQSwwEWNLGHH6HSD80qQNgtG
+ QuqkwA3B1fw7zXFfgj0O5lmsvhCj0sq4vHdfENXm/5w2L8YdrZBOFEcRoMfbAwQ1
+ o47meEnzAT40sB+hMIlc2lX4M2HosNKpXLhX/xUUbLfavjbM21IDcONrOIdkXoyQ
+ ==
+X-ME-Sender: <xms:LMBxXxBRuktaa-8C1IrnIhy3PvyyZRl-8v7YqM977mxnjietb4Ixjw>
+ <xme:LMBxX_j_3oU_1HMa-R_gPIISLj-34ElA_LRPFxFufH2YAZjch-hgKRkiNBfecH3NJ
+ I7h-OnRVIw_U7ZVF98>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrvdeigdefudcutefuodetggdotefrodftvf
+ curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+ uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+ fjughrpeffhffvuffkfhggtggujgesghdtreertddtjeenucfhrhhomhepmfhlrghushcu
+ lfgvnhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrdgukheqnecuggftrfgrthhtvg
+ hrnhepkeehheffheejuddvtedutdfftdehkedvheetueehtedujedvkeduhffhueethefg
+ necuffhomhgrihhnpehkvghrnhgvlhdrohhrghdpihhnfhhrrgguvggrugdrohhrghenuc
+ fkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedtnecurfgr
+ rhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
+X-ME-Proxy: <xmx:LMBxX8kk7Fkn91wM9fYha0_qj0Cz0q-gVAEW9U-1cTU0Dcc-Ir-wrQ>
+ <xmx:LMBxX7yrx-7l_VcZPMfYxIBCU42cnHyROIyKlu-sxKVpWCZP7ECQgQ>
+ <xmx:LMBxX2TL4qQthhBHSFXb7wUDOSd-NcfkT0pJ-4zUQN8XD0qosOG9Yw>
+ <xmx:LcBxX8PJEPAB6TxSLwQ7VKjYpHnMi4bn8K97InRM9Zj5xqyxkRgbYQ>
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by mail.messagingengine.com (Postfix) with ESMTPA id 5207F328005A;
+ Mon, 28 Sep 2020 06:51:23 -0400 (EDT)
+Date: Mon, 28 Sep 2020 12:51:21 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
+Subject: Re: [PATCH v6] nvme: allow cmb and pmr emulation on same device
+Message-ID: <20200928105121.GC33043@apples.localdomain>
+References: <20200729220107.37758-1-andrzej.jakowski@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="raC6veAxrt5nqIoY"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20f0ab00-8ca4-1a8f-43de-3b86dacc2124@greensocs.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
-X-TM-AS-User-Approved-Sender: Yes;Yes
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 1472bc33-adbc-4214-e1b2-08d8639c0c68
-X-MS-TrafficTypeDiagnostic: SN6PR02MB5072:
-X-Microsoft-Antispam-PRVS: <SN6PR02MB50722914C9A2F6CE8BE28316C2350@SN6PR02MB5072.namprd02.prod.outlook.com>
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:546;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Pb1R5gGXMTF8+ch+U5LkhXnyTNZukPo3ProxypEZPXxT5NLN793CNolEIRD1lbJ6877Sj+kSrZ/5itv0JRy2I5AbdSsVr2kFoBUxNQNcelZPa+80abfNQHAY3C0zHD96aFzf3HLIyeS/+7TfvcVNxNkhQanr0Ki9AgyrIDfiUaN6ALZVXHPEV10HnWot6ohr6RIzQ+6OXtrH8ZDdtAKaLZpJ8Q6gvtsrP5dcscmyMrXUBHWnUdH8dNtcSP1nqmCviPa4/IgKGRCxQ8hW6ml97oBUEgRIb10E2J/C9dI+2Gfa+TUcRjvwJu3k7xTUhx3Xw1+sJKfgkTI4e1r2uSiEpk7EMD2ewwigFp1PfawvQnGnDstxziQ0m0UFAFMtap8ZJnMuQd+TNK1vXSj5peSsWJZqW2k+4n07PQQqb6V+XSsYimq8Q8RKALBUzUofW58C
-X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
- SFS:(7916004)(346002)(396003)(376002)(39860400002)(136003)(46966005)(53546011)(54906003)(83380400001)(426003)(356005)(8676002)(26005)(6916009)(2906002)(9686003)(4326008)(70586007)(70206006)(9786002)(5660300002)(82740400003)(33716001)(33656002)(47076004)(1076003)(8936002)(81166007)(82310400003)(316002)(336012)(186003)(478600001)(7416002);
- DIR:OUT; SFP:1101; 
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Sep 2020 10:48:34.7023 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1472bc33-adbc-4214-e1b2-08d8639c0c68
-X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
- Helo=[xsj-pvapsmtpgw01]
-X-MS-Exchange-CrossTenant-AuthSource: BL2NAM02FT041.eop-nam02.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR02MB5072
-Received-SPF: pass client-ip=40.107.92.68; envelope-from=edgar@xilinx.com;
- helo=NAM10-BN7-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 07:03:39
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+In-Reply-To: <20200729220107.37758-1-andrzej.jakowski@linux.intel.com>
+Received-SPF: pass client-ip=66.111.4.224; envelope-from=its@irrelevant.dk;
+ helo=new2-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 06:43:03
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -140,79 +109,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Luc Michel <luc@lmichel.fr>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org, Tyrone Ting <kfting@nuvoton.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Havard Skinnemoen <hskinnemoen@google.com>
+Cc: kbusch@kernel.org, kwolf@redhat.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 28, 2020 at 12:45:15PM +0200, Damien Hedde wrote:
-> 
-> 
-> On 9/28/20 9:53 AM, Luc Michel wrote:
-> > On 11:08 Sun 27 Sep     , Philippe Mathieu-Daudé wrote:
-> >> Instead of directly aborting, display a hint to help the developer
-> >> figure out the problem (likely trying to connect a clock to a device
-> >> pre-dating the Clock API, thus not expecting clocks).
-> >>
-> >> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> > 
-> > Reviewed-by: Luc Michel <luc@lmichel.fr>
-> 
-> Reviewed-by: Damien Hedde <damien.hedde@greensocs.com>
 
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+--raC6veAxrt5nqIoY
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Jul 29 15:01, Andrzej Jakowski wrote:
+> Resending series recently posted on mailing list related to nvme device
+> extension with couple of fixes after review.
+>=20
+> This patch series does following:
+>  - Fixes problem where CMBS bit was not set in controller capabilities
+>    register, so support for CMB was not correctly advertised to guest.
+>    This is resend of patch that has been submitted and reviewed by
+>    Klaus [1]
+>  - Introduces BAR4 sharing between MSI-X vectors and CMB. This allows
+>    to have CMB and PMR emulated on the same device. This extension
+>    was indicated by Keith [2]
+>=20
+> v6:
+>  - instead of using memory_region_to_absolute_addr() function local helpe=
+r has
+>    been defined (nvme_cmb_to_absolute_addr()) to calculate absolute addre=
+ss of
+>    CMB in simplified way. Also a number of code style changes has been do=
+ne
+>    (function rename, use literal instead of macro definition, etc.)
+>=20
+> v5:
+>  - fixed problem introduced in v4 where CMB buffer was represented as
+>    subregion of BAR4 memory region. In that case CMB address was used
+>    incorrectly as it was relative to BAR4 and not absolute. Appropriate
+>    changes were added to v5 to calculate CMB address properly ([6])
+>=20
+> v4:
+>  - modified BAR4 initialization, so now it consists of CMB, MSIX and
+>    PBA memory regions overlapping on top of it. This reduces patch
+>    complexity significantly (Klaus [5])
+>=20
+> v3:
+>  - code style fixes including: removal of spurious line break, moving
+>    define into define section and code alignment (Klaus [4])
+>  - removed unintended code reintroduction (Klaus [4])
+>=20
+> v2:
+>  - rebase on Kevin's latest block branch (Klaus [3])
+>  - improved comments section (Klaus [3])
+>  - simplified calculation of BAR4 size (Klaus [3])
+>=20
+> v1:
+>  - initial push of the patch
+>=20
+> [1]: https://lore.kernel.org/qemu-devel/20200408055607.g2ii7gwqbnv6cd3w@a=
+pples.localdomain/
+> [2]: https://lore.kernel.org/qemu-devel/20200330165518.GA8234@redsun51.ss=
+a.fujisawa.hgst.com/
+> [3]: https://lore.kernel.org/qemu-devel/20200605181043.28782-1-andrzej.ja=
+kowski@linux.intel.com/
+> [4]: https://lore.kernel.org/qemu-devel/20200618092524.posxi5mysb3jjtpn@a=
+pples.localdomain/
+> [5]: https://lore.kernel.org/qemu-devel/20200626055033.6vxqvi4s5pll7som@a=
+pples.localdomain/
+> [6]: https://lore.kernel.org/qemu-devel/9143a543-d32d-f3e7-c37b-b3df7f853=
+952@linux.intel.com/
+>=20
+
+Hi Andrzej,
+
+Any chance you can respin this on git.infradead.org/qemu-nvme.git
+nvme-next branch?
 
 
-> 
-> > 
-> >> ---
-> >>  hw/core/qdev-clock.c | 11 +++++++++++
-> >>  1 file changed, 11 insertions(+)
-> >>
-> >> diff --git a/hw/core/qdev-clock.c b/hw/core/qdev-clock.c
-> >> index 47ecb5b4fae..33bd4a9d520 100644
-> >> --- a/hw/core/qdev-clock.c
-> >> +++ b/hw/core/qdev-clock.c
-> >> @@ -12,6 +12,7 @@
-> >>   */
-> >>  
-> >>  #include "qemu/osdep.h"
-> >> +#include "qemu/error-report.h"
-> >>  #include "hw/qdev-clock.h"
-> >>  #include "hw/qdev-core.h"
-> >>  #include "qapi/error.h"
-> >> @@ -153,6 +154,11 @@ Clock *qdev_get_clock_in(DeviceState *dev, const char *name)
-> >>      assert(name);
-> >>  
-> >>      ncl = qdev_get_clocklist(dev, name);
-> >> +    if (!ncl) {
-> >> +        error_report("can not find clock-in '%s' for device type '%s'",
-> >> +                     name, object_get_typename(OBJECT(dev)));
-> >> +        abort();
-> >> +    }
-> >>      assert(!ncl->output);
-> >>  
-> >>      return ncl->clock;
-> >> @@ -165,6 +171,11 @@ Clock *qdev_get_clock_out(DeviceState *dev, const char *name)
-> >>      assert(name);
-> >>  
-> >>      ncl = qdev_get_clocklist(dev, name);
-> >> +    if (!ncl) {
-> >> +        error_report("can not find clock-out '%s' for device type '%s'",
-> >> +                     name, object_get_typename(OBJECT(dev)));
-> >> +        abort();
-> >> +    }
-> >>      assert(ncl->output);
-> >>  
-> >>      return ncl->clock;
-> >> -- 
-> >> 2.26.2
-> >>
+Thanks,
+Klaus
+
+--raC6veAxrt5nqIoY
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl9xwCQACgkQTeGvMW1P
+Del5yggAmILQXpeRnLQfg28VtbcOkjc9q7JmyRJkLbMfzBgmsVSpvmzPwQDJYhSV
+7snKQsv4pAIDIk+RSeVsxYtLdYri6GrmIGMQ117SjTrGAgwkMqk/Z774Bgh22WZy
+/N5/624twAEH2it4RLXsZ9Aa8s0hrkjRm6VOYkLz4kyONGIPkBMJ6m5Smft4Ki8e
+FRmDOci9guAnawBdLoeyDOuavilhIqSiyjAkiD+3EzsKv7jwQtWgRJx06gjd+gnk
+hm6gxbpRZSLGaF2TQUlvwokbzCgb2HNDPViivdRK0RlRNtxp2ZOwI3nscleh1kyv
+TJUbQfyCIRmU0Y9274RTNVggxzgNHg==
+=TIgK
+-----END PGP SIGNATURE-----
+
+--raC6veAxrt5nqIoY--
 
