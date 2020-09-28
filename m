@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0968EC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:25:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F0B0C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:27:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EDA721D95
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:25:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 07437206B8
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:27:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NHXmlz91"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EDA721D95
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gw6ULcDN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07437206B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMt9o-0007S1-Jc
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 09:25:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59724)
+	id 1kMtC6-00012n-Sf
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 09:27:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59652)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kMt1X-00058z-C0
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 09:16:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21097)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kMt1Q-0004sJ-JX
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 09:16:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48493)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kMt1U-0002Wh-Qj
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 09:16:59 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kMt1O-0002Vs-9e
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 09:16:52 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601299016;
+ s=mimecast20190719; t=1601299009;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=9uL38bp1DG0RhgajUmqqB/H02+8TdK2vUIBR1Dazxiw=;
- b=NHXmlz916l3DnesM53ybHB8svF8x8I4ImlUNik2c3kOFa32O+Ouku0xas+YjryPuh3oADu
- af1w8U25w8KkPgZrjUZiOg3QT9LfAjtnUkkaNyTfXe9cWkGcU04HSXJ+h6plZOzg1Oj0XM
- Bh7byo+v1YyrB3+HhQrYW5TBwwwmArw=
+ bh=SsB7Z7wEm/pw3WEmmpgLTLeL5YfQEvM9koaXlvAtZlE=;
+ b=Gw6ULcDNZsISIoR0gctieL3M7InbaTBp+v+fF5WVfs39RvDVexCshBZlX09W4snGTfa5P0
+ opZuRb/dYFr/vX8ZU7gJ/mZiyBm3A1RCsny6evi6xGSYoYhJ2qWy2bJL/7TxN+EcmTUe0O
+ mno08hGtnQ2N0xYLMR1wJYqaAe08ANg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-16-diU1LSsyMVyT2geUsEdu7Q-1; Mon, 28 Sep 2020 09:16:52 -0400
-X-MC-Unique: diU1LSsyMVyT2geUsEdu7Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-461-Gm3DI93_PSWOil5lyAl2WA-1; Mon, 28 Sep 2020 09:16:43 -0400
+X-MC-Unique: Gm3DI93_PSWOil5lyAl2WA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F20EB8064B1;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 056EF801AB2;
  Mon, 28 Sep 2020 13:16:40 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
  [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6942310013D0;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 691795C1BB;
  Mon, 28 Sep 2020 13:16:39 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 698F14083F; Mon, 28 Sep 2020 15:16:38 +0200 (CEST)
+ id 8A40740844; Mon, 28 Sep 2020 15:16:38 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 2/5] usb/hcd-xhci: Move qemu-xhci device to hcd-xhci-pci.c
-Date: Mon, 28 Sep 2020 15:16:35 +0200
-Message-Id: <20200928131638.9486-3-kraxel@redhat.com>
+Subject: [PULL 4/5] usb: hcd-xhci-sysbus: Attach xhci to sysbus device
+Date: Mon, 28 Sep 2020 15:16:37 +0200
+Message-Id: <20200928131638.9486-5-kraxel@redhat.com>
 In-Reply-To: <20200928131638.9486-1-kraxel@redhat.com>
 References: <20200928131638.9486-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 03:47:08
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 03:29:35
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
@@ -104,204 +104,212 @@ Sender: "Qemu-devel"
 
 From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
 
-Move pci specific devices to new file. This set the environment to move all
-pci specific hooks in hcd-xhci.c to hcd-xhci-pci.c.
+Use XHCI as sysbus device, add memory region property to get the
+address space instance for dma read/write.
 
 Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-Message-id: 1600957256-6494-3-git-send-email-sai.pavan.boddu@xilinx.com
+Message-id: 1600957256-6494-5-git-send-email-sai.pavan.boddu@xilinx.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/usb/hcd-xhci.h     |  4 +++
- hw/usb/hcd-xhci-pci.c | 66 +++++++++++++++++++++++++++++++++++++++++++
- hw/usb/hcd-xhci.c     | 33 ++--------------------
- hw/usb/Kconfig        |  6 ++++
- hw/usb/meson.build    |  1 +
- 5 files changed, 79 insertions(+), 31 deletions(-)
- create mode 100644 hw/usb/hcd-xhci-pci.c
+ hw/usb/hcd-xhci-sysbus.h |  32 ++++++++++++
+ hw/usb/hcd-xhci.h        |   1 +
+ hw/usb/hcd-xhci-sysbus.c | 109 +++++++++++++++++++++++++++++++++++++++
+ hw/usb/Kconfig           |   5 ++
+ hw/usb/meson.build       |   1 +
+ 5 files changed, 148 insertions(+)
+ create mode 100644 hw/usb/hcd-xhci-sysbus.h
+ create mode 100644 hw/usb/hcd-xhci-sysbus.c
 
+diff --git a/hw/usb/hcd-xhci-sysbus.h b/hw/usb/hcd-xhci-sysbus.h
+new file mode 100644
+index 000000000000..a308753ceb9b
+--- /dev/null
++++ b/hw/usb/hcd-xhci-sysbus.h
+@@ -0,0 +1,32 @@
++/*
++ * USB xHCI controller for system-bus interface
++ *
++ * SPDX-FileCopyrightText: 2020 Xilinx
++ * SPDX-FileContributor: Author: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
++ * SPDX-sourceInfo: Based on hcd-echi-sysbus
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
++#ifndef HW_USB_HCD_XHCI_SYSBUS_H
++#define HW_USB_HCD_XHCI_SYSBUS_H
++
++#include "hw/usb.h"
++#include "hcd-xhci.h"
++#include "hw/sysbus.h"
++
++#define TYPE_XHCI_SYSBUS "sysbus-xhci"
++#define XHCI_SYSBUS(obj) \
++    OBJECT_CHECK(XHCISysbusState, (obj), TYPE_XHCI_SYSBUS)
++
++
++typedef struct XHCISysbusState {
++    /*< private >*/
++    SysBusDevice parent_obj;
++    /*< public >*/
++    XHCIState xhci;
++    qemu_irq *irq;
++} XHCISysbusState;
++
++void xhci_sysbus_reset(DeviceState *dev);
++#endif
 diff --git a/hw/usb/hcd-xhci.h b/hw/usb/hcd-xhci.h
-index c8a8ae4c34eb..effd46cea66f 100644
+index 0040c271d62f..f859a17e73ee 100644
 --- a/hw/usb/hcd-xhci.h
 +++ b/hw/usb/hcd-xhci.h
-@@ -23,6 +23,8 @@
- #define HW_USB_HCD_XHCI_H
- #include "qom/object.h"
+@@ -189,6 +189,7 @@ typedef struct XHCIState {
  
-+#include "hw/usb.h"
-+
- #define TYPE_XHCI "base-xhci"
- #define TYPE_NEC_XHCI "nec-usb-xhci"
- #define TYPE_QEMU_XHCI "qemu-xhci"
-@@ -229,4 +231,6 @@ struct XHCIState {
-     bool nec_quirks;
- };
- 
-+bool xhci_get_flag(XHCIState *xhci, enum xhci_flags bit);
-+void xhci_set_flag(XHCIState *xhci, enum xhci_flags bit);
- #endif
-diff --git a/hw/usb/hcd-xhci-pci.c b/hw/usb/hcd-xhci-pci.c
+     USBBus bus;
+     MemoryRegion mem;
++    MemoryRegion *dma_mr;
+     AddressSpace *as;
+     MemoryRegion mem_cap;
+     MemoryRegion mem_oper;
+diff --git a/hw/usb/hcd-xhci-sysbus.c b/hw/usb/hcd-xhci-sysbus.c
 new file mode 100644
-index 000000000000..15627575660f
+index 000000000000..852ca5103b4d
 --- /dev/null
-+++ b/hw/usb/hcd-xhci-pci.c
-@@ -0,0 +1,66 @@
++++ b/hw/usb/hcd-xhci-sysbus.c
+@@ -0,0 +1,109 @@
 +/*
-+ * USB xHCI controller with PCI bus emulation
-+ *
-+ * SPDX-FileCopyrightText: 2011 Securiforest
-+ * SPDX-FileContributor: Hector Martin <hector@marcansoft.com>
-+ * SPDX-sourceInfo: Based on usb-ohci.c, emulates Renesas NEC USB 3.0
++ * USB xHCI controller for system-bus interface
++ * Based on hcd-echi-sysbus.c
++
 + * SPDX-FileCopyrightText: 2020 Xilinx
-+ * SPDX-FileContributor: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-+ * SPDX-sourceInfo: Moved the pci specific content for hcd-xhci.c to
-+ *                  hcd-xhci-pci.c
++ * SPDX-FileContributor: Author: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
 + *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ * SPDX-License-Identifier: GPL-2.0-or-later
 + */
 +#include "qemu/osdep.h"
-+#include "hw/pci/pci.h"
 +#include "hw/qdev-properties.h"
-+#include "hw/pci/msi.h"
-+#include "hw/pci/msix.h"
-+#include "hcd-xhci.h"
++#include "migration/vmstate.h"
 +#include "trace.h"
 +#include "qapi/error.h"
++#include "hcd-xhci-sysbus.h"
++#include "hw/irq.h"
 +
-+static void qemu_xhci_class_init(ObjectClass *klass, void *data)
++static void xhci_sysbus_intr_raise(XHCIState *xhci, int n, bool level)
 +{
-+    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
++    XHCISysbusState *s = container_of(xhci, XHCISysbusState, xhci);
 +
-+    k->vendor_id    = PCI_VENDOR_ID_REDHAT;
-+    k->device_id    = PCI_DEVICE_ID_REDHAT_XHCI;
-+    k->revision     = 0x01;
++    qemu_set_irq(s->irq[n], level);
 +}
 +
-+static void qemu_xhci_instance_init(Object *obj)
++void xhci_sysbus_reset(DeviceState *dev)
 +{
-+    XHCIState *xhci = XHCI(obj);
++    XHCISysbusState *s = XHCI_SYSBUS(dev);
 +
-+    xhci->msi      = ON_OFF_AUTO_OFF;
-+    xhci->msix     = ON_OFF_AUTO_AUTO;
-+    xhci->numintrs = MAXINTRS;
-+    xhci->numslots = MAXSLOTS;
-+    xhci_set_flag(xhci, XHCI_FLAG_SS_FIRST);
++    device_legacy_reset(DEVICE(&s->xhci));
 +}
 +
-+static const TypeInfo qemu_xhci_info = {
-+    .name          = TYPE_QEMU_XHCI,
-+    .parent        = TYPE_XHCI,
-+    .class_init    = qemu_xhci_class_init,
-+    .instance_init = qemu_xhci_instance_init,
++static void xhci_sysbus_realize(DeviceState *dev, Error **errp)
++{
++    XHCISysbusState *s = XHCI_SYSBUS(dev);
++    Error *err = NULL;
++
++    object_property_set_link(OBJECT(&s->xhci), "host", OBJECT(s), NULL);
++    object_property_set_bool(OBJECT(&s->xhci), "realized", true, &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    s->irq = g_new0(qemu_irq, s->xhci.numintrs);
++    qdev_init_gpio_out_named(dev, s->irq, SYSBUS_DEVICE_GPIO_IRQ,
++                             s->xhci.numintrs);
++    if (s->xhci.dma_mr) {
++        s->xhci.as =  g_malloc0(sizeof(AddressSpace));
++        address_space_init(s->xhci.as, s->xhci.dma_mr, NULL);
++    } else {
++        s->xhci.as = &address_space_memory;
++    }
++
++    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->xhci.mem);
++}
++
++static void xhci_sysbus_instance_init(Object *obj)
++{
++    XHCISysbusState *s = XHCI_SYSBUS(obj);
++
++    object_initialize_child(obj, "xhci-core", &s->xhci, TYPE_XHCI);
++    qdev_alias_all_properties(DEVICE(&s->xhci), obj);
++
++    object_property_add_link(obj, "dma", TYPE_MEMORY_REGION,
++                             (Object **)&s->xhci.dma_mr,
++                             qdev_prop_allow_set_link_before_realize,
++                             OBJ_PROP_LINK_STRONG);
++    s->xhci.intr_update = NULL;
++    s->xhci.intr_raise = xhci_sysbus_intr_raise;
++}
++
++static Property xhci_sysbus_props[] = {
++    DEFINE_PROP_UINT32("intrs", XHCISysbusState, xhci.numintrs, MAXINTRS),
++    DEFINE_PROP_UINT32("slots", XHCISysbusState, xhci.numslots, MAXSLOTS),
++    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static void xhci_register_types(void)
++static const VMStateDescription vmstate_xhci_sysbus = {
++    .name = "xhci-sysbus",
++    .version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_STRUCT(xhci, XHCISysbusState, 1, vmstate_xhci, XHCIState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void xhci_sysbus_class_init(ObjectClass *klass, void *data)
 +{
-+    type_register_static(&qemu_xhci_info);
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->reset = xhci_sysbus_reset;
++    dc->realize = xhci_sysbus_realize;
++    dc->vmsd = &vmstate_xhci_sysbus;
++    device_class_set_props(dc, xhci_sysbus_props);
 +}
 +
-+type_init(xhci_register_types)
-diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-index 254cf1ead4b5..f92756760fe5 100644
---- a/hw/usb/hcd-xhci.c
-+++ b/hw/usb/hcd-xhci.c
-@@ -23,7 +23,6 @@
- #include "qemu/timer.h"
- #include "qemu/module.h"
- #include "qemu/queue.h"
--#include "hw/usb.h"
- #include "migration/vmstate.h"
- #include "hw/pci/pci.h"
- #include "hw/qdev-properties.h"
-@@ -429,12 +428,12 @@ static const char *ep_state_name(uint32_t state)
-                        ARRAY_SIZE(ep_state_names));
- }
- 
--static bool xhci_get_flag(XHCIState *xhci, enum xhci_flags bit)
-+bool xhci_get_flag(XHCIState *xhci, enum xhci_flags bit)
- {
-     return xhci->flags & (1 << bit);
- }
- 
--static void xhci_set_flag(XHCIState *xhci, enum xhci_flags bit)
-+void xhci_set_flag(XHCIState *xhci, enum xhci_flags bit)
- {
-     xhci->flags |= (1 << bit);
- }
-@@ -3730,37 +3729,9 @@ static const TypeInfo xhci_info = {
-     },
- };
- 
--static void qemu_xhci_class_init(ObjectClass *klass, void *data)
--{
--    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
--
--    k->vendor_id    = PCI_VENDOR_ID_REDHAT;
--    k->device_id    = PCI_DEVICE_ID_REDHAT_XHCI;
--    k->revision     = 0x01;
--}
--
--static void qemu_xhci_instance_init(Object *obj)
--{
--    XHCIState *xhci = XHCI(obj);
--
--    xhci->msi      = ON_OFF_AUTO_OFF;
--    xhci->msix     = ON_OFF_AUTO_AUTO;
--    xhci->numintrs = MAXINTRS;
--    xhci->numslots = MAXSLOTS;
--    xhci_set_flag(xhci, XHCI_FLAG_SS_FIRST);
--}
--
--static const TypeInfo qemu_xhci_info = {
--    .name          = TYPE_QEMU_XHCI,
--    .parent        = TYPE_XHCI,
--    .class_init    = qemu_xhci_class_init,
--    .instance_init = qemu_xhci_instance_init,
--};
--
- static void xhci_register_types(void)
- {
-     type_register_static(&xhci_info);
--    type_register_static(&qemu_xhci_info);
- }
- 
- type_init(xhci_register_types)
++static const TypeInfo xhci_sysbus_info = {
++    .name          = TYPE_XHCI_SYSBUS,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(XHCISysbusState),
++    .class_init    = xhci_sysbus_class_init,
++    .instance_init = xhci_sysbus_instance_init
++};
++
++static void xhci_sysbus_register_types(void)
++{
++    type_register_static(&xhci_sysbus_info);
++}
++
++type_init(xhci_sysbus_register_types);
 diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
-index 3fc8fbe3c74c..bab582f58dea 100644
+index bab582f58dea..4dd2ba9630cb 100644
 --- a/hw/usb/Kconfig
 +++ b/hw/usb/Kconfig
-@@ -36,6 +36,12 @@ config USB_XHCI
+@@ -48,6 +48,11 @@ config USB_XHCI_NEC
      depends on PCI
-     select USB
+     select USB_XHCI
  
-+config USB_XHCI_PCI
++config USB_XHCI_SYSBUS
 +    bool
-+    default y if PCI_DEVICES
-+    depends on PCI
-+    select USB_XHCI
++    default y if USB_XHCI
++    select USB
 +
- config USB_XHCI_NEC
+ config USB_MUSB
      bool
-     default y if PCI_DEVICES
+     select USB
 diff --git a/hw/usb/meson.build b/hw/usb/meson.build
-index b7c7ff23bfbd..90dc54f96135 100644
+index 90dc54f96135..934e4fa67551 100644
 --- a/hw/usb/meson.build
 +++ b/hw/usb/meson.build
-@@ -21,6 +21,7 @@ softmmu_ss.add(when: 'CONFIG_USB_EHCI', if_true: files('hcd-ehci.c'))
- softmmu_ss.add(when: 'CONFIG_USB_EHCI_PCI', if_true: files('hcd-ehci-pci.c'))
+@@ -22,6 +22,7 @@ softmmu_ss.add(when: 'CONFIG_USB_EHCI_PCI', if_true: files('hcd-ehci-pci.c'))
  softmmu_ss.add(when: 'CONFIG_USB_EHCI_SYSBUS', if_true: files('hcd-ehci.c', 'hcd-ehci-sysbus.c'))
  softmmu_ss.add(when: 'CONFIG_USB_XHCI', if_true: files('hcd-xhci.c'))
-+softmmu_ss.add(when: 'CONFIG_USB_XHCI_PCI', if_true: files('hcd-xhci-pci.c'))
+ softmmu_ss.add(when: 'CONFIG_USB_XHCI_PCI', if_true: files('hcd-xhci-pci.c'))
++softmmu_ss.add(when: 'CONFIG_USB_XHCI_SYSBUS', if_true: files('hcd-xhci-sysbus.c'))
  softmmu_ss.add(when: 'CONFIG_USB_XHCI_NEC', if_true: files('hcd-xhci-nec.c'))
  softmmu_ss.add(when: 'CONFIG_USB_MUSB', if_true: files('hcd-musb.c'))
  softmmu_ss.add(when: 'CONFIG_USB_DWC2', if_true: files('hcd-dwc2.c'))
