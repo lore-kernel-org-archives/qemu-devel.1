@@ -2,58 +2,70 @@ Return-Path: <SRS0=Z1O7=DF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC87BC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:11:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03EEFC4727C
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:11:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5044C2074A
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:11:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5044C2074A
-Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id A9B102074A
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:11:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9B102074A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49690 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMsvr-0004ZA-9o
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 09:11:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55668)
+	id 1kMsvu-0004f7-2B
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 09:11:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55284)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kMsmw-0005EY-Ay; Mon, 28 Sep 2020 09:01:56 -0400
-Received: from relay.sw.ru ([185.231.240.75]:58700 helo=relay3.sw.ru)
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1kMsm8-0004hM-Uh
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 09:01:04 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:35066 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kMsmk-0000QA-9U; Mon, 28 Sep 2020 09:01:54 -0400
-Received: from [172.16.25.136] (helo=localhost.sw.ru)
- by relay3.sw.ru with esmtp (Exim 4.94)
- (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kMsmA-001tba-FS; Mon, 28 Sep 2020 16:01:06 +0300
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com,
- stefanha@redhat.com, fam@euphon.net, jsnow@redhat.com, armbru@redhat.com,
- eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com,
- andrey.shinkevich@virtuozzo.com
-Subject: [PATCH v9 3/9] qapi: add filter-node-name to block-stream
-Date: Mon, 28 Sep 2020 15:59:55 +0300
-Message-Id: <1601298001-774096-4-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1601298001-774096-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1601298001-774096-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Received-SPF: pass client-ip=185.231.240.75;
- envelope-from=andrey.shinkevich@virtuozzo.com; helo=relay3.sw.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 09:00:28
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1kMsm3-0000EF-IJ
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 09:01:04 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 8E0D6C31EF5B88D17BD7;
+ Mon, 28 Sep 2020 21:00:44 +0800 (CST)
+Received: from [10.174.186.4] (10.174.186.4) by DGGEMS402-HUB.china.huawei.com
+ (10.3.19.202) with Microsoft SMTP Server id 14.3.487.0;
+ Mon, 28 Sep 2020 21:00:36 +0800
+Subject: Re: [PATCH] migration/dirtyrate: present dirty rate only when
+ querying the rate has completed
+To: David Edmondson <david.edmondson@oracle.com>, <quintela@redhat.com>,
+ <eblake@redhat.com>, <dgilbert@redhat.com>, <berrange@redhat.com>
+References: <1601182520-130450-1-git-send-email-zhengchuan@huawei.com>
+ <m2mu1af5uj.fsf@oracle.com>
+From: Zheng Chuan <zhengchuan@huawei.com>
+Message-ID: <a4a04f59-a230-08f7-96bf-9518e0e0ee8b@huawei.com>
+Date: Mon, 28 Sep 2020 21:00:36 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
+MIME-Version: 1.0
+In-Reply-To: <m2mu1af5uj.fsf@oracle.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.186.4]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.35; envelope-from=zhengchuan@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 09:00:45
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -25
+X-Spam_score: -2.6
+X-Spam_bar: --
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -66,127 +78,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: alex.chen@huawei.com, wanghao232@huawei.com, zhang.zhanghailiang@huawei.com,
+ xiexiangyou@huawei.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-From: Andrey Shinkevich via <qemu-devel@nongnu.org>
 
-Provide the possibility to pass the 'filter-node-name' parameter to the
-block-stream job as it is done for the commit block job.
 
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/monitor/block-hmp-cmds.c | 4 ++--
- block/stream.c                 | 4 +++-
- blockdev.c                     | 4 +++-
- include/block/block_int.h      | 7 ++++++-
- qapi/block-core.json           | 6 ++++++
- 5 files changed, 20 insertions(+), 5 deletions(-)
 
-diff --git a/block/monitor/block-hmp-cmds.c b/block/monitor/block-hmp-cmds.c
-index 4d3db5e..4e66775 100644
---- a/block/monitor/block-hmp-cmds.c
-+++ b/block/monitor/block-hmp-cmds.c
-@@ -507,8 +507,8 @@ void hmp_block_stream(Monitor *mon, const QDict *qdict)
- 
-     qmp_block_stream(true, device, device, base != NULL, base, false, NULL,
-                      false, NULL, qdict_haskey(qdict, "speed"), speed, true,
--                     BLOCKDEV_ON_ERROR_REPORT, false, false, false, false,
--                     &error);
-+                     BLOCKDEV_ON_ERROR_REPORT, false, NULL, false, false, false,
-+                     false, &error);
- 
-     hmp_handle_error(mon, error);
- }
-diff --git a/block/stream.c b/block/stream.c
-index 8ce6729..e0540ee 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -221,7 +221,9 @@ static const BlockJobDriver stream_job_driver = {
- void stream_start(const char *job_id, BlockDriverState *bs,
-                   BlockDriverState *base, const char *backing_file_str,
-                   int creation_flags, int64_t speed,
--                  BlockdevOnError on_error, Error **errp)
-+                  BlockdevOnError on_error,
-+                  const char *filter_node_name,
-+                  Error **errp)
- {
-     StreamBlockJob *s;
-     BlockDriverState *iter;
-diff --git a/blockdev.c b/blockdev.c
-index bebd3ba..d719c47 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2489,6 +2489,7 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-                       bool has_backing_file, const char *backing_file,
-                       bool has_speed, int64_t speed,
-                       bool has_on_error, BlockdevOnError on_error,
-+                      bool has_filter_node_name, const char *filter_node_name,
-                       bool has_auto_finalize, bool auto_finalize,
-                       bool has_auto_dismiss, bool auto_dismiss,
-                       Error **errp)
-@@ -2571,7 +2572,8 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-     }
- 
-     stream_start(has_job_id ? job_id : NULL, bs, base_bs, base_name,
--                 job_flags, has_speed ? speed : 0, on_error, &local_err);
-+                 job_flags, has_speed ? speed : 0, on_error,
-+                 filter_node_name, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         goto out;
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 38cad9d..f782737 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -1134,6 +1134,9 @@ int is_windows_drive(const char *filename);
-  *                  See @BlockJobCreateFlags
-  * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
-  * @on_error: The action to take upon error.
-+ * @filter_node_name: The node name that should be assigned to the filter
-+ * driver that the commit job inserts into the graph above @bs. NULL means
-+ * that a node name should be autogenerated.
-  * @errp: Error object.
-  *
-  * Start a streaming operation on @bs.  Clusters that are unallocated
-@@ -1146,7 +1149,9 @@ int is_windows_drive(const char *filename);
- void stream_start(const char *job_id, BlockDriverState *bs,
-                   BlockDriverState *base, const char *backing_file_str,
-                   int creation_flags, int64_t speed,
--                  BlockdevOnError on_error, Error **errp);
-+                  BlockdevOnError on_error,
-+                  const char *filter_node_name,
-+                  Error **errp);
- 
- /**
-  * commit_start:
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 3c16f1e..32fb097 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2533,6 +2533,11 @@
- #            'stop' and 'enospc' can only be used if the block device
- #            supports io-status (see BlockInfo).  Since 1.3.
- #
-+# @filter-node-name: the node name that should be assigned to the
-+#                    filter driver that the stream job inserts into the graph
-+#                    above @device. If this option is not given, a node name is
-+#                    autogenerated. (Since: 5.2)
-+#
- # @auto-finalize: When false, this job will wait in a PENDING state after it has
- #                 finished its work, waiting for @block-job-finalize before
- #                 making any block graph changes.
-@@ -2563,6 +2568,7 @@
-   'data': { '*job-id': 'str', 'device': 'str', '*base': 'str',
-             '*base-node': 'str', '*backing-file': 'str', '*speed': 'int',
-             '*on-error': 'BlockdevOnError',
-+            '*filter-node-name': 'str',
-             '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
- 
- ##
--- 
-1.8.3.1
+On 2020/9/28 20:23, David Edmondson wrote:
+> On Sunday, 2020-09-27 at 12:55:20 +08, Chuan Zheng wrote:
+> 
+>> Make dirty_rate field optional, present dirty rate only when querying
+>> the rate has completed.
+>> The qmp results is shown as follow:
+>> @unstarted:
+>> {"return":{"status":"unstarted","start-time":0,"calc-time":0},"id":"libvirt-12"}
+>> @measuring:
+>> {"return":{"status":"measuring","start-time":0,"calc-time":0},"id":"libvirt-14"}
+> 
+> Not this patch, but the "measuring" state could include both the
+> start-time and the calc-time, allowing a caller to determine when they
+> should expect to come back looking for a result.
+> 
+Hi, David.
+Yes, maybe we should record start-time and calc-time in reset_dirtyrate_stat() and move it forward just after
+setting CalculatingState status succeed in get_dirtyrate_thread.
 
+>> @measured:
+>> {"return":{"status":"measured","dirty-rate":4,"start-time":150146,"calc-time":1},"id":"libvirt-15"}
+>>
+>> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
+> 
+> With the minor wording changes below...
+> 
+> Reviewed-by: David Edmondson <david.edmondson@oracle.com>
+> 
+>> ---
+>>  migration/dirtyrate.c | 3 +--
+>>  qapi/migration.json   | 9 ++++-----
+>>  2 files changed, 5 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+>> index 68577ef..9024b0f 100644
+>> --- a/migration/dirtyrate.c
+>> +++ b/migration/dirtyrate.c
+>> @@ -69,9 +69,8 @@ static struct DirtyRateInfo *query_dirty_rate_info(void)
+>>      struct DirtyRateInfo *info = g_malloc0(sizeof(DirtyRateInfo));
+>>  
+>>      if (qatomic_read(&CalculatingState) == DIRTY_RATE_STATUS_MEASURED) {
+>> +        info->has_dirty_rate = true;
+>>          info->dirty_rate = dirty_rate;
+>> -    } else {
+>> -        info->dirty_rate = -1;
+>>      }
+>>  
+>>      info->status = CalculatingState;
+>> diff --git a/qapi/migration.json b/qapi/migration.json
+>> index ce2216c..6e428f7 100644
+>> --- a/qapi/migration.json
+>> +++ b/qapi/migration.json
+>> @@ -1743,10 +1743,9 @@
+>>  #
+>>  # Information about current dirty page rate of vm.
+>>  #
+>> -# @dirty-rate: @dirtyrate describing the dirty page rate of vm
+>> -#          in units of MB/s.
+>> -#          If this field returns '-1', it means querying has not
+>> -#          yet started or completed.
+>> +# @dirty-rate: dirty-rate describing the dirty page rate of vm
+>> +#              in units of MB/s, present only when querying the
+>> +#              rate has completed.
+> 
+> How about:
+> 
+> @dirty-rate: an estimate of the dirty page rate of the VM in units of
+> 	     MB/s, present only when estimating the rate has completed.
+> 
+That's better, thanks.
+
+>>  #
+>>  # @status: status containing dirtyrate query status includes
+>>  #          'unstarted' or 'measuring' or 'measured'
+>> @@ -1759,7 +1758,7 @@
+>>  #
+>>  ##
+>>  { 'struct': 'DirtyRateInfo',
+>> -  'data': {'dirty-rate': 'int64',
+>> +  'data': {'*dirty-rate': 'int64',
+>>             'status': 'DirtyRateStatus',
+>>             'start-time': 'int64',
+>>             'calc-time': 'int64'} }
+>> -- 
+>> 1.8.3.1
+> 
+> dme.
+> 
 
