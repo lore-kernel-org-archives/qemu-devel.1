@@ -2,77 +2,91 @@ Return-Path: <SRS0=Z1O7=DF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB41EC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 17:47:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04111C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 17:47:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F7212083B
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 17:47:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6FC5E2083B
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 17:47:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="uRwDlvDi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F7212083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WVIP2hOp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FC5E2083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54020 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMxFW-00081O-6W
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 13:47:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48786)
+	id 1kMxFb-0008Dp-CZ
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 13:47:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49012)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <tsimpson@qualcomm.com>)
- id 1kMwxj-0002q5-8C
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 13:29:19 -0400
-Received: from alexa-out-sd-02.qualcomm.com ([199.106.114.39]:51869)
- by eggs.gnu.org with esmtps (TLS1.2:RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <tsimpson@qualcomm.com>)
- id 1kMwxg-0007v2-Ji
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 13:29:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
- t=1601314156; x=1632850156;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=6BrnM6dxL5Kb7rzVDKnQjwqRht2632BP/pwRgXWRBAk=;
- b=uRwDlvDitMSMJnLAyLU3tHI1BeP9AQSCyiylzuhILhJXGyHP9r8MgRMa
- TWxNrTrjtCrgL7HRl5zWRSaOwzyPdmXwIAmD2v7Zs0/Ynl/JmrEcQk3Ej
- 771f9Vgs/2qX3evpSVT9sjHgMoPUpyCJxB8JcGRw7bypPRCjsI3u5DDtb A=;
-Received: from unknown (HELO ironmsg02-sd.qualcomm.com) ([10.53.140.142])
- by alexa-out-sd-02.qualcomm.com with ESMTP; 28 Sep 2020 10:29:05 -0700
-X-QCInternal: smtphost
-Received: from vu-tsimpson-aus.qualcomm.com (HELO
- vu-tsimpson1-aus.qualcomm.com) ([10.222.150.1])
- by ironmsg02-sd.qualcomm.com with ESMTP; 28 Sep 2020 10:29:04 -0700
-Received: by vu-tsimpson1-aus.qualcomm.com (Postfix, from userid 47164)
- id 4572F11E9; Mon, 28 Sep 2020 12:29:04 -0500 (CDT)
-From: Taylor Simpson <tsimpson@quicinc.com>
-To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v4 19/29] Hexagon (target/hexagon) generator phase 3 - C
- preprocessor for decode tree
-Date: Mon, 28 Sep 2020 12:28:48 -0500
-Message-Id: <1601314138-9930-20-git-send-email-tsimpson@quicinc.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1601314138-9930-1-git-send-email-tsimpson@quicinc.com>
-References: <1601314138-9930-1-git-send-email-tsimpson@quicinc.com>
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kMwyC-0003Lj-PR
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 13:29:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50099)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kMwy9-00081D-83
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 13:29:48 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601314181;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=VKk46sdFk/P7SA14/DSbPrreDC+Np0hWeiYURj4cHNY=;
+ b=WVIP2hOpn7JiOpMDuklCEWSb/AYA3FwdAslfbI73Yc2Hk7xw9UCB31Y9LaeNQ0sJz/B5f5
+ xeeDsvzoTky98tidJ+PmbUvvyq91kRbeBPUI7POXyISnQDlMVYqxji+3CpriScu7Svmk65
+ cRhCU9mEpU9JK7jgHNdu0cWZ2l6U8nI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-238-8sdpYu-oOpaZtLCNKlG6vA-1; Mon, 28 Sep 2020 13:29:37 -0400
+X-MC-Unique: 8sdpYu-oOpaZtLCNKlG6vA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B347A80572E;
+ Mon, 28 Sep 2020 17:29:36 +0000 (UTC)
+Received: from thuth.remote.csb (unknown [10.40.192.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D19A573666;
+ Mon, 28 Sep 2020 17:29:34 +0000 (UTC)
+Subject: Re: [PATCH v2 3/8] qemu/bswap: Replace bswapXXs() by compiler
+ __builtin_bswap()
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200928131934.739451-1-philmd@redhat.com>
+ <20200928131934.739451-4-philmd@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <82d583fa-6c71-2e79-2af7-b2ccdfe07b3a@redhat.com>
+Date: Mon, 28 Sep 2020 19:29:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Received-SPF: pass client-ip=199.106.114.39;
- envelope-from=tsimpson@qualcomm.com; helo=alexa-out-sd-02.qualcomm.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 13:29:03
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.199,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+In-Reply-To: <20200928131934.739451-4-philmd@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 03:47:08
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -86,121 +100,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ale@rev.ng, riku.voipio@iki.fi, richard.henderson@linaro.org,
- laurent@vivier.eu, tsimpson@quicinc.com, philmd@redhat.com,
- aleksandar.m.mail@gmail.com
+Cc: Fam Zheng <fam@euphon.net>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Kamil Rytarowski <kamil@netbsd.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UnVuIHRoZSBDIHByZXByb2Nlc3NvciBhY3Jvc3MgdGhlIGluc3RydWN0aW9uIGRlZmluaXRpb24g
-YW5kIGVuY29kaW5nCmZpbGVzIHRvIGV4cGFuZCBtYWNyb3MgYW5kIHByZXBhcmUgdGhlIGlzZXQu
-cHkgZmlsZS4gIFRoZSByZXN1bHRpbmcKZmlsbCBjb250YWlucyBweXRob24gZGF0YSBzdHJ1Y3R1
-cmVzIHVzZWQgdG8gYnVpbGQgdGhlIGRlY29kZSB0cmVlLgoKU2lnbmVkLW9mZi1ieTogVGF5bG9y
-IFNpbXBzb24gPHRzaW1wc29uQHF1aWNpbmMuY29tPgotLS0KIHRhcmdldC9oZXhhZ29uL2dlbl9k
-ZWN0cmVlX2ltcG9ydC5jIHwgMTkxICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KwogMSBmaWxlIGNoYW5nZWQsIDE5MSBpbnNlcnRpb25zKCspCiBjcmVhdGUgbW9kZSAxMDA2NDQg
-dGFyZ2V0L2hleGFnb24vZ2VuX2RlY3RyZWVfaW1wb3J0LmMKCmRpZmYgLS1naXQgYS90YXJnZXQv
-aGV4YWdvbi9nZW5fZGVjdHJlZV9pbXBvcnQuYyBiL3RhcmdldC9oZXhhZ29uL2dlbl9kZWN0cmVl
-X2ltcG9ydC5jCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CmluZGV4IDAwMDAwMDAuLjIzNzcyNmUKLS0t
-IC9kZXYvbnVsbAorKysgYi90YXJnZXQvaGV4YWdvbi9nZW5fZGVjdHJlZV9pbXBvcnQuYwpAQCAt
-MCwwICsxLDE5MSBAQAorLyoKKyAqICBDb3B5cmlnaHQoYykgMjAxOS0yMDIwIFF1YWxjb21tIElu
-bm92YXRpb24gQ2VudGVyLCBJbmMuIEFsbCBSaWdodHMgUmVzZXJ2ZWQuCisgKgorICogIFRoaXMg
-cHJvZ3JhbSBpcyBmcmVlIHNvZnR3YXJlOyB5b3UgY2FuIHJlZGlzdHJpYnV0ZSBpdCBhbmQvb3Ig
-bW9kaWZ5CisgKiAgaXQgdW5kZXIgdGhlIHRlcm1zIG9mIHRoZSBHTlUgR2VuZXJhbCBQdWJsaWMg
-TGljZW5zZSBhcyBwdWJsaXNoZWQgYnkKKyAqICB0aGUgRnJlZSBTb2Z0d2FyZSBGb3VuZGF0aW9u
-OyBlaXRoZXIgdmVyc2lvbiAyIG9mIHRoZSBMaWNlbnNlLCBvcgorICogIChhdCB5b3VyIG9wdGlv
-bikgYW55IGxhdGVyIHZlcnNpb24uCisgKgorICogIFRoaXMgcHJvZ3JhbSBpcyBkaXN0cmlidXRl
-ZCBpbiB0aGUgaG9wZSB0aGF0IGl0IHdpbGwgYmUgdXNlZnVsLAorICogIGJ1dCBXSVRIT1VUIEFO
-WSBXQVJSQU5UWTsgd2l0aG91dCBldmVuIHRoZSBpbXBsaWVkIHdhcnJhbnR5IG9mCisgKiAgTUVS
-Q0hBTlRBQklMSVRZIG9yIEZJVE5FU1MgRk9SIEEgUEFSVElDVUxBUiBQVVJQT1NFLiAgU2VlIHRo
-ZQorICogIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlIGZvciBtb3JlIGRldGFpbHMuCisgKgor
-ICogIFlvdSBzaG91bGQgaGF2ZSByZWNlaXZlZCBhIGNvcHkgb2YgdGhlIEdOVSBHZW5lcmFsIFB1
-YmxpYyBMaWNlbnNlCisgKiAgYWxvbmcgd2l0aCB0aGlzIHByb2dyYW07IGlmIG5vdCwgc2VlIDxo
-dHRwOi8vd3d3LmdudS5vcmcvbGljZW5zZXMvPi4KKyAqLworCisvKgorICogVGhpcyBwcm9ncmFt
-IGdlbmVyYXRlcyB0aGUgZW5jb2RpbmdzIGZpbGUgdGhhdCBpcyBwcm9jZXNzZWQgYnkKKyAqIHRo
-ZSBkZWN0cmVlLnB5IHNjcmlwdCB0byBwcm9kdWNlIHRoZSBkZWNvZGluZyB0cmVlLiAgV2UgdXNl
-IHRoZSBDCisgKiBwcmVwcm9jZXNzb3IgdG8gbWFuaXB1bGF0ZSB0aGUgZmlsZXMgaW1wb3J0ZWQg
-ZnJvbSB0aGUgSGV4YWdvbgorICogYXJjaGl0ZWN0dXJlIGxpYnJhcnkuCisgKi8KKyNpbmNsdWRl
-ICJxZW11L29zZGVwLmgiCisjaW5jbHVkZSAib3Bjb2Rlcy5oIgorCisjZGVmaW5lIFNUUklOR0la
-RShYKSAgICAjWAorCitjb25zdCBjaGFyICpvcGNvZGVfbmFtZXNbXSA9IHsKKyNkZWZpbmUgT1BD
-T0RFKElJRCkgU1RSSU5HSVpFKElJRCkKKyNpbmNsdWRlICJvcGNvZGVzX2RlZl9nZW5lcmF0ZWQu
-aCIKKyAgICBOVUxMCisjdW5kZWYgT1BDT0RFCit9OworCitjb25zdCBjaGFyICpvcGNvZGVfc3lu
-dGF4W1hYX0xBU1RfT1BDT0RFXTsKKworLyoKKyAqIFByb2Nlc3MgdGhlIGluc3RydWN0aW9uIGRl
-ZmluaXRpb25zCisgKiAgICAgU2NhbGFyIGNvcmUgaW5zdHJ1Y3Rpb25zIGhhdmUgdGhlIGZvbGxv
-d2luZyBmb3JtCisgKiAgICAgICAgIFE2SU5TTihBMl9hZGQsIlJkMzI9YWRkKFJzMzIsUnQzMiki
-LEFUVFJJQlMoKSwKKyAqICAgICAgICAgIkFkZCAzMi1iaXQgcmVnaXN0ZXJzIiwKKyAqICAgICAg
-ICAgeyBSZFY9UnNWK1J0Vjt9KQorICovCit2b2lkIG9wY29kZV9pbml0KHZvaWQpCit7CisjZGVm
-aW5lIFE2SU5TTihUQUcsIEJFSCwgQVRUUklCUywgREVTQ1IsIFNFTSkgXAorICAgb3Bjb2RlX3N5
-bnRheFtUQUddID0gQkVIOworI2RlZmluZSBFWFRJTlNOKFRBRywgQkVILCBBVFRSSUJTLCBERVND
-UiwgU0VNKSBcCisgICBvcGNvZGVfc3ludGF4W1RBR10gPSBCRUg7CisjaW5jbHVkZSAiaW1wb3J0
-ZWQvYWxsaWRlZnMuZGVmIgorI3VuZGVmIFE2SU5TTgorI3VuZGVmIEVYVElOU04KK30KKworY29u
-c3QgY2hhciAqb3Bjb2RlX3JyZWdzW10gPSB7CisjZGVmaW5lIFJFR0lORk8oVEFHLCBSRUdJTkZP
-LCBSUkVHUywgV1JFR1MpIFJSRUdTLAorI2RlZmluZSBJTU1JTkZPKFRBRywgU0lHTiwgU0laRSwg
-U0hBTVQsIFNJR04yLCBTSVpFMiwgU0hBTVQyKSAgLyogbm90aGluZyAqLworI2luY2x1ZGUgIm9w
-X3JlZ3NfZ2VuZXJhdGVkLmgiCisgICAgTlVMTAorI3VuZGVmIFJFR0lORk8KKyN1bmRlZiBJTU1J
-TkZPCit9OworCitjb25zdCBjaGFyICpvcGNvZGVfd3JlZ3NbXSA9IHsKKyNkZWZpbmUgUkVHSU5G
-TyhUQUcsIFJFR0lORk8sIFJSRUdTLCBXUkVHUykgV1JFR1MsCisjZGVmaW5lIElNTUlORk8oVEFH
-LCBTSUdOLCBTSVpFLCBTSEFNVCwgU0lHTjIsIFNJWkUyLCBTSEFNVDIpICAvKiBub3RoaW5nICov
-CisjaW5jbHVkZSAib3BfcmVnc19nZW5lcmF0ZWQuaCIKKyAgICBOVUxMCisjdW5kZWYgUkVHSU5G
-TworI3VuZGVmIElNTUlORk8KK307CisKK29wY29kZV9lbmNvZGluZ190IG9wY29kZV9lbmNvZGlu
-Z3NbXSA9IHsKKyNkZWZpbmUgREVGX0VOQzMyKFRBRywgRU5DU1RSKSBcCisgICAgW1RBR10gPSB7
-IC5lbmNvZGluZyA9IEVOQ1NUUiB9LAorI2RlZmluZSBERUZfRU5DX1NVQklOU04oVEFHLCBDTEFT
-UywgRU5DU1RSKSBcCisgICAgW1RBR10gPSB7IC5lbmNvZGluZyA9IEVOQ1NUUiwgLmVuY19jbGFz
-cyA9IENMQVNTIH0sCisjZGVmaW5lIERFRl9FWFRfRU5DKFRBRywgQ0xBU1MsIEVOQ1NUUikgXAor
-ICAgIFtUQUddID0geyAuZW5jb2RpbmcgPSBFTkNTVFIsIC5lbmNfY2xhc3MgPSBDTEFTUyB9LAor
-I2luY2x1ZGUgImltcG9ydGVkL2VuY29kZS5kZWYiCisjdW5kZWYgREVGX0VOQzMyCisjdW5kZWYg
-REVGX0VOQ19TVUJJTlNOCisjdW5kZWYgREVGX0VYVF9FTkMKK307CisKK3N0YXRpYyBjb25zdCBj
-aGFyICogY29uc3Qgb3Bjb2RlX2VuY19jbGFzc19uYW1lc1tYWF9MQVNUX0VOQ19DTEFTU10gPSB7
-CisgICAgIk5PUk1BTCIsCisgICAgIjE2QklUIiwKKyAgICAiU1VCSU5TTl9BIiwKKyAgICAiU1VC
-SU5TTl9MMSIsCisgICAgIlNVQklOU05fTDIiLAorICAgICJTVUJJTlNOX1MxIiwKKyAgICAiU1VC
-SU5TTl9TMiIsCisgICAgIkVYVF9ub2V4dCIsCisgICAgIkVYVF9tbXZlYyIsCit9OworCitzdGF0
-aWMgY29uc3QgY2hhciAqZ2V0X29wY29kZV9lbmMoaW50IG9wY29kZSkKK3sKKyAgICBjb25zdCBj
-aGFyICp0bXAgPSBvcGNvZGVfZW5jb2RpbmdzW29wY29kZV0uZW5jb2Rpbmc7CisgICAgaWYgKHRt
-cCA9PSBOVUxMKSB7CisgICAgICAgIHRtcCA9ICJNSVNTSU5HIEVOQ09ESU5HIjsKKyAgICB9Cisg
-ICAgcmV0dXJuIHRtcDsKK30KKworc3RhdGljIGNvbnN0IGNoYXIgKmdldF9vcGNvZGVfZW5jX2Ns
-YXNzKGludCBvcGNvZGUpCit7CisgICAgcmV0dXJuIG9wY29kZV9lbmNfY2xhc3NfbmFtZXNbb3Bj
-b2RlX2VuY29kaW5nc1tvcGNvZGVdLmVuY19jbGFzc107Cit9CisKK3N0YXRpYyB2b2lkIGdlbl9p
-c2V0X3RhYmxlKEZJTEUgKm91dCkKK3sKKyAgICBpbnQgaTsKKworICAgIGZwcmludGYob3V0LCAi
-aXNldCA9IHtcbiIpOworICAgIGZvciAoaSA9IDA7IGkgPCBYWF9MQVNUX09QQ09ERTsgaSsrKSB7
-CisgICAgICAgIGZwcmludGYob3V0LCAiXHRcJyVzXCcgOiB7XG4iLCBvcGNvZGVfbmFtZXNbaV0p
-OworICAgICAgICBmcHJpbnRmKG91dCwgIlx0XHRcJ3RhZ1wnIDogXCclc1wnLFxuIiwgb3Bjb2Rl
-X25hbWVzW2ldKTsKKyAgICAgICAgZnByaW50ZihvdXQsICJcdFx0XCdzeW50YXhcJyA6IFwnJXNc
-JyxcbiIsIG9wY29kZV9zeW50YXhbaV0pOworICAgICAgICBmcHJpbnRmKG91dCwgIlx0XHRcJ3Jy
-ZWdzXCcgOiBcJyVzXCcsXG4iLCBvcGNvZGVfcnJlZ3NbaV0pOworICAgICAgICBmcHJpbnRmKG91
-dCwgIlx0XHRcJ3dyZWdzXCcgOiBcJyVzXCcsXG4iLCBvcGNvZGVfd3JlZ3NbaV0pOworICAgICAg
-ICBmcHJpbnRmKG91dCwgIlx0XHRcJ2VuY1wnIDogXCclc1wnLFxuIiwgZ2V0X29wY29kZV9lbmMo
-aSkpOworICAgICAgICBmcHJpbnRmKG91dCwgIlx0XHRcJ2VuY19jbGFzc1wnIDogXCclc1wnLFxu
-IiwgZ2V0X29wY29kZV9lbmNfY2xhc3MoaSkpOworICAgICAgICBmcHJpbnRmKG91dCwgIlx0fSxc
-biIpOworICAgIH0KKyAgICBmcHJpbnRmKG91dCwgIn07XG5cbiIpOworfQorCitzdGF0aWMgdm9p
-ZCBnZW5fdGFnc19saXN0KEZJTEUgKm91dCkKK3sKKyAgICBpbnQgaTsKKworICAgIGZwcmludGYo
-b3V0LCAidGFncyA9IFtcbiIpOworICAgIGZvciAoaSA9IDA7IGkgPCBYWF9MQVNUX09QQ09ERTsg
-aSsrKSB7CisgICAgICAgIGZwcmludGYob3V0LCAiXHRcJyVzXCcsXG4iLCBvcGNvZGVfbmFtZXNb
-aV0pOworICAgIH0KKyAgICBmcHJpbnRmKG91dCwgIl07XG5cbiIpOworfQorCitzdGF0aWMgdm9p
-ZCBnZW5fZW5jX2V4dF9zcGFjZXNfdGFibGUoRklMRSAqb3V0KQoreworICAgIGZwcmludGYob3V0
-LCAiZW5jX2V4dF9zcGFjZXMgPSB7XG4iKTsKKyNkZWZpbmUgREVGX0VYVF9TUEFDRShTUEFDRUlE
-LCBFTkNTVFIpIFwKKyAgICBmcHJpbnRmKG91dCwgIlx0XCclc1wnIDogXCclc1wnLFxuIiwgI1NQ
-QUNFSUQsIEVOQ1NUUik7CisjaW5jbHVkZSAiaW1wb3J0ZWQvZW5jb2RlLmRlZiIKKyN1bmRlZiBE
-RUZfRVhUX1NQQUNFCisgICAgZnByaW50ZihvdXQsICJ9O1xuXG4iKTsKK30KKworc3RhdGljIHZv
-aWQgZ2VuX3N1Ymluc25fZ3JvdXBpbmdzX3RhYmxlKEZJTEUgKm91dCkKK3sKKyAgICBmcHJpbnRm
-KG91dCwgInN1Ymluc25fZ3JvdXBpbmdzID0ge1xuIik7CisjZGVmaW5lIERFRl9QQUNLRUQzMihU
-QUcsIFRZUEVBLCBUWVBFQiwgRU5DU1RSKSBcCisgICAgZG8geyBcCisgICAgICAgIGZwcmludGYo
-b3V0LCAiXHRcJyVzXCcgOiB7XG4iLCAjVEFHKTsgXAorICAgICAgICBmcHJpbnRmKG91dCwgIlx0
-XHRcJ25hbWVcJyA6IFwnJXNcJyxcbiIsICNUQUcpOyBcCisgICAgICAgIGZwcmludGYob3V0LCAi
-XHRcdFwnY2xhc3NfYVwnIDogXCclc1wnLFxuIiwgI1RZUEVBKTsgXAorICAgICAgICBmcHJpbnRm
-KG91dCwgIlx0XHRcJ2NsYXNzX2JcJyA6IFwnJXNcJyxcbiIsICNUWVBFQik7IFwKKyAgICAgICAg
-ZnByaW50ZihvdXQsICJcdFx0XCdlbmNcJyA6IFwnJXNcJyxcbiIsIEVOQ1NUUik7IFwKKyAgICAg
-ICAgZnByaW50ZihvdXQsICJcdH0sXG4iKTsgXAorICAgIH0gd2hpbGUgKDApOworI2luY2x1ZGUg
-ImltcG9ydGVkL2VuY29kZS5kZWYiCisjdW5kZWYgREVGX1BBQ0tFRDMyCisgICAgZnByaW50Zihv
-dXQsICJ9O1xuXG4iKTsKK30KKworaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKK3sK
-KyAgICBGSUxFICpvdXRmaWxlOworCisgICAgaWYgKGFyZ2MgIT0gMikgeworICAgICAgICBmcHJp
-bnRmKHN0ZGVyciwgIlVzYWdlOiBnZW5fZGVjdHJlZV9pbXBvcnQgb3VwdHB1dGZpbGVcbiIpOwor
-ICAgICAgICByZXR1cm4gLTE7CisgICAgfQorICAgIG91dGZpbGUgPSBmb3Blbihhcmd2WzFdLCAi
-dyIpOworICAgIGlmIChvdXRmaWxlID09IE5VTEwpIHsKKyAgICAgICAgZnByaW50ZihzdGRlcnIs
-ICJDYW5ub3Qgb3BlbiAlcyBmb3Igd3JpdGluZ1xuIiwgYXJndlsxXSk7CisgICAgICAgIHJldHVy
-biAtMTsKKyAgICB9CisKKyAgICBvcGNvZGVfaW5pdCgpOworICAgIGdlbl9pc2V0X3RhYmxlKG91
-dGZpbGUpOworICAgIGdlbl90YWdzX2xpc3Qob3V0ZmlsZSk7CisgICAgZ2VuX2VuY19leHRfc3Bh
-Y2VzX3RhYmxlKG91dGZpbGUpOworICAgIGdlbl9zdWJpbnNuX2dyb3VwaW5nc190YWJsZShvdXRm
-aWxlKTsKKworICAgIGZjbG9zZShvdXRmaWxlKTsKKyAgICByZXR1cm4gMDsKK30KLS0gCjIuNy40
-Cgo=
+On 28/09/2020 15.19, Philippe Mathieu-Daudé wrote:
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  include/qemu/bswap.h | 16 +++++++++-------
+>  1 file changed, 9 insertions(+), 7 deletions(-)
+> 
+> diff --git a/include/qemu/bswap.h b/include/qemu/bswap.h
+> index 41131d3d76e..fed96dddd7a 100644
+> --- a/include/qemu/bswap.h
+> +++ b/include/qemu/bswap.h
+> @@ -38,29 +38,31 @@ static inline uint64_t bswap64(uint64_t x)
+>  
+>  static inline void bswap16s(uint16_t *s)
+>  {
+> -    *s = bswap16(*s);
+> +    *s = __builtin_bswap16(*s);
+>  }
+>  
+>  static inline void bswap32s(uint32_t *s)
+>  {
+> -    *s = bswap32(*s);
+> +    *s = __builtin_bswap32(*s);
+>  }
+>  
+>  static inline void bswap64s(uint64_t *s)
+>  {
+> -    *s = bswap64(*s);
+> +    *s = __builtin_bswap64(*s);
+>  }
+>  
+>  #if defined(HOST_WORDS_BIGENDIAN)
+>  #define be_bswap(v, size) (v)
+> -#define le_bswap(v, size) glue(bswap, size)(v)
+> +#define le_bswap(v, size) glue(__builtin_bswap, size)(v)
+>  #define be_bswaps(v, size)
+> -#define le_bswaps(p, size) do { *p = glue(bswap, size)(*p); } while(0)
+> +#define le_bswaps(p, size) \
+> +            do { *p = glue(__builtin_bswap, size)(*p); } while (0)
+>  #else
+>  #define le_bswap(v, size) (v)
+> -#define be_bswap(v, size) glue(bswap, size)(v)
+> +#define be_bswap(v, size) glue(__builtin_bswap, size)(v)
+>  #define le_bswaps(v, size)
+> -#define be_bswaps(p, size) do { *p = glue(bswap, size)(*p); } while(0)
+> +#define be_bswaps(p, size) \
+> +            do { *p = glue(__builtin_bswap, size)(*p); } while (0)
+>  #endif
+
+What's the advantage of the renaming here if bswap is already #defined
+to the builtin function (or another useful function from a system
+header)? This just looks like code churn to me?
+
+ Thomas
+
 
