@@ -2,66 +2,68 @@ Return-Path: <SRS0=Z1O7=DF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55B28C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 09:20:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4D1DC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 09:21:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1E07206F4
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 09:20:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1E07206F4
+	by mail.kernel.org (Postfix) with ESMTPS id 4B7C4221E8
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 09:21:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B7C4221E8
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41630 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMpKv-0000Sc-2w
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 05:20:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46994)
+	id 1kMpLc-00017W-BO
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 05:21:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47066)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kMpGZ-0003p6-RX; Mon, 28 Sep 2020 05:16:16 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:39553)
+ id 1kMpGe-0003r2-Ni; Mon, 28 Sep 2020 05:16:22 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:41627)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kMpGV-0002Vx-9u; Mon, 28 Sep 2020 05:16:15 -0400
+ id 1kMpGZ-0002XI-Pj; Mon, 28 Sep 2020 05:16:20 -0400
 Received: from localhost.localdomain ([82.252.129.222]) by
  mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1M9ZRc-1kJY0I1yg0-005ZpY; Mon, 28 Sep 2020 11:16:06 +0200
+ id 1MHVWT-1k9Kjw3AXZ-00Dahp; Mon, 28 Sep 2020 11:16:09 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 0/8] Trivial branch for 5.2 patches
-Date: Mon, 28 Sep 2020 11:15:54 +0200
-Message-Id: <20200928091602.383870-1-laurent@vivier.eu>
+Subject: [PULL 4/8] Add *.pyc back to the .gitignore file
+Date: Mon, 28 Sep 2020 11:15:58 +0200
+Message-Id: <20200928091602.383870-5-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200928091602.383870-1-laurent@vivier.eu>
+References: <20200928091602.383870-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:XJL1WKLlklttVz9H5VoBhwdgplly6dQFyqrny4G2V+AK3Ogz/8X
- h+ysfzPXFeEumWZRKVa1Siepr6/LNB+B2lsVzqzeLFZ4VOTu1YljheUUkm5F6Oy0uK3yxGL
- buaYXqri90PqkNLpjvPib/hw7kn+qCXV8NNBQ6Fgzu8pKuzkyo9n2AZJb1aP0y7If4mkz/b
- bsu6gkZ930LB+/Tj+pr4Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:6gXmBrqpW7I=:M6AU5LHhlQJzuXVq2oD6SS
- fOr+kRuynZ5nECMioRNf5bkIX8AT2P5OuOPEizs1MAIQ2yz86hQTFoPZmQnZQAhrGKhiQQ0LX
- nec5rrmty0uCxcRogqdpTsTj/2dgFzOnUsf7uSqvk0jE/ahfpv6/6zDEU4zVUWHDEJPqPzwmI
- DoIi9SizGGtZyVo+WZ0+aX63uAWCX+OGeuk+IFXWuI3N7qfsRlaOAyJtl1VPjlfZmhcmW8ppL
- PBz4CSJfcer69COME0ae+PcY1bcWJU8Tr3pVyR2PQ/e51nHmqdTBQWDalAHT1tIYSOKSyFr4P
- 9UpRH5tG1LHtrQLBe1KqfAJYB7hI0VWXnTrHrkMqycjVCOov+QMdrmLOZtg/Oa24HzXiXbhHx
- GXqHunubiziVZHseqRtc49KOSxOiSGrCYb4ft4HR5gfFaxfbXqP+0IloCZOKgSZ2ztJp9oCuc
- xymmU2W0hrX+wPB4PEGy7RDXAEMLe9Zy0LxqwgSDu3sZeioT9UpqMIthBqgkH8YSfo+X/KKt+
- +wre/LYqNaBZBK9qc7NtWNDefciejr56nDdARbl7XhQAWLhUO6qY79U5qSexWnBy+WeUFye1n
- SocmhCnaUZwHH7nxlP9Rxr8AoKzoSNT1H1zkzgIgsYAJUZ7YJnIwC2+eTQa2rW7LSn013g/VP
- Im93LcDF8SIvG87vFZcHoKnRevQcV2Ue1dRj2wRdVCxAKyVo9m7eaL4DgRd37HsJ0PUvs0Dvg
- 1bQpU8304I6AVgoZ+A5giWX3YR/YL60BVP786NITncBQvPxPnxLIMbcqX8qCXudy7NKEbRsn2
- +VfvlckP19Ykg8ucBEEk4DcqflgAYt70SZgyb6waXrMoAC/K2XeFVD7FT8TSo8mLTwGc+2e
-Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:ZJYK1rFyvYfcc1RY9shQRugdD/I2fgxXiA5GSPXHDWik7DtpDjJ
+ o4naIrgY093fD8n/YDr8+FdVkdYd0sLGeFzzXvGKhtj8C1Tf6Jhwl6W1zxVTI6H6oAYCXF7
+ YwSrdhBC8Ge3dMaL7US6KJhbtFyimqf0VC7KConAmbVzvdt9csL34qrEeIJyiUHDmgOzFoO
+ M4zjSD7MUsQqAcN4OH30g==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:sHi8vO6LAyw=:b5I++VPdeCqL1djMULZwhH
+ zeNdBpBsGL4XtKnjqnvvR3c1huKZ2Ljlkoj13TIf/MIGziBKfRdI1dYSKGNWSa07NmXeP2sSx
+ YeyBZl/4JBOBHCkIt5r4ocSrflqmrIdbqeJ3vtwmlpWqacTs/9zJysEmVCE9gMBFYQfyd42v9
+ mY0h0M1yJt9cor8EyMDqYyXpd+nPQ3eHTBI3fR0Q98opCFSCaIlwZQFh51swmqvhye3ugob9Y
+ AoxqriFaJML8wJ/Hn4ul3paDF7kf9n1P//ZGH0ySYG5NSuuswTGsiZZnPyu7fnv3Z8lyVTUlk
+ HVTa4KAH2BoisufgWchRJlMoceh2jS7g+OXZhwrQ64ysGjBtAPeqJp+EkdLweTZRuJ4bEF4/C
+ KrTPL2VKUDR18QFd/aTAe55ybKaaQ4mewsssFVWNsHqdbWJeVG/7IEd/N70sS7aosLTm8a6ER
+ vrs3Sdx2+/2W57JwKyHT8z4taBgJDfYsX+3mpmUvM0ojryXAR6AQlFcqbU1yWe1DYb5WrRvam
+ yNJAPidMibtU3Td4OAgNIqf2LhM9iZ1SvWHy9vGW/WUNaU3yMRG4XsGkUZEtWmr6So8bR2Wir
+ P6ydG2Oliw0yg3d4oKvHF08xKEPpfSXbIhheuFqABIP60uIJhgu02LTJNz5ykNW59zIM/1wGx
+ m0ZQeFJf5Xy/0/2ojJctHm5YOBi8n6yU5tohWEKUdtXG6HmC7nJTO6Fq0xsRzzT58U/gUocoJ
+ Erszr3nJ7/9BpGOaMRVJ9XmIssTE8kiwbaYC3rv2MA7wcpMqn/kck8Fg0YlNQ6sk2dAYQOuyV
+ YsaWaChNhaWjXA0/lkfRDeMK04q9icFMQXk0rmDR3KnE/0QDF5hX7hlBvRsinJ2wpdZCuYu
+Received-SPF: none client-ip=212.227.126.187; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 05:16:07
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 05:16:14
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -23
 X-Spam_score: -2.4
@@ -81,62 +83,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
+ Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit c122bca9cd7b986be4d473240a4fec6315b7a2c2=
-:=0D
-=0D
-  Merge remote-tracking branch 'remotes/ericb/tags/pull-bitmaps-2020-09-21'=
- i=3D=0D
-nto staging (2020-09-23 15:11:38 +0100)=0D
-=0D
-are available in the Git repository at:=0D
-=0D
-  git://github.com/vivier/qemu.git tags/trivial-branch-for-5.2-pull-request=
-=0D
-=0D
-for you to fetch changes up to c66790b5dfc2430c04bf5876cf485e1f538af7f2:=0D
-=0D
-  docs/system/deprecated: Move lm32 and unicore32 to the right section (202=
-0-=3D=0D
-09-23 19:19:57 +0200)=0D
-=0D
-----------------------------------------------------------------=0D
-Trivial Patches Pull request 20200928=0D
-=0D
-----------------------------------------------------------------=0D
-=0D
-Laurent Vivier (2):=0D
-  meson: fix static flag summary=0D
-  vhost-vdpa: remove useless variable=0D
-=0D
-Li Qiang (1):=0D
-  virtio: vdpa: omit check return of g_malloc=0D
-=0D
-Philippe Mathieu-Daud=3DC3=3DA9 (2):=0D
-  timer: Fix timer_mod_anticipate() documentation=0D
-  migration/multifd: Remove superfluous semicolons=0D
-=0D
-Stefano Garzarella (1):=0D
-  vhost-vdpa: fix indentation in vdpa_ops=0D
-=0D
-Thomas Huth (2):=0D
-  Add *.pyc back to the .gitignore file=0D
-  docs/system/deprecated: Move lm32 and unicore32 to the right section=0D
-=0D
- .gitignore                 |  1 +=0D
- docs/system/deprecated.rst | 32 ++++++++++++++++----------------=0D
- hw/virtio/vhost-vdpa.c     | 20 ++++++--------------=0D
- include/qemu/timer.h       |  2 +-=0D
- meson.build                |  2 +-=0D
- migration/multifd.c        |  2 +-=0D
- 6 files changed, 26 insertions(+), 33 deletions(-)=0D
-=0D
---=3D20=0D
-2.26.2=0D
-=0D
+From: Thomas Huth <thuth@redhat.com>
+
+Python still dumps its bytecode into the source directory, so
+we should continue to ignore the *.pyc files.
+
+Fixes: 0e72b7df4d ("Simplify the .gitignore file")
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20200919101859.28739-1-thuth@redhat.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ .gitignore | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/.gitignore b/.gitignore
+index 5515f595e67c..b32bca1315e1 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,5 +1,6 @@
+ /GNUmakefile
+ /build/
++*.pyc
+ .sdk
+ .stgit-*
+ .git-submodule-status
+-- 
+2.26.2
+
 
