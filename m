@@ -2,88 +2,103 @@ Return-Path: <SRS0=Z1O7=DF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BE6CC4727C
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:56:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04243C4727C
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:56:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF31421548
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:56:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8ED8121548
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:56:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UduuD1oZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF31421548
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NymI8jyU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8ED8121548
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMtdZ-0005vO-PU
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 09:56:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38628)
+	id 1kMte6-0006PJ-M0
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 09:56:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60488)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kMtR3-0000R0-Kh
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 09:43:22 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:42651)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kMtQz-0005sJ-A5
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 09:43:19 -0400
-Received: by mail-ed1-x543.google.com with SMTP id j2so1365539eds.9
- for <qemu-devel@nongnu.org>; Mon, 28 Sep 2020 06:43:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=JIyCcUqU+I+2Q6OrPjcxk7PebAegazxlkvgzooDEyS0=;
- b=UduuD1oZ41IMzCVxyekoLdEuC6s1v2qIupImEzkI92R7gxN+FoXFlgNzYeLv5JWv0x
- ff272nqku6EMZRs/RtvURn6GcIi3h/brwxlXenlCU14G1K4m4yAGAaLrKW7F0zPcNW+V
- lyjDuWCf6KKWGuMwLJEyA2ewFP8UMriWUe6Utx0TwzjftOyBjvaBHLNk82KUA7pewNLi
- yxVJITWbCxzap9rrvOsI2yZouHTFBY/JjEx+YwANbwFgQI9+230fL7XU7TaPvifsOvQ6
- lsvu4qILwNB0S/inwkAN1BY8DaCTiGewhcnuvFnKH2ISrE3nAN+wUCZURcp1kW0E5ygi
- hHDg==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kMt4W-0000ho-Hj
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 09:20:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59719)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kMt4Q-0002no-92
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 09:20:01 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601299196;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/GuNNoh6nkdsrmjKbQNZ/H8CBCcsX4tPVisO++gKbE0=;
+ b=NymI8jyUMD9t3Z4oqWb/HWUJfPuJwtj3X6PJPKu5YAG3DUC+YVxuAAVblxZSs8A1sTd5vN
+ EVOpDL2pORJZCiwUd2Z0Mnd5JmDZsBdLH2oFFqNOzRMKfKTyCUcVg9cSTbWkjNVkwQqRVQ
+ DiaayKuKZbqQgVZUt75Uc8c9rWHAEGM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-545-MlqOGRoeMzyeJCfi71QOng-1; Mon, 28 Sep 2020 09:19:54 -0400
+X-MC-Unique: MlqOGRoeMzyeJCfi71QOng-1
+Received: by mail-wr1-f72.google.com with SMTP id d13so389425wrr.23
+ for <qemu-devel@nongnu.org>; Mon, 28 Sep 2020 06:19:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=JIyCcUqU+I+2Q6OrPjcxk7PebAegazxlkvgzooDEyS0=;
- b=pgtGbZnW+GiHwFMz2XgNAc2YulB06/Z25wla33xdrxmxfk4ICSsIDhgJ40EpYIlLoa
- 1ELiBCsMeTh1gAkBDGe6gNYHZd+EKDZGuTLYwR1Qh8nk1E5Rr58I1guFYeijq7kcNb9i
- Ye8q+v7jY1WhaBndUdCnAKt3pgwSwpKENyMi8gadNxFWPo422O8vd8cRsLCfK7kxDalm
- fnfyPBWb7t4fcJyz3NcRJ6jf3ANHh604j2XJ23QwN7z1/E0jewBckVAyhD98Ye+wKt7R
- dLlRsUH+sOFDJWXKlA8GU/BefZ8s3rqpym5VwD8AfPTZ/bbVqzCgZQopzGhFKOt8+DWF
- ownQ==
-X-Gm-Message-State: AOAM530k20vgH8VHAB60DtWOx8K/WDWy2zg/Lwz8TSqG1DcN5hhFJlOX
- MwoMBpQNbIw5mAr3+JacphE1bG6D3Zh6p7ErZS2iJw==
-X-Google-Smtp-Source: ABdhPJzZZkKfaRsUyK/PzaRm4khVZhHPqqAtuqT3zDunbjxbyOoPIM3B0T+8RW8A2g/5yZN7Nxw+PVNpr/x6onGWO5c=
-X-Received: by 2002:a50:e68a:: with SMTP id z10mr1926827edm.100.1601300594518; 
- Mon, 28 Sep 2020 06:43:14 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=/GuNNoh6nkdsrmjKbQNZ/H8CBCcsX4tPVisO++gKbE0=;
+ b=qo7tW22pxSVOH81OETb74e6ySEyiU4XuRAZ+PLtwAlwiHXVUA5JtvG/Rw4RlwJjJ+Y
+ HsUUv+UxxvVFcaJHx6SB/z9+647obDOqbib+RTIv2SkH/d8qfBVL1sHtI1lVRQ0T7QC+
+ MJ+SOW+8KeUkZdg9S5/NyZ3ueaa78dwixswmZQOZhjJ+H/P2QKj6WZF+DE4gtsQ+SLZN
+ vpNTPRMW38fXVFd1ZNgWiewejhRdTUgYJBK4kD0IIQA4XyMVmEhjHEucq3iPMlkhxOy7
+ VAzvCengpC5NYM9rr4oYJ0jNewySMHqR0SSeBR/4cagNaRnKLGGTkPuHN2psniEh7yl7
+ A1Zg==
+X-Gm-Message-State: AOAM5330MnRkwhwnZ4Yv++WFHRk6j5e5vPcy41xfGuyJGdVi0+Xpg0wn
+ 3mKYCDNRYFOnZoRm2j0u5IwcipOEp+I6rIopT08oxz6hM4I4IBZ4SCdJvxbMDC+cmHsiktPyqeP
+ jCKpixW8yyqacAi4=
+X-Received: by 2002:a7b:c84a:: with SMTP id c10mr1597334wml.139.1601299193214; 
+ Mon, 28 Sep 2020 06:19:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyat1laQPxulibnFjOJctKDEtgKO4pKfyi/4oZgnhBrfdQVkb9kh6nVGm0ZFsSjsDUCiOH5sw==
+X-Received: by 2002:a7b:c84a:: with SMTP id c10mr1597319wml.139.1601299193024; 
+ Mon, 28 Sep 2020 06:19:53 -0700 (PDT)
+Received: from localhost.localdomain (74.red-83-53-161.dynamicip.rima-tde.net.
+ [83.53.161.74])
+ by smtp.gmail.com with ESMTPSA id z83sm1392284wmb.4.2020.09.28.06.19.51
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 28 Sep 2020 06:19:52 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 3/8] qemu/bswap: Replace bswapXXs() by compiler
+ __builtin_bswap()
+Date: Mon, 28 Sep 2020 15:19:29 +0200
+Message-Id: <20200928131934.739451-4-philmd@redhat.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200928131934.739451-1-philmd@redhat.com>
+References: <20200928131934.739451-1-philmd@redhat.com>
 MIME-Version: 1.0
-References: <20200928125859.734287-1-philmd@redhat.com>
- <20200928125859.734287-2-philmd@redhat.com>
-In-Reply-To: <20200928125859.734287-2-philmd@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 28 Sep 2020 14:43:03 +0100
-Message-ID: <CAFEAcA_Ga+155jEcGW0c0bcJ1m3h9xdRYeZH9tJF+7_z6KiGtw@mail.gmail.com>
-Subject: Re: [PATCH 1/3] qemu/compiler: Simplify as all compilers support
- attribute 'gnu_printf'
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::543;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x543.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 03:29:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,48 +111,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Kamil Rytarowski <kamil@netbsd.org>,
  Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 28 Sep 2020 at 14:37, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
->
-> Since commit efc6c070aca ("configure: Add a test for the minimum
-> compiler version") the minimum compiler version required for GCC
-> is 4.8, which supports the gnu_printf attribute.
->
-> We can safely remove the code introduced in commit 9c9e7d51bf0
-> ("Move macros GCC_ATTR and GCC_FMT_ATTR to common header file").
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ include/qemu/bswap.h | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
-clang doesn't support the gnu_printf attribute, though:
+diff --git a/include/qemu/bswap.h b/include/qemu/bswap.h
+index 41131d3d76e..fed96dddd7a 100644
+--- a/include/qemu/bswap.h
++++ b/include/qemu/bswap.h
+@@ -38,29 +38,31 @@ static inline uint64_t bswap64(uint64_t x)
+ 
+ static inline void bswap16s(uint16_t *s)
+ {
+-    *s = bswap16(*s);
++    *s = __builtin_bswap16(*s);
+ }
+ 
+ static inline void bswap32s(uint32_t *s)
+ {
+-    *s = bswap32(*s);
++    *s = __builtin_bswap32(*s);
+ }
+ 
+ static inline void bswap64s(uint64_t *s)
+ {
+-    *s = bswap64(*s);
++    *s = __builtin_bswap64(*s);
+ }
+ 
+ #if defined(HOST_WORDS_BIGENDIAN)
+ #define be_bswap(v, size) (v)
+-#define le_bswap(v, size) glue(bswap, size)(v)
++#define le_bswap(v, size) glue(__builtin_bswap, size)(v)
+ #define be_bswaps(v, size)
+-#define le_bswaps(p, size) do { *p = glue(bswap, size)(*p); } while(0)
++#define le_bswaps(p, size) \
++            do { *p = glue(__builtin_bswap, size)(*p); } while (0)
+ #else
+ #define le_bswap(v, size) (v)
+-#define be_bswap(v, size) glue(bswap, size)(v)
++#define be_bswap(v, size) glue(__builtin_bswap, size)(v)
+ #define le_bswaps(v, size)
+-#define be_bswaps(p, size) do { *p = glue(bswap, size)(*p); } while(0)
++#define be_bswaps(p, size) \
++            do { *p = glue(__builtin_bswap, size)(*p); } while (0)
+ #endif
+ 
+ /**
+-- 
+2.26.2
 
-$ clang --version
-clang version 6.0.0-1ubuntu2 (tags/RELEASE_600/final)
-Target: x86_64-pc-linux-gnu
-Thread model: posix
-InstalledDir: /usr/bin
-$ cat /tmp/zz9.c
-#include <stdio.h>
-
-int monitor_printf(void *mon, const char *fmt, ...)
-__attribute__((format(gnu_printf, 2, 3)));
-
-int main(void) {
-  printf("hello\n");
-  return 0;
-}
-$ clang -Wall -o /tmp/zz9  /tmp/zz9.c
-/tmp/zz9.c:3:68: warning: 'format' attribute argument not supported:
-gnu_printf [-Wignored-attributes]
-int monitor_printf(void *mon, const char *fmt, ...)
-__attribute__((format(gnu_printf, 2, 3)));
-                                                                   ^
-1 warning generated.
-
-thanks
--- PMM
 
