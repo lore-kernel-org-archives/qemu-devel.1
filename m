@@ -2,87 +2,89 @@ Return-Path: <SRS0=Z1O7=DF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A22AC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 09:26:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFB31C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 09:27:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1AD121D95
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 09:26:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D6AF21D95
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 09:27:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="JF3ZR2PV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1AD121D95
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NS0CTR+T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D6AF21D95
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMpQ7-0005kv-Rs
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 05:26:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47554)
+	id 1kMpRH-0006nD-6y
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 05:27:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49140)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <green.wan@sifive.com>)
- id 1kMpIh-000640-7H
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 05:18:28 -0400
-Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:38419)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <green.wan@sifive.com>)
- id 1kMpIf-0002ih-6M
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 05:18:26 -0400
-Received: by mail-qk1-x743.google.com with SMTP id d20so304883qka.5
- for <qemu-devel@nongnu.org>; Mon, 28 Sep 2020 02:18:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=zydUDfHqvBBYKXIwxde4mSeIqQaIEeuMG9Pyz0aVv9Q=;
- b=JF3ZR2PVmpxinZYu92P1VJ9K13Q7tzg5PvaNqER/L8KMxwGceNTZO7neGuD+qW7jR3
- qLV3i5J+nr8SCBULEIMMps2urVoN2hUf1xKNR3duRFc5a63D1zOL+/ZF0GkiGgDllHKS
- HUyhKjzI7ZdV6zR/TIZjMij5PN64H6c6cEQ3Ji5QpUI6boblLw9aN37oKodIUP773BPF
- tYkklLozXmnrQHRkgh0DcnSb/jCYni5XJY4BMzqAjmiMwnaOWYpngtcw2+Vfva2W24Xf
- 7BWg/8idwyupvs7QtXAfHgydlDNZPc+UkU8po2c9/1V5B9HBL2M6gneY1+mHqaOdYTge
- MnVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=zydUDfHqvBBYKXIwxde4mSeIqQaIEeuMG9Pyz0aVv9Q=;
- b=BD5Z3OFeMubTjpyc32XacI37wG8PKCdPdIbST56JQ2+k8+m/gUKQqPZuDDDKmPnW60
- 9JiD7bH9satkMk3oIiZKWWImmTkRDcGbY63Z0YnlXRIApupbXrzqc9pv+2dh1gTg1H5Y
- BZ1gVpCXgiuuxPX7l2EQi8RAMiM4tRm/op/pGb2dqofA4vl085HVw67NuQH4UtXwjqwU
- SA6tvleld53yDL3esw5smygO69I2XFeY4vl/ngNyhdmCR5ufx34hFLAimbb+HNnocI/y
- tcCHAsmv6PX09FLCDi/Z2o6eN9Px67imJMiZGgfJWx9RFcZcWbti//qtNW70u9VOT7Da
- 27DQ==
-X-Gm-Message-State: AOAM532RoYnb7ql/doxebGTpHSGwJhF9QSxX+VcTEfLSQS8MsTackuBK
- zKt58C1ZN4Gr3MB8CK+IRNOX5T0cVP7DN6+3W3+asg==
-X-Google-Smtp-Source: ABdhPJxd9ogz4hpvfQ2DAEO7nBUIkN6Z1qOxwylFBzaBEypn1PVDfNfliDriLwSmWBSWHEal8Q16+gDdAUQzZqLC2J0=
-X-Received: by 2002:a37:5a47:: with SMTP id o68mr505918qkb.234.1601284702925; 
- Mon, 28 Sep 2020 02:18:22 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kMpQ1-0005t3-Vz
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 05:26:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20614)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kMpPy-0003lE-JG
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 05:26:01 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601285156;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+ bh=WwjuQ4OzpEp83RgsZCdezz+kZjm9Q3x3hpdoLW159kA=;
+ b=NS0CTR+T8UoRbJr3g97WXtgd1Wfxt2Ov2CGiphTPF5GkeSfmI4SgL4r9l5tjoJCsJbnray
+ qWPbxFwAvvPrDxeNXznQAnoQuWwP9WjHmWS/idCw1mQKQIMQJaG8QaeuYi4g02CKt6wIxa
+ ZbotEHiMxgcdlf2agr0OGQrouyThcg8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-534-KQcF4rF0OoCH3r-jFka36w-1; Mon, 28 Sep 2020 05:25:52 -0400
+X-MC-Unique: KQcF4rF0OoCH3r-jFka36w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2170164140;
+ Mon, 28 Sep 2020 09:25:51 +0000 (UTC)
+Received: from localhost (ovpn-114-195.ams2.redhat.com [10.36.114.195])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C95C15D9CA;
+ Mon, 28 Sep 2020 09:25:38 +0000 (UTC)
+Date: Mon, 28 Sep 2020 10:25:37 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: maxime.coquelin@redhat.com, jasowang@redhat.com, lulu@redhat.com,
+ "Michael S. Tsirkin" <mst@redhat.com>, tiwei.bie@intel.com,
+ changpeng.liu@intel.com, raphael.norwitz@nutanix.com,
+ Felipe Franciosi <felipe@nutanix.com>, marcandre.lureau@redhat.com,
+ kraxel@redhat.com, Nikos Dragazis <ndragazis@arrikto.com>,
+ Daniele Buono <dbuono@us.ibm.com>
+Subject: Outline for VHOST_USER_PROTOCOL_F_VDPA
+Message-ID: <20200928092537.GA44353@stefanha-x1.localdomain>
 MIME-Version: 1.0
-References: <20200901154711.18457-1-green.wan@sifive.com>
- <20200901154711.18457-3-green.wan@sifive.com>
- <CAKmqyKOqQgE0X3T100Zzi6_8X5d9XVEjam01bhCZSU=-FL-ecw@mail.gmail.com>
-In-Reply-To: <CAKmqyKOqQgE0X3T100Zzi6_8X5d9XVEjam01bhCZSU=-FL-ecw@mail.gmail.com>
-From: Green Wan <green.wan@sifive.com>
-Date: Mon, 28 Sep 2020 17:18:11 +0800
-Message-ID: <CAJivOr4xLP1n4eVFyWHi=ckg17C_j76f=+o+YPztsYuaPDwCCw@mail.gmail.com>
-Subject: Re: [RFC PATCH v5 2/2] hw/riscv: sifive_u: Add backend drive support
-To: Alistair Francis <alistair23@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::743;
- envelope-from=green.wan@sifive.com; helo=mail-qk1-x743.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="C7zPtVaVf+AK4Oqc"
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 03:47:08
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -36
+X-Spam_score: -3.7
+X-Spam_bar: ---
+X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.576,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,201 +97,255 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Bin Meng <bmeng.cn@gmail.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Alistair,
+--C7zPtVaVf+AK4Oqc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks for the review. See the reply inline below.
+Hi,
+Thanks for the positive responses to the initial discussion about
+introducing VHOST_USER_PROTOCOL_F_VDPA to use vDPA semantics and bring
+the full VIRTIO device model to vhost-user:
+https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg05181.html
 
+Below is an inlined version of the more detailed explanation I posted on
+my blog yesterday[1]. Email is better for discussion.
 
-On Sat, Sep 26, 2020 at 5:52 AM Alistair Francis <alistair23@gmail.com> wrote:
->
-> On Tue, Sep 1, 2020 at 8:49 AM Green Wan <green.wan@sifive.com> wrote:
-> >
-> > Add '-drive' support to OTP device. Allow users to assign a raw file
-> > as OTP image.
->
-> Do you mind writing an example command line argument in the commit message?
->
-> Also, do you have a test case for this? I would like to add it to my CI.
->
+If anyone wants to tackle this, please reply so others can stay
+up-to-date.
 
-Do you mean qtest? I run uboot and use uboot driver to test it and
-didn't create a qemu test case.
-Here is the command I use:
+Stefan
 
-$ qemu-system-riscv64 -M sifive_u -m 256M -nographic -bios none
--kernel ../opensbi/build/platform/sifive/fu540/firmware/fw_payload.elf
--d guest_errors -drive if=none,format=raw,file=otp.img
+[1] http://blog.vmsplice.net/2020/09/on-unifying-vhost-user-and-virtio.html
+---
+The recent development of a Linux driver framework called VIRTIO Data
+Path Acceleration (vDPA) has laid the groundwork for exciting new
+vhost-user features. The implications of vDPA have not yet rippled
+through the community so I want to share my thoughts on how the
+vhost-user protocol can take advantage of new ideas from vDPA.
 
-I'll check how to create a test case but maybe not that soon in the next patch.
+This post is aimed at developers and assumes familiarity with the
+vhost-user protocol and VIRTIO. No knowledge of vDPA is required.
 
-> >
-> > Signed-off-by: Green Wan <green.wan@sifive.com>
-> > ---
-> >  hw/riscv/sifive_u_otp.c         | 50 +++++++++++++++++++++++++++++++++
-> >  include/hw/riscv/sifive_u_otp.h |  2 ++
-> >  2 files changed, 52 insertions(+)
-> >
-> > diff --git a/hw/riscv/sifive_u_otp.c b/hw/riscv/sifive_u_otp.c
-> > index b8369e9035..477c54c7b8 100644
-> > --- a/hw/riscv/sifive_u_otp.c
-> > +++ b/hw/riscv/sifive_u_otp.c
-> > @@ -24,6 +24,8 @@
-> >  #include "qemu/log.h"
-> >  #include "qemu/module.h"
-> >  #include "hw/riscv/sifive_u_otp.h"
-> > +#include "sysemu/blockdev.h"
-> > +#include "sysemu/block-backend.h"
-> >
-> >  #define WRITTEN_BIT_ON 0x1
-> >
-> > @@ -54,6 +56,16 @@ static uint64_t sifive_u_otp_read(void *opaque, hwaddr addr, unsigned int size)
-> >          if ((s->pce & SIFIVE_U_OTP_PCE_EN) &&
-> >              (s->pdstb & SIFIVE_U_OTP_PDSTB_EN) &&
-> >              (s->ptrim & SIFIVE_U_OTP_PTRIM_EN)) {
-> > +
-> > +            /* read from backend */
-> > +            if (s->blk) {
-> > +                int32_t buf;
-> > +
-> > +                blk_pread(s->blk, s->pa * SIFIVE_U_OTP_FUSE_WORD, &buf,
-> > +                          SIFIVE_U_OTP_FUSE_WORD);
-> > +                return buf;
-> > +            }
-> > +
-> >              return s->fuse[s->pa & SIFIVE_U_OTP_PA_MASK];
-> >          } else {
-> >              return 0xff;
-> > @@ -145,6 +157,12 @@ static void sifive_u_otp_write(void *opaque, hwaddr addr,
-> >              /* write bit data */
-> >              SET_FUSEARRAY_BIT(s->fuse, s->pa, s->paio, s->pdin);
-> >
-> > +            /* write to backend */
-> > +            if (s->blk) {
-> > +                blk_pwrite(s->blk, s->pa * SIFIVE_U_OTP_FUSE_WORD, &val32,
-> > +                           SIFIVE_U_OTP_FUSE_WORD, 0);
-> > +            }
-> > +
-> >              /* update written bit */
-> >              SET_FUSEARRAY_BIT(s->fuse_wo, s->pa, s->paio, WRITTEN_BIT_ON);
-> >          }
-> > @@ -168,16 +186,48 @@ static const MemoryRegionOps sifive_u_otp_ops = {
-> >
-> >  static Property sifive_u_otp_properties[] = {
-> >      DEFINE_PROP_UINT32("serial", SiFiveUOTPState, serial, 0),
-> > +    DEFINE_PROP_DRIVE("drive", SiFiveUOTPState, blk),
-> >      DEFINE_PROP_END_OF_LIST(),
-> >  };
-> >
-> >  static void sifive_u_otp_realize(DeviceState *dev, Error **errp)
-> >  {
-> >      SiFiveUOTPState *s = SIFIVE_U_OTP(dev);
-> > +    DriveInfo *dinfo;
-> >
-> >      memory_region_init_io(&s->mmio, OBJECT(dev), &sifive_u_otp_ops, s,
-> >                            TYPE_SIFIVE_U_OTP, SIFIVE_U_OTP_REG_SIZE);
-> >      sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->mmio);
-> > +
-> > +    dinfo = drive_get_next(IF_NONE);
-> > +    if (dinfo) {
-> > +        int ret;
-> > +        uint64_t perm;
-> > +        int filesize;
-> > +        BlockBackend *blk;
-> > +
-> > +        blk = blk_by_legacy_dinfo(dinfo);
->
-> I think this should be:
->
-> blk = dinfo ? blk_by_legacy_dinfo(dinfo) : NULL;
->
+vDPA helps with writing drivers for hardware that supports VIRTIO
+offload. Its goal is to enable hybrid hardware/software VIRTIO devices,
+but as a nice side-effect it has overcome limitations in the kernel
+vhost interface. It turns out that applying ideas from vDPA to the
+vhost-user protocol solves the same issues there. In this article I'll
+show how extending the vhost-user protocol with vDPA has the following
+benefits:
 
-The previous code, "if (dinfo)", should check NULL already. But we can
-add more checks for blk such as qdev_prop_set_drive_err().
+* Allows existing VIRTIO device emulation code to act as a vhost-user
+  device backend.
+* Removes the need for shim devices in the virtual machine monitor (VMM).
+* Replaces undocumented conventions with a well-defined device model.
 
-> > +        filesize = SIFIVE_U_OTP_NUM_FUSES * SIFIVE_U_OTP_FUSE_WORD;
-> > +        if (blk_getlength(blk) < filesize) {
-> > +            qemu_log_mask(LOG_GUEST_ERROR, "OTP drive size < 16K\n");
->
-> You should probably be setting errp instead.
->
-> If a user specified a -drive argument, they probably want to error if
-> we aren't going to use it.
->
+These things can be done while reusing existing vhost-user and VIRTIO
+code. In fact, this is especially good news for existing codebases like
+QEMU because they already have a wealth of vhost-user and VIRTIO code
+that can now finally be connected together!
 
-Will set an errp.
+Let's look at the advantages of extending vhost-user with vDPA first and
+then discuss how to do it.
 
-> > +            return;
-> > +        }
-> > +
-> > +        qdev_prop_set_drive(dev, "drive", blk);
-> > +
-> > +        perm = BLK_PERM_CONSISTENT_READ |
-> > +                        (blk_is_read_only(s->blk) ? 0 : BLK_PERM_WRITE);
-> > +        ret = blk_set_perm(s->blk, perm, BLK_PERM_ALL, errp);
-> > +        if (ret < 0) {
-> > +            qemu_log_mask(LOG_GUEST_ERROR, "set perm error.");
->
-> Is it worth printing the error?
->
-Probably add it when I test it. Will remove it.
+Why extend vhost-user with vDPA?
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D
+Reusing VIRTIO emulation code for vhost-user backends
+-----------------------------------------------------
+It is a common misconception that a vhost device is a VIRTIO device.
+VIRTIO devices are defined in the VIRTIO specification and consist of a
+configuration space, virtqueues, and a device lifecycle that includes
+feature negotiation. A vhost device is a subset of the corresponding
+VIRTIO device. The exact subset depends on the device type, and some
+vhost devices are closer to the full functionality of their
+corresponding VIRTIO device than others. The most well-known example is
+that vhost-net devices have rx/tx virtqueues and but lack the virtio-net
+control virtqueue. Also, the configuration space and device lifecycle
+are only partially available to vhost devices.
 
-> > +        }
-> > +
-> > +        if (blk_pread(s->blk, 0, s->fuse, filesize) != filesize) {
-> > +            qemu_log_mask(LOG_GUEST_ERROR,
-> > +                          "failed to read the initial flash content");
-> > +            return;
->
-> You don't need a return here.
->
-k, will remove it and set errp.
+This difference makes it impossible to use a VIRTIO device as a
+vhost-user device and vice versa. There is an impedance mismatch and
+missing functionality. That's a shame because existing VIRTIO device
+emulation code is mature and duplicating it to provide vhost-user
+backends creates additional work.
 
-> Is this error fatal?
->
-This shouldn't be fatal but it might lead to unknown state if the
-content is read partially.
-But the checking, "filesize < 16K", is fatal. It leads qemu to abort.
+If there was a way to reuse existing VIRTIO device emulation code it
+would be easier to move to a multi-process architecture in QEMU. Want to
+run --netdev user,id=3Dnetdev0 --device virtio-net-pci,netdev=3Dnetdev0 in =
+a
+separate, sandboxed process? Easy, run it as a vhost-user-net device
+instead of as virtio-net.
 
+Making VMM device shims optional
+--------------------------------
+Today each new vhost device type requires a shim device in the VMM. QEMU
+has --device vhost-user-blk-pci, --device vhost-user-input-pci, and so
+on. Why can't there be a single --device vhost-user device?
 
-> Alistair
->
-> > +        }
-> > +    }
-> >  }
-> >
-> >  static void sifive_u_otp_reset(DeviceState *dev)
-> > diff --git a/include/hw/riscv/sifive_u_otp.h b/include/hw/riscv/sifive_u_otp.h
-> > index 4a5a0acf48..9bc781fd4f 100644
-> > --- a/include/hw/riscv/sifive_u_otp.h
-> > +++ b/include/hw/riscv/sifive_u_otp.h
-> > @@ -45,6 +45,7 @@
-> >
-> >  #define SIFIVE_U_OTP_PA_MASK        0xfff
-> >  #define SIFIVE_U_OTP_NUM_FUSES      0x1000
-> > +#define SIFIVE_U_OTP_FUSE_WORD      4
-> >  #define SIFIVE_U_OTP_SERIAL_ADDR    0xfc
-> >
-> >  #define SIFIVE_U_OTP_REG_SIZE       0x1000
-> > @@ -78,6 +79,7 @@ typedef struct SiFiveUOTPState {
-> >      uint32_t fuse_wo[SIFIVE_U_OTP_NUM_FUSES];
-> >      /* config */
-> >      uint32_t serial;
-> > +    BlockBackend *blk;
-> >  } SiFiveUOTPState;
-> >
-> >  #endif /* HW_SIFIVE_U_OTP_H */
-> > --
-> > 2.17.1
-> >
-> >
+This limitation is a consequence of the fact that vhost devices are not
+full VIRTIO devices. In fact, a vhost device does not even have a way to
+report its device type (net, blk, scsi, etc). Therefore it is impossible
+for today's VMMs to offer a generic device. Each vhost device type
+requires a shim device.
+
+In some cases a shim device is desirable because it allows the VMM to
+handle some aspects of the device instead of passing everything through
+to the vhost device backend. But requiring shims by default involves
+lots of tedious boilerplate code and prevents new device types from
+being used by older VMMs.
+
+Providing a well-defined device model in vhost-user
+---------------------------------------------------
+Although vhost-user works well for users, it is difficult for developers
+to learn and extend. The protocol does not have a well-defined device
+model. Each device type has its own undocumented set of protocol
+messages that are used. For example, the vhost-user-blk device uses the
+configuration space whereas most other device types do not use the
+configuration space at all.
+
+Since protocol use is not fully documented in the specification,
+developers might resort to reading Linux, QEMU, and DPDK code in order
+to figure out how to make their devices work. They typically have to
+debug vhost-user protocol messages and adjust their code until it
+appears to work. Hopefully the critical bugs are caught before the code
+ships. This is problematic because it's hard to produce high-quality
+vhost-user implementations.
+
+Although the protocol specification can certainly be cleaned up, the
+problem is more fundamental. vhost-user badly needs a well-defined
+device model so that protocol usage is clear and uniform for all device
+types. The best way to do that is to simply adopt the VIRTIO device
+model. The VIRTIO specification already defines the device lifecycle and
+details of the device types. By making vhost-user devices full VIRTIO
+devices there is no need for additional vhost device specifications. The
+vhost-user specification just becomes a transport for the established
+VIRTIO device model. Luckily that is effectively what vDPA has done for
+kernel vhost ioctls.
+
+How to do this in QEMU
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+The following QEMU changes are needed to implement vhost-user vDPA
+support. Below I will focus on vhost-user-net but most of the work is
+generic and benefits all device types.
+Import vDPA ioctls into vhost-user
+
+vDPA extends the Linux vhost ioctl interface. It uses a subset of vhost
+ioctls and adds new vDPA-specific ioctls that are implemented in the
+vhost_vdpa.ko kernel module. These new ioctls enable the full VIRTIO
+device model, including device IDs, the status register, configuration
+space, and so on.
+
+In theory vhost-user could be fixed without vDPA, but it would involve
+effectively adding the same set of functionality that vDPA has already
+added onto kernel vhost. Reusing the vDPA ioctls allows VMMs to support
+both kernel vDPA and vhost-user with minimal code duplication.
+
+This can be done by adding a VHOST_USER_PROTOCOL_F_VDPA feature bit to
+the vhost-user protocol. If both the vhost-user frontend and backend
+support vDPA then all vDPA messages are available. Otherwise they can
+either fall back on legacy vhost-user behavior or drop the connection.
+
+The vhost-user specification could be split into a legacy section and a
+modern vDPA-enabled section. The modern protocol will remove vhost-user
+messages that are not needed by vDPA, simplifying the protocol for new
+developers while allowing existing implementations to support both with
+minimal changes.
+
+One detail is that vDPA does not use the memory table mechanism for
+sharing memory. Instead it relies on the richer IOMMU message family
+that is optional in vhost-user today. This approach can be adopted in
+vhost-user too, making the IOMMU code path standard for all
+implementations and dropping the memory table mechanism.
+
+Add vhost-user vDPA to the vhost code
+-------------------------------------
+QEMU's hw/virtio/vhost*.c code supports kernel vhost, vhost-user, and
+kernel vDPA. A vhost-user vDPA mode must be added to implement the new
+protocol. It can be implemented as a combination of the vhost-user and
+kernel vDPA code already in QEMU. Most likely the existing vhost-user
+code can simply be extended to enable vDPA support if the backend
+supports it.
+
+Only small changes to hw/net/virtio-net.c and net/vhost-user.c are
+needed to use vhost-user vDPA with net devices. At that point QEMU can
+connect to a vhost-user-net device backend and use vDPA extensions.
+
+Add a vhost-user vDPA VIRTIO transport
+--------------------------------------
+Next a vhost-user-net device backend can be put together using QEMU's
+virtio-net emulation. A translation layer is needed between the
+vhost-user protocol and the VirtIODevice type in QEMU. This can be done
+by implementing a new VIRTIO transport alongside the existing pci, mmio,
+and ccw transports. The transport processes vhost-user protocol messages
+from the UNIX domain socket and invokes VIRTIO device emulation code
+inside QEMU. It acts as a VIRTIO bus so that virtio-net-device,
+virtio-blk-device, and other device types can be plugged in.
+
+This piece is the most involved but the vhost-user protocol
+communication part was already implemented in the virtio-vhost-user
+prototype that I worked on previously. Most of the communication code
+can be reused and the remainder is implementing the VirtioBusClass
+interface.
+
+To summarize, a new transport acts as the vhost-user device backend and
+invokes QEMU VirtIODevice methods in response to vhost-user protocol
+messages. The syntax would be something like --device
+virtio-net-device,id=3Dvirtio-net0 --device
+vhost-user-backend,device=3Dvirtio-net0,addr.type=3Dunix,addr.path=3D/tmp/v=
+host-user-net.sock.
+
+Where this converges with multi-process QEMU
+--------------------------------------------
+At this point QEMU can run ad-hoc vhost-user backends using existing
+VIRTIO device models. It is possible to go further by creating a
+qemu-dev launcher executable that implements the vhost-user spec's
+"Backend program conventions". This way a minimal device emulator
+executable hosts the device instead of a full system emulator.
+
+The requirements for this are similar to the multi-process QEMU effort,
+which aims to run QEMU devices as separate processes. One of the main
+open questions is how to design build system and Kconfig support for
+building minimal device emulator executables.
+
+In the case of vhost-user-net the qemu-dev-vhost-user-net executable
+would contain virtio-net-device, vhost-user-backend, any netdevs the
+user wishes to include, a QMP monitor, and a vhost-user backend
+command-line interface.
+
+Where does this leave us? QEMU's existing VIRTIO device models can be
+used as vhost-user devices and run in a separate processes from the VMM.
+It's a great way of reusing code and having the flexibility to deploy it
+in the way that makes most sense for the intended use case.
+
+Conclusion
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+The vhost-user protocol can be simplified by adopting the vhost vDPA
+ioctls that have recently been introduced in Linux. This turns
+vhost-user into a VIRTIO transport and vhost-user devices become full
+VIRTIO devices. Existing VIRTIO device emulation code can then be reused
+in vhost-user device backends.
+
+--C7zPtVaVf+AK4Oqc
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9xrBEACgkQnKSrs4Gr
+c8gV/AgAn6EvrmCnBFMAd8UyQzb4b5FYeVD/+kaoh5JnUWMRtj3RGJGZjVrzPu5D
+61qcEsqUUlj/EFNB5xBxQkgo9Pm8p5fbv4DBQgpBwRbLl1j+gLQxtXt53qNeKR9G
+ijxCDTKRyGgYcg076Z/B0ryhf5tEUw6SemfDxtYLBjYoML0xT+uCgJt+bkDHnMdx
+K43GELcUnu0wqpAysPhj5rOWHCbTmiO81jBmURxSbowyuqzoX3DicI342TcmZdZW
+yE98+86qFXJvFP8ZWoUf5JrWY2wF6A9ZJA6jYWOl1G3sJA3enIE7/v9iJ2rtiUm6
+lXOreKe4oiDWUC4kcjOrugeAbuEIQQ==
+=6Bg9
+-----END PGP SIGNATURE-----
+
+--C7zPtVaVf+AK4Oqc--
+
 
