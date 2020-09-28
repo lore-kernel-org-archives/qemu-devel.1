@@ -2,88 +2,164 @@ Return-Path: <SRS0=Z1O7=DF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52080C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:32:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68ADDC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:32:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A87A920759
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:32:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B826120759
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 13:32:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hWrSldjA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A87A920759
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nsKpCB8x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B826120759
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMtGE-0005Vn-Mz
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 09:32:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59640)
+	id 1kMtGU-0005xh-J4
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 09:32:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52712)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kMt1O-0004n9-IA
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 09:16:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26690)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kMt1M-0002Vh-BL
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 09:16:50 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601299007;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=+aw3n+SUA1rcEWZ1AuT1xh5fxTYW7c7q5skyURMwx7k=;
- b=hWrSldjANJRy4yMr9kWtz1FwXbTn71If5PbKUT0LYU0aql8bxhBPQmACFCFj1e+15nlvi1
- /XxRhKhje12fQv5ZGRy5LzAGI9HBEaY8Zlhoea9wztSs77fGCGZxIHR362k3KdARUQG9sL
- FSaedIKWMzcblGtvWDZLPiUwQJdQ8iQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-262-E8rbvN3dPN-Ck1seOOtAHw-1; Mon, 28 Sep 2020 09:16:43 -0400
-X-MC-Unique: E8rbvN3dPN-Ck1seOOtAHw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DC656AD514;
- Mon, 28 Sep 2020 13:16:39 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
- [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 53A2960C11;
- Mon, 28 Sep 2020 13:16:39 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 59F0140830; Mon, 28 Sep 2020 15:16:38 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 1/5] usb/hcd-xhci: Make dma read/writes hooks pci free
-Date: Mon, 28 Sep 2020 15:16:34 +0200
-Message-Id: <20200928131638.9486-2-kraxel@redhat.com>
-In-Reply-To: <20200928131638.9486-1-kraxel@redhat.com>
-References: <20200928131638.9486-1-kraxel@redhat.com>
+ (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
+ id 1kMscD-0002Yt-Lw; Mon, 28 Sep 2020 08:50:49 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:14900
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
+ id 1kMscB-0007Lt-Ak; Mon, 28 Sep 2020 08:50:49 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 08SCWNpO084436; Mon, 28 Sep 2020 08:50:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=+sfzSo8biRRsPcOeCl8sxsbzd12HgAc0yx+3NcLRScI=;
+ b=nsKpCB8xHwn6sMPeekLV6QZLK6iIpRefOPHUrzneFYx+trcgWDzOGTq4KLjJT/vtL9ZB
+ wU6XbJqpCZk8DK5YtNr69yLcdqnm3Y2TmMPQ7zerI/P0OFXokX5SZoxJ2FKbRWIXdCQl
+ SZww2e9Mj0t9+oTle0wwZorZDHvHOklhUYx8z/Q4w9qhTyW3MZ1bXOwgXALmb3buj6NQ
+ CS1URKwW2IylxS2Gbzo+WC+VwDZHQBTlb6xXmLE08oe+9VwEMU2SjhQkosvLIAO2mwNX
+ 3Os7Mc3FbBPAofKuHO/s7S4AIjErReoAbhJacE1jBG8TjQSMKR/E4Zf0qyDA5heaFRpK Yw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 33uekuu447-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 28 Sep 2020 08:50:42 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08SCWapI085477;
+ Mon, 28 Sep 2020 08:50:42 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com
+ [169.51.49.102])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 33uekuu43a-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 28 Sep 2020 08:50:42 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+ by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08SClnnw027133;
+ Mon, 28 Sep 2020 12:50:40 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com
+ (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+ by ppma06ams.nl.ibm.com with ESMTP id 33u5r9ghqc-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 28 Sep 2020 12:50:40 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
+ [9.149.105.61])
+ by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 08SCocNG24772878
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 28 Sep 2020 12:50:38 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 0E45911C058;
+ Mon, 28 Sep 2020 12:50:38 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id AC66211C052;
+ Mon, 28 Sep 2020 12:50:37 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.83.217])
+ by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Mon, 28 Sep 2020 12:50:37 +0000 (GMT)
+Subject: Re: [PATCH v2 1/9] s390x/cpu_model: S390_FEAT_MISC_INSTRUCTION_EXT ->
+ S390_FEAT_MISC_INSTRUCTION_EXT2
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20200928122717.30586-1-david@redhat.com>
+ <20200928122717.30586-2-david@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Message-ID: <dd80c2e1-074d-cb10-91e3-4014d5ddf8e1@de.ibm.com>
+Date: Mon, 28 Sep 2020 14:50:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 03:47:08
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200928122717.30586-2-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-09-28_11:2020-09-24,
+ 2020-09-28 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 mlxscore=0
+ suspectscore=0 mlxlogscore=999 priorityscore=1501 impostorscore=0
+ bulkscore=0 adultscore=0 phishscore=0 lowpriorityscore=0 clxscore=1011
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009280099
+Received-SPF: pass client-ip=148.163.158.5;
+ envelope-from=borntraeger@de.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 08:50:43
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -32
+X-Spam_score: -3.3
+X-Spam_bar: ---
+X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.614, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,163 +172,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
- "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
 
-This patch starts making the hcd-xhci.c pci free, as part of this
-restructuring dma read/writes are handled without passing pci object.
 
-Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Message-id: 1600957256-6494-2-git-send-email-sai.pavan.boddu@xilinx.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/usb/hcd-xhci.h |  1 +
- hw/usb/hcd-xhci.c | 24 +++++++++++-------------
- 2 files changed, 12 insertions(+), 13 deletions(-)
+On 28.09.20 14:27, David Hildenbrand wrote:
+> Let's avoid confusion with the "Miscellaneous-Instruction-Extensions
+> Facility 1"
+> 
+> Suggested-by: Thomas Huth <thuth@redhat.com>
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/cpu_features_def.h.inc | 2 +-
 
-diff --git a/hw/usb/hcd-xhci.h b/hw/usb/hcd-xhci.h
-index c3dfc1440590..c8a8ae4c34eb 100644
---- a/hw/usb/hcd-xhci.h
-+++ b/hw/usb/hcd-xhci.h
-@@ -188,6 +188,7 @@ struct XHCIState {
- 
-     USBBus bus;
-     MemoryRegion mem;
-+    AddressSpace *as;
-     MemoryRegion mem_cap;
-     MemoryRegion mem_oper;
-     MemoryRegion mem_runtime;
-diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-index 46a2186d912a..254cf1ead4b5 100644
---- a/hw/usb/hcd-xhci.c
-+++ b/hw/usb/hcd-xhci.c
-@@ -495,7 +495,7 @@ static inline void xhci_dma_read_u32s(XHCIState *xhci, dma_addr_t addr,
- 
-     assert((len % sizeof(uint32_t)) == 0);
- 
--    pci_dma_read(PCI_DEVICE(xhci), addr, buf, len);
-+    dma_memory_read(xhci->as, addr, buf, len);
- 
-     for (i = 0; i < (len / sizeof(uint32_t)); i++) {
-         buf[i] = le32_to_cpu(buf[i]);
-@@ -515,7 +515,7 @@ static inline void xhci_dma_write_u32s(XHCIState *xhci, dma_addr_t addr,
-     for (i = 0; i < n; i++) {
-         tmp[i] = cpu_to_le32(buf[i]);
-     }
--    pci_dma_write(PCI_DEVICE(xhci), addr, tmp, len);
-+    dma_memory_write(xhci->as, addr, tmp, len);
- }
- 
- static XHCIPort *xhci_lookup_port(XHCIState *xhci, struct USBPort *uport)
-@@ -644,7 +644,6 @@ static void xhci_die(XHCIState *xhci)
- 
- static void xhci_write_event(XHCIState *xhci, XHCIEvent *event, int v)
- {
--    PCIDevice *pci_dev = PCI_DEVICE(xhci);
-     XHCIInterrupter *intr = &xhci->intr[v];
-     XHCITRB ev_trb;
-     dma_addr_t addr;
-@@ -663,7 +662,7 @@ static void xhci_write_event(XHCIState *xhci, XHCIEvent *event, int v)
-                                ev_trb.status, ev_trb.control);
- 
-     addr = intr->er_start + TRB_SIZE*intr->er_ep_idx;
--    pci_dma_write(pci_dev, addr, &ev_trb, TRB_SIZE);
-+    dma_memory_write(xhci->as, addr, &ev_trb, TRB_SIZE);
- 
-     intr->er_ep_idx++;
-     if (intr->er_ep_idx >= intr->er_size) {
-@@ -720,12 +719,11 @@ static void xhci_ring_init(XHCIState *xhci, XHCIRing *ring,
- static TRBType xhci_ring_fetch(XHCIState *xhci, XHCIRing *ring, XHCITRB *trb,
-                                dma_addr_t *addr)
- {
--    PCIDevice *pci_dev = PCI_DEVICE(xhci);
-     uint32_t link_cnt = 0;
- 
-     while (1) {
-         TRBType type;
--        pci_dma_read(pci_dev, ring->dequeue, trb, TRB_SIZE);
-+        dma_memory_read(xhci->as, ring->dequeue, trb, TRB_SIZE);
-         trb->addr = ring->dequeue;
-         trb->ccs = ring->ccs;
-         le64_to_cpus(&trb->parameter);
-@@ -762,7 +760,6 @@ static TRBType xhci_ring_fetch(XHCIState *xhci, XHCIRing *ring, XHCITRB *trb,
- 
- static int xhci_ring_chain_length(XHCIState *xhci, const XHCIRing *ring)
- {
--    PCIDevice *pci_dev = PCI_DEVICE(xhci);
-     XHCITRB trb;
-     int length = 0;
-     dma_addr_t dequeue = ring->dequeue;
-@@ -773,7 +770,7 @@ static int xhci_ring_chain_length(XHCIState *xhci, const XHCIRing *ring)
- 
-     while (1) {
-         TRBType type;
--        pci_dma_read(pci_dev, dequeue, &trb, TRB_SIZE);
-+        dma_memory_read(xhci->as, dequeue, &trb, TRB_SIZE);
-         le64_to_cpus(&trb.parameter);
-         le32_to_cpus(&trb.status);
-         le32_to_cpus(&trb.control);
-@@ -828,7 +825,7 @@ static void xhci_er_reset(XHCIState *xhci, int v)
-         xhci_die(xhci);
-         return;
-     }
--    pci_dma_read(PCI_DEVICE(xhci), erstba, &seg, sizeof(seg));
-+    dma_memory_read(xhci->as, erstba, &seg, sizeof(seg));
-     le32_to_cpus(&seg.addr_low);
-     le32_to_cpus(&seg.addr_high);
-     le32_to_cpus(&seg.size);
-@@ -1440,7 +1437,7 @@ static int xhci_xfer_create_sgl(XHCITransfer *xfer, int in_xfer)
-     int i;
- 
-     xfer->int_req = false;
--    pci_dma_sglist_init(&xfer->sgl, PCI_DEVICE(xhci), xfer->trb_count);
-+    qemu_sglist_init(&xfer->sgl, DEVICE(xhci), xfer->trb_count, xhci->as);
-     for (i = 0; i < xfer->trb_count; i++) {
-         XHCITRB *trb = &xfer->trbs[i];
-         dma_addr_t addr;
-@@ -2104,7 +2101,7 @@ static TRBCCode xhci_address_slot(XHCIState *xhci, unsigned int slotid,
-     assert(slotid >= 1 && slotid <= xhci->numslots);
- 
-     dcbaap = xhci_addr64(xhci->dcbaap_low, xhci->dcbaap_high);
--    poctx = ldq_le_pci_dma(PCI_DEVICE(xhci), dcbaap + 8 * slotid);
-+    poctx = ldq_le_dma(xhci->as, dcbaap + 8 * slotid);
-     ictx = xhci_mask64(pictx);
-     octx = xhci_mask64(poctx);
- 
-@@ -2442,7 +2439,7 @@ static TRBCCode xhci_get_port_bandwidth(XHCIState *xhci, uint64_t pctx)
-     /* TODO: actually implement real values here */
-     bw_ctx[0] = 0;
-     memset(&bw_ctx[1], 80, xhci->numports); /* 80% */
--    pci_dma_write(PCI_DEVICE(xhci), ctx, bw_ctx, sizeof(bw_ctx));
-+    dma_memory_write(xhci->as, ctx, bw_ctx, sizeof(bw_ctx));
- 
-     return CC_SUCCESS;
- }
-@@ -3434,6 +3431,7 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
-     }
- 
-     usb_xhci_init(xhci);
-+    xhci->as = pci_get_address_space(dev);
-     xhci->mfwrap_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, xhci_mfwrap_timer, xhci);
- 
-     memory_region_init(&xhci->mem, OBJECT(xhci), "xhci", LEN_REGS);
-@@ -3534,7 +3532,7 @@ static int usb_xhci_post_load(void *opaque, int version_id)
-             continue;
-         }
-         slot->ctx =
--            xhci_mask64(ldq_le_pci_dma(pci_dev, dcbaap + 8 * slotid));
-+            xhci_mask64(ldq_le_dma(xhci->as, dcbaap + 8 * slotid));
-         xhci_dma_read_u32s(xhci, slot->ctx, slot_ctx, sizeof(slot_ctx));
-         slot->uport = xhci_lookup_uport(xhci, slot_ctx);
-         if (!slot->uport) {
--- 
-2.27.0
+strange this is target/s390x/cpu_features_def.inc.h in my repo?
 
+>  target/s390x/gen-features.c         | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/s390x/cpu_features_def.h.inc b/target/s390x/cpu_features_def.h.inc
+> index 5942f81f16..6cc776e121 100644
+> --- a/target/s390x/cpu_features_def.h.inc
+> +++ b/target/s390x/cpu_features_def.h.inc
+> @@ -72,7 +72,7 @@ DEF_FEAT(INTERLOCKED_ACCESS_2, "iacc2", STFL, 52, "Interlocked-access facility 2
+>  DEF_FEAT(STFLE_53, "stfle53", STFL, 53, "Various facilities introduced with z13")
+>  DEF_FEAT(ENTROPY_ENC_COMP, "eec", STFL, 54, "Entropy encoding compression facility")
+>  DEF_FEAT(MSA_EXT_5, "msa5-base", STFL, 57, "Message-security-assist-extension-5 facility (excluding subfunctions)")
+> -DEF_FEAT(MISC_INSTRUCTION_EXT, "minste2", STFL, 58, "Miscellaneous-instruction-extensions facility 2")
+> +DEF_FEAT(MISC_INSTRUCTION_EXT2, "minste2", STFL, 58, "Miscellaneous-instruction-extensions facility 2")
+
+Right, the 1 variant is part of STFLE_49 and thus not mentioned directly, but as everything else uses the 2 in that
+line it makes sense to also rename the define. 
+
+
+>  DEF_FEAT(SEMAPHORE_ASSIST, "sema", STFL, 59, "Semaphore-assist facility")
+>  DEF_FEAT(TIME_SLICE_INSTRUMENTATION, "tsi", STFL, 60, "Time-slice Instrumentation facility")
+>  DEF_FEAT(MISC_INSTRUCTION_EXT3, "minste3", STFL, 61, "Miscellaneous-Instruction-Extensions Facility 3")
+> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+> index 8ddeebc544..210cee65f3 100644
+> --- a/target/s390x/gen-features.c
+> +++ b/target/s390x/gen-features.c
+> @@ -412,7 +412,7 @@ static uint16_t base_GEN13_GA1[] = {
+>  
+>  static uint16_t base_GEN14_GA1[] = {
+>      S390_FEAT_ENTROPY_ENC_COMP,
+> -    S390_FEAT_MISC_INSTRUCTION_EXT,
+> +    S390_FEAT_MISC_INSTRUCTION_EXT2,
+>      S390_FEAT_SEMAPHORE_ASSIST,
+>      S390_FEAT_TIME_SLICE_INSTRUMENTATION,
+>      S390_FEAT_ORDER_PRESERVING_COMPRESSION,
+> 
 
