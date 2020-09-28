@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69765C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 14:36:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B38F6C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 14:37:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8F8B2075A
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 14:36:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 413D82075A
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 14:37:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Iwa72SCD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8F8B2075A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="doeHNzax"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 413D82075A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60186 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMuG9-0006HL-0R
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 10:36:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55598)
+	id 1kMuHB-0007hy-2S
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 10:37:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56148)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kMuDf-00052R-1P
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 10:33:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30956)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kMuFv-0006QF-9I
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 10:35:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31701)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kMuDc-0004vb-Qc
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 10:33:34 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kMuFp-0005It-Hu
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 10:35:55 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601303610;
+ s=mimecast20190719; t=1601303748;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=W7fK/NQPPePoj8L/gqsYMkyYNYN5zy779blewpwgWb8=;
- b=Iwa72SCDu2iYEK8mVzK3COQQllnG2pxO5OYzC53prSczbXVmD/y/ZUMW0nDKqA2PUp+qYV
- KzGm2a2qLcZ4Gc5QeodkesBD0RHOxUfzrPX5TdVDy4x3RQAuvb2vyqrnhQPen5DsH99NGT
- Vd38fiJKNqsy47YqupZVE2w5hJCv33c=
+ bh=MWFumjoqgqaxg7Lw/kkvNKiYd0uqtrru8F0pQ5H5hLM=;
+ b=doeHNzaxRxJ5pcWEax71neIsW8XIMvMwyzUlT0aU9u2IxoMhc6wEXLKEPlH/omtlAGn74+
+ uHIiD5nFxZj423AFxds5oIAXh7UDHDrW5X76PdqSFATCOE4csRZe23vzK7LkZ6WybFYyaE
+ T0jew5n9nO4DquaSfn3InMz518XHFS8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-526-wPVAIw2tOwCpqLwvU_mJww-1; Mon, 28 Sep 2020 10:33:28 -0400
-X-MC-Unique: wPVAIw2tOwCpqLwvU_mJww-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-425-5tSahJ-wPGe42Fniu8KLuA-1; Mon, 28 Sep 2020 10:35:45 -0400
+X-MC-Unique: 5tSahJ-wPGe42Fniu8KLuA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49E4880572E;
- Mon, 28 Sep 2020 14:33:26 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F6511019624;
+ Mon, 28 Sep 2020 14:35:44 +0000 (UTC)
 Received: from [10.3.112.208] (ovpn-112-208.phx2.redhat.com [10.3.112.208])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B9D055C1BB;
- Mon, 28 Sep 2020 14:33:22 +0000 (UTC)
-Subject: Re: [PATCH 2/3] nbd: Add new qemu:allocation-depth metacontext
-To: "Richard W.M. Jones" <rjones@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E463B55799;
+ Mon, 28 Sep 2020 14:35:43 +0000 (UTC)
+Subject: Re: [PATCH 3/3] nbd: Add 'qemu-nbd -A' to expose allocation depth
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
 References: <20200925203249.155705-1-eblake@redhat.com>
- <20200925203249.155705-3-eblake@redhat.com>
- <20200926073308.GV3888@redhat.com>
+ <20200925203249.155705-4-eblake@redhat.com>
+ <ee868912-173e-328d-5138-b1e19a0ca2b1@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <d0290138-f9d9-86a1-faf7-34f3ef4218c2@redhat.com>
-Date: Mon, 28 Sep 2020 09:33:22 -0500
+Message-ID: <5908bfab-f9ab-bbb9-5a47-85c38c1040e5@redhat.com>
+Date: Mon, 28 Sep 2020 09:35:43 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200926073308.GV3888@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <ee868912-173e-328d-5138-b1e19a0ca2b1@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=eblake@redhat.com;
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=eblake@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 03:47:08
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 03:29:35
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
@@ -87,7 +88,7 @@ X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
  RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,52 +102,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, pkrempa@redhat.com, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, vsementsov@virtuozzo.com
+ Markus Armbruster <armbru@redhat.com>, rjones@redhat.com,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/26/20 2:33 AM, Richard W.M. Jones wrote:
-> On Fri, Sep 25, 2020 at 03:32:48PM -0500, Eric Blake wrote:
->> +The second is related to exposing the source of various extents within
->> +the image, with a single context named:
->> +
->> +    qemu:allocation-depth
->> +
->> +In the allocation depth context, bits 0 and 1 form a tri-state value:
->> +
->> +    bits 0-1 clear: NBD_STATE_DEPTH_UNALLOC, means the extent is unallocated
->> +    bit 0 set: NBD_STATE_DEPTH_LOCAL, the extent is allocated in this image
->> +    bit 1 set: NBD_STATE_DEPTH_BACKING, the extent is inherited from a
->> +               backing layer
+On 9/26/20 8:32 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 25.09.2020 23:32, Eric Blake wrote:
+>> Allow the server to expose an additional metacontext to be requested
+>> by savvy clients.  qemu-nbd adds a new option -A to expose the
+>> qemu:allocation-depth metacontext through NBD_CMD_BLOCK_STATUS; this
+>> can also be set via QMP when using nbd-server-add.
+>>
+>> qemu as client can be hacked into viewing this new context by using
+>> the now-misnamed x-dirty-bitmap option when creating an NBD blockdev;
 > 
->>From the cover description I imagined it would show the actual depth, ie:
+> may be rename it to x-block-status ?
+
+I thought about it.  We don't promise any back-compat with x- prefix, 
+but at the same time, if there's not a strong reason to change it, 
+scripts written against older qemu will not break as long as we still 
+have the hack.
+
 > 
->           top -> backing -> backing -> backing
->   depth:   1        2         3   ....          (0 = unallocated)
+>> although it is worth noting the decoding of how such context
+>> information will appear in 'qemu-img map --output=json':
+>>
+>> NBD_STATE_DEPTH_UNALLOC => "zero":false, "data":true
+>> NBD_STATE_DEPTH_LOCAL => "zero":false, "data":false
+>> NBD_STATE_DEPTH_BACKING => "zero":true, "data":true
 > 
-> I wonder if that is possible?  (Perhaps there's something I don't
-> understand here.)
+> It wouldn't be so simple if we decide to export exact depth number..
 
-The real reason I don't want to do a straight depth number is that 
-'qemu-img map' combined with x-dirty-bitmap is still a very convenient 
-way to get at bits 0 and 1 (even if it requires decoding).  But if we 
-plumb in a way for bdrv_get_status to return depth counts (rather than 
-reimplementing the depth count ourselves), I would have no problem with 
-returning a struct:
-
-bits 31-4: the depth of the chain
-bits 3-2: reserved (to make reading hex values easier...)
-bits 1-0: tri-state of unalloc, local, or backing
-
-where it would look like:
-
-0x0000 -> unallocated
-0x0011 -> depth 1, local
-0x0022 -> depth 2, from the first backing layer
-0x0032 -> depth 3, from the second backing layer
-0x0042 ...
+It's still simple to do tri-state results if we separate the exact depth 
+number to bits 31-4, leaving bits 1-0 as the tri-state summary...
 
 -- 
 Eric Blake, Principal Software Engineer
