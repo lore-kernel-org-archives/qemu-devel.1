@@ -2,77 +2,76 @@ Return-Path: <SRS0=Z1O7=DF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 573E0C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 10:22:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66E43C4741F
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 10:34:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D704421531
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 10:22:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B6859206F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 10:34:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AJzsSyAN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D704421531
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XZyM4Pn6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6859206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMqIQ-0001Fs-UE
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 06:22:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38666)
+	id 1kMqUR-0004RW-KE
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 06:34:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41566)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kMqHp-0000kn-E6
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 06:21:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34136)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kMqT9-0003oz-H1
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 06:33:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59131)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kMqHl-0003Km-GO
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 06:21:37 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kMqT6-00053Z-NN
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 06:33:18 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601288492;
+ s=mimecast20190719; t=1601289195;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=sq3SCr/G8YXnLfiMHpGI+TfJxC2L8wanh412SIrsw+Q=;
- b=AJzsSyANY5QchuOkA1eiMAbuQPQ4HZ/IHTs9qdASq2OuLgOqlSJJfTOzLILIcLuJdAD6W/
- 81npLLzLLK8CY8dXGy8wVHlzYtzq1+XeRT2bFI/PE520l4mwfolTbSPzTgTegeGre+FOGV
- 7h72HG2tTtT3BH0Y+RcmvaWRTloL3O4=
+ bh=bN615i3zu81+vwrS9a/pI/VYHcUKTa+nYYBRhglc5KQ=;
+ b=XZyM4Pn6YmYW2NlSkMdbr+twfr58u13fmMYMG+daVlZEM1Dwe54+y6qpFlSULZ2adqUvTU
+ L6VDGY3MFze26dNCgguuTb+4BrRnp9xrO80/vTGYOOcINjOHArX9pQaD+RI9lUVjQaIZMc
+ rXOFvPblaG+WuyKu3LOrf/7DfnfG8jc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-75-YclfzLaqMoSDMaTjnOfeXw-1; Mon, 28 Sep 2020 06:21:30 -0400
-X-MC-Unique: YclfzLaqMoSDMaTjnOfeXw-1
+ us-mta-197-ejHA1FmHPtWqdjQZbCSoEA-1; Mon, 28 Sep 2020 06:33:12 -0400
+X-MC-Unique: ejHA1FmHPtWqdjQZbCSoEA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 268171021200;
- Mon, 28 Sep 2020 10:21:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 208ED802B4B;
+ Mon, 28 Sep 2020 10:33:11 +0000 (UTC)
 Received: from linux.fritz.box (ovpn-114-193.ams2.redhat.com [10.36.114.193])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B8F1D7838A;
- Mon, 28 Sep 2020 10:21:24 +0000 (UTC)
-Date: Mon, 28 Sep 2020 12:21:23 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A28A978437;
+ Mon, 28 Sep 2020 10:33:06 +0000 (UTC)
+Date: Mon, 28 Sep 2020 12:33:05 +0200
 From: Kevin Wolf <kwolf@redhat.com>
 To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH v7 12/13] block: Add bdrv_co_move_to_aio_context()
-Message-ID: <20200928102123.GC5451@linux.fritz.box>
+Subject: Re: [PATCH v7 13/13] block: Convert 'block_resize' to coroutine
+Message-ID: <20200928103305.GD5451@linux.fritz.box>
 References: <20200909151149.490589-1-kwolf@redhat.com>
- <20200909151149.490589-13-kwolf@redhat.com>
- <20200915143142.GE629589@stefanha-x1.localdomain>
- <20200925160051.GI5731@linux.fritz.box>
- <20200928085911.GD43571@stefanha-x1.localdomain>
+ <20200909151149.490589-14-kwolf@redhat.com>
+ <20200915145733.GF629589@stefanha-x1.localdomain>
+ <20200925160750.GJ5731@linux.fritz.box>
+ <20200928090514.GE43571@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20200928085911.GD43571@stefanha-x1.localdomain>
+In-Reply-To: <20200928090514.GE43571@stefanha-x1.localdomain>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="+pHx0qQiF2pBVqBT"
+ protocol="application/pgp-signature"; boundary="WplhKdTI2c8ulnbP"
 Content-Disposition: inline
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
@@ -103,113 +102,106 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---+pHx0qQiF2pBVqBT
+--WplhKdTI2c8ulnbP
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Am 28.09.2020 um 10:59 hat Stefan Hajnoczi geschrieben:
-> On Fri, Sep 25, 2020 at 06:00:51PM +0200, Kevin Wolf wrote:
-> > Am 15.09.2020 um 16:31 hat Stefan Hajnoczi geschrieben:
-> > > On Wed, Sep 09, 2020 at 05:11:48PM +0200, Kevin Wolf wrote:
-> > > > Add a function to move the current coroutine to the AioContext of a
-> > > > given BlockDriverState.
-> > > >=20
-> > > > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > > > ---
-> > > >  include/block/block.h |  6 ++++++
-> > > >  block.c               | 10 ++++++++++
-> > > >  2 files changed, 16 insertions(+)
-> > > >=20
-> > > > diff --git a/include/block/block.h b/include/block/block.h
-> > > > index 981ab5b314..80ab322f11 100644
-> > > > --- a/include/block/block.h
-> > > > +++ b/include/block/block.h
-> > > > @@ -626,6 +626,12 @@ bool bdrv_debug_is_suspended(BlockDriverState =
-*bs, const char *tag);
-> > > >   */
-> > > >  AioContext *bdrv_get_aio_context(BlockDriverState *bs);
+Am 28.09.2020 um 11:05 hat Stefan Hajnoczi geschrieben:
+> On Fri, Sep 25, 2020 at 06:07:50PM +0200, Kevin Wolf wrote:
+> > Am 15.09.2020 um 16:57 hat Stefan Hajnoczi geschrieben:
+> > > On Wed, Sep 09, 2020 at 05:11:49PM +0200, Kevin Wolf wrote:
+> > > > @@ -2456,8 +2456,7 @@ void qmp_block_resize(bool has_device, const =
+char *device,
+> > > >          return;
+> > > >      }
 > > > > =20
-> > > > +/**
-> > > > + * Move the current coroutine to the AioContext of @bs and return =
-the old
-> > > > + * AioContext of the coroutine.
-> > > > + */
-> > > > +AioContext *coroutine_fn bdrv_co_move_to_aio_context(BlockDriverSt=
-ate *bs);
+> > > > -    aio_context =3D bdrv_get_aio_context(bs);
+> > > > -    aio_context_acquire(aio_context);
+> > > > +    old_ctx =3D bdrv_co_move_to_aio_context(bs);
+> > > > =20
+> > > >      if (size < 0) {
+> > > >          error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "size", "a =
+>0 size");
 > > >=20
-> > > I'm not sure this function handles all cases:
-> > > 1. Being called without the BQL (i.e. from an IOThread).
-> > > 2. Being called while a device stops using its IOThread.
+> > > Is it safe to call blk_new() outside the BQL since it mutates global =
+state?
 > > >=20
-> > > The races that come to mind are fetching the AioContext for bs and th=
-en
-> > > scheduling a BH. The BH is executed later on by the event loop. There
-> > > might be cases where the AioContext for bs is updated before the BH
-> > > runs.
+> > > In other words, could another thread race with us?
+> >=20
+> > Hm, probably not.
+> >=20
+> > Would it be safer to have the bdrv_co_move_to_aio_context() call only
+> > immediately before the drain?
 >=20
-> The scenario I'm thinking about is where bs' AioContext changes while we
-> are trying to move there.
+> Yes, sounds good.
 >=20
-> There is a window of time between fetching bs' AioContext, scheduling a
-> BH in our old AioContext (not in bs' AioContext), and then scheduling
-> the coroutine into the AioContext we previously fetched for bs.
+> > > > @@ -2479,8 +2478,8 @@ void qmp_block_resize(bool has_device, const =
+char *device,
+> > > >      bdrv_drained_end(bs);
+> > > > =20
+> > > >  out:
+> > > > +    aio_co_reschedule_self(old_ctx);
+> > > >      blk_unref(blk);
+> > > > -    aio_context_release(aio_context);
+> > >=20
+> > > The following precondition is violated by the blk_unref -> bdrv_drain=
+ ->
+> > > AIO_WAIT_WHILE() call if blk->refcnt is 1 here:
+> > >=20
+> > >  * The caller's thread must be the IOThread that owns @ctx or the mai=
+n loop
+> > >  * thread (with @ctx acquired exactly once).
+> > >=20
+> > > blk_unref() is called from the main loop thread without having acquir=
+ed
+> > > blk's AioContext.
+> > >=20
+> > > Normally blk->refcnt will be > 1 so bdrv_drain() won't be called, but
+> > > I'm not sure if that can be guaranteed.
+> > >=20
+> > > The following seems safer although it's uglier:
+> > >=20
+> > >   aio_context =3D bdrv_get_aio_context(bs);
+> > >   aio_context_acquire(aio_context);
+> > >   blk_unref(blk);
+> > >   aio_context_release(aio_context);
+> >=20
+> > May we actually acquire aio_context if blk is in the main thread? I
+> > think we must only do this if it's in a different iothread because we'd
+> > end up with a recursive lock and drain would hang.
 >=20
-> Is it possible for the AioContext value we stashed to be outdated by the
-> time we use it?
->=20
-> I think the answer is that it's safe to use this function from the main
-> loop thread under the BQL. That way nothing else will change bs'
-> AioContext while we're running. But it's probably not safe to use this
-> function from an arbitrary IOThread (without the BQL).
+> Right :). Maybe an aio_context_acquire_once() API would help.
 
-It's probably the safest to treat it as such. The first part of it (the
-window between fetching bs->aio_context and using it) is actually also
-true for this ubiquitous sequence:
+If you want it to work in the general case, how would you implement
+this? As far as I know there is no way to tell whether we already own
+the lock or not.
 
-    AioContext *ctx =3D bdrv_get_aio_context(bs);
-    aio_context_acquire(ctx);
-
-I never really thought about this, but this is only safe in the main
-thread. Most of its users are of course monitor command handlers, which
-always run in the main thread.
-
-> I think this limitation is okay but it needs to be documented. Maybe an
-> assertion can verify that it holds.
-
-Yes, why not.
-
-Maybe we should actually change the interface into a pair of
-bdrv_co_enter/leave() functions that also increase bs->in_flight so that
-the whole section will complete before the AioContext of bs changes
-(changing the AioContext while the handle coroutine has yielded and will
-continue to run in the old context would be bad).
-
-block_resize is safe without it, but it might be better to introduce
-patterns that will be safe without being extra careful in each command.
+Something like aio_context_acquire_unless_self() might be easier to
+implement.
 
 Kevin
 
---+pHx0qQiF2pBVqBT
+--WplhKdTI2c8ulnbP
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEE3D3rFZqa+V09dFb+fwmycsiPL9YFAl9xuSMACgkQfwmycsiP
-L9ZT0g/8CLqbnTAT17v8QZ8+fUKY6Kq9bcNGaath3UIWAvU4I3ftzLSzB0I7oaP+
-psidigtCbMJJt35JSUyvaZhv/DBg3HK74ww9lc+K6iDQBj7FIMdDcZ7PTqqb2/PY
-z3mSSCLPu902XSWLPbgEs8NvMkJ/JFHbYqiMbp1kDAfJxH8ZNh7wRiOb0GgcIDUb
-xO4piknsbpbclQB4Z818FiZmrCcq+Uhp+hQuxFw23TX4BaGQVF9Dh4M6xd85bIYU
-nywzYmtqWq9prKODxb7dHxFdQ0Kbu06NzrRXrze0QYMRqKFUIWZ2qfySjD1hfB6U
-9XMp9XURqHWjLxubFI9GSiU3guG1KZA0AWkk8r8CAEw4jsIaOCJjRqdso1p5NxYY
-3H/cer/Ns9SYLE7DGQ8pjEaQd8JvRx1BSPpuOFvjTeAAOE+exDIYPAhUNymPubL4
-ByWkJmL32JjDZ6yQSRWpCvq2maG6fhC8OuUSl6IWOrkQXSz9k5n13FprD1z/nK1N
-koztodKWIaOvF5jnQ6QKnKIHN//mrUHqK7QdqOWhLSOWRVn1hyZqfk+gvpLBb+qC
-u1GQvYBdjMCt2Lhfl1WoeKuD+Q4ZHa+vGZOqSPYlpAy1YOadzxV/lnVvDRhcGRUJ
-vjPLDmVvSGkAToonT2ZWijNm5FQ0gFULNUUWQLy7ccQsM4588Qc=
-=v4SQ
+iQIzBAEBCAAdFiEE3D3rFZqa+V09dFb+fwmycsiPL9YFAl9xu+EACgkQfwmycsiP
+L9azsxAAlWWHg2VIS9dsexFuM47u5FJSpZNhW0HrF8ztjWHJFgW4L5RjaIzGB8e+
+oFdaQuEyvrI364VYErHyhI1s+dXgvo6hLe9dm5erONv/RXI6OqNa++cfdPC5zI8s
+m6EZwDcGYSVe4yUZp9RBuOc8JbJwEQ04fadHQSDydQPILJmAiyRtcnRDY8dMQ/mm
+3HgWEnXPKPbj88GkyTZysi5G/zyuimHwzSC49F5iPjY4pRA7hII5jdVXrWUh8zpv
+HbkZqIKc/lCSRvH7MW42FO0Dj0yebfMvJEQQ+RBjH3Wv+psixQ5m/dQdCEeBvg9R
+hmcM69x2h45RH8fQSRYrg13E6mZvfPFQsoyd1sd3m3fS2YOr0cqc1P0cq9tLsFXI
+6YhABFxZl4WbTUhuHrja36huhBtMncZKHk/XHgcRZnomYVepOeq9REJwanSoJaHw
+QYRRq2oMS1gv6wbXrw2s0K1hH8frHYXHGDTYhtNPXOSZrZ0K8//HXSBE0NwtIgzw
++DiU+WO+gjKAQYTBAfigKmzI/YcyUumfBKvgu0fvZtLSPBJdI4kg5SK+CMEB7PQc
+uhf8UC1qk1pGkJJ9zlWvS7m1MfhmWr1SNSB+fpZPRYO4B7+Khm+22tivcG1rZxIb
+ymvTkXVYSH+cMozycH92L9Q2/vdpeheMFNtivNsUCkw7dS6ZEG4=
+=buy7
 -----END PGP SIGNATURE-----
 
---+pHx0qQiF2pBVqBT--
+--WplhKdTI2c8ulnbP--
 
 
