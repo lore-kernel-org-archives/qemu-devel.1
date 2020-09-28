@@ -2,92 +2,76 @@ Return-Path: <SRS0=Z1O7=DF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6BE8C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 07:53:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D8A1C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 07:56:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFD7D21775
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 07:53:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lmichel.fr header.i=@lmichel.fr header.b="R7WAaSBu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFD7D21775
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=lmichel.fr
+	by mail.kernel.org (Postfix) with ESMTPS id 7021D22207
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 07:56:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7021D22207
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMnya-0007l7-UK
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 03:53:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56876)
+	id 1kMo1H-00015O-I5
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 03:56:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57632)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc@lmichel.fr>) id 1kMnxC-0006eJ-9T
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 03:52:10 -0400
-Received: from pharaoh.lmichel.fr ([149.202.28.74]:36682)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1kMo0M-0000W0-E3; Mon, 28 Sep 2020 03:55:26 -0400
+Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:38019)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc@lmichel.fr>) id 1kMnxA-0000na-L2
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 03:52:10 -0400
-Received: from localhost (sekoia-pc.home.lmichel.fr [192.168.61.100])
- by pharaoh.lmichel.fr (Postfix) with ESMTPSA id 68DBDC60F1A;
- Mon, 28 Sep 2020 07:52:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr; s=pharaoh; 
- t=1601279523;
- h=from:from:sender:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=gcJlgcggBr8TDeD0xKw+LH+VcLMaM31XJoAdh5HF5Jw=;
- b=R7WAaSBuQdCE2QiGzl9dQ5enku1FtU8JpqVMa7JtFJlaBkZqqMiUzZg4hSXnvZPaL4t3zH
- SFxpZKg436tqTiSm8TkeVJt0wzAFDFr49/6XHaZ+7AfjfCB46/D3oCaDAtGpydPNZQxwlX
- toLjgUzQHNZQqvT1TeeFNGnS3cdxBryFwJYY1KRhth63qewSMO+D/d8OkAOeb1abBc23CA
- yBc0PZHr7McGCs3VLNZahssNMQ4kNphLMWFykdmry6g4eKhNoG4Efobd+F073ta8CZNnUn
- m3bxU4S9nYXcE7Bs+pRT22E3hRf9ac22DI2pG3Fida/zO0IeUcLY7fXLUcqNFg==
-Date: Mon, 28 Sep 2020 09:53:00 +0200
-From: Luc Michel <luc@lmichel.fr>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH 3/3] hw/qdev-clock: Display error hint when clock is
- missing from device
-Message-ID: <20200928075300.q5ngcywiz5fyu6du@sekoia-pc.home.lmichel.fr>
-References: <20200927090820.61859-1-f4bug@amsat.org>
- <20200927090820.61859-4-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1kMo0K-000143-Cd; Mon, 28 Sep 2020 03:55:26 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.109.146.59])
+ by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 41AB85F7F16D;
+ Mon, 28 Sep 2020 09:55:13 +0200 (CEST)
+Received: from kaod.org (37.59.142.99) by DAG4EX1.mxp5.local (172.16.2.31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Mon, 28 Sep
+ 2020 09:55:12 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-99G003fe85e500-6295-409b-bb34-7b73e44841f2,
+ 9B5560306CAF984A1CB20844932014F06B941BD6) smtp.auth=clg@kaod.org
+Subject: Re: [PATCH] aspeed: Add support for the g220a-bmc board
+To: John Wang <wangzhiqiang.bj@bytedance.com>, <yulei.sh@bytedance.com>,
+ <xuxiaohan@bytedance.com>
+References: <20200928061201.1601-1-wangzhiqiang.bj@bytedance.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <d6cf7464-a0bf-2748-7e4c-732208881711@kaod.org>
+Date: Mon, 28 Sep 2020 09:55:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200927090820.61859-4-f4bug@amsat.org>
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr;
- s=pharaoh; t=1601279523;
- h=from:from:sender:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=gcJlgcggBr8TDeD0xKw+LH+VcLMaM31XJoAdh5HF5Jw=;
- b=NEwPj1IB/et7CROaMl6yrKkx49rfP0sTizhYit65Joq11PY84sBheetuLdzWX/9rzHP3qL
- Tq2nIAmB5WFTOGSCqsHbTVURmHrntYIzpv8PowwWR3t3vY6cFRzdldVUZy96H3dQy/5K02
- 9+OAQAPuhx/o2tE4L9Y2yQX3JzpXjE+BjmaeopIfmb3X0y+DP6f5S3HOib/EAtE/VBe2RP
- rGik9hxtfsBYo/5b6azuqmijfLchjBK54XSqyTa/iuerqkZKj19kVMdAX7bcmiql2dhjej
- iSgGS1/bbut67JT+y+pvAA+pQc6DQhhad9DqQKDmeyszxHyvp+KXYg/59Sg2bQ==
-ARC-Seal: i=1; s=pharaoh; d=lmichel.fr; t=1601279523; a=rsa-sha256; cv=none;
- b=gmJYDd+6EW+ggEeBEED0vuGNVoxdHbATqGtUJX11yt4/ITTNmjrDCv9ydDM4c5eFkCpJnUct1kDTXL78hegxgBYVWQip6CS8qSdViQupdSe/+jN8n8/u2y62u+78zjodtZn+CyXU/s5ZvuuyOsfmDfqjJ/Fy49YxtgS70d5/dYqgSxgPCrrFy/YY+Nw7mw9ehJ1OClwul1rGABVMqnYXnDNCxU2czQ3l6+ef59x5w4C/1lhCVbIIFlv43T9xfGCoafMESt1+CUh72vz4HMkeiUcYcWj/7+547kN882EqG3oUgVkqkhrb2SyEqlSQMv598gUsrx6XV+xfFZ1GTtdFHg==
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=sekoia smtp.mailfrom=luc@lmichel.fr
-Received-SPF: pass client-ip=149.202.28.74; envelope-from=luc@lmichel.fr;
- helo=pharaoh.lmichel.fr
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 03:49:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200928061201.1601-1-wangzhiqiang.bj@bytedance.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [37.59.142.99]
+X-ClientProxiedBy: DAG6EX2.mxp5.local (172.16.2.52) To DAG4EX1.mxp5.local
+ (172.16.2.31)
+X-Ovh-Tracer-GUID: 48120c75-e5dd-4d99-bf8f-4053739dbdb2
+X-Ovh-Tracer-Id: 10871689504203115372
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrvdehgdduvdejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfhisehtjeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepgedvieejfedvhfduhfffueevheeludffhfdvkeehleegtddttdfhieegveeghfffnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrdelleenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepfigrnhhgiihhihhqihgrnhhgrdgsjhessgihthgvuggrnhgtvgdrtghomh
+Received-SPF: pass client-ip=178.32.125.2; envelope-from=clg@kaod.org;
+ helo=smtpout1.mo529.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 03:55:14
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.011,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,68 +84,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>,
- "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
- Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Havard Skinnemoen <hskinnemoen@google.com>, Tyrone Ting <kfting@nuvoton.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
+ "open list:ASPEED BMCs" <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11:08 Sun 27 Sep     , Philippe Mathieu-Daudé wrote:
-> Instead of directly aborting, display a hint to help the developer
-> figure out the problem (likely trying to connect a clock to a device
-> pre-dating the Clock API, thus not expecting clocks).
+On 9/28/20 8:12 AM, John Wang wrote:
+> G220A is a 2 socket x86 motherboard supported by OpenBMC.
+> Strapping configuration was obtained from hardware.
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Signed-off-by: John Wang <wangzhiqiang.bj@bytedance.com>> ---
+>  hw/arm/aspeed.c | 35 +++++++++++++++++++++++++++++++++++
+>  1 file changed, 35 insertions(+)
+> 
+> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+> index bdb981d2f8..1de61f7d4f 100644
+> --- a/hw/arm/aspeed.c
+> +++ b/hw/arm/aspeed.c
+> @@ -120,6 +120,20 @@ struct AspeedMachineState {
+>          SCU_AST2500_HW_STRAP_ACPI_ENABLE |                              \
+>          SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER))
+>  
+> +#define G220A_BMC_HW_STRAP1 (                                      \
+> +        SCU_AST2500_HW_STRAP_SPI_AUTOFETCH_ENABLE |                     \
+> +        SCU_AST2500_HW_STRAP_GPIO_STRAP_ENABLE |                        \
+> +        SCU_AST2500_HW_STRAP_UART_DEBUG |                               \
+> +        SCU_AST2500_HW_STRAP_RESERVED28 |                               \
+> +        SCU_AST2500_HW_STRAP_DDR4_ENABLE |                              \
+> +        SCU_HW_STRAP_2ND_BOOT_WDT |                                     \
+> +        SCU_HW_STRAP_VGA_CLASS_CODE |                                   \
+> +        SCU_HW_STRAP_LPC_RESET_PIN |                                    \
+> +        SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER) |                \
+> +        SCU_AST2500_HW_STRAP_SET_AXI_AHB_RATIO(AXI_AHB_RATIO_2_1) |     \
+> +        SCU_HW_STRAP_VGA_SIZE_SET(VGA_64M_DRAM) |                       \
+> +        SCU_AST2500_HW_STRAP_RESERVED1)
+> +
+>  /* Witherspoon hardware value: 0xF10AD216 (but use romulus definition) */
+>  #define WITHERSPOON_BMC_HW_STRAP1 ROMULUS_BMC_HW_STRAP1
+>  
+> @@ -798,6 +812,23 @@ static void aspeed_machine_tacoma_class_init(ObjectClass *oc, void *data)
+>          aspeed_soc_num_cpus(amc->soc_name);
+>  };
+>  
+> +static void aspeed_machine_g220a_class_init(ObjectClass *oc, void *data)
+> +{
+> +    MachineClass *mc = MACHINE_CLASS(oc);
+> +    AspeedMachineClass *amc = ASPEED_MACHINE_CLASS(oc);
+> +
+> +    mc->desc       = "Bytedance G220A BMC (ARM1176)";
+> +    amc->soc_name  = "ast2500-a1";
+> +    amc->hw_strap1 = G220A_BMC_HW_STRAP1;
+> +    amc->fmc_model = "n25q512a";
+> +    amc->spi_model = "mx25l25635e";
+> +    amc->num_cs    = 2;
 
-Reviewed-by: Luc Michel <luc@lmichel.fr>
+'macs_mask' is missing. You won't get network.
 
-> ---
->  hw/core/qdev-clock.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
+> +    amc->i2c_init  = NULL;
+
+Isn't it possible to add some default I2C devices ? temperature sensors ?
+
+Thanks,
+
+C. 
+
+> +    mc->default_ram_size = 1024 * MiB;
+> +    mc->default_cpus = mc->min_cpus = mc->max_cpus =
+> +        aspeed_soc_num_cpus(amc->soc_name);
+> +};
+> +
+>  static const TypeInfo aspeed_machine_types[] = {
+>      {
+>          .name          = MACHINE_TYPE_NAME("palmetto-bmc"),
+> @@ -835,6 +866,10 @@ static const TypeInfo aspeed_machine_types[] = {
+>          .name          = MACHINE_TYPE_NAME("tacoma-bmc"),
+>          .parent        = TYPE_ASPEED_MACHINE,
+>          .class_init    = aspeed_machine_tacoma_class_init,
+> +    }, {
+> +        .name          = MACHINE_TYPE_NAME("g220a-bmc"),
+> +        .parent        = TYPE_ASPEED_MACHINE,
+> +        .class_init    = aspeed_machine_g220a_class_init,
+>      }, {
+>          .name          = TYPE_ASPEED_MACHINE,
+>          .parent        = TYPE_MACHINE,
 > 
-> diff --git a/hw/core/qdev-clock.c b/hw/core/qdev-clock.c
-> index 47ecb5b4fae..33bd4a9d520 100644
-> --- a/hw/core/qdev-clock.c
-> +++ b/hw/core/qdev-clock.c
-> @@ -12,6 +12,7 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
->  #include "hw/qdev-clock.h"
->  #include "hw/qdev-core.h"
->  #include "qapi/error.h"
-> @@ -153,6 +154,11 @@ Clock *qdev_get_clock_in(DeviceState *dev, const char *name)
->      assert(name);
->  
->      ncl = qdev_get_clocklist(dev, name);
-> +    if (!ncl) {
-> +        error_report("can not find clock-in '%s' for device type '%s'",
-> +                     name, object_get_typename(OBJECT(dev)));
-> +        abort();
-> +    }
->      assert(!ncl->output);
->  
->      return ncl->clock;
-> @@ -165,6 +171,11 @@ Clock *qdev_get_clock_out(DeviceState *dev, const char *name)
->      assert(name);
->  
->      ncl = qdev_get_clocklist(dev, name);
-> +    if (!ncl) {
-> +        error_report("can not find clock-out '%s' for device type '%s'",
-> +                     name, object_get_typename(OBJECT(dev)));
-> +        abort();
-> +    }
->      assert(ncl->output);
->  
->      return ncl->clock;
-> -- 
-> 2.26.2
-> 
+
 
