@@ -2,102 +2,90 @@ Return-Path: <SRS0=Z1O7=DF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82732C47420
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 07:56:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8926C4727F
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 08:16:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E414622262
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 07:56:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E414622262
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id E290020738
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Sep 2020 08:16:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r6jqlCtP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E290020738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kMo1j-000164-Mq
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 03:56:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56840)
+	id 1kMoKr-0006DM-ND
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 04:16:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33048)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kMnws-0006X6-21; Mon, 28 Sep 2020 03:51:51 -0400
-Received: from new3-smtp.messagingengine.com ([66.111.4.229]:57679)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kMnwp-0000mn-Ap; Mon, 28 Sep 2020 03:51:49 -0400
-Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
- by mailnew.nyi.internal (Postfix) with ESMTP id CAACA580129;
- Mon, 28 Sep 2020 03:51:45 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
- by compute7.internal (MEProxy); Mon, 28 Sep 2020 03:51:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-type:in-reply-to; s=fm1; bh=CpqnTLEdugbPMWpapaa1UpYzDyj
- DwYAHkUpuLvhbAMQ=; b=Eo8ymBY5jzvIIzDjNmQZLd94wZd0F8keqV6yeUs+//j
- KgalHVNanNlJo4uhIDyq8q2aroz78dfTuBqtTVkkpknJAge9dNJ+6Ij49wMietk1
- AvqlsPXTQq3mr4Py0lH3uJWLCY0VPsoKwZHBFdyK8BUyXeNDrvf/8Aaldsk35ebJ
- 5SCl284GG6bb+jmtitczztoaMyNHwYtEy62NWHAMX5EUPBGOTSkmLJJYiCz6q65j
- 8P/GAAl6tNTNWWreeDdNmX4UIifUHz7CYwjxPSrpap7PWIKZkJobi9aMZKp02ufi
- beX60Sc9Xo5HzGi/9bp2aOyVLqpJehM8NCMb6kF2vzg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-type:date:from:in-reply-to
- :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=CpqnTL
- EdugbPMWpapaa1UpYzDyjDwYAHkUpuLvhbAMQ=; b=tiJnOTCMbvxzKzkP/rrb1E
- 0WW9915brJ60wdC4EYdEs143wXb+/BArSJpkfhePW8l6C1j1OqjnurbNRjPLP5ct
- uY6y3UtsxACA1Wyvguycihh6VhvBKQjy4GAKcvvXIg2Z8+veTfm1u89/qyetiQzc
- ySy3wGI7iVQKm4Y9wtcRvfGtdP+p/+C/HPjYK0gwEObOX13KaQ19U548C0R6osW0
- yNOzVQejkIJkUmfepO/3d47OPSt/0gp/CoKt85l1OKWjRuDwbHls9c44jJkB5v2m
- 2OOP/4Pmof5xFZse9r7wiPSxAbr9Jzb23hEmLy7k/q5CdNpSUKHEfWQ+wcH35KKA
- ==
-X-ME-Sender: <xms:D5ZxX7a3xwpe1QaRkNg4jNGr_nn5mKuJ-tf4aQUrnCaf_F4ZUmNX8Q>
- <xme:D5ZxX6bY1H1_WUAT15buGQ9chcQ1n8ClJCYkMdMFDQNei8bXh5QVPYlkOHa61HMoX
- M6tOOVTOC4E4mH88xE>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrvdehgdduvdeiucetufdoteggodetrfdotf
- fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
- uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
- cujfgurhepfffhvffukfhfgggtuggjsehgtderredttdejnecuhfhrohhmpefmlhgruhhs
- ucflvghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtth
- gvrhhnpeejgeduffeuieetkeeileekvdeuleetveejudeileduffefjeegfffhuddvudff
- keenucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedtne
- curfgrrhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
-X-ME-Proxy: <xmx:D5ZxX9-6rXLUO1N4AAb-jMqVXWmyQDo-KqAo39fDg2BNoRNkf9JSkw>
- <xmx:D5ZxXxpXVNZJ_9ZcdPSyUNg0rZaNmU9BKih-QOZn6NOROklT2SGeGg>
- <xmx:D5ZxX2o2ZhwUkAYNq7OkcNZxejP9BhgqPoIb2TuhGbEwRJUjeERM_A>
- <xmx:EZZxXzTb9KEkIUC91DmrPzQU9nDc0B0XlGyiHjOe8_ilyxTkQ2Q7VjTp6Xs>
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id 1895C328005A;
- Mon, 28 Sep 2020 03:51:41 -0400 (EDT)
-Date: Mon, 28 Sep 2020 09:51:40 +0200
-From: Klaus Jensen <its@irrelevant.dk>
-To: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-Subject: Re: [PATCH v5 13/14] hw/block/nvme: Use zone metadata file for
- persistence
-Message-ID: <20200928075140.GC1967@apples.localdomain>
-References: <20200928023528.15260-1-dmitry.fomichev@wdc.com>
- <20200928023528.15260-14-dmitry.fomichev@wdc.com>
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1kMoJH-0005bU-1m
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 04:14:59 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39380)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1kMoJD-0003MN-S5
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 04:14:58 -0400
+Received: by mail-wr1-x442.google.com with SMTP id k10so169286wru.6
+ for <qemu-devel@nongnu.org>; Mon, 28 Sep 2020 01:14:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=4LuE+ZyTkVbmwN/lB5uxUEoH1IGN9UtxDvilvEtWJbs=;
+ b=r6jqlCtP20DiXZdyNejLMfIPrX+czM1aUkKF3QVFSysqh1Wq5/O0BesaymmH4VV0YM
+ 8AD+iQ31gar5R4BrfLPsQr/Xzl9j0K/mQdC/IEB55BSijHVCn/+QC7sbDe9uypznJLGT
+ vGmB2FGSc5jgpOL0W2j9GS6DBcsjvbxifFV22XtQh8IlKdFYZnFE6iWXrtUzH0n6cwJd
+ KdOhL23OPzdI6eZpCB4NgQaE62ioXGxcZAwbjpitTGALqIFBTuc4zPZJBIdpEy/6cO0f
+ i0BymxIe9Z5Eis5yNGhJfSMV5KUstCIteIqpeYNIwi+O9atVcsCKYflhIH3hQxixQA0/
+ 3DXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=4LuE+ZyTkVbmwN/lB5uxUEoH1IGN9UtxDvilvEtWJbs=;
+ b=S6wHsfqwFq9J+HnwpHUNkLS43xTAw5Gb2XI4zTSxHQBgtHKsghjN4yUVn0tR75tbcV
+ CEOdJbCMI61asxgIeWkscDlQ4NiM9/JSZyQvgTvIEJjIPP0hiVZ6cIN3KYUX69wPD2PR
+ s8b+hBz5zE6MpTUR1QCye2BRgyK4Fpcw/YRNxJBUJ8D8SKGOD8yoRZh9SbtqJ7GlqAXz
+ FuRMthBSD5jHDYbvoq8+gFFgT5Zlflah3XSvAlkcklI1aByYyf0faQffZ1SmzkOXsjvi
+ ntSvFYczhtUi60AeWVa7KZNpvtKaAHyxRMW0GiI3+5BH+0cWJPEbPBIMdHCGFMskR/Ka
+ dTxA==
+X-Gm-Message-State: AOAM531AIexonOpZUcUjmiju+ipmsm8wlv1P6pcnW/504IgLCs3Oib5J
+ 7DYqLSARMVdbNzCMNRsEgHsewm6Y4XewpF//OVA=
+X-Google-Smtp-Source: ABdhPJwEBO3Wo9prReZWVgwhoaZhNoVhNpcUxHumjVLSLsI2ZgI0K9KYkTVDs86sesUy75Bl2jCMehkSFJpezyXH4q0=
+X-Received: by 2002:adf:fc4e:: with SMTP id e14mr258208wrs.329.1601280891867; 
+ Mon, 28 Sep 2020 01:14:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="uXxzq0nDebZQVNAZ"
-Content-Disposition: inline
-In-Reply-To: <20200928023528.15260-14-dmitry.fomichev@wdc.com>
-Received-SPF: pass client-ip=66.111.4.229; envelope-from=its@irrelevant.dk;
- helo=new3-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 02:36:55
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+Received: by 2002:a1c:7504:0:0:0:0:0 with HTTP; Mon, 28 Sep 2020 01:14:51
+ -0700 (PDT)
+In-Reply-To: <CA+FBGNepcP98zG2jzgivGHsgPDvMEmV5kNWVkvri6UFsOSyQTw@mail.gmail.com>
+References: <20200927082033.8716-1-kele.hwang@gmail.com>
+ <c716ca94-5600-5521-f0ef-cd0e7809f52a@amsat.org>
+ <CA+FBGNepcP98zG2jzgivGHsgPDvMEmV5kNWVkvri6UFsOSyQTw@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Mon, 28 Sep 2020 10:14:51 +0200
+Message-ID: <CAHiYmc6n-Z2f4utqxT73TciRRmg3nSfrHhX4o4YayF59WAK1Gw@mail.gmail.com>
+Subject: Re: [PATCH v3 1/1] accel/tcg: Fix computing of is_write for MIPS
+To: Kele Huang <kele.hwang@gmail.com>
+Content-Type: multipart/alternative; boundary="000000000000bed64d05b05b4229"
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,128 +98,256 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
- Niklas Cassel <niklas.cassel@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
- qemu-devel@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
- Alistair Francis <alistair.francis@wdc.com>, Keith Busch <kbusch@kernel.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Matias Bjorling <matias.bjorling@wdc.com>
+Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Xu Zou <iwatchnima@gmail.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---uXxzq0nDebZQVNAZ
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+--000000000000bed64d05b05b4229
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sep 28 11:35, Dmitry Fomichev wrote:
-> A ZNS drive that is emulated by this module is currently initialized
-> with all zones Empty upon startup. However, actual ZNS SSDs save the
-> state and condition of all zones in their internal NVRAM in the event
-> of power loss. When such a drive is powered up again, it closes or
-> finishes all zones that were open at the moment of shutdown. Besides
-> that, the write pointer position as well as the state and condition
-> of all zones is preserved across power-downs.
->=20
-> This commit adds the capability to have a persistent zone metadata
-> to the device. The new optional module property, "zone_file",
-> is introduced. If added to the command line, this property specifies
-> the name of the file that stores the zone metadata. If "zone_file" is
-> omitted, the device will be initialized with all zones empty, the same
-> as before.
->=20
-> If zone metadata is configured to be persistent, then zone descriptor
-> extensions also persist across controller shutdowns.
->=20
-> Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-> ---
->  hw/block/nvme-ns.c    | 341 ++++++++++++++++++++++++++++++++++++++++--
->  hw/block/nvme-ns.h    |  33 ++++
->  hw/block/nvme.c       |   2 +
->  hw/block/trace-events |   1 +
->  4 files changed, 362 insertions(+), 15 deletions(-)
->=20
-> diff --git a/hw/block/nvme-ns.c b/hw/block/nvme-ns.c
-> index 47751f2d54..a94021da81 100644
-> --- a/hw/block/nvme-ns.c
-> +++ b/hw/block/nvme-ns.c
-> @@ -293,12 +421,180 @@ static void nvme_init_zone_meta(NvmeNamespace *ns)
->              i--;
->          }
->      }
-> +
-> +    if (ns->params.zone_file) {
-> +        nvme_set_zone_meta_dirty(ns);
-> +    }
-> +}
-> +
-> +static int nvme_open_zone_file(NvmeNamespace *ns, bool *init_meta,
-> +                               Error **errp)
-> +{
-> +    Object *file_be;
-> +    HostMemoryBackend *fb;
-> +    struct stat statbuf;
-> +    int ret;
-> +
-> +    ret =3D stat(ns->params.zone_file, &statbuf);
-> +    if (ret && errno =3D=3D ENOENT) {
-> +        *init_meta =3D true;
-> +    } else if (!S_ISREG(statbuf.st_mode)) {
-> +        error_setg(errp, "\"%s\" is not a regular file",
-> +                   ns->params.zone_file);
-> +        return -1;
-> +    }
-> +
-> +    file_be =3D object_new(TYPE_MEMORY_BACKEND_FILE);
-> +    object_property_set_str(file_be, "mem-path", ns->params.zone_file,
-> +                            &error_abort);
-> +    object_property_set_int(file_be, "size", ns->meta_size, &error_abort=
-);
-> +    object_property_set_bool(file_be, "share", true, &error_abort);
-> +    object_property_set_bool(file_be, "discard-data", false, &error_abor=
-t);
-> +    if (!user_creatable_complete(USER_CREATABLE(file_be), errp)) {
-> +        object_unref(file_be);
-> +        return -1;
-> +    }
-> +    object_property_add_child(OBJECT(ns), "_fb", file_be);
-> +    object_unref(file_be);
-> +
-> +    fb =3D MEMORY_BACKEND(file_be);
-> +    ns->zone_mr =3D host_memory_backend_get_memory(fb);
-> +
-> +    return 0;
-> +}
-> +
-> +static int nvme_map_zone_file(NvmeNamespace *ns, bool *init_meta)
-> +{
-> +    ns->zone_meta =3D (void *)memory_region_get_ram_ptr(ns->zone_mr);
+On Sunday, September 27, 2020, Kele Huang <kele.hwang@gmail.com> wrote:
 
-I forgot that the HostMemoryBackend doesn't magically make the memory
-available to the device, so of course this is still needed.
+> Sorry about that, I only got maintainers by './scripts/get_maintainer.pl
+> -f accel/tcg/user-exec.c' and missed your advice about maintainers.
+> In another words, I thought I had Cc'ed the TCG MIPS maintainers. =F0=9F=
+=98=85
+> And sorry to maintainers. =F0=9F=98=85
+>
+>>
+>>
+This is fine, Kele. :)
 
-Anyway.
+The granularity of get_maintainer.py is at file level, so this is one of
+the cases where you can use your own judgement and include more email
+addresses, even though get_maintainer.py doesn't list them.
+get_maintainer.py is good most of the time, but not always. But not a big
+deal.
 
-No reason for me to keep complaining about this. I do not like it, I
-will not ACK it and I think I made my reasons pretty clear.
+Thanks for the patch! :)
 
---uXxzq0nDebZQVNAZ
-Content-Type: application/pgp-signature; name="signature.asc"
+I expect Richard is going to include it in his next tcg queue.
 
------BEGIN PGP SIGNATURE-----
+Yours,
+Aleksandar
 
-iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl9xlgkACgkQTeGvMW1P
-Demyhwf+P5lQB3/Eq6yklOcWKJgypu34io55p/ONPMdj3KVaCYVeTcyriZSMwa7/
-8PaLgdRExYkoQwZolpiiWusmM9BERpvvBX1yiSjgI308KLz+PV6JP4ZTZC21WaP8
-z+mCf2s4KDO1cFJzH/0RdDjLQFwksU5O8x1j7dzRcFzAXsnOkvchiN0XZH7JS57+
-o6HbxWilLG7vfYZEVuTsYm9PntXPW4tOCHYCOPD2RFhsnYZ8NRogPls0KMx3aJPM
-uMtkJ7T+hlLiJ+RBjwvHC1PC3jOIpK1PBKeOZhJK38SkYWDfMjlQL2QGC518JkOk
-R0H/8Z5tuzqxXtjjbdr/o/yNZzpnQw==
-=e0JA
------END PGP SIGNATURE-----
 
---uXxzq0nDebZQVNAZ--
+> On Sun, 27 Sep 2020 at 16:41, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g>
+> wrote:
+>
+>> On 9/27/20 10:20 AM, Kele Huang wrote:
+>> > Detect all MIPS store instructions in cpu_signal_handler for all
+>> available
+>> > MIPS versions, and set is_write if encountering such store instruction=
+s.
+>> >
+>> > This fixed the error while dealing with self-modified code for MIPS.
+>> >
+>> > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>> > Signed-off-by: Kele Huang <kele.hwang@gmail.com>
+>> > Signed-off-by: Xu Zou <iwatchnima@gmail.com>
+>>
+>> I already Cc'ed the TCG MIPS maintainers twice for you,
+>> but you don't mind, so this time I won't insist.
+>>
+>> > ---
+>> >  accel/tcg/user-exec.c | 39 ++++++++++++++++++++++++++++++++++++++-
+>> >  1 file changed, 38 insertions(+), 1 deletion(-)
+>> >
+>> > diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
+>> > index bb039eb32d..9ecda6c0d0 100644
+>> > --- a/accel/tcg/user-exec.c
+>> > +++ b/accel/tcg/user-exec.c
+>> > @@ -702,6 +702,10 @@ int cpu_signal_handler(int host_signum, void
+>> *pinfo,
+>> >
+>> >  #elif defined(__mips__)
+>> >
+>> > +#if defined(__misp16) || defined(__mips_micromips)
+>> > +#error "Unsupported encoding"
+>> > +#endif
+>> > +
+>> >  int cpu_signal_handler(int host_signum, void *pinfo,
+>> >                         void *puc)
+>> >  {
+>> > @@ -709,9 +713,42 @@ int cpu_signal_handler(int host_signum, void
+>> *pinfo,
+>> >      ucontext_t *uc =3D puc;
+>> >      greg_t pc =3D uc->uc_mcontext.pc;
+>> >      int is_write;
+>> > +    uint32_t insn;
+>> >
+>> > -    /* XXX: compute is_write */
+>> > +    /* Detect all store instructions at program counter. */
+>> >      is_write =3D 0;
+>> > +    insn =3D *(uint32_t *)pc;
+>> > +    switch((insn >> 26) & 077) {
+>> > +    case 050: /* SB */
+>> > +    case 051: /* SH */
+>> > +    case 052: /* SWL */
+>> > +    case 053: /* SW */
+>> > +    case 054: /* SDL */
+>> > +    case 055: /* SDR */
+>> > +    case 056: /* SWR */
+>> > +    case 070: /* SC */
+>> > +    case 071: /* SWC1 */
+>> > +    case 074: /* SCD */
+>> > +    case 075: /* SDC1 */
+>> > +    case 077: /* SD */
+>> > +#if !defined(__mips_isa_rev) || __mips_isa_rev < 6
+>> > +    case 072: /* SWC2 */
+>> > +    case 076: /* SDC2 */
+>> > +#endif
+>> > +        is_write =3D 1;
+>> > +        break;
+>> > +    case 023: /* COP1X */
+>> > +        /* Required in all versions of MIPS64 since
+>> > +           MIPS64r1 and subsequent versions of MIPS32r2. */
+>> > +        switch (insn & 077) {
+>> > +        case 010: /* SWXC1 */
+>> > +        case 011: /* SDXC1 */
+>> > +        case 015: /* SDXC1 */
+>> > +            is_write =3D 1;
+>> > +        }
+>> > +        break;
+>> > +    }
+>> > +
+>> >      return handle_cpu_signal(pc, info, is_write, &uc->uc_sigmask);
+>> >  }
+>> >
+>> >
+>>
+>>
+
+--000000000000bed64d05b05b4229
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<br><br>On Sunday, September 27, 2020, Kele Huang &lt;<a href=3D"mailto:kel=
+e.hwang@gmail.com">kele.hwang@gmail.com</a>&gt; wrote:<br><blockquote class=
+=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
+ing-left:1ex"><div dir=3D"ltr">Sorry about that, I only got maintainers by =
+&#39;./scripts/<a href=3D"http://get_maintainer.pl" target=3D"_blank">get_m=
+aintainer.pl</a> -f accel/tcg/user-exec.c&#39; and missed your advice about=
+ maintainers.=C2=A0<div>In another words, I thought I had Cc&#39;ed the TCG=
+ MIPS maintainers.=C2=A0=F0=9F=98=85</div><div>And sorry to maintainers.=C2=
+=A0=F0=9F=98=85</div></div><blockquote class=3D"gmail_quote" style=3D"margi=
+n:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><br></blockquote>=
+</blockquote><div><br></div><div>This is fine, Kele. :)</div><div><br></div=
+><div>The granularity of get_maintainer.py is at file level, so this is one=
+ of the cases where you can use your own judgement and include more email a=
+ddresses, even though get_maintainer.py doesn&#39;t list them. get_maintain=
+er.py is good most of the time, but not always. But not a big deal.</div><d=
+iv><br></div><div>Thanks for the patch! :)</div><div><br></div><div>I expec=
+t Richard is going to include it in his next tcg queue.</div><div><br></div=
+><div>Yours,</div><div>Aleksandar</div><div>=C2=A0</div><blockquote class=
+=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
+ing-left:1ex"><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_at=
+tr">On Sun, 27 Sep 2020 at 16:41, Philippe Mathieu-Daud=C3=A9 &lt;<a href=
+=3D"mailto:f4bug@amsat.org" target=3D"_blank">f4bug@amsat.org</a>&gt; wrote=
+:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.=
+8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On 9/27/20 10:=
+20 AM, Kele Huang wrote:<br>
+&gt; Detect all MIPS store instructions in cpu_signal_handler for all avail=
+able<br>
+&gt; MIPS versions, and set is_write if encountering such store instruction=
+s.<br>
+&gt; <br>
+&gt; This fixed the error while dealing with self-modified code for MIPS.<b=
+r>
+&gt; <br>
+&gt; Reviewed-by: Richard Henderson &lt;<a href=3D"mailto:richard.henderson=
+@linaro.org" target=3D"_blank">richard.henderson@linaro.org</a>&gt;<br>
+&gt; Signed-off-by: Kele Huang &lt;<a href=3D"mailto:kele.hwang@gmail.com" =
+target=3D"_blank">kele.hwang@gmail.com</a>&gt;<br>
+&gt; Signed-off-by: Xu Zou &lt;<a href=3D"mailto:iwatchnima@gmail.com" targ=
+et=3D"_blank">iwatchnima@gmail.com</a>&gt;<br>
+<br>
+I already Cc&#39;ed the TCG MIPS maintainers twice for you,<br>
+but you don&#39;t mind, so this time I won&#39;t insist.<br>
+<br>
+&gt; ---<br>
+&gt;=C2=A0 accel/tcg/user-exec.c | 39 ++++++++++++++++++++++++++++++<wbr>++=
+++++++-<br>
+&gt;=C2=A0 1 file changed, 38 insertions(+), 1 deletion(-)<br>
+&gt; <br>
+&gt; diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c<br>
+&gt; index bb039eb32d..9ecda6c0d0 100644<br>
+&gt; --- a/accel/tcg/user-exec.c<br>
+&gt; +++ b/accel/tcg/user-exec.c<br>
+&gt; @@ -702,6 +702,10 @@ int cpu_signal_handler(int host_signum, void *pin=
+fo,<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 #elif defined(__mips__)<br>
+&gt;=C2=A0 <br>
+&gt; +#if defined(__misp16) || defined(__mips_micromips)<br>
+&gt; +#error &quot;Unsupported encoding&quot;<br>
+&gt; +#endif<br>
+&gt; +<br>
+&gt;=C2=A0 int cpu_signal_handler(int host_signum, void *pinfo,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0void *puc)<br>
+&gt;=C2=A0 {<br>
+&gt; @@ -709,9 +713,42 @@ int cpu_signal_handler(int host_signum, void *pin=
+fo,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 ucontext_t *uc =3D puc;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 greg_t pc =3D uc-&gt;uc_mcontext.pc;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 int is_write;<br>
+&gt; +=C2=A0 =C2=A0 uint32_t insn;<br>
+&gt;=C2=A0 <br>
+&gt; -=C2=A0 =C2=A0 /* XXX: compute is_write */<br>
+&gt; +=C2=A0 =C2=A0 /* Detect all store instructions at program counter. */=
+<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 is_write =3D 0;<br>
+&gt; +=C2=A0 =C2=A0 insn =3D *(uint32_t *)pc;<br>
+&gt; +=C2=A0 =C2=A0 switch((insn &gt;&gt; 26) &amp; 077) {<br>
+&gt; +=C2=A0 =C2=A0 case 050: /* SB */<br>
+&gt; +=C2=A0 =C2=A0 case 051: /* SH */<br>
+&gt; +=C2=A0 =C2=A0 case 052: /* SWL */<br>
+&gt; +=C2=A0 =C2=A0 case 053: /* SW */<br>
+&gt; +=C2=A0 =C2=A0 case 054: /* SDL */<br>
+&gt; +=C2=A0 =C2=A0 case 055: /* SDR */<br>
+&gt; +=C2=A0 =C2=A0 case 056: /* SWR */<br>
+&gt; +=C2=A0 =C2=A0 case 070: /* SC */<br>
+&gt; +=C2=A0 =C2=A0 case 071: /* SWC1 */<br>
+&gt; +=C2=A0 =C2=A0 case 074: /* SCD */<br>
+&gt; +=C2=A0 =C2=A0 case 075: /* SDC1 */<br>
+&gt; +=C2=A0 =C2=A0 case 077: /* SD */<br>
+&gt; +#if !defined(__mips_isa_rev) || __mips_isa_rev &lt; 6<br>
+&gt; +=C2=A0 =C2=A0 case 072: /* SWC2 */<br>
+&gt; +=C2=A0 =C2=A0 case 076: /* SDC2 */<br>
+&gt; +#endif<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 is_write =3D 1;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
+&gt; +=C2=A0 =C2=A0 case 023: /* COP1X */<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* Required in all versions of MIPS64 sin=
+ce <br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0MIPS64r1 and subsequent vers=
+ions of MIPS32r2. */<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 switch (insn &amp; 077) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 case 010: /* SWXC1 */<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 case 011: /* SDXC1 */<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 case 015: /* SDXC1 */<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 is_write =3D 1;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 return handle_cpu_signal(pc, info, is_write, &amp;=
+uc-&gt;uc_sigmask);<br>
+&gt;=C2=A0 }<br>
+&gt;=C2=A0 <br>
+&gt; <br>
+<br>
+</blockquote></div>
+</blockquote>
+
+--000000000000bed64d05b05b4229--
 
