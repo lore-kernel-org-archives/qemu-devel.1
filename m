@@ -2,81 +2,81 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12CEBC4727F
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 20:07:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC492C4727C
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 20:08:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 719702076B
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 20:07:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C8D12076A
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 20:08:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="KwEYdBgt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 719702076B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t0WcvVom"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C8D12076A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNLtw-0000kF-E4
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 16:07:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45458)
+	id 1kNLuu-0002RC-13
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 16:08:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56696)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1kNKzu-0008Eb-BX
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 15:09:10 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:36351)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kNLtv-0000zI-KX
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 16:07:03 -0400
+Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:36582)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1kNKzs-0002Wp-NJ
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 15:09:10 -0400
-Received: by mail-pf1-x441.google.com with SMTP id d9so5550710pfd.3
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 12:09:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=W1RnwHdcfPqUNeQK0zvGYuf3hB9xeHXDqfa7SIUjDuo=;
- b=KwEYdBgtpMNJOx/cj77iAtoIb5CneK1nbmpzGIGRJPYffVLScnX6zvs9OYm0i9JZQK
- WWl7pEZDavHD48GDDzZn9ppUX6K7Ngewa1DJZ4WCKmaKyubJ2gBH5L0q0YHLIYs9dG7P
- zGzBHTgvALrm2b7S5c2gnVA5CiT0LxppPTTlM+vVFT3Kdgu4BjgH8DQpO4z10iDg4RwI
- GYkCxybTy/b9wj4Y92gF9NLm5v48z5kVl69xBvewaSmgO/ZyiQ6OJ2ygXnZ75rmFQKsS
- bM7CoGrgv9Je9wwAzMArxHqXaF5iDhGVH1b0qD3jhMH2noBgoIYBUIOev1JZtEsH4Os1
- obgw==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kNLtu-0001qq-4b
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 16:07:03 -0400
+Received: by mail-ej1-x641.google.com with SMTP id h26so6878535ejq.3
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 13:07:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=u1h2fvvT4OPp+mDt9BSuEIwI1NU5rX5oD8xSPHyS3oE=;
+ b=t0WcvVombLhwdXdTCcUWhl2itrZyb/IumcAxL3uVxGyb+WGHU7Uoz2ogoqkVeZAGQG
+ gW2aYszOTJ2aNsbB+Z7NeadAmAPSpjGCuOEUp39eBda8VphQlH9gIWkuTtSj77LJ420/
+ vF54QA5aweY79WlMUb7c3cN0o9CvJGUE+WTyQte3ECfZObuWUpdj9EPiWNEYkwgpj7GH
+ ascElJ35lrz2DMJ0n/C6k96ywcVccRucu9kHhvLPb3qgPv1z0IcZoajuknEAnKVtrnzt
+ ViwIn7o/SNtjAmnE92xgSNB+qc6WQwHs3Wp8lIFhQqnKMy71Vse1JvjQELUunP9Uqndf
+ 0miw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=W1RnwHdcfPqUNeQK0zvGYuf3hB9xeHXDqfa7SIUjDuo=;
- b=mYs7/Pqi+kZa6doOOtVCJY/iXjT27/ydmwZL5O+CEwJyTI2PmcMQo3lNFeC+dIumM0
- 5SWIi8d7r30fAEx0X1lsatd3BAKNjz2MLZNmXOrfF6G7bvkSO08p9/FfJDY3gOIETs3w
- QIVy3yOJgF7iXSE4yZe8Ho4B03I0TXlyw2Gs/4t4VlAVTmo3fsISbzrxwRujKxTxzja/
- 145laPfm/7MdfgSOkQJV35LYzdUnJtdvqYVGhaAeKv1IjDBYaUfKZpJ2zsM128b2MBMS
- JdkOeap02p5juqgqOQASX3x+HOKln4Af/5ImdyNHtkxTq79pJguQx7ol7rZPi7R4aFfM
- rHgw==
-X-Gm-Message-State: AOAM531wRbW9RYHqYZRIHZUI2PoYJk0Rg+VUKl1aZ0vzr32nmcRGZa3r
- szvouzX54DkdWEYEK420qTRxxxUrOPGIRw==
-X-Google-Smtp-Source: ABdhPJyPcD0QtMAPSqvqWHHV41sujCrP5LwrHoX1s/vQJkhd6rI/XUIEHQHDmE53ypjRcSGsVouD8Q==
-X-Received: by 2002:a63:1b44:: with SMTP id b4mr4264053pgm.175.1601406547270; 
- Tue, 29 Sep 2020 12:09:07 -0700 (PDT)
-Received: from localhost.localdomain (122-116-72-36.HINET-IP.hinet.net.
- [122.116.72.36])
- by smtp.gmail.com with ESMTPSA id v8sm6003950pgg.58.2020.09.29.12.09.05
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 29 Sep 2020 12:09:06 -0700 (PDT)
-From: frank.chang@sifive.com
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [RFC v5 64/68] target/riscv: rvv-1.0: relax RV_VLEN_MAX to 1024-bits
-Date: Wed, 30 Sep 2020 03:04:39 +0800
-Message-Id: <20200929190448.31116-65-frank.chang@sifive.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200929190448.31116-1-frank.chang@sifive.com>
-References: <20200929190448.31116-1-frank.chang@sifive.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
- envelope-from=frank.chang@sifive.com; helo=mail-pf1-x441.google.com
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=u1h2fvvT4OPp+mDt9BSuEIwI1NU5rX5oD8xSPHyS3oE=;
+ b=rCyoLSgSHPZoUKJsotmiD74Kma9VAhBT0NgHS6yjD36PICTVdP/OFVJ1jWcNy8vitU
+ 8T0ilEyIcX6/52ry5pIfV70IiWc8nKbLO7Yoz1TILgVm2iHKXZxwdf6se4ch/3nBB50Y
+ /KqmcuMyw8pK+aqAzwCaGZzlUqKx6HWbZtpQSlyK7Wmk6gFKQutI8Ke89G8iYDQNYTyu
+ XlRvdeFpeXDOxYUV3CrWFWILxq5Zu/ufyv5MA5enY7k3CmTs9uCRHxL8GMt+xZGEMnrO
+ lUuHmALtGyWh/gHRibN7Cl89a7iS2SndGUpXTAgPctJfs+Be3e37vGbyb67hxo1LX/0X
+ kCSg==
+X-Gm-Message-State: AOAM531xBE2hfKsNwco5Aa+ucjHfJEIpnYIW9DKLKFnJYW0lvU02hrqS
+ NJ+ipxD5qqGZsRaVc0667KX+3yZi/S6NKUvPH5d51Q==
+X-Google-Smtp-Source: ABdhPJzNvPmfpqeFF5weiJ06WOCbfrwLMo30g1vXELPjVSGmAHTe0OlZZUhZENuMjibdqJ8Ah+loAU7hXvzaKksnKQA=
+X-Received: by 2002:a17:906:d936:: with SMTP id
+ rn22mr5774019ejb.4.1601410020098; 
+ Tue, 29 Sep 2020 13:07:00 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200316160634.3386-1-philmd@redhat.com>
+ <20200316160634.3386-18-philmd@redhat.com>
+In-Reply-To: <20200316160634.3386-18-philmd@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 29 Sep 2020 21:06:48 +0100
+Message-ID: <CAFEAcA-Rt__Du0TqqVFov4mNoBvC9hTt7t7e-3G45Eck4z94tQ@mail.gmail.com>
+Subject: Re: [PATCH v3 17/19] hw/arm: Automatically select the 'virt' machine
+ on KVM
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::641;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x641.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -98,71 +98,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Frank Chang <frank.chang@sifive.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+ kvm-devel <kvm@vger.kernel.org>,
  Richard Henderson <richard.henderson@linaro.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Frank Chang <frank.chang@sifive.com>
+On Mon, 16 Mar 2020 at 16:08, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> When building a KVM-only QEMU, the 'virt' machine is a good
+> default :)
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  hw/arm/Kconfig | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+> index d0903d8544..8e801cd15f 100644
+> --- a/hw/arm/Kconfig
+> +++ b/hw/arm/Kconfig
+> @@ -1,5 +1,6 @@
+>  config ARM_VIRT
+>      bool
+> +    default y if KVM
+>      imply PCI_DEVICES
+>      imply TEST_DEVICES
+>      imply VFIO_AMD_XGBE
 
-Signed-off-by: Frank Chang <frank.chang@sifive.com>
+What does this actually do ? Why should the choice of
+accelerator affect what boards we pull in by default?
+I can see why you'd want to disable boards that only
+work with accelerators we don't enable, ie don't build
+TCG-only boards unless CONFIG_TCG, but this is the other
+way around...
 
---
-
-Signed-off-by: Frank Chang <frank.chang@sifive.com>
----
- target/riscv/cpu.h                      | 2 +-
- target/riscv/insn_trans/trans_rvv.c.inc | 4 ++--
- target/riscv/vector_helper.c            | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 930607de24..ca78b7f352 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -92,7 +92,7 @@ typedef struct CPURISCVState CPURISCVState;
- 
- #include "pmp.h"
- 
--#define RV_VLEN_MAX 256
-+#define RV_VLEN_MAX 1024
- 
- FIELD(VTYPE, VLMUL, 0, 3)
- FIELD(VTYPE, VSEW, 3, 3)
-diff --git a/target/riscv/insn_trans/trans_rvv.c.inc b/target/riscv/insn_trans/trans_rvv.c.inc
-index db6c3d9bdf..576d20c6eb 100644
---- a/target/riscv/insn_trans/trans_rvv.c.inc
-+++ b/target/riscv/insn_trans/trans_rvv.c.inc
-@@ -631,8 +631,8 @@ static bool ldst_us_trans(uint32_t vd, uint32_t rs1, uint32_t data,
-     base = tcg_temp_new();
- 
-     /*
--     * As simd_desc supports at most 256 bytes, and in this implementation,
--     * the max vector group length is 2048 bytes. So split it into two parts.
-+     * As simd_desc supports at most 2048 bytes, and in this implementation,
-+     * the max vector group length is 4096 bytes. So split it into two parts.
-      *
-      * The first part is vlen in bytes, encoded in maxsz of simd_desc.
-      * The second part is lmul, encoded in data of simd_desc.
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 8d389af4b7..16331939b6 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -129,7 +129,7 @@ static uint32_t vext_wd(uint32_t desc)
- static inline uint32_t vext_max_elems(uint32_t desc, uint32_t esz)
- {
-     /*
--     * As simd_desc support at most 256 bytes, the max vlen is 256 bits.
-+     * As simd_desc support at most 2048 bytes, the max vlen is 1024 bits.
-      * so vlen in bytes (vlenb) is encoded as maxsz.
-      */
-     uint32_t vlenb = simd_maxsz(desc);
--- 
-2.17.1
-
+thanks
+-- PMM
 
