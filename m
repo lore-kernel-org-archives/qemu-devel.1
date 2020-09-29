@@ -2,80 +2,82 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEE01C4727C
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 13:19:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 745F3C4727C
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 13:20:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED68320757
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 13:19:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A665A20848
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 13:20:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eZm9QH5K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED68320757
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bLapHbjE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A665A20848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNFXv-0004vi-Nz
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 09:19:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35558)
+	id 1kNFYF-0005HZ-MQ
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 09:20:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35762)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1kNFWA-00042C-DM
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 09:18:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40120)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kNFWt-0004Oa-Lh
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 09:18:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34239)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1kNFW8-0006NA-0h
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 09:18:06 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kNFWq-0006SP-06
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 09:18:51 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601385483;
+ s=mimecast20190719; t=1601385526;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=PPbkkC9FMyjvlcJK9Y8akpwUgQWAGA3b4Syy8ayWkOw=;
- b=eZm9QH5KMD8beUQdyAzbKfRBuVck6In8i5H0A56fX504FCl4zO9ud8kIhEuQhmHnevkTOu
- KebKW3kVDY4voeFahJgNqBvB+RpMFRI46bFoEWvlJbLutRf3O2L+vYSHqd7n548lh7B1am
- d6RanjqcfWiCA99N4T74Ai2gCBQpoKY=
+ bh=oIsjJio2HZAHLcI+yK59P+oIBh6ir975ANdT4BX+8Y0=;
+ b=bLapHbjE69vWP1nqxSX4lhsSbfr948v6PAM+WcwKX/+5JIQDyxP9lHy/+TKC6VP08/x3Bp
+ LaemT8y63y0dW2IUFdVGX3ku+6z8B4vlG3WRSvCGQNAN+I4tbU/qM+Q76sPlMONE5u1Ryj
+ s7VbGeh/vll38tBsmRvbqJH9cO28yBI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-42-xNcgO_1ZNCSH14wiymIf7A-1; Tue, 29 Sep 2020 09:18:01 -0400
-X-MC-Unique: xNcgO_1ZNCSH14wiymIf7A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-216-x9h_JSpiP52qNvUtQQlhbg-1; Tue, 29 Sep 2020 09:18:43 -0400
+X-MC-Unique: x9h_JSpiP52qNvUtQQlhbg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 96E4C10BBEC5;
- Tue, 29 Sep 2020 13:17:59 +0000 (UTC)
-Received: from horse.redhat.com (ovpn-116-167.rdu2.redhat.com [10.10.116.167])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EB74D10013D0;
- Tue, 29 Sep 2020 13:17:53 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
- id 70119220203; Tue, 29 Sep 2020 09:17:53 -0400 (EDT)
-Date: Tue, 29 Sep 2020 09:17:53 -0400
-From: Vivek Goyal <vgoyal@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: virtiofs vs 9p performance(Re: tools/virtiofs: Multi threading
- seems to hurt performance)
-Message-ID: <20200929131753.GB220516@redhat.com>
-References: <20200918213436.GA3520@redhat.com> <20200921153243.GK3221@work-vm>
- <20200922102531.GA2837@work-vm> <20200922174733.GD57620@redhat.com>
- <46D726A6-72F3-40FE-9382-A189513F783D@intel.com>
- <20200924221023.GB132653@redhat.com>
- <20200925124139.GJ2873@work-vm>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 52C4F80EF9D;
+ Tue, 29 Sep 2020 13:18:42 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-101.ams2.redhat.com
+ [10.36.112.101])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F207D5D9CA;
+ Tue, 29 Sep 2020 13:18:41 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 7A644113864A; Tue, 29 Sep 2020 15:18:40 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v6 15/21] tests/qapi-schema: Add test of the rST QAPI
+ doc-comment outputn
+References: <20200925162316.21205-1-peter.maydell@linaro.org>
+ <20200925162316.21205-16-peter.maydell@linaro.org>
+ <877dscvkp5.fsf@dusky.pond.sub.org>
+ <CAFEAcA_fQPYbf4TG3TayQ5Y5NBJCOq6wuBiqXZMp3MUVj7XFrA@mail.gmail.com>
+Date: Tue, 29 Sep 2020 15:18:40 +0200
+In-Reply-To: <CAFEAcA_fQPYbf4TG3TayQ5Y5NBJCOq6wuBiqXZMp3MUVj7XFrA@mail.gmail.com>
+ (Peter Maydell's message of "Tue, 29 Sep 2020 13:33:30 +0100")
+Message-ID: <877dscsoun.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20200925124139.GJ2873@work-vm>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=vgoyal@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=vgoyal@redhat.com;
+Content-Type: text/plain
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 22:47:55
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -98,63 +100,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Venegas Munoz, Jose Carlos" <jose.carlos.venegas.munoz@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "cdupontd@redhat.com" <cdupontd@redhat.com>,
- virtio-fs-list <virtio-fs@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- "Shinde, Archana M" <archana.m.shinde@intel.com>
+Cc: John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 25, 2020 at 01:41:39PM +0100, Dr. David Alan Gilbert wrote:
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-[..]
-> So I'm sitll beating 9p; the thread-pool-size=1 seems to be great for
-> read performance here.
-> 
+> On Tue, 29 Sep 2020 at 13:20, Markus Armbruster <armbru@redhat.com> wrote:
+>>
+>> In subject, s/outputn/output/
+>>
+>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>
+>> > Add a test of the rST output from the QAPI doc-comment generator,
+>> > similar to what we currently have that tests the Texinfo output.
+>> >
+>> > This is a bit more awkward with Sphinx, because the generated
+>> > output is not 100% under our control the way the QAPI-to-Texinfo
+>> > generator was. However, in practice Sphinx's plaintext output
+>> > generation has been identical between at least Sphinx 1.6 and
+>> > 3.0, so we use that. (The HTML output has had changes across
+>> > versions). We use an exact-match comparison check, with the
+>> > understanding that perhaps changes in a future Sphinx version
+>> > might require us to implement something more clever to cope
+>> > with variation in the output.
+>> >
+>> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>>
+>> It's not just the potential Sphinx version dependence that makes this
+>> awkward.
+>>
+>> We can no longer check what our doc generator does (at least not without
+>> substantial additional coding), we can only check what it does together
+>> with Sphinx.  We do so for one output format.
+>>
+>> Our doc generator output could change in ways that are not visible in
+>> the Sphinx output format we test, but are visible in some other output
+>> format.
+>>
+>> We choose to test plain text, because it has the lowest risk of unwanted
+>> Sphinx version dependence, even though it probably has the highest risk
+>> of "rendering stuff invisible".
+>>
+>> Certainly better than nothing, and probably the best we can do now, but
+>> let's capture the tradeoff in the commit message.  Perhaps:
+>>
+>>   This is a bit more awkward with Sphinx, because the generated output
+>>   is not 100% under our control the way the QAPI-to-Texinfo generator
+>>   was. We can't observe the data we generate, only the Sphinx
+>>   output. Two issues.
+>>
+>>   One, the output can vary with the Sphinx version.  In practice
+>>   Sphinx's plaintext output generation has been identical between at
+>>   least Sphinx 1.6 and 3.0, so we use that. (The HTML output has had
+>>   changes across versions). We use an exact-match comparison check, with
+>>   the understanding that perhaps changes in a future Sphinx version
+>>   might require us to implement something more clever to cope with
+>>   variation in the output.
+>>
+>>   Two, the test can only protect us from changes in the data we generate
+>>   that are visible in plain text.
+>>
+>> What do you think?
+>
+> Yes, seems worth recording that in the commit message (especially
+> now you've written the text :-)).
 
-Hi Dave,
+:)
 
-I spent some time making changes to virtiofs-tests so that I can test
-a mix of random read and random write workload. That testsuite runs
-a workload 3 times and reports the average. So I like to use it to
-reduce run to run variation effect.
+>> > +# Test the document-comment document generation code by running a test schema
+>> > +# file through Sphinx's plain-text builder and comparing the result against
+>> > +# a golden reference. This is in theory susceptible to failures if Sphinx
+>> > +# changes its output, but the text output has historically been very stable
+>> > +# (no changes between Sphinx 1.6 and 3.0), so it is a better bet than
+>> > +# texinfo or HTML generation, both of which have had changes. We might
+>>
+>> Texinfo
+>>
+>> > +# need to add more sophisticated logic here in future for some sort of
+>> > +# fuzzy comparison if future Sphinx versions produce different text,
+>> > +# but for now the simple comparison suffices.
+>> > +qapi_doc_out = custom_target('QAPI rST doc',
+>> > +                             output: ['doc-good.txt'],
+>> > +                             input: files('doc-good.json', 'doc-good.rst'),
+>>
+>> Gawk at my Meson ignorance...
+>>
+>> Looks like this builds doc-good.txt from doc.good.json and doc-good.rst.
+>>
+>> doc-good.txt is also a source file.  Works, because we use a separate
+>> build tree.  Might be confusing, though.
+>
+> Yes. We could change the name of the reference source file that
+> we have checked into the git repo if you wanted. (The output file
+> written by Sphinx has to be the same name as the input .rst file AFAICT.)
 
-So I ran following to mimic carlos's workload.
+I'll see what I can do (and thanks for the hint).
 
-$ ./run-fio-test.sh test -direct=1 -c <test-dir> fio-jobs/randrw-psync.job >
-testresults.txt
+>> > +                             build_by_default: build_docs,
+>> > +                             depend_files: sphinx_extn_depends,
+>> > +                             # We use -E to suppress Sphinx's caching, because
+>> > +                             # we want it to always really run the QAPI doc
+>> > +                             # generation code. It also means we don't
+>> > +                             # clutter up the build dir with the cache.
+>> > +                             command: [SPHINX_ARGS,
+>> > +                                       '-b', 'text', '-E',
+>> > +                                       '-c', meson.source_root() / 'docs',
+>> > +                                       '-D', 'master_doc=doc-good',
+>> > +                                       meson.current_source_dir(),
+>> > +                                       meson.current_build_dir()])
+>> > +
+>> > +# Fix possible inconsistency in line endings in generated output and
+>> > +# in the golden reference (which could otherwise cause test failures
+>> > +# on Windows hosts). Unfortunately diff --strip-trailing-cr
+>> > +# is GNU-diff only. The odd-looking perl is because we must avoid
+>> > +# using an explicit '\' character in the command arguments to
+>> > +# a custom_target(), as Meson will unhelpfully replace it with a '/'
+>> > +# (https://github.com/mesonbuild/meson/issues/1564)
+>>
+>> Rather disappointing.
+>>
+>> > +qapi_doc_out_nocr = custom_target('QAPI rST doc newline-sanitized',
+>> > +                                  output: ['doc-good.txt.nocr'],
+>> > +                                  input: qapi_doc_out[0],
+>> > +                                  build_by_default: build_docs,
+>> > +                                  command: ['perl', '-pe', '$x = chr 13; s/$x$//', '@INPUT@'],
+>> > +                                  capture: true)
+>>
+>> I figure this strips \r from the build tree's doc-good.txt.
+>
+> Close; it turns either CRLF or LF into the host OS's
+> line-ending sequence (see below).
+>
+>> > +qapi_doc_ref_nocr = custom_target('QAPI rST doc reference newline-sanitized',
+>> > +                                  output: ['doc-good.ref.nocr'],
+>> > +                                  input: files('doc-good.txt'),
+>> > +                                  build_by_default: build_docs,
+>> > +                                  command: ['perl', '-pe', '$x = chr 13; s/$x$//', '@INPUT@'],
+>> > +                                  capture: true)
+>>
+>> Uh, this strips it from the source tree's doc-good.txt, right?  Why is
+>> that necessary?
+>
+> This is in case the user has a setup that eg has git
+> doing line-ending conversion on checkout somehow. As a
+> non-Windows user I opted to be belt-and-braces about
+> converting both files to a known-consistent line ending.
+> It's also necessary because the perl rune isn't really
+> "delete \r"; it's "delete any \r and then output the
+> line with the OS line ending" because the files it processes
+> are being read and written in text mode. So the output
+> will be \r\n on Windows and \n on Unix; the test passes
+> in both cases because both files have the same
+> line endings after conversion.
 
-$ ./parse-fio-results.sh testresults.txt
+Uff.  Thanks!
 
-I am using a SSD at the host to back these files. Option "-c" always
-creates new files for testing.
-
-Following are my results in various configurations. Used cache=mmap mode
-for 9p and cache=auto (and cache=none) modes for virtiofs. Also tested
-9p default as well as msize=16m. Tested virtiofs both with exclusive
-as well as shared thread pool.
-
-NAME                    WORKLOAD                Bandwidth       IOPS            
-9p-mmap-randrw          randrw-psync            42.8mb/14.3mb   10.7k/3666      
-9p-mmap-msize16m        randrw-psync            42.8mb/14.3mb   10.7k/3674      
-vtfs-auto-ex-randrw     randrw-psync            27.8mb/9547kb   7136/2386       
-vtfs-auto-sh-randrw     randrw-psync            43.3mb/14.4mb   10.8k/3709      
-vtfs-none-sh-randrw     randrw-psync            54.1mb/18.1mb   13.5k/4649      
-
-
-- Increasing msize to 16m did not help with performance for this workload.
-- virtiofs exclusive thread pool ("ex"), is slower than 9p.
-- virtiofs shared thread pool ("sh"), matches the performance of 9p.
-- virtiofs cache=none mode is faster than cache=auto mode for this
-  workload.
-
-Carlos, I am looking at more ways to optimize it further for virtiofs.
-In the mean time I think switching to "shared" thread pool should
-bring you very close to 9p in your setup I think.
-
-Thanks
-Vivek
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
 
