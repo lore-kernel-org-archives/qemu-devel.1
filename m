@@ -2,104 +2,102 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E824C4727C
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 22:46:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0199C4727C
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 22:48:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF71920756
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 22:46:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF71920756
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id 3351520756
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 22:48:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MVZaWTj3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3351520756
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNOOQ-00078t-K7
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 18:46:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60520)
+	id 1kNOPf-0001XE-5c
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 18:47:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60720)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kNOKt-0004Qx-PY; Tue, 29 Sep 2020 18:43:03 -0400
-Received: from wnew2-smtp.messagingengine.com ([64.147.123.27]:43407)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kNOKn-0004Rk-4a; Tue, 29 Sep 2020 18:43:01 -0400
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
- by mailnew.west.internal (Postfix) with ESMTP id 03ADBE95;
- Tue, 29 Sep 2020 18:42:53 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
- by compute4.internal (MEProxy); Tue, 29 Sep 2020 18:42:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-type:in-reply-to; s=fm1; bh=yJy2qHVCJqwal7pE3dQcnTpWriP
- Q8Ee2PsuOqAqUNAk=; b=lR0AaOaYrAE9Q/wmBugoOWGu1ChcB6u2jhcfyRtB/uP
- 5/1Pyhqe1y7dS1jhMQJClFs7ueBeIaQYMjPOSlcLh3f/hDkI8rVrkojs7bR9MPU5
- 15Vb6UbEDrOrbXOn5KveAro8SWcU4gZ+RRkBo4V3F6XXJNVpuc+pQFMnH88Jshju
- +Se+AyTpp7tE8r6Aq5uEhSzMfccCrrbgQTlbqSJbEt82NGK+p4qWyG4zfDs56570
- Hp34uPMT1PCk8GKKHS6rX3PcX/FEerKpijbS2jJG2SWYHuSnZLEy3j5UYiXIKTN6
- UJdkrWwyAkqoqwc1XidHvA2QCIs/qo3hy5NCHNPM7EQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-type:date:from:in-reply-to
- :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=yJy2qH
- VCJqwal7pE3dQcnTpWriPQ8Ee2PsuOqAqUNAk=; b=uIPOsaf0xyc4lhKRepNqNt
- iWmsTQeJPVJ7cD/2KztWtp16yGLLA6gxjCcVrQkWNQA4NMvZil03mptBdI4sgP2e
- Ama39spcGcl5DzZ+CVVfbXySKF38A5/0fbXRxld2gawc5mNB+zT6NGFuXOiRRuP9
- jDzb3jxrTvWiCQWj2lp05Ru8l1wnzUukSzj27MH7N8APcxd5IVgoqk5yjwJMXndL
- AQ0k4AzDCXG9seCXPKPSlvTygs0niYgmM1ggy0bzS1slq/Af8BhF0I+IeUjSDKE5
- fimu46bTMhhaEdRhQnV4WdDIgSV4UE8VNrQlSpLGdo4j2DWWl2codQ88C4yHVpHg
- ==
-X-ME-Sender: <xms:a7hzXzD7l5kAOCl4gs4HvuoADr-GCbdf0ghr1rgCUbmOgT6-PPrPrg>
- <xme:a7hzX5gvmWkMD-FPfb_9vnUHcOss1jRocJnU834h5oQW8kxxKFeocq2YQHeiHnH7d
- BO8D-6Ng79kY5m9nuU>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrfedtgddutdcutefuodetggdotefrodftvf
- curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
- uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
- fjughrpeffhffvuffkfhggtggujgesghdtreertddtjeenucfhrhhomhepmfhlrghushcu
- lfgvnhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrdgukheqnecuggftrfgrthhtvg
- hrnhepjeegudffueeiteekieelkedvueelteevjeduieeludfffeejgeffhfduvdduffek
- necukfhppeektddrudeijedrleekrdduledtnecuvehluhhsthgvrhfuihiivgeptdenuc
- frrghrrghmpehmrghilhhfrhhomhepihhtshesihhrrhgvlhgvvhgrnhhtrdgukh
-X-ME-Proxy: <xmx:a7hzX-krfD5gdiJDUyzpA45W1p439SYphf4REUF5p5y6UWxs_0yNWw>
- <xmx:a7hzX1x0AfhWK-9DcQR0Q-Jvm5_9MDGDR4lJxk77-fPQUf4HNgEPbg>
- <xmx:a7hzX4T3PDCEjySnDj0YkN3Sjxk7EoM1hdpmZAyd_9cWNpRRPfAKtg>
- <xmx:bbhzXx9kDFIjaKdQ7lOvEEj58zSGKrQfB5ywfdzjbt1iqra9wFbPyZlS9Ibk9y3s>
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id 3C6603280059;
- Tue, 29 Sep 2020 18:42:50 -0400 (EDT)
-Date: Wed, 30 Sep 2020 00:42:48 +0200
-From: Klaus Jensen <its@irrelevant.dk>
-To: Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH v3 07/18] hw/block/nvme: add support for the get log page
- command
-Message-ID: <20200929224248.GB377237@apples.localdomain>
-References: <20200706061303.246057-1-its@irrelevant.dk>
- <20200706061303.246057-8-its@irrelevant.dk>
- <CAFEAcA8dqNBm1YqLPjoJ=79K=6z=SxYHvcvnZiY3MJMvv1n1BQ@mail.gmail.com>
- <20200929214600.GA377237@apples.localdomain>
- <20200929223420.GB508696@dhcp-10-100-145-180.wdl.wdc.com>
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kNOM1-000556-LM
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 18:44:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24843)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kNOLz-0004ZY-Vn
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 18:44:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601419451;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=fnVaKlxSjgosYNWUZ3C9BB5KnUFHrX+zW6dbopznvYU=;
+ b=MVZaWTj3uuEWiAJX7mnLgvCR1qJdqbNF7Nh0l4y4x/JPJrz8tRNUAuG6j33lDKNGvmWG2G
+ daNojlzfhWL7Kmw6Pq3P6/F8zJ90dEURNaiaEeB+rcIrVqXHwbZ7nUxo76h2bXdHpavGdR
+ mrDR+0DUrG8Yr5Fo45KvI9Bd2gamV4o=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-55-Bn0Rml5nPHqAneVBULJ8tQ-1; Tue, 29 Sep 2020 18:44:09 -0400
+X-MC-Unique: Bn0Rml5nPHqAneVBULJ8tQ-1
+Received: by mail-wr1-f69.google.com with SMTP id s8so2338449wrb.15
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 15:44:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=fnVaKlxSjgosYNWUZ3C9BB5KnUFHrX+zW6dbopznvYU=;
+ b=hECtpd/exQx+0ZCyPxqB8zQ/XIUzH+d5BuEdoeACFVIA7dXX+DgWD5iqMoX8dIvBsi
+ EwnXT/UX33/IEkzNFFiMq8Rl8gmBwk7lCKi4bKgnLUFuZKgHdE4IlI6OdYVQxtjgH2UR
+ y2YUJbr8+s3UamAE77bUjjlEWkn0wpAL9qsBqo9R0egP1ZQO8vgRttjQb0r25bQ2rsBB
+ 7oZtnqN4xXR9ApKthSQ1Wvp0RjT8o/IeOZBG0fDlxphjHYTNOqwxTFtGmPbphumoSB7z
+ nnTFxKTV9Dgu6Q48k/I5sBzyYwhI4bvFRjGy0/BUb/ibS78nvoe9HWIu3k9515iFUBNK
+ HUwg==
+X-Gm-Message-State: AOAM532GAJiivnlZs6UKIQjkhQJ5bRHqp3ORzjl1vaydKj1Ydjy+C05t
+ xYfGmacko09A7ctQmyo/PiqTGIqPQJTm4cb1IuZ+PXu6Nz44SoPeGZuhhGdRBQi4UUETOMaiLmD
+ wyFpekl05vp6u008=
+X-Received: by 2002:adf:f2d0:: with SMTP id d16mr6386597wrp.332.1601419448303; 
+ Tue, 29 Sep 2020 15:44:08 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz32LQg/FraBPNB2aGTQWNffth7R+ByzmBlrprh0rhJbQuVc73LtYh8e6YQu2ibVKmeTxTjoQ==
+X-Received: by 2002:adf:f2d0:: with SMTP id d16mr6386570wrp.332.1601419448124; 
+ Tue, 29 Sep 2020 15:44:08 -0700 (PDT)
+Received: from x1w.redhat.com (74.red-83-53-161.dynamicip.rima-tde.net.
+ [83.53.161.74])
+ by smtp.gmail.com with ESMTPSA id e13sm8276536wre.60.2020.09.29.15.44.06
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 29 Sep 2020 15:44:07 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 02/12] meson: Allow optional target/${ARCH}/Kconfig
+Date: Wed, 30 Sep 2020 00:43:45 +0200
+Message-Id: <20200929224355.1224017-3-philmd@redhat.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200929224355.1224017-1-philmd@redhat.com>
+References: <20200929224355.1224017-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="cvVnyQ+4j833TQvp"
-Content-Disposition: inline
-In-Reply-To: <20200929223420.GB508696@dhcp-10-100-145-180.wdl.wdc.com>
-Received-SPF: pass client-ip=64.147.123.27; envelope-from=its@irrelevant.dk;
- helo=wnew2-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 17:46:07
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 02:22:44
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,97 +110,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Qemu-block <qemu-block@nongnu.org>, Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
- Klaus Jensen <k.jensen@samsung.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, Javier Gonzalez <javier.gonz@samsung.com>,
- Maxim Levitsky <mlevitsk@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
+ Claudio Fontana <cfontana@suse.de>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Extend the generic Meson script to pass optional target Kconfig
+file to the minikconf script.
 
---cvVnyQ+4j833TQvp
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+We could use fs.exists() but is_file() is more specific
+(can not be a directory).
 
-On Sep 29 15:34, Keith Busch wrote:
-> On Tue, Sep 29, 2020 at 11:46:00PM +0200, Klaus Jensen wrote:
-> > On Sep 29 14:11, Peter Maydell wrote:
-> > > > +static uint16_t nvme_fw_log_info(NvmeCtrl *n, NvmeCmd *cmd, uint32=
-_t buf_len,
-> > > > +                                 uint64_t off, NvmeRequest *req)
-> > > > +{
-> > > > +    uint32_t trans_len;
-> > > > +    uint64_t prp1 =3D le64_to_cpu(cmd->dptr.prp1);
-> > > > +    uint64_t prp2 =3D le64_to_cpu(cmd->dptr.prp2);
-> > > > +    NvmeFwSlotInfoLog fw_log =3D {
-> > > > +        .afi =3D 0x1,
-> > > > +    };
-> > > > +
-> > > > +    strpadcpy((char *)&fw_log.frs1, sizeof(fw_log.frs1), "1.0", ' =
-');
-> > > > +
-> > > > +    if (off > sizeof(fw_log)) {
-> > > > +        return NVME_INVALID_FIELD | NVME_DNR;
-> > > > +    }
-> > > > +
-> > > > +    trans_len =3D MIN(sizeof(fw_log) - off, buf_len);
-> > > > +
-> > > > +    return nvme_dma_read_prp(n, (uint8_t *) &fw_log + off, trans_l=
-en, prp1,
-> > > > +                             prp2);
-> > >=20
-> > > Coverity warns about the same structure here (CID 1432411).
-> > >=20
-> > > thanks
-> > > -- PMM
-> >=20
-> > Hi Peter,
-> >=20
-> > Thanks. This is somewhere in the middle of a bunch of patches I got
-> > merged I think, commit 94a7897c41db? I just requested Coverity access.
-> >=20
-> > What happens is that nvme_dma_read_prp will call into nvme_map_prp which
-> > wont map anything because len is 0. This will cause the statically
-> > allocated QEMUSGList and QEMUIOVector in the request to be
-> > uninitialized. Returning from nvme_map_prp, nvme_dma_read_prp will
-> > notice that req->qsg.nsg is zero so it will default to the iov and move
-> > into qemu_iovec_{to,from}_buf(&req->iov, ...). In there we actually pass
-> > the NULL struct iovec, but since there is a __builtin_constant_p(bytes)
-> > condition at the end of it all, we never follow it.
-> >=20
-> > Not "serious" I think, but definitely not good. We will of course fix
-> > this up.
-> >=20
-> > @keith, do you agree with my analysis?
->=20
-> Yeah, looks safe as-is, but we're missing out on returning the spec
-> required 'Invalid Field'.
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Claudio Fontana <cfontana@suse.de>
+---
+ meson.build | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-I can't see where it says that we should do that? Invalid Field in
-Command if offset is *greater* than the size of the log page.
+diff --git a/meson.build b/meson.build
+index d36dd085b5..9ab5d514d7 100644
+--- a/meson.build
++++ b/meson.build
+@@ -529,6 +529,7 @@ kconfig_external_symbols = [
+ ]
+ ignored = ['TARGET_XML_FILES', 'TARGET_ABI_DIR', 'TARGET_DIRS']
+ 
++fs = import('fs')
+ foreach target : target_dirs
+   config_target = keyval.load(meson.current_build_dir() / target / 'config-target.mak')
+ 
+@@ -569,8 +570,13 @@ foreach target : target_dirs
+     endforeach
+ 
+     config_devices_mak = target + '-config-devices.mak'
++    target_kconfig = 'target' / config_target['TARGET_BASE_ARCH'] / 'Kconfig'
++    minikconf_input = ['default-configs' / target + '.mak', 'Kconfig']
++    if fs.is_file(target_kconfig)
++      minikconf_input += [target_kconfig]
++    endif
+     config_devices_mak = configure_file(
+-      input: ['default-configs' / target + '.mak', 'Kconfig'],
++      input: minikconf_input,
+       output: config_devices_mak,
+       depfile: config_devices_mak + '.d',
+       capture: true,
+-- 
+2.26.2
 
-Some dynamic log pages have side-effects of being read, so while this is
-a super wierd way of specifying that we want nothing returned, I think
-it is valid?
-
---cvVnyQ+4j833TQvp
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl9zuGYACgkQTeGvMW1P
-Denm1gf/XaZHL4LA8aPsGZoJlVoHxb4gL43ED4+jjNoQ5eskES2jZwJ2mwQSixxg
-b8cVKhsQaCS2rz+rgb3qGGA6SrdXZSQMVLut5jKmnE6QQSR/mUQg60e/YwmPGfch
-bgPTmDJ71hYFRuvcmieJxdls3i/x5JrFQoOcym2f4OCs9XkxBd4iD4Bn+wCbfEPV
-gxDZgnocjCwajQytT3KGHFNtmUIf9HHPsocBsKdznWzgo39KM3MDTn5nf41fGgky
-UJLxZUBR2vbfNAa+S5J7o4aM+v+z0xfpMqpbNpvr/oGj1keFWTSDgHDx1IP/t01K
-gZmUqqxR7KzAn6oyJ8UeXtcNkhwkJQ==
-=yoH9
------END PGP SIGNATURE-----
-
---cvVnyQ+4j833TQvp--
 
