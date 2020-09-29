@@ -4,65 +4,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 581FAC4727F
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 20:28:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5261BC4727C
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 20:28:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB4672076B
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 20:28:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A0ABE2076B
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 20:28:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KihsvI+9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB4672076B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cr+jvLeV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0ABE2076B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56280 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNMEx-0005PG-KM
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 16:28:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59838)
+	id 1kNMF0-0005WB-GE
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 16:28:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59740)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kNM6I-0001v3-79
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 16:19:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34277)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kNM6D-0001sD-Dy
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 16:19:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48433)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kNM69-0003W1-C2
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 16:19:49 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kNM64-0003Uu-P8
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 16:19:45 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601410780;
+ s=mimecast20190719; t=1601410776;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=IpaPO/xyASpAHb6Tn9VNSQDlYnAL6prIqxyflpicY3k=;
- b=KihsvI+9oCO2SxK5M3ppljGX8phcjVb0IbDgeOAS2Fn8MH/EeresYQSdnIWX9DOz1SpHLU
- Sl7Gr1x12IYbqLtCQkXwkadB0ePaeGBq3rmmTmLXBY5w+6DQneO7W/U6YJgQOtWw+kYdCm
- HrshslLA5oRJ94OOWmRc4HIs367xD94=
+ bh=5xXGdpZWFIbYsKeR6BJ9bRVsOlgEvEJGRYy4+ov2b0E=;
+ b=Cr+jvLeVGOYfA03OZsALpLOm+wOyKBtF+3+JUcWM9nu3lzsB/fUdThu8nMdut5nZXDzy5G
+ N2x+JpEnoXVYUgdyvj8iPeH+b0tjpHtrlFS4bX8md/duKsmkPVJ9CLOOjiEvpDYpn3G2Pa
+ XT3cPVR7MP1XmS+kZd9aBtxIFfPD+l0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-297-boDGIgE1PdehE1ACTDIkBg-1; Tue, 29 Sep 2020 16:19:30 -0400
-X-MC-Unique: boDGIgE1PdehE1ACTDIkBg-1
+ us-mta-462-XkbWE1Z2O723Dl8a1WF0Yw-1; Tue, 29 Sep 2020 16:19:32 -0400
+X-MC-Unique: XkbWE1Z2O723Dl8a1WF0Yw-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CAF3D801AE5;
- Tue, 29 Sep 2020 20:19:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DFA710BBEC3;
+ Tue, 29 Sep 2020 20:19:31 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-101.ams2.redhat.com
  [10.36.112.101])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C5E66198E;
- Tue, 29 Sep 2020 20:19:29 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1B2FB6198E;
+ Tue, 29 Sep 2020 20:19:31 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 9EEFB11384A5; Tue, 29 Sep 2020 22:19:26 +0200 (CEST)
+ id BA56011358C3; Tue, 29 Sep 2020 22:19:26 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 05/29] qapi: Restrict query-uuid command to machine code
-Date: Tue, 29 Sep 2020 22:19:02 +0200
-Message-Id: <20200929201926.2155622-6-armbru@redhat.com>
+Subject: [PULL 12/29] scripts/qapi: Move doc-comment whitespace stripping to
+ doc.py
+Date: Tue, 29 Sep 2020 22:19:09 +0200
+Message-Id: <20200929201926.2155622-13-armbru@redhat.com>
 In-Reply-To: <20200929201926.2155622-1-armbru@redhat.com>
 References: <20200929201926.2155622-1-armbru@redhat.com>
 MIME-Version: 1.0
@@ -71,11 +72,11 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 02:22:44
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 22:47:55
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
@@ -96,141 +97,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: peter.maydell@linaro.org, Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
 
-Only qemu-system-FOO and qemu-storage-daemon provide QMP
-monitors, therefore such declarations and definitions are
-irrelevant for user-mode emulation.
+As we accumulate lines from doc comments when parsing the JSON, the
+QAPIDoc class generally strips leading and trailing whitespace using
+line.strip() when it calls _append_freeform().  This is fine for
+Texinfo, but for rST leading whitespace is significant.  We'd like to
+move to having the text in doc comments be rST format rather than a
+custom syntax, so move the removal of leading whitespace from the
+QAPIDoc class to the texinfo-specific processing code in
+texi_format() in qapi/doc.py.
 
-Restricting the query-uuid command to machine.json pulls less
-QAPI-generated code into user-mode.
+(Trailing whitespace will always be stripped by the rstrip() in
+Section::append regardless.)
 
-Acked-by: Markus Armbruster <armbru@redhat.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200913195348.1064154-6-philmd@redhat.com>
-[Commit message tweaked]
+In a followup commit we will make the whitespace in the lines of doc
+comment sections more consistently follow the input source.
+
+There is no change to the generated .texi files before and after this
+commit.
+
+Because the qapi-schema test checks the exact values of the
+documentation comments against a reference, we need to update that
+reference to match the new whitespace.  In the first four places this
+is now correctly checking that we did put in the amount of whitespace
+to pass a rST-formatted list to the backend; in the last two places
+the extra whitespace is 'wrong' and will go away again in the
+following commit.
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Message-Id: <20200925162316.21205-5-peter.maydell@linaro.org>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- qapi/machine.json | 30 ++++++++++++++++++++++++++++++
- qapi/misc.json    | 30 ------------------------------
- block/iscsi.c     |  2 +-
- stubs/uuid.c      |  2 +-
- 4 files changed, 32 insertions(+), 32 deletions(-)
+ scripts/qapi/doc.py            |  1 +
+ scripts/qapi/parser.py         | 12 ++++--------
+ tests/qapi-schema/doc-good.out | 12 ++++++------
+ 3 files changed, 11 insertions(+), 14 deletions(-)
 
-diff --git a/qapi/machine.json b/qapi/machine.json
-index 15c8d606ab..5e5ddd7a5e 100644
---- a/qapi/machine.json
-+++ b/qapi/machine.json
-@@ -402,6 +402,36 @@
- ##
- { 'command': 'query-target', 'returns': 'TargetInfo' }
+diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
+index 92f584edcf..7764de1e4b 100644
+--- a/scripts/qapi/doc.py
++++ b/scripts/qapi/doc.py
+@@ -79,6 +79,7 @@ def texi_format(doc):
+     inlist = ''
+     lastempty = False
+     for line in doc.split('\n'):
++        line = line.strip()
+         empty = line == ''
  
-+##
-+# @UuidInfo:
-+#
-+# Guest UUID information (Universally Unique Identifier).
-+#
-+# @UUID: the UUID of the guest
-+#
-+# Since: 0.14.0
-+#
-+# Notes: If no UUID was specified for the guest, a null UUID is returned.
-+##
-+{ 'struct': 'UuidInfo', 'data': {'UUID': 'str'} }
-+
-+##
-+# @query-uuid:
-+#
-+# Query the guest UUID information.
-+#
-+# Returns: The @UuidInfo for the guest
-+#
-+# Since: 0.14.0
-+#
-+# Example:
-+#
-+# -> { "execute": "query-uuid" }
-+# <- { "return": { "UUID": "550e8400-e29b-41d4-a716-446655440000" } }
-+#
-+##
-+{ 'command': 'query-uuid', 'returns': 'UuidInfo', 'allow-preconfig': true }
-+
- ##
- # @GuidInfo:
- #
-diff --git a/qapi/misc.json b/qapi/misc.json
-index edcc91e106..05db6295fe 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -98,36 +98,6 @@
- ##
- { 'command': 'query-kvm', 'returns': 'KvmInfo' }
+         # FIXME: Doing this in a single if / elif chain is
+diff --git a/scripts/qapi/parser.py b/scripts/qapi/parser.py
+index 165925ca72..04bf10db37 100644
+--- a/scripts/qapi/parser.py
++++ b/scripts/qapi/parser.py
+@@ -427,10 +427,10 @@ class QAPIDoc:
+                 self._append_line = self._append_various_line
+                 self._append_various_line(line)
+             else:
+-                self._append_freeform(line.strip())
++                self._append_freeform(line)
+         else:
+             # This is a free-form documentation block
+-            self._append_freeform(line.strip())
++            self._append_freeform(line)
  
--##
--# @UuidInfo:
--#
--# Guest UUID information (Universally Unique Identifier).
--#
--# @UUID: the UUID of the guest
--#
--# Since: 0.14.0
--#
--# Notes: If no UUID was specified for the guest, a null UUID is returned.
--##
--{ 'struct': 'UuidInfo', 'data': {'UUID': 'str'} }
+     def _append_args_line(self, line):
+         """
+@@ -463,7 +463,7 @@ class QAPIDoc:
+                 self._append_various_line(line)
+             return
+ 
+-        self._append_freeform(line.strip())
++        self._append_freeform(line)
+ 
+     def _append_features_line(self, line):
+         name = line.split(' ', 1)[0]
+@@ -482,7 +482,7 @@ class QAPIDoc:
+             self._append_various_line(line)
+             return
+ 
+-        self._append_freeform(line.strip())
++        self._append_freeform(line)
+ 
+     def _append_various_line(self, line):
+         """
+@@ -505,10 +505,6 @@ class QAPIDoc:
+             line = line[len(name)+1:]
+             self._start_section(name[:-1])
+ 
+-        if (not self._section.name or
+-                not self._section.name.startswith('Example')):
+-            line = line.strip()
 -
--##
--# @query-uuid:
--#
--# Query the guest UUID information.
--#
--# Returns: The @UuidInfo for the guest
--#
--# Since: 0.14.0
--#
--# Example:
--#
--# -> { "execute": "query-uuid" }
--# <- { "return": { "UUID": "550e8400-e29b-41d4-a716-446655440000" } }
--#
--##
--{ 'command': 'query-uuid', 'returns': 'UuidInfo', 'allow-preconfig': true }
--
- ##
- # @IOThreadInfo:
- #
-diff --git a/block/iscsi.c b/block/iscsi.c
-index bd2122a3a4..e30a7e3606 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -42,7 +42,7 @@
- #include "qemu/uuid.h"
- #include "sysemu/replay.h"
- #include "qapi/error.h"
--#include "qapi/qapi-commands-misc.h"
-+#include "qapi/qapi-commands-machine.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qstring.h"
- #include "crypto/secret.h"
-diff --git a/stubs/uuid.c b/stubs/uuid.c
-index 67f182fa3a..e5112eb3f6 100644
---- a/stubs/uuid.c
-+++ b/stubs/uuid.c
-@@ -1,5 +1,5 @@
- #include "qemu/osdep.h"
--#include "qapi/qapi-commands-misc.h"
-+#include "qapi/qapi-commands-machine.h"
- #include "qemu/uuid.h"
+         self._append_freeform(line)
  
- UuidInfo *qmp_query_uuid(Error **errp)
+     def _start_symbol_section(self, symbols_dict, name):
+diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.out
+index acb00ade17..9993ffcd89 100644
+--- a/tests/qapi-schema/doc-good.out
++++ b/tests/qapi-schema/doc-good.out
+@@ -78,20 +78,20 @@ doc freeform
+ 
+ * List item one
+ * Two, multiple
+-lines
++  lines
+ 
+ * Three
+-Still in list
++  Still in list
+ 
+ Not in list
+ 
+ - Second list
+-Note: still in list
++  Note: still in list
+ 
+ Note: not in list
+ 
+ 1. Third list
+-is numbered
++   is numbered
+ 
+ 2. another item
+ 
+@@ -159,7 +159,7 @@ doc symbol=Alternate
+ 
+     arg=i
+ an integer
+-@b is undocumented
++    @b is undocumented
+     arg=b
+ 
+     feature=alt-feat
+@@ -174,7 +174,7 @@ doc symbol=cmd
+ the first argument
+     arg=arg2
+ the second
+-argument
++       argument
+     arg=arg3
+ 
+     feature=cmd-feat1
 -- 
 2.26.2
 
