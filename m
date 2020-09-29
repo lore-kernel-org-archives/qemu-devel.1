@@ -7,58 +7,57 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4589C4727C
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 17:52:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99080C4727C
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 17:54:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD0AC207F7
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 17:52:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E105E207F7
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 17:54:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QsCTnCea"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD0AC207F7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="drlzmq7L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E105E207F7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNJng-00017L-LF
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 13:52:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53168)
+	id 1kNJq2-0002JF-08
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 13:54:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53640)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kNJn5-0000cJ-EI
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 13:51:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53988)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kNJop-0001jE-TV
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 13:53:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32189)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kNJn2-000877-PD
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 13:51:51 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kNJoj-0008Ib-No
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 13:53:39 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601401907;
+ s=mimecast20190719; t=1601402012;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=33nH2eNMMeHXDUA9ap7h/PFNRPtyaH2j6R1CAet6ViQ=;
- b=QsCTnCeaPGHk2gOpdK8U5aCnfOWlSXbi/GL4VulSKjbTQfOZUFs04JZ9lU+mwbYnyrJ/IP
- /59a7eho2OBI8GRVQQoJ/1GxYrT4DmBEUUN0kHC8ec2D9LsJ5eVKTgQHc5nfm8ORkHgw/8
- fh7dhiiEStJs85gV27trE1h/6Q185d4=
+ bh=lvNrMGpUPI7kx6auvtdSlNRo1LKG0RSlxgBdCfzm+lI=;
+ b=drlzmq7LN+kj3lk++HI5sz+dpp9KG//T/zDaFPfHdoZ3Yzdit5YTgFlcO/xa1iYqu4N6hM
+ i9krmcM3vedkX4/t+ccqUm2cTXLOvf1O307SB7KM+v4sCQu+kp099LUewcCjTrKuWpGGwr
+ YTrcKeWs/06FbDs4A5d8Mf8AMqNIbSE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-95-Kl30_MbDOdeY7lEaBfpQXw-1; Tue, 29 Sep 2020 13:51:44 -0400
-X-MC-Unique: Kl30_MbDOdeY7lEaBfpQXw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-264-IoeOVeMJMIKGgXtnaP2n7A-1; Tue, 29 Sep 2020 13:53:30 -0400
+X-MC-Unique: IoeOVeMJMIKGgXtnaP2n7A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45E6D10BBED3;
- Tue, 29 Sep 2020 17:51:22 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D093802B4B;
+ Tue, 29 Sep 2020 17:53:29 +0000 (UTC)
 Received: from [10.3.112.208] (ovpn-112-208.phx2.redhat.com [10.3.112.208])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BE7B55C1C4;
- Tue, 29 Sep 2020 17:51:21 +0000 (UTC)
-Subject: Re: [PATCH 2/4] qom: Factor out helpers from
- user_creatable_print_help()
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AA86819D61;
+ Tue, 29 Sep 2020 17:53:28 +0000 (UTC)
+Subject: Re: [PATCH 3/4] qom: Add user_creatable_print_help_from_qdict()
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 References: <20200929172649.158086-1-kwolf@redhat.com>
- <20200929172649.158086-3-kwolf@redhat.com>
+ <20200929172649.158086-4-kwolf@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Autocrypt: addr=eblake@redhat.com; keydata=
  mQENBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
@@ -106,23 +105,23 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  0t/Wx0llylWVG6mjD6pY/8+lIJNNu/9xlIxx6/FpHi9Xs1nqWA2O1kqF8H6AC9lF2LDAK/7l
  J3EipX47wK4bHo9EuM26optmWOkvGkVsPeCd20ryUfjcG7N+Bj0w+D4=
 Organization: Red Hat, Inc.
-Message-ID: <d95671bc-8d86-4a68-1117-76d31af9a6c7@redhat.com>
-Date: Tue, 29 Sep 2020 12:51:21 -0500
+Message-ID: <69238ab8-3e42-0d7c-d7ca-400a5bc63678@redhat.com>
+Date: Tue, 29 Sep 2020 12:53:28 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200929172649.158086-3-kwolf@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200929172649.158086-4-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="aAcyX0VNXIsaXaRQpYqAKApfCT6vfv0Ft"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=eblake@redhat.com;
+ boundary="H6bIUZf0bipTEASNJKWnn2GZvXWSEcKrB"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=eblake@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 02:22:44
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 22:47:55
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
@@ -150,36 +149,33 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---aAcyX0VNXIsaXaRQpYqAKApfCT6vfv0Ft
-Content-Type: multipart/mixed; boundary="aUFZ8BJbBvvzJjfr0Hy4r4ux9JgMZqkWn";
+--H6bIUZf0bipTEASNJKWnn2GZvXWSEcKrB
+Content-Type: multipart/mixed; boundary="9CZ4ghuHQWnJfcj83u61tRy4c5tzi0WmA";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, armbru@redhat.com, mreitz@redhat.com
-Message-ID: <d95671bc-8d86-4a68-1117-76d31af9a6c7@redhat.com>
-Subject: Re: [PATCH 2/4] qom: Factor out helpers from
- user_creatable_print_help()
+Message-ID: <69238ab8-3e42-0d7c-d7ca-400a5bc63678@redhat.com>
+Subject: Re: [PATCH 3/4] qom: Add user_creatable_print_help_from_qdict()
 References: <20200929172649.158086-1-kwolf@redhat.com>
- <20200929172649.158086-3-kwolf@redhat.com>
-In-Reply-To: <20200929172649.158086-3-kwolf@redhat.com>
+ <20200929172649.158086-4-kwolf@redhat.com>
+In-Reply-To: <20200929172649.158086-4-kwolf@redhat.com>
 
---aUFZ8BJbBvvzJjfr0Hy4r4ux9JgMZqkWn
+--9CZ4ghuHQWnJfcj83u61tRy4c5tzi0WmA
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 9/29/20 12:26 PM, Kevin Wolf wrote:
-> This creates separate helper functions for printing a list of user
-> creatable object types and for printing a list of properties of a given
-> type. This allows using these parts without having a QemuOpts.
+> This adds a function that, given a QDict of non-help options, prints
+> help for user creatable objects.
 >=20
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  qom/object_interfaces.c | 90 ++++++++++++++++++++++++-----------------
->  1 file changed, 52 insertions(+), 38 deletions(-)
+>  include/qom/object_interfaces.h | 9 +++++++++
+>  qom/object_interfaces.c         | 9 +++++++++
+>  2 files changed, 18 insertions(+)
 >=20
-
-Awkward diff as presented; ignoring whitespace makes it easier.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -189,25 +185,25 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---aUFZ8BJbBvvzJjfr0Hy4r4ux9JgMZqkWn--
+--9CZ4ghuHQWnJfcj83u61tRy4c5tzi0WmA--
 
---aAcyX0VNXIsaXaRQpYqAKApfCT6vfv0Ft
+--H6bIUZf0bipTEASNJKWnn2GZvXWSEcKrB
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl9zdBkACgkQp6FrSiUn
-Q2o7tAf/Q7jHqLQYqxLR/7b77vrAHOuHi9QkWQlRb72CE3LU1k58BVIU7JoXOFno
-Hvkd5wBR77aB0ftL++RucZonJ9+0BJ2NVyEpQqFZA7mN8FKw0UmNL6C9xwczC3ut
-Ww/E1QhbueZQcD2PMsFFNeIna8ydvd0DM4CXZ9aG6de4/Y/R0Oqr7UJifJALxA5E
-sMOz5phiYhO1vpm4WVSuG6/TMPUtM4FsF+Y+kL/Wn1THJuqLccw3JDg+PPgsI0X/
-hYJVMLEbrR98aux8OznVRHbVFvIkc4gZhP2dgUz3xh+6FYeSizRQiBq/eVVjry7H
-krzWG3EdNdGOdvknBe5F1BpmphEkew==
-=IFHY
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl9zdJgACgkQp6FrSiUn
+Q2r4SQf+NDYoBXl0EbEE/CgaN2/rOTud/R23Q/WSgB4BJRTt97KEQ97CDBcUFziC
+/T5c9qXPXFI3E5ncOOsNR6VS0OQhehW/Xk0p7oPTmjRgfWD4g6di2qgcfHgayVZv
+FkHfzOkHDQ0kVQfU/rhPTHLToMP3h9zLRwIpLMsrXTHbj8TvwxoBB9AUEVND6h7F
+rScfQAWUDsF+AOljVEpkayqO5Pmf3DtbxdF6zNnyOWLExY732/yPavThpk81qExY
+t+36azHmdpk+k4Pg4yRi0XuqlDd8Z53kzUEyKkdvF7yyG3i0gRTGtaBbz1F5xIfe
+lljya2k57bfCyP49WJk+i3r04fxe6Q==
+=qOGg
 -----END PGP SIGNATURE-----
 
---aAcyX0VNXIsaXaRQpYqAKApfCT6vfv0Ft--
+--H6bIUZf0bipTEASNJKWnn2GZvXWSEcKrB--
 
 
