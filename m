@@ -4,78 +4,77 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D439BC4346E
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:41:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDA19C4346E
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:42:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67052206DC
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:41:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B39D206DC
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:42:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A6lC5bnx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67052206DC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fBYT/6i8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B39D206DC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNAG7-000578-Gq
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 03:41:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57736)
+	id 1kNAHL-0006Xb-Rs
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 03:42:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58660)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9xr-0003zY-Vm
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:22:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50078)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9zd-0005wm-55
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:24:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22781)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9xp-0001ju-EL
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:22:19 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9zX-00021d-GK
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:24:08 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601364136;
+ s=mimecast20190719; t=1601364242;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=PNUjx48dQuW4OxD6Zh0ZlG4gw5DtpRC3cn0oLI7dAj0=;
- b=A6lC5bnxix7jEwmTB7le4Y0IKG/6tikopBHU93XN+WV+zCSQUnkp4Ohbwsd8y7AhE+O3pb
- Ml99HvkLbXE6E90silZGomXm3tS5bD43lSTCbnFz72zEayzcxGzOqbPFc+YwcCRYoP9/ai
- ZkdKxkno13kobCZQrOJ/ajusWU1FcwU=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-128-7qHvUNRUNZeSp_tjHDa_aQ-1; Tue, 29 Sep 2020 03:22:14 -0400
-X-MC-Unique: 7qHvUNRUNZeSp_tjHDa_aQ-1
-Received: by mail-wr1-f70.google.com with SMTP id a10so1335388wrw.22
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 00:22:14 -0700 (PDT)
+ bh=xf2I6AVSrGRq/duV5gv6UTIln0Sg/9kyZt7swxOVAAg=;
+ b=fBYT/6i8t6FL7xlCpmKm0gMrNEKD27eoS6a0rdWC48mNofFrH5/sV+8X7IaboBcdTF3GLf
+ xOml7lG+y4hP4Eq8Wghvd0567SgzueB+mUucT3gW/ErgLzcKn3v1hTTzYCN5dG53i6ouXG
+ OHJGvC7NwXZA5ktfUnURv9uJTKTVQu4=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-191-LRdmOv2jPz2hzBZRsA6LIg-1; Tue, 29 Sep 2020 03:20:58 -0400
+X-MC-Unique: LRdmOv2jPz2hzBZRsA6LIg-1
+Received: by mail-wr1-f69.google.com with SMTP id d13so1340712wrr.23
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 00:20:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=PNUjx48dQuW4OxD6Zh0ZlG4gw5DtpRC3cn0oLI7dAj0=;
- b=satPuo61Xa/I7weL1aGbWkETpIfztw+I5bdMuBFbGhNl7PRY0MeL/MMLuLUDO3gbk4
- mC3bRfp1uyj6aRJy5A8rFG/HkIJYFxzq+f0aXABuF8tWCdOtSzyBRsKFOo6pQ+isYNbv
- c3Qu5oACXrZ+u1R0sPa2yRjQUpEHONHVxvAvHh66wOFCy9BNcxzd4BeQeLHDiA+OhZ4U
- 43S5x/dfQW1X/LN4GDhCnl8PwBP/P5BOgr5ieAXUnZcn+PuuwddcaNnmmFd5VicgVrNg
- xGMxYa6AmBY4KxKttnCSIVHh1tC+SWRVrSi9mxqy04M/2WT9bhw3qfJxI3w43WwqXBAR
- gLjg==
-X-Gm-Message-State: AOAM532YkA7ktd93RQPyw2ymdLr/vOLDmRi7Nx8AfFcpZ89TkTPCGpoR
- 3kLvFmVZkyAvoiJxZ5RNppX3nm06fJYwllgWsroHHbBACv51S+74WNrWNSuMfgNzteSa+heVcXi
- LecSnDVDfRq90a4I=
-X-Received: by 2002:a5d:660d:: with SMTP id n13mr2617565wru.308.1601364132926; 
- Tue, 29 Sep 2020 00:22:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxND/GfQO2BgHqeNLK2O2TyZLUGx/aId8llODT/6Hszc29jy0l0d7dz9F+S/34toiU5/u8tWA==
-X-Received: by 2002:a5d:660d:: with SMTP id n13mr2617534wru.308.1601364132647; 
- Tue, 29 Sep 2020 00:22:12 -0700 (PDT)
+ bh=xf2I6AVSrGRq/duV5gv6UTIln0Sg/9kyZt7swxOVAAg=;
+ b=XoWEApIlg9o2Tv7HrLyAbiTfaqcUiyr18uo7l8IeGBxs3LPfBxMPD59zgI6BoTE9Kr
+ 86JK6TgZQLE/G8tOBz5etTptXOoCFZwylqS2WH51U0Xqzu6PClhDBf+j3gTlIntERHab
+ K/HLevVL+Vj1OzIhdjifKBrvxDHqnVzQ+jI8y6614hWhrwgoUfH0mLzfWpffoNQtMkI9
+ 88nrFwGu7Xnihm9PQ12rZJqZ/QHy9PBzW+yh3ZGE3GeRvV+Yu6/zbBpWPA/dSA7IZd67
+ ZVS3K/s4Mi7NFdtf7S4I+X/qJu+8vmBxyunS6v0TNoRV9S4OJLMuRZIT1xx69/EpBh/a
+ U5wQ==
+X-Gm-Message-State: AOAM530KNAdu0Atcn/1Q25BEgE2zR4/oYu532KOlO2fD1XtIh0snRyr2
+ sFPqXCPrKqDXhCY9fGJhGkDy4oWzYmHxcGclDqziGQQj4/EILPphwAua7HI+JiAM7YuNVA2GkpY
+ xBxt6NoCXd430FAo=
+X-Received: by 2002:adf:828f:: with SMTP id 15mr2483886wrc.49.1601364056070;
+ Tue, 29 Sep 2020 00:20:56 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyfz/pwBn/n5cuZ8m7r2+3BAsg2eNNKKtS1x0nRJrhMo1sB+MI2N7tXszKtLIhrL9l5ZjI0bQ==
+X-Received: by 2002:adf:828f:: with SMTP id 15mr2483834wrc.49.1601364055518;
+ Tue, 29 Sep 2020 00:20:55 -0700 (PDT)
 Received: from redhat.com (bzq-79-179-71-128.red.bezeqint.net. [79.179.71.128])
- by smtp.gmail.com with ESMTPSA id q20sm4168663wmj.5.2020.09.29.00.22.11
+ by smtp.gmail.com with ESMTPSA id h17sm4964520wro.27.2020.09.29.00.20.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 29 Sep 2020 00:22:12 -0700 (PDT)
-Date: Tue, 29 Sep 2020 03:22:10 -0400
+ Tue, 29 Sep 2020 00:20:54 -0700 (PDT)
+Date: Tue, 29 Sep 2020 03:20:53 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v4 29/48] x68: acpi: trigger SMI before sending hotplug Notify
- event to OSPM
-Message-ID: <20200929071948.281157-30-mst@redhat.com>
+Subject: [PULL v4 01/48] linux headers: sync to 5.9-rc4
+Message-ID: <20200929071948.281157-2-mst@redhat.com>
 References: <20200929071948.281157-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200929071948.281157-1-mst@redhat.com>
@@ -110,237 +109,834 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Igor Mammedov <imammedo@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
 
-In case firmware has negotiated CPU hotplug SMI feature, generate
-AML to describe SMI IO port region and send SMI to firmware
-on each CPU hotplug SCI in case new CPUs were hotplugged.
+Update against Linux 5.9-rc4.
 
-Since new CPUs can be hotplugged while CPU_SCAN_METHOD is running
-we can't send SMI before new CPUs are fetched from QEMU as it
-could cause sending Notify to a CPU that firmware hasn't seen yet.
-So fetch new CPUs into local cache first, then send SMI and
-after that send Notify events to cached CPUs. This should ensure
-that Notify is sent only to CPUs which were processed by firmware
-first.
-Any CPUs that were hotplugged after caching will be processed
-by the next CPU_SCAN_METHOD, when pending SCI is handled.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Tested-by: Laszlo Ersek <lersek@redhat.com>
-Message-Id: <20200923094650.1301166-10-imammedo@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+Message-Id: <20200907104903.31551-2-jasowang@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/acpi/cpu.c | 165 +++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 138 insertions(+), 27 deletions(-)
+ include/standard-headers/drm/drm_fourcc.h     | 140 ++++++++++++++++++
+ include/standard-headers/linux/ethtool.h      |  87 +++++++++++
+ .../linux/input-event-codes.h                 |   3 +-
+ include/standard-headers/linux/vhost_types.h  |  11 ++
+ include/standard-headers/linux/virtio_9p.h    |   4 +-
+ include/standard-headers/linux/virtio_blk.h   |  26 ++--
+ .../standard-headers/linux/virtio_config.h    |   8 +-
+ .../standard-headers/linux/virtio_console.h   |   8 +-
+ include/standard-headers/linux/virtio_net.h   |   6 +-
+ include/standard-headers/linux/virtio_scsi.h  |  20 +--
+ linux-headers/asm-generic/unistd.h            |   6 +-
+ linux-headers/asm-mips/unistd_n32.h           |   1 +
+ linux-headers/asm-mips/unistd_n64.h           |   1 +
+ linux-headers/asm-mips/unistd_o32.h           |   1 +
+ linux-headers/asm-powerpc/kvm.h               |   5 +
+ linux-headers/asm-powerpc/unistd_32.h         |   1 +
+ linux-headers/asm-powerpc/unistd_64.h         |   1 +
+ linux-headers/asm-s390/kvm.h                  |   7 +-
+ linux-headers/asm-s390/unistd_32.h            |   1 +
+ linux-headers/asm-s390/unistd_64.h            |   1 +
+ linux-headers/asm-x86/unistd_32.h             |   1 +
+ linux-headers/asm-x86/unistd_64.h             |   1 +
+ linux-headers/asm-x86/unistd_x32.h            |   1 +
+ linux-headers/linux/kvm.h                     |   4 +
+ linux-headers/linux/vfio.h                    |   2 +-
+ linux-headers/linux/vhost.h                   |   2 +
+ 26 files changed, 308 insertions(+), 41 deletions(-)
 
-diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
-index 3d6a500fb7..8dd4d8ebbf 100644
---- a/hw/acpi/cpu.c
-+++ b/hw/acpi/cpu.c
-@@ -14,6 +14,8 @@
- #define ACPI_CPU_CMD_DATA_OFFSET_RW 8
- #define ACPI_CPU_CMD_DATA2_OFFSET_R 0
+diff --git a/include/standard-headers/drm/drm_fourcc.h b/include/standard-headers/drm/drm_fourcc.h
+index 909a66753c..0de1a552ca 100644
+--- a/include/standard-headers/drm/drm_fourcc.h
++++ b/include/standard-headers/drm/drm_fourcc.h
+@@ -235,6 +235,12 @@ extern "C" {
+ #define DRM_FORMAT_NV61		fourcc_code('N', 'V', '6', '1') /* 2x1 subsampled Cb:Cr plane */
+ #define DRM_FORMAT_NV24		fourcc_code('N', 'V', '2', '4') /* non-subsampled Cr:Cb plane */
+ #define DRM_FORMAT_NV42		fourcc_code('N', 'V', '4', '2') /* non-subsampled Cb:Cr plane */
++/*
++ * 2 plane YCbCr
++ * index 0 = Y plane, [39:0] Y3:Y2:Y1:Y0 little endian
++ * index 1 = Cr:Cb plane, [39:0] Cr1:Cb1:Cr0:Cb0 little endian
++ */
++#define DRM_FORMAT_NV15		fourcc_code('N', 'V', '1', '5') /* 2x2 subsampled Cr:Cb plane */
  
-+#define OVMF_CPUHP_SMI_CMD 4
-+
- enum {
-     CPHP_GET_NEXT_CPU_WITH_EVENT_CMD = 0,
-     CPHP_OST_EVENT_CMD = 1,
-@@ -321,6 +323,7 @@ const VMStateDescription vmstate_cpu_hotplug = {
- #define CPU_NOTIFY_METHOD "CTFY"
- #define CPU_EJECT_METHOD  "CEJ0"
- #define CPU_OST_METHOD    "COST"
-+#define CPU_ADDED_LIST    "CNEW"
+ /*
+  * 2 plane YCbCr MSB aligned
+@@ -264,6 +270,22 @@ extern "C" {
+  */
+ #define DRM_FORMAT_P016		fourcc_code('P', '0', '1', '6') /* 2x2 subsampled Cr:Cb plane 16 bits per channel */
  
- #define CPU_ENABLED       "CPEN"
- #define CPU_SELECTOR      "CSEL"
-@@ -465,42 +468,150 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
++/* 3 plane non-subsampled (444) YCbCr
++ * 16 bits per component, but only 10 bits are used and 6 bits are padded
++ * index 0: Y plane, [15:0] Y:x [10:6] little endian
++ * index 1: Cb plane, [15:0] Cb:x [10:6] little endian
++ * index 2: Cr plane, [15:0] Cr:x [10:6] little endian
++ */
++#define DRM_FORMAT_Q410		fourcc_code('Q', '4', '1', '0')
++
++/* 3 plane non-subsampled (444) YCrCb
++ * 16 bits per component, but only 10 bits are used and 6 bits are padded
++ * index 0: Y plane, [15:0] Y:x [10:6] little endian
++ * index 1: Cr plane, [15:0] Cr:x [10:6] little endian
++ * index 2: Cb plane, [15:0] Cb:x [10:6] little endian
++ */
++#define DRM_FORMAT_Q401		fourcc_code('Q', '4', '0', '1')
++
+ /*
+  * 3 plane YCbCr
+  * index 0: Y plane, [7:0] Y
+@@ -308,6 +330,7 @@ extern "C" {
+ #define DRM_FORMAT_MOD_VENDOR_BROADCOM 0x07
+ #define DRM_FORMAT_MOD_VENDOR_ARM     0x08
+ #define DRM_FORMAT_MOD_VENDOR_ALLWINNER 0x09
++#define DRM_FORMAT_MOD_VENDOR_AMLOGIC 0x0a
  
-         method = aml_method(CPU_SCAN_METHOD, 0, AML_SERIALIZED);
-         {
-+            const uint8_t max_cpus_per_pass = 255;
-             Aml *else_ctx;
--            Aml *while_ctx;
-+            Aml *while_ctx, *while_ctx2;
-             Aml *has_event = aml_local(0);
-             Aml *dev_chk = aml_int(1);
-             Aml *eject_req = aml_int(3);
-             Aml *next_cpu_cmd = aml_int(CPHP_GET_NEXT_CPU_WITH_EVENT_CMD);
-+            Aml *num_added_cpus = aml_local(1);
-+            Aml *cpu_idx = aml_local(2);
-+            Aml *uid = aml_local(3);
-+            Aml *has_job = aml_local(4);
-+            Aml *new_cpus = aml_name(CPU_ADDED_LIST);
+ /* add more to the end as needed */
  
-             aml_append(method, aml_acquire(ctrl_lock, 0xFFFF));
--            aml_append(method, aml_store(one, has_event));
--            while_ctx = aml_while(aml_equal(has_event, one));
+@@ -322,8 +345,33 @@ extern "C" {
+  * When adding a new token please document the layout with a code comment,
+  * similar to the fourcc codes above. drm_fourcc.h is considered the
+  * authoritative source for all of these.
++ *
++ * Generic modifier names:
++ *
++ * DRM_FORMAT_MOD_GENERIC_* definitions are used to provide vendor-neutral names
++ * for layouts which are common across multiple vendors. To preserve
++ * compatibility, in cases where a vendor-specific definition already exists and
++ * a generic name for it is desired, the common name is a purely symbolic alias
++ * and must use the same numerical value as the original definition.
++ *
++ * Note that generic names should only be used for modifiers which describe
++ * generic layouts (such as pixel re-ordering), which may have
++ * independently-developed support across multiple vendors.
++ *
++ * In future cases where a generic layout is identified before merging with a
++ * vendor-specific modifier, a new 'GENERIC' vendor or modifier using vendor
++ * 'NONE' could be considered. This should only be for obvious, exceptional
++ * cases to avoid polluting the 'GENERIC' namespace with modifiers which only
++ * apply to a single vendor.
++ *
++ * Generic names should not be used for cases where multiple hardware vendors
++ * have implementations of the same standardised compression scheme (such as
++ * AFBC). In those cases, all implementations should use the same format
++ * modifier(s), reflecting the vendor of the standard.
+  */
+ 
++#define DRM_FORMAT_MOD_GENERIC_16_16_TILE DRM_FORMAT_MOD_SAMSUNG_16_16_TILE
 +
-+            /*
-+             * Windows versions newer than XP (including Windows 10/Windows
-+             * Server 2019), do support* VarPackageOp but, it is cripled to hold
-+             * the same elements number as old PackageOp.
-+             * For compatibility with Windows XP (so it won't crash) use ACPI1.0
-+             * PackageOp which can hold max 255 elements.
-+             *
-+             * use named package as old Windows don't support it in local var
-+             */
-+            aml_append(method, aml_name_decl(CPU_ADDED_LIST,
-+                                             aml_package(max_cpus_per_pass)));
+ /*
+  * Invalid Modifier
+  *
+@@ -891,6 +939,18 @@ drm_fourcc_canonicalize_nvidia_format_mod(uint64_t modifier)
+  */
+ #define AFBC_FORMAT_MOD_BCH     (1ULL << 11)
+ 
++/* AFBC uncompressed storage mode
++ *
++ * Indicates that the buffer is using AFBC uncompressed storage mode.
++ * In this mode all superblock payloads in the buffer use the uncompressed
++ * storage mode, which is usually only used for data which cannot be compressed.
++ * The buffer layout is the same as for AFBC buffers without USM set, this only
++ * affects the storage mode of the individual superblocks. Note that even a
++ * buffer without USM set may use uncompressed storage mode for some or all
++ * superblocks, USM just guarantees it for all.
++ */
++#define AFBC_FORMAT_MOD_USM	(1ULL << 12)
 +
-+            aml_append(method, aml_store(zero, uid));
-+            aml_append(method, aml_store(one, has_job));
-+            /*
-+             * CPU_ADDED_LIST can hold limited number of elements, outer loop
-+             * allows to process CPUs in batches which let us to handle more
-+             * CPUs than CPU_ADDED_LIST can hold.
-+             */
-+            while_ctx2 = aml_while(aml_equal(has_job, one));
-             {
--                 /* clear loop exit condition, ins_evt/rm_evt checks
--                  * will set it to 1 while next_cpu_cmd returns a CPU
--                  * with events */
--                 aml_append(while_ctx, aml_store(zero, has_event));
--                 aml_append(while_ctx, aml_store(next_cpu_cmd, cpu_cmd));
--                 ifctx = aml_if(aml_equal(ins_evt, one));
--                 {
--                     aml_append(ifctx,
--                         aml_call2(CPU_NOTIFY_METHOD, cpu_data, dev_chk));
--                     aml_append(ifctx, aml_store(one, ins_evt));
--                     aml_append(ifctx, aml_store(one, has_event));
--                 }
--                 aml_append(while_ctx, ifctx);
--                 else_ctx = aml_else();
--                 ifctx = aml_if(aml_equal(rm_evt, one));
--                 {
--                     aml_append(ifctx,
--                         aml_call2(CPU_NOTIFY_METHOD, cpu_data, eject_req));
--                     aml_append(ifctx, aml_store(one, rm_evt));
--                     aml_append(ifctx, aml_store(one, has_event));
--                 }
--                 aml_append(else_ctx, ifctx);
--                 aml_append(while_ctx, else_ctx);
-+                aml_append(while_ctx2, aml_store(zero, has_job));
+ /*
+  * Arm 16x16 Block U-Interleaved modifier
+  *
+@@ -915,6 +975,86 @@ drm_fourcc_canonicalize_nvidia_format_mod(uint64_t modifier)
+  */
+ #define DRM_FORMAT_MOD_ALLWINNER_TILED fourcc_mod_code(ALLWINNER, 1)
+ 
++/*
++ * Amlogic Video Framebuffer Compression modifiers
++ *
++ * Amlogic uses a proprietary lossless image compression protocol and format
++ * for their hardware video codec accelerators, either video decoders or
++ * video input encoders.
++ *
++ * It considerably reduces memory bandwidth while writing and reading
++ * frames in memory.
++ *
++ * The underlying storage is considered to be 3 components, 8bit or 10-bit
++ * per component YCbCr 420, single plane :
++ * - DRM_FORMAT_YUV420_8BIT
++ * - DRM_FORMAT_YUV420_10BIT
++ *
++ * The first 8 bits of the mode defines the layout, then the following 8 bits
++ * defines the options changing the layout.
++ *
++ * Not all combinations are valid, and different SoCs may support different
++ * combinations of layout and options.
++ */
++#define __fourcc_mod_amlogic_layout_mask 0xf
++#define __fourcc_mod_amlogic_options_shift 8
++#define __fourcc_mod_amlogic_options_mask 0xf
 +
-+                aml_append(while_ctx2, aml_store(one, has_event));
-+                aml_append(while_ctx2, aml_store(zero, num_added_cpus));
++#define DRM_FORMAT_MOD_AMLOGIC_FBC(__layout, __options) \
++	fourcc_mod_code(AMLOGIC, \
++			((__layout) & __fourcc_mod_amlogic_layout_mask) | \
++			(((__options) & __fourcc_mod_amlogic_options_mask) \
++			 << __fourcc_mod_amlogic_options_shift))
 +
-+                /*
-+                 * Scan CPUs, till there are CPUs with events or
-+                 * CPU_ADDED_LIST capacity is exhausted
-+                 */
-+                while_ctx = aml_while(aml_land(aml_equal(has_event, one),
-+                                      aml_lless(uid, aml_int(arch_ids->len))));
-+                {
-+                     /*
-+                      * clear loop exit condition, ins_evt/rm_evt checks will
-+                      * set it to 1 while next_cpu_cmd returns a CPU with events
-+                      */
-+                     aml_append(while_ctx, aml_store(zero, has_event));
++/* Amlogic FBC Layouts */
 +
-+                     aml_append(while_ctx, aml_store(uid, cpu_selector));
-+                     aml_append(while_ctx, aml_store(next_cpu_cmd, cpu_cmd));
++/*
++ * Amlogic FBC Basic Layout
++ *
++ * The basic layout is composed of:
++ * - a body content organized in 64x32 superblocks with 4096 bytes per
++ *   superblock in default mode.
++ * - a 32 bytes per 128x64 header block
++ *
++ * This layout is transferrable between Amlogic SoCs supporting this modifier.
++ */
++#define AMLOGIC_FBC_LAYOUT_BASIC		(1ULL)
 +
-+                     /*
-+                      * wrap around case, scan is complete, exit loop.
-+                      * It happens since events are not cleared in scan loop,
-+                      * so next_cpu_cmd continues to find already processed CPUs
-+                      */
-+                     ifctx = aml_if(aml_lless(cpu_data, uid));
-+                     {
-+                         aml_append(ifctx, aml_break());
-+                     }
-+                     aml_append(while_ctx, ifctx);
++/*
++ * Amlogic FBC Scatter Memory layout
++ *
++ * Indicates the header contains IOMMU references to the compressed
++ * frames content to optimize memory access and layout.
++ *
++ * In this mode, only the header memory address is needed, thus the
++ * content memory organization is tied to the current producer
++ * execution and cannot be saved/dumped neither transferrable between
++ * Amlogic SoCs supporting this modifier.
++ *
++ * Due to the nature of the layout, these buffers are not expected to
++ * be accessible by the user-space clients, but only accessible by the
++ * hardware producers and consumers.
++ *
++ * The user-space clients should expect a failure while trying to mmap
++ * the DMA-BUF handle returned by the producer.
++ */
++#define AMLOGIC_FBC_LAYOUT_SCATTER		(2ULL)
 +
-+                     /*
-+                      * if CPU_ADDED_LIST is full, exit inner loop and process
-+                      * collected CPUs
-+                      */
-+                     ifctx = aml_if(
-+                         aml_equal(num_added_cpus, aml_int(max_cpus_per_pass)));
-+                     {
-+                         aml_append(ifctx, aml_store(one, has_job));
-+                         aml_append(ifctx, aml_break());
-+                     }
-+                     aml_append(while_ctx, ifctx);
++/* Amlogic FBC Layout Options Bit Mask */
 +
-+                     aml_append(while_ctx, aml_store(cpu_data, uid));
-+                     ifctx = aml_if(aml_equal(ins_evt, one));
-+                     {
-+                         /* cache added CPUs to Notify/Wakeup later */
-+                         aml_append(ifctx, aml_store(uid,
-+                             aml_index(new_cpus, num_added_cpus)));
-+                         aml_append(ifctx, aml_increment(num_added_cpus));
-+                         aml_append(ifctx, aml_store(one, has_event));
-+                     }
-+                     aml_append(while_ctx, ifctx);
-+                     else_ctx = aml_else();
-+                     ifctx = aml_if(aml_equal(rm_evt, one));
-+                     {
-+                         aml_append(ifctx,
-+                             aml_call2(CPU_NOTIFY_METHOD, uid, eject_req));
-+                         aml_append(ifctx, aml_store(one, rm_evt));
-+                         aml_append(ifctx, aml_store(one, has_event));
-+                     }
-+                     aml_append(else_ctx, ifctx);
-+                     aml_append(while_ctx, else_ctx);
-+                     aml_append(while_ctx, aml_increment(uid));
-+                }
-+                aml_append(while_ctx2, while_ctx);
++/*
++ * Amlogic FBC Memory Saving mode
++ *
++ * Indicates the storage is packed when pixel size is multiple of word
++ * boudaries, i.e. 8bit should be stored in this mode to save allocation
++ * memory.
++ *
++ * This mode reduces body layout to 3072 bytes per 64x32 superblock with
++ * the basic layout and 3200 bytes per 64x32 superblock combined with
++ * the scatter layout.
++ */
++#define AMLOGIC_FBC_OPTION_MEM_SAVING		(1ULL << 0)
 +
-+                /*
-+                 * in case FW negotiated ICH9_LPC_SMI_F_CPU_HOTPLUG_BIT,
-+                 * make upcall to FW, so it can pull in new CPUs before
-+                 * OS is notified and wakes them up
-+                 */
-+                if (opts.smi_path) {
-+                    ifctx = aml_if(aml_lgreater(num_added_cpus, zero));
-+                    {
-+                        aml_append(ifctx, aml_store(aml_int(OVMF_CPUHP_SMI_CMD),
-+                            aml_name("%s", opts.smi_path)));
-+                    }
-+                    aml_append(while_ctx2, ifctx);
-+                }
+ #if defined(__cplusplus)
+ }
+ #endif
+diff --git a/include/standard-headers/linux/ethtool.h b/include/standard-headers/linux/ethtool.h
+index fd8d2cccfe..e13eff4488 100644
+--- a/include/standard-headers/linux/ethtool.h
++++ b/include/standard-headers/linux/ethtool.h
+@@ -579,6 +579,76 @@ struct ethtool_pauseparam {
+ 	uint32_t	tx_pause;
+ };
+ 
++/**
++ * enum ethtool_link_ext_state - link extended state
++ */
++enum ethtool_link_ext_state {
++	ETHTOOL_LINK_EXT_STATE_AUTONEG,
++	ETHTOOL_LINK_EXT_STATE_LINK_TRAINING_FAILURE,
++	ETHTOOL_LINK_EXT_STATE_LINK_LOGICAL_MISMATCH,
++	ETHTOOL_LINK_EXT_STATE_BAD_SIGNAL_INTEGRITY,
++	ETHTOOL_LINK_EXT_STATE_NO_CABLE,
++	ETHTOOL_LINK_EXT_STATE_CABLE_ISSUE,
++	ETHTOOL_LINK_EXT_STATE_EEPROM_ISSUE,
++	ETHTOOL_LINK_EXT_STATE_CALIBRATION_FAILURE,
++	ETHTOOL_LINK_EXT_STATE_POWER_BUDGET_EXCEEDED,
++	ETHTOOL_LINK_EXT_STATE_OVERHEAT,
++};
 +
-+                /* Notify OSPM about new CPUs and clear insert events */
-+                aml_append(while_ctx2, aml_store(zero, cpu_idx));
-+                while_ctx = aml_while(aml_lless(cpu_idx, num_added_cpus));
-+                {
-+                    aml_append(while_ctx,
-+                        aml_store(aml_derefof(aml_index(new_cpus, cpu_idx)),
-+                                  uid));
-+                    aml_append(while_ctx,
-+                        aml_call2(CPU_NOTIFY_METHOD, uid, dev_chk));
-+                    aml_append(while_ctx, aml_store(uid, aml_debug()));
-+                    aml_append(while_ctx, aml_store(uid, cpu_selector));
-+                    aml_append(while_ctx, aml_store(one, ins_evt));
-+                    aml_append(while_ctx, aml_increment(cpu_idx));
-+                }
-+                aml_append(while_ctx2, while_ctx);
-+                /*
-+                 * If another batch is needed, then it will resume scanning
-+                 * exactly at -- and not after -- the last CPU that's currently
-+                 * in CPU_ADDED_LIST. In other words, the last CPU in
-+                 * CPU_ADDED_LIST is going to be re-checked. That's OK: we've
-+                 * just cleared the insert event for *all* CPUs in
-+                 * CPU_ADDED_LIST, including the last one. So the scan will
-+                 * simply seek past it.
-+                 */
-             }
--            aml_append(method, while_ctx);
-+            aml_append(method, while_ctx2);
-             aml_append(method, aml_release(ctrl_lock));
-         }
-         aml_append(cpus_dev, method);
++/**
++ * enum ethtool_link_ext_substate_autoneg - more information in addition to
++ * ETHTOOL_LINK_EXT_STATE_AUTONEG.
++ */
++enum ethtool_link_ext_substate_autoneg {
++	ETHTOOL_LINK_EXT_SUBSTATE_AN_NO_PARTNER_DETECTED = 1,
++	ETHTOOL_LINK_EXT_SUBSTATE_AN_ACK_NOT_RECEIVED,
++	ETHTOOL_LINK_EXT_SUBSTATE_AN_NEXT_PAGE_EXCHANGE_FAILED,
++	ETHTOOL_LINK_EXT_SUBSTATE_AN_NO_PARTNER_DETECTED_FORCE_MODE,
++	ETHTOOL_LINK_EXT_SUBSTATE_AN_FEC_MISMATCH_DURING_OVERRIDE,
++	ETHTOOL_LINK_EXT_SUBSTATE_AN_NO_HCD,
++};
++
++/**
++ * enum ethtool_link_ext_substate_link_training - more information in addition to
++ * ETHTOOL_LINK_EXT_STATE_LINK_TRAINING_FAILURE.
++ */
++enum ethtool_link_ext_substate_link_training {
++	ETHTOOL_LINK_EXT_SUBSTATE_LT_KR_FRAME_LOCK_NOT_ACQUIRED = 1,
++	ETHTOOL_LINK_EXT_SUBSTATE_LT_KR_LINK_INHIBIT_TIMEOUT,
++	ETHTOOL_LINK_EXT_SUBSTATE_LT_KR_LINK_PARTNER_DID_NOT_SET_RECEIVER_READY,
++	ETHTOOL_LINK_EXT_SUBSTATE_LT_REMOTE_FAULT,
++};
++
++/**
++ * enum ethtool_link_ext_substate_logical_mismatch - more information in addition
++ * to ETHTOOL_LINK_EXT_STATE_LINK_LOGICAL_MISMATCH.
++ */
++enum ethtool_link_ext_substate_link_logical_mismatch {
++	ETHTOOL_LINK_EXT_SUBSTATE_LLM_PCS_DID_NOT_ACQUIRE_BLOCK_LOCK = 1,
++	ETHTOOL_LINK_EXT_SUBSTATE_LLM_PCS_DID_NOT_ACQUIRE_AM_LOCK,
++	ETHTOOL_LINK_EXT_SUBSTATE_LLM_PCS_DID_NOT_GET_ALIGN_STATUS,
++	ETHTOOL_LINK_EXT_SUBSTATE_LLM_FC_FEC_IS_NOT_LOCKED,
++	ETHTOOL_LINK_EXT_SUBSTATE_LLM_RS_FEC_IS_NOT_LOCKED,
++};
++
++/**
++ * enum ethtool_link_ext_substate_bad_signal_integrity - more information in
++ * addition to ETHTOOL_LINK_EXT_STATE_BAD_SIGNAL_INTEGRITY.
++ */
++enum ethtool_link_ext_substate_bad_signal_integrity {
++	ETHTOOL_LINK_EXT_SUBSTATE_BSI_LARGE_NUMBER_OF_PHYSICAL_ERRORS = 1,
++	ETHTOOL_LINK_EXT_SUBSTATE_BSI_UNSUPPORTED_RATE,
++};
++
++/**
++ * enum ethtool_link_ext_substate_cable_issue - more information in
++ * addition to ETHTOOL_LINK_EXT_STATE_CABLE_ISSUE.
++ */
++enum ethtool_link_ext_substate_cable_issue {
++	ETHTOOL_LINK_EXT_SUBSTATE_CI_UNSUPPORTED_CABLE = 1,
++	ETHTOOL_LINK_EXT_SUBSTATE_CI_CABLE_TEST_FAILURE,
++};
++
+ #define ETH_GSTRING_LEN		32
+ 
+ /**
+@@ -599,6 +669,7 @@ struct ethtool_pauseparam {
+  * @ETH_SS_SOF_TIMESTAMPING: SOF_TIMESTAMPING_* flags
+  * @ETH_SS_TS_TX_TYPES: timestamping Tx types
+  * @ETH_SS_TS_RX_FILTERS: timestamping Rx filters
++ * @ETH_SS_UDP_TUNNEL_TYPES: UDP tunnel types
+  */
+ enum ethtool_stringset {
+ 	ETH_SS_TEST		= 0,
+@@ -616,6 +687,7 @@ enum ethtool_stringset {
+ 	ETH_SS_SOF_TIMESTAMPING,
+ 	ETH_SS_TS_TX_TYPES,
+ 	ETH_SS_TS_RX_FILTERS,
++	ETH_SS_UDP_TUNNEL_TYPES,
+ 
+ 	/* add new constants above here */
+ 	ETH_SS_COUNT
+@@ -1530,6 +1602,21 @@ enum ethtool_link_mode_bit_indices {
+ 	ETHTOOL_LINK_MODE_400000baseDR8_Full_BIT	 = 72,
+ 	ETHTOOL_LINK_MODE_400000baseCR8_Full_BIT	 = 73,
+ 	ETHTOOL_LINK_MODE_FEC_LLRS_BIT			 = 74,
++	ETHTOOL_LINK_MODE_100000baseKR_Full_BIT		 = 75,
++	ETHTOOL_LINK_MODE_100000baseSR_Full_BIT		 = 76,
++	ETHTOOL_LINK_MODE_100000baseLR_ER_FR_Full_BIT	 = 77,
++	ETHTOOL_LINK_MODE_100000baseCR_Full_BIT		 = 78,
++	ETHTOOL_LINK_MODE_100000baseDR_Full_BIT		 = 79,
++	ETHTOOL_LINK_MODE_200000baseKR2_Full_BIT	 = 80,
++	ETHTOOL_LINK_MODE_200000baseSR2_Full_BIT	 = 81,
++	ETHTOOL_LINK_MODE_200000baseLR2_ER2_FR2_Full_BIT = 82,
++	ETHTOOL_LINK_MODE_200000baseDR2_Full_BIT	 = 83,
++	ETHTOOL_LINK_MODE_200000baseCR2_Full_BIT	 = 84,
++	ETHTOOL_LINK_MODE_400000baseKR4_Full_BIT	 = 85,
++	ETHTOOL_LINK_MODE_400000baseSR4_Full_BIT	 = 86,
++	ETHTOOL_LINK_MODE_400000baseLR4_ER4_FR4_Full_BIT = 87,
++	ETHTOOL_LINK_MODE_400000baseDR4_Full_BIT	 = 88,
++	ETHTOOL_LINK_MODE_400000baseCR4_Full_BIT	 = 89,
+ 	/* must be last entry */
+ 	__ETHTOOL_LINK_MODE_MASK_NBITS
+ };
+diff --git a/include/standard-headers/linux/input-event-codes.h b/include/standard-headers/linux/input-event-codes.h
+index ebf72c1031..e740ad9f2e 100644
+--- a/include/standard-headers/linux/input-event-codes.h
++++ b/include/standard-headers/linux/input-event-codes.h
+@@ -888,7 +888,8 @@
+ #define SW_LINEIN_INSERT	0x0d  /* set = inserted */
+ #define SW_MUTE_DEVICE		0x0e  /* set = device disabled */
+ #define SW_PEN_INSERTED		0x0f  /* set = pen inserted */
+-#define SW_MAX_			0x0f
++#define SW_MACHINE_COVER	0x10  /* set = cover closed */
++#define SW_MAX_			0x10
+ #define SW_CNT			(SW_MAX_+1)
+ 
+ /*
+diff --git a/include/standard-headers/linux/vhost_types.h b/include/standard-headers/linux/vhost_types.h
+index a678d8fbaa..486630b332 100644
+--- a/include/standard-headers/linux/vhost_types.h
++++ b/include/standard-headers/linux/vhost_types.h
+@@ -60,6 +60,17 @@ struct vhost_iotlb_msg {
+ #define VHOST_IOTLB_UPDATE         2
+ #define VHOST_IOTLB_INVALIDATE     3
+ #define VHOST_IOTLB_ACCESS_FAIL    4
++/*
++ * VHOST_IOTLB_BATCH_BEGIN and VHOST_IOTLB_BATCH_END allow modifying
++ * multiple mappings in one go: beginning with
++ * VHOST_IOTLB_BATCH_BEGIN, followed by any number of
++ * VHOST_IOTLB_UPDATE messages, and ending with VHOST_IOTLB_BATCH_END.
++ * When one of these two values is used as the message type, the rest
++ * of the fields in the message are ignored. There's no guarantee that
++ * these changes take place automatically in the device.
++ */
++#define VHOST_IOTLB_BATCH_BEGIN    5
++#define VHOST_IOTLB_BATCH_END      6
+ 	uint8_t type;
+ };
+ 
+diff --git a/include/standard-headers/linux/virtio_9p.h b/include/standard-headers/linux/virtio_9p.h
+index e68f71dbe6..f5604fc5fb 100644
+--- a/include/standard-headers/linux/virtio_9p.h
++++ b/include/standard-headers/linux/virtio_9p.h
+@@ -25,7 +25,7 @@
+  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+  * SUCH DAMAGE. */
+-#include "standard-headers/linux/types.h"
++#include "standard-headers/linux/virtio_types.h"
+ #include "standard-headers/linux/virtio_ids.h"
+ #include "standard-headers/linux/virtio_config.h"
+ 
+@@ -36,7 +36,7 @@
+ 
+ struct virtio_9p_config {
+ 	/* length of the tag name */
+-	uint16_t tag_len;
++	__virtio16 tag_len;
+ 	/* non-NULL terminated tag name */
+ 	uint8_t tag[0];
+ } QEMU_PACKED;
+diff --git a/include/standard-headers/linux/virtio_blk.h b/include/standard-headers/linux/virtio_blk.h
+index 0229b0fbe4..2dcc90826a 100644
+--- a/include/standard-headers/linux/virtio_blk.h
++++ b/include/standard-headers/linux/virtio_blk.h
+@@ -55,20 +55,20 @@
+ 
+ struct virtio_blk_config {
+ 	/* The capacity (in 512-byte sectors). */
+-	uint64_t capacity;
++	__virtio64 capacity;
+ 	/* The maximum segment size (if VIRTIO_BLK_F_SIZE_MAX) */
+-	uint32_t size_max;
++	__virtio32 size_max;
+ 	/* The maximum number of segments (if VIRTIO_BLK_F_SEG_MAX) */
+-	uint32_t seg_max;
++	__virtio32 seg_max;
+ 	/* geometry of the device (if VIRTIO_BLK_F_GEOMETRY) */
+ 	struct virtio_blk_geometry {
+-		uint16_t cylinders;
++		__virtio16 cylinders;
+ 		uint8_t heads;
+ 		uint8_t sectors;
+ 	} geometry;
+ 
+ 	/* block size of device (if VIRTIO_BLK_F_BLK_SIZE) */
+-	uint32_t blk_size;
++	__virtio32 blk_size;
+ 
+ 	/* the next 4 entries are guarded by VIRTIO_BLK_F_TOPOLOGY  */
+ 	/* exponent for physical block per logical block. */
+@@ -76,42 +76,42 @@ struct virtio_blk_config {
+ 	/* alignment offset in logical blocks. */
+ 	uint8_t alignment_offset;
+ 	/* minimum I/O size without performance penalty in logical blocks. */
+-	uint16_t min_io_size;
++	__virtio16 min_io_size;
+ 	/* optimal sustained I/O size in logical blocks. */
+-	uint32_t opt_io_size;
++	__virtio32 opt_io_size;
+ 
+ 	/* writeback mode (if VIRTIO_BLK_F_CONFIG_WCE) */
+ 	uint8_t wce;
+ 	uint8_t unused;
+ 
+ 	/* number of vqs, only available when VIRTIO_BLK_F_MQ is set */
+-	uint16_t num_queues;
++	__virtio16 num_queues;
+ 
+ 	/* the next 3 entries are guarded by VIRTIO_BLK_F_DISCARD */
+ 	/*
+ 	 * The maximum discard sectors (in 512-byte sectors) for
+ 	 * one segment.
+ 	 */
+-	uint32_t max_discard_sectors;
++	__virtio32 max_discard_sectors;
+ 	/*
+ 	 * The maximum number of discard segments in a
+ 	 * discard command.
+ 	 */
+-	uint32_t max_discard_seg;
++	__virtio32 max_discard_seg;
+ 	/* Discard commands must be aligned to this number of sectors. */
+-	uint32_t discard_sector_alignment;
++	__virtio32 discard_sector_alignment;
+ 
+ 	/* the next 3 entries are guarded by VIRTIO_BLK_F_WRITE_ZEROES */
+ 	/*
+ 	 * The maximum number of write zeroes sectors (in 512-byte sectors) in
+ 	 * one segment.
+ 	 */
+-	uint32_t max_write_zeroes_sectors;
++	__virtio32 max_write_zeroes_sectors;
+ 	/*
+ 	 * The maximum number of segments in a write zeroes
+ 	 * command.
+ 	 */
+-	uint32_t max_write_zeroes_seg;
++	__virtio32 max_write_zeroes_seg;
+ 	/*
+ 	 * Set if a VIRTIO_BLK_T_WRITE_ZEROES request may result in the
+ 	 * deallocation of one or more of the sectors.
+diff --git a/include/standard-headers/linux/virtio_config.h b/include/standard-headers/linux/virtio_config.h
+index 9a69d9e242..22e3a85f67 100644
+--- a/include/standard-headers/linux/virtio_config.h
++++ b/include/standard-headers/linux/virtio_config.h
+@@ -67,13 +67,15 @@
+ #define VIRTIO_F_VERSION_1		32
+ 
+ /*
+- * If clear - device has the IOMMU bypass quirk feature.
+- * If set - use platform tools to detect the IOMMU.
++ * If clear - device has the platform DMA (e.g. IOMMU) bypass quirk feature.
++ * If set - use platform DMA tools to access the memory.
+  *
+  * Note the reverse polarity (compared to most other features),
+  * this is for compatibility with legacy systems.
+  */
+-#define VIRTIO_F_IOMMU_PLATFORM		33
++#define VIRTIO_F_ACCESS_PLATFORM	33
++/* Legacy name for VIRTIO_F_ACCESS_PLATFORM (for compatibility with old userspace) */
++#define VIRTIO_F_IOMMU_PLATFORM		VIRTIO_F_ACCESS_PLATFORM
+ 
+ /* This feature indicates support for the packed virtqueue layout. */
+ #define VIRTIO_F_RING_PACKED		34
+diff --git a/include/standard-headers/linux/virtio_console.h b/include/standard-headers/linux/virtio_console.h
+index 0dedc9e6f5..71f5f648e3 100644
+--- a/include/standard-headers/linux/virtio_console.h
++++ b/include/standard-headers/linux/virtio_console.h
+@@ -45,13 +45,13 @@
+ 
+ struct virtio_console_config {
+ 	/* colums of the screens */
+-	uint16_t cols;
++	__virtio16 cols;
+ 	/* rows of the screens */
+-	uint16_t rows;
++	__virtio16 rows;
+ 	/* max. number of ports this device can hold */
+-	uint32_t max_nr_ports;
++	__virtio32 max_nr_ports;
+ 	/* emergency write register */
+-	uint32_t emerg_wr;
++	__virtio32 emerg_wr;
+ } QEMU_PACKED;
+ 
+ /*
+diff --git a/include/standard-headers/linux/virtio_net.h b/include/standard-headers/linux/virtio_net.h
+index a90f79e1b1..e0a070518f 100644
+--- a/include/standard-headers/linux/virtio_net.h
++++ b/include/standard-headers/linux/virtio_net.h
+@@ -87,14 +87,14 @@ struct virtio_net_config {
+ 	/* The config defining mac address (if VIRTIO_NET_F_MAC) */
+ 	uint8_t mac[ETH_ALEN];
+ 	/* See VIRTIO_NET_F_STATUS and VIRTIO_NET_S_* above */
+-	uint16_t status;
++	__virtio16 status;
+ 	/* Maximum number of each of transmit and receive queues;
+ 	 * see VIRTIO_NET_F_MQ and VIRTIO_NET_CTRL_MQ.
+ 	 * Legal values are between 1 and 0x8000
+ 	 */
+-	uint16_t max_virtqueue_pairs;
++	__virtio16 max_virtqueue_pairs;
+ 	/* Default maximum transmit unit advice */
+-	uint16_t mtu;
++	__virtio16 mtu;
+ 	/*
+ 	 * speed, in units of 1Mb. All values 0 to INT_MAX are legal.
+ 	 * Any other value stands for unknown.
+diff --git a/include/standard-headers/linux/virtio_scsi.h b/include/standard-headers/linux/virtio_scsi.h
+index ab66166b6a..663f36cbb7 100644
+--- a/include/standard-headers/linux/virtio_scsi.h
++++ b/include/standard-headers/linux/virtio_scsi.h
+@@ -103,16 +103,16 @@ struct virtio_scsi_event {
+ } QEMU_PACKED;
+ 
+ struct virtio_scsi_config {
+-	uint32_t num_queues;
+-	uint32_t seg_max;
+-	uint32_t max_sectors;
+-	uint32_t cmd_per_lun;
+-	uint32_t event_info_size;
+-	uint32_t sense_size;
+-	uint32_t cdb_size;
+-	uint16_t max_channel;
+-	uint16_t max_target;
+-	uint32_t max_lun;
++	__virtio32 num_queues;
++	__virtio32 seg_max;
++	__virtio32 max_sectors;
++	__virtio32 cmd_per_lun;
++	__virtio32 event_info_size;
++	__virtio32 sense_size;
++	__virtio32 cdb_size;
++	__virtio16 max_channel;
++	__virtio16 max_target;
++	__virtio32 max_lun;
+ } QEMU_PACKED;
+ 
+ /* Feature Bits */
+diff --git a/linux-headers/asm-generic/unistd.h b/linux-headers/asm-generic/unistd.h
+index f4a01305d9..995b36c2ea 100644
+--- a/linux-headers/asm-generic/unistd.h
++++ b/linux-headers/asm-generic/unistd.h
+@@ -606,9 +606,9 @@ __SYSCALL(__NR_sendto, sys_sendto)
+ #define __NR_recvfrom 207
+ __SC_COMP(__NR_recvfrom, sys_recvfrom, compat_sys_recvfrom)
+ #define __NR_setsockopt 208
+-__SC_COMP(__NR_setsockopt, sys_setsockopt, compat_sys_setsockopt)
++__SC_COMP(__NR_setsockopt, sys_setsockopt, sys_setsockopt)
+ #define __NR_getsockopt 209
+-__SC_COMP(__NR_getsockopt, sys_getsockopt, compat_sys_getsockopt)
++__SC_COMP(__NR_getsockopt, sys_getsockopt, sys_getsockopt)
+ #define __NR_shutdown 210
+ __SYSCALL(__NR_shutdown, sys_shutdown)
+ #define __NR_sendmsg 211
+@@ -850,6 +850,8 @@ __SYSCALL(__NR_pidfd_open, sys_pidfd_open)
+ #define __NR_clone3 435
+ __SYSCALL(__NR_clone3, sys_clone3)
+ #endif
++#define __NR_close_range 436
++__SYSCALL(__NR_close_range, sys_close_range)
+ 
+ #define __NR_openat2 437
+ __SYSCALL(__NR_openat2, sys_openat2)
+diff --git a/linux-headers/asm-mips/unistd_n32.h b/linux-headers/asm-mips/unistd_n32.h
+index 3b9eda7e7d..246fbb6a78 100644
+--- a/linux-headers/asm-mips/unistd_n32.h
++++ b/linux-headers/asm-mips/unistd_n32.h
+@@ -365,6 +365,7 @@
+ #define __NR_fspick	(__NR_Linux + 433)
+ #define __NR_pidfd_open	(__NR_Linux + 434)
+ #define __NR_clone3	(__NR_Linux + 435)
++#define __NR_close_range	(__NR_Linux + 436)
+ #define __NR_openat2	(__NR_Linux + 437)
+ #define __NR_pidfd_getfd	(__NR_Linux + 438)
+ #define __NR_faccessat2	(__NR_Linux + 439)
+diff --git a/linux-headers/asm-mips/unistd_n64.h b/linux-headers/asm-mips/unistd_n64.h
+index 9cdf9b6c60..194d777dfd 100644
+--- a/linux-headers/asm-mips/unistd_n64.h
++++ b/linux-headers/asm-mips/unistd_n64.h
+@@ -341,6 +341,7 @@
+ #define __NR_fspick	(__NR_Linux + 433)
+ #define __NR_pidfd_open	(__NR_Linux + 434)
+ #define __NR_clone3	(__NR_Linux + 435)
++#define __NR_close_range	(__NR_Linux + 436)
+ #define __NR_openat2	(__NR_Linux + 437)
+ #define __NR_pidfd_getfd	(__NR_Linux + 438)
+ #define __NR_faccessat2	(__NR_Linux + 439)
+diff --git a/linux-headers/asm-mips/unistd_o32.h b/linux-headers/asm-mips/unistd_o32.h
+index e3e5e238f0..3e093dd913 100644
+--- a/linux-headers/asm-mips/unistd_o32.h
++++ b/linux-headers/asm-mips/unistd_o32.h
+@@ -411,6 +411,7 @@
+ #define __NR_fspick	(__NR_Linux + 433)
+ #define __NR_pidfd_open	(__NR_Linux + 434)
+ #define __NR_clone3	(__NR_Linux + 435)
++#define __NR_close_range	(__NR_Linux + 436)
+ #define __NR_openat2	(__NR_Linux + 437)
+ #define __NR_pidfd_getfd	(__NR_Linux + 438)
+ #define __NR_faccessat2	(__NR_Linux + 439)
+diff --git a/linux-headers/asm-powerpc/kvm.h b/linux-headers/asm-powerpc/kvm.h
+index 264e266a85..c3af3f324c 100644
+--- a/linux-headers/asm-powerpc/kvm.h
++++ b/linux-headers/asm-powerpc/kvm.h
+@@ -640,6 +640,11 @@ struct kvm_ppc_cpu_char {
+ #define KVM_REG_PPC_ONLINE	(KVM_REG_PPC | KVM_REG_SIZE_U32 | 0xbf)
+ #define KVM_REG_PPC_PTCR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc0)
+ 
++/* POWER10 registers */
++#define KVM_REG_PPC_MMCR3	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc1)
++#define KVM_REG_PPC_SIER2	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc2)
++#define KVM_REG_PPC_SIER3	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc3)
++
+ /* Transactional Memory checkpointed state:
+  * This is all GPRs, all VSX regs and a subset of SPRs
+  */
+diff --git a/linux-headers/asm-powerpc/unistd_32.h b/linux-headers/asm-powerpc/unistd_32.h
+index 862edb7448..0db9481d49 100644
+--- a/linux-headers/asm-powerpc/unistd_32.h
++++ b/linux-headers/asm-powerpc/unistd_32.h
+@@ -418,6 +418,7 @@
+ #define __NR_fspick	433
+ #define __NR_pidfd_open	434
+ #define __NR_clone3	435
++#define __NR_close_range	436
+ #define __NR_openat2	437
+ #define __NR_pidfd_getfd	438
+ #define __NR_faccessat2	439
+diff --git a/linux-headers/asm-powerpc/unistd_64.h b/linux-headers/asm-powerpc/unistd_64.h
+index f553224ce4..9f74310988 100644
+--- a/linux-headers/asm-powerpc/unistd_64.h
++++ b/linux-headers/asm-powerpc/unistd_64.h
+@@ -390,6 +390,7 @@
+ #define __NR_fspick	433
+ #define __NR_pidfd_open	434
+ #define __NR_clone3	435
++#define __NR_close_range	436
+ #define __NR_openat2	437
+ #define __NR_pidfd_getfd	438
+ #define __NR_faccessat2	439
+diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
+index 0138ccb0d8..f053b8304a 100644
+--- a/linux-headers/asm-s390/kvm.h
++++ b/linux-headers/asm-s390/kvm.h
+@@ -231,11 +231,13 @@ struct kvm_guest_debug_arch {
+ #define KVM_SYNC_GSCB   (1UL << 9)
+ #define KVM_SYNC_BPBC   (1UL << 10)
+ #define KVM_SYNC_ETOKEN (1UL << 11)
++#define KVM_SYNC_DIAG318 (1UL << 12)
+ 
+ #define KVM_SYNC_S390_VALID_FIELDS \
+ 	(KVM_SYNC_PREFIX | KVM_SYNC_GPRS | KVM_SYNC_ACRS | KVM_SYNC_CRS | \
+ 	 KVM_SYNC_ARCH0 | KVM_SYNC_PFAULT | KVM_SYNC_VRS | KVM_SYNC_RICCB | \
+-	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN)
++	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN | \
++	 KVM_SYNC_DIAG318)
+ 
+ /* length and alignment of the sdnx as a power of two */
+ #define SDNXC 8
+@@ -264,7 +266,8 @@ struct kvm_sync_regs {
+ 	__u8 reserved2 : 7;
+ 	__u8 padding1[51];	/* riccb needs to be 64byte aligned */
+ 	__u8 riccb[64];		/* runtime instrumentation controls block */
+-	__u8 padding2[192];	/* sdnx needs to be 256byte aligned */
++	__u64 diag318;		/* diagnose 0x318 info */
++	__u8 padding2[184];	/* sdnx needs to be 256byte aligned */
+ 	union {
+ 		__u8 sdnx[SDNXL];  /* state description annex */
+ 		struct {
+diff --git a/linux-headers/asm-s390/unistd_32.h b/linux-headers/asm-s390/unistd_32.h
+index e08233c0c3..1803cd0c3b 100644
+--- a/linux-headers/asm-s390/unistd_32.h
++++ b/linux-headers/asm-s390/unistd_32.h
+@@ -408,6 +408,7 @@
+ #define __NR_fspick 433
+ #define __NR_pidfd_open 434
+ #define __NR_clone3 435
++#define __NR_close_range 436
+ #define __NR_openat2 437
+ #define __NR_pidfd_getfd 438
+ #define __NR_faccessat2 439
+diff --git a/linux-headers/asm-s390/unistd_64.h b/linux-headers/asm-s390/unistd_64.h
+index 560e19ae2b..228d5004e5 100644
+--- a/linux-headers/asm-s390/unistd_64.h
++++ b/linux-headers/asm-s390/unistd_64.h
+@@ -356,6 +356,7 @@
+ #define __NR_fspick 433
+ #define __NR_pidfd_open 434
+ #define __NR_clone3 435
++#define __NR_close_range 436
+ #define __NR_openat2 437
+ #define __NR_pidfd_getfd 438
+ #define __NR_faccessat2 439
+diff --git a/linux-headers/asm-x86/unistd_32.h b/linux-headers/asm-x86/unistd_32.h
+index c727981d4a..356c12c2db 100644
+--- a/linux-headers/asm-x86/unistd_32.h
++++ b/linux-headers/asm-x86/unistd_32.h
+@@ -426,6 +426,7 @@
+ #define __NR_fspick 433
+ #define __NR_pidfd_open 434
+ #define __NR_clone3 435
++#define __NR_close_range 436
+ #define __NR_openat2 437
+ #define __NR_pidfd_getfd 438
+ #define __NR_faccessat2 439
+diff --git a/linux-headers/asm-x86/unistd_64.h b/linux-headers/asm-x86/unistd_64.h
+index 843fa62745..ef70e1c7c9 100644
+--- a/linux-headers/asm-x86/unistd_64.h
++++ b/linux-headers/asm-x86/unistd_64.h
+@@ -348,6 +348,7 @@
+ #define __NR_fspick 433
+ #define __NR_pidfd_open 434
+ #define __NR_clone3 435
++#define __NR_close_range 436
+ #define __NR_openat2 437
+ #define __NR_pidfd_getfd 438
+ #define __NR_faccessat2 439
+diff --git a/linux-headers/asm-x86/unistd_x32.h b/linux-headers/asm-x86/unistd_x32.h
+index 7d63d703ca..84ae8e9f5f 100644
+--- a/linux-headers/asm-x86/unistd_x32.h
++++ b/linux-headers/asm-x86/unistd_x32.h
+@@ -301,6 +301,7 @@
+ #define __NR_fspick (__X32_SYSCALL_BIT + 433)
+ #define __NR_pidfd_open (__X32_SYSCALL_BIT + 434)
+ #define __NR_clone3 (__X32_SYSCALL_BIT + 435)
++#define __NR_close_range (__X32_SYSCALL_BIT + 436)
+ #define __NR_openat2 (__X32_SYSCALL_BIT + 437)
+ #define __NR_pidfd_getfd (__X32_SYSCALL_BIT + 438)
+ #define __NR_faccessat2 (__X32_SYSCALL_BIT + 439)
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index a28c366737..6683e2e1b0 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -289,6 +289,7 @@ struct kvm_run {
+ 		/* KVM_EXIT_FAIL_ENTRY */
+ 		struct {
+ 			__u64 hardware_entry_failure_reason;
++			__u32 cpu;
+ 		} fail_entry;
+ 		/* KVM_EXIT_EXCEPTION */
+ 		struct {
+@@ -1031,6 +1032,9 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_PPC_SECURE_GUEST 181
+ #define KVM_CAP_HALT_POLL 182
+ #define KVM_CAP_ASYNC_PF_INT 183
++#define KVM_CAP_LAST_CPU 184
++#define KVM_CAP_SMALLER_MAXPHYADDR 185
++#define KVM_CAP_S390_DIAG318 186
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+index f09df262c4..a90672494d 100644
+--- a/linux-headers/linux/vfio.h
++++ b/linux-headers/linux/vfio.h
+@@ -1030,7 +1030,7 @@ struct vfio_iommu_type1_info_cap_iova_range {
+  * size in bytes that can be used by user applications when getting the dirty
+  * bitmap.
+  */
+-#define VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION  1
++#define VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION  2
+ 
+ struct vfio_iommu_type1_info_cap_migration {
+ 	struct	vfio_info_cap_header header;
+diff --git a/linux-headers/linux/vhost.h b/linux-headers/linux/vhost.h
+index 0c2349612e..7523218532 100644
+--- a/linux-headers/linux/vhost.h
++++ b/linux-headers/linux/vhost.h
+@@ -91,6 +91,8 @@
+ 
+ /* Use message type V2 */
+ #define VHOST_BACKEND_F_IOTLB_MSG_V2 0x1
++/* IOTLB can accept batching hints */
++#define VHOST_BACKEND_F_IOTLB_BATCH  0x2
+ 
+ #define VHOST_SET_BACKEND_FEATURES _IOW(VHOST_VIRTIO, 0x25, __u64)
+ #define VHOST_GET_BACKEND_FEATURES _IOR(VHOST_VIRTIO, 0x26, __u64)
 -- 
 MST
 
