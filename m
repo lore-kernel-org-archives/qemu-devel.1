@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E181C4727F
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 09:21:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16FFFC4727C
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 09:26:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E576420848
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 09:21:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E576420848
+	by mail.kernel.org (Postfix) with ESMTPS id F39462076B
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 09:26:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F39462076B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNBpK-0004xc-0E
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 05:21:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57790)
+	id 1kNBuG-00079d-OB
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 05:26:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59094)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kNBoO-00042U-2p
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 05:20:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51876)
+ id 1kNBtB-0006jd-0C
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 05:25:37 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52748)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kNBoL-0003Yz-Rz
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 05:20:39 -0400
+ id 1kNBt9-0004JF-71
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 05:25:36 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kNBoK-0006Y0-2S
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 09:20:36 +0000
+ id 1kNBt7-00071U-HT
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 09:25:33 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 1018F2E80E8
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 09:20:36 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 817282E80E7
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 09:25:33 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 29 Sep 2020 09:14:25 -0000
+Date: Tue, 29 Sep 2020 09:19:33 -0000
 From: Peter Maydell <1897680@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -53,7 +53,7 @@ X-Launchpad-Bug-Commenters: pmaydell zpzigi
 X-Launchpad-Bug-Reporter: Changho Choi (zpzigi)
 X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
 References: <160136265426.22784.9778102281742505477.malonedeb@gac.canonical.com>
-Message-Id: <160137086562.23463.17005100975348676018.malone@gac.canonical.com>
+Message-Id: <160137117306.23397.9822576099583034440.malone@gac.canonical.com>
 Subject: [Bug 1897680] Re: memory address over 0x2000_7ffc is not accessible
  in mps2-an505
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -61,7 +61,7 @@ X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="d685c0a40836eb9844ed835c9700f20633c1d7af"; Instance="production"
-X-Launchpad-Hash: cbde006311da917bc2747c4ca89500f6f20a21a6
+X-Launchpad-Hash: 38e9ec08e047b6c3c975eefacc5d62711a75c3cd
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 03:05:36
@@ -89,9 +89,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PS: you don't need to pass "-cpu cortex-m33" as it is the default for
-the mps2-an505 board, and you don't need to pass a -m argument either,
-as 16MB is the fixed value for this board.
+(If you were just interested in having a large area of contiguous RAM,
+the "PSRAM" is the largest lump on this board: it's 16MB starting at
+0x8000_0000.)
 
 -- =
 
