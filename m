@@ -2,71 +2,89 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45465C4346E
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 09:49:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A129C4346E
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 09:50:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBE2820848
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 09:49:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBE2820848
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6D81A20848
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 09:50:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="wtYM5bw6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D81A20848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38716 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNCG8-0004Uo-LL
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 05:49:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36406)
+	id 1kNCGo-000564-AC
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 05:50:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36558)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cenjiahui@huawei.com>)
- id 1kNCFF-0003fO-UB
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 05:48:25 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:4771 helo=huawei.com)
+ (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
+ id 1kNCFk-00046w-QZ; Tue, 29 Sep 2020 05:48:57 -0400
+Received: from forwardcorp1j.mail.yandex.net ([2a02:6b8:0:1619::183]:54370)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cenjiahui@huawei.com>)
- id 1kNCFC-0007fr-2D
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 05:48:25 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id A6667E6156EF2CA0B138;
- Tue, 29 Sep 2020 17:48:11 +0800 (CST)
-Received: from [10.174.186.107] (10.174.186.107) by
- DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 29 Sep 2020 17:48:02 +0800
-Subject: Re: [RFC PATCH 0/7] block-backend: Introduce I/O hang
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20200927130420.1095-1-fangying1@huawei.com>
- <20200928105711.GF5451@linux.fritz.box>
-From: cenjiahui <cenjiahui@huawei.com>
-Message-ID: <74c436e6-4796-fc03-1706-5cee9bb2e8bd@huawei.com>
-Date: Tue, 29 Sep 2020 17:48:01 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
+ id 1kNCFg-0007jq-0e; Tue, 29 Sep 2020 05:48:55 -0400
+Received: from vla1-fdfb804fb3f3.qloud-c.yandex.net
+ (vla1-fdfb804fb3f3.qloud-c.yandex.net
+ [IPv6:2a02:6b8:c0d:3199:0:640:fdfb:804f])
+ by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 03D922E182B;
+ Tue, 29 Sep 2020 12:48:41 +0300 (MSK)
+Received: from vla1-81430ab5870b.qloud-c.yandex.net
+ (vla1-81430ab5870b.qloud-c.yandex.net [2a02:6b8:c0d:35a1:0:640:8143:ab5])
+ by vla1-fdfb804fb3f3.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ vjhjzQjrRW-mew05FSc; Tue, 29 Sep 2020 12:48:40 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1601372920; bh=Lns98uKhHAlRMhbR+H0QtruPlIAVQxl/oZtiQ/pNS1M=;
+ h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
+ b=wtYM5bw6hP06O//Y+dvrWfBsJkvkLk4RlvQqJIDoUnRMNy0QBs1PZc2MO/cB9O+Xx
+ /n8oGjY8P/aHOVF8lBufQEf9xJNMUjYEZd/L2LWme15SEzvrg21JnztqQ53lH1PD1k
+ +d/Y3LQfUTVbOwEHaqnB3zybAd+DfSPvH+iiTFl4=
+Authentication-Results: vla1-fdfb804fb3f3.qloud-c.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
+ [2a02:6b8:b081:303::1:c])
+ by vla1-81430ab5870b.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
+ v2OBNEwTka-memmTJ1A; Tue, 29 Sep 2020 12:48:40 +0300
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Client certificate not present)
+Date: Tue, 29 Sep 2020 12:48:38 +0300
+From: Dima Stepanov <dimastep@yandex-team.ru>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v5 0/7] vhost-user-blk: fix the migration issue and
+ enhance qtests
+Message-ID: <20200929094830.GA32457@dimastep-nix>
+References: <cover.1599813294.git.dimastep@yandex-team.ru>
+ <20200924072506-mutt-send-email-mst@kernel.org>
+ <20200927064822.GA3761@dimastep-nix>
+ <20200929031212-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20200928105711.GF5451@linux.fritz.box>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.186.107]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.191; envelope-from=cenjiahui@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 05:48:12
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200929031212-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/1.5.24 (2015-08-30)
+Received-SPF: pass client-ip=2a02:6b8:0:1619::183;
+ envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1j.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,58 +93,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ying Fang <fangying1@huawei.com>, mreitz@redhat.com,
- zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Peter Maydell <peter.maydell@linaro.org>,
+ thuth@redhat.com, qemu-block@nongnu.org, lvivier@redhat.com,
+ stefanha@gmail.com, jasowang@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, raphael.norwitz@nutanix.com, fengli@smartx.com,
+ yc-core@yandex-team.ru, pbonzini@redhat.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, Sep 29, 2020 at 03:13:09AM -0400, Michael S. Tsirkin wrote:
+> On Sun, Sep 27, 2020 at 09:48:28AM +0300, Dima Stepanov wrote:
+> > On Thu, Sep 24, 2020 at 07:26:14AM -0400, Michael S. Tsirkin wrote:
+> > > On Fri, Sep 11, 2020 at 11:39:42AM +0300, Dima Stepanov wrote:
+> > > > v4 -> v5:
+> > > >   - vhost: check queue state in the vhost_dev_set_log routine
+> > > >     tests/qtest/vhost-user-test: prepare the tests for adding new
+> > > >     dev class
+> > > >     tests/qtest/vhost-user-test: add support for the
+> > > >     vhost-user-blk device
+> > > >     tests/qtest/vhost-user-test: add migrate_reconnect test
+> > > >     Reviewed-by: Raphael Norwitz
+> > > >   - Update qtest, by merging vhost-user-blk "if" case with the
+> > > >     virtio-blk case.
+> > > 
+> > > I dropped patches 3-7 since they were stalling on some systems.
+> > > Pls work with Peter Maydell (cc'd) to figure it out.
+> > Thanks!
+> > 
+> > Peter, can you share any details for the stalling errors with me?
+> 
+> I can say for sure that even on x86/linux the affected tests take
+> much longer to run with these applied.
+> I'd suggest making sure there are no timeouts involved in the good case ....
+Could you help me to reproduce it? Because on my system i see only 10+ seconds
+increase for the qos-test set to pass (both x86_64 and i386). So on the
+current master i'm running it like:
+  - ./configure  --target-list="x86_64-softmmu i386-softmmu"
+  - with no patch set:
+    time QTEST_QEMU_BINARY=./build/x86_64-softmmu/qemu-system-x86_64 ./build/tests/qtest/qos-test
+    real    0m6.394s
+    user    0m3.643s
+    sys     0m3.477s
+  - without patch 7 (where i include vhost-user-net tests also):
+    real    0m9.955s
+    user    0m4.133s
+    sys     0m4.397s
+  - full patch set:
+    real    0m17.263s
+    user    0m4.530s
+    sys     0m4.802s
+For i386 target i see pretty the same numbers:
+  time QTEST_QEMU_BINARY=./build/i386-softmmu/qemu-system-i386 ./build/tests/qtest/qos-test
+  real    0m17.386s
+  user    0m4.503s
+  sys     0m4.911s
+So it looks like that i'm missing some step to reproduce an issue.
 
-On 2020/9/28 18:57, Kevin Wolf wrote:
-> Am 27.09.2020 um 15:04 hat Ying Fang geschrieben:
->> A VM in the cloud environment may use a virutal disk as the backend storage,
->> and there are usually filesystems on the virtual block device. When backend
->> storage is temporarily down, any I/O issued to the virtual block device will
->> cause an error. For example, an error occurred in ext4 filesystem would make
->> the filesystem readonly. However a cloud backend storage can be soon recovered.
->> For example, an IP-SAN may be down due to network failure and will be online
->> soon after network is recovered. The error in the filesystem may not be
->> recovered unless a device reattach or system restart. So an I/O rehandle is
->> in need to implement a self-healing mechanism.
->>
->> This patch series propose a feature called I/O hang. It can rehandle AIOs
->> with EIO error without sending error back to guest. From guest's perspective
->> of view it is just like an IO is hanging and not returned. Guest can get
->> back running smoothly when I/O is recovred with this feature enabled.
-> 
-> What is the problem with setting werror=stop and rerror=stop for the
-When an I/O error occurs, if simply setting werror=stop and rerror=stop, the
-whole VM will be paused and unavailable. Moreover, the VM won't be recovered
-until the management tool manually resumes it after the backend storage recovers.
-> device? Is it that QEMU won't automatically retry, but management tool
-> interaction is required to resume the guest?
-By using I/O Hang mechanism, we can temporarily hang the IOs, and any other
-services unrelated with the hung virtual block device like network can go on
-working. Besides, once the backend storage is recovered, our I/O rehandle
-mechanism will automatically complete the hung IOs and continue the VM's work.
-> 
-> I haven't checked your patches in detail yet, but implementing this
-> functionality in the backend means that blk_drain() will hang (or if it
-> doesn't hang, it doesn't do what it's supposed to do), making the whole
-What if we disable rehandle before blk_drain().
-> QEMU process unresponsive until the I/O succeeds again. Amongst others,
-> this would make it impossible to migrate away from a host with storage
-> problems.
-Exactly if the storage is recovered during migration iteration phase, the
-migration can succeed, but if the storage is still not recovered on migration
-completion phase, the migration should fail and be cancelled.
+And if i run the exact test it takes ~2-3s to pass:
+  $ time QTEST_QEMU_BINARY=./build/x86_64-softmmu/qemu-system-x86_64 ./build/tests/qtest/qos-test -p /x86_64/pc/i440FX-pcihost/pci-bus-pc/pci-bus/vhost-user-blk-pci/vhost-user-blk/vhost-user-blk-tests/reconnect
+  /x86_64/pc/i440FX-pcihost/pci-bus-pc/pci-bus/vhost-user-blk-pci/vhost-user-blk/vhost-user-blk-tests/reconnect: OK
+  real    0m2.253s
+  user    0m0.118s
+  sys     0m0.104s
+And same numbers for i386.
 
-Thanks,
-Jiahui Cen
 > 
-> Kevin
+> > > 
+> > > 
+> > > > v3 -> v4:
+> > > >   - vhost: recheck dev state in the vhost_migration_log routine
+> > > >     Reviewed-by: Raphael Norwitz
+> > > >   - vhost: check queue state in the vhost_dev_set_log routine
+> > > >     Use "continue" instead of "break" to handle non-initialized
+> > > >     virtqueue case.
+> > > > 
+> > > > v2 -> v3:
+> > > >   - update commit message for the 
+> > > >     "vhost: recheck dev state in the vhost_migration_log routine" commit
+> > > >   - rename "started" field of the VhostUserBlk structure to
+> > > >     "started_vu", so there will be no confustion with the VHOST started
+> > > >     field
+> > > >   - update vhost-user-test.c to always initialize nq local variable
+> > > >     (spotted by patchew)
+> > > > 
+> > > > v1 -> v2:
+> > > >   - add comments to connected/started fields in the header file
+> > > >   - move the "s->started" logic from the vhost_user_blk_disconnect
+> > > >     routine to the vhost_user_blk_stop routine
+> > > > 
+> > > > Reference e-mail threads:
+> > > >   - https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg01509.html
+> > > >   - https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg05241.html
+> > > > 
+> > > > If vhost-user daemon is used as a backend for the vhost device, then we
+> > > > should consider a possibility of disconnect at any moment. There was a general
+> > > > question here: should we consider it as an error or okay state for the vhost-user
+> > > > devices during migration process?
+> > > > I think the disconnect event for the vhost-user devices should not break the
+> > > > migration process, because:
+> > > >   - the device will be in the stopped state, so it will not be changed
+> > > >     during migration
+> > > >   - if reconnect will be made the migration log will be reinitialized as
+> > > >     part of reconnect/init process:
+> > > >     #0  vhost_log_global_start (listener=0x563989cf7be0)
+> > > >     at hw/virtio/vhost.c:920
+> > > >     #1  0x000056398603d8bc in listener_add_address_space (listener=0x563989cf7be0,
+> > > >         as=0x563986ea4340 <address_space_memory>)
+> > > >     at softmmu/memory.c:2664
+> > > >     #2  0x000056398603dd30 in memory_listener_register (listener=0x563989cf7be0,
+> > > >         as=0x563986ea4340 <address_space_memory>)
+> > > >     at softmmu/memory.c:2740
+> > > >     #3  0x0000563985fd6956 in vhost_dev_init (hdev=0x563989cf7bd8,
+> > > >         opaque=0x563989cf7e30, backend_type=VHOST_BACKEND_TYPE_USER,
+> > > >         busyloop_timeout=0)
+> > > >     at hw/virtio/vhost.c:1385
+> > > >     #4  0x0000563985f7d0b8 in vhost_user_blk_connect (dev=0x563989cf7990)
+> > > >     at hw/block/vhost-user-blk.c:315
+> > > >     #5  0x0000563985f7d3f6 in vhost_user_blk_event (opaque=0x563989cf7990,
+> > > >         event=CHR_EVENT_OPENED)
+> > > >     at hw/block/vhost-user-blk.c:379
+> > > > The first patch in the patchset fixes this issue by setting vhost device to the
+> > > > stopped state in the disconnect handler and check it the vhost_migration_log()
+> > > > routine before returning from the function.
+> > > > qtest framework was updated to test vhost-user-blk functionality. The
+> > > > vhost-user-blk/vhost-user-blk-tests/migrate_reconnect test was added to reproduce
+> > > > the original issue found.
+> > > > 
+> > > > Dima Stepanov (7):
+> > > >   vhost: recheck dev state in the vhost_migration_log routine
+> > > >   vhost: check queue state in the vhost_dev_set_log routine
+> > > >   tests/qtest/vhost-user-test: prepare the tests for adding new dev
+> > > >     class
+> > > >   tests/qtest/libqos/virtio-blk: add support for vhost-user-blk
+> > > >   tests/qtest/vhost-user-test: add support for the vhost-user-blk device
+> > > >   tests/qtest/vhost-user-test: add migrate_reconnect test
+> > > >   tests/qtest/vhost-user-test: enable the reconnect tests
+> > > > 
+> > > >  hw/block/vhost-user-blk.c          |  19 ++-
+> > > >  hw/virtio/vhost.c                  |  39 ++++-
+> > > >  include/hw/virtio/vhost-user-blk.h |  10 ++
+> > > >  tests/qtest/libqos/virtio-blk.c    |  14 +-
+> > > >  tests/qtest/vhost-user-test.c      | 290 +++++++++++++++++++++++++++++++------
+> > > >  5 files changed, 322 insertions(+), 50 deletions(-)
+> > > > 
+> > > > -- 
+> > > > 2.7.4
+> > > 
 > 
-> 
-> .
->
 
