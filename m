@@ -7,40 +7,39 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04088C4727C
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 11:09:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EDEEC4741F
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 11:10:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62E1B21D92
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 11:08:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62E1B21D92
+	by mail.kernel.org (Postfix) with ESMTPS id D72E321941
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 11:10:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D72E321941
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNDVC-00038j-BQ
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 07:08:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56976)
+	id 1kNDWL-0005LM-0B
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 07:10:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56860)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kNDOr-0003fJ-DE
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 07:02:25 -0400
-Received: from mail.ispras.ru ([83.149.199.84]:35304)
+ id 1kNDOU-0003LB-98
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 07:02:02 -0400
+Received: from mail.ispras.ru ([83.149.199.84]:35218)
  by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kNDOp-0002i1-Dm
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 07:02:24 -0400
+ id 1kNDOR-0002fd-1j
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 07:02:01 -0400
 Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id 4ED2E413C33E;
- Tue, 29 Sep 2020 11:02:20 +0000 (UTC)
-Subject: [PATCH v6 13/14] replay: create temporary snapshot at debugger
- connection
+ by mail.ispras.ru (Postfix) with ESMTPSA id 0DF7240F9AAE;
+ Tue, 29 Sep 2020 11:01:57 +0000 (UTC)
+Subject: [PATCH v6 09/14] replay: flush rr queue before loading the vmstate
 From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
 To: qemu-devel@nongnu.org
-Date: Tue, 29 Sep 2020 14:02:20 +0300
-Message-ID: <160137734000.31007.4668841178583344264.stgit@pasha-ThinkPad-X280>
+Date: Tue, 29 Sep 2020 14:01:56 +0300
+Message-ID: <160137731672.31007.8039171437790634738.stgit@pasha-ThinkPad-X280>
 In-Reply-To: <160137726426.31007.12061315974029139983.stgit@pasha-ThinkPad-X280>
 References: <160137726426.31007.12061315974029139983.stgit@pasha-ThinkPad-X280>
 User-Agent: StGit/0.17.1-dirty
@@ -76,71 +75,94 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When record/replay does not uses overlays for storing the snapshots,
-user is not capable of issuing reverse debugging commands.
-This patch adds creation of the VM snapshot on the temporary
-overlay image, when the debugger connects to QEMU.
-Therefore the execution can be rewind to the moment
-of the debugger connection while debugging the virtual machine.
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+
+Non-empty record/replay queue prevents saving and loading the VM state,
+because it includes pending bottom halves and block coroutines.
+But when the new VM state is loaded, we don't have to preserve the consistency
+of the current state anymore. Therefore this patch just flushes the queue
+allowing the coroutines to finish and removes checking for empty rr queue
+for load_snapshot function.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
-
---
-
-v6:
- - dropped unused error processing (suggested by Philippe Mathieu-Daudé)
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- gdbstub.c                 |    1 +
- include/sysemu/replay.h   |    2 ++
- replay/replay-debugging.c |   14 ++++++++++++++
- 3 files changed, 17 insertions(+)
+ include/sysemu/replay.h  |    2 ++
+ migration/savevm.c       |   12 ++++++------
+ replay/replay-events.c   |    4 ++++
+ replay/replay-internal.h |    2 --
+ 4 files changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/gdbstub.c b/gdbstub.c
-index ac92273018..f19f98ab1a 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -3321,6 +3321,7 @@ static void gdb_chr_event(void *opaque, QEMUChrEvent event)
-         s->g_cpu = s->c_cpu;
- 
-         vm_stop(RUN_STATE_PAUSED);
-+        replay_gdb_attached();
-         gdb_has_xml = false;
-         break;
-     default:
 diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-index b6cac175c4..2aa34b8919 100644
+index e00ed2f4a5..239c01e7df 100644
 --- a/include/sysemu/replay.h
 +++ b/include/sysemu/replay.h
-@@ -94,6 +94,8 @@ bool replay_reverse_continue(void);
- bool replay_running_debug(void);
- /* Called in reverse debugging mode to collect breakpoint information */
- void replay_breakpoint(void);
-+/* Called when gdb is attached to gdbstub */
-+void replay_gdb_attached(void);
+@@ -149,6 +149,8 @@ void replay_disable_events(void);
+ void replay_enable_events(void);
+ /*! Returns true when saving events is enabled */
+ bool replay_events_enabled(void);
++/* Flushes events queue */
++void replay_flush_events(void);
+ /*! Adds bottom half event to the queue */
+ void replay_bh_schedule_event(QEMUBH *bh);
+ /* Adds oneshot bottom half event to the queue */
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 0e8dc78684..d2e141f7b1 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2881,12 +2881,6 @@ int load_snapshot(const char *name, Error **errp)
+     AioContext *aio_context;
+     MigrationIncomingState *mis = migration_incoming_get_current();
  
- /* Processing the instructions */
+-    if (!replay_can_snapshot()) {
+-        error_setg(errp, "Record/replay does not allow loading snapshot "
+-                   "right now. Try once more later.");
+-        return -EINVAL;
+-    }
+-
+     if (!bdrv_all_can_snapshot(&bs)) {
+         error_setg(errp,
+                    "Device '%s' is writable but does not support snapshots",
+@@ -2920,6 +2914,12 @@ int load_snapshot(const char *name, Error **errp)
+         return -EINVAL;
+     }
  
-diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
-index d02d4e0766..a55715ba0a 100644
---- a/replay/replay-debugging.c
-+++ b/replay/replay-debugging.c
-@@ -316,3 +316,17 @@ void replay_breakpoint(void)
-     assert(replay_mode == REPLAY_MODE_PLAY);
-     replay_last_breakpoint = replay_get_current_icount();
- }
-+
-+void replay_gdb_attached(void)
-+{
 +    /*
-+     * Create VM snapshot on temporary overlay to allow reverse
-+     * debugging even if snapshots were not enabled.
++     * Flush the record/replay queue. Now the VM state is going
++     * to change. Therefore we don't need to preserve its consistency
 +     */
-+    if (replay_mode == REPLAY_MODE_PLAY
-+        && !replay_snapshot) {
-+        if (save_snapshot("start_debugging", NULL) != 0) {
-+            /* Can't create the snapshot. Continue conventional debugging. */
-+        }
++    replay_flush_events();
++
+     /* Flush all IO requests so they don't interfere with the new state.  */
+     bdrv_drain_all_begin();
+ 
+diff --git a/replay/replay-events.c b/replay/replay-events.c
+index 302b84043a..a1c6bb934e 100644
+--- a/replay/replay-events.c
++++ b/replay/replay-events.c
+@@ -77,6 +77,10 @@ bool replay_has_events(void)
+ 
+ void replay_flush_events(void)
+ {
++    if (replay_mode == REPLAY_MODE_NONE) {
++        return;
 +    }
-+}
++
+     g_assert(replay_mutex_locked());
+ 
+     while (!QTAILQ_EMPTY(&events_list)) {
+diff --git a/replay/replay-internal.h b/replay/replay-internal.h
+index 2f6145ec7c..97649ed8d7 100644
+--- a/replay/replay-internal.h
++++ b/replay/replay-internal.h
+@@ -149,8 +149,6 @@ void replay_read_next_clock(unsigned int kind);
+ void replay_init_events(void);
+ /*! Clears internal data structures for events handling */
+ void replay_finish_events(void);
+-/*! Flushes events queue */
+-void replay_flush_events(void);
+ /*! Returns true if there are any unsaved events in the queue */
+ bool replay_has_events(void);
+ /*! Saves events from queue into the file */
 
 
