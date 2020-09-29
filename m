@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACA39C4727F
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 20:32:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF448C47423
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 20:32:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2083D20789
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 20:32:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 36C082076B
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 20:32:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Do2UnsRw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2083D20789
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VFkhrIwX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36C082076B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNMIG-000195-R2
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 16:32:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59778)
+	id 1kNMIg-00027Q-5b
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 16:32:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59760)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kNM6F-0001t8-Go
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kNM6E-0001sd-3Q
  for qemu-devel@nongnu.org; Tue, 29 Sep 2020 16:19:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57405)
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:24353)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kNM65-0003VD-S1
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 16:19:47 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kNM64-0003Ue-H5
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 16:19:45 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601410776;
+ s=mimecast20190719; t=1601410775;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8K+DshiWKB+kYIq5FXrQuaN+d5b9nzNbf0RKpx257yo=;
- b=Do2UnsRwys+i7f5rDIytmnUUZ3NdJrEpD58m6WJqjJASUL6iERkRHNNxLFJg4LqIdK7dEE
- r/CNqaXZ+fYwBRBqA3WBEJJ4QiEDlJcM4YJveVk9JruLUs5algVYdWModUZ09cqDX2AelT
- EkeatB3Bqy94yqTs8i8hyrvmSETV3XE=
+ bh=E4TiT38gDo8oyo8Muf7mhAiplRC9qSsQ4WSYb3ECKjE=;
+ b=VFkhrIwXF2z/p8AhusyST5eyK6PI9iChOHzLwOOlwmr18cPGsZO6UJ1mPrJ9qMZIgtcbFt
+ VWYY7OY2JnQ6GUM07K6150Ed55zgw84N4Ta2YBmwtGaX7gI6CG1FXEnZbqBkvHoZfZnY98
+ +APskQq2Y9ckScoED53KmHBCfiSQ8Fo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-361-eMEXWI81PkChR_htW9pzoA-1; Tue, 29 Sep 2020 16:19:34 -0400
-X-MC-Unique: eMEXWI81PkChR_htW9pzoA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-464--oBLmtuJO_Sl_hk6d3KMUg-1; Tue, 29 Sep 2020 16:19:32 -0400
+X-MC-Unique: -oBLmtuJO_Sl_hk6d3KMUg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D47718BE165;
- Tue, 29 Sep 2020 20:19:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A26041DE02;
+ Tue, 29 Sep 2020 20:19:31 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-101.ams2.redhat.com
  [10.36.112.101])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D425A73674;
- Tue, 29 Sep 2020 20:19:32 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 750ED78822;
+ Tue, 29 Sep 2020 20:19:31 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 0A93E11358DD; Tue, 29 Sep 2020 22:19:27 +0200 (CEST)
+ id D83C411358D2; Tue, 29 Sep 2020 22:19:26 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 29/29] Remove texinfo dependency from docker and CI configs
-Date: Tue, 29 Sep 2020 22:19:26 +0200
-Message-Id: <20200929201926.2155622-30-armbru@redhat.com>
+Subject: [PULL 20/29] tests/qapi-schema: Convert doc-good.json to rST-style
+ strong/emphasis
+Date: Tue, 29 Sep 2020 22:19:17 +0200
+Message-Id: <20200929201926.2155622-21-armbru@redhat.com>
 In-Reply-To: <20200929201926.2155622-1-armbru@redhat.com>
 References: <20200929201926.2155622-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 02:22:44
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 22:47:55
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
@@ -103,107 +104,77 @@ Sender: "Qemu-devel"
 
 From: Peter Maydell <peter.maydell@linaro.org>
 
-We don't need texinfo to build the docs any more, so we can
-drop that dependency from our docker and other CI configs.
+doc-good.json currently uses the old *strong* and _emphasis_ markup.
+As part of the conversion to rST this needs to switch to **strong**
+and *emphasis*, because rST uses underscores as part of its markup
+of hyperlinks and will otherwise warn about the syntax error.
+
+In commit a660eed482063b we fixed up the in-tree uses of the
+old markup:
+ 1) _this_ was replaced with *this*
+ 2) the only in-tree use of *this* was left alone (turning
+    a 'strong' into an 'emphasis')
+(and so currently in-tree nothing is using either new-style
+**strong** or old-style _emphasis_).
+
+Update doc-good.json in a similar way:
+ 1) replace _this_ with *this*
+ 2) remove the usage of old-style *this*
+
+(This slightly reduces the coverage for the old Texinfo generator,
+which is about to go away, but is fine for the new rST generator
+because that does not need to handle strong/emphasis itself because
+it is simply passing the entire text as raw rST to Sphinx.)
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Message-Id: <20200925162316.21205-22-peter.maydell@linaro.org>
+Message-Id: <20200925162316.21205-13-peter.maydell@linaro.org>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- .travis.yml                                | 1 -
- scripts/coverity-scan/coverity-scan.docker | 1 -
- tests/docker/dockerfiles/debian10.docker   | 1 -
- tests/docker/dockerfiles/fedora.docker     | 1 -
- tests/docker/dockerfiles/ubuntu.docker     | 1 -
- tests/docker/dockerfiles/ubuntu1804.docker | 1 -
- tests/docker/dockerfiles/ubuntu2004.docker | 1 -
- 7 files changed, 7 deletions(-)
+ tests/qapi-schema/doc-good.json | 2 +-
+ tests/qapi-schema/doc-good.out  | 2 +-
+ tests/qapi-schema/doc-good.texi | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/.travis.yml b/.travis.yml
-index c75221dca3..bd9a6fc06c 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -192,7 +192,6 @@ jobs:
-         apt:
-           packages:
-             - python3-sphinx
--            - texinfo
-             - perl
+diff --git a/tests/qapi-schema/doc-good.json b/tests/qapi-schema/doc-good.json
+index c6822145c4..e9af0857db 100644
+--- a/tests/qapi-schema/doc-good.json
++++ b/tests/qapi-schema/doc-good.json
+@@ -10,7 +10,7 @@
+ #
+ # == Subsection
+ #
+-# *strong* _with emphasis_
++# *with emphasis*
+ # @var {in braces}
+ #
+ # * List item one
+diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.out
+index b7e3f4313d..419284dae2 100644
+--- a/tests/qapi-schema/doc-good.out
++++ b/tests/qapi-schema/doc-good.out
+@@ -73,7 +73,7 @@ doc freeform
+     body=
+ == Subsection
  
+-*strong* _with emphasis_
++*with emphasis*
+ @var {in braces}
  
-diff --git a/scripts/coverity-scan/coverity-scan.docker b/scripts/coverity-scan/coverity-scan.docker
-index 018c03de6d..501ac67233 100644
---- a/scripts/coverity-scan/coverity-scan.docker
-+++ b/scripts/coverity-scan/coverity-scan.docker
-@@ -110,7 +110,6 @@ ENV PACKAGES \
-     systemd-devel \
-     systemtap-sdt-devel \
-     tar \
--    texinfo \
-     usbredir-devel \
-     virglrenderer-devel \
-     vte291-devel \
-diff --git a/tests/docker/dockerfiles/debian10.docker b/tests/docker/dockerfiles/debian10.docker
-index e3c11a454e..1e4188ba22 100644
---- a/tests/docker/dockerfiles/debian10.docker
-+++ b/tests/docker/dockerfiles/debian10.docker
-@@ -31,7 +31,6 @@ RUN apt update && \
-         python3 \
-         python3-setuptools \
-         python3-sphinx \
--        texinfo \
-         $(apt-get -s build-dep qemu | egrep ^Inst | fgrep '[all]' | cut -d\  -f2)
+ * List item one
+diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good.texi
+index 12808989ff..29abef33e9 100644
+--- a/tests/qapi-schema/doc-good.texi
++++ b/tests/qapi-schema/doc-good.texi
+@@ -4,7 +4,7 @@
  
- ENV FEATURES docs
-diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
-index 70b6186bd3..71e4b56977 100644
---- a/tests/docker/dockerfiles/fedora.docker
-+++ b/tests/docker/dockerfiles/fedora.docker
-@@ -96,7 +96,6 @@ ENV PACKAGES \
-     tar \
-     tesseract \
-     tesseract-langpack-eng \
--    texinfo \
-     usbredir-devel \
-     virglrenderer-devel \
-     vte291-devel \
-diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/dockerfiles/ubuntu.docker
-index 161806e6b8..b556ed17d2 100644
---- a/tests/docker/dockerfiles/ubuntu.docker
-+++ b/tests/docker/dockerfiles/ubuntu.docker
-@@ -63,7 +63,6 @@ ENV PACKAGES \
-     python3-yaml \
-     python3-sphinx \
-     sparse \
--    texinfo \
-     xfslibs-dev
- RUN apt-get update && \
-     DEBIAN_FRONTEND=noninteractive apt-get -y install $PACKAGES
-diff --git a/tests/docker/dockerfiles/ubuntu1804.docker b/tests/docker/dockerfiles/ubuntu1804.docker
-index a10ea2850b..a6a7617da6 100644
---- a/tests/docker/dockerfiles/ubuntu1804.docker
-+++ b/tests/docker/dockerfiles/ubuntu1804.docker
-@@ -49,7 +49,6 @@ ENV PACKAGES \
-     python3-yaml \
-     python3-sphinx \
-     sparse \
--    texinfo \
-     xfslibs-dev
- RUN apt-get update && \
-     DEBIAN_FRONTEND=noninteractive apt-get -y install $PACKAGES
-diff --git a/tests/docker/dockerfiles/ubuntu2004.docker b/tests/docker/dockerfiles/ubuntu2004.docker
-index 8d10934a2a..cafe8443fb 100644
---- a/tests/docker/dockerfiles/ubuntu2004.docker
-+++ b/tests/docker/dockerfiles/ubuntu2004.docker
-@@ -57,7 +57,6 @@ ENV PACKAGES flex bison \
-     sparse \
-     tesseract-ocr \
-     tesseract-ocr-eng \
--    texinfo \
-     xfslibs-dev\
-     vim
- RUN apt-get update && \
+ @subsection Subsection
+ 
+-@strong{strong} @emph{with emphasis}
++@strong{with emphasis}
+ @code{var} @{in braces@}
+ 
+ @itemize @bullet
 -- 
 2.26.2
 
