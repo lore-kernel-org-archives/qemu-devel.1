@@ -4,77 +4,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E80AC4346E
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:28:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C28D1C4346E
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:28:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C7DF207F7
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:28:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4C0EF207F7
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:28:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hRj8MdTU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C7DF207F7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FMxozRnQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C0EF207F7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNA3s-0003Ws-CO
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 03:28:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57456)
+	id 1kNA3v-0003dJ-DM
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 03:28:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57322)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9xT-0003RE-5n
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:21:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29137)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9xF-0003Ci-V7
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:21:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33561)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9xO-0001ef-Ri
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:21:54 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9xC-0001d5-G7
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:21:41 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601364110;
+ s=mimecast20190719; t=1601364097;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/Hogw7T/QnmLtf59Wzlc7OPSCDTBdeKjm88GBrhDZBI=;
- b=hRj8MdTUtXlmQmqF3l6vGF3/wp9TiKs9MVBQt2ent/yV8iDZSr2c1aKbDJzLwd6l7my8V9
- F+TlXQdfnZAAyxUb9DBbCh8axdUQKA/tVWvKzsZ60/YuQVhMNXnlA3AA6JyO2RMtMNwX8P
- iVpgvNrbLdXkqtfFtNLF2D8LHgYRSRs=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-416-FGyYXFG6Om-arPU6lsoTDg-1; Tue, 29 Sep 2020 03:21:47 -0400
-X-MC-Unique: FGyYXFG6Om-arPU6lsoTDg-1
-Received: by mail-wr1-f69.google.com with SMTP id o6so1364292wrp.1
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 00:21:47 -0700 (PDT)
+ bh=av5Mz4G8ahNNHHbj7k0mQcB8mlsr0+IKdPzJNJRtlnM=;
+ b=FMxozRnQeN1LqSwPkhQw3fLShlW6IZTGXP7ZVazR5KJ/NxOeOGIlfloenrjn3w9uUivosb
+ JfZABbdP8tIrH3i+T8WAnMv5+NONiTpX4gtHUTrNRlaDC2VN8DtJVjG7OchZWQb8RYCclv
+ wscyNuLEn3zc9NEbQnoIb7ysKlkEkVA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-395-w7nKC3FLNRKBaBw4Dkl1fg-1; Tue, 29 Sep 2020 03:21:35 -0400
+X-MC-Unique: w7nKC3FLNRKBaBw4Dkl1fg-1
+Received: by mail-wm1-f71.google.com with SMTP id m19so1453909wmg.6
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 00:21:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=/Hogw7T/QnmLtf59Wzlc7OPSCDTBdeKjm88GBrhDZBI=;
- b=ccdhgA7kjAy8nVSerdvZrvJwUGwQ9RW6KWLG3TyfeAaaAZMOxJRohuoUIQ/DbpHYfM
- W7oKoUuPr/xEBLHdxx7m+YzUxjOKfem/joeloMbVZ1dE17g9PXG1LilqTnax9PYEjSl4
- CNQHccE4GmslJ1de2zWsTaRsCnvTglQE2Zs8BHU6672ck0J3fbNNB3j8cifhA0l8OEcB
- BvgOh8dwkZs30MI2lAc5LGzra1Alv83D5K3pEWba66v4mog9tw16eW9BCwjhCJ34mkjk
- 2RZ9EicvVKZm12zAseixO8QfhGI99fQJUBCjplmEAy99BxEPjtXPPByk4TcRJdwRDfFE
- Lo0A==
-X-Gm-Message-State: AOAM530R4+qc4qqwXq0KlntV1QCjhXGlpg0hczxpYcpl91xX9SETuHg2
- YBwOB/t2VqF1oyodcdphhttDaNTu9hUU9on1P8Q23FxYrQpIcNyKGo6kfoEab28G+ItUmUlYRvj
- lr9Yk1mDE4DCknMI=
-X-Received: by 2002:a7b:c753:: with SMTP id w19mr2872216wmk.157.1601364105739; 
- Tue, 29 Sep 2020 00:21:45 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzltlsRSEYdMW5aNyk4rcSHrNsrbulbMUcC6c+XIsRAqtRK4LfPWke2U/JppE4yqYen9cQMEQ==
-X-Received: by 2002:a7b:c753:: with SMTP id w19mr2872195wmk.157.1601364105538; 
- Tue, 29 Sep 2020 00:21:45 -0700 (PDT)
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=av5Mz4G8ahNNHHbj7k0mQcB8mlsr0+IKdPzJNJRtlnM=;
+ b=KDzL+kdKjES1+dZcxf4mIIW9/sohZ5lCfIVyHPrfKgLOdkFPhPclkJRAbhmkiKk7J4
+ aW1pJlu6a9kIq+nnUc/NxBhNsmlS/rN2j8ots2jw0Q4kDg1LWIeksKs+vyhEHKevjfn/
+ m6/HgWnN0hFOj4KLYhroIdhiFxuCqkOyLYDeIQjz+99FILcUDycHfHCNcVpC6+Zm8aZ1
+ X3q42fvBiGwDXb8fUB/YeFITRanuzRZp4IcJW3i4R2SAOuzdGvJSbzLMplGcWkOraRGY
+ cJoZkT9DjouYTCaFlvvIHYyfpzk184cAYAj+euQ1plAJT6QJeCHdoXbKjpFrZtJQxy6g
+ YqHg==
+X-Gm-Message-State: AOAM5300CPmzrZCRwkMNWfr2Q7XOZhw54QOTo0OuM1/UJ39CJMW5thHG
+ Jn/5bxbLcQp5bpMsAlCpwaq/IkN4amSO8Ob+DY0DeZlMLx+OdhFPe5Gwp+I/xsN1CIenGkz5NF7
+ mZRyMFVCUGA3gN50=
+X-Received: by 2002:a05:600c:20c8:: with SMTP id
+ y8mr2851809wmm.108.1601364094080; 
+ Tue, 29 Sep 2020 00:21:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyLO7v9LkFUBiHkyulaCupUIQ6+rAK+A5F3fM66wtauUwrb5YnJwmZ4cec/ptBWhozc9Ujr8g==
+X-Received: by 2002:a05:600c:20c8:: with SMTP id
+ y8mr2851792wmm.108.1601364093921; 
+ Tue, 29 Sep 2020 00:21:33 -0700 (PDT)
 Received: from redhat.com (bzq-79-179-71-128.red.bezeqint.net. [79.179.71.128])
- by smtp.gmail.com with ESMTPSA id v204sm4360003wmg.20.2020.09.29.00.21.43
+ by smtp.gmail.com with ESMTPSA id h17sm4967259wro.27.2020.09.29.00.21.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 29 Sep 2020 00:21:44 -0700 (PDT)
-Date: Tue, 29 Sep 2020 03:21:42 -0400
+ Tue, 29 Sep 2020 00:21:33 -0700 (PDT)
+Date: Tue, 29 Sep 2020 03:21:31 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v4 19/48] vhost-vsock-ccw: force virtio version 1
-Message-ID: <20200929071948.281157-20-mst@redhat.com>
+Subject: [PULL v4 15/48] configure: Fix build dependencies with vhost-vdpa.
+Message-ID: <20200929071948.281157-16-mst@redhat.com>
 References: <20200929071948.281157-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200929071948.281157-1-mst@redhat.com>
@@ -84,11 +88,12 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 22:47:55
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 02:22:44
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
@@ -109,62 +114,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-stable@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>, Stefano Garzarella <sgarzare@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, lulu@redhat.com,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, pbonzini@redhat.com,
+ marcandre.lureau@redhat.com,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefano Garzarella <sgarzare@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
 
-virtio-vsock was introduced after the release of VIRTIO 1.0
-specifications, so it should be 'modern-only'.
+Following the same logic as for vhost-net-user and vhost-kernel,
+enable vhost-net if vhost-net-vdpa is enabled and vhost-net is not
+explicitly disabled.
+See 299e6f19b3e2 ("vhost-net: revamp configure logic")
 
-This patch forces virtio version 1 as done for vhost-vsock-pci.
+Autoselect VHOST if VHOST_VDPA is set
+See 21c6b0c87e85 ("configure: simplify vhost condition with Kconfig")
+See 2becc36a3e53 ("meson: infrastructure for building emulators"
 
-To avoid migration issues, we force virtio version 1 only when
-legacy check is enabled in the new machine types (>= 5.1).
+Problems can be triggered using;
+... --enable-vhost-vdpa --disable-vhost-user --disable-vhost-kernel ...
 
-Cc: qemu-stable@nongnu.org
-Suggested-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-Message-Id: <20200921122506.82515-5-sgarzare@redhat.com>
+Fixes: 108a64818e69 ("vhost-vdpa: introduce vhost-vdpa backend")
+Cc: lulu@redhat.com
+Cc: pbonzini@redhat.com
+Cc: marcandre.lureau@redhat.com
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Message-Id: <20200924210023.160679-1-lvivier@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/s390x/vhost-vsock-ccw.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ configure    | 3 ++-
+ Kconfig.host | 4 ++++
+ meson.build  | 1 +
+ 3 files changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/hw/s390x/vhost-vsock-ccw.c b/hw/s390x/vhost-vsock-ccw.c
-index 0822ecca89..246416a8f9 100644
---- a/hw/s390x/vhost-vsock-ccw.c
-+++ b/hw/s390x/vhost-vsock-ccw.c
-@@ -40,9 +40,21 @@ static void vhost_vsock_ccw_class_init(ObjectClass *klass, void *data)
- static void vhost_vsock_ccw_instance_init(Object *obj)
- {
-     VHostVSockCCWState *dev = VHOST_VSOCK_CCW(obj);
-+    VirtioCcwDevice *ccw_dev = VIRTIO_CCW_DEVICE(obj);
-+    VirtIODevice *virtio_dev;
+diff --git a/configure b/configure
+index e8e8e984f2..8ee15810c8 100755
+--- a/configure
++++ b/configure
+@@ -2494,9 +2494,10 @@ if test "$vhost_net_vdpa" = "yes" && test "$vhost_vdpa" = "no"; then
+   error_exit "--enable-vhost-net-vdpa requires --enable-vhost-vdpa"
+ fi
  
-     virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-                                 TYPE_VHOST_VSOCK);
-+
-+    virtio_dev = VIRTIO_DEVICE(&dev->vdev);
-+
-+    /*
-+     * To avoid migration issues, we force virtio version 1 only when
-+     * legacy check is enabled in the new machine types (>= 5.1).
-+     */
-+    if (!virtio_legacy_check_disabled(virtio_dev)) {
-+        ccw_dev->force_revision_1 = true;
-+    }
- }
+-# OR the vhost-kernel and vhost-user values for simplicity
++# OR the vhost-kernel, vhost-vdpa and vhost-user values for simplicity
+ if test "$vhost_net" = ""; then
+   test "$vhost_net_user" = "yes" && vhost_net=yes
++  test "$vhost_net_vdpa" = "yes" && vhost_net=yes
+   test "$vhost_kernel" = "yes" && vhost_net=yes
+ fi
  
- static const TypeInfo vhost_vsock_ccw_info = {
+diff --git a/Kconfig.host b/Kconfig.host
+index 4af19bf70e..a9a55a9c31 100644
+--- a/Kconfig.host
++++ b/Kconfig.host
+@@ -24,6 +24,10 @@ config VHOST_USER
+     bool
+     select VHOST
+ 
++config VHOST_VDPA
++    bool
++    select VHOST
++
+ config VHOST_KERNEL
+     bool
+     select VHOST
+diff --git a/meson.build b/meson.build
+index b26c8bffc6..d36dd085b5 100644
+--- a/meson.build
++++ b/meson.build
+@@ -521,6 +521,7 @@ kconfig_external_symbols = [
+   'CONFIG_OPENGL',
+   'CONFIG_X11',
+   'CONFIG_VHOST_USER',
++  'CONFIG_VHOST_VDPA',
+   'CONFIG_VHOST_KERNEL',
+   'CONFIG_VIRTFS',
+   'CONFIG_LINUX',
 -- 
 MST
 
