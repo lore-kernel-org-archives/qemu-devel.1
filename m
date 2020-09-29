@@ -2,92 +2,86 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A649C4727C
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 20:04:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E230C4727C
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 20:06:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CFAF20679
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 20:04:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E7212076A
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 20:06:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="i4Ipab4/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CFAF20679
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TyQH5xj+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E7212076A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNLri-0006yS-6w
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 16:04:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45394)
+	id 1kNLtf-0000FD-FE
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 16:06:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53570)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1kNKzn-00089e-QM
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 15:09:04 -0400
-Received: from mail-pj1-x1035.google.com ([2607:f8b0:4864:20::1035]:51276)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1kNKzk-0002V0-KX
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 15:09:03 -0400
-Received: by mail-pj1-x1035.google.com with SMTP id l18so48985pjz.1
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 12:09:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=pvN8Om/RgBOsGrGBRFmFDJLUCxKzek2s7iLbr+SMo5Q=;
- b=i4Ipab4//u63l2OOiskP/9LaE4srJBFX7SM7OP+G7f872nADh6wrasqsWgzPOPjgwt
- o5ZWi4D8p7Kc/J48B8rjaJi/574gdUuqNtB0GWudPLUKunLUYJqXeTRBwN/e3GicU/U3
- lQDmkeDirak7USEHmqoJut/Wpwj9aRuXxHxh5kMaehQzNEgS7bUg+KdufrxB+bljamKV
- LgAaXFcvqyqPlMYz/cXbElZ+Ra6lSRexGB9TDk7dTlBznOhmMobMpy+ihwVwMMgIxTYS
- x2vk/cc5b9n8Yk+kSdEJNaHWPNxHd2f7Qj06cui87X6Zi+4/qNfr96c0HcqFBW7fE2Pi
- VCkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=pvN8Om/RgBOsGrGBRFmFDJLUCxKzek2s7iLbr+SMo5Q=;
- b=eWw3F4VcvHRj69VTgUHElo15dDRSr6zm8gfqJeoPlt4FeLLh8S+wxYfbOhfAkKzpAs
- fLgPWgARrORb1/qRGuqeaTGQ/gCmBgEO4eAKNazw3brtk2YFdiU7lMQBbul5s2uUXe10
- DW9tOOaC36rFhufoqdlgr5JTxINv6V7c5eeLeb7sCjj7y6Svxsqdj6FqN7gg14zZSH/C
- dQDHqq4XNkWn7+8bDiKebFeUYqckjnBmuyF/ZqfY/aOw2YEe0TYjWh/8WBJVwEP/eG5M
- +ev51r771Ec9TrrVT7pJ5Xjicg3n3fqlmNERAOeJkqsEu6gfjmI0hlAqs9sxqFKdfrm5
- /Y/A==
-X-Gm-Message-State: AOAM533ZUlY3usmZ9YGfUL5Dn8ytpF1eKrOIFMfXa4lfr9ZUPPuITNEv
- PKZTG9xQxRi3jyydi4TqWzJs24aCNdCeRw==
-X-Google-Smtp-Source: ABdhPJwwtZsoMhoLCFTRbjPDnhbOR+hd+3qNU+tpfsrb2oZlNVqEBZgGK5z1HdFIra4Gaq46V37R4g==
-X-Received: by 2002:a17:90a:4b0e:: with SMTP id
- g14mr2317124pjh.140.1601406539237; 
- Tue, 29 Sep 2020 12:08:59 -0700 (PDT)
-Received: from localhost.localdomain (122-116-72-36.HINET-IP.hinet.net.
- [122.116.72.36])
- by smtp.gmail.com with ESMTPSA id v8sm6003950pgg.58.2020.09.29.12.08.57
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 29 Sep 2020 12:08:58 -0700 (PDT)
-From: frank.chang@sifive.com
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [RFC v5 62/68] target/riscv: add "set round to odd" rounding mode
- helper function
-Date: Wed, 30 Sep 2020 03:04:37 +0800
-Message-Id: <20200929190448.31116-63-frank.chang@sifive.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200929190448.31116-1-frank.chang@sifive.com>
-References: <20200929190448.31116-1-frank.chang@sifive.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1035;
- envelope-from=frank.chang@sifive.com; helo=mail-pj1-x1035.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kNLgB-0002h4-Ee
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 15:52:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39962)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kNLg9-0008GV-AV
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 15:52:50 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601409167;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=gMdwuCpOh/nwgsUZha8J6mJLEGqGIPS0qTYJXjMijtQ=;
+ b=TyQH5xj+KdSN0ekPx5WNWXZp1zjiJf05cGudFnsd30zF/cOXfNBth+YX72r+2Pp24lpFDZ
+ tAJ0RbQ6lN24uMOn3qQjL+qsMxzt4eyE1E5Z8LpH4B3EaBXdlzhFBwg6ImNxNQRM1GSiqZ
+ lReiYOoyOM4m6umG7VKwgKZ2RpQhN+s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-538-USZBNIvZPDuob-6Qjivajg-1; Tue, 29 Sep 2020 15:52:41 -0400
+X-MC-Unique: USZBNIvZPDuob-6Qjivajg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE2491882FC7;
+ Tue, 29 Sep 2020 19:52:38 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DACB760C13;
+ Tue, 29 Sep 2020 19:52:30 +0000 (UTC)
+Date: Tue, 29 Sep 2020 13:52:30 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Subject: Re: [PATCH Kernel v24 0/8] Add UAPIs to support migration for VFIO
+ devices
+Message-ID: <20200929135230.6cfb24aa@x1.home>
+In-Reply-To: <20200929082702.GA181243@stefanha-x1.localdomain>
+References: <1590697854-21364-1-git-send-email-kwankhede@nvidia.com>
+ <20200929082702.GA181243@stefanha-x1.localdomain>
+Organization: Red Hat
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Received-SPF: pass client-ip=63.128.21.124;
+ envelope-from=alex.williamson@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 22:47:55
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,93 +94,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Frank Chang <frank.chang@sifive.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: cjia@nvidia.com, kvm@vger.kernel.org, aik@ozlabs.ru,
+ Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, Kirti Wankhede <kwankhede@nvidia.com>,
+ eauger@redhat.com, yi.l.liu@intel.com, eskultet@redhat.com,
+ ziye.yang@intel.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
+ felipe@nutanix.com, Ken.Xue@amd.com, kevin.tian@intel.com,
+ yan.y.zhao@intel.com, dgilbert@redhat.com, changpeng.liu@intel.com,
+ cohuck@redhat.com, zhi.a.wang@intel.com, jonathan.davies@nutanix.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Frank Chang <frank.chang@sifive.com>
+On Tue, 29 Sep 2020 09:27:02 +0100
+Stefan Hajnoczi <stefanha@gmail.com> wrote:
 
-helper_set_rounding_mode() is responsible for SIGILL, and "round to odd"
-should be an interface private to translation, so add a new independent
-helper_set_rod_rounding_mode().
+> On Fri, May 29, 2020 at 02:00:46AM +0530, Kirti Wankhede wrote:
+> > * IOCTL VFIO_IOMMU_DIRTY_PAGES to get dirty pages bitmap with
+> >   respect to IOMMU container rather than per device. All pages pinned by
+> >   vendor driver through vfio_pin_pages external API has to be marked as
+> >   dirty during  migration. When IOMMU capable device is present in the
+> >   container and all pages are pinned and mapped, then all pages are marked
+> >   dirty.  
+> 
+> From what I can tell only the iommu participates in dirty page tracking.
+> This places the responsibility for dirty page tracking on IOMMUs. My
+> understanding is that support for dirty page tracking is currently not
+> available in IOMMUs.
+> 
+> Can a PCI device implement its own DMA dirty log and let an mdev driver
+> implement the dirty page tracking using this mechanism? That way we
+> don't need to treat all pinned pages as dirty all the time.
 
-Signed-off-by: Frank Chang <frank.chang@sifive.com>
----
- target/riscv/fpu_helper.c | 5 +++++
- target/riscv/helper.h     | 1 +
- target/riscv/internals.h  | 1 +
- target/riscv/translate.c  | 5 +++++
- 4 files changed, 12 insertions(+)
+Look at the last patch in this series, there we define a mechanism
+whereby the act of a vendor driver pinning pages both marks those pages
+dirty and indicates a mode in the vfio type1 container where the scope
+of dirty pages is limited to those pages pinned by the driver.  The
+vfio_dma_rw() interface does the same.  We could clearly implement a
+more lightweight interface for this as well, one without pinning or
+memory access, but there are no proposed users for such an interface
+currently.  Thanks,
 
-diff --git a/target/riscv/fpu_helper.c b/target/riscv/fpu_helper.c
-index 3850146fec..b37e1d08a2 100644
---- a/target/riscv/fpu_helper.c
-+++ b/target/riscv/fpu_helper.c
-@@ -81,6 +81,11 @@ void helper_set_rounding_mode(CPURISCVState *env, uint32_t rm)
-     set_float_rounding_mode(softrm, &env->fp_status);
- }
- 
-+void helper_set_rod_rounding_mode(CPURISCVState *env)
-+{
-+    set_float_rounding_mode(float_round_to_odd, &env->fp_status);
-+}
-+
- static uint64_t do_fmadd_s(CPURISCVState *env, uint64_t rs1, uint64_t rs2,
-                            uint64_t rs3, int flags)
- {
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 2a31c7bba1..32edc77858 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -3,6 +3,7 @@ DEF_HELPER_2(raise_exception, noreturn, env, i32)
- 
- /* Floating Point - rounding mode */
- DEF_HELPER_FLAGS_2(set_rounding_mode, TCG_CALL_NO_WG, void, env, i32)
-+DEF_HELPER_FLAGS_1(set_rod_rounding_mode, TCG_CALL_NO_WG, void, env)
- 
- /* Floating Point - fused */
- DEF_HELPER_FLAGS_4(fmadd_s, TCG_CALL_NO_RWG, i64, env, i64, i64, i64)
-diff --git a/target/riscv/internals.h b/target/riscv/internals.h
-index 55bcd84e39..f0705a796b 100644
---- a/target/riscv/internals.h
-+++ b/target/riscv/internals.h
-@@ -39,6 +39,7 @@ enum {
-     RISCV_FRM_RUP = 3,  /* Round Up */
-     RISCV_FRM_RMM = 4,  /* Round to Nearest, ties to Max Magnitude */
-     RISCV_FRM_DYN = 7,  /* Dynamic rounding mode */
-+    RISCV_FRM_ROD = 8,  /* Round to Odd */
- };
- 
- static inline uint64_t nanbox_s(float32 f)
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index 2d12b8adc4..e6f4a662f5 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -30,6 +30,7 @@
- #include "exec/log.h"
- 
- #include "instmap.h"
-+#include "internals.h"
- 
- /* global register indices */
- static TCGv cpu_gpr[32], cpu_pc, cpu_vl;
-@@ -583,6 +584,10 @@ static void gen_set_rm(DisasContext *ctx, int rm)
-         return;
-     }
-     ctx->frm = rm;
-+    if (rm == RISCV_FRM_ROD) {
-+        gen_helper_set_rod_rounding_mode(cpu_env);
-+        return;
-+    }
-     t0 = tcg_const_i32(rm);
-     gen_helper_set_rounding_mode(cpu_env, t0);
-     tcg_temp_free_i32(t0);
--- 
-2.17.1
+Alex
 
 
