@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ADC6C4727D
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 04:16:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A227C4346E
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 04:18:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1FD3208FE
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 04:16:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F1AB6208FE
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 04:18:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BVVsXuFS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1FD3208FE
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vubq3Kn+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1AB6208FE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37766 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kN73t-0005q3-R1
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 00:16:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41740)
+	id 1kN76O-0007bI-3w
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 00:18:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42132)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kN73J-0005Lb-Ps
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 00:15:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50939)
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kN75S-00070B-59
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 00:17:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36795)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kN73I-0007qF-9N
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 00:15:45 -0400
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kN75Q-000827-3g
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 00:17:57 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601352943;
+ s=mimecast20190719; t=1601353075;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=zqfc7pEYcrycIJ+3SLi9v8SZpATga4YRGBj5/+dXTQo=;
- b=BVVsXuFS0gMGdjNMLTM+2k8a53jHlp0pw0N6oE3BeRDYShcs2LChwZjlZyQJOUJ7ekLAG3
- VfH+DVrebDFbSNg82T0cos6r8wTb4t8hnD1evTW0WoLlOFxHh767BQEevkpr7ffYCjGEoF
- bYAIF5QubmMT05li+K+awqWHsL2Etfs=
+ bh=qUCVyEj9616TrSsRAkmsCedp725vlnspnjwjW3DhTIw=;
+ b=Vubq3Kn+eyNUmPStvV+JDY9Uc8jji7bcxGeDx6WL1Tzjsg7kHF7pyNZPbwFvacUn2lnQO+
+ brxs0TpRKpyGFRyIX4h2R0bI6Z0pprzZMf0yCjTX1ZIC/bSBv/zlNIe3nTKuQWcUdP0vht
+ eHTRSttVu+0ap9nXlZcWPbQ3WCgizu8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-181-H9zi6hEXN1WC8PBw9xKAOw-1; Tue, 29 Sep 2020 00:15:40 -0400
-X-MC-Unique: H9zi6hEXN1WC8PBw9xKAOw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-26-MtHdT0YzMsuzgbutBMewMw-1; Tue, 29 Sep 2020 00:17:51 -0400
+X-MC-Unique: MtHdT0YzMsuzgbutBMewMw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CAD10107464E
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 04:15:39 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B523D1005E61
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 04:17:50 +0000 (UTC)
 Received: from localhost.localdomain (ovpn-119-55.rdu2.redhat.com
  [10.10.119.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2F495277D0;
- Tue, 29 Sep 2020 04:15:39 +0000 (UTC)
-Date: Tue, 29 Sep 2020 00:15:37 -0400
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3005C60C84;
+ Tue, 29 Sep 2020 04:17:50 +0000 (UTC)
+Date: Tue, 29 Sep 2020 00:17:48 -0400
 From: Cleber Rosa <crosa@redhat.com>
 To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v3 12/47] qapi: enforce import order/styling with isort
-Message-ID: <20200929041537.GJ700868@localhost.localdomain>
+Subject: Re: [PATCH v3 23/47] qapi: establish mypy type-checking baseline
+Message-ID: <20200929041748.GK700868@localhost.localdomain>
 References: <20200925002900.465855-1-jsnow@redhat.com>
- <20200925002900.465855-13-jsnow@redhat.com>
+ <20200925002900.465855-24-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200925002900.465855-13-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20200925002900.465855-24-jsnow@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="GlnCQLZWzqLRJED8"
+ protocol="application/pgp-signature"; boundary="2feizKym29CxAecD"
 Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=crosa@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=crosa@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 23:30:14
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 22:47:55
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
@@ -100,55 +100,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---GlnCQLZWzqLRJED8
+--2feizKym29CxAecD
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 24, 2020 at 08:28:25PM -0400, John Snow wrote:
-> While we're mucking around with imports, we might as well formalize the
-> style we use. Let's use isort to do it for us.
+On Thu, Sep 24, 2020 at 08:28:36PM -0400, John Snow wrote:
+> Fix two very minor issues, and then establish a mypy type-checking
+> baseline.
 >=20
-> force_sort_within_sections: Intermingles "from x" and "import x" style
-> statements, such that sorting is always performed strictly on the module
-> name itself.
+> Like pylint, this should be run from the folder above:
 >=20
-> force_grid_wrap=3D4: Four or more imports from a single module will force
-> the one-per-line style that's more git-friendly. This will generally
-> happen for 'typing' imports.
+>  > mypy --config-file=3Dqapi/mypy.ini qapi/
 >=20
-> multi_line_output=3D3: Uses the one-per-line indented style for long
-> imports.
+> This is designed and tested for mypy 0.770 or greater.
 >=20
-> include_trailing_comma: Adds a comma to the last import in a group,
-> which makes git conflicts nicer to deal with, generally.
->=20
-> Suggested-by: Cleber Rosa <crosa@redhat.com>
 > Signed-off-by: John Snow <jsnow@redhat.com>
+> Tested-by: Eduardo Habkost <ehabkost@redhat.com>
 
 Reviewed-by: Cleber Rosa <crosa@redhat.com>
 Tested-by: Cleber Rosa <crosa@redhat.com>
 
---GlnCQLZWzqLRJED8
+--2feizKym29CxAecD
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl9ytOkACgkQZX6NM6Xy
-CfN3AQ/8CDCZ+N9Qbm3ewlcjuTi8JsNz64EDRhCcfpg13pas8ssEFWWOOJ/NHEH0
-wN9GjpWMyYF/DS3X0tbiRmMfNS6NWdqLLve9njx0YWU6kmm3ma8BXwQlC/oheMM7
-xC3g9u+6nP1SZLqtM0s1HU+yzgIjVYeJDN6fa30mQMzFdEQtpyDOhsrLzgbCeqCd
-m4tHcIdRLiaQoeM1cUprQCyNdgd8D1r04Hf+Ekp1NwxHfLQo08Cb47TunQ/hu3VQ
-bbSfR9OtB0QxWpGWsgZVy5TpU+MDIEX9dOE/uFLcqYTjj2MVIoIuE/yu8VmGT7MN
-+srehfhlwD6HUO7qAFbkBHLeqL1gQBqoMesQEbhB+r2M7cSH9hWxMuVXG8IyRbsQ
-YjLCPpLomn/kyOiwayphFNT11hT36dJ9Su4mzT/cZq6ibYtu6MxfDwFl0BBntsYd
-eJKNvWD3FL4LzaBZEax58574G3VO6gLZ/VAjFKx96f1FbFivNvs+UKzq/77FaR3b
-++CtKlbolJ/m+bPOXOER+8WqJL4ymAzwbWVQzz3kvICwKy3oSN6rI8Iec+THPAC7
-nCUzIZE/AGxZl0K6tVshOW5wnRNinmKTzrjLeNVWjoJidCMdPB1VEauReHCagP0L
-79FXGUbQ7KB1ICu6C/ZTbzkB0RswBQtONI3utqri6xLqyvVCQ3U=
-=NE1O
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl9ytWwACgkQZX6NM6Xy
+CfPSnxAArFxccIzx/N2F2Ee0GCYqCZIIjQsdr3z3CzMX0Dn2Rs4nfV+c+eAuXKKu
+ueVtqHxJ2Yyq0ztw1YQgRQBBcvfnbzOaLSctaIWFqHIWGgk2BYjybp85WTLMIGZV
+VC7f/33seRa940yWqnKzTwTTPNcSwtViAK+ztldWUSJe3gQGlFYfuZ6/vQPFcmaC
+XcMiP7R6xJeMJaIbaZ9JlVLnjx0Elief/4IxsbMCo+q4yjppt+0VajTJ+SNqlapr
+NJ4YfNUAoDEYN/1CiaslxNSHAwErpylre7/DLEuzMxl4HGEb0do1s/US5OlURT/C
+6/FVVAgrzLsm3YmjAgngtiv2SZWasJsoAZhUnAGyfN6+w8t3WjJ7RoE7zkL0LjAo
+nJLMhMIPucxBMrziFyYh4H26WV24anbae8jxA4vRsRYLRJVWCE/U2rOH477HEPhk
+k8fzRFALrtNthr+1YXO6viBX5svwB/1bIY3k45HKO90xRvGQrV+9TEwpG1R5yKAe
+ogdL6G3evCqZZOlRadcLiEcD1CHYxcMQ+KSzuhyGpJTJgeIYRrFVC81HNZYMDEda
+iGRt2jtTVcQx8wj0/W6x81h3mfFWzH63HXAYjX6MIAFn4//BqLrvwVg9XPTz0i3i
+FwHgm8gzWp4A2nYJ2azKpPar+RJncwTOj1mGMgxNuuda1sW4XII=
+=RgL8
 -----END PGP SIGNATURE-----
 
---GlnCQLZWzqLRJED8--
+--2feizKym29CxAecD--
 
 
