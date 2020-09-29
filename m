@@ -2,87 +2,102 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.9 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8028C4727C
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 21:33:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C44A5C4727C
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 21:51:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C7292076A
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 21:33:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZREOQKvC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C7292076A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTPS id 29E522076D
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 21:51:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29E522076D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNNFm-0006WY-SY
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 17:33:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46398)
+	id 1kNNWq-0003ns-PI
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 17:51:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48664)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <oanderso@google.com>)
- id 1kNNEn-00064x-Ol
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 17:32:43 -0400
-Received: from mail-ed1-x532.google.com ([2a00:1450:4864:20::532]:33261)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <oanderso@google.com>)
- id 1kNNEl-0004Oo-LO
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 17:32:41 -0400
-Received: by mail-ed1-x532.google.com with SMTP id g4so8288711edk.0
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 14:32:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:from:date:message-id:subject:to:cc;
- bh=XA+mrk18J1sNU6j9klyWCYlrjyCnZeUHkmu4Ub5BuP4=;
- b=ZREOQKvCecquZR3RdjzbuCyVtrRH7ttRBXvN9uMx/9HoM8nHWkncQ+mZQ3eFP6/HG6
- Qv/sffZVVSwglGaCaXwqtQmRb6bv+XdedaXEVDqLqmZk+u1g/y6YiC+swrd6++ndRXRg
- FaTA1oKPB5GvZyhu3lVZQElpTLaqI1oS7L9BZmPcI1tlKxTwqJIXK8AeDmVycBK7wVmL
- Is/hGZm07x9C1dRqHOxj4LxzLTrXgdBKHV2f6mqzmbpeeagSHDp1Up81unB5AJncXYaN
- 4dIOBiGctfDE6y4LkvfB3iCn+FrmfrwcCm3xtfcmoFrfSD1tGZ8hPFlEEIFOeehrii2m
- ZNFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
- bh=XA+mrk18J1sNU6j9klyWCYlrjyCnZeUHkmu4Ub5BuP4=;
- b=ksZAG4HxaHdqZukvPHwf5BQl7Ma1FX65Jevzuj3+xon1JPALWZ43/qf+h3xyDqgpgI
- 1iseB7C88U574IeiP4mPF2cCD3ETSPyfJ2APutej7n/LjcJGVMBgZbdKJ2ljXAXq2mrt
- 9gdzoB6zJOJCLJqeZFbZPx2BtGxVgD5WNrLH6nt850m9NfgUBaOQOVUq4NOPzoY+ES6b
- 8LtfJuHTdDdi+9XYpESRprEemeLp3Y07/v0c+U9HZkSKmjrfpfQOkHNtBlfi8LX9Ng8P
- skkbpNqOIoBXwFZVkzZtfj8eWmYaGl7u1HaUr0TQ7/SjpDj3TCQNjJSiSHdTcaZ8+SVn
- Mrhg==
-X-Gm-Message-State: AOAM531pnJ7YBrwGRVDbrGUYFQd81ukezBiv0QItQlXvPMAkj6F2IsMK
- 3h5PjuA/a7Ld9TSE4CaiH65SVqLu3Y8WOZwNqHr7eEOT/1WzxA==
-X-Google-Smtp-Source: ABdhPJx2GAYo6MxlRvouHtQp8zRyaGoXpW9NrCJ/FRVDKECLMXXjcLS8iIX5bWXYGg+fH2VQ/Hrd99aLKNWMtUbQpWc=
-X-Received: by 2002:a05:6402:1656:: with SMTP id
- s22mr5718478edx.160.1601415156277; 
- Tue, 29 Sep 2020 14:32:36 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kNNRt-000171-ED; Tue, 29 Sep 2020 17:46:13 -0400
+Received: from wnew2-smtp.messagingengine.com ([64.147.123.27]:60791)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kNNRp-00061B-Ca; Tue, 29 Sep 2020 17:46:13 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+ by mailnew.west.internal (Postfix) with ESMTP id D5591D2D;
+ Tue, 29 Sep 2020 17:46:05 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+ by compute4.internal (MEProxy); Tue, 29 Sep 2020 17:46:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-type:in-reply-to; s=fm1; bh=lA5XqT/37hyVUNJWUmCw3mMk5Yn
+ x4eRaSz3tiJP8NwU=; b=wDs73sd5YE7PHBooQMugFgcjY/N4mUKm+Z8QQKyKXVD
+ jv7ER6f438fTxJtKgtwjkQwh7SyVmtaEFSLax0ymViN8gtbpgKtsvdnbZj73LuSF
+ QZZSva56qnKlDbbedoKrzFhbaN+rDXfuWKlSq8icguzNpUKZI78mFcp1ZdOPY8tU
+ zlDjW2hlE0cSOuCWK6DVvGa7IthgWC9I89cTaWSANH0U/WanYm0Vz10B/fZLgIV3
+ 6UMWuDpqS1Gkv7h0ROWhd/LEy+ypWOMS3Fdr+PN52VYsDloZV6qrsRKrMFFPQskV
+ fvYZWlTU3kePJ0AWpFTcF/CqluvsuWCO7HW2fwQEdpg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-type:date:from:in-reply-to
+ :message-id:mime-version:references:subject:to:x-me-proxy
+ :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=lA5XqT
+ /37hyVUNJWUmCw3mMk5Ynx4eRaSz3tiJP8NwU=; b=g9/mPZo+ZPXyg1D/IfaC8d
+ bbc02/2JyHTuBOeR4A8v59f5uwqNx34wtiSNbWo9uyVEC84AWdx79ect15nGDAQT
+ xskUWlGv7D4ihTboMVrwq97DrZf7TpLbMrbHc7Efc8Ys91uZhbamKLoVq+wEQzZd
+ gyZW0MYcbzlXCF6sURBhMmqKxk+6tH5mCC7wkOtT1Gg55THA2UHHbgI91S7NM5De
+ kKYPnb4YYw2X87vTlxWXRQH7Jxrbu64WefbzJvH/MRPRlDZs5toJZYqTSkO62ksY
+ auynnAlKnTXdn17us8Vm2SsXYHbasKXuN0H2qVLCplVSvRjd2Nd605XHVdNzWGLg
+ ==
+X-ME-Sender: <xms:G6tzXxTsc_Fx6fE5wEEc3o_0SyUqidDeJpMb2bovsdL9tHwAmio-2w>
+ <xme:G6tzX6yY2zYgsFyotooqA-pyEdRO5DLYTNFfktJun1bozA7vijANNJfi2_SBiknFV
+ PwOfj453DtVOsIVuq8>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrvdekgdduieehucetufdoteggodetrfdotf
+ fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+ uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+ cujfgurhepfffhvffukfhfgggtuggjsehgtderredttdejnecuhfhrohhmpefmlhgruhhs
+ ucflvghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtth
+ gvrhhnpeejgeduffeuieetkeeileekvdeuleetveejudeileduffefjeegfffhuddvudff
+ keenucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedtne
+ curfgrrhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
+X-ME-Proxy: <xmx:G6tzX23hmoQbYepHGHuR1inzYIrUdpOQTA0GVqiToaXz10K2hW0C5A>
+ <xmx:G6tzX5BV2TcJPrmByw_2T2OVG06Pgb0TY7CL6zIlUwsDMOrntCBShw>
+ <xmx:G6tzX6iSbAc3tMJVXHDUkgKxJT9Pf12mFkyk-gbnWlgtIrgUiV_qUA>
+ <xmx:HKtzX1P6LsOMpTZ9AjBIaIjKwoOHtOHlKaIqU93sB7TYBWouuJhERQPi9bYic_44>
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by mail.messagingengine.com (Postfix) with ESMTPA id 3B632328005E;
+ Tue, 29 Sep 2020 17:46:02 -0400 (EDT)
+Date: Tue, 29 Sep 2020 23:46:00 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v3 07/18] hw/block/nvme: add support for the get log page
+ command
+Message-ID: <20200929214600.GA377237@apples.localdomain>
+References: <20200706061303.246057-1-its@irrelevant.dk>
+ <20200706061303.246057-8-its@irrelevant.dk>
+ <CAFEAcA8dqNBm1YqLPjoJ=79K=6z=SxYHvcvnZiY3MJMvv1n1BQ@mail.gmail.com>
 MIME-Version: 1.0
-From: Owen Anderson <oanderso@google.com>
-Date: Tue, 29 Sep 2020 14:32:25 -0700
-Message-ID: <CAKs3XfJPrMGxdAouGCje3ppnWKA6fXpNaywQ5rj9u45VkPuUXg@mail.gmail.com>
-Subject: [RFC] Don't lookup full CPU state in the indirect branch fast path on
- AArch64 when running in user mode.
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::532;
- envelope-from=oanderso@google.com; helo=mail-ed1-x532.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -180
-X-Spam_score: -18.1
-X-Spam_bar: ------------------
-X-Spam_report: (-18.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-0.468,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
- USER_IN_DEF_SPF_WL=-7.5 autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="mP3DRpeJDSE+ciuQ"
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8dqNBm1YqLPjoJ=79K=6z=SxYHvcvnZiY3MJMvv1n1BQ@mail.gmail.com>
+Received-SPF: pass client-ip=64.147.123.27; envelope-from=its@irrelevant.dk;
+ helo=wnew2-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 17:46:07
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,85 +110,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
+ Dmitry Fomichev <Dmitry.Fomichev@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello,
 
-I would like to request feedback on the following patch, which I do
-not believe should be applied to master as-is.  The idea here is to
-avoid gathering the full CPU state in the fast path of an indirect
-branch lookup when running in user mode on a platform where the flags
-can only be changed in privileged mode.  I believe this is true on the
-AArch64 scenario that I care about, but clearly not true in general.
-I'm particularly seeking feedback on how to clean this up into a
-version that checks the correct necessary and sufficient conditions to
-allow all users that can benefit from it to do so.
+--mP3DRpeJDSE+ciuQ
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On the workload that I am targeting (aarch64 on x86), this patch
-reduces execution wall time by approximately 20%, and eliminates
-indirect branch lookups from the hot stack traces entirely.
+On Sep 29 14:11, Peter Maydell wrote:
+> On Mon, 6 Jul 2020 at 07:15, Klaus Jensen <its@irrelevant.dk> wrote:
+> >
+> > From: Klaus Jensen <k.jensen@samsung.com>
+> >
+> > Add support for the Get Log Page command and basic implementations of
+> > the mandatory Error Information, SMART / Health Information and Firmware
+> > Slot Information log pages.
+> >
+> > In violation of the specification, the SMART / Health Information log
+> > page does not persist information over the lifetime of the controller
+> > because the device has no place to store such persistent state.
+> >
+> > Note that the LPA field in the Identify Controller data structure
+> > intentionally has bit 0 cleared because there is no namespace specific
+> > information in the SMART / Health information log page.
+> >
+> > Required for compliance with NVMe revision 1.3d. See NVM Express 1.3d,
+> > Section 5.14 ("Get Log Page command").
+>=20
+> Hi; Coverity reports a potential issue in this code
+> (CID 1432413):
+>=20
+> > +static uint16_t nvme_smart_info(NvmeCtrl *n, NvmeCmd *cmd, uint32_t bu=
+f_len,
+> > +                                uint64_t off, NvmeRequest *req)
+> > +{
+> > +    uint64_t prp1 =3D le64_to_cpu(cmd->dptr.prp1);
+> > +    uint64_t prp2 =3D le64_to_cpu(cmd->dptr.prp2);
+> > +    uint32_t nsid =3D le32_to_cpu(cmd->nsid);
+> > +
+> > +    uint32_t trans_len;
+> > +    time_t current_ms;
+> > +    uint64_t units_read =3D 0, units_written =3D 0;
+> > +    uint64_t read_commands =3D 0, write_commands =3D 0;
+> > +    NvmeSmartLog smart;
+> > +    BlockAcctStats *s;
+> > +
+> > +    if (nsid && nsid !=3D 0xffffffff) {
+> > +        return NVME_INVALID_FIELD | NVME_DNR;
+> > +    }
+> > +
+> > +    s =3D blk_get_stats(n->conf.blk);
+> > +
+> > +    units_read =3D s->nr_bytes[BLOCK_ACCT_READ] >> BDRV_SECTOR_BITS;
+> > +    units_written =3D s->nr_bytes[BLOCK_ACCT_WRITE] >> BDRV_SECTOR_BIT=
+S;
+> > +    read_commands =3D s->nr_ops[BLOCK_ACCT_READ];
+> > +    write_commands =3D s->nr_ops[BLOCK_ACCT_WRITE];
+> > +
+> > +    if (off > sizeof(smart)) {
+> > +        return NVME_INVALID_FIELD | NVME_DNR;
+> > +    }
+>=20
+> Here we check for off > sizeof(smart), which means that we allow
+> off =3D=3D sizeof(smart)...
+>=20
+> > +
+> > +    trans_len =3D MIN(sizeof(smart) - off, buf_len);
+>=20
+> > +    return nvme_dma_read_prp(n, (uint8_t *) &smart + off, trans_len, p=
+rp1,
+> > +                             prp2);
+>=20
+> ...in which case the pointer we pass to nvme_dma_read_prp() will
+> be off the end of the 'smart' object.
+>=20
+> Now we are passing 0 as the trans_len, so I *think* this function
+> will not actually read the buffer (Coverity is not smart
+> enough to see this); so I could just close the Coverity issue as
+> a false-positive. But maybe there is a clearer-to-humans as well
+> as clearer-to-Coverity way to write this. What do you think ?
+>=20
+> > +static uint16_t nvme_fw_log_info(NvmeCtrl *n, NvmeCmd *cmd, uint32_t b=
+uf_len,
+> > +                                 uint64_t off, NvmeRequest *req)
+> > +{
+> > +    uint32_t trans_len;
+> > +    uint64_t prp1 =3D le64_to_cpu(cmd->dptr.prp1);
+> > +    uint64_t prp2 =3D le64_to_cpu(cmd->dptr.prp2);
+> > +    NvmeFwSlotInfoLog fw_log =3D {
+> > +        .afi =3D 0x1,
+> > +    };
+> > +
+> > +    strpadcpy((char *)&fw_log.frs1, sizeof(fw_log.frs1), "1.0", ' ');
+> > +
+> > +    if (off > sizeof(fw_log)) {
+> > +        return NVME_INVALID_FIELD | NVME_DNR;
+> > +    }
+> > +
+> > +    trans_len =3D MIN(sizeof(fw_log) - off, buf_len);
+> > +
+> > +    return nvme_dma_read_prp(n, (uint8_t *) &fw_log + off, trans_len, =
+prp1,
+> > +                             prp2);
+>=20
+> Coverity warns about the same structure here (CID 1432411).
+>=20
+> thanks
+> -- PMM
 
-Thank you,
+Hi Peter,
 
---Owen
+Thanks. This is somewhere in the middle of a bunch of patches I got
+merged I think, commit 94a7897c41db? I just requested Coverity access.
 
-From 3d96db17d3baacb92ef1bc5e70ef06b97d06a0ae Mon Sep 17 00:00:00 2001
-From: Owen Anderson <oanderso@google.com>
-Date: Tue, 29 Sep 2020 13:47:00 -0700
-Subject: [RFC] Don't lookup full CPU state in the indirect branch fast path on
- AArch64 when running in user mode.
+What happens is that nvme_dma_read_prp will call into nvme_map_prp which
+wont map anything because len is 0. This will cause the statically
+allocated QEMUSGList and QEMUIOVector in the request to be
+uninitialized. Returning from nvme_map_prp, nvme_dma_read_prp will
+notice that req->qsg.nsg is zero so it will default to the iov and move
+into qemu_iovec_{to,from}_buf(&req->iov, ...). In there we actually pass
+the NULL struct iovec, but since there is a __builtin_constant_p(bytes)
+condition at the end of it all, we never follow it.
 
-Most of the CPU state can't be changed in user mode, so this is useless work.
+Not "serious" I think, but definitely not good. We will of course fix
+this up.
 
-Signed-off-by: Owen Anderson <oanderso@google.com>
----
- include/exec/tb-lookup.h | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+@keith, do you agree with my analysis?
 
-diff --git a/include/exec/tb-lookup.h b/include/exec/tb-lookup.h
-index 9cf475bb03..f4ea0eb4c0 100644
---- a/include/exec/tb-lookup.h
-+++ b/include/exec/tb-lookup.h
-@@ -25,7 +25,15 @@ tb_lookup__cpu_state(CPUState *cpu, target_ulong
-*pc, target_ulong *cs_base,
-     TranslationBlock *tb;
-     uint32_t hash;
+--mP3DRpeJDSE+ciuQ
+Content-Type: application/pgp-signature; name="signature.asc"
 
-+#if !defined(TARGET_ARM) || !defined(CONFIG_USER_ONLY)
-     cpu_get_tb_cpu_state(env, pc, cs_base, flags);
-+#else
-+    if (is_a64(env)) {
-+      *pc = env->pc;
-+    } else {
-+      *pc = env->regs[15];
-+    }
-+#endif
-     hash = tb_jmp_cache_hash_func(*pc);
-     tb = qatomic_rcu_read(&cpu->tb_jmp_cache[hash]);
+-----BEGIN PGP SIGNATURE-----
 
-@@ -34,12 +42,19 @@ tb_lookup__cpu_state(CPUState *cpu, target_ulong
-*pc, target_ulong *cs_base,
+iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl9zqxUACgkQTeGvMW1P
+DemHNAf/WI8C19iRbSVbOYTVWG4ooRcB+ePLGgRYiEuc7ejmBzhKFRj3Z2jkm95Y
+MpNxvZD5gwzT7H27fmsDjTzi8Hgf2VQ4RKvmP4gQpBH08OyiMMyhKkrwHBZq0KIO
+MC9v9oBdd5XRiFWhx1jRFkleuZHvLJiXHmvBr6wb3VJvsE0CzTPW4gDvD4/NytTE
+5a66st1d6ymO8Vs3NerHxLE7BqzYwqRQYud+0pNlnUPlLgzaJvMZAxjhd8Wl/9X/
+4l9PSPYbgxJ7A55n4gc2NQfUcmKqCUdquUuFXonxnomQjTIfhFLy2LzfEn0m14nX
+tOv++VLM43b1C/XcIDTnGRkrmQ1xBw==
+=ryzi
+-----END PGP SIGNATURE-----
 
-     if (likely(tb &&
-                tb->pc == *pc &&
-+#if !defined(TARGET_ARM) || !defined(CONFIG_USER_ONLY)
-                tb->cs_base == *cs_base &&
-                tb->flags == *flags &&
-+#endif
-                tb->trace_vcpu_dstate == *cpu->trace_dstate &&
-                (tb_cflags(tb) & (CF_HASH_MASK | CF_INVALID)) == cf_mask)) {
-         return tb;
-     }
-+
-+#ifdef CONFIG_USER_ONLY
-+    cpu_get_tb_cpu_state(env, pc, cs_base, flags);
-+#endif
-+
-     tb = tb_htable_lookup(cpu, *pc, *cs_base, *flags, cf_mask);
-     if (tb == NULL) {
-         return NULL;
--- 
-2.28.0.709.gb0816b6eb0-goog
+--mP3DRpeJDSE+ciuQ--
 
