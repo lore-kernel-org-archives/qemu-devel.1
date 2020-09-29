@@ -2,100 +2,87 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16E77C4727C
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 14:42:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFA09C4727C
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 14:44:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3049D2074B
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 14:42:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C6222074B
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 14:44:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K3VKt83B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3049D2074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sa/EJoBr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C6222074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNGpN-00056Z-08
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 10:42:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57876)
+	id 1kNGrS-0006dF-D7
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 10:44:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58682)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kNGnv-0004UT-D1
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 10:40:31 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34043)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kNGqK-00069v-MC
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 10:43:00 -0400
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:44638)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kNGnt-0001rr-Ku
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 10:40:31 -0400
-Received: by mail-wr1-x443.google.com with SMTP id t10so5718774wrv.1
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 07:40:28 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kNGqJ-0002Bk-5I
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 10:43:00 -0400
+Received: by mail-lf1-x143.google.com with SMTP id d15so5786417lfq.11
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 07:42:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=tFD8QIhVLL4N2C4xaQPmVjay5jPu/SATrPbVDF6/thQ=;
- b=K3VKt83BGJuh1nJrWrmKyY+T1qkpaB45rFd5wDnlJsBKEIhNR+OG9DrbDuCrAeRaJm
- zUO909a3AS7pSWLT4YqhkXqeJrM8L6KJvE4F/fX/93zKannQ9ewoGm6nbDibm+ukj4oX
- HUJRWs+EaeY+yOm3gJqbSyv9rbAwFB1H5UBz4nOidtmZywFuWj5XP5BhTZmdVBo+pUhf
- ZGJG6WvD5o5jFqhSB3qkmaWHNubAaLh+nrHg/Wh9IyUNzE3jJJrdRHipIuRPsLFLZg7W
- JTMarJ14RWFfv6GrTX4TJSJJ9iqw1TjfOdpquw33ZbpwH5mq6qwb2wdj0geyhXxL8wUb
- b6ZQ==
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=mW4SBhPit+wlp8bCGOmHqsTWZEg7XTKs77eGhf9CREw=;
+ b=Sa/EJoBr+Bfey4OqqsNJfj/sfBWlCNckB58LKNL4AJqsFdOUUAZHuxSLCNbMeAI4dQ
+ CFqD2xR8eUdwCcioPWIFHiHKw1cSnH5ZS9I+DDklSHe2JmHwaXqwfi9ByX1dD7wiuOkG
+ NZnDrtmsfbA6ZNp+nFG2nbYdB6ugAEiPlVhKPWVr3e8O9HI34eteKIWODUXcR1oC003d
+ OOdf+jtOyRD6yMsEKfT/EQ2QOOXIUumMyBUIK+nWTg640wBUeIp5xnBWQIHHzIhz1NsK
+ Hh6QQ69+uuEW0ljcm7EBktB1kkC2sZXgkZ5jrA0Mq4kHoawOytlOyxu1RX0K4/XIeEDG
+ jV6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=tFD8QIhVLL4N2C4xaQPmVjay5jPu/SATrPbVDF6/thQ=;
- b=lBC4CKAYtunfyp5C/enzqfFYPBrWPSC148jse/yTlYcRHZB3Z14cq9wcyTr4TjO5rt
- qtQw9r9TtMB8i4ioDth2V5I17Rjh+W8Uj1dlpatvtJBUKhEskUFMjaIyh5JzsHa2WKJU
- bL8eHxUz0MR4WzhgUT4XBkCGqzTCqrUW5FG+jzrINJL4QIEYpEwzcahuQirVMrvtZApi
- Ie60cYbzjgIvvBdZbUcRY0o7Ko4Urb5EBw6Skf+WH3+7xHKgfIdS8oBv+PKLaqlkvSeN
- skjG0iIic1+fzRHOFY5RFTVv0cCQP+ipzZJBB4ls53lh++1TyAg4RYYFfHxZBaGS2rBE
- Kdcg==
-X-Gm-Message-State: AOAM5305J6EP+f4KTQWLiFmJt9GE2FSBGIkECOPvnQbBmM5LTC/DjJMD
- jYrGr00wkem1w5EQLJiyfe0=
-X-Google-Smtp-Source: ABdhPJw9sOPMXVL0gQq5dLGAtu1pJN6xGs0j5hMP44k3O8OueXfJcoXJCRVoHwQmlxAc4S5+dc/CVA==
-X-Received: by 2002:adf:e7c4:: with SMTP id e4mr4648846wrn.113.1601390427337; 
- Tue, 29 Sep 2020 07:40:27 -0700 (PDT)
-Received: from [192.168.1.36] (74.red-83-53-161.dynamicip.rima-tde.net.
- [83.53.161.74])
- by smtp.gmail.com with ESMTPSA id c16sm6745887wrx.31.2020.09.29.07.40.25
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 29 Sep 2020 07:40:26 -0700 (PDT)
-Subject: Re: [PATCH 15/16] target/mips/cpu: Do not allow system-mode use
- without input clock
-To: Igor Mammedov <imammedo@redhat.com>
-References: <20200928171539.788309-1-f4bug@amsat.org>
- <20200928171539.788309-16-f4bug@amsat.org>
- <20200929150154.04f77949@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <35db3210-8165-6fe8-c835-22970fb31c93@amsat.org>
-Date: Tue, 29 Sep 2020 16:40:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=mW4SBhPit+wlp8bCGOmHqsTWZEg7XTKs77eGhf9CREw=;
+ b=QbSzAxRTNUwypUd8L9QIxNDZVob+bDgOc1JjIddTylHxPyzqB9EbYtULIzQ1H0pyNe
+ 1j7oR1XlguNu6femsrXfL2sLkiRGfUY6dAoDP0cQBmZv2/GnQ2VFqCeryoEPR9TOOYLU
+ dr9+nPq4+N5ExVIrNDEHOncju2puYutcniAOyMrg9L44Wom1PjcwqlXXK49touCjguKG
+ Nwz3x+BoAGdFX1UiF1kv924ISszrq7AGw5cJTx8OP5B/+zt4GGRESIZeG0qxHsL96pB2
+ hnaM1OFnQ//hdoeNiy/SKXcj7q8EpR1ROj2Je/KnmZGys1Bom7ffy8kErx0ACpjpxeFE
+ N3eg==
+X-Gm-Message-State: AOAM531lpJyAj1ilmp55iZapd6NhaaYNdI6RMeVuwENuq64dKlcN83Dl
+ XidUpA4cOLBgl3Bv1SvxpcgO9GpniveH0ixaH8U=
+X-Google-Smtp-Source: ABdhPJywg0l7U9yEoq/hvyA80AUYzIvOM5ykM1OI9c42SN99/S43f+ltCHMLcu7/+FHvratr63oiXF5jl8V5DammUUs=
+X-Received: by 2002:a19:560a:: with SMTP id k10mr1251436lfb.599.1601390577156; 
+ Tue, 29 Sep 2020 07:42:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200929150154.04f77949@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+References: <20200929143654.518157-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20200929143654.518157-1-marcandre.lureau@redhat.com>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Tue, 29 Sep 2020 22:42:49 +0800
+Message-ID: <CAE2XoE9x4ovaUaNJhh=-deYqYJKQC68wQaACQbnC28EZoeEqUg@mail.gmail.com>
+Subject: Re: [PATCH v2] build-sys: fix git version from -version
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000007f87e805b074cc5d"
+Received-SPF: pass client-ip=2a00:1450:4864:20::143;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x143.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -15
-X-Spam_score: -1.6
-X-Spam_bar: -
-X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.199, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,111 +95,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>,
- Huacai Chen <zltjiangshi@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Paul Burton <paulburton@kernel.org>,
- "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Cleber Rosa <crosa@redhat.com>, Huacai Chen <chenhc@lemote.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Reply-To: luoyonggang@gmail.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, lersek@redhat.com,
+ qemu-level <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/29/20 3:01 PM, Igor Mammedov wrote:
-> On Mon, 28 Sep 2020 19:15:38 +0200
-> Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
-> 
->> Now than all QOM users provides the input clock, do not allow
->> using a CPU core without its input clock connected on system-mode
->> emulation. For user-mode, keep providing a fixed 200 MHz clock,
->> as it used by the RDHWR instruction (see commit cdfcad788394).
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->> Cc: Igor Mammedov <imammedo@redhat.com>
->>
->> We need the qtest check for tests/qtest/machine-none-test.c
->> which instanciate a CPU with the none machine. Igor, is it
->> better to remove the MIPS targets from the test cpus_map[]?
-> 
-> I don't get idea, could you rephrase/elaborate?
+--0000000000007f87e805b074cc5d
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-cpu_class_init sets:
+On Tue, Sep 29, 2020 at 10:38 PM <marcandre.lureau@redhat.com> wrote:
+>
+> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>
+> Typo introduced with the script.
+>
+> Fixes: 2c273f32d3 ("meson: generate qemu-version.h")
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/qemu-version.sh | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/qemu-version.sh b/scripts/qemu-version.sh
+> index 03128c56a2..3f6e7e6d41 100755
+> --- a/scripts/qemu-version.sh
+> +++ b/scripts/qemu-version.sh
+> @@ -9,7 +9,7 @@ version=3D"$3"
+>  if [ -z "$pkgversion" ]; then
+>      cd "$dir"
+>      if [ -e .git ]; then
+> -        pkgversion=3D$(git describe --match 'v*' --dirty | echo "")
+> +        pkgversion=3D$(git describe --match 'v*' --dirty) || :
+>      fi
+>  fi
+>
+> --
+> 2.26.2
+>
+>
+Maybe this script can convert to python? as we are converting to
+meson+python,
+for less care about different bash/zsh/xsh differences?
 
-    /*
-     * Reason: CPUs still need special care by board code: wiring up
-     * IRQs, adding reset handlers, halting non-first CPUs, ...
-     */
-    dc->user_creatable = false;
+--
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
 
-but the CPUs are created via another path in vl.c:
+--0000000000007f87e805b074cc5d
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-        current_machine->cpu_type = parse_cpu_option(cpu_option);
+<div dir=3D"ltr"><br><br>On Tue, Sep 29, 2020 at 10:38 PM &lt;<a href=3D"ma=
+ilto:marcandre.lureau@redhat.com">marcandre.lureau@redhat.com</a>&gt; wrote=
+:<br>&gt;<br>&gt; From: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcan=
+dre.lureau@redhat.com">marcandre.lureau@redhat.com</a>&gt;<br>&gt;<br>&gt; =
+Typo introduced with the script.<br>&gt;<br>&gt; Fixes: 2c273f32d3 (&quot;m=
+eson: generate qemu-version.h&quot;)<br>&gt; Signed-off-by: Marc-Andr=C3=A9=
+ Lureau &lt;<a href=3D"mailto:marcandre.lureau@redhat.com">marcandre.lureau=
+@redhat.com</a>&gt;<br>&gt; ---<br>&gt; =C2=A0scripts/qemu-version.sh | 2 +=
+-<br>&gt; =C2=A01 file changed, 1 insertion(+), 1 deletion(-)<br>&gt;<br>&g=
+t; diff --git a/scripts/qemu-version.sh b/scripts/qemu-version.sh<br>&gt; i=
+ndex 03128c56a2..3f6e7e6d41 100755<br>&gt; --- a/scripts/qemu-version.sh<br=
+>&gt; +++ b/scripts/qemu-version.sh<br>&gt; @@ -9,7 +9,7 @@ version=3D&quot=
+;$3&quot;<br>&gt; =C2=A0if [ -z &quot;$pkgversion&quot; ]; then<br>&gt; =C2=
+=A0 =C2=A0 =C2=A0cd &quot;$dir&quot;<br>&gt; =C2=A0 =C2=A0 =C2=A0if [ -e .g=
+it ]; then<br>&gt; - =C2=A0 =C2=A0 =C2=A0 =C2=A0pkgversion=3D$(git describe=
+ --match &#39;v*&#39; --dirty | echo &quot;&quot;)<br>&gt; + =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0pkgversion=3D$(git describe --match &#39;v*&#39; --dirty) || :=
+<br>&gt; =C2=A0 =C2=A0 =C2=A0fi<br>&gt; =C2=A0fi<br>&gt;<br>&gt; --<br>&gt;=
+ 2.26.2<br>&gt;<br>&gt;<br>Maybe this script can convert to python? as we a=
+re converting to meson+python,<div>for less care about different bash/zsh/x=
+sh differences?<br><br>--<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=
+=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
+=A0 sincerely,<br>Yonggang Luo</div></div>
 
-The machine-none-test assumes CPU objects are user-creatable.
-
-With this patch I enforce MIPS CPU to have an input clock
-connected, so they are not user-creatable anymore.
-
-I tried this code ...:
-
---- a/target/mips/cpu.c
-+++ b/target/mips/cpu.c
-@@ -229,7 +229,11 @@ static const TypeInfo mips_cpu_type_info = {
- static void mips_cpu_cpudef_class_init(ObjectClass *oc, void *data)
- {
-     MIPSCPUClass *mcc = MIPS_CPU_CLASS(oc);
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-     mcc->cpu_def = data;
-+    /* Reason: clock need to be wired up */
-+    dc->user_creatable = false;
- }
-
-... but it is ignored, the CPU can still be created.
-
-Not sure how to handle this.
-
-> 
->> ---
->>  target/mips/cpu.c | 8 ++++++++
->>  1 file changed, 8 insertions(+)
->>
->> diff --git a/target/mips/cpu.c b/target/mips/cpu.c
->> index 2f75216c324..cc4ee75af30 100644
->> --- a/target/mips/cpu.c
->> +++ b/target/mips/cpu.c
->> @@ -25,6 +25,7 @@
->>  #include "kvm_mips.h"
->>  #include "qemu/module.h"
->>  #include "sysemu/kvm.h"
->> +#include "sysemu/qtest.h"
->>  #include "exec/exec-all.h"
->>  #include "hw/qdev-clock.h"
->>  #include "hw/qdev-properties.h"
->> @@ -159,11 +160,18 @@ static void mips_cpu_realizefn(DeviceState *dev, Error **errp)
->>      Error *local_err = NULL;
->>  
->>      if (!clock_get(cs->clock)) {
->> +#ifdef CONFIG_USER_ONLY
->>          /*
->>           * Initialize the frequency to 200MHz in case
->>           * the clock remains unconnected.
->>           */
->>          clock_set_hz(cs->clock, 200000000);
->> +#else
->> +        if (!qtest_enabled()) {
->> +            error_setg(errp, "CPU clock must be connected to a clock source");
->> +            return;
->> +        }
->> +#endif
->>      }
->>      mips_cpu_clk_update(cs);
->>  
-> 
+--0000000000007f87e805b074cc5d--
 
