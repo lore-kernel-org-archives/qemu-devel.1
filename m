@@ -2,98 +2,135 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2D61C4727C
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 17:48:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EB28C4727C
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 17:49:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5407D207F7
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 17:48:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6351F208B8
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 17:49:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rfQTHgqf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5407D207F7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h1vzcNYO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6351F208B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNJk0-0007L4-SS
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 13:48:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52218)
+	id 1kNJkw-00081R-6e
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 13:49:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52308)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <tcminyard@gmail.com>)
- id 1kNJiF-0006ig-FJ
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 13:46:51 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:35742)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <tcminyard@gmail.com>)
- id 1kNJiD-0007SK-R8
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 13:46:51 -0400
-Received: by mail-oi1-x244.google.com with SMTP id w16so6401840oia.2
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 10:46:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:date:from:to:cc:subject:message-id:reply-to:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=bZP3LWX30hqzwtE+yAjH7hbK7GkTw2dhTd2Z4ZhRr6w=;
- b=rfQTHgqfOwUjlGuQI7tySQQaGUjiLNxUfTYzvu/F7w9shsVH7lhjmPMLemlqK2hvnp
- BqQ3HvvRximPFXRD+84n/LwURApH/Nts9uGwI4l/s4WRm4sh7yy+OO3vGhbAxMu9cQdg
- l/AmsDTdXjVvJhFEcNCNEKqrPoffy8Angy2HEI2ycsAxEma5P0xY4EVvLjECSZ/+xBZo
- Yp1otPzo5cFTkExXwT1VDt5ituNGWvnCIOIvdfuSHp+MbdffIKoRcJEIIxLFAhqJAY7P
- wNxuYq4C/XUy3Kxz6NT0U8+DcgD8v7AnjRWazDIFG0SGHMrNlVhAbh08SvHYG1+K7ALn
- /Luw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
- :reply-to:references:mime-version:content-disposition:in-reply-to
- :user-agent;
- bh=bZP3LWX30hqzwtE+yAjH7hbK7GkTw2dhTd2Z4ZhRr6w=;
- b=krTGt4lmILeqgURjwAd7ncXm+AEzHOaGU1jAMlUOfTbc6/eLlxbath/QbBliWGBzWg
- BAfKjgEuewhOY0KMIyyRC6cMSKUGN1i79yPvtqVf09AKMUcuLdFCXyzJTRGKWY4yeEqR
- if3rApYMCbWdHnIYRDXgiBNT4h7W0c1tNd5j2ONb4ewU6sZOACheODIEtuRK9ZCbO+6y
- XhpLLybkcGIU2GRr1+TkKZWqD6usNt4RAAjqXxGsS8zzktjA8GdwMMHbg7FuTz4ZFC96
- E8hyYsekqb6eh7oFpLxHkA7KhIahejq6RV5FmEFnAA9AdwYuVim7b5cTLxa2V0kfWlJh
- XKSA==
-X-Gm-Message-State: AOAM530ww5HBmrBpFlGEwl/4HCcWRh0tVb/TMAcg1eJC0E8b2ECQIb8F
- 605GGWLJeq7b1LsMZmglVw==
-X-Google-Smtp-Source: ABdhPJy/ev2zt14RzeQQzLC36UdCWprl4ZmPxaDUfAhksKKqzb4phfY3PR6W1pCz+/ImWOEGPgSkRw==
-X-Received: by 2002:aca:1a09:: with SMTP id a9mr3182513oia.164.1601401607975; 
- Tue, 29 Sep 2020 10:46:47 -0700 (PDT)
-Received: from serve.minyard.net (serve.minyard.net. [2001:470:b8f6:1b::1])
- by smtp.gmail.com with ESMTPSA id l23sm1145920otk.79.2020.09.29.10.46.46
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 29 Sep 2020 10:46:46 -0700 (PDT)
-Received: from minyard.net (unknown
- [IPv6:2001:470:b8f6:1b:ad7b:1513:3f4c:af82])
- by serve.minyard.net (Postfix) with ESMTPSA id 8420518003B;
- Tue, 29 Sep 2020 17:46:45 +0000 (UTC)
-Date: Tue, 29 Sep 2020 12:46:44 -0500
-From: Corey Minyard <minyard@acm.org>
-To: Havard Skinnemoen <hskinnemoen@google.com>
-Subject: Re: [RFC 0/3] QEMU as IPMI BMC emulator
-Message-ID: <20200929174644.GW3674@minyard.net>
-References: <20200929003916.4183696-1-hskinnemoen@google.com>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kNJib-00071o-28
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 13:47:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28591)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kNJiY-0007Vn-ME
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 13:47:12 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601401629;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=BupxoHdjbL2TpBh8a0BYS6QeDupOHyjF9X61wUjeE88=;
+ b=h1vzcNYOWfnqQc7aW06N0wK3L0WxlbqCgymHa4ALa42jeO4W4/mfqp9SncKn1qYnc6onsk
+ n2et2gaNYj8L5AfwU4AdayHLhJ76gQ4DVjuboNaHH6aywPLUxEjA2BV4RyjfmZCiFI3mY2
+ Cy209GzzAlFQX0MhDZYauUDaRKAI8k8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-347-mhlVNHKxNqaAOdDfy24XWg-1; Tue, 29 Sep 2020 13:47:06 -0400
+X-MC-Unique: mhlVNHKxNqaAOdDfy24XWg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97FB91084C9B;
+ Tue, 29 Sep 2020 17:47:05 +0000 (UTC)
+Received: from [10.3.112.208] (ovpn-112-208.phx2.redhat.com [10.3.112.208])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 159297BE49;
+ Tue, 29 Sep 2020 17:46:57 +0000 (UTC)
+Subject: Re: [PATCH 1/4] keyval: Parse help options
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200929172649.158086-1-kwolf@redhat.com>
+ <20200929172649.158086-2-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Autocrypt: addr=eblake@redhat.com; keydata=
+ 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
+Organization: Red Hat, Inc.
+Message-ID: <b28cad72-d344-78fa-fc07-b4a6a63fbc50@redhat.com>
+Date: Tue, 29 Sep 2020 12:46:55 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200929003916.4183696-1-hskinnemoen@google.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
- envelope-from=tcminyard@gmail.com; helo=mail-oi1-x244.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -15
-X-Spam_score: -1.6
-X-Spam_bar: -
-X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.199,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+In-Reply-To: <20200929172649.158086-2-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="w2YOyLmZAwuYhMOSNcpdwm64oy3c16HLh"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 02:22:44
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,73 +143,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: minyard@acm.org
-Cc: Avi.Fishman@nuvoton.com, venture@google.com, qemu-devel@nongnu.org,
- wuhaotsh@google.com, kfting@nuvoton.com, clg@kaod.org, joel@jms.id.au
+Cc: mreitz@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 28, 2020 at 05:39:13PM -0700, Havard Skinnemoen via wrote:
-> This series briefly documents the existing IPMI device support for main
-> processor emulation, and goes on to propose a similar device structure to
-> emulate IPMI responder devices in BMC machines. This would allow a qemu
-> instance running BMC firmware to serve as an external BMC for a qemu instance
-> running server software.
-> 
-> RFC only at this point because the series does not include actual code to
-> implement this. I'd appreciate some initial feedback on
-> 
-> 1. Whether anyone else is interested in something like this.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--w2YOyLmZAwuYhMOSNcpdwm64oy3c16HLh
+Content-Type: multipart/mixed; boundary="lY49hzTHYNWwghw4gYUqNOQw0pzjHPI1A";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, mreitz@redhat.com
+Message-ID: <b28cad72-d344-78fa-fc07-b4a6a63fbc50@redhat.com>
+Subject: Re: [PATCH 1/4] keyval: Parse help options
+References: <20200929172649.158086-1-kwolf@redhat.com>
+ <20200929172649.158086-2-kwolf@redhat.com>
+In-Reply-To: <20200929172649.158086-2-kwolf@redhat.com>
 
-Though I've had this idea once or twice, I'm not working on real BMCs,
-so I didn't really pursue anything.  It's a good idea, I think, for the
-BMC developers, and possibly for system developers trying to do
-integration testing between BMCs and system software.
+--lY49hzTHYNWwghw4gYUqNOQw0pzjHPI1A
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-You will need to tie in to more emulation than just the BMC side of the
-system interface registers.  You will also need to tie into GPIOs or
-whatnot for things like host reset.
+On 9/29/20 12:26 PM, Kevin Wolf wrote:
+> This adds a new parameter 'help' to keyval_parse() that enables parsing
+> of help options. If NULL is passed, the function behaves the same as
+> before. But if a bool pointer is given, it contains the information
+> whether an option "help" without value was given (which would otherwise
+> either result in an error or be interpreted as the value for an implied
+> key).
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
 
-Power handling is going to be a bit weird.  The OpenIPMI emulator
-starts/stops qemu based upon power control.  It might be possible to do
-the same thing in this sort of emulator.
+> +++ b/util/keyval.c
 
-You may need extensions to the protocol, and that's fine.  I can't think
-of any at the moment, but you never know.
+Might be nice to see this before the testsuite changes by tweaking the
+git orderfile.
 
-> 2. Completeness (i.e. anything that could be explained in more detail in the
->    docs).
+> @@ -166,7 +166,7 @@ static QObject *keyval_parse_put(QDict *cur,
+>   * On failure, return NULL.
+>   */
+>  static const char *keyval_parse_one(QDict *qdict, const char *params,
+> -                                    const char *implied_key,
+> +                                    const char *implied_key, bool *help,
+>                                      Error **errp)
+>  {
+>      const char *key, *key_end, *s, *end;
+> @@ -179,6 +179,16 @@ static const char *keyval_parse_one(QDict *qdict, co=
+nst char *params,
+> =20
+>      key =3D params;
+>      len =3D strcspn(params, "=3D,");
+> +
+> +    if (help && key[len] !=3D '=3D' && !strncmp(key, "help", len)) {
 
-It's certainly a good start.  The second patch would be useful right
-now.  There are more details, of course, but I think that's covered in
-the man page under the various devices.
+What if the user typed "help,," to get "help," as the value of the
+implied key?
 
-Thanks,
+> +        *help =3D true;
+> +        s =3D key + len;
+> +        if (key[len] !=3D '\0') {
+> +            s++;
+> +        }
+> +        return s;
+> +    }
+> +
+>      if (implied_key && len && key[len] !=3D '=3D') {
+>          /* Desugar implied key */
+>          key =3D implied_key;
+> @@ -388,21 +398,33 @@ static QObject *keyval_listify(QDict *cur, GSList *=
+key_of_cur, Error **errp)
+> =20
+>  /*
+>   * Parse @params in QEMU's traditional KEY=3DVALUE,... syntax.
+> + *
+>   * If @implied_key, the first KEY=3D can be omitted.  @implied_key is
+>   * implied then, and VALUE can't be empty or contain ',' or '=3D'.
+> + *
+> + * If @help is given, an option "help" without a value isn't added to
+> + * the resulting dictionary, but instead sets @help to true. If no
+> + * help option is found, @help is false on return. All other options
+> + * are parsed and returned normally so that context specific help can
+> + * be printed.
+> + *
+>   * On success, return a dictionary of the parsed keys and values.
+>   * On failure, store an error through @errp and return NULL.
+>   */
+>  QDict *keyval_parse(const char *params, const char *implied_key,
+> -                    Error **errp)
+> +                    bool *help, Error **errp)
+>  {
+>      QDict *qdict =3D qdict_new();
+>      QObject *listified;
+>      const char *s;
+> =20
+> +    if (help) {
+> +        *help =3D false;
+> +    }
+> +
+>      s =3D params;
+>      while (*s) {
+> -        s =3D keyval_parse_one(qdict, s, implied_key, errp);
+> +        s =3D keyval_parse_one(qdict, s, implied_key, help, errp);
+>          if (!s) {
+>              qobject_unref(qdict);
+>              return NULL;
+>=20
 
--corey
+I like it, but wonder if you are missing one corner case.
 
-> 3. Naming, and whether 'specs' is the right place to put this.
-> 4. Whether it's OK to enable the blockdiag sphinx extension (if not, I'll just
->    toss the block diagrams and turn the docs into walls of text).
-> 
-> If this seems reasonable, I'll start working with one of my team mates on
-> implementing the common part, as well as the Nuvoton-specific responder device.
-> Possibly also an Aspeed device.
-> 
-> Havard Skinnemoen (3):
->   docs: enable sphinx blockdiag extension
->   docs/specs: IPMI device emulation: main processor
->   docs/specs: IPMI device emulation: BMC
-> 
->  docs/conf.py         |   5 +-
->  docs/specs/index.rst |   1 +
->  docs/specs/ipmi.rst  | 183 +++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 188 insertions(+), 1 deletion(-)
->  create mode 100644 docs/specs/ipmi.rst
-> 
-> -- 
-> 2.28.0.709.gb0816b6eb0-goog
-> 
-> 
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--lY49hzTHYNWwghw4gYUqNOQw0pzjHPI1A--
+
+--w2YOyLmZAwuYhMOSNcpdwm64oy3c16HLh
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl9zcxAACgkQp6FrSiUn
+Q2pFEQf9EOTNu/bqCQvFIf25aLN2iqRaD45aJvGMPUf2BlIIULPY0Z2HUcsVJQvy
+1U8NsqcWrSIFSLnTd5+i9EUY+fW0LmkntYoNPj1Oc4TLvWbZWAvGrxFyut1/d41c
+G8sEPu0Yg3d+jklG+PItwkJr/Q/BYdutir0szwc1Ytko7naCsK8FdDrrkJKoVfKb
+r92q66sNPruHEgoCL/pcmPNKTssh5KIaKPqmaFBXh11lJUMFJp0dbZm0HxqiE+R0
+WiiT/Dd3DqC4nnR35a9HOEciXHctzRcCwyV1OCZKq7lZEZzi3/LTOHm94RfDp00F
+EJC0KMVinTFC0QDSyle6e1Vc3Sgplg==
+=h6cY
+-----END PGP SIGNATURE-----
+
+--w2YOyLmZAwuYhMOSNcpdwm64oy3c16HLh--
+
 
