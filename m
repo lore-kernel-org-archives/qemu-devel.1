@@ -2,106 +2,80 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1652C4727C
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 22:58:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98FFEC4727C
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 23:11:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B55F2083B
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 22:58:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R5Jwe8wi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B55F2083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CE24D2072E
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 23:11:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE24D2072E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36268 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNOZt-0004EQ-Vb
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 18:58:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32862)
+	id 1kNOmq-0007YV-Hd
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 19:11:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37720)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kNOMt-0006gP-Cu
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 18:45:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49122)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kNOMq-0004gj-Sr
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 18:45:07 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601419504;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=LDAC3FC/MEaPD4LUvl2bkbirLPCAiqLo/YtDEMBCclM=;
- b=R5Jwe8wix09pVIeYCw+Jtdse4VcVJmmF9cw4E+SJX+F0bWR6wQQdZChe0K5knG54Yg2Nxo
- jyaybuhtCBRKXg1HO19DuFYD/LCbVA0HiZhWtSCBl8YsDHWOWUV4MqXFoUJJ5vHhxmEPks
- JU8Fh0nxWNAAk5pkuMsKessdg42gptQ=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-xmtR7E0UNbO2yWjc0OCAAw-1; Tue, 29 Sep 2020 18:45:00 -0400
-X-MC-Unique: xmtR7E0UNbO2yWjc0OCAAw-1
-Received: by mail-wr1-f70.google.com with SMTP id v5so2326292wrs.17
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 15:45:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=LDAC3FC/MEaPD4LUvl2bkbirLPCAiqLo/YtDEMBCclM=;
- b=Xcg6wliLArvw9SzekdtWBlTYiiHYO4uWqEy3xrreBe90LafLVedwnCpNLNzzmPVY4l
- SCFoDIIBGiQtLlm3ChnD/USEypJI8kJGZg2z6AxJ9r9mHVTvUSlI4b+dqycCEwpSlI66
- fE6dmv0hoIaYBy7MrMoJxqhCiMecCFGhWlPIAKcZJGB/tWroGXi/BpxvYcavLkJ3cL7d
- +ghDRaDNeaiJKw904Pw5j8bxaSD5uUTz0dLna1KXoq80Yud68jh3KftwwS1dtJikxO/K
- 7ozMtl4z/F51AE9K32L88YnFU1CvVx2Rs5sXC7LypXEanqsIh2rEs2LQLE31byoKWnq3
- RGig==
-X-Gm-Message-State: AOAM531W8W8S4r14KaPyVR+EhGQ5dRly99tPGx0b8J29k0uBtv2MLN3N
- GjXyrfEWtM4DDNAB1/wtJTUf2TLpBgEMID/EJvjgECsHmb0PW4/E4D3vzFwJjdTR+ZA20HIthiq
- 9ccdLQMKEKchDrpU=
-X-Received: by 2002:a5d:43cf:: with SMTP id v15mr6808328wrr.269.1601419499107; 
- Tue, 29 Sep 2020 15:44:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwH+Rg1xe9gd9DlTZs7Ar3VzsQvPodRcCF6Ci4iIpufBqC6fONYRBje8t5F8NeD4ocLB3USiA==
-X-Received: by 2002:a5d:43cf:: with SMTP id v15mr6808303wrr.269.1601419498855; 
- Tue, 29 Sep 2020 15:44:58 -0700 (PDT)
-Received: from x1w.redhat.com (74.red-83-53-161.dynamicip.rima-tde.net.
- [83.53.161.74])
- by smtp.gmail.com with ESMTPSA id 76sm7666468wma.42.2020.09.29.15.44.57
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 29 Sep 2020 15:44:58 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 12/12] .travis.yml: Add a KVM-only Aarch64 job
-Date: Wed, 30 Sep 2020 00:43:55 +0200
-Message-Id: <20200929224355.1224017-13-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200929224355.1224017-1-philmd@redhat.com>
-References: <20200929224355.1224017-1-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kNOlm-0006gM-PN
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 19:10:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44028)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kNOlj-0007mS-RC
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 19:10:50 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kNOlh-0007b5-7I
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 23:10:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 309B82E80DB
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 23:10:45 +0000 (UTC)
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 22:47:55
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 29 Sep 2020 23:00:48 -0000
+From: Alex Williamson <1897481@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: alex-l-williamson sergey-kukunin
+X-Launchpad-Bug-Reporter: Sergiy K (sergey-kukunin)
+X-Launchpad-Bug-Modifier: Alex Williamson (alex-l-williamson)
+References: <160123953126.1246.10707501292033522741.malonedeb@gac.canonical.com>
+Message-Id: <160142044897.23147.9277662326800857447.malone@gac.canonical.com>
+Subject: [Bug 1897481] Re: qemu crashes with VGA pass-through, e-GPU,
+ nvidia 1060
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="d685c0a40836eb9844ed835c9700f20633c1d7af"; Instance="production"
+X-Launchpad-Hash: 0524e26e9e20802c20637321def9bcf1fc638972
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 19:10:45
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -66
+X-Spam_score: -6.7
+X-Spam_bar: ------
+X-Spam_report: (-6.7 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.199, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -110,78 +84,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1897481 <1897481@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a job to build QEMU on Aarch64 with TCG disabled, so
-this configuration won't bitrot over time.
+Please attach output from `dmesg` and `sudo lspci -vvv`, both from the
+host.  Laptops typically don't provide sufficient resources for GPUs
+attached like this, so my guess is that we're trying to add a quirk on
+top of a BAR that isn't mapped.  If that's the case, the following host
+kernel options might help: pci=3Drealloc,assign-busses,nocrs
 
-We explicitly modify default-configs/aarch64-softmmu.mak to
-only select the 'virt' and 'SBSA-REF' machines.
+-- =
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
-Job ran for 7 min 30 sec
-https://travis-ci.org/github/philmd/qemu/jobs/731428859
----
- .travis.yml | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1897481
 
-diff --git a/.travis.yml b/.travis.yml
-index c75221dca3..cad65cf181 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -402,6 +402,41 @@ jobs:
-         - CONFIG="--disable-containers --target-list=${MAIN_SOFTMMU_TARGETS}"
-         - UNRELIABLE=true
- 
-+    - name: "[aarch64] GCC (disable-tcg)"
-+      arch: arm64
-+      dist: bionic
-+      addons:
-+        apt_packages:
-+          - libaio-dev
-+          - libattr1-dev
-+          - libcap-ng-dev
-+          - libgcrypt20-dev
-+          - libgnutls28-dev
-+          - libiscsi-dev
-+          - liblttng-ust-dev
-+          - libnfs-dev
-+          - libnss3-dev
-+          - libpixman-1-dev
-+          - libpng-dev
-+          - librados-dev
-+          - libseccomp-dev
-+          - liburcu-dev
-+          - libusb-1.0-0-dev
-+          - libvdeplug-dev
-+          - libvte-2.91-dev
-+          # Tests dependencies
-+          - genisoimage
-+      env:
-+        - CONFIG="--disable-containers --disable-tcg --enable-kvm --disable-tools"
-+        - TEST_CMD="make check-unit"
-+        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-aarch64"
-+      before_script:
-+        # Only use the 'virt' and 'sbsa-ref' machine which don't need TCG.
-+        - echo CONFIG_ARM_VIRT=y > default-configs/aarch64-softmmu.mak
-+        - echo CONFIG_SBSA_REF=y >> default-configs/aarch64-softmmu.mak
-+        - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
-+        - ${SRC_DIR}/configure ${BASE_CONFIG} ${CONFIG} || { cat config.log && exit 1; }
-+
-     - name: "[ppc64] GCC check-tcg"
-       arch: ppc64le
-       dist: xenial
--- 
-2.26.2
+Title:
+  qemu crashes with VGA pass-through, e-GPU, nvidia 1060
 
+Status in QEMU:
+  New
+
+Bug description:
+  I try to pass-through nvidia 1060 6gb card, which is connected via
+  ExpressCard (EXP-GDC converter).
+
+  I can successfully run my virtual machine without pass-through, but
+  when I try to add the devices, qemu crashes.
+
+  The coredump contains:
+
+  Stack trace of thread 3289311:
+  #0  0x0000000000614c49 memory_region_update_container_subregions (qemu-sy=
+stem-x86_64 + 0x214c49)
+  #1  0x00000000005c0e8c vfio_probe_nvidia_bar0_quirk (qemu-system-x86_64 +=
+ 0x1c0e8c)
+  #2  0x00000000005bcec0 vfio_realize (qemu-system-x86_64 + 0x1bcec0)
+  #3  0x000000000079b423 pci_qdev_realize (qemu-system-x86_64 + 0x39b423)
+  #4  0x00000000006facda device_set_realized (qemu-system-x86_64 + 0x2facda)
+  #5  0x0000000000887e57 property_set_bool (qemu-system-x86_64 + 0x487e57)
+  #6  0x000000000088ac48 object_property_set (qemu-system-x86_64 + 0x48ac48)
+  #7  0x000000000088d1d2 object_property_set_qobject (qemu-system-x86_64 + =
+0x48d1d2)
+  #8  0x000000000088b1f7 object_property_set_bool (qemu-system-x86_64 + 0x4=
+8b1f7)
+  #9  0x0000000000693785 qdev_device_add (qemu-system-x86_64 + 0x293785)
+  #10 0x000000000061aad0 device_init_func (qemu-system-x86_64 + 0x21aad0)
+  #11 0x000000000098c87b qemu_opts_foreach (qemu-system-x86_64 + 0x58c87b)
+  #12 0x00000000006211cb qemu_init (qemu-system-x86_64 + 0x2211cb)
+  #13 0x00000000005002aa main (qemu-system-x86_64 + 0x1002aa)
+  #14 0x00007fce8af21152 __libc_start_main (libc.so.6 + 0x28152)
+  #15 0x000000000050087e _start (qemu-system-x86_64 + 0x10087e)
+
+  The whole running command is pretty long, since I use libvirt to
+  manage my machines:
+
+  LC_ALL=3DC \
+  PATH=3D/usr/local/sbin:/usr/local/bin:/usr/bin \
+  HOME=3D/var/lib/libvirt/qemu/domain-2-Win10 \
+  XDG_DATA_HOME=3D/var/lib/libvirt/qemu/domain-2-Win10/.local/share \
+  XDG_CACHE_HOME=3D/var/lib/libvirt/qemu/domain-2-Win10/.cache \
+  XDG_CONFIG_HOME=3D/var/lib/libvirt/qemu/domain-2-Win10/.config \
+  QEMU_AUDIO_DRV=3Dspice \
+  /usr/bin/qemu-system-x86_64 \
+  -name guest=3DWin10,debug-threads=3Don \
+  -S \
+  -blockdev '{"driver":"file","filename":"/usr/share/edk2-ovmf/x64/OVMF_COD=
+E.fd","node-name":"libvirt-pflash0-storage","auto-read-only":true,"discard"=
+:"unmap"}' \
+  -blockdev '{"node-name":"libvirt-pflash0-format","read-only":true,"driver=
+":"raw","file":"libvirt-pflash0-storage"}' \
+  -blockdev '{"driver":"file","filename":"/var/lib/libvirt/qemu/nvram/Win10=
+_VARS.fd","node-name":"libvirt-pflash1-storage","auto-read-only":true,"disc=
+ard":"unmap"}' \
+  -blockdev '{"node-name":"libvirt-pflash1-format","read-only":false,"drive=
+r":"raw","file":"libvirt-pflash1-storage"}' \
+  -machine pc-q35-5.1,accel=3Dkvm,usb=3Doff,vmport=3Doff,dump-guest-core=3D=
+off,pflash0=3Dlibvirt-pflash0-format,pflash1=3Dlibvirt-pflash1-format \
+  -cpu host,migratable=3Don,hv-time,hv-relaxed,hv-vapic,hv-spinlocks=3D0x1f=
+ff \
+  -m 8192 \
+  -overcommit mem-lock=3Doff \
+  -smp 2,sockets=3D2,cores=3D1,threads=3D1 \
+  -uuid 7043c77b-4903-4527-8089-9679d9a17fee \
+  -no-user-config \
+  -nodefaults \
+  -chardev stdio,mux=3Don,id=3Dcharmonitor \
+  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol \
+  -rtc base=3Dlocaltime,driftfix=3Dslew \
+  -global kvm-pit.lost_tick_policy=3Ddelay \
+  -no-hpet \
+  -no-shutdown \
+  -global ICH9-LPC.disable_s3=3D1 \
+  -global ICH9-LPC.disable_s4=3D1 \
+  -boot strict=3Don \
+  -device pcie-root-port,port=3D0x10,chassis=3D1,id=3Dpci.1,bus=3Dpcie.0,mu=
+ltifunction=3Don,addr=3D0x2 \
+  -device pcie-root-port,port=3D0x11,chassis=3D2,id=3Dpci.2,bus=3Dpcie.0,ad=
+dr=3D0x2.0x1 \
+  -device pcie-root-port,port=3D0x12,chassis=3D3,id=3Dpci.3,bus=3Dpcie.0,ad=
+dr=3D0x2.0x2 \
+  -device pcie-root-port,port=3D0x13,chassis=3D4,id=3Dpci.4,bus=3Dpcie.0,ad=
+dr=3D0x2.0x3 \
+  -device pcie-root-port,port=3D0x14,chassis=3D5,id=3Dpci.5,bus=3Dpcie.0,ad=
+dr=3D0x2.0x4 \
+  -device pcie-root-port,port=3D0x15,chassis=3D6,id=3Dpci.6,bus=3Dpcie.0,ad=
+dr=3D0x2.0x5 \
+  -device qemu-xhci,p2=3D15,p3=3D15,id=3Dusb,bus=3Dpci.2,addr=3D0x0 \
+  -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.3,addr=3D0x0 \
+  -blockdev '{"driver":"file","filename":"/home/sergiy/VirtualBox VMs/win4g=
+ames.img","node-name":"libvirt-2-storage","auto-read-only":true,"discard":"=
+unmap"}' \
+  -blockdev '{"node-name":"libvirt-2-format","read-only":false,"driver":"ra=
+w","file":"libvirt-2-storage"}' \
+  -device ide-hd,bus=3Dide.0,drive=3Dlibvirt-2-format,id=3Dsata0-0-0,bootin=
+dex=3D1 \
+  -blockdev '{"driver":"file","filename":"/home/sergiy/Downloads/Win10_2004=
+_Ukrainian_x64.iso","node-name":"libvirt-1-storage","auto-read-only":true,"=
+discard":"unmap"}' \
+  -blockdev '{"node-name":"libvirt-1-format","read-only":true,"driver":"raw=
+","file":"libvirt-1-storage"}' \
+  -device ide-cd,bus=3Dide.1,drive=3Dlibvirt-1-format,id=3Dsata0-0-1 \
+  -chardev pty,id=3Dcharserial0 \
+  -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 \
+  -chardev spicevmc,id=3Dcharchannel0,name=3Dvdagent \
+  -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchanne=
+l0,id=3Dchannel0,name=3Dcom.redhat.spice.0 \
+  -spice port=3D5900,addr=3D127.0.0.1,disable-ticketing,image-compression=
+=3Doff,seamless-migration=3Don \
+  -device qxl-vga,id=3Dvideo0,ram_size=3D67108864,vram_size=3D67108864,vram=
+64_size_mb=3D0,vgamem_mb=3D16,max_outputs=3D1,bus=3Dpcie.0,addr=3D0x1 \
+  -chardev spicevmc,id=3Dcharredir0,name=3Dusbredir \
+  -device usb-redir,chardev=3Dcharredir0,id=3Dredir0,bus=3Dusb.0,port=3D1 \
+  -chardev spicevmc,id=3Dcharredir1,name=3Dusbredir \
+  -device usb-redir,chardev=3Dcharredir1,id=3Dredir1,bus=3Dusb.0,port=3D2 \
+  -device vfio-pci,host=3D0000:04:00.0,id=3Dhostdev0,bus=3Dpci.4,multifunct=
+ion=3Don,addr=3D0x0 \
+  -device vfio-pci,host=3D0000:04:00.1,id=3Dhostdev1,bus=3Dpci.4,addr=3D0x0=
+.0x1 \
+  -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.5,addr=3D0x0 \
+  -sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourc=
+econtrol=3Ddeny \
+  -msg timestamp=3Don
+
+  I've forced vfio_pci module for the VGA, and ensured that lspci shows
+
+    Kernel driver in use: vfio_pci
+
+  My laptop is Thinkpad x230, that runs on Intel(R) Core(TM) i5-3320M CPU @=
+ 2.60GHz. =
+
+  I run 5.8.6-1-MANJARO kernel and run QEMU emulator version 5.1.0.
+
+  Thank you for your attention. I'd love to provide more information,
+  but I don't know what else matters.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1897481/+subscriptions
 
