@@ -2,140 +2,87 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-17.9 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E028C4727C
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 21:30:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8028C4727C
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 21:33:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 598C62075E
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 21:30:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C7292076A
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 21:33:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZA86gVLT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 598C62075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZREOQKvC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C7292076A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNNCG-0004Xf-Me
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 17:30:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45708)
+	id 1kNNFm-0006WY-SY
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 17:33:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46398)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kNNBI-00046B-HO
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 17:29:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50728)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kNNBF-0003sK-Qk
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 17:29:04 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601414940;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=F42LqRAVufYnsU/VJk1aC6E5FlUU94Spnttr9vy1dXM=;
- b=ZA86gVLT4IM6piHe2+e4+OR7iifLoa43FDGmNAWNn88oQT05hFtzZXWFTW4ljsr0cgRoP0
- tXf0I2JQlXYpV3N9j+Xw0xoCItwIxorTf00/TC/Kx3C11HWMW5hEBQCvKuu5Fbfd6TBeIs
- WQ8JEHkEi6y6P9ZmviEHqhC7Z3uz6M0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-418-GU9m8ocUPQKRxcSULWNi0Q-1; Tue, 29 Sep 2020 17:28:51 -0400
-X-MC-Unique: GU9m8ocUPQKRxcSULWNi0Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 34762807340;
- Tue, 29 Sep 2020 21:28:49 +0000 (UTC)
-Received: from [10.3.112.208] (ovpn-112-208.phx2.redhat.com [10.3.112.208])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F412C6715F;
- Tue, 29 Sep 2020 21:28:47 +0000 (UTC)
-Subject: Re: [RFC PATCH v4 00/29] Hexagon patch series
-To: Taylor Simpson <tsimpson@quicinc.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <1601314138-9930-1-git-send-email-tsimpson@quicinc.com>
- <c4307aa4-f194-a02f-a4db-90b546a6024a@amsat.org>
- <BYAPR02MB4886C5014B1012371DE0DCDFDE320@BYAPR02MB4886.namprd02.prod.outlook.com>
- <8f684258-8b41-ee3b-8921-41693113c1f1@amsat.org>
- <BYAPR02MB4886C114AAC9DDEF70300D23DE320@BYAPR02MB4886.namprd02.prod.outlook.com>
-From: Eric Blake <eblake@redhat.com>
-Autocrypt: addr=eblake@redhat.com; keydata=
- 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
-Organization: Red Hat, Inc.
-Message-ID: <c63a9b09-bffb-ad16-c38c-1a2b55d4ff4f@redhat.com>
-Date: Tue, 29 Sep 2020 16:28:47 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <oanderso@google.com>)
+ id 1kNNEn-00064x-Ol
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 17:32:43 -0400
+Received: from mail-ed1-x532.google.com ([2a00:1450:4864:20::532]:33261)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <oanderso@google.com>)
+ id 1kNNEl-0004Oo-LO
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 17:32:41 -0400
+Received: by mail-ed1-x532.google.com with SMTP id g4so8288711edk.0
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 14:32:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to:cc;
+ bh=XA+mrk18J1sNU6j9klyWCYlrjyCnZeUHkmu4Ub5BuP4=;
+ b=ZREOQKvCecquZR3RdjzbuCyVtrRH7ttRBXvN9uMx/9HoM8nHWkncQ+mZQ3eFP6/HG6
+ Qv/sffZVVSwglGaCaXwqtQmRb6bv+XdedaXEVDqLqmZk+u1g/y6YiC+swrd6++ndRXRg
+ FaTA1oKPB5GvZyhu3lVZQElpTLaqI1oS7L9BZmPcI1tlKxTwqJIXK8AeDmVycBK7wVmL
+ Is/hGZm07x9C1dRqHOxj4LxzLTrXgdBKHV2f6mqzmbpeeagSHDp1Up81unB5AJncXYaN
+ 4dIOBiGctfDE6y4LkvfB3iCn+FrmfrwcCm3xtfcmoFrfSD1tGZ8hPFlEEIFOeehrii2m
+ ZNFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+ bh=XA+mrk18J1sNU6j9klyWCYlrjyCnZeUHkmu4Ub5BuP4=;
+ b=ksZAG4HxaHdqZukvPHwf5BQl7Ma1FX65Jevzuj3+xon1JPALWZ43/qf+h3xyDqgpgI
+ 1iseB7C88U574IeiP4mPF2cCD3ETSPyfJ2APutej7n/LjcJGVMBgZbdKJ2ljXAXq2mrt
+ 9gdzoB6zJOJCLJqeZFbZPx2BtGxVgD5WNrLH6nt850m9NfgUBaOQOVUq4NOPzoY+ES6b
+ 8LtfJuHTdDdi+9XYpESRprEemeLp3Y07/v0c+U9HZkSKmjrfpfQOkHNtBlfi8LX9Ng8P
+ skkbpNqOIoBXwFZVkzZtfj8eWmYaGl7u1HaUr0TQ7/SjpDj3TCQNjJSiSHdTcaZ8+SVn
+ Mrhg==
+X-Gm-Message-State: AOAM531pnJ7YBrwGRVDbrGUYFQd81ukezBiv0QItQlXvPMAkj6F2IsMK
+ 3h5PjuA/a7Ld9TSE4CaiH65SVqLu3Y8WOZwNqHr7eEOT/1WzxA==
+X-Google-Smtp-Source: ABdhPJx2GAYo6MxlRvouHtQp8zRyaGoXpW9NrCJ/FRVDKECLMXXjcLS8iIX5bWXYGg+fH2VQ/Hrd99aLKNWMtUbQpWc=
+X-Received: by 2002:a05:6402:1656:: with SMTP id
+ s22mr5718478edx.160.1601415156277; 
+ Tue, 29 Sep 2020 14:32:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <BYAPR02MB4886C114AAC9DDEF70300D23DE320@BYAPR02MB4886.namprd02.prod.outlook.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="1qmIELuNOka8pai167LRBsV5Mk5L2wZQL"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 22:47:55
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
+From: Owen Anderson <oanderso@google.com>
+Date: Tue, 29 Sep 2020 14:32:25 -0700
+Message-ID: <CAKs3XfJPrMGxdAouGCje3ppnWKA6fXpNaywQ5rj9u45VkPuUXg@mail.gmail.com>
+Subject: [RFC] Don't lookup full CPU state in the indirect branch fast path on
+ AArch64 when running in user mode.
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::532;
+ envelope-from=oanderso@google.com; helo=mail-ed1-x532.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -180
+X-Spam_score: -18.1
+X-Spam_bar: ------------------
+X-Spam_report: (-18.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-0.468,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
+ USER_IN_DEF_SPF_WL=-7.5 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -148,85 +95,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "ale@rev.ng" <ale@rev.ng>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "laurent@vivier.eu" <laurent@vivier.eu>,
- "aleksandar.m.mail@gmail.com" <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1qmIELuNOka8pai167LRBsV5Mk5L2wZQL
-Content-Type: multipart/mixed; boundary="EsZgxwRPSF5ZIlpgUxqUlVw9J5LIjpqnN";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Taylor Simpson <tsimpson@quicinc.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "ale@rev.ng" <ale@rev.ng>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "laurent@vivier.eu" <laurent@vivier.eu>,
- "aleksandar.m.mail@gmail.com" <aleksandar.m.mail@gmail.com>
-Message-ID: <c63a9b09-bffb-ad16-c38c-1a2b55d4ff4f@redhat.com>
-Subject: Re: [RFC PATCH v4 00/29] Hexagon patch series
-References: <1601314138-9930-1-git-send-email-tsimpson@quicinc.com>
- <c4307aa4-f194-a02f-a4db-90b546a6024a@amsat.org>
- <BYAPR02MB4886C5014B1012371DE0DCDFDE320@BYAPR02MB4886.namprd02.prod.outlook.com>
- <8f684258-8b41-ee3b-8921-41693113c1f1@amsat.org>
- <BYAPR02MB4886C114AAC9DDEF70300D23DE320@BYAPR02MB4886.namprd02.prod.outlook.com>
-In-Reply-To: <BYAPR02MB4886C114AAC9DDEF70300D23DE320@BYAPR02MB4886.namprd02.prod.outlook.com>
+Hello,
 
---EsZgxwRPSF5ZIlpgUxqUlVw9J5LIjpqnN
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+I would like to request feedback on the following patch, which I do
+not believe should be applied to master as-is.  The idea here is to
+avoid gathering the full CPU state in the fast path of an indirect
+branch lookup when running in user mode on a platform where the flags
+can only be changed in privileged mode.  I believe this is true on the
+AArch64 scenario that I care about, but clearly not true in general.
+I'm particularly seeking feedback on how to clean this up into a
+version that checks the correct necessary and sufficient conditions to
+allow all users that can benefit from it to do so.
 
-On 9/29/20 3:11 PM, Taylor Simpson wrote:
+On the workload that I am targeting (aarch64 on x86), this patch
+reduces execution wall time by approximately 20%, and eliminates
+indirect branch lookups from the hot stack traces entirely.
 
-> Ouch!  4.8 is old enough that it doesn't support C11 _Generic which I am =
-using.  That needs at least GCC 4.9.
->=20
-> Here are a couple of examples.  As you can see, _Generic is used to dispa=
-tch to slightly different TCG generation functions depending on the type of=
- the operands.  I will scratch my head and figure out a different way to do=
- this.
->=20
-> #define MEM_STORE1_FUNC(X) \
->     _Generic((X), int : gen_store1i, TCGv_i32 : gen_store1)
-> #define MEM_STORE1(VA, DATA, SLOT) \
->     MEM_STORE1_FUNC(DATA)(cpu_env, VA, DATA, ctx, SLOT)
+Thank you,
 
-See if you can use __builtin_choose_expr() instead.  Look at
-include/osdep/atomic.h which defines typeof_strip_qual() without
-_Generic.  linux-user/qemu.h __put_user_e() is also an example of what
-appears to be a poor-man's replacement to _Generic.
+--Owen
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+From 3d96db17d3baacb92ef1bc5e70ef06b97d06a0ae Mon Sep 17 00:00:00 2001
+From: Owen Anderson <oanderso@google.com>
+Date: Tue, 29 Sep 2020 13:47:00 -0700
+Subject: [RFC] Don't lookup full CPU state in the indirect branch fast path on
+ AArch64 when running in user mode.
 
+Most of the CPU state can't be changed in user mode, so this is useless work.
 
---EsZgxwRPSF5ZIlpgUxqUlVw9J5LIjpqnN--
+Signed-off-by: Owen Anderson <oanderso@google.com>
+---
+ include/exec/tb-lookup.h | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
---1qmIELuNOka8pai167LRBsV5Mk5L2wZQL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+diff --git a/include/exec/tb-lookup.h b/include/exec/tb-lookup.h
+index 9cf475bb03..f4ea0eb4c0 100644
+--- a/include/exec/tb-lookup.h
++++ b/include/exec/tb-lookup.h
+@@ -25,7 +25,15 @@ tb_lookup__cpu_state(CPUState *cpu, target_ulong
+*pc, target_ulong *cs_base,
+     TranslationBlock *tb;
+     uint32_t hash;
 
------BEGIN PGP SIGNATURE-----
++#if !defined(TARGET_ARM) || !defined(CONFIG_USER_ONLY)
+     cpu_get_tb_cpu_state(env, pc, cs_base, flags);
++#else
++    if (is_a64(env)) {
++      *pc = env->pc;
++    } else {
++      *pc = env->regs[15];
++    }
++#endif
+     hash = tb_jmp_cache_hash_func(*pc);
+     tb = qatomic_rcu_read(&cpu->tb_jmp_cache[hash]);
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl9zpw8ACgkQp6FrSiUn
-Q2rrCQf/SI8QhIVKzPWvKMeX9UKuPzd0TqxiWsbuW/B91Ck6QKtGXGjdHbOqEcoH
-WUN93VW+tipxM6wfdooCIFTk+TnPDp2NULExE0aVUDmgE+9s/k7kDpg+O+givkGy
-FRZW6YYX9ONg4lW939hLnsbJGhI+GDz+RLwgd4ZcwsHa0RUd8qAXtCZYip6XQuKe
-vWaJa4aXLB7W2kfDlvV8Bi1l8wOa11/1fAp/OBgBbmGCLWN2sD/XiQqI8EnGRdNm
-WlqJE/JU7lR2scdBFeDknBZYmKEFTk9PBSoHcFuNhXbJ8Yrt3+BX1Mdajs73T0qK
-qhl9nOxGBc8u9Xpt2jrlPUpqaJYWDA==
-=/xN5
------END PGP SIGNATURE-----
+@@ -34,12 +42,19 @@ tb_lookup__cpu_state(CPUState *cpu, target_ulong
+*pc, target_ulong *cs_base,
 
---1qmIELuNOka8pai167LRBsV5Mk5L2wZQL--
-
+     if (likely(tb &&
+                tb->pc == *pc &&
++#if !defined(TARGET_ARM) || !defined(CONFIG_USER_ONLY)
+                tb->cs_base == *cs_base &&
+                tb->flags == *flags &&
++#endif
+                tb->trace_vcpu_dstate == *cpu->trace_dstate &&
+                (tb_cflags(tb) & (CF_HASH_MASK | CF_INVALID)) == cf_mask)) {
+         return tb;
+     }
++
++#ifdef CONFIG_USER_ONLY
++    cpu_get_tb_cpu_state(env, pc, cs_base, flags);
++#endif
++
+     tb = tb_htable_lookup(cpu, *pc, *cs_base, *flags, cf_mask);
+     if (tb == NULL) {
+         return NULL;
+-- 
+2.28.0.709.gb0816b6eb0-goog
 
