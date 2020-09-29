@@ -2,105 +2,88 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9F43C4727C
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 14:15:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FD75C4727C
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 14:25:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1BC5206C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 14:15:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1BC5206C1
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=netbsd.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1017A20739
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 14:25:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h1SNF821"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1017A20739
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNGPO-0004A1-P1
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 10:15:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48530)
+	id 1kNGZh-00012b-FR
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 10:25:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53190)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kamil@netbsd.org>) id 1kNGJk-0005qV-8u
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 10:09:20 -0400
-Received: from mail.netbsd.org ([199.233.217.200]:50706)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kamil@netbsd.org>) id 1kNGJi-0005av-0r
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 10:09:19 -0400
-Received: from [IPv6:::1] (localhost [127.0.0.1])
- by mail.netbsd.org (Postfix) with ESMTP id 389FA84E3C;
- Tue, 29 Sep 2020 14:09:11 +0000 (UTC)
-To: Peter Maydell <peter.maydell@linaro.org>,
- Kamil Rytarowski <kamil@netbsd.org>
-References: <20200928131934.739451-1-philmd@redhat.com>
- <20200928131934.739451-8-philmd@redhat.com>
- <dcb7bb1f-eaec-7039-1cbd-80e50d298707@netbsd.org>
- <CAFEAcA9B-RMKxzfTv3RQ-a5EP3yGdNmdcyn4KJSKXB_c_wVX1Q@mail.gmail.com>
-From: Kamil Rytarowski <kamil@netbsd.org>
-Autocrypt: addr=kamil@netbsd.org; keydata=
- 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
-Subject: Re: [PATCH v2 7/8] qemu/bswap: Use compiler __builtin_bswap() on
- NetBSD
-Message-ID: <eeb52784-f224-73b3-7ae9-bae7d71c90b9@netbsd.org>
-Date: Tue, 29 Sep 2020 16:06:10 +0200
-User-Agent: Mozilla/5.0 (X11; NetBSD amd64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.90_1) (envelope-from <pankaj.gupta.linux@gmail.com>)
+ id 1kNGYS-0000Np-5G
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 10:24:32 -0400
+Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:34695)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <pankaj.gupta.linux@gmail.com>)
+ id 1kNGYP-0007wZ-T0
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 10:24:31 -0400
+Received: by mail-il1-x144.google.com with SMTP id q5so5064897ilj.1
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 07:24:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ghbpn7PKO8ktden4QTLfrNlyxdykkhqcQmWsxGfZ4dA=;
+ b=h1SNF821m0NNhLo7ie3ZwpF7ZJn7KlFad3KIyu+1760nRSywrDAFulsfAtSEth/kiA
+ /WgqnUfgEJxpgw3s+022IneSL9SoM1lxkTywWYTFSHNJeitLytg8RUxAmP7nnxeK6xX7
+ kMxwJ+iTvgMj0V+amDsa46gZkVk7w4DFpyo5xPwrre72nj6drejI616vr0dM7hajaDGn
+ QRQ/szeP7Vx/uJlTYuR/lAzolEVfFH70po+VWsBBHNwWTMoqhmKUBHlDRWr7iO0bdMDF
+ nz1Ify+z9thiLH1N254NFFdS8V6HnKsa0wUiAXbJGVSHDO8uShKk59CWa3BXdm4hU8HX
+ tiBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ghbpn7PKO8ktden4QTLfrNlyxdykkhqcQmWsxGfZ4dA=;
+ b=FUf8AzCEBNaKwWSzDG4CenvAKvm94BNybqiKCP7VDCpTXogibWmvWnC2e+TbnlZ0HT
+ BlPTraNIkpv/BExTk3eYFknsSBoMLQ/mTsZ0cJnZ1D0JfRNZnBg60TbTc/BxtJvn9O5t
+ TFlaQg6ZsCSfQVCdsSgI8YmcUa13BxmuhwCNTDb18MZct6HWqj7XzOhPLLbS/eT2E2RI
+ Wc1n4K+gBz1Rnhtv+78t0Kc8BHR3hhOVC6smKngyP+F+mYC+UMiKCbI/CJ3Iy+TOjJ18
+ NIo0v585O6ECN1qNWS4s3EnSqL0si+cc+jLBI0SmjqV4gdpdb34DTCZJrjJ1BbygjwJF
+ uCow==
+X-Gm-Message-State: AOAM5332wVdOLS8lwCOJxRJ0E/vPfyZ8vqADIp0Em40Gar3a2OKuYO2u
+ fVEHIj9xxrlEYozv99NaPdqEPAfeKD4FY0CtGHI=
+X-Google-Smtp-Source: ABdhPJwKH+5cfaylbaiAt4tporlUi8YLdJmr5jhd8y5zTSRGYviaMOK2tern1ClzGFxIwHaJtJElBAVBL0r5f4qEfN8=
+X-Received: by 2002:a92:ccc5:: with SMTP id u5mr3369854ilq.178.1601389468631; 
+ Tue, 29 Sep 2020 07:24:28 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9B-RMKxzfTv3RQ-a5EP3yGdNmdcyn4KJSKXB_c_wVX1Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=199.233.217.200; envelope-from=kamil@netbsd.org;
- helo=mail.netbsd.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 10:09:15
-X-ACL-Warn: Detected OS   = ???
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+References: <20200928114909.20791-1-david@redhat.com>
+ <20200928114909.20791-2-david@redhat.com>
+ <CAM9Jb+gdf+n+Poa_kZRRTchcB8D33FDuuTyn4tB4TjWyAah9Hw@mail.gmail.com>
+ <e14670b7-417b-17be-3275-82f7ef0861d7@redhat.com>
+In-Reply-To: <e14670b7-417b-17be-3275-82f7ef0861d7@redhat.com>
+From: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Date: Tue, 29 Sep 2020 16:24:17 +0200
+Message-ID: <CAM9Jb+j3pMLOUhm=x+Wr+t1sHDxyT6aNC=keK7G1p7yaU5p-kQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/5] virtio-mem: Probe THP size to determine default
+ block size
+To: David Hildenbrand <david@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::144;
+ envelope-from=pankaj.gupta.linux@gmail.com; helo=mail-il1-x144.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -115,41 +98,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Igor Mammedov <imammedo@redhat.com>,
+ Wei Yang <richardw.yang@linux.intel.com>,
+ Qemu Developers <qemu-devel@nongnu.org>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 29.09.2020 10:58, Peter Maydell wrote:
-> On Mon, 28 Sep 2020 at 23:02, Kamil Rytarowski <kamil@netbsd.org> wrote:
->>
->> Personally, I prefer using the system headers. but if you want to use
->> the GCC builtins, please go for it.
-> 
-> I'd agree if the system header approach was cross-platform
-> or if this was a BSD-only program or if we were aiming for
-> complete compiler-implementation independence, but since we
-> rely on GCC/clang all over the place already it seems nicer to
-> avoid all the machinery for identifying which of the multiple
-> different system header implementations is present, and
-> instead just have a single implementation that works on
-> all the hosts we care about...
-> 
+> >> Let's allow a minimum block size of 1 MiB in all configurations. Select
+> >> the default block size based on
+> >> - The page size of the memory backend.
+> >> - The THP size if the memory backend size corresponds to the real hsot
+> >
+> > s/hsot/host
+>
+> thanks!
+>
+> >>   page size.
+> >> - The global minimum of 1 MiB.
+> >> and warn if something smaller is configured by the user.
+> >>
+> >> VIRTIO_MEM only supports Linux (depends on LINUX), so we can probe the
+> >> THP size unconditionally.
+> >>
+> >> For now we only support virtio-mem on x86-64 - there isn't a user-visiable
+> >
+> > s/visiable/visible
+>
+> thanks!
+>
+> >> change (x86-64 only supports 2 MiB THP on the PMD level) - the default
+> >> was, and will be 2 MiB.
+> >>
+> >> If we ever have THP on the PUD level (e.g., 1 GiB THP on x86-64), we
+> >> expect to have a trigger to explicitly opt-in for the new THP granularity.
+> >>
+> >> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> >> Cc: Wei Yang <richardw.yang@linux.intel.com>
+> >> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> >> Cc: Igor Mammedov <imammedo@redhat.com>
+> >> Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+> >> Signed-off-by: David Hildenbrand <david@redhat.com>
+> >> ---
+> >>  hw/virtio/virtio-mem.c | 105 +++++++++++++++++++++++++++++++++++++++--
+> >>  1 file changed, 101 insertions(+), 4 deletions(-)
+> >>
+> >> diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
+> >> index 8fbec77ccc..9b1461cf9d 100644
+> >> --- a/hw/virtio/virtio-mem.c
+> >> +++ b/hw/virtio/virtio-mem.c
+> >> @@ -33,10 +33,83 @@
+> >>  #include "trace.h"
+> >>
+> >>  /*
+> >> - * Use QEMU_VMALLOC_ALIGN, so no THP will have to be split when unplugging
+> >> - * memory (e.g., 2MB on x86_64).
+> >> + * Let's not allow blocks smaller than 1 MiB, for example, to keep the tracking
+> >> + * bitmap small.
+> >>   */
+> >> -#define VIRTIO_MEM_MIN_BLOCK_SIZE ((uint32_t)QEMU_VMALLOC_ALIGN)
+> >> +#define VIRTIO_MEM_MIN_BLOCK_SIZE ((uint32_t)(1 * MiB))
+> >> +
+> >> +#if defined(__x86_64__) || defined(__arm__) || defined(__aarch64__) || \
+> >> +    defined(__powerpc64__)
+> >> +#define VIRTIO_MEM_DEFAULT_THP_SIZE ((uint32_t)(2 * MiB))
+> >> +#else
+> >> +        /* fallback to 1 MiB (e.g., the THP size on s390x) */
+> >> +#define VIRTIO_MEM_DEFAULT_THP_SIZE VIRTIO_MEM_MIN_BLOCK_SIZE
+> >> +#endif
+> >> +
+> >> +/*
+> >> + * We want to have a reasonable default block size such that
+> >> + * 1. We avoid splitting THPs when unplugging memory, which degrades
+> >> + *    performance.
+> >> + * 2. We avoid placing THPs for plugged blocks that also cover unplugged
+> >> + *    blocks.
+> >> + *
+> >> + * The actual THP size might differ between Linux kernels, so we try to probe
+> >> + * it. In the future (if we ever run into issues regarding 2.), we might want
+> >> + * to disable THP in case we fail to properly probe the THP size, or if the
+> >> + * block size is configured smaller than the THP size.
+> >> + */
+> >> +static uint32_t thp_size;
+> >> +
+> >> +#define HPAGE_PMD_SIZE_PATH "/sys/kernel/mm/transparent_hugepage/hpage_pmd_size"
+> >> +static uint32_t virtio_mem_thp_size(void)
+> >> +{
+> >> +    gchar *content = NULL;
+> >> +    const char *endptr;
+> >> +    uint64_t tmp;
+> >> +
+> >> +    if (thp_size) {
+> >> +        return thp_size;
+> >> +    }
+> >> +
+> >> +    /*
+> >> +     * Try to probe the actual THP size, fallback to (sane but eventually
+> >> +     * incorrect) default sizes.
+> >> +     */
+> >> +    if (g_file_get_contents(HPAGE_PMD_SIZE_PATH, &content, NULL, NULL) &&
+> >> +        !qemu_strtou64(content, &endptr, 0, &tmp) &&
+> >> +        (!endptr || *endptr == '\n')) {
+> >> +        /*
+> >> +         * Sanity-check the value, if it's too big (e.g., aarch64 with 64k base
+> >> +         * pages) or weird, fallback to something smaller.
+> >> +         */
+> >> +        if (!tmp || !is_power_of_2(tmp) || tmp > 16 * MiB) {
+> >> +            warn_report("Read unsupported THP size: %" PRIx64, tmp);
+> >> +        } else {
+> >> +            thp_size = tmp;
+> >> +        }
+> >> +    }
+> >> +
+> >> +    if (!thp_size) {
+> >> +        thp_size = VIRTIO_MEM_DEFAULT_THP_SIZE;
+> >> +        warn_report("Could not detect THP size, falling back to %" PRIx64
+> >> +                    "  MiB.", thp_size / MiB);
+> >> +    }
+> >> +
+> >> +    g_free(content);
+> >> +    return thp_size;
+> >> +}
+> >> +
+> >> +static uint64_t virtio_mem_default_block_size(RAMBlock *rb)
+> >> +{
+> >> +    const uint64_t page_size = qemu_ram_pagesize(rb);
+> >> +
+> >> +    /* We can have hugetlbfs with a page size smaller than the THP size. */
+> >> +    if (page_size == qemu_real_host_page_size) {
+> >> +        return MAX(page_size, virtio_mem_thp_size());
+> >> +    }
+> >
+> > This condition is special, can think of hugetlbfs smaller in size than THP size
+> > configured.
+>
+> Yeah, there are weird architectures, most prominently arm64:
+>
+> https://www.kernel.org/doc/html/latest/arm64/hugetlbpage.html
+>
+> Assume you're on 64K base pages with a probed 512MB THP size
+> (currently). You could have hugetlbfs with 2MB page size via "CONT PTE"
+> bits.
 
-This is already a part of POSIX:
+Ok. I understand now. Thanks for explaining!
+>
+> >> +    return MAX(page_size, VIRTIO_MEM_MIN_BLOCK_SIZE);
+> >
+> > Do we still need this? Or we can have only one return for both the cases?
+> > Probably, I am missing something here.
+>
+> We still need it. Assume somebody would have 64K hugetlbfs on arm64
+> (with 4k base pages), we want to make sure we use at least 1MB blocks.
+ok. got it.
 
-https://www.austingroupbugs.net/view.php?id=162
-
-We have got everything needed from the standard now to implement bswap
-without relying on compiler builtins. Every modern enough POSIX-like OS
-already ships with <endian.h>.
-
-> thanks
-> -- PMM
-> 
-
+Looks good to me.
+Reviewed-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
 
