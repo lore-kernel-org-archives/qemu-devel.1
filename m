@@ -2,90 +2,60 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F7F1C47423
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 11:08:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04088C4727C
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 11:09:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A6C421D43
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 11:08:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z6WE9450"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A6C421D43
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 62E1B21D92
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 11:08:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62E1B21D92
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNDUx-0002RD-6U
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 07:08:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57248)
+	id 1kNDVC-00038j-BQ
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 07:08:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56976)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kNDQ1-0005FK-9D
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 07:03:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38079)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kNDPz-0002rf-BG
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 07:03:36 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601377414;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=8iVaPevfbtqr+4yOyxmAPVmCMQ7qa9hFmw6lRqdlNYw=;
- b=Z6WE945045Zvg89ezP89y/VlpJ8EevRFnVCNCOU/b3S1GonXoveR2K5vvDzMxfXvOy9/9c
- 9loS+/xkeehjCgW+znFj2Au1uPQbPEGKlOIgqzmeJTNBYjs6rP5VMMQJRxiqm7YQs8XIZW
- dxVhbEsWKNQ+5j/uMoeGs/TyfXs/WTo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-391-bM_UNyZ-Ok226yUSle0OSQ-1; Tue, 29 Sep 2020 07:03:30 -0400
-X-MC-Unique: bM_UNyZ-Ok226yUSle0OSQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 62520186842D;
- Tue, 29 Sep 2020 11:03:28 +0000 (UTC)
-Received: from work-vm (ovpn-114-253.ams2.redhat.com [10.36.114.253])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BA6E85D9CA;
- Tue, 29 Sep 2020 11:03:14 +0000 (UTC)
-Date: Tue, 29 Sep 2020 12:03:12 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH v26 05/17] vfio: Add VM state change handler to know
- state of VM
-Message-ID: <20200929110312.GF2826@work-vm>
-References: <1600817059-26721-1-git-send-email-kwankhede@nvidia.com>
- <1600817059-26721-6-git-send-email-kwankhede@nvidia.com>
- <20200924170220.0a9836fe.cohuck@redhat.com>
+ (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
+ id 1kNDOr-0003fJ-DE
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 07:02:25 -0400
+Received: from mail.ispras.ru ([83.149.199.84]:35304)
+ by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
+ id 1kNDOp-0002i1-Dm
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 07:02:24 -0400
+Received: from [127.0.1.1] (unknown [62.118.151.149])
+ by mail.ispras.ru (Postfix) with ESMTPSA id 4ED2E413C33E;
+ Tue, 29 Sep 2020 11:02:20 +0000 (UTC)
+Subject: [PATCH v6 13/14] replay: create temporary snapshot at debugger
+ connection
+From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
+To: qemu-devel@nongnu.org
+Date: Tue, 29 Sep 2020 14:02:20 +0300
+Message-ID: <160137734000.31007.4668841178583344264.stgit@pasha-ThinkPad-X280>
+In-Reply-To: <160137726426.31007.12061315974029139983.stgit@pasha-ThinkPad-X280>
+References: <160137726426.31007.12061315974029139983.stgit@pasha-ThinkPad-X280>
+User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
-In-Reply-To: <20200924170220.0a9836fe.cohuck@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 02:22:44
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=83.149.199.84;
+ envelope-from=pavel.dovgalyuk@ispras.ru; helo=mail.ispras.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 07:01:05
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,149 +68,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cjia@nvidia.com, aik@ozlabs.ru, Zhengxiao.zx@alibaba-inc.com,
- shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, peterx@redhat.com,
- Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, yi.l.liu@intel.com,
- quintela@redhat.com, ziye.yang@intel.com, armbru@redhat.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com,
- zhi.a.wang@intel.com, kevin.tian@intel.com, yan.y.zhao@intel.com,
- alex.williamson@redhat.com, changpeng.liu@intel.com, eskultet@redhat.com,
- Ken.Xue@amd.com, jonathan.davies@nutanix.com, pbonzini@redhat.com
+Cc: kwolf@redhat.com, wrampazz@redhat.com, pavel.dovgalyuk@ispras.ru,
+ ehabkost@redhat.com, alex.bennee@linaro.org, mtosatti@redhat.com,
+ armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, crosa@redhat.com,
+ pbonzini@redhat.com, philmd@redhat.com, zhiwei_liu@c-sky.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Cornelia Huck (cohuck@redhat.com) wrote:
-> On Wed, 23 Sep 2020 04:54:07 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
-> > VM state change handler gets called on change in VM's state. This is used to set
-> > VFIO device state to _RUNNING.
-> > 
-> > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> > Reviewed-by: Neo Jia <cjia@nvidia.com>
-> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  hw/vfio/migration.c           | 136 ++++++++++++++++++++++++++++++++++++++++++
-> >  hw/vfio/trace-events          |   3 +-
-> >  include/hw/vfio/vfio-common.h |   4 ++
-> >  3 files changed, 142 insertions(+), 1 deletion(-)
-> > 
-> 
-> (...)
-> 
-> > +static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t mask,
-> > +                                    uint32_t value)
-> 
-> I think I've mentioned that before, but this function could really
-> benefit from a comment what mask and value mean. 
-> 
-> > +{
-> > +    VFIOMigration *migration = vbasedev->migration;
-> > +    VFIORegion *region = &migration->region;
-> > +    off_t dev_state_off = region->fd_offset +
-> > +                      offsetof(struct vfio_device_migration_info, device_state);
-> > +    uint32_t device_state;
-> > +    int ret;
-> > +
-> > +    ret = vfio_mig_read(vbasedev, &device_state, sizeof(device_state),
-> > +                        dev_state_off);
-> > +    if (ret < 0) {
-> > +        return ret;
-> > +    }
-> > +
-> > +    device_state = (device_state & mask) | value;
-> > +
-> > +    if (!VFIO_DEVICE_STATE_VALID(device_state)) {
-> > +        return -EINVAL;
-> > +    }
-> > +
-> > +    ret = vfio_mig_write(vbasedev, &device_state, sizeof(device_state),
-> > +                         dev_state_off);
-> > +    if (ret < 0) {
-> > +        ret = vfio_mig_read(vbasedev, &device_state, sizeof(device_state),
-> > +                          dev_state_off);
-> > +        if (ret < 0) {
-> > +            return ret;
-> > +        }
-> > +
-> > +        if (VFIO_DEVICE_STATE_IS_ERROR(device_state)) {
-> > +            hw_error("%s: Device is in error state 0x%x",
-> > +                     vbasedev->name, device_state);
-> > +            return -EFAULT;
-> 
-> Is -EFAULT a good return value here? Maybe -EIO?
-> 
-> > +        }
-> > +    }
-> > +
-> > +    vbasedev->device_state = device_state;
-> > +    trace_vfio_migration_set_state(vbasedev->name, device_state);
-> > +    return 0;
-> > +}
-> > +
-> > +static void vfio_vmstate_change(void *opaque, int running, RunState state)
-> > +{
-> > +    VFIODevice *vbasedev = opaque;
-> > +
-> > +    if ((vbasedev->vm_running != running)) {
-> > +        int ret;
-> > +        uint32_t value = 0, mask = 0;
-> > +
-> > +        if (running) {
-> > +            value = VFIO_DEVICE_STATE_RUNNING;
-> > +            if (vbasedev->device_state & VFIO_DEVICE_STATE_RESUMING) {
-> > +                mask = ~VFIO_DEVICE_STATE_RESUMING;
-> 
-> I've been staring at this for some time and I think that the desired
-> result is
-> - set _RUNNING
-> - if _RESUMING was set, clear it, but leave the other bits intact
-> - if _RESUMING was not set, clear everything previously set
-> This would really benefit from a comment (or am I the only one
-> struggling here?)
-> 
-> > +            }
-> > +        } else {
-> > +            mask = ~VFIO_DEVICE_STATE_RUNNING;
-> > +        }
-> > +
-> > +        ret = vfio_migration_set_state(vbasedev, mask, value);
-> > +        if (ret) {
-> > +            /*
-> > +             * vm_state_notify() doesn't support reporting failure. If such
-> > +             * error reporting support added in furure, migration should be
-> > +             * aborted.
-> 
-> 
-> "We should abort the migration in this case, but vm_state_notify()
-> currently does not support reporting failures."
-> 
-> ?
-> 
-> Can/should we mark the failing device in some way?
+When record/replay does not uses overlays for storing the snapshots,
+user is not capable of issuing reverse debugging commands.
+This patch adds creation of the VM snapshot on the temporary
+overlay image, when the debugger connects to QEMU.
+Therefore the execution can be rewind to the moment
+of the debugger connection while debugging the virtual machine.
 
-I think you can call qemu_file_set_error on the migration stream to
-force an error.
+Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
 
-Dave
+--
 
-> > +             */
-> > +            error_report("%s: Failed to set device state 0x%x",
-> > +                         vbasedev->name, value & mask);
-> > +        }
-> > +        vbasedev->vm_running = running;
-> > +        trace_vfio_vmstate_change(vbasedev->name, running, RunState_str(state),
-> > +                                  value & mask);
-> > +    }
-> > +}
-> > +
-> >  static int vfio_migration_init(VFIODevice *vbasedev,
-> >                                 struct vfio_region_info *info)
-> >  {
-> 
-> (...)
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+v6:
+ - dropped unused error processing (suggested by Philippe Mathieu-Daudé)
+---
+ gdbstub.c                 |    1 +
+ include/sysemu/replay.h   |    2 ++
+ replay/replay-debugging.c |   14 ++++++++++++++
+ 3 files changed, 17 insertions(+)
+
+diff --git a/gdbstub.c b/gdbstub.c
+index ac92273018..f19f98ab1a 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -3321,6 +3321,7 @@ static void gdb_chr_event(void *opaque, QEMUChrEvent event)
+         s->g_cpu = s->c_cpu;
+ 
+         vm_stop(RUN_STATE_PAUSED);
++        replay_gdb_attached();
+         gdb_has_xml = false;
+         break;
+     default:
+diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
+index b6cac175c4..2aa34b8919 100644
+--- a/include/sysemu/replay.h
++++ b/include/sysemu/replay.h
+@@ -94,6 +94,8 @@ bool replay_reverse_continue(void);
+ bool replay_running_debug(void);
+ /* Called in reverse debugging mode to collect breakpoint information */
+ void replay_breakpoint(void);
++/* Called when gdb is attached to gdbstub */
++void replay_gdb_attached(void);
+ 
+ /* Processing the instructions */
+ 
+diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
+index d02d4e0766..a55715ba0a 100644
+--- a/replay/replay-debugging.c
++++ b/replay/replay-debugging.c
+@@ -316,3 +316,17 @@ void replay_breakpoint(void)
+     assert(replay_mode == REPLAY_MODE_PLAY);
+     replay_last_breakpoint = replay_get_current_icount();
+ }
++
++void replay_gdb_attached(void)
++{
++    /*
++     * Create VM snapshot on temporary overlay to allow reverse
++     * debugging even if snapshots were not enabled.
++     */
++    if (replay_mode == REPLAY_MODE_PLAY
++        && !replay_snapshot) {
++        if (save_snapshot("start_debugging", NULL) != 0) {
++            /* Can't create the snapshot. Continue conventional debugging. */
++        }
++    }
++}
 
 
