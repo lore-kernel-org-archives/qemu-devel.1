@@ -2,78 +2,91 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5DA8C4346E
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 08:02:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21C4FC4346E
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 08:04:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 313362075F
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 08:02:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 803732075F
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 08:04:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gUG6REvb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 313362075F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AoCtnw1v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 803732075F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNAab-0000k5-2h
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 04:02:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59788)
+	id 1kNAci-00035I-El
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 04:04:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58614)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kNA3P-000394-5K
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:28:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49598)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9za-0005qU-L5
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:24:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54339)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kNA3N-0002pg-ET
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:28:02 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9zY-00021j-OL
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:24:06 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601364480;
+ s=mimecast20190719; t=1601364243;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=uEK8I/FGG3j53B+4b6RsOT7X9rvIJgBnm8LqJyACgd8=;
- b=gUG6REvbhGKHh3EbL4H4Hwywpp2+9Tv3e7UwYiU1AFmNCt6ObJWLFSmdLEJF0zpuTX10vX
- T7cE4JedkajTr7ikfoq88j96VEaKkU4hCIpvLtO97QRGdXxWtZFiqZbyvr2a4ogoLyVL3T
- ypwPPvy5EYi8gRrDVGdhJIJjHsny2eA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-353-q5ReYIHIMZWWCgnLmzWyXg-1; Tue, 29 Sep 2020 03:27:58 -0400
-X-MC-Unique: q5ReYIHIMZWWCgnLmzWyXg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F155B1084D64;
- Tue, 29 Sep 2020 07:27:57 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
- [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8A21F3782;
- Tue, 29 Sep 2020 07:27:51 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 6F28B1750A; Tue, 29 Sep 2020 09:27:50 +0200 (CEST)
-Date: Tue, 29 Sep 2020 09:27:50 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: marcandre.lureau@redhat.com
-Subject: Re: [PATCH v3 0/6] Add physical display dimensions to spice/virtio-gpu
-Message-ID: <20200929072750.uvddsvf325hkvpb7@sirius.home.kraxel.org>
-References: <20200927145751.365446-1-marcandre.lureau@redhat.com>
+ bh=Ah7mc5RocJKu5k38pc3bIhhlNP7PQMywKwtP1B1qEw0=;
+ b=AoCtnw1vEYc63i/qwNLO69tmBgTVtdhdk12dpVmI2VDhoVOfwJoViqkCunSolHsjeQG5q8
+ zxYjx2rKEUFuYJHHpDC7XPOXAGwcglxNpMG42AsWV69y1LydvJABiVIpigc2yRFlPpdNtF
+ X8FyY3maSXUcnK+fTmlujVKj0TkrzdE=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-537-pg3dWQO6MTCVTZhYQNmRWA-1; Tue, 29 Sep 2020 03:21:27 -0400
+X-MC-Unique: pg3dWQO6MTCVTZhYQNmRWA-1
+Received: by mail-wm1-f69.google.com with SMTP id a7so1462323wmc.2
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 00:21:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=Ah7mc5RocJKu5k38pc3bIhhlNP7PQMywKwtP1B1qEw0=;
+ b=mmpmxkYFvRfkHEgRRrAAPGYOEuBTVe0LECf/EkWJ4T1ZP9AVpssfSOsnmYlEbtjT6z
+ RhkzYP72O0JNXxRybMGIoCgdJW8iWlK9uX1Q4fbhU/ZD6my4TJQrkLbKn29IcIiHQTyk
+ 9uGiExKid8LJuX14LbmUk/tIwO5fqAQK333v2xygPyjdym4VOn3l+oXFuEct09tugUCI
+ joGtR9Qfuan9q9N/HXfw4wl/PBpis9b0y7FaRG1b+B2AaPimo6+kSzmoipHD5/KHYnDf
+ 84rKWWB/oIVMdry4hwPswx5kq9nxNFIc6X4OlfMqIi/BG9Xiw/FugXuYQ/VS41EarEix
+ R9Ug==
+X-Gm-Message-State: AOAM533ptW3Pg+62FKNXkIpi+7R665+DPVUfpCxlbsDHm5BddOhJh3by
+ yxhId03AsszwatZ7rfq2yjZoYRcavZ6Qss+iMjJgw6wt5UAbr9KHTwBWQbv5/mVXFhtl4fxS5Y7
+ 7YIX2FQbNL8grvd8=
+X-Received: by 2002:a5d:6a42:: with SMTP id t2mr2429767wrw.425.1601364085685; 
+ Tue, 29 Sep 2020 00:21:25 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzRbMwRFZ9pWhOHmAUD+WFik+UvC0HK0qS4MxnIZyQjRLoVoM6g/oegQBIBIONjlXDkU8xRhw==
+X-Received: by 2002:a5d:6a42:: with SMTP id t2mr2429751wrw.425.1601364085536; 
+ Tue, 29 Sep 2020 00:21:25 -0700 (PDT)
+Received: from redhat.com (bzq-79-179-71-128.red.bezeqint.net. [79.179.71.128])
+ by smtp.gmail.com with ESMTPSA id g8sm3948392wmd.12.2020.09.29.00.21.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 29 Sep 2020 00:21:24 -0700 (PDT)
+Date: Tue, 29 Sep 2020 03:21:23 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL v4 12/48] virtio-pmem-pci: force virtio version 1
+Message-ID: <20200929071948.281157-13-mst@redhat.com>
+References: <20200929071948.281157-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200927145751.365446-1-marcandre.lureau@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20200929071948.281157-1-mst@redhat.com>
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 02:22:44
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -96,28 +109,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ David Hildenbrand <david@redhat.com>,
+ Pankaj Gupta <pankaj.gupta.linux@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Sep 27, 2020 at 06:57:45PM +0400, marcandre.lureau@redhat.com wrote:
-> From: Marc-André Lureau <marcandre.lureau@redhat.com>
-> 
-> Hi,
-> 
-> This series improves the support for HiDPI displays with Spice.
-> The related spice series have already been merged.
-> 
-> v3:
->  - simplify the handling of Spice monitor configuration (Frediano)
-> v2:
->  - add a patch to "spice: remove the single monitor config logic" (Gerd)
+From: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
 
-Series queued up now.
+ Qemu fails with below error when trying to run with virtio pmem:
 
-thanks,
-  Gerd
+ (qemu) qemu-system-x86_64: -device virtio-pmem-pci,memdev=mem1,id=nv1:
+  device is modern-only, use disable-legacy=on
+
+ This patch fixes this by forcing virtio 1 with virtio-pmem.
+
+fixes: adf0748a49 ("virtio-pci: Proxy for virtio-pmem")
+Signed-off-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Message-Id: <20200925102251.7216-1-pankaj.gupta.linux@gmail.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Acked-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/virtio/virtio-pmem-pci.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/hw/virtio/virtio-pmem-pci.c b/hw/virtio/virtio-pmem-pci.c
+index 21a457d151..2b2a0b1eae 100644
+--- a/hw/virtio/virtio-pmem-pci.c
++++ b/hw/virtio/virtio-pmem-pci.c
+@@ -22,6 +22,7 @@ static void virtio_pmem_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+     VirtIOPMEMPCI *pmem_pci = VIRTIO_PMEM_PCI(vpci_dev);
+     DeviceState *vdev = DEVICE(&pmem_pci->vdev);
+ 
++    virtio_pci_force_virtio_1(vpci_dev);
+     qdev_realize(vdev, BUS(&vpci_dev->bus), errp);
+ }
+ 
+-- 
+MST
 
 
