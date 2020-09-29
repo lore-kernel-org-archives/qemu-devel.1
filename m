@@ -7,78 +7,77 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 678FCC4727C
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 20:08:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D79AC47420
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 20:10:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E40B72076A
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 20:08:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61E9420774
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 20:10:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Ei6YoEta"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E40B72076A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="ZQhE9NsG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61E9420774
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNLvB-0002d3-Px
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 16:08:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45506)
+	id 1kNLwn-0004KN-E6
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 16:10:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45624)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1kNKzy-0008ND-Hj
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 15:09:15 -0400
-Received: from mail-pj1-x1030.google.com ([2607:f8b0:4864:20::1030]:52456)
+ id 1kNL0D-0008TC-AU
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 15:09:32 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:33509)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1kNKzw-0002XF-5C
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 15:09:14 -0400
-Received: by mail-pj1-x1030.google.com with SMTP id ml18so353378pjb.2
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 12:09:11 -0700 (PDT)
+ id 1kNL07-0002YV-Ad
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 15:09:28 -0400
+Received: by mail-pf1-x441.google.com with SMTP id q123so5552174pfb.0
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 12:09:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=J86lKGoDu1PcC00L+Bxg4r6til8/6L+deYlUXajDyyY=;
- b=Ei6YoEtaaRAAy3CJTP4k7lCflNlnc2VgHw5r64bfKZBQEDxWsPjEzNyui8EDYT3Vga
- WQXug7aTWuAV/dfcyQ5VYco2F/jA1Zviq0pN8kff7vPy5L6rUmq+d1J7UcBAvXQFRWQP
- 4bm76VmDdo5rVUE573mpZAvMldKRtG7ZoMsg8jcqFkeOPXvMUD3TbpQP/cL7FcvzufaA
- S4RNCc3/5WVnIwij9GqhfBi6DW5Re8g0YfzyOBlTVCBtltLkzoUfB+pbNxb0CaPVxwRm
- 8vZYaZFVSz+vDvUYKwTzo2Br4QMdrgYzgJrwdeh0MHSrQrdcq2mQQzJngUOLluvn+Gqq
- paxQ==
+ bh=XI3sKczohciBsZgnmxAfhEd2fKi5Y9uKTWUghLaMHXA=;
+ b=ZQhE9NsGUsuhKkZasb4VSRERQYh52kk6iMFmbJ72EpaeZ4QjKo65D973PlyPT6XiMv
+ 1gY9Dre9n/t/eq+m0wZzPjkZA3bmimPF2s6wcNzr1nQwVWbdRCRJX2daw/I0okv49DZ6
+ CCDGcB2eXQWV62RMEqkM3nn0ZnzFdUsE2U20pDkSYAyCYK7My4mQJI3QdigaSb1if5eF
+ r/pgrySMYlNR7an2ZMztFAHgI1b0P1iDCEj8TvnNuwERE03afP9rBecOwISFgtBx6hVt
+ HrgmmU2dwcLlzhsx7ZFMl+23E8JSrqmlTIVRkc1i7tikAoQte2H8DsUgB1JnztJU3UYG
+ bL4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=J86lKGoDu1PcC00L+Bxg4r6til8/6L+deYlUXajDyyY=;
- b=ZALfm1ourgz4g7SqQ6rUVJoQ2MvJnYTLN/ejhCopdBdiMMk4IRv0UMYcuEym8UckWX
- wr+61NlKsePQJmKfFanVLhAOaeRlBFzE2KRKbyQ/aaLxhu7fGR+CrVUrP3UVuP158LgQ
- ftCnJ2n/zFrK/LeBVZwGlJy2r6xtnzPrTRlY8+Do06DZQhUcnkulq6dkuCPVpDGrxyJ0
- z28HMkJSWQUBRdShIlSvA+OAdgievIiJoSMbMJDMyyqWFo3KUJnWLbBig+wH522ANTAz
- doZweZp8O5UjtNdxj0vUDM5BEQWbQxSzLzPLDSbymWbg0n9Ofy4uoqlPxRMxROyXHT+j
- be2Q==
-X-Gm-Message-State: AOAM531B8cwZAusZovQdl9Gh36HxmWunYI1ux3CIbGHkuh13T4zEsVXY
- 97AZlWjldrRFjjHrOvtl7Ok6q3UL+Mmbtw==
-X-Google-Smtp-Source: ABdhPJy1QbJvt7Acbn1fpAFi0DDTgN/ykU54FqFzGuPYqowLdxrv1cBbsuWnQl4EnUl8ul9RODZo/A==
-X-Received: by 2002:a17:90a:d990:: with SMTP id
- d16mr3731393pjv.226.1601406550517; 
- Tue, 29 Sep 2020 12:09:10 -0700 (PDT)
+ bh=XI3sKczohciBsZgnmxAfhEd2fKi5Y9uKTWUghLaMHXA=;
+ b=OFKks474du7WEr0PAmtTR20yj4Kv7YTYJT2H5mlGYlU8a8ApER+655VpgMywVd5Dyh
+ A6dC+BkeLb8VgP5JJY4xul2nmalrg23aMlurCAnkxaoVBu1tujyKpv+kc9P6bJa//PrN
+ jdwvUXy2cFJMz0gczlfshkGmSsOInDiF/QkMaFuyLJnhpN8vLHynJxCdvY3ea4cCv79k
+ sEKyYi3WCFQw7S9zR6aLqfJcwdSQuYd189IBypA6y2mORgVKPzbqMAe+00vEWFJlImYJ
+ VJEezMwfOhxbpaI6kftaHGP4RuSEx4MCgf81Q0RPD9j/Lj6nvgLndGVN9MIneCDzPP6l
+ TfXg==
+X-Gm-Message-State: AOAM532t/wXHzKzYfv4/bwpzN/JHFQHCoSjA4fMix+oFus4NgdIL23io
+ 8q8OcWeC5fH328gpQN9KjTrob92yKF8g7A==
+X-Google-Smtp-Source: ABdhPJxuCkJJbwUe8Kx2i8YITOSsTf5hVWKqb/2oADOIZAqvbLvaMkl4bAYK9gEiZKv7BKDLwSoCag==
+X-Received: by 2002:a63:db44:: with SMTP id x4mr4290588pgi.435.1601406561700; 
+ Tue, 29 Sep 2020 12:09:21 -0700 (PDT)
 Received: from localhost.localdomain (122-116-72-36.HINET-IP.hinet.net.
  [122.116.72.36])
- by smtp.gmail.com with ESMTPSA id v8sm6003950pgg.58.2020.09.29.12.09.08
+ by smtp.gmail.com with ESMTPSA id v8sm6003950pgg.58.2020.09.29.12.09.19
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 29 Sep 2020 12:09:10 -0700 (PDT)
+ Tue, 29 Sep 2020 12:09:21 -0700 (PDT)
 From: frank.chang@sifive.com
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [RFC v5 65/68] target/riscv: gdb: modify gdb csr xml file to align
- with csr register map
-Date: Wed, 30 Sep 2020 03:04:40 +0800
-Message-Id: <20200929190448.31116-66-frank.chang@sifive.com>
+Subject: [RFC v5 68/68] target/riscv: trigger illegal instruction exception if
+ frm is not valid
+Date: Wed, 30 Sep 2020 03:04:43 +0800
+Message-Id: <20200929190448.31116-69-frank.chang@sifive.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200929190448.31116-1-frank.chang@sifive.com>
 References: <20200929190448.31116-1-frank.chang@sifive.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1030;
- envelope-from=frank.chang@sifive.com; helo=mail-pj1-x1030.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
+ envelope-from=frank.chang@sifive.com; helo=mail-pf1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -102,106 +101,107 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>,
  Frank Chang <frank.chang@sifive.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Hsiangkai Wang <kai.wang@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
  Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Richard Henderson <richard.henderson@linaro.org>,
  Alistair Francis <Alistair.Francis@wdc.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ Palmer Dabbelt <palmer@dabbelt.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Hsiangkai Wang <kai.wang@sifive.com>
+From: Frank Chang <frank.chang@sifive.com>
 
-Signed-off-by: Hsiangkai Wang <kai.wang@sifive.com>
-Acked-by: Richard Henderson <richard.henderson@linaro.org>
+If the frm field contains an invalid rounding mode (101-111),
+attempting to execute any vector floating-point instruction, even
+those that do not depend on the rounding mode, will raise an illegal
+instruction exception.
+
+Call gen_set_rm() with DYN rounding mode to check and trigger illegal
+instruction exception if frm field contains invalid value at run-time
+for vector floating-point instructions.
+
 Signed-off-by: Frank Chang <frank.chang@sifive.com>
 ---
- gdb-xml/riscv-32bit-csr.xml | 11 ++++++-----
- gdb-xml/riscv-64bit-csr.xml | 11 ++++++-----
- target/riscv/gdbstub.c      |  4 ++--
- 3 files changed, 14 insertions(+), 12 deletions(-)
+ target/riscv/insn_trans/trans_rvv.c.inc | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
-diff --git a/gdb-xml/riscv-32bit-csr.xml b/gdb-xml/riscv-32bit-csr.xml
-index da1bf19e2f..3d2031da7d 100644
---- a/gdb-xml/riscv-32bit-csr.xml
-+++ b/gdb-xml/riscv-32bit-csr.xml
-@@ -110,6 +110,8 @@
-   <reg name="mcause" bitsize="32"/>
-   <reg name="mtval" bitsize="32"/>
-   <reg name="mip" bitsize="32"/>
-+  <reg name="mtinst" bitsize="32"/>
-+  <reg name="mtval2" bitsize="32"/>
-   <reg name="pmpcfg0" bitsize="32"/>
-   <reg name="pmpcfg1" bitsize="32"/>
-   <reg name="pmpcfg2" bitsize="32"/>
-@@ -232,12 +234,11 @@
-   <reg name="hedeleg" bitsize="32"/>
-   <reg name="hideleg" bitsize="32"/>
-   <reg name="hie" bitsize="32"/>
--  <reg name="htvec" bitsize="32"/>
--  <reg name="hscratch" bitsize="32"/>
--  <reg name="hepc" bitsize="32"/>
--  <reg name="hcause" bitsize="32"/>
--  <reg name="hbadaddr" bitsize="32"/>
-+  <reg name="hcounteren" bitsize="32"/>
-+  <reg name="htval" bitsize="32"/>
-   <reg name="hip" bitsize="32"/>
-+  <reg name="htinst" bitsize="32"/>
-+  <reg name="hgatp" bitsize="32"/>
-   <reg name="mbase" bitsize="32"/>
-   <reg name="mbound" bitsize="32"/>
-   <reg name="mibase" bitsize="32"/>
-diff --git a/gdb-xml/riscv-64bit-csr.xml b/gdb-xml/riscv-64bit-csr.xml
-index 6aa4bed9f5..9039456293 100644
---- a/gdb-xml/riscv-64bit-csr.xml
-+++ b/gdb-xml/riscv-64bit-csr.xml
-@@ -110,6 +110,8 @@
-   <reg name="mcause" bitsize="64"/>
-   <reg name="mtval" bitsize="64"/>
-   <reg name="mip" bitsize="64"/>
-+  <reg name="mtinst" bitsize="64"/>
-+  <reg name="mtval2" bitsize="64"/>
-   <reg name="pmpcfg0" bitsize="64"/>
-   <reg name="pmpcfg1" bitsize="64"/>
-   <reg name="pmpcfg2" bitsize="64"/>
-@@ -232,12 +234,11 @@
-   <reg name="hedeleg" bitsize="64"/>
-   <reg name="hideleg" bitsize="64"/>
-   <reg name="hie" bitsize="64"/>
--  <reg name="htvec" bitsize="64"/>
--  <reg name="hscratch" bitsize="64"/>
--  <reg name="hepc" bitsize="64"/>
--  <reg name="hcause" bitsize="64"/>
--  <reg name="hbadaddr" bitsize="64"/>
-+  <reg name="hcounteren" bitsize="64"/>
-+  <reg name="htval" bitsize="64"/>
-   <reg name="hip" bitsize="64"/>
-+  <reg name="htinst" bitsize="64"/>
-+  <reg name="hgatp" bitsize="64"/>
-   <reg name="mbase" bitsize="64"/>
-   <reg name="mbound" bitsize="64"/>
-   <reg name="mibase" bitsize="64"/>
-diff --git a/target/riscv/gdbstub.c b/target/riscv/gdbstub.c
-index eba12a86f2..f7c5212e27 100644
---- a/target/riscv/gdbstub.c
-+++ b/target/riscv/gdbstub.c
-@@ -418,13 +418,13 @@ void riscv_cpu_register_gdb_regs_for_features(CPUState *cs)
-     }
- #if defined(TARGET_RISCV32)
-     gdb_register_coprocessor(cs, riscv_gdb_get_csr, riscv_gdb_set_csr,
--                             240, "riscv-32bit-csr.xml", 0);
-+                             241, "riscv-32bit-csr.xml", 0);
+diff --git a/target/riscv/insn_trans/trans_rvv.c.inc b/target/riscv/insn_trans/trans_rvv.c.inc
+index 7a1571cee8..7d4ce9e092 100644
+--- a/target/riscv/insn_trans/trans_rvv.c.inc
++++ b/target/riscv/insn_trans/trans_rvv.c.inc
+@@ -2624,8 +2624,11 @@ static bool do_opfv(DisasContext *s, arg_rmr *a,
+                     int rm)
+ {
+     if (checkfn(s, a)) {
++        if (rm != RISCV_FRM_DYN) {
++            gen_set_rm(s, RISCV_FRM_DYN);
++        }
++
+         uint32_t data = 0;
+-        gen_set_rm(s, RISCV_FRM_DYN);
+         TCGLabel *over = gen_new_label();
+         gen_set_rm(s, rm);
+         tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
+@@ -2710,6 +2713,8 @@ static bool trans_vfmv_v_f(DisasContext *s, arg_vfmv_v_f *a)
+         require_rvf(s) &&
+         vext_check_isa_ill(s) &&
+         require_align(a->rd, s->lmul)) {
++        gen_set_rm(s, RISCV_FRM_DYN);
++
+         TCGv_i64 t1;
  
-     gdb_register_coprocessor(cs, riscv_gdb_get_virtual, riscv_gdb_set_virtual,
-                              1, "riscv-32bit-virtual.xml", 0);
- #elif defined(TARGET_RISCV64)
-     gdb_register_coprocessor(cs, riscv_gdb_get_csr, riscv_gdb_set_csr,
--                             240, "riscv-64bit-csr.xml", 0);
-+                             241, "riscv-64bit-csr.xml", 0);
- 
-     gdb_register_coprocessor(cs, riscv_gdb_get_virtual, riscv_gdb_set_virtual,
-                              1, "riscv-64bit-virtual.xml", 0);
+         if (s->vl_eq_vlmax) {
+@@ -2792,6 +2797,10 @@ static bool opfv_widen_check(DisasContext *s, arg_rmr *a)
+ static bool trans_##NAME(DisasContext *s, arg_rmr *a)              \
+ {                                                                  \
+     if (opfv_widen_check(s, a)) {                                  \
++        if (FRM != RISCV_FRM_DYN) {                                \
++            gen_set_rm(s, RISCV_FRM_DYN);                          \
++        }                                                          \
++                                                                   \
+         uint32_t data = 0;                                         \
+         static gen_helper_gvec_3_ptr * const fns[2] = {            \
+             gen_helper_##HELPER##_h,                               \
+@@ -2877,6 +2886,10 @@ static bool opfv_narrow_check(DisasContext *s, arg_rmr *a)
+ static bool trans_##NAME(DisasContext *s, arg_rmr *a)              \
+ {                                                                  \
+     if (opfv_narrow_check(s, a)) {                                 \
++        if (FRM != RISCV_FRM_DYN) {                                \
++            gen_set_rm(s, RISCV_FRM_DYN);                          \
++        }                                                          \
++                                                                   \
+         uint32_t data = 0;                                         \
+         static gen_helper_gvec_3_ptr * const fns[2] = {            \
+             gen_helper_##HELPER##_h,                               \
+@@ -2917,6 +2930,10 @@ static bool opxfv_narrow_check(DisasContext *s, arg_rmr *a)
+ static bool trans_##NAME(DisasContext *s, arg_rmr *a)              \
+ {                                                                  \
+     if (opxfv_narrow_check(s, a)) {                                \
++        if (FRM != RISCV_FRM_DYN) {                                \
++            gen_set_rm(s, RISCV_FRM_DYN);                          \
++        }                                                          \
++                                                                   \
+         uint32_t data = 0;                                         \
+         static gen_helper_gvec_3_ptr * const fns[3] = {            \
+             gen_helper_##HELPER##_b,                               \
+@@ -3386,6 +3403,8 @@ static bool trans_vfmv_f_s(DisasContext *s, arg_vfmv_f_s *a)
+     if (require_rvv(s) &&
+         require_rvf(s) &&
+         vext_check_isa_ill(s)) {
++        gen_set_rm(s, RISCV_FRM_DYN);
++
+         unsigned int ofs = (8 << s->sew);
+         unsigned int len = 64 - ofs;
+         TCGv_i64 t_nan;
+@@ -3411,6 +3430,8 @@ static bool trans_vfmv_s_f(DisasContext *s, arg_vfmv_s_f *a)
+     if (require_rvv(s) &&
+         require_rvf(s) &&
+         vext_check_isa_ill(s)) {
++        gen_set_rm(s, RISCV_FRM_DYN);
++
+         /* The instructions ignore LMUL and vector register group. */
+         TCGv_i64 t1;
+         TCGLabel *over = gen_new_label();
 -- 
 2.17.1
 
