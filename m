@@ -6,62 +6,76 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3454C4346E
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 10:39:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4F64C4346E
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 10:41:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34F9A207C4
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 10:39:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EF12D207C4
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 10:40:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="KstC0wdv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34F9A207C4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KiT+2nqR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF12D207C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kND2V-0003wZ-0P
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 06:39:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51102)
+	id 1kND47-0005IN-3e
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 06:40:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51244)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kND0R-0002qi-5D
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 06:37:11 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51684)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kND0G-0007QF-12
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 06:37:10 -0400
-Received: by mail-wm1-x342.google.com with SMTP id w2so4114909wmi.1
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 03:36:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=h8arlqCjtMznOpQCgEoYwkyu5n80Epqv5mac782Wgcw=;
- b=KstC0wdvFUSxRGxHKtiQPy8P0OpawQ+qQGMq1LHho3Qb+cn4+OU3aLRGHX/RBNNVqP
- MrNhbOHJGbk3lJkrZ3rYrOb6Ldx7mZZaRp5AYIgjF28xlm423xzfm14gxOoGhinz0BHN
- 0krM0dZEAS8XXfrZjqKWAe7ZjHW2zDJSi0RWJ2WnX3uStLInWJJ1pfqqQN6u7jOZ2O+7
- GstUT15v987a+i8b0P+zPtm3Exh4Jc/cLBLi4xP8j1PYQZoDdBYSupCXExB9YaQcSzwX
- 2WWjqpLfKDV2lp6DRZweyNCZyUVlnRE9v+Mey8W7bjUBU8YkCK7weHWXwJ2z2GvdtIFN
- EilQ==
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kND0u-00037v-OW
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 06:37:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20473)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kND0p-0007Tr-A3
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 06:37:39 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601375851;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=59zJoRm8m52QbX8EdoAuziKffVkgDLUpeFXURuxLsOs=;
+ b=KiT+2nqR6YfOpds4SHrLgvLg9jr9SW+ErspMd+JmSdVps4UH0xU8dEoOYW2n8d7AzXtJCn
+ ghYWOrIlvWN4vQgOPdEwsFNGVuiWG39dYNW6hU/vyrjHkB77HrznRAME1sG4H0ftFvLbiy
+ 0B38ZWechip/Q6XAmeZzRdbbvuH+AjM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-151-Oridmqc0NWuPoNFPe99QZA-1; Tue, 29 Sep 2020 06:37:13 -0400
+X-MC-Unique: Oridmqc0NWuPoNFPe99QZA-1
+Received: by mail-wr1-f72.google.com with SMTP id l17so1557965wrw.11
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 03:37:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=h8arlqCjtMznOpQCgEoYwkyu5n80Epqv5mac782Wgcw=;
- b=noT3990geq3W8rCjCZGEdKTkmRcMhYSmudhZAk9anQobOOY3DlkE9S7tWcT9BDh1Lo
- VXF4lzZdhEfmAm975ndI8PJg9yWSlHH5p4WfmeGHvPn/e24f+vlZtWZ5gBGi0FzatpLz
- 8SqJABgurZ6N8HYlST8QqpKcONl7u4/n/moen1718Uq/XDCCM3V2mtP2C6B+SFPtuOOX
- Xkvb5Ssc7ENXIHrpsnmpkdE8mDzNwkQuEMUe+bnm1k0bnFmOxnBwv5NUcCvEY6+Gbskx
- cO/IcLiQcc1p0S0Zj3fZ8uaiLipf9qT2utdZ3v9Gu1o9ckGHmSf2HaPIhC8svPc5SV7q
- oVgQ==
-X-Gm-Message-State: AOAM533Dx97yRhxsLNfM/kB1pWSc6t/PjHv+VszNsWFXpYoKmNcbA8pL
- 5fm7ZdPq+Mn2TuoDjMLKQ9rlW61AuUOQORUBwgAsCw==
-X-Google-Smtp-Source: ABdhPJxX/flRUKHj+RxovDVp0cYqGmToA4M9zRqSOi0PyvkQQY8n234ypPz4qz/8G5D6JDznkG3/prI5HsVSdLeJYdQ=
-X-Received: by 2002:a1c:e256:: with SMTP id z83mr4100013wmg.137.1601375817664; 
- Tue, 29 Sep 2020 03:36:57 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200918084111.15339-1-ani@anisinha.ca>
- <20200918084111.15339-14-ani@anisinha.ca>
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=59zJoRm8m52QbX8EdoAuziKffVkgDLUpeFXURuxLsOs=;
+ b=MzyqKvvA66Noq98Fmo68/lXlCn0SDCQkjIz4c45D3+DzfNlw9sg7kegTUmp2EsCiQB
+ MCkB5X0aedjgdrWMeex2r105dwUdhnLm6Mv8FO4jMIvOhyQVzXvE7FU3ePuzii5PduLc
+ vZ24mbrwKJcQNRwtne2scnT+NxPt1FysW9VBYGR1gEjmQjcLHl5WBG7PRmhxkHLDQNr6
+ LESMnUPGMCGl2YQORbja0bOFYWE2C+ANbTBxBHSdMLw7rtIOyh2S2L0a/xyAcICyOIsO
+ QwNeDpsUFHcMOEwZHsQsHGXk9iK4cUjTgaY9zdleOHfrYPbpcuhb8izMTxuY0ZEomExc
+ ddfA==
+X-Gm-Message-State: AOAM530DiIIfdH4d6KR9GCNnv3I8D86+MhF60lUwObmpI+75F9Q0vKpL
+ FUPvGP9mYcBzWoaZ+bfmypINh9ruwkpYVS02diWV0COB0iq1jQkMspUTLB+bDrmS/C25sRVN8X7
+ K3xI4tjhzbjEE5Do=
+X-Received: by 2002:adf:9e41:: with SMTP id v1mr3864752wre.60.1601375831635;
+ Tue, 29 Sep 2020 03:37:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw5DRvD6AkiPUOXVTe45ftWl4ChsRyDSyaRSIRbPhh5H+ybMDqdvFo7uXuP1T8EwQ8lgxipXA==
+X-Received: by 2002:adf:9e41:: with SMTP id v1mr3864641wre.60.1601375830539;
+ Tue, 29 Sep 2020 03:37:10 -0700 (PDT)
+Received: from redhat.com (bzq-79-179-71-128.red.bezeqint.net. [79.179.71.128])
+ by smtp.gmail.com with ESMTPSA id a13sm4588853wme.26.2020.09.29.03.37.08
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 29 Sep 2020 03:37:09 -0700 (PDT)
+Date: Tue, 29 Sep 2020 06:37:06 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Ani Sinha <ani@anisinha.ca>
+Subject: Re: [PATCH v10 13/13] tests/acpi: add DSDT.hpbrroot DSDT table blob
+ to test global i440fx hotplug
+Message-ID: <20200929063539-mutt-send-email-mst@kernel.org>
+References: <20200918084111.15339-14-ani@anisinha.ca>
  <20200929031032-mutt-send-email-mst@kernel.org>
  <CAARzgwzdVCwzXE2hUgPQdQpnp8eTf0JyEt3vctKWnZgwZZAfuA@mail.gmail.com>
  <20200929032619-mutt-send-email-mst@kernel.org>
@@ -71,24 +85,25 @@ References: <20200918084111.15339-1-ani@anisinha.ca>
  <CAARzgwxBcTDkK7QhHP=_mpYoAYYgRY+d6o+2SCSP-haBPDttwA@mail.gmail.com>
  <CAARzgwy8QNw=OD6cOEkDY-x9mC10ry+NTdCH2gNKuLXp8bAAyg@mail.gmail.com>
  <CAARzgwyNPZB5PGc-B9vDn9V-uEwVCiCvXgvamMaGTvBCPJQiCg@mail.gmail.com>
+MIME-Version: 1.0
 In-Reply-To: <CAARzgwyNPZB5PGc-B9vDn9V-uEwVCiCvXgvamMaGTvBCPJQiCg@mail.gmail.com>
-From: Ani Sinha <ani@anisinha.ca>
-Date: Tue, 29 Sep 2020 16:06:45 +0530
-Message-ID: <CAARzgwxnK2UCC=HSz5x2ENhtHTBtpe40_FUQMU_x8tSifjPpDg@mail.gmail.com>
-Subject: Re: [PATCH v10 13/13] tests/acpi: add DSDT.hpbrroot DSDT table blob
- to test global i440fx hotplug
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: none client-ip=2a00:1450:4864:20::342;
- envelope-from=ani@anisinha.ca; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 02:22:44
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,7 +117,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Julia Suvorova <jusual@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
  QEMU Developers <qemu-devel@nongnu.org>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
  Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
@@ -111,8 +126,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 29, 2020 at 4:02 PM Ani Sinha <ani@anisinha.ca> wrote:
->
+On Tue, Sep 29, 2020 at 04:02:07PM +0530, Ani Sinha wrote:
 > On Tue, Sep 29, 2020 at 4:00 PM Ani Sinha <ani@anisinha.ca> wrote:
 > >
 > > In your pull request the following patch is completely screwed up:
@@ -126,41 +140,16 @@ On Tue, Sep 29, 2020 at 4:02 PM Ani Sinha <ani@anisinha.ca> wrote:
 > >
 > > This is not my patch. It has all sorts of changes which does not
 > > belong there. Can you please check?
->
+> 
 > See https://patchew.org/QEMU/20200929071948.281157-1-mst@redhat.com/20200929071948.281157-46-mst@redhat.com/
 
-Also you have tons of dsl files which does not belong :
 
-ani@ani-ubuntu:~/workspace/qemu-patchew/tests/data/acpi/pc$ ls *.dsl
-APIC.acpihmat.dsl  DSDT.acpihmat.dsl  FACP.acpihmat.dsl
-FACS.acpihmat.dsl  HMAT.acpihmat.dsl  HPET.dsl          SLIT.memhp.dsl
-    WAET.acpihmat.dsl
-APIC.bridge.dsl    DSDT.bridge.dsl    FACP.bridge.dsl
-FACS.bridge.dsl    HMAT.dsl           HPET.ipmikcs.dsl
-SRAT.acpihmat.dsl  WAET.bridge.dsl
-APIC.cphp.dsl      DSDT.cphp.dsl      FACP.cphp.dsl      FACS.cphp.dsl
-     hpbridge.dsl       HPET.memhp.dsl    SRAT.cphp.dsl
-WAET.cphp.dsl
-APIC.dimmpxm.dsl   DSDT.dimmpxm.dsl   FACP.dimmpxm.dsl
-FACS.dimmpxm.dsl   hpbrroot.dsl       HPET.numamem.dsl
-SRAT.dimmpxm.dsl   WAET.dimmpxm.dsl
-APIC.dsl           DSDT.dsl           FACP.dsl           FACS.dsl
-     HPET.acpihmat.dsl  NFIT.dimmpxm.dsl  SRAT.dsl           WAET.dsl
-APIC.ipmikcs.dsl   DSDT.ipmikcs.dsl   FACP.ipmikcs.dsl
-FACS.ipmikcs.dsl   HPET.bridge.dsl    NFIT.dsl          SRAT.memhp.dsl
-    WAET.ipmikcs.dsl
-APIC.memhp.dsl     DSDT.memhp.dsl     FACP.memhp.dsl
-FACS.memhp.dsl     HPET.cphp.dsl      SLIT.cphp.dsl
-SRAT.numamem.dsl   WAET.memhp.dsl
-APIC.numamem.dsl   DSDT.numamem.dsl   FACP.numamem.dsl
-FACS.numamem.dsl   HPET.dimmpxm.dsl   SLIT.dsl          SSDT.dsl
-    WAET.numamem.dsl
-
-They are all introduced by that patch. So some screwup while rebase?
+I had to regenerate the binary, yes. That's par for the course.
+But it looks like I added disasssembled files. Will fix up and drop,
+thanks for noticing this.
 
 
->
->
+> 
 > >
 > > On Tue, Sep 29, 2020 at 3:20 PM Ani Sinha <ani@anisinha.ca> wrote:
 > > >
@@ -2879,4 +2868,5 @@ They are all introduced by that patch. So some screwup while rebase?
 > > >>
 > > >>
 > > >>
+
 
