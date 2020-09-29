@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01C84C4346E
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:44:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74858C4346E
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:44:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59460206DC
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:44:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E1116206DC
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:44:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dJOOacNH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59460206DC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UBdLF+z6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1116206DC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNAIu-0000lv-Ca
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 03:44:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57928)
+	id 1kNAJQ-0001gB-Mr
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 03:44:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58984)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9yG-0004ME-5W
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:22:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55951)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kNA0f-0007Yo-K5
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:25:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36780)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9yA-0001np-5c
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:22:43 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kNA0Z-0002Bb-GL
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:25:13 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601364157;
+ s=mimecast20190719; t=1601364304;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=V8Xci8HnNkfgeQV1Okxnuws7AtEIZPnWRoO72+kZyuo=;
- b=dJOOacNHwQCFcsIiMHF967a2lgIzAGa3aI6IluBTnxvSCKzImerRvDXdYuo1U8Yf6hckJ8
- 5RWVkuvaMnCn/CEqVYGMltE38/R7cOxIPzBOuyZRuPveG1T70mWKtjiUOjUJSE1YTnnhfK
- IyBsx5I7NdmD3KJRVQhJxKIr46SV9mA=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-327-bUlQJ4ZXPWSo-bPWS4Nyiw-1; Tue, 29 Sep 2020 03:22:32 -0400
-X-MC-Unique: bUlQJ4ZXPWSo-bPWS4Nyiw-1
-Received: by mail-wr1-f69.google.com with SMTP id d9so1356199wrv.16
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 00:22:32 -0700 (PDT)
+ bh=OtuDJIdJ5w4UGc1V2cVEinxPVBCkF805rxImr5K61RY=;
+ b=UBdLF+z6FtFVw+PIIRH6ktegkEQ3+Wt6N1PeEndh1vXtDvE7M+v6PHpRyk6Le2zBTTp6Yw
+ EGz3lXet+C+HUoV9F1OYT2sof3KqPMI7m6DO+DMhvvTyBTvjBT/IEnDAOR67R/alLSXJye
+ EYvhNxyVSoXYz8xfXnioba7rDEHmYKI=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-181-utD7RgCQNR-E-B5AVqupwQ-1; Tue, 29 Sep 2020 03:21:49 -0400
+X-MC-Unique: utD7RgCQNR-E-B5AVqupwQ-1
+Received: by mail-wr1-f71.google.com with SMTP id g6so1375728wrv.3
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 00:21:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=V8Xci8HnNkfgeQV1Okxnuws7AtEIZPnWRoO72+kZyuo=;
- b=ScePLuIIMO9rZlihaO1dxrkVzGC2rANSaf6FPh0L8Zr67r9Keju/IXS/QUgFJRr6kQ
- oy3AHx4azMed71JKLX4MQUK1ia788DfNm+aoE3zHhJOkRRqIuWg0lML1PFRiL4ISNTJx
- gCemDLT/rw2T6yv/y4Z7KKnqhA+7EO5B928eoSfXXTQ5Dfauk84JGJYNpr1QkJDnMaIT
- A52ftrVwJIwA/MyUzemZywCzNwoBNXqusr61IqbhL6elNxjOy+Mu7wJrtdxg5UyMv5v3
- O8MH0kYbaq1DfG+oBDTB1yen/9xeY+oW4ORapSXSLFiVTQWeS5QlHreX3aV5tNiD/CKv
- 9e2Q==
-X-Gm-Message-State: AOAM5339sx/waVyb3HLZAXovZ5zcfvGlisTEcGRXUpgyvLk4xqELl+z6
- 6kmL5HsMOeo5fNmcO5+ZUkth0d+6abtTiYOOibRG66dBKzU1G1czPq+4RkZXuB0piS6wL5kCXkG
- ZfkF8b0mLSmn1+k0=
-X-Received: by 2002:a7b:c84a:: with SMTP id c10mr2943730wml.139.1601364150937; 
- Tue, 29 Sep 2020 00:22:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxtPc7cVi5KpkCB0m3RlGR7hA4yvw4BikMZePW/sdUVVYU+CepNgS0+llTi5uWF6No6EQL9dw==
-X-Received: by 2002:a7b:c84a:: with SMTP id c10mr2943710wml.139.1601364150774; 
- Tue, 29 Sep 2020 00:22:30 -0700 (PDT)
+ bh=OtuDJIdJ5w4UGc1V2cVEinxPVBCkF805rxImr5K61RY=;
+ b=OCUjzrtgkm/dWDb08hJE5vC1YDInLEVoUB90aQpTasvxcaHPloANwLNOxpsVS81Fan
+ wziEOe3Wp1bVjWUPPPAV3K/lkyE8hhMj+OR8lBrxAVokDAwEbZgUK85SuFLsfVQ0IW/V
+ kp8do0Yjnq13X5xO1QRqgeKzWqWBX6wT1jYkFUgNR9NAWAe8+56bb69H0v0ZqRzTdX0G
+ 4EBORjAbC6q0XBmKZx9FdOvtU9IBYmdzuVDCYSEKgAxUtesu/8pkVD7oskTfeKpUMV7+
+ 6UXNBgS45k//Dxx9yCHJkofzpQFoefDbi19zFgw8zqKnLC/QvT850rg8KAkqHtv3CIFS
+ h56A==
+X-Gm-Message-State: AOAM532FOYvpEK7hqxtltKLyZj7JVUA70hAC0xIlp9Gas6hN5RmV0HTm
+ e/EvuI0TYGgMJeuoua91OJ3mbXwsx1nQXxztkwWgWoCmzu5ULD/LtiAsiuAoPKbMJJL3fP2YCPp
+ TKFDqlMdKzHr+oJE=
+X-Received: by 2002:adf:a35d:: with SMTP id d29mr2523763wrb.307.1601364108456; 
+ Tue, 29 Sep 2020 00:21:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzkNrZWMqxoVjiN9DBOVuxj00BgGz1FN9YDiZfN3ysMzveoaymFmRZPTBLJ2jezhq7Sh7ECsA==
+X-Received: by 2002:adf:a35d:: with SMTP id d29mr2523742wrb.307.1601364108298; 
+ Tue, 29 Sep 2020 00:21:48 -0700 (PDT)
 Received: from redhat.com (bzq-79-179-71-128.red.bezeqint.net. [79.179.71.128])
- by smtp.gmail.com with ESMTPSA id u186sm4212160wmu.34.2020.09.29.00.22.29
+ by smtp.gmail.com with ESMTPSA id a10sm4125449wmj.38.2020.09.29.00.21.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 29 Sep 2020 00:22:30 -0700 (PDT)
-Date: Tue, 29 Sep 2020 03:22:28 -0400
+ Tue, 29 Sep 2020 00:21:47 -0700 (PDT)
+Date: Tue, 29 Sep 2020 03:21:45 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v4 36/48] tests/acpi: add new unit test to test hotplug off/on
- feature on the root pci bus
-Message-ID: <20200929071948.281157-37-mst@redhat.com>
+Subject: [PULL v4 20/48] virtio: update MemoryRegionCaches when guest set bad
+ features
+Message-ID: <20200929071948.281157-21-mst@redhat.com>
 References: <20200929071948.281157-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200929071948.281157-1-mst@redhat.com>
@@ -110,65 +110,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Ani Sinha <ani@anisinha.ca>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Li Qiang <liq3ea@163.com>,
+ Alexander Bulekov <alxndr@bu.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Ani Sinha <ani@anisinha.ca>
+From: Li Qiang <liq3ea@163.com>
 
-Ability to turn hotplug off on the pci root bus for i440fx was added in commit:
-3d7e78aa7777f0 ("Introduce a new flag for i440fx to disable PCI hotplug on the
-root bus")
+Current the 'virtio_set_features' only update the 'MemorRegionCaches'
+when the 'virtio_set_features_nocheck' return '0' which means it is
+not bad features. However the guest can still trigger the access of the
+used vring after set bad features. In this situation it will cause assert
+failure in 'ADDRESS_SPACE_ST_CACHED'.
 
-This change adds a unit test in order to test this feature.
-
-Signed-off-by: Ani Sinha <ani@anisinha.ca>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <20200918084111.15339-3-ani@anisinha.ca>
+Buglink: https://bugs.launchpad.net/qemu/+bug/1890333
+Fixes: db812c4073c7 ("virtio: update MemoryRegionCaches when guest negotiates features")
+Reported-by: Alexander Bulekov <alxndr@bu.edu>
+Signed-off-by: Li Qiang <liq3ea@163.com>
+Message-Id: <20200919082706.6703-1-liq3ea@163.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- tests/qtest/bios-tables-test.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ hw/virtio/virtio.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
-index a9c8d478ae..bc932d0b9f 100644
---- a/tests/qtest/bios-tables-test.c
-+++ b/tests/qtest/bios-tables-test.c
-@@ -742,6 +742,20 @@ static void test_acpi_piix4_tcg_bridge(void)
-     free_test_data(&data);
- }
- 
-+static void test_acpi_piix4_no_root_hotplug(void)
-+{
-+    test_data data;
-+
-+    memset(&data, 0, sizeof(data));
-+    data.machine = MACHINE_PC;
-+    data.variant = ".roothp";
-+    data.required_struct_types = base_required_struct_types;
-+    data.required_struct_types_len = ARRAY_SIZE(base_required_struct_types);
-+    test_acpi_one("-global PIIX4_PM.acpi-root-pci-hotplug=off "
-+                  "-device pci-bridge,chassis_nr=1", &data);
-+    free_test_data(&data);
-+}
-+
- static void test_acpi_q35_tcg(void)
- {
-     test_data data;
-@@ -1160,6 +1174,8 @@ int main(int argc, char *argv[])
-         qtest_add_func("acpi/q35/tpm-tis", test_acpi_q35_tcg_tpm_tis);
-         qtest_add_func("acpi/piix4", test_acpi_piix4_tcg);
-         qtest_add_func("acpi/piix4/bridge", test_acpi_piix4_tcg_bridge);
-+        qtest_add_func("acpi/piix4/pci-hotplug/no_root_hotplug",
-+                       test_acpi_piix4_no_root_hotplug);
-         qtest_add_func("acpi/q35", test_acpi_q35_tcg);
-         qtest_add_func("acpi/q35/bridge", test_acpi_q35_tcg_bridge);
-         qtest_add_func("acpi/q35/mmio64", test_acpi_q35_tcg_mmio64);
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index a2edb4f386..6f8f865aff 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -2963,17 +2963,16 @@ int virtio_set_features(VirtIODevice *vdev, uint64_t val)
+         return -EINVAL;
+     }
+     ret = virtio_set_features_nocheck(vdev, val);
+-    if (!ret) {
+-        if (virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX)) {
+-            /* VIRTIO_RING_F_EVENT_IDX changes the size of the caches.  */
+-            int i;
+-            for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
+-                if (vdev->vq[i].vring.num != 0) {
+-                    virtio_init_region_cache(vdev, i);
+-                }
++    if (virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX)) {
++        /* VIRTIO_RING_F_EVENT_IDX changes the size of the caches.  */
++        int i;
++        for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
++            if (vdev->vq[i].vring.num != 0) {
++                virtio_init_region_cache(vdev, i);
+             }
+         }
+-
++    }
++    if (!ret) {
+         if (!virtio_device_started(vdev, vdev->status) &&
+             !virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
+             vdev->start_on_kick = true;
 -- 
 MST
 
