@@ -2,91 +2,88 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAB55C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 03:25:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59CF7C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 03:33:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0C73216C4
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 03:25:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7ACD6208D5
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 03:33:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="m9djjnEe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0C73216C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bytedance.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AViefR/U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ACD6208D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kN6GS-0000V6-M4
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 23:25:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59196)
+	id 1kN6OW-0005Qm-1n
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 23:33:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60782)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <wanghonghao@bytedance.com>)
- id 1kN6Fm-0008Mb-0s
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 23:24:34 -0400
-Received: from mail-pf1-x435.google.com ([2607:f8b0:4864:20::435]:45653)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <wanghonghao@bytedance.com>)
- id 1kN6Fh-0007gb-5j
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 23:24:31 -0400
-Received: by mail-pf1-x435.google.com with SMTP id x22so3141032pfo.12
- for <qemu-devel@nongnu.org>; Mon, 28 Sep 2020 20:24:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=bytedance-com.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Nven6VN6iAJYLf+Q6ct/3DtVEVRwJWGsmZwivX5VO2Y=;
- b=m9djjnEePz6WgDdT6C96Ra3pBE+ZKB7F7Gpl8EjtvpmULniA0ycelaPzT3XnRoKma/
- Q805qQzo7GiOYKcQM0F6Ap+YzjcJNGC0/FG06qCF0MvAjeKMDU0YY6wCyDEK8iHL38EZ
- PKCf1kn0gkrU0HeOsTe2bp+YzUSrJfBTnceVNndREjalykfQcV/UfQpFXiWJjnao7Klq
- z/TzketBY9/ORQMIKwQ1ia4/uuboVWj9v+tmUr0Phxr622Ruup7cBxWxr8eJz1WyBlgt
- tgqACObJuxgZWm4uEXvHu/3d7DyKuk2CCbjxJuuld6Yl3CndPuwqTagVyoJPcBq8KYE4
- tM1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Nven6VN6iAJYLf+Q6ct/3DtVEVRwJWGsmZwivX5VO2Y=;
- b=bGKd/+Bcv/lm37TG7LeooW1bbmlj1eDjIvMhRVGD8IrWTa++iXfQkMLpDEdnBL9z63
- a/3FOVm7tbTgqfLWkt0BjF/pqNgz+peOxERi7K6URZfQDB9H05l0PydtCJOJ2w7Bakmk
- 6yV1EQUHA9pM51ARSDmnhvvLDpIb/dZTS7CQKNpgd9Be2iuuptHrbhYEAL5Ma7BtVca2
- KJjRyaTaxFjvDI+dzko2dD7xjOlDJ/hxWFWE0003oNXyeWh6bHxcjZVAarmSmGODtGE/
- wjeJ+FcDUtdPHJZ10oYR06L89fCW6/+xYPWJnnpAm1WsBpEb34iYtMGJx9Jbohk7w0ur
- FncQ==
-X-Gm-Message-State: AOAM531LYw/SxYYG7Lef46DlwgT/Q+57RfrJF31aKR+eZXnQrFgM1GOG
- AdgIUHWZ295AucCVZc5NBDp7oXXTJCG2JhVL7PMadw==
-X-Google-Smtp-Source: ABdhPJzox1awoXwDyYWTHRPgitnCj6y5lcNAJ9+Tw81pA6BOXpOr1vtIey/PSaj3GYEZf6NOPAw+l/LGk9xHyGNMIfQ=
-X-Received: by 2002:a17:902:bc8a:b029:d2:2a0b:f09e with SMTP id
- bb10-20020a170902bc8ab02900d22a0bf09emr2538869plb.33.1601349865639; Mon, 28
- Sep 2020 20:24:25 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kN6LK-0002uK-4Z
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 23:30:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47485)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kN6LH-0001Fu-QA
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 23:30:17 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601350214;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=EyoiZErsCK5O0Fc1NDIeRgE7jkHzK7kKElq7DPgkNd0=;
+ b=AViefR/UCehObPNiJPitC62q6bKOcKxBMDxWM2zlxhPFj8faz8YQJdnKkKesmUERnppn7t
+ /AnEjqL7KR32pILAOKdlOgl7q2/jSPT8GlpERafi2os84dd9q+uXmf7TjJ4b2c0ZM5nfJb
+ 5xySbXNtTifCK+GV825zA+xdVzxi4E0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-467-9Mo8oRwjPQiGoh8ELeNzPQ-1; Mon, 28 Sep 2020 23:30:11 -0400
+X-MC-Unique: 9Mo8oRwjPQiGoh8ELeNzPQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D15E0802B47
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 03:30:10 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-119-55.rdu2.redhat.com
+ [10.10.119.55])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 399D97842B;
+ Tue, 29 Sep 2020 03:30:02 +0000 (UTC)
+Date: Mon, 28 Sep 2020 23:30:00 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: [PATCH v3 03/47] [DO-NOT-MERGE] docs/sphinx: change default role
+ to "any"
+Message-ID: <20200929033000.GD700868@localhost.localdomain>
+References: <20200925002900.465855-1-jsnow@redhat.com>
+ <20200925002900.465855-4-jsnow@redhat.com>
 MIME-Version: 1.0
-References: <20200824043121.13421-1-wanghonghao@bytedance.com>
- <20200824043121.13421-2-wanghonghao@bytedance.com>
- <20200825145250.GB7124@stefanha-x1.localdomain>
- <CADzM5uQnVRPaH6Xtef95BMJtLRCgNq2OcaMQi0xTG-dxUjJ1Fg@mail.gmail.com>
-In-Reply-To: <CADzM5uQnVRPaH6Xtef95BMJtLRCgNq2OcaMQi0xTG-dxUjJ1Fg@mail.gmail.com>
-From: =?UTF-8?B?546L5rSq5rWp?= <wanghonghao@bytedance.com>
-Date: Tue, 29 Sep 2020 11:24:14 +0800
-Message-ID: <CADzM5uRNSZurnZ-wm8-FG7H3y7_bg+V5oNo4AjNiFSWmMJcijA@mail.gmail.com>
-Subject: PING: [PATCH 2/2] coroutine: take exactly one batch from global pool
- at a time
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::435;
- envelope-from=wanghonghao@bytedance.com; helo=mail-pf1-x435.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200925002900.465855-4-jsnow@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="NtwzykIc2mflq5ck"
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=crosa@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 23:30:14
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,116 +96,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, pbonzini@redhat.com, fam@euphon.net,
- qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, I'd like to know if there are any other problems with this patch,
-or if there is a better implement to improve coroutine pool.
+--NtwzykIc2mflq5ck
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-=E7=8E=8B=E6=B4=AA=E6=B5=A9 <wanghonghao@bytedance.com> =E4=BA=8E2020=E5=B9=
-=B48=E6=9C=8826=E6=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=882:06=E5=86=99=
-=E9=81=93=EF=BC=9A
+On Thu, Sep 24, 2020 at 08:28:16PM -0400, John Snow wrote:
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  docs/conf.py | 3 +++
+>  1 file changed, 3 insertions(+)
+>=20
+> diff --git a/docs/conf.py b/docs/conf.py
+> index 0dbd90dc11..a68f616d5a 100644
+> --- a/docs/conf.py
+> +++ b/docs/conf.py
+> @@ -81,6 +81,9 @@
+>  # The master toctree document.
+>  master_doc =3D 'index'
+> =20
+> +# Interpret `this` to be a cross-reference to "anything".
+> +default_role =3D 'any'
+> +
+>  # General information about the project.
+>  project =3D u'QEMU'
+>  copyright =3D u'2020, The QEMU Project Developers'
+> --=20
+> 2.26.2
+>=20
 
->
-> The purpose of this patch is to improve performance without increasing
-> memory consumption.
->
-> My test case:
-> QEMU command line arguments
-> -drive file=3D/dev/nvme2n1p1,format=3Draw,if=3Dnone,id=3Dlocal0,cache=3Dn=
-one,aio=3Dnative \
->     -device virtio-blk,id=3Dblk0,drive=3Dlocal0,iothread=3Diothread0,num-=
-queues=3D4 \
-> -drive file=3D/dev/nvme3n1p1,format=3Draw,if=3Dnone,id=3Dlocal1,cache=3Dn=
-one,aio=3Dnative \
->     -device virtio-blk,id=3Dblk1,drive=3Dlocal1,iothread=3Diothread1,num-=
-queues=3D4 \
->
-> run these two fio jobs at the same time
-> [job-vda]
-> filename=3D/dev/vda
-> iodepth=3D64
-> ioengine=3Dlibaio
-> rw=3Drandrw
-> bs=3D4k
-> size=3D300G
-> rwmixread=3D80
-> direct=3D1
-> numjobs=3D2
-> runtime=3D60
->
-> [job-vdb]
-> filename=3D/dev/vdb
-> iodepth=3D64
-> ioengine=3Dlibaio
-> rw=3Drandrw
-> bs=3D4k
-> size=3D300G
-> rwmixread=3D90
-> direct=3D1
-> numjobs=3D2
-> loops=3D1
-> runtime=3D60
->
-> without this patch, test 3 times:
-> total iops: 278548.1, 312374.1, 276638.2
-> with this patch, test 3 times:
-> total iops: 368370.9, 335693.2, 327693.1
->
-> 18.9% improvement in average.
->
-> In addition, we are also using a distributed block storage, of which
-> the io latency is much more than local nvme devices because of the
-> network overhead. So it needs higher iodepth(>=3D256) to reach its max
-> throughput.
-> Without this patch, it has more than 5% chance of calling
-> `qemu_coroutine_new` and the iops is less than 100K, while the iops is
-> about 260K with this patch.
->
-> On the other hand, there's a simpler way to reduce or eliminate the
-> cost of `qemu_coroutine_new` is to increase POOL_BATCH_SIZE. But it
-> will also bring much more memory consumption which we don't expect.
-> So it's the purpose of this patch.
->
-> Stefan Hajnoczi <stefanha@redhat.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=8825=
-=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=8810:52=E5=86=99=E9=81=93=EF=BC=
-=9A
-> >
-> > On Mon, Aug 24, 2020 at 12:31:21PM +0800, wanghonghao wrote:
-> > > This patch replace the global coroutine queue with a lock-free stack =
-of which
-> > > the elements are coroutine queues. Threads can put coroutine queues i=
-nto the
-> > > stack or take queues from it and each coroutine queue has exactly
-> > > POOL_BATCH_SIZE coroutines. Note that the stack is not strictly LIFO,=
- but it's
-> > > enough for buffer pool.
-> > >
-> > > Coroutines will be put into thread-local pools first while release. N=
-ow the
-> > > fast pathes of both allocation and release are atomic-free, and there=
- won't
-> > > be too many coroutines remain in a single thread since POOL_BATCH_SIZ=
-E has been
-> > > reduced to 16.
-> > >
-> > > In practice, I've run a VM with two block devices binding to two diff=
-erent
-> > > iothreads, and run fio with iodepth 128 on each device. It maintains =
-around
-> > > 400 coroutines and has about 1% chance of calling to `qemu_coroutine_=
-new`
-> > > without this patch. And with this patch, it maintains no more than 27=
-3
-> > > coroutines and doesn't call `qemu_coroutine_new` after initial alloca=
-tions.
-> >
-> > Does throughput or IOPS change?
-> >
-> > Is the main purpose of this patch to reduce memory consumption?
-> >
-> > Stefan
+After this I get:
+
+  qemu/docs/cpu-hotplug.rst:81: WARNING: 'any' reference target not found: =
+query-cpus-fast
+
+So I missed it during the review of the first patch ("docs: replace
+single backtick (`) with double-backtick (``)").
+
+- Cleber.
+
+--NtwzykIc2mflq5ck
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl9yqjQACgkQZX6NM6Xy
+CfPHhA//SexBftYJNE21PpgDtII0Qu4SW0rdrojaddJakWhxC67xNkE/h1dyQiA/
+ETUc62iyb6brf+nw6GiBrELCoR68mZV+dE1K8AG8cVgz2/h0IHMrH5AetthKCic9
+ddYgYU/qf9UhhELf/q4f03K7KQ/5PwBjaHPQm2avOMU9FjVO7oEiT0w4yS240sz7
+ulc8J0EXXWF/Aybw+bhhjuOF+dQI+AA1Pon5detFoW9anEjB7LNLNxRYJcX/+Dh6
+eijWZC7GqrgIzAIRsjBpgVWrpiFQz70VNTqQkOzKoawZPNnjbA+M2SbcPjV0OYAf
+NMuKq4UOnAfgI/S8XVNaEBBy4XTXEs9QkZHO2AsV1gBS6I0pHBPHywakhH06KdwO
+tvN9u8KMkIZLKbDIK3ZvC1mYCWJmOgo/xEjixbB1JbyLVLV4omw9yLhWTmEYN8Bk
+xnYA04dFq8SULsDcOvzQO5krTFTSp/rwjNe2l0OuAibuXkPhf1GhbsTJ3rcxJylK
+JzCTpcJ0Dj7R9ukMuiFwBUjrdedm3oOWUMTzSsxaXoOM5EKp5I0P3tcmmwFTwYpk
+uVbk26FqN57qk9c0qEeJA0BVqOYTIh3nj1bGZKf+0QrzoA4nwiCr5gVUQLX/aPh0
+coPLG0us+8K2NUQ9VI4ykaBmP2vSu4Q6VB4yXA89w0UBouIthC0=
+=/MZ8
+-----END PGP SIGNATURE-----
+
+--NtwzykIc2mflq5ck--
+
 
