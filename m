@@ -2,93 +2,111 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 885DDC4741F
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 11:34:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9391C4727C
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 11:35:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1BA523B97
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 11:34:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 431CF23BCD
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 11:35:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="gnjdQt03"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1BA523B97
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="p/vmDzAi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 431CF23BCD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNDu1-0007Av-NC
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 07:34:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34362)
+	id 1kNDul-0007qa-Am
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 07:35:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35774)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kNDnv-0002Nt-7A
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 07:28:19 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:38075)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kNDnr-0006Ef-SU
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 07:28:18 -0400
-Received: by mail-wm1-x342.google.com with SMTP id v12so4399540wmh.3
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 04:28:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=CPJ1TkAdLkuZt1nhWv5RxpiiwJHbN5iu6R3tAYPLpr4=;
- b=gnjdQt03kfW4V31h3pNGKxThdX1n7U7qNOYz78ZWbQjjn1KIy2fYS6EOVi54KblSG6
- SUMbx+sbNC909I3Yz41XBoqRRfeUBivJCkvoteTE83nkUcLkVKJ7UkifzUaXtuL5eicp
- jd6hExVHmp8QboCkeaQH+a+0kCioZQib3IJiqz7HF3uMJVSp2HHbhoYTibVjQlUsMdsa
- CwHS+FrUGR828CXy4iDehUS5xe9aSoinwvmoZRQwnfzVco+PhMY00Fh+eipzVGXn7k4M
- IjPkq3Kks0J/WdmKong3oAvSAvGHJw79RYOuVKy0qsOF/9rHu1v5CHur6/AxsOfOx1an
- nBCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=CPJ1TkAdLkuZt1nhWv5RxpiiwJHbN5iu6R3tAYPLpr4=;
- b=cjAFqoYBF1KYTOg/JUkp+V9KVqhfltqteDeSOYdRZ17XfsVbceh4l7+AO+kKJlSNbd
- NOrIztnDSPqsUvlO6p1LodxAt3PMPhdpj22eBJUf4jsyWSTqaG6wLZ1eTpBf17QxWNmW
- XPhtO1V2I8AUr4ScSCtKOnd+UOY/S0tWOkz+V+oP30TzOemqb9dtUEtuGIjBIij5eoMc
- QOsQUU8l9SsLhB/VlUCCGsFn23p+dPK0dmELWxquXXCxLTxT2wzxcG+k1e/+f3mSTBTc
- ZMlIPIIFknSOLxNJfzS2vOtsOQtT09ZRLTmI4bFF7CKDHX0mmX/tZ4Hciwo4KM+lG2ZV
- PVHg==
-X-Gm-Message-State: AOAM533Y+LnhOSXsjFmUypzHiMHNDAOvMxDzscbxBZoYKnr2ac/lpUni
- g23gsn3R+qqaKjrbDRW6MpWvyVHccAuVn+EzjGqwKg==
-X-Google-Smtp-Source: ABdhPJyUWJ7Xf3jJk5/XiRGvF6ShMFk0n6HJ8g75aupLr2LW0Egq713K4mGkub88QiMP2v9/L4v7F4VKa5y8wwvpQlQ=
-X-Received: by 2002:a1c:7405:: with SMTP id p5mr4024177wmc.35.1601378894291;
- Tue, 29 Sep 2020 04:28:14 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <david.edmondson@oracle.com>)
+ id 1kNDtk-0006yk-S5
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 07:34:20 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:35844)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <david.edmondson@oracle.com>)
+ id 1kNDti-00079R-G6
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 07:34:20 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+ by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08TBXxYi189651;
+ Tue, 29 Sep 2020 11:34:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=to : cc : subject :
+ in-reply-to : references : sender : from : date : message-id :
+ mime-version : content-type; s=corp-2020-01-29;
+ bh=umwCqdhj75KSLfQbD3cwHqPreckllFJ+itCYa6/fJbk=;
+ b=p/vmDzAieCqRytosi8cwG9ROCwPrnwyZjnp7agF87bFzWMehbC0bMZIKfodZq6ZAFJ94
+ wILcrc3AH/qItJLKqtHC1CcB/jbyhH26rGXUJPzJNBAzwYc2pyMbKBXPgSYAtFGgBiyq
+ RVrTbpybBnxqBIwONda7OVC6MHp96dR6KQghsZXymzQ1Y0E1NUwzuF8bUp2Ul6oJN3gw
+ 3xAF0dpQnSEfcsx4wP1Eahsw2XMcs8C+ztA01rXArHoz+iWkGhEzxxVTY3lZ2V7S0tXv
+ CvfTHjMwdZa4G/PpPtMx1yJhLKASPoLWbY7CqXqnen7Xvn07xAIeImADJf3ikryHP4bB Fw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by aserp2130.oracle.com with ESMTP id 33su5at8kw-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+ Tue, 29 Sep 2020 11:34:04 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08TBUpsM173345;
+ Tue, 29 Sep 2020 11:34:04 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by aserp3030.oracle.com with ESMTP id 33uv2dre69-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 29 Sep 2020 11:34:03 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 08TBY2lQ003973;
+ Tue, 29 Sep 2020 11:34:02 GMT
+Received: from disaster-area.hh.sledj.net (/81.187.26.238)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Tue, 29 Sep 2020 04:34:01 -0700
+Received: from localhost (disaster-area.hh.sledj.net [local])
+ by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id e50176b4;
+ Tue, 29 Sep 2020 11:33:58 +0000 (UTC)
+To: Chuan Zheng <zhengchuan@huawei.com>, quintela@redhat.com,
+ eblake@redhat.com, dgilbert@redhat.com, berrange@redhat.com
+Subject: Re: [PATCH v2 1/2] migration/dirtyrate: record start_time and
+ calc_time while at the measuring state
+In-Reply-To: <1601350938-128320-2-git-send-email-zhengchuan@huawei.com>
+References: <1601350938-128320-1-git-send-email-zhengchuan@huawei.com>
+ <1601350938-128320-2-git-send-email-zhengchuan@huawei.com>
+X-HGTTG: heart-of-gold
+From: David Edmondson <david.edmondson@oracle.com>
+Date: Tue, 29 Sep 2020 12:33:58 +0100
+Message-ID: <m2imbwrf4p.fsf@oracle.com>
 MIME-Version: 1.0
-References: <CAARzgwz7x6uinPQ+oC+yAuFCbQEWhQuDmGU73E5NZ2WCH_C_kA@mail.gmail.com>
- <CAARzgwwxjjCAVsFB6_987pa1Z_in2G50rViYiRGVae-c_wn6xQ@mail.gmail.com>
- <20200929053823-mutt-send-email-mst@kernel.org>
- <CAARzgwxBcTDkK7QhHP=_mpYoAYYgRY+d6o+2SCSP-haBPDttwA@mail.gmail.com>
- <CAARzgwy8QNw=OD6cOEkDY-x9mC10ry+NTdCH2gNKuLXp8bAAyg@mail.gmail.com>
- <CAARzgwyNPZB5PGc-B9vDn9V-uEwVCiCvXgvamMaGTvBCPJQiCg@mail.gmail.com>
- <20200929063539-mutt-send-email-mst@kernel.org>
- <CAARzgwz6iTsO9Z1ACAHmbSteGYfetDgnSRYc-xnaqjYyJ4yEHA@mail.gmail.com>
- <20200929064858-mutt-send-email-mst@kernel.org>
- <CAARzgwwFeSPd=JGjdk-uj=uuLb+HcfMfGTe1_GmbFRTkP-jZdQ@mail.gmail.com>
- <20200929071412-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200929071412-mutt-send-email-mst@kernel.org>
-From: Ani Sinha <ani@anisinha.ca>
-Date: Tue, 29 Sep 2020 16:58:03 +0530
-Message-ID: <CAARzgwzdYfVn6Kdic+rj7xSxdvP6RAM48wr8Pt_MpDwuYvDSiw@mail.gmail.com>
-Subject: Re: [PATCH v10 13/13] tests/acpi: add DSDT.hpbrroot DSDT table blob
- to test global i440fx hotplug
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: none client-ip=2a00:1450:4864:20::342;
- envelope-from=ani@anisinha.ca; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9758
+ signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ spamscore=0 adultscore=0
+ suspectscore=1 malwarescore=0 bulkscore=0 mlxlogscore=999 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009290103
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9758
+ signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
+ suspectscore=1
+ lowpriorityscore=0 spamscore=0 clxscore=1015 mlxscore=0 impostorscore=0
+ malwarescore=0 phishscore=0 adultscore=0 bulkscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009290103
+Received-SPF: pass client-ip=141.146.126.79;
+ envelope-from=david.edmondson@oracle.com; helo=aserp2130.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 07:34:17
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -34
+X-Spam_score: -3.5
+X-Spam_bar: ---
+X-Spam_report: (-3.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,110 +119,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Julia Suvorova <jusual@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: alex.chen@huawei.com, wanghao232@huawei.com, zhang.zhanghailiang@huawei.com,
+ xiexiangyou@huawei.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 29, 2020 at 4:45 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Tue, Sep 29, 2020 at 04:35:50PM +0530, Ani Sinha wrote:
-> > On Tue, Sep 29, 2020 at 4:25 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > >
-> > > On Tue, Sep 29, 2020 at 04:11:45PM +0530, Ani Sinha wrote:
-> > > > On Tue, Sep 29, 2020 at 4:07 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > > >
-> > > > > On Tue, Sep 29, 2020 at 04:02:07PM +0530, Ani Sinha wrote:
-> > > > > > On Tue, Sep 29, 2020 at 4:00 PM Ani Sinha <ani@anisinha.ca> wrote:
-> > > > > > >
-> > > > > > > In your pull request the following patch is completely screwed up:
-> > > > > > >
-> > > > > > > commit cda2006eded0ed91974e1d9e7f9f288e65812a3e
-> > > > > > > Author: Ani Sinha <ani@anisinha.ca>
-> > > > > > > Date:   Tue Sep 29 03:22:52 2020 -0400
-> > > > > > >
-> > > > > > >     tests/acpi: update golden master DSDT binary table blobs for q35
-> > > > > > >
-> > > > > > >
-> > > > > > > This is not my patch. It has all sorts of changes which does not
-> > > > > > > belong there. Can you please check?
-> > > > > >
-> > > > > > See https://patchew.org/QEMU/20200929071948.281157-1-mst@redhat.com/20200929071948.281157-46-mst@redhat.com/
-> > > > >
-> > > > >
-> > > > > I had to regenerate the binary, yes. That's par for the course.
-> > > > > But it looks like I added disasssembled files. Will fix up and drop,
-> > > > > thanks for noticing this.
-> > >
-> > > OK I pushed out a fixed variant. Pls take a look.
-> >
-> > OK I am not used to this workflow. How am I supposed to get it? Which tag?
->
-> New for_upstream tag - I just sent in a pull request.
+On Tuesday, 2020-09-29 at 11:42:17 +08, Chuan Zheng wrote:
 
-Can you please point me to your tree?
+> Querying could include both the start-time and the calc-time while at the measuring
+> state, allowing a caller to determine when they should expect to come back looking
+> for a result.
+>
+> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
 
+Reviewed-by: David Edmondson <david.edmondson@oracle.com>
+
+> ---
+>  migration/dirtyrate.c | 13 +++++++++----
+>  1 file changed, 9 insertions(+), 4 deletions(-)
 >
-> >
-> > >
-> > > > I think DSDT.hbridge is wrong. The checksum looks weird:
-> > > >
-> > > >
-> > > > + *     Length           0x00000B89 (2953)
-> > > >   *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
-> > > > - *     Checksum         0x05
-> > >
-> > > What is weird about it?
-> > >
-> > > >
-> > > > This file should be introduced just by one patch. my patch.
-> > >
-> > > I just re-run rebuild-expected-aml, no changes.
-> > >
-> > > I have this:
-> > > commit 5e3a486211f02d9ecb18939ca21087515ec81883
-> > > Author: Ani Sinha <ani@anisinha.ca>
-> > > Date:   Fri Sep 18 14:11:05 2020 +0530
-> > >
-> > >     tests/acpi: unit test for 'acpi-pci-hotplug-with-bridge-support' bridge flag
-> > >
-> > >     This change adds a new unit test for the global flag
-> > >     'acpi-pci-hotplug-with-bridge-support' which is available for cold plugged pci
-> > >     bridges in i440fx. The flag can be used to turn off ACPI based hotplug support
-> > >     on all pci bridges.
-> > >
-> > >
-> > > Here is the full DSDT header, attached:
-> > >
-> > > /*
-> > >  * Intel ACPI Component Architecture
-> > >  * AML/ASL+ Disassembler version 20190509 (64-bit version)
-> > >  * Copyright (c) 2000 - 2019 Intel Corporation
-> > >  *
-> > >  * Disassembling to symbolic ASL+ operators
-> > >  *
-> > >  * Disassembly of tests/data/acpi/pc/DSDT.hpbridge, Tue Sep 29 06:51:03 2020
-> > >  *
-> > >  * Original Table Header:
-> > >  *     Signature        "DSDT"
-> > >  *     Length           0x0000139D (5021)
-> > >  *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
-> > >  *     Checksum         0x05
-> > >  *     OEM ID           "BOCHS "
-> > >  *     OEM Table ID     "BXPCDSDT"
-> > >  *     OEM Revision     0x00000001 (1)
-> > >  *     Compiler ID      "BXPC"
-> > >  *     Compiler Version 0x00000001 (1)
-> > >  */
-> > > DefinitionBlock ("", "DSDT", 1, "BOCHS ", "BXPCDSDT", 0x00000001)
-> > >
-> > > --
-> > > MST
-> > >
->
+> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+> index 68577ef..40e41e7 100644
+> --- a/migration/dirtyrate.c
+> +++ b/migration/dirtyrate.c
+> @@ -83,14 +83,14 @@ static struct DirtyRateInfo *query_dirty_rate_info(void)
+>      return info;
+>  }
+>  
+> -static void reset_dirtyrate_stat(void)
+> +static void init_dirtyrate_stat(int64_t start_time, int64_t calc_time)
+>  {
+>      DirtyStat.total_dirty_samples = 0;
+>      DirtyStat.total_sample_count = 0;
+>      DirtyStat.total_block_mem_MB = 0;
+>      DirtyStat.dirty_rate = -1;
+> -    DirtyStat.start_time = 0;
+> -    DirtyStat.calc_time = 0;
+> +    DirtyStat.start_time = start_time;
+> +    DirtyStat.calc_time = calc_time;
+>  }
+>  
+>  static void update_dirtyrate_stat(struct RamblockDirtyInfo *info)
+> @@ -335,7 +335,6 @@ static void calculate_dirtyrate(struct DirtyRateConfig config)
+>      int64_t initial_time;
+>  
+>      rcu_register_thread();
+> -    reset_dirtyrate_stat();
+>      rcu_read_lock();
+>      initial_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+>      if (!record_ramblock_hash_info(&block_dinfo, config, &block_count)) {
+> @@ -365,6 +364,8 @@ void *get_dirtyrate_thread(void *arg)
+>  {
+>      struct DirtyRateConfig config = *(struct DirtyRateConfig *)arg;
+>      int ret;
+> +    int64_t start_time;
+> +    int64_t calc_time;
+>  
+>      ret = dirtyrate_set_state(&CalculatingState, DIRTY_RATE_STATUS_UNSTARTED,
+>                                DIRTY_RATE_STATUS_MEASURING);
+> @@ -373,6 +374,10 @@ void *get_dirtyrate_thread(void *arg)
+>          return NULL;
+>      }
+>  
+> +    start_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME) / 1000;
+> +    calc_time = config.sample_period_seconds;
+> +    init_dirtyrate_stat(start_time, calc_time);
+> +
+>      calculate_dirtyrate(config);
+>  
+>      ret = dirtyrate_set_state(&CalculatingState, DIRTY_RATE_STATUS_MEASURING,
+> -- 
+> 1.8.3.1
+
+dme.
+-- 
+No proper time of day.
 
