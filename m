@@ -2,81 +2,82 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NUMERIC_HTTP_ADDR,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT,WEIRD_PORT autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36416C4346E
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:34:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1347C4346E
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:36:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B930A207F7
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:34:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1BAC12083B
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:36:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U08m/YGb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B930A207F7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PCrc2EAi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BAC12083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNA9t-0002cH-Qb
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 03:34:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57954)
+	id 1kNABu-0005ji-W9
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 03:36:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57810)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9yI-0004Oe-MD
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:22:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48544)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9xw-0004Ac-LW
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:22:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31598)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9yF-0001nz-Rd
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:22:46 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9xu-0001kx-9g
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:22:24 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601364159;
+ s=mimecast20190719; t=1601364141;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0g5K5CUjVa2QgPkjnSBYRFmkoKQ6IkhV7beBCx5g004=;
- b=U08m/YGbUbIBEflUJn4W6qR5OIvGjgweWI6ZeXZ3rK+Fp29e2pslXbkhF1HPEN+/kN0zIo
- l0pzxDvYTh0sdyLL1rGnaAI2uIMm0V7ukHaivBSnyc0DvkDqNtyySoIdfNsJnjcwe0pkgz
- rsIsHaXhSnFGvX6R2ADd7intQUzpmuQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-109-77_-JigrPXiT0CPXiY5bjQ-1; Tue, 29 Sep 2020 03:22:24 -0400
-X-MC-Unique: 77_-JigrPXiT0CPXiY5bjQ-1
-Received: by mail-wm1-f71.google.com with SMTP id t8so1351281wmj.6
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 00:22:24 -0700 (PDT)
+ bh=xSxMXzNX3S9fhMB/ZxOtFmJyYfynnqlA4EJjVlHl23s=;
+ b=PCrc2EAiz04N8/HSwZp0316RJ4VF4qcXZHKHTuEm3HI2HPSTabHP/jaeHgEFHbiU3vUjVH
+ z/HWzEwrCdfI7bCWeunVhyfuCdbaEsmMjeX3WiPP6doKwqNq41VHsg3VAnDOCwqCV+/HiT
+ 1wZvFzpQ4wgnFEdl5DotQzczpIKcyMU=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-457-LnH4FjoYOAGmVuyrv-jBCw-1; Tue, 29 Sep 2020 03:22:19 -0400
+X-MC-Unique: LnH4FjoYOAGmVuyrv-jBCw-1
+Received: by mail-wr1-f72.google.com with SMTP id w7so1375770wrp.2
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 00:22:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:content-transfer-encoding
  :in-reply-to;
- bh=0g5K5CUjVa2QgPkjnSBYRFmkoKQ6IkhV7beBCx5g004=;
- b=EgLAc0nVzVGv8evhhE77dqW3NjKSbovkio9Wit/ejmhbDyOiesZyua9YUFEPBgfwEi
- 4P6PBoqBefSrwHzrre3n9aZ/tStxjvjQ38TfNuQH44ArNt4hLhkVwNMQMS16319oGkb+
- Ciy3xHmwPjlF59DMNn/O0owkgJTYGqyq9s7z9Xf+v893INxNs3rzSTjdY6wcBI2gwpCC
- YNf/Qqg6EeVpvOfAFk3F0OKLtf8cdYobw71s1+EWmIhk3G+YFPKEartmlFe5Zc/dHtOt
- TKvdne+8Ch5RKDuCAaDQVBevVP/t8OUprKB3dQh2WgUNd1ZJTRTPWS1LXuPRWp4gENfq
- J4ZQ==
-X-Gm-Message-State: AOAM533kyfKvcpG8CmYev4hbqFcfez2l1W20d4eLgl16cvs0VBwfFhar
- dEaPqWngtMHCgGmqKpI0Ixuh5FwosJz03z2xBnus3GhgM8bHmtn59os66g2pS441afi5PzVZgWe
- j0YxhAGnJkQahYgs=
-X-Received: by 2002:a1c:9c13:: with SMTP id f19mr2816210wme.97.1601364143313; 
- Tue, 29 Sep 2020 00:22:23 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyFsX0A/bvXO21sl053FhSgqTPGx6izlNDDAouB7BwmFc4SnRNBBxBMAs8Jkie4/8Nc83quWg==
-X-Received: by 2002:a1c:9c13:: with SMTP id f19mr2816192wme.97.1601364143057; 
- Tue, 29 Sep 2020 00:22:23 -0700 (PDT)
+ bh=xSxMXzNX3S9fhMB/ZxOtFmJyYfynnqlA4EJjVlHl23s=;
+ b=Es3X0Kd3KhDOG97x5Qp9t+VugKPVJ7lrBUqGvkAzI69CQwFyxUZ1KlL3E0LphqZsFe
+ LhvyMxjHYaxCw1MylmB/fy8aesRRlKD77Fm5H7G8PhYYSTdIi0ULaK9/qT9rrVWIuQI5
+ 5OOd+TRq+l0T7OdCFk/zfgZoeuMaWE4EktwQlRvPUHV9gRz4GeypDJK7s5avlkUQHFhQ
+ ijdYXuPPFY7Mwy9nXmuwxdoD7r+EPiV70s/SpKxXc8AX4Dj73llHoFw2wz2Qz4RsesVJ
+ BkiulF1046oF3Eha4yC2yCUO52W1rTNAb9pRPtZ/fB6uaamIxF+NpTIhGs0+YTT43A1r
+ gpJQ==
+X-Gm-Message-State: AOAM533M4Dcaq7wADiseDNyjzNryQraS7TKYLk4zkZkBii6+3sck1Lj1
+ 8zhJ5D/rBNnsAnHFVYecXCQYsvuvne/J1d0t5tNI3Avv+UJtYtDIiWzTjmSMRIzQn/q6yvSexVh
+ 4qESDZ9rBftEsFRE=
+X-Received: by 2002:adf:ef4a:: with SMTP id c10mr2432024wrp.13.1601364138145; 
+ Tue, 29 Sep 2020 00:22:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwXXePR+4x4z89DZa12KGo00Ugf91GiMQtubJGwWqqoekrPp2m52itphSXnv9SRapq93Ur8kg==
+X-Received: by 2002:adf:ef4a:: with SMTP id c10mr2431996wrp.13.1601364137969; 
+ Tue, 29 Sep 2020 00:22:17 -0700 (PDT)
 Received: from redhat.com (bzq-79-179-71-128.red.bezeqint.net. [79.179.71.128])
- by smtp.gmail.com with ESMTPSA id u66sm4144303wmg.44.2020.09.29.00.22.21
+ by smtp.gmail.com with ESMTPSA id v4sm3930341wml.46.2020.09.29.00.22.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 29 Sep 2020 00:22:22 -0700 (PDT)
-Date: Tue, 29 Sep 2020 03:22:20 -0400
+ Tue, 29 Sep 2020 00:22:17 -0700 (PDT)
+Date: Tue, 29 Sep 2020 03:22:15 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v4 33/48] qemu-options: document SMBIOS type 11 settings
-Message-ID: <20200929071948.281157-34-mst@redhat.com>
+Subject: [PULL v4 31/48] hw/smbios: support loading OEM strings values from a
+ file
+Message-ID: <20200929071948.281157-32-mst@redhat.com>
 References: <20200929071948.281157-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200929071948.281157-1-mst@redhat.com>
@@ -93,14 +94,13 @@ Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 02:22:44
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NUMERIC_HTTP_ADDR=1.242, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- WEIRD_PORT=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -113,9 +113,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Igor Mammedov <imammedo@redhat.com>,
  Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+ Laszlo Ersek <lersek@redhat.com>,
  Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -123,74 +124,167 @@ Sender: "Qemu-devel"
 
 From: Daniel P. Berrangé <berrange@redhat.com>
 
+Some applications want to pass quite large values for the OEM strings
+entries. Rather than having huge strings on the command line, it would
+be better to load them from a file, as supported with -fw_cfg.
+
+This introduces the "path" parameter allowing for:
+
+  $ echo -n "thisthing" > mydata.txt
+  $ qemu-system-x86_64 \
+    -smbios type=11,value=something \
+    -smbios type=11,path=mydata.txt \
+    -smbios type=11,value=somemore \
+    ...other args...
+
+Now in the guest
+
+$ dmidecode -t 11
+Getting SMBIOS data from sysfs.
+SMBIOS 2.8 present.
+
+Handle 0x0E00, DMI type 11, 5 bytes
+OEM Strings
+	String 1: something
+	String 2: thisthing
+	String 3: somemore
+
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20200923133804.2089190-4-berrange@redhat.com>
+Message-Id: <20200923133804.2089190-2-berrange@redhat.com>
+Tested-by: Laszlo Ersek <lersek@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- qemu-options.hx | 41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+ hw/smbios/smbios.c | 71 +++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 58 insertions(+), 13 deletions(-)
 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 47f64be0c0..3564c2303f 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -2296,6 +2296,8 @@ DEF("smbios", HAS_ARG, QEMU_OPTION_smbios,
-     "-smbios type=4[,sock_pfx=str][,manufacturer=str][,version=str][,serial=str]\n"
-     "              [,asset=str][,part=str][,max-speed=%d][,current-speed=%d]\n"
-     "                specify SMBIOS type 4 fields\n"
-+    "-smbios type=11[,value=str][,path=filename]\n"
-+    "                specify SMBIOS type 11 fields\n"
-     "-smbios type=17[,loc_pfx=str][,bank=str][,manufacturer=str][,serial=str]\n"
-     "               [,asset=str][,part=str][,speed=%d]\n"
-     "                specify SMBIOS type 17 fields\n",
-@@ -2319,6 +2321,45 @@ SRST
- ``-smbios type=4[,sock_pfx=str][,manufacturer=str][,version=str][,serial=str][,asset=str][,part=str]``
-     Specify SMBIOS type 4 fields
+diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
+index 7cc950b41c..d993448087 100644
+--- a/hw/smbios/smbios.c
++++ b/hw/smbios/smbios.c
+@@ -110,7 +110,7 @@ static struct {
  
-+``-smbios type=11[,value=str][,path=filename]``
-+    Specify SMBIOS type 11 fields
+ static struct {
+     size_t nvalues;
+-    const char **values;
++    char **values;
+ } type11;
+ 
+ static struct {
+@@ -314,6 +314,11 @@ static const QemuOptDesc qemu_smbios_type11_opts[] = {
+         .type = QEMU_OPT_STRING,
+         .help = "OEM string data",
+     },
++    {
++        .name = "path",
++        .type = QEMU_OPT_STRING,
++        .help = "OEM string data from file",
++    },
+ };
+ 
+ static const QemuOptDesc qemu_smbios_type17_opts[] = {
+@@ -641,6 +646,8 @@ static void smbios_build_type_11_table(void)
+ 
+     for (i = 0; i < type11.nvalues; i++) {
+         SMBIOS_TABLE_SET_STR_LIST(11, type11.values[i]);
++        g_free(type11.values[i]);
++        type11.values[i] = NULL;
+     }
+ 
+     SMBIOS_BUILD_TABLE_POST;
+@@ -940,9 +947,8 @@ static void save_opt(const char **dest, QemuOpts *opts, const char *name)
+ 
+ 
+ struct opt_list {
+-    const char *name;
+     size_t *ndest;
+-    const char ***dest;
++    char ***dest;
+ };
+ 
+ static int save_opt_one(void *opaque,
+@@ -951,23 +957,60 @@ static int save_opt_one(void *opaque,
+ {
+     struct opt_list *opt = opaque;
+ 
+-    if (!g_str_equal(name, opt->name)) {
+-        return 0;
++    if (g_str_equal(name, "path")) {
++        g_autoptr(GByteArray) data = g_byte_array_new();
++        g_autofree char *buf = g_new(char, 4096);
++        ssize_t ret;
++        int fd = qemu_open(value, O_RDONLY, errp);
++        if (fd < 0) {
++            return -1;
++        }
 +
-+    This argument can be repeated multiple times, and values are added in the order they are parsed.
-+    Applications intending to use OEM strings data are encouraged to use their application name as
-+    a prefix for the value string. This facilitates passing information for multiple applications
-+    concurrently.
++        while (1) {
++            ret = read(fd, buf, 4096);
++            if (ret == 0) {
++                break;
++            }
++            if (ret < 0) {
++                error_setg(errp, "Unable to read from %s: %s",
++                           value, strerror(errno));
++                return -1;
++            }
++            if (memchr(buf, '\0', ret)) {
++                error_setg(errp, "NUL in OEM strings value in %s", value);
++                return -1;
++            }
++            g_byte_array_append(data, (guint8 *)buf, ret);
++        }
 +
-+    The ``value=str`` syntax provides the string data inline, while the ``path=filename`` syntax
-+    loads data from a file on disk. Note that the file is not permitted to contain any NUL bytes.
++        close(fd);
 +
-+    Both the ``value`` and ``path`` options can be repeated multiple times and will be added to
-+    the SMBIOS table in the order in which they appear.
-+
-+    Note that on the x86 architecture, the total size of all SMBIOS tables is limited to 65535
-+    bytes. Thus the OEM strings data is not suitable for passing large amounts of data into the
-+    guest. Instead it should be used as a indicator to inform the guest where to locate the real
-+    data set, for example, by specifying the serial ID of a block device.
-+
-+    An example passing three strings is
-+
-+    .. parsed-literal::
-+
-+        -smbios type=11,value=cloud-init:ds=nocloud-net;s=http://10.10.0.1:8000/,\\
-+                        value=anaconda:method=http://dl.fedoraproject.org/pub/fedora/linux/releases/25/x86_64/os,\\
-+                        path=/some/file/with/oemstringsdata.txt
-+
-+    In the guest OS this is visible with the ``dmidecode`` command
-+
-+     .. parsed-literal::
-+
-+         $ dmidecode -t 11
-+         Handle 0x0E00, DMI type 11, 5 bytes
-+         OEM Strings
-+              String 1: cloud-init:ds=nocloud-net;s=http://10.10.0.1:8000/
-+              String 2: anaconda:method=http://dl.fedoraproject.org/pub/fedora/linux/releases/25/x86_64/os
-+              String 3: myapp:some extra data
-+
-+
- ``-smbios type=17[,loc_pfx=str][,bank=str][,manufacturer=str][,serial=str][,asset=str][,part=str][,speed=%d]``
-     Specify SMBIOS type 17 fields
- ERST
++        *opt->dest = g_renew(char *, *opt->dest, (*opt->ndest) + 1);
++        (*opt->dest)[*opt->ndest] = (char *)g_byte_array_free(data,  FALSE);
++        (*opt->ndest)++;
++        data = NULL;
++   } else if (g_str_equal(name, "value")) {
++        *opt->dest = g_renew(char *, *opt->dest, (*opt->ndest) + 1);
++        (*opt->dest)[*opt->ndest] = g_strdup(value);
++        (*opt->ndest)++;
++    } else if (!g_str_equal(name, "type")) {
++        error_setg(errp, "Unexpected option %s", name);
++        return -1;
+     }
+ 
+-    *opt->dest = g_renew(const char *, *opt->dest, (*opt->ndest) + 1);
+-    (*opt->dest)[*opt->ndest] = value;
+-    (*opt->ndest)++;
+     return 0;
+ }
+ 
+-static void save_opt_list(size_t *ndest, const char ***dest,
+-                          QemuOpts *opts, const char *name)
++static bool save_opt_list(size_t *ndest, char ***dest, QemuOpts *opts,
++                          Error **errp)
+ {
+     struct opt_list opt = {
+-        name, ndest, dest,
++        ndest, dest,
+     };
+-    qemu_opt_foreach(opts, save_opt_one, &opt, NULL);
++    if (!qemu_opt_foreach(opts, save_opt_one, &opt, errp)) {
++        return false;
++    }
++    return true;
+ }
+ 
+ void smbios_entry_add(QemuOpts *opts, Error **errp)
+@@ -1149,7 +1192,9 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
+             if (!qemu_opts_validate(opts, qemu_smbios_type11_opts, errp)) {
+                 return;
+             }
+-            save_opt_list(&type11.nvalues, &type11.values, opts, "value");
++            if (!save_opt_list(&type11.nvalues, &type11.values, opts, errp)) {
++                return;
++            }
+             return;
+         case 17:
+             if (!qemu_opts_validate(opts, qemu_smbios_type17_opts, errp)) {
 -- 
 MST
 
