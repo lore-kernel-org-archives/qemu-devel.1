@@ -4,78 +4,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E21DFC4346E
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:37:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 443ADC4346E
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:38:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8AFCB2083B
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:37:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D297F2083B
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:38:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Og0KA9CC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AFCB2083B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GdCX3e7N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D297F2083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNAC8-0006Lk-Lq
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 03:37:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57348)
+	id 1kNADX-0000lg-Ve
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 03:38:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57846)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9xI-0003Hn-3Z
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:21:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56378)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9y3-0004G7-Nv
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:22:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45516)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9xG-0001dV-0D
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:21:43 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9xx-0001lb-72
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:22:31 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601364101;
+ s=mimecast20190719; t=1601364144;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PR4qBN07x4Vimn0/QnAKwqdBvmtmgl6PaVSJGqhqqO8=;
- b=Og0KA9CCQhbzNIdMj20G5JP3+PK4JyX63D2hAXlFvnGKx3gU0kGSfF2Dsu7VjLbnEC5chW
- v+gXm0dhCEANc7PW6m61dQznNxW9KWkK/ZVNjvIo0CpPcz237vMJ8yvMfqh+mmwLNFerW6
- Ba4v3TxPP47+HbrKR+hW/dHJeN7ghs4=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-270-dgsB_uKBOlaoX_sJZmP2AA-1; Tue, 29 Sep 2020 03:21:39 -0400
-X-MC-Unique: dgsB_uKBOlaoX_sJZmP2AA-1
-Received: by mail-wm1-f70.google.com with SMTP id t8so1350605wmj.6
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 00:21:38 -0700 (PDT)
+ bh=gkUx6b1cSk9kEji0PxARO6FKoBMVB3jc1oddzWmGMC8=;
+ b=GdCX3e7NaBilBiJ34LRLD8ECyO2cntX2XM88bnaUsKuf5uyFo0I/m22Z8VI0Fv/6s6afjP
+ UhCgjmqoCCO9KWYmjra4pgWQBdT23EqKFUZ7D0gV7WXIgByOAbwtapG2bGXshi+rJrFk6y
+ KsN+1atTyBp3EXgxfGwjzoj0OrM76/Y=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-335-pnAh2eOhMFSNuhNiEvyhfQ-1; Tue, 29 Sep 2020 03:22:22 -0400
+X-MC-Unique: pnAh2eOhMFSNuhNiEvyhfQ-1
+Received: by mail-wm1-f71.google.com with SMTP id r83so1031184wma.8
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 00:22:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=PR4qBN07x4Vimn0/QnAKwqdBvmtmgl6PaVSJGqhqqO8=;
- b=Rtsdu567uN2Egc1mgob/p0TyLKIhCuHqOks8vy9tnqjnoEl8viQDKjLoMVbnp/kJuo
- 17y8x+2mOGA1G+Luqm7mWnPcuMfzrF6IG5GwriTO5zY/Qu4bIZ2GYkWWq5mCIbpnArp4
- zl7yKgg3zDhHmQJm8X7aG4ZChMcI0i9afooA0BTFOgFMvKEODVNiw6cHSAjyzhlcQiu0
- pkRbyJdz6ePCbe24pwEc5tJ5sB1Lq7H9JiXmCtgP4Iwa1cgRIjxlcFQOs2n3BwUm6zQ9
- nDL3cCpFjYiyJ4GZWCM5jG2JHFksz9qEk+faWa3OZ78ha8qFV5H7eJDttf8a5am8pu7H
- rm8Q==
-X-Gm-Message-State: AOAM5309u6li/qSsQ9R9huAzcVwk0u9AZ9j2bH21DM4XcqBRsnRqrQzz
- Ss8HqxkLaeK19gw5py8tkXjxnGF4BpwUWhV9cwHfY8AW1bRhjvfni8tXO5V1Xwiya74ckFmUh5y
- y+56AmRKOlUTOQPk=
-X-Received: by 2002:adf:ff83:: with SMTP id j3mr2603284wrr.135.1601364097307; 
- Tue, 29 Sep 2020 00:21:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz6A2FCngV/MxsTJmlORuF1rJtRCg7o7Uju2aFW83BXOtmrM6s02RaDTCvOJKWRrB0ea91yGQ==
-X-Received: by 2002:adf:ff83:: with SMTP id j3mr2603255wrr.135.1601364097104; 
- Tue, 29 Sep 2020 00:21:37 -0700 (PDT)
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=gkUx6b1cSk9kEji0PxARO6FKoBMVB3jc1oddzWmGMC8=;
+ b=GTIDc8YeMBvZZR/0D9BJMt+BYEFKFIaL/5RogZeQ3mfHjWst5a4+im7xK5UIapFi87
+ Oz6SF7na0iU6fvktYPi5/NbmWrU6PhkqmkrKcaNjESvUXKYqO/Xrjnp3Qpg+NGk+yaqe
+ dzkoiwvU7eOTOTkI1+jrf+2Mt5NpsW+PyqIE7HrO/PGheWD9heBEv0ezMhw74QFSK8LR
+ erYuMU/NqNRp6XwQ5fdJC5XhfmElR1GPc58ls6phq9ndzpb7vaPbsX7wuDkgSh56cJ5M
+ EVI2RU+oBtTt4fJhX4zBOL4zrax8Jyy6ksSL2pYhaYICh2SyAY/qTgjGN7bmHtkcOvCE
+ x4Ug==
+X-Gm-Message-State: AOAM5334MO26MV8k1HVjg+s/bHc0P5LO7tBwYxfRGRS5G/6XHihTVg2R
+ oShZALYd1C9fcm/YRYYN3BO520OMmCUU7P8JOcHr/aNlwhaGBCp3voTl+cDpdxtqMisdvFOqLP9
+ Fqw+FRcxrPlme504=
+X-Received: by 2002:a5d:5306:: with SMTP id e6mr2617201wrv.156.1601364140757; 
+ Tue, 29 Sep 2020 00:22:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwujlSBY2x3DesO5EzaeCJPnztN0ViQYzUQrwHLatJxkVVp0o40ICJF1ih0k3amh6t2q5hCrQ==
+X-Received: by 2002:a5d:5306:: with SMTP id e6mr2617182wrv.156.1601364140538; 
+ Tue, 29 Sep 2020 00:22:20 -0700 (PDT)
 Received: from redhat.com (bzq-79-179-71-128.red.bezeqint.net. [79.179.71.128])
- by smtp.gmail.com with ESMTPSA id l126sm4248502wmf.39.2020.09.29.00.21.35
+ by smtp.gmail.com with ESMTPSA id q13sm4920163wra.93.2020.09.29.00.22.19
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 29 Sep 2020 00:21:36 -0700 (PDT)
-Date: Tue, 29 Sep 2020 03:21:34 -0400
+ Tue, 29 Sep 2020 00:22:19 -0700 (PDT)
+Date: Tue, 29 Sep 2020 03:22:18 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v4 16/48] virtio: skip legacy support check on machine types
- less than 5.1
-Message-ID: <20200929071948.281157-17-mst@redhat.com>
+Subject: [PULL v4 32/48] hw/smbios: report error if table size is too large
+Message-ID: <20200929071948.281157-33-mst@redhat.com>
 References: <20200929071948.281157-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200929071948.281157-1-mst@redhat.com>
@@ -85,11 +86,12 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 22:47:55
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 02:22:44
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
@@ -110,153 +112,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-stable@nongnu.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>, Stefano Garzarella <sgarzare@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+ Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefano Garzarella <sgarzare@redhat.com>
+From: Daniel P. Berrangé <berrange@redhat.com>
 
-Commit 9b3a35ec82 ("virtio: verify that legacy support is not accidentally
-on") added a check that returns an error if legacy support is on, but the
-device does not support legacy.
+The SMBIOS 2.1 entry point uses a uint16 data type for reporting the
+total length of the tables. If the user passes -smbios configuration to
+QEMU that causes the table size to exceed this limit then various bad
+behaviours result, including
 
-Unfortunately some devices were wrongly declared legacy capable even if
-they were not (e.g vhost-vsock).
+ - firmware hangs in an infinite loop
+ - firmware triggers a KVM crash on bad memory access
+ - firmware silently discards user's SMBIOS data replacing it with
+   a generic data set.
 
-To avoid migration issues, we add a virtio-device property
-(x-disable-legacy-check) to skip the legacy error, printing a warning
-instead, for machine types < 5.1.
+Limiting the size to 0xffff in QEMU avoids triggering most of these
+problems. There is a remaining bug in SeaBIOS which tries to prepend its
+own data for table 0, and does not check whether there is sufficient
+space before attempting this.
 
-Cc: qemu-stable@nongnu.org
-Fixes: 9b3a35ec82 ("virtio: verify that legacy support is not accidentally on")
-Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Suggested-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-Message-Id: <20200921122506.82515-2-sgarzare@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+Message-Id: <20200923133804.2089190-3-berrange@redhat.com>
+Tested-by: Laszlo Ersek <lersek@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/virtio/virtio.h |  2 ++
- hw/core/machine.c          |  1 +
- hw/s390x/virtio-ccw.c      | 15 ++++++++++++---
- hw/virtio/virtio-pci.c     | 14 ++++++++++++--
- hw/virtio/virtio.c         |  7 +++++++
- 5 files changed, 34 insertions(+), 5 deletions(-)
+ hw/smbios/smbios.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-index 28cf3b9120..b7ece7a6a8 100644
---- a/include/hw/virtio/virtio.h
-+++ b/include/hw/virtio/virtio.h
-@@ -101,6 +101,7 @@ struct VirtIODevice
-     bool use_started;
-     bool started;
-     bool start_on_kick; /* when virtio 1.0 feature has not been negotiated */
-+    bool disable_legacy_check;
-     VMChangeStateEntry *vmstate;
-     char *bus_name;
-     uint8_t device_endian;
-@@ -394,5 +395,6 @@ static inline bool virtio_device_disabled(VirtIODevice *vdev)
- }
+diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
+index d993448087..8b30906e50 100644
+--- a/hw/smbios/smbios.c
++++ b/hw/smbios/smbios.c
+@@ -365,6 +365,13 @@ static void smbios_register_config(void)
  
- bool virtio_legacy_allowed(VirtIODevice *vdev);
-+bool virtio_legacy_check_disabled(VirtIODevice *vdev);
+ opts_init(smbios_register_config);
  
- #endif
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 9b02fb2f5e..d7f4a0d259 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -44,6 +44,7 @@ GlobalProperty hw_compat_5_0[] = {
-     { "vmport", "x-signal-unsupported-cmd", "off" },
-     { "vmport", "x-report-vmx-type", "off" },
-     { "vmport", "x-cmds-v2", "off" },
-+    { "virtio-device", "x-disable-legacy-check", "true" },
- };
- const size_t hw_compat_5_0_len = G_N_ELEMENTS(hw_compat_5_0);
- 
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index 8d140dc50f..4582e94ae7 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -1122,9 +1122,18 @@ static void virtio_ccw_device_plugged(DeviceState *d, Error **errp)
-     }
- 
-     if (!virtio_ccw_rev_max(dev) && !virtio_legacy_allowed(vdev)) {
--        error_setg(errp, "Invalid value of property max_rev "
--                   "(is %d expected >= 1)", virtio_ccw_rev_max(dev));
--        return;
-+        /*
-+         * To avoid migration issues, we allow legacy mode when legacy
-+         * check is disabled in the old machine types (< 5.1).
-+         */
-+        if (virtio_legacy_check_disabled(vdev)) {
-+            warn_report("device requires revision >= 1, but for backward "
-+                        "compatibility max_revision=0 is allowed");
-+        } else {
-+            error_setg(errp, "Invalid value of property max_rev "
-+                       "(is %d expected >= 1)", virtio_ccw_rev_max(dev));
-+            return;
-+        }
-     }
- 
-     if (virtio_get_num_queues(vdev) > VIRTIO_QUEUE_MAX) {
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 02790e3237..36524a5728 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -1597,8 +1597,18 @@ static void virtio_pci_device_plugged(DeviceState *d, Error **errp)
- 
-     if (legacy) {
-         if (!virtio_legacy_allowed(vdev)) {
--            error_setg(errp, "device is modern-only, use disable-legacy=on");
--            return;
-+            /*
-+             * To avoid migration issues, we allow legacy mode when legacy
-+             * check is disabled in the old machine types (< 5.1).
-+             */
-+            if (virtio_legacy_check_disabled(vdev)) {
-+                warn_report("device is modern-only, but for backward "
-+                            "compatibility legacy is allowed");
-+            } else {
-+                error_setg(errp,
-+                           "device is modern-only, use disable-legacy=on");
-+                return;
-+            }
-         }
-         if (virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_PLATFORM)) {
-             error_setg(errp, "VIRTIO_F_IOMMU_PLATFORM was supported by"
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 3a3d012d9f..a2edb4f386 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -3304,6 +3304,11 @@ bool virtio_legacy_allowed(VirtIODevice *vdev)
-     }
- }
- 
-+bool virtio_legacy_check_disabled(VirtIODevice *vdev)
-+{
-+    return vdev->disable_legacy_check;
-+}
++/*
++ * The SMBIOS 2.1 "structure table length" field in the
++ * entry point uses a 16-bit integer, so we're limited
++ * in total table size
++ */
++#define SMBIOS_21_MAX_TABLES_LEN 0xffff
 +
- hwaddr virtio_queue_get_desc_addr(VirtIODevice *vdev, int n)
+ static void smbios_validate_table(MachineState *ms)
  {
-     return vdev->vq[n].vring.desc;
-@@ -3713,6 +3718,8 @@ static Property virtio_properties[] = {
-     DEFINE_VIRTIO_COMMON_FEATURES(VirtIODevice, host_features),
-     DEFINE_PROP_BOOL("use-started", VirtIODevice, use_started, true),
-     DEFINE_PROP_BOOL("use-disabled-flag", VirtIODevice, use_disabled_flag, true),
-+    DEFINE_PROP_BOOL("x-disable-legacy-check", VirtIODevice,
-+                     disable_legacy_check, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
+     uint32_t expect_t4_count = smbios_legacy ?
+@@ -375,6 +382,13 @@ static void smbios_validate_table(MachineState *ms)
+                      expect_t4_count, smbios_type4_count);
+         exit(1);
+     }
++
++    if (smbios_ep_type == SMBIOS_ENTRY_POINT_21 &&
++        smbios_tables_len > SMBIOS_21_MAX_TABLES_LEN) {
++        error_report("SMBIOS 2.1 table length %zu exceeds %d",
++                     smbios_tables_len, SMBIOS_21_MAX_TABLES_LEN);
++        exit(1);
++    }
+ }
+ 
  
 -- 
 MST
