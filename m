@@ -2,86 +2,75 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80B3FC4727D
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 04:03:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EE34C4346E
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 04:04:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBFA4208FE
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 04:03:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QARExY4K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBFA4208FE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C0A13208FE
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 04:04:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0A13208FE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kN6ra-0000cx-Sg
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 00:03:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39480)
+	id 1kN6sN-0001Hc-Va
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 00:04:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39522)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kN6r0-00005o-PI
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 00:03:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48845)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kN6qz-00065u-7F
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 00:03:02 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601352180;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=4SbMIqcOEFmb7ROQ1fqCGug253FOxI63jiWTVG5UbkY=;
- b=QARExY4Kvgn6Ik4KdGs+CvUxr5/7kmiMtiQOgljGpLFvId+rfqOJMMjFJsZ4j2JAqpT+OL
- t7WK6Qa36q63meNZ/cPWkGkA58wvtj7Tajc1H5y8CU3g0+Wqr1tuVJu77d4N6H0GPl7NSc
- muXrZhtl3HFnCNIfgmjQyS80L3K9JMY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-477-zNaX8UkRO8eOnHwaMfdoBw-1; Tue, 29 Sep 2020 00:02:57 -0400
-X-MC-Unique: zNaX8UkRO8eOnHwaMfdoBw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 72E191DDED
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 04:02:56 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-119-55.rdu2.redhat.com
- [10.10.119.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D3C1B5D9CA;
- Tue, 29 Sep 2020 04:02:55 +0000 (UTC)
-Date: Tue, 29 Sep 2020 00:02:53 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v3 07/47] qapi-gen: Separate arg-parsing from generation
-Message-ID: <20200929040253.GH700868@localhost.localdomain>
-References: <20200925002900.465855-1-jsnow@redhat.com>
- <20200925002900.465855-8-jsnow@redhat.com>
+ (Exim 4.90_1) (envelope-from <sean.j.christopherson@intel.com>)
+ id 1kN6rK-0000Qc-Vb
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 00:03:22 -0400
+Received: from mga09.intel.com ([134.134.136.24]:13332)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <sean.j.christopherson@intel.com>)
+ id 1kN6rI-00067X-5V
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 00:03:22 -0400
+IronPort-SDR: LFKIUWTPiMWP1QSp0vSuK6Ydhol9ADnlDHtg/0iJ7FLYiaP4ATph8q3HeFjSo2oW9Tew/K69Ke
+ qLzyiorc56cw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9758"; a="162989297"
+X-IronPort-AV: E=Sophos;i="5.77,316,1596524400"; d="scan'208";a="162989297"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+ by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 28 Sep 2020 21:03:14 -0700
+IronPort-SDR: H+A8gaOj84RpkZt74p+GjpzFAfHlGf+IYoh0enZRvL1fIkCabp2geqNngGtJ0RW1hP8m88adg4
+ YJ7mfJIdYITg==
+X-IronPort-AV: E=Sophos;i="5.77,316,1596524400"; d="scan'208";a="350068368"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com)
+ ([10.54.74.160])
+ by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 28 Sep 2020 21:03:13 -0700
+Date: Mon, 28 Sep 2020 21:03:11 -0700
+From: Sean Christopherson <sean.j.christopherson@intel.com>
+To: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Subject: Re: [PATCH 1/6 v3] KVM: x86: Change names of some of the kvm_x86_ops
+ functions to make them more semantical and readable
+Message-ID: <20200929040309.GI31514@linux.intel.com>
+References: <1595895050-105504-1-git-send-email-krish.sadhukhan@oracle.com>
+ <1595895050-105504-2-git-send-email-krish.sadhukhan@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20200925002900.465855-8-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="BXr400anF0jyguTS"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=crosa@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 23:30:14
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <1595895050-105504-2-git-send-email-krish.sadhukhan@oracle.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
+Received-SPF: pass client-ip=134.134.136.24;
+ envelope-from=sean.j.christopherson@intel.com; helo=mga09.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 00:03:14
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,50 +83,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+Cc: pbonzini@redhat.com, vkuznets@redhat.com, qemu-devel@nongnu.org,
+ kvm@vger.kernel.org, jmattson@google.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---BXr400anF0jyguTS
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This needs a changelog.
 
-On Thu, Sep 24, 2020 at 08:28:20PM -0400, John Snow wrote:
-> This is a minor re-work of the entrypoint script. It isolates a
-> generate() method from the actual command-line mechanism.
->=20
-> The regex match error checking was modified slightly to check that we
-> actually got a regex match.
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+I would also split the non-x86 parts, i.e. the kvm_arch_* renames, to a
+separate patch.
 
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
-Tested-by: Cleber Rosa <crosa@redhat.com>
+On Tue, Jul 28, 2020 at 12:10:45AM +0000, Krish Sadhukhan wrote:
+> Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> ---
+> @@ -4016,15 +4016,15 @@ static int svm_vm_init(struct kvm *kvm)
+>  	.tlb_flush_gva = svm_flush_tlb_gva,
+>  	.tlb_flush_guest = svm_flush_tlb,
+>  
+> -	.run = svm_vcpu_run,
+> +	.vcpu_run = svm_vcpu_run,
+>  	.handle_exit = handle_exit,
+>  	.skip_emulated_instruction = skip_emulated_instruction,
+>  	.update_emulated_instruction = NULL,
+>  	.set_interrupt_shadow = svm_set_interrupt_shadow,
+>  	.get_interrupt_shadow = svm_get_interrupt_shadow,
+>  	.patch_hypercall = svm_patch_hypercall,
+> -	.set_irq = svm_set_irq,
+> -	.set_nmi = svm_inject_nmi,
+> +	.inject_irq = svm_set_irq,
 
---BXr400anF0jyguTS
-Content-Type: application/pgp-signature; name="signature.asc"
+I would strongly prefer these renames to be fully recursive within a single
+patch, i.e. rename svm_set_irq() as well.
 
------BEGIN PGP SIGNATURE-----
+Ditto for the unsetup->teardown change.
 
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl9yse0ACgkQZX6NM6Xy
-CfPWUxAAtGyYdDTqmhI+hQs4rjvDbQrbJhcS3jgo5DXH8I82D08HkuHIZ0NvpvUX
-dkKdkPU3o0gMHX+BdWAhRQQb/MgttEgnPLxXLFxcjbUi3RIgRw5qg95kgqmMm053
-KKkdAvdcqoVRmcpV3jtBZatlATatXdmBv6xgEkoUO4Jp7omHoduI7b9T7WRdugKj
-xeuxXZz/olDo4prXSspxmTFzJdKjbmcWZHtqDtfrDfwjatClmR+JV1ArLHbcypnx
-quoLIbtc20evAp6lIT7gzOguUW+y2Hnze8JzK/MIeAopLsOMELEg7lBZbPMbD6cR
-jmYfriXMqBgGttUfQ17I7ozJjjkNgoFL5Poq44+v7ubLpEeiU25cQXE8/zBmIXB+
-xeCo1oB4WJJUhAsVsVByv5OKmXJKWzbjElX7D1mpSqDPfJHqansrEE1nS2a8nfcQ
-2PSB8St2R4wcR8rQ6gCClY1UyQ5whlQ5KO9td4NspKQfpKvROGzlRyN7OmEsm7oM
-lVX8gdrAp3xqIvoL4oAfKo+XS7zXp+p3Le/gSp2RzK00XIP3y/kBUDd+h/X7itR/
-FqKxZl+1SK3UBBg2N57+hGiFYRCtIp9kqvSZ9BTKSBQCX6fcS/swtpud6EmcAX8W
-dOzdRnVJwnZcZydgVh2xK9T7wTxq6fcNfiCSasmytsX4T3s1pEo=
-=mVuM
------END PGP SIGNATURE-----
+> +	.inject_nmi = svm_inject_nmi,
+>  	.queue_exception = svm_queue_exception,
+>  	.cancel_injection = svm_cancel_injection,
+>  	.interrupt_allowed = svm_interrupt_allowed,
+> @@ -4080,8 +4080,8 @@ static int svm_vm_init(struct kvm *kvm)
+>  	.enable_smi_window = enable_smi_window,
+>  
+>  	.mem_enc_op = svm_mem_enc_op,
+> -	.mem_enc_reg_region = svm_register_enc_region,
+> -	.mem_enc_unreg_region = svm_unregister_enc_region,
+> +	.mem_enc_register_region = svm_register_enc_region,
+> +	.mem_enc_unregister_region = svm_unregister_enc_region,
+>  
+>  	.need_emulation_on_page_fault = svm_need_emulation_on_page_fault,
+>  
 
---BXr400anF0jyguTS--
+...
 
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 4fdf303..cb6f153 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1469,15 +1469,15 @@ struct kvm_s390_ucas_mapping {
+>  #define KVM_S390_GET_CMMA_BITS      _IOWR(KVMIO, 0xb8, struct kvm_s390_cmma_log)
+>  #define KVM_S390_SET_CMMA_BITS      _IOW(KVMIO, 0xb9, struct kvm_s390_cmma_log)
+>  /* Memory Encryption Commands */
+> -#define KVM_MEMORY_ENCRYPT_OP      _IOWR(KVMIO, 0xba, unsigned long)
+> +#define KVM_MEM_ENC_OP	            _IOWR(KVMIO, 0xba, unsigned long)
+
+Renaming macros in uapi headers will break userspace.
+
+We could do
+
+  #define KVM_MEMORY_ENCRYPT_OP	KVM_MEM_ENC_OP
+
+internally, but personally I think it would do more harm than good.
+
+>  struct kvm_enc_region {
+>  	__u64 addr;
+>  	__u64 size;
+>  };
+>  
+> -#define KVM_MEMORY_ENCRYPT_REG_REGION    _IOR(KVMIO, 0xbb, struct kvm_enc_region)
+> -#define KVM_MEMORY_ENCRYPT_UNREG_REGION  _IOR(KVMIO, 0xbc, struct kvm_enc_region)
+> +#define KVM_MEM_ENC_REGISTER_REGION    _IOR(KVMIO, 0xbb, struct kvm_enc_region)
+> +#define KVM_MEM_ENC_UNREGISTER_REGION  _IOR(KVMIO, 0xbc, struct kvm_enc_region)
+>  
+>  /* Available with KVM_CAP_HYPERV_EVENTFD */
+>  #define KVM_HYPERV_EVENTFD        _IOW(KVMIO,  0xbd, struct kvm_hyperv_eventfd)
 
