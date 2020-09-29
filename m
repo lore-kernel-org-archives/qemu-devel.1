@@ -2,93 +2,100 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF969C4346E
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 10:35:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21B8DC4346E
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 10:36:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A9D62075F
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 10:35:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4143B207C4
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 10:36:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZPFJJHyr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A9D62075F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="1b8B/kNb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4143B207C4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNCyx-0001JH-CY
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 06:35:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50376)
+	id 1kNCzo-00027Y-1u
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 06:36:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50554)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kNCy2-0000ir-M1
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 06:34:42 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:39632)
+ (Exim 4.90_1) (envelope-from <aik@ozlabs.ru>) id 1kNCye-0001Bv-Ft
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 06:35:20 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:38612)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kNCy0-00071p-BG
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 06:34:42 -0400
-Received: by mail-ed1-x543.google.com with SMTP id e22so5779601edq.6
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 03:34:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=SemIGdCwYLKCKaF9vpPmwJI19fSYT8opFhUWXtWKWUY=;
- b=ZPFJJHyrISS8qSilg4PGQqfvb0mICsBuTwxSQRa9tVM70xDusohff5fc7HnRiNFw4I
- jg6MwsKAPtWnV1Cc05hIQwKiF4Gv9Y4yRLsBNgoBFgpl6jQ/M+MNra+UoURhrsqexscb
- rd9TK67vxQmnUyFzAQsl+IpolKhTDtyP70XcbmyVWQfYilhU8qCIGz5DkBgFd/xJQq3o
- PZ05gV+eTMJ3qY4FRrzVBkomYTag9GX6bRm81zN4ya+xpyZlI5+OtfTGuoW8sibfFdl6
- GMTpYlo3hQb7xAb2gMr2HERtrAO5pLDUw5NIFAXknAnUpkarj9BvMOfWQnbyrXK802Me
- fcWA==
+ (Exim 4.90_1) (envelope-from <aik@ozlabs.ru>) id 1kNCyb-00075M-Nb
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 06:35:20 -0400
+Received: by mail-pg1-x544.google.com with SMTP id 5so3536377pgf.5
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 03:35:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=hu/DnEzv+N1WTogD8U6m75+7hBo3s8MUQql4IDgOh50=;
+ b=1b8B/kNbgcNazD4C1ggy30dUue6r51U+OpXBDWfZzqhbx8fT2EHxEkkLS+Ldvy8o5C
+ foFIQvBkMZax6v7SU13gjeuc1kB1YAMywAQOvG94qHxxHMCxLgzqanqfpDWhqABAD+cX
+ AW+HXJ9eEM5MenKCQNQLlmpJGprSd3EpFh+S5ro/VlTTOccjWAncjuV4oqK8meB2HQ+Z
+ eqwHW3a0Utdt640WmH2/RSU+o59AkSnle9vN7TsotPtDSPQH2MHZVWEvIVudN7UreVIp
+ y7AyJJo6TKpE3A/Vo1tVBiTc/Cdbja5Gf+qit4BBHfhOcNTCG6gsrjzEydqJWgvRCcJg
+ 36Hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=SemIGdCwYLKCKaF9vpPmwJI19fSYT8opFhUWXtWKWUY=;
- b=QQKJqvK5UIsS6k0Vfmb6Kxk0YmTToT28vQPs8hHBeQGgiwOEO5CWShuPU/u4fJQN+S
- wxQxQjdUGH5Osbdj/Y8PEDcTI/QbJo/h/6hCibr4lewCUDPR3X5nXUaFQx2EVI+QAT1h
- h1ZbAOfLW8RALX58uSMIjfQpvAijrVgKQFJSsGZIzDLiuSy91qDeb4pqzAoF3wlphCXP
- 3uGtoAeIhJ2upEnk1eYVZtqjnUCVjXYS6/ulHcB6J3uPeY/O4gAUe0oIGUI2DC+ismSC
- BAuPZ3e7iQTDfU8zcg6AG1gQPMHhgVrMS7fE4R+0Aba/mer9RCPHR4jD22UQlgG9U313
- PVMw==
-X-Gm-Message-State: AOAM531gJGg/eL3MY28f8FksDoX6jGlftEI4kk0FmPCsZFjWHO5woqlX
- jnoWpbeBNw9RT9pI3T2P/mSS4G2xVdDzxnBEdHW1noc7Usf/Cw==
-X-Google-Smtp-Source: ABdhPJzLMAYgFepgOdKWF/bZ02eJMxe0OYQZtvzx0v+nt38+pIcRIy6JNmkTm/lE5uimigyaAuaUVpd8KyTNf3TrioY=
-X-Received: by 2002:aa7:ca17:: with SMTP id y23mr2538756eds.245.1601375678554; 
- Tue, 29 Sep 2020 03:34:38 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=hu/DnEzv+N1WTogD8U6m75+7hBo3s8MUQql4IDgOh50=;
+ b=aNGu6FtHo59v5MUUdnwDHTECiFjYydg7KjdY1GnRm3zJBJVA7Ma6dRweHohyTeTL5q
+ yEf2/pOiBvHhy/c4GSulrHUB8m6FckIoL6LW3AJRE6LfzFQKJMhRYiO3TNInQYf85DjQ
+ EQIr6GT5ez3i3JaVOWL3nNW+iJpw0xnBbM0JbFvHvkRnr4z2d+Vj4G/Eki3E0KMA6ZWk
+ ViMUNhJVs0BqTDyfTar7Gox5Dsm0ABatnkjNPXfG1HGjse6m3jSwA0BaAK2bH6phCp9k
+ tiTGEQQl6J79pbDScm/lSmqCJ8VT8WlzxiMp5CQlbkVE1B8pOCFFeuvY/2plWL1sIPNx
+ SzuA==
+X-Gm-Message-State: AOAM533v57LCQtA35UKKIdzaO09cpUQ1cK6KmzJGKDEH0taCHBfZHoI3
+ 82mz5E3vTqkGeFCklbgl8eRBN/jW7lKmES+E
+X-Google-Smtp-Source: ABdhPJw47juzHa7FGUUao5fyt0xh8xNPhX6iRt9EccE0hycDoxlUnef0kj1Vla/HAkiz8Dch614eKw==
+X-Received: by 2002:a17:902:b686:b029:d1:e5e7:bdd6 with SMTP id
+ c6-20020a170902b686b02900d1e5e7bdd6mr3837040pls.54.1601375714480; 
+ Tue, 29 Sep 2020 03:35:14 -0700 (PDT)
+Received: from [192.168.10.88] (124-171-83-152.dyn.iinet.net.au.
+ [124.171.83.152])
+ by smtp.gmail.com with UTF8SMTPSA id u22sm4304713pgi.85.2020.09.29.03.35.11
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 29 Sep 2020 03:35:13 -0700 (PDT)
+Subject: Re: [PATCH qemu v9] spapr: Implement Open Firmware client interface
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20200513035826.14205-1-aik@ozlabs.ru>
+ <e5ddf04a-0d68-3cb8-2b84-47a43e234a59@ozlabs.ru>
+ <f7e9ff41-de7a-c0d5-f004-51a2046ce0a0@ozlabs.ru>
+ <434cdf49-5b80-5620-2635-079ee4b4ebad@ozlabs.ru>
+ <86e79b6a-0032-56da-a066-9f02df361298@ozlabs.ru>
+ <20200716132249.GB5607@umbus.fritz.box>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <24e83a34-6788-d9ee-ca07-6833778d81df@ozlabs.ru>
+Date: Tue, 29 Sep 2020 20:35:09 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:82.0) Gecko/20100101
+ Thunderbird/82.0
 MIME-Version: 1.0
-References: <20200910174850.716104-1-marcandre.lureau@redhat.com>
- <87mu1j8p7p.fsf@dusky.pond.sub.org>
- <CAMxuvayvRfjUMYDiB5fm5QBD76kfD8-G1wTEucQTBbZUtnwXrA@mail.gmail.com>
- <874knpluez.fsf@dusky.pond.sub.org>
- <CAJ+F1CLCT3RpZF8JDYayqkKxFu76vy+q6GUjofZV3JF_YDvxng@mail.gmail.com>
- <9d6215d4-d0cd-67e4-3048-77127194f7e8@redhat.com>
- <CAJ+F1CLowpdHaJ58Vt7GYukAYvYAfuEJvnuw_ZM5kO_4=gh9XA@mail.gmail.com>
- <8c1783d1-70f4-d751-3d5d-83459cb1db45@redhat.com>
-In-Reply-To: <8c1783d1-70f4-d751-3d5d-83459cb1db45@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 29 Sep 2020 14:34:26 +0400
-Message-ID: <CAJ+F1CJgEe3++UHDfT3iOGyu+r1tM4A_9jRXoKC0P-k-Mhq29w@mail.gmail.com>
-Subject: Re: [PATCH] PoC: Rust binding for QAPI (qemu-ga only, for now)
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000078e4a905b07154d8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::543;
- envelope-from=marcandre.lureau@gmail.com; helo=mail-ed1-x543.google.com
+In-Reply-To: <20200716132249.GB5607@umbus.fritz.box>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
+ envelope-from=aik@ozlabs.ru; helo=mail-pg1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,329 +108,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "P. Berrange, Daniel" <berrange@redhat.com>,
- Sergio Lopez Pascual <slp@redhat.com>, "Hajnoczi, Stefan" <stefanha@gmail.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- John Snow <jsnow@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000078e4a905b07154d8
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-Hi
-
-On Tue, Sep 29, 2020 at 2:15 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
-
-> On 29/09/20 09:45, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi
-> >
-> > On Tue, Sep 22, 2020 at 9:08 PM Paolo Bonzini <pbonzini@redhat.com
-> > <mailto:pbonzini@redhat.com>> wrote:
-> >     > So a QEMU D-Bus interface could have a name like org.qemu.Qemu51,
-> >     > org.qemu.Qemu52.. for example, if we can't provide better API
-> >     stability...
-> >
-> >     That would be a problem for backports.
-> >
-> > Yes..  Backports could expose a subset of the new version interface? Or
-> > the interface can be divided for each Qmp command. (unorthodox)
->
-> That seems like a workaround for an IDL that is not the right solution
-> for the problem.
->
-> >        qapi::qga::commands::GuestShutdown::new()
-> >            .mode("halt")
-> >            .invoke_on(qapi_channel)?;
-> >
-> >
-> > Or simply use the same approach as qapi-rs
-> > (https://github.com/arcnmx/qapi-rs) which is  simply generating data
-> > structures based on the schema, and not binding commands to Rust
-> > functions for ex.
-> >
-> > qga.execute(&qga::guest_shutdown { mode: Some(GuestShutdownMode::Halt) =
-})
->
->
-> That would not be backwards compatible as you would have to set all
-> optional fields.  Every time the command grows a new optional argument,
-> all clients would have to specify it; if a command becomes optional,
-> you'd have to add Some() around it.  So I would say that...
->
->
-Not necessarily, with ..default::Default()
-
-> Less idiomatic, but it also works around the optional arguments and
-> > ordering issue.
->
-> ...  the builder pattern is not a workaround: it's the best and most
-> common Rust idiom to achieve what QAPI expresses as optional fields.
-> Likewise for keyword-only arguments in Python.
->
-
-Except QAPI makes all fields potentially optional (and unordered), that's
-not idiomatic.
 
 
-> > Yes, the python binding will have a similar issue. And if we want to ad=
-d
-> > typing to the mix, representing everything as a dict is not going to
-> > help much. Fortunately, there are other options I believe. But I would
-> > rather aim for the obvious, having non-optional & ordered arguments, an=
-d
-> > interface/methods versioning.
->
-> You shouldn't just state what you want; you really should take a look at
-> how the ability to add optional arguments has been used in the past, and
-> see if an alternative RPC without optional and unordered arguments would
-> have been as effective.  D-Bus is probably a perfectly good API for
-> qemu-ga.  The experience with qemu-ga however does not necessarily
-> extend to QEMU.
->
-> The main issue with D-Bus is that it conflates the transport and the IDL
-> so that you have to resort to passing arguments as key-value pairs.  QMP
->
-
-D-Bus is machine-level oriented, it's easy to bind to various languages, it
-can be pretty efficient too. It's not designed to be a good network RPC.
-QMP tries to be a bit of both, but is perhaps not good enough in either.
-
-does the same, but the IDL is much more flexible and not QEMU-specific,
-> so we don't pay as high a price.  Remember that while the specific
-> transport of QMP ("JSON dictionaries over a socket with 'execute' and
-> 'arguments' keys") is QEMU-specific, the concept of using JSON payloads
-> for RPC is very common.  For example, REST APIs almost invariably use
-> JSON and the resulting API even "feel" somewhat similar to QMP.
->
-> In fact, The first Google result for "openapi backwards compatible
-> extensions"
-> (
-> https://github.com/zalando/restful-api-guidelines/blob/master/chapters/co=
-mpatibility.adoc#107
-> )
-> might as well be written for QMP:
->
-> * [server] Add only optional, never mandatory fields.
->
-> * [client] Be tolerant with unknown fields in the payload
->
-> * [server] Unknown input fields in payload or URL should not be ignored
->
-> * [client] API clients consuming data must not assume that objects are
-> closed for extension
->
-> * [server] When changing your RESTful APIs, do so in a compatible way
-> and avoid generating additional API versions
->
-> * [server] MUST not use URI versioning
->
-> and so on.
->
-> If you want to "reinvent" QMP, instead of focusing on D-Bus you should
-> take a look at alternative IDLs and protocols (D-Bus is one but there's
-> also Protobuf and Flexbuffers), see how QAPI declarations would map to
-> those protocols, see how you would deal with extensibility, and rank
-> them according to various criteria.  For example:
->
-> * JSON "just works" but needs a custom code generator and imposes some
-> extra complexity on the clients for the simplest commands
->
-> * D-Bus has a good ecosystem and would keep simple commands simpler but
-> has issues with upgrade paths and is uglier for complex commands
->
-> * Protobufs probably would also just work and would have better code
-> generators, but would require some kind of lint to ensure
-> backwards-compatibility
->
->
-
-Again, the issues we are discussing are not specific to binding QMP over
-D-Bus. Binding QMP to various languages has similar problems. Perhaps those
-problems are minor, perhaps we can find decent solutions, like the one you
-suggest to use Rust builder pattern for commands. I think they are not
-great, as I tried to explain with the versioning and runtime issues that
-you have to take into account anyway at the client level. I would rather
-make those problems solved at the server level, that doesn't require any
-change to QMP today, just a more careful consideration when making changes
-(and probably some tools to help enforce some stability).
+On 16/07/2020 23:22, David Gibson wrote:
+> On Thu, Jul 16, 2020 at 07:04:56PM +1000, Alexey Kardashevskiy wrote:
+>> Ping? I kinda realize it is not going to replace SLOF any time soon but
+>> still...
+> 
+> Yeah, I know.   I just haven't had time to consider it.  Priority
+> starvation.
 
 
+Still? :)
 
---=20
-Marc-Andr=C3=A9 Lureau
 
---00000000000078e4a905b07154d8
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+>> On 07/07/2020 10:34, Alexey Kardashevskiy wrote:
+>>> Ping?
+>>>
+>>>
+>>> On 24/06/2020 10:28, Alexey Kardashevskiy wrote:
+>>>> Ping?
+>>>>
+>>>> On 02/06/2020 21:40, Alexey Kardashevskiy wrote:
+>>>>> Ping?
+>>>>>
+>>>>> On 13/05/2020 13:58, Alexey Kardashevskiy wrote:
+>>>>>> The PAPR platform which describes an OS environment that's presented by
+>>>>>> a combination of a hypervisor and firmware. The features it specifies
+>>>>>> require collaboration between the firmware and the hypervisor.
+>>>>>>
+>>>>>> Since the beginning, the runtime component of the firmware (RTAS) has
+>>>>>> been implemented as a 20 byte shim which simply forwards it to
+>>>>>> a hypercall implemented in qemu. The boot time firmware component is
+>>>>>> SLOF - but a build that's specific to qemu, and has always needed to be
+>>>>>> updated in sync with it. Even though we've managed to limit the amount
+>>>>>> of runtime communication we need between qemu and SLOF, there's some,
+>>>>>> and it has become increasingly awkward to handle as we've implemented
+>>>>>> new features.
+>>>>>>
+>>>>>> This implements a boot time OF client interface (CI) which is
+>>>>>> enabled by a new "x-vof" pseries machine option (stands for "Virtual Open
+>>>>>> Firmware). When enabled, QEMU implements the custom H_OF_CLIENT hcall
+>>>>>> which implements Open Firmware Client Interface (OF CI). This allows
+>>>>>> using a smaller stateless firmware which does not have to manage
+>>>>>> the device tree.
+>>>>>>
+>>>>>> The new "vof.bin" firmware image is included with source code under
+>>>>>> pc-bios/. It also includes RTAS blob.
+>>>>>>
+>>>>>> This implements a handful of CI methods just to get -kernel/-initrd
+>>>>>> working. In particular, this implements the device tree fetching and
+>>>>>> simple memory allocator - "claim" (an OF CI memory allocator) and updates
+>>>>>> "/memory@0/available" to report the client about available memory.
+>>>>>>
+>>>>>> This implements changing some device tree properties which we know how
+>>>>>> to deal with, the rest is ignored. To allow changes, this skips
+>>>>>> fdt_pack() when x-vof=on as not packing the blob leaves some room for
+>>>>>> appending.
+>>>>>>
+>>>>>> In absence of SLOF, this assigns phandles to device tree nodes to make
+>>>>>> device tree traversing work.
+>>>>>>
+>>>>>> When x-vof=on, this adds "/chosen" every time QEMU (re)builds a tree.
+>>>>>>
+>>>>>> This adds basic instances support which are managed by a hash map
+>>>>>> ihandle -> [phandle].
+>>>>>>
+>>>>>> Before the guest started, the used memory is:
+>>>>>> 0..4000 - the initial firmware
+>>>>>> 10000..180000 - stack
+>>>>>>
+>>>>>> This OF CI does not implement "interpret".
+>>>>>>
+>>>>>> With this basic support, this can only boot into kernel directly.
+>>>>>> However this is just enough for the petitboot kernel and initradmdisk to
+>>>>>> boot from any possible source. Note this requires reasonably recent guest
+>>>>>> kernel with:
+>>>>>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=df5be5be8735
+>>>>>>
+>>>>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>>>>>> ---
+>>>>>>
+>>
+>>
+> 
 
-<div dir=3D"ltr"><div dir=3D"ltr">Hi<br></div><br><div class=3D"gmail_quote=
-"><div dir=3D"ltr" class=3D"gmail_attr">On Tue, Sep 29, 2020 at 2:15 PM Pao=
-lo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com">pbonzini@redhat.com</=
-a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0p=
-x 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On=
- 29/09/20 09:45, Marc-Andr=C3=A9 Lureau wrote:<br>
-&gt; Hi<br>
-&gt; <br>
-&gt; On Tue, Sep 22, 2020 at 9:08 PM Paolo Bonzini &lt;<a href=3D"mailto:pb=
-onzini@redhat.com" target=3D"_blank">pbonzini@redhat.com</a><br>
-&gt; &lt;mailto:<a href=3D"mailto:pbonzini@redhat.com" target=3D"_blank">pb=
-onzini@redhat.com</a>&gt;&gt; wrote:<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; So a QEMU D-Bus interface could have a name li=
-ke org.qemu.Qemu51,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; org.qemu.Qemu52.. for example, if we can&#39;t=
- provide better API<br>
-&gt;=C2=A0 =C2=A0 =C2=A0stability...<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0That would be a problem for backports.<br>
-&gt; <br>
-&gt; Yes..=C2=A0 Backports could expose a subset of the new version interfa=
-ce? Or<br>
-&gt; the interface can be divided for each Qmp command. (unorthodox)<br>
-<br>
-That seems like a workaround for an IDL that is not the right solution<br>
-for the problem.<br>
-<br>
-&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0qapi::qga::commands::GuestShutdown::ne=
-w()<br>
-&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0.mode(&quot;halt&quot;)<=
-br>
-&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0.invoke_on(qapi_channel)=
-?;<br>
-&gt; <br>
-&gt; <br>
-&gt; Or simply use the same approach as qapi-rs<br>
-&gt; (<a href=3D"https://github.com/arcnmx/qapi-rs" rel=3D"noreferrer" targ=
-et=3D"_blank">https://github.com/arcnmx/qapi-rs</a>) which is=C2=A0 simply =
-generating data<br>
-&gt; structures based on the schema, and not binding commands to Rust<br>
-&gt; functions for ex.<br>
-&gt; <br>
-&gt; qga.execute(&amp;qga::guest_shutdown { mode: Some(GuestShutdownMode::H=
-alt) })<br>
-<br>
-<br>
-That would not be backwards compatible as you would have to set all<br>
-optional fields.=C2=A0 Every time the command grows a new optional argument=
-,<br>
-all clients would have to specify it; if a command becomes optional,<br>
-you&#39;d have to add Some() around it.=C2=A0 So I would say that...<br>
-<br></blockquote><div><br></div><div>Not necessarily, with ..default::Defau=
-lt()</div><div> <br></div><blockquote class=3D"gmail_quote" style=3D"margin=
-:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"=
->
-&gt; Less idiomatic, but it also works around the optional arguments and<br=
->
-&gt; ordering issue.<br>
-<br>
-...=C2=A0 the builder pattern is not a workaround: it&#39;s the best and mo=
-st<br>
-common Rust idiom to achieve what QAPI expresses as optional fields.<br>
-Likewise for keyword-only arguments in Python.<br></blockquote><div><br></d=
-iv><div>Except QAPI makes all fields potentially optional (and unordered), =
-that&#39;s not idiomatic.<br></div><div>=C2=A0</div><blockquote class=3D"gm=
-ail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,=
-204,204);padding-left:1ex">
-&gt; Yes, the python binding will have a similar issue. And if we want to a=
-dd<br>
-&gt; typing to the mix, representing everything as a dict is not going to<b=
-r>
-&gt; help much. Fortunately, there are other options I believe. But I would=
-<br>
-&gt; rather aim for the obvious, having non-optional &amp; ordered argument=
-s, and<br>
-&gt; interface/methods versioning.<br>
-<br>
-You shouldn&#39;t just state what you want; you really should take a look a=
-t<br>
-how the ability to add optional arguments has been used in the past, and<br=
->
-see if an alternative RPC without optional and unordered arguments would<br=
->
-have been as effective.=C2=A0 D-Bus is probably a perfectly good API for<br=
->
-qemu-ga.=C2=A0 The experience with qemu-ga however does not necessarily<br>
-extend to QEMU.<br>
-<br>
-The main issue with D-Bus is that it conflates the transport and the IDL<br=
->
-so that you have to resort to passing arguments as key-value pairs.=C2=A0 Q=
-MP<br></blockquote><div><br></div><div>D-Bus is machine-level oriented, it&=
-#39;s easy to bind to various languages, it can be pretty efficient too. It=
-&#39;s not designed to be a good network RPC. QMP tries to be a bit of both=
-, but is perhaps not good enough in either.<br></div><div><br></div><blockq=
-uote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1p=
-x solid rgb(204,204,204);padding-left:1ex">
-does the same, but the IDL is much more flexible and not QEMU-specific,<br>
-so we don&#39;t pay as high a price.=C2=A0 Remember that while the specific=
-<br>
-transport of QMP (&quot;JSON dictionaries over a socket with &#39;execute&#=
-39; and<br>
-&#39;arguments&#39; keys&quot;) is QEMU-specific, the concept of using JSON=
- payloads<br>
-for RPC is very common.=C2=A0 For example, REST APIs almost invariably use<=
-br>
-JSON and the resulting API even &quot;feel&quot; somewhat similar to QMP.<b=
-r>
-<br></blockquote><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px =
-0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-In fact, The first Google result for &quot;openapi backwards compatible<br>
-extensions&quot;<br>
-(<a href=3D"https://github.com/zalando/restful-api-guidelines/blob/master/c=
-hapters/compatibility.adoc#107" rel=3D"noreferrer" target=3D"_blank">https:=
-//github.com/zalando/restful-api-guidelines/blob/master/chapters/compatibil=
-ity.adoc#107</a>)<br>
-might as well be written for QMP:<br>
-<br>
-* [server] Add only optional, never mandatory fields.<br>
-<br>
-* [client] Be tolerant with unknown fields in the payload<br>
-<br>
-* [server] Unknown input fields in payload or URL should not be ignored<br>
-<br>
-* [client] API clients consuming data must not assume that objects are<br>
-closed for extension<br>
-<br>
-* [server] When changing your RESTful APIs, do so in a compatible way<br>
-and avoid generating additional API versions<br>
-<br>
-* [server] MUST not use URI versioning<br>
-<br>
-and so on.<br>
-<br>
-If you want to &quot;reinvent&quot; QMP, instead of focusing on D-Bus you s=
-hould<br>
-take a look at alternative IDLs and protocols (D-Bus is one but there&#39;s=
-<br>
-also Protobuf and Flexbuffers), see how QAPI declarations would map to<br>
-those protocols, see how you would deal with extensibility, and rank<br>
-them according to various criteria.=C2=A0 For example:<br>
-<br>
-* JSON &quot;just works&quot; but needs a custom code generator and imposes=
- some<br>
-extra complexity on the clients for the simplest commands<br>
-<br>
-* D-Bus has a good ecosystem and would keep simple commands simpler but<br>
-has issues with upgrade paths and is uglier for complex commands<br>
-<br>
-* Protobufs probably would also just work and would have better code<br>
-generators, but would require some kind of lint to ensure<br>
-backwards-compatibility<br>
-<br>
-</blockquote><div><br></div><div><div><br></div><div>Again, the issues we a=
-re discussing are not specific to binding QMP over D-Bus. Binding QMP to va=
-rious languages has similar problems. Perhaps those problems are minor, per=
-haps we can find decent solutions, like the one you suggest to use Rust bui=
-lder pattern for commands. I think they are not great, as I tried to explai=
-n with the versioning and runtime issues that you have to take into account=
- anyway at the client level. I would rather make those problems solved at t=
-he server level, that doesn&#39;t require any change to QMP today, just a m=
-ore careful consideration when making changes (and probably some tools to h=
-elp enforce some stability).<br></div></div><div><br></div></div><br clear=
-=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"gmail_signature">Marc-Andr=C3=
-=A9 Lureau<br></div></div>
-
---00000000000078e4a905b07154d8--
+-- 
+Alexey
 
