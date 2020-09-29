@@ -2,94 +2,92 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96EDDC4727C
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 20:03:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A649C4727C
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 20:04:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02CA020679
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 20:03:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4CFAF20679
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 20:04:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bLVu7BnX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02CA020679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="i4Ipab4/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CFAF20679
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNLqn-0006Y1-U3
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 16:03:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52280)
+	id 1kNLri-0006yS-6w
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 16:04:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45394)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kNLYi-0000QO-Fu
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 15:45:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35891)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kNLYg-0007Gv-4C
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 15:45:08 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601408704;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ApZGxpY8y8F7xmMMII2LWwpwh5Cnnxx2AjaMg3GtiCI=;
- b=bLVu7BnXEA+KxLJzNqWDuQnrtGiI5TndZ6wCBwAbODjA4e+QEwST7qd431DFExRIoq8z4V
- wcFYEoNXIu32wlJi4dxlqS5dIMXxvtBncJRU8WxA8rl6AjHEaV7dmgkrmCdvE88ie/pG8w
- xO7Hk7L9/r49JnEwQMAbHh16juj6d90=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-140-wweYFVZrOKye_q78H9BtWg-1; Tue, 29 Sep 2020 15:45:00 -0400
-X-MC-Unique: wweYFVZrOKye_q78H9BtWg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93FCB186841B;
- Tue, 29 Sep 2020 19:44:59 +0000 (UTC)
-Received: from [10.36.113.210] (ovpn-113-210.ams2.redhat.com [10.36.113.210])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 33D7655795;
- Tue, 29 Sep 2020 19:44:50 +0000 (UTC)
-Subject: Re: [PATCH v2 2/2] util/vfio-helpers: Rework the IOVA allocator to
- avoid IOVA reserved regions
-To: Stefan Hajnoczi <stefanha@redhat.com>
-References: <20200929085550.30926-1-eric.auger@redhat.com>
- <20200929085550.30926-3-eric.auger@redhat.com>
- <20200929155951.GB191675@stefanha-x1.localdomain>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <6ebdb1f7-792b-6fbe-d4b3-f06aafc8deef@redhat.com>
-Date: Tue, 29 Sep 2020 21:44:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20200929155951.GB191675@stefanha-x1.localdomain>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=eric.auger@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 22:47:55
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1kNKzn-00089e-QM
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 15:09:04 -0400
+Received: from mail-pj1-x1035.google.com ([2607:f8b0:4864:20::1035]:51276)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1kNKzk-0002V0-KX
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 15:09:03 -0400
+Received: by mail-pj1-x1035.google.com with SMTP id l18so48985pjz.1
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 12:09:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=pvN8Om/RgBOsGrGBRFmFDJLUCxKzek2s7iLbr+SMo5Q=;
+ b=i4Ipab4//u63l2OOiskP/9LaE4srJBFX7SM7OP+G7f872nADh6wrasqsWgzPOPjgwt
+ o5ZWi4D8p7Kc/J48B8rjaJi/574gdUuqNtB0GWudPLUKunLUYJqXeTRBwN/e3GicU/U3
+ lQDmkeDirak7USEHmqoJut/Wpwj9aRuXxHxh5kMaehQzNEgS7bUg+KdufrxB+bljamKV
+ LgAaXFcvqyqPlMYz/cXbElZ+Ra6lSRexGB9TDk7dTlBznOhmMobMpy+ihwVwMMgIxTYS
+ x2vk/cc5b9n8Yk+kSdEJNaHWPNxHd2f7Qj06cui87X6Zi+4/qNfr96c0HcqFBW7fE2Pi
+ VCkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=pvN8Om/RgBOsGrGBRFmFDJLUCxKzek2s7iLbr+SMo5Q=;
+ b=eWw3F4VcvHRj69VTgUHElo15dDRSr6zm8gfqJeoPlt4FeLLh8S+wxYfbOhfAkKzpAs
+ fLgPWgARrORb1/qRGuqeaTGQ/gCmBgEO4eAKNazw3brtk2YFdiU7lMQBbul5s2uUXe10
+ DW9tOOaC36rFhufoqdlgr5JTxINv6V7c5eeLeb7sCjj7y6Svxsqdj6FqN7gg14zZSH/C
+ dQDHqq4XNkWn7+8bDiKebFeUYqckjnBmuyF/ZqfY/aOw2YEe0TYjWh/8WBJVwEP/eG5M
+ +ev51r771Ec9TrrVT7pJ5Xjicg3n3fqlmNERAOeJkqsEu6gfjmI0hlAqs9sxqFKdfrm5
+ /Y/A==
+X-Gm-Message-State: AOAM533ZUlY3usmZ9YGfUL5Dn8ytpF1eKrOIFMfXa4lfr9ZUPPuITNEv
+ PKZTG9xQxRi3jyydi4TqWzJs24aCNdCeRw==
+X-Google-Smtp-Source: ABdhPJwwtZsoMhoLCFTRbjPDnhbOR+hd+3qNU+tpfsrb2oZlNVqEBZgGK5z1HdFIra4Gaq46V37R4g==
+X-Received: by 2002:a17:90a:4b0e:: with SMTP id
+ g14mr2317124pjh.140.1601406539237; 
+ Tue, 29 Sep 2020 12:08:59 -0700 (PDT)
+Received: from localhost.localdomain (122-116-72-36.HINET-IP.hinet.net.
+ [122.116.72.36])
+ by smtp.gmail.com with ESMTPSA id v8sm6003950pgg.58.2020.09.29.12.08.57
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 29 Sep 2020 12:08:58 -0700 (PDT)
+From: frank.chang@sifive.com
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [RFC v5 62/68] target/riscv: add "set round to odd" rounding mode
+ helper function
+Date: Wed, 30 Sep 2020 03:04:37 +0800
+Message-Id: <20200929190448.31116-63-frank.chang@sifive.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200929190448.31116-1-frank.chang@sifive.com>
+References: <20200929190448.31116-1-frank.chang@sifive.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1035;
+ envelope-from=frank.chang@sifive.com; helo=mail-pj1-x1035.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,54 +100,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, lvivier@redhat.com, cohuck@redhat.com,
- qemu-devel@nongnu.org, mreitz@redhat.com, alex.williamson@redhat.com,
- qemu-arm@nongnu.org, kwolf@redhat.com, philmd@redhat.com,
- eric.auger.pro@gmail.com
+Cc: Frank Chang <frank.chang@sifive.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Stefan,
+From: Frank Chang <frank.chang@sifive.com>
 
-On 9/29/20 5:59 PM, Stefan Hajnoczi wrote:
-> On Tue, Sep 29, 2020 at 10:55:50AM +0200, Eric Auger wrote:
->> diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
->> index ba0ee6e21c..71145970f3 100644
->> --- a/util/vfio-helpers.c
->> +++ b/util/vfio-helpers.c
->> @@ -667,6 +667,50 @@ static bool qemu_vfio_verify_mappings(QEMUVFIOState *s)
->>      return true;
->>  }
->>  
->> +static int
->> +qemu_vfio_find_fixed_iova(QEMUVFIOState *s, size_t size, uint64_t *iova)
->> +{
->> +    int i;
->> +
->> +    for (i = 0; i < s->nb_iova_ranges; i++) {
->> +        if (s->usable_iova_ranges[i].end < s->low_water_mark) {
->> +            continue;
->> +        }
->> +        s->low_water_mark =
->> +            MAX(s->low_water_mark, s->usable_iova_ranges[i].start);
->> +
->> +        if (s->usable_iova_ranges[i].end - s->low_water_mark + 1 >= size ||
->> +            s->usable_iova_ranges[i].end - s->low_water_mark + 1 == 0) {
-> 
-> I don't understand the == 0 case. It seems like we are allocating an
-> IOVA beyond usable_iova_ranges[i].end?>
-It is meant to handle the case were low_water_mark = 0 and
-s->usable_iova_ranges[0].end = ULLONG_MAX (I know it cannot exist at the
-moment but may happen in the future) where we get an overflow. Given the
-        if (s->usable_iova_ranges[i].end < s->low_water_mark) {
-            continue;
-        }
-I think this prevents us from allocating beyond
-usable_iova_ranges[i].end or do I miss something?
+helper_set_rounding_mode() is responsible for SIGILL, and "round to odd"
+should be an interface private to translation, so add a new independent
+helper_set_rod_rounding_mode().
 
-Thanks
+Signed-off-by: Frank Chang <frank.chang@sifive.com>
+---
+ target/riscv/fpu_helper.c | 5 +++++
+ target/riscv/helper.h     | 1 +
+ target/riscv/internals.h  | 1 +
+ target/riscv/translate.c  | 5 +++++
+ 4 files changed, 12 insertions(+)
 
-Eric
+diff --git a/target/riscv/fpu_helper.c b/target/riscv/fpu_helper.c
+index 3850146fec..b37e1d08a2 100644
+--- a/target/riscv/fpu_helper.c
++++ b/target/riscv/fpu_helper.c
+@@ -81,6 +81,11 @@ void helper_set_rounding_mode(CPURISCVState *env, uint32_t rm)
+     set_float_rounding_mode(softrm, &env->fp_status);
+ }
+ 
++void helper_set_rod_rounding_mode(CPURISCVState *env)
++{
++    set_float_rounding_mode(float_round_to_odd, &env->fp_status);
++}
++
+ static uint64_t do_fmadd_s(CPURISCVState *env, uint64_t rs1, uint64_t rs2,
+                            uint64_t rs3, int flags)
+ {
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 2a31c7bba1..32edc77858 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -3,6 +3,7 @@ DEF_HELPER_2(raise_exception, noreturn, env, i32)
+ 
+ /* Floating Point - rounding mode */
+ DEF_HELPER_FLAGS_2(set_rounding_mode, TCG_CALL_NO_WG, void, env, i32)
++DEF_HELPER_FLAGS_1(set_rod_rounding_mode, TCG_CALL_NO_WG, void, env)
+ 
+ /* Floating Point - fused */
+ DEF_HELPER_FLAGS_4(fmadd_s, TCG_CALL_NO_RWG, i64, env, i64, i64, i64)
+diff --git a/target/riscv/internals.h b/target/riscv/internals.h
+index 55bcd84e39..f0705a796b 100644
+--- a/target/riscv/internals.h
++++ b/target/riscv/internals.h
+@@ -39,6 +39,7 @@ enum {
+     RISCV_FRM_RUP = 3,  /* Round Up */
+     RISCV_FRM_RMM = 4,  /* Round to Nearest, ties to Max Magnitude */
+     RISCV_FRM_DYN = 7,  /* Dynamic rounding mode */
++    RISCV_FRM_ROD = 8,  /* Round to Odd */
+ };
+ 
+ static inline uint64_t nanbox_s(float32 f)
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index 2d12b8adc4..e6f4a662f5 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -30,6 +30,7 @@
+ #include "exec/log.h"
+ 
+ #include "instmap.h"
++#include "internals.h"
+ 
+ /* global register indices */
+ static TCGv cpu_gpr[32], cpu_pc, cpu_vl;
+@@ -583,6 +584,10 @@ static void gen_set_rm(DisasContext *ctx, int rm)
+         return;
+     }
+     ctx->frm = rm;
++    if (rm == RISCV_FRM_ROD) {
++        gen_helper_set_rod_rounding_mode(cpu_env);
++        return;
++    }
+     t0 = tcg_const_i32(rm);
+     gen_helper_set_rounding_mode(cpu_env, t0);
+     tcg_temp_free_i32(t0);
+-- 
+2.17.1
 
 
