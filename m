@@ -2,90 +2,91 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A664BC4727C
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 15:39:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB251C47425
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 15:44:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B86BE207F7
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 15:39:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1BAB5207F7
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 15:44:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KmPootB4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B86BE207F7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lGQQ6gOe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BAB5207F7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNHiV-0007NB-D6
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 11:38:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45608)
+	id 1kNHoE-0003dd-UG
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 11:44:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47414)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNHgm-00060c-Qr
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 11:37:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52803)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNHgk-00032M-W1
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 11:37:12 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601393830;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=q8cc9IIyzjSUAbUWpHaPZ6/q23SwBX+d3fzkby4bx6Y=;
- b=KmPootB4byLVQ+hmIdNfmKuuzt6grs0XGkLHsC57ZVZ4Fp+4iRamn3JRJdCxb/nPEIjJLV
- X8aGY25+u3wGKTq0wrICNbG+5DAUrdoED5ICcWTmISZ6UmdWH8LojGHhm6/HJ25NZef8Dt
- R1NZSTdcKzKx8eZpL3rNQczh+eO72Fs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-223-Bfo562yjNCWRNeEuYZFhVw-1; Tue, 29 Sep 2020 11:37:08 -0400
-X-MC-Unique: Bfo562yjNCWRNeEuYZFhVw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 714CD80733D
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 15:37:06 +0000 (UTC)
-Received: from [10.10.119.140] (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BFD4760C13;
- Tue, 29 Sep 2020 15:37:05 +0000 (UTC)
-Subject: Re: [PATCH v3 04/47] qapi: modify docstrings to be sphinx-compatible
-To: Cleber Rosa <crosa@redhat.com>
-References: <20200925002900.465855-1-jsnow@redhat.com>
- <20200925002900.465855-5-jsnow@redhat.com>
- <20200929033946.GE700868@localhost.localdomain>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <2263602c-97c7-4e6b-4bde-f209e6d5efef@redhat.com>
-Date: Tue, 29 Sep 2020 11:37:05 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kNHmh-0002Hh-PH
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 11:43:19 -0400
+Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:44760)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kNHmf-0004Gy-OB
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 11:43:19 -0400
+Received: by mail-ej1-x644.google.com with SMTP id r7so15639156ejs.11
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 08:43:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=tD2TkqZe2KjzbiWg27fwcR975/q7/4o22MkC+UugYrU=;
+ b=lGQQ6gOeg982cCWmNGg/2zbsKmAZtNYOfz9+2UQNJgscc2oPpS8cExRUFiVo/y2/H8
+ NCM0ayim0jADa7h46jErNZPV/6aPJfPoZ1QN8LsHANzXaX/yk+WpbzMTgnDHuPtqDLIh
+ +VP3n2VAx4di0yYWv7uSzOBmvKFL6JpZ8BBTfBG03jfJOc3RvfOwXX8m3E8WKWi4vdjQ
+ 3wRDt0BeQ+wA+4kFqBE8A7rzQxpv7OgoSe8yate/YXxY08JA46oMW7YKVQOua7tQNuar
+ UYbNwpilwPx4u2stl9Otzvnj0XU91/BWtSEVcCx6IjcnAsvpOR6d4JfMIK2xCv0f28zO
+ /b1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=tD2TkqZe2KjzbiWg27fwcR975/q7/4o22MkC+UugYrU=;
+ b=RFAdy/dHU0c/IGlvOm/IBd4uxq+8hfycBv6rywDermaG4cuMjl60a7ylacBWwnELtE
+ HIjDs8+f5XCuSwKsyrV8zELJSBqIQLNpTr3nIFR4UtMd4Ka1sX+U1YnCJxf/uWgMe27M
+ 5xaxKHMAcJPU+id7dnmpc7Zkqq/vpMxNog9yUzdeF3Iuaz1UZ2qljs11qkGDtQMdf0nb
+ +FjU/kAdOvFBDfOr22KfFZ06MY/AuOgqhGXqbbcXLoYISPHP0kCRDR02UgdXCHBkCeD4
+ 9My3tkBCV1ztoH9rjL8821TQShLy/UlU4hjnEj2mBqTQd2AM21EynpSVU72bisqMfz0o
+ WVHg==
+X-Gm-Message-State: AOAM532JmsmtVrDMPdjt7tmahav7VTCJZSpb7642/jFPUruVUTPb2mIP
+ bMlzQvu0KzMNxNiwOFzb8X+mORFFzu7zPI1JoOr8gQ==
+X-Google-Smtp-Source: ABdhPJzTVvI9uul+5UcClW3RQDzfA9g9cEZd7fyk2JG6FLyziNDIYdKIJreAdJdNfMQNfgIlS7A+8t4ddNDGA1jfqSs=
+X-Received: by 2002:a17:906:24d6:: with SMTP id
+ f22mr4352058ejb.85.1601394195122; 
+ Tue, 29 Sep 2020 08:43:15 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200929033946.GE700868@localhost.localdomain>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 02:22:44
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+References: <20200925162316.21205-1-peter.maydell@linaro.org>
+ <160106193961.10465.12078546060105198824@66eaa9a8a123>
+ <CAFEAcA8uWY+MCDToz9an+zsrMVrctkBmgpMV82iUR2ZZOgA3Vg@mail.gmail.com>
+ <87h7rif3x3.fsf@dusky.pond.sub.org>
+ <CAFEAcA9TdEPAHECmLAA3nOzUBEzcpis=OL7MFmMv-76e4yS6+g@mail.gmail.com>
+ <87imbwob8g.fsf@dusky.pond.sub.org>
+In-Reply-To: <87imbwob8g.fsf@dusky.pond.sub.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 29 Sep 2020 16:43:03 +0100
+Message-ID: <CAFEAcA-4gyjxoyMTY5ZUW47VuGGiQyTwRV_OL91_Rdw-zAb+qw@mail.gmail.com>
+Subject: Re: [PATCH v6 00/21] Convert QAPI doc comments to generate rST
+ instead of texinfo
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::644;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,87 +100,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/28/20 11:39 PM, Cleber Rosa wrote:
-> On Thu, Sep 24, 2020 at 08:28:17PM -0400, John Snow wrote:
->> I did not say "sphinx beautiful", just "sphinx compatible". They will
->> not throw errors when parsed and interpreted as ReST.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>   scripts/qapi/doc.py    | 10 +++++-----
->>   scripts/qapi/gen.py    |  6 ++++--
->>   scripts/qapi/parser.py |  9 +++++----
->>   3 files changed, 14 insertions(+), 11 deletions(-)
->>
->> diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
->> index 92f584edcf..c41e9d29f5 100644
->> --- a/scripts/qapi/doc.py
->> +++ b/scripts/qapi/doc.py
->> @@ -65,11 +65,11 @@ def texi_format(doc):
->>       Format documentation
->>   
->>       Lines starting with:
->> -    - |: generates an @example
->> -    - =: generates @section
->> -    - ==: generates @subsection
->> -    - 1. or 1): generates an @enumerate @item
->> -    - */-: generates an @itemize list
->> +    - ``|:`` generates an @example
->> +    - ``=:`` generates @section
->> +    - ``==:`` generates @subsection
->> +    - ``1.`` or ``1):`` generates an @enumerate @item
->> +    - ``*/-:`` generates an @itemize list
->>       """
->>       ret = ''
->>       doc = subst_braces(doc)
->> diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
->> index bf5552a4e7..3d25a8cff4 100644
->> --- a/scripts/qapi/gen.py
->> +++ b/scripts/qapi/gen.py
->> @@ -154,9 +154,11 @@ def _bottom(self):
->>   
->>   @contextmanager
->>   def ifcontext(ifcond, *args):
->> -    """A 'with' statement context manager to wrap with start_if()/end_if()
->> +    """
->> +    A 'with' statement context manager to wrap with start_if()/end_if()
->>   
-> 
-> If you're making it compatible, why not take the time to give
-> backticks to start_if and end_if?
-> 
+On Tue, 29 Sep 2020 at 16:26, Markus Armbruster <armbru@redhat.com> wrote:
+> One more issue:
+>
+>     /work/armbru/qemu/docs/../qapi/machine.json:1000: WARNING: Unexpected indentation.
+>     /work/armbru/qemu/docs/../qapi/machine.json:1000: WARNING: Block quote ends without a blank line; unexpected unindent.
+>
+> Line 1000 is at the beginning of a comment block.  Suboptimal.
 
-I forget. Must not have been a good reason, then...?
+Yes. There's a comment in qapidoc.py about that:
 
-> Bonus points for setting the "meth" role, but not lost points for not
-> doing it, as I understand this is beyond what you're attempting at
-> this time.
-> 
++            # The reported line number will always be that of the start line
++            # of the doc comment, rather than the actual location of the error.
++            # Being more precise would require overhaul of the QAPIDoc class
++            # to track lines more exactly within all the sub-parts of the doc
++            # comment, as well as counting lines here.
 
-I remain unsold on using explicit roles for references in docstrings, 
-because I'd like to keep the amount of Sphinx-ese syntax down to a 
-minimum if I can. The double backticks are bad enough ...
+(That is, within qapidoc.py we can count the offset of each line within
+this doc comment fragment from the start of the fragment (here, from
+the "@value:" line), but only the scripts/qapi code is in a position to
+know the offset from the start of the block comment on line 1000 to
+the @value line, and it doesn't currently track that.)
 
->> -    *args: any number of QAPIGenCCode
->> +    :param ifcond: List of conditionals
->> +    :param args: any number of QAPIGenCCode
->>   
-> 
-> I would argue that this is not a strict sphinx compatibility change,
-> but a fix to a broken docstring.
-> 
+> After a bit of guessing, I arrived at this fix:
+>
+> diff --git a/qapi/machine.json b/qapi/machine.json
+> index 7c9e69a9f5..756dacb06f 100644
+> --- a/qapi/machine.json
+> +++ b/qapi/machine.json
+> @@ -1001,9 +1001,11 @@
+>  #
+>  # Request the balloon driver to change its balloon size.
+>  #
+> -# @value: the target logical size of the VM in bytes
+> +# @value: the target logical size of the VM in bytes.
+>  #         We can deduce the size of the balloon using this formula:
+> +#
+>  #            logical_vm_size = vm_ram_size - balloon_size
+> +#
+>  #         From it we have: balloon_size = vm_ram_size - @value
+>  #
+>  # Returns: - Nothing on success
+>
+> Looks good?
 
-Not entirely correct: the syntax of *args breaks document generation.
+That will work: it will render the indented text as a block quote.
 
-(OK, I could make QAPIGenCCode a reference ...)
+If you want the formula to be rendered as a fixed-width code
+example, you could additionally do s/formula:/formula::/ to
+create a rST literal block. But then you'd probably want to
+do similar with the equation on the following line, for consistency.
 
-> - Cleber.
-> 
-
+thanks
+-- PMM
 
