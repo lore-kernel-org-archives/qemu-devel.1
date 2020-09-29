@@ -2,77 +2,88 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 210B0C4346E
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 06:26:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B90F8C4346E
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 06:55:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78BDE206A4
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 06:26:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78BDE206A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 070EF206B7
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 06:55:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MV40wPoI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 070EF206B7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kN95d-0005FS-K1
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 02:26:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44100)
+	id 1kN9Y3-00029Q-M2
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 02:55:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51956)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <like.xu@intel.com>) id 1kN94C-0004ab-GR
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 02:24:48 -0400
-Received: from mga09.intel.com ([134.134.136.24]:24487)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <like.xu@intel.com>) id 1kN947-0001hl-FL
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 02:24:47 -0400
-IronPort-SDR: Wf0rbCHOWz7ElofX4ZBHhyx54GzBttn4PW4w0hldIaMOLI8uO14mS9zb3GGANja6FWQid706HO
- ynyem38GD2yQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9758"; a="163003253"
-X-IronPort-AV: E=Sophos;i="5.77,317,1596524400"; d="scan'208";a="163003253"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 28 Sep 2020 23:24:35 -0700
-IronPort-SDR: p+womoRydx1qfJZxZ3dHSFTCkXY8J6lVJSQmoCBG14H2f6nkU7m8O+CrlAM3945UvePDuF5sQQ
- 79yv1VOY3t5g==
-X-IronPort-AV: E=Sophos;i="5.77,317,1596524400"; d="scan'208";a="338492660"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.187])
- ([10.238.4.187])
- by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 28 Sep 2020 23:24:33 -0700
-Subject: Re: [PATCH] target/i386: add -cpu,lbr=true support to enable guest LBR
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <20200726153229.27149-1-like.xu@linux.intel.com>
- <20200726153229.27149-3-like.xu@linux.intel.com>
- <20200924220523.GL3717385@habkost.net>
- <958128c6-39e8-96fe-34d8-7be1888f4144@intel.com>
- <20200928154107.GX3717385@habkost.net>
-From: "Xu, Like" <like.xu@intel.com>
-Organization: Intel OTC
-Message-ID: <911adb63-ba05-ea93-c038-1c09cff15eda@intel.com>
-Date: Tue, 29 Sep 2020 14:24:30 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kN9XC-0001hx-DT
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 02:54:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54454)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kN9X7-0006BL-OD
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 02:54:46 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601362480;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=yRaqgM3qKvZSm64Eo5Sqc0XJvf3ztounAET1EMNDPL0=;
+ b=MV40wPoI8jLMTinsi8nBfILQOHW6grIITHGiXYm45eGy1S9gFqAtoO/SLgbnqyD3hUVdUZ
+ KstE6I0cFFlbcDxJHK0FLhszllpUPxXLp4VMOJVIBrXiJ/Uhr+ez2TTT7Sz/BIJxLYYJDX
+ 9pokIC14RfjF46CNisu7fnpU2ZX5xQs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-444-lVnMoVqjNtC9R6U1yTqncg-1; Tue, 29 Sep 2020 02:54:07 -0400
+X-MC-Unique: lVnMoVqjNtC9R6U1yTqncg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F366802B69;
+ Tue, 29 Sep 2020 06:54:06 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-101.ams2.redhat.com
+ [10.36.112.101])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9277D1A837;
+ Tue, 29 Sep 2020 06:54:05 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 19AD4113865F; Tue, 29 Sep 2020 08:54:04 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v6 07/21] docs/sphinx: Add new qapi-doc Sphinx extension
+References: <20200925162316.21205-1-peter.maydell@linaro.org>
+ <20200925162316.21205-8-peter.maydell@linaro.org>
+Date: Tue, 29 Sep 2020 08:54:04 +0200
+In-Reply-To: <20200925162316.21205-8-peter.maydell@linaro.org> (Peter
+ Maydell's message of "Fri, 25 Sep 2020 17:23:02 +0100")
+Message-ID: <874knh6pkj.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20200928154107.GX3717385@habkost.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=134.134.136.24; envelope-from=like.xu@intel.com;
- helo=mga09.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 02:24:40
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 22:47:55
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -86,315 +97,682 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: like.xu@intel.com
-Cc: Wanpeng Li <wanpengli@tencent.com>, Like Xu <like.xu@linux.intel.com>,
- kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Joerg Roedel <joro@8bytes.org>, Marcelo Tosatti <mtosatti@redhat.com>,
- linux-kernel@vger.kernel.org,
- Sean Christopherson <sean.j.christopherson@intel.com>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Jim Mattson <jmattson@google.com>
+Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Eduardo,
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-On 2020/9/28 23:41, Eduardo Habkost wrote:
-> On Mon, Sep 28, 2020 at 10:51:03PM +0800, Xu, Like wrote:
->> Hi Eduardo,
->>
->> Thanks for your detailed review.
->>
->> On 2020/9/25 6:05, Eduardo Habkost wrote:
->>> I've just noticed this on my review queue (apologies for the long
->>> delay).  Comments below:
->>>
->>> On Sun, Jul 26, 2020 at 11:32:20PM +0800, Like Xu wrote:
->>>> The LBR feature would be enabled on the guest if:
->>>> - the KVM is enabled and the PMU is enabled and,
->>>> - the msr-based-feature IA32_PERF_CAPABILITIES is supporterd and,
->>>> - the supported returned value for lbr_fmt from this msr is not zero.
->>>>
->>>> The LBR feature would be disabled on the guest if:
->>>> - the msr-based-feature IA32_PERF_CAPABILITIES is unsupporterd OR,
->>>> - qemu set the IA32_PERF_CAPABILITIES msr feature without lbr_fmt values OR,
->>>> - the requested guest vcpu model doesn't support PDCM.
->>>>
->>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
->>>> Cc: Richard Henderson <rth@twiddle.net>
->>>> Cc: Eduardo Habkost <ehabkost@redhat.com>
->>>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->>>> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
->>>> Cc: Marcelo Tosatti <mtosatti@redhat.com>
->>>> Cc: qemu-devel@nongnu.org
->>>> Signed-off-by: Like Xu <like.xu@linux.intel.com>
->>>> ---
->>>>    hw/i386/pc.c      |  1 +
->>>>    target/i386/cpu.c | 24 ++++++++++++++++++++++--
->>>>    target/i386/cpu.h |  2 ++
->>>>    target/i386/kvm.c |  7 ++++++-
->>>>    4 files changed, 31 insertions(+), 3 deletions(-)
->>>>
->>>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->>>> index 3d419d5991..857aff75bb 100644
->>>> --- a/hw/i386/pc.c
->>>> +++ b/hw/i386/pc.c
->>>> @@ -318,6 +318,7 @@ GlobalProperty pc_compat_1_5[] = {
->>>>        { "Nehalem-" TYPE_X86_CPU, "min-level", "2" },
->>>>        { "virtio-net-pci", "any_layout", "off" },
->>>>        { TYPE_X86_CPU, "pmu", "on" },
->>>> +    { TYPE_X86_CPU, "lbr", "on" },
->>> Why is this line here?
->> I'll remove it.
->>>>        { "i440FX-pcihost", "short_root_bus", "0" },
->>>>        { "q35-pcihost", "short_root_bus", "0" },
->>>>    };
->>>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->>>> index 588f32e136..c803994887 100644
->>>> --- a/target/i386/cpu.c
->>>> +++ b/target/i386/cpu.c
->>>> @@ -1142,8 +1142,8 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->>>>        [FEAT_PERF_CAPABILITIES] = {
->>>>            .type = MSR_FEATURE_WORD,
->>>>            .feat_names = {
->>>> -            NULL, NULL, NULL, NULL,
->>>> -            NULL, NULL, NULL, NULL,
->>>> +            "lbr-fmt-bit-0", "lbr-fmt-bit-1", "lbr-fmt-bit-2", "lbr-fmt-bit-3",
->>>> +            "lbr-fmt-bit-4", "lbr-fmt-bit-5", NULL, NULL,
->>> What about a separate "lbr-fmt" int property instead of
->>> individual bit properties?
->> I'm not sure if you mean adding a "separate lbr-fmt int property"
->> like "uint64_t tcg_features" to 'struct FeatureWordInfo'.
->>
->> Would you mind providing more implementation hints,
->> considering the PEBS_FMT will be added later ?
-> You can add a regular uint8_t field to X86CPU, use
-> DEFINE_PROP_UINT8 at x86_cpu_properties[], and just validate/copy
-> the bits to cpu->features[FEAT_PERF_CAPABILITIES][bits 0:5] on
-> x86_cpu_realizefn().
+> Some of our documentation is auto-generated from documentation
+> comments in the JSON schema.
 >
-Thanks, I'll apply it and enable "-cpu,lbr-fmt=*" from command line.
->>> What happens if LBR_FMT on the host (returned by
->>> kvm_arch_get_supported_msr_feature(MSR_IA32_PERF_CAPABILITIES) is
->>> different than the one configured for the guest?
->> To enable guest LBR, guest LBR_FMT must be the same as host LBR_FMT.
->>> Can KVM emulate
->>> a CPU with different LBR_FMT, or it must match the host?
->> It must match the host since the LBR registers are model specified.
-> OK, this means the value set in cpu->features[] need to be
-> validated against the host in x86_cpu_filter_features().
+> For Sphinx, rather than creating a file to include, the most natural
+> way to handle this is to have a small custom Sphinx extension which
+> processes the JSON file and inserts documentation into the rST
+> file being processed.
 >
-> It can be similar to what's done for intel-pt bits, but instead
-> of comparing to constants (the intel-pt bits in CPUID are
-> constant today), you can compare the host value with
-> cpu->features[FEAT_PERF_CAPABILITIES].
-I assume you mean
-     env->features[FEAT_PERF_CAPABILITIES]
-for
-     cpu->features[FEAT_PERF_CAPABILITIES].
-
-Thanks, I'll apply it.
+> This is the same approach that kerneldoc and hxtool use.
 >
-> Maybe a FeatureWordInfo.validate_feature(X86CPU *, FeatureWord)
-> callback could be added, so we could just define separate
-> validation functions for each feature word, to be called
-> automatically by x86_cpu_filter_features().  This could be done
-> as a follow-up patch, though.
-Sure, let me see if there is extra value in adding separate
-verification functions for each feature word.
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Down to a few trivial things, which I can tidy up in my tree.
+
+> ---
+>  docs/conf.py           |   6 +-
+>  docs/sphinx/qapidoc.py | 550 +++++++++++++++++++++++++++++++++++++++++
+>  MAINTAINERS            |   1 +
+>  3 files changed, 556 insertions(+), 1 deletion(-)
+>  create mode 100644 docs/sphinx/qapidoc.py
 >
->
->>> If LBR_FMT must always match the host, the feature needs to block
->>> live migration.
->> It's migrable enough of the perf cap LBR version matches,
->> don't need full model number match.
-> As long as the requirements are validated inside
-> x86_cpu_filter_features(), it should be OK to make it migratable.
-Thanks.
->
->> For example it's fine to migrate from SKY to CLX.
->>> I guess this is already the case because PDCM is
->>> cleared if !cpu->enable_pmu.  Adding PDCM to .unmigratable_flags
->>> is probably a good idea, though.
->> I'm trying to make LBR migration-friendly as much as possible w/ your help.
->>
->> If Arch LBR is enabled for SPR guest, the situation will be different
->> hence adding PDCM to .unmigratable_flags may not help it.
-> OK, in this case forget what I said about setting it on
-> .unmigratable_flags.  The constraints for making the feature
-> migratable should be same ones mentioned for intel-pt at:
-> https://lore.kernel.org/qemu-devel/20200923141502.GO2044576@habkost.net/
-Thanks for clarification.
+> diff --git a/docs/conf.py b/docs/conf.py
+> index 0dbd90dc112..606f623211d 100644
+> --- a/docs/conf.py
+> +++ b/docs/conf.py
+> @@ -52,7 +52,10 @@ except NameError:
+>  # add these directories to sys.path here. If the directory is relative to the
+>  # documentation root, use an absolute path starting from qemu_docdir.
+>  #
+> +# Our extensions are in docs/sphinx; the qapidoc extension requires
+> +# the QAPI modules from scripts/.
+>  sys.path.insert(0, os.path.join(qemu_docdir, "sphinx"))
+> +sys.path.insert(0, os.path.join(qemu_docdir, "../scripts"))
+>  
+>  
+>  # -- General configuration ------------------------------------------------
+> @@ -67,7 +70,7 @@ needs_sphinx = '1.6'
+>  # Add any Sphinx extension module names here, as strings. They can be
+>  # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
+>  # ones.
+> -extensions = ['kerneldoc', 'qmp_lexer', 'hxtool', 'depfile']
+> +extensions = ['kerneldoc', 'qmp_lexer', 'hxtool', 'depfile', 'qapidoc']
+>  
+>  # Add any paths that contain templates here, relative to this directory.
+>  templates_path = ['_templates']
+> @@ -241,3 +244,4 @@ texinfo_documents = [
+>  kerneldoc_bin = os.path.join(qemu_docdir, '../scripts/kernel-doc')
+>  kerneldoc_srctree = os.path.join(qemu_docdir, '..')
+>  hxtool_srctree = os.path.join(qemu_docdir, '..')
+> +qapidoc_srctree = os.path.join(qemu_docdir, '..')
+> diff --git a/docs/sphinx/qapidoc.py b/docs/sphinx/qapidoc.py
+> new file mode 100644
+> index 00000000000..afc4167f8b1
+> --- /dev/null
+> +++ b/docs/sphinx/qapidoc.py
+> @@ -0,0 +1,550 @@
+> +# coding=utf-8
+> +#
+> +# QEMU qapidoc QAPI file parsing extension
+> +#
+> +# Copyright (c) 2020 Linaro
+> +#
+> +# This work is licensed under the terms of the GNU GPLv2 or later.
+> +# See the COPYING file in the top-level directory.
 
-Please let me know if the v2 patch doesn't follow you guide:
-https://lore.kernel.org/qemu-devel/20200929061217.118440-1-like.xu@linux.intel.com/
+Blank line, please.
 
->
->
->>>
->>>
->>>>                NULL, NULL, NULL, NULL,
->>>>                NULL, "full-width-write", NULL, NULL,
->>>>                NULL, NULL, NULL, NULL,
->>>> @@ -4224,6 +4224,12 @@ static bool lmce_supported(void)
->>>>        return !!(mce_cap & MCG_LMCE_P);
->>>>    }
->>>> +static inline bool lbr_supported(void)
->>>> +{
->>>> +    return kvm_enabled() && (kvm_arch_get_supported_msr_feature(kvm_state,
->>>> +        MSR_IA32_PERF_CAPABILITIES) & PERF_CAP_LBR_FMT);
->>>> +}
->>> You can rewrite this is an accelerator-independent way as:
->>>     (x86_cpu_get_supported_feature_word(FEAT_PERF_CAPABILITIES) & PERF_CAP_LBR_FMT)
->> Thanks, I'll apply it.
->>> However, is this really supposed to return false if LBR_FMT is 000000?
->> I think it's fine to return false if LBR_FMT is 000000.
-> Don't we want to support hosts that have PDCM
-> (CPUID[1].ECX[bit 15]) = 1 and
-> IA32_PERF_CAPABILITIES.LBR_FMT[bits 5:0] = 000000 ?
-Real hardware may always has PDCM and non-zero LBR_FMT.
+> +"""qapidoc is a Sphinx extension that implements the qapi-doc directive"""
+> +
+> +# The purpose of this extension is to read the documentation comments
+> +# in QAPI schema files, and insert them all into the current document.
+> +#
+> +# It implements one new rST directive, "qapi-doc::".
+> +# Each qapi-doc:: directive takes one argument, which is the
+> +# pathname of the schema file to process, relative to the source tree.
+> +#
+> +# The docs/conf.py file must set the qapidoc_srctree config value to
+> +# the root of the QEMU source tree.
+> +#
+> +# The Sphinx documentation on writing extensions is at:
+> +# https://www.sphinx-doc.org/en/master/development/index.html
 
-If we are talking about supporting guest with PDCM and zero LBR_FMT,
-it has been supported due to the present of "full-width-write" bit.
->
->>>> +
->>>>    #define CPUID_MODEL_ID_SZ 48
->>>>    /**
->>>> @@ -4327,6 +4333,9 @@ static void max_x86_cpu_initfn(Object *obj)
->>>>        }
->>>>        object_property_set_bool(OBJECT(cpu), "pmu", true, &error_abort);
->>>> +    if (lbr_supported()) {
->>>> +        object_property_set_bool(OBJECT(cpu), "lbr", true, &error_abort);
->>> Why is this necessary?
->>>
->>> If kvm_arch_get_supported_msr_feature(MSR_IA32_PERF_CAPABILITIES)
->>> return the PERF_CAP_LBR_FMT bits set,
->>> x86_cpu_get_supported_feature_word() will return those bits, and
->>> they will be automatically set at
->>> env->features[FEAT_PERF_CAPABILITIES].
->> Thanks, I'll remove it.
->>>> +    }
->>>>    }
->>>>    static const TypeInfo max_x86_cpu_type_info = {
->>>> @@ -5535,6 +5544,10 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->>>>            }
->>>>            if (!cpu->enable_pmu) {
->>>>                *ecx &= ~CPUID_EXT_PDCM;
->>>> +            if (cpu->enable_lbr) {
->>>> +                warn_report("LBR is unsupported since guest PMU is disabled.");
->>>> +                exit(1);
->>>> +            }
->>>>            }
->>>>            break;
->>>>        case 2:
->>>> @@ -6553,6 +6566,12 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
->>>>            }
->>>>        }
->>>> +    if (!cpu->max_features && cpu->enable_lbr &&
->>> Why do we need to check for !cpu->max_features here?
->> I'll remove it.
->>>> +        !(env->features[FEAT_1_ECX] & CPUID_EXT_PDCM)) {
->>>> +        warn_report("requested vcpu model doesn't support PDCM for LBR.");
->>>> +        exit(1);
->>> Please report errors using error_setg(errp, ...) instead.
->> I'll apply it.
->>>> +    }
->>>> +
->>>>        if (cpu->ucode_rev == 0) {
->>>>            /* The default is the same as KVM's.  */
->>>>            if (IS_AMD_CPU(env)) {
->>>> @@ -7187,6 +7206,7 @@ static Property x86_cpu_properties[] = {
->>>>    #endif
->>>>        DEFINE_PROP_INT32("node-id", X86CPU, node_id, CPU_UNSET_NUMA_NODE_ID),
->>>>        DEFINE_PROP_BOOL("pmu", X86CPU, enable_pmu, false),
->>>> +    DEFINE_PROP_BOOL("lbr", X86CPU, enable_lbr, false),
->>> When exactly do we want to set lbr=off explicitly?  What's the
->>> expected outcome when lbr=off?
->> We set pmu=off explicitly, so does lbr=off.
->>
->> When set lbr=off, the LBR-related registers accesses from guest bring #GP
->> and expected outcome is just like pmu=off.
-> How are those registers enumerated?  Maybe I'm looking at an
-> outdated version of the Intel SDM or I couldn't find the right
-> section.
-For model-specified LBR, please refer to:
+Should this go into the doc string?
 
-     17.4 LAST BRANCH, INTERRUPT, AND EXCEPTION RECORDING OVERVIEW
+Blank line, please.
 
-For Architecture LBR, please refer to:
+> +import os
+> +import re
+> +
+> +from docutils import nodes
+> +from docutils.statemachine import ViewList
+> +from docutils.parsers.rst import directives, Directive
+> +from sphinx.errors import ExtensionError
+> +from sphinx.util.nodes import nested_parse_with_titles
+> +import sphinx
+> +from qapi.gen import QAPISchemaVisitor
+> +from qapi.schema import QAPIError, QAPISemError, QAPISchema
+> +
+> +# Sphinx up to 1.6 uses AutodocReporter; 1.7 and later
+> +# use switch_source_input. Check borrowed from kerneldoc.py.
+> +Use_SSI = sphinx.__version__[:3] >= '1.7'
+> +if Use_SSI:
+> +    from sphinx.util.docutils import switch_source_input
+> +else:
+> +    from sphinx.ext.autodoc import AutodocReporter
+> +
+> +
+> +__version__ = '1.0'
+> +
+> +
+> +# Function borrowed from pydash, which is under the MIT license
+> +def intersperse(iterable, separator):
+> +    """Yield the members of *iterable* interspersed with *separator*."""
+> +    iterable = iter(iterable)
+> +    yield next(iterable)
+> +    for item in iterable:
+> +        yield separator
+> +        yield item
+> +
+> +
+> +class QAPISchemaGenRSTVisitor(QAPISchemaVisitor):
+> +    """A QAPI schema visitor which generates docutils/Sphinx nodes
+> +
+> +    This class builds up a tree of docutils/Sphinx nodes corresponding
+> +    to documentation for the various QAPI objects. To use it, first create
+> +    a QAPISchemaGenRSTVisitor object, and call its visit_begin() method.
+> +    Then you can call one of the two methods 'freeform' (to add documentation
+> +    for a freeform documentation chunk) or 'symbol' (to add documentation
+> +    for a QAPI symbol). These will cause the visitor to build up the
+> +    tree of document nodes. Once you've added all the documentation
+> +    via 'freeform' and 'symbol' method calls, you can call 'get_document_nodes'
+> +    to get the final list of document nodes (in a form suitable for returning
+> +    from a Sphinx directive's 'run' method).
+> +    """
 
-CHAPTER 7 ARCHITECTURAL LAST BRANCH RECORDS (LBRS)
+PEP 8: For flowing long blocks of text with fewer structural
+restrictions (docstrings or comments), the line length should be limited
+to 72 characters.
 
-     in the "JUNE 2020" of Intel® Architecture Instruction Set Extensions \
-     and Future Features Programming Reference
+John aims to get us to consistent, Sphinx-compatible doc string format
+and markup.  We could try to do the doc strings in this file right from
+the start, but I figure it's easier not to complicate things now, and
+let John massage the doc strings in due time.
 
-Or, you can also ask me for any relevant details.
+> +    def __init__(self, sphinx_directive):
+> +        self._cur_doc = None
+> +        self._sphinx_directive = sphinx_directive
+> +        self._top_node = nodes.section()
+> +        self._active_headings = [self._top_node]
+> +
+> +    def _serror(self, msg):
+> +        """Raise an exception giving a user-friendly syntax error message"""
+> +        file = self._cur_doc.info.fname
+> +        line = self._cur_doc.info.line
+> +        raise ExtensionError(
+> +            '%s line %d: syntax error: %s' % (file, line, msg))
 
-Thanks,
-Like Xu
+Unused, let's drop.
 
->>>>        DEFINE_PROP_UINT32("hv-spinlocks", X86CPU, hyperv_spinlock_attempts,
->>>>                           HYPERV_SPINLOCK_NEVER_RETRY),
->>>> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
->>>> index e1a5c174dc..a059913e26 100644
->>>> --- a/target/i386/cpu.h
->>>> +++ b/target/i386/cpu.h
->>>> @@ -357,6 +357,7 @@ typedef enum X86Seg {
->>>>    #define ARCH_CAP_TSX_CTRL_MSR		(1<<7)
->>>>    #define MSR_IA32_PERF_CAPABILITIES      0x345
->>>> +#define PERF_CAP_LBR_FMT      0x3f
->>>>    #define MSR_IA32_TSX_CTRL		0x122
->>>>    #define MSR_IA32_TSCDEADLINE            0x6e0
->>>> @@ -1702,6 +1703,7 @@ struct X86CPU {
->>>>         * capabilities) directly to the guest.
->>>>         */
->>>>        bool enable_pmu;
->>>> +    bool enable_lbr;
->>> This is a good place to document what enable_lbr=true|false
->>> means (see questions above).
->>>
->> I'll document it here.
->>>>        /* LMCE support can be enabled/disabled via cpu option 'lmce=on/off'. It is
->>>>         * disabled by default to avoid breaking migration between QEMU with
->>>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->>>> index b8455c89ed..feb33d5472 100644
->>>> --- a/target/i386/kvm.c
->>>> +++ b/target/i386/kvm.c
->>>> @@ -2690,8 +2690,10 @@ static void kvm_msr_entry_add_perf(X86CPU *cpu, FeatureWordArray f)
->>>>        uint64_t kvm_perf_cap =
->>>>            kvm_arch_get_supported_msr_feature(kvm_state,
->>>>                                               MSR_IA32_PERF_CAPABILITIES);
->>>> -
->>>>        if (kvm_perf_cap) {
->>>> +        if (!cpu->enable_lbr) {
->>>> +            kvm_perf_cap &= ~PERF_CAP_LBR_FMT;
->>>> +        }
->>> Why is this necessary?  If enable_lbr is false,
->>> f[FEAT_PERF_CAPABILITIES] should not have those bits set at all.
->> I'll remove it.
->>>>            kvm_msr_entry_add(cpu, MSR_IA32_PERF_CAPABILITIES,
->>>>                            kvm_perf_cap & f[FEAT_PERF_CAPABILITIES]);
->>>>        }
->>>> @@ -2731,6 +2733,9 @@ static void kvm_init_msrs(X86CPU *cpu)
->>>>        if (has_msr_perf_capabs && cpu->enable_pmu) {
->>>>            kvm_msr_entry_add_perf(cpu, env->features);
->>>> +    } else if (!has_msr_perf_capabs && cpu->enable_lbr) {
->>>> +        warn_report("KVM doesn't support MSR_IA32_PERF_CAPABILITIES for LBR.");
->>>> +        exit(1);
->>> This is not the appropriate place to check for unsupported
->>> features.  x86_cpu_realizefn() and/or x86_cpu_filter_features()
->>> is.
->> Thanks, I'll apply it in the x86_cpu_filter_features().
->>
->> Please let me if you have more comments.
->>
->> Thanks,
->> Like Xu
->>>>        }
->>>>        if (has_msr_ucode_rev) {
->>>> -- 
->>>> 2.21.3
->>>>
+> +
+> +    def _make_dlitem(self, term, defn):
+> +        """Return a dlitem node with the specified term and definition.
+> +
+> +        term should be a list of Text and literal nodes.
+> +        defn should be one of:
+> +        - a string, which will be handed to _parse_text_into_node
+> +        - a list of Text and literal nodes, which will be put into
+> +          a paragraph node
+> +        """
+> +        dlitem = nodes.definition_list_item()
+> +        dlterm = nodes.term('', '', *term)
+> +        dlitem += dlterm
+> +        if defn:
+> +            dldef = nodes.definition()
+> +            if isinstance(defn, list):
+> +                dldef += nodes.paragraph('', '', *defn)
+> +            else:
+> +                self._parse_text_into_node(defn, dldef)
+> +            dlitem += dldef
+> +        return dlitem
+> +
+> +    def _make_section(self, title):
+> +        """Return a section node with optional title"""
+> +        section = nodes.section(ids=[self._sphinx_directive.new_serialno()])
+> +        if title:
+> +            section += nodes.title(title, title)
+> +        return section
+> +
+> +    def _nodes_for_ifcond(self, ifcond, with_if=True):
+> +        """Return list of Text, literal nodes for the ifcond
+> +
+> +        Return a list which gives text like ' (If: cond1, cond2, cond3)', where
+> +        the conditions are in literal-text and the commas are not.
+> +        If with_if is False, we don't return the "(If: " and ")".
+> +        """
+> +        condlist = intersperse([nodes.literal('', c) for c in ifcond],
+> +                               nodes.Text(', '))
+> +        if not with_if:
+> +            return condlist
+> +
+> +        nodelist = [nodes.Text(' ('), nodes.strong('', 'If: ')]
+> +        nodelist.extend(condlist)
+> +        nodelist.append(nodes.Text(')'))
+> +        return nodelist
+> +
+> +    def _nodes_for_one_member(self, member):
+> +        """Return list of Text, literal nodes for this member
+> +
+> +        Return a list of doctree nodes which give text like
+> +        'name: type (optional) (If: ...)' suitable for use as the
+> +        'term' part of a definition list item.
+> +        """
+> +        term = [nodes.literal('', member.name)]
+> +        if member.type.doc_type():
+> +            term.append(nodes.Text(': '))
+> +            term.append(nodes.literal('', member.type.doc_type()))
+> +        if member.optional:
+> +            term.append(nodes.Text(' (optional)'))
+> +        if member.ifcond:
+> +            term.extend(self._nodes_for_ifcond(member.ifcond))
+> +        return term
+> +
+> +    def _nodes_for_variant_when(self, variants, variant):
+> +        """Return list of Text, literal nodes for variant 'when' clause
+> +
+> +        Return a list of doctree nodes which give text like
+> +        'when tagname is variant (If: ...)' suitable for use in
+> +        the 'variants' part of a definition list.
+> +        """
+> +        term = [nodes.Text(' when '),
+> +                nodes.literal('', variants.tag_member.name),
+> +                nodes.Text(' is '),
+> +                nodes.literal('', '"%s"' % variant.name)]
+> +        if variant.ifcond:
+> +            term.extend(self._nodes_for_ifcond(variant.ifcond))
+> +        return term
+> +
+> +    def _nodes_for_members(self, doc, what, base=None, variants=None):
+> +        """Return list of doctree nodes for the table of members"""
+> +        dlnode = nodes.definition_list()
+> +        for section in doc.args.values():
+> +            term = self._nodes_for_one_member(section.member)
+> +            # TODO drop fallbacks when undocumented members are outlawed
+> +            if section.text:
+> +                defn = section.text
+> +            elif (variants and variants.tag_member == section.member
+> +                  and not section.member.type.doc_type()):
+> +                values = section.member.type.member_names()
+> +                defn = [nodes.Text('One of ')]
+> +                defn.extend(intersperse([nodes.literal('', v) for v in values],
+> +                                        nodes.Text(', ')))
+> +            else:
+> +                defn = [nodes.Text('Not documented')]
+> +
+> +            dlnode += self._make_dlitem(term, defn)
+> +
+> +        if base:
+> +            dlnode += self._make_dlitem([nodes.Text('The members of '),
+> +                                         nodes.literal('', base.doc_type())],
+> +                                        None)
+> +
+> +        if variants:
+> +            for v in variants.variants:
+> +                if v.type.is_implicit():
+> +                    assert not v.type.base and not v.type.variants
+> +                    for m in v.type.local_members:
+> +                        term = self._nodes_for_one_member(m)
+> +                        term.extend(self._nodes_for_variant_when(variants, v))
+> +                        dlnode += self._make_dlitem(term, None)
+> +                else:
+> +                    term = [nodes.Text('The members of '),
+> +                            nodes.literal('', v.type.doc_type())]
+> +                    term.extend(self._nodes_for_variant_when(variants, v))
+> +                    dlnode += self._make_dlitem(term, None)
+> +
+> +        if not dlnode.children:
+> +            return []
+> +
+> +        section = self._make_section(what)
+> +        section += dlnode
+> +        return [section]
+> +
+> +    def _nodes_for_enum_values(self, doc):
+> +        """Return list of doctree nodes for the table of enum values"""
+> +        seen_item = False
+> +        dlnode = nodes.definition_list()
+> +        for section in doc.args.values():
+> +            termtext = [nodes.literal('', section.member.name)]
+> +            if section.member.ifcond:
+> +                termtext.extend(self._nodes_for_ifcond(section.member.ifcond))
+> +            # TODO drop fallbacks when undocumented members are outlawed
+> +            if section.text:
+> +                defn = section.text
+> +            else:
+> +                defn = [nodes.Text('Not documented')]
+> +
+> +            dlnode += self._make_dlitem(termtext, defn)
+> +            seen_item = True
+> +
+> +        if not seen_item:
+> +            return []
+> +
+> +        section = self._make_section('Values')
+> +        section += dlnode
+> +        return [section]
+> +
+> +    def _nodes_for_arguments(self, doc, boxed_arg_type):
+> +        """Return list of doctree nodes for the arguments section"""
+> +        if boxed_arg_type:
+> +            assert not doc.args
+> +            section = self._make_section('Arguments')
+> +            dlnode = nodes.definition_list()
+> +            dlnode += self._make_dlitem(
+> +                [nodes.Text('The members of '),
+> +                 nodes.literal('', boxed_arg_type.name)],
+> +                None)
+> +            section += dlnode
+> +            return [section]
+> +
+> +        return self._nodes_for_members(doc, 'Arguments')
+> +
+> +    def _nodes_for_features(self, doc):
+> +        """Return list of doctree nodes for the table of features"""
+> +        seen_item = False
+> +        dlnode = nodes.definition_list()
+> +        for section in doc.features.values():
+> +            dlnode += self._make_dlitem([nodes.literal('', section.name)],
+> +                                        section.text)
+> +            seen_item = True
+> +
+> +        if not seen_item:
+> +            return []
+> +
+> +        section = self._make_section('Features')
+> +        section += dlnode
+> +        return [section]
+> +
+> +    def _nodes_for_example(self, exampletext):
+> +        """Return list of doctree nodes for a code example snippet"""
+> +        return [nodes.literal_block(exampletext, exampletext)]
+> +
+> +    def _nodes_for_sections(self, doc):
+> +        """Return list of doctree nodes for additional sections"""
+> +        nodelist = []
+> +        for section in doc.sections:
+> +            snode = self._make_section(section.name)
+> +            if section.name and section.name.startswith('Example'):
+> +                snode += self._nodes_for_example(section.text)
+> +            else:
+> +                self._parse_text_into_node(section.text, snode)
+> +            nodelist.append(snode)
+> +        return nodelist
+> +
+> +    def _nodes_for_if_section(self, ifcond):
+> +        """Return list of doctree nodes for the "If" section"""
+> +        nodelist = []
+> +        if ifcond:
+> +            snode = self._make_section('If')
+> +            snode += self._nodes_for_ifcond(ifcond, with_if=False)
+> +            nodelist.append(snode)
+> +        return nodelist
+> +
+> +    def _add_doc(self, typ, sections):
+> +        """Add documentation for a command/object/enum...
+> +
+> +        We assume we're documenting the thing defined in self._cur_doc.
+> +        typ is the type of thing being added ("Command", "Object", etc)
+> +
+> +        sections is a list of nodes for sections to add to the definition.
+> +        """
+> +
+> +        doc = self._cur_doc
+> +        snode = nodes.section(ids=[self._sphinx_directive.new_serialno()])
+> +        snode += nodes.title('', '', *[nodes.literal(doc.symbol, doc.symbol),
+> +                                       nodes.Text(' (' + typ + ')')])
+> +        self._parse_text_into_node(doc.body.text, snode)
+> +        for s in sections:
+> +            if s is not None:
+> +                snode += s
+> +        self._add_node_to_current_heading(snode)
+> +
+> +    def visit_enum_type(self, name, info, ifcond, features, members, prefix):
+> +        doc = self._cur_doc
+> +        self._add_doc('Enum',
+> +                      self._nodes_for_enum_values(doc) +
+> +                      self._nodes_for_features(doc) +
+> +                      self._nodes_for_sections(doc) +
+> +                      self._nodes_for_if_section(ifcond))
+
+PEP 8: In Python code, it is permissible to break before or after a
+binary operator, as long as the convention is consistent locally.  For
+new code Knuth's style is suggested.
+
+Mind switching to Knuth style, i.e. break before the operator?
+
+More of the same below.
+
+> +
+> +    def visit_object_type(self, name, info, ifcond, features,
+> +                          base, members, variants):
+> +        doc = self._cur_doc
+> +        if base and base.is_implicit():
+> +            base = None
+> +        self._add_doc('Object',
+> +                      self._nodes_for_members(doc, 'Members', base, variants) +
+> +                      self._nodes_for_features(doc) +
+> +                      self._nodes_for_sections(doc) +
+> +                      self._nodes_for_if_section(ifcond))
+> +
+> +    def visit_alternate_type(self, name, info, ifcond, features, variants):
+> +        doc = self._cur_doc
+> +        self._add_doc('Alternate',
+> +                      self._nodes_for_members(doc, 'Members') +
+> +                      self._nodes_for_features(doc) +
+> +                      self._nodes_for_sections(doc) +
+> +                      self._nodes_for_if_section(ifcond))
+> +
+> +    def visit_command(self, name, info, ifcond, features, arg_type,
+> +                      ret_type, gen, success_response, boxed, allow_oob,
+> +                      allow_preconfig):
+> +        doc = self._cur_doc
+> +        self._add_doc('Command',
+> +                      self._nodes_for_arguments(doc,
+> +                                                arg_type if boxed else None) +
+> +                      self._nodes_for_features(doc) +
+> +                      self._nodes_for_sections(doc) +
+> +                      self._nodes_for_if_section(ifcond))
+> +
+> +    def visit_event(self, name, info, ifcond, features, arg_type, boxed):
+> +        doc = self._cur_doc
+> +        self._add_doc('Event',
+> +                      self._nodes_for_arguments(doc,
+> +                                                arg_type if boxed else None) +
+> +                      self._nodes_for_features(doc) +
+> +                      self._nodes_for_sections(doc) +
+> +                      self._nodes_for_if_section(ifcond))
+> +
+> +    def symbol(self, doc, entity):
+> +        """Add documentation for one symbol to the document tree
+> +
+> +        This is the main entry point which causes us to add documentation
+> +        nodes for a symbol (which could be a 'command', 'object', 'event',
+> +        etc). We do this by calling 'visit' on the schema entity, which
+> +        will then call back into one of our visit_* methods, depending
+> +        on what kind of thing this symbol is.
+> +        """
+> +        self._cur_doc = doc
+> +        entity.visit(self)
+> +        self._cur_doc = None
+> +
+> +    def _start_new_heading(self, heading, level):
+> +        """Start a new heading at the specified heading level
+> +
+> +        Create a new section whose title is 'heading' and which is placed
+> +        in the docutils node tree as a child of the most recent level-1
+> +        heading. Subsequent document sections (commands, freeform doc chunks,
+> +        etc) will be placed as children of this new heading section.
+> +        """
+> +        if len(self._active_headings) < level:
+> +            raise QAPISemError(self._cur_doc.info,
+> +                               'Level %d subheading found outside a '
+> +                               'level %d heading'
+> +                               % (level, level - 1))
+> +        snode = self._make_section(heading)
+> +        self._active_headings[level - 1] += snode
+> +        self._active_headings = self._active_headings[:level]
+> +        self._active_headings.append(snode)
+> +
+> +    def _add_node_to_current_heading(self, node):
+> +        """Add the node to whatever the current active heading is"""
+> +        self._active_headings[-1] += node
+> +
+> +    def freeform(self, doc):
+> +        """Add a piece of 'freeform' documentation to the document tree
+> +
+> +        A 'freeform' document chunk doesn't relate to any particular
+> +        symbol (for instance, it could be an introduction).
+> +
+> +        If the freeform document starts with a line of the form
+> +        '= Heading text', this is a section or subsection heading, with
+> +        the heading level indicated by the number of '=' signs.
+> +        """
+> +
+> +        # QAPIDoc documentation says free-form documentation blocks
+> +        # must have only a body section, nothing else.
+> +        assert not doc.sections
+> +        assert not doc.args
+> +        assert not doc.features
+> +        self._cur_doc = doc
+> +
+> +        text = doc.body.text
+> +        if re.match(r'=+ ', text):
+> +            # Section/subsection heading (if present, will always be
+> +            # the first line of the block)
+> +            (heading, _, text) = text.partition('\n')
+> +            (leader, _, heading) = heading.partition(' ')
+> +            self._start_new_heading(heading, len(leader))
+> +            if text == '':
+> +                return
+> +
+> +        node = self._make_section(None)
+> +        self._parse_text_into_node(text, node)
+> +        self._add_node_to_current_heading(node)
+> +        self._cur_doc = None
+> +
+> +    def _parse_text_into_node(self, doctext, node):
+> +        """Parse a chunk of QAPI-doc-format text into the node
+> +
+> +        The doc comment can contain most inline rST markup, including
+> +        bulleted and enumerated lists.
+> +        As an extra permitted piece of markup, @var will be turned
+> +        into ``var``.
+> +        """
+> +
+> +        # Handle the "@var means ``var`` case
+> +        doctext = re.sub(r'@([\w-]+)', r'``\1``', doctext)
+> +
+> +        rstlist = ViewList()
+> +        for line in doctext.splitlines():
+> +            # The reported line number will always be that of the start line
+> +            # of the doc comment, rather than the actual location of the error.
+> +            # Being more precise would require overhaul of the QAPIDoc class
+> +            # to track lines more exactly within all the sub-parts of the doc
+> +            # comment, as well as counting lines here.
+> +            rstlist.append(line, self._cur_doc.info.fname,
+> +                           self._cur_doc.info.line)
+> +        # Append a blank line -- in some cases rST syntax errors get
+> +        # attributed to the line after one with actual text, and if there
+> +        # isn't anything in the ViewList corresponding to that then Sphinx
+> +        # 1.6's AutodocReporter will then misidentify the source/line location
+> +        # in the error message (usually attributing it to the top-level
+> +        # .rst file rather than the offending .json file). The extra blank
+> +        # line won't affect the rendered output.
+> +        rstlist.append("", self._cur_doc.info.fname, self._cur_doc.info.line)
+> +        self._sphinx_directive.do_parse(rstlist, node)
+> +
+> +    def get_document_nodes(self):
+> +        """Return the list of docutils nodes which make up the document"""
+> +        return self._top_node.children
+> +
+> +
+> +class QAPISchemaGenDepVisitor(QAPISchemaVisitor):
+> +    """A QAPI schema visitor which adds Sphinx dependencies each module
+> +
+> +    This class calls the Sphinx note_dependency() function to tell Sphinx
+> +    that the generated documentation output depends on the input
+> +    schema file associated with each module in the QAPI input.
+> +    """
+> +    def __init__(self, env, qapidir):
+> +        self._env = env
+> +        self._qapidir = qapidir
+> +
+> +    def visit_module(self, name):
+> +        if name is not None:
+> +            qapifile = self._qapidir + '/' + name
+> +            self._env.note_dependency(os.path.abspath(qapifile))
+> +        super().visit_module(name)
+> +
+> +
+> +class QAPIDocDirective(Directive):
+> +    """Extract documentation from the specified QAPI .json file"""
+> +    required_argument = 1
+> +    optional_arguments = 1
+> +    option_spec = {
+> +        'qapifile': directives.unchanged_required
+> +    }
+> +    has_content = False
+> +
+> +    def new_serialno(self):
+> +        """Return a unique new ID string suitable for use as a node's ID"""
+> +        env = self.state.document.settings.env
+> +        return 'qapidoc-%d' % env.new_serialno('qapidoc')
+> +
+> +    def run(self):
+> +        env = self.state.document.settings.env
+> +        qapifile = env.config.qapidoc_srctree + '/' + self.arguments[0]
+> +        qapidir = os.path.dirname(qapifile)
+> +
+> +        try:
+> +            schema = QAPISchema(qapifile)
+> +
+> +            # First tell Sphinx about all the schema files that the
+> +            # output documentation depends on (including 'qapifile' itself)
+> +            schema.visit(QAPISchemaGenDepVisitor(env, qapidir))
+> +
+> +            vis = QAPISchemaGenRSTVisitor(self)
+> +            vis.visit_begin(schema)
+> +            for doc in schema.docs:
+> +                if doc.symbol:
+> +                    vis.symbol(doc, schema.lookup_entity(doc.symbol))
+> +                else:
+> +                    vis.freeform(doc)
+> +            return vis.get_document_nodes()
+> +        except QAPIError as err:
+> +            # Launder QAPI parse errors into Sphinx extension errors
+> +            # so they are displayed nicely to the user
+> +            raise ExtensionError(str(err))
+> +
+> +    def do_parse(self, rstlist, node):
+> +        """Parse rST source lines and add them to the specified node
+> +
+> +        Take the list of rST source lines rstlist, parse them as
+> +        rST, and add the resulting docutils nodes as children of node.
+> +        The nodes are parsed in a way that allows them to include
+> +        subheadings (titles) without confusing the rendering of
+> +        anything else.
+> +        """
+> +        # This is from kerneldoc.py -- it works around an API change in
+> +        # Sphinx between 1.6 and 1.7. Unlike kerneldoc.py, we use
+> +        # sphinx.util.nodes.nested_parse_with_titles() rather than the
+> +        # plain self.state.nested_parse(), and so we can drop the saving
+> +        # of title_styles and section_level that kerneldoc.py does,
+> +        # because nested_parse_with_titles() does that for us.
+> +        if Use_SSI:
+> +            with switch_source_input(self.state, rstlist):
+> +                nested_parse_with_titles(self.state, rstlist, node)
+> +        else:
+> +            save = self.state.memo.reporter
+> +            self.state.memo.reporter = AutodocReporter(
+> +                rstlist, self.state.memo.reporter)
+> +            try:
+> +                nested_parse_with_titles(self.state, rstlist, node)
+> +            finally:
+> +                self.state.memo.reporter = save
+> +
+> +
+> +def setup(app):
+> +    """ Register qapi-doc directive with Sphinx"""
+> +    app.add_config_value('qapidoc_srctree', None, 'env')
+> +    app.add_directive('qapi-doc', QAPIDocDirective)
+> +
+> +    return dict(
+> +        version=__version__,
+> +        parallel_read_safe=True,
+> +        parallel_write_safe=True
+> +    )
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 5eed1e692b4..dbddb0a7635 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -3149,6 +3149,7 @@ M: Peter Maydell <peter.maydell@linaro.org>
+>  S: Maintained
+>  F: docs/conf.py
+>  F: docs/*/conf.py
+> +F: docs/sphinx/
+>  
+>  Miscellaneous
+>  -------------
+
+Maintainers of scripts/qapi/ should help review patches to
+docs/sphinx/qapidoc.py.  Two options:
+
+* Add docs/sphinx/qapidoc.py to section QAPI.  The QAPI maintainers
+  become M: of this small part of "Sphinx documentation configuration
+  and build machinery".  R: would be more accurate.  The inaccuracy
+  feels harmless.
+
+* Do nothing.  scripts/get_maintainer.pl won't loop in the QAPI
+  maintainers.  The Sphinx documentation maintainers may have to do that
+  manually.
+
+What do you think?
+
+
+My review is of uneven value: the QAPI-facing parts are good, the
+Sphinx-related parts merely look good to ignorant me.  I guess that's
+good enough, since we also have "generated docs look sane".
+
+Preferably tidied up a bit more:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
 
