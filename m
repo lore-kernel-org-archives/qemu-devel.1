@@ -4,77 +4,78 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E034C4346E
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:26:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52288C4346E
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:28:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E54E207F7
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:26:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B90E12083B
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:28:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jl88jgwE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E54E207F7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UOPTdWj3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B90E12083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNA1c-0008U4-Mh
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 03:26:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57252)
+	id 1kNA3Y-0002rX-TF
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 03:28:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57172)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9x4-0002s2-CT
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:21:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52349)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9wv-0002bS-2s
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:21:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47656)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9wz-0001am-4r
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:21:30 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9ws-0001a9-NN
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:21:20 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601364083;
+ s=mimecast20190719; t=1601364078;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=ggobvKRt4FkY49FTToc3BsJTkPMkTEyDnNZb0ODAaYk=;
- b=Jl88jgwEAZBwmr6yjz6g404XqX6/oUnsjl2p34Up+IO11YFiRqRkvJLyw1liow0jhtUIVd
- +dqank5pfnTjkGllpSRIcUguOVeGhQ/PTmUJkFYz6A0cneJqf658ddAx/++/JIjcMOpmRu
- QLRZkzgQjESFy1c0/TOXdGlXeQ/Z2c4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-34-WaGM5e_hMjSqbyH8j-59sg-1; Tue, 29 Sep 2020 03:21:20 -0400
-X-MC-Unique: WaGM5e_hMjSqbyH8j-59sg-1
-Received: by mail-wm1-f71.google.com with SMTP id c200so1454150wmd.5
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 00:21:19 -0700 (PDT)
+ bh=gyuuZ4Sz8ayGeGEwQkqastteCZWQE5SL9GYanhN/cu8=;
+ b=UOPTdWj39V7lKyHGUi/oOOlNbUZtmukHKF2kAPPVLsgcG9K4UjcLPiBn12o3pFVuj8l/4J
+ QAj4iIAlZgwcdMu8WbddyaQrPUe/g5a20So3Kn8h3hFNk1fYBALX2Lk0DYklWWb4BN6Taj
+ WR6iIe0Qu2M66ZIRwSbHhORu93+E+CQ=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-363-BwrSHReHNG2Y1z-NCgezrQ-1; Tue, 29 Sep 2020 03:21:16 -0400
+X-MC-Unique: BwrSHReHNG2Y1z-NCgezrQ-1
+Received: by mail-wm1-f70.google.com with SMTP id m25so1465979wmi.0
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 00:21:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=ggobvKRt4FkY49FTToc3BsJTkPMkTEyDnNZb0ODAaYk=;
- b=ZipbMUMdgcumDnoZZAEXYJdeVO50xdm5oB/c32FBck0S7KWbGK+Y4eD1/2PX7tLU9L
- FMrNsGRAep1NekStZLcUiQW+GcIofNn7Ib4wcqp5C5xFTVkO9EtlRNaSNL8CinNRi6FE
- 1Ns2gtebUhTK1SWwhyZ7aRsEUC/1/qy3W8LzSLSnUF2+68hXE+zlJLs01l9NRC+R+9l7
- Sod7C7OcGNFTBuOKfO7MCam0mEVnIy+1oldmaU3mCxeJwSUznfpkOk7HZRIbp1UfuJhh
- wpVhQ4wmgAVfABgSOMbszmTU9X27NlR9G+bKRQ8bc++WPq4mA7YQ/FDXG2h8lGgk5iVw
- Qk1w==
-X-Gm-Message-State: AOAM530BDMhp9e3hgo5JEBLKMcAb0k+h0Ee0zMzpmUR3ham8O/YclI6m
- MfgVbBH2a0B2kHNep3jKXbAw9Ogmy7OJ5PK8HA09PJvjMJIJ/eq0pcERMzNzBqGLEJIac5f4tJT
- HJT3ahmwLLL5QOFk=
-X-Received: by 2002:a7b:cc8f:: with SMTP id p15mr3015971wma.18.1601364078195; 
- Tue, 29 Sep 2020 00:21:18 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyATLQQ4w+TYgMfCL/U96xC1WoJ6AA2LacInJsWJVsl0EEzUMdyULWCnGV64Z73a91YAk8TzA==
-X-Received: by 2002:a7b:cc8f:: with SMTP id p15mr3015934wma.18.1601364077863; 
- Tue, 29 Sep 2020 00:21:17 -0700 (PDT)
+ bh=gyuuZ4Sz8ayGeGEwQkqastteCZWQE5SL9GYanhN/cu8=;
+ b=oG7Pw3j4BYeE1DVLOG0kcYun4lft+xJPc1QGMZzHOcBeTeLowJemNWvfBzueKKo9gM
+ DY8T02qXmneMT2/rKDiZ/Ti0S73apEflu00chASqL26iM4TgXEs10zj6sixgyHsXztpc
+ /uqkAB2cycNS7n6eBSVSxJAzFFA8UA/PdxARStDl1lc/5G/EIOqp6/PHW77UjCMbOX3G
+ IpnMxq4l1aE+nRpUOH3P7Xma4IJdV0lZ/FyFl9Mqx795hY7+FIZdojCJZ8berXYxqHH0
+ fw47SDlBcQPwB86HZLF1yEzo/wUyWKF45ldSXNk9+M77e8uiF9ACFI6ZUp4NhN+Frnr8
+ 2GcA==
+X-Gm-Message-State: AOAM532ZrZrhdYUM0wMZeyoNE2eRYQ9AdyW0STKo/WmWkrYIERpbL3jT
+ LSB/tcwR9MPvKY3tDGQnXOQ1oOu1trOJe0PQQ6fDhOcihMML+/51jnnhxMVh35uJrkNblN5Rzr7
+ hf1B3GLQ7EVMqYZg=
+X-Received: by 2002:adf:ef45:: with SMTP id c5mr2455240wrp.37.1601364074445;
+ Tue, 29 Sep 2020 00:21:14 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz0lB3Fph7wYWe/9WysN5u7iZB4AXo508F3GgngSuTPzno01+yk4S5zrLb5Y2jQv4RlnxnaiA==
+X-Received: by 2002:adf:ef45:: with SMTP id c5mr2455213wrp.37.1601364074231;
+ Tue, 29 Sep 2020 00:21:14 -0700 (PDT)
 Received: from redhat.com (bzq-79-179-71-128.red.bezeqint.net. [79.179.71.128])
- by smtp.gmail.com with ESMTPSA id 92sm5021292wra.19.2020.09.29.00.21.15
+ by smtp.gmail.com with ESMTPSA id n66sm4256882wmb.35.2020.09.29.00.21.12
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 29 Sep 2020 00:21:17 -0700 (PDT)
-Date: Tue, 29 Sep 2020 03:21:14 -0400
+ Tue, 29 Sep 2020 00:21:13 -0700 (PDT)
+Date: Tue, 29 Sep 2020 03:21:11 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v4 09/48] cphp: remove deprecated cpu-add command(s)
-Message-ID: <20200929071948.281157-10-mst@redhat.com>
+Subject: [PULL v4 08/48] tests/qtest/vhost-user-test: prepare the tests for
+ adding new dev class
+Message-ID: <20200929071948.281157-9-mst@redhat.com>
 References: <20200929071948.281157-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200929071948.281157-1-mst@redhat.com>
@@ -86,9 +87,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 22:47:55
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 02:22:44
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
@@ -111,484 +112,269 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Laurent Vivier <lvivier@redhat.com>,
  Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>,
- libvir-list@redhat.com, Michal Privoznik <mprivozn@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+ Raphael Norwitz <raphael.norwitz@nutanix.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Dima Stepanov <dimastep@yandex-team.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Igor Mammedov <imammedo@redhat.com>
+From: Dima Stepanov <dimastep@yandex-team.ru>
 
-These were deprecated since 4.0, remove both HMP and QMP variants.
+For now only vhost-user-net device is supported by the test. Other
+vhost-user devices are not tested. As a first step make source code
+refactoring so new devices can reuse the same test routines. To make
+this provide a new vhost_user_ops structure with the methods to
+initialize device, its command line or make a proper vhost-user
+responses.
 
-Users should use device_add command instead. To get list of
-possible CPUs and options, use 'info hotpluggable-cpus' HMP
-or query-hotpluggable-cpus QMP command.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Michal Privoznik <mprivozn@redhat.com>
-Acked-by: Cornelia Huck <cohuck@redhat.com>
-Message-Id: <20200915120403.1074579-1-imammedo@redhat.com>
+Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+Reviewed-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
+Message-Id: <a48b60fb96fef230b75fff72a2d77040dcb5ef7c.1599813294.git.dimastep@yandex-team.ru>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- qapi/machine.json           |  24 ---------
- include/hw/boards.h         |   1 -
- include/hw/i386/pc.h        |   1 -
- include/monitor/hmp.h       |   1 -
- hw/core/machine-hmp-cmds.c  |  12 -----
- hw/core/machine-qmp-cmds.c  |  12 -----
- hw/i386/pc.c                |  27 ----------
- hw/i386/pc_piix.c           |   1 -
- hw/s390x/s390-virtio-ccw.c  |  12 -----
- tests/qtest/cpu-plug-test.c | 100 ++++--------------------------------
- tests/qtest/test-hmp.c      |   1 -
- docs/system/deprecated.rst  |  25 +++++----
- hmp-commands.hx             |  15 ------
- 13 files changed, 21 insertions(+), 211 deletions(-)
+ tests/qtest/vhost-user-test.c | 105 ++++++++++++++++++++++++----------
+ 1 file changed, 76 insertions(+), 29 deletions(-)
 
-diff --git a/qapi/machine.json b/qapi/machine.json
-index 0ac1880e4a..d8ed096e9a 100644
---- a/qapi/machine.json
-+++ b/qapi/machine.json
-@@ -307,30 +307,6 @@
- ##
- { 'command': 'query-cpus-fast', 'returns': [ 'CpuInfoFast' ] }
- 
--##
--# @cpu-add:
--#
--# Adds CPU with specified ID.
--#
--# @id: ID of CPU to be created, valid values [0..max_cpus)
--#
--# Features:
--# @deprecated: This command is deprecated.  Use `device_add` instead.
--#              See the `query-hotpluggable-cpus` command for details.
--#
--# Returns: Nothing on success
--#
--# Since: 1.5
--#
--# Example:
--#
--# -> { "execute": "cpu-add", "arguments": { "id": 2 } }
--# <- { "return": {} }
--#
--##
--{ 'command': 'cpu-add', 'data': {'id': 'int'},
--  'features': [ 'deprecated' ] }
--
- ##
- # @MachineInfo:
- #
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 56aa1ca335..482d2833f6 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -168,7 +168,6 @@ struct MachineClass {
-     void (*init)(MachineState *state);
-     void (*reset)(MachineState *state);
-     void (*wakeup)(MachineState *state);
--    void (*hot_add_cpu)(MachineState *state, const int64_t id, Error **errp);
-     int (*kvm_type)(MachineState *machine, const char *arg);
-     void (*smp_parse)(MachineState *ms, QemuOpts *opts);
- 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index b2da2c8d2b..c71b02cafd 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -132,7 +132,6 @@ extern int fd_bootchk;
- 
- void pc_acpi_smi_interrupt(void *opaque, int irq, int level);
- 
--void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error **errp);
- void pc_smp_parse(MachineState *ms, QemuOpts *opts);
- 
- void pc_guest_info_init(PCMachineState *pcms);
-diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
-index c986cfd28b..642e9e91f9 100644
---- a/include/monitor/hmp.h
-+++ b/include/monitor/hmp.h
-@@ -89,7 +89,6 @@ void hmp_chardev_add(Monitor *mon, const QDict *qdict);
- void hmp_chardev_change(Monitor *mon, const QDict *qdict);
- void hmp_chardev_remove(Monitor *mon, const QDict *qdict);
- void hmp_chardev_send_break(Monitor *mon, const QDict *qdict);
--void hmp_cpu_add(Monitor *mon, const QDict *qdict);
- void hmp_object_add(Monitor *mon, const QDict *qdict);
- void hmp_object_del(Monitor *mon, const QDict *qdict);
- void hmp_info_memdev(Monitor *mon, const QDict *qdict);
-diff --git a/hw/core/machine-hmp-cmds.c b/hw/core/machine-hmp-cmds.c
-index 39999c47c5..f4092b98cc 100644
---- a/hw/core/machine-hmp-cmds.c
-+++ b/hw/core/machine-hmp-cmds.c
-@@ -46,18 +46,6 @@ void hmp_info_cpus(Monitor *mon, const QDict *qdict)
-     qapi_free_CpuInfoFastList(cpu_list);
- }
- 
--void hmp_cpu_add(Monitor *mon, const QDict *qdict)
--{
--    int cpuid;
--    Error *err = NULL;
--
--    error_report("cpu_add is deprecated, please use device_add instead");
--
--    cpuid = qdict_get_int(qdict, "id");
--    qmp_cpu_add(cpuid, &err);
--    hmp_handle_error(mon, err);
--}
--
- void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict)
- {
-     Error *err = NULL;
-diff --git a/hw/core/machine-qmp-cmds.c b/hw/core/machine-qmp-cmds.c
-index 21551221ad..5362c80a18 100644
---- a/hw/core/machine-qmp-cmds.c
-+++ b/hw/core/machine-qmp-cmds.c
-@@ -284,18 +284,6 @@ HotpluggableCPUList *qmp_query_hotpluggable_cpus(Error **errp)
-     return machine_query_hotpluggable_cpus(ms);
- }
- 
--void qmp_cpu_add(int64_t id, Error **errp)
--{
--    MachineClass *mc;
--
--    mc = MACHINE_GET_CLASS(current_machine);
--    if (mc->hot_add_cpu) {
--        mc->hot_add_cpu(current_machine, id, errp);
--    } else {
--        error_setg(errp, "Not supported");
--    }
--}
--
- void qmp_set_numa_node(NumaOptions *cmd, Error **errp)
- {
-     if (!runstate_check(RUN_STATE_PRECONFIG)) {
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 1e2ab5ebe7..50e8317342 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -769,32 +769,6 @@ void pc_smp_parse(MachineState *ms, QemuOpts *opts)
-     }
- }
- 
--void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error **errp)
--{
--    X86MachineState *x86ms = X86_MACHINE(ms);
--    int64_t apic_id = x86_cpu_apic_id_from_index(x86ms, id);
--    Error *local_err = NULL;
--
--    if (id < 0) {
--        error_setg(errp, "Invalid CPU id: %" PRIi64, id);
--        return;
--    }
--
--    if (apic_id >= ACPI_CPU_HOTPLUG_ID_LIMIT) {
--        error_setg(errp, "Unable to add CPU: %" PRIi64
--                   ", resulting APIC ID (%" PRIi64 ") is too large",
--                   id, apic_id);
--        return;
--    }
--
--
--    x86_cpu_new(X86_MACHINE(ms), apic_id, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        return;
--    }
--}
--
- static
- void pc_machine_done(Notifier *notifier, void *data)
- {
-@@ -1691,7 +1665,6 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     mc->auto_enable_numa_with_memdev = true;
-     mc->has_hotpluggable_cpus = true;
-     mc->default_boot_order = "cad";
--    mc->hot_add_cpu = pc_hot_add_cpu;
-     mc->smp_parse = pc_smp_parse;
-     mc->block_default_type = IF_IDE;
-     mc->max_cpus = 255;
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 6f3e78bb60..2d8413a0ce 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -752,7 +752,6 @@ static void pc_i440fx_1_4_machine_options(MachineClass *m)
- {
-     pc_i440fx_1_5_machine_options(m);
-     m->hw_version = "1.4.0";
--    m->hot_add_cpu = NULL;
-     compat_props_add(m->compat_props, pc_compat_1_4, pc_compat_1_4_len);
- }
- 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 3106bbea33..28266a3a35 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -553,17 +553,6 @@ static HotplugHandler *s390_get_hotplug_handler(MachineState *machine,
-     return NULL;
- }
- 
--static void s390_hot_add_cpu(MachineState *machine,
--                             const int64_t id, Error **errp)
--{
--    ObjectClass *oc;
--
--    g_assert(machine->possible_cpus->cpus[0].cpu);
--    oc = OBJECT_CLASS(CPU_GET_CLASS(machine->possible_cpus->cpus[0].cpu));
--
--    s390x_new_cpu(object_class_get_name(oc), id, errp);
--}
--
- static void s390_nmi(NMIState *n, int cpu_index, Error **errp)
- {
-     CPUState *cs = qemu_get_cpu(cpu_index);
-@@ -604,7 +593,6 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
-     s390mc->hpage_1m_allowed = true;
-     mc->init = ccw_init;
-     mc->reset = s390_machine_reset;
--    mc->hot_add_cpu = s390_hot_add_cpu;
-     mc->block_default_type = IF_VIRTIO;
-     mc->no_cdrom = 1;
-     mc->no_floppy = 1;
-diff --git a/tests/qtest/cpu-plug-test.c b/tests/qtest/cpu-plug-test.c
-index e8ffbbce4b..a1c689414b 100644
---- a/tests/qtest/cpu-plug-test.c
-+++ b/tests/qtest/cpu-plug-test.c
-@@ -25,54 +25,6 @@ struct PlugTestData {
+diff --git a/tests/qtest/vhost-user-test.c b/tests/qtest/vhost-user-test.c
+index 9ee0f1e4fd..3df5322614 100644
+--- a/tests/qtest/vhost-user-test.c
++++ b/tests/qtest/vhost-user-test.c
+@@ -135,6 +135,10 @@ enum {
+     TEST_FLAGS_END,
  };
- typedef struct PlugTestData PlugTestData;
  
--static void test_plug_with_cpu_add(gconstpointer data)
--{
--    const PlugTestData *s = data;
--    char *args;
--    QDict *response;
--    unsigned int i;
--
--    args = g_strdup_printf("-machine %s -cpu %s "
--                           "-smp 1,sockets=%u,cores=%u,threads=%u,maxcpus=%u",
--                           s->machine, s->cpu_model,
--                           s->sockets, s->cores, s->threads, s->maxcpus);
--    qtest_start(args);
--
--    for (i = 1; i < s->maxcpus; i++) {
--        response = qmp("{ 'execute': 'cpu-add',"
--                       "  'arguments': { 'id': %d } }", i);
--        g_assert(response);
--        g_assert(!qdict_haskey(response, "error"));
--        qobject_unref(response);
--    }
--
--    qtest_end();
--    g_free(args);
--}
--
--static void test_plug_without_cpu_add(gconstpointer data)
--{
--    const PlugTestData *s = data;
--    char *args;
--    QDict *response;
--
--    args = g_strdup_printf("-machine %s -cpu %s "
--                           "-smp 1,sockets=%u,cores=%u,threads=%u,maxcpus=%u",
--                           s->machine, s->cpu_model,
--                           s->sockets, s->cores, s->threads, s->maxcpus);
--    qtest_start(args);
--
--    response = qmp("{ 'execute': 'cpu-add',"
--                   "  'arguments': { 'id': %d } }",
--                   s->sockets * s->cores * s->threads);
--    g_assert(response);
--    g_assert(qdict_haskey(response, "error"));
--    qobject_unref(response);
--
--    qtest_end();
--    g_free(args);
--}
--
- static void test_plug_with_device_add(gconstpointer data)
++enum {
++    VHOST_USER_NET,
++};
++
+ typedef struct TestServer {
+     gchar *socket_path;
+     gchar *mig_path;
+@@ -154,10 +158,25 @@ typedef struct TestServer {
+     bool test_fail;
+     int test_flags;
+     int queues;
++    struct vhost_user_ops *vu_ops;
+ } TestServer;
+ 
++struct vhost_user_ops {
++    /* Device types. */
++    int type;
++    void (*append_opts)(TestServer *s, GString *cmd_line,
++            const char *chr_opts);
++
++    /* VHOST-USER commands. */
++    void (*set_features)(TestServer *s, CharBackend *chr,
++            VhostUserMsg *msg);
++    void (*get_protocol_features)(TestServer *s,
++            CharBackend *chr, VhostUserMsg *msg);
++};
++
+ static const char *init_hugepagefs(void);
+-static TestServer *test_server_new(const gchar *name);
++static TestServer *test_server_new(const gchar *name,
++        struct vhost_user_ops *ops);
+ static void test_server_free(TestServer *server);
+ static void test_server_listen(TestServer *server);
+ 
+@@ -167,7 +186,7 @@ enum test_memfd {
+     TEST_MEMFD_NO,
+ };
+ 
+-static void append_vhost_opts(TestServer *s, GString *cmd_line,
++static void append_vhost_net_opts(TestServer *s, GString *cmd_line,
+                              const char *chr_opts)
  {
-     const PlugTestData *td = data;
-@@ -144,36 +96,13 @@ static void add_pc_test_case(const char *mname)
-     data->cores = 3;
-     data->threads = 2;
-     data->maxcpus = data->sockets * data->cores * data->threads;
--    if (g_str_has_suffix(mname, "-1.4") ||
--        (strcmp(mname, "pc-1.3") == 0) ||
--        (strcmp(mname, "pc-1.2") == 0) ||
--        (strcmp(mname, "pc-1.1") == 0) ||
--        (strcmp(mname, "pc-1.0") == 0)) {
--        path = g_strdup_printf("cpu-plug/%s/init/%ux%ux%u&maxcpus=%u",
--                               mname, data->sockets, data->cores,
--                               data->threads, data->maxcpus);
--        qtest_add_data_func_full(path, data, test_plug_without_cpu_add,
--                                 test_data_free);
--        g_free(path);
--    } else {
--        PlugTestData *data2 = g_memdup(data, sizeof(PlugTestData));
+     g_string_append_printf(cmd_line, QEMU_CMD_CHR QEMU_CMD_NETDEV,
+@@ -332,25 +351,15 @@ static void chr_read(void *opaque, const uint8_t *buf, int size)
+         break;
  
--        data2->machine = g_strdup(data->machine);
--        data2->device_model = g_strdup(data->device_model);
--
--        path = g_strdup_printf("cpu-plug/%s/cpu-add/%ux%ux%u&maxcpus=%u",
--                               mname, data->sockets, data->cores,
--                               data->threads, data->maxcpus);
--        qtest_add_data_func_full(path, data, test_plug_with_cpu_add,
--                                 test_data_free);
--        g_free(path);
--        path = g_strdup_printf("cpu-plug/%s/device-add/%ux%ux%u&maxcpus=%u",
--                               mname, data2->sockets, data2->cores,
--                               data2->threads, data2->maxcpus);
--        qtest_add_data_func_full(path, data2, test_plug_with_device_add,
--                                 test_data_free);
--        g_free(path);
--    }
-+    path = g_strdup_printf("cpu-plug/%s/device-add/%ux%ux%u&maxcpus=%u",
-+                           mname, data->sockets, data->cores,
-+                           data->threads, data->maxcpus);
-+    qtest_add_data_func_full(path, data, test_plug_with_device_add,
-+                             test_data_free);
-+    g_free(path);
+     case VHOST_USER_SET_FEATURES:
+-        g_assert_cmpint(msg.payload.u64 & (0x1ULL << VHOST_USER_F_PROTOCOL_FEATURES),
+-                        !=, 0ULL);
+-        if (s->test_flags == TEST_FLAGS_DISCONNECT) {
+-            qemu_chr_fe_disconnect(chr);
+-            s->test_flags = TEST_FLAGS_BAD;
++        if (s->vu_ops->set_features) {
++            s->vu_ops->set_features(s, chr, &msg);
+         }
+         break;
+ 
+     case VHOST_USER_GET_PROTOCOL_FEATURES:
+-        /* send back features to qemu */
+-        msg.flags |= VHOST_USER_REPLY_MASK;
+-        msg.size = sizeof(m.payload.u64);
+-        msg.payload.u64 = 1 << VHOST_USER_PROTOCOL_F_LOG_SHMFD;
+-        msg.payload.u64 |= 1 << VHOST_USER_PROTOCOL_F_CROSS_ENDIAN;
+-        if (s->queues > 1) {
+-            msg.payload.u64 |= 1 << VHOST_USER_PROTOCOL_F_MQ;
++        if (s->vu_ops->get_protocol_features) {
++            s->vu_ops->get_protocol_features(s, chr, &msg);
+         }
+-        p = (uint8_t *) &msg;
+-        qemu_chr_fe_write_all(chr, p, VHOST_USER_HDR_SIZE + msg.size);
+         break;
+ 
+     case VHOST_USER_GET_VRING_BASE:
+@@ -467,7 +476,8 @@ static const char *init_hugepagefs(void)
+ #endif
  }
  
- static void add_pseries_test_case(const char *mname)
-@@ -205,7 +134,7 @@ static void add_pseries_test_case(const char *mname)
- static void add_s390x_test_case(const char *mname)
+-static TestServer *test_server_new(const gchar *name)
++static TestServer *test_server_new(const gchar *name,
++        struct vhost_user_ops *ops)
  {
-     char *path;
--    PlugTestData *data, *data2;
-+    PlugTestData *data;
+     TestServer *server = g_new0(TestServer, 1);
+     char template[] = "/tmp/vhost-test-XXXXXX";
+@@ -495,6 +505,7 @@ static TestServer *test_server_new(const gchar *name)
  
-     if (!g_str_has_prefix(mname, "s390-ccw-virtio-")) {
+     server->log_fd = -1;
+     server->queues = 1;
++    server->vu_ops = ops;
+ 
+     return server;
+ }
+@@ -669,11 +680,11 @@ static void vhost_user_test_cleanup(void *s)
+ 
+ static void *vhost_user_test_setup(GString *cmd_line, void *arg)
+ {
+-    TestServer *server = test_server_new("vhost-user-test");
++    TestServer *server = test_server_new("vhost-user-test", arg);
+     test_server_listen(server);
+ 
+     append_mem_opts(server, cmd_line, 256, TEST_MEMFD_AUTO);
+-    append_vhost_opts(server, cmd_line, "");
++    server->vu_ops->append_opts(server, cmd_line, "");
+ 
+     g_test_queue_destroy(vhost_user_test_cleanup, server);
+ 
+@@ -682,11 +693,11 @@ static void *vhost_user_test_setup(GString *cmd_line, void *arg)
+ 
+ static void *vhost_user_test_setup_memfd(GString *cmd_line, void *arg)
+ {
+-    TestServer *server = test_server_new("vhost-user-test");
++    TestServer *server = test_server_new("vhost-user-test", arg);
+     test_server_listen(server);
+ 
+     append_mem_opts(server, cmd_line, 256, TEST_MEMFD_YES);
+-    append_vhost_opts(server, cmd_line, "");
++    server->vu_ops->append_opts(server, cmd_line, "");
+ 
+     g_test_queue_destroy(vhost_user_test_cleanup, server);
+ 
+@@ -720,7 +731,7 @@ static void test_migrate(void *obj, void *arg, QGuestAllocator *alloc)
          return;
-@@ -220,21 +149,10 @@ static void add_s390x_test_case(const char *mname)
-     data->threads = 1;
-     data->maxcpus = data->sockets * data->cores * data->threads;
+     }
  
--    data2 = g_memdup(data, sizeof(PlugTestData));
--    data2->machine = g_strdup(data->machine);
--    data2->device_model = g_strdup(data->device_model);
--
--    path = g_strdup_printf("cpu-plug/%s/cpu-add/%ux%ux%u&maxcpus=%u",
-+    path = g_strdup_printf("cpu-plug/%s/device-add/%ux%ux%u&maxcpus=%u",
-                            mname, data->sockets, data->cores,
-                            data->threads, data->maxcpus);
--    qtest_add_data_func_full(path, data, test_plug_with_cpu_add,
--                             test_data_free);
--    g_free(path);
--
--    path = g_strdup_printf("cpu-plug/%s/device-add/%ux%ux%u&maxcpus=%u",
--                           mname, data2->sockets, data2->cores,
--                           data2->threads, data2->maxcpus);
--    qtest_add_data_func_full(path, data2, test_plug_with_device_add,
-+    qtest_add_data_func_full(path, data, test_plug_with_device_add,
-                              test_data_free);
-     g_free(path);
+-    dest = test_server_new("dest");
++    dest = test_server_new("dest", s->vu_ops);
+     dest_cmdline = g_string_new(qos_get_current_command_line());
+     uri = g_strdup_printf("%s%s", "unix:", dest->mig_path);
+ 
+@@ -730,7 +741,7 @@ static void test_migrate(void *obj, void *arg, QGuestAllocator *alloc)
+     test_server_listen(dest);
+     g_string_append_printf(dest_cmdline, " -incoming %s", uri);
+     append_mem_opts(dest, dest_cmdline, 256, TEST_MEMFD_AUTO);
+-    append_vhost_opts(dest, dest_cmdline, "");
++    dest->vu_ops->append_opts(dest, dest_cmdline, "");
+     to = qtest_init(dest_cmdline->str);
+ 
+     /* This would be where you call qos_allocate_objects(to, NULL), if you want
+@@ -831,11 +842,11 @@ connect_thread(gpointer data)
+ 
+ static void *vhost_user_test_setup_reconnect(GString *cmd_line, void *arg)
+ {
+-    TestServer *s = test_server_new("reconnect");
++    TestServer *s = test_server_new("reconnect", arg);
+ 
+     g_thread_new("connect", connect_thread, s);
+     append_mem_opts(s, cmd_line, 256, TEST_MEMFD_AUTO);
+-    append_vhost_opts(s, cmd_line, ",server");
++    s->vu_ops->append_opts(s, cmd_line, ",server");
+ 
+     g_test_queue_destroy(vhost_user_test_cleanup, s);
+ 
+@@ -866,13 +877,13 @@ static void test_reconnect(void *obj, void *arg, QGuestAllocator *alloc)
+ 
+ static void *vhost_user_test_setup_connect_fail(GString *cmd_line, void *arg)
+ {
+-    TestServer *s = test_server_new("connect-fail");
++    TestServer *s = test_server_new("connect-fail", arg);
+ 
+     s->test_fail = true;
+ 
+     g_thread_new("connect", connect_thread, s);
+     append_mem_opts(s, cmd_line, 256, TEST_MEMFD_AUTO);
+-    append_vhost_opts(s, cmd_line, ",server");
++    s->vu_ops->append_opts(s, cmd_line, ",server");
+ 
+     g_test_queue_destroy(vhost_user_test_cleanup, s);
+ 
+@@ -881,13 +892,13 @@ static void *vhost_user_test_setup_connect_fail(GString *cmd_line, void *arg)
+ 
+ static void *vhost_user_test_setup_flags_mismatch(GString *cmd_line, void *arg)
+ {
+-    TestServer *s = test_server_new("flags-mismatch");
++    TestServer *s = test_server_new("flags-mismatch", arg);
+ 
+     s->test_flags = TEST_FLAGS_DISCONNECT;
+ 
+     g_thread_new("connect", connect_thread, s);
+     append_mem_opts(s, cmd_line, 256, TEST_MEMFD_AUTO);
+-    append_vhost_opts(s, cmd_line, ",server");
++    s->vu_ops->append_opts(s, cmd_line, ",server");
+ 
+     g_test_queue_destroy(vhost_user_test_cleanup, s);
+ 
+@@ -924,11 +935,47 @@ static void test_multiqueue(void *obj, void *arg, QGuestAllocator *alloc)
+     wait_for_rings_started(s, s->queues * 2);
  }
-diff --git a/tests/qtest/test-hmp.c b/tests/qtest/test-hmp.c
-index aea1384bac..94a8023173 100644
---- a/tests/qtest/test-hmp.c
-+++ b/tests/qtest/test-hmp.c
-@@ -27,7 +27,6 @@ static const char *hmp_cmds[] = {
-     "chardev-change testchardev1 ringbuf",
-     "chardev-remove testchardev1",
-     "commit all",
--    "cpu-add 1",
-     "cpu 0",
-     "device_add ?",
-     "device_add usb-mouse,id=mouse1",
-diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
-index 17aa74531c..5326141cee 100644
---- a/docs/system/deprecated.rst
-+++ b/docs/system/deprecated.rst
-@@ -272,13 +272,6 @@ The ``query-cpus`` command is replaced by the ``query-cpus-fast`` command.
- The ``arch`` output member of the ``query-cpus-fast`` command is
- replaced by the ``target`` output member.
  
--``cpu-add`` (since 4.0)
--'''''''''''''''''''''''
--
--Use ``device_add`` for hotplugging vCPUs instead of ``cpu-add``.  See
--documentation of ``query-hotpluggable-cpus`` for additional
--details.
--
- ``query-events`` (since 4.0)
- ''''''''''''''''''''''''''''
- 
-@@ -294,12 +287,6 @@ the 'wait' field, which is only applicable to sockets in server mode
- Human Monitor Protocol (HMP) commands
- -------------------------------------
- 
--``cpu-add`` (since 4.0)
--'''''''''''''''''''''''
--
--Use ``device_add`` for hotplugging vCPUs instead of ``cpu-add``.  See
--documentation of ``query-hotpluggable-cpus`` for additional details.
--
- ``acl_show``, ``acl_reset``, ``acl_policy``, ``acl_add``, ``acl_remove`` (since 4.0.0)
- ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
- 
-@@ -517,6 +504,12 @@ QEMU Machine Protocol (QMP) commands
- The "autoload" parameter has been ignored since 2.12.0. All bitmaps
- are automatically loaded from qcow2 images.
- 
-+``cpu-add`` (removed in 5.2)
-+''''''''''''''''''''''''''''
++static void vu_net_set_features(TestServer *s, CharBackend *chr,
++        VhostUserMsg *msg)
++{
++    g_assert_cmpint(msg->payload.u64 &
++            (0x1ULL << VHOST_USER_F_PROTOCOL_FEATURES), !=, 0ULL);
++    if (s->test_flags == TEST_FLAGS_DISCONNECT) {
++        qemu_chr_fe_disconnect(chr);
++        s->test_flags = TEST_FLAGS_BAD;
++    }
++}
 +
-+Use ``device_add`` for hotplugging vCPUs instead of ``cpu-add``.  See
-+documentation of ``query-hotpluggable-cpus`` for additional details.
++static void vu_net_get_protocol_features(TestServer *s, CharBackend *chr,
++        VhostUserMsg *msg)
++{
++    /* send back features to qemu */
++    msg->flags |= VHOST_USER_REPLY_MASK;
++    msg->size = sizeof(m.payload.u64);
++    msg->payload.u64 = 1 << VHOST_USER_PROTOCOL_F_LOG_SHMFD;
++    msg->payload.u64 |= 1 << VHOST_USER_PROTOCOL_F_CROSS_ENDIAN;
++    if (s->queues > 1) {
++        msg->payload.u64 |= 1 << VHOST_USER_PROTOCOL_F_MQ;
++    }
++    qemu_chr_fe_write_all(chr, (uint8_t *)msg, VHOST_USER_HDR_SIZE + msg->size);
++}
 +
- Human Monitor Protocol (HMP) commands
- -------------------------------------
- 
-@@ -526,6 +519,12 @@ The ``hub_id`` parameter of ``hostfwd_add`` / ``hostfwd_remove`` (removed in 5.0
- The ``[hub_id name]`` parameter tuple of the 'hostfwd_add' and
- 'hostfwd_remove' HMP commands has been replaced by ``netdev_id``.
- 
-+``cpu-add`` (removed in 5.2)
-+''''''''''''''''''''''''''''
++/* Each VHOST-USER device should have its ops structure defined. */
++static struct vhost_user_ops g_vu_net_ops = {
++    .type = VHOST_USER_NET,
 +
-+Use ``device_add`` for hotplugging vCPUs instead of ``cpu-add``.  See
-+documentation of ``query-hotpluggable-cpus`` for additional details.
++    .append_opts = append_vhost_net_opts,
 +
- Guest Emulator ISAs
- -------------------
++    .set_features = vu_net_set_features,
++    .get_protocol_features = vu_net_get_protocol_features,
++};
++
+ static void register_vhost_user_test(void)
+ {
+     QOSGraphTestOptions opts = {
+         .before = vhost_user_test_setup,
+         .subprocess = true,
++        .arg = &g_vu_net_ops,
+     };
  
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 27c4bbe0f2..1088d64503 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1761,21 +1761,6 @@ SRST
-   Executes a qemu-io command on the given block device.
- ERST
- 
--    {
--        .name       = "cpu-add",
--        .args_type  = "id:i",
--        .params     = "id",
--        .help       = "add cpu (deprecated, use device_add instead)",
--        .cmd        = hmp_cpu_add,
--    },
--
--SRST
--``cpu-add`` *id*
--  Add CPU with id *id*.  This command is deprecated, please
--  +use ``device_add`` instead. For details, refer to
--  'docs/cpu-hotplug.rst'.
--ERST
--
-     {
-         .name       = "qom-list",
-         .args_type  = "path:s?",
+     qemu_add_opts(&qemu_chardev_opts);
 -- 
 MST
 
