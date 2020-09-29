@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 443ADC4346E
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:38:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33B65C4346E
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:38:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D297F2083B
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:38:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D45F92083B
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 07:38:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GdCX3e7N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D297F2083B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IXqHejjd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D45F92083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNADX-0000lg-Ve
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 03:38:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57846)
+	id 1kNADc-00010r-Up
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 03:38:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57526)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9y3-0004G7-Nv
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:22:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45516)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9xc-0003W4-Ga
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:22:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41360)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9xx-0001lb-72
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:22:31 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kN9xY-0001gH-Ln
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 03:22:04 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601364144;
+ s=mimecast20190719; t=1601364117;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=gkUx6b1cSk9kEji0PxARO6FKoBMVB3jc1oddzWmGMC8=;
- b=GdCX3e7NaBilBiJ34LRLD8ECyO2cntX2XM88bnaUsKuf5uyFo0I/m22Z8VI0Fv/6s6afjP
- UhCgjmqoCCO9KWYmjra4pgWQBdT23EqKFUZ7D0gV7WXIgByOAbwtapG2bGXshi+rJrFk6y
- KsN+1atTyBp3EXgxfGwjzoj0OrM76/Y=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-335-pnAh2eOhMFSNuhNiEvyhfQ-1; Tue, 29 Sep 2020 03:22:22 -0400
-X-MC-Unique: pnAh2eOhMFSNuhNiEvyhfQ-1
-Received: by mail-wm1-f71.google.com with SMTP id r83so1031184wma.8
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 00:22:22 -0700 (PDT)
+ bh=jSJn6oeFuRdQPsvZXqc86KYoAu1cV/dFDaiSPKGeOMg=;
+ b=IXqHejjdpSZsHyX656uhuxm3XSMwuTuvWJIYUUN5MxtyUiRUDpRtKhE6IRSlUrNvQ8lsIw
+ L6F6Mvz6kJCWHyEbNTn5d2uC6dnDF6kjxShcy5ZIjpoFp5fmR4KkiJ514+Hw8ZQ0HYgpKO
+ YanuQ3bIgSS8XXHu5n1VxqZ8Rzr4N9s=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-322-iasf6RQzOq22r_cR-j7fxQ-1; Tue, 29 Sep 2020 03:21:55 -0400
+X-MC-Unique: iasf6RQzOq22r_cR-j7fxQ-1
+Received: by mail-wr1-f71.google.com with SMTP id o6so1364420wrp.1
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 00:21:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=gkUx6b1cSk9kEji0PxARO6FKoBMVB3jc1oddzWmGMC8=;
- b=GTIDc8YeMBvZZR/0D9BJMt+BYEFKFIaL/5RogZeQ3mfHjWst5a4+im7xK5UIapFi87
- Oz6SF7na0iU6fvktYPi5/NbmWrU6PhkqmkrKcaNjESvUXKYqO/Xrjnp3Qpg+NGk+yaqe
- dzkoiwvU7eOTOTkI1+jrf+2Mt5NpsW+PyqIE7HrO/PGheWD9heBEv0ezMhw74QFSK8LR
- erYuMU/NqNRp6XwQ5fdJC5XhfmElR1GPc58ls6phq9ndzpb7vaPbsX7wuDkgSh56cJ5M
- EVI2RU+oBtTt4fJhX4zBOL4zrax8Jyy6ksSL2pYhaYICh2SyAY/qTgjGN7bmHtkcOvCE
- x4Ug==
-X-Gm-Message-State: AOAM5334MO26MV8k1HVjg+s/bHc0P5LO7tBwYxfRGRS5G/6XHihTVg2R
- oShZALYd1C9fcm/YRYYN3BO520OMmCUU7P8JOcHr/aNlwhaGBCp3voTl+cDpdxtqMisdvFOqLP9
- Fqw+FRcxrPlme504=
-X-Received: by 2002:a5d:5306:: with SMTP id e6mr2617201wrv.156.1601364140757; 
- Tue, 29 Sep 2020 00:22:20 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwujlSBY2x3DesO5EzaeCJPnztN0ViQYzUQrwHLatJxkVVp0o40ICJF1ih0k3amh6t2q5hCrQ==
-X-Received: by 2002:a5d:5306:: with SMTP id e6mr2617182wrv.156.1601364140538; 
- Tue, 29 Sep 2020 00:22:20 -0700 (PDT)
+ :mime-version:content-disposition:in-reply-to;
+ bh=jSJn6oeFuRdQPsvZXqc86KYoAu1cV/dFDaiSPKGeOMg=;
+ b=GsXdH0UNk9lh8jBTSlF0/SBkkV0P+CWFnFO4kMtWFfSEeqieR78yGquZOYB4sz6Sh4
+ n9b7+ObMJNcPAEdoVw9+32e/GcQxOu+ciGZogZ8akQeq6HflGKfiakSLmsPNmcSfbnia
+ IKV81Ew0UmYgqhsLLUY//jo8alIdulroLv/NImkw7I/qU/2PoXXJhxpR5J8b9KxuiOEV
+ +1FQz7XMLoilFhDIqmEN7Ko6z33i/Mht7yGAHfX6cxP6Rb34ECmHn1SiOCaQ74VTkaPY
+ gJtH9qoFAuThyKH1X0HHSXPj9chES0vSGM623QHfZJPm3dc+q/r5ZM3PRCu6oeKL8mu0
+ DeqQ==
+X-Gm-Message-State: AOAM533DyzEC+AAyuSVUTGI+Zs6dPMn2oaju+rxWLjRofkXRoZPw7J9J
+ /jsurTBYJCDk7V9YtEpmwxwtvt1BvF38CpYZKkEg4RTkwv2BHKkFMNDmRqr9Y6NqFEzO7dM76du
+ Q8g5iDbZLLiBX1yI=
+X-Received: by 2002:a7b:c21a:: with SMTP id x26mr1517812wmi.100.1601364114092; 
+ Tue, 29 Sep 2020 00:21:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx6XIjt4DqEfnoo8IytXDSOngpQ4z2DhXu77HHopqGP5KaWDCK2xeh5rOTSn+4rijXXmq83bg==
+X-Received: by 2002:a7b:c21a:: with SMTP id x26mr1517800wmi.100.1601364113898; 
+ Tue, 29 Sep 2020 00:21:53 -0700 (PDT)
 Received: from redhat.com (bzq-79-179-71-128.red.bezeqint.net. [79.179.71.128])
- by smtp.gmail.com with ESMTPSA id q13sm4920163wra.93.2020.09.29.00.22.19
+ by smtp.gmail.com with ESMTPSA id l18sm4720017wrp.84.2020.09.29.00.21.52
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 29 Sep 2020 00:22:19 -0700 (PDT)
-Date: Tue, 29 Sep 2020 03:22:18 -0400
+ Tue, 29 Sep 2020 00:21:53 -0700 (PDT)
+Date: Tue, 29 Sep 2020 03:21:51 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v4 32/48] hw/smbios: report error if table size is too large
-Message-ID: <20200929071948.281157-33-mst@redhat.com>
+Subject: [PULL v4 22/48] x86: cpuhp: prevent guest crash on CPU hotplug when
+ broadcast SMI is in use
+Message-ID: <20200929071948.281157-23-mst@redhat.com>
 References: <20200929071948.281157-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200929071948.281157-1-mst@redhat.com>
@@ -86,12 +85,11 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 02:22:44
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 22:47:55
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
@@ -113,73 +111,82 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+ Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Daniel P. Berrangé <berrange@redhat.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-The SMBIOS 2.1 entry point uses a uint16 data type for reporting the
-total length of the tables. If the user passes -smbios configuration to
-QEMU that causes the table size to exceed this limit then various bad
-behaviours result, including
+There were reports of guest crash on CPU hotplug, when using q35 machine
+type and OVMF with SMM, due to hotplugged CPU trying to process SMI at
+default SMI handler location without it being relocated by firmware first.
 
- - firmware hangs in an infinite loop
- - firmware triggers a KVM crash on bad memory access
- - firmware silently discards user's SMBIOS data replacing it with
-   a generic data set.
+Fix it by refusing hotplug if firmware hasn't negotiated CPU hotplug with
+SMI support while SMI broadcast is in use.
 
-Limiting the size to 0xffff in QEMU avoids triggering most of these
-problems. There is a remaining bug in SeaBIOS which tries to prepend its
-own data for table 0, and does not check whether there is sufficient
-space before attempting this.
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20200923133804.2089190-3-berrange@redhat.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Tested-by: Laszlo Ersek <lersek@redhat.com>
+Message-Id: <20200923094650.1301166-3-imammedo@redhat.com>
 Tested-by: Laszlo Ersek <lersek@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/smbios/smbios.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ hw/acpi/ich9.c | 12 +++++++++++-
+ hw/i386/x86.c  | 11 +++++++++++
+ 2 files changed, 22 insertions(+), 1 deletion(-)
 
-diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
-index d993448087..8b30906e50 100644
---- a/hw/smbios/smbios.c
-+++ b/hw/smbios/smbios.c
-@@ -365,6 +365,13 @@ static void smbios_register_config(void)
+diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
+index 6a19070cec..0acc9a3107 100644
+--- a/hw/acpi/ich9.c
++++ b/hw/acpi/ich9.c
+@@ -408,10 +408,20 @@ void ich9_pm_device_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+     ICH9LPCState *lpc = ICH9_LPC_DEVICE(hotplug_dev);
  
- opts_init(smbios_register_config);
- 
-+/*
-+ * The SMBIOS 2.1 "structure table length" field in the
-+ * entry point uses a 16-bit integer, so we're limited
-+ * in total table size
-+ */
-+#define SMBIOS_21_MAX_TABLES_LEN 0xffff
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
+-        !lpc->pm.acpi_memory_hotplug.is_enabled)
++        !lpc->pm.acpi_memory_hotplug.is_enabled) {
+         error_setg(errp,
+                    "memory hotplug is not enabled: %s.memory-hotplug-support "
+                    "is not set", object_get_typename(OBJECT(lpc)));
++    } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
++        uint64_t negotiated = lpc->smi_negotiated_features;
 +
- static void smbios_validate_table(MachineState *ms)
- {
-     uint32_t expect_t4_count = smbios_legacy ?
-@@ -375,6 +382,13 @@ static void smbios_validate_table(MachineState *ms)
-                      expect_t4_count, smbios_type4_count);
-         exit(1);
-     }
-+
-+    if (smbios_ep_type == SMBIOS_ENTRY_POINT_21 &&
-+        smbios_tables_len > SMBIOS_21_MAX_TABLES_LEN) {
-+        error_report("SMBIOS 2.1 table length %zu exceeds %d",
-+                     smbios_tables_len, SMBIOS_21_MAX_TABLES_LEN);
-+        exit(1);
++        if (negotiated & BIT_ULL(ICH9_LPC_SMI_F_BROADCAST_BIT) &&
++            !(negotiated & BIT_ULL(ICH9_LPC_SMI_F_CPU_HOTPLUG_BIT))) {
++            error_setg(errp, "cpu hotplug with SMI wasn't enabled by firmware");
++            error_append_hint(errp, "update machine type to newer than 5.1 "
++                "and firmware that suppors CPU hotplug with SMM");
++        }
 +    }
  }
  
+ void ich9_pm_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index c2ea989579..403c2b1dad 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -279,6 +279,17 @@ void x86_cpu_pre_plug(HotplugHandler *hotplug_dev,
+         return;
+     }
  
++    if (x86ms->acpi_dev) {
++        Error *local_err = NULL;
++
++        hotplug_handler_pre_plug(HOTPLUG_HANDLER(x86ms->acpi_dev), dev,
++                                 &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            return;
++        }
++    }
++
+     init_topo_info(&topo_info, x86ms);
+ 
+     env->nr_dies = x86ms->smp_dies;
 -- 
 MST
 
