@@ -2,119 +2,80 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DB3FC4727C
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 12:39:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AC30C4727F
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 12:41:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DB5F20789
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 12:39:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA3272064E
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 12:41:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RtI6CRsU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DB5F20789
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NpJrfZAj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA3272064E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNEv6-0005gk-G6
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 08:39:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52356)
+	id 1kNEwY-000787-UN
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 08:41:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52104)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kNEri-0001nP-AT
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 08:36:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52798)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kNErE-000137-DE
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 08:35:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20470)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kNErg-0008TI-Ft
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 08:36:17 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kNErB-0008M5-MI
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 08:35:47 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601382974;
+ s=mimecast20190719; t=1601382944;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=4lBUYOJ/zf4AUShZShTIEBCNI9Us+gFkJTQTP44uR+E=;
- b=RtI6CRsUd78Mzio+aUJbOHEtyFbcLu297VPc9EbpfOA+aS2tVTpWNc6ZM7fb+AGGq07meG
- QfQQAC7qOYZnQQV72JZTmMRGsFBXOSa6u3tIMmsBqV43sNU9GVDF7oyz3cUMSBw/zIMNtW
- fW/RKLWdAmn2pQT+b1WRw6ANI9ddlrc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-377-wfrYFJbOOTynXpeuUJxaTQ-1; Tue, 29 Sep 2020 08:36:12 -0400
-X-MC-Unique: wfrYFJbOOTynXpeuUJxaTQ-1
-Received: by mail-wm1-f69.google.com with SMTP id b20so3338317wmj.1
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 05:36:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=4lBUYOJ/zf4AUShZShTIEBCNI9Us+gFkJTQTP44uR+E=;
- b=RwvO3GNOn/sT1WL+thy4zpXDYMkxOCDfXGxfedyrMVpnlaWXHVNlesULrpXY7LEc6o
- UAAWrnKXa1OlZ4yX7BH1V3gw+SekTvmbyRsOlnV/ej5T4E6djjrlINC7jjfZp8Bni9vM
- xlKqG41uo0uSpSjC1O4e8GggyvQ0Iff+oNghWINME4wgHBQW6kgfI7RZvZ7GsaPWuGtv
- MOGflnCaNPcAbf7FG30U9G8t6sEcGYAcOt4ZuzQuerq1BWU2k9g4bZzaXPgiBreB8D5p
- mO/ytkfZiXIJbvMOibTiIkYviOh+oIEqpBE/bOly9ZEH3saRbESjBDX7UBabxlOVcmKZ
- i9zw==
-X-Gm-Message-State: AOAM530kJsXCn03JeVs6hGTsjg3ZVQyqio9gRlDtChOedZQD+rmGsHIX
- zajV9ATU2E5zR6cytYYIzKZBr5bSVMBTPT6es26ntlEcgm8ysWy6YDTNb/yTHn3rsl89MFeUoA2
- qfmXq17aSxBHmUnk=
-X-Received: by 2002:adf:ee01:: with SMTP id y1mr4261632wrn.2.1601382971253;
- Tue, 29 Sep 2020 05:36:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw/Piev54bo7P9na83hVr2E7aIomfMMwXhMiYw6QcJ3MozmIqbp2HFMiczJ5OhB0KDSTrf+6A==
-X-Received: by 2002:adf:ee01:: with SMTP id y1mr4261618wrn.2.1601382971101;
- Tue, 29 Sep 2020 05:36:11 -0700 (PDT)
-Received: from [192.168.1.36] (74.red-83-53-161.dynamicip.rima-tde.net.
- [83.53.161.74])
- by smtp.gmail.com with ESMTPSA id q18sm5802629wre.78.2020.09.29.05.36.10
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 29 Sep 2020 05:36:10 -0700 (PDT)
-Subject: Re: [PULL 0/1] acpi: fixup
-To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-References: <20200929111255.381871-1-mst@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <ed9c633d-63c0-4e84-4eb1-adf634416bec@redhat.com>
-Date: Tue, 29 Sep 2020 14:36:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ in-reply-to:in-reply-to:references:references;
+ bh=dQ3wsfy5KsplaynrJMJyjMESYjSUlnklpCwwhnKYOoQ=;
+ b=NpJrfZAjiIXEe50HZTFZ7pqiBuGW8Vc7Ajp/6TAp8DkAQU6gxUYrsYpOg31eaQMiB0bq6Y
+ ddNPmoDE/vCV4BKkYZENmUIqdxLV2n0lan36L2yRUvye2oL83tRRm9VZti+sHKtF6DqOYB
+ rKLaNLA780ih0aAFmsVUUeR6Ux2Rouk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-505-GTXIMTrCNx2-ScKVqg2sng-1; Tue, 29 Sep 2020 08:35:42 -0400
+X-MC-Unique: GTXIMTrCNx2-ScKVqg2sng-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A411418C89C3;
+ Tue, 29 Sep 2020 12:35:41 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-101.ams2.redhat.com
+ [10.36.112.101])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4E8125578B;
+ Tue, 29 Sep 2020 12:35:41 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id D1D28113864A; Tue, 29 Sep 2020 14:35:39 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v6 17/21] docs/devel/qapi-code-gen.txt: Update to new
+ rST backend conventions
+References: <20200925162316.21205-1-peter.maydell@linaro.org>
+ <20200925162316.21205-18-peter.maydell@linaro.org>
+Date: Tue, 29 Sep 2020 14:35:39 +0200
+In-Reply-To: <20200925162316.21205-18-peter.maydell@linaro.org> (Peter
+ Maydell's message of "Fri, 25 Sep 2020 17:23:12 +0100")
+Message-ID: <87wo0cu5es.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20200929111255.381871-1-mst@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+Content-Type: text/plain
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 02:22:44
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -123,9 +84,8 @@ X-Spam_score: -2.8
 X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -138,33 +98,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/29/20 1:13 PM, Michael S. Tsirkin wrote:
-> The following changes since commit 213057383c9f73a17cfe635b204d88e11f918df1:
-> 
->   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2020-09-29 11:10:29 +0100)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-> 
-> for you to fetch changes up to f142e4ede72853aaa7d306bc79b099caed45769b:
-> 
->   tests/acpi: drop unnecessary files (2020-09-29 07:10:37 -0400)
-> 
-> ----------------------------------------------------------------
-> acpi: fixup
-> 
-> My last pull included a ton of useless files by mistake.
-> Drop them all.
-> 
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-It might be cleaner to directly apply this as a "buildsys fix",
-sometimes Peter accepts to do it.
+> Update the documentation of QAPI document comment syntax to match
+> the new rST backend requirements. The principal changes are:
+>  * whitespace is now significant,
+
+Well, differently significant :)  Anyway, close enough.
+
+>                                   and multiline definitions
+>    must have their second and subsequent lines indented to
+>    match the first line
+>  * general rST format markup is permitted, not just the small
+>    set of markup the old texinfo generator handled. For most
+>    things (notably bulleted and itemized lists) the old format
+>    is the same as rST was.
+
+"was the same as rST is"?
+
+>  * Specific things that might trip people up:
+>    - instead of *bold* and _italic_ rST has **bold** and *italic*
+>    - lists need a preceding and following blank line
+>    - a lone literal '*' will need to be backslash-escaped to
+>      avoid a rST syntax error
+>  * the old leading '|' for example (literal text) blocks is
+>    replaced by the standard rST '::' literal block.
+>  * we support arbitrary levels of sub- and sub-sub-heading, not
+>    just a main and sub-heading like the old texinfo generator
+
+Possibly noteworthy: lists can now be nested.  Can add that in my tree.
+
+>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  docs/devel/qapi-code-gen.txt | 83 +++++++++++++++++++++++-------------
+>  1 file changed, 53 insertions(+), 30 deletions(-)
+>
+> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+> index 69eaffac376..7d2479dde82 100644
+> --- a/docs/devel/qapi-code-gen.txt
+> +++ b/docs/devel/qapi-code-gen.txt
+> @@ -824,23 +824,37 @@ See below for more on definition documentation.
+>  Free-form documentation may be used to provide additional text and
+>  structuring content.
+>  
+> +==== Headings and subheadings ====
+> +
+> +A free-form documentation comment containing a line which starts with
+> +some '=' symbols and then a space defines a section heading:
+> +
+> +    ##
+> +    # = This is a top level heading
+> +    #
+> +    # This is a free-form comment which will go under the
+> +    # top level heading.
+> +    ##
+> +
+> +    ##
+> +    # == This is a second level heading
+> +    ##
+> +
+> +A heading line must be the first line of the documentation
+> +comment block.
+> +
+> +Section headings must always be correctly nested, so you can only
+> +define a third-level heading inside a second-level heading, and so on.
+>  
+>  ==== Documentation markup ====
+>  
+> -Comment text starting with '=' is a section title:
+> +Documentation comments can use most rST markup.  In particular,
+> +a '::' literal block can be used for examples:
+>  
+> -    # = Section title
+> -
+> -Double the '=' for a subsection title:
+> -
+> -    # == Subsection title
+> -
+> -Both are only permitted in free-form documentation.
+> -
+> -'|' denotes examples:
+> -
+> -    # | Text of the example, may span
+> -    # | multiple lines
+> +    # ::
+> +    #
+> +    #   Text of the example, may span
+> +    #   multiple lines
+>  
+>  '*' starts an itemized list:
+>  
+> @@ -856,34 +870,33 @@ A decimal number followed by '.' starts a numbered list:
+>      #    multiple lines
+>      # 2. Second item
+>  
+> -The actual number doesn't matter.  You could even use '*' instead of
+> -'2.' for the second item.
+> +The actual number doesn't matter.
+>  
+> -Lists can't be nested.  Blank lines are currently not supported within
+> -lists.
+> +Lists of either kind must be preceded and followed by a blank line.
+> +If a list item's text spans multiple lines, then the second and
+> +subsequent lines must be correctly indented to line up with the
+> +first character of the first line.
+>  
+> -Additional whitespace between the initial '#' and the comment text is
+> -permitted.
+> -
+> -*foo* and _foo_ are for strong and emphasis styles respectively (they
+> -do not work over multiple lines).  @foo is used to reference a name in
+> -the schema.
+> +The usual '**strong**', '*emphasised*' and '``literal``' markup should
+> +be used.  If you need a single literal '*' you will need to
+> +backslash-escape it.  As an extension beyond the usual rST syntax, you
+> +can also use '@foo' to reference a name in the schema; this is
+> +rendered the same way as '``foo``'.
+>  
+>  Example:
+>  
+>  ##
+> -# = Section
+> -# == Subsection
+> -#
+> -# Some text foo with *strong* and _emphasis_
+> +# Some text foo with **bold** and *emphasis*
+>  # 1. with a list
+>  # 2. like that
+>  #
+>  # And some code:
+> -# | $ echo foo
+> -# | -> do this
+> -# | <- get that
+>  #
+> +# ::
+> +#
+> +#   $ echo foo
+> +#   -> do this
+> +#   <- get that
+>  ##
+>  
+>  
+
+v5 had
+
+  @@ -899,6 +915,12 @@ commands and events), member (for structs and unions), branch (for
+   alternates), or value (for enums), and finally optional tagged
+   sections.
+   
+  +Descriptions of arguments can span multiple lines; if they
+  +do then the second and subsequent lines must be indented
+  +to line up with the first character of the first line of the
+  +description. The parser will report a syntax error if there
+  +is insufficient indentation.
+  +
+   FIXME: the parser accepts these things in almost any order.
+   FIXME: union branches should be described, too.
+   
+I questioned the value of the last sentence.  You dropped both.
+Intentional?
+
+> @@ -937,6 +950,16 @@ multiline argument descriptions.
+>  A 'Since: x.y.z' tagged section lists the release that introduced the
+>  definition.
+>  
+> +The text of a section can start on a new line, in
+> +which case it must not be indented at all.  It can also start
+> +on the same line as the 'Note:', 'Returns:', etc tag.  In this
+> +case if it spans multiple lines then second and subsequent
+> +lines must be indented to match the first.
+> +
+> +An 'Example' or 'Examples' section is automatically rendered
+> +entirely as literal fixed-width text.  In other sections,
+> +the text is formatted, and rST markup can be used.
+> +
+>  For example:
+>  
+>  ##
 
 
