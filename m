@@ -2,59 +2,90 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43296C4741F
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 11:08:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F7F1C47423
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 11:08:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE54821D46
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 11:08:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE54821D46
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 6A6C421D43
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 11:08:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z6WE9450"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A6C421D43
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNDUe-0002Ho-NZ
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 07:08:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56690)
+	id 1kNDUx-0002RD-6U
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 07:08:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57248)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kNDO2-0002Z9-EN
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 07:01:36 -0400
-Received: from mail.ispras.ru ([83.149.199.84]:35098)
- by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kNDNy-0002cI-RL
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 07:01:34 -0400
-Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id E990740F9AAE;
- Tue, 29 Sep 2020 11:01:27 +0000 (UTC)
-Subject: [PATCH v6 04/14] migration: introduce icount field for snapshots
-From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
-To: qemu-devel@nongnu.org
-Date: Tue, 29 Sep 2020 14:01:27 +0300
-Message-ID: <160137728764.31007.2320315782013180847.stgit@pasha-ThinkPad-X280>
-In-Reply-To: <160137726426.31007.12061315974029139983.stgit@pasha-ThinkPad-X280>
-References: <160137726426.31007.12061315974029139983.stgit@pasha-ThinkPad-X280>
-User-Agent: StGit/0.17.1-dirty
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kNDQ1-0005FK-9D
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 07:03:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38079)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kNDPz-0002rf-BG
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 07:03:36 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601377414;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=8iVaPevfbtqr+4yOyxmAPVmCMQ7qa9hFmw6lRqdlNYw=;
+ b=Z6WE945045Zvg89ezP89y/VlpJ8EevRFnVCNCOU/b3S1GonXoveR2K5vvDzMxfXvOy9/9c
+ 9loS+/xkeehjCgW+znFj2Au1uPQbPEGKlOIgqzmeJTNBYjs6rP5VMMQJRxiqm7YQs8XIZW
+ dxVhbEsWKNQ+5j/uMoeGs/TyfXs/WTo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-391-bM_UNyZ-Ok226yUSle0OSQ-1; Tue, 29 Sep 2020 07:03:30 -0400
+X-MC-Unique: bM_UNyZ-Ok226yUSle0OSQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 62520186842D;
+ Tue, 29 Sep 2020 11:03:28 +0000 (UTC)
+Received: from work-vm (ovpn-114-253.ams2.redhat.com [10.36.114.253])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BA6E85D9CA;
+ Tue, 29 Sep 2020 11:03:14 +0000 (UTC)
+Date: Tue, 29 Sep 2020 12:03:12 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH v26 05/17] vfio: Add VM state change handler to know
+ state of VM
+Message-ID: <20200929110312.GF2826@work-vm>
+References: <1600817059-26721-1-git-send-email-kwankhede@nvidia.com>
+ <1600817059-26721-6-git-send-email-kwankhede@nvidia.com>
+ <20200924170220.0a9836fe.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=83.149.199.84;
- envelope-from=pavel.dovgalyuk@ispras.ru; helo=mail.ispras.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 07:01:05
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200924170220.0a9836fe.cohuck@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 02:22:44
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -67,355 +98,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, wrampazz@redhat.com, pavel.dovgalyuk@ispras.ru,
- ehabkost@redhat.com, alex.bennee@linaro.org, mtosatti@redhat.com,
- armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, crosa@redhat.com,
- pbonzini@redhat.com, philmd@redhat.com, zhiwei_liu@c-sky.com, rth@twiddle.net
+Cc: cjia@nvidia.com, aik@ozlabs.ru, Zhengxiao.zx@alibaba-inc.com,
+ shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, peterx@redhat.com,
+ Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, yi.l.liu@intel.com,
+ quintela@redhat.com, ziye.yang@intel.com, armbru@redhat.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com,
+ zhi.a.wang@intel.com, kevin.tian@intel.com, yan.y.zhao@intel.com,
+ alex.williamson@redhat.com, changpeng.liu@intel.com, eskultet@redhat.com,
+ Ken.Xue@amd.com, jonathan.davies@nutanix.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Saving icount as a parameters of the snapshot allows navigation between
-them in the execution replay scenario.
-This information can be used for finding a specific snapshot for proceeding
-the recorded execution to the specific moment of the time.
-E.g., 'reverse step' action (introduced in one of the following patches)
-needs to load the nearest snapshot which is prior to the current moment
-of time.
-This patch also updates snapshot test which verifies qemu monitor output.
+* Cornelia Huck (cohuck@redhat.com) wrote:
+> On Wed, 23 Sep 2020 04:54:07 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> 
+> > VM state change handler gets called on change in VM's state. This is used to set
+> > VFIO device state to _RUNNING.
+> > 
+> > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> > Reviewed-by: Neo Jia <cjia@nvidia.com>
+> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >  hw/vfio/migration.c           | 136 ++++++++++++++++++++++++++++++++++++++++++
+> >  hw/vfio/trace-events          |   3 +-
+> >  include/hw/vfio/vfio-common.h |   4 ++
+> >  3 files changed, 142 insertions(+), 1 deletion(-)
+> > 
+> 
+> (...)
+> 
+> > +static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t mask,
+> > +                                    uint32_t value)
+> 
+> I think I've mentioned that before, but this function could really
+> benefit from a comment what mask and value mean. 
+> 
+> > +{
+> > +    VFIOMigration *migration = vbasedev->migration;
+> > +    VFIORegion *region = &migration->region;
+> > +    off_t dev_state_off = region->fd_offset +
+> > +                      offsetof(struct vfio_device_migration_info, device_state);
+> > +    uint32_t device_state;
+> > +    int ret;
+> > +
+> > +    ret = vfio_mig_read(vbasedev, &device_state, sizeof(device_state),
+> > +                        dev_state_off);
+> > +    if (ret < 0) {
+> > +        return ret;
+> > +    }
+> > +
+> > +    device_state = (device_state & mask) | value;
+> > +
+> > +    if (!VFIO_DEVICE_STATE_VALID(device_state)) {
+> > +        return -EINVAL;
+> > +    }
+> > +
+> > +    ret = vfio_mig_write(vbasedev, &device_state, sizeof(device_state),
+> > +                         dev_state_off);
+> > +    if (ret < 0) {
+> > +        ret = vfio_mig_read(vbasedev, &device_state, sizeof(device_state),
+> > +                          dev_state_off);
+> > +        if (ret < 0) {
+> > +            return ret;
+> > +        }
+> > +
+> > +        if (VFIO_DEVICE_STATE_IS_ERROR(device_state)) {
+> > +            hw_error("%s: Device is in error state 0x%x",
+> > +                     vbasedev->name, device_state);
+> > +            return -EFAULT;
+> 
+> Is -EFAULT a good return value here? Maybe -EIO?
+> 
+> > +        }
+> > +    }
+> > +
+> > +    vbasedev->device_state = device_state;
+> > +    trace_vfio_migration_set_state(vbasedev->name, device_state);
+> > +    return 0;
+> > +}
+> > +
+> > +static void vfio_vmstate_change(void *opaque, int running, RunState state)
+> > +{
+> > +    VFIODevice *vbasedev = opaque;
+> > +
+> > +    if ((vbasedev->vm_running != running)) {
+> > +        int ret;
+> > +        uint32_t value = 0, mask = 0;
+> > +
+> > +        if (running) {
+> > +            value = VFIO_DEVICE_STATE_RUNNING;
+> > +            if (vbasedev->device_state & VFIO_DEVICE_STATE_RESUMING) {
+> > +                mask = ~VFIO_DEVICE_STATE_RESUMING;
+> 
+> I've been staring at this for some time and I think that the desired
+> result is
+> - set _RUNNING
+> - if _RESUMING was set, clear it, but leave the other bits intact
+> - if _RESUMING was not set, clear everything previously set
+> This would really benefit from a comment (or am I the only one
+> struggling here?)
+> 
+> > +            }
+> > +        } else {
+> > +            mask = ~VFIO_DEVICE_STATE_RUNNING;
+> > +        }
+> > +
+> > +        ret = vfio_migration_set_state(vbasedev, mask, value);
+> > +        if (ret) {
+> > +            /*
+> > +             * vm_state_notify() doesn't support reporting failure. If such
+> > +             * error reporting support added in furure, migration should be
+> > +             * aborted.
+> 
+> 
+> "We should abort the migration in this case, but vm_state_notify()
+> currently does not support reporting failures."
+> 
+> ?
+> 
+> Can/should we mark the failing device in some way?
 
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
-Acked-by: Markus Armbruster <armbru@redhat.com>
-Acked-by: Kevin Wolf <kwolf@redhat.com>
+I think you can call qemu_file_set_error on the migration stream to
+force an error.
 
---
+Dave
 
-v4 changes:
- - squashed format update with test output update
----
- block/qapi.c               |   18 +++++++++++++----
- block/qcow2-snapshot.c     |    2 ++
- blockdev.c                 |   10 +++++++++
- include/block/snapshot.h   |    1 +
- migration/savevm.c         |    5 +++++
- qapi/block-core.json       |   10 +++++++--
- stubs/replay.c             |    5 +++++
- tests/qemu-iotests/267.out |   48 ++++++++++++++++++++++----------------------
- 8 files changed, 69 insertions(+), 30 deletions(-)
-
-diff --git a/block/qapi.c b/block/qapi.c
-index f423ece98c..1086ee0c76 100644
---- a/block/qapi.c
-+++ b/block/qapi.c
-@@ -230,6 +230,8 @@ int bdrv_query_snapshot_info_list(BlockDriverState *bs,
-         info->date_nsec     = sn_tab[i].date_nsec;
-         info->vm_clock_sec  = sn_tab[i].vm_clock_nsec / 1000000000;
-         info->vm_clock_nsec = sn_tab[i].vm_clock_nsec % 1000000000;
-+        info->icount        = sn_tab[i].icount;
-+        info->has_icount    = sn_tab[i].icount != -1ULL;
- 
-         info_list = g_new0(SnapshotInfoList, 1);
-         info_list->value = info;
-@@ -694,14 +696,15 @@ BlockStatsList *qmp_query_blockstats(bool has_query_nodes,
- void bdrv_snapshot_dump(QEMUSnapshotInfo *sn)
- {
-     char date_buf[128], clock_buf[128];
-+    char icount_buf[128] = {0};
-     struct tm tm;
-     time_t ti;
-     int64_t secs;
-     char *sizing = NULL;
- 
-     if (!sn) {
--        qemu_printf("%-10s%-20s%11s%20s%15s",
--                    "ID", "TAG", "VM SIZE", "DATE", "VM CLOCK");
-+        qemu_printf("%-10s%-18s%7s%20s%13s%11s",
-+                    "ID", "TAG", "VM SIZE", "DATE", "VM CLOCK", "ICOUNT");
-     } else {
-         ti = sn->date_sec;
-         localtime_r(&ti, &tm);
-@@ -715,11 +718,16 @@ void bdrv_snapshot_dump(QEMUSnapshotInfo *sn)
-                  (int)(secs % 60),
-                  (int)((sn->vm_clock_nsec / 1000000) % 1000));
-         sizing = size_to_str(sn->vm_state_size);
--        qemu_printf("%-10s%-20s%11s%20s%15s",
-+        if (sn->icount != -1ULL) {
-+            snprintf(icount_buf, sizeof(icount_buf),
-+                "%"PRId64, sn->icount);
-+        }
-+        qemu_printf("%-10s%-18s%7s%20s%13s%11s",
-                     sn->id_str, sn->name,
-                     sizing,
-                     date_buf,
--                    clock_buf);
-+                    clock_buf,
-+                    icount_buf);
-     }
-     g_free(sizing);
- }
-@@ -881,6 +889,8 @@ void bdrv_image_info_dump(ImageInfo *info)
-                 .date_nsec = elem->value->date_nsec,
-                 .vm_clock_nsec = elem->value->vm_clock_sec * 1000000000ULL +
-                                  elem->value->vm_clock_nsec,
-+                .icount = elem->value->has_icount ?
-+                          elem->value->icount : -1ULL,
-             };
- 
-             pstrcpy(sn.id_str, sizeof(sn.id_str), elem->value->id);
-diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
-index d68b25e0c5..2e98c7f4b6 100644
---- a/block/qcow2-snapshot.c
-+++ b/block/qcow2-snapshot.c
-@@ -663,6 +663,7 @@ int qcow2_snapshot_create(BlockDriverState *bs, QEMUSnapshotInfo *sn_info)
-     sn->date_sec = sn_info->date_sec;
-     sn->date_nsec = sn_info->date_nsec;
-     sn->vm_clock_nsec = sn_info->vm_clock_nsec;
-+    sn->icount = sn_info->icount;
-     sn->extra_data_size = sizeof(QCowSnapshotExtraData);
- 
-     /* Allocate the L1 table of the snapshot and copy the current one there. */
-@@ -1007,6 +1008,7 @@ int qcow2_snapshot_list(BlockDriverState *bs, QEMUSnapshotInfo **psn_tab)
-         sn_info->date_sec = sn->date_sec;
-         sn_info->date_nsec = sn->date_nsec;
-         sn_info->vm_clock_nsec = sn->vm_clock_nsec;
-+        sn_info->icount = sn->icount;
-     }
-     *psn_tab = sn_tab;
-     return s->nb_snapshots;
-diff --git a/blockdev.c b/blockdev.c
-index bebd3ba1c3..a6ae475dac 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -59,6 +59,7 @@
- #include "sysemu/arch_init.h"
- #include "sysemu/qtest.h"
- #include "sysemu/runstate.h"
-+#include "sysemu/replay.h"
- #include "qemu/cutils.h"
- #include "qemu/help_option.h"
- #include "qemu/main-loop.h"
-@@ -1190,6 +1191,10 @@ SnapshotInfo *qmp_blockdev_snapshot_delete_internal_sync(const char *device,
-     info->vm_state_size = sn.vm_state_size;
-     info->vm_clock_nsec = sn.vm_clock_nsec % 1000000000;
-     info->vm_clock_sec = sn.vm_clock_nsec / 1000000000;
-+    if (sn.icount != -1ULL) {
-+        info->icount = sn.icount;
-+        info->has_icount = true;
-+    }
- 
-     return info;
- 
-@@ -1350,6 +1355,11 @@ static void internal_snapshot_prepare(BlkActionState *common,
-     sn->date_sec = tv.tv_sec;
-     sn->date_nsec = tv.tv_usec * 1000;
-     sn->vm_clock_nsec = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    if (replay_mode != REPLAY_MODE_NONE) {
-+        sn->icount = replay_get_current_icount();
-+    } else {
-+        sn->icount = -1ULL;
-+    }
- 
-     ret1 = bdrv_snapshot_create(bs, sn);
-     if (ret1 < 0) {
-diff --git a/include/block/snapshot.h b/include/block/snapshot.h
-index 2bfcd57578..b0fe42993d 100644
---- a/include/block/snapshot.h
-+++ b/include/block/snapshot.h
-@@ -42,6 +42,7 @@ typedef struct QEMUSnapshotInfo {
-     uint32_t date_sec; /* UTC date of the snapshot */
-     uint32_t date_nsec;
-     uint64_t vm_clock_nsec; /* VM clock relative to boot */
-+    uint64_t icount; /* record/replay step */
- } QEMUSnapshotInfo;
- 
- int bdrv_snapshot_find(BlockDriverState *bs, QEMUSnapshotInfo *sn_info,
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 34e4b71052..0e8dc78684 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -2723,6 +2723,11 @@ int save_snapshot(const char *name, Error **errp)
-     sn->date_sec = tv.tv_sec;
-     sn->date_nsec = tv.tv_usec * 1000;
-     sn->vm_clock_nsec = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    if (replay_mode != REPLAY_MODE_NONE) {
-+        sn->icount = replay_get_current_icount();
-+    } else {
-+        sn->icount = -1ULL;
-+    }
- 
-     if (name) {
-         ret = bdrv_snapshot_find(bs, old_sn, name);
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 3c16f1e11d..2135a61432 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -27,13 +27,18 @@
- #
- # @vm-clock-nsec: fractional part in nano seconds to be used with vm-clock-sec
- #
-+# @icount: Current instruction count. Appears when execution record/replay
-+#          is enabled. Used for "time-traveling" to match the moment
-+#          in the recorded execution with the snapshots. (since 5.2)
-+#
- # Since: 1.3
- #
- ##
- { 'struct': 'SnapshotInfo',
-   'data': { 'id': 'str', 'name': 'str', 'vm-state-size': 'int',
-             'date-sec': 'int', 'date-nsec': 'int',
--            'vm-clock-sec': 'int', 'vm-clock-nsec': 'int' } }
-+            'vm-clock-sec': 'int', 'vm-clock-nsec': 'int',
-+            '*icount': 'int' } }
- 
- ##
- # @ImageInfoSpecificQCow2EncryptionBase:
-@@ -5527,7 +5532,8 @@
- #                    "date-sec": 1000012,
- #                    "date-nsec": 10,
- #                    "vm-clock-sec": 100,
--#                    "vm-clock-nsec": 20
-+#                    "vm-clock-nsec": 20,
-+#                    "icount": 220414
- #      }
- #    }
- #
-diff --git a/stubs/replay.c b/stubs/replay.c
-index 5974ec1f50..eacb366aa8 100644
---- a/stubs/replay.c
-+++ b/stubs/replay.c
-@@ -88,3 +88,8 @@ int replay_read_random(void *buf, size_t len)
- {
-     return 0;
- }
-+
-+uint64_t replay_get_current_icount(void)
-+{
-+    return 0;
-+}
-diff --git a/tests/qemu-iotests/267.out b/tests/qemu-iotests/267.out
-index 215902b3ad..27471ffae8 100644
---- a/tests/qemu-iotests/267.out
-+++ b/tests/qemu-iotests/267.out
-@@ -33,8 +33,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) savevm snap0
- (qemu) info snapshots
- List of snapshots present on all disks:
--ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-+ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
-+--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
- (qemu) loadvm snap0
- (qemu) quit
- 
-@@ -44,8 +44,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) savevm snap0
- (qemu) info snapshots
- List of snapshots present on all disks:
--ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-+ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
-+--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
- (qemu) loadvm snap0
- (qemu) quit
- 
-@@ -69,8 +69,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) savevm snap0
- (qemu) info snapshots
- List of snapshots present on all disks:
--ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-+ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
-+--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
- (qemu) loadvm snap0
- (qemu) quit
- 
-@@ -94,8 +94,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) savevm snap0
- (qemu) info snapshots
- List of snapshots present on all disks:
--ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-+ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
-+--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
- (qemu) loadvm snap0
- (qemu) quit
- 
-@@ -105,8 +105,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) savevm snap0
- (qemu) info snapshots
- List of snapshots present on all disks:
--ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-+ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
-+--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
- (qemu) loadvm snap0
- (qemu) quit
- 
-@@ -119,8 +119,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) savevm snap0
- (qemu) info snapshots
- List of snapshots present on all disks:
--ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-+ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
-+--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
- (qemu) loadvm snap0
- (qemu) quit
- 
-@@ -134,8 +134,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) savevm snap0
- (qemu) info snapshots
- List of snapshots present on all disks:
--ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-+ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
-+--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
- (qemu) loadvm snap0
- (qemu) quit
- 
-@@ -145,15 +145,15 @@ QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) savevm snap0
- (qemu) info snapshots
- List of snapshots present on all disks:
--ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-+ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
-+--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
- (qemu) loadvm snap0
- (qemu) quit
- 
- Internal snapshots on overlay:
- Snapshot list:
--ID        TAG                 VM SIZE                DATE       VM CLOCK
--1         snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-+ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
-+1         snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
- Internal snapshots on backing file:
- 
- === -blockdev with NBD server on the backing file ===
-@@ -166,17 +166,17 @@ QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) savevm snap0
- (qemu) info snapshots
- List of snapshots present on all disks:
--ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-+ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
-+--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
- (qemu) loadvm snap0
- (qemu) quit
- 
- Internal snapshots on overlay:
- Snapshot list:
--ID        TAG                 VM SIZE                DATE       VM CLOCK
--1         snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-+ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
-+1         snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
- Internal snapshots on backing file:
- Snapshot list:
--ID        TAG                 VM SIZE                DATE       VM CLOCK
--1         snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-+ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
-+1         snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
- *** done
+> > +             */
+> > +            error_report("%s: Failed to set device state 0x%x",
+> > +                         vbasedev->name, value & mask);
+> > +        }
+> > +        vbasedev->vm_running = running;
+> > +        trace_vfio_vmstate_change(vbasedev->name, running, RunState_str(state),
+> > +                                  value & mask);
+> > +    }
+> > +}
+> > +
+> >  static int vfio_migration_init(VFIODevice *vbasedev,
+> >                                 struct vfio_region_info *info)
+> >  {
+> 
+> (...)
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
