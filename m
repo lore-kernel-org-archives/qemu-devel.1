@@ -2,88 +2,88 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33444C4727C
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 12:57:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F23BFC4727C
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 12:57:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66BEC20679
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 12:57:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5EFD020679
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 12:57:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N0mMUIDu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66BEC20679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wSFIJ4JE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EFD020679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNFC6-0000Gq-6T
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 08:57:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57150)
+	id 1kNFCd-000129-Ae
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 08:57:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54598)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kNFAZ-0006lz-MW
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 08:55:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24435)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kNFAR-000316-BQ
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 08:55:47 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601384138;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=aQ6mKk/Xvpoh0FwSh8rFgMjwPJbPcXVa/7jUk56NGb0=;
- b=N0mMUIDuGb7hvU9b+QLUCR1QcUWQmraEsNT9ShN03wlE5f3d/HfylAYo3zOFbdRacPD36r
- wFbJoMnUuW8X5fkeaADf/JK+s1/ZxUwwvrqChy2ZMCCSKoYnUHbLVYDi/A3ZoThM3hxdAc
- 6vJ7Cxm/0plaPoeO9c4gtvcDQUUHUHc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-563-83dlRuGOMcSYI-RR_JhMJQ-1; Tue, 29 Sep 2020 08:55:35 -0400
-X-MC-Unique: 83dlRuGOMcSYI-RR_JhMJQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A4D558D84AA;
- Tue, 29 Sep 2020 12:55:34 +0000 (UTC)
-Received: from localhost (ovpn-113-13.ams2.redhat.com [10.36.113.13])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8A39821ECD;
- Tue, 29 Sep 2020 12:55:25 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/4] util/vhost-user-server: use static library in
- meson.build
-Date: Tue, 29 Sep 2020 13:55:13 +0100
-Message-Id: <20200929125516.186715-2-stefanha@redhat.com>
-In-Reply-To: <20200929125516.186715-1-stefanha@redhat.com>
-References: <20200929125516.186715-1-stefanha@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kNF19-00051A-Vh
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 08:46:05 -0400
+Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:40114)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kNF16-0001Y1-4y
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 08:46:03 -0400
+Received: by mail-ej1-x642.google.com with SMTP id p15so14777315ejm.7
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 05:45:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=tiLWtIOYgRN9d6nagK7a0qiUslc8etCA4wEhaK9Yj9I=;
+ b=wSFIJ4JEwrN/2f6U+OrgN1MCPyJl+1UDK+Q9+872Dc5W+rVijHW3DMeAFyAsggY1ri
+ 45ldS+lBuAQplpLDXZ3C0EbGEg5/6Lg6KsnEXV3quCzGsa5mx73k+XrHEhc/8RZ3Mlo0
+ 9lqBbfW1xhJAZJPQTsKe8i11lZWHZ5s6XdEhOTVVfd/UO5JDY5oOvWLOU2CK8OOpbv84
+ BCJQK/1peR+yQCYSnfbi6pGoRMjZke+E4TVfAd7vBLQSL/H/KENupdMv373qzK68dZJY
+ CntOiF8aCfMwKbhulGDWlbVs8+4szSmrplcEvz71ftAVUDbr1xCXLAeIu49naLnkwSqL
+ 7DbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=tiLWtIOYgRN9d6nagK7a0qiUslc8etCA4wEhaK9Yj9I=;
+ b=rwDQGQIwH0/+1qHjE/HpGBSSbRj0w+ZVNlAvHxLgZ8sxbw4m7K70HFrbSqOVRh5piH
+ zxcnyGdyZxM1MGn2fc+Wg06RwtU8glNtYJ90HSD5N+LlyE9DlOBgJsu59yuTTJ0zOn1C
+ /PWyGVi3ms66I0e9+v7EAJ8XHnAAJCLxItihFKJMB+YvNyRKRDAKhTjWAG4j7nL6q0ax
+ CA6TOb6y+kmlB5nerXZlMeoloenMeWR+7urhfZrmADtS60r58XBsVvRenQdF+BMHqVEj
+ 5BesgqRhblM9t1SeE6Lvb3y8CVYax/V1/NE2uZQW0g7r9hvaUfd3pq6vDkDTie14A4Ss
+ d8lQ==
+X-Gm-Message-State: AOAM5325iVirADPO67O3uCvdUO//MUEoVv+JjHfydHhtzNmXufpVvbMP
+ IdUEd1ZplTX7DGWJPEucIjY8rLjvnD7FjXFXfBY5Xw==
+X-Google-Smtp-Source: ABdhPJx76C+JMbD197l1GKtmOpAJvOhmqmU/FD6p27ebv3CMMH+C4oILLsE093gY39b1jGD1Kl0t8roQmCqeXPSncRs=
+X-Received: by 2002:a17:906:24d6:: with SMTP id
+ f22mr3551451ejb.85.1601383558668; 
+ Tue, 29 Sep 2020 05:45:58 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 02:22:44
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -9
-X-Spam_score: -1.0
-X-Spam_bar: -
-X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MIME_BASE64_TEXT=1.741, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+References: <20200929111255.381871-1-mst@redhat.com>
+ <ed9c633d-63c0-4e84-4eb1-adf634416bec@redhat.com>
+In-Reply-To: <ed9c633d-63c0-4e84-4eb1-adf634416bec@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 29 Sep 2020 13:45:45 +0100
+Message-ID: <CAFEAcA-p3hZPi+xmNOgS4=Dd6EJV38n2=2B6rDiEvANDGF+oXA@mail.gmail.com>
+Subject: Re: [PULL 0/1] acpi: fixup
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::642;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x642.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,85 +97,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Coiby Xu <Coiby.Xu@gmail.com>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-RG9uJ3QgY29tcGlsZSBjb250cmliL2xpYnZob3N0LXVzZXIvbGlidmhvc3QtdXNlci5jIGFnYWlu
-LiBJbnN0ZWFkIGJ1aWxkCnRoZSBzdGF0aWMgbGlicmFyeSBvbmNlIGFuZCB0aGVuIHJldXNlIGl0
-IHRocm91Z2hvdXQgUUVNVS4KCkFsc28gc3dpdGNoIGZyb20gQ09ORklHX0xJTlVYIHRvIENPTkZJ
-R19WSE9TVF9VU0VSLCB3aGljaCBpcyB3aGF0IHRoZQp2aG9zdC11c2VyIHRvb2xzICh2aG9zdC11
-c2VyLWdwdSwgZXRjKSBkby4KClNpZ25lZC1vZmYtYnk6IFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFu
-aGFAcmVkaGF0LmNvbT4KLS0tCiBibG9jay9leHBvcnQvZXhwb3J0LmMgICAgICAgICAgICAgfCA4
-ICsrKystLS0tCiBibG9jay9leHBvcnQvbWVzb24uYnVpbGQgICAgICAgICAgfCAyICstCiBjb250
-cmliL2xpYnZob3N0LXVzZXIvbWVzb24uYnVpbGQgfCAxICsKIG1lc29uLmJ1aWxkICAgICAgICAg
-ICAgICAgICAgICAgICB8IDYgKysrKystCiB0ZXN0cy9xdGVzdC9tZXNvbi5idWlsZCAgICAgICAg
-ICAgfCAyICstCiB1dGlsL21lc29uLmJ1aWxkICAgICAgICAgICAgICAgICAgfCA0ICsrKy0KIDYg
-ZmlsZXMgY2hhbmdlZCwgMTUgaW5zZXJ0aW9ucygrKSwgOCBkZWxldGlvbnMoLSkKCmRpZmYgLS1n
-aXQgYS9ibG9jay9leHBvcnQvZXhwb3J0LmMgYi9ibG9jay9leHBvcnQvZXhwb3J0LmMKaW5kZXgg
-YmQ3Y2FjMjQxZi4uNTUwODk3ZTIzNiAxMDA2NDQKLS0tIGEvYmxvY2svZXhwb3J0L2V4cG9ydC5j
-CisrKyBiL2Jsb2NrL2V4cG9ydC9leHBvcnQuYwpAQCAtMTcsMTcgKzE3LDE3IEBACiAjaW5jbHVk
-ZSAic3lzZW11L2Jsb2NrLWJhY2tlbmQuaCIKICNpbmNsdWRlICJibG9jay9leHBvcnQuaCIKICNp
-bmNsdWRlICJibG9jay9uYmQuaCIKLSNpZiBDT05GSUdfTElOVVgKLSNpbmNsdWRlICJibG9jay9l
-eHBvcnQvdmhvc3QtdXNlci1ibGstc2VydmVyLmgiCi0jZW5kaWYKICNpbmNsdWRlICJxYXBpL2Vy
-cm9yLmgiCiAjaW5jbHVkZSAicWFwaS9xYXBpLWNvbW1hbmRzLWJsb2NrLWV4cG9ydC5oIgogI2lu
-Y2x1ZGUgInFhcGkvcWFwaS1ldmVudHMtYmxvY2stZXhwb3J0LmgiCiAjaW5jbHVkZSAicWVtdS9p
-ZC5oIgorI2lmZGVmIENPTkZJR19WSE9TVF9VU0VSCisjaW5jbHVkZSAidmhvc3QtdXNlci1ibGst
-c2VydmVyLmgiCisjZW5kaWYKIAogc3RhdGljIGNvbnN0IEJsb2NrRXhwb3J0RHJpdmVyICpibGtf
-ZXhwX2RyaXZlcnNbXSA9IHsKICAgICAmYmxrX2V4cF9uYmQsCi0jaWYgQ09ORklHX0xJTlVYCisj
-aWZkZWYgQ09ORklHX1ZIT1NUX1VTRVIKICAgICAmYmxrX2V4cF92aG9zdF91c2VyX2JsaywKICNl
-bmRpZgogfTsKZGlmZiAtLWdpdCBhL2Jsb2NrL2V4cG9ydC9tZXNvbi5idWlsZCBiL2Jsb2NrL2V4
-cG9ydC9tZXNvbi5idWlsZAppbmRleCBlZjNhOTU3NmY3Li40NjlhN2FhMGY1IDEwMDY0NAotLS0g
-YS9ibG9jay9leHBvcnQvbWVzb24uYnVpbGQKKysrIGIvYmxvY2svZXhwb3J0L21lc29uLmJ1aWxk
-CkBAIC0xLDIgKzEsMiBAQAogYmxvY2tfc3MuYWRkKGZpbGVzKCdleHBvcnQuYycpKQotYmxvY2tf
-c3MuYWRkKHdoZW46ICdDT05GSUdfTElOVVgnLCBpZl90cnVlOiBmaWxlcygndmhvc3QtdXNlci1i
-bGstc2VydmVyLmMnLCAnLi4vLi4vY29udHJpYi9saWJ2aG9zdC11c2VyL2xpYnZob3N0LXVzZXIu
-YycpKQorYmxvY2tfc3MuYWRkKHdoZW46ICdDT05GSUdfVkhPU1RfVVNFUicsIGlmX3RydWU6IGZp
-bGVzKCd2aG9zdC11c2VyLWJsay1zZXJ2ZXIuYycpKQpkaWZmIC0tZ2l0IGEvY29udHJpYi9saWJ2
-aG9zdC11c2VyL21lc29uLmJ1aWxkIGIvY29udHJpYi9saWJ2aG9zdC11c2VyL21lc29uLmJ1aWxk
-CmluZGV4IGU2OGRkMWE1ODEuLmEyNjFlNzY2NWYgMTAwNjQ0Ci0tLSBhL2NvbnRyaWIvbGlidmhv
-c3QtdXNlci9tZXNvbi5idWlsZAorKysgYi9jb250cmliL2xpYnZob3N0LXVzZXIvbWVzb24uYnVp
-bGQKQEAgLTEsMyArMSw0IEBACiBsaWJ2aG9zdF91c2VyID0gc3RhdGljX2xpYnJhcnkoJ3Zob3N0
-LXVzZXInLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGZpbGVzKCdsaWJ2aG9zdC11
-c2VyLmMnLCAnbGlidmhvc3QtdXNlci1nbGliLmMnKSwKICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBidWlsZF9ieV9kZWZhdWx0OiBmYWxzZSkKK3Zob3N0X3VzZXIgPSBkZWNsYXJlX2Rl
-cGVuZGVuY3kobGlua193aXRoOiBsaWJ2aG9zdF91c2VyKQpkaWZmIC0tZ2l0IGEvbWVzb24uYnVp
-bGQgYi9tZXNvbi5idWlsZAppbmRleCA0YzZjNzMxMGZhLi5lYjg0Yjk3ZWJiIDEwMDY0NAotLS0g
-YS9tZXNvbi5idWlsZAorKysgYi9tZXNvbi5idWlsZApAQCAtNzg4LDYgKzc4OCwxMSBAQCB0cmFj
-ZV9ldmVudHNfc3ViZGlycyArPSBbCiAgICd1dGlsJywKIF0KIAordmhvc3RfdXNlciA9IG5vdF9m
-b3VuZAoraWYgJ0NPTkZJR19WSE9TVF9VU0VSJyBpbiBjb25maWdfaG9zdAorICBzdWJkaXIoJ2Nv
-bnRyaWIvbGlidmhvc3QtdXNlcicpCitlbmRpZgorCiBzdWJkaXIoJ3FhcGknKQogc3ViZGlyKCdx
-b2JqZWN0JykKIHN1YmRpcignc3R1YnMnKQpAQCAtMTE2OSw3ICsxMTc0LDYgQEAgaWYgaGF2ZV90
-b29scwogICAgICAgICAgICAgIGluc3RhbGw6IHRydWUpCiAKICAgaWYgJ0NPTkZJR19WSE9TVF9V
-U0VSJyBpbiBjb25maWdfaG9zdAotICAgIHN1YmRpcignY29udHJpYi9saWJ2aG9zdC11c2VyJykK
-ICAgICBzdWJkaXIoJ2NvbnRyaWIvdmhvc3QtdXNlci1ibGsnKQogICAgIHN1YmRpcignY29udHJp
-Yi92aG9zdC11c2VyLWdwdScpCiAgICAgc3ViZGlyKCdjb250cmliL3Zob3N0LXVzZXItaW5wdXQn
-KQpkaWZmIC0tZ2l0IGEvdGVzdHMvcXRlc3QvbWVzb24uYnVpbGQgYi90ZXN0cy9xdGVzdC9tZXNv
-bi5idWlsZAppbmRleCBjNzI4MjFiMDlhLi5hYThkMDk4NWUxIDEwMDY0NAotLS0gYS90ZXN0cy9x
-dGVzdC9tZXNvbi5idWlsZAorKysgYi90ZXN0cy9xdGVzdC9tZXNvbi5idWlsZApAQCAtMTkxLDcg
-KzE5MSw3IEBAIHFvc190ZXN0X3NzLmFkZCgKICkKIHFvc190ZXN0X3NzLmFkZCh3aGVuOiAnQ09O
-RklHX1ZJUlRGUycsIGlmX3RydWU6IGZpbGVzKCd2aXJ0aW8tOXAtdGVzdC5jJykpCiBxb3NfdGVz
-dF9zcy5hZGQod2hlbjogJ0NPTkZJR19WSE9TVF9VU0VSJywgaWZfdHJ1ZTogZmlsZXMoJ3Zob3N0
-LXVzZXItdGVzdC5jJykpCi1xb3NfdGVzdF9zcy5hZGQod2hlbjogJ0NPTkZJR19MSU5VWCcsIGlm
-X3RydWU6IGZpbGVzKCd2aG9zdC11c2VyLWJsay10ZXN0LmMnKSkKK3Fvc190ZXN0X3NzLmFkZCh3
-aGVuOiAnQ09ORklHX1ZIT1NUX1VTRVInLCBpZl90cnVlOiBmaWxlcygndmhvc3QtdXNlci1ibGst
-dGVzdC5jJykpCiAKIGV4dHJhX3F0ZXN0X2RlcHMgPSB7CiAgICdiaW9zLXRhYmxlcy10ZXN0Jzog
-W2lvXSwKZGlmZiAtLWdpdCBhL3V0aWwvbWVzb24uYnVpbGQgYi91dGlsL21lc29uLmJ1aWxkCmlu
-ZGV4IDIyOTZlODFiMzQuLjliMmE3YTVkZTkgMTAwNjQ0Ci0tLSBhL3V0aWwvbWVzb24uYnVpbGQK
-KysrIGIvdXRpbC9tZXNvbi5idWlsZApAQCAtNjYsNyArNjYsOSBAQCBpZiBoYXZlX2Jsb2NrCiAg
-IHV0aWxfc3MuYWRkKGZpbGVzKCdtYWluLWxvb3AuYycpKQogICB1dGlsX3NzLmFkZChmaWxlcygn
-bnZkaW1tLXV0aWxzLmMnKSkKICAgdXRpbF9zcy5hZGQoZmlsZXMoJ3FlbXUtY29yb3V0aW5lLmMn
-LCAncWVtdS1jb3JvdXRpbmUtbG9jay5jJywgJ3FlbXUtY29yb3V0aW5lLWlvLmMnKSkKLSAgdXRp
-bF9zcy5hZGQod2hlbjogJ0NPTkZJR19MSU5VWCcsIGlmX3RydWU6IGZpbGVzKCd2aG9zdC11c2Vy
-LXNlcnZlci5jJykpCisgIHV0aWxfc3MuYWRkKHdoZW46ICdDT05GSUdfVkhPU1RfVVNFUicsIGlm
-X3RydWU6IFsKKyAgICBmaWxlcygndmhvc3QtdXNlci1zZXJ2ZXIuYycpLCB2aG9zdF91c2VyCisg
-IF0pCiAgIHV0aWxfc3MuYWRkKGZpbGVzKCdibG9jay1oZWxwZXJzLmMnKSkKICAgdXRpbF9zcy5h
-ZGQoZmlsZXMoJ3FlbXUtY29yb3V0aW5lLXNsZWVwLmMnKSkKICAgdXRpbF9zcy5hZGQoZmlsZXMo
-J3FlbXUtY28tc2hhcmVkLXJlc291cmNlLmMnKSkKLS0gCjIuMjYuMgoK
+On Tue, 29 Sep 2020 at 13:36, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> On 9/29/20 1:13 PM, Michael S. Tsirkin wrote:
+> > The following changes since commit 213057383c9f73a17cfe635b204d88e11f91=
+8df1:
+> >
+> >   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into sta=
+ging (2020-09-29 11:10:29 +0100)
+> >
+> > are available in the Git repository at:
+> >
+> >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+> >
+> > for you to fetch changes up to f142e4ede72853aaa7d306bc79b099caed45769b=
+:
+> >
+> >   tests/acpi: drop unnecessary files (2020-09-29 07:10:37 -0400)
+> >
+> > ----------------------------------------------------------------
+> > acpi: fixup
+> >
+> > My last pull included a ton of useless files by mistake.
+> > Drop them all.
+> >
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>
+> It might be cleaner to directly apply this as a "buildsys fix",
+> sometimes Peter accepts to do it.
 
+I apply patches directly sometimes to avoid somebody else having
+to construct a pullreq just containing a patch. In this case we
+started off with a pullreq anyway...
+
+thanks
+-- PMM
 
