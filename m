@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E246DC4727C
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 12:50:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7E69C4727C
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 12:51:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DAF72083B
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 12:50:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DAF72083B
+	by mail.kernel.org (Postfix) with ESMTPS id 1F9BC2145D
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 12:51:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F9BC2145D
 Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNF5P-0001GY-S4
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 08:50:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53400)
+	id 1kNF60-0001sU-4U
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 08:51:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53210)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kNEwf-0007wv-L1; Tue, 29 Sep 2020 08:41:25 -0400
-Received: from relay.sw.ru ([185.231.240.75]:35052 helo=relay3.sw.ru)
+ id 1kNEvt-0006w5-3t; Tue, 29 Sep 2020 08:40:40 -0400
+Received: from relay.sw.ru ([185.231.240.75]:34822 helo=relay3.sw.ru)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kNEwa-0000hc-AB; Tue, 29 Sep 2020 08:41:25 -0400
+ id 1kNEvp-0000Rt-Dw; Tue, 29 Sep 2020 08:40:36 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay3.sw.ru with esmtp (Exim 4.94)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kNEw0-002EOe-Nx; Tue, 29 Sep 2020 15:40:44 +0300
+ id 1kNEvE-002EOe-NH; Tue, 29 Sep 2020 15:39:56 +0300
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com,
  stefanha@redhat.com, fam@euphon.net, jsnow@redhat.com, armbru@redhat.com,
  eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com,
  andrey.shinkevich@virtuozzo.com
-Subject: [PATCH v10 6/9] copy-on-read: skip non-guest reads if no copy needed
-Date: Tue, 29 Sep 2020 15:38:26 +0300
-Message-Id: <1601383109-110988-7-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v10 4/9] copy-on-read: pass base node name to COR driver
+Date: Tue, 29 Sep 2020 15:38:24 +0300
+Message-Id: <1601383109-110988-5-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1601383109-110988-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1601383109-110988-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -72,55 +72,61 @@ Sender: "Qemu-devel"
 Reply-to: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 From: Andrey Shinkevich via <qemu-devel@nongnu.org>
 
-If the flag BDRV_REQ_PREFETCH was set, pass it further to the
-COR-driver to skip unneeded reading. It can be taken into account for
-the COR-algorithms optimization. That check is being made during the
-block stream job by the moment.
+To limit the guest's COR operations by the base node in the backing
+chain during stream job, pass the base node name to the copy-on-read
+driver. The rest of the functionality will be implemented in the patch
+that follows.
 
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- block/copy-on-read.c | 14 ++++++++++----
- block/io.c           |  2 +-
- 2 files changed, 11 insertions(+), 5 deletions(-)
+ block/copy-on-read.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
 diff --git a/block/copy-on-read.c b/block/copy-on-read.c
-index f53f7e0..5389dca 100644
+index 3c8231f..e04092f 100644
 --- a/block/copy-on-read.c
 +++ b/block/copy-on-read.c
-@@ -145,10 +145,16 @@ static int coroutine_fn cor_co_preadv_part(BlockDriverState *bs,
-             }
-         }
+@@ -24,19 +24,23 @@
+ #include "block/block_int.h"
+ #include "qemu/module.h"
+ #include "qapi/error.h"
++#include "qapi/qmp/qerror.h"
+ #include "qapi/qmp/qdict.h"
+ #include "block/copy-on-read.h"
  
--        ret = bdrv_co_preadv_part(bs->file, offset, n, qiov, qiov_offset,
--                                  local_flags);
--        if (ret < 0) {
--            return ret;
-+        if ((flags & BDRV_REQ_PREFETCH) &
-+            !(local_flags & BDRV_REQ_COPY_ON_READ)) {
-+            /* Skip non-guest reads if no copy needed */
-+        } else {
-+
-+            ret = bdrv_co_preadv_part(bs->file, offset, n, qiov, qiov_offset,
-+                                      local_flags);
-+            if (ret < 0) {
-+                return ret;
-+            }
-         }
  
-         offset += n;
-diff --git a/block/io.c b/block/io.c
-index 11df188..62b75a5 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -1388,7 +1388,7 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
-             qemu_iovec_init_buf(&local_qiov, bounce_buffer, pnum);
+ typedef struct BDRVStateCOR {
+     bool active;
++    BlockDriverState *base_bs;
+ } BDRVStateCOR;
  
-             ret = bdrv_driver_preadv(bs, cluster_offset, pnum,
--                                     &local_qiov, 0, 0);
-+                                     &local_qiov, 0, flags & BDRV_REQ_PREFETCH);
-             if (ret < 0) {
-                 goto err;
-             }
+ 
+ static int cor_open(BlockDriverState *bs, QDict *options, int flags,
+                     Error **errp)
+ {
++    BlockDriverState *base_bs = NULL;
+     BDRVStateCOR *state = bs->opaque;
++    const char *base_node = qdict_get_try_str(options, "base");
+ 
+     bs->file = bdrv_open_child(NULL, options, "file", bs, &child_of_bds,
+                                BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY,
+@@ -52,7 +56,16 @@ static int cor_open(BlockDriverState *bs, QDict *options, int flags,
+         ((BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_NO_FALLBACK) &
+             bs->file->bs->supported_zero_flags);
+ 
++    if (base_node) {
++        qdict_del(options, "base");
++        base_bs = bdrv_lookup_bs(NULL, base_node, errp);
++        if (!base_bs) {
++            error_setg(errp, QERR_BASE_NOT_FOUND, base_node);
++            return -EINVAL;
++        }
++    }
+     state->active = true;
++    state->base_bs = base_bs;
+ 
+     /*
+      * We don't need to call bdrv_child_refresh_perms() now as the permissions
 -- 
 1.8.3.1
 
