@@ -2,88 +2,69 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F71C4741F
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 14:56:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FDF8C4727C
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 15:06:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F280A2076B
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 14:56:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 26C732076B
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 15:06:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F+aIZlGs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F280A2076B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="gbTgtP4K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26C732076B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38112 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNH2v-0005su-Ox
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 10:56:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34024)
+	id 1kNHDS-0003vE-R9
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 11:06:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36144)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
- id 1kNH1A-0004HY-UQ; Tue, 29 Sep 2020 10:54:12 -0400
-Received: from mail-oi1-x232.google.com ([2607:f8b0:4864:20::232]:32802)
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1kNH9b-0001Dw-QS; Tue, 29 Sep 2020 11:02:56 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:51296)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
- id 1kNH18-0003gp-P4; Tue, 29 Sep 2020 10:54:12 -0400
-Received: by mail-oi1-x232.google.com with SMTP id m7so5778841oie.0;
- Tue, 29 Sep 2020 07:54:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=wDyOV+2IqsNaikDuoZQo4vsGpBCfgsOifh/LZ3kHFUo=;
- b=F+aIZlGsD4/8+sntiRQ4wEMi5JH13WJt7H06vCtv/MWWM00ed1jXiqXYRqoLKKXF3S
- 2aoWV2q7OCiX6xfZTfR4rV2DyEEa2T9ThAn05RiO+cgts0E+fCToPQXwwPxUDzLJUDM+
- J/3GfZb8rkov0xn0BO+5oZZ8S7GaQKPmidWSSnnWp0lshq2S/ybhmYsfavcYmivLeG+m
- qRMFZ1sU/JyJ/MKvlXlaMof+7x8iuViEdP+rHBTwi7Afjnap9yFG7hwFGSEEyUYi3fIy
- 6GObjDSIZwHOa99qo61VhNP2MptSNIZ3rCPyhvPZ886C/QoRZ5DDqCh0pwqUUxrdcxky
- iraQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=wDyOV+2IqsNaikDuoZQo4vsGpBCfgsOifh/LZ3kHFUo=;
- b=Ljszpl3UssP2JJXmqW8puNDJDKeZ4Atli2JJMl1ysF7If6bzv1AV1AVxLpQjHw+u+g
- c+1oHZf4FZbCO/x5KEnc4Ifg8DVVRgQVLhpdXRS9Yu0eL7/tHIZWayDN+XB/ob5ll4Ua
- HyOzx/Tm28VGR5CDGishvpHol3RG6uvyLz5PqPSlkk7AiuM+EhJb5PcTulVxpGcibThd
- O8LmYPPZft/OIihWVT9f5GXItj1WdD4NO2G1k+6BTJG9L2tziCES/jB23YFnVGBrMZyZ
- ZD94gMgcd8iTvwmQ3DiPHXsEh7Wb4fvYMbIf2yuh8T1/xJ10QPJ3x/JVpcC12Sd0yRRO
- QOSA==
-X-Gm-Message-State: AOAM531HYHDryVcbqArq//r6C2L1bbp1jZWZ/VfpUIdU6cB2k8kEOkeq
- hhuL7yqv1j99DHHG1LZQ0nYYlbwYZfj9/1P5Rhs=
-X-Google-Smtp-Source: ABdhPJwKeUqWoI6mhmTOU8XIIhn/GRhza266/2TbqeyWU3A7NIhFt+8KZbWIXFRqqD91oJDvbR3IMoExAdOJ9TnCpAw=
-X-Received: by 2002:a54:4d88:: with SMTP id y8mr2885891oix.97.1601391248775;
- Tue, 29 Sep 2020 07:54:08 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1kNH9Y-0005BP-WE; Tue, 29 Sep 2020 11:02:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=tQn2+j6CvjanyRo+MaWRASd8g8G9azr4yhSXHzpCucc=; 
+ b=gbTgtP4KVIy/GKue7h4yH5jANTGIL6UYLfvWOumbQxWuulSadZ9DJLPVBXxQ6++Ajoi8Ncy3YwqaxA5agbwxgNoMYcETjnBfyI6elbXfzGDGgza7QYrU5tQknL9F62HyGhLXEH4MRg8IrJhyBMe7eJ0XEIyJtQplAB4oXsnLDOoamJkSX5Ht2qRKzWQkFL4A+YxlJpp7My2oU3OnB4T43sh96LsvRTuwitCpPsRxGcmhyAVFjGnTv1seMpNQ7zzJwi3yoA5Kipmll7poQlEz96b+aNue9I9Eo+pQFWuSOe+8okiOp7gbfptd2fDzOoUT10Qn6wQjgcYE3UIsnvRBlw==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1kNH9V-0006oa-Bh; Tue, 29 Sep 2020 17:02:49 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1kNH9V-0006PL-1I; Tue, 29 Sep 2020 17:02:49 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu block <qemu-block@nongnu.org>
+Subject: Re: qcow2 merge_cow() question
+In-Reply-To: <20684b8e-4f13-794a-f3d2-974ba380277b@virtuozzo.com>
+References: <b44aafbf-bd00-3bc0-68c4-5cc01a6b8b01@virtuozzo.com>
+ <w51wo1si2jv.fsf@maestria.local.igalia.com>
+ <20684b8e-4f13-794a-f3d2-974ba380277b@virtuozzo.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Tue, 29 Sep 2020 17:02:49 +0200
+Message-ID: <w51lfgspqw6.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-References: <20200903183138.2161977-1-ppandit@redhat.com>
- <CAKXe6SLv1HX5_ty2SP5F_MkVKYO-tz5fNOKhpqZr0mH_ePypSA@mail.gmail.com>
- <nycvar.YSQ.7.78.906.2009181427350.10832@xnncv>
- <CAKXe6SL6BFErCqk+AJt2iQiQsCN_EvHJCur=Y8J1yz7F_c8t4A@mail.gmail.com>
- <nycvar.YSQ.7.78.906.2009291106100.10832@xnncv>
-In-Reply-To: <nycvar.YSQ.7.78.906.2009291106100.10832@xnncv>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Tue, 29 Sep 2020 22:53:32 +0800
-Message-ID: <CAKXe6SKBhVXfvAxQDUTjc7PeR5PPiOMHfZxLSmoQcgYYFcftfQ@mail.gmail.com>
-Subject: Re: [PATCH v2] hw/ide: check null block before _cancel_dma_sync
-To: P J P <ppandit@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::232;
- envelope-from=liq3ea@gmail.com; helo=mail-oi1-x232.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Content-Type: text/plain
+Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
+ helo=fanzine.igalia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 11:02:50
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,115 +78,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ruhr-University <bugs-syssec@rub.de>, John Snow <jsnow@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- qemu-block@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-P J P <ppandit@redhat.com> =E4=BA=8E2020=E5=B9=B49=E6=9C=8829=E6=97=A5=E5=
-=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=882:22=E5=86=99=E9=81=93=EF=BC=9A
+On Fri 21 Aug 2020 03:42:29 PM CEST, Vladimir Sementsov-Ogievskiy wrote:
+>>> What are these ifs for?
+>>>
+>>>             /* The data (middle) region must be immediately after the
+>>>              * start region */
+>>>             if (l2meta_cow_start(m) + m->cow_start.nb_bytes != offset) {
+>>>                 continue;
+>>>             }
+>>>                                                                                                             
+>>>             /* The end region must be immediately after the data (middle)
+>>>              * region */
+>>>             if (m->offset + m->cow_end.offset != offset + bytes) {
+>>>                 continue;
+>>>             }
+>>>
+>>> How is it possible that data doesn't immediately follow start cow
+>>> region or end cow region doesn't immediately follow data region?
+>> 
+>> They are sanity checks. They maybe cannot happen in practice and in
+>> that case I suppose they should be replaced with assertions but this
+>> should be checked carefully. If I remember correctly I was wary of
+>> overlooking a case where this could happen.
+>> 
+>> In particular, that function receives only one data region but a list
+>> of QCowL2Meta objects. I think you can get more than one QCowL2Meta
+>> if the same request involves a mix of copied and newly allocated
+>> clusters, but that shouldn't be a problem either.
 >
->   Hello Li,
->
-> +-- On Fri, 18 Sep 2020, Li Qiang wrote --+
-> | P J P <ppandit@redhat.com> =E4=BA=8E2020=E5=B9=B49=E6=9C=8818=E6=97=A5=
-=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=886:26=E5=86=99=E9=81=93=EF=BC=9A
-> | > +-- On Fri, 18 Sep 2020, Li Qiang wrote --+
-> | > | Update v2: use an assert() call
-> | > |   ->https://lists.nongnu.org/archive/html/qemu-devel/2020-08/msg083=
-36.html
-> |
-> | In 'ide_ioport_write' the guest can set 'bus->unit' to 0 or 1 by issue
-> | 'ATA_IOPORT_WR_DEVICE_HEAD'. So this case the guest can set the active =
-ifs.
-> | If the guest set this to 1.
-> |
-> | Then in 'idebus_active_if' will return 'IDEBus.ifs[1]' and thus the 's-=
->blk'
-> | will be NULL.
->
-> Right, guest does select the drive via
->
->   portio_write
->    ->ide_ioport_write
->       case ATA_IOPORT_WR_DEVICE_HEAD:
->       /* FIXME: HOB readback uses bit 7 */
->       bus->ifs[0].select =3D (val & ~0x10) | 0xa0;
->       bus->ifs[1].select =3D (val | 0x10) | 0xa0;
->       /* select drive */
->       bus->unit =3D (val >> 4) & 1;     <=3D=3D set bus->unit=3D0x1
->       break;
->
->
-> | So from your (Peter's) saying, we need to check the value in
-> | 'ATA_IOPORT_WR_DEVICE_HEAD' handler. To say if the guest
-> | set a valid 'bus->unit'. This can also work I think.
->
-> Yes, with the following fix, an assert(3) in ide_cancel_dma_sync fails.
->
-> =3D=3D=3D
-> diff --git a/hw/ide/core.c b/hw/ide/core.c
-> index f76f7e5234..cb55cc8b0f 100644
-> --- a/hw/ide/core.c
-> +++ b/hw/ide/core.c
-> @@ -1300,7 +1300,11 @@ void ide_ioport_write(void *opaque, uint32_t addr,
-> uint_)
->          bus->ifs[0].select =3D (val & ~0x10) | 0xa0;
->          bus->ifs[1].select =3D (val | 0x10) | 0xa0;
->          /* select drive */
-> +        uint8_t bu =3D bus->unit;
->          bus->unit =3D (val >> 4) & 1;
-> +        if (!bus->ifs[bus->unit].blk) {
-> +            bus->unit =3D bu;
-> +        }
->          break;
->      default:
->
-> qemu-system-x86_64: ../hw/ide/core.c:724: ide_cancel_dma_sync: Assertion =
-`s->bus->dma->aiocb =3D=3D NULL' failed.
-> Aborted (core dumped)
+> OK, thanks. So, intuitively it shouldn't happen, but there should be
+> some careful investigation to change them to assertions.
 
-This is what I am worried, in the 'ide_ioport_write' set the
-'bus->unit'. It also change the 'buf->ifs[0].select'.
-Also there maybe some other corner case that causes some inconsistent.
-And if we choice this method we need to deep into the more ahci-spec to
-know how things really going.
+I was having a look at this and here's a simple example of how this can
+happen:
 
+qemu-img create -f qcow2 -o cluster_size=1k img.qcow2 1M
+qemu-io -c 'write 0 3k' img.qcow2
+qemu-io -c 'discard 0 1k' img.qcow2
+qemu-io -c 'discard 2k 1k' img.qcow2
+qemu-io -c 'write 512 2k' img.qcow2
 
-> =3D=3D=3D
->
-> | As we the 'ide_exec_cmd' and other functions in 'hw/ide/core.c' check t=
-he
-> | 's->blk' directly. I think we just check it in 'ide_cancel_dma_sync' is
-> | enough and also this is more consistent with the other functions.
-> | 'ide_cancel_dma_sync' is also called by 'cmd_device_reset' which is one=
- of
-> | the 'ide_cmd_table' handler.
->
->   Yes, I'm okay with either approach. Earlier patch v1 checks 's->blk' in
-> ide_cancel_dma_sync().
+The last write request can be performed with one single write operation
+but it needs to allocate clusters #0 and #2.
 
-I prefer the 'check the s->blk in the beginning of ide_cancel_dma_sync' met=
-hod.
-Some little different with your earlier patch.
+This means that merge_cow() is called with offset=512, bytes=2k and two
+QCowL2Meta structures:
 
-Anyway, let the maintainer do the choices.
+  - The first one with cow_start={0, 512} and cow_end={1k, 0} 
+  - The second one with cow_start={2k, 0} and cow_end={2560, 512}
 
-Thanks,
-Li Qiang
+In theory it should be possible to combine both into one that has
+cow_start={0, 512} and cow_end={2560, 512}, but I don't think this
+situation happens very often so I wouldn't go that way.
 
->
-> | BTW, where is the Peter's email saying this, just want to learn somethi=
-ng,
-> | :).
->
->   -> https://lists.nongnu.org/archive/html/qemu-devel/2020-09/msg05820.ht=
-ml
->
-> Thank you.
-> --
-> Prasad J Pandit / Red Hat Product Security Team
-> 8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
+In any case, the checks have to remain and they cannot be turned into
+assertions.
+
+Berto
 
