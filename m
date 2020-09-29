@@ -2,89 +2,93 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9465BC4346E
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 10:45:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F3AAC4727F
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 10:48:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09DAE207C4
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 10:45:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D5C67208FE
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 10:48:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b0fIAeGL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09DAE207C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="vz4kwuAq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5C67208FE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40824 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kND8U-0008Jl-2G
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 06:45:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51718)
+	id 1kNDB9-0001OQ-6T
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 06:48:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51988)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kND3v-0005Kt-4k
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 06:40:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60174)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kND3s-0007ts-UU
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 06:40:46 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601376044;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=KcoILg2/s37AiEPbHmeVFptZp6IgFWJx8mA+ThOIjho=;
- b=b0fIAeGLfOoz7Z+Nm+03MHAeT0X9yoXkMHXq9W+2GPTojg8P9ibzA61Pr9soYcykJIlYop
- AE8KgJ9HZAKJz0Diyc6CF0MLZ5yXN4yN+LA9H550EEsHvymziwv+O7oZf/YDU95TPOnzPF
- 6MWNHCoYcDcs6jHnSrqD6iw9Txydqs8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-591-PJVS7PtLOFSYllTuqCMMPw-1; Tue, 29 Sep 2020 06:40:37 -0400
-X-MC-Unique: PJVS7PtLOFSYllTuqCMMPw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3985C8018A9;
- Tue, 29 Sep 2020 10:40:35 +0000 (UTC)
-Received: from work-vm (ovpn-114-253.ams2.redhat.com [10.36.114.253])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2E8E15D9CA;
- Tue, 29 Sep 2020 10:40:22 +0000 (UTC)
-Date: Tue, 29 Sep 2020 11:40:19 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH v26 17/17] qapi: Add VFIO devices migration stats in
- Migration stats
-Message-ID: <20200929104019.GE2826@work-vm>
-References: <1600817059-26721-1-git-send-email-kwankhede@nvidia.com>
- <1600817059-26721-18-git-send-email-kwankhede@nvidia.com>
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kND5A-0005kJ-CG
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 06:42:04 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35640)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kND55-00084o-IN
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 06:42:04 -0400
+Received: by mail-wm1-x344.google.com with SMTP id y15so4281095wmi.0
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 03:41:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=HZp+rtPuU6+c4RbuMZg1Y64RBvx8DDZ88ey0JM1oGqE=;
+ b=vz4kwuAqns0WLW9CiyVPV5KjYTs9cAPMaGelaIWIKV5RWd763ZdLGj2RqIBY9ix1Zc
+ 5uJUDrtAQwRXPqWFMB+ximhtwnHVXiybuHakS3GoPZlzUGib+G43ivfM3ux8fEK7YcZd
+ r5SmbR/Iac6XUf2aiuy0CQXTviNH1tM6nbmyMDs4BYAmV874sFw4SwGAhJPnOb/z1lbB
+ En6e3ewWm4w1aqOxWAwsGQKYLtVWfuWiUdia2e5OVf25UPKJPZARlAcP2FzNhpAOcHNv
+ /3bNBeubhHqT+dvFeVuzLC95tm3MupVwM+bSPnrzfuuHm2lQqYLEiGXq5qicPl7UJGw0
+ rGZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=HZp+rtPuU6+c4RbuMZg1Y64RBvx8DDZ88ey0JM1oGqE=;
+ b=p8yCaUdz+XYm2RRqZ/rgQoH5BHHHNa1IPvXuyPuyLfjRrtUnDaGo8DAqKh0M1DAY0R
+ xzu6Q+wsO7p5PcCdEkLjcraV9EAE+PwK65EnWD6FMAH/8HFKDrRPS2MxYKpyokE690m8
+ 1YP1zEpCNf2DudHkIYUhxk1ahXSdRsTA3tc4A0wFzyXzv3hRu0iOpuCYPIigAOyPLHs+
+ lCHAO5MEAOR/z7IbIp0qmbxybAkS+MQ2Q626TnqVUe+eQDobELsWzjdYrrrkVGFZwpIK
+ 6Fa48ofi1Uj2RpfcJ44T0ZG79GHkyWeRmxXxxpP3gyEOOBrbfkfrNARtVdVgYQ/SX10i
+ g/5A==
+X-Gm-Message-State: AOAM533n2kFGIpGjZ/kwuqv389XR7ZRPHXLH9bEWdn5/YlGXi2kOEAMg
+ ArmiHyKeQ3wBF4t+hxCX6eMytdTiNVLfAkBFxc+6vg==
+X-Google-Smtp-Source: ABdhPJwJ8vrO18wSphac26WuE+i6pYifpDyTCWbtx9bYLjYYHpQe1GT+9/K3XXvoTkzrC1NRJmbO53QbTx2GZL8kdjg=
+X-Received: by 2002:a1c:7405:: with SMTP id p5mr3818423wmc.35.1601376117118;
+ Tue, 29 Sep 2020 03:41:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1600817059-26721-18-git-send-email-kwankhede@nvidia.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 02:22:44
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200918084111.15339-14-ani@anisinha.ca>
+ <20200929031032-mutt-send-email-mst@kernel.org>
+ <CAARzgwzdVCwzXE2hUgPQdQpnp8eTf0JyEt3vctKWnZgwZZAfuA@mail.gmail.com>
+ <20200929032619-mutt-send-email-mst@kernel.org>
+ <CAARzgwz7x6uinPQ+oC+yAuFCbQEWhQuDmGU73E5NZ2WCH_C_kA@mail.gmail.com>
+ <CAARzgwwxjjCAVsFB6_987pa1Z_in2G50rViYiRGVae-c_wn6xQ@mail.gmail.com>
+ <20200929053823-mutt-send-email-mst@kernel.org>
+ <CAARzgwxBcTDkK7QhHP=_mpYoAYYgRY+d6o+2SCSP-haBPDttwA@mail.gmail.com>
+ <CAARzgwy8QNw=OD6cOEkDY-x9mC10ry+NTdCH2gNKuLXp8bAAyg@mail.gmail.com>
+ <CAARzgwyNPZB5PGc-B9vDn9V-uEwVCiCvXgvamMaGTvBCPJQiCg@mail.gmail.com>
+ <20200929063539-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200929063539-mutt-send-email-mst@kernel.org>
+From: Ani Sinha <ani@anisinha.ca>
+Date: Tue, 29 Sep 2020 16:11:45 +0530
+Message-ID: <CAARzgwz6iTsO9Z1ACAHmbSteGYfetDgnSRYc-xnaqjYyJ4yEHA@mail.gmail.com>
+Subject: Re: [PATCH v10 13/13] tests/acpi: add DSDT.hpbrroot DSDT table blob
+ to test global i440fx hotplug
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: none client-ip=2a00:1450:4864:20::344;
+ envelope-from=ani@anisinha.ca; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,255 +101,2769 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, cjia@nvidia.com, aik@ozlabs.ru,
- Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
- qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com,
- yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
- armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
- felipe@nutanix.com, zhi.a.wang@intel.com, kevin.tian@intel.com,
- yan.y.zhao@intel.com, alex.williamson@redhat.com, changpeng.liu@intel.com,
- eskultet@redhat.com, Ken.Xue@amd.com, jonathan.davies@nutanix.com,
- pbonzini@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Julia Suvorova <jusual@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Kirti Wankhede (kwankhede@nvidia.com) wrote:
-> Added amount of bytes transferred to the target VM by all VFIO devices
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> ---
-> 
-> Note: Comments from v25 for this patch are not addressed yet.
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg715620.html
-> 
-> Alex, need more pointer on documentation part raised Markus Armbruster.
+On Tue, Sep 29, 2020 at 4:07 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Tue, Sep 29, 2020 at 04:02:07PM +0530, Ani Sinha wrote:
+> > On Tue, Sep 29, 2020 at 4:00 PM Ani Sinha <ani@anisinha.ca> wrote:
+> > >
+> > > In your pull request the following patch is completely screwed up:
+> > >
+> > > commit cda2006eded0ed91974e1d9e7f9f288e65812a3e
+> > > Author: Ani Sinha <ani@anisinha.ca>
+> > > Date:   Tue Sep 29 03:22:52 2020 -0400
+> > >
+> > >     tests/acpi: update golden master DSDT binary table blobs for q35
+> > >
+> > >
+> > > This is not my patch. It has all sorts of changes which does not
+> > > belong there. Can you please check?
+> >
+> > See https://patchew.org/QEMU/20200929071948.281157-1-mst@redhat.com/20200929071948.281157-46-mst@redhat.com/
+>
+>
+> I had to regenerate the binary, yes. That's par for the course.
+> But it looks like I added disasssembled files. Will fix up and drop,
+> thanks for noticing this.
 
-I think I'm OK with this from the migration side, except for the minor
-5.2's below, so
+I think DSDT.hbridge is wrong. The checksum looks weird:
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Markus is right that we do have lots more information that falls out of
-the migration stats, but I'm not sure what more you have to collect.
++ *     Length           0x00000B89 (2953)
+  *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
+- *     Checksum         0x05
 
-Dave
+This file should be introduced just by one patch. my patch.
 
-> 
->  hw/vfio/common.c            | 20 ++++++++++++++++++++
->  hw/vfio/migration.c         | 10 ++++++++++
->  include/qemu/vfio-helpers.h |  3 +++
->  migration/migration.c       | 14 ++++++++++++++
->  monitor/hmp-cmds.c          |  6 ++++++
->  qapi/migration.json         | 17 +++++++++++++++++
->  6 files changed, 70 insertions(+)
-> 
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index 7eeaa368187a..286cdaac8674 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -39,6 +39,7 @@
->  #include "trace.h"
->  #include "qapi/error.h"
->  #include "migration/migration.h"
-> +#include "qemu/vfio-helpers.h"
->  
->  VFIOGroupList vfio_group_list =
->      QLIST_HEAD_INITIALIZER(vfio_group_list);
-> @@ -292,6 +293,25 @@ const MemoryRegionOps vfio_region_ops = {
->   * Device state interfaces
->   */
->  
-> +bool vfio_mig_active(void)
-> +{
-> +    VFIOGroup *group;
-> +    VFIODevice *vbasedev;
-> +
-> +    if (QLIST_EMPTY(&vfio_group_list)) {
-> +        return false;
-> +    }
-> +
-> +    QLIST_FOREACH(group, &vfio_group_list, next) {
-> +        QLIST_FOREACH(vbasedev, &group->device_list, next) {
-> +            if (vbasedev->migration_blocker) {
-> +                return false;
-> +            }
-> +        }
-> +    }
-> +    return true;
-> +}
-> +
->  static bool vfio_devices_all_stopped_and_saving(VFIOContainer *container)
->  {
->      VFIOGroup *group;
-> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> index 822b68b4e015..c4226fa8b183 100644
-> --- a/hw/vfio/migration.c
-> +++ b/hw/vfio/migration.c
-> @@ -28,6 +28,7 @@
->  #include "pci.h"
->  #include "trace.h"
->  #include "hw/hw.h"
-> +#include "qemu/vfio-helpers.h"
->  
->  /*
->   * Flags used as delimiter:
-> @@ -40,6 +41,8 @@
->  #define VFIO_MIG_FLAG_DEV_SETUP_STATE   (0xffffffffef100003ULL)
->  #define VFIO_MIG_FLAG_DEV_DATA_STATE    (0xffffffffef100004ULL)
->  
-> +static int64_t bytes_transferred;
-> +
->  static inline int vfio_mig_access(VFIODevice *vbasedev, void *val, int count,
->                                    off_t off, bool iswrite)
->  {
-> @@ -289,6 +292,7 @@ static int vfio_save_buffer(QEMUFile *f, VFIODevice *vbasedev, uint64_t *size)
->          *size = data_size;
->      }
->  
-> +    bytes_transferred += data_size;
->      return ret;
->  }
->  
-> @@ -770,6 +774,7 @@ static void vfio_migration_state_notifier(Notifier *notifier, void *data)
->          }
->  
->          vfio_set_dirty_page_tracking(vbasedev, false);
-> +        bytes_transferred = 0;
->      }
->  }
->  
-> @@ -820,6 +825,11 @@ static int vfio_migration_init(VFIODevice *vbasedev,
->  
->  /* ---------------------------------------------------------------------- */
->  
-> +int64_t vfio_mig_bytes_transferred(void)
-> +{
-> +    return bytes_transferred;
-> +}
-> +
->  int vfio_migration_probe(VFIODevice *vbasedev, Error **errp)
->  {
->      VFIOContainer *container = vbasedev->group->container;
-> diff --git a/include/qemu/vfio-helpers.h b/include/qemu/vfio-helpers.h
-> index 1f057c2b9e40..26a7df0767b1 100644
-> --- a/include/qemu/vfio-helpers.h
-> +++ b/include/qemu/vfio-helpers.h
-> @@ -29,4 +29,7 @@ void qemu_vfio_pci_unmap_bar(QEMUVFIOState *s, int index, void *bar,
->  int qemu_vfio_pci_init_irq(QEMUVFIOState *s, EventNotifier *e,
->                             int irq_type, Error **errp);
->  
-> +bool vfio_mig_active(void);
-> +int64_t vfio_mig_bytes_transferred(void);
-> +
->  #endif
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 58a5452471f9..b204bb1f6cd9 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -56,6 +56,7 @@
->  #include "net/announce.h"
->  #include "qemu/queue.h"
->  #include "multifd.h"
-> +#include "qemu/vfio-helpers.h"
->  
->  #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed throttling */
->  
-> @@ -996,6 +997,17 @@ static void populate_disk_info(MigrationInfo *info)
->      }
->  }
->  
-> +static void populate_vfio_info(MigrationInfo *info)
-> +{
-> +#ifdef CONFIG_LINUX
-> +    if (vfio_mig_active()) {
-> +        info->has_vfio = true;
-> +        info->vfio = g_malloc0(sizeof(*info->vfio));
-> +        info->vfio->transferred = vfio_mig_bytes_transferred();
-> +    }
-> +#endif
-> +}
-> +
->  static void fill_source_migration_info(MigrationInfo *info)
->  {
->      MigrationState *s = migrate_get_current();
-> @@ -1020,6 +1032,7 @@ static void fill_source_migration_info(MigrationInfo *info)
->          populate_time_info(info, s);
->          populate_ram_info(info, s);
->          populate_disk_info(info);
-> +        populate_vfio_info(info);
->          break;
->      case MIGRATION_STATUS_COLO:
->          info->has_status = true;
-> @@ -1028,6 +1041,7 @@ static void fill_source_migration_info(MigrationInfo *info)
->      case MIGRATION_STATUS_COMPLETED:
->          populate_time_info(info, s);
->          populate_ram_info(info, s);
-> +        populate_vfio_info(info);
->          break;
->      case MIGRATION_STATUS_FAILED:
->          info->has_status = true;
-> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-> index 7711726fd222..40d60d6a6651 100644
-> --- a/monitor/hmp-cmds.c
-> +++ b/monitor/hmp-cmds.c
-> @@ -355,6 +355,12 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
->          }
->          monitor_printf(mon, "]\n");
->      }
-> +
-> +    if (info->has_vfio) {
-> +        monitor_printf(mon, "vfio device transferred: %" PRIu64 " kbytes\n",
-> +                       info->vfio->transferred >> 10);
-> +    }
-> +
->      qapi_free_MigrationInfo(info);
->  }
->  
-> diff --git a/qapi/migration.json b/qapi/migration.json
-> index 675f70bb6734..3535977123d3 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -147,6 +147,18 @@
->              'active', 'postcopy-active', 'postcopy-paused',
->              'postcopy-recover', 'completed', 'failed', 'colo',
->              'pre-switchover', 'device', 'wait-unplug' ] }
-> +##
-> +# @VfioStats:
-> +#
-> +# Detailed VFIO devices migration statistics
-> +#
-> +# @transferred: amount of bytes transferred to the target VM by VFIO devices
-> +#
-> +# Since: 5.1
-> +#
-> +##
-> +{ 'struct': 'VfioStats',
-> +  'data': {'transferred': 'int' } }
->  
->  ##
->  # @MigrationInfo:
-> @@ -208,11 +220,16 @@
->  #
->  # @socket-address: Only used for tcp, to know what the real port is (Since 4.0)
->  #
-> +# @vfio: @VfioStats containing detailed VFIO devices migration statistics,
-> +#        only returned if VFIO device is present, migration is supported by all
-> +#         VFIO devices and status is 'active' or 'completed' (since 5.1)
-> +#
->  # Since: 0.14.0
->  ##
->  { 'struct': 'MigrationInfo',
->    'data': {'*status': 'MigrationStatus', '*ram': 'MigrationStats',
->             '*disk': 'MigrationStats',
-> +           '*vfio': 'VfioStats',
->             '*xbzrle-cache': 'XBZRLECacheStats',
->             '*total-time': 'int',
->             '*expected-downtime': 'int',
-> -- 
-> 2.7.0
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+>
+>
+> >
+> > >
+> > > On Tue, Sep 29, 2020 at 3:20 PM Ani Sinha <ani@anisinha.ca> wrote:
+> > > >
+> > > >
+> > > >
+> > > > On Tue, Sep 29, 2020 at 3:12 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > >>
+> > > >> On Tue, Sep 29, 2020 at 02:21:06PM +0530, Ani Sinha wrote:
+> > > >>
+> > > >> > On Tue, Sep 29, 2020 at 1:53 PM Ani Sinha <ani@anisinha.ca> wrote:
+> > > >>
+> > > >> > >
+> > > >>
+> > > >> > > On Tue, Sep 29, 2020 at 12:56 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > >>
+> > > >> > > >
+> > > >>
+> > > >> > > > On Tue, Sep 29, 2020 at 12:53:17PM +0530, Ani Sinha wrote:
+> > > >>
+> > > >> > > > > On Tue, Sep 29, 2020 at 12:42 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > >>
+> > > >> > > > > >
+> > > >>
+> > > >> > > > > > On Fri, Sep 18, 2020 at 02:11:11PM +0530, Ani Sinha wrote:
+> > > >>
+> > > >> > > > > > > This change adds a new DSDT golden master table blob to test disabling
+> > > >>
+> > > >> > > > > > > hotplug on both pci root bus and pci bridges. Also reverts the change
+> > > >>
+> > > >> > > > > > > in file bios-tables-test-allowed-diff.h to make sure its now empty so that
+> > > >>
+> > > >> > > > > > > future modifications to acpi tables can be caught.
+> > > >>
+> > > >> > > > > > >
+> > > >>
+> > > >> > > > > > > The following is the disassembled diff between DSDT.hpbridge and DSDT.hpbrroot:
+> > > >>
+> > > >> > > > > > >
+> > > >>
+> > > >> > > > > > > @@ -1,30 +1,30 @@
+> > > >>
+> > > >> > > > > > >  /*
+> > > >>
+> > > >> > > > > > >   * Intel ACPI Component Architecture
+> > > >>
+> > > >> > > > > > >   * AML/ASL+ Disassembler version 20180105 (64-bit version)
+> > > >>
+> > > >> > > > > > >   * Copyright (c) 2000 - 2018 Intel Corporation
+> > > >>
+> > > >> > > > > > >   *
+> > > >>
+> > > >> > > > > > >   * Disassembling to symbolic ASL+ operators
+> > > >>
+> > > >> > > > > > >   *
+> > > >>
+> > > >> > > > > > > - * Disassembly of tests/data/acpi/pc/DSDT.hpbridge, Wed Sep 16 09:45:56 2020
+> > > >>
+> > > >> > > > > > > + * Disassembly of /tmp/aml-ECV9Q0, Wed Sep 16 09:45:56 2020
+> > > >>
+> > > >> > > > > > >   *
+> > > >>
+> > > >> > > > > > >   * Original Table Header:
+> > > >>
+> > > >> > > > > > >   *     Signature        "DSDT"
+> > > >>
+> > > >> > > > > > > - *     Length           0x0000131F (4895)
+> > > >>
+> > > >> > > > > > > + *     Length           0x00000B89 (2953)
+> > > >>
+> > > >> > > > > > >   *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
+> > > >>
+> > > >> > > > > > > - *     Checksum         0xF9
+> > > >>
+> > > >> > > > > > > + *     Checksum         0xA2
+> > > >>
+> > > >> > > > > > >   *     OEM ID           "BOCHS "
+> > > >>
+> > > >> > > > > > >   *     OEM Table ID     "BXPCDSDT"
+> > > >>
+> > > >> > > > > > >   *     OEM Revision     0x00000001 (1)
+> > > >>
+> > > >> > > > > > >   *     Compiler ID      "BXPC"
+> > > >>
+> > > >> > > > > > >   *     Compiler Version 0x00000001 (1)
+> > > >>
+> > > >> > > > > > >   */
+> > > >>
+> > > >> > > > > > >  DefinitionBlock ("", "DSDT", 1, "BOCHS ", "BXPCDSDT", 0x00000001)
+> > > >>
+> > > >> > > > > > >  {
+> > > >>
+> > > >> > > > > > >      Scope (\)
+> > > >>
+> > > >> > > > > > >      {
+> > > >>
+> > > >> > > > > > >          OperationRegion (DBG, SystemIO, 0x0402, One)
+> > > >>
+> > > >> > > > > > >          Field (DBG, ByteAcc, NoLock, Preserve)
+> > > >>
+> > > >> > > > > > >          {
+> > > >>
+> > > >> > > > > > >              DBGB,   8
+> > > >>
+> > > >> > > > > > >          }
+> > > >>
+> > > >> > > > > > >
+> > > >>
+> > > >> > > > > > > @@ -234,64 +234,32 @@
+> > > >>
+> > > >> > > > > > >          {
+> > > >>
+> > > >> > > > > > >              Name (_HID, EisaId ("PNP0B00") /* AT Real-Time Clock */)  // _HID: Hardware ID
+> > > >>
+> > > >> > > > > > >              Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
+> > > >>
+> > > >> > > > > > >              {
+> > > >>
+> > > >> > > > > > >                  IO (Decode16,
+> > > >>
+> > > >> > > > > > >                      0x0070,             // Range Minimum
+> > > >>
+> > > >> > > > > > >                      0x0070,             // Range Maximum
+> > > >>
+> > > >> > > > > > >                      0x01,               // Alignment
+> > > >>
+> > > >> > > > > > >                      0x08,               // Length
+> > > >>
+> > > >> > > > > > >                      )
+> > > >>
+> > > >> > > > > > >                  IRQNoFlags ()
+> > > >>
+> > > >> > > > > > >                      {8}
+> > > >>
+> > > >> > > > > > >              })
+> > > >>
+> > > >> > > > > > >          }
+> > > >>
+> > > >> > > > > > >      }
+> > > >>
+> > > >> > > > > > >
+> > > >>
+> > > >> > > > > > > -    Scope (_SB.PCI0)
+> > > >>
+> > > >> > > > > > > -    {
+> > > >>
+> > > >> > > > > > > -        OperationRegion (PCST, SystemIO, 0xAE00, 0x08)
+> > > >>
+> > > >> > > > > > > -        Field (PCST, DWordAcc, NoLock, WriteAsZeros)
+> > > >>
+> > > >> > > > > > > -        {
+> > > >>
+> > > >> > > > > > > -            PCIU,   32,
+> > > >>
+> > > >> > > > > > > -            PCID,   32
+> > > >>
+> > > >> > > > > > > -        }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -        OperationRegion (SEJ, SystemIO, 0xAE08, 0x04)
+> > > >>
+> > > >> > > > > > > -        Field (SEJ, DWordAcc, NoLock, WriteAsZeros)
+> > > >>
+> > > >> > > > > > > -        {
+> > > >>
+> > > >> > > > > > > -            B0EJ,   32
+> > > >>
+> > > >> > > > > > > -        }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -        OperationRegion (BNMR, SystemIO, 0xAE10, 0x04)
+> > > >>
+> > > >> > > > > > > -        Field (BNMR, DWordAcc, NoLock, WriteAsZeros)
+> > > >>
+> > > >> > > > > > > -        {
+> > > >>
+> > > >> > > > > > > -            BNUM,   32
+> > > >>
+> > > >> > > > > > > -        }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -        Mutex (BLCK, 0x00)
+> > > >>
+> > > >> > > > > > > -        Method (PCEJ, 2, NotSerialized)
+> > > >>
+> > > >> > > > > > > -        {
+> > > >>
+> > > >> > > > > > > -            Acquire (BLCK, 0xFFFF)
+> > > >>
+> > > >> > > > > > > -            BNUM = Arg0
+> > > >>
+> > > >> > > > > > > -            B0EJ = (One << Arg1)
+> > > >>
+> > > >> > > > > > > -            Release (BLCK)
+> > > >>
+> > > >> > > > > > > -            Return (Zero)
+> > > >>
+> > > >> > > > > > > -        }
+> > > >>
+> > > >> > > > > > > -    }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > >      Scope (_SB)
+> > > >>
+> > > >> > > > > > >      {
+> > > >>
+> > > >> > > > > > >          Scope (PCI0)
+> > > >>
+> > > >> > > > > > >          {
+> > > >>
+> > > >> > > > > > >              Method (_PRT, 0, NotSerialized)  // _PRT: PCI Routing Table
+> > > >>
+> > > >> > > > > > >              {
+> > > >>
+> > > >> > > > > > >                  Local0 = Package (0x80){}
+> > > >>
+> > > >> > > > > > >                  Local1 = Zero
+> > > >>
+> > > >> > > > > > >                  While ((Local1 < 0x80))
+> > > >>
+> > > >> > > > > > >                  {
+> > > >>
+> > > >> > > > > > >                      Local2 = (Local1 >> 0x02)
+> > > >>
+> > > >> > > > > > >                      Local3 = ((Local1 + Local2) & 0x03)
+> > > >>
+> > > >> > > > > > >                      If ((Local3 == Zero))
+> > > >>
+> > > >> > > > > > >                      {
+> > > >>
+> > > >> > > > > > >                          Local4 = Package (0x04)
+> > > >>
+> > > >> > > > > > >                              {
+> > > >>
+> > > >> > > > > > > @@ -690,38 +658,32 @@
+> > > >>
+> > > >> > > > > > >                  Method (_OST, 3, Serialized)  // _OST: OSPM Status Indication
+> > > >>
+> > > >> > > > > > >                  {
+> > > >>
+> > > >> > > > > > >                      COST (Zero, Arg0, Arg1, Arg2)
+> > > >>
+> > > >> > > > > > >                  }
+> > > >>
+> > > >> > > > > > >              }
+> > > >>
+> > > >> > > > > > >          }
+> > > >>
+> > > >> > > > > > >      }
+> > > >>
+> > > >> > > > > > >
+> > > >>
+> > > >> > > > > > >      Method (\_GPE._E02, 0, NotSerialized)  // _Exx: Edge-Triggered GPE
+> > > >>
+> > > >> > > > > > >      {
+> > > >>
+> > > >> > > > > > >          \_SB.CPUS.CSCN ()
+> > > >>
+> > > >> > > > > > >      }
+> > > >>
+> > > >> > > > > > >
+> > > >>
+> > > >> > > > > > >      Scope (_GPE)
+> > > >>
+> > > >> > > > > > >      {
+> > > >>
+> > > >> > > > > > >          Name (_HID, "ACPI0006" /* GPE Block Device */)  // _HID: Hardware ID
+> > > >>
+> > > >> > > > > > > -        Method (_E01, 0, NotSerialized)  // _Exx: Edge-Triggered GPE
+> > > >>
+> > > >> > > > > > > -        {
+> > > >>
+> > > >> > > > > > > -            Acquire (\_SB.PCI0.BLCK, 0xFFFF)
+> > > >>
+> > > >> > > > > > > -            \_SB.PCI0.PCNT ()
+> > > >>
+> > > >> > > > > > > -            Release (\_SB.PCI0.BLCK)
+> > > >>
+> > > >> > > > > > > -        }
+> > > >>
+> > > >> > > > > > >      }
+> > > >>
+> > > >> > > > > > >
+> > > >>
+> > > >> > > > > > >      Scope (\_SB.PCI0)
+> > > >>
+> > > >> > > > > > >      {
+> > > >>
+> > > >> > > > > > >          Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
+> > > >>
+> > > >> > > > > > >          {
+> > > >>
+> > > >> > > > > > >              WordBusNumber (ResourceProducer, MinFixed, MaxFixed, PosDecode,
+> > > >>
+> > > >> > > > > > >                  0x0000,             // Granularity
+> > > >>
+> > > >> > > > > > >                  0x0000,             // Range Minimum
+> > > >>
+> > > >> > > > > > >                  0x00FF,             // Range Maximum
+> > > >>
+> > > >> > > > > > >                  0x0000,             // Translation Offset
+> > > >>
+> > > >> > > > > > >                  0x0100,             // Length
+> > > >>
+> > > >> > > > > > >                  ,, )
+> > > >>
+> > > >> > > > > > >              IO (Decode16,
+> > > >>
+> > > >> > > > > > >                  0x0CF8,             // Range Minimum
+> > > >>
+> > > >> > > > > > >                  0x0CF8,             // Range Maximum
+> > > >>
+> > > >> > > > > > > @@ -766,48 +728,32 @@
+> > > >>
+> > > >> > > > > > >          })
+> > > >>
+> > > >> > > > > > >          Device (GPE0)
+> > > >>
+> > > >> > > > > > >          {
+> > > >>
+> > > >> > > > > > >              Name (_HID, "PNP0A06" /* Generic Container Device */)  // _HID: Hardware ID
+> > > >>
+> > > >> > > > > > >              Name (_UID, "GPE0 resources")  // _UID: Unique ID
+> > > >>
+> > > >> > > > > > >              Name (_STA, 0x0B)  // _STA: Status
+> > > >>
+> > > >> > > > > > >              Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
+> > > >>
+> > > >> > > > > > >              {
+> > > >>
+> > > >> > > > > > >                  IO (Decode16,
+> > > >>
+> > > >> > > > > > >                      0xAFE0,             // Range Minimum
+> > > >>
+> > > >> > > > > > >                      0xAFE0,             // Range Maximum
+> > > >>
+> > > >> > > > > > >                      0x01,               // Alignment
+> > > >>
+> > > >> > > > > > >                      0x04,               // Length
+> > > >>
+> > > >> > > > > > >                      )
+> > > >>
+> > > >> > > > > > >              })
+> > > >>
+> > > >> > > > > > >          }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -        Device (PHPR)
+> > > >>
+> > > >> > > > > > > -        {
+> > > >>
+> > > >> > > > > > > -            Name (_HID, "PNP0A06" /* Generic Container Device */)  // _HID: Hardware ID
+> > > >>
+> > > >> > > > > > > -            Name (_UID, "PCI Hotplug resources")  // _UID: Unique ID
+> > > >>
+> > > >> > > > > > > -            Name (_STA, 0x0B)  // _STA: Status
+> > > >>
+> > > >> > > > > > > -            Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                IO (Decode16,
+> > > >>
+> > > >> > > > > > > -                    0xAE00,             // Range Minimum
+> > > >>
+> > > >> > > > > > > -                    0xAE00,             // Range Maximum
+> > > >>
+> > > >> > > > > > > -                    0x01,               // Alignment
+> > > >>
+> > > >> > > > > > > -                    0x14,               // Length
+> > > >>
+> > > >> > > > > > > -                    )
+> > > >>
+> > > >> > > > > > > -            })
+> > > >>
+> > > >> > > > > > > -        }
+> > > >>
+> > > >> > > > > > >      }
+> > > >>
+> > > >> > > > > > >
+> > > >>
+> > > >> > > > > > >      Scope (\)
+> > > >>
+> > > >> > > > > > >      {
+> > > >>
+> > > >> > > > > > >          Name (_S3, Package (0x04)  // _S3_: S3 System State
+> > > >>
+> > > >> > > > > > >          {
+> > > >>
+> > > >> > > > > > >              One,
+> > > >>
+> > > >> > > > > > >              One,
+> > > >>
+> > > >> > > > > > >              Zero,
+> > > >>
+> > > >> > > > > > >              Zero
+> > > >>
+> > > >> > > > > > >          })
+> > > >>
+> > > >> > > > > > >          Name (_S4, Package (0x04)  // _S4_: S4 System State
+> > > >>
+> > > >> > > > > > >          {
+> > > >>
+> > > >> > > > > > >              0x02,
+> > > >>
+> > > >> > > > > > >              0x02,
+> > > >>
+> > > >> > > > > > >              Zero,
+> > > >>
+> > > >> > > > > > > @@ -831,479 +777,48 @@
+> > > >>
+> > > >> > > > > > >              Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
+> > > >>
+> > > >> > > > > > >              {
+> > > >>
+> > > >> > > > > > >                  IO (Decode16,
+> > > >>
+> > > >> > > > > > >                      0x0510,             // Range Minimum
+> > > >>
+> > > >> > > > > > >                      0x0510,             // Range Maximum
+> > > >>
+> > > >> > > > > > >                      0x01,               // Alignment
+> > > >>
+> > > >> > > > > > >                      0x0C,               // Length
+> > > >>
+> > > >> > > > > > >                      )
+> > > >>
+> > > >> > > > > > >              })
+> > > >>
+> > > >> > > > > > >          }
+> > > >>
+> > > >> > > > > > >      }
+> > > >>
+> > > >> > > > > > >
+> > > >>
+> > > >> > > > > > >      Scope (\_SB)
+> > > >>
+> > > >> > > > > > >      {
+> > > >>
+> > > >> > > > > > >          Scope (PCI0)
+> > > >>
+> > > >> > > > > > >          {
+> > > >>
+> > > >> > > > > > > -            Name (BSEL, Zero)
+> > > >>
+> > > >> > > > > > >              Device (S00)
+> > > >>
+> > > >> > > > > > >              {
+> > > >>
+> > > >> > > > > > >                  Name (_ADR, Zero)  // _ADR: Address
+> > > >>
+> > > >> > > > > > >              }
+> > > >>
+> > > >> > > > > > >
+> > > >>
+> > > >> > > > > > >              Device (S10)
+> > > >>
+> > > >> > > > > > >              {
+> > > >>
+> > > >> > > > > > >                  Name (_ADR, 0x00020000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > >                  Method (_S1D, 0, NotSerialized)  // _S1D: S1 Device State
+> > > >>
+> > > >> > > > > > >                  {
+> > > >>
+> > > >> > > > > > >                      Return (Zero)
+> > > >>
+> > > >> > > > > > >                  }
+> > > >>
+> > > >> > > > > > >
+> > > >>
+> > > >> > > > > > >                  Method (_S2D, 0, NotSerialized)  // _S2D: S2 Device State
+> > > >>
+> > > >> > > > > > >                  {
+> > > >>
+> > > >> > > > > > >                      Return (Zero)
+> > > >>
+> > > >> > > > > > >                  }
+> > > >>
+> > > >> > > > > > >
+> > > >>
+> > > >> > > > > > >                  Method (_S3D, 0, NotSerialized)  // _S3D: S3 Device State
+> > > >>
+> > > >> > > > > > >                  {
+> > > >>
+> > > >> > > > > > >                      Return (Zero)
+> > > >>
+> > > >> > > > > > >                  }
+> > > >>
+> > > >> > > > > > >              }
+> > > >>
+> > > >> > > > > > >
+> > > >>
+> > > >> > > > > > >              Device (S18)
+> > > >>
+> > > >> > > > > > >              {
+> > > >>
+> > > >> > > > > > >                  Name (_ADR, 0x00030000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > >              }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (S20)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x04)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x00040000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (S28)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x05)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x00050000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (S30)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x06)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x00060000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (S38)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x07)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x00070000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (S40)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x08)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x00080000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (S48)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x09)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x00090000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (S50)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x0A)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x000A0000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (S58)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x0B)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x000B0000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (S60)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x0C)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x000C0000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (S68)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x0D)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x000D0000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (S70)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x0E)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x000E0000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (S78)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x0F)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x000F0000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (S80)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x10)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x00100000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (S88)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x11)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x00110000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (S90)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x12)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x00120000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (S98)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x13)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x00130000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (SA0)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x14)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x00140000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (SA8)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x15)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x00150000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (SB0)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x16)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x00160000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (SB8)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x17)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x00170000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (SC0)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x18)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x00180000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (SC8)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x19)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x00190000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (SD0)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x1A)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x001A0000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (SD8)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x1B)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x001B0000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (SE0)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x1C)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x001C0000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (SE8)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x1D)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x001D0000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (SF0)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x1E)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x001E0000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Device (SF8)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                Name (_SUN, 0x1F)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > > > > -                Name (_ADR, 0x001F0000)  // _ADR: Address
+> > > >>
+> > > >> > > > > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Method (DVNT, 2, NotSerialized)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x10))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (S20, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x20))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (S28, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x40))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (S30, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x80))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (S38, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x0100))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (S40, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x0200))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (S48, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x0400))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (S50, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x0800))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (S58, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x1000))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (S60, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x2000))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (S68, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x4000))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (S70, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x8000))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (S78, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x00010000))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (S80, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x00020000))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (S88, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x00040000))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (S90, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x00080000))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (S98, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x00100000))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (SA0, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x00200000))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (SA8, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x00400000))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (SB0, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x00800000))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (SB8, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x01000000))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (SC0, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x02000000))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (SC8, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x04000000))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (SD0, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x08000000))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (SD8, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x10000000))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (SE0, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x20000000))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (SE8, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x40000000))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (SF0, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -                If ((Arg0 & 0x80000000))
+> > > >>
+> > > >> > > > > > > -                {
+> > > >>
+> > > >> > > > > > > -                    Notify (SF8, Arg1)
+> > > >>
+> > > >> > > > > > > -                }
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > > -
+> > > >>
+> > > >> > > > > > > -            Method (PCNT, 0, NotSerialized)
+> > > >>
+> > > >> > > > > > > -            {
+> > > >>
+> > > >> > > > > > > -                BNUM = Zero
+> > > >>
+> > > >> > > > > > > -                DVNT (PCIU, One)
+> > > >>
+> > > >> > > > > > > -                DVNT (PCID, 0x03)
+> > > >>
+> > > >> > > > > > > -            }
+> > > >>
+> > > >> > > > > > >          }
+> > > >>
+> > > >> > > > > > >      }
+> > > >>
+> > > >> > > > > > >  }
+> > > >>
+> > > >> > > > > >
+> > > >>
+> > > >> > > > > > This is not the only diff I see if I apply this patchset on
+> > > >>
+> > > >> > > > > > top of master.
+> > > >>
+> > > >> > > > > > Dropped this and the previous patch.
+> > > >>
+> > > >> > > > > > Please check what is going on and repost as appropriate.
+> > > >>
+> > > >> > > > >
+> > > >>
+> > > >> > > > > Which two ACPI DSDT files are you diffing? What diff are you getting?
+> > > >>
+> > > >> > > >
+> > > >>
+> > > >> > > >
+> > > >>
+> > > >> > > > diff -rup ./tests/data/acpi/pc/DSDT.hpbridge.dsl ./tests/data/acpi/pc/DSDT.hpbrroot.dsl
+> > > >>
+> > > >> > >
+> > > >>
+> > > >> > > I re-based my patchset on top of the latest qemu master and did a make
+> > > >>
+> > > >> > >  && make check-qtest-x86_64 V=1.
+> > > >>
+> > > >> > > They pass. I am seeing this diff:
+> > > >>
+> > > >> > > https://pastebin.ubuntu.com/p/BXy9GFfB2R/
+> > > >>
+> > > >> > >
+> > > >>
+> > > >> > > and it looks good to me.
+> > > >>
+> > > >> > >
+> > > >>
+> > > >> > > Not sure why your diff looks different. Maybe you can regenerate the blob?
+> > > >>
+> > > >> >
+> > > >>
+> > > >> > I did a full make check and it passed. I compared the diff again and
+> > > >>
+> > > >> > it's the same. I checked my tree and it looks clean. These are the
+> > > >>
+> > > >> > patches I have:
+> > > >>
+> > > >> >
+> > > >>
+> > > >> > $ git log --oneline
+> > > >>
+> > > >> > 20d1323e10 (HEAD -> master) qom: code hardening - have bound checking
+> > > >>
+> > > >> > while looping with integer value
+> > > >>
+> > > >> > 0f69dae0e2 Add a comment in bios-tables-test.c to clarify the reason
+> > > >>
+> > > >> > behind approach
+> > > >>
+> > > >> > dd9a8c3cd3 tests/acpi: add DSDT.hpbrroot DSDT table blob to test
+> > > >>
+> > > >> > global i440fx hotplug
+> > > >>
+> > > >> > 5b93474fe9 tests/acpi: unit test exercising global pci hotplug off for i440fx
+> > > >>
+> > > >> > 54c33e334a tests/acpi: update golden master DSDT binary table blobs for q35
+> > > >>
+> > > >> > 2279f61f30 piix4: don't reserve hw resources when hotplug is off globally
+> > > >>
+> > > >> > 1f61c524a0 Add ACPI DSDT tables for q35 that are being updated by the next patch
+> > > >>
+> > > >> > bdd823611b tests/acpi: add newly added acpi DSDT table blob for pci
+> > > >>
+> > > >> > bridge hotplug flag
+> > > >>
+> > > >> > 8c80f8fba9 tests/acpi: unit test for
+> > > >>
+> > > >> > 'acpi-pci-hotplug-with-bridge-support' bridge flag
+> > > >>
+> > > >> > e0a3142df9 tests/acpi: list added acpi table binary file for pci
+> > > >>
+> > > >> > bridge hotplug test
+> > > >>
+> > > >> > 0ba08317a8 i440fx/acpi: do not add hotplug related amls for cold plugged bridges
+> > > >>
+> > > >> > 73b191ade6 Fix a gap where acpi_pcihp_find_hotplug_bus() returns a
+> > > >>
+> > > >> > non-hotpluggable bus
+> > > >>
+> > > >> > ef0e526cc2 tests/acpi: add a new ACPI table in order to test root pci
+> > > >>
+> > > >> > hotplug on/off
+> > > >>
+> > > >> > c6d13264f8 tests/acpi: add new unit test to test hotplug off/on
+> > > >>
+> > > >> > feature on the root pci bus
+> > > >>
+> > > >> > 6901bada65 tests/acpi: mark addition of table DSDT.roothp for unit
+> > > >>
+> > > >> > testing root pci hotplug
+> > > >>
+> > > >> > 74504514b1 (origin/master, origin/HEAD) Merge remote-tracking branch
+> > > >>
+> > > >> > 'remotes/alistair/tags/pull-register-20200927' into staging
+> > > >>
+> > > >>
+> > > >>
+> > > >> Try applying on top of latest pull request?
+> > > >
+> > > >
+> > > > Maybe I'm missing something but can you point me to the latest pull request?
+> > > >>
+> > > >>
+> > > >>
+> > > >>
+> > > >>
+> > > >>
+> > > >>
+> > > >> >
+> > > >>
+> > > >> > >
+> > > >>
+> > > >> > > >
+> > > >>
+> > > >> > > >
+> > > >>
+> > > >> > > >
+> > > >>
+> > > >> > > > --- ./tests/data/acpi/pc/DSDT.hpbridge.dsl      2020-09-29 02:44:43.874622404 -0400
+> > > >>
+> > > >> > > > +++ ./tests/data/acpi/pc/DSDT.hpbrroot.dsl      2020-09-29 02:44:43.876622403 -0400
+> > > >>
+> > > >> > > > @@ -5,13 +5,13 @@
+> > > >>
+> > > >> > > >   *
+> > > >>
+> > > >> > > >   * Disassembling to symbolic ASL+ operators
+> > > >>
+> > > >> > > >   *
+> > > >>
+> > > >> > > > - * Disassembly of tests/data/acpi/pc/DSDT.hpbridge, Tue Sep 29 02:44:43 2020
+> > > >>
+> > > >> > > > + * Disassembly of tests/data/acpi/pc/DSDT.hpbrroot, Tue Sep 29 02:44:43 2020
+> > > >>
+> > > >> > > >   *
+> > > >>
+> > > >> > > >   * Original Table Header:
+> > > >>
+> > > >> > > >   *     Signature        "DSDT"
+> > > >>
+> > > >> > > > - *     Length           0x0000139D (5021)
+> > > >>
+> > > >> > > > + *     Length           0x00000B89 (2953)
+> > > >>
+> > > >> > > >   *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
+> > > >>
+> > > >> > > > - *     Checksum         0x05
+> > > >>
+> > > >> > > > + *     Checksum         0xA2
+> > > >>
+> > > >> > > >   *     OEM ID           "BOCHS "
+> > > >>
+> > > >> > > >   *     OEM Table ID     "BXPCDSDT"
+> > > >>
+> > > >> > > >   *     OEM Revision     0x00000001 (1)
+> > > >>
+> > > >> > > > @@ -247,38 +247,6 @@ DefinitionBlock ("", "DSDT", 1, "BOCHS "
+> > > >>
+> > > >> > > >          }
+> > > >>
+> > > >> > > >      }
+> > > >>
+> > > >> > > >
+> > > >>
+> > > >> > > > -    Scope (_SB.PCI0)
+> > > >>
+> > > >> > > > -    {
+> > > >>
+> > > >> > > > -        OperationRegion (PCST, SystemIO, 0xAE00, 0x08)
+> > > >>
+> > > >> > > > -        Field (PCST, DWordAcc, NoLock, WriteAsZeros)
+> > > >>
+> > > >> > > > -        {
+> > > >>
+> > > >> > > > -            PCIU,   32,
+> > > >>
+> > > >> > > > -            PCID,   32
+> > > >>
+> > > >> > > > -        }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -        OperationRegion (SEJ, SystemIO, 0xAE08, 0x04)
+> > > >>
+> > > >> > > > -        Field (SEJ, DWordAcc, NoLock, WriteAsZeros)
+> > > >>
+> > > >> > > > -        {
+> > > >>
+> > > >> > > > -            B0EJ,   32
+> > > >>
+> > > >> > > > -        }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -        OperationRegion (BNMR, SystemIO, 0xAE10, 0x04)
+> > > >>
+> > > >> > > > -        Field (BNMR, DWordAcc, NoLock, WriteAsZeros)
+> > > >>
+> > > >> > > > -        {
+> > > >>
+> > > >> > > > -            BNUM,   32
+> > > >>
+> > > >> > > > -        }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -        Mutex (BLCK, 0x00)
+> > > >>
+> > > >> > > > -        Method (PCEJ, 2, NotSerialized)
+> > > >>
+> > > >> > > > -        {
+> > > >>
+> > > >> > > > -            Acquire (BLCK, 0xFFFF)
+> > > >>
+> > > >> > > > -            BNUM = Arg0
+> > > >>
+> > > >> > > > -            B0EJ = (One << Arg1)
+> > > >>
+> > > >> > > > -            Release (BLCK)
+> > > >>
+> > > >> > > > -            Return (Zero)
+> > > >>
+> > > >> > > > -        }
+> > > >>
+> > > >> > > > -    }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > >      Scope (_SB)
+> > > >>
+> > > >> > > >      {
+> > > >>
+> > > >> > > >          Scope (PCI0)
+> > > >>
+> > > >> > > > @@ -643,56 +611,22 @@ DefinitionBlock ("", "DSDT", 1, "BOCHS "
+> > > >>
+> > > >> > > >              Method (CSCN, 0, Serialized)
+> > > >>
+> > > >> > > >              {
+> > > >>
+> > > >> > > >                  Acquire (\_SB.PCI0.PRES.CPLK, 0xFFFF)
+> > > >>
+> > > >> > > > -                Name (CNEW, Package (0xFF){})
+> > > >>
+> > > >> > > > -                Local3 = Zero
+> > > >>
+> > > >> > > > -                Local4 = One
+> > > >>
+> > > >> > > > -                While ((Local4 == One))
+> > > >>
+> > > >> > > > +                Local0 = One
+> > > >>
+> > > >> > > > +                While ((Local0 == One))
+> > > >>
+> > > >> > > >                  {
+> > > >>
+> > > >> > > > -                    Local4 = Zero
+> > > >>
+> > > >> > > > -                    Local0 = One
+> > > >>
+> > > >> > > > -                    Local1 = Zero
+> > > >>
+> > > >> > > > -                    While (((Local0 == One) && (Local3 < One)))
+> > > >>
+> > > >> > > > +                    Local0 = Zero
+> > > >>
+> > > >> > > > +                    \_SB.PCI0.PRES.CCMD = Zero
+> > > >>
+> > > >> > > > +                    If ((\_SB.PCI0.PRES.CINS == One))
+> > > >>
+> > > >> > > >                      {
+> > > >>
+> > > >> > > > -                        Local0 = Zero
+> > > >>
+> > > >> > > > -                        \_SB.PCI0.PRES.CSEL = Local3
+> > > >>
+> > > >> > > > -                        \_SB.PCI0.PRES.CCMD = Zero
+> > > >>
+> > > >> > > > -                        If ((\_SB.PCI0.PRES.CDAT < Local3))
+> > > >>
+> > > >> > > > -                        {
+> > > >>
+> > > >> > > > -                            Break
+> > > >>
+> > > >> > > > -                        }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                        If ((Local1 == 0xFF))
+> > > >>
+> > > >> > > > -                        {
+> > > >>
+> > > >> > > > -                            Local4 = One
+> > > >>
+> > > >> > > > -                            Break
+> > > >>
+> > > >> > > > -                        }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                        Local3 = \_SB.PCI0.PRES.CDAT
+> > > >>
+> > > >> > > > -                        If ((\_SB.PCI0.PRES.CINS == One))
+> > > >>
+> > > >> > > > -                        {
+> > > >>
+> > > >> > > > -                            CNEW [Local1] = Local3
+> > > >>
+> > > >> > > > -                            Local1++
+> > > >>
+> > > >> > > > -                            Local0 = One
+> > > >>
+> > > >> > > > -                        }
+> > > >>
+> > > >> > > > -                        ElseIf ((\_SB.PCI0.PRES.CRMV == One))
+> > > >>
+> > > >> > > > -                        {
+> > > >>
+> > > >> > > > -                            CTFY (Local3, 0x03)
+> > > >>
+> > > >> > > > -                            \_SB.PCI0.PRES.CRMV = One
+> > > >>
+> > > >> > > > -                            Local0 = One
+> > > >>
+> > > >> > > > -                        }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                        Local3++
+> > > >>
+> > > >> > > > +                        CTFY (\_SB.PCI0.PRES.CDAT, One)
+> > > >>
+> > > >> > > > +                        \_SB.PCI0.PRES.CINS = One
+> > > >>
+> > > >> > > > +                        Local0 = One
+> > > >>
+> > > >> > > >                      }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                    Local2 = Zero
+> > > >>
+> > > >> > > > -                    While ((Local2 < Local1))
+> > > >>
+> > > >> > > > +                    ElseIf ((\_SB.PCI0.PRES.CRMV == One))
+> > > >>
+> > > >> > > >                      {
+> > > >>
+> > > >> > > > -                        Local3 = DerefOf (CNEW [Local2])
+> > > >>
+> > > >> > > > -                        CTFY (Local3, One)
+> > > >>
+> > > >> > > > -                        Debug = Local3
+> > > >>
+> > > >> > > > -                        \_SB.PCI0.PRES.CSEL = Local3
+> > > >>
+> > > >> > > > -                        \_SB.PCI0.PRES.CINS = One
+> > > >>
+> > > >> > > > -                        Local2++
+> > > >>
+> > > >> > > > +                        CTFY (\_SB.PCI0.PRES.CDAT, 0x03)
+> > > >>
+> > > >> > > > +                        \_SB.PCI0.PRES.CRMV = One
+> > > >>
+> > > >> > > > +                        Local0 = One
+> > > >>
+> > > >> > > >                      }
+> > > >>
+> > > >> > > >                  }
+> > > >>
+> > > >> > > >
+> > > >>
+> > > >> > > > @@ -737,12 +671,6 @@ DefinitionBlock ("", "DSDT", 1, "BOCHS "
+> > > >>
+> > > >> > > >      Scope (_GPE)
+> > > >>
+> > > >> > > >      {
+> > > >>
+> > > >> > > >          Name (_HID, "ACPI0006" /* GPE Block Device */)  // _HID: Hardware ID
+> > > >>
+> > > >> > > > -        Method (_E01, 0, NotSerialized)  // _Exx: Edge-Triggered GPE, xx=0x00-0xFF
+> > > >>
+> > > >> > > > -        {
+> > > >>
+> > > >> > > > -            Acquire (\_SB.PCI0.BLCK, 0xFFFF)
+> > > >>
+> > > >> > > > -            \_SB.PCI0.PCNT ()
+> > > >>
+> > > >> > > > -            Release (\_SB.PCI0.BLCK)
+> > > >>
+> > > >> > > > -        }
+> > > >>
+> > > >> > > >      }
+> > > >>
+> > > >> > > >
+> > > >>
+> > > >> > > >      Scope (\_SB.PCI0)
+> > > >>
+> > > >> > > > @@ -813,22 +741,6 @@ DefinitionBlock ("", "DSDT", 1, "BOCHS "
+> > > >>
+> > > >> > > >                      )
+> > > >>
+> > > >> > > >              })
+> > > >>
+> > > >> > > >          }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -        Device (PHPR)
+> > > >>
+> > > >> > > > -        {
+> > > >>
+> > > >> > > > -            Name (_HID, "PNP0A06" /* Generic Container Device */)  // _HID: Hardware ID
+> > > >>
+> > > >> > > > -            Name (_UID, "PCI Hotplug resources")  // _UID: Unique ID
+> > > >>
+> > > >> > > > -            Name (_STA, 0x0B)  // _STA: Status
+> > > >>
+> > > >> > > > -            Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                IO (Decode16,
+> > > >>
+> > > >> > > > -                    0xAE00,             // Range Minimum
+> > > >>
+> > > >> > > > -                    0xAE00,             // Range Maximum
+> > > >>
+> > > >> > > > -                    0x01,               // Alignment
+> > > >>
+> > > >> > > > -                    0x14,               // Length
+> > > >>
+> > > >> > > > -                    )
+> > > >>
+> > > >> > > > -            })
+> > > >>
+> > > >> > > > -        }
+> > > >>
+> > > >> > > >      }
+> > > >>
+> > > >> > > >
+> > > >>
+> > > >> > > >      Scope (\)
+> > > >>
+> > > >> > > > @@ -878,7 +790,6 @@ DefinitionBlock ("", "DSDT", 1, "BOCHS "
+> > > >>
+> > > >> > > >      {
+> > > >>
+> > > >> > > >          Scope (PCI0)
+> > > >>
+> > > >> > > >          {
+> > > >>
+> > > >> > > > -            Name (BSEL, Zero)
+> > > >>
+> > > >> > > >              Device (S00)
+> > > >>
+> > > >> > > >              {
+> > > >>
+> > > >> > > >                  Name (_ADR, Zero)  // _ADR: Address
+> > > >>
+> > > >> > > > @@ -907,436 +818,6 @@ DefinitionBlock ("", "DSDT", 1, "BOCHS "
+> > > >>
+> > > >> > > >              {
+> > > >>
+> > > >> > > >                  Name (_ADR, 0x00030000)  // _ADR: Address
+> > > >>
+> > > >> > > >              }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (S20)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x04)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x00040000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (S28)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x05)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x00050000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (S30)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x06)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x00060000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (S38)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x07)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x00070000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (S40)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x08)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x00080000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (S48)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x09)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x00090000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (S50)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x0A)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x000A0000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (S58)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x0B)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x000B0000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (S60)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x0C)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x000C0000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (S68)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x0D)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x000D0000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (S70)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x0E)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x000E0000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (S78)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x0F)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x000F0000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (S80)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x10)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x00100000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (S88)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x11)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x00110000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (S90)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x12)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x00120000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (S98)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x13)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x00130000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (SA0)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x14)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x00140000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (SA8)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x15)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x00150000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (SB0)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x16)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x00160000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (SB8)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x17)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x00170000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (SC0)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x18)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x00180000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (SC8)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x19)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x00190000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (SD0)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x1A)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x001A0000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (SD8)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x1B)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x001B0000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (SE0)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x1C)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x001C0000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (SE8)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x1D)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x001D0000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (SF0)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x1E)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x001E0000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Device (SF8)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                Name (_SUN, 0x1F)  // _SUN: Slot User Number
+> > > >>
+> > > >> > > > -                Name (_ADR, 0x001F0000)  // _ADR: Address
+> > > >>
+> > > >> > > > -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device, x=0-9
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    PCEJ (BSEL, _SUN)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Method (DVNT, 2, NotSerialized)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x10))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (S20, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x20))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (S28, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x40))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (S30, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x80))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (S38, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x0100))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (S40, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x0200))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (S48, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x0400))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (S50, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x0800))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (S58, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x1000))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (S60, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x2000))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (S68, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x4000))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (S70, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x8000))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (S78, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x00010000))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (S80, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x00020000))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (S88, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x00040000))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (S90, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x00080000))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (S98, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x00100000))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (SA0, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x00200000))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (SA8, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x00400000))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (SB0, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x00800000))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (SB8, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x01000000))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (SC0, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x02000000))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (SC8, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x04000000))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (SD0, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x08000000))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (SD8, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x10000000))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (SE0, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x20000000))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (SE8, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x40000000))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (SF0, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -                If ((Arg0 & 0x80000000))
+> > > >>
+> > > >> > > > -                {
+> > > >>
+> > > >> > > > -                    Notify (SF8, Arg1)
+> > > >>
+> > > >> > > > -                }
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > > -
+> > > >>
+> > > >> > > > -            Method (PCNT, 0, NotSerialized)
+> > > >>
+> > > >> > > > -            {
+> > > >>
+> > > >> > > > -                BNUM = Zero
+> > > >>
+> > > >> > > > -                DVNT (PCIU, One)
+> > > >>
+> > > >> > > > -                DVNT (PCID, 0x03)
+> > > >>
+> > > >> > > > -            }
+> > > >>
+> > > >> > > >          }
+> > > >>
+> > > >> > > >      }
+> > > >>
+> > > >> > > >  }
+> > > >>
+> > > >> > > >
+> > > >>
+> > > >>
+> > > >>
+>
 
