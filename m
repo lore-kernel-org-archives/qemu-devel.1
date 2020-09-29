@@ -2,86 +2,92 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83D08C4727C
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 14:26:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24E13C4727C
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 14:28:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74C0D20739
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 14:26:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 462A220739
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 14:28:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="MVvCcs0d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74C0D20739
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ALFPWju2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 462A220739
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41192 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNGai-0002V6-7u
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 10:26:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53372)
+	id 1kNGbz-0003sg-0n
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 10:28:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53476)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kNGZB-00012g-Pn
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 10:25:17 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:34008)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kNGZ9-00083h-Q5
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 10:25:17 -0400
-Received: by mail-pg1-x543.google.com with SMTP id u24so4026874pgi.1
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 07:25:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id;
- bh=tw2BSAHxMyMXfXN20HZnVu2RCSj4CLVnFIN2vj4VPxI=;
- b=MVvCcs0dbTqCGedBriVQZxjd3D5OzbJxF10BuziepSaUP7z5PyUaF+d9kYv+J0hjSb
- 8sRta3s0OTqzORs/jj4ln/Yj8wvDUHXdrMrMqdtjAy3ZMSnQYK5hRkvHgDxFA2+WeA+7
- p5lQlst8gYWArLBUOW9IYSRk8h1aO/+Gj/mRxfk42vrTiC7KFAv50KNBz6nRX/hXh92f
- EuNljg4CESSrhBXkdANgYAMrUKK85BuWl8UiGRn/39k0a1dtIt35pJYEwzTzh3IXSjPV
- vQpMVbEVrGTa6qdBclz8zXj2/bygQynOYvq/wvajnE/yywfucvQvXv+M+9JKwbApoOv1
- maqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=tw2BSAHxMyMXfXN20HZnVu2RCSj4CLVnFIN2vj4VPxI=;
- b=cd7Vy2xn489uJoWABvOXO1E1dMB5xRm77JzbVlJ56H4DpgwfStbRerFzzp2toJlnxy
- HM5Vlhrz4T1CIQrg71G+Th7Dtmhu2075sgJgg7zicJBa4CAoG/TUtpB2StzFS5EDP7pN
- cXnOaOxgplfqV15CV7wWn7bUG+abfeXr08gJi6TK9YlNH/HDNj1oGs4ZqF+kAeaUJr3V
- YH5OouxOTGnURAxpKuIh4ni8A4eEaOfxRQQZj94RASWEKSKLGlPbJKX9hUMwEDCVu5Eu
- jM6Y/6ds6rfuiMPwvby/OH9ZewXDTMnlbrr5OCZzBuWGlxnsAlgnL0aBtjrfP001zmeX
- j24Q==
-X-Gm-Message-State: AOAM533xnbk+ertZL327kunUShm3o6115RL7XMr72BqOvTE4Sd0eGXdI
- jH8KBNIQOU31vThvyq0EcDNfxA==
-X-Google-Smtp-Source: ABdhPJzikRuSNwFbS0XwHFw0G/0mjABCkLh29n8eDin2iJpJHDYOhOPMat1Zw4mcPkeI7f3Y2Yvfkw==
-X-Received: by 2002:aa7:8001:0:b029:142:2501:34e6 with SMTP id
- j1-20020aa780010000b0290142250134e6mr4355467pfi.63.1601389513985; 
- Tue, 29 Sep 2020 07:25:13 -0700 (PDT)
-Received: from localhost.localdomain ([115.96.125.11])
- by smtp.googlemail.com with ESMTPSA id g1sm5631796pfm.124.2020.09.29.07.25.10
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 29 Sep 2020 07:25:12 -0700 (PDT)
-From: Ani Sinha <ani@anisinha.ca>
-To: mst@redhat.com,
-	qemu-devel@nongnu.org
-Subject: [PATCH v5] Add a comment in bios-tables-test.c to clarify the reason
- behind approach
-Date: Tue, 29 Sep 2020 19:55:01 +0530
-Message-Id: <20200929142501.1057-1-ani@anisinha.ca>
-X-Mailer: git-send-email 2.17.1
-Received-SPF: none client-ip=2607:f8b0:4864:20::543;
- envelope-from=ani@anisinha.ca; helo=mail-pg1-x543.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kNGZZ-0001MA-3B
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 10:25:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47684)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kNGZT-0008Be-Cm
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 10:25:40 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601389529;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=gUkr2pUf/YBiDeL7ojehOebsZyhTPPfCAbwLNfD2ZDI=;
+ b=ALFPWju29JXgqeWFhnCjv5NHtcGD7CO5rqlfzrqWon57Bd3815nAoHNWtCm/RCGV+zVfHd
+ GfC0Mv8nHn/iDCl4sFKfFLrUXDEJW4yflQF8wvgUdZlDxXPi+3eWOVuo0b7f32GXrLFDDL
+ H5Mz1s5Lz9z4x5YHXWjiy/4Km0JSToQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-332-e_p-hov4OHeTeJKoHi54uQ-1; Tue, 29 Sep 2020 10:25:27 -0400
+X-MC-Unique: e_p-hov4OHeTeJKoHi54uQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 129A184E240;
+ Tue, 29 Sep 2020 14:25:13 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-101.ams2.redhat.com
+ [10.36.112.101])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C15915578A;
+ Tue, 29 Sep 2020 14:25:12 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 545D9113864A; Tue, 29 Sep 2020 16:25:11 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v6 08/21] docs/interop: Convert qemu-ga-ref to rST
+References: <20200925162316.21205-1-peter.maydell@linaro.org>
+ <20200925162316.21205-9-peter.maydell@linaro.org>
+ <87tuvh0zaf.fsf@dusky.pond.sub.org>
+ <CAFEAcA90L2YEOU70S_B-o+ZQNz+NJKtRd4UU48RBcqe=Z=eSAw@mail.gmail.com>
+ <87k0wcsp5w.fsf@dusky.pond.sub.org>
+Date: Tue, 29 Sep 2020 16:25:11 +0200
+In-Reply-To: <87k0wcsp5w.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+ of "Tue, 29 Sep 2020 15:11:55 +0200")
+Message-ID: <87pn64psmw.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/28 22:47:55
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,58 +100,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Ani Sinha <ani@anisinha.ca>,
- Igor Mammedov <imammedo@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A comment is added in bios-tables-test.c that explains the reasoning
-behind the process of updating the ACPI table blobs when new tests are added
-or old tests are modified or code is committed that affect tests. The
-explanation would help future contributors follow the correct process when
-making code changes that affect ACPI tables.
-
-Signed-off-by: Ani Sinha <ani@anisinha.ca>
-Acked-by: Igor Mammedov <imammedo@redhat.com>
----
- tests/qtest/bios-tables-test.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-changelog:
-v5: incorporated suggestion from eric.
-v4: more updates as per Igor's suggestion. Dropped some comment lines. added
-    ack'd by line.
-v3: review feedback incorporared and actual comment in the code reworded.
-v2: cosmetic - commit log reworded.
-
-diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
-index 3c09b844f9..fc7aaaf82c 100644
---- a/tests/qtest/bios-tables-test.c
-+++ b/tests/qtest/bios-tables-test.c
-@@ -11,7 +11,7 @@
-  */
- 
- /*
-- * How to add or update the tests:
-+ * How to add or update the tests or commit changes that affect ACPI tables:
-  * Contributor:
-  * 1. add empty files for new tables, if any, under tests/data/acpi
-  * 2. list any changed files in tests/qtest/bios-tables-test-allowed-diff.h
-@@ -38,6 +38,11 @@
-  *      $(SRC_PATH)/tests/data/acpi/rebuild-expected-aml.sh
-  * 6. Now commit any changes to the expected binary, include diff from step 4
-  *    in commit log.
-+ *    Expected binary updates needs to be a separate patch from the code that
-+ *    introduces changes to ACPI tables. It lets the maintainer drop
-+ *    and regenerate binary updates in case of merge conflicts. Further, a code
-+ *    change is easily reviewable but a binary blob is not (without doing a
-+ *    disassembly).
-  * 7. Before sending patches to the list (Contributor)
-  *    or before doing a pull request (Maintainer), make sure
-  *    tests/qtest/bios-tables-test-allowed-diff.h is empty - this will ensure
--- 
-2.17.1
+Neglected to say
+With the unicode legacy string literal made plain:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
 
