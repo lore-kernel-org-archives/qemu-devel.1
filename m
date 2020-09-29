@@ -2,82 +2,85 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 684DFC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 00:41:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A37A8C4727F
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 00:41:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A11E21734
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 00:41:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F09B721734
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 00:41:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="QrZD2QpW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A11E21734
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="BZ3o1k9N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F09B721734
 Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kN3i0-0003XH-Kz
-	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 20:41:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55518)
+	id 1kN3i0-0003Xk-Mp
+	for qemu-devel@archiver.kernel.org; Mon, 28 Sep 2020 20:41:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55526)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from
- <3SIJyXwsKChk6H97CC3BD3C5DD5A3.1DBF3BJ-23K3ACDC5CJ.DG5@flex--hskinnemoen.bounces.google.com>)
- id 1kN3gC-0002G9-NA
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 20:39:40 -0400
-Received: from mail-qt1-x84a.google.com ([2607:f8b0:4864:20::84a]:34706)
+ <3SYJyXwsKCho7IA8DD4CE4D6EE6B4.2ECG4CK-34L4BDED6DK.EH6@flex--hskinnemoen.bounces.google.com>)
+ id 1kN3gD-0002GG-Is
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 20:39:41 -0400
+Received: from mail-yb1-xb4a.google.com ([2607:f8b0:4864:20::b4a]:54424)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from
- <3SIJyXwsKChk6H97CC3BD3C5DD5A3.1DBF3BJ-23K3ACDC5CJ.DG5@flex--hskinnemoen.bounces.google.com>)
- id 1kN3gB-0000PK-1h
- for qemu-devel@nongnu.org; Mon, 28 Sep 2020 20:39:40 -0400
-Received: by mail-qt1-x84a.google.com with SMTP id g10so1865570qto.1
- for <qemu-devel@nongnu.org>; Mon, 28 Sep 2020 17:39:37 -0700 (PDT)
+ <3SYJyXwsKCho7IA8DD4CE4D6EE6B4.2ECG4CK-34L4BDED6DK.EH6@flex--hskinnemoen.bounces.google.com>)
+ id 1kN3gC-0000PR-4F
+ for qemu-devel@nongnu.org; Mon, 28 Sep 2020 20:39:41 -0400
+Received: by mail-yb1-xb4a.google.com with SMTP id s128so2930157ybc.21
+ for <qemu-devel@nongnu.org>; Mon, 28 Sep 2020 17:39:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=sender:date:message-id:mime-version:subject:from:to:cc;
- bh=cK79FpM6Y4GoQRIVgHZKxRPYems1DgVkhmUNuMjucR0=;
- b=QrZD2QpW7OeRB6TIFoeo3+KHDuVkJNYZBhGNIlt0i0hvUVfSSgolKEnjsPVOjd7yZm
- bvO8D+BPGAryu8j3aOckCnYZ/GaAqZREMqxxwvDB+quSX0aPEW2UWQduro9B2mZexRIr
- rxLIJ4api/wr/LUiZMmsC4doamA7V2SFGTGTp17TQob3veI0EsiBMlPKizBmJ/KCP+83
- WTC55E6EJ8H5/+YxtS+B+whZpKmGJNtlytriUM8OdQn3PpLOSAYGUTLh1w+ZwP/3T4DT
- vc4hSdAZ5pRfrgV/KsLMHJ8+vqUObopqd1lb8T/fg6jGS9b9vyyWY9vuJSmJ9yxo0/zP
- li3w==
+ h=sender:date:in-reply-to:message-id:mime-version:references:subject
+ :from:to:cc; bh=sYg5Kzsr8KLjdNXvzs0OEoN/iOhrZqYW4HJOWew+/+s=;
+ b=BZ3o1k9NYKMO7qfF55oxjLloDhis/h5uzOHdD1+Glkqmycmr7sdCcWQLIM8oHrLam/
+ ajvjmoiHKOmluhD5kRvP9yAy8nkLeOn9zNnG+l/kin32Slr+YyXhfrS4vOmw+sO5hTFw
+ 7dH3QsZWfT+1QozINyHSnTShuWvSazI444mwNyCv/r0l3MFyH6OWlCMG0CF4RDrCb1wJ
+ LlgtJkmSd75Gxk+vd3QQHqybpwIXNZFITctH212DCsBAyAxm4yicYhvpez5VKnymXsRp
+ Rmv9V5j3igggOx2UU00uA+7/X3QlP3xfgnEl5KUQHfg9dho2KIiKE/Js7XK2Hq0w2LhD
+ aavw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
- :to:cc;
- bh=cK79FpM6Y4GoQRIVgHZKxRPYems1DgVkhmUNuMjucR0=;
- b=N41aiqitlBoEcpjQnV031/qSzWe7QjlVk1cyuie/GFFHyy6Aa4k2aXQ2JjqedV6Kdd
- jGvSE/tCYNcQYWmtTeKtZlEqCMEQdWNUXIZW6it4BBW2+pG90QkEUyeirZc05Q7FrBZJ
- eU+BxK216gdFluNG62tg5s6sPYClvcC//g6t1gMXWKuzYvp4SEoOwEP9LyHymd5bt/Cd
- +ol9WyyDnE5lWNPkDUT0KaeRZ9M8qkW8xsEM5cxSDM7nMWonlx0dipaDVJYkPihG8ww/
- IJaIlqnU7sxeG4zIgxJWyPEpjmSdN1Ss7zjVGniuFAoDKtrtO9Nro8JguuYIe7E5unED
- 70Cg==
-X-Gm-Message-State: AOAM531RKhaJ6wxpPs53l8zWhizTt+NFr/Fpcq1LacaBngW0A7e8B5ql
- boLDRTgnLKh04yesvET0GAXlmi5T6rg5gozM2a+g3T1iE0+jfFjPUdjfToLjzousUkvAKLDvnZo
- Hc9t4uaIpuWog3/ujznrNEUH/87lY58UyysZVsmSuQd3Tc90O4AJlArDfv9KfArFT2Do1XKVI8Q
+ h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=sYg5Kzsr8KLjdNXvzs0OEoN/iOhrZqYW4HJOWew+/+s=;
+ b=UbMguYQvh2UDS7Tiky/VdkQgm99QqJSYjqSC2e9LFUYWPOvxUyqZyry+ustPxcH44S
+ xvlq5ZwOzl2nkwnqZ7NNDHO9UOFkX43mrPhfulS7CJP7//1WbfdAJWLuKlzAxH63pitv
+ 0pBf5sBO5LZm1og0WAqE7m1BzvG7goeoIscbzfXfBpJpsUQjrdT2eVPXLZCDPYZy39oN
+ /KcyEyufvhfP809E1GxkSVoF4ZSiW3dujUb3BEjkXRZ5OOZTuporLYZCBd/HBNgvdMjM
+ I6uk7z/3sL3ipF1pz0xTR0iL7WmQIb/zJBZ6S7ErEVLcEqtKBWtyu4VWda12+zdM8V4C
+ 6uiw==
+X-Gm-Message-State: AOAM532QgsZrdkFiU6MnPlc8pkXGCfXX2uhf306Qo8Bm/PJoedr2jkUf
+ vOwzfh3GEAvRe44BflCu+Yy/F3a8h/v7ZHqiLPZDVhwZtrDX/S2i5hAJICdgODa+usySr12ASmq
+ uaJJmac+9wqF+cVsnQ2zYAEEk3VWs4zRMPH8RS1nMid60OHFx7V+ToF2ypi/YLZTkjYEsDEWp9Q
  ==
-X-Google-Smtp-Source: ABdhPJy8vUqDhLvNdaqkloRqT/KTfT5gUnxKtb4P23ilJ0/T6dL52/bvIn2jDQ44TSsTKf6Oit5lc3GUCtrHlrLHaQ==
+X-Google-Smtp-Source: ABdhPJxTcetwlCFZyOjMP+C2TBvcHwYdQfNWBOFiw86GDfnqsPDSJMZnoA0+3ma64bpwlR8iehEF39QYoElAnO4qTQ==
 X-Received: from skybert.c.googlers.com ([fda3:e722:ac3:10:24:72f4:c0a8:3107])
- (user=hskinnemoen job=sendgmr) by 2002:a0c:e447:: with SMTP id
- d7mr2152783qvm.44.1601339976225; Mon, 28 Sep 2020 17:39:36 -0700 (PDT)
-Date: Mon, 28 Sep 2020 17:39:13 -0700
-Message-Id: <20200929003916.4183696-1-hskinnemoen@google.com>
+ (user=hskinnemoen job=sendgmr) by 2002:a25:d1d4:: with SMTP id
+ i203mr2838876ybg.429.1601339977897; Mon, 28 Sep 2020 17:39:37 -0700 (PDT)
+Date: Mon, 28 Sep 2020 17:39:14 -0700
+In-Reply-To: <20200929003916.4183696-1-hskinnemoen@google.com>
+Message-Id: <20200929003916.4183696-2-hskinnemoen@google.com>
 Mime-Version: 1.0
+References: <20200929003916.4183696-1-hskinnemoen@google.com>
 X-Mailer: git-send-email 2.28.0.709.gb0816b6eb0-goog
-Subject: [RFC 0/3] QEMU as IPMI BMC emulator
+Subject: [RFC 1/3] docs: enable sphinx blockdiag extension
 To: qemu-devel@nongnu.org
 Cc: Avi.Fishman@nuvoton.com, kfting@nuvoton.com, joel@jms.id.au, clg@kaod.org, 
  venture@google.com, wuhaotsh@google.com, minyard@acm.org, 
  Havard Skinnemoen <hskinnemoen@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::84a;
- envelope-from=3SIJyXwsKChk6H97CC3BD3C5DD5A3.1DBF3BJ-23K3ACDC5CJ.DG5@flex--hskinnemoen.bounces.google.com;
- helo=mail-qt1-x84a.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b4a;
+ envelope-from=3SYJyXwsKCho7IA8DD4CE4D6EE6B4.2ECG4CK-34L4BDED6DK.EH6@flex--hskinnemoen.bounces.google.com;
+ helo=mail-yb1-xb4a.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -100
@@ -105,37 +108,27 @@ Sender: "Qemu-devel"
 Reply-to: Havard Skinnemoen <hskinnemoen@google.com>
 From: Havard Skinnemoen via <qemu-devel@nongnu.org>
 
-This series briefly documents the existing IPMI device support for main
-processor emulation, and goes on to propose a similar device structure to
-emulate IPMI responder devices in BMC machines. This would allow a qemu
-instance running BMC firmware to serve as an external BMC for a qemu instance
-running server software.
+Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+---
+ docs/conf.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-RFC only at this point because the series does not include actual code to
-implement this. I'd appreciate some initial feedback on
-
-1. Whether anyone else is interested in something like this.
-2. Completeness (i.e. anything that could be explained in more detail in the
-   docs).
-3. Naming, and whether 'specs' is the right place to put this.
-4. Whether it's OK to enable the blockdiag sphinx extension (if not, I'll just
-   toss the block diagrams and turn the docs into walls of text).
-
-If this seems reasonable, I'll start working with one of my team mates on
-implementing the common part, as well as the Nuvoton-specific responder device.
-Possibly also an Aspeed device.
-
-Havard Skinnemoen (3):
-  docs: enable sphinx blockdiag extension
-  docs/specs: IPMI device emulation: main processor
-  docs/specs: IPMI device emulation: BMC
-
- docs/conf.py         |   5 +-
- docs/specs/index.rst |   1 +
- docs/specs/ipmi.rst  | 183 +++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 188 insertions(+), 1 deletion(-)
- create mode 100644 docs/specs/ipmi.rst
-
+diff --git a/docs/conf.py b/docs/conf.py
+index 0dbd90dc11..7c72f1a074 100644
+--- a/docs/conf.py
++++ b/docs/conf.py
+@@ -67,7 +67,10 @@ needs_sphinx = '1.6'
+ # Add any Sphinx extension module names here, as strings. They can be
+ # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
+ # ones.
+-extensions = ['kerneldoc', 'qmp_lexer', 'hxtool', 'depfile']
++extensions = ['kerneldoc', 'qmp_lexer', 'hxtool', 'depfile', 'sphinxcontrib.blockdiag']
++
++# Fontpath for blockdiag (truetype font)
++blockdiag_fontpath = '/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf'
+ 
+ # Add any paths that contain templates here, relative to this directory.
+ templates_path = ['_templates']
 -- 
 2.28.0.709.gb0816b6eb0-goog
 
