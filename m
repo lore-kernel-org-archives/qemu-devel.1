@@ -2,88 +2,101 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84DC3C4346E
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 09:07:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7CB4C4346E
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 09:10:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DE802076A
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 09:06:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C9502076A
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 09:10:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="itmdwVtF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DE802076A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZymfVICG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C9502076A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNBb8-0000Ye-9Y
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 05:06:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54890)
+	id 1kNBeS-0001iW-Tw
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 05:10:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55702)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kNBZw-0008Il-DX
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 05:05:45 -0400
-Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:38740)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kNBdS-0001Gv-At
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 05:09:22 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39511)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kNBZr-0001Z9-JJ
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 05:05:42 -0400
-Received: by mail-ej1-x644.google.com with SMTP id dd13so1172204ejb.5
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 02:05:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=2AdiZrKpdZpwZHDa7XB73w669O5RGRFo5RlxL1ynl28=;
- b=itmdwVtFtqGGcbzI9/uWd2xx2Hy8xMvPm5cI43lABjy/OCLjtnL3wt9dCrDXnwydsG
- B/MSE0IrPoMtCVmEcu+UawJMqSYZvo6uchYHa7BbCksLBOOmKU2Rc49qTOYgBDuaFqFe
- cI243WAJUZktO/0ydoge5O+NKhitAFocQ88XY263671Eff5Ms+yMwt8pOfK/QHETknOW
- vBGzJnTCwNDExj0DIk3GHFd4EWdzUT7zlXb943pi4Y1+r5rQ5uoZql0Qs+XcOSqKXcbJ
- PBxS+XH7HnkoLdygGCSBWH/AIGQQxkC4QmOEbwialSDmBXQR3FPyOhtJDP+gbmqFtykH
- bSuQ==
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kNBdQ-00020e-8L
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 05:09:22 -0400
+Received: by mail-wm1-x341.google.com with SMTP id t17so1338930wmi.4
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 02:09:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=eWUfh2LX+/uB+0Xo1n3d/Pu9GFYystKkSGGHNiDkG3o=;
+ b=ZymfVICGCGTD8jxQtWrSMTeUiXGFKpNUJBumvv500rdXv2nBSw6ODbOXNu9T3b6mpC
+ oUdPAZfk84FimM9zXj8CYDvyHiXmOXFZg4CzDkM4Tiv/ZTr/u4dUmqpMmKEIE4bHbQpS
+ 8WszFhZvujT56unK5a7JCS/zGYK1C/CBoHHsFsqWtKxkMYz8j76tAbqKqgiknmlPOLpW
+ jA8qgB9snuOjfbkhY+OR2hz/ODVvGcDdB0kK9M7t/RxtUKBZJeQpEgzEaIE+O3K35cH7
+ HXMBJXoNr3pScadQFnbIlhXTqttS+u7uoBAynve874x861TK2ZDBJer/8zaAcex5V6z/
+ afRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=2AdiZrKpdZpwZHDa7XB73w669O5RGRFo5RlxL1ynl28=;
- b=RxCkMWmVYDzy+qXugA5KGLrcdKYgkvDFKNJr6abpOJZ0GOSBwQq2vx4yQLoZnlim9P
- wYVED93jWilDHHIv7ZC6WjDL8RpX6xEmYv3QSNlypjyM2otRyj0pZ+z1yFQHZoCrkEVR
- sX8x+S6kZfYHXq8jsfsqpcXLGMMTTlOLxnOD6lv6CIHG8kvWhFwrobDPXcjJNJiYrLkd
- 4JMSHDqIZprCAOrsoYHH/YIX8rapi4yLxqaFFei6nxHtIq+sbekg/zXuzsaKXsxtkHup
- wZqSn3v7GIHM/wVOq6TWxkdLLZ0hMa1vPCvosfXazfbKr0koqe00QmIohKVuKvpFRNPO
- /nIg==
-X-Gm-Message-State: AOAM531iPRiNbYW53Bv9fKXqGnNvMqZQzfq/xOBTztNSQGROSGo0cfAe
- ii65ximC7WE2qY5jOLFciMgTDYAsiPNYyGHHtzHKzA==
-X-Google-Smtp-Source: ABdhPJykFMyqkck6XUzuW6+0+rYWSm9kCxzH2ImOwcB8GigKxDf9tMcr3l0z7tNSVvuXgtlkOA5+BTxY0vksoDpwAHo=
-X-Received: by 2002:a17:906:4a53:: with SMTP id
- a19mr2976358ejv.56.1601370337320; 
- Tue, 29 Sep 2020 02:05:37 -0700 (PDT)
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=eWUfh2LX+/uB+0Xo1n3d/Pu9GFYystKkSGGHNiDkG3o=;
+ b=KXmesjhQa/KDCE87smGDLnpgaGivU2+FEsskCWFaG0tiURK7FwAK7ABugZ3E/LSSEY
+ mHAN1RRj4rXQe1rveCmIeuj8Vs7vL9zkdZDLdzeVzvdCGLrVfv/7jYP+wHSR64GQV1lh
+ mlSMEAJ3V0SJ400E6RW7vWpxEuxnBPksa2LeETDHrfsT9okN0sWrRjp/WTvsRqwXZqP+
+ TLYW5wP0e3IkKOTOxxzcyi+XMvkRUIpBPWKmXOO7r5d2wHhZJCf/+aEE/lQLAULJ6HoI
+ z1b90dbeG65alLgLLDtm3232ucbO2OCsWxoVHusCSg3fav0UEBNRRKi8Qm+Lu0J/L9SO
+ hZ0Q==
+X-Gm-Message-State: AOAM533c8hAspAdgUcTLWVMvUWFXBYHOKt0pkoaL9r3GW/YooZF8Y0dl
+ hERimVvMx6WvNfBllYbUXxg=
+X-Google-Smtp-Source: ABdhPJywvwlgahDxL8eMx/Dvkt/DEwOW8ioKkOCqyTCrbhp3JvDYmZZVJrgRN4OTk7+b5Gz9a0TE1g==
+X-Received: by 2002:a7b:ce0d:: with SMTP id m13mr3637502wmc.83.1601370557777; 
+ Tue, 29 Sep 2020 02:09:17 -0700 (PDT)
+Received: from [192.168.1.36] (74.red-83-53-161.dynamicip.rima-tde.net.
+ [83.53.161.74])
+ by smtp.gmail.com with ESMTPSA id 189sm4541083wmb.3.2020.09.29.02.09.16
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 29 Sep 2020 02:09:17 -0700 (PDT)
+Subject: Re: [PATCH 16/16] tests/acceptance: Test the MIPSsim machine
+To: Willian Rampazzo <wrampazz@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ "Daniel P . Berrange" <berrange@redhat.com>
+References: <20200928171539.788309-1-f4bug@amsat.org>
+ <20200928171539.788309-17-f4bug@amsat.org>
+ <CAKJDGDbowgUtu8Ap7K6vm_sksW3-maHU0bk3uib7BNY-5YxMdQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <105e7a4e-adee-284e-cf20-31b1a2781720@amsat.org>
+Date: Tue, 29 Sep 2020 11:09:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200925162316.21205-1-peter.maydell@linaro.org>
- <20200925162316.21205-8-peter.maydell@linaro.org>
- <874knh6pkj.fsf@dusky.pond.sub.org>
-In-Reply-To: <874knh6pkj.fsf@dusky.pond.sub.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 29 Sep 2020 10:05:26 +0100
-Message-ID: <CAFEAcA_Cz-Y5XAj6mZq2hVecGWrga4R61CxA-jjaAFuACw8yZg@mail.gmail.com>
-Subject: Re: [PATCH v6 07/21] docs/sphinx: Add new qapi-doc Sphinx extension
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::644;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x644.google.com
+In-Reply-To: <CAKJDGDbowgUtu8Ap7K6vm_sksW3-maHU0bk3uib7BNY-5YxMdQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_score_int: -15
+X-Spam_score: -1.6
+X-Spam_bar: -
+X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.199, NICE_REPLY_A=-0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,101 +109,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Damien Hedde <damien.hedde@greensocs.com>,
+ Huacai Chen <zltjiangshi@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Paul Burton <paulburton@kernel.org>,
+ Thomas Huth <huth@tuxfamily.org>, qemu-devel <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Cleber Rosa <crosa@redhat.com>, Huacai Chen <chenhc@lemote.com>,
+ "Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 29 Sep 2020 at 07:54, Markus Armbruster <armbru@redhat.com> wrote:
->
-> Peter Maydell <peter.maydell@linaro.org> writes:
->
-> > Some of our documentation is auto-generated from documentation
-> > comments in the JSON schema.
-> >
-> > For Sphinx, rather than creating a file to include, the most natural
-> > way to handle this is to have a small custom Sphinx extension which
-> > processes the JSON file and inserts documentation into the rST
-> > file being processed.
-> >
-> > This is the same approach that kerneldoc and hxtool use.
-> >
-> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->
-> Down to a few trivial things, which I can tidy up in my tree.
++Alex/Daniel
 
-Thanks, that would be great.
+On 9/28/20 10:33 PM, Willian Rampazzo wrote:
+> On Mon, Sep 28, 2020 at 2:31 PM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>
+>> Add a test for the mipssim machine, based on the recommended
+>> test setup from Thomas Huth:
+>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg606846.html
+>>
+>> The test is quick and can be run as:
+>>
+>>   $ avocado --show=console run -t machine:mipssim tests/acceptance/
+>>    (1/1) tests/acceptance/machine_mips_mipssim.py:MipsSimMachine.test_mipssim_linux_console:
+>>   console: Linux version 3.6.11 (root@711bb8ba16a7) (gcc version 4.8.3 (Buildroot 2014.11) ) #2 Sun Sep 27 13:39:35 UTC 2020
+>>   console: Setting default memory size 0x02000000
+>>   console: bootconsole [early0] enabled
+>>   console: CPU revision is: 00019300 (MIPS 24Kc)
+>>   console: FPU revision is: 00739300
+>>   ...
+>>   console: CPU frequency 12.00 MHz
+>>   console: Calibrating delay loop... 950.27 BogoMIPS (lpj=4751360)
+>>   ...
+>>   console: MIPSNet Ethernet driver. Version: 2007-11-17. (c)2005 MIPS Technologies, Inc.
+>>   ...
+>>   console: Welcome to Buildroot
+>>   console: buildroot login: root
+>>   console: # root
+>>   console: -sh: root: not found
+>>   console: # ping -c 3 10.0.2.2
+>>   console: PING 10.0.2.2 (10.0.2.2): 56 data bytes
+>>   console: 64 bytes from 10.0.2.2: seq=0 ttl=255 time=48.231 ms
+>>   console: 64 bytes from 10.0.2.2: seq=1 ttl=255 time=9.407 ms
+>>   console: 64 bytes from 10.0.2.2: seq=2 ttl=255 time=2.298 ms
+>>   console: --- 10.0.2.2 ping statistics ---
+>>   console: 3 packets transmitted, 3 packets received, 0% packet loss
+>>   PASS (7.99 s)
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>> Cc: Thomas Huth <huth@tuxfamily.org>
+>> ---
+>>  MAINTAINERS                              |  1 +
+>>  tests/acceptance/machine_mips_mipssim.py | 56 ++++++++++++++++++++++++
+>>  2 files changed, 57 insertions(+)
+>>  create mode 100644 tests/acceptance/machine_mips_mipssim.py
+>>
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index 5eed1e692b4..17d8a012b0e 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -240,6 +240,7 @@ F: include/hw/misc/mips_*
+>>  F: include/hw/timer/mips_gictimer.h
+>>  F: tests/acceptance/linux_ssh_mips_malta.py
+>>  F: tests/acceptance/machine_mips_malta.py
+>> +F: tests/acceptance/machine_mips_mipssim.py
+>>  F: tests/tcg/mips/
+>>  K: ^Subject:.*(?i)mips
+>>
+>> diff --git a/tests/acceptance/machine_mips_mipssim.py b/tests/acceptance/machine_mips_mipssim.py
+>> new file mode 100644
+>> index 00000000000..b2749917b08
+>> --- /dev/null
+>> +++ b/tests/acceptance/machine_mips_mipssim.py
+>> @@ -0,0 +1,56 @@
+>> +# Functional tests for the MIPS simulator (MIPSsim machine)
+>> +#
+>> +# Copyright (c) 2020 Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> +#
+>> +# This work is licensed under the terms of the GNU GPL, version 2 or later.
+>> +# See the COPYING file in the top-level directory.
+>> +#
+>> +# SPDX-License-Identifier: GPL-2.0-or-later
+>> +
+>> +import os
+>> +import logging
+>> +import time
+>> +
+>> +from avocado import skipUnless
+>> +from avocado_qemu import Test
+>> +from avocado_qemu import exec_command_and_wait_for_pattern
+>> +from avocado_qemu import interrupt_interactive_console_until_pattern
+>> +from avocado_qemu import wait_for_console_pattern
+>> +
+>> +class MipsSimMachine(Test):
+>> +
+>> +    timeout = 30
+>> +    KERNEL_COMMON_COMMAND_LINE = 'printk.time=0 '
+>> +
+>> +    @skipUnless(os.getenv('AVOCADO_ALLOW_UNTRUSTED_CODE'), 'untrusted code')
+>> +    def test_mipssim_linux_console(self):
+>> +        """
+>> +        Boots the Linux kernel and checks that the console is operational
+>> +        :avocado: tags=arch:mipsel
+>> +        :avocado: tags=machine:mipssim
+>> +        :avocado: tags=device:mipsnet
+>> +        """
+>> +        kernel_url = ('https://github.com/philmd/qemu-testing-blob/raw/'
+>> +                      '32ea5764e1de8fffa0d59366c44822cd06d7c8e0/'
+>> +                      'mips/mipssim/mipsel/vmlinux')
+> 
+> So, are you willing to maintain some images on your GitHub to avoid
+> the image changes when they are not found?
 
+No, I am not willing to do that.
 
-> > +    def _serror(self, msg):
-> > +        """Raise an exception giving a user-friendly syntax error message"""
-> > +        file = self._cur_doc.info.fname
-> > +        line = self._cur_doc.info.line
-> > +        raise ExtensionError(
-> > +            '%s line %d: syntax error: %s' % (file, line, msg))
->
-> Unused, let's drop.
+But I see it pointless to have everyone (including CI) to spend 1h
+building this image, when the sources and build recipe is available,
+making the built image reproducible.
 
-Oops, yes. I refactored the error-handling code below and forgot
-to delete this now-unused method.
+I'm not sure we need to run all the tests all the time, but I'd like
+to have the tests:
 
-> > +    def visit_enum_type(self, name, info, ifcond, features, members, prefix):
-> > +        doc = self._cur_doc
-> > +        self._add_doc('Enum',
-> > +                      self._nodes_for_enum_values(doc) +
-> > +                      self._nodes_for_features(doc) +
-> > +                      self._nodes_for_sections(doc) +
-> > +                      self._nodes_for_if_section(ifcond))
->
-> PEP 8: In Python code, it is permissible to break before or after a
-> binary operator, as long as the convention is consistent locally.  For
-> new code Knuth's style is suggested.
->
-> Mind switching to Knuth style, i.e. break before the operator?
+1/ provided with a series, so reviewer are free to rebuild the image
+   and test this series works as expected,
+2/ committed in the repository, so maintainers can verify future changes
+   doesn't introduce regression.
 
-Fine with me, I have no strong Python style preferences.
-I'm unlikely to be able to reliably follow any particular
-style rules in future code I write unless there's a linter
-that complains about violations, though...
+> 
+>> +        kernel_hash = '0f9aeca3a2e25b5b0cc4999571f39a7ad58cdc43'
+>> +        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
+>> +
+>> +        initrd_url = ('https://github.com/philmd/qemu-testing-blob/raw/'
+>> +                      '32ea5764e1de8fffa0d59366c44822cd06d7c8e0/'
+>> +                      'mips/mipssim/mipsel/rootfs.cpio')
+>> +        initrd_hash = 'b20359bdfae66387e5a17d6692686d59c189417b'
+>> +        initrd_path = self.fetch_asset(initrd_url, asset_hash=initrd_hash)
+>> +
+>> +        self.vm.set_console()
+>> +        self.vm.add_args('-kernel', kernel_path,
+>> +                         '-initrd', initrd_path,
+>> +                         '-append', self.KERNEL_COMMON_COMMAND_LINE)
+>> +        self.vm.launch()
+>> +
+>> +        wait_for_console_pattern(self, 'Welcome to Buildroot')
+>> +        interrupt_interactive_console_until_pattern(self,
+>> +                                                    interrupt_string='root\r',
+>> +                                                    success_message='#')
+>> +        pattern = '3 packets transmitted, 3 packets received, 0% packet loss'
+>> +        exec_command_and_wait_for_pattern(self, 'ping -c 3 10.0.2.2', pattern)
+>> --
+>> 2.26.2
+>>
+>>
+> 
+> IMHO, although the solution of spreading images over personal
+> repositories is not the best, I don't have a strong opinion to block
+> this, so
 
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index 5eed1e692b4..dbddb0a7635 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -3149,6 +3149,7 @@ M: Peter Maydell <peter.maydell@linaro.org>
-> >  S: Maintained
-> >  F: docs/conf.py
-> >  F: docs/*/conf.py
-> > +F: docs/sphinx/
-> >
-> >  Miscellaneous
-> >  -------------
->
-> Maintainers of scripts/qapi/ should help review patches to
-> docs/sphinx/qapidoc.py.  Two options:
->
-> * Add docs/sphinx/qapidoc.py to section QAPI.  The QAPI maintainers
->   become M: of this small part of "Sphinx documentation configuration
->   and build machinery".  R: would be more accurate.  The inaccuracy
->   feels harmless.
->
-> * Do nothing.  scripts/get_maintainer.pl won't loop in the QAPI
->   maintainers.  The Sphinx documentation maintainers may have to do that
->   manually.
->
-> What do you think?
+If the URL is stable (stable commit or even better, tag) it should
+be OK.
 
-No strong preference. I guess putting qapidoc.py in the QAPI
-section means that the right people get cc'd so that's the
-better approach.
+tag is used in the quanta-gsj tests, see commit 4fe986dd448
+("tests/acceptance: console boot tests for quanta-gsj"):
 
-> My review is of uneven value: the QAPI-facing parts are good, the
-> Sphinx-related parts merely look good to ignorant me.  I guess that's
-> good enough, since we also have "generated docs look sane".
->
-> Preferably tidied up a bit more:
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+  image_url = (
+          'https://github.com/hskinnemoen/openbmc/releases/download/'
+          '20200711-gsj-qemu-0/obmc-phosphor-image-gsj.static.mtd.gz')
+  image_hash = '14895e634923345cb5c8776037ff7876df96f6b1'
 
-thanks
--- PMM
+> 
+> Reviewed-by: Willian Rampazzo (willianr@redhat.com)
+> 
+
+Thanks!
+
+Phil.
 
