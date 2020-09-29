@@ -2,78 +2,74 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CBD9C4346E
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 04:14:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ADC6C4727D
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 04:16:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F785214D8
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 04:14:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C1FD3208FE
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 04:16:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OOiErtBD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F785214D8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BVVsXuFS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1FD3208FE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kN72K-0004rG-7H
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 00:14:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41436)
+	id 1kN73t-0005q3-R1
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 00:16:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41740)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kN71i-0004QV-GX
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 00:14:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27719)
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kN73J-0005Lb-Ps
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 00:15:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50939)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kN71h-0007U2-0n
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 00:14:06 -0400
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kN73I-0007qF-9N
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 00:15:45 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601352844;
+ s=mimecast20190719; t=1601352943;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=lB7YlX5nQouTVuZIHcg+IUWx5MX7JVkWZQWs4OVKF44=;
- b=OOiErtBD2XsIInP/dUhJaH6ZDFvUxsA5tqe/Cx5+q9CnZaHi9srx62ACHsPYuqfrib8HiL
- Lsfo9PhX0rTfM+BtmtypTc7ty65aX+1SRmvlIBvk59GUF/LqXi0CVOhxKLyP5oalwiTg4q
- nwbkkbLfPRepuFBPU9J70X6suw4FOC4=
+ bh=zqfc7pEYcrycIJ+3SLi9v8SZpATga4YRGBj5/+dXTQo=;
+ b=BVVsXuFS0gMGdjNMLTM+2k8a53jHlp0pw0N6oE3BeRDYShcs2LChwZjlZyQJOUJ7ekLAG3
+ VfH+DVrebDFbSNg82T0cos6r8wTb4t8hnD1evTW0WoLlOFxHh767BQEevkpr7ffYCjGEoF
+ bYAIF5QubmMT05li+K+awqWHsL2Etfs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-343-NIXWc24aNEaHOiSKvKGD0w-1; Tue, 29 Sep 2020 00:14:01 -0400
-X-MC-Unique: NIXWc24aNEaHOiSKvKGD0w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-181-H9zi6hEXN1WC8PBw9xKAOw-1; Tue, 29 Sep 2020 00:15:40 -0400
+X-MC-Unique: H9zi6hEXN1WC8PBw9xKAOw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 746D3801AE1
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 04:14:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CAD10107464E
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 04:15:39 +0000 (UTC)
 Received: from localhost.localdomain (ovpn-119-55.rdu2.redhat.com
  [10.10.119.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B96BC7368F;
- Tue, 29 Sep 2020 04:13:59 +0000 (UTC)
-Date: Tue, 29 Sep 2020 00:13:57 -0400
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2F495277D0;
+ Tue, 29 Sep 2020 04:15:39 +0000 (UTC)
+Date: Tue, 29 Sep 2020 00:15:37 -0400
 From: Cleber Rosa <crosa@redhat.com>
 To: John Snow <jsnow@redhat.com>
 Subject: Re: [PATCH v3 12/47] qapi: enforce import order/styling with isort
-Message-ID: <20200929041357.GI700868@localhost.localdomain>
+Message-ID: <20200929041537.GJ700868@localhost.localdomain>
 References: <20200925002900.465855-1-jsnow@redhat.com>
  <20200925002900.465855-13-jsnow@redhat.com>
- <87imc2w6uf.fsf@dusky.pond.sub.org>
- <8baab976-1dfd-a7b4-1a1e-47480cf0c4b6@redhat.com>
- <87tuvigkuf.fsf@dusky.pond.sub.org>
- <a2bd875a-b158-3c64-e6b6-7238e1e7c7d9@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a2bd875a-b158-3c64-e6b6-7238e1e7c7d9@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200925002900.465855-13-jsnow@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="svExV93C05KqedWb"
+ protocol="application/pgp-signature"; boundary="GlnCQLZWzqLRJED8"
 Content-Disposition: inline
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=crosa@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
@@ -98,60 +94,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---svExV93C05KqedWb
+--GlnCQLZWzqLRJED8
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 28, 2020 at 10:34:42AM -0400, John Snow wrote:
-> On 9/28/20 8:13 AM, Markus Armbruster wrote:
-> > PEP 8: "Surround top-level function and class definitions with two blan=
-k
-> > lines."
-> >=20
-> > [...]
-> >=20
-> >=20
+On Thu, Sep 24, 2020 at 08:28:25PM -0400, John Snow wrote:
+> While we're mucking around with imports, we might as well formalize the
+> style we use. Let's use isort to do it for us.
 >=20
-> Yep, but flake8 does not complain about the first definitions that occur
-> below imports. Why not? I don't know.
+> force_sort_within_sections: Intermingles "from x" and "import x" style
+> statements, such that sorting is always performed strictly on the module
+> name itself.
 >=20
-> Regardless, I can change it and fold the changes in; they won't affect mu=
-ch
-> here.
+> force_grid_wrap=3D4: Four or more imports from a single module will force
+> the one-per-line style that's more git-friendly. This will generally
+> happen for 'typing' imports.
 >=20
+> multi_line_output=3D3: Uses the one-per-line indented style for long
+> imports.
+>=20
+> include_trailing_comma: Adds a comma to the last import in a group,
+> which makes git conflicts nicer to deal with, generally.
+>=20
+> Suggested-by: Cleber Rosa <crosa@redhat.com>
+> Signed-off-by: John Snow <jsnow@redhat.com>
 
-Well, on all of the cases here, it's not function or class definition
-that follows, so that aspect of PEP 8 is not being violated.
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Tested-by: Cleber Rosa <crosa@redhat.com>
 
-- Cleber.
-
---svExV93C05KqedWb
+--GlnCQLZWzqLRJED8
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl9ytIMACgkQZX6NM6Xy
-CfPRsQ/+M6m7bYCZZ5+3FaXzkoTmZ6oSIfo5YVBOGF9qe7XJLqV6HQ8Wo74NC/A8
-YZMSLMGDaTsXxd+YL5EbsBx2rVemZnXUTuVyic5eOiPybET2CcPMXrc0nSe3vzdc
-LE5tx1MD+QI9VU25jcXajAvd8dwpVrhZ0kx5m0rBF3zeChE/zD8gaCt8pjhskFWd
-3mv8owYskSva0fqJ1CZwgu1EbbysT0B8JtIoWuceDMkKaFDNuVlOqUMHBl++wdPL
-e+kx6JGiYTgodwSp5Ig+fAEya89ilwqoH4+GUB0T3JxuCOJaokROGRS1Ncs8azV9
-dT38da4qZW5pK/2I6Rm/lfdW2vXwPMjShnKxrjq8ZspGNbIJDeLd6nwRFpNGMREy
-Ojv6BN3G7b5Q/bFO/LOYNx0BFtXXhhmHiurVCawNlzrh2uEDQZpKgNpXObCKj04D
-kvevocggoRA84/WPhDW1JZ9Hrvpb5jgfRc0GNW5K0PX8/XP80JtdILXGW1w+ptpE
-g8ij+tVun/b7BeW5NCAwGojuJiVyTG6pBCOQk/qWKbbALo1VNTrVIimQ31f/DDRh
-1z+DLsFXJnQyvldI3uLw86UYbwlC3a22OxqHSEXOo/n8XvkQcAnsvydzop/c/Who
-mxstx+WcHDon5LyhFJtHvSnMHv1FMzAoP0qcvZmiH3gaBe3xjmg=
-=+91L
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl9ytOkACgkQZX6NM6Xy
+CfN3AQ/8CDCZ+N9Qbm3ewlcjuTi8JsNz64EDRhCcfpg13pas8ssEFWWOOJ/NHEH0
+wN9GjpWMyYF/DS3X0tbiRmMfNS6NWdqLLve9njx0YWU6kmm3ma8BXwQlC/oheMM7
+xC3g9u+6nP1SZLqtM0s1HU+yzgIjVYeJDN6fa30mQMzFdEQtpyDOhsrLzgbCeqCd
+m4tHcIdRLiaQoeM1cUprQCyNdgd8D1r04Hf+Ekp1NwxHfLQo08Cb47TunQ/hu3VQ
+bbSfR9OtB0QxWpGWsgZVy5TpU+MDIEX9dOE/uFLcqYTjj2MVIoIuE/yu8VmGT7MN
++srehfhlwD6HUO7qAFbkBHLeqL1gQBqoMesQEbhB+r2M7cSH9hWxMuVXG8IyRbsQ
+YjLCPpLomn/kyOiwayphFNT11hT36dJ9Su4mzT/cZq6ibYtu6MxfDwFl0BBntsYd
+eJKNvWD3FL4LzaBZEax58574G3VO6gLZ/VAjFKx96f1FbFivNvs+UKzq/77FaR3b
+++CtKlbolJ/m+bPOXOER+8WqJL4ymAzwbWVQzz3kvICwKy3oSN6rI8Iec+THPAC7
+nCUzIZE/AGxZl0K6tVshOW5wnRNinmKTzrjLeNVWjoJidCMdPB1VEauReHCagP0L
+79FXGUbQ7KB1ICu6C/ZTbzkB0RswBQtONI3utqri6xLqyvVCQ3U=
+=NE1O
 -----END PGP SIGNATURE-----
 
---svExV93C05KqedWb--
+--GlnCQLZWzqLRJED8--
 
 
