@@ -2,89 +2,99 @@ Return-Path: <SRS0=JiPe=DG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B1A7C4727C
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 13:00:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 818F6C4727F
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 13:01:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B51C520848
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 13:00:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BF24E207F7
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Sep 2020 13:01:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ghM2tjTv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B51C520848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KHNuZy/o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF24E207F7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNFEt-0003ri-0H
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 09:00:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57212)
+	id 1kNFGR-0004oi-IT
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 09:01:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57398)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kNFAd-0006tD-A3
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 08:55:51 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:42284)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kNFAb-00032y-DM
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 08:55:50 -0400
-Received: by mail-ed1-x542.google.com with SMTP id j2so6202257eds.9
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 05:55:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=hFiQ1IrKPc/BeaEYsp9+YmLWAPi+EAYPi87IdGvuqQk=;
- b=ghM2tjTv4cjzmMOv/AeQDiMBOhMQhqLvKwaamv9ocrmi+WMeZvba0JlazvZJSCBNEi
- Wc/4LCSxqAa1txYDmLmUKVr2GKtN5dh1ehs5ZtWB8+cXejvIyryJwujfnIb/U+7H6iHD
- WNUxK8/+/Gfj57+a0OSZk9Bs2dSjFcn0eUaq0bfH2XixfqV9L6+FpEWDLNU1IBQMDq8I
- lOFOJjtzHruVWlSGOHYfOLJOsSHHoSpB5bN90RV7ZiFhZrhLAGArHY/pjmiUFSrMdJxY
- yLB6o5ZfaUcFnJ+onZkrTKCAfi/L7KuHOJbPEt8bQoHYMhLEa50Yb1o7DaJedHnWPc/w
- JgiQ==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kNFB4-0007Nf-1O
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 08:56:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48707)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kNFB2-0003Fn-3F
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 08:56:17 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601384175;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=iguQs2kfsCnerdjWScTWC7qFlJXZ9V7uhuoxVsh48D8=;
+ b=KHNuZy/oqkqaxQw4qxAhnUR2IjEc63Roe8a/RhXWHkunfbZ8IBsqUIf7sB2W+REPjk1eRv
+ q+ikIOl8QnGXelm/fKiBDl78wxunUTLLWC4BNym1/fyZRYfV/6eNtMx9qr2IPm/kTpTQM1
+ Hl2h7AO7u4JL+i12ELXbNMA5/VCfP2o=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-165-xgzwXCjaMXeKCigUrkE-Ng-1; Tue, 29 Sep 2020 08:56:13 -0400
+X-MC-Unique: xgzwXCjaMXeKCigUrkE-Ng-1
+Received: by mail-wm1-f72.google.com with SMTP id a11so1050326wmh.7
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 05:56:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=hFiQ1IrKPc/BeaEYsp9+YmLWAPi+EAYPi87IdGvuqQk=;
- b=Kw7BW1DUbqYkO3O/JOhZ7gHTFBZvrPvWPwahPF5OnMzOVUrl7przPf5oRhFCv0AK8i
- CWsLjVnA8Rq8VFmdoeHyHCFqgbO+FbnJBwzIt50O0SGRwz6riuX+ZipJUHoOEsb86iNC
- 46CW3v/9xvJUGE6ldV3NOpJPVCg7dev4jBIxpPzmXXXyvOGdWSsFmKMZxGM5IK+T5Gwh
- vxn0TWLNUJqLpOM/aEeO31uUjSLi0QjXXoUqI9VubGOKr14DztygmWx9PEf+MJFnxkf2
- UK0VS1wKcnwne8YnLDLl4+8rHdul9jNJ4crcXV37M23nvK7YADMjxoHQG8IvabXjdnpC
- HVPQ==
-X-Gm-Message-State: AOAM530lGUM7U97ZSS601kTM5OUKHIQfK+12jKOo++a138/t132Yp6Wq
- WBQyMY4SZlRp+Hcvx/oFrQVR1RV3PqcgFavO40VlLw==
-X-Google-Smtp-Source: ABdhPJyBp84IeI6myo8wcKekOpQW2bDLdhWx7Auk1C51HFpEKlYokb2Dc8qz3tmt44t2GcSs+hlGe/2YdMLfQKTVf+s=
-X-Received: by 2002:a05:6402:202a:: with SMTP id
- ay10mr3169838edb.36.1601384146852; 
- Tue, 29 Sep 2020 05:55:46 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=iguQs2kfsCnerdjWScTWC7qFlJXZ9V7uhuoxVsh48D8=;
+ b=f8TLBlvsLcZDuDALY3cvak8r5ctES+90Ars2LvIwzvWc3GcLa0ZRGVWopEB01jdSQy
+ gQ9EzOa/SnsQ413kYEgLSIYBRe9O+TKfY4PKAG1ONI3ibu6BhXouDIK6Zi5V+zpH262S
+ xfaCO+VM012X9fQgKe+C3Z7DsXm4Wa64QONoE5ZC8wSb8wzzgc8NIrJKneWKgkGiv/ti
+ jS7FvL6tHFvXiVIVWwTiiSGgBIX6FwDuvVqM76lzhr/sndr+P3btC5vRjit0mOIcSINl
+ 9LBb4UO3ZNefvrRdyKQjIMgI5SpvvvMCxqNLXFE7Lkcdx/ZpeU2jUSHDn9KSeebOVowK
+ /QqA==
+X-Gm-Message-State: AOAM533aiajlqhKW1jJxt1Al7KiF3Fp9vHksV6TvPj2iZsshjIxtEKys
+ rtPiY00TPJgd7R3HuzqxgpEpOz4JPAup4PlELrqlKdcaKmiZYbsuaPR2IoCLt5BPjH7cz0M3TM2
+ 8/OAKSJukVOCjeKY=
+X-Received: by 2002:a7b:c453:: with SMTP id l19mr4207284wmi.163.1601384171908; 
+ Tue, 29 Sep 2020 05:56:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzY/ljyP/8XkyOUh4y71tr6Dg8Rj3L0vAoEHdBT7mtUKxjn+n3W8h0yq7tjPB/MZPTXoF5uhw==
+X-Received: by 2002:a7b:c453:: with SMTP id l19mr4207263wmi.163.1601384171691; 
+ Tue, 29 Sep 2020 05:56:11 -0700 (PDT)
+Received: from x1w.redhat.com (74.red-83-53-161.dynamicip.rima-tde.net.
+ [83.53.161.74])
+ by smtp.gmail.com with ESMTPSA id n21sm5387913wmi.21.2020.09.29.05.56.10
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 29 Sep 2020 05:56:11 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] hw/arm: Restrict APEI tables generation to the 'virt' machine
+Date: Tue, 29 Sep 2020 14:56:09 +0200
+Message-Id: <20200929125609.1088330-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-References: <20200927134609.2358960-1-alistair.francis@wdc.com>
- <20200927134609.2358960-3-alistair.francis@wdc.com>
-In-Reply-To: <20200927134609.2358960-3-alistair.francis@wdc.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 29 Sep 2020 13:55:35 +0100
-Message-ID: <CAFEAcA9Rduz5RB4oUD_wR41_oEfdRSbB8O=99pb+AjXM8gLG6A@mail.gmail.com>
-Subject: Re: [PULL 2/2] core/register: Specify instance_size in the TypeInfo
-To: Alistair Francis <alistair.francis@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::542;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x542.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 02:22:44
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,48 +107,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair23@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S . Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+ Dongjiu Geng <gengdongjiu@huawei.com>, Xiang Zheng <zhengxiang9@huawei.com>,
+ qemu-arm@nongnu.org, Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 27 Sep 2020 at 15:00, Alistair Francis <alistair.francis@wdc.com> w=
-rote:
->
-> Reported-by: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Message-Id: <4cf1beb7dafb9143c261d266557d3173bf160524.1598376594.git.alis=
-tair.francis@wdc.com>
-> ---
-> @@ -269,13 +258,18 @@ static RegisterInfoArray *register_init_block(Devic=
-eState *owner,
->          int index =3D rae[i].addr / data_size;
->          RegisterInfo *r =3D &ri[index];
->
-> -        *r =3D (RegisterInfo) {
-> -            .data =3D data + data_size * index,
-> -            .data_size =3D data_size,
-> -            .access =3D &rae[i],
-> -            .opaque =3D owner,
-> -        };
-> -        register_init(r);
-> +        if (data + data_size * index =3D=3D 0 || !&rae[i]) {
-> +            continue;
+As only the Virt machine uses the RAS Virtualization feature (see
+commit 2afa8c8519: "hw/arm/virt: Introduce a RAS machine option"),
+restrict the APEI tables generation code to the virt machine.
 
-Coverity thinks (CID 1432800) that this is dead code, because
-"data + data_size * index" can never be NULL[*]. What was this
-intending to test for ? (maybe data =3D=3D NULL? Missing dereference
-operator ?)
+Fixes: aa16508f1d ("ACPI: Build related register address fields via hardware error fw_cfg blob")
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+Cc: Laszlo Ersek <lersek@redhat.com>
+Cc: Xiang Zheng <zhengxiang9@huawei.com>
+Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Dongjiu Geng <gengdongjiu@huawei.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+---
+ default-configs/arm-softmmu.mak | 1 -
+ hw/arm/Kconfig                  | 1 +
+ 2 files changed, 1 insertion(+), 1 deletion(-)
 
-[*] The C spec is quite strict about what valid pointer arithmetic
-is; in particular adding to a NULL pointer is undefined behaviour,
-and pointer arithmetic that overflows and wraps around is
-undefined behaviour, so there's no way to get a 0 result from
-"ptr + offset" without the expression being UB.
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index 9a94ebd0be..08a32123b4 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -43,4 +43,3 @@ CONFIG_FSL_IMX7=y
+ CONFIG_FSL_IMX6UL=y
+ CONFIG_SEMIHOSTING=y
+ CONFIG_ALLWINNER_H3=y
+-CONFIG_ACPI_APEI=y
+diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+index f303c6bead..7d040827af 100644
+--- a/hw/arm/Kconfig
++++ b/hw/arm/Kconfig
+@@ -26,6 +26,7 @@ config ARM_VIRT
+     select ACPI_MEMORY_HOTPLUG
+     select ACPI_HW_REDUCED
+     select ACPI_NVDIMM
++    select ACPI_APEI
+ 
+ config CHEETAH
+     bool
+-- 
+2.26.2
 
-thanks
--- PMM
 
