@@ -4,88 +4,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0048BC4727C
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 16:33:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A875C4741F
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 16:39:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3213A2072E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 16:33:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A8A19207FB
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 16:39:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bH5uak1q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3213A2072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=euphon.net header.i=fam@euphon.net header.b="dE1QHrsp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8A19207FB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=euphon.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNf2w-00082v-T5
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 12:33:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33544)
+	id 1kNf87-0001cq-G4
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 12:38:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36384)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kNexz-00060S-Oy
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 12:28:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50240)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kNext-0005Gn-Oi
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 12:28:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601483305;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=IWlejYLOEtME4/CaNiqiGmYDlL/+xu/chVBf3n34s/k=;
- b=bH5uak1qtOabZbFuw9tyQoUFWbQa00jUDnqOF+Vql4XVeM21aLjVRLkeSiojYLPuEIMJkf
- A+mGbN9hB9/BjJWqOdYygTq7uC9cOGsndoMSI2pUGlS/c8plluBZLUcVWs9FjuKoFNhj0Z
- zyOP9WPKB270vVBrAD18CrzymO6a3W0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-61-ogGcZkvSMruCtppv2Y1Rqg-1; Wed, 30 Sep 2020 12:28:10 -0400
-X-MC-Unique: ogGcZkvSMruCtppv2Y1Rqg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 86E8F1019627;
- Wed, 30 Sep 2020 16:28:09 +0000 (UTC)
-Received: from work-vm (ovpn-114-238.ams2.redhat.com [10.36.114.238])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8653878807;
- Wed, 30 Sep 2020 16:28:00 +0000 (UTC)
-Date: Wed, 30 Sep 2020 17:27:57 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: Re: [PATCH 4/4] virtiofsd: avoid false positive compiler warning
-Message-ID: <20200930162757.GD2783@work-vm>
+ (Exim 4.90_1) (envelope-from <fam@euphon.net>)
+ id 1kNf6f-0001BX-33; Wed, 30 Sep 2020 12:37:29 -0400
+Received: from sender2-op-o12.zoho.com.cn ([163.53.93.243]:17639)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <fam@euphon.net>)
+ id 1kNf6Y-00063M-JD; Wed, 30 Sep 2020 12:37:28 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1601483800; cv=none; d=zoho.com.cn; s=zohoarc; 
+ b=pQdZ9jA2P7iCED0yWsolm+rWYNee5E1bFGW46QdqNMJ7MVskwvLNWgFzK+CBozZw7N4wqv0SlSxqZBm1Vhca9OQEgPsRVWgLLmixNXN2Uv0+lLZ/QLr1kH5k4OzZerP+r76I9WrW4Y86e7LleOMItiZl3Bxv51Qx2YIDNSxhaFY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com.cn;
+ s=zohoarc; t=1601483800;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To;
+ bh=nDUXJ0aD0OpbgdchhPD1AE3rG4yeFoP17l7N2MrqhVc=; 
+ b=j8ShZ4oO2ozRRAMIryhVa2FZbLUlZAvssU7cpqlC3F0qC6dkISivxTLWHmb9PnA5eVcQvfefZv8LzBuVTsHCHSp6baNRT3xTnom2ELcfhChPPz4Dy/bWZVifxZUVgrKKxmAv28afD73WPmr/rEucf08vgywXPtrCBmmcLLSnQ58=
+ARC-Authentication-Results: i=1; mx.zoho.com.cn;
+ dkim=pass  header.i=euphon.net;
+ spf=pass  smtp.mailfrom=fam@euphon.net;
+ dmarc=pass header.from=<fam@euphon.net> header.from=<fam@euphon.net>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1601483800; 
+ s=zoho; d=euphon.net; i=fam@euphon.net;
+ h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:Content-Type:Mime-Version:Content-Transfer-Encoding;
+ bh=nDUXJ0aD0OpbgdchhPD1AE3rG4yeFoP17l7N2MrqhVc=;
+ b=dE1QHrspMn4nenFt+4z6kld8pUzz7LXzVK9Htfw22q9Mk+z/DFqHDH20mYdXbWM1
+ lxcmjz+taqJ+/ZfCLVyqOa1UNZ0vld20MFeexx7LJYd++3SMdF0mWfdTFdwSY63Us+C
+ mFwTnj0u2Phq0/wgWmzI5Cv+kOhQMSYM/3PrJk4U=
+Received: from u60bdefc337955a.ant.amazon.com (54.239.6.185 [54.239.6.185]) by
+ mx.zoho.com.cn with SMTPS id 1601483797963335.588003385917;
+ Thu, 1 Oct 2020 00:36:37 +0800 (CST)
+Message-ID: <f78c368c7a61c2386deec50cd3386253588e64dc.camel@euphon.net>
+Subject: Re: [PATCH 1/4] vmdk: fix maybe uninitialized warnings
+From: Fam Zheng <fam@euphon.net>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
+Date: Wed, 30 Sep 2020 17:36:29 +0100
+In-Reply-To: <20200930155859.303148-2-borntraeger@de.ibm.com>
 References: <20200930155859.303148-1-borntraeger@de.ibm.com>
- <20200930155859.303148-5-borntraeger@de.ibm.com>
-MIME-Version: 1.0
-In-Reply-To: <20200930155859.303148-5-borntraeger@de.ibm.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:26:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
+ <20200930155859.303148-2-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+X-ZohoCNMailClient: External
+Received-SPF: pass client-ip=163.53.93.243; envelope-from=fam@euphon.net;
+ helo=sender2-op-o12.zoho.com.cn
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 12:37:02
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.469,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,59 +89,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Christian Borntraeger (borntraeger@de.ibm.com) wrote:
-> make: *** [Makefile:121: config-host.mak] Error 1
-> [cborntra@m83lp52 qemu]$ make -C build/
-> make: Entering directory '/home/cborntra/REPOS/qemu/build'
-> Generating qemu-version.h with a meson_exe.py custom command
-> Compiling C object tools/virtiofsd/virtiofsd.p/passthrough_ll.c.o
-> ../tools/virtiofsd/passthrough_ll.c: In function ‘lo_setattr’:
-> ../tools/virtiofsd/passthrough_ll.c:702:19: error: ‘fd’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
->   702 |             res = futimens(fd, tv);
->       |                   ^~~~~~~~~~~~~~~~
+On Wed, 2020-09-30 at 17:58 +0200, Christian Borntraeger wrote:
+> Fedora 32 gcc 10 seems to give false positives:
+>=20
+> Compiling C object libblock.fa.p/block_vmdk.c.o
+> ../block/vmdk.c: In function =E2=80=98vmdk_parse_extents=E2=80=99:
+> ../block/vmdk.c:587:5: error: =E2=80=98extent=E2=80=99 may be used uninit=
+ialized in
+> this function [-Werror=3Dmaybe-uninitialized]
+>   587 |     g_free(extent->l1_table);
+>       |     ^~~~~~~~~~~~~~~~~~~~~~~~
+> ../block/vmdk.c:754:17: note: =E2=80=98extent=E2=80=99 was declared here
+>   754 |     VmdkExtent *extent;
+>       |                 ^~~~~~
+> ../block/vmdk.c:620:11: error: =E2=80=98extent=E2=80=99 may be used unini=
+tialized in
+> this function [-Werror=3Dmaybe-uninitialized]
+>   620 |     ret =3D vmdk_init_tables(bs, extent, errp);
+>       |           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> ../block/vmdk.c:598:17: note: =E2=80=98extent=E2=80=99 was declared here
+>   598 |     VmdkExtent *extent;
+>       |                 ^~~~~~
+> ../block/vmdk.c:1178:39: error: =E2=80=98extent=E2=80=99 may be used unin=
+itialized in
+> this function [-Werror=3Dmaybe-uninitialized]
+>  1178 |             extent->flat_start_offset =3D flat_offset << 9;
+>       |             ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~
+> ../block/vmdk.c: In function =E2=80=98vmdk_open_vmdk4=E2=80=99:
+> ../block/vmdk.c:581:22: error: =E2=80=98extent=E2=80=99 may be used unini=
+tialized in
+> this function [-Werror=3Dmaybe-uninitialized]
+>   581 |     extent->l2_cache =3D
+>       |     ~~~~~~~~~~~~~~~~~^
+>   582 |         g_malloc(extent->entry_size * extent->l2_size *
+> L2_CACHE_SIZE);
+>       |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> ~~~~~~~~~
+> ../block/vmdk.c:872:17: note: =E2=80=98extent=E2=80=99 was declared here
+>   872 |     VmdkExtent *extent;
+>       |                 ^~~~~~
+> ../block/vmdk.c: In function =E2=80=98vmdk_open=E2=80=99:
+> ../block/vmdk.c:620:11: error: =E2=80=98extent=E2=80=99 may be used unini=
+tialized in
+> this function [-Werror=3Dmaybe-uninitialized]
+>   620 |     ret =3D vmdk_init_tables(bs, extent, errp);
+>       |           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> ../block/vmdk.c:598:17: note: =E2=80=98extent=E2=80=99 was declared here
+>   598 |     VmdkExtent *extent;
+>       |                 ^~~~~~
 > cc1: all warnings being treated as errors
-> make: *** [Makefile.ninja:1438: tools/virtiofsd/virtiofsd.p/passthrough_ll.c.o] Error 1
-> make: Leaving directory '/home/cborntra/REPOS/
-> 
-> as far as I can see this can not happen. Let us silence the warning by
-> giving fd a default value.
-> 
+> make: *** [Makefile.ninja:884: libblock.fa.p/block_vmdk.c.o] Error 1
+>=20
+> fix them by assigning a default value.
+>=20
 > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
-Yeh, I'd posted https://www.mail-archive.com/qemu-devel@nongnu.org/msg738783.html
-but not yet merged it; only difference is I'd used -1 since it seemd
-safer to use -1 even if it couldn't happen :-)
-
-Dave
-
 > ---
->  tools/virtiofsd/passthrough_ll.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
-> index 0b229ebd5786..da06aa6e9264 100644
-> --- a/tools/virtiofsd/passthrough_ll.c
-> +++ b/tools/virtiofsd/passthrough_ll.c
-> @@ -620,7 +620,7 @@ static void lo_setattr(fuse_req_t req, fuse_ino_t ino, struct stat *attr,
->      struct lo_inode *inode;
->      int ifd;
->      int res;
-> -    int fd;
-> +    int fd = 0;
->  
->      inode = lo_inode(req, ino);
->      if (!inode) {
-> -- 
-> 2.26.2
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>  block/vmdk.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/block/vmdk.c b/block/vmdk.c
+> index 8ec62c7ab798..a00dc00eb47a 100644
+> --- a/block/vmdk.c
+> +++ b/block/vmdk.c
+> @@ -595,7 +595,7 @@ static int vmdk_open_vmfs_sparse(BlockDriverState
+> *bs,
+>      int ret;
+>      uint32_t magic;
+>      VMDK3Header header;
+> -    VmdkExtent *extent;
+> +    VmdkExtent *extent =3D NULL;
+> =20
+>      ret =3D bdrv_pread(file, sizeof(magic), &header, sizeof(header));
+>      if (ret < 0) {
+> @@ -751,7 +751,7 @@ static int vmdk_open_se_sparse(BlockDriverState
+> *bs,
+>      int ret;
+>      VMDKSESparseConstHeader const_header;
+>      VMDKSESparseVolatileHeader volatile_header;
+> -    VmdkExtent *extent;
+> +    VmdkExtent *extent =3D NULL;
+> =20
+>      ret =3D bdrv_apply_auto_read_only(bs,
+>              "No write support for seSparse images available", errp);
+> @@ -869,7 +869,7 @@ static int vmdk_open_vmdk4(BlockDriverState *bs,
+>      uint32_t magic;
+>      uint32_t l1_size, l1_entry_sectors;
+>      VMDK4Header header;
+> -    VmdkExtent *extent;
+> +    VmdkExtent *extent =3D NULL;
+>      BDRVVmdkState *s =3D bs->opaque;
+>      int64_t l1_backup_offset =3D 0;
+>      bool compressed;
+> @@ -1088,7 +1088,7 @@ static int vmdk_parse_extents(const char *desc,
+> BlockDriverState *bs,
+>      BdrvChild *extent_file;
+>      BdrvChildRole extent_role;
+>      BDRVVmdkState *s =3D bs->opaque;
+> -    VmdkExtent *extent;
+> +    VmdkExtent *extent =3D NULL;
+>      char extent_opt_prefix[32];
+>      Error *local_err =3D NULL;
+> =20
+
+Looks trivial, and correct.
+
+Reviewed-by: Fam Zheng <fam@euphon.net>
+
 
 
