@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4482C4727E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 12:13:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E6A0C4727E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 12:13:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53D43206B7
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 12:13:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E1770206B7
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 12:13:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hPdRNdZa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53D43206B7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LytOGkM/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1770206B7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNazE-0005e4-AN
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 08:13:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43214)
+	id 1kNazP-0005xH-Qa
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 08:13:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43212)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kNaxE-0003lo-GH
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kNaxE-0003lj-FO
  for qemu-devel@nongnu.org; Wed, 30 Sep 2020 08:11:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28519)
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36510)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kNaxB-00079U-93
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kNaxC-00079d-N5
  for qemu-devel@nongnu.org; Wed, 30 Sep 2020 08:11:28 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601467884;
+ s=mimecast20190719; t=1601467885;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Nyv59/oAk8foURYbALJVEhTDMu1L50G5uzPJCzXo2ng=;
- b=hPdRNdZaei5+vJY4JtjuE7IPp+8Xby/xFfIyLlPlsvt91reM+2Ujl0L54yGzJHO8I6eJo5
- L/O1FPFbHGnjpAVucc8Jj9wS6h/JajKgeV/IEd3Aa9hxErb+CIoQb3q8FLmgGx7VNsMBXT
- nndzF1ACz2q6kfwgkdMzNzBwIBpKCuU=
+ bh=f2vTvpMUs/R+7+oon1oKvJdjTeI/HB6VBRES9SzXx2Q=;
+ b=LytOGkM/uptK/ZTQ3uHLA0iYDIIG+7DOtC1kUU6uEFM/rDTCZ9ueULFQ7qL38eX8+MsvRz
+ j7WmjbKZ2Dzbsuqx+9p7KGJTfSy+Io+vCpr/Xclkew80m6sccLfPCSsmznB/IAn1eGSrU9
+ flMeOsyrb9M1H3xStQU1IEe8Cjt05Oo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-571-Z0BzmLg1Oc-3dnSfS1X_4w-1; Wed, 30 Sep 2020 08:11:22 -0400
-X-MC-Unique: Z0BzmLg1Oc-3dnSfS1X_4w-1
+ us-mta-428-9imyaUpBNGiaOzQLglCR1w-1; Wed, 30 Sep 2020 08:11:21 -0400
+X-MC-Unique: 9imyaUpBNGiaOzQLglCR1w-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 72ED3186DD24;
- Wed, 30 Sep 2020 12:11:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E6494425D0;
+ Wed, 30 Sep 2020 12:11:19 +0000 (UTC)
 Received: from blue.redhat.com (ovpn-112-208.phx2.redhat.com [10.3.112.208])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D85A360C05;
- Wed, 30 Sep 2020 12:11:20 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2EE3B6198B;
+ Wed, 30 Sep 2020 12:11:17 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 3/5] nbd: Simplify meta-context parsing
-Date: Wed, 30 Sep 2020 07:11:03 -0500
-Message-Id: <20200930121105.667049-4-eblake@redhat.com>
+Subject: [PATCH v2 1/5] qemu-nbd: Honor SIGINT and SIGHUP
+Date: Wed, 30 Sep 2020 07:11:01 -0500
+Message-Id: <20200930121105.667049-2-eblake@redhat.com>
 In-Reply-To: <20200930121105.667049-1-eblake@redhat.com>
 References: <20200930121105.667049-1-eblake@redhat.com>
 MIME-Version: 1.0
@@ -70,9 +70,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=eblake@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=eblake@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:26:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:31:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -25
 X-Spam_score: -2.6
@@ -99,290 +99,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We had a premature optimization of trying to read as little from the
-wire as possible while handling NBD_OPT_SET_META_CONTEXT in phases.
-But in reality, we HAVE to read the entire string from the client
-before we can get to the next command, and it is easier to just read
-it all at once than it is to read it in pieces.  And once we do that,
-several functions end up no longer performing I/O, so they can drop
-length and errp parameters, and just return a bool instead of
-modifying through a pointer.
+Honoring just SIGTERM on Linux is too weak; we also want to handle
+other common signals, and do so even on BSD.  Why?  Because at least
+'qemu-nbd -B bitmap' needs a chance to clean up the in-use bit on
+bitmaps when the server is shut down via a signal.
 
-Our iotests still pass; I also checked that libnbd's testsuite (which
-covers more corner cases of odd meta context requests) still passes.
+See also: http://bugzilla.redhat.com/1883608
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- nbd/server.c | 193 +++++++++++++++++++--------------------------------
- 1 file changed, 70 insertions(+), 123 deletions(-)
+ qemu-nbd.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/nbd/server.c b/nbd/server.c
-index 809f88ce6607..7271a09b5c2b 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -1,5 +1,5 @@
- /*
-- *  Copyright (C) 2016-2018 Red Hat, Inc.
-+ *  Copyright (C) 2016-2020 Red Hat, Inc.
-  *  Copyright (C) 2005  Anthony Liguori <anthony@codemonkey.ws>
-  *
-  *  Network Block Device Server Side
-@@ -797,135 +797,95 @@ static int nbd_negotiate_send_meta_context(NBDClient *client,
-     return qio_channel_writev_all(client->ioc, iov, 2, errp) < 0 ? -EIO : 0;
- }
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index bacb69b0898b..e7520261134f 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -581,7 +581,7 @@ int main(int argc, char **argv)
+     const char *pid_file_name = NULL;
+     BlockExportOptions *export_opts;
 
--/* Read strlen(@pattern) bytes, and set @match to true if they match @pattern.
-- * @match is never set to false.
-- *
-- * Return -errno on I/O error, 0 if option was completely handled by
-- * sending a reply about inconsistent lengths, or 1 on success.
-- *
-- * Note: return code = 1 doesn't mean that we've read exactly @pattern.
-- * It only means that there are no errors.
-+/*
-+ * Return true if @query matches @pattern, or if @query is empty when
-+ * the @client is performing _LIST_.
-  */
--static int nbd_meta_pattern(NBDClient *client, const char *pattern, bool *match,
--                            Error **errp)
-+static bool nbd_meta_empty_or_pattern(NBDClient *client, const char *pattern,
-+                                      const char *query)
- {
--    int ret;
--    char *query;
--    size_t len = strlen(pattern);
--
--    assert(len);
--
--    query = g_malloc(len);
--    ret = nbd_opt_read(client, query, len, true, errp);
--    if (ret <= 0) {
--        g_free(query);
--        return ret;
-+    if (!*query) {
-+        trace_nbd_negotiate_meta_query_parse("empty");
-+        return client->opt == NBD_OPT_LIST_META_CONTEXT;
-     }
--
--    if (strncmp(query, pattern, len) == 0) {
-+    if (strcmp(query, pattern) == 0) {
-         trace_nbd_negotiate_meta_query_parse(pattern);
--        *match = true;
--    } else {
--        trace_nbd_negotiate_meta_query_skip("pattern not matched");
-+        return true;
-     }
--    g_free(query);
--
--    return 1;
-+    trace_nbd_negotiate_meta_query_skip("pattern not matched");
-+    return false;
- }
+-#if HAVE_NBD_DEVICE
++#ifdef CONFIG_POSIX
+     /* The client thread uses SIGTERM to interrupt the server.  A signal
+      * handler ensures that "qemu-nbd -v -c" exits with a nice status code.
+      */
+@@ -589,9 +589,9 @@ int main(int argc, char **argv)
+     memset(&sa_sigterm, 0, sizeof(sa_sigterm));
+     sa_sigterm.sa_handler = termsig_handler;
+     sigaction(SIGTERM, &sa_sigterm, NULL);
+-#endif /* HAVE_NBD_DEVICE */
++    sigaction(SIGINT, &sa_sigterm, NULL);
++    sigaction(SIGHUP, &sa_sigterm, NULL);
 
- /*
-- * Read @len bytes, and set @match to true if they match @pattern, or if @len
-- * is 0 and the client is performing _LIST_. @match is never set to false.
-- *
-- * Return -errno on I/O error, 0 if option was completely handled by
-- * sending a reply about inconsistent lengths, or 1 on success.
-- *
-- * Note: return code = 1 doesn't mean that we've read exactly @pattern.
-- * It only means that there are no errors.
-+ * Return true and adjust @str in place if it begins with @prefix.
-  */
--static int nbd_meta_empty_or_pattern(NBDClient *client, const char *pattern,
--                                     uint32_t len, bool *match, Error **errp)
-+static bool nbd_strshift(const char **str, const char *prefix)
- {
--    if (len == 0) {
--        if (client->opt == NBD_OPT_LIST_META_CONTEXT) {
--            *match = true;
--        }
--        trace_nbd_negotiate_meta_query_parse("empty");
--        return 1;
--    }
-+    size_t len = strlen(prefix);
+-#ifdef CONFIG_POSIX
+     signal(SIGPIPE, SIG_IGN);
+ #endif
 
--    if (len != strlen(pattern)) {
--        trace_nbd_negotiate_meta_query_skip("different lengths");
--        return nbd_opt_skip(client, len, errp);
-+    if (strncmp(*str, prefix, len) == 0) {
-+        *str += len;
-+        return true;
-     }
--
--    return nbd_meta_pattern(client, pattern, match, errp);
-+    return false;
- }
-
- /* nbd_meta_base_query
-  *
-  * Handle queries to 'base' namespace. For now, only the base:allocation
-- * context is available.  'len' is the amount of text remaining to be read from
-- * the current name, after the 'base:' portion has been stripped.
-- *
-- * Return -errno on I/O error, 0 if option was completely handled by
-- * sending a reply about inconsistent lengths, or 1 on success.
-+ * context is available.  Return true if @query has been handled.
-  */
--static int nbd_meta_base_query(NBDClient *client, NBDExportMetaContexts *meta,
--                               uint32_t len, Error **errp)
-+static bool nbd_meta_base_query(NBDClient *client, NBDExportMetaContexts *meta,
-+                                const char *query)
- {
--    return nbd_meta_empty_or_pattern(client, "allocation", len,
--                                     &meta->base_allocation, errp);
-+    if (!nbd_strshift(&query, "base:")) {
-+        return false;
-+    }
-+    trace_nbd_negotiate_meta_query_parse("base:");
-+
-+    if (nbd_meta_empty_or_pattern(client, "allocation", query)) {
-+        meta->base_allocation = true;
-+    }
-+    return true;
- }
-
--/* nbd_meta_bitmap_query
-+/* nbd_meta_qemu_query
-  *
-- * Handle query to 'qemu:' namespace.
-- * @len is the amount of text remaining to be read from the current name, after
-- * the 'qemu:' portion has been stripped.
-- *
-- * Return -errno on I/O error, 0 if option was completely handled by
-- * sending a reply about inconsistent lengths, or 1 on success. */
--static int nbd_meta_qemu_query(NBDClient *client, NBDExportMetaContexts *meta,
--                               uint32_t len, Error **errp)
-+ * Handle queries to 'qemu' namespace. For now, only the qemu:dirty-bitmap:
-+ * context is available.  Return true if @query has been handled.
-+ */
-+static bool nbd_meta_qemu_query(NBDClient *client, NBDExportMetaContexts *meta,
-+                                const char *query)
- {
--    bool dirty_bitmap = false;
--    size_t dirty_bitmap_len = strlen("dirty-bitmap:");
--    int ret;
--
--    if (!meta->exp->export_bitmap) {
--        trace_nbd_negotiate_meta_query_skip("no dirty-bitmap exported");
--        return nbd_opt_skip(client, len, errp);
-+    if (!nbd_strshift(&query, "qemu:")) {
-+        return false;
-     }
-+    trace_nbd_negotiate_meta_query_parse("qemu:");
-
--    if (len == 0) {
-+    if (!*query) {
-         if (client->opt == NBD_OPT_LIST_META_CONTEXT) {
-+            meta->bitmap = !!meta->exp->export_bitmap;
-+        }
-+        trace_nbd_negotiate_meta_query_parse("empty");
-+        return true;
-+    }
-+
-+    if (nbd_strshift(&query, "dirty-bitmap:")) {
-+        trace_nbd_negotiate_meta_query_parse("dirty-bitmap:");
-+        if (!meta->exp->export_bitmap) {
-+            trace_nbd_negotiate_meta_query_skip("no dirty-bitmap exported");
-+            return true;
-+        }
-+        if (nbd_meta_empty_or_pattern(client,
-+                                      meta->exp->export_bitmap_context +
-+                                      strlen("qemu:dirty-bitmap:"), query)) {
-             meta->bitmap = true;
-         }
--        trace_nbd_negotiate_meta_query_parse("empty");
--        return 1;
-+        return true;
-     }
-
--    if (len < dirty_bitmap_len) {
--        trace_nbd_negotiate_meta_query_skip("not dirty-bitmap:");
--        return nbd_opt_skip(client, len, errp);
--    }
--
--    len -= dirty_bitmap_len;
--    ret = nbd_meta_pattern(client, "dirty-bitmap:", &dirty_bitmap, errp);
--    if (ret <= 0) {
--        return ret;
--    }
--    if (!dirty_bitmap) {
--        trace_nbd_negotiate_meta_query_skip("not dirty-bitmap:");
--        return nbd_opt_skip(client, len, errp);
--    }
--
--    trace_nbd_negotiate_meta_query_parse("dirty-bitmap:");
--
--    return nbd_meta_empty_or_pattern(
--            client, meta->exp->export_bitmap_context +
--            strlen("qemu:dirty_bitmap:"), len, &meta->bitmap, errp);
-+    trace_nbd_negotiate_meta_query_skip("not dirty-bitmap");
-+    return true;
- }
-
- /* nbd_negotiate_meta_query
-@@ -935,22 +895,13 @@ static int nbd_meta_qemu_query(NBDClient *client, NBDExportMetaContexts *meta,
-  *
-  * The only supported namespaces are 'base' and 'qemu'.
-  *
-- * The function aims not wasting time and memory to read long unknown namespace
-- * names.
-- *
-  * Return -errno on I/O error, 0 if option was completely handled by
-  * sending a reply about inconsistent lengths, or 1 on success. */
- static int nbd_negotiate_meta_query(NBDClient *client,
-                                     NBDExportMetaContexts *meta, Error **errp)
- {
--    /*
--     * Both 'qemu' and 'base' namespaces have length = 5 including a
--     * colon. If another length namespace is later introduced, this
--     * should certainly be refactored.
--     */
-     int ret;
--    size_t ns_len = 5;
--    char ns[5];
-+    g_autofree char *query = NULL;
-     uint32_t len;
-
-     ret = nbd_opt_read(client, &len, sizeof(len), false, errp);
-@@ -963,27 +914,23 @@ static int nbd_negotiate_meta_query(NBDClient *client,
-         trace_nbd_negotiate_meta_query_skip("length too long");
-         return nbd_opt_skip(client, len, errp);
-     }
--    if (len < ns_len) {
--        trace_nbd_negotiate_meta_query_skip("length too short");
--        return nbd_opt_skip(client, len, errp);
--    }
-
--    len -= ns_len;
--    ret = nbd_opt_read(client, ns, ns_len, true, errp);
-+    query = g_malloc(len + 1);
-+    ret = nbd_opt_read(client, query, len, true, errp);
-     if (ret <= 0) {
-         return ret;
-     }
-+    query[len] = '\0';
-
--    if (!strncmp(ns, "base:", ns_len)) {
--        trace_nbd_negotiate_meta_query_parse("base:");
--        return nbd_meta_base_query(client, meta, len, errp);
--    } else if (!strncmp(ns, "qemu:", ns_len)) {
--        trace_nbd_negotiate_meta_query_parse("qemu:");
--        return nbd_meta_qemu_query(client, meta, len, errp);
-+    if (nbd_meta_base_query(client, meta, query)) {
-+        return 1;
-+    }
-+    if (nbd_meta_qemu_query(client, meta, query)) {
-+        return 1;
-     }
-
-     trace_nbd_negotiate_meta_query_skip("unknown namespace");
--    return nbd_opt_skip(client, len, errp);
-+    return 1;
- }
-
- /* nbd_negotiate_meta_queries
 -- 
 2.28.0
 
