@@ -2,65 +2,63 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BBFDC4727C
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 00:35:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78A15C4727C
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 00:37:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9AF0220754
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 00:35:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AF0220754
+	by mail.kernel.org (Postfix) with ESMTPS id DEB8D2074F
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 00:37:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEB8D2074F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNQ5d-0002MU-G0
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 20:35:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50972)
+	id 1kNQ7S-0003lh-L0
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 20:37:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50986)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kNQ1L-0006Om-M3
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 20:30:59 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:45823)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kNQ1N-0006QX-0A
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 20:31:01 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:43837)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kNQ1J-00089B-ND
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 20:30:59 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kNQ1K-00089D-1h
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 20:31:00 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue108 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1Mg6i8-1kupIA1vFW-00hdCi; Wed, 30 Sep 2020 02:30:36 +0200
+ id 1Mw9Hm-1kfunv3doa-00s9y6; Wed, 30 Sep 2020 02:30:36 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/4] linux-user: update syscall_nr.h to Linux 5.9-rc7
-Date: Wed, 30 Sep 2020 02:30:30 +0200
-Message-Id: <20200930003033.554124-2-laurent@vivier.eu>
+Subject: [PATCH 0/4] linux-user: update syscall_nr headers to Linux 5.9-rc7
+Date: Wed, 30 Sep 2020 02:30:29 +0200
+Message-Id: <20200930003033.554124-1-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200930003033.554124-1-laurent@vivier.eu>
-References: <20200930003033.554124-1-laurent@vivier.eu>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:LN9U56u3ggGdA/1rJ/bIvGZouklUwfsm2VfYViKYv5EST5tmlsb
- /j6lbYpxyKpuELHQLm5bFngDNrXRwXboPCaomrjHvNCQCHptt5F2rVXvO7ZkpRXHh7SOwRw
- lZ54ng4Q95MMv0GDy4b5nZyNSCqXX0KJ5V/kCKPIwAepkpNcxvbX8uVCRSpKc5n2O6DmfV3
- I6Q4reaub+qOxHMzllZFA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:DbOsiY1cUL0=:+FkB1p5y8FT71zM1FICy26
- z0grHeVgV7bnX3hLIZdqU6zSq0NPXR0A5yVhVKfeddo8ozkOGmuIJ0oDhIOdaqvD+55bR16VV
- hNeeLNZPEao5viWK/UXaJXrdOWA1bmVI+y4JDX2lAA3Ow8uaQCM1dXE1VOuSXl3YG/flp715c
- H3niZqsxxN63p/F5IQClfG6JL7+53mZX+gX9nu/Vul+4w6CLtUn5fadq1b8i5xv5otnYfBi9/
- dQtwRGJ9gy0/toiAMqu9DvCepuPBMeijiLTJSqRVTidmMg4hVICk+BR2xNt9pCNyQ9FGxxgRM
- TBRxZr3lo1G3UbSfl43lOKTYJ+B9TNOOGqTCJXKvy7cDMKT2p42+CqZiF8Xpi8me7oSFA586A
- 1hNGAwUO7ha1Kj98qsjNgMnbJtXvDMTqjsfB4uMTwmUTokjzVAoukVY9qTM2LhlqotGwik7wM
- oQfpAUlQmXdj1lusDHnDeKkOfNL1Lsr/yOhxqkxrhXhe+ogx8h/ZRBi81+DrHBMUvO+FGPfIb
- AOtbiCgRQxaAzFUzKj6P59uMq2i4yKpMP77Td2YkX8QSoQgoPQgIFUE7adjkauLBgRR5v9KIT
- msSfSO3HoPBDhWa2JqYASRYRYhO0cZ2QueHsA5HF2S47nA0nakQtfv0M+Ptst7to2lNSChJwc
- H6nZmPjnSM67pSRJ0B0+OGBrLiPF/9yJgm+b1JkWDYgxE6GQHKq0ZelsTGAmKd6xoMY0RzVtW
- mN1dJkz8MQqkCgPDdFMpiHsG09xV+isW/fPD7j3ZHDpydbNP2zc8tDZNElZa52M2mac3rCIwG
- WsbAEXqR8YaWvBZSYlHcJpgKnm9apFuanpORTARaHKdyRwDSUNmm0x4GVfAdSINI6RRFmks
-Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:UIMpv4tVrnOQWULfUfCZb3iiCrwqo/EOuJKxe4h/F+Xj4MicAgA
+ uoQ5K/nl7r3h4MgubFBE8Lm7QxwBWnWI1Rxrb0UrbMa7on54JGJON9a2JDTzXrhcKwVGlyp
+ vO1mWCVIZwTd9WoMLnSGhmpqCQIusKMgBQn06TWMdnyTGOH1tnwW7F7XxSpPSX4hm109PC/
+ QQ9+JJpV3UQK4zH574fPQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:PeFeg2+XtSs=:9jVxeYq2xPpcKfraFZDRQL
+ z5cx2tjx+TmtOiyh7QdWD/H7IwapAB+qunbCaGtguwO3qgjgYS+AZWrX0I8b0702RJA/igRDv
+ t+U1HKtKVJBxQHOaE1NvMkRgfQtbeuDH4fFA2HFjnR9bKxCkwwyWSQFUA3LmuYs4pA+hFHu/w
+ s+q7IhA10bTyE27F73lrNCn7ZDmx+6mhIP2D70VG804hxvTNfEhGKc3XxQRVV5K4jkoqUFdbh
+ tFtW0xcyrekWPTEX56EAyIJI6cp/zTdJWv5oKlZkWxgkovkRcSSXJ2dPn1H0iNIkTRY5U2Ftq
+ 0UhfypCeLzxaCmUme0r/FQM+06eQYrVwyCXVwsshA8WEW/93oI+I0DY4wgTCR2ev66kyRZ4kc
+ TZN+vUMjWhBR389aH52HTcrLVLIqH9VyXmpo5LZySC9j7l00YAS32GU2LYthFocDR7kSpFTcf
+ F1iyKKsURfWZ7pNlIjAgh2cF56d9G0DC+bo0iKIRZrOQ0CuUt+85+sNaEx3laZSMBEK3phQxb
+ xt2O6nl0CSwN+SN8hJ0T5HHRxfRHkvIGHzlqPvoboc16L7dBCeC8ObDgvTOqeP43JKpwvIi0N
+ noinEfZwcA0nd/8DaVPUcNZm3DLWRRbdmKRHqk+IKJyAfQCJpdHl5rcTueSOGY7Wa+oi8TOLE
+ ERZyB3j17IeCqP1bWuTKsKgGJKrgjjLcIUj36381hNsnxkYTFdjFoSguZuk0A5OZ8Ah6RLOfJ
+ FnJ3U4EvAPbVDx3r20ebvubz5TH6J+8XNVUJNbvg82h50sehEdRKDWOIgBdhDac9ufX+ZI48r
+ 4dVnMZcftCqyMeOXKSzX11+7aBaG0WsLd2snJuUHIstUzLgNMjWkhTmzOGpt4HsF8e/q2+s
+Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 20:30:56
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
@@ -90,135 +88,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Update gensyscalls.sh not to generate an empty line at the end of the file
-
-And then automatically update syscall_nr.h running scripts/gensyscalls.sh
-
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/aarch64/syscall_nr.h  | 7 +++++--
- linux-user/nios2/syscall_nr.h    | 7 +++++--
- linux-user/openrisc/syscall_nr.h | 8 ++++++--
- linux-user/riscv/syscall32_nr.h  | 8 +++++++-
- linux-user/riscv/syscall64_nr.h  | 8 +++++++-
- scripts/gensyscalls.sh           | 3 +--
- 6 files changed, 31 insertions(+), 10 deletions(-)
-
-diff --git a/linux-user/aarch64/syscall_nr.h b/linux-user/aarch64/syscall_nr.h
-index 85de000b2490..6fd5b331e780 100644
---- a/linux-user/aarch64/syscall_nr.h
-+++ b/linux-user/aarch64/syscall_nr.h
-@@ -298,7 +298,10 @@
- #define TARGET_NR_fspick 433
- #define TARGET_NR_pidfd_open 434
- #define TARGET_NR_clone3 435
--#define TARGET_NR_syscalls 436
-+#define TARGET_NR_close_range 436
-+#define TARGET_NR_openat2 437
-+#define TARGET_NR_pidfd_getfd 438
-+#define TARGET_NR_faccessat2 439
-+#define TARGET_NR_syscalls 440
- 
- #endif /* LINUX_USER_AARCH64_SYSCALL_NR_H */
--
-diff --git a/linux-user/nios2/syscall_nr.h b/linux-user/nios2/syscall_nr.h
-index 32d485dc9ae8..e37f40179bf3 100644
---- a/linux-user/nios2/syscall_nr.h
-+++ b/linux-user/nios2/syscall_nr.h
-@@ -318,7 +318,10 @@
- #define TARGET_NR_fsmount 432
- #define TARGET_NR_fspick 433
- #define TARGET_NR_pidfd_open 434
--#define TARGET_NR_syscalls 436
-+#define TARGET_NR_close_range 436
-+#define TARGET_NR_openat2 437
-+#define TARGET_NR_pidfd_getfd 438
-+#define TARGET_NR_faccessat2 439
-+#define TARGET_NR_syscalls 440
- 
- #endif /* LINUX_USER_NIOS2_SYSCALL_NR_H */
--
-diff --git a/linux-user/openrisc/syscall_nr.h b/linux-user/openrisc/syscall_nr.h
-index 340383beb2c6..a8fc0295109a 100644
---- a/linux-user/openrisc/syscall_nr.h
-+++ b/linux-user/openrisc/syscall_nr.h
-@@ -318,7 +318,11 @@
- #define TARGET_NR_fsmount 432
- #define TARGET_NR_fspick 433
- #define TARGET_NR_pidfd_open 434
--#define TARGET_NR_syscalls 436
-+#define TARGET_NR_clone3 435
-+#define TARGET_NR_close_range 436
-+#define TARGET_NR_openat2 437
-+#define TARGET_NR_pidfd_getfd 438
-+#define TARGET_NR_faccessat2 439
-+#define TARGET_NR_syscalls 440
- 
- #endif /* LINUX_USER_OPENRISC_SYSCALL_NR_H */
--
-diff --git a/linux-user/riscv/syscall32_nr.h b/linux-user/riscv/syscall32_nr.h
-index 4fef73e954da..079b804daef5 100644
---- a/linux-user/riscv/syscall32_nr.h
-+++ b/linux-user/riscv/syscall32_nr.h
-@@ -1,5 +1,7 @@
- /*
-  * This file contains the system call numbers.
-+ * Do not modify.
-+ * This file is generated by scripts/gensyscalls.sh
-  */
- #ifndef LINUX_USER_RISCV_SYSCALL32_NR_H
- #define LINUX_USER_RISCV_SYSCALL32_NR_H
-@@ -290,6 +292,10 @@
- #define TARGET_NR_fspick 433
- #define TARGET_NR_pidfd_open 434
- #define TARGET_NR_clone3 435
--#define TARGET_NR_syscalls 436
-+#define TARGET_NR_close_range 436
-+#define TARGET_NR_openat2 437
-+#define TARGET_NR_pidfd_getfd 438
-+#define TARGET_NR_faccessat2 439
-+#define TARGET_NR_syscalls 440
- 
- #endif /* LINUX_USER_RISCV_SYSCALL32_NR_H */
-diff --git a/linux-user/riscv/syscall64_nr.h b/linux-user/riscv/syscall64_nr.h
-index cc82f3244f55..d54224ccec64 100644
---- a/linux-user/riscv/syscall64_nr.h
-+++ b/linux-user/riscv/syscall64_nr.h
-@@ -1,5 +1,7 @@
- /*
-  * This file contains the system call numbers.
-+ * Do not modify.
-+ * This file is generated by scripts/gensyscalls.sh
-  */
- #ifndef LINUX_USER_RISCV_SYSCALL64_NR_H
- #define LINUX_USER_RISCV_SYSCALL64_NR_H
-@@ -296,6 +298,10 @@
- #define TARGET_NR_fspick 433
- #define TARGET_NR_pidfd_open 434
- #define TARGET_NR_clone3 435
--#define TARGET_NR_syscalls 436
-+#define TARGET_NR_close_range 436
-+#define TARGET_NR_openat2 437
-+#define TARGET_NR_pidfd_getfd 438
-+#define TARGET_NR_faccessat2 439
-+#define TARGET_NR_syscalls 440
- 
- #endif /* LINUX_USER_RISCV_SYSCALL64_NR_H */
-diff --git a/scripts/gensyscalls.sh b/scripts/gensyscalls.sh
-index b7b8456f6312..bba9fb052c47 100755
---- a/scripts/gensyscalls.sh
-+++ b/scripts/gensyscalls.sh
-@@ -86,8 +86,7 @@ generate_syscall_nr()
-     read_includes $arch $bits | filter_defines | rename_defines | \
-                                 evaluate_values | sort -n -k 3
-     echo
--    echo "#endif /* ${guard} */"
--    echo) > "$file"
-+    echo "#endif /* ${guard} */") > "$file"
- }
- 
- mkdir "$TMP/asm"
--- 
-2.26.2
-
+All the changes have been done using:=0D
+=0D
+scripts/gensyscalls.sh, scripts/update-mips-syscall-args.sh and=0D
+scripts/update-syscalltbl.sh=0D
+=0D
+I've checked syscall_nr.h generated from syscall.tbl are=0D
+always correctly generated (there have been massive changes in=0D
+x86 targets).=0D
+=0D
+The series also removes _sysctl from syscall.c as it has been=0D
+removed from the kernel (and we didn't emulate it correctly)=0D
+=0D
+Laurent Vivier (4):=0D
+  linux-user: update syscall_nr.h to Linux 5.9-rc7=0D
+  linux-user: update mips/syscall-args-o32.c.inc to Linux 5.9-rc7=0D
+  linux-user: update syscall.tbl to Linux 5.9-rc7=0D
+  linux-user: remove _sysctl=0D
+=0D
+ linux-user/aarch64/syscall_nr.h        |   7 +-=0D
+ linux-user/alpha/syscall.tbl           |   4 +-=0D
+ linux-user/arm/syscall.tbl             |   4 +-=0D
+ linux-user/hppa/syscall.tbl            |   8 +-=0D
+ linux-user/i386/syscall_32.tbl         | 820 +++++++++++++------------=0D
+ linux-user/m68k/syscall.tbl            |   4 +-=0D
+ linux-user/microblaze/syscall.tbl      |   4 +-=0D
+ linux-user/mips/syscall-args-o32.c.inc |   4 +=0D
+ linux-user/mips/syscall_o32.tbl        |   8 +-=0D
+ linux-user/mips64/syscall_n32.tbl      |   8 +-=0D
+ linux-user/mips64/syscall_n64.tbl      |   4 +-=0D
+ linux-user/nios2/syscall_nr.h          |   7 +-=0D
+ linux-user/openrisc/syscall_nr.h       |   8 +-=0D
+ linux-user/ppc/syscall.tbl             |  30 +-=0D
+ linux-user/riscv/syscall32_nr.h        |   8 +-=0D
+ linux-user/riscv/syscall64_nr.h        |   8 +-=0D
+ linux-user/s390x/syscall.tbl           |   8 +-=0D
+ linux-user/sh4/syscall.tbl             |   4 +-=0D
+ linux-user/sparc/syscall.tbl           |   8 +-=0D
+ linux-user/sparc64/syscall.tbl         |   8 +-=0D
+ linux-user/syscall.c                   |   6 -=0D
+ linux-user/x86_64/syscall_64.tbl       | 742 +++++++++++-----------=0D
+ linux-user/xtensa/syscall.tbl          |   4 +-=0D
+ scripts/gensyscalls.sh                 |   3 +-=0D
+ 24 files changed, 889 insertions(+), 830 deletions(-)=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
 
