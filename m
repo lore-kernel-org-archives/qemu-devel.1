@@ -2,83 +2,81 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99A3EC4727E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 14:25:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DF42C4727E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 14:28:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA7AF20709
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 14:25:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D8A672076B
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 14:28:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CDZ5/TTX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA7AF20709
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hXhiJNK8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8A672076B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNd2k-0000aT-Ll
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 10:25:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50864)
+	id 1kNd6G-0002JL-VC
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 10:28:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51888)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kNd25-0008EI-JT
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 10:24:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27740)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1kNd5M-0001ez-Bt
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 10:28:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21851)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kNd23-0001NQ-8j
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 10:24:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601475874;
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1kNd5I-0001vA-Uv
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 10:27:59 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601476075;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=NFV9VByxc4HJlDPbl6xpJg2XZPhWcjHEQGDNkCLLICQ=;
- b=CDZ5/TTXcRjJlZdrtwM+k7YgmRN2e18hE7Rp7D5GeEpJfcPK04saQ+/FHOz0tX15LOAzJX
- Zrwccd/bQbSkSptjJmJ3PKoqRAJ6iBlTRMuSwJqUlTDakzCvoY7TT7TqdXHMxC/zmhYneE
- w5lvdZanMg4uEqqJ1fJVLh8d4kyQM+A=
+ bh=HWRFTUfu0pQXvAci2PAevJS8pFxLgFOdc2xqb9Tvvho=;
+ b=hXhiJNK8FsxXAT8D733sbAzpmL30B/ksIdVyLb0Vi7EjX82v1N9WKjdvmpu0Xt4cSjPLGm
+ fJjKPfxsNQDV8pOVZ5Hh4vCvPIrFflBVp0NsMqW2F9X5KuWKnPaSBXQlDtZfCN1FET4TDt
+ 01/JxtnyOIQM8zd0cRkAzN9hQ3SUdH8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-5-IvE3LDANMsmArR3ec6yOFg-1; Wed, 30 Sep 2020 10:24:22 -0400
-X-MC-Unique: IvE3LDANMsmArR3ec6yOFg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-232--Fr0RDaNNHi7Mshvfl9m9A-1; Wed, 30 Sep 2020 10:27:53 -0400
+X-MC-Unique: -Fr0RDaNNHi7Mshvfl9m9A-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 892B31DE08;
- Wed, 30 Sep 2020 14:24:18 +0000 (UTC)
-Received: from localhost (ovpn-115-76.ams2.redhat.com [10.36.115.76])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6F7CE5D9D3;
- Wed, 30 Sep 2020 14:24:09 +0000 (UTC)
-Date: Wed, 30 Sep 2020 15:24:08 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: John G Johnson <john.g.johnson@oracle.com>
-Subject: Re: [PATCH v4] introduce vfio-user protocol specification
-Message-ID: <20200930142408.GA320669@stefanha-x1.localdomain>
-References: <1594984851-59327-1-git-send-email-thanos.makatos@nutanix.com>
- <1600180157-74760-1-git-send-email-thanos.makatos@nutanix.com>
- <20200924082132.GJ62770@stefanha-x1.localdomain>
- <MW2PR02MB37232E78343B164C2405AC248B350@MW2PR02MB3723.namprd02.prod.outlook.com>
- <20200929103743.GB181609@stefanha-x1.localdomain>
- <2E6DF2C2-A3C3-404D-BB2E-B53B3555EB66@oracle.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 36451425DF
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 14:27:52 +0000 (UTC)
+Received: from starship (unknown [10.35.206.29])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0F3D87838A;
+ Wed, 30 Sep 2020 14:27:46 +0000 (UTC)
+Message-ID: <0ce8035d631324768ff0f2914499740c8ba992c1.camel@redhat.com>
+Subject: Re: [PATCH 01/10] qdev: add "check if address free" callback for buses
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Date: Wed, 30 Sep 2020 17:27:45 +0300
+In-Reply-To: <20200925172604.2142227-2-pbonzini@redhat.com>
+References: <20200925172604.2142227-1-pbonzini@redhat.com>
+ <20200925172604.2142227-2-pbonzini@redhat.com>
+User-Agent: Evolution 3.36.3 (3.36.3-1.fc32)
 MIME-Version: 1.0
-In-Reply-To: <2E6DF2C2-A3C3-404D-BB2E-B53B3555EB66@oracle.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mlevitsk@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="zhXaljGHf11kAtnf"
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mlevitsk@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:26:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:31:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -25
 X-Spam_score: -2.6
@@ -99,123 +97,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "benjamin.walker@intel.com" <benjamin.walker@intel.com>,
- "tomassetti.andrea@gmail.com" <tomassetti.andrea@gmail.com>,
- "jag.raman@oracle.com" <jag.raman@oracle.com>,
- Swapnil Ingle <swapnil.ingle@nutanix.com>,
- "james.r.harris@intel.com" <james.r.harris@intel.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "yuvalkashtan@gmail.com" <yuvalkashtan@gmail.com>,
- "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "elena.ufimtseva@oracle.com" <elena.ufimtseva@oracle.com>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>,
- "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
- "ismael@linux.com" <ismael@linux.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- Felipe Franciosi <felipe@nutanix.com>,
- "xiuchun.lu@intel.com" <xiuchun.lu@intel.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>,
- "changpeng.liu@intel.com" <changpeng.liu@intel.com>,
- "tina.zhang@intel.com" <tina.zhang@intel.com>,
- "Kanth.Ghatraju@oracle.com" <Kanth.Ghatraju@oracle.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>
+Cc: stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---zhXaljGHf11kAtnf
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Fri, 2020-09-25 at 13:25 -0400, Paolo Bonzini wrote:
+> Check if an address is free on the bus before plugging in the
+> device.  This makes it possible to do the check without any
+> side effects, and to detect the problem early without having
+> to do it in the realize callback.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  hw/core/qdev.c         | 17 +++++++++++++++--
+>  hw/net/virtio-net.c    |  2 +-
+>  hw/sd/core.c           |  3 ++-
+>  include/hw/qdev-core.h |  3 ++-
+>  4 files changed, 20 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index 96772a15bd..74db78df36 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -94,13 +94,23 @@ static void bus_add_child(BusState *bus, DeviceState *child)
+>                               0);
+>  }
+>  
+> -void qdev_set_parent_bus(DeviceState *dev, BusState *bus)
+> +static bool bus_check_address(BusState *bus, DeviceState *child, Error **errp)
+> +{
+> +    BusClass *bc = BUS_GET_CLASS(bus);
+> +    return !bc->check_address || bc->check_address(bus, child, errp);
+> +}
+> +
+> +bool qdev_set_parent_bus(DeviceState *dev, BusState *bus, Error **errp)
+>  {
+>      BusState *old_parent_bus = dev->parent_bus;
+>      DeviceClass *dc = DEVICE_GET_CLASS(dev);
+>  
+>      assert(dc->bus_type && object_dynamic_cast(OBJECT(bus), dc->bus_type));
+>  
+> +    if (!bus_check_address(bus, dev, errp)) {
+> +        return false;
+> +    }
+> +
+>      if (old_parent_bus) {
+>          trace_qdev_update_parent_bus(dev, object_get_typename(OBJECT(dev)),
+>              old_parent_bus, object_get_typename(OBJECT(old_parent_bus)),
+> @@ -126,6 +136,7 @@ void qdev_set_parent_bus(DeviceState *dev, BusState *bus)
+>          object_unref(OBJECT(old_parent_bus));
+>          object_unref(OBJECT(dev));
+>      }
+> +    return true;
+>  }
+>  
+>  DeviceState *qdev_new(const char *name)
+> @@ -371,7 +382,9 @@ bool qdev_realize(DeviceState *dev, BusState *bus, Error **errp)
+>      assert(!dev->realized && !dev->parent_bus);
+>  
+>      if (bus) {
+> -        qdev_set_parent_bus(dev, bus);
+> +        if (!qdev_set_parent_bus(dev, bus, errp)) {
+> +            return false;
+> +        }
+>      } else {
+>          assert(!DEVICE_GET_CLASS(dev)->bus_type);
+>      }
+> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> index 7bf27b9db7..268cecc498 100644
+> --- a/hw/net/virtio-net.c
+> +++ b/hw/net/virtio-net.c
+> @@ -3142,7 +3142,7 @@ static bool failover_replug_primary(VirtIONet *n, Error **errp)
+>          error_setg(errp, "virtio_net: couldn't find primary bus");
+>          return false;
+>      }
+> -    qdev_set_parent_bus(n->primary_dev, n->primary_bus);
+> +    qdev_set_parent_bus(n->primary_dev, n->primary_bus, &error_abort);
+>      n->primary_should_be_hidden = false;
+>      if (!qemu_opt_set_bool(n->primary_device_opts,
+>                             "partially_hotplugged", true, errp)) {
+> diff --git a/hw/sd/core.c b/hw/sd/core.c
+> index 957d116f1a..08c93b5903 100644
+> --- a/hw/sd/core.c
+> +++ b/hw/sd/core.c
+> @@ -23,6 +23,7 @@
+>  #include "hw/qdev-core.h"
+>  #include "hw/sd/sd.h"
+>  #include "qemu/module.h"
+> +#include "qapi/error.h"
+>  #include "trace.h"
+>  
+>  static inline const char *sdbus_name(SDBus *sdbus)
+> @@ -240,7 +241,7 @@ void sdbus_reparent_card(SDBus *from, SDBus *to)
+>      readonly = sc->get_readonly(card);
+>  
+>      sdbus_set_inserted(from, false);
+> -    qdev_set_parent_bus(DEVICE(card), &to->qbus);
+> +    qdev_set_parent_bus(DEVICE(card), &to->qbus, &error_abort);
+>      sdbus_set_inserted(to, true);
+>      sdbus_set_readonly(to, readonly);
+>  }
+> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> index 72064f4dd4..e62da68a26 100644
+> --- a/include/hw/qdev-core.h
+> +++ b/include/hw/qdev-core.h
+> @@ -217,6 +217,7 @@ struct BusClass {
+>       */
+>      char *(*get_fw_dev_path)(DeviceState *dev);
+>      void (*reset)(BusState *bus);
+> +    bool (*check_address)(BusState *bus, DeviceState *dev, Error **errp);
+>      BusRealize realize;
+>      BusUnrealize unrealize;
+>  
+> @@ -788,7 +789,7 @@ const char *qdev_fw_name(DeviceState *dev);
+>  Object *qdev_get_machine(void);
+>  
+>  /* FIXME: make this a link<> */
+> -void qdev_set_parent_bus(DeviceState *dev, BusState *bus);
+> +bool qdev_set_parent_bus(DeviceState *dev, BusState *bus, Error **errp);
+>  
+>  extern bool qdev_hotplug;
+>  extern bool qdev_hot_removed;
 
-On Tue, Sep 29, 2020 at 09:21:54AM -0700, John G Johnson wrote:
-> > On Sep 29, 2020, at 3:37 AM, Stefan Hajnoczi <stefanha@redhat.com> wrot=
-e:
-> >=20
-> > On Mon, Sep 28, 2020 at 09:58:37AM +0000, Thanos Makatos wrote:
-> >>> It should be accompanied by a test in tests/. PCI-level testing APIS =
-for
-> >>> BARs, configuration space, interrupts, etc are available in
-> >>> tests/qtest/libqos/pci.h. The test case needs to include a vfio-user
-> >>> device backend interact with QEMU's vfio-user-pci implementation.
-> >>=20
-> >> We plan to use a libmuser-based backend for testing. This, I suppose, =
-will
-> >> make libmuser a dependency of QEMU (either as a submodule or as a libr=
-ary),
-> >> which for now can be disabled in the default configuration. Is this ac=
-ceptable?
-> >=20
-> > If there are no other dependencies and libmuser supports all host
-> > operating systems that QEMU's -device vfio-user supports, then I think
-> > it's a good idea to use libmuser for at least one in-tree test in QEMU.
-> >=20
-> >>> Also please let us know who is working on what so additional people c=
-an
-> >>> get involved in areas that need work!
-> >>=20
-> >> Swapnil and I will be working on libmuser and the test in QEMU, John a=
-nd
-> >> the mp-qemu folks will be working on the patches for implementing
-> >> --device vfio-user-pci.
-> >=20
-> > Great!
-> >=20
-> > John: Will mpqemu use libmuser to implement the remote PCI host
-> > controller?
-> >=20
->=20
->=20
-> =09The vfio-user-pci plan is to use libmuser on the server side.
 
-Okay. Using libmuser in tests seems like a good choice in that case.
+I like that idea, however I wonder why this was needed.
+My patch that switches the direction in scsi_device_find, is supposed to be completely equavalent, 
+based on the following train of thought:
 
-We'll need to figure out the details of how to do it because the
-traditional shared library dependency approach is not well-suited to
-in-development code. It would involve shipping libmuser distro packages
-so QEMU's build system can declare a library dependency (with details
-provided in a pkg-config file).
+If scsi_device_find finds an exact match it returns only it, as before.
 
-Here are approaches that are better for in-development libraries:
-1. Keep the libmuser code in qemu.git.
-2. A copy of libmuser in qemu.git with changes being sent upstream
-   (allows more flexibility in case QEMU-specific issues require
-   experimentation).
-3. Git submodules.
+Otherwise scsi_device_find were to scan from end of the list to the start, and every time,
+it finds a device with same channel/id it would update the target_dev
+and return it when it reaches the end of the list. 
 
-#1 if you're happy to use the QEMU development process for merging
-libmuser code then it's easiest to officially host the code in qemu.git.
-libmuser gets a subdirectory in the qemu.git tree and you (the
-maintainers) send pull requests. A libmuser library build target
-provides installable static and shared libraries so external
-applications can link against libmuser too. The big advantage here is
-that QEMU can instantly use the latest libmuser code changes.
+If I am not mistaken this means that it would return _first_ device in the 
+list that matches the channel/id.
+This is exactly what new version of scsi_device_find does.
 
-#2 works best if the library is a small (just a few source files) with
-no fancy build system requirements.
+Anyway, since I don't see anything wrong with doing what this patch does other
+than adding a documentation to the function as Stefan pointed out,
 
-#3 is used in QEMU for several other components. Submodules are a pain
-to sync (requires sending a qemu.git patch to move to a new commit ID),
-so this isn't good for a dependency that moves quickly.
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
-Stefan
+Best regards,
+	Maxim Levitsky
 
---zhXaljGHf11kAtnf
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl90lQgACgkQnKSrs4Gr
-c8gv5ggAjr/t3xoxhjL+rjZfoEzy4P0lfN3p5spstwdNYeh5WWpSLY7aRB0WDXxo
-k3Xt2bu2OaVgtuqJBB0oCqVoMu9p7iUVYC1n+YV+5PZBH1qhszialLkrN7hL8r56
-9HWbfSnvsWl1F/lK5rxrR5rx/D6umK+b6EIUUZv2PA/w6UcMtqrs5xDarY8h31DP
-WM+ullE1T2Tf4y6uJSMrva05azIslsk2RIz+HAovBwyR6jscvUz6BAbenf55QoUL
-5dwudCuxuME2kFW5KJlDOGaLLD7AzYA1bgBK7Zy/67EPOO1gkOq06Ff+2Fs9VjhT
-SsN/1TV2FvqI9pQmXxa6K5w/vTfxbg==
-=dEF2
------END PGP SIGNATURE-----
-
---zhXaljGHf11kAtnf--
 
 
