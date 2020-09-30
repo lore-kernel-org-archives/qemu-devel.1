@@ -2,89 +2,89 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D187C4727E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 10:14:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29E98C4727E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 10:14:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A3A72074A
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 10:14:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 685282074A
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 10:14:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="RfdEwHOm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A3A72074A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bytedance.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e6ayxjnS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 685282074A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNZ86-0003uF-Is
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 06:14:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41550)
+	id 1kNZ8T-0004ve-Cn
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 06:14:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43550)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pizhenwei@bytedance.com>)
- id 1kNYyn-0003Om-4I
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 06:04:57 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:34535)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <pizhenwei@bytedance.com>)
- id 1kNYyl-0005DK-61
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 06:04:56 -0400
-Received: by mail-pf1-x441.google.com with SMTP id k13so870593pfg.1
- for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 03:04:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=bytedance-com.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=rNTLRO7eI/MsFc78yk63Tq1O7QMzt9xIGkepVz1ORQA=;
- b=RfdEwHOm/YtysAXRfe7WQW6Q4ZJNpK8yO+i/9mR3jxX+OVgJP6mkdNtKncDUHHL6HM
- mDQDlHtRVb7661IDKWnF+qQsco+esHlfWIc55TNHHcF+dvbdTIGjm2dtzUpuB686O+7N
- TwriZ6c4+WAZxxAOwawK0HDxkkvxstgpOJg54+cXBR8j/jPNiExY5Zs6rAw9DJ69rK9z
- C/OVMfFxSKt1P/lSw4UrGmJojpdkC0FBz62UqhQ3o2iiaKnSRxbniyqmVjYwDfwmoXMq
- 3bO6yDIVqtUugZAwHVod2CAaaXcIGUm1DPwZ/CyTpo2Sl8ru9eTkDyHTD6tXhkuZrPR+
- Nr+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=rNTLRO7eI/MsFc78yk63Tq1O7QMzt9xIGkepVz1ORQA=;
- b=GICtNV7/AWDQR4/6VaA8PJ0yAf/7AzomgbifSy4ez7n4EnmPslqy8LvgN0jb3EjXbY
- oBnX0nwx2t8ac/m6a06syFHzjDmJ6iYRcLtWm3ikosbmduZ4ZbJDrCX5JdNyj/AStoMK
- PXZ5RWXl4LqI1pjrjoXNJV3oL8EB319rY+UnaZwhf8zDWxQvbkrLU3Acgno6OwW6+eQm
- Wvur/BSL7om0aw8MTXsGb7fvzEPpp291E8sRJSuHlPu021UQG3Rwni051d2FSCfQbM5Q
- AJ875Hde0oPrNWDufJW/S/MsP1EYnDVKR3HAQzusoU7DUVpHyYHWChSNmAYHOy6SKnxi
- u+bg==
-X-Gm-Message-State: AOAM532QBHFIJoDP3KtY74VFeg5lq700AYiVAOUdVNNH3ocAIxq0umDC
- 7EmOso0mD9TgOWsAUsMjV/u37Q==
-X-Google-Smtp-Source: ABdhPJxG0VpP00vLQ3zN321QiHTdOpuRsUyHXysd1hI3TMFTQDpaw+AKN5L+PX/TXrHYh6EtdmRWBg==
-X-Received: by 2002:a63:ff4e:: with SMTP id s14mr1517836pgk.137.1601460293836; 
- Wed, 30 Sep 2020 03:04:53 -0700 (PDT)
-Received: from libai.bytedance.net ([61.120.150.71])
- by smtp.gmail.com with ESMTPSA id c185sm1884230pfb.123.2020.09.30.03.04.51
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 30 Sep 2020 03:04:53 -0700 (PDT)
-From: zhenwei pi <pizhenwei@bytedance.com>
-To: pbonzini@redhat.com,
-	peter.maydell@linaro.org
-Subject: [PATCH v3 3/3] target-i386: post memory failure event to uplayer
-Date: Wed, 30 Sep 2020 18:04:40 +0800
-Message-Id: <20200930100440.1060708-4-pizhenwei@bytedance.com>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20200930100440.1060708-1-pizhenwei@bytedance.com>
-References: <20200930100440.1060708-1-pizhenwei@bytedance.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
- envelope-from=pizhenwei@bytedance.com; helo=mail-pf1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kNZ6u-00037F-0O
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 06:13:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50126)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kNZ6s-0005zg-5r
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 06:13:19 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601460797;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=tx7PPL5IZ0TX3/fiyMAXN29HmQFckjsJgmoCzOjgIW4=;
+ b=e6ayxjnSgcL1Qk9GQHngQKb1wiUkZmuuZz/YvohRPeAYwuidpkABG3ZPuX5yB5q578rVbv
+ PRThks0+8P/N2QfUBMurvdB37Ki8edP8RrtV/zuDsoRTP+5XIvpdu/VE+6nKYqwKOXJbs2
+ RuLBHkjUjOd6zrAitrSpcXm7u6yIQuE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-433-W3jJ68cUMYS7JxCH3JbXTw-1; Wed, 30 Sep 2020 06:13:15 -0400
+X-MC-Unique: W3jJ68cUMYS7JxCH3JbXTw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 318D8800688;
+ Wed, 30 Sep 2020 10:13:14 +0000 (UTC)
+Received: from localhost (ovpn-114-33.ams2.redhat.com [10.36.114.33])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id ED57719D61;
+ Wed, 30 Sep 2020 10:13:10 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+	qemu-devel@nongnu.org
+Subject: [PULL 01/17] util/vfio-helpers: Pass page protections to
+ qemu_vfio_pci_map_bar()
+Date: Wed, 30 Sep 2020 11:12:49 +0100
+Message-Id: <20200930101305.305302-2-stefanha@redhat.com>
+In-Reply-To: <20200930101305.305302-1-stefanha@redhat.com>
+References: <20200930101305.305302-1-stefanha@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:26:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,140 +97,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, zhenwei pi <pizhenwei@bytedance.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Post memory failure event to uplayer to handle hardware memory
-corrupted event. Rather than simple QEMU log, QEMU could report more
-effective message to uplayer. For example, guest crashes by MCE,
-selecting another host server is a better choice.
-
-Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
----
- target/i386/helper.c | 24 ++++++++++++++++++++----
- target/i386/kvm.c    | 13 ++++++++++++-
- 2 files changed, 32 insertions(+), 5 deletions(-)
-
-diff --git a/target/i386/helper.c b/target/i386/helper.c
-index 17e1684ff9..2a184c4835 100644
---- a/target/i386/helper.c
-+++ b/target/i386/helper.c
-@@ -18,6 +18,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qapi/qapi-events-run-state.h"
- #include "cpu.h"
- #include "exec/exec-all.h"
- #include "qemu/qemu-print.h"
-@@ -851,6 +852,15 @@ typedef struct MCEInjectionParams {
-     int flags;
- } MCEInjectionParams;
- 
-+static void emit_guest_memory_failure(MemoryFailureAction action, bool ar,
-+                                      bool recursive)
-+{
-+    MemoryFailureFlags mff = {.action_required = ar, .recursive = recursive};
-+
-+    qapi_event_send_memory_failure(MEMORY_FAILURE_RECIPIENT_GUEST, action,
-+                                   &mff);
-+}
-+
- static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
- {
-     MCEInjectionParams *params = data.host_ptr;
-@@ -859,16 +869,18 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
-     uint64_t *banks = cenv->mce_banks + 4 * params->bank;
-     g_autofree char *msg = NULL;
-     bool need_reset = false;
-+    bool recursive;
-+    bool ar = !!(params->status & MCI_STATUS_AR);
- 
-     cpu_synchronize_state(cs);
-+    recursive = !!(cenv->mcg_status & MCG_STATUS_MCIP);
- 
-     /*
-      * If there is an MCE exception being processed, ignore this SRAO MCE
-      * unless unconditional injection was requested.
-      */
--    if (!(params->flags & MCE_INJECT_UNCOND_AO)
--        && !(params->status & MCI_STATUS_AR)
--        && (cenv->mcg_status & MCG_STATUS_MCIP)) {
-+    if (!(params->flags & MCE_INJECT_UNCOND_AO) && !ar && recursive) {
-+        emit_guest_memory_failure(MEMORY_FAILURE_ACTION_IGNORE, ar, recursive);
-         return;
-     }
- 
-@@ -896,7 +908,7 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
-             return;
-         }
- 
--        if (cenv->mcg_status & MCG_STATUS_MCIP) {
-+        if (recursive) {
-             need_reset = true;
-             msg = g_strdup_printf("CPU %d: Previous MCE still in progress, "
-                                   "raising triple fault", cs->cpu_index);
-@@ -909,6 +921,8 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
-         }
- 
-         if (need_reset) {
-+            emit_guest_memory_failure(MEMORY_FAILURE_ACTION_FATAL, ar,
-+                                      recursive);
-             monitor_printf(params->mon, "%s", msg);
-             qemu_log_mask(CPU_LOG_RESET, "%s\n", msg);
-             qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-@@ -934,6 +948,8 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
-     } else {
-         banks[1] |= MCI_STATUS_OVER;
-     }
-+
-+    emit_guest_memory_failure(MEMORY_FAILURE_ACTION_INJECT, ar, recursive);
- }
- 
- void cpu_x86_inject_mce(Monitor *mon, X86CPU *cpu, int bank,
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 9efb07e7c8..923749f5d8 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -13,6 +13,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qapi/qapi-events-run-state.h"
- #include "qapi/error.h"
- #include <sys/ioctl.h>
- #include <sys/utsname.h>
-@@ -575,8 +576,17 @@ static void kvm_mce_inject(X86CPU *cpu, hwaddr paddr, int code)
-                        (MCM_ADDR_PHYS << 6) | 0xc, flags);
- }
- 
-+static void emit_hypervisor_memory_failure(MemoryFailureAction action, bool ar)
-+{
-+    MemoryFailureFlags mff = {.action_required = ar, .recursive = false};
-+
-+    qapi_event_send_memory_failure(MEMORY_FAILURE_RECIPIENT_HYPERVISOR, action,
-+                                   &mff);
-+}
-+
- static void hardware_memory_error(void *host_addr)
- {
-+    emit_hypervisor_memory_failure(MEMORY_FAILURE_ACTION_FATAL, true);
-     error_report("QEMU got Hardware memory error at addr %p", host_addr);
-     exit(1);
- }
-@@ -631,7 +641,8 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
-         hardware_memory_error(addr);
-     }
- 
--    /* Hope we are lucky for AO MCE */
-+    /* Hope we are lucky for AO MCE, just notify a event */
-+    emit_hypervisor_memory_failure(MEMORY_FAILURE_ACTION_IGNORE, false);
- }
- 
- static void kvm_reset_exception(CPUX86State *env)
--- 
-2.11.0
+RnJvbTogUGhpbGlwcGUgTWF0aGlldS1EYXVkw6kgPHBoaWxtZEByZWRoYXQuY29tPgoKUGFnZXMg
+YXJlIGN1cnJlbnRseSBtYXBwZWQgUkVBRC9XUklURS4gVG8gYmUgYWJsZSB0byB1c2UgZGlmZmVy
+ZW50CnByb3RlY3Rpb25zLCBhZGQgYSBuZXcgYXJndW1lbnQgdG8gcWVtdV92ZmlvX3BjaV9tYXBf
+YmFyKCkuCgpTaWduZWQtb2ZmLWJ5OiBQaGlsaXBwZSBNYXRoaWV1LURhdWTDqSA8cGhpbG1kQHJl
+ZGhhdC5jb20+ClNpZ25lZC1vZmYtYnk6IFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFAcmVkaGF0
+LmNvbT4KTWVzc2FnZS1JZDogPDIwMjAwOTIyMDgzODIxLjU3ODUxOS0yLXBoaWxtZEByZWRoYXQu
+Y29tPgotLS0KIGluY2x1ZGUvcWVtdS92ZmlvLWhlbHBlcnMuaCB8IDIgKy0KIGJsb2NrL252bWUu
+YyAgICAgICAgICAgICAgICB8IDMgKystCiB1dGlsL3ZmaW8taGVscGVycy5jICAgICAgICAgfCA0
+ICsrLS0KIDMgZmlsZXMgY2hhbmdlZCwgNSBpbnNlcnRpb25zKCspLCA0IGRlbGV0aW9ucygtKQoK
+ZGlmZiAtLWdpdCBhL2luY2x1ZGUvcWVtdS92ZmlvLWhlbHBlcnMuaCBiL2luY2x1ZGUvcWVtdS92
+ZmlvLWhlbHBlcnMuaAppbmRleCAxZjA1N2MyYjllLi40NDkxYzhlMWE2IDEwMDY0NAotLS0gYS9p
+bmNsdWRlL3FlbXUvdmZpby1oZWxwZXJzLmgKKysrIGIvaW5jbHVkZS9xZW11L3ZmaW8taGVscGVy
+cy5oCkBAIC0yMiw3ICsyMiw3IEBAIGludCBxZW11X3ZmaW9fZG1hX21hcChRRU1VVkZJT1N0YXRl
+ICpzLCB2b2lkICpob3N0LCBzaXplX3Qgc2l6ZSwKIGludCBxZW11X3ZmaW9fZG1hX3Jlc2V0X3Rl
+bXBvcmFyeShRRU1VVkZJT1N0YXRlICpzKTsKIHZvaWQgcWVtdV92ZmlvX2RtYV91bm1hcChRRU1V
+VkZJT1N0YXRlICpzLCB2b2lkICpob3N0KTsKIHZvaWQgKnFlbXVfdmZpb19wY2lfbWFwX2JhcihR
+RU1VVkZJT1N0YXRlICpzLCBpbnQgaW5kZXgsCi0gICAgICAgICAgICAgICAgICAgICAgICAgICAg
+dWludDY0X3Qgb2Zmc2V0LCB1aW50NjRfdCBzaXplLAorICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIHVpbnQ2NF90IG9mZnNldCwgdWludDY0X3Qgc2l6ZSwgaW50IHByb3QsCiAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgRXJyb3IgKiplcnJwKTsKIHZvaWQgcWVtdV92ZmlvX3BjaV91bm1h
+cF9iYXIoUUVNVVZGSU9TdGF0ZSAqcywgaW50IGluZGV4LCB2b2lkICpiYXIsCiAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90IG9mZnNldCwgdWludDY0X3Qgc2l6ZSk7CmRpZmYg
+LS1naXQgYS9ibG9jay9udm1lLmMgYi9ibG9jay9udm1lLmMKaW5kZXggZjRmMjdiNmRhNy4uNWE0
+ZGM2YTcyMiAxMDA2NDQKLS0tIGEvYmxvY2svbnZtZS5jCisrKyBiL2Jsb2NrL252bWUuYwpAQCAt
+NzEyLDcgKzcxMiw4IEBAIHN0YXRpYyBpbnQgbnZtZV9pbml0KEJsb2NrRHJpdmVyU3RhdGUgKmJz
+LCBjb25zdCBjaGFyICpkZXZpY2UsIGludCBuYW1lc3BhY2UsCiAgICAgICAgIGdvdG8gb3V0Owog
+ICAgIH0KIAotICAgIHMtPnJlZ3MgPSBxZW11X3ZmaW9fcGNpX21hcF9iYXIocy0+dmZpbywgMCwg
+MCwgTlZNRV9CQVJfU0laRSwgZXJycCk7CisgICAgcy0+cmVncyA9IHFlbXVfdmZpb19wY2lfbWFw
+X2JhcihzLT52ZmlvLCAwLCAwLCBOVk1FX0JBUl9TSVpFLAorICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgUFJPVF9SRUFEIHwgUFJPVF9XUklURSwgZXJycCk7CiAgICAgaWYgKCFz
+LT5yZWdzKSB7CiAgICAgICAgIHJldCA9IC1FSU5WQUw7CiAgICAgICAgIGdvdG8gb3V0OwpkaWZm
+IC0tZ2l0IGEvdXRpbC92ZmlvLWhlbHBlcnMuYyBiL3V0aWwvdmZpby1oZWxwZXJzLmMKaW5kZXgg
+NTgzYmRmYjM2Zi4uOWFjMzA3ZTNkNCAxMDA2NDQKLS0tIGEvdXRpbC92ZmlvLWhlbHBlcnMuYwor
+KysgYi91dGlsL3ZmaW8taGVscGVycy5jCkBAIC0xNDYsMTMgKzE0NiwxMyBAQCBzdGF0aWMgaW50
+IHFlbXVfdmZpb19wY2lfaW5pdF9iYXIoUUVNVVZGSU9TdGF0ZSAqcywgaW50IGluZGV4LCBFcnJv
+ciAqKmVycnApCiAgKiBNYXAgYSBQQ0kgYmFyIGFyZWEuCiAgKi8KIHZvaWQgKnFlbXVfdmZpb19w
+Y2lfbWFwX2JhcihRRU1VVkZJT1N0YXRlICpzLCBpbnQgaW5kZXgsCi0gICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgdWludDY0X3Qgb2Zmc2V0LCB1aW50NjRfdCBzaXplLAorICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIHVpbnQ2NF90IG9mZnNldCwgdWludDY0X3Qgc2l6ZSwgaW50IHByb3Qs
+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgRXJyb3IgKiplcnJwKQogewogICAgIHZvaWQg
+KnA7CiAgICAgYXNzZXJ0X2Jhcl9pbmRleF92YWxpZChzLCBpbmRleCk7CiAgICAgcCA9IG1tYXAo
+TlVMTCwgTUlOKHNpemUsIHMtPmJhcl9yZWdpb25faW5mb1tpbmRleF0uc2l6ZSAtIG9mZnNldCks
+Ci0gICAgICAgICAgICAgUFJPVF9SRUFEIHwgUFJPVF9XUklURSwgTUFQX1NIQVJFRCwKKyAgICAg
+ICAgICAgICBwcm90LCBNQVBfU0hBUkVELAogICAgICAgICAgICAgIHMtPmRldmljZSwgcy0+YmFy
+X3JlZ2lvbl9pbmZvW2luZGV4XS5vZmZzZXQgKyBvZmZzZXQpOwogICAgIGlmIChwID09IE1BUF9G
+QUlMRUQpIHsKICAgICAgICAgZXJyb3Jfc2V0Z19lcnJubyhlcnJwLCBlcnJubywgIkZhaWxlZCB0
+byBtYXAgQkFSIHJlZ2lvbiIpOwotLSAKMi4yNi4yCgo=
 
 
