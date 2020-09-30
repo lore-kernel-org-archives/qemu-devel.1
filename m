@@ -2,62 +2,89 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8E55C4727E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 12:51:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A15BC4727E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 12:59:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8277720674
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 12:51:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8277720674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 865F720719
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 12:59:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SjdH5pyI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 865F720719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNbaM-0003qi-Ky
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 08:51:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51924)
+	id 1kNbhd-0004pj-Fb
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 08:59:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53344)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>)
- id 1kNbZ9-0002lW-TS; Wed, 30 Sep 2020 08:50:39 -0400
-Received: from mx2.suse.de ([195.135.220.15]:54460)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>)
- id 1kNbZ8-0001Mc-4N; Wed, 30 Sep 2020 08:50:39 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id 29CA0AF26;
- Wed, 30 Sep 2020 12:50:35 +0000 (UTC)
-Subject: Re: [PATCH v4 02/12] meson: Allow optional target/${ARCH}/Kconfig
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-References: <20200929224355.1224017-1-philmd@redhat.com>
- <20200929224355.1224017-3-philmd@redhat.com>
-From: Claudio Fontana <cfontana@suse.de>
-Message-ID: <19b1318a-f9be-5808-760b-ba7748d48267@suse.de>
-Date: Wed, 30 Sep 2020 14:50:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kNbh4-0004Qw-0R
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 08:58:50 -0400
+Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:34537)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kNbh1-0001vk-7W
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 08:58:49 -0400
+Received: by mail-ej1-x643.google.com with SMTP id gr14so2705546ejb.1
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 05:58:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Y+TNjGoI+Ocb1adRNgHqoQccGj0PrNfs+A0+zkkc4To=;
+ b=SjdH5pyIv9E+EyPg5Z0YxDdN294+Ngt1l0bsN8EPQ/TXDoo35d/CneDjZdMBAZ0lv+
+ EFYODcCOOvVHniLErEoKreDiItP6nFv7jYfzrpITIKvuK9hKV4RPtI077jyMl/RsC2Zn
+ +Zc7c4Kzm+j0NXzOpVtGdpbvf1hnXu48iK+QyBUbsJtGws92y/wOXw8c/5n2FA0swfQR
+ /0apv6X2b8Ax9S+lPzv3NkUK57/i+Ko/9mvRzE2r16Z5fnaKz7xH4f2aYb24Qu6C5aDN
+ z4V1ICsm9Cdj+DGgASTBhEFK9Dkn9Qse1y8EbW22O/T6ve+91sqpHPVmN2Hox92ymofF
+ Ax9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Y+TNjGoI+Ocb1adRNgHqoQccGj0PrNfs+A0+zkkc4To=;
+ b=jOWfWHaPe4Dr0iZNP57f+L6Q8nUBwU8D9+XLA65RO0K9zZ9yV1t3WwTGguove4SvYN
+ GSDaWYNL88JQHbIo0z8ZrUWeqzg2XQy8yhxlhbOrs+TTCQhP+a+GxHp2LPpPpkj+ffDU
+ pkUE2OR4h+ZmkZ3GN3hn83xbXb5IOfkWiRhHVo3xP/dXoOfH/vHcw7RFpbT9XytXiBAE
+ GInddsVROSyB+LTc5420Tq4adfGJIGXMh7YqIwZlynIHSeZJSZ/PZBhTRNqWWcuxIwFp
+ S8pTVeQzVZPKjTOn6JrwOcyB3Z8GyZqiId1fhj4MOwaCH89UY/Dqhho4Phd1GbTzmrZz
+ /FAw==
+X-Gm-Message-State: AOAM530wOfgjk71HjaxZ0zxyoWlELEv8IvKwi1Z8EliMsZjzoxnbwJG9
+ WXfVNVk/1ie1LNWIZyW6nCv60sirzN2L4b6mmkhT4g==
+X-Google-Smtp-Source: ABdhPJzX3Mo3D38dVxEDBWvuYhIWf7dye1snjA6WTVOzVVT1feb69drsPoCQWLxEpLoF7M/Txy+6+ffDGW4jeQXopxM=
+X-Received: by 2002:a17:906:71c9:: with SMTP id
+ i9mr2629240ejk.250.1601470725173; 
+ Wed, 30 Sep 2020 05:58:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200929224355.1224017-3-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 20:52:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <CAFEAcA-wMzZhO-9EdYhPC3aoPatQ-JEtBJ2nSjGepRbLs-5AdA@mail.gmail.com>
+ <e0a62d48-62dd-992d-6ca4-25587217966c@amsat.org>
+In-Reply-To: <e0a62d48-62dd-992d-6ca4-25587217966c@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 30 Sep 2020 13:58:34 +0100
+Message-ID: <CAFEAcA9i6DGTUpbxX-1nSPnpe6w3WbOiUmvy8Q9xh2Fg3EESXQ@mail.gmail.com>
+Subject: Re: use of 'apt' in scripting in our dockerfiles provokes warnings
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::643;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x643.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,63 +97,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/30/20 12:43 AM, Philippe Mathieu-Daudé wrote:
-> Extend the generic Meson script to pass optional target Kconfig
-> file to the minikconf script.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
-> We could use fs.exists() but is_file() is more specific
-> (can not be a directory).
-> 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Claudio Fontana <cfontana@suse.de>
-> ---
->  meson.build | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/meson.build b/meson.build
-> index d36dd085b5..9ab5d514d7 100644
-> --- a/meson.build
-> +++ b/meson.build
-> @@ -529,6 +529,7 @@ kconfig_external_symbols = [
->  ]
->  ignored = ['TARGET_XML_FILES', 'TARGET_ABI_DIR', 'TARGET_DIRS']
->  
-> +fs = import('fs')
->  foreach target : target_dirs
->    config_target = keyval.load(meson.current_build_dir() / target / 'config-target.mak')
->  
-> @@ -569,8 +570,13 @@ foreach target : target_dirs
->      endforeach
->  
->      config_devices_mak = target + '-config-devices.mak'
-> +    target_kconfig = 'target' / config_target['TARGET_BASE_ARCH'] / 'Kconfig'
-> +    minikconf_input = ['default-configs' / target + '.mak', 'Kconfig']
-> +    if fs.is_file(target_kconfig)
-> +      minikconf_input += [target_kconfig]
-> +    endif
->      config_devices_mak = configure_file(
-> -      input: ['default-configs' / target + '.mak', 'Kconfig'],
-> +      input: minikconf_input,
->        output: config_devices_mak,
->        depfile: config_devices_mak + '.d',
->        capture: true,
-> 
+On Wed, 30 Sep 2020 at 11:43, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
+ wrote:
+> On 9/30/20 12:33 PM, Peter Maydell wrote:
+> > Also, any idea what this error is about?
+> >
+> > #4 importing cache manifest from registry.gitlab.com/qemu-project/qemu/=
+qemu...
+> > #4       digest:
+> > sha256:815fb44b573ac7520d148d9b2510c00f31846ca6fa55127d322bc8db3c5d0ec0
+> > #4         name: "importing cache manifest from
+> > registry.gitlab.com/qemu-project/qemu/qemu/debian-alpha-cross:latest"
+> > #4      started: 2020-09-29 22:57:54.371490684 +0000 UTC
+> > #4    completed: 2020-09-29 22:57:55.064468936 +0000 UTC
+> > #4     duration: 692.978252ms
+> > #4        error: "invalid build cache from
+> > {MediaType:application/vnd.docker.distribution.manifest.v2+json
+> > Digest:sha256:a1e8a5830bb19b7cddda64872c5d71a0337d4b98bed30fd7684d20467=
+adcd289
+> > Size:1161 URLs:[] Annotations:map[] Platform:<nil>}"
+> >
+> > It didn't seemt to have an adverse effect...
+>
+> It seems to come from '--cache-from' from commit e6f1306b10,
+> there is some DOCKER_BUILDKIT black magic involved.
+>
+> What is your 'docker version' output please?
 
-I can't say I understand it, but the general idea seems right to me.
 
-Ciao,
+e104462:bionic:qemu$ docker version
+Client:
+ Version:           18.09.1
+ API version:       1.39
+ Go version:        go1.10.6
+ Git commit:        4c52b90
+ Built:             Wed Jan  9 19:35:23 2019
+ OS/Arch:           linux/amd64
+ Experimental:      false
 
-Claudio
+Server: Docker Engine - Community
+ Engine:
+  Version:          18.09.1
+  API version:      1.39 (minimum version 1.12)
+  Go version:       go1.10.6
+  Git commit:       4c52b90
+  Built:            Wed Jan  9 19:02:44 2019
+  OS/Arch:          linux/amd64
+  Experimental:     false
+
+
+-- PMM
 
