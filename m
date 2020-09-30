@@ -2,92 +2,88 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.9 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E660C4727C
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 01:06:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF04FC4727C
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 01:25:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BBEC20B1F
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 01:06:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 055E020B1F
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 01:25:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tB71iyDM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BBEC20B1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CREd8xW2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 055E020B1F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNQZw-0000CE-5H
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 21:06:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56730)
+	id 1kNQro-0003Wy-Vk
+	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 21:25:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59788)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
- id 1kNQYm-0008Cn-Sd
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 21:05:32 -0400
-Received: from mail-vk1-xa44.google.com ([2607:f8b0:4864:20::a44]:37048)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kNQqs-00031I-VS
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 21:24:14 -0400
+Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:46940)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
- id 1kNQYj-00034F-Na
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 21:05:31 -0400
-Received: by mail-vk1-xa44.google.com with SMTP id h23so34513vkn.4
- for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 18:05:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kNQqr-000581-5V
+ for qemu-devel@nongnu.org; Tue, 29 Sep 2020 21:24:14 -0400
+Received: by mail-il1-x141.google.com with SMTP id l16so6877328ilt.13
+ for <qemu-devel@nongnu.org>; Tue, 29 Sep 2020 18:24:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=FoyFyzp6E3LDn7z9CHnhiE2TsJI3nV8V4sbVPljM0F0=;
- b=tB71iyDMfj9rWzxD2mrOYzYVBKfF6sG2h3KFrLr7csiB7TVDh40bdMUvGafCf6h1AY
- q12B6975GZm+W1Up3KdgQT6EqUSDO4dUe63n7PiMFnm5tJNRaP5n/NVUf48WZUr25IoD
- lSoc0PdmYsUENgK/VLry2e9QalJR1GYSK5xjnPhMnIiJ8S4YoIKzmbMKJhd2A134B62O
- AJhgFDympazXtwAITTo9AQvoThTatHvnn5yPnOujV5LTh8OFP+8VcBShFT8V7XXxr2Q7
- ISfTJt5BP2w0A2KWtp7WK8w5l/VlCdfij1p9fR4c85dQuMMd944QHeWJ/UhNwPvXQU1F
- 5OXg==
+ :cc; bh=NPyGlJQgiz95bjuxjz4K21GBO2IGQ2YpDA4/2nPalEw=;
+ b=CREd8xW2nkIvqGOg/yM+cJeNenNImFIVkxbBtf52YdmCzfmIc6jREFP0vi3oQxe/Yb
+ UHHL35W2BTWMwPtBeDcenhUNTkXpRfv5TRCaq2wneMZ4602L1HEkkvBShXLoZwc9BvXg
+ RiM92YfktUTPmUGLTeuLxq/EtQupLk2jqwRknEKF15cMKRkU1wx5cKyWLGadgXV1U9lZ
+ W8N7BuEcpJJhMtCiJ+cc2QimCBsarcWvhIF5TUx0Ap53MyZN2+Qkyfq0DFVTVPURIwY1
+ KbQ8hRdv9XmVM/wUAb1wZBIL5oshThnAdTgbkUFDZIfGAc0uAXnKEdAhdCgssP/Pzxab
+ k2FQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=FoyFyzp6E3LDn7z9CHnhiE2TsJI3nV8V4sbVPljM0F0=;
- b=Joea8IiOzfn/xUeFGpmRL1jOHCsZh9Q6IPf0KNDmPqU2ILjfv6Pk2krHJEfoQaXGUj
- 71V/8KoGP0x0EwlkpSt8FgQOYZHKr11rfV+9Ea5r+7WE6sYhf0m7du9fr/AgeZNzjYxU
- aH15V0vKIm+RyendDykz0kdxJZ3VlLVJozMPQ8ml+kTGG3STJCXNWN/CCorXGNNoeqIs
- EezQbZdUjOS/GQEeYm9DAVh5qQ1cx6bSWgzO4dM3+L4JOc17bVs2U6JP3k1G0WwzzdJE
- r1VP2cjWncKEULPmOSA5NeBEWYUB1wtNtt32RWaHjvuVwItwZjCy6P/mv0NPMPRYugIt
- nhXA==
-X-Gm-Message-State: AOAM533/Axtj5tP7AdEOPnG3yFxDnUyR1fafHirt4Ap+eRozWM4sSav5
- JfbjQkim0KVw1akpw3zy9vrGn2AzWv3kilVvWLOxew==
-X-Google-Smtp-Source: ABdhPJxvYnt8wVVT+NdJF0s8SjpY+ZuC5DIYp6tMJMWIcPn7NQklBW+C+/AuZ7vBiL95SjtBuVI6LsbimmGgqTU2caw=
-X-Received: by 2002:a1f:b64a:: with SMTP id g71mr111994vkf.11.1601427927991;
- Tue, 29 Sep 2020 18:05:27 -0700 (PDT)
+ bh=NPyGlJQgiz95bjuxjz4K21GBO2IGQ2YpDA4/2nPalEw=;
+ b=Ak8Fwfx8BOkUSx6GK4kZTj6I8321kYZuqLa8uO98ODPPB8H/vbgccJdrMM+7IIHuSZ
+ LUYbqGzN8uRN5Kgn8OviPyLcc8ZwmijDNNZT9HBSgMkG3eO2jEETM+KCC3iGTe9urwTB
+ iZiLvqOvz+hmqgp9KOtkBOlnhNtc2/IPb2zO3g41FbI+IVVCFx3/TmQnELZdeSppB0Ik
+ 2Nnn07yRzIv0UQ1ap2/IJdH1zqpLoPvbE9YKnyxJ0elzNbpKnZnZ0Hlq8GiMK2MWK8Lj
+ ZmMBAqNistYjhwtL7dH9fp06Yq3YwK+IbEOMN01hNbbASAQHUbpTzzV5OUD9QvddjeiP
+ TInQ==
+X-Gm-Message-State: AOAM533OdykaBZVZDPtCTYHvuwVKN7VQahzVEWaTEoKl/Fx7YMa3XLRQ
+ OdKay48+WBEa4H+oQFsIvjHnHFDu0PDofBKE3n4=
+X-Google-Smtp-Source: ABdhPJz8J9sFEogkwHDUoJ6e8vg78urgSAHREt1BtsZCVAmVwFMSNp8XyMqHJO1cYeSA7jtSJwuFVDcf3eRA8i3V9Lc=
+X-Received: by 2002:a92:9817:: with SMTP id l23mr62029ili.131.1601429051257;
+ Tue, 29 Sep 2020 18:24:11 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200929003916.4183696-1-hskinnemoen@google.com>
- <20200929174644.GW3674@minyard.net>
-In-Reply-To: <20200929174644.GW3674@minyard.net>
-From: Havard Skinnemoen <hskinnemoen@google.com>
-Date: Tue, 29 Sep 2020 18:05:16 -0700
-Message-ID: <CAFQmdRaJOqDxOWgoJ6c4TFuJGw5zvb6KyUXoYT0SFJe1xJZhNQ@mail.gmail.com>
-Subject: Re: [RFC 0/3] QEMU as IPMI BMC emulator
-To: minyard@acm.org
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- IS20 Avi Fishman <Avi.Fishman@nuvoton.com>, 
- CS20 KFTing <kfting@nuvoton.com>, Joel Stanley <joel@jms.id.au>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, 
- Patrick Venture <venture@google.com>, Hao Wu <wuhaotsh@google.com>
+References: <20200930003033.554124-1-laurent@vivier.eu>
+ <20200930003033.554124-2-laurent@vivier.eu>
+In-Reply-To: <20200930003033.554124-2-laurent@vivier.eu>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 29 Sep 2020 18:12:48 -0700
+Message-ID: <CAKmqyKP_1MkXzgPG+eQk65-ey+YJGBOKbkysnjGWoMYsNcMNjQ@mail.gmail.com>
+Subject: Re: [PATCH 1/4] linux-user: update syscall_nr.h to Linux 5.9-rc7
+To: Laurent Vivier <laurent@vivier.eu>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::a44;
- envelope-from=hskinnemoen@google.com; helo=mail-vk1-xa44.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x141.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -180
-X-Spam_score: -18.1
-X-Spam_bar: ------------------
-X-Spam_report: (-18.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-0.468,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
- USER_IN_DEF_SPF_WL=-7.5 autolearn=ham autolearn_force=no
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,88 +96,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Aurelien Jarno <aurelien@aurel32.net>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 29, 2020 at 10:46 AM Corey Minyard <minyard@acm.org> wrote:
+On Tue, Sep 29, 2020 at 5:34 PM Laurent Vivier <laurent@vivier.eu> wrote:
 >
-> On Mon, Sep 28, 2020 at 05:39:13PM -0700, Havard Skinnemoen via wrote:
-> > This series briefly documents the existing IPMI device support for main
-> > processor emulation, and goes on to propose a similar device structure to
-> > emulate IPMI responder devices in BMC machines. This would allow a qemu
-> > instance running BMC firmware to serve as an external BMC for a qemu instance
-> > running server software.
-> >
-> > RFC only at this point because the series does not include actual code to
-> > implement this. I'd appreciate some initial feedback on
-> >
-> > 1. Whether anyone else is interested in something like this.
+> Update gensyscalls.sh not to generate an empty line at the end of the file
 >
-> Though I've had this idea once or twice, I'm not working on real BMCs,
-> so I didn't really pursue anything.  It's a good idea, I think, for the
-> BMC developers, and possibly for system developers trying to do
-> integration testing between BMCs and system software.
+> And then automatically update syscall_nr.h running scripts/gensyscalls.sh
 >
-> You will need to tie in to more emulation than just the BMC side of the
-> system interface registers.  You will also need to tie into GPIOs or
-> whatnot for things like host reset.
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 
-That is true. The OpenIPMI protocol seems to handle at least some of
-that, so it should be just a matter of adding a few GPIO inputs
-(power, reset, ATTN, ...) to the ipmi-host-extern device.
+For the RISC-V part:
 
-I should add some more details about this to the doc.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-> Power handling is going to be a bit weird.  The OpenIPMI emulator
-> starts/stops qemu based upon power control.  It might be possible to do
-> the same thing in this sort of emulator.
+Alistair
 
-Hmm, yeah, I guess we can't kill/restart qemu from within qemu itself.
-But perhaps stopping all CPUs and doing a full system reset might be a
-good enough approximation for power-off?
-
-> You may need extensions to the protocol, and that's fine.  I can't think
-> of any at the moment, but you never know.
-
-True.
-
-> > 2. Completeness (i.e. anything that could be explained in more detail in the
-> >    docs).
+> ---
+>  linux-user/aarch64/syscall_nr.h  | 7 +++++--
+>  linux-user/nios2/syscall_nr.h    | 7 +++++--
+>  linux-user/openrisc/syscall_nr.h | 8 ++++++--
+>  linux-user/riscv/syscall32_nr.h  | 8 +++++++-
+>  linux-user/riscv/syscall64_nr.h  | 8 +++++++-
+>  scripts/gensyscalls.sh           | 3 +--
+>  6 files changed, 31 insertions(+), 10 deletions(-)
 >
-> It's certainly a good start.  The second patch would be useful right
-> now.  There are more details, of course, but I think that's covered in
-> the man page under the various devices.
-
-Thanks, I might send the second patch separately in the next round.
-
-Havard
-
-> Thanks,
+> diff --git a/linux-user/aarch64/syscall_nr.h b/linux-user/aarch64/syscall_nr.h
+> index 85de000b2490..6fd5b331e780 100644
+> --- a/linux-user/aarch64/syscall_nr.h
+> +++ b/linux-user/aarch64/syscall_nr.h
+> @@ -298,7 +298,10 @@
+>  #define TARGET_NR_fspick 433
+>  #define TARGET_NR_pidfd_open 434
+>  #define TARGET_NR_clone3 435
+> -#define TARGET_NR_syscalls 436
+> +#define TARGET_NR_close_range 436
+> +#define TARGET_NR_openat2 437
+> +#define TARGET_NR_pidfd_getfd 438
+> +#define TARGET_NR_faccessat2 439
+> +#define TARGET_NR_syscalls 440
 >
-> -corey
+>  #endif /* LINUX_USER_AARCH64_SYSCALL_NR_H */
+> -
+> diff --git a/linux-user/nios2/syscall_nr.h b/linux-user/nios2/syscall_nr.h
+> index 32d485dc9ae8..e37f40179bf3 100644
+> --- a/linux-user/nios2/syscall_nr.h
+> +++ b/linux-user/nios2/syscall_nr.h
+> @@ -318,7 +318,10 @@
+>  #define TARGET_NR_fsmount 432
+>  #define TARGET_NR_fspick 433
+>  #define TARGET_NR_pidfd_open 434
+> -#define TARGET_NR_syscalls 436
+> +#define TARGET_NR_close_range 436
+> +#define TARGET_NR_openat2 437
+> +#define TARGET_NR_pidfd_getfd 438
+> +#define TARGET_NR_faccessat2 439
+> +#define TARGET_NR_syscalls 440
 >
-> > 3. Naming, and whether 'specs' is the right place to put this.
-> > 4. Whether it's OK to enable the blockdiag sphinx extension (if not, I'll just
-> >    toss the block diagrams and turn the docs into walls of text).
-> >
-> > If this seems reasonable, I'll start working with one of my team mates on
-> > implementing the common part, as well as the Nuvoton-specific responder device.
-> > Possibly also an Aspeed device.
-> >
-> > Havard Skinnemoen (3):
-> >   docs: enable sphinx blockdiag extension
-> >   docs/specs: IPMI device emulation: main processor
-> >   docs/specs: IPMI device emulation: BMC
-> >
-> >  docs/conf.py         |   5 +-
-> >  docs/specs/index.rst |   1 +
-> >  docs/specs/ipmi.rst  | 183 +++++++++++++++++++++++++++++++++++++++++++
-> >  3 files changed, 188 insertions(+), 1 deletion(-)
-> >  create mode 100644 docs/specs/ipmi.rst
-> >
-> > --
-> > 2.28.0.709.gb0816b6eb0-goog
-> >
-> >
+>  #endif /* LINUX_USER_NIOS2_SYSCALL_NR_H */
+> -
+> diff --git a/linux-user/openrisc/syscall_nr.h b/linux-user/openrisc/syscall_nr.h
+> index 340383beb2c6..a8fc0295109a 100644
+> --- a/linux-user/openrisc/syscall_nr.h
+> +++ b/linux-user/openrisc/syscall_nr.h
+> @@ -318,7 +318,11 @@
+>  #define TARGET_NR_fsmount 432
+>  #define TARGET_NR_fspick 433
+>  #define TARGET_NR_pidfd_open 434
+> -#define TARGET_NR_syscalls 436
+> +#define TARGET_NR_clone3 435
+> +#define TARGET_NR_close_range 436
+> +#define TARGET_NR_openat2 437
+> +#define TARGET_NR_pidfd_getfd 438
+> +#define TARGET_NR_faccessat2 439
+> +#define TARGET_NR_syscalls 440
+>
+>  #endif /* LINUX_USER_OPENRISC_SYSCALL_NR_H */
+> -
+> diff --git a/linux-user/riscv/syscall32_nr.h b/linux-user/riscv/syscall32_nr.h
+> index 4fef73e954da..079b804daef5 100644
+> --- a/linux-user/riscv/syscall32_nr.h
+> +++ b/linux-user/riscv/syscall32_nr.h
+> @@ -1,5 +1,7 @@
+>  /*
+>   * This file contains the system call numbers.
+> + * Do not modify.
+> + * This file is generated by scripts/gensyscalls.sh
+>   */
+>  #ifndef LINUX_USER_RISCV_SYSCALL32_NR_H
+>  #define LINUX_USER_RISCV_SYSCALL32_NR_H
+> @@ -290,6 +292,10 @@
+>  #define TARGET_NR_fspick 433
+>  #define TARGET_NR_pidfd_open 434
+>  #define TARGET_NR_clone3 435
+> -#define TARGET_NR_syscalls 436
+> +#define TARGET_NR_close_range 436
+> +#define TARGET_NR_openat2 437
+> +#define TARGET_NR_pidfd_getfd 438
+> +#define TARGET_NR_faccessat2 439
+> +#define TARGET_NR_syscalls 440
+>
+>  #endif /* LINUX_USER_RISCV_SYSCALL32_NR_H */
+> diff --git a/linux-user/riscv/syscall64_nr.h b/linux-user/riscv/syscall64_nr.h
+> index cc82f3244f55..d54224ccec64 100644
+> --- a/linux-user/riscv/syscall64_nr.h
+> +++ b/linux-user/riscv/syscall64_nr.h
+> @@ -1,5 +1,7 @@
+>  /*
+>   * This file contains the system call numbers.
+> + * Do not modify.
+> + * This file is generated by scripts/gensyscalls.sh
+>   */
+>  #ifndef LINUX_USER_RISCV_SYSCALL64_NR_H
+>  #define LINUX_USER_RISCV_SYSCALL64_NR_H
+> @@ -296,6 +298,10 @@
+>  #define TARGET_NR_fspick 433
+>  #define TARGET_NR_pidfd_open 434
+>  #define TARGET_NR_clone3 435
+> -#define TARGET_NR_syscalls 436
+> +#define TARGET_NR_close_range 436
+> +#define TARGET_NR_openat2 437
+> +#define TARGET_NR_pidfd_getfd 438
+> +#define TARGET_NR_faccessat2 439
+> +#define TARGET_NR_syscalls 440
+>
+>  #endif /* LINUX_USER_RISCV_SYSCALL64_NR_H */
+> diff --git a/scripts/gensyscalls.sh b/scripts/gensyscalls.sh
+> index b7b8456f6312..bba9fb052c47 100755
+> --- a/scripts/gensyscalls.sh
+> +++ b/scripts/gensyscalls.sh
+> @@ -86,8 +86,7 @@ generate_syscall_nr()
+>      read_includes $arch $bits | filter_defines | rename_defines | \
+>                                  evaluate_values | sort -n -k 3
+>      echo
+> -    echo "#endif /* ${guard} */"
+> -    echo) > "$file"
+> +    echo "#endif /* ${guard} */") > "$file"
+>  }
+>
+>  mkdir "$TMP/asm"
+> --
+> 2.26.2
+>
+>
 
