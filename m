@@ -2,88 +2,86 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D750C4727E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 10:31:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 239CFC4727F
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 10:34:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC2C62071E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 10:31:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5CF592071E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 10:34:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X82hWG8h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC2C62071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A4tNIbo7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CF592071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNZOC-0001y0-TZ
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 06:31:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44090)
+	id 1kNZR2-0004CR-5m
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 06:34:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47534)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kNZ7o-0003rq-C6
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 06:14:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34887)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kNZ7m-00065u-FQ
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 06:14:16 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601460852;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=2oVRTewZtVGZG2GCafRUewUFORQU15oW+TyxD4WO/8k=;
- b=X82hWG8hCMkEk4hN8nLQ9rWJLxLH2UXNLv/i+OuFQ6eT7xz8Y3erMETIge/QTietATbbus
- 29pQdbSAI79GLn6mNcFU9/PSyzvRS7fG0Q3XHwuqcYc+ra+N1Ccw+CCza6bZwu4aKTJIGx
- 6fiw4Dta0G2+ob09P2CKtEhS9zrIcVc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-287-qP_K4MV9MOSc64wKWm5sIA-1; Wed, 30 Sep 2020 06:14:10 -0400
-X-MC-Unique: qP_K4MV9MOSc64wKWm5sIA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5CE771091068;
- Wed, 30 Sep 2020 10:14:09 +0000 (UTC)
-Received: from localhost (ovpn-114-33.ams2.redhat.com [10.36.114.33])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0783760E1C;
- Wed, 30 Sep 2020 10:14:05 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-devel@nongnu.org
-Subject: [PULL 14/17] include/block/block.h: drop non-ascii quotation mark
-Date: Wed, 30 Sep 2020 11:13:02 +0100
-Message-Id: <20200930101305.305302-15-stefanha@redhat.com>
-In-Reply-To: <20200930101305.305302-1-stefanha@redhat.com>
-References: <20200930101305.305302-1-stefanha@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kNZKZ-0004qZ-54
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 06:27:27 -0400
+Received: from mail-ej1-x634.google.com ([2a00:1450:4864:20::634]:42429)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kNZKX-00077g-3V
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 06:27:26 -0400
+Received: by mail-ej1-x634.google.com with SMTP id q13so1997034ejo.9
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 03:27:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=m814gk6TUi/1yQvIyqh2gt4RwYpLrttFpHdkEr/i7oY=;
+ b=A4tNIbo7j4SRDdJc8JpqrEfSSLn7/mdW8gPUmatxonlB+lsvr8frgX/vnBG4B1pypC
+ kAYmUY4zzvoC9ZTO+3csOU5VZ7s17fXIC0bGf9usN9iuJ1V8qMntZal4P6XywJm9P+AF
+ TAcWTDhfoNmplZy7ybnhteVIQgLkfl3hfNIDG8ew9PxVjcFyvmSBMfuilG9xIfz2q+QK
+ Rs3oecLo3E0STr6BBb4WGPBQmkxtNQNJhBVseVxMAW6UelIvhg/DxNj8W6ABmdP4rPsn
+ sJM+7KQMBTmECkY/1yfO3XawhxKvEqpantM5C6TojtJSJ8I2ZwzCLdKIoFCYqubowSjz
+ CPpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=m814gk6TUi/1yQvIyqh2gt4RwYpLrttFpHdkEr/i7oY=;
+ b=mzvZgSwAjga3jySn+fXIt4UBOnotcYKvEeSJcSeuCGObiTivdRr4xadE7Uw0LjOydQ
+ px1tGSmGZTU+jk31fpA7Wv2MQRfzv3JO3Fnnh/DC7/XzeFaOnMjQp2ScPMMv6DGt/vti
+ 7MjYEu5CBzzW7NBTROHScANuZSTYXJaQp1SfWx72VmQWPdxR9acALYMhhPOMXFsT4lBw
+ vXfeufaG8g6Fk1kNEc0cJodvenM5kk7MLQ30TvrUU0gU71O2XmnHpcIY/B187ttIVo/N
+ BHCRc2QX0ppMLrjo2QGRJOVrwCEKOGGvcztCH2FBiD+qI3jIbAR1GcAKih4kws4GuFMI
+ TX4Q==
+X-Gm-Message-State: AOAM530VrF+mT+BsJr7j3pY3nCE4lhlmH1U1mwxRYMUM7S4uONnCtug8
+ Or52MXPpYg7POrZeNvB1FrDYmnvRgNCcN6VyuAbCtFCvAdaDzYPR
+X-Google-Smtp-Source: ABdhPJyBtcegeHJQOdPftzP+5s4dpR8otAkthHLvFnFQMvy34JZ7I5FGvPlW74+HRhIoB7fyyGu1KmAJhkOE2C1gs+4=
+X-Received: by 2002:a17:906:d936:: with SMTP id
+ rn22mr2114857ejb.4.1601461643318; 
+ Wed, 30 Sep 2020 03:27:23 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:26:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+References: <20200929201926.2155622-1-armbru@redhat.com>
+In-Reply-To: <20200929201926.2155622-1-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 30 Sep 2020 11:27:12 +0100
+Message-ID: <CAFEAcA9kXaX_WqY5exxEyGDm=-TnNyQM2qdSB+Hz9xjzRi7kKw@mail.gmail.com>
+Subject: Re: [PULL 00/29] QAPI patches patches for 2020-09-29
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::634;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x634.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,33 +94,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-RnJvbTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8u
-Y29tPgoKVGhpcyBpcyB0aGUgb25seSBub24tYXNjaWkgY2hhcmFjdGVyIGluIHRoZSBmaWxlIGFu
-ZCBpdCBkb2Vzbid0IHJlYWxseQpuZWVkZWQgaGVyZS4gTGV0J3MgdXNlIG5vcm1hbCAiJyIgc3lt
-Ym9sIGZvciBjb25zaXN0ZW5jeSB3aXRoIHRoZSByZXN0CjExIG9jY3VycmVuY2VzIG9mICInIiBp
-biB0aGUgZmlsZS4KClNpZ25lZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkg
-PHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4KUmV2aWV3ZWQtYnk6IEVyaWMgQmxha2UgPGVibGFr
-ZUByZWRoYXQuY29tPgpTaWduZWQtb2ZmLWJ5OiBTdGVmYW4gSGFqbm9jemkgPHN0ZWZhbmhhQHJl
-ZGhhdC5jb20+Ci0tLQogaW5jbHVkZS9ibG9jay9ibG9jay5oIHwgMiArLQogMSBmaWxlIGNoYW5n
-ZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9i
-bG9jay9ibG9jay5oIGIvaW5jbHVkZS9ibG9jay9ibG9jay5oCmluZGV4IDhiODdkZjY5YTEuLmNl
-MmFjMzkyOTkgMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvYmxvY2svYmxvY2suaAorKysgYi9pbmNsdWRl
-L2Jsb2NrL2Jsb2NrLmgKQEAgLTMwNCw3ICszMDQsNyBAQCBlbnVtIEJkcnZDaGlsZFJvbGVCaXRz
-IHsKICAgICBCRFJWX0NISUxEX0ZJTFRFUkVEICAgICA9ICgxIDw8IDIpLAogCiAgICAgLyoKLSAg
-ICAgKiBDaGlsZCBmcm9tIHdoaWNoIHRvIHJlYWQgYWxsIGRhdGEgdGhhdCBpc27igJl0IGFsbG9j
-YXRlZCBpbiB0aGUKKyAgICAgKiBDaGlsZCBmcm9tIHdoaWNoIHRvIHJlYWQgYWxsIGRhdGEgdGhh
-dCBpc24ndCBhbGxvY2F0ZWQgaW4gdGhlCiAgICAgICogcGFyZW50IChpLmUuLCB0aGUgYmFja2lu
-ZyBjaGlsZCk7IHN1Y2ggZGF0YSBpcyBjb3BpZWQgdG8gdGhlCiAgICAgICogcGFyZW50IHRocm91
-Z2ggQ09XIChhbmQgb3B0aW9uYWxseSBDT1IpLgogICAgICAqIFRoaXMgZmllbGQgaXMgbXV0dWFs
-bHkgZXhjbHVzaXZlIHdpdGggREFUQSwgTUVUQURBVEEsIGFuZAotLSAKMi4yNi4yCgo=
+On Tue, 29 Sep 2020 at 21:19, Markus Armbruster <armbru@redhat.com> wrote:
+>
+> The following changes since commit b150cb8f67bf491a49a1cb1c7da151eeacbdbcc9:
+>
+>   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2020-09-29 13:18:54 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2020-09-29
+>
+> for you to fetch changes up to 7cd77fb02b9a2117a56fed172f09a1820fcd6b0b:
+>
+>   Remove texinfo dependency from docker and CI configs (2020-09-29 17:55:39 +0200)
+>
+> ----------------------------------------------------------------
+> QAPI patches patches for 2020-09-29
 
+
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
+
+-- PMM
 
