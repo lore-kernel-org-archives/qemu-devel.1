@@ -7,59 +7,60 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01839C4727F
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 04:57:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB33AC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 04:58:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F52F20791
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 04:57:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 14D2320791
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 04:58:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XCLmw8ta"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F52F20791
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cglg8pxl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14D2320791
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNUBe-0000oY-Gf
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 00:57:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37164)
+	id 1kNUCc-0002BZ-4g
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 00:58:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37514)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNTnT-0001Ff-P1
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 00:32:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60363)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNToK-00022M-0w
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 00:33:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39596)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNTnN-0000ak-RQ
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 00:32:55 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNToG-0000h8-Gi
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 00:33:47 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601440366;
+ s=mimecast20190719; t=1601440423;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QpcPc0JJZjUHkmAfzfFumJ9LBKbWFBiymq5dslj7rHA=;
- b=XCLmw8tarP9EQ/fjITp8H5jYM5USd/HSl5USlTbQ38F12muAyPgQ1giCQxkKUjXdLs963n
- 3XHTZyzr4zwFzROiWBISZ+BtMWL2vH9yGl37DY78NDq0zdmv/HjH25L0WyUI8m2YEoVopy
- Ravb2Zpze1tB+7HY88FkvRUOGg/OsJE=
+ bh=c5auX7EroCZXw8pH2fyfl+xSutQQ8tLHCS5UdjXZX24=;
+ b=Cglg8pxlOijLhsqwwoYRsv2xYA5cp3pA80SQxnRmICJR5/yLoNo9LCw3DtYkGdhpjpTG9G
+ 1Eb6HvK58pLr4rQ1RCS38BrslK8a2CgZWygZxBtvEwOz6XoCm2A6ZRuW6I3O8olilqJlXy
+ 4FprSquwhr9rjxgTjNDOOV7EmytzfK4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-180-nkzgQeqpMWyiaCYRBGmUIw-1; Wed, 30 Sep 2020 00:32:44 -0400
-X-MC-Unique: nkzgQeqpMWyiaCYRBGmUIw-1
+ us-mta-167-GUdIPoEBOHm0f7fUrkPExQ-1; Wed, 30 Sep 2020 00:33:30 -0400
+X-MC-Unique: GUdIPoEBOHm0f7fUrkPExQ-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 63EAC801AC8;
- Wed, 30 Sep 2020 04:32:43 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 29D101DE09;
+ Wed, 30 Sep 2020 04:33:29 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 386497BE42;
- Wed, 30 Sep 2020 04:32:42 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A711673678;
+ Wed, 30 Sep 2020 04:33:23 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 24/46] qapi/events.py: Move comments into docstrings
-Date: Wed, 30 Sep 2020 00:31:28 -0400
-Message-Id: <20200930043150.1454766-25-jsnow@redhat.com>
+Subject: [PATCH v4 41/46] qapi/introspect.py: create a typed 'Node' data
+ structure
+Date: Wed, 30 Sep 2020 00:31:45 -0400
+Message-Id: <20200930043150.1454766-42-jsnow@redhat.com>
 In-Reply-To: <20200930043150.1454766-1-jsnow@redhat.com>
 References: <20200930043150.1454766-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -70,9 +71,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:31:59
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:26:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
@@ -101,33 +102,180 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Clarify them while we're here.
+This replaces _make_tree with Node.__init__(), effectively. By creating
+it as a generic container, we can more accurately describe the exact
+nature of this particular Node.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
 ---
- scripts/qapi/events.py | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ scripts/qapi/introspect.py | 77 +++++++++++++++++++-------------------
+ 1 file changed, 38 insertions(+), 39 deletions(-)
 
-diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
-index 57e0939e963..599f3d1f564 100644
---- a/scripts/qapi/events.py
-+++ b/scripts/qapi/events.py
-@@ -44,8 +44,12 @@ def gen_event_send_decl(name: str,
-                  proto=build_event_send_proto(name, arg_type, boxed))
+diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+index 43b6ba5df1f..86286e755ca 100644
+--- a/scripts/qapi/introspect.py
++++ b/scripts/qapi/introspect.py
+@@ -12,11 +12,12 @@
+ 
+ from typing import (
+     Dict,
++    Generic,
++    Iterable,
+     List,
+     Optional,
+     Sequence,
+-    Tuple,
+-    Union,
++    TypeVar,
+ )
+ 
+ from .common import (
+@@ -43,42 +44,42 @@
  
  
--# Declare and initialize an object 'qapi' using parameters from build_params()
- def gen_param_var(typ: QAPISchemaObjectType) -> str:
+ # The correct type for TreeNode is actually:
+-# Union[AnnotatedNode, List[TreeNode], Dict[str, TreeNode], str, bool]
++# Union[Node[TreeNode], List[TreeNode], Dict[str, TreeNode], str, bool]
+ # but mypy does not support recursive types yet.
+ TreeNode = object
++_NodeType = TypeVar('_NodeType', bound=TreeNode)
+ _DObject = Dict[str, object]
+-Extra = Dict[str, object]
+-AnnotatedNode = Tuple[TreeNode, Extra]
+ 
+ 
+-def _make_tree(obj: Union[_DObject, str], ifcond: List[str],
+-               comment: Optional[str] = None) -> AnnotatedNode:
+-    extra: Extra = {
+-        'if': ifcond,
+-        'comment': comment,
+-    }
+-    return (obj, extra)
++class Node(Generic[_NodeType]):
 +    """
-+    Generate a struct variable holding the event parameters.
-+
-+    Initialize it with the function arguments defined in `gen_event_send`.
++    Node generally contains a SchemaInfo-like type (as a dict),
++    But it also used to wrap comments/ifconds around leaf value types.
 +    """
-     assert not typ.variants
-     ret = mcgen('''
-     %(c_name)s param = {
++    # Remove after 3.7 adds @dataclass:
++    # pylint: disable=too-few-public-methods
++    def __init__(self, data: _NodeType, ifcond: Iterable[str],
++                 comment: Optional[str] = None):
++        self.data = data
++        self.comment: Optional[str] = comment
++        self.ifcond: Sequence[str] = tuple(ifcond)
+ 
+ 
+-def _tree_to_qlit(obj: TreeNode,
+-                  level: int = 0,
++def _tree_to_qlit(obj: TreeNode, level: int = 0,
+                   suppress_first_indent: bool = False) -> str:
+ 
+     def indent(level: int) -> str:
+         return level * 4 * ' '
+ 
+-    if isinstance(obj, tuple):
+-        ifobj, extra = obj
+-        ifcond = extra.get('if')
+-        comment = extra.get('comment')
++    if isinstance(obj, Node):
+         ret = ''
+-        if comment:
+-            ret += indent(level) + '/* %s */\n' % comment
+-        if ifcond:
+-            ret += gen_if(ifcond)
+-        ret += _tree_to_qlit(ifobj, level)
+-        if ifcond:
+-            ret += '\n' + gen_endif(ifcond)
++        if obj.comment:
++            ret += indent(level) + '/* %s */\n' % obj.comment
++        if obj.ifcond:
++            ret += gen_if(obj.ifcond)
++        ret += _tree_to_qlit(obj.data, level)
++        if obj.ifcond:
++            ret += '\n' + gen_endif(obj.ifcond)
+         return ret
+ 
+     ret = ''
+@@ -125,7 +126,7 @@ def __init__(self, prefix: str, unmask: bool):
+             ' * QAPI/QMP schema introspection', __doc__)
+         self._unmask = unmask
+         self._schema: Optional[QAPISchema] = None
+-        self._trees: List[AnnotatedNode] = []
++        self._trees: List[Node[_DObject]] = []
+         self._used_types: List[QAPISchemaType] = []
+         self._name_map: Dict[str, str] = {}
+         self._genc.add(mcgen('''
+@@ -192,9 +193,8 @@ def _use_type(self, typ: QAPISchemaType) -> str:
+ 
+     @classmethod
+     def _gen_features(cls,
+-                      features: List[QAPISchemaFeature]
+-                      ) -> List[AnnotatedNode]:
+-        return [_make_tree(f.name, f.ifcond) for f in features]
++                      features: List[QAPISchemaFeature]) -> List[Node[str]]:
++        return [Node(f.name, f.ifcond) for f in features]
+ 
+     def _gen_tree(self, name: str, mtype: str, obj: _DObject,
+                   ifcond: List[str],
+@@ -210,10 +210,10 @@ def _gen_tree(self, name: str, mtype: str, obj: _DObject,
+         obj['meta-type'] = mtype
+         if features:
+             obj['features'] = self._gen_features(features)
+-        self._trees.append(_make_tree(obj, ifcond, comment))
++        self._trees.append(Node(obj, ifcond, comment))
+ 
+     def _gen_member(self,
+-                    member: QAPISchemaObjectTypeMember) -> AnnotatedNode:
++                    member: QAPISchemaObjectTypeMember) -> Node[_DObject]:
+         obj: _DObject = {
+             'name': member.name,
+             'type': self._use_type(member.type)
+@@ -222,19 +222,19 @@ def _gen_member(self,
+             obj['default'] = None
+         if member.features:
+             obj['features'] = self._gen_features(member.features)
+-        return _make_tree(obj, member.ifcond)
++        return Node(obj, member.ifcond)
+ 
+     def _gen_variants(self, tag_name: str,
+                       variants: List[QAPISchemaVariant]) -> _DObject:
+         return {'tag': tag_name,
+                 'variants': [self._gen_variant(v) for v in variants]}
+ 
+-    def _gen_variant(self, variant: QAPISchemaVariant) -> AnnotatedNode:
++    def _gen_variant(self, variant: QAPISchemaVariant) -> Node[_DObject]:
+         obj: _DObject = {
+             'case': variant.name,
+             'type': self._use_type(variant.type)
+         }
+-        return _make_tree(obj, variant.ifcond)
++        return Node(obj, variant.ifcond)
+ 
+     def visit_builtin_type(self, name: str, info: Optional[QAPISourceInfo],
+                            json_type: str) -> None:
+@@ -245,8 +245,7 @@ def visit_enum_type(self, name: str, info: QAPISourceInfo,
+                         members: List[QAPISchemaEnumMember],
+                         prefix: Optional[str]) -> None:
+         self._gen_tree(name, 'enum',
+-                       {'values': [_make_tree(m.name, m.ifcond, None)
+-                                   for m in members]},
++                       {'values': [Node(m.name, m.ifcond) for m in members]},
+                        ifcond, features)
+ 
+     def visit_array_type(self, name: str, info: Optional[QAPISourceInfo],
+@@ -274,9 +273,9 @@ def visit_alternate_type(self, name: str, info: QAPISourceInfo,
+                              variants: QAPISchemaVariants) -> None:
+         self._gen_tree(name, 'alternate',
+                        {'members': [
+-                           _make_tree({'type': self._use_type(m.type)},
+-                                      m.ifcond, None)
+-                           for m in variants.variants]},
++                           Node({'type': self._use_type(m.type)}, m.ifcond)
++                           for m in variants.variants
++                       ]},
+                        ifcond, features)
+ 
+     def visit_command(self, name: str, info: QAPISourceInfo, ifcond: List[str],
 -- 
 2.26.2
 
