@@ -1,110 +1,87 @@
-Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=M6H1=DI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59490C4363D
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 23:37:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D37ECC4363D
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 00:06:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B969320B1F
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 23:37:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 38DDE2067C
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 00:06:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KLrz/91B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B969320B1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nkhOPp4c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38DDE2067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNlfW-0006uj-Mw
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 19:37:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48648)
+	id 1kNm6w-0005uJ-S0
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 20:06:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54690)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kNlex-0006Tn-VW
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 19:37:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:31624)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kNlev-0002y0-Oj
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 19:37:19 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601509036;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=q4+nsmi2lXoKFzMEw0jJpxApbbGvz2CBxefKBwgMdKE=;
- b=KLrz/91Bsj2BkKKE9Yhj0HCpD7InWmwPjaJHqDhFKyOghjBOvHRMtDEBC3SkDgNon6oYCg
- Cn4dX3wDz4eRjpKVEI7O9JJjZ7p1WWUYvrLNjm1/3nJ0KbsqfrlK7C8GDzooYY1p7PgG1w
- PEwMjZ/ob9nA5QhPYlZiU9+z4Opmqgc=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-278-Ig8wZ581PFWJsr5QDodhQQ-1; Wed, 30 Sep 2020 19:37:14 -0400
-X-MC-Unique: Ig8wZ581PFWJsr5QDodhQQ-1
-Received: by mail-wr1-f70.google.com with SMTP id h4so1276750wrb.4
- for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 16:37:13 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kNm5j-0005H2-33; Wed, 30 Sep 2020 20:04:59 -0400
+Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:37373)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kNm5h-0006TP-GC; Wed, 30 Sep 2020 20:04:58 -0400
+Received: by mail-il1-x142.google.com with SMTP id j13so4334736ilc.4;
+ Wed, 30 Sep 2020 17:04:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=YPWmL5pqxcGhaQHK4Z5UI4PW8UeS6FPhFCYrMEvjtso=;
+ b=nkhOPp4c6Qa0eFRa+2Y3Ni6dG7752zjaBeBHsql53dac/htwSg8IeN0V4+0xEhsbDl
+ Is/KsLUxvMj47pYwKUmY1t/O6tFtNWuR/LEgUupftBoUbRotewJog4IxD/3DxIpgMd54
+ oXbcc5W+SzOP4SC0XXR8A2Smi+Pumpyn0LABdZeWXmGfbIzFg80sd5Qld0qeccqAx0w4
+ epxAiSKbLmdTcHtYIhUk1ZnMJsMv2nQxVLbkNrU+hBJWArLeif4tSeln0g68u94teIKi
+ PM0Zd2WkMfJ0EWZOH6zUMKy0s+VsIAi5I1Lt0I7FdODumwsSXe4Ws2ZIuLFEOs6nXo59
+ imEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=q4+nsmi2lXoKFzMEw0jJpxApbbGvz2CBxefKBwgMdKE=;
- b=tKRU1Frk6y9kRjZJhcMPwcY1Bqy5VzinBJ9qiq9vK5TYH7gU1NHVZP0YENyHqzzuo/
- X6GnswTeb6+POFtPYB0FqZHmXAtDZoVn/aJ4bjEvHelIbuq23GCK5seX0X5EVezEtcF1
- sA3mTD7JtnaQLI8s+126QrPV5EeNr2JpvkDYf1i7DazX+t9iLfbRRLhCnblwH2Op3v/c
- fPBIyaUWjysrVy7o4k+1/sx+6tCpyk4jfaDTmNtulE4U1/oaaQXNA14hNcDnlFUy4Giu
- iLspVvcUsyT85WBxY9Hrl1NsHxmgTMopiIujEKppd7MRfX6DWfHe7UQxWjh6vXR/YXrw
- TIew==
-X-Gm-Message-State: AOAM530ee42d110JVhbyViml8zJEoCGHn0voOvVctrj6T6oi3fDSdhZY
- zEDnX+3ewd1kqyLktSmKXBiUcia8deHkBE1wKnDB70rzdZ5ETmvsYFAE13xT3epOcPDt9+I6+Bw
- vyiAP7NZpJosehgY=
-X-Received: by 2002:a5d:6784:: with SMTP id v4mr5928236wru.132.1601509032736; 
- Wed, 30 Sep 2020 16:37:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyovlP78EtYnDog5/LJ9In3o8X2O0IegHZQUPZnOzpMAWCy+qRrvbTJnN2DYkyBWmR5LEa2oA==
-X-Received: by 2002:a5d:6784:: with SMTP id v4mr5928224wru.132.1601509032489; 
- Wed, 30 Sep 2020 16:37:12 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:75e3:aaa7:77d6:f4e4?
- ([2001:b07:6468:f312:75e3:aaa7:77d6:f4e4])
- by smtp.gmail.com with ESMTPSA id c16sm6126858wrx.31.2020.09.30.16.37.11
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 30 Sep 2020 16:37:11 -0700 (PDT)
-Subject: Re: [PATCH 01/10] qdev: add "check if address free" callback for buses
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-References: <20200925172604.2142227-1-pbonzini@redhat.com>
- <20200925172604.2142227-2-pbonzini@redhat.com>
- <0ce8035d631324768ff0f2914499740c8ba992c1.camel@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <861b0950-b5c4-f53a-c9d8-e5b22c873188@redhat.com>
-Date: Thu, 1 Oct 2020 01:37:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=YPWmL5pqxcGhaQHK4Z5UI4PW8UeS6FPhFCYrMEvjtso=;
+ b=ZZHyHmWEaKICrgZ+L8JnDEsUbtdb0aXXF2IXMuZv8MfT54vkdn1i/zNijYDE6Ischz
+ C5F1TejJpgub3PWc88s3ytzYUBX9imCnsReMMCPPg0EEW5t+SfZTN4vylBHm6O6GHG9U
+ 2Wvztm41NEzlO3dkbkyqa9p/ljSmSo0eagn0brWJeDrMrmSujXVBeHB4TDc6nssZcZx4
+ JBEI7pV54MqJEh3AhzGdnMUrDJUAA5UyvnwFsSdKWnd+JdzJG3XS/YGlqfMyWkagmVSI
+ iyPn4As4pnElH22+9t0gNFSAdg+FR/gAFcbZwFnj8ugrkMu4eCRd3OA7lfkTk2McEWmp
+ dTRA==
+X-Gm-Message-State: AOAM532dSpgzq1wwufh330TGD2fQQoRvW//INIqVeHDrdTkPxpczLCUx
+ d0UYcthDxPCfbPk7okpg/j3DBK/SlcDb0rhsLJ0=
+X-Google-Smtp-Source: ABdhPJzOTFD0B5Wzc/6Lu6NnSITMKbPzTOdGOqTNqwSSvwQA9+WwFHTWBXvJOSCb3cds3z9jFFcmqqP/Js2ZVW2SDpA=
+X-Received: by 2002:a92:9817:: with SMTP id l23mr338924ili.131.1601510696190; 
+ Wed, 30 Sep 2020 17:04:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <0ce8035d631324768ff0f2914499740c8ba992c1.camel@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 18:09:23
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.469,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+References: <20200927091946.65491-1-f4bug@amsat.org>
+In-Reply-To: <20200927091946.65491-1-f4bug@amsat.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 30 Sep 2020 16:53:33 -0700
+Message-ID: <CAKmqyKO0jkh+=R4H5yFms2fDk7N4vfUgU8RQLTAZHqoCPMS9kw@mail.gmail.com>
+Subject: Re: [PATCH] ssi: Display chip select polarity in monitor 'info qtree'
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::142;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x142.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -118,27 +95,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: stefanha@redhat.com
+Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
+ qemu-arm <qemu-arm@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <alistair@alistair23.me>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 30/09/20 16:27, Maxim Levitsky wrote:
-> My patch that switches the direction in scsi_device_find, is supposed to be completely equavalent, 
-> based on the following train of thought:
-> 
-> If scsi_device_find finds an exact match it returns only it, as before.
-> 
-> Otherwise scsi_device_find were to scan from end of the list to the start, and every time,
-> it finds a device with same channel/id it would update the target_dev
-> and return it when it reaches the end of the list. 
-> 
-> If I am not mistaken this means that it would return _first_ device in the 
-> list that matches the channel/id.
-> This is exactly what new version of scsi_device_find does.
+On Sun, Sep 27, 2020 at 2:20 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+>
+> It is sometime useful to verify a device chip select polarity
+> on a SPI bus. Since we have this information available, display
+> it in the 'info qtree' monitor output:
+>
+>   $ qemu-system-arm -M lm3s6965evb -monitor stdio -S
+>   (qemu) info qtree
+>   [...]
+>   dev: pl022, id ""
+>     gpio-out "sysbus-irq" 1
+>     mmio 0000000040008000/0000000000001000
+>     bus: ssi
+>       type SSI
+>       dev: ssd0323, id ""
+>         gpio-in "" 1
+>         gpio-in "ssi-gpio-cs" 1
+>         chip select polarity: high           <---
+>       dev: ssi-sd, id ""
+>         gpio-in "ssi-gpio-cs" 1
+>         chip select polarity: low            <---
+>         bus: sd-bus
+>           type sd-bus
+>           dev: sd-card, id ""
+>             spec_version =3D 2 (0x2)
+>             drive =3D "sd0"
+>             spi =3D true
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Oh!  I missed that subtlety.  Thanks, that makes sense.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Paolo
+Alistair
 
+> ---
+>  hw/ssi/ssi.c | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
+>
+> diff --git a/hw/ssi/ssi.c b/hw/ssi/ssi.c
+> index 4278d0e4440..4c9f8d66d23 100644
+> --- a/hw/ssi/ssi.c
+> +++ b/hw/ssi/ssi.c
+> @@ -17,6 +17,7 @@
+>  #include "migration/vmstate.h"
+>  #include "qemu/module.h"
+>  #include "qapi/error.h"
+> +#include "monitor/monitor.h"
+>  #include "qom/object.h"
+>
+>  struct SSIBus {
+> @@ -26,10 +27,31 @@ struct SSIBus {
+>  #define TYPE_SSI_BUS "SSI"
+>  OBJECT_DECLARE_SIMPLE_TYPE(SSIBus, SSI_BUS)
+>
+> +static void ssi_print_dev(Monitor *mon, DeviceState *dev, int indent)
+> +{
+> +    static const char *const polarity_s[] =3D {
+> +        [SSI_CS_NONE] =3D "unknown",
+> +        [SSI_CS_LOW]  =3D "low",
+> +        [SSI_CS_HIGH] =3D "high"
+> +    };
+> +    SSISlaveClass *ssc =3D SSI_SLAVE_GET_CLASS(dev);
+> +
+> +    monitor_printf(mon, "%*schip select polarity: %s\n",
+> +                   indent, "", polarity_s[ssc->cs_polarity]);
+> +}
+> +
+> +static void ssi_bus_class_init(ObjectClass *klass, void *data)
+> +{
+> +    BusClass *k =3D BUS_CLASS(klass);
+> +
+> +    k->print_dev =3D ssi_print_dev;
+> +}
+> +
+>  static const TypeInfo ssi_bus_info =3D {
+>      .name =3D TYPE_SSI_BUS,
+>      .parent =3D TYPE_BUS,
+>      .instance_size =3D sizeof(SSIBus),
+> +    .class_init =3D ssi_bus_class_init,
+>  };
+>
+>  static void ssi_cs_default(void *opaque, int n, int level)
+> --
+> 2.26.2
+>
+>
 
