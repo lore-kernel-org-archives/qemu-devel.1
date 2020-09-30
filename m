@@ -2,93 +2,80 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BA9AC4727F
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:29:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62CC6C4727E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:32:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A5EB2071E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:29:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dshBnqSe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A5EB2071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6771321D7F
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:32:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6771321D7F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNe37-00034E-HD
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 11:29:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40988)
+	id 1kNe5t-0004uq-As
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 11:32:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40210)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1kNe1i-0001Lp-MG
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 11:28:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53475)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1kNe1g-0007OD-3E
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 11:28:18 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601479694;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=gNpAgJi6Rdc8qz6EM5672Qh/ppwi6/9Jx86viah0Zco=;
- b=dshBnqSevpS0WU5jliA5wSea7NCO2GS4SzVMs/zrlS8pT0qdkzq9/4dCLJ9i+j1Lp2qfaS
- JUSUWQsEbNSrWhUYWdSEljcmc5iUXk4/HmeK9aemQaMXj/PpHo5NIc4uuu9p8oIMjm346R
- OM1iK//75VAOV+sredGuRh/FCCzuRJw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-587-9lKRz2-TOCC7YTpftQfayQ-1; Wed, 30 Sep 2020 11:28:11 -0400
-X-MC-Unique: 9lKRz2-TOCC7YTpftQfayQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA72B2FD12;
- Wed, 30 Sep 2020 15:28:09 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.193.24])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 177915C1CF;
- Wed, 30 Sep 2020 15:28:07 +0000 (UTC)
-Date: Wed, 30 Sep 2020 17:28:05 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PULL 13/13] qemu/atomic.h: rename atomic_ to qatomic_
-Message-ID: <20200930152805.tycn6lcm4qx74phi@kamzik.brq.redhat.com>
-References: <20200923161031.69474-1-stefanha@redhat.com>
- <20200923161031.69474-14-stefanha@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kNdzJ-0006wn-PZ
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 11:25:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41846)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kNdzG-0007CN-2f
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 11:25:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kNdzE-0007bp-1G
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 15:25:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 05B162E80E9
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 15:25:44 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200923161031.69474-14-stefanha@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=drjones@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:26:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.469,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 30 Sep 2020 15:12:54 -0000
+From: Alex Williamson <1897481@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: alex-l-williamson sergey-kukunin
+X-Launchpad-Bug-Reporter: Sergiy K (sergey-kukunin)
+X-Launchpad-Bug-Modifier: Alex Williamson (alex-l-williamson)
+References: <160123953126.1246.10707501292033522741.malonedeb@gac.canonical.com>
+Message-Id: <160147877482.24881.11249970993995586313.malone@chaenomeles.canonical.com>
+Subject: [Bug 1897481] Re: qemu crashes with VGA pass-through, e-GPU,
+ nvidia 1060
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="d50d1e75c500726862802414f880ee3e3bb759bf"; Instance="production"
+X-Launchpad-Hash: 6290b0c06d5a521444becae69f1cb42942f2b9cc
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 11:25:44
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.001, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -97,85 +84,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Reply-To: Bug 1897481 <1897481@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 23, 2020 at 05:10:31PM +0100, Stefan Hajnoczi wrote:
-> clang's C11 atomic_fetch_*() functions only take a C11 atomic type
-> pointer argument. QEMU uses direct types (int, etc) and this causes a
-> compiler error when a QEMU code calls these functions in a source file
-> that also included <stdatomic.h> via a system header file:
-> 
->   $ CC=clang CXX=clang++ ./configure ... && make
->   ../util/async.c:79:17: error: address argument to atomic operation must be a pointer to _Atomic type ('unsigned int *' invalid)
-> 
-> Avoid using atomic_*() names in QEMU's atomic.h since that namespace is
-> used by <stdatomic.h>. Prefix QEMU's APIs with 'q' so that atomic.h
-> and <stdatomic.h> can co-exist. I checked /usr/include on my machine and
-> searched GitHub for existing "qatomic_" users but there seem to be none.
-> 
-> This patch was generated using:
-> 
->   $ git grep -h -o '\<atomic\(64\)\?_[a-z0-9_]\+' include/qemu/atomic.h | \
->     sort -u >/tmp/changed_identifiers
->   $ for identifier in $(</tmp/changed_identifiers); do
->         sed -i "s%\<$identifier\>%q$identifier%g" \
->             $(git grep -I -l "\<$identifier\>")
->     done
-> 
-> I manually fixed line-wrap issues and misaligned rST tables.
-> 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> Message-Id: <20200923105646.47864-1-stefanha@redhat.com>
-> ---
->  include/qemu/atomic.h                         | 248 +++++++++---------
->  docs/devel/lockcnt.txt                        |   8 +-
->  docs/devel/rcu.txt                            |  34 +--
->  accel/tcg/atomic_template.h                   |  20 +-
->  include/block/aio-wait.h                      |   4 +-
->  include/block/aio.h                           |   8 +-
->  include/exec/cpu_ldst.h                       |   2 +-
->  include/exec/exec-all.h                       |   6 +-
->  include/exec/log.h                            |   6 +-
->  include/exec/memory.h                         |   2 +-
->  include/exec/ram_addr.h                       |  26 +-
->  include/exec/ramlist.h                        |   2 +-
->  include/exec/tb-lookup.h                      |   4 +-
->  include/hw/core/cpu.h                         |   2 +-
->  include/qemu/atomic128.h                      |   6 +-
->  include/qemu/bitops.h                         |   2 +-
->  include/qemu/coroutine.h                      |   2 +-
->  include/qemu/log.h                            |   6 +-
->  include/qemu/queue.h                          |   7 +-
->  include/qemu/rcu.h                            |  10 +-
->  include/qemu/rcu_queue.h                      | 100 +++----
->  include/qemu/seqlock.h                        |   8 +-
->  include/qemu/stats64.h                        |  28 +-
->  include/qemu/thread.h                         |  24 +-
->  .../infiniband/hw/vmw_pvrdma/pvrdma_ring.h    |  14 +-
+There are definitely resource allocation issues on the host in the
+crashing case.  The quirks currently enumerate the device BARs without
+testing them, we identify a device and know what the resources should
+be, which is why I think QEMU crashes.  Are you able to test if the
+patch below is sufficient to resolve the crash?  I'd expect the GPU not
+to work in the guest as it doesn't have enough resources, but the goal
+would be to resolve the crash; QEMU cannot fix the device mappings on
+the host.
 
-Hi Stefan,
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 0d83eb0e47bb..10477af9fc14 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -2921,7 +2921,9 @@ static void vfio_realize(PCIDevice *pdev, Error **err=
+p)
+     }
+ =
 
-pvrdma_ring.h is an update-linux-headers.sh file. When running the
-script again we lose the atomic_ to qatomic_ renaming. I've hacked
-the script by adding
+     for (i =3D 0; i < PCI_ROM_SLOT; i++) {
+-        vfio_bar_quirk_setup(vdev, i);
++        if (vdev->bars[i].size) {
++            vfio_bar_quirk_setup(vdev, i);
++        }
+     }
+ =
 
- -e 's/\batomic_read/qatomic_read/g;s/\batomic_set/qatomic_set/g'
+     if (!vdev->igd_opregion &&
 
-to the cp_portable() sed command, but only considering the two
-qatomic_ functions currently used is obviously not a complete
-solution.
+-- =
 
-Any ideas?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1897481
 
-Thanks,
-drew
+Title:
+  qemu crashes with VGA pass-through, e-GPU, nvidia 1060
 
+Status in QEMU:
+  New
+
+Bug description:
+  I try to pass-through nvidia 1060 6gb card, which is connected via
+  ExpressCard (EXP-GDC converter).
+
+  I can successfully run my virtual machine without pass-through, but
+  when I try to add the devices, qemu crashes.
+
+  The coredump contains:
+
+  Stack trace of thread 3289311:
+  #0  0x0000000000614c49 memory_region_update_container_subregions (qemu-sy=
+stem-x86_64 + 0x214c49)
+  #1  0x00000000005c0e8c vfio_probe_nvidia_bar0_quirk (qemu-system-x86_64 +=
+ 0x1c0e8c)
+  #2  0x00000000005bcec0 vfio_realize (qemu-system-x86_64 + 0x1bcec0)
+  #3  0x000000000079b423 pci_qdev_realize (qemu-system-x86_64 + 0x39b423)
+  #4  0x00000000006facda device_set_realized (qemu-system-x86_64 + 0x2facda)
+  #5  0x0000000000887e57 property_set_bool (qemu-system-x86_64 + 0x487e57)
+  #6  0x000000000088ac48 object_property_set (qemu-system-x86_64 + 0x48ac48)
+  #7  0x000000000088d1d2 object_property_set_qobject (qemu-system-x86_64 + =
+0x48d1d2)
+  #8  0x000000000088b1f7 object_property_set_bool (qemu-system-x86_64 + 0x4=
+8b1f7)
+  #9  0x0000000000693785 qdev_device_add (qemu-system-x86_64 + 0x293785)
+  #10 0x000000000061aad0 device_init_func (qemu-system-x86_64 + 0x21aad0)
+  #11 0x000000000098c87b qemu_opts_foreach (qemu-system-x86_64 + 0x58c87b)
+  #12 0x00000000006211cb qemu_init (qemu-system-x86_64 + 0x2211cb)
+  #13 0x00000000005002aa main (qemu-system-x86_64 + 0x1002aa)
+  #14 0x00007fce8af21152 __libc_start_main (libc.so.6 + 0x28152)
+  #15 0x000000000050087e _start (qemu-system-x86_64 + 0x10087e)
+
+  The whole running command is pretty long, since I use libvirt to
+  manage my machines:
+
+  LC_ALL=3DC \
+  PATH=3D/usr/local/sbin:/usr/local/bin:/usr/bin \
+  HOME=3D/var/lib/libvirt/qemu/domain-2-Win10 \
+  XDG_DATA_HOME=3D/var/lib/libvirt/qemu/domain-2-Win10/.local/share \
+  XDG_CACHE_HOME=3D/var/lib/libvirt/qemu/domain-2-Win10/.cache \
+  XDG_CONFIG_HOME=3D/var/lib/libvirt/qemu/domain-2-Win10/.config \
+  QEMU_AUDIO_DRV=3Dspice \
+  /usr/bin/qemu-system-x86_64 \
+  -name guest=3DWin10,debug-threads=3Don \
+  -S \
+  -blockdev '{"driver":"file","filename":"/usr/share/edk2-ovmf/x64/OVMF_COD=
+E.fd","node-name":"libvirt-pflash0-storage","auto-read-only":true,"discard"=
+:"unmap"}' \
+  -blockdev '{"node-name":"libvirt-pflash0-format","read-only":true,"driver=
+":"raw","file":"libvirt-pflash0-storage"}' \
+  -blockdev '{"driver":"file","filename":"/var/lib/libvirt/qemu/nvram/Win10=
+_VARS.fd","node-name":"libvirt-pflash1-storage","auto-read-only":true,"disc=
+ard":"unmap"}' \
+  -blockdev '{"node-name":"libvirt-pflash1-format","read-only":false,"drive=
+r":"raw","file":"libvirt-pflash1-storage"}' \
+  -machine pc-q35-5.1,accel=3Dkvm,usb=3Doff,vmport=3Doff,dump-guest-core=3D=
+off,pflash0=3Dlibvirt-pflash0-format,pflash1=3Dlibvirt-pflash1-format \
+  -cpu host,migratable=3Don,hv-time,hv-relaxed,hv-vapic,hv-spinlocks=3D0x1f=
+ff \
+  -m 8192 \
+  -overcommit mem-lock=3Doff \
+  -smp 2,sockets=3D2,cores=3D1,threads=3D1 \
+  -uuid 7043c77b-4903-4527-8089-9679d9a17fee \
+  -no-user-config \
+  -nodefaults \
+  -chardev stdio,mux=3Don,id=3Dcharmonitor \
+  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol \
+  -rtc base=3Dlocaltime,driftfix=3Dslew \
+  -global kvm-pit.lost_tick_policy=3Ddelay \
+  -no-hpet \
+  -no-shutdown \
+  -global ICH9-LPC.disable_s3=3D1 \
+  -global ICH9-LPC.disable_s4=3D1 \
+  -boot strict=3Don \
+  -device pcie-root-port,port=3D0x10,chassis=3D1,id=3Dpci.1,bus=3Dpcie.0,mu=
+ltifunction=3Don,addr=3D0x2 \
+  -device pcie-root-port,port=3D0x11,chassis=3D2,id=3Dpci.2,bus=3Dpcie.0,ad=
+dr=3D0x2.0x1 \
+  -device pcie-root-port,port=3D0x12,chassis=3D3,id=3Dpci.3,bus=3Dpcie.0,ad=
+dr=3D0x2.0x2 \
+  -device pcie-root-port,port=3D0x13,chassis=3D4,id=3Dpci.4,bus=3Dpcie.0,ad=
+dr=3D0x2.0x3 \
+  -device pcie-root-port,port=3D0x14,chassis=3D5,id=3Dpci.5,bus=3Dpcie.0,ad=
+dr=3D0x2.0x4 \
+  -device pcie-root-port,port=3D0x15,chassis=3D6,id=3Dpci.6,bus=3Dpcie.0,ad=
+dr=3D0x2.0x5 \
+  -device qemu-xhci,p2=3D15,p3=3D15,id=3Dusb,bus=3Dpci.2,addr=3D0x0 \
+  -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.3,addr=3D0x0 \
+  -blockdev '{"driver":"file","filename":"/home/sergiy/VirtualBox VMs/win4g=
+ames.img","node-name":"libvirt-2-storage","auto-read-only":true,"discard":"=
+unmap"}' \
+  -blockdev '{"node-name":"libvirt-2-format","read-only":false,"driver":"ra=
+w","file":"libvirt-2-storage"}' \
+  -device ide-hd,bus=3Dide.0,drive=3Dlibvirt-2-format,id=3Dsata0-0-0,bootin=
+dex=3D1 \
+  -blockdev '{"driver":"file","filename":"/home/sergiy/Downloads/Win10_2004=
+_Ukrainian_x64.iso","node-name":"libvirt-1-storage","auto-read-only":true,"=
+discard":"unmap"}' \
+  -blockdev '{"node-name":"libvirt-1-format","read-only":true,"driver":"raw=
+","file":"libvirt-1-storage"}' \
+  -device ide-cd,bus=3Dide.1,drive=3Dlibvirt-1-format,id=3Dsata0-0-1 \
+  -chardev pty,id=3Dcharserial0 \
+  -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 \
+  -chardev spicevmc,id=3Dcharchannel0,name=3Dvdagent \
+  -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchanne=
+l0,id=3Dchannel0,name=3Dcom.redhat.spice.0 \
+  -spice port=3D5900,addr=3D127.0.0.1,disable-ticketing,image-compression=
+=3Doff,seamless-migration=3Don \
+  -device qxl-vga,id=3Dvideo0,ram_size=3D67108864,vram_size=3D67108864,vram=
+64_size_mb=3D0,vgamem_mb=3D16,max_outputs=3D1,bus=3Dpcie.0,addr=3D0x1 \
+  -chardev spicevmc,id=3Dcharredir0,name=3Dusbredir \
+  -device usb-redir,chardev=3Dcharredir0,id=3Dredir0,bus=3Dusb.0,port=3D1 \
+  -chardev spicevmc,id=3Dcharredir1,name=3Dusbredir \
+  -device usb-redir,chardev=3Dcharredir1,id=3Dredir1,bus=3Dusb.0,port=3D2 \
+  -device vfio-pci,host=3D0000:04:00.0,id=3Dhostdev0,bus=3Dpci.4,multifunct=
+ion=3Don,addr=3D0x0 \
+  -device vfio-pci,host=3D0000:04:00.1,id=3Dhostdev1,bus=3Dpci.4,addr=3D0x0=
+.0x1 \
+  -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.5,addr=3D0x0 \
+  -sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourc=
+econtrol=3Ddeny \
+  -msg timestamp=3Don
+
+  I've forced vfio_pci module for the VGA, and ensured that lspci shows
+
+    Kernel driver in use: vfio_pci
+
+  My laptop is Thinkpad x230, that runs on Intel(R) Core(TM) i5-3320M CPU @=
+ 2.60GHz. =
+
+  I run 5.8.6-1-MANJARO kernel and run QEMU emulator version 5.1.0.
+
+  Thank you for your attention. I'd love to provide more information,
+  but I don't know what else matters.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1897481/+subscriptions
 
