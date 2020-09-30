@@ -2,88 +2,96 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2014C4727E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 18:41:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1AA1C4727C
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 18:57:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F17820708
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 18:41:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3A3D7206DC
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 18:57:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bw0tjaf8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F17820708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qeaTHnsE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A3D7206DC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNh2Y-0007Ef-2h
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 14:41:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38962)
+	id 1kNhIK-0002G1-7j
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 14:57:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42422)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kNh16-0006jm-Gf
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 14:39:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22698)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kNh0w-0000zG-79
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 14:39:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601491180;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=uSD/nfCxoqiLFgMvdrrP3p1HAOEzVIATLMyyO7xNHUo=;
- b=bw0tjaf8KyVzos1wkYWBkfMigMogdMw5KJyb8G7DilgoTusIyzQXyA3CSZhhsuznK71axo
- ESUeYiuYxlo5N2Deas2gpxHewgTFaaYEXbCNCkwPewEnifphgSQzbBYwj3wyzF4IN46DvL
- 2e/FTZzzHByPqLhcrfvh8x6bbsC3Yqw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-12-t3MNdr2YM4m4jLtXDyXDtQ-1; Wed, 30 Sep 2020 14:39:20 -0400
-X-MC-Unique: t3MNdr2YM4m4jLtXDyXDtQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F6DB802EA6;
- Wed, 30 Sep 2020 18:39:19 +0000 (UTC)
-Received: from localhost (unknown [10.10.67.5])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 335E719D7D;
- Wed, 30 Sep 2020 18:39:19 +0000 (UTC)
-Date: Wed, 30 Sep 2020 14:39:18 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v4 41/46] qapi/introspect.py: create a typed 'Node' data
- structure
-Message-ID: <20200930183918.GY3717385@habkost.net>
-References: <20200930043150.1454766-1-jsnow@redhat.com>
- <20200930043150.1454766-42-jsnow@redhat.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kNhHl-0001pL-JU
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 14:57:05 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:52269)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kNhHg-0002Gb-GW
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 14:57:05 -0400
+Received: by mail-wm1-x343.google.com with SMTP id q9so566958wmj.2
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 11:57:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=fdD4LmknZ97Ia8xcZ6cDf1cxJbm8hRxwsKwh9c4TDwk=;
+ b=qeaTHnsEfUehVFfdewAT0L8ZllkefjJBTbx4zXpvT14o0liRB3YOzXDcIGjQKV8xXk
+ yQ8qh+YpaVQbFCLojKfWQYaTJxZJvqZI3b/KJDotE5XoCgCI7PG/g6lSZIPkp+wKWMIK
+ 48rZeV1t+FpiwJwqnesQffNHkViDJ+SWxkqWAj/dJ3ie2/eR5+HzOwyB8HLuaH9ymeny
+ Du0mc0MwG4959jzU4HOwmLu9YBTCv1l6wfzXC5S6a3oFwpQhEcHzPWlku2x2WGjsp328
+ 4/1WeDdzW8APiWAVGeDKoMS96Mdc22Epc8acJ1XGd+kM5iB4b/X5S+/ME+kV7GNqOfSr
+ qcSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=fdD4LmknZ97Ia8xcZ6cDf1cxJbm8hRxwsKwh9c4TDwk=;
+ b=C43Bgsq8pXTKUZa0pEUQMwnUzesYDkVCgm+zWSkP9aoK8lNY9F7QV83LJKWi2ju29Z
+ Ps2B43cVy7721ec81gMW5XXpIQRNttD8d6tnJC5ENXU6t3Ym7EWAPD2Qy0Zj7tSOBmhV
+ SpEwh75L0Kp0yeLAK7LL8TS2evaPv1P8W8lpJjV7guO4IvwgzgwG9KgE3rdemWPTQWNf
+ MlJl7+IQ2x806v8LRupDApvAPz0eC1FFMzT9vTvh1a7JEg92j3ZW6OOAtRw7HYcQiJ6s
+ QZuWB16EAzQ4fhNaNkf7c8yTyEaUXLt8G/1T6aeWricczq54Y9DEo7gV6yxPU/eL36Dv
+ iDVA==
+X-Gm-Message-State: AOAM533cRxOrHeQ5D9VcqAldyL2pc4XcmP1fYyKzTcVnqtDVmuC18Vgm
+ 00S0sXITBWmRpQ/IAYfvCzSQyA==
+X-Google-Smtp-Source: ABdhPJw08PSRpv2eGrn7DsXFrKzaQsbu4ClsHvCeAhvnd3+MhZO2qxjkAXZPBIMsB3PJ3Jfc/P8q+w==
+X-Received: by 2002:a1c:9a10:: with SMTP id c16mr4240484wme.96.1601492216147; 
+ Wed, 30 Sep 2020 11:56:56 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id v9sm4709930wrv.35.2020.09.30.11.56.54
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 30 Sep 2020 11:56:54 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 4E8781FF7E;
+ Wed, 30 Sep 2020 19:56:54 +0100 (BST)
+References: <20200930164949.1425294-1-philmd@redhat.com>
+ <20200930171529.GR3717385@habkost.net>
+ <0c46bedf-9aa6-4ea9-40e1-b0f85a767bb5@redhat.com>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3 00/11] user-mode: Prune build dependencies (part 3)
+In-reply-to: <0c46bedf-9aa6-4ea9-40e1-b0f85a767bb5@redhat.com>
+Date: Wed, 30 Sep 2020 19:56:54 +0100
+Message-ID: <87lfgrnle1.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200930043150.1454766-42-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:31:59
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.469,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,201 +104,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Cleber Rosa <crosa@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?utf-8?Q?Daniel_P=2E?= =?utf-8?Q?_Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, Peter Lieven <pl@kamp.de>,
+ Markus Armbruster <armbru@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>, Max Reitz <mreitz@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud?= =?utf-8?Q?=C3=A9?= <philmd@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 30, 2020 at 12:31:45AM -0400, John Snow wrote:
-> This replaces _make_tree with Node.__init__(), effectively. By creating
-> it as a generic container, we can more accurately describe the exact
-> nature of this particular Node.
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  scripts/qapi/introspect.py | 77 +++++++++++++++++++-------------------
->  1 file changed, 38 insertions(+), 39 deletions(-)
-> 
-> diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
-> index 43b6ba5df1f..86286e755ca 100644
-> --- a/scripts/qapi/introspect.py
-> +++ b/scripts/qapi/introspect.py
-> @@ -12,11 +12,12 @@
->  
->  from typing import (
->      Dict,
-> +    Generic,
-> +    Iterable,
->      List,
->      Optional,
->      Sequence,
-> -    Tuple,
-> -    Union,
-> +    TypeVar,
->  )
->  
->  from .common import (
-> @@ -43,42 +44,42 @@
->  
->  
->  # The correct type for TreeNode is actually:
-> -# Union[AnnotatedNode, List[TreeNode], Dict[str, TreeNode], str, bool]
-> +# Union[Node[TreeNode], List[TreeNode], Dict[str, TreeNode], str, bool]
->  # but mypy does not support recursive types yet.
->  TreeNode = object
-> +_NodeType = TypeVar('_NodeType', bound=TreeNode)
->  _DObject = Dict[str, object]
-> -Extra = Dict[str, object]
-> -AnnotatedNode = Tuple[TreeNode, Extra]
 
-Do you have plans to make Node replace TreeNode completely?
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-I'd understand this patch as a means to reach that goal, but I'm
-not sure the intermediate state of having both Node and TreeNode
-types (that can be confused with each other) is desirable.
+> On 30/09/20 19:15, Eduardo Habkost wrote:
+>> On Wed, Sep 30, 2020 at 06:49:38PM +0200, Philippe Mathieu-Daud=C3=A9 wr=
+ote:
+>>> This is the third part of a series reducing user-mode
+>>> dependencies. By stripping out unused code, the build
+>>> and testing time is reduced (as is space used by objects).
+>> I'm queueing patches 2-9 on machine-next.  Thanks!
+>>=20
+>> Markus, Eric: I can merge the QAPI patches (1, 11) if I get an
+>> Acked-by.
+>>=20
+>> I'll send separate comments on patch 10.
+>>=20
+>
+> 1-8 is fine, but I think 9-11 is too much complication (especially not
+> really future-proof) for the benefit.
 
->  
->  
-> -def _make_tree(obj: Union[_DObject, str], ifcond: List[str],
-> -               comment: Optional[str] = None) -> AnnotatedNode:
-> -    extra: Extra = {
-> -        'if': ifcond,
-> -        'comment': comment,
-> -    }
-> -    return (obj, extra)
-> +class Node(Generic[_NodeType]):
-> +    """
-> +    Node generally contains a SchemaInfo-like type (as a dict),
-> +    But it also used to wrap comments/ifconds around leaf value types.
-> +    """
-> +    # Remove after 3.7 adds @dataclass:
-> +    # pylint: disable=too-few-public-methods
-> +    def __init__(self, data: _NodeType, ifcond: Iterable[str],
-> +                 comment: Optional[str] = None):
-> +        self.data = data
-> +        self.comment: Optional[str] = comment
-> +        self.ifcond: Sequence[str] = tuple(ifcond)
->  
->  
-> -def _tree_to_qlit(obj: TreeNode,
-> -                  level: int = 0,
-> +def _tree_to_qlit(obj: TreeNode, level: int = 0,
->                    suppress_first_indent: bool = False) -> str:
->  
->      def indent(level: int) -> str:
->          return level * 4 * ' '
->  
-> -    if isinstance(obj, tuple):
-> -        ifobj, extra = obj
-> -        ifcond = extra.get('if')
-> -        comment = extra.get('comment')
-> +    if isinstance(obj, Node):
->          ret = ''
-> -        if comment:
-> -            ret += indent(level) + '/* %s */\n' % comment
-> -        if ifcond:
-> -            ret += gen_if(ifcond)
-> -        ret += _tree_to_qlit(ifobj, level)
-> -        if ifcond:
-> -            ret += '\n' + gen_endif(ifcond)
-> +        if obj.comment:
-> +            ret += indent(level) + '/* %s */\n' % obj.comment
-> +        if obj.ifcond:
-> +            ret += gen_if(obj.ifcond)
-> +        ret += _tree_to_qlit(obj.data, level)
-> +        if obj.ifcond:
-> +            ret += '\n' + gen_endif(obj.ifcond)
->          return ret
->  
->      ret = ''
-> @@ -125,7 +126,7 @@ def __init__(self, prefix: str, unmask: bool):
->              ' * QAPI/QMP schema introspection', __doc__)
->          self._unmask = unmask
->          self._schema: Optional[QAPISchema] = None
-> -        self._trees: List[AnnotatedNode] = []
-> +        self._trees: List[Node[_DObject]] = []
->          self._used_types: List[QAPISchemaType] = []
->          self._name_map: Dict[str, str] = {}
->          self._genc.add(mcgen('''
-> @@ -192,9 +193,8 @@ def _use_type(self, typ: QAPISchemaType) -> str:
->  
->      @classmethod
->      def _gen_features(cls,
-> -                      features: List[QAPISchemaFeature]
-> -                      ) -> List[AnnotatedNode]:
-> -        return [_make_tree(f.name, f.ifcond) for f in features]
-> +                      features: List[QAPISchemaFeature]) -> List[Node[str]]:
-> +        return [Node(f.name, f.ifcond) for f in features]
->  
->      def _gen_tree(self, name: str, mtype: str, obj: _DObject,
->                    ifcond: List[str],
-> @@ -210,10 +210,10 @@ def _gen_tree(self, name: str, mtype: str, obj: _DObject,
->          obj['meta-type'] = mtype
->          if features:
->              obj['features'] = self._gen_features(features)
-> -        self._trees.append(_make_tree(obj, ifcond, comment))
-> +        self._trees.append(Node(obj, ifcond, comment))
->  
->      def _gen_member(self,
-> -                    member: QAPISchemaObjectTypeMember) -> AnnotatedNode:
-> +                    member: QAPISchemaObjectTypeMember) -> Node[_DObject]:
->          obj: _DObject = {
->              'name': member.name,
->              'type': self._use_type(member.type)
-> @@ -222,19 +222,19 @@ def _gen_member(self,
->              obj['default'] = None
->          if member.features:
->              obj['features'] = self._gen_features(member.features)
-> -        return _make_tree(obj, member.ifcond)
-> +        return Node(obj, member.ifcond)
->  
->      def _gen_variants(self, tag_name: str,
->                        variants: List[QAPISchemaVariant]) -> _DObject:
->          return {'tag': tag_name,
->                  'variants': [self._gen_variant(v) for v in variants]}
->  
-> -    def _gen_variant(self, variant: QAPISchemaVariant) -> AnnotatedNode:
-> +    def _gen_variant(self, variant: QAPISchemaVariant) -> Node[_DObject]:
->          obj: _DObject = {
->              'case': variant.name,
->              'type': self._use_type(variant.type)
->          }
-> -        return _make_tree(obj, variant.ifcond)
-> +        return Node(obj, variant.ifcond)
->  
->      def visit_builtin_type(self, name: str, info: Optional[QAPISourceInfo],
->                             json_type: str) -> None:
-> @@ -245,8 +245,7 @@ def visit_enum_type(self, name: str, info: QAPISourceInfo,
->                          members: List[QAPISchemaEnumMember],
->                          prefix: Optional[str]) -> None:
->          self._gen_tree(name, 'enum',
-> -                       {'values': [_make_tree(m.name, m.ifcond, None)
-> -                                   for m in members]},
-> +                       {'values': [Node(m.name, m.ifcond) for m in members]},
->                         ifcond, features)
->  
->      def visit_array_type(self, name: str, info: Optional[QAPISourceInfo],
-> @@ -274,9 +273,9 @@ def visit_alternate_type(self, name: str, info: QAPISourceInfo,
->                               variants: QAPISchemaVariants) -> None:
->          self._gen_tree(name, 'alternate',
->                         {'members': [
-> -                           _make_tree({'type': self._use_type(m.type)},
-> -                                      m.ifcond, None)
-> -                           for m in variants.variants]},
-> +                           Node({'type': self._use_type(m.type)}, m.ifcond)
-> +                           for m in variants.variants
-> +                       ]},
->                         ifcond, features)
->  
->      def visit_command(self, name: str, info: QAPISourceInfo, ifcond: List[str],
-> -- 
-> 2.26.2
-> 
+Isn't qdev considered an internal API for our object and device lifetime
+handling (which should be shared) versus QAPI which only exists for
+system emulation and tool integration? That is of course assuming
+libvirt is never going to want to know about linux-user emulation?
 
--- 
-Eduardo
+>
+> Paolo
 
+
+--=20
+Alex Benn=C3=A9e
 
