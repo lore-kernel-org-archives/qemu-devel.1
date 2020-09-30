@@ -8,75 +8,75 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12F68C4727C
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 18:10:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13EFEC4727C
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 18:12:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83E992076A
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 18:10:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5F4182076A
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 18:12:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iKS0n7Qs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83E992076A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gAdImrJY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F4182076A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNgYP-0000St-Fw
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 14:10:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59054)
+	id 1kNgab-00029P-3k
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 14:12:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60930)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1kNgTA-0004AU-RX
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 14:04:48 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:39754)
+ id 1kNgYQ-0000nk-BV
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 14:10:14 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38602)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1kNgT4-00066i-G1
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 14:04:48 -0400
-Received: by mail-wm1-x342.google.com with SMTP id t17so427669wmi.4
- for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 11:04:41 -0700 (PDT)
+ id 1kNgYK-0006eb-F0
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 14:10:13 -0400
+Received: by mail-wr1-x442.google.com with SMTP id g4so2846549wrs.5
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 11:10:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=IO0i6mgnG+29fMwbBaHwXiTUvnXwVlZR+MvZslEKGfE=;
- b=iKS0n7QsD+iu0beYXiut6pHTHkBmOEzRO9Smq3vnVVOiHziXIRfxWTiitlSV7sHpge
- otjfbl0n19OBeERy5DzDNRjcW220oxQ/DDF6M465oFj4DyT6P/0kOxiyurhKT2kUckXk
- uM+y4dlyoeIsq4lOCFsX9kKw9y8OYfSvrFY6E55GfBJ+9K0mRX6KaMT0nF+B8wkyIQx/
- Yu2S8yHYyrlHrXTxUqzLzlWTFpWa5VAvwyFzEBRb1tBVHd5gVmOd9we4gH9xPi7VJRo9
- QLlyiNc4QShOmmpBmo4Onqp3eBeFfnIJGBr+YrGYXKIVHNek1lVGtKpe6Bs7YD0gQNFS
- 3o8Q==
+ :cc; bh=6eoc0Os8U/KFwF0LS4uVDsYzl4Wo5Iufzv71Q4cIKwU=;
+ b=gAdImrJYKt2Q9qCFrnlVhTgqReeNybwEmGW6aDAAA6S9S7D1xSqTAbNPp5rZeCdRfX
+ 9cTzhKw2rxJQ+iaMdoPR95a6TgXIW4KqOCHmJpp+YafeXqPOwOLPbxisDAJCeGq90hYD
+ IiWisviU1jDg3Zyp20D3u35p4WzMe239mMBhFCN7FnyfOFoM2wDnfVoJa2QHRE5DInwr
+ KKtqsoUR57cdCznTexaKxrBc5N19ePNLm3djcQGu3NlfP0UWfFXhBmEXONEUil5jLihg
+ UEP9F5hQFcqz0LQ5p3H6j2Oz9diKIy0S6teej1a4CRi94evW9fuYR8OI74oDtJtJIVGZ
+ 0CUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:in-reply-to:references:from:date
  :message-id:subject:to:cc;
- bh=IO0i6mgnG+29fMwbBaHwXiTUvnXwVlZR+MvZslEKGfE=;
- b=jS2SL/JCnigLe/PCi4A/eF116TKTpjUdBZgH0Iu/HMJxxR1sNVqv5u7d0e8bNLA15M
- 6pi4bXe0kZvhEYazIkL3Xgth214/lJAF+xJaxi2jqSO7ohMH8XB4fx5VtGT29NQYkw+Q
- NGSds44xjljeaUvKfn+lTp5Ydj1kSgIpRsCLsFw3VZLE/8ThXsCO7PXiFSiEx4BBZpZM
- QuTdzhexHQuG7DATOqHxmEV1ORtuTG+jrW3J2fRhBDv9+z1Yg5BkRnyftQC6WcbFuwNP
- 01tvQMJmKwP7jSlJZx3KZI/CieLOFIApelczz6ypVkPLCwdSar418RrrJYtJLlfl1iMR
- xm7A==
-X-Gm-Message-State: AOAM532lNN6ZoTtcxZVSf5FKVHuiIaiN/vvO431fT2X7/qLuFevhDYnO
- 2pv5ZM6XGXSDynpjMhLuqNpYnrNZD+1kXim+FM0=
-X-Google-Smtp-Source: ABdhPJzLRLa/KEIs2PtA7OPbFo9LRvIieE8x3F/04oCX6pumzWKBs7bxJ4he6K5jz0e1sCS474JTkFBZZm0qnObv7RI=
-X-Received: by 2002:a7b:c958:: with SMTP id i24mr4531932wml.50.1601489078664; 
- Wed, 30 Sep 2020 11:04:38 -0700 (PDT)
+ bh=6eoc0Os8U/KFwF0LS4uVDsYzl4Wo5Iufzv71Q4cIKwU=;
+ b=j3FW7QQt6GbYmRiUobNuQS7T9HwJ0UEMUDMrzsdnFcpDQbP0jDsPVqg2JDfwIOcvlm
+ pQIpdrIzQVFo25u25NAh51IxCgXt0uUdm+P/lqpYfzm5ksDSPysiHd7P0C8exeGaxdGv
+ 7dsTKKHcnfCNn2bwzSQ04JFc8qNtr1snpeCn5IYsNsuCKyY5YfEf1H2OjKX6eB0HGVLd
+ z3gFqfqugdQC66Qmd1lqBynVHgxFIXNxeGYaqHGPhdNWMTDbgERkY0w7hDcVbJQQ8FjQ
+ uwnhZLaquEXOY2VaVUBhvsGyWHSW1gCjzShIJvxNRYhr2mICOvTViR15YEHY8mHr889t
+ 59eg==
+X-Gm-Message-State: AOAM533L/LoRr1VV6Du43thd291MP1C0QN6+5cOcifvjoNpNDbTeeQeb
+ HB0ZunM+xAX204Y/BRNNYf4DLSWdSSvUFnLrni4=
+X-Google-Smtp-Source: ABdhPJxKl6aLcEBu4BIDQiAo59eu+xOoGfObhkN5fW5vKknzThzNK+IguWvscQpjIU6km5fXUrDrAb90jr7o96Hok/U=
+X-Received: by 2002:a5d:470f:: with SMTP id y15mr4408798wrq.420.1601489405739; 
+ Wed, 30 Sep 2020 11:10:05 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a1c:7504:0:0:0:0:0 with HTTP; Wed, 30 Sep 2020 11:04:38
+Received: by 2002:a1c:7504:0:0:0:0:0 with HTTP; Wed, 30 Sep 2020 11:10:05
  -0700 (PDT)
-In-Reply-To: <20200928171539.788309-3-f4bug@amsat.org>
+In-Reply-To: <20200928171539.788309-4-f4bug@amsat.org>
 References: <20200928171539.788309-1-f4bug@amsat.org>
- <20200928171539.788309-3-f4bug@amsat.org>
+ <20200928171539.788309-4-f4bug@amsat.org>
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Wed, 30 Sep 2020 20:04:38 +0200
-Message-ID: <CAHiYmc7RMHycfhzkLD6Q=aXast3cdO6qcjOQQordzsr4dQuFzg@mail.gmail.com>
-Subject: Re: [PATCH 02/16] target/mips: Move cpu_mips_get_random() with CP0
- helpers
+Date: Wed, 30 Sep 2020 20:10:05 +0200
+Message-ID: <CAHiYmc6AfcERT1+Wg6r+qzZ1SdXdD95GOR2cq98hvEW0ttYEGw@mail.gmail.com>
+Subject: Re: [PATCH 03/16] target/mips/cp0_timer: Explicit unit in variable
+ name
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: multipart/alternative; boundary="000000000000a5445405b08bbbbf"
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x342.google.com
+Content-Type: multipart/alternative; boundary="0000000000002403d505b08bcf2f"
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -114,7 +114,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000a5445405b08bbbbf
+--0000000000002403d505b08bcf2f
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -122,11 +122,7 @@ On Monday, September 28, 2020, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
 >
 wrote:
 
-> The get_random() helper uses the CP0_Wired register, which is
-> unrelated to the CP0_Count register use as timer.
-> Commit e16fe40c872 ("Move the MIPS CPU timer in a separate file")
-> incorrectly moved this get_random() helper with timer specific
-> code. Move it back to generic CP0 helpers.
+> Name variables holding nanoseconds with the '_ns' suffix.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
@@ -135,123 +131,69 @@ wrote:
 Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 
 
->  target/mips/internal.h   |  2 +-
->  target/mips/cp0_helper.c | 25 +++++++++++++++++++++++++
->  target/mips/cp0_timer.c  | 25 -------------------------
->  3 files changed, 26 insertions(+), 26 deletions(-)
+>  target/mips/cp0_timer.c | 19 ++++++++++---------
+>  1 file changed, 10 insertions(+), 9 deletions(-)
 >
-> diff --git a/target/mips/internal.h b/target/mips/internal.h
-> index 7f159a9230c..087cabaa6d4 100644
-> --- a/target/mips/internal.h
-> +++ b/target/mips/internal.h
-> @@ -144,6 +144,7 @@ void r4k_helper_tlbr(CPUMIPSState *env);
->  void r4k_helper_tlbinv(CPUMIPSState *env);
->  void r4k_helper_tlbinvf(CPUMIPSState *env);
->  void r4k_invalidate_tlb(CPUMIPSState *env, int idx, int use_extra);
-> +uint32_t cpu_mips_get_random(CPUMIPSState *env);
->
->  void mips_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
->                                      vaddr addr, unsigned size,
-> @@ -209,7 +210,6 @@ void cpu_state_reset(CPUMIPSState *s);
->  void cpu_mips_realize_env(CPUMIPSState *env);
->
->  /* cp0_timer.c */
-> -uint32_t cpu_mips_get_random(CPUMIPSState *env);
->  uint32_t cpu_mips_get_count(CPUMIPSState *env);
->  void cpu_mips_store_count(CPUMIPSState *env, uint32_t value);
->  void cpu_mips_store_compare(CPUMIPSState *env, uint32_t value);
-> diff --git a/target/mips/cp0_helper.c b/target/mips/cp0_helper.c
-> index de64add038b..12143ac55b9 100644
-> --- a/target/mips/cp0_helper.c
-> +++ b/target/mips/cp0_helper.c
-> @@ -203,6 +203,31 @@ static void sync_c0_entryhi(CPUMIPSState *cpu, int t=
-c)
->      *tcst |=3D asid;
->  }
->
-> +/* XXX: do not use a global */
-> +uint32_t cpu_mips_get_random(CPUMIPSState *env)
-> +{
-> +    static uint32_t seed =3D 1;
-> +    static uint32_t prev_idx;
-> +    uint32_t idx;
-> +    uint32_t nb_rand_tlb =3D env->tlb->nb_tlb - env->CP0_Wired;
-> +
-> +    if (nb_rand_tlb =3D=3D 1) {
-> +        return env->tlb->nb_tlb - 1;
-> +    }
-> +
-> +    /* Don't return same value twice, so get another value */
-> +    do {
-> +        /*
-> +         * Use a simple algorithm of Linear Congruential Generator
-> +         * from ISO/IEC 9899 standard.
-> +         */
-> +        seed =3D 1103515245 * seed + 12345;
-> +        idx =3D (seed >> 16) % nb_rand_tlb + env->CP0_Wired;
-> +    } while (idx =3D=3D prev_idx);
-> +    prev_idx =3D idx;
-> +    return idx;
-> +}
-> +
->  /* CP0 helpers */
->  target_ulong helper_mfc0_mvpcontrol(CPUMIPSState *env)
->  {
 > diff --git a/target/mips/cp0_timer.c b/target/mips/cp0_timer.c
-> index bd7efb152dd..9c38e9da1c8 100644
+> index 9c38e9da1c8..5194c967ae3 100644
 > --- a/target/mips/cp0_timer.c
 > +++ b/target/mips/cp0_timer.c
-> @@ -29,31 +29,6 @@
->
->  #define TIMER_PERIOD 10 /* 10 ns period for 100 Mhz frequency */
->
-> -/* XXX: do not use a global */
-> -uint32_t cpu_mips_get_random(CPUMIPSState *env)
-> -{
-> -    static uint32_t seed =3D 1;
-> -    static uint32_t prev_idx =3D 0;
-> -    uint32_t idx;
-> -    uint32_t nb_rand_tlb =3D env->tlb->nb_tlb - env->CP0_Wired;
-> -
-> -    if (nb_rand_tlb =3D=3D 1) {
-> -        return env->tlb->nb_tlb - 1;
-> -    }
-> -
-> -    /* Don't return same value twice, so get another value */
-> -    do {
-> -        /*
-> -         * Use a simple algorithm of Linear Congruential Generator
-> -         * from ISO/IEC 9899 standard.
-> -         */
-> -        seed =3D 1103515245 * seed + 12345;
-> -        idx =3D (seed >> 16) % nb_rand_tlb + env->CP0_Wired;
-> -    } while (idx =3D=3D prev_idx);
-> -    prev_idx =3D idx;
-> -    return idx;
-> -}
-> -
+> @@ -32,13 +32,14 @@
 >  /* MIPS R4K timer */
 >  static void cpu_mips_timer_update(CPUMIPSState *env)
 >  {
+> -    uint64_t now, next;
+> +    uint64_t now_ns, next_ns;
+>      uint32_t wait;
+>
+> -    now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> -    wait =3D env->CP0_Compare - env->CP0_Count - (uint32_t)(now /
+> TIMER_PERIOD);
+> -    next =3D now + (uint64_t)wait * TIMER_PERIOD;
+> -    timer_mod(env->timer, next);
+> +    now_ns =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> +    wait =3D env->CP0_Compare - env->CP0_Count -
+> +           (uint32_t)(now_ns / TIMER_PERIOD);
+> +    next_ns =3D now_ns + (uint64_t)wait * TIMER_PERIOD;
+> +    timer_mod(env->timer, next_ns);
+>  }
+>
+>  /* Expire the timer.  */
+> @@ -56,16 +57,16 @@ uint32_t cpu_mips_get_count(CPUMIPSState *env)
+>      if (env->CP0_Cause & (1 << CP0Ca_DC)) {
+>          return env->CP0_Count;
+>      } else {
+> -        uint64_t now;
+> +        uint64_t now_ns;
+>
+> -        now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> +        now_ns =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+>          if (timer_pending(env->timer)
+> -            && timer_expired(env->timer, now)) {
+> +            && timer_expired(env->timer, now_ns)) {
+>              /* The timer has already expired.  */
+>              cpu_mips_timer_expire(env);
+>          }
+>
+> -        return env->CP0_Count + (uint32_t)(now / TIMER_PERIOD);
+> +        return env->CP0_Count + (uint32_t)(now_ns / TIMER_PERIOD);
+>      }
+>  }
+>
 > --
 > 2.26.2
 >
 >
 
---000000000000a5445405b08bbbbf
+--0000000000002403d505b08bcf2f
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 <br><br>On Monday, September 28, 2020, Philippe Mathieu-Daud=C3=A9 &lt;<a h=
 ref=3D"mailto:f4bug@amsat.org">f4bug@amsat.org</a>&gt; wrote:<br><blockquot=
 e class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc sol=
-id;padding-left:1ex">The get_random() helper uses the CP0_Wired register, w=
-hich is<br>
-unrelated to the CP0_Count register use as timer.<br>
-Commit e16fe40c872 (&quot;Move the MIPS CPU timer in a separate file&quot;)=
-<br>
-incorrectly moved this get_random() helper with timer specific<br>
-code. Move it back to generic CP0 helpers.<br>
+id;padding-left:1ex">Name variables holding nanoseconds with the &#39;_ns&#=
+39; suffix.<br>
 <br>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsa=
 t.org">f4bug@amsat.org</a>&gt;<br>
@@ -263,122 +205,69 @@ mu.devel@gmail.c<wbr>om</a><span style=3D"color:rgb(34,34,34);font-size:14p=
 x;line-height:22.1200008392334px">&gt;</span><br></div><div>=C2=A0</div><bl=
 ockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #=
 ccc solid;padding-left:1ex">
-=C2=A0target/mips/internal.h=C2=A0 =C2=A0|=C2=A0 2 +-<br>
-=C2=A0target/mips/cp0_helper.c | 25 +++++++++++++++++++++++++<br>
-=C2=A0target/mips/cp0_timer.c=C2=A0 | 25 -------------------------<br>
-=C2=A03 files changed, 26 insertions(+), 26 deletions(-)<br>
+=C2=A0target/mips/cp0_timer.c | 19 ++++++++++---------<br>
+=C2=A01 file changed, 10 insertions(+), 9 deletions(-)<br>
 <br>
-diff --git a/target/mips/internal.h b/target/mips/internal.h<br>
-index 7f159a9230c..087cabaa6d4 100644<br>
---- a/target/mips/internal.h<br>
-+++ b/target/mips/internal.h<br>
-@@ -144,6 +144,7 @@ void r4k_helper_tlbr(CPUMIPSState *env);<br>
-=C2=A0void r4k_helper_tlbinv(CPUMIPSState *env);<br>
-=C2=A0void r4k_helper_tlbinvf(<wbr>CPUMIPSState *env);<br>
-=C2=A0void r4k_invalidate_tlb(<wbr>CPUMIPSState *env, int idx, int use_extr=
-a);<br>
-+uint32_t cpu_mips_get_random(<wbr>CPUMIPSState *env);<br>
-<br>
-=C2=A0void mips_cpu_do_transaction_<wbr>failed(CPUState *cs, hwaddr physadd=
-r,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0vaddr addr, unsi=
-gned size,<br>
-@@ -209,7 +210,6 @@ void cpu_state_reset(CPUMIPSState *s);<br>
-=C2=A0void cpu_mips_realize_env(<wbr>CPUMIPSState *env);<br>
-<br>
-=C2=A0/* cp0_timer.c */<br>
--uint32_t cpu_mips_get_random(<wbr>CPUMIPSState *env);<br>
-=C2=A0uint32_t cpu_mips_get_count(<wbr>CPUMIPSState *env);<br>
-=C2=A0void cpu_mips_store_count(<wbr>CPUMIPSState *env, uint32_t value);<br=
->
-=C2=A0void cpu_mips_store_compare(<wbr>CPUMIPSState *env, uint32_t value);<=
-br>
-diff --git a/target/mips/cp0_helper.c b/target/mips/cp0_helper.c<br>
-index de64add038b..12143ac55b9 100644<br>
---- a/target/mips/cp0_helper.c<br>
-+++ b/target/mips/cp0_helper.c<br>
-@@ -203,6 +203,31 @@ static void sync_c0_entryhi(CPUMIPSState *cpu, int tc)=
-<br>
-=C2=A0 =C2=A0 =C2=A0*tcst |=3D asid;<br>
-=C2=A0}<br>
-<br>
-+/* XXX: do not use a global */<br>
-+uint32_t cpu_mips_get_random(<wbr>CPUMIPSState *env)<br>
-+{<br>
-+=C2=A0 =C2=A0 static uint32_t seed =3D 1;<br>
-+=C2=A0 =C2=A0 static uint32_t prev_idx;<br>
-+=C2=A0 =C2=A0 uint32_t idx;<br>
-+=C2=A0 =C2=A0 uint32_t nb_rand_tlb =3D env-&gt;tlb-&gt;nb_tlb - env-&gt;CP=
-0_Wired;<br>
-+<br>
-+=C2=A0 =C2=A0 if (nb_rand_tlb =3D=3D 1) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return env-&gt;tlb-&gt;nb_tlb - 1;<br>
-+=C2=A0 =C2=A0 }<br>
-+<br>
-+=C2=A0 =C2=A0 /* Don&#39;t return same value twice, so get another value *=
-/<br>
-+=C2=A0 =C2=A0 do {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 /*<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* Use a simple algorithm of Linear Congr=
-uential Generator<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* from ISO/IEC 9899 standard.<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 seed =3D 1103515245 * seed + 12345;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 idx =3D (seed &gt;&gt; 16) % nb_rand_tlb + env=
--&gt;CP0_Wired;<br>
-+=C2=A0 =C2=A0 } while (idx =3D=3D prev_idx);<br>
-+=C2=A0 =C2=A0 prev_idx =3D idx;<br>
-+=C2=A0 =C2=A0 return idx;<br>
-+}<br>
-+<br>
-=C2=A0/* CP0 helpers */<br>
-=C2=A0target_ulong helper_mfc0_mvpcontrol(<wbr>CPUMIPSState *env)<br>
-=C2=A0{<br>
 diff --git a/target/mips/cp0_timer.c b/target/mips/cp0_timer.c<br>
-index bd7efb152dd..9c38e9da1c8 100644<br>
+index 9c38e9da1c8..5194c967ae3 100644<br>
 --- a/target/mips/cp0_timer.c<br>
 +++ b/target/mips/cp0_timer.c<br>
-@@ -29,31 +29,6 @@<br>
-<br>
-=C2=A0#define TIMER_PERIOD 10 /* 10 ns period for 100 Mhz frequency */<br>
-<br>
--/* XXX: do not use a global */<br>
--uint32_t cpu_mips_get_random(<wbr>CPUMIPSState *env)<br>
--{<br>
--=C2=A0 =C2=A0 static uint32_t seed =3D 1;<br>
--=C2=A0 =C2=A0 static uint32_t prev_idx =3D 0;<br>
--=C2=A0 =C2=A0 uint32_t idx;<br>
--=C2=A0 =C2=A0 uint32_t nb_rand_tlb =3D env-&gt;tlb-&gt;nb_tlb - env-&gt;CP=
-0_Wired;<br>
--<br>
--=C2=A0 =C2=A0 if (nb_rand_tlb =3D=3D 1) {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 return env-&gt;tlb-&gt;nb_tlb - 1;<br>
--=C2=A0 =C2=A0 }<br>
--<br>
--=C2=A0 =C2=A0 /* Don&#39;t return same value twice, so get another value *=
-/<br>
--=C2=A0 =C2=A0 do {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 /*<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* Use a simple algorithm of Linear Congr=
-uential Generator<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* from ISO/IEC 9899 standard.<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 seed =3D 1103515245 * seed + 12345;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 idx =3D (seed &gt;&gt; 16) % nb_rand_tlb + env=
--&gt;CP0_Wired;<br>
--=C2=A0 =C2=A0 } while (idx =3D=3D prev_idx);<br>
--=C2=A0 =C2=A0 prev_idx =3D idx;<br>
--=C2=A0 =C2=A0 return idx;<br>
--}<br>
--<br>
+@@ -32,13 +32,14 @@<br>
 =C2=A0/* MIPS R4K timer */<br>
 =C2=A0static void cpu_mips_timer_update(<wbr>CPUMIPSState *env)<br>
 =C2=A0{<br>
+-=C2=A0 =C2=A0 uint64_t now, next;<br>
++=C2=A0 =C2=A0 uint64_t now_ns, next_ns;<br>
+=C2=A0 =C2=A0 =C2=A0uint32_t wait;<br>
+<br>
+-=C2=A0 =C2=A0 now =3D qemu_clock_get_ns(QEMU_CLOCK_<wbr>VIRTUAL);<br>
+-=C2=A0 =C2=A0 wait =3D env-&gt;CP0_Compare - env-&gt;CP0_Count - (uint32_t=
+)(now / TIMER_PERIOD);<br>
+-=C2=A0 =C2=A0 next =3D now + (uint64_t)wait * TIMER_PERIOD;<br>
+-=C2=A0 =C2=A0 timer_mod(env-&gt;timer, next);<br>
++=C2=A0 =C2=A0 now_ns =3D qemu_clock_get_ns(QEMU_CLOCK_<wbr>VIRTUAL);<br>
++=C2=A0 =C2=A0 wait =3D env-&gt;CP0_Compare - env-&gt;CP0_Count -<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0(uint32_t)(now_ns / TIMER_PERIOD)=
+;<br>
++=C2=A0 =C2=A0 next_ns =3D now_ns + (uint64_t)wait * TIMER_PERIOD;<br>
++=C2=A0 =C2=A0 timer_mod(env-&gt;timer, next_ns);<br>
+=C2=A0}<br>
+<br>
+=C2=A0/* Expire the timer.=C2=A0 */<br>
+@@ -56,16 +57,16 @@ uint32_t cpu_mips_get_count(<wbr>CPUMIPSState *env)<br>
+=C2=A0 =C2=A0 =C2=A0if (env-&gt;CP0_Cause &amp; (1 &lt;&lt; CP0Ca_DC)) {<br=
+>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return env-&gt;CP0_Count;<br>
+=C2=A0 =C2=A0 =C2=A0} else {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 uint64_t now;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 uint64_t now_ns;<br>
+<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 now =3D qemu_clock_get_ns(QEMU_CLOCK_<wbr>VIRT=
+UAL);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 now_ns =3D qemu_clock_get_ns(QEMU_CLOCK_<wbr>V=
+IRTUAL);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (timer_pending(env-&gt;timer)<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;&amp; timer_expired(env-&gt=
+;timer, now)) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;&amp; timer_expired(env-&gt=
+;timer, now_ns)) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* The timer has already ex=
+pired.=C2=A0 */<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cpu_mips_timer_expire(env);=
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 return env-&gt;CP0_Count + (uint32_t)(now / TI=
+MER_PERIOD);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 return env-&gt;CP0_Count + (uint32_t)(now_ns /=
+ TIMER_PERIOD);<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0}<br>
+=C2=A0<br>
 -- <br>
 2.26.2<br>
 <br>
 </blockquote>
 
---000000000000a5445405b08bbbbf--
+--0000000000002403d505b08bcf2f--
 
