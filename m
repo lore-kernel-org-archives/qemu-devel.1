@@ -2,78 +2,81 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC372C4727F
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 10:11:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D187C4727E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 10:14:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D5412074A
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 10:11:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A3A72074A
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 10:14:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="PzbtkjGs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D5412074A
+	dkim=pass (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="RfdEwHOm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A3A72074A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bytedance.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35532 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNZ5I-0001gv-6A
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 06:11:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41526)
+	id 1kNZ86-0003uF-Is
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 06:14:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41550)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pizhenwei@bytedance.com>)
- id 1kNYyj-0003Gp-Lz
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 06:04:53 -0400
-Received: from mail-pj1-x1036.google.com ([2607:f8b0:4864:20::1036]:34743)
+ id 1kNYyn-0003Om-4I
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 06:04:57 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:34535)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <pizhenwei@bytedance.com>)
- id 1kNYye-0005C7-Uz
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 06:04:53 -0400
-Received: by mail-pj1-x1036.google.com with SMTP id s14so701887pju.1
- for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 03:04:47 -0700 (PDT)
+ id 1kNYyl-0005DK-61
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 06:04:56 -0400
+Received: by mail-pf1-x441.google.com with SMTP id k13so870593pfg.1
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 03:04:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=bytedance-com.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id;
- bh=HSq+Ir9vUAcFclVGpXTnRULSP4HkjTw+bUu7CMUflZU=;
- b=PzbtkjGs9t8Pyq9XLCyftyREQy2i3bGBFnVRUZKyF82AYh6p9QiphwY9AK81gJ3sXV
- DRH8iwjzttKUSj7A107g/eYXwJfq7XKnVX+myaJmCvqufOivRMubemX8SPeEfRhxLVTn
- FmDzMWWgjbZ2bvWUDJXdhOxReayZjd2DTK75W0NMOGjrjoO5TL5Dm05HSKa1v4UT57mF
- IEXXXuJB5PLUBEPg+PKX2OHrKHu9a2aNGzcew7XIOshB9BkrUqD0bV005h6O/8hYsmlr
- UOks7MZsSHnusBMPcWETYCB/HgDJV8T/MHBKDkAsei4oSSt/5qzEaPd33KcdL0kEYrQv
- mbMQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=rNTLRO7eI/MsFc78yk63Tq1O7QMzt9xIGkepVz1ORQA=;
+ b=RfdEwHOm/YtysAXRfe7WQW6Q4ZJNpK8yO+i/9mR3jxX+OVgJP6mkdNtKncDUHHL6HM
+ mDQDlHtRVb7661IDKWnF+qQsco+esHlfWIc55TNHHcF+dvbdTIGjm2dtzUpuB686O+7N
+ TwriZ6c4+WAZxxAOwawK0HDxkkvxstgpOJg54+cXBR8j/jPNiExY5Zs6rAw9DJ69rK9z
+ C/OVMfFxSKt1P/lSw4UrGmJojpdkC0FBz62UqhQ3o2iiaKnSRxbniyqmVjYwDfwmoXMq
+ 3bO6yDIVqtUugZAwHVod2CAaaXcIGUm1DPwZ/CyTpo2Sl8ru9eTkDyHTD6tXhkuZrPR+
+ Nr+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=HSq+Ir9vUAcFclVGpXTnRULSP4HkjTw+bUu7CMUflZU=;
- b=ox2+JSybVnxrYpGK1xmp2nFJaqe0DHMoiiHwxKhLkZBiQZM5O0mlexrbzGIOgUVu8S
- 8/tzeUOQIRASr9hFHKmkk3Ob4Q1sd8IbNhlXBRLdkKVqgRsQvcyJOS6KaAChqgMAwNYC
- FDmzmvtdIMRBQ0B8SsySOHStdxtKbYUwAKckJbj2LgncmEmE5m3+NffsBhzhJkRJmbFl
- bq7LNlCF7cr8LWAmrTsY+OiEKRbJoNHM65mjmNtyVAXBe4SHr8k7U1uO15DiLweNKRoq
- UUuvEyJNcYU6et8THoRzKh8CDlX0nwGM6TaanEgDkbYk+9Ec2f9KJSB52LMHEs+UpgCF
- mqlg==
-X-Gm-Message-State: AOAM532Lz35gzEbyK8chjjOL0HwIvvBvHRM2Yzm7+ZNOYG7mPlnV9Eg8
- yvSXcbQ+4aPcziIv3IlZ2jmR2g==
-X-Google-Smtp-Source: ABdhPJz1NardNIVq1pDN9hMOCqnKet+7NbsjDYzhHqPLJ1zUuBY5TsZ9ZjqKs9lbUeTVo5oXT4DjlQ==
-X-Received: by 2002:a17:902:a50b:b029:d1:e5e7:bdd2 with SMTP id
- s11-20020a170902a50bb02900d1e5e7bdd2mr1808770plq.50.1601460286045; 
- Wed, 30 Sep 2020 03:04:46 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=rNTLRO7eI/MsFc78yk63Tq1O7QMzt9xIGkepVz1ORQA=;
+ b=GICtNV7/AWDQR4/6VaA8PJ0yAf/7AzomgbifSy4ez7n4EnmPslqy8LvgN0jb3EjXbY
+ oBnX0nwx2t8ac/m6a06syFHzjDmJ6iYRcLtWm3ikosbmduZ4ZbJDrCX5JdNyj/AStoMK
+ PXZ5RWXl4LqI1pjrjoXNJV3oL8EB319rY+UnaZwhf8zDWxQvbkrLU3Acgno6OwW6+eQm
+ Wvur/BSL7om0aw8MTXsGb7fvzEPpp291E8sRJSuHlPu021UQG3Rwni051d2FSCfQbM5Q
+ AJ875Hde0oPrNWDufJW/S/MsP1EYnDVKR3HAQzusoU7DUVpHyYHWChSNmAYHOy6SKnxi
+ u+bg==
+X-Gm-Message-State: AOAM532QBHFIJoDP3KtY74VFeg5lq700AYiVAOUdVNNH3ocAIxq0umDC
+ 7EmOso0mD9TgOWsAUsMjV/u37Q==
+X-Google-Smtp-Source: ABdhPJxG0VpP00vLQ3zN321QiHTdOpuRsUyHXysd1hI3TMFTQDpaw+AKN5L+PX/TXrHYh6EtdmRWBg==
+X-Received: by 2002:a63:ff4e:: with SMTP id s14mr1517836pgk.137.1601460293836; 
+ Wed, 30 Sep 2020 03:04:53 -0700 (PDT)
 Received: from libai.bytedance.net ([61.120.150.71])
- by smtp.gmail.com with ESMTPSA id c185sm1884230pfb.123.2020.09.30.03.04.43
+ by smtp.gmail.com with ESMTPSA id c185sm1884230pfb.123.2020.09.30.03.04.51
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 30 Sep 2020 03:04:45 -0700 (PDT)
+ Wed, 30 Sep 2020 03:04:53 -0700 (PDT)
 From: zhenwei pi <pizhenwei@bytedance.com>
 To: pbonzini@redhat.com,
 	peter.maydell@linaro.org
-Subject: [PATCH v3 0/3] add MEMORY_FAILURE event
-Date: Wed, 30 Sep 2020 18:04:37 +0800
-Message-Id: <20200930100440.1060708-1-pizhenwei@bytedance.com>
+Subject: [PATCH v3 3/3] target-i386: post memory failure event to uplayer
+Date: Wed, 30 Sep 2020 18:04:40 +0800
+Message-Id: <20200930100440.1060708-4-pizhenwei@bytedance.com>
 X-Mailer: git-send-email 2.11.0
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1036;
- envelope-from=pizhenwei@bytedance.com; helo=mail-pj1-x1036.google.com
+In-Reply-To: <20200930100440.1060708-1-pizhenwei@bytedance.com>
+References: <20200930100440.1060708-1-pizhenwei@bytedance.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
+ envelope-from=pizhenwei@bytedance.com; helo=mail-pf1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -18
@@ -99,44 +102,134 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v2->v3:
-Use g_strdup_printf instead of snprintf.
-Declear memory failure event as 3 parts: 'recipient', 'action', 'flags'.
-Wrapper function emit_guest_memory_failure&emit_hypervisor_memory_failure.
+Post memory failure event to uplayer to handle hardware memory
+corrupted event. Rather than simple QEMU log, QEMU could report more
+effective message to uplayer. For example, guest crashes by MCE,
+selecting another host server is a better choice.
 
-v1->v2:
-Suggested by Peter Maydell, rename events to make them
-architecture-neutral:
-'PC-RAM' -> 'guest-memory'
-'guest-triple-fault' -> 'guest-mce-fatal'
+Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
+---
+ target/i386/helper.c | 24 ++++++++++++++++++++----
+ target/i386/kvm.c    | 13 ++++++++++++-
+ 2 files changed, 32 insertions(+), 5 deletions(-)
 
-Suggested by Paolo, add more fields in event:
-'action-required': boolean type to distinguish a guest-mce is AR/AO.
-'recursive': boolean type. set true if: previous MCE in processing
-             in guest, another AO MCE occurs.
-
-v1:
-Although QEMU could catch signal BUS to handle hardware memory
-corrupted event, sadly, QEMU just prints a little log and try to fix
-it silently.
-
-In these patches, introduce a 'MEMORY_FAILURE' event with 4 detailed
-actions of QEMU, then uplayer could know what situaction QEMU hit and
-did. And further step we can do: if a host server hits a 'hypervisor-ignore'
-or 'guest-mce', scheduler could migrate VM to another host; if hitting
-'hypervisor-stop' or 'guest-triple-fault', scheduler could select other
-healthy servers to launch VM.
-
-Zhenwei Pi (3):
-  target-i386: seperate MCIP & MCE_MASK error reason
-  qapi/run-state.json: introduce memory failure event
-  target-i386: post memory failure event to uplayer
-
- qapi/run-state.json  | 85 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- target/i386/helper.c | 47 ++++++++++++++++++++++-------
- target/i386/kvm.c    | 13 +++++++-
- 3 files changed, 134 insertions(+), 11 deletions(-)
-
+diff --git a/target/i386/helper.c b/target/i386/helper.c
+index 17e1684ff9..2a184c4835 100644
+--- a/target/i386/helper.c
++++ b/target/i386/helper.c
+@@ -18,6 +18,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qapi/qapi-events-run-state.h"
+ #include "cpu.h"
+ #include "exec/exec-all.h"
+ #include "qemu/qemu-print.h"
+@@ -851,6 +852,15 @@ typedef struct MCEInjectionParams {
+     int flags;
+ } MCEInjectionParams;
+ 
++static void emit_guest_memory_failure(MemoryFailureAction action, bool ar,
++                                      bool recursive)
++{
++    MemoryFailureFlags mff = {.action_required = ar, .recursive = recursive};
++
++    qapi_event_send_memory_failure(MEMORY_FAILURE_RECIPIENT_GUEST, action,
++                                   &mff);
++}
++
+ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
+ {
+     MCEInjectionParams *params = data.host_ptr;
+@@ -859,16 +869,18 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
+     uint64_t *banks = cenv->mce_banks + 4 * params->bank;
+     g_autofree char *msg = NULL;
+     bool need_reset = false;
++    bool recursive;
++    bool ar = !!(params->status & MCI_STATUS_AR);
+ 
+     cpu_synchronize_state(cs);
++    recursive = !!(cenv->mcg_status & MCG_STATUS_MCIP);
+ 
+     /*
+      * If there is an MCE exception being processed, ignore this SRAO MCE
+      * unless unconditional injection was requested.
+      */
+-    if (!(params->flags & MCE_INJECT_UNCOND_AO)
+-        && !(params->status & MCI_STATUS_AR)
+-        && (cenv->mcg_status & MCG_STATUS_MCIP)) {
++    if (!(params->flags & MCE_INJECT_UNCOND_AO) && !ar && recursive) {
++        emit_guest_memory_failure(MEMORY_FAILURE_ACTION_IGNORE, ar, recursive);
+         return;
+     }
+ 
+@@ -896,7 +908,7 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
+             return;
+         }
+ 
+-        if (cenv->mcg_status & MCG_STATUS_MCIP) {
++        if (recursive) {
+             need_reset = true;
+             msg = g_strdup_printf("CPU %d: Previous MCE still in progress, "
+                                   "raising triple fault", cs->cpu_index);
+@@ -909,6 +921,8 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
+         }
+ 
+         if (need_reset) {
++            emit_guest_memory_failure(MEMORY_FAILURE_ACTION_FATAL, ar,
++                                      recursive);
+             monitor_printf(params->mon, "%s", msg);
+             qemu_log_mask(CPU_LOG_RESET, "%s\n", msg);
+             qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+@@ -934,6 +948,8 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
+     } else {
+         banks[1] |= MCI_STATUS_OVER;
+     }
++
++    emit_guest_memory_failure(MEMORY_FAILURE_ACTION_INJECT, ar, recursive);
+ }
+ 
+ void cpu_x86_inject_mce(Monitor *mon, X86CPU *cpu, int bank,
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 9efb07e7c8..923749f5d8 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -13,6 +13,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qapi/qapi-events-run-state.h"
+ #include "qapi/error.h"
+ #include <sys/ioctl.h>
+ #include <sys/utsname.h>
+@@ -575,8 +576,17 @@ static void kvm_mce_inject(X86CPU *cpu, hwaddr paddr, int code)
+                        (MCM_ADDR_PHYS << 6) | 0xc, flags);
+ }
+ 
++static void emit_hypervisor_memory_failure(MemoryFailureAction action, bool ar)
++{
++    MemoryFailureFlags mff = {.action_required = ar, .recursive = false};
++
++    qapi_event_send_memory_failure(MEMORY_FAILURE_RECIPIENT_HYPERVISOR, action,
++                                   &mff);
++}
++
+ static void hardware_memory_error(void *host_addr)
+ {
++    emit_hypervisor_memory_failure(MEMORY_FAILURE_ACTION_FATAL, true);
+     error_report("QEMU got Hardware memory error at addr %p", host_addr);
+     exit(1);
+ }
+@@ -631,7 +641,8 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
+         hardware_memory_error(addr);
+     }
+ 
+-    /* Hope we are lucky for AO MCE */
++    /* Hope we are lucky for AO MCE, just notify a event */
++    emit_hypervisor_memory_failure(MEMORY_FAILURE_ACTION_IGNORE, false);
+ }
+ 
+ static void kvm_reset_exception(CPUX86State *env)
 -- 
 2.11.0
 
