@@ -4,39 +4,39 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14FBAC4727E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 11:27:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4CD9C4727E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 11:28:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9409520708
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 11:27:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9409520708
+	by mail.kernel.org (Postfix) with ESMTPS id 416FE20708
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 11:28:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 416FE20708
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNaGP-0000MF-L1
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 07:27:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60628)
+	id 1kNaHz-0001yo-Cz
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 07:28:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32980)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kNaF7-0007bq-9R; Wed, 30 Sep 2020 07:25:57 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:40223)
+ id 1kNaGw-00016I-I6; Wed, 30 Sep 2020 07:27:46 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:40701)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kNaF5-0003Q8-5Z; Wed, 30 Sep 2020 07:25:53 -0400
+ id 1kNaGs-0003bH-1b; Wed, 30 Sep 2020 07:27:46 -0400
 Received: from [192.168.100.1] ([82.252.145.98]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MYedH-1jtWO21e3X-00Ve35; Wed, 30 Sep 2020 13:25:45 +0200
-Subject: Re: [PATCH] hw/rtc/m48t59: Simplify m48t59_init()
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200914102425.1152962-1-f4bug@amsat.org>
+ (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MdNwm-1kwv1N0u6i-00ZR8y; Wed, 30 Sep 2020 13:27:37 +0200
+Subject: Re: [PATCH 1/2] qemu-img-cmds.hx: Update comment that mentions Texinfo
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200929075824.1517969-1-armbru@redhat.com>
+ <20200929075824.1517969-2-armbru@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -80,36 +80,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <116cc893-74c3-42d7-adbd-0afa1660805b@vivier.eu>
-Date: Wed, 30 Sep 2020 13:25:42 +0200
+Message-ID: <3e4c3c7f-c8ed-5e94-c436-bad7346c27fd@vivier.eu>
+Date: Wed, 30 Sep 2020 13:27:36 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200914102425.1152962-1-f4bug@amsat.org>
+In-Reply-To: <20200929075824.1517969-2-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:27+uFBK3TmNp+LoTxM5aLQ55i5mEpD6uNbamKfJuasbzW0FW53w
- Uq4HprSAHH1llolSspJOfrQfQjNF2HmIrvJib4McNkcyV/7+z3akSboQOQK/dF32lNg+pBz
- lIUBHasypSpii+dBJmeJdDh5BcXDR1yKSVeDOfyViOl/2NsmtNs6OCvxKIoUgKtDRy5Fd5A
- 67HvVlb7O56HMkm1lKJlw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:yn7KJZQP+E0=:ryQmMxRXNzaEFeP9YQIMyn
- /+052sTmjXgvy+9W9Sag9qlFimDZhwwnJZlEylMTQbSN1d6mQMwTfjy5ugp+CwSRH0IrEbdqX
- jlCOZNZEKtfq/mzqRVYDVovMGXES4kthGxYiMEehBJup3gJs+2LhxabAzsk1bedDsFuLw/119
- Zko9I4TJ4QKv8H4YCqD4gsPP5DVHP+KmCtfV/QSt4VKFUkUAoddDIwKRzsmoIMAuNiGWskSnk
- ec0b8qSZ69ljFol7SJquvxf/ymJ5sJcFPgZ36KIAHG1Nip63ayrvHuGLFwrKIS3CFbrbqyaRO
- t/yExpGt0ac0JhR/u67F+FjAWILwYcCSpeesS7SUY1gaUxneDxZIcGJLLf6gphn76x5EDkeOM
- g7frxusB1PrbCif/RU23bR47M00i2VupFDy0CDeZWnxGCIcSytkQZEbPl+GxKnRzB53SojTMo
- NJ0CEJkGW+ky/kD90XgOqC+U7kemusIxAHPnZJEfMik/4yDo9O2q4pmSH0ZSsfxQGE9HbJ3Ms
- cWqwYA0xG7BoUPKgA5zcWGv1pZ24k3ZrSJNhIpukp8d7YgGbHYVWNaum3x3zVhVm46CDwHF/H
- EvalASBhOj0+ylPcoinJgjrIdgANBE4UGa7pBw4JS3zcbSgz31+i4vGnyC4NurOV+78JnkdLY
- W3CoPH4S/99AjwSDicoqqJXQP4GEjJbaUfnxAtRW5mzyYQ1QaUw34qFIM3c8kiTgXN/6ayjwC
- riJDjAz/9QVHqpAG7KLC3Zj4CNgGuGHYR+wROYGPuqUE3/VktWZNOO8+c/yqCUPQWHr18PsTI
- 2oZ6gZukJggs1lKpI5vMDXjHjxdT14owjuwAj5I91rt3VLUKH3eF18kwCSXlKvbPkLGZelf
-Received-SPF: none client-ip=212.227.126.130; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:WH5HdYJgPXnUIIyksZYA6A05VAIrVGqSGhPs1tjVMmGLsMwwhE9
+ /A6EXHpqkEZbkhxwuroVVk/UjAMzRT3gxLu6KdzhIYUJtEDJD9wbXw3CL0IBctAU8dszSkD
+ e2HYRTpiyYOJqApiVnFLBbw00gvcorAEsfiHxCx8QkqQw90/W3KxAesAvAwCMED7s1g7RLI
+ uhK/VIrUiJzdbXaWmAQ7w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:YS6Ljv6ERQk=:bAda4MZYDzMnYhAxAqod4C
+ tC8waUh2v181jK9ngo3/R6nrbHVHvumJookte4zIQfFmXYxRoMHuJ9EnSnkjZxkRGURTaA3o8
+ QMZ+j1w1ING+K/jVyL/WT5hP0kGAHEhHI9gE4Nq03R/Yn9lvwSYdvGRxYlVUrieUoZGC73bzY
+ IaAWpIXvcbhRNPdUwphvTjpAm2H93WEzodYIIhV8Ovj1euugzBG4TRQeqvjhP5YbibOPDIu8p
+ gE/LV1tuXC4YvvWLiQuQnKrZXsCES6jHe0TeDVgZKFAUAIBX5N+4dDhrf1a9+Ebok5+KjW36i
+ 2PV7ZIpX4djB7Hwkkh7gnviWHOaoMj9V84swUtIcWaq0sb+5kic7buDOOgpdys6VHvwgL6dmb
+ UeFwhP1pICGnFCILkvmzixpcWZT1ZHHFDaPx3mv9fTMEinzZk21Oz8/DtgYxNey6hGdxOGiDP
+ 3ndefQ7wGEC7FVFn0Jb6eIaPpOQ8vWqlKWPrleBK36xPiRvCbw26R8VVwKIKJzmzJoPpVMAlh
+ pAVSzZhWTx0g6qqwUw7GNQnaBmJkmFH2TT2Uv2dy+i9N/UKD7Day+XhVW08RH4CgaVwCc6ZqC
+ CEsTvFpbDKsUAuWmlUGDUdjoaY6bOjlwomlrlnj2fN2mzJb41OuKXPm6rUBdq4Ap/w4zJ7jEh
+ JN8FmBbWVDGfUbgdR5QTuwjGLIy+GXoPPcIn5XTbMNXcPwJIViIFWK1wc3waghAV0cl3jxtrH
+ RdyirTWD1N9gKup2G/V7UFE+708WiM9mjyxDeMtco5/HFCquQM35dubiXOd7Y4vdzz0piEB1N
+ dCtXn202g0aGsbElYFusw9LMb/MW7tYrJYCa4DnyykrEMsVGhMDM7h8QuXJzpdP9QXQq5iV
+Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 07:25:48
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 07:27:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -22
 X-Spam_score: -2.3
 X-Spam_bar: --
@@ -128,114 +128,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-ppc@nongnu.org,
- Artyom Tarasenko <atar4qemu@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-trivial@nongnu.org, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 14/09/2020 à 12:24, Philippe Mathieu-Daudé a écrit :
-> As the 'io_base' argument of m48t59_init() is unused (set to 0),
-> remove it to simplify.
-> To create a device on the ISA bus, m48t59_init_isa() is the
-> preferred function to use.
+Le 29/09/2020 à 09:58, Markus Armbruster a écrit :
+> Missed in 3c95fdef94 "Update comments in .hx files that mention
+> Texinfo".
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  include/hw/rtc/m48t59.h |  2 +-
->  hw/ppc/ppc405_boards.c  |  2 +-
->  hw/rtc/m48t59.c         | 10 ++--------
->  hw/sparc/sun4m.c        |  2 +-
->  hw/sparc64/sun4u.c      |  2 +-
->  5 files changed, 6 insertions(+), 12 deletions(-)
+>  qemu-img-cmds.hx | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/include/hw/rtc/m48t59.h b/include/hw/rtc/m48t59.h
-> index 04abedf3b2b..62297ee0db1 100644
-> --- a/include/hw/rtc/m48t59.h
-> +++ b/include/hw/rtc/m48t59.h
-> @@ -50,7 +50,7 @@ struct NvramClass {
->  Nvram *m48t59_init_isa(ISABus *bus, uint32_t io_base, uint16_t size,
->                         int base_year, int type);
->  Nvram *m48t59_init(qemu_irq IRQ, hwaddr mem_base,
-> -                   uint32_t io_base, uint16_t size, int base_year,
-> +                   uint16_t size, int base_year,
->                     int type);
->  
->  #endif /* HW_M48T59_H */
-> diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
-> index 6198ec1035b..93ffee801a3 100644
-> --- a/hw/ppc/ppc405_boards.c
-> +++ b/hw/ppc/ppc405_boards.c
-> @@ -227,7 +227,7 @@ static void ref405ep_init(MachineState *machine)
->      /* Register FPGA */
->      ref405ep_fpga_init(sysmem, 0xF0300000);
->      /* Register NVRAM */
-> -    m48t59_init(NULL, 0xF0000000, 0, 8192, 1968, 8);
-> +    m48t59_init(NULL, 0xF0000000, 8192, 1968, 8);
->      /* Load kernel */
->      linux_boot = (kernel_filename != NULL);
->      if (linux_boot) {
-> diff --git a/hw/rtc/m48t59.c b/hw/rtc/m48t59.c
-> index 6525206976b..2d6a095c4e4 100644
-> --- a/hw/rtc/m48t59.c
-> +++ b/hw/rtc/m48t59.c
-> @@ -566,7 +566,7 @@ const MemoryRegionOps m48t59_io_ops = {
->  
->  /* Initialisation routine */
->  Nvram *m48t59_init(qemu_irq IRQ, hwaddr mem_base,
-> -                   uint32_t io_base, uint16_t size, int base_year,
-> +                   uint16_t size, int base_year,
->                     int model)
->  {
->      DeviceState *dev;
-> @@ -584,13 +584,7 @@ Nvram *m48t59_init(qemu_irq IRQ, hwaddr mem_base,
->          s = SYS_BUS_DEVICE(dev);
->          sysbus_realize_and_unref(s, &error_fatal);
->          sysbus_connect_irq(s, 0, IRQ);
-> -        if (io_base != 0) {
-> -            memory_region_add_subregion(get_system_io(), io_base,
-> -                                        sysbus_mmio_get_region(s, 1));
-> -        }
-> -        if (mem_base != 0) {
-> -            sysbus_mmio_map(s, 0, mem_base);
-> -        }
-> +        sysbus_mmio_map(s, 0, mem_base);
->  
->          return NVRAM(s);
->      }
-> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-> index 947b69d1597..56a0d38f274 100644
-> --- a/hw/sparc/sun4m.c
-> +++ b/hw/sparc/sun4m.c
-> @@ -970,7 +970,7 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
->          create_unimplemented_device("SUNW,sx", hwdef->sx_base, 0x2000);
->      }
->  
-> -    nvram = m48t59_init(slavio_irq[0], hwdef->nvram_base, 0, 0x2000, 1968, 8);
-> +    nvram = m48t59_init(slavio_irq[0], hwdef->nvram_base, 0x2000, 1968, 8);
->  
->      slavio_timer_init_all(hwdef->counter_base, slavio_irq[19], slavio_cpu_irq, smp_cpus);
->  
-> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-> index b4aabfc076f..1cc57b030a7 100644
-> --- a/hw/sparc64/sun4u.c
-> +++ b/hw/sparc64/sun4u.c
-> @@ -675,7 +675,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
->      pci_ide_create_devs(pci_dev);
->  
->      /* Map NVRAM into I/O (ebus) space */
-> -    nvram = m48t59_init(NULL, 0, 0, NVRAM_SIZE, 1968, 59);
-> +    nvram = m48t59_init(NULL, 0, NVRAM_SIZE, 1968, 59);
->      s = SYS_BUS_DEVICE(nvram);
->      memory_region_add_subregion(pci_address_space_io(ebus), 0x2000,
->                                  sysbus_mmio_get_region(s, 0));
+> diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+> index b89c019b76..cab8234235 100644
+> --- a/qemu-img-cmds.hx
+> +++ b/qemu-img-cmds.hx
+> @@ -1,5 +1,5 @@
+>  HXCOMM Keep the list of subcommands sorted by name.
+> -HXCOMM Use DEFHEADING() to define headings in both help text and texi
+> +HXCOMM Use DEFHEADING() to define headings in both help text and rST
+>  HXCOMM Text between SRST and ERST are copied to rST version and
+>  HXCOMM discarded from C version
+>  HXCOMM DEF(command, callback, arg_string) is used to construct
 > 
+
 
 Applied to my trivial-patches branch.
 
 Thanks,
-Laurent
-
 
