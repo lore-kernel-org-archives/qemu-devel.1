@@ -2,83 +2,82 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B1AEC4727C
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 20:01:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 679F6C4727C
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 20:03:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E8AD20709
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 20:01:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C00CA20709
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 20:03:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R/PzAud+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E8AD20709
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dRfczquk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C00CA20709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNiIH-0008Jn-GU
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 16:01:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53472)
+	id 1kNiJx-0002Ch-Rv
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 16:03:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53500)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kNiFd-0006Hg-EZ
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 15:58:57 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:41879)
+ id 1kNiFf-0006LK-IJ
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 15:58:59 -0400
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:44341)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kNiFb-000790-J1
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 15:58:57 -0400
-Received: by mail-wr1-x429.google.com with SMTP id w5so3130104wrp.8
+ id 1kNiFb-00078x-Sh
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 15:58:59 -0400
+Received: by mail-wr1-x430.google.com with SMTP id s12so3125518wrw.11
  for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 12:58:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=W6Lam4OFe7gO57Je+OnMrr6I7gK609J1eHhN01o9JRw=;
- b=R/PzAud+eR5WyPIfAAKak6esb8X6XfS4qlCrKpF3dpsUqszxyW1GSr96SQw56VApKU
- 9gWmSmEl+/1lT+Acbjy+OFZEH8d/1eHHDtUYOKEhEM3KHDktdjyjKRtdThaiqGtfVQs4
- NYfSitEimRDCrnyxIkw4HRdoTLkRfKaPHj1W9VfPrOC0OwChpQdu8qBztIiAzgOQx2k4
- Xei+B1TC7sO+cXoF8VG8GWXAt+S6wzeYRNkC6J6zVFSMjDPDdsUwYEzQesbVewS0AsEg
- PmRkG0M9Az4AXeLFEjzv4Xyl45sU/Vd51s1RmgP47ly6nflXriaF450OdQO4Gs7CySkc
- orMw==
+ h=sender:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=v5tw+r2AdyHWT0BTaF4Z2V03716zLGvhfDrHdU7C4vo=;
+ b=dRfczquk+XjNsyglUAnCMGX8/sgYvp5mq+LW6NBL8MvyNtemdUnq/bU2ueFFTUT+Ln
+ +6pU0OxCD8LMxzrvN1OG4gvL3si7/QEiU29nfjNaHS051TjVBhD5rB3GwP0kOoagEsBO
+ ME2WW9/5QsL/UiMUGuRb41kWHTLtFHW6prdfnhAOyJWcG4xu5wYI1k7i0hZXtWY2qYsU
+ 2FkcBAk7bsy5RRHlM6RB69za67k5ZEgopSJrc8wyl+W9+wZWf0N183DdRWzGyDiK4/Sy
+ QVMHf8vjbrFhA+cwv0qcEwoo5chE/wFDQYSYJvLT7eg/DMICYdgsLFBmyQ5J5XFw5Yrm
+ mSNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=W6Lam4OFe7gO57Je+OnMrr6I7gK609J1eHhN01o9JRw=;
- b=hW7ZsLb/WMuJEOnaESFwD8cS/r+oPOx7eXM3jSOQmglTPKre9hudKzlQF9VJdDlMJI
- 6LjRfGJ2Pdp7x7ATnwvUtb5HOjta2ph1qGnbSWDDnNbngSwojd6LWgVh77XXfZUwuE16
- gv/wpZLGRgK0Mw8UYoWZ0h2YsB7QuQf+pz/znefY8NT6Pc3tJFX/sWJGt7nqAVJNzrfx
- RUu+wD28x4lgdbOczm08oHQ/EQYax5qy/IZXTxBLY3nNtcaAUwVT8nm0tTbsp5YD3KBx
- aFuWskBkyinKkxdwLCR98aGg8MURzzZqMdPzEreumK/o3BifgonPnV+6viRKMu/QQ1X9
- hKDw==
-X-Gm-Message-State: AOAM5333qjwbpigFbDKa+EphG9ihw6AW4YYB1pHbdDRB1bKNDTuudYJC
- PCW8bugS1Deg6mXls+zNA6QbQDqanCc=
-X-Google-Smtp-Source: ABdhPJwzuQh2VjbZh8ddKRn6+dQk9TjsGwVPK4HRAMWYxmgblrIqji1pyS3Ux+WHzWo3LWnhvDaUBw==
-X-Received: by 2002:adf:dfc3:: with SMTP id q3mr4661491wrn.238.1601495933000; 
- Wed, 30 Sep 2020 12:58:53 -0700 (PDT)
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=v5tw+r2AdyHWT0BTaF4Z2V03716zLGvhfDrHdU7C4vo=;
+ b=AtIouDJcwDZHhBoaazU0NQeNQNDzXwQgRrEBZxd0Nv7WGOultKlv1k6gcuTFEXVK78
+ nMtJBSHBNQuvCpwuh45SG4PzUeadU6b1nXQoLPcP0hYRMssfM717gCfftlZ7h3eaPeLL
+ VDBiMnzuVVgyGyU/cZPM79WL9jCnsN94xr4EJQ4rGrWOAzroYpxDlGfqrrm9JG4glanL
+ /bRieqjDwkKrsF1s+7pvQpTXK2uOtH10swBQJL+S3Drxx+GlIWAzBLZk/L3HvcDGr8fW
+ OHDGDafah41NjsMMVSWrJJCX1DgpXCZZ/YJ5LkG2vPtDnS8Y3/JxO4XR2BB9fsAbZTH6
+ L9Zw==
+X-Gm-Message-State: AOAM533ybWKr5THrxbce8YidSjSqkW5EwHo6No5PGtHM6FW4jLolq6V8
+ XTKeSMgil72JSHLolQEPC8WQn6WcodM=
+X-Google-Smtp-Source: ABdhPJxCTEcuSorVnyAPur0c8KUmL0DDUwqnPLWdr05zRyW9Z8iEmwtikF8lh9KiTR7TtB3d7vwGug==
+X-Received: by 2002:adf:db52:: with SMTP id f18mr4808150wrj.397.1601495931569; 
+ Wed, 30 Sep 2020 12:58:51 -0700 (PDT)
 Received: from donizetti.redhat.com ([2001:b07:6468:f312:75e3:aaa7:77d6:f4e4])
  by smtp.gmail.com with ESMTPSA id
- b64sm4824204wmh.13.2020.09.30.12.58.52
+ b64sm4824204wmh.13.2020.09.30.12.58.50 for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 30 Sep 2020 12:58:52 -0700 (PDT)
+ Wed, 30 Sep 2020 12:58:50 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 30/86] meson: move libmpathpersist test
-Date: Wed, 30 Sep 2020 21:58:49 +0200
-Message-Id: <20200930195850.278104-3-pbonzini@redhat.com>
+Subject: [PULL v8 00/86] Misc QEMU patches for 2020-09-24
+Date: Wed, 30 Sep 2020 21:58:47 +0200
+Message-Id: <20200930195850.278104-1-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200930195850.278104-1-pbonzini@redhat.com>
-References: <20200930195850.278104-1-pbonzini@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::429;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x429.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::430;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x430.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -101,303 +100,288 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is the first compiler/linker test that has been moved to Meson.
-Add more section headings to keep things clearer.
+The following changes since commit cbba3dc6ea3fc9aa66e9f9eb41051536e3ad7cd0:
 
-This also fixes static linking to libmpathpersist, which has a
-dependency on libmultipath but no pkg-config file to describe it.
+  Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2020-09-30 11:40:38 +0100)
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- configure         | 77 +++-----------------------------------------
- meson.build       | 81 +++++++++++++++++++++++++++++++++++++++++++----
- meson_options.txt |  2 ++
- 3 files changed, 80 insertions(+), 80 deletions(-)
+are available in the Git repository at:
 
-diff --git a/configure b/configure
-index 6f2599f99f..aade6eb285 100755
---- a/configure
-+++ b/configure
-@@ -403,7 +403,7 @@ netmap="no"
- sdl="auto"
- sdl_image="auto"
- virtfs=""
--mpath=""
-+mpath="auto"
- vnc="enabled"
- sparse="no"
- vde=""
-@@ -1116,9 +1116,9 @@ for opt do
-   ;;
-   --enable-virtfs) virtfs="yes"
-   ;;
--  --disable-mpath) mpath="no"
-+  --disable-mpath) mpath="disabled"
-   ;;
--  --enable-mpath) mpath="yes"
-+  --enable-mpath) mpath="enabled"
-   ;;
-   --disable-vnc) vnc="disabled"
-   ;;
-@@ -3852,57 +3852,6 @@ if test "$modules" = yes; then
-     fi
- fi
- 
--##########################################
--# libmpathpersist probe
--
--if test "$mpath" != "no" ; then
--  # probe for the new API
--  cat > $TMPC <<EOF
--#include <libudev.h>
--#include <mpath_persist.h>
--unsigned mpath_mx_alloc_len = 1024;
--int logsink;
--static struct config *multipath_conf;
--extern struct udev *udev;
--extern struct config *get_multipath_config(void);
--extern void put_multipath_config(struct config *conf);
--struct udev *udev;
--struct config *get_multipath_config(void) { return multipath_conf; }
--void put_multipath_config(struct config *conf) { }
--
--int main(void) {
--    udev = udev_new();
--    multipath_conf = mpath_lib_init();
--    return 0;
--}
--EOF
--  if compile_prog "" "-ludev -lmultipath -lmpathpersist" ; then
--    mpathpersist=yes
--    mpathpersist_new_api=yes
--  else
--    # probe for the old API
--    cat > $TMPC <<EOF
--#include <libudev.h>
--#include <mpath_persist.h>
--unsigned mpath_mx_alloc_len = 1024;
--int logsink;
--int main(void) {
--    struct udev *udev = udev_new();
--    mpath_lib_init(udev);
--    return 0;
--}
--EOF
--    if compile_prog "" "-ludev -lmultipath -lmpathpersist" ; then
--      mpathpersist=yes
--      mpathpersist_new_api=no
--    else
--      mpathpersist=no
--    fi
--  fi
--else
--  mpathpersist=no
--fi
--
- ##########################################
- # pthread probe
- PTHREADLIBS_LIST="-pthread -lpthread -lpthreadGC2"
-@@ -6337,23 +6286,11 @@ if test "$softmmu" = yes ; then
-       fi
-       virtfs=no
-     fi
--    if test "$mpath" != no && test "$mpathpersist" = yes ; then
--      mpath=yes
--    else
--      if test "$mpath" = yes; then
--        error_exit "Multipath requires libmpathpersist devel"
--      fi
--      mpath=no
--    fi
-   else
-     if test "$virtfs" = yes; then
-       error_exit "VirtFS is supported only on Linux"
-     fi
-     virtfs=no
--    if test "$mpath" = yes; then
--      error_exit "Multipath is supported only on Linux"
--    fi
--    mpath=no
-   fi
- fi
- 
-@@ -6894,12 +6831,6 @@ fi
- if test "$virtfs" = "yes" ; then
-   echo "CONFIG_VIRTFS=y" >> $config_host_mak
- fi
--if test "$mpath" = "yes" ; then
--  echo "CONFIG_MPATH=y" >> $config_host_mak
--  if test "$mpathpersist_new_api" = "yes"; then
--    echo "CONFIG_MPATH_NEW_API=y" >> $config_host_mak
--  fi
--fi
- if test "$vhost_scsi" = "yes" ; then
-   echo "CONFIG_VHOST_SCSI=y" >> $config_host_mak
- fi
-@@ -7988,7 +7919,7 @@ NINJA=${ninja:-$PWD/ninjatool} $meson setup \
-         -Dstrip=$(if test "$strip_opt" = yes; then echo true; else echo false; fi) \
-         -Db_pie=$(if test "$pie" = yes; then echo true; else echo false; fi) \
-         -Db_coverage=$(if test "$gcov" = yes; then echo true; else echo false; fi) \
--	-Dsdl=$sdl -Dsdl_image=$sdl_image \
-+	-Dmpath=$mpath -Dsdl=$sdl -Dsdl_image=$sdl_image \
- 	-Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
- 	-Dgettext=$gettext -Dxkbcommon=$xkbcommon -Du2f=$u2f\
-         $cross_arg \
-diff --git a/meson.build b/meson.build
-index cd3d1ee260..8e9cd67235 100644
---- a/meson.build
-+++ b/meson.build
-@@ -86,6 +86,14 @@ if 'SPARSE_CFLAGS' in config_host
-                        'compile_commands.json'])
- endif
- 
-+###########################################
-+# Target-specific checks and dependencies #
-+###########################################
-+
-+if targetos != 'linux' and get_option('mpath').enabled()
-+  error('Multipath is supported only on Linux')
-+endif
-+
- m = cc.find_library('m', required: false)
- util = cc.find_library('util', required: false)
- winmm = []
-@@ -117,6 +125,11 @@ elif targetos == 'haiku'
-             cc.find_library('network'),
-             cc.find_library('bsd')]
- endif
-+
-+################
-+# Dependencies #
-+################
-+
- # The path to glib.h is added to all compilation commands.  This was
- # grandfathered in from the QEMU Makefiles.
- add_project_arguments(config_host['GLIB_CFLAGS'].split(),
-@@ -223,10 +236,6 @@ if 'CONFIG_SPICE' in config_host
-                              link_args: config_host['SPICE_LIBS'].split())
- endif
- rt = cc.find_library('rt', required: false)
--libmpathpersist = not_found
--if config_host.has_key('CONFIG_MPATH')
--  libmpathpersist = cc.find_library('mpathpersist')
--endif
- libdl = not_found
- if 'CONFIG_PLUGIN' in config_host
-   libdl = cc.find_library('dl', required: true)
-@@ -258,8 +267,64 @@ if 'CONFIG_CURL' in config_host
- endif
- libudev = not_found
- if targetos == 'linux' and (have_system or have_tools)
--  libudev = dependency('libudev', static: enable_static)
-+  libudev = dependency('libudev',
-+                       required: get_option('mpath').enabled(),
-+                       static: enable_static)
-+endif
-+
-+mpathpersist = not_found
-+mpathpersist_new_api = false
-+if targetos == 'linux' and have_tools and not get_option('mpath').disabled()
-+  mpath_test_source_new = '''
-+    #include <libudev.h>
-+    #include <mpath_persist.h>
-+    unsigned mpath_mx_alloc_len = 1024;
-+    int logsink;
-+    static struct config *multipath_conf;
-+    extern struct udev *udev;
-+    extern struct config *get_multipath_config(void);
-+    extern void put_multipath_config(struct config *conf);
-+    struct udev *udev;
-+    struct config *get_multipath_config(void) { return multipath_conf; }
-+    void put_multipath_config(struct config *conf) { }
-+    int main(void) {
-+        udev = udev_new();
-+        multipath_conf = mpath_lib_init();
-+        return 0;
-+    }'''
-+  mpath_test_source_old = '''
-+      #include <libudev.h>
-+      #include <mpath_persist.h>
-+      unsigned mpath_mx_alloc_len = 1024;
-+      int logsink;
-+      int main(void) {
-+          struct udev *udev = udev_new();
-+          mpath_lib_init(udev);
-+          return 0;
-+      }'''
-+  libmultipath = cc.find_library('multipath',
-+                                 required: get_option('mpath'),
-+                                 static: enable_static)
-+  libmpathpersist = cc.find_library('mpathpersist',
-+                                    required: get_option('mpath'),
-+                                    static: enable_static)
-+  if libmultipath.found() and libmpathpersist.found() and libudev.found()
-+    mpathlibs = [libmultipath, libmpathpersist, libudev]
-+    if cc.links(mpath_test_source_new, dependencies: mpathlibs)
-+      mpathpersist = declare_dependency(dependencies: mpathlibs)
-+      mpathpersist_new_api = true
-+    elif cc.links(mpath_test_source_old, dependencies: mpathlibs)
-+      mpathpersist = declare_dependency(dependencies: mpathlibs)
-+    else
-+      if get_option('mpath').enabled()
-+        error('Cannot detect libmpathpersist API')
-+      else
-+        warning('Cannot detect libmpathpersist API, disabling')
-+      endif
-+    endif
-+  endif
- endif
-+
- brlapi = not_found
- if 'CONFIG_BRLAPI' in config_host
-   brlapi = declare_dependency(link_args: config_host['BRLAPI_LIBS'].split())
-@@ -441,6 +506,8 @@ has_gettid = cc.has_function('gettid')
- # Create config-host.h
- 
- config_host_data.set('CONFIG_LIBUDEV', libudev.found())
-+config_host_data.set('CONFIG_MPATH', mpathpersist.found())
-+config_host_data.set('CONFIG_MPATH_NEW_API', mpathpersist_new_api)
- config_host_data.set('CONFIG_SDL', sdl.found())
- config_host_data.set('CONFIG_SDL_IMAGE', sdl_image.found())
- config_host_data.set('CONFIG_VNC', vnc.found())
-@@ -1205,7 +1272,7 @@ if have_tools
- 
-     executable('qemu-pr-helper', files('scsi/qemu-pr-helper.c', 'scsi/utils.c'),
-                dependencies: [authz, crypto, io, qom, qemuutil,
--                              libcap_ng, libudev, libmpathpersist],
-+                              libcap_ng, mpathpersist],
-                install: true)
-   endif
- 
-@@ -1342,7 +1409,7 @@ summary_info += {'Audio drivers':     config_host['CONFIG_AUDIO_DRIVERS']}
- summary_info += {'Block whitelist (rw)': config_host['CONFIG_BDRV_RW_WHITELIST']}
- summary_info += {'Block whitelist (ro)': config_host['CONFIG_BDRV_RO_WHITELIST']}
- summary_info += {'VirtFS support':    config_host.has_key('CONFIG_VIRTFS')}
--summary_info += {'Multipath support': config_host.has_key('CONFIG_MPATH')}
-+summary_info += {'Multipath support': mpathpersist.found()}
- summary_info += {'VNC support':       vnc.found()}
- if vnc.found()
-   summary_info += {'VNC SASL support':  sasl.found()}
-diff --git a/meson_options.txt b/meson_options.txt
-index 543cf70043..b38a6ae92a 100644
---- a/meson_options.txt
-+++ b/meson_options.txt
-@@ -6,6 +6,8 @@ option('docdir', type : 'string', value : 'doc',
- option('gettext', type : 'boolean', value : true,
-        description: 'Localization of the GTK+ user interface')
- 
-+option('mpath', type : 'feature', value : 'auto',
-+       description: 'Multipath persistent reservation passthrough')
- option('sdl', type : 'feature', value : 'auto',
-        description: 'SDL user interface')
- option('sdl_image', type : 'feature', value : 'auto',
+  https://gitlab.com/bonzini/qemu.git tags/for-upstream
+
+for you to fetch changes up to 37aeb7a28ddbf52dd25dd53ae1b8391bc2287858:
+
+  hw/net/can: Correct Kconfig dependencies (2020-09-30 19:11:37 +0200)
+
+----------------------------------------------------------------
+* SCSI fix (Dmitry, Li Feng, Li Qiang)
+* memory API fixes (Eduardo)
+* removal of deprecated '-numa node', 'cpu-add', '-smp' (Igor)
+* ACPI fix for VMBus (Jon)
+* relocatable install (myself)
+* always remove docker containers (myself)
+* serial cleanups (Philippe)
+* vmware cpuid leaf for tsc and apic frequency (Sunil)
+* KVM_FEATURE_ASYNC_PF_INT support (Vitaly)
+* i386 XSAVE bugfix (Xiaoyao)
+* QOM developer documentation in docs/devel (Eduardo)
+* new checkpatch tests (Dov)
+* x86_64 syscall fix (Douglas)
+* interrupt-based APF fix (Vitaly)
+* always create kvmclock (Vitaly)
+* fix bios-tables-test (Eduardo)
+* KVM PV features cleanup (myself)
+* CAN FD (Pavel)
+
+meson:
+* fixes (Marc-André, Max, Stefan, Alexander, myself)
+* moved libmpathpersist, cocoa, malloc tests (myself)
+* support for 0.56 introspected test dependencies (myself)
+
+----------------------------------------------------------------
+Alexander Bulekov (1):
+      oss-fuzz: move linker arg to fix coverage-build
+
+Anthony PERARD (1):
+      meson: fix installation of keymaps
+
+Claudio Fontana (1):
+      tests: add missing genh dependency
+
+Daniel P. Berrangé (1):
+      char: fix logging when chardev write fails
+
+Dmitry Fomichev (1):
+      scsi-generic: Fix HM-zoned device scan
+
+Douglas Crosher (1):
+      helper_syscall x86_64: clear exception_is_int
+
+Dov Murik (1):
+      checkpatch: Detect '%#' or '%0#' in printf-style format strings
+
+Eduardo Habkost (10):
+      memory: Convert IOMMUMemoryRegionClass doc comment to kernel-doc
+      qom: Document all function parameters in doc comments
+      qom: Use kernel-doc private/public tags in structs
+      qom: Use ``code`` Sphinx syntax where appropriate
+      qom: Add kernel-doc markup to introduction doc comment
+      qom: Reformat section titles using Sphinx syntax
+      qom: Indent existing code examples
+      qom: Add code block markup to all code blocks
+      docs: Create docs/devel/qom.rst
+      bios-tables-test: Remove kernel-irqchip=off option
+
+Igor Mammedov (4):
+      numa: drop support for '-numa node' (without memory specified)
+      doc: Cleanup "'-mem-path' fallback to RAM" deprecation text
+      numa: remove fixup numa_state->num_nodes to MAX_NODES
+      smp: drop support for deprecated (invalid topologies)
+
+Jan Charvat (5):
+      net/can: Initial host SocketCan support for CAN FD.
+      hw/net/can: sja1000 ignore CAN FD frames
+      net/can: Add can_dlc2len and can_len2dlc for CAN FD.
+      hw/net/can/ctucafd: Add CTU CAN FD core register definitions.
+      hw/net/can: CTU CAN FD IP open hardware core emulation.
+
+Jon Doron (1):
+      acpi: i386: Move VMBus DSDT entry to SB
+
+Li Feng (1):
+      vhost-scsi: support inflight io track
+
+Li Qiang (2):
+      hw: megasas: return -1 when 'megasas_map_sgl' fails
+      hw: megasas: consider 'iov_count=0' is an error in megasas_map_sgl
+
+Marc-André Lureau (2):
+      meson: fix MSI rule
+      meson: error out if qemu_suffix starts with /
+
+Paolo Bonzini (28):
+      meson: clean up build_by_default
+      ninjatool: rebuild multi-output targets if outputs are missing
+      meson: move libudev test
+      meson: move libmpathpersist test
+      meson: extend libmpathpersist test for static linking
+      configure: move malloc_trim/tcmalloc/jemalloc to meson
+      configure: fix --meson=/path/to/meson
+      configure: move cocoa option to Meson
+      configure: do not limit Hypervisor.framework test to Darwin
+      meson: qtest: set "depends" correctly
+      mtest2make: add support for introspected test dependencies
+      meson: report accelerator support
+      oslib: do not call g_strdup from qemu_get_exec_dir
+      fuzz: use qemu_get_exec_dir
+      oslib-posix: default exec_dir to bindir
+      cutils: introduce get_relocated_path
+      oslib-posix: relocate path to /var
+      module: relocate path to modules
+      net: relocate paths to helpers and scripts
+      vl: relocate paths to data directories
+      vl: relocate path to configuration file
+      qemu-bridge-helper: relocate path to default ACL
+      qga: relocate path to default configuration and hook
+      ui: relocate paths to icons and translations
+      configure: use a platform-neutral prefix
+      tests/tcg: reinstate or replace desired parts of rules.mak
+      docs: Move object.h overview doc comment to qom.rst
+      target/i386: kvm: do not use kvm_check_extension to find paravirtual capabilities
+
+Pavel Pisa (2):
+      hw/net/can: Documentation for CTU CAN FD IP open hardware core emulation.
+      hw/net/can: Correct Kconfig dependencies
+
+Philippe Mathieu-Daudé (16):
+      configure: Do not intent to build WHPX on 32-bit host
+      hw/mips/mipssim: Use MMIO serial device on fake ISA I/O
+      hw/char/serial: Remove TYPE_SERIAL_IO
+      hw/char/serial: Assert serial_ioport_read/write offset fits 8 bytes
+      hw/char/serial: Replace commented DPRINTF() by trace event
+      hw/char/serial: Remove old DEBUG_SERIAL commented code
+      hw/char/serial: Rename I/O read/write trace events
+      hw/char/serial: Make 'wakeup' property boolean
+      hw/char/serial-{isa, pci}: Alias QDEV properties from generic serial object
+      hw/i386/q35: Remove unreachable Xen code on Q35 machine
+      exec: Remove MemoryRegion::global_locking field
+      hw/i386/xen: Rename X86/PC specific function as xen_hvm_init_pc()
+      sysemu/xen: Add missing 'exec/cpu-common.h' header for ram_addr_t type
+      stubs: Split accelerator / hardware related stubs
+      hw/xen: Split x86-specific declaration from generic hardware ones
+      typedefs: Restrict PCMachineState to 'hw/i386/pc.h'
+
+Stefan Hajnoczi (2):
+      MAINTAINERS: add Paolo Bonzini as RCU maintainer
+      configure: rename QEMU_GA_MSI_ENABLED to CONFIG_QGA_MSI
+
+Stefano Garzarella (1):
+      checkpatch: avoid error on cover letter files
+
+Sunil Muthuswamy (1):
+      WHPX: vmware cpuid leaf for tsc and apic frequency
+
+Vitaly Kuznetsov (3):
+      target/i386: support KVM_FEATURE_ASYNC_PF_INT
+      target/i386: Fix VM migration when interrupt based APF is enabled
+      target/i386: always create kvmclock device
+
+Xiaoyao Li (1):
+      i386/cpu: Clear FEAT_XSAVE_COMP_{LO,HI} when XSAVE is not available
+
+ MAINTAINERS                           |  18 +
+ Makefile                              |   4 +-
+ accel/stubs/xen-stub.c                |  41 +-
+ accel/tcg/cputlb.c                    |   4 +-
+ chardev/char.c                        |  13 +
+ configure                             | 237 ++-------
+ docs/can.txt                          | 113 +++-
+ docs/devel/build-system.rst           |   5 +
+ docs/devel/index.rst                  |   1 +
+ docs/devel/qom.rst                    | 378 +++++++++++++
+ docs/system/deprecated.rst            |  57 +-
+ exec.c                                |   2 +-
+ hw/char/serial-isa.c                  |   4 +-
+ hw/char/serial-pci.c                  |   3 +-
+ hw/char/serial.c                      |  65 +--
+ hw/char/trace-events                  |   5 +-
+ hw/core/machine.c                     |   1 -
+ hw/core/numa.c                        |  59 ---
+ hw/i386/acpi-build.c                  |  12 +-
+ hw/i386/kvm/clock.c                   |   7 +-
+ hw/i386/microvm.c                     |   2 +-
+ hw/i386/pc.c                          |   1 +
+ hw/i386/pc_piix.c                     |  16 +-
+ hw/i386/pc_q35.c                      |  19 +-
+ hw/i386/xen/xen-hvm.c                 |   3 +-
+ hw/mips/mipssim.c                     |   5 +-
+ hw/net/Kconfig                        |  16 +-
+ hw/net/can/can_sja1000.c              |  31 +-
+ hw/net/can/ctu_can_fd_frame.h         | 189 +++++++
+ hw/net/can/ctu_can_fd_regs.h          | 971 ++++++++++++++++++++++++++++++++++
+ hw/net/can/ctucan_core.c              | 696 ++++++++++++++++++++++++
+ hw/net/can/ctucan_core.h              | 127 +++++
+ hw/net/can/ctucan_pci.c               | 281 ++++++++++
+ hw/net/can/meson.build                |   2 +
+ hw/ppc/spapr.c                        |   1 -
+ hw/scsi/megasas.c                     |   6 +-
+ hw/scsi/scsi-generic.c                |  10 +-
+ hw/scsi/vhost-scsi-common.c           |  27 +
+ include/exec/memory.h                 |  64 ++-
+ include/hw/boards.h                   |   2 -
+ include/hw/char/serial.h              |  11 +-
+ include/hw/i386/pc.h                  |   7 +-
+ include/hw/kvm/clock.h                |   4 +-
+ include/hw/virtio/vhost-scsi-common.h |   2 +
+ include/hw/xen/xen-x86.h              |  15 +
+ include/hw/xen/xen.h                  |   2 -
+ include/net/can_emu.h                 |  12 +-
+ include/net/net.h                     |   4 +-
+ include/qemu-common.h                 |   1 -
+ include/qemu/cutils.h                 |  12 +
+ include/qemu/osdep.h                  |   8 +-
+ include/qemu/typedefs.h               |   1 -
+ include/qom/object.h                  | 547 ++++---------------
+ include/scsi/constants.h              |   1 +
+ include/sysemu/numa.h                 |   4 -
+ include/sysemu/sysemu.h               |   2 +-
+ include/sysemu/xen.h                  |   2 +
+ meson.build                           | 202 +++++--
+ meson_options.txt                     |   9 +
+ net/can/can_core.c                    |  36 ++
+ net/can/can_socketcan.c               |  47 +-
+ net/tap.c                             |  26 +-
+ os-posix.c                            |  24 -
+ os-win32.c                            |  11 -
+ pc-bios/keymaps/meson.build           |   2 +
+ qemu-bridge-helper.c                  |   9 +-
+ qga/main.c                            |   8 +-
+ qga/meson.build                       |   1 +
+ scripts/checkpatch.pl                 |  12 +-
+ scripts/mtest2make.py                 |  19 +-
+ scripts/ninjatool.py                  |   3 +
+ softmmu/memory.c                      |   6 -
+ softmmu/vl.c                          |  43 +-
+ stubs/meson.build                     |   1 +
+ stubs/xen-hw-stub.c                   |  50 ++
+ target/i386/cpu.c                     |   5 +-
+ target/i386/cpu.h                     |   1 +
+ target/i386/kvm.c                     |  45 +-
+ target/i386/kvm_i386.h                |   1 +
+ target/i386/machine.c                 |  19 +
+ target/i386/seg_helper.c              |   1 +
+ target/i386/whp-dispatch.h            |   3 +-
+ target/i386/whpx-all.c                |  96 +++-
+ tests/fp/meson.build                  |   2 -
+ tests/meson.build                     |   9 +-
+ tests/qemu-iotests/meson.build        |   3 +-
+ tests/qtest/bios-tables-test.c        |   3 +-
+ tests/qtest/fuzz/fuzz.c               |  12 +-
+ tests/qtest/meson.build               |   8 +-
+ tests/tcg/Makefile.qemu               |  13 +-
+ tests/tcg/configure.sh                |   4 +-
+ trace/meson.build                     |   1 -
+ ui/gtk.c                              |  10 +-
+ ui/meson.build                        |   2 +-
+ ui/sdl2.c                             |   9 +-
+ ui/shader/meson.build                 |   1 -
+ util/cutils.c                         |  61 +++
+ util/module.c                         |  10 +-
+ util/oslib-posix.c                    |  35 +-
+ util/oslib-win32.c                    |  14 +-
+ 100 files changed, 3842 insertions(+), 1168 deletions(-)
+ create mode 100644 docs/devel/qom.rst
+ create mode 100644 hw/net/can/ctu_can_fd_frame.h
+ create mode 100644 hw/net/can/ctu_can_fd_regs.h
+ create mode 100644 hw/net/can/ctucan_core.c
+ create mode 100644 hw/net/can/ctucan_core.h
+ create mode 100644 hw/net/can/ctucan_pci.c
+ create mode 100644 include/hw/xen/xen-x86.h
+ create mode 100644 stubs/xen-hw-stub.c
 -- 
 2.26.2
-
 
 
