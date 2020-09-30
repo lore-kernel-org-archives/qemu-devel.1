@@ -4,63 +4,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C536C4727C
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 04:36:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 361AEC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 04:37:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 933ED2075A
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 04:36:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B31112075A
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 04:37:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BvX357BQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 933ED2075A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NCYEbJTQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B31112075A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNTrL-0006eP-Oo
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 00:36:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36836)
+	id 1kNTs6-0008AG-Qq
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 00:37:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37074)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNTmu-0000QL-Ji
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 00:32:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25522)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNTnI-0001DG-JC
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 00:32:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37602)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNTms-0000Wp-Jb
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 00:32:20 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601440337;
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNTnG-0000Zx-1X
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 00:32:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601440361;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PMfY/Avpo3m0nh6E15uhPDMto4widvo9VJOZEVoz66w=;
- b=BvX357BQmIxPMfq1D+NnYpHxRW9a4F5FY1CXj9k2zZs1uE/CUiU1hGSVs42VLG9wuEP6pE
- Z5FqWW8OWUtkEnBeS74oS+Z19CVqaXoNrGFI6qL+dy33KHLKBG1VEc/qxSkxfigepl6aQS
- 9MywdH9U40Z1cWBqphC2292GaiPfj+I=
+ bh=9zFBaWvVJPG3rjs8pj+3mSBCJfVyPtmMqFlvinO7qcw=;
+ b=NCYEbJTQOjcsMVM+3LnexfMiiB7VfdDgWQDTuiuI13RSEfaboDE0fWURXnIZ0KJ0O3/BOK
+ NqQKrB9Y28evkhU0+hhx+MRBGV7bdTb9fW4rQA4tUtI4qRURulACV6mpcACbaDqiDd7dty
+ LqAZNOpndE2W9pUkxsr1aUU7yVN1VOo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-218-91uxEjwtPa-1RIiWM1t3ZQ-1; Wed, 30 Sep 2020 00:32:11 -0400
-X-MC-Unique: 91uxEjwtPa-1RIiWM1t3ZQ-1
+ us-mta-31-8O8E9vdQP5aytp8prkVFYg-1; Wed, 30 Sep 2020 00:32:37 -0400
+X-MC-Unique: 8O8E9vdQP5aytp8prkVFYg-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 474091005E6F;
- Wed, 30 Sep 2020 04:32:10 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EF47F1DE03;
+ Wed, 30 Sep 2020 04:32:35 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E0E6573678;
- Wed, 30 Sep 2020 04:32:08 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C2C7073678;
+ Wed, 30 Sep 2020 04:32:34 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 08/46] [DO-NOT-MERGE] docs: add scripts/qapi/main to python
- manual
-Date: Wed, 30 Sep 2020 00:31:12 -0400
-Message-Id: <20200930043150.1454766-9-jsnow@redhat.com>
+Subject: [PATCH v4 20/46] qapi/common.py: Convert comments into docstrings,
+ and elaborate
+Date: Wed, 30 Sep 2020 00:31:24 -0400
+Message-Id: <20200930043150.1454766-21-jsnow@redhat.com>
 In-Reply-To: <20200930043150.1454766-1-jsnow@redhat.com>
 References: <20200930043150.1454766-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -71,9 +71,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:31:59
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:26:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
@@ -102,38 +102,126 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- docs/devel/python/qapi.main.rst | 7 +++++++
- docs/devel/python/qapi.rst      | 1 +
- 2 files changed, 8 insertions(+)
- create mode 100644 docs/devel/python/qapi.main.rst
+As docstrings, they'll show up in documentation and IDE help.
 
-diff --git a/docs/devel/python/qapi.main.rst b/docs/devel/python/qapi.main.rst
-new file mode 100644
-index 00000000000..1255fcda633
---- /dev/null
-+++ b/docs/devel/python/qapi.main.rst
-@@ -0,0 +1,7 @@
-+qapi.main module
-+================
+The docstring style being targeted is the Sphinx documentation
+style. Sphinx uses an extension of ReST with "domains". We use the
+(implicit) Python domain, which supports a number of custom "info
+fields". Those info fields are documented here:
+https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#info-field-lists
+
+Primarily, we use `:param X: descr`, `:return[s]: descr`, and `:raise[s]
+Z: when`. Everything else is the Sphinx dialect of ReST.
+
+(No, nothing checks or enforces this style that I am aware of. Sphinx
+either chokes or succeeds, but does not enforce a standard of what is
+otherwise inside the docstring. Pycharm does highlight when your param
+fields are not aligned with the actual fields present. It does not
+highlight missing return or exception statements. There is no existing
+style guide I am aware of that covers a standard for a minimally
+acceptable docstring. I am debating writing one.)
+
+Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
+---
+ scripts/qapi/common.py | 53 +++++++++++++++++++++++++++++++-----------
+ 1 file changed, 39 insertions(+), 14 deletions(-)
+
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 74a2c001ed9..0ef38ea5fe0 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -15,15 +15,24 @@
+ from typing import Optional, Sequence
+ 
+ 
++#: Sentinel value that causes all space to its right to be removed.
+ EATSPACE = '\033EATSPACE.'
+ POINTER_SUFFIX = ' *' + EATSPACE
+ _C_NAME_TRANS = str.maketrans('.-', '__')
+ 
+ 
+-# ENUMName -> ENUM_NAME, EnumName1 -> ENUM_NAME1
+-# ENUM_NAME -> ENUM_NAME, ENUM_NAME1 -> ENUM_NAME1, ENUM_Name2 -> ENUM_NAME2
+-# ENUM24_Name -> ENUM24_NAME
+ def camel_to_upper(value: str) -> str:
++    """
++    Converts CamelCase to CAMEL_CASE.
 +
-+.. automodule:: qapi.main
-+   :members:
-+   :undoc-members:
-+   :show-inheritance:
-diff --git a/docs/devel/python/qapi.rst b/docs/devel/python/qapi.rst
-index cfeb759d763..c762019aad3 100644
---- a/docs/devel/python/qapi.rst
-+++ b/docs/devel/python/qapi.rst
-@@ -18,6 +18,7 @@ Submodules
-    qapi.expr
-    qapi.gen
-    qapi.introspect
-+   qapi.main
-    qapi.parser
-    qapi.schema
-    qapi.source
++    Examples:
++      ENUMName -> ENUM_NAME
++      EnumName1 -> ENUM_NAME1
++      ENUM_NAME -> ENUM_NAME
++      ENUM_NAME1 -> ENUM_NAME1
++      ENUM_Name2 -> ENUM_NAME2
++      ENUM24_Name -> ENUM24_NAME
++    """
+     c_fun_str = c_name(value, False)
+     if value.isupper():
+         return c_fun_str
+@@ -45,21 +54,33 @@ def camel_to_upper(value: str) -> str:
+ def c_enum_const(type_name: str,
+                  const_name: str,
+                  prefix: Optional[str] = None) -> str:
++    """
++    Generate a C enumeration constant name.
++
++    :param type_name: The name of the enumeration.
++    :param const_name: The name of this constant.
++    :param prefix: Optional, prefix that overrides the type_name.
++    """
+     if prefix is not None:
+         type_name = prefix
+     return camel_to_upper(type_name) + '_' + c_name(const_name, False).upper()
+ 
+ 
+-# Map @name to a valid C identifier.
+-# If @protect, avoid returning certain ticklish identifiers (like
+-# C keywords) by prepending 'q_'.
+-#
+-# Used for converting 'name' from a 'name':'type' qapi definition
+-# into a generated struct member, as well as converting type names
+-# into substrings of a generated C function name.
+-# '__a.b_c' -> '__a_b_c', 'x-foo' -> 'x_foo'
+-# protect=True: 'int' -> 'q_int'; protect=False: 'int' -> 'int'
+ def c_name(name: str, protect: bool = True) -> str:
++    """
++    Map ``name`` to a valid C identifier.
++
++    Used for converting 'name' from a 'name':'type' qapi definition
++    into a generated struct member, as well as converting type names
++    into substrings of a generated C function name.
++
++    '__a.b_c' -> '__a_b_c', 'x-foo' -> 'x_foo'
++    protect=True: 'int' -> 'q_int'; protect=False: 'int' -> 'int'
++
++    :param name: The name to map.
++    :param protect: If true, avoid returning certain ticklish identifiers
++                    (like C keywords) by prepending ``q_``.
++    """
+     # ANSI X3J11/88-090, 3.1.1
+     c89_words = set(['auto', 'break', 'case', 'char', 'const', 'continue',
+                      'default', 'do', 'double', 'else', 'enum', 'extern',
+@@ -129,12 +150,16 @@ def decrease(self, amount: int = 4) -> None:
+         self._level -= amount
+ 
+ 
++#: Global, current indent level for code generation.
+ indent = Indentation()
+ 
+ 
+-# Generate @code with @kwds interpolated.
+-# Obey indent, and strip EATSPACE.
+ def cgen(code: str, **kwds: object) -> str:
++    """
++    Generate ``code`` with ``kwds`` interpolated.
++
++    Obey `indent`, and strip `EATSPACE`.
++    """
+     raw = code % kwds
+     if indent:
+         raw = re.sub(r'^(?!(#|$))', str(indent), raw, flags=re.MULTILINE)
 -- 
 2.26.2
 
