@@ -6,49 +6,49 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0B6DC4363D
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 22:06:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9ECDC4741F
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 22:06:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 230B3206BE
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 22:06:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3CCC9206BE
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 22:06:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="UHKc6J6s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 230B3206BE
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="y2Umwbbg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CCC9206BE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNkEh-00072M-1O
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 18:06:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56178)
+	id 1kNkEi-00075I-2e
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 18:06:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56118)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kbusch@kernel.org>)
- id 1kNkD7-0005TO-I1; Wed, 30 Sep 2020 18:04:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50502)
+ id 1kNkD4-0005O9-R8; Wed, 30 Sep 2020 18:04:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50460)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kbusch@kernel.org>)
- id 1kNkD4-0007vs-L2; Wed, 30 Sep 2020 18:04:29 -0400
+ id 1kNkD2-0007vK-BC; Wed, 30 Sep 2020 18:04:26 -0400
 Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 91F9D20C09;
- Wed, 30 Sep 2020 22:04:24 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 434B62076A;
+ Wed, 30 Sep 2020 22:04:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1601503465;
- bh=80ZjOCIc2WjjQPb7N7sA3OGjEt0PtsQvDwhUpEhRQ/I=;
+ s=default; t=1601503462;
+ bh=/62M2pSDHHfBPXS/NRYPqbkA4RFhwX8RNBnWCfBW6hQ=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=UHKc6J6srpIuk+2aVNKF/fcY80JnrVdlyqvKfq5RV1HyF6ixsLXPCOMtgF0Ml8w34
- GqbkO82mpe9EizrE6BJAz2+/03/cRg/QkLyFbWRU3JYFb7+dW87PRTUBXcqXe0P3uq
- vo67wKPioyfv1DbGWRIk8AFW5LE2GCuCwc+Uagak=
+ b=y2Umwbbghn7Ac1NdbwAAWxobd+Lr70EUXIYDDmXbMumMeM9I2VwrD4SZaO1yyMqco
+ It4Rj71HwPO0rASd2XO9Gqnt4z+YwWYC5oB7AKSZoY5EaniNrXOZ5rnpUnusvS117O
+ qaOi77NJCiKAtwdXjbit5zy3M5ramQqUFiy4wIGk=
 From: Keith Busch <kbusch@kernel.org>
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org,
  Klaus Jensen <k.jensen@samsung.com>
-Subject: [PATCH 5/9] hw/block/nvme: support for admin-only command set
-Date: Wed, 30 Sep 2020 15:04:10 -0700
-Message-Id: <20200930220414.562527-6-kbusch@kernel.org>
+Subject: [PATCH 2/9] hw/block/nvme: fix log page offset check
+Date: Wed, 30 Sep 2020 15:04:07 -0700
+Message-Id: <20200930220414.562527-3-kbusch@kernel.org>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200930220414.562527-1-kbusch@kernel.org>
 References: <20200930220414.562527-1-kbusch@kernel.org>
@@ -85,38 +85,77 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Return error if the requested offset starts after the size of the log
+being returned. Also, move the check for earlier in the function so
+we're not doing unnecessary calculations.
+
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- hw/block/nvme.c      | 1 +
- include/block/nvme.h | 3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ hw/block/nvme.c | 22 ++++++++++------------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 6c582e6874..ec7363ea40 100644
+index db52ea0db9..8d2b5be567 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -2755,6 +2755,7 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
-     NVME_CAP_SET_CQR(n->bar.cap, 1);
-     NVME_CAP_SET_TO(n->bar.cap, 0xf);
-     NVME_CAP_SET_CSS(n->bar.cap, NVME_CAP_CSS_NVM);
-+    NVME_CAP_SET_CSS(n->bar.cap, NVME_CAP_CSS_ADMIN_ONLY);
-     NVME_CAP_SET_MPSMAX(n->bar.cap, 4);
+@@ -1179,6 +1179,10 @@ static uint16_t nvme_smart_info(NvmeCtrl *n, uint8_t rae, uint32_t buf_len,
+         return NVME_INVALID_FIELD | NVME_DNR;
+     }
  
-     n->bar.vs = NVME_SPEC_VER;
-diff --git a/include/block/nvme.h b/include/block/nvme.h
-index bc20a2ba5e..521533fd2a 100644
---- a/include/block/nvme.h
-+++ b/include/block/nvme.h
-@@ -83,7 +83,8 @@ enum NvmeCapMask {
-                                                             << CAP_PMR_SHIFT)
++    if (off >= sizeof(smart)) {
++        return NVME_INVALID_FIELD | NVME_DNR;
++    }
++
+     for (int i = 1; i <= n->num_namespaces; i++) {
+         NvmeNamespace *ns = nvme_ns(n, i);
+         if (!ns) {
+@@ -1193,10 +1197,6 @@ static uint16_t nvme_smart_info(NvmeCtrl *n, uint8_t rae, uint32_t buf_len,
+         write_commands += s->nr_ops[BLOCK_ACCT_WRITE];
+     }
  
- enum NvmeCapCss {
--    NVME_CAP_CSS_NVM = 1 << 0,
-+    NVME_CAP_CSS_NVM        = 1 << 0,
-+    NVME_CAP_CSS_ADMIN_ONLY = 1 << 7,
- };
+-    if (off > sizeof(smart)) {
+-        return NVME_INVALID_FIELD | NVME_DNR;
+-    }
+-
+     trans_len = MIN(sizeof(smart) - off, buf_len);
  
- enum NvmeCcShift {
+     memset(&smart, 0x0, sizeof(smart));
+@@ -1234,12 +1234,11 @@ static uint16_t nvme_fw_log_info(NvmeCtrl *n, uint32_t buf_len, uint64_t off,
+         .afi = 0x1,
+     };
+ 
+-    strpadcpy((char *)&fw_log.frs1, sizeof(fw_log.frs1), "1.0", ' ');
+-
+-    if (off > sizeof(fw_log)) {
++    if (off >= sizeof(fw_log)) {
+         return NVME_INVALID_FIELD | NVME_DNR;
+     }
+ 
++    strpadcpy((char *)&fw_log.frs1, sizeof(fw_log.frs1), "1.0", ' ');
+     trans_len = MIN(sizeof(fw_log) - off, buf_len);
+ 
+     return nvme_dma(n, (uint8_t *) &fw_log + off, trans_len,
+@@ -1252,16 +1251,15 @@ static uint16_t nvme_error_info(NvmeCtrl *n, uint8_t rae, uint32_t buf_len,
+     uint32_t trans_len;
+     NvmeErrorLog errlog;
+ 
+-    if (!rae) {
+-        nvme_clear_events(n, NVME_AER_TYPE_ERROR);
++    if (off >= sizeof(errlog)) {
++        return NVME_INVALID_FIELD | NVME_DNR;
+     }
+ 
+-    if (off > sizeof(errlog)) {
+-        return NVME_INVALID_FIELD | NVME_DNR;
++    if (!rae) {
++        nvme_clear_events(n, NVME_AER_TYPE_ERROR);
+     }
+ 
+     memset(&errlog, 0x0, sizeof(errlog));
+-
+     trans_len = MIN(sizeof(errlog) - off, buf_len);
+ 
+     return nvme_dma(n, (uint8_t *)&errlog, trans_len,
 -- 
 2.24.1
 
