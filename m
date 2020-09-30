@@ -2,90 +2,101 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98D5DC4727C
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 07:11:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0247CC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 07:35:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D26562076E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 07:11:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 36E6C2075F
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 07:34:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="BdOS3aKs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D26562076E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mvu31vzd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36E6C2075F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNWHI-0005vG-TZ
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 03:11:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34840)
+	id 1kNWde-0000F4-6C
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 03:34:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39712)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <green.wan@sifive.com>)
- id 1kNWG3-0005UO-VS
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 03:10:35 -0400
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:44171)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <green.wan@sifive.com>)
- id 1kNWG1-00024R-No
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 03:10:35 -0400
-Received: by mail-qk1-x742.google.com with SMTP id x201so450415qkb.11
- for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 00:10:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=UxhyX4Yrj3ng/x68SSB52f605eZ6Pyfq3YQ5aWvE5BE=;
- b=BdOS3aKsBNS3kf3ZtFK3DAkpTG2SGmk4z7wR4U80+ib4dYFRwSDUrBfslY7+ZDdLxm
- NjkSD9E7kUuSM+v2IZPVkW9vTbn4/eKXoZca0JsWxQQ+Q2rInz/pljEoaLbZzPBtGYhR
- WnCrs4FSUa7XWi8N8LDRf+ypGkGa7YVqhU5aHz48LVmj6mBkT0AS2OnUFGl7qoG7aJFy
- 8bCgPnryWXz7AgW8gmIe1/Y3ZNEvj11JWxjvS4ydLdboI0oQJ/P/9M80iQ+/odhyP8Z7
- 8rEMtTiPyNgu6tAFM+mNddX4ctSvncku9seSjskmTXgNM2I4gE1QhmHRQtSDjmXP8h9q
- yA+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=UxhyX4Yrj3ng/x68SSB52f605eZ6Pyfq3YQ5aWvE5BE=;
- b=CTl+gCzb979hFqF1Mahdq0isCD/2J7ebSL21y/LjKWR1Kh5Qq0HDiBmFtMAXSM+ux/
- J9g/N8mPSqZFFTIQ84TqT1+RUelqrkW1lpWX0m2MA8eEE+Okxt7vG0jF4EM96RCatnFg
- RQgTEJxe2X1IHvFJU3Lm+fROYT+tFM0OdiQrvoxcGF1FiOzQ9yprgbewX0+XZ0Cm1e32
- XevnicW9/8AnLS1GPei7o0SHWx4TeOtiL4ilRUYaaDFEuIHwxV+8SAQcGAr3lkBUwBp0
- iPPpov9OqMJMNFrUGUcuB4aSWhWIVL0QIi5JpC7o/h/MrGSMeuTolaYIkpN3aLVkySOm
- TMEA==
-X-Gm-Message-State: AOAM530jFkk420J6reB5RwlTIyL78j0M/i9/0hgF5EVVcpK0s6ZqelTj
- VDFj3mtkW2hJJtSplJWY2ybPcb13+14CHd3xQaCKlw==
-X-Google-Smtp-Source: ABdhPJwVPlWqJEdeVDuOe74ZNitzE6SLngrGFVdDdGtUxZIdvm0c2wKUKGropt5ooH2CDlozDSXG8jqgihCaEUOLGmA=
-X-Received: by 2002:a05:620a:1411:: with SMTP id
- d17mr1193281qkj.325.1601449831903; 
- Wed, 30 Sep 2020 00:10:31 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kNWcz-0008Gf-B7
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 03:34:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23920)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kNWcw-0003Zr-Dx
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 03:34:16 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601451253;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Wss5RMrLATY2B6ltWuTRpnK1aJj59fsDsuNIDXUMRCs=;
+ b=Mvu31vzdi0m3sMKsSEbOd9WZ6ahKOA93AhS+1B0ISgfe73Jj29fv18T4zFIENPhQd5yrll
+ Kiv+P79noYL95DjnFwJqAIlRdK0/4u2Ke+eDAfZCM0SwVSo3jqjh+OLk6QfgQLdFnVwY5Z
+ hYAoqZ3scMhTdFtHaSDh6G/DGdIcFB0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-159-orSkpVvjMcWZzyVoCrV3uQ-1; Wed, 30 Sep 2020 03:34:10 -0400
+X-MC-Unique: orSkpVvjMcWZzyVoCrV3uQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 96D1480EFA6;
+ Wed, 30 Sep 2020 07:34:08 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-101.ams2.redhat.com
+ [10.36.112.101])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 140AF5D9DC;
+ Wed, 30 Sep 2020 07:34:05 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 96457113864A; Wed, 30 Sep 2020 09:34:03 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Subject: Re: [PATCH] PoC: Rust binding for QAPI (qemu-ga only, for now)
+References: <20200910174850.716104-1-marcandre.lureau@redhat.com>
+ <87mu1j8p7p.fsf@dusky.pond.sub.org>
+ <CAMxuvayvRfjUMYDiB5fm5QBD76kfD8-G1wTEucQTBbZUtnwXrA@mail.gmail.com>
+ <874knpluez.fsf@dusky.pond.sub.org>
+ <CAJ+F1CLCT3RpZF8JDYayqkKxFu76vy+q6GUjofZV3JF_YDvxng@mail.gmail.com>
+ <9d6215d4-d0cd-67e4-3048-77127194f7e8@redhat.com>
+ <CAJ+F1CLowpdHaJ58Vt7GYukAYvYAfuEJvnuw_ZM5kO_4=gh9XA@mail.gmail.com>
+ <8c1783d1-70f4-d751-3d5d-83459cb1db45@redhat.com>
+ <CAJ+F1CJgEe3++UHDfT3iOGyu+r1tM4A_9jRXoKC0P-k-Mhq29w@mail.gmail.com>
+ <fb20f8e4-6bc9-3518-a983-86fad1915e49@redhat.com>
+ <CAJ+F1C+p-JLj_epZfLiag7CdJGfZUkFNOmzPTsjCkW=QQ07_3g@mail.gmail.com>
+Date: Wed, 30 Sep 2020 09:34:03 +0200
+In-Reply-To: <CAJ+F1C+p-JLj_epZfLiag7CdJGfZUkFNOmzPTsjCkW=QQ07_3g@mail.gmail.com>
+ (=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 29 Sep 2020
+ 15:34:32 +0400")
+Message-ID: <87r1qjhg5w.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-References: <20200901154711.18457-1-green.wan@sifive.com>
- <20200901154711.18457-3-green.wan@sifive.com>
- <CAKmqyKOqQgE0X3T100Zzi6_8X5d9XVEjam01bhCZSU=-FL-ecw@mail.gmail.com>
- <CAJivOr4xLP1n4eVFyWHi=ckg17C_j76f=+o+YPztsYuaPDwCCw@mail.gmail.com>
- <CAKmqyKPFbfbXSryWW40kW=RF-mx4V_nVqmdOveQ-fuLQgFbARQ@mail.gmail.com>
-In-Reply-To: <CAKmqyKPFbfbXSryWW40kW=RF-mx4V_nVqmdOveQ-fuLQgFbARQ@mail.gmail.com>
-From: Green Wan <green.wan@sifive.com>
-Date: Wed, 30 Sep 2020 15:10:20 +0800
-Message-ID: <CAJivOr7PVXi430SzPgbyFtFPqAsufy_xs1O7gfWQAS1ktTwb1A@mail.gmail.com>
-Subject: Re: [RFC PATCH v5 2/2] hw/riscv: sifive_u: Add backend drive support
-To: Alistair Francis <alistair23@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::742;
- envelope-from=green.wan@sifive.com; helo=mail-qk1-x742.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:26:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,235 +109,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Bin Meng <bmeng.cn@gmail.com>
+Cc: "P. Berrange, Daniel" <berrange@redhat.com>,
+ Sergio Lopez Pascual <slp@redhat.com>, "Hajnoczi, 
+ Stefan" <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 30, 2020 at 1:08 AM Alistair Francis <alistair23@gmail.com> wrote:
->
-> On Mon, Sep 28, 2020 at 2:18 AM Green Wan <green.wan@sifive.com> wrote:
-> >
-> > Hi Alistair,
-> >
-> > Thanks for the review. See the reply inline below.
-> >
-> >
-> > On Sat, Sep 26, 2020 at 5:52 AM Alistair Francis <alistair23@gmail.com> wrote:
-> > >
-> > > On Tue, Sep 1, 2020 at 8:49 AM Green Wan <green.wan@sifive.com> wrote:
-> > > >
-> > > > Add '-drive' support to OTP device. Allow users to assign a raw file
-> > > > as OTP image.
-> > >
-> > > Do you mind writing an example command line argument in the commit message?
-> > >
-> > > Also, do you have a test case for this? I would like to add it to my CI.
-> > >
-> >
-> > Do you mean qtest? I run uboot and use uboot driver to test it and
-> > didn't create a qemu test case.
->
-> No, I just mean how are you running and testing this.
->
-> So you are booting U-Boot, then how do you test it in U-Boot?
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-Correct, I just enabled the configuration for
-./drivers/misc/sifive-otp.c in uboot for normal booting access to OTP.
-And manually modify some failures write case to test write-once
-feature.
+> Hi
+>
+> On Tue, Sep 29, 2020 at 3:01 PM Paolo Bonzini <pbonzini@redhat.com> wrote=
+:
+[...]
+>> Marc-Andr=C3=A9, we are totally in agreement about that!  The problem is=
+ that
+>> you have already decided what the solution looks like, and that's what
+>> I'm not sure about because your solution also implies completely
+>> revisiting the schema.
+>>
+>
+> Did I? Which schema change are you (or I) implying? Versioning the
+> interface? It's necessary at the client level, unless everything is
+> dynamic, after introspection, which makes automated static bindings
+> impractical.
 
->
-> > Here is the command I use:
-> >
-> > $ qemu-system-riscv64 -M sifive_u -m 256M -nographic -bios none
-> > -kernel ../opensbi/build/platform/sifive/fu540/firmware/fw_payload.elf
-> > -d guest_errors -drive if=none,format=raw,file=otp.img
-> >
-> > I'll check how to create a test case but maybe not that soon in the next patch.
-> >
-> > > >
-> > > > Signed-off-by: Green Wan <green.wan@sifive.com>
-> > > > ---
-> > > >  hw/riscv/sifive_u_otp.c         | 50 +++++++++++++++++++++++++++++++++
-> > > >  include/hw/riscv/sifive_u_otp.h |  2 ++
-> > > >  2 files changed, 52 insertions(+)
-> > > >
-> > > > diff --git a/hw/riscv/sifive_u_otp.c b/hw/riscv/sifive_u_otp.c
-> > > > index b8369e9035..477c54c7b8 100644
-> > > > --- a/hw/riscv/sifive_u_otp.c
-> > > > +++ b/hw/riscv/sifive_u_otp.c
-> > > > @@ -24,6 +24,8 @@
-> > > >  #include "qemu/log.h"
-> > > >  #include "qemu/module.h"
-> > > >  #include "hw/riscv/sifive_u_otp.h"
-> > > > +#include "sysemu/blockdev.h"
-> > > > +#include "sysemu/block-backend.h"
-> > > >
-> > > >  #define WRITTEN_BIT_ON 0x1
-> > > >
-> > > > @@ -54,6 +56,16 @@ static uint64_t sifive_u_otp_read(void *opaque, hwaddr addr, unsigned int size)
-> > > >          if ((s->pce & SIFIVE_U_OTP_PCE_EN) &&
-> > > >              (s->pdstb & SIFIVE_U_OTP_PDSTB_EN) &&
-> > > >              (s->ptrim & SIFIVE_U_OTP_PTRIM_EN)) {
-> > > > +
-> > > > +            /* read from backend */
-> > > > +            if (s->blk) {
-> > > > +                int32_t buf;
-> > > > +
-> > > > +                blk_pread(s->blk, s->pa * SIFIVE_U_OTP_FUSE_WORD, &buf,
-> > > > +                          SIFIVE_U_OTP_FUSE_WORD);
-> > > > +                return buf;
-> > > > +            }
-> > > > +
-> > > >              return s->fuse[s->pa & SIFIVE_U_OTP_PA_MASK];
-> > > >          } else {
-> > > >              return 0xff;
-> > > > @@ -145,6 +157,12 @@ static void sifive_u_otp_write(void *opaque, hwaddr addr,
-> > > >              /* write bit data */
-> > > >              SET_FUSEARRAY_BIT(s->fuse, s->pa, s->paio, s->pdin);
-> > > >
-> > > > +            /* write to backend */
-> > > > +            if (s->blk) {
-> > > > +                blk_pwrite(s->blk, s->pa * SIFIVE_U_OTP_FUSE_WORD, &val32,
-> > > > +                           SIFIVE_U_OTP_FUSE_WORD, 0);
-> > > > +            }
-> > > > +
-> > > >              /* update written bit */
-> > > >              SET_FUSEARRAY_BIT(s->fuse_wo, s->pa, s->paio, WRITTEN_BIT_ON);
-> > > >          }
-> > > > @@ -168,16 +186,48 @@ static const MemoryRegionOps sifive_u_otp_ops = {
-> > > >
-> > > >  static Property sifive_u_otp_properties[] = {
-> > > >      DEFINE_PROP_UINT32("serial", SiFiveUOTPState, serial, 0),
-> > > > +    DEFINE_PROP_DRIVE("drive", SiFiveUOTPState, blk),
-> > > >      DEFINE_PROP_END_OF_LIST(),
-> > > >  };
-> > > >
-> > > >  static void sifive_u_otp_realize(DeviceState *dev, Error **errp)
-> > > >  {
-> > > >      SiFiveUOTPState *s = SIFIVE_U_OTP(dev);
-> > > > +    DriveInfo *dinfo;
-> > > >
-> > > >      memory_region_init_io(&s->mmio, OBJECT(dev), &sifive_u_otp_ops, s,
-> > > >                            TYPE_SIFIVE_U_OTP, SIFIVE_U_OTP_REG_SIZE);
-> > > >      sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->mmio);
-> > > > +
-> > > > +    dinfo = drive_get_next(IF_NONE);
-> > > > +    if (dinfo) {
-> > > > +        int ret;
-> > > > +        uint64_t perm;
-> > > > +        int filesize;
-> > > > +        BlockBackend *blk;
-> > > > +
-> > > > +        blk = blk_by_legacy_dinfo(dinfo);
-> > >
-> > > I think this should be:
-> > >
-> > > blk = dinfo ? blk_by_legacy_dinfo(dinfo) : NULL;
-> > >
-> >
-> > The previous code, "if (dinfo)", should check NULL already. But we can
-> > add more checks for blk such as qdev_prop_set_drive_err().
->
-> You are right, but I don't see a fallback if !dinfo
->
-Not sure whether we need it. Originally, I also added '!dinfo' check
-logic and turned out I found it can be handled like without "-drive"
-case. It just does a fallback to use the fuse[] array in memory. For
-example,
-"qemu-system-riscv64 -M sifive_u -m 256M -nographic -bios none -kernel
-../opensbi/build/platform/sifive/fu540/firmware/fw_payload.elf"
+I disagree with "necessary".
 
+A client can use a specific version of QMP, and still talk to a server
+with a different version, because we designed that capability into QMP.
 
-> >
-> > > > +        filesize = SIFIVE_U_OTP_NUM_FUSES * SIFIVE_U_OTP_FUSE_WORD;
-> > > > +        if (blk_getlength(blk) < filesize) {
-> > > > +            qemu_log_mask(LOG_GUEST_ERROR, "OTP drive size < 16K\n");
-> > >
-> > > You should probably be setting errp instead.
-> > >
-> > > If a user specified a -drive argument, they probably want to error if
-> > > we aren't going to use it.
-> > >
-> >
-> > Will set an errp.
+You absolutely can create bindings for a specific version of QMP for the
+client if you want.  Just make sure the client as a whole obeys the
+rules of the QMP game laid down in qmp-spec.txt and qapi-code-gen.txt.
+
+>> I say there are many candidates (the ones I know are Protobuf and
+>> Flexbuffers) for serialization and many candidates for transport (REST
+>> and gRPC to begin with) in addition to the two {QMP,JSON} and
+>> {DBus,DBus} tuples.  We should at least look at how they do code
+>> generation before deciding that JSON is bad and DBus is good.
+>>
 >
-> Great!
+> Contrary to what you believe I am not focusing so much on DBus here :) It
+> took about 200 loc to bind it, effortlessly (compared to sys<->rs
+> conversion). All it does is to expose the same API we have in the generat=
+ed
+> C somehow (similar static types & functions - not all as a{sv} opaque
+> dictionaries).
+
+Two points.
+
+1. Opaque dictionaries are far from the only way to do keyword arguments
+in a language that lacks them.
+
+2. The API we generate for C is not exactly wonderful.
+
+Behold this beauty:
+
+    void qmp_block_commit(bool has_job_id, const char *job_id, const char *=
+device, bool has_base_node, const char *base_node, bool has_base, const cha=
+r *base, bool has_top_node, const char *top_node, bool has_top, const char =
+*top, bool has_backing_file, const char *backing_file, bool has_speed, int6=
+4_t speed, bool has_on_error, BlockdevOnError on_error, bool has_filter_nod=
+e_name, const char *filter_node_name, bool has_auto_finalize, bool auto_fin=
+alize, bool has_auto_dismiss, bool auto_dismiss, Error **errp);
+
+It's gotten so bad we added a second way to do the C API:
+
+    void qmp_drive_backup(DriveBackup *arg, Error **errp);
+
+Turns out
+
+    DriveBackup arg =3D {
+        ... initialize the optionals you need ...
+    }
+    qmp_drive_backup(&arg, &err);
+
+is a lot easier on the eyes than passing 29 positional arguments.
+
+This could be viewed as a work-around for C's lack of positional
+parameters.
+
+Even more fun:
+
+    void qmp_blockdev_add(BlockdevOptions *arg, Error **errp);
+
+BlockdevOptions is a tagged union.
+
+This could be viewed as a work-around for C's lack of function
+overloading.
+
+> It's easy for QEMU to generate a good static binding for C, because the
+> version always matches. For a client, you wouldn't be able to write a
+> similar idiomatic API in C, Rust, Python or Go, unfortunately.
+
+I disagree.  You won't be able to write good bindings using just
+positional parameters.  Not even if you add restrictions on how we can
+evolve QMP.  And no, I do not consider the C bindings we create for QEMU
+itself "good".  They're the best we could do, and good enough.
+
+When you do bindings for another language, do bindings for that
+language, not C bindings in that language.
+
+Regardless of bindings, the client as a whole should obey the rules of
+the QMP game laid down in qmp-spec.txt and qapi-code-gen.txt.  If these
+rules have become counter-productive, then it's time to replace QMP
+wholesale.
+
+Do not attempt to force a square peg into a round hole.  If we must have
+square pegs, design a square hole, and retire the round hole.
+
+> Iow, I am not trying to sell DBus, I would like to make it easier to bind
+> QMP in general. (although I do believe that DBus is a better protocol tha=
+n
+> QMP for local IPC, yes. And gRPC is probably better for remoting)
 >
-> >
-> > > > +            return;
-> > > > +        }
-> > > > +
-> > > > +        qdev_prop_set_drive(dev, "drive", blk);
-> > > > +
-> > > > +        perm = BLK_PERM_CONSISTENT_READ |
-> > > > +                        (blk_is_read_only(s->blk) ? 0 : BLK_PERM_WRITE);
-> > > > +        ret = blk_set_perm(s->blk, perm, BLK_PERM_ALL, errp);
-> > > > +        if (ret < 0) {
-> > > > +            qemu_log_mask(LOG_GUEST_ERROR, "set perm error.");
-> > >
-> > > Is it worth printing the error?
-> > >
-> > Probably add it when I test it. Will remove it.
+>> I would rather make those problems solved at the server level, that
+>> > doesn't require any change to QMP today, just a more careful
+>> > consideration when making changes (and probably some tools to help
+>> > enforce some stability).
+>>
+>> Problem is, "more careful consideration when making changes" is not a
+>> small thing.  And other RPCs have evolved in a completely different
+>> space (REST APIs for web services) that have chosen the same tradeoffs
+>> as QMP, so why should we not learn from them?
+>>
+>>
+> I don't buy that generalization. A very recent protocol in this space, th=
+at
+> aims to be a good low-level RPC on Linux (for containers, cloud etc) is
+> varlink. (In many ways, we could compare it to QMP, but it lacks some
+> important features, like events)
 >
-> Thanks
->
-> Alistair
->
-> >
-> > > > +        }
-> > > > +
-> > > > +        if (blk_pread(s->blk, 0, s->fuse, filesize) != filesize) {
-> > > > +            qemu_log_mask(LOG_GUEST_ERROR,
-> > > > +                          "failed to read the initial flash content");
-> > > > +            return;
-> > >
-> > > You don't need a return here.
-> > >
-> > k, will remove it and set errp.
-> >
-> > > Is this error fatal?
-> > >
-> > This shouldn't be fatal but it might lead to unknown state if the
-> > content is read partially.
-> > But the checking, "filesize < 16K", is fatal. It leads qemu to abort.
-> >
-> >
-> > > Alistair
-> > >
-> > > > +        }
-> > > > +    }
-> > > >  }
-> > > >
-> > > >  static void sifive_u_otp_reset(DeviceState *dev)
-> > > > diff --git a/include/hw/riscv/sifive_u_otp.h b/include/hw/riscv/sifive_u_otp.h
-> > > > index 4a5a0acf48..9bc781fd4f 100644
-> > > > --- a/include/hw/riscv/sifive_u_otp.h
-> > > > +++ b/include/hw/riscv/sifive_u_otp.h
-> > > > @@ -45,6 +45,7 @@
-> > > >
-> > > >  #define SIFIVE_U_OTP_PA_MASK        0xfff
-> > > >  #define SIFIVE_U_OTP_NUM_FUSES      0x1000
-> > > > +#define SIFIVE_U_OTP_FUSE_WORD      4
-> > > >  #define SIFIVE_U_OTP_SERIAL_ADDR    0xfc
-> > > >
-> > > >  #define SIFIVE_U_OTP_REG_SIZE       0x1000
-> > > > @@ -78,6 +79,7 @@ typedef struct SiFiveUOTPState {
-> > > >      uint32_t fuse_wo[SIFIVE_U_OTP_NUM_FUSES];
-> > > >      /* config */
-> > > >      uint32_t serial;
-> > > > +    BlockBackend *blk;
-> > > >  } SiFiveUOTPState;
-> > > >
-> > > >  #endif /* HW_SIFIVE_U_OTP_H */
-> > > > --
-> > > > 2.17.1
-> > > >
-> > > >
+> varlink does non-optional members and versioning the same way I propose
+> here, for what I could tell. Although they use JSON, and have similar
+> transport "benefits", this basic rule allow them to have very decent
+> automated binding in various languages, without resorting to unorthodox
+> solutions, ex:
+> https://github.com/varlink/rust/blob/master/examples/example/src/main.rs
+
+Paolo pointed out successful protocols that make tradeoffs similar to
+QMP to support the idea that these tradeoffs can make sense and are
+workable.
+
+Pointing out other, dissimilar protocols is not a convincing
+counter-argument :)
+
 
