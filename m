@@ -2,76 +2,81 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-4.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61A57C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 05:03:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3E0DC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 05:04:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3567206A5
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 05:03:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 69743206A5
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 05:04:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bJyBgKkm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3567206A5
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TEclirro"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69743206A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNUGp-0008VB-N4
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 01:03:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37530)
+	id 1kNUHt-0001dM-Jr
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 01:04:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42410)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNToL-00025n-8A
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 00:33:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43806)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1kNUGh-0000BA-3a
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 01:03:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21838)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNToG-0000hH-QQ
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 00:33:48 -0400
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1kNUGe-0002bv-7m
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 01:03:06 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601440424;
+ s=mimecast20190719; t=1601442182;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=v+e93mCRDe/bxKTPlNwZliB3mLufli1yOz5JspODTuY=;
- b=bJyBgKkmvbmw8viesytYNS1GbSr50LYAM1hjncGfwn6nF5BJ9YX1F3fe72QgNV2YCa9XW2
- mnZ5PscaqrJY8K47E2BnPPH7TSzbENilU3Ahcw0Pyn7x1OJC8L+aWh6oPLXVOCbrg9t6KZ
- AKTnOuc8A1u9jEbeFgRf7oF+11KxXCo=
+ bh=Yr/fy6ZArXNJsTxBYZTN0/VjLvr8LJjzsSaka7DssLM=;
+ b=TEclirroErPaVIYqdlfNFSz9npXAAokoxwb4voJi4zl0RG1MYPGT4SgHX3lgEVIZLXnNu2
+ MytpSmNiyizls4FhXxkJ5HbSTfJNxuX/NaR1xU9grZshtEd1GV/VH+atI1v1LKB2i/EBQW
+ 1O4E350oo3588Bn4gfPHHalkpIhGiME=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-mBtGT26lO82AOYLNfiIstw-1; Wed, 30 Sep 2020 00:33:18 -0400
-X-MC-Unique: mBtGT26lO82AOYLNfiIstw-1
+ us-mta-339-QMRyUb3jMlGEzLfEr056EA-1; Wed, 30 Sep 2020 01:02:55 -0400
+X-MC-Unique: QMRyUb3jMlGEzLfEr056EA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 080C1802B7A;
- Wed, 30 Sep 2020 04:33:17 +0000 (UTC)
-Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 868107B40D;
- Wed, 30 Sep 2020 04:33:15 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 37/46] qapi/instrospect.py: add preliminary type hint
- annotations
-Date: Wed, 30 Sep 2020 00:31:41 -0400
-Message-Id: <20200930043150.1454766-38-jsnow@redhat.com>
-In-Reply-To: <20200930043150.1454766-1-jsnow@redhat.com>
-References: <20200930043150.1454766-1-jsnow@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C33DA185A0CA;
+ Wed, 30 Sep 2020 05:02:53 +0000 (UTC)
+Received: from kaapi (unknown [10.40.192.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 283177BE42;
+ Wed, 30 Sep 2020 05:02:45 +0000 (UTC)
+Date: Wed, 30 Sep 2020 10:32:42 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+X-X-Sender: pjp@kaapi
+To: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>
+Subject: Re: [PATCH] pci: check bus pointer before dereference
+In-Reply-To: <nycvar.YSQ.7.78.906.2009281616200.10832@xnncv>
+Message-ID: <nycvar.YSQ.7.78.906.2009301029460.10832@xnncv>
+References: <20200827114917.1851111-1-ppandit@redhat.com>
+ <CAKXe6SJNio2cy05ecr_DyB0Z6WjxHN_X8ZiOU5By0jwdRq12fg@mail.gmail.com>
+ <b0859f8a-1224-66d0-7e32-091caa5cfcbe@redhat.com>
+ <nycvar.YSQ.7.78.906.2009161152040.10832@xnncv>
+ <CAFEAcA8Y+sJkapmrjNOdWP4xXa9kWTmSyXpthkvdb6QgUyDh5Q@mail.gmail.com>
+ <nycvar.YSQ.7.78.906.2009281616200.10832@xnncv>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ppandit@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:26:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -94,322 +99,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- John Snow <jsnow@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Li Qiang <liq3ea@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Alexander Bulekov <alxndr@bu.edu>, Ruhr-University <bugs-syssec@rub.de>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eduardo Habkost <ehabkost@redhat.com>
 
-The typing of _make_tree and friends is a bit involved, but it can be
-done with some stubbed out types and a bit of elbow grease. The
-forthcoming patches attempt to make some simplifications, but having the
-type hints in advance can aid in review.
+[+Paolo, +Fam Zheng - for scsi]
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- scripts/qapi/introspect.py | 133 +++++++++++++++++++++++++++----------
- scripts/qapi/mypy.ini      |   5 --
- scripts/qapi/schema.py     |   2 +-
- 3 files changed, 98 insertions(+), 42 deletions(-)
++-- On Mon, 28 Sep 2020, P J P wrote --+
+| +-- On Wed, 16 Sep 2020, Peter Maydell wrote --+
+| | On Wed, 16 Sep 2020 at 07:28, P J P <ppandit@redhat.com> wrote:
+| | > -> https://ruhr-uni-bochum.sciebo.de/s/NNWP2GfwzYKeKwE?path=%2Flsi_nullptr1
+| | > ==1183858==Hint: address points to the zero page.
+| | > #0 pci_change_irq_level hw/pci/pci.c:259
+| | > #1 pci_irq_handler hw/pci/pci.c:1445
+| | > #2 pci_set_irq hw/pci/pci.c:1463
+| | > #3 lsi_set_irq hw/scsi/lsi53c895a.c:488
+| | > #4 lsi_update_irq hw/scsi/lsi53c895a.c:523
+| | > #5 lsi_script_scsi_interrupt hw/scsi/lsi53c895a.c:554
+| | > #6 lsi_execute_script hw/scsi/lsi53c895a.c:1149
+| | > #7 lsi_reg_writeb hw/scsi/lsi53c895a.c:1984
+| | > #8 lsi_io_write hw/scsi/lsi53c895a.c:2146
+| ...
+| | Generally we don't bother to assert() that pointers that shouldn't be NULL 
+| | really are NULL immediately before dereferencing them, because the 
+| | dereference provides an equally easy-to-debug crash to the assert, and so 
+| | the assert doesn't provide anything extra. assert()ing that a pointer is 
+| | non-NULL is more useful if it is done in a place that identifies the problem 
+| | at an earlier and easier-to-debug point in execution rather than at a later 
+| | point which is distantly removed from the place where the bogus pointer was 
+| | introduced.
+| 
+| * The NULL dereference above occurs because the 'pci_dev->qdev->parent_bus' 
+|   address gets overwritten (with 0x0) during scsi 'Memory Move' operation in
+| 
+|  ../hw/scsi/lsi53c895a.c
+|   #define LSI_BUF_SIZE 4096
+| 
+| lsi_mmio_write
+|  lsi_reg_writeb
+|   lsi_execute_script
+|    static void lsi_memcpy(LSIState *s, ... int count=12MB)
+|    {
+|       int n;
+|       uint8_t buf[LSI_BUF_SIZE];
+| 
+|       while (count) {
+|         n = (count > LSI_BUF_SIZE) ? LSI_BUF_SIZE : count;
+|         lsi_mem_read(s, src, buf, n);          <== read from DMA memory
+|         lsi_mem_write(s, dest, buf, n);        <== write to I/O memory
+|         src += n;
+|         dest += n;
+|         count -= n;
+|      }
+|    }
+| -> https://www.manualslib.com/manual/1407578/Lsi-Lsi53c895a.html?page=254#manual
+| 
+| * Above loop moves data between DMA memory to i/o address space.
+| 
+| * Going through the manual above, it seems 'Memory Move' can move upto 16MB of 
+|   data between memory spaces.
+| 
+| * I tried to see a suitable fix, but couldn't get one.
+| 
+|   - Limiting 'count' value does not seem right, as allowed value is upto 16MB.
+| 
+|   - Manual above talks about moving data via 'dma_buf'. But it doesn't seem to 
+|     be used here.
+| 
+| * During above loop, 'dest' address moves past its 'MemoryRegion mr' and 
+|   overwrites the adjacent 'mr' memory area, overwritting 'parent_bus' value.
+| 
+| Any thoughts/hints please...?
 
-diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
-index 83140f2c564..f7de3953391 100644
---- a/scripts/qapi/introspect.py
-+++ b/scripts/qapi/introspect.py
-@@ -10,6 +10,15 @@
- See the COPYING file in the top-level directory.
- """
- 
-+from typing import (
-+    Dict,
-+    List,
-+    Optional,
-+    Sequence,
-+    Tuple,
-+    Union,
-+)
-+
- from .common import (
-     c_name,
-     gen_endif,
-@@ -18,13 +27,34 @@
- )
- from .gen import QAPISchemaMonolithicCVisitor
- from .schema import (
-+    QAPISchema,
-     QAPISchemaArrayType,
-     QAPISchemaBuiltinType,
-+    QAPISchemaEntity,
-+    QAPISchemaEnumMember,
-+    QAPISchemaFeature,
-+    QAPISchemaObjectType,
-+    QAPISchemaObjectTypeMember,
-     QAPISchemaType,
-+    QAPISchemaVariant,
-+    QAPISchemaVariants,
- )
-+from .source import QAPISourceInfo
- 
- 
--def _make_tree(obj, ifcond, features, extra=None):
-+# The correct type for TreeNode is actually:
-+# Union[AnnotatedNode, List[TreeNode], Dict[str, TreeNode], str, bool]
-+# but mypy does not support recursive types yet.
-+TreeNode = object
-+_DObject = Dict[str, object]
-+Extra = Dict[str, object]
-+AnnotatedNode = Tuple[TreeNode, Extra]
-+
-+
-+def _make_tree(obj: Union[_DObject, str], ifcond: List[str],
-+               features: List[QAPISchemaFeature],
-+               extra: Optional[Extra] = None
-+               ) -> Union[TreeNode, AnnotatedNode]:
-     if extra is None:
-         extra = {}
-     if ifcond:
-@@ -37,9 +67,11 @@ def _make_tree(obj, ifcond, features, extra=None):
-     return obj
- 
- 
--def _tree_to_qlit(obj, level=0, suppress_first_indent=False):
-+def _tree_to_qlit(obj: TreeNode,
-+                  level: int = 0,
-+                  suppress_first_indent: bool = False) -> str:
- 
--    def indent(level):
-+    def indent(level: int) -> str:
-         return level * 4 * ' '
- 
-     if isinstance(obj, tuple):
-@@ -89,21 +121,20 @@ def indent(level):
-     return ret
- 
- 
--def to_c_string(string):
-+def to_c_string(string: str) -> str:
-     return '"' + string.replace('\\', r'\\').replace('"', r'\"') + '"'
- 
- 
- class QAPISchemaGenIntrospectVisitor(QAPISchemaMonolithicCVisitor):
--
--    def __init__(self, prefix, unmask):
-+    def __init__(self, prefix: str, unmask: bool):
-         super().__init__(
-             prefix, 'qapi-introspect',
-             ' * QAPI/QMP schema introspection', __doc__)
-         self._unmask = unmask
--        self._schema = None
--        self._trees = []
--        self._used_types = []
--        self._name_map = {}
-+        self._schema: Optional[QAPISchema] = None
-+        self._trees: List[TreeNode] = []
-+        self._used_types: List[QAPISchemaType] = []
-+        self._name_map: Dict[str, str] = {}
-         self._genc.add(mcgen('''
- #include "qemu/osdep.h"
- #include "%(prefix)sqapi-introspect.h"
-@@ -111,10 +142,10 @@ def __init__(self, prefix, unmask):
- ''',
-                              prefix=prefix))
- 
--    def visit_begin(self, schema):
-+    def visit_begin(self, schema: QAPISchema) -> None:
-         self._schema = schema
- 
--    def visit_end(self):
-+    def visit_end(self) -> None:
-         # visit the types that are actually used
-         for typ in self._used_types:
-             typ.visit(self)
-@@ -136,18 +167,18 @@ def visit_end(self):
-         self._used_types = []
-         self._name_map = {}
- 
--    def visit_needed(self, entity):
-+    def visit_needed(self, entity: QAPISchemaEntity) -> bool:
-         # Ignore types on first pass; visit_end() will pick up used types
-         return not isinstance(entity, QAPISchemaType)
- 
--    def _name(self, name):
-+    def _name(self, name: str) -> str:
-         if self._unmask:
-             return name
-         if name not in self._name_map:
-             self._name_map[name] = '%d' % len(self._name_map)
-         return self._name_map[name]
- 
--    def _use_type(self, typ):
-+    def _use_type(self, typ: QAPISchemaType) -> str:
-         # Map the various integer types to plain int
-         if typ.json_type() == 'int':
-             typ = self._schema.lookup_type('int')
-@@ -166,8 +197,10 @@ def _use_type(self, typ):
-             return '[' + self._use_type(typ.element_type) + ']'
-         return self._name(typ.name)
- 
--    def _gen_tree(self, name, mtype, obj, ifcond, features):
--        extra = None
-+    def _gen_tree(self, name: str, mtype: str, obj: _DObject,
-+                  ifcond: List[str],
-+                  features: Optional[List[QAPISchemaFeature]]) -> None:
-+        extra: Extra = None
-         if mtype not in ('command', 'event', 'builtin', 'array'):
-             if not self._unmask:
-                 # Output a comment to make it easy to map masked names
-@@ -178,44 +211,64 @@ def _gen_tree(self, name, mtype, obj, ifcond, features):
-         obj['meta-type'] = mtype
-         self._trees.append(_make_tree(obj, ifcond, features, extra))
- 
--    def _gen_member(self, member):
--        obj = {'name': member.name, 'type': self._use_type(member.type)}
-+    def _gen_member(self,
-+                    member: QAPISchemaObjectTypeMember) -> TreeNode:
-+        obj: _DObject = {
-+            'name': member.name,
-+            'type': self._use_type(member.type)
-+        }
-         if member.optional:
-             obj['default'] = None
-         return _make_tree(obj, member.ifcond, member.features)
- 
--    def _gen_variants(self, tag_name, variants):
-+    def _gen_variants(self, tag_name: str,
-+                      variants: List[QAPISchemaVariant]) -> _DObject:
-         return {'tag': tag_name,
-                 'variants': [self._gen_variant(v) for v in variants]}
- 
--    def _gen_variant(self, variant):
--        obj = {'case': variant.name, 'type': self._use_type(variant.type)}
-+    def _gen_variant(self, variant: QAPISchemaVariant) -> TreeNode:
-+        obj: _DObject = {
-+            'case': variant.name,
-+            'type': self._use_type(variant.type)
-+        }
-         return _make_tree(obj, variant.ifcond, None)
- 
--    def visit_builtin_type(self, name, info, json_type):
-+    def visit_builtin_type(self, name: str, info: Optional[QAPISourceInfo],
-+                           json_type: str) -> None:
-         self._gen_tree(name, 'builtin', {'json-type': json_type}, [], None)
- 
--    def visit_enum_type(self, name, info, ifcond, features, members, prefix):
-+    def visit_enum_type(self, name: str, info: QAPISourceInfo,
-+                        ifcond: List[str], features: List[QAPISchemaFeature],
-+                        members: List[QAPISchemaEnumMember],
-+                        prefix: Optional[str]) -> None:
-         self._gen_tree(name, 'enum',
-                        {'values': [_make_tree(m.name, m.ifcond, None)
-                                    for m in members]},
-                        ifcond, features)
- 
--    def visit_array_type(self, name, info, ifcond, element_type):
-+    def visit_array_type(self, name: str, info: Optional[QAPISourceInfo],
-+                         ifcond: List[str],
-+                         element_type: QAPISchemaType) -> None:
-         element = self._use_type(element_type)
-         self._gen_tree('[' + element + ']', 'array', {'element-type': element},
-                        ifcond, None)
- 
--    def visit_object_type_flat(self, name, info, ifcond, features,
--                               members, variants):
--        obj = {'members': [self._gen_member(m) for m in members]}
-+    def visit_object_type_flat(self, name: str, info: Optional[QAPISourceInfo],
-+                               ifcond: List[str],
-+                               features: List[QAPISchemaFeature],
-+                               members: Sequence[QAPISchemaObjectTypeMember],
-+                               variants: Optional[QAPISchemaVariants]) -> None:
-+        obj: _DObject = {'members': [self._gen_member(m) for m in members]}
-         if variants:
-             obj.update(self._gen_variants(variants.tag_member.name,
-                                           variants.variants))
- 
-         self._gen_tree(name, 'object', obj, ifcond, features)
- 
--    def visit_alternate_type(self, name, info, ifcond, features, variants):
-+    def visit_alternate_type(self, name: str, info: QAPISourceInfo,
-+                             ifcond: List[str],
-+                             features: List[QAPISchemaFeature],
-+                             variants: QAPISchemaVariants) -> None:
-         self._gen_tree(name, 'alternate',
-                        {'members': [
-                            _make_tree({'type': self._use_type(m.type)},
-@@ -223,24 +276,32 @@ def visit_alternate_type(self, name, info, ifcond, features, variants):
-                            for m in variants.variants]},
-                        ifcond, features)
- 
--    def visit_command(self, name, info, ifcond, features,
--                      arg_type, ret_type, gen, success_response, boxed,
--                      allow_oob, allow_preconfig):
-+    def visit_command(self, name: str, info: QAPISourceInfo, ifcond: List[str],
-+                      features: List[QAPISchemaFeature],
-+                      arg_type: QAPISchemaObjectType,
-+                      ret_type: Optional[QAPISchemaType], gen: bool,
-+                      success_response: bool, boxed: bool, allow_oob: bool,
-+                      allow_preconfig: bool) -> None:
-         arg_type = arg_type or self._schema.the_empty_object_type
-         ret_type = ret_type or self._schema.the_empty_object_type
--        obj = {'arg-type': self._use_type(arg_type),
--               'ret-type': self._use_type(ret_type)}
-+        obj: _DObject = {
-+            'arg-type': self._use_type(arg_type),
-+            'ret-type': self._use_type(ret_type)
-+        }
-         if allow_oob:
-             obj['allow-oob'] = allow_oob
-         self._gen_tree(name, 'command', obj, ifcond, features)
- 
--    def visit_event(self, name, info, ifcond, features, arg_type, boxed):
-+    def visit_event(self, name: str, info: QAPISourceInfo,
-+                    ifcond: List[str], features: List[QAPISchemaFeature],
-+                    arg_type: QAPISchemaObjectType, boxed: bool) -> None:
-         arg_type = arg_type or self._schema.the_empty_object_type
-         self._gen_tree(name, 'event', {'arg-type': self._use_type(arg_type)},
-                        ifcond, features)
- 
- 
--def gen_introspect(schema, output_dir, prefix, opt_unmask):
-+def gen_introspect(schema: QAPISchema, output_dir: str, prefix: str,
-+                   opt_unmask: bool) -> None:
-     vis = QAPISchemaGenIntrospectVisitor(prefix, opt_unmask)
-     schema.visit(vis)
-     vis.write(output_dir)
-diff --git a/scripts/qapi/mypy.ini b/scripts/qapi/mypy.ini
-index c6960ff2dbd..5e5c305062e 100644
---- a/scripts/qapi/mypy.ini
-+++ b/scripts/qapi/mypy.ini
-@@ -14,11 +14,6 @@ disallow_untyped_defs = False
- disallow_incomplete_defs = False
- check_untyped_defs = False
- 
--[mypy-qapi.introspect]
--disallow_untyped_defs = False
--disallow_incomplete_defs = False
--check_untyped_defs = False
--
- [mypy-qapi.parser]
- disallow_untyped_defs = False
- disallow_incomplete_defs = False
-diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-index 483b4b68dff..a26b25c5e99 100644
---- a/scripts/qapi/schema.py
-+++ b/scripts/qapi/schema.py
-@@ -28,7 +28,7 @@
- class QAPISchemaEntity:
-     meta: Optional[str] = None
- 
--    def __init__(self, name, info, doc, ifcond=None, features=None):
-+    def __init__(self, name: str, info, doc, ifcond=None, features=None):
-         assert name is None or isinstance(name, str)
-         for f in features or []:
-             assert isinstance(f, QAPISchemaFeature)
--- 
-2.26.2
+@Paolo, @Fam...wdyt?
+
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
 
 
