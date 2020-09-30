@@ -2,90 +2,101 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A907C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 08:22:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1C60C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 08:27:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF4C220738
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 08:22:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF4C220738
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id B186120EDD
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 08:27:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B186120EDD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNXNL-0001Ns-KN
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 04:22:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48432)
+	id 1kNXSV-0002wN-Q8
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 04:27:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49454)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kNXM9-0000tq-Qt
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 04:20:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43972)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kNXM7-0006Wy-Hq
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 04:20:57 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kNXM5-0000sm-KV
- for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 08:20:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 99E262E80E8
- for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 08:20:53 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kNXRV-0002Gb-7T; Wed, 30 Sep 2020 04:26:29 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:49258
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kNXRT-000707-Bq; Wed, 30 Sep 2020 04:26:28 -0400
+Received: from host86-184-131-21.range86-184.btcentralplus.com
+ ([86.184.131.21] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kNXS2-0000Fb-40; Wed, 30 Sep 2020 09:27:05 +0100
+To: Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ David Gibson <david@gibson.dropbear.id.au>
+References: <20200914102425.1152962-1-f4bug@amsat.org>
+ <20200916025022.GE5258@yekko.fritz.box>
+ <de2b5d0c-fcc4-a26c-5fda-610b7fa75862@amsat.org>
+ <cc4d5239-636c-f01a-d822-97ea60ee303c@vivier.eu>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <8661dcb8-09b1-2c0e-bdf4-0ca4a6d754d5@ilande.co.uk>
+Date: Wed, 30 Sep 2020 09:26:13 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 30 Sep 2020 08:15:00 -0000
-From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1849644@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Fix Released; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
- component=main; status=Fix Committed; importance=Low;
- assignee=None; 
-X-Launchpad-Bug-Tags: verification-done verification-done-focal
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: berrange laurent-vivier npes87184 paelzer racb
- samuel-t ubuntu-sru-bot
-X-Launchpad-Bug-Reporter: Samuel (samuel-t)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
- =?utf-8?q?=29?=
-References: <157191258679.29920.9268940625941119092.malonedeb@soybean.canonical.com>
-Message-Id: <160145370044.22921.7460141716073428660.malone@wampee.canonical.com>
-Subject: [Bug 1849644] Re: QEMU VNC websocket proxy requires non-standard
- 'binary' subprotocol
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="d685c0a40836eb9844ed835c9700f20633c1d7af"; Instance="production"
-X-Launchpad-Hash: 064542d2185a99ea71fbc406ba6144249c51b8e3
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 04:20:54
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -66
-X-Spam_score: -6.7
-X-Spam_bar: ------
-X-Spam_report: (-6.7 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.199, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <cc4d5239-636c-f01a-d822-97ea60ee303c@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.184.131.21
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH] hw/rtc/m48t59: Simplify m48t59_init()
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -94,148 +105,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1849644 <1849644@bugs.launchpad.net>
+Cc: qemu-trivial@nongnu.org, qemu-ppc@nongnu.org,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ qemu-devel@nongnu.org, Artyom Tarasenko <atar4qemu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Trying to connect using
-novnc   latest/stable:    1.2.0      2020-07-31 (6) 18MB -
+On 24/09/2020 16:00, Laurent Vivier wrote:
 
-as-is failing to connect
-Keeping VNC up and refreshing qemu.
+> Le 24/09/2020 à 16:53, Philippe Mathieu-Daudé a écrit :
+>> On 9/16/20 4:50 AM, David Gibson wrote:
+>>> On Mon, Sep 14, 2020 at 12:24:25PM +0200, Philippe Mathieu-Daudé wrote:
+>>>> As the 'io_base' argument of m48t59_init() is unused (set to 0),
+>>>> remove it to simplify.
+>>>> To create a device on the ISA bus, m48t59_init_isa() is the
+>>>> preferred function to use.
+>>>>
+>>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>>> ---
+>>>>  include/hw/rtc/m48t59.h |  2 +-
+>>>>  hw/ppc/ppc405_boards.c  |  2 +-
+>>>>  hw/rtc/m48t59.c         | 10 ++--------
+>>>>  hw/sparc/sun4m.c        |  2 +-
+>>>>  hw/sparc64/sun4u.c      |  2 +-
+>>>>  5 files changed, 6 insertions(+), 12 deletions(-)
+>>>
+>>> ppc part
+>>> Acked-by: David Gibson <david@gibson.dropbear.id.au>
+>>
+>> Thanks!
+>>
+>> Can this go via qemu-trivial@?
+> 
+> Yes, but more reviewers would help. Mark?
 
-
-Updating to the new qemu from focal proposed (by now resolved the archive p=
-ublishing issues we had before this morning).
-Get:67 http://archive.ubuntu.com/ubuntu focal-proposed/main amd64 qemu-util=
-s amd64 1:4.2-3ubuntu6.7 [975 kB]                                          =
-                                        =
-
-Get:68 http://archive.ubuntu.com/ubuntu focal-proposed/main amd64 qemu-syst=
-em-common amd64 1:4.2-3ubuntu6.7 [1056 kB]                                 =
-                                        =
-
-Get:69 http://archive.ubuntu.com/ubuntu focal-proposed/main amd64 qemu-bloc=
-k-extra amd64 1:4.2-3ubuntu6.7 [53.8 kB]                                   =
-                                        =
-
-Get:70 http://archive.ubuntu.com/ubuntu focal-proposed/main amd64 qemu-syst=
-em-data all 1:4.2-3ubuntu6.7 [563 kB]                                      =
-                                        =
-
-Get:71 http://archive.ubuntu.com/ubuntu focal-proposed/main amd64 qemu-kvm =
-amd64 1:4.2-3ubuntu6.7 [13.1 kB]                                           =
-                                        =
-
-Get:72 http://archive.ubuntu.com/ubuntu focal-proposed/main amd64 qemu-syst=
-em-x86 amd64 1:4.2-3ubuntu6.7 [6720 kB]                                    =
-                                        =
-
-Get:73 http://archive.ubuntu.com/ubuntu focal-proposed/main amd64 qemu-syst=
-em-gui amd64 1:4.2-3ubuntu6.7 [40.8 kB]                                    =
-                                        =
-
-Get:74 http://archive.ubuntu.com/ubuntu focal-proposed/main amd64 qemu-syst=
-em-mips amd64 1:4.2-3ubuntu6.7 [12.9 MB]
+Ooof sorry I missed this one. Let me take a quick look now...
 
 
-Now the same novnc1.2 can connect to it \o/
-Setting verified
+ATB,
 
-** Tags removed: verification-needed verification-needed-focal
-** Tags added: verification-done verification-done-focal
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1849644
-
-Title:
-  QEMU VNC websocket proxy requires non-standard 'binary' subprotocol
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Focal:
-  Fix Committed
-
-Bug description:
-  [Impact]
-
-   * The exact details of the protocol/subprotocal was slightly unclear
-     between the projects. So qemu ended up insisting on "binary" being
-     used but newer noVNC clients no more used it.
-
-   * Qemu got fixed in 5.0 to be more tolerant and accept an empty sub-
-     protocol as well. This SRU backports that fix to Focal.
-
-  [Test Case]
-
-   * Without the fix the following will "Failed to connect", but with
-  the fix it will work.
-
-  $ sudo apt install qemu-system-x86
-  # will only boot into a failing bootloader, but that is enough
-  $ qemu-system-x86_64 -vnc :0,websocket
-  # We need version 1.2 or later, so use the snap
-  $ snap install novnc
-  $ novnc --vnc localhost:5700
-  Connect browser to http://<IP>:6080/vnc.html
-  Click "Connect"
-
-   * Cross check with an older noVNC (e.g. the one in Focal) if the =
-
-     connectivity still works on those as well
-
-     - Reminders when switching between the noVNC implementations
-       - always refresh the browser with all clear ctrl+alt+f5
-       - start/stop the snapped one via snap.novnc.novncsvc.service
-
-  [Regression Potential]
-
-   * This is exclusive to the functionality of noVNC, so regressions would =
-
-     have to be expected in there. The tests try to exercise the basics, but
-     e.g. Openstack would be a major product using =
-
-
-  [Other Info]
-   =
-
-   * The noVNC in Focal itself does not yet have the offending change, but
-     we want the qemu in focal to be connecteable from ~any type of client
-
-
-  ---
-
-
-  =
-
-  When running a machine using "-vnc" and the "websocket" option QEMU seems=
- to require the subprotocol called 'binary'. This subprotocol does not exis=
-t in the WebSocket specification. In fact it has never existed in the spec,=
- in one of the very early drafts of WebSockets it was briefly mentioned but=
- it never made it to a final version.
-
-  When the WebSocket server requires a non-standard subprotocol any
-  WebSocket client that works correctly won't be able to connect.
-
-  One example of such a client is noVNC, it tells the server that it
-  doesn't want to use any subprotocol. QEMU's WebSocket proxy doesn't
-  let noVNC connect. If noVNC is modified to ask for 'binary' it will
-  work, this is, however, incorrect behavior.
-
-  Looking at the code in "io/channel-websock.c" it seems it's quite
-  hard-coded to binary:
-
-  Look at line 58 and 433 here:
-  https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dio/channel-websock.c
-
-  This code has to be made more dynamic, and shouldn't require binary.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1849644/+subscriptions
+Mark.
 
