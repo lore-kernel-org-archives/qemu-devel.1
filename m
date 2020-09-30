@@ -2,94 +2,105 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B7DDC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 08:08:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04E88C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 08:08:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96B5020738
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 08:08:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A91E206C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 08:08:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="QhBLq14F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96B5020738
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fCmQ3RHn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A91E206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNXA3-0004rG-OO
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 04:08:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45784)
+	id 1kNXAV-0005ZN-Hb
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 04:08:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45910)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kNX8x-0004N1-MJ
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 04:07:19 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:53789)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kNX8v-0005fK-1V
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 04:07:19 -0400
-Received: by mail-wm1-x344.google.com with SMTP id x23so670364wmi.3
- for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 01:07:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=5IFGrRsiGUbveeAmt24po8ZGSYM6sDqBuzE2j7tjfSs=;
- b=QhBLq14FJ38jM0v+W/vi+RYAd3uGeV+ZxI0MMnsvBCNM4+xXB2CHiC7lGSzgrILSLZ
- DiTN/q13lKQeYgr/K3aPldWSSBwxQCE53JrPpzs6xJ5CMQEP735YQoI+hgpERT5y0yxT
- Q7RjsdIt6OJMa6dOfVijKpKu4fxaHLaevvQGTvYOvDV6axsAIBsc6sGoWXrNnu/zZL5x
- QekR+8nLpAnGdnWuH0MyLM/i59cG7kvDfd2FPqjEHgPEeO8lt9gx288bQM2m81okcsJ1
- MIvb8JASzfo8rC1ZkcEqqnW70vuykk5iW2crfo66BsaWr3rWdsZFAkCHevM+5owlCvQ/
- Gf3Q==
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kNX9m-0004jf-JZ
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 04:08:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:31040)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kNX9k-0005hS-Dc
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 04:08:10 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601453287;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=3xlx9gaNKZKqdBu02gsJZ7Lo+Egdrif5g5DRBfymPng=;
+ b=fCmQ3RHnB4SvjbBkOjoi+ZrzPKQaZJeXpkerCn0rtSSaid6l/6+tlssBxKL/2qiLaN3T5b
+ JYUlI6iSy26GHM98BdjQEpHlOcFKIlk1XQg8C5G7NambNfBjpHToIKClCE5Hz9AIV9zKoh
+ s66FX+dPKKttFALNsxCF1CiwT5TbPuQ=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-504-y23PYbT2P3ivw9Gn2ZmMnA-1; Wed, 30 Sep 2020 04:08:05 -0400
+X-MC-Unique: y23PYbT2P3ivw9Gn2ZmMnA-1
+Received: by mail-wr1-f71.google.com with SMTP id a12so306323wrg.13
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 01:08:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=5IFGrRsiGUbveeAmt24po8ZGSYM6sDqBuzE2j7tjfSs=;
- b=YnhS+93QdxywEe0qxv5zdo9p+8ac90VDJ5UhEes1aPyIerD5u7wBDehN9dMQ/v4ZOf
- zGNhDLh2z3R+5Nix1DzpocZxGJ5gzBL2g0bpzNtOOF44/u8Z+pUkHWhg0qVH/kbGA09R
- PZMW7dRHBE0WMjT5UbPyfFoEyC/n3X154Fu0VKMfYbFsN4zlzFFmhLcua0AqEq/GGqME
- PcC/puvGyOns7WUAg1+Ps1O9kVC7YVmYXWNDFNToXy5BaXJ85NtnGrXYIUUUv8DX1HrJ
- 9/PUorE8qW9MznxekhQzsapHHb5Vwo/WmClUASyXSgRp+s6HPt10g0DYkpL1y9wdX46+
- q59g==
-X-Gm-Message-State: AOAM5319U1zwX8GqlZBENm4oaBLvqnaFYgYB/mCtXUOMCA9/e9mARxZ8
- 5d4+EI7//EG5Rm3egh2U0U87yPYPBJ2RUwZ7fVPeQw==
-X-Google-Smtp-Source: ABdhPJwYikvK6QjWE/yNt59TfxLg8a8nyxhLv2h+/0lfoa8KdXQ6AV/MigDGNRdaTJEXpg9hGcm9tZcKK7Cez3om4g0=
-X-Received: by 2002:a1c:e256:: with SMTP id z83mr1691368wmg.137.1601453235156; 
- Wed, 30 Sep 2020 01:07:15 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=sBgwaswi8aE+MBgp+AjsZd5weyRsYZTc5zWV1b0YzgQ=;
+ b=Tmtc5MxTNJNUB/xtGgX5+g7qtNNwHLjL/Eq/z1rEt4zG+J7gU3qy7a/ZbxoSnu7+CI
+ +TYuWwCx35Nt7DNSsO3bB89wzuyOgX8Fc44jzNlp8hSzqO5aQ2dkIzDYpXrQUGCEeI00
+ OrfOMcVDRBlg06RVKh588JoUv6KTXMXWR6omzxb8H0MHKUeis2Y0pT5vlo8+3U9lqK4A
+ DeMBCUsNXKm9YuObxKfo1RbncU4S0iWnMR3Hll5pc9p+gSqs4UW1L7kc4DceynkgFeYZ
+ Mcl5Evh27Vk/wX70kp2OEWyRWTHJaT9zS1YyCArPdfcTvVf3dXhD1UVQ9yXsnSmpHj3X
+ 7ekw==
+X-Gm-Message-State: AOAM53064PNAqyekRF5chcNnss8H3Gj3PNLIPyJ/dJx6v2c4DI9j7h2Z
+ OC12NKqf83htUCJZ8VfCbePnVKApk/3PHJz8jJb+CjnrAWaU/yFTO/KZT+5U7642vwKzI7RobQ5
+ fhY6p2HSHNNOKgpc=
+X-Received: by 2002:adf:dd88:: with SMTP id x8mr1772906wrl.54.1601453283851;
+ Wed, 30 Sep 2020 01:08:03 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJypCcKAqACmCRvBI8j/nOHTsWwRDd7JWvJAYLjoyNn2oUIjm3yyeGeWyX45efGHbIz91IcuJQ==
+X-Received: by 2002:adf:dd88:: with SMTP id x8mr1772870wrl.54.1601453283557;
+ Wed, 30 Sep 2020 01:08:03 -0700 (PDT)
+Received: from redhat.com (bzq-79-179-71-128.red.bezeqint.net. [79.179.71.128])
+ by smtp.gmail.com with ESMTPSA id 63sm1703977wrc.63.2020.09.30.01.08.01
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 30 Sep 2020 01:08:02 -0700 (PDT)
+Date: Wed, 30 Sep 2020 04:07:59 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: Outline for VHOST_USER_PROTOCOL_F_VDPA
+Message-ID: <20200930034807-mutt-send-email-mst@kernel.org>
+References: <20200928092537.GA44353@stefanha-x1.localdomain>
+ <20200929020114-mutt-send-email-mst@kernel.org>
+ <20200929085751.GA181609@stefanha-x1.localdomain>
+ <20200929055110-mutt-send-email-mst@kernel.org>
+ <20200929183824.GC191675@stefanha-x1.localdomain>
 MIME-Version: 1.0
-References: <20200929064858-mutt-send-email-mst@kernel.org>
- <CAARzgwwFeSPd=JGjdk-uj=uuLb+HcfMfGTe1_GmbFRTkP-jZdQ@mail.gmail.com>
- <20200929071412-mutt-send-email-mst@kernel.org>
- <CAARzgwzdYfVn6Kdic+rj7xSxdvP6RAM48wr8Pt_MpDwuYvDSiw@mail.gmail.com>
- <20200929073523-mutt-send-email-mst@kernel.org>
- <CAARzgwyNHnG_dzhD9mZbico2V3-c=XL-fNo7xO=rP2jfVMqtdw@mail.gmail.com>
- <20200930033540-mutt-send-email-mst@kernel.org>
- <CAARzgwyAE1bL5VnkH7dKBeMEtwcsZBhuhtRxx+BUxYsd8ZRi_A@mail.gmail.com>
- <20200930034220-mutt-send-email-mst@kernel.org>
- <CAARzgwy_+kVWQs5sQo4qAYC3Gi5LhdLoMQDPzKadwRPZ1D8Brw@mail.gmail.com>
- <20200930040207-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200930040207-mutt-send-email-mst@kernel.org>
-From: Ani Sinha <ani@anisinha.ca>
-Date: Wed, 30 Sep 2020 13:37:03 +0530
-Message-ID: <CAARzgwz1TJpyVZfxJF=yCoj4pBMsUxOvaVmZCCn0Dfni-dB5kw@mail.gmail.com>
-Subject: Re: [PATCH v10 13/13] tests/acpi: add DSDT.hpbrroot DSDT table blob
- to test global i440fx hotplug
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: none client-ip=2a00:1450:4864:20::344;
- envelope-from=ani@anisinha.ca; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200929183824.GC191675@stefanha-x1.localdomain>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:31:59
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.687,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,629 +113,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Julia Suvorova <jusual@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: lulu@redhat.com, tiwei.bie@intel.com, jasowang@redhat.com,
+ qemu-devel@nongnu.org, raphael.norwitz@nutanix.com, maxime.coquelin@redhat.com,
+ kraxel@redhat.com, Felipe Franciosi <felipe@nutanix.com>,
+ marcandre.lureau@redhat.com, Nikos Dragazis <ndragazis@arrikto.com>,
+ changpeng.liu@intel.com, Daniele Buono <dbuono@us.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 30, 2020 at 1:34 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Wed, Sep 30, 2020 at 01:17:53PM +0530, Ani Sinha wrote:
-> >
-> >
-> > On Wed, Sep 30, 2020 at 1:14 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> >     On Wed, Sep 30, 2020 at 01:09:09PM +0530, Ani Sinha wrote:
-> >
-> >     >
-> >
-> >     >
-> >
-> >     > On Wed, Sep 30, 2020 at 1:06 PM Michael S. Tsirkin <mst@redhat.com>
-> >     wrote:
-> >
-> >     >
-> >
-> >     >     On Tue, Sep 29, 2020 at 06:03:00PM +0530, Ani Sinha wrote:
-> >
-> >     >
-> >
-> >     >     > On Tue, Sep 29, 2020 at 5:05 PM Michael S. Tsirkin <mst@redhat.com>
-> >
-> >     >     wrote:
-> >
-> >     >
-> >
-> >     >     > >
-> >
-> >     >
-> >
-> >     >     > > On Tue, Sep 29, 2020 at 04:58:03PM +0530, Ani Sinha wrote:
-> >
-> >     >
-> >
-> >     >     > > > On Tue, Sep 29, 2020 at 4:45 PM Michael S. Tsirkin <
-> >     mst@redhat.com>
-> >
-> >     >     wrote:
-> >
-> >     >
-> >
-> >     >     > > > >
-> >
-> >     >
-> >
-> >     >     > > > > On Tue, Sep 29, 2020 at 04:35:50PM +0530, Ani Sinha wrote:
-> >
-> >     >
-> >
-> >     >     > > > > > On Tue, Sep 29, 2020 at 4:25 PM Michael S. Tsirkin <
-> >
-> >     >     mst@redhat.com> wrote:
-> >
-> >     >
-> >
-> >     >     > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > > On Tue, Sep 29, 2020 at 04:11:45PM +0530, Ani Sinha
-> >     wrote:
-> >
-> >     >
-> >
-> >     >     > > > > > > > On Tue, Sep 29, 2020 at 4:07 PM Michael S. Tsirkin <
-> >
-> >     >     mst@redhat.com> wrote:
-> >
-> >     >
-> >
-> >     >     > > > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > > > > On Tue, Sep 29, 2020 at 04:02:07PM +0530, Ani Sinha
-> >     wrote:
-> >
-> >     >
-> >
-> >     >     > > > > > > > > > On Tue, Sep 29, 2020 at 4:00 PM Ani Sinha <
-> >
-> >     >     ani@anisinha.ca> wrote:
-> >
-> >     >
-> >
-> >     >     > > > > > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > > > > > > In your pull request the following patch is
-> >     completely
-> >
-> >     >     screwed up:
-> >
-> >     >
-> >
-> >     >     > > > > > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > > > > > > commit cda2006eded0ed91974e1d9e7f9f288e65812a3e
-> >
-> >     >
-> >
-> >     >     > > > > > > > > > > Author: Ani Sinha <ani@anisinha.ca>
-> >
-> >     >
-> >
-> >     >     > > > > > > > > > > Date:   Tue Sep 29 03:22:52 2020 -0400
-> >
-> >     >
-> >
-> >     >     > > > > > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > > > > > >     tests/acpi: update golden master DSDT binary
-> >     table
-> >
-> >     >     blobs for q35
-> >
-> >     >
-> >
-> >     >     > > > > > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > > > > > > This is not my patch. It has all sorts of changes
-> >     which
-> >
-> >     >     does not
-> >
-> >     >
-> >
-> >     >     > > > > > > > > > > belong there. Can you please check?
-> >
-> >     >
-> >
-> >     >     > > > > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > > > > > See https://patchew.org/QEMU/
-> >
-> >     >     20200929071948.281157-1-mst@redhat.com/
-> >
-> >     >     20200929071948.281157-46-mst@redhat.com/
-> >
-> >     >
-> >
-> >     >     > > > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > > > > I had to regenerate the binary, yes. That's par for
-> >     the
-> >
-> >     >     course.
-> >
-> >     >
-> >
-> >     >     > > > > > > > > But it looks like I added disasssembled files. Will
-> >     fix up
-> >
-> >     >     and drop,
-> >
-> >     >
-> >
-> >     >     > > > > > > > > thanks for noticing this.
-> >
-> >     >
-> >
-> >     >     > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > > OK I pushed out a fixed variant. Pls take a look.
-> >
-> >     >
-> >
-> >     >     > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > OK I am not used to this workflow. How am I supposed to get
-> >     it?
-> >
-> >     >     Which tag?
-> >
-> >     >
-> >
-> >     >     > > > >
-> >
-> >     >
-> >
-> >     >     > > > > New for_upstream tag - I just sent in a pull request.
-> >
-> >     >
-> >
-> >     >     > > >
-> >
-> >     >
-> >
-> >     >     > > > Can you please point me to your tree?
-> >
-> >     >
-> >
-> >     >     > >
-> >
-> >     >
-> >
-> >     >     > >
-> >
-> >     >
-> >
-> >     >     > >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/
-> >     for_upstream
-> >
-> >     >
-> >
-> >     >     >
-> >
-> >     >
-> >
-> >     >     > I have sent the updated patches based on your pull request tag. I
-> >     just
-> >
-> >     >
-> >
-> >     >     > had to regenrated the blob for tests/data/acpi/pc/DSDT.hpbrroot.
-> >
-> >     >
-> >
-> >     >     >
-> >
-> >     >
-> >
-> >     >     > make && make check-qtest-x86_64 V=1 passes.
-> >
-> >     >
-> >
-> >     >     >
-> >
-> >     >
-> >
-> >     >     > The diff looks good.
-> >
-> >     >
-> >
-> >     >     >
-> >
-> >     >
-> >
-> >     >     > Can you please send a pull request with these two patches ASAP?
-> >
-> >     >
-> >
-> >     >
-> >
-> >     >
-> >
-> >     >
-> >
-> >     >
-> >
-> >     >     Thanks, I will queue them and merge in the next pull request.
-> >
-> >     >
-> >
-> >     >
-> >
-> >     > I'm willing to get down on my knees begging you to just do one another
-> >     pull
-> >
-> >     > request for these two patches. Were so close with my entire work merged.
-> >
-> >     >
-> >
-> >     > Please let's not wait another week or so.
-> >
-> >
-> >
-> >
-> >
-> >     OK it's not too much work but ... could you please add justification
-> >
-> >     about why adding this one unit test is needed so urgently?
-> >
-> >     That motivation would be quite helpful for the pull request.
-> >
-> >
-> > A patch without unit test doesn't complete the patch work. A unit test makes
-> > sure that the change would not get broken by other changes that come in later.
-> > Typically all code changes are accompanied by unit test in the same patch.
-> > Hence since the main work has already been merged, the unit test should merge
-> > ASAP so that no breakage can happen in between.
-> >
-> > Plus this completes an entire series of work which I've been working for a
-> > while. I really would love to see it all merged cleanly and fully completed.
-> >
->
-> Absolutely, thanks for the great work!
-> I am not sure that's a good justification to rushing a pull request
-> though ... are you waiting to get paid and it hinges on the test, or are
-> under a deadline, or something like this? It's okay to say so if so.
+On Tue, Sep 29, 2020 at 07:38:24PM +0100, Stefan Hajnoczi wrote:
+> On Tue, Sep 29, 2020 at 06:04:34AM -0400, Michael S. Tsirkin wrote:
+> > On Tue, Sep 29, 2020 at 09:57:51AM +0100, Stefan Hajnoczi wrote:
+> > > On Tue, Sep 29, 2020 at 02:09:55AM -0400, Michael S. Tsirkin wrote:
+> > > > On Mon, Sep 28, 2020 at 10:25:37AM +0100, Stefan Hajnoczi wrote:
+> > > > > Why extend vhost-user with vDPA?
+> > > > > ================================
+> > > > > Reusing VIRTIO emulation code for vhost-user backends
+> > > > > -----------------------------------------------------
+> > > > > It is a common misconception that a vhost device is a VIRTIO device.
+> > > > > VIRTIO devices are defined in the VIRTIO specification and consist of a
+> > > > > configuration space, virtqueues, and a device lifecycle that includes
+> > > > > feature negotiation. A vhost device is a subset of the corresponding
+> > > > > VIRTIO device. The exact subset depends on the device type, and some
+> > > > > vhost devices are closer to the full functionality of their
+> > > > > corresponding VIRTIO device than others. The most well-known example is
+> > > > > that vhost-net devices have rx/tx virtqueues and but lack the virtio-net
+> > > > > control virtqueue. Also, the configuration space and device lifecycle
+> > > > > are only partially available to vhost devices.
+> > > > > 
+> > > > > This difference makes it impossible to use a VIRTIO device as a
+> > > > > vhost-user device and vice versa. There is an impedance mismatch and
+> > > > > missing functionality. That's a shame because existing VIRTIO device
+> > > > > emulation code is mature and duplicating it to provide vhost-user
+> > > > > backends creates additional work.
+> > > > 
+> > > > 
+> > > > The biggest issue facing vhost-user and absent in vdpa is
+> > > > backend disconnect handling. This is the reason control path
+> > > > is kept under QEMU control: we do not need any logic to
+> > > > restore control path data, and we can verify a new backend
+> > > > is consistent with old one.
+> > > 
+> > > I don't think using vhost-user with vDPA changes that. The VMM still
+> > > needs to emulate a virtio-pci/ccw/mmio device that the guest interfaces
+> > > with. If the device backend goes offline it's possible to restore that
+> > > state upon reconnection. What have I missed?
+> > 
+> > The need to maintain the state in a way that is robust
+> > against backend disconnects and can be restored.
+> 
+> QEMU is only bypassed for virtqueue accesses. Everything else still
+> goes through the virtio-pci emulation in QEMU (VIRTIO configuration
+> space, status register). vDPA doesn't change this.
+> 
+> Existing vhost-user messages can be kept if they are useful (e.g.
+> virtqueue state tracking). So I think the situation is no different than
+> with the existing vhost-user protocol.
+> 
+> > > Regarding reconnection in general, it currently seems like a partially
+> > > solved problem in vhost-user. There is the "Inflight I/O tracking"
+> > > mechanism in the spec and some wording about reconnecting the socket,
+> > > but in practice I wouldn't expect all device types, VMMs, or device
+> > > backends to actually support reconnection. This is an area where a
+> > > uniform solution would be very welcome too.
+> > 
+> > I'm not aware of big issues. What are they?
+> 
+> I think "Inflight I/O tracking" can only be used when request processing
+> is idempotent? In other words, it can only be used when submitting the
+> same request multiple times is safe.
 
-Yes I am under a deadline too. Unfortunately can't disclose more details.
 
+Not inherently it just does not attempt to address this problem.
+
+
+Inflight tracking only tries to address issues on the guest side,
+that is, making sure the same buffer is used exactly once.
+
+> A silly example where this recovery mechanism cannot be used is if a
+> device has a persistent counter that is incremented by the request. The
+> guest can't be sure that the counter will be incremented exactly once.
+> 
+> Another example: devices that support requests with compare-and-swap
+> semantics cannot use this mechanism. During recover the compare will
+> fail if the request was just completing when the backend crashed.
+> 
+> Do I understand the limitations of this mechanism correctly? It doesn't
+> seem general and I doubt it can be applied to all existing device types.
+
+Device with any kind of atomicity guarantees will
+have to use some internal mechanism (e.g. log?) to ensure
+internal consistency, that is out of scope for tracking.
+
+
+
+> > > There was discussion about recovering state in muser. The original idea
+> > > was for the muser kernel module to host state that persists across
+> > > device backend restart. That way the device backend can go away
+> > > temporarily and resume without guest intervention.
+> > > 
+> > > Then when the vfio-user discussion started the idea morphed into simply
+> > > keeping a tmpfs file for each device instance (no special muser.ko
+> > > support needed anymore). This allows the device backend to resume
+> > > without losing state. In practice a programming framework is needed to
+> > > make this easy and safe to use but it boils down to a tmpfs mmap.
+> > > 
+> > > > > If there was a way to reuse existing VIRTIO device emulation code it
+> > > > > would be easier to move to a multi-process architecture in QEMU. Want to
+> > > > > run --netdev user,id=netdev0 --device virtio-net-pci,netdev=netdev0 in a
+> > > > > separate, sandboxed process? Easy, run it as a vhost-user-net device
+> > > > > instead of as virtio-net.
+> > > > 
+> > > > Given vhost-user is using a socket, and given there's an elaborate
+> > > > protocol due to need for backwards compatibility, it seems safer to
+> > > > have vhost-user interface in a separate process too.
+> > > 
+> > > Right, with vhost-user only the virtqueue processing is done in the
+> > > device backend. The VMM still has to do the virtio transport emulation
+> > > (pci, ccw, mmio) and vhost-user connection lifecycle, which is complex.
+> > 
+> > IIUC all vfio user does is add another protocol in the VMM,
+> > and move code out of VMM to backend.
+> > 
+> > Architecturally I don't see why it's safer.
+> 
+> It eliminates one layer of device emulation (virtio-pci). Fewer
+> registers to emulate means a smaller attack surface.
+
+Well it does not eliminate it as such, it moves it to the backend.
+Which in a variety of setups is actually a more sensitive
+place as the backend can do things like access host
+storage/network which VMM can be prevented from doing.
+
+> It's possible to take things further, maybe with the proposed ioregionfd
+> mechanism, where the VMM's KVM_RUN loop no longer handles MMIO/PIO
+> exits. A separate process can handle them. Maybe some platform devices
+> need CPU state access though.
+> 
+> BTW I think the goal of removing as much emulation from the VMM as
+> possible is interesting.
+> 
+> Did you have some other approach in mind to remove the PCI and
+> virtio-pci device from the VMM?
+
+Architecturally, I think we can have 3 processes:
+
+
+VMM -- guest device emulation -- host backend
+
+
+to me this looks like increasing our defence in depth strength,
+as opposed to just shifting things around ...
+
+
+
+
+> > Something like multi-process patches seems like a way to
+> > add defence in depth by having a process in the middle,
+> > outside both VMM and backend.
+> 
+> There is no third process in mpqemu. The VMM uses a UNIX domain socket
+> to communicate directly with the device backend. There is a PCI "proxy"
+> device in the VMM that does this communication when the guest accesses
+> registers. The device backend has a PCI "remote" host controller that a
+> PCIDevice instance is plugged into and the UNIX domain socket protocol
+> commands are translated into PCIDevice operations.
+
+Yes, but does anything prevent us from further splitting the backend
+up to emulation part and host side part?
+
+
+> This is exactly the same as vfio-user. The only difference is that
+> vfio-user uses an existing set of commands, whereas mpqemu defines a new
+> protocol that will eventually need to provide equivalent functionality.
 >
-> >
-> >
-> >
-> >
-> >
-> >
-> >     >
-> >
-> >     >
-> >
-> >     >
-> >
-> >     >
-> >
-> >     >
-> >
-> >     >     > >
-> >
-> >     >
-> >
-> >     >     > >
-> >
-> >     >
-> >
-> >     >     > >
-> >
-> >     >
-> >
-> >     >     > > > >
-> >
-> >     >
-> >
-> >     >     > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > > > I think DSDT.hbridge is wrong. The checksum looks
-> >     weird:
-> >
-> >     >
-> >
-> >     >     > > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > > > + *     Length           0x00000B89 (2953)
-> >
-> >     >
-> >
-> >     >     > > > > > > >   *     Revision         0x01 **** 32-bit table (V1),
-> >     no
-> >
-> >     >     64-bit math support
-> >
-> >     >
-> >
-> >     >     > > > > > > > - *     Checksum         0x05
-> >
-> >     >
-> >
-> >     >     > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > > What is weird about it?
-> >
-> >     >
-> >
-> >     >     > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > > > This file should be introduced just by one patch. my
-> >     patch.
-> >
-> >     >
-> >
-> >     >     > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > > I just re-run rebuild-expected-aml, no changes.
-> >
-> >     >
-> >
-> >     >     > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > > I have this:
-> >
-> >     >
-> >
-> >     >     > > > > > > commit 5e3a486211f02d9ecb18939ca21087515ec81883
-> >
-> >     >
-> >
-> >     >     > > > > > > Author: Ani Sinha <ani@anisinha.ca>
-> >
-> >     >
-> >
-> >     >     > > > > > > Date:   Fri Sep 18 14:11:05 2020 +0530
-> >
-> >     >
-> >
-> >     >     > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > >     tests/acpi: unit test for
-> >
-> >     >     'acpi-pci-hotplug-with-bridge-support' bridge flag
-> >
-> >     >
-> >
-> >     >     > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > >     This change adds a new unit test for the global flag
-> >
-> >     >
-> >
-> >     >     > > > > > >     'acpi-pci-hotplug-with-bridge-support' which is
-> >     available
-> >
-> >     >     for cold plugged pci
-> >
-> >     >
-> >
-> >     >     > > > > > >     bridges in i440fx. The flag can be used to turn off
-> >     ACPI
-> >
-> >     >     based hotplug support
-> >
-> >     >
-> >
-> >     >     > > > > > >     on all pci bridges.
-> >
-> >     >
-> >
-> >     >     > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > > Here is the full DSDT header, attached:
-> >
-> >     >
-> >
-> >     >     > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > > /*
-> >
-> >     >
-> >
-> >     >     > > > > > >  * Intel ACPI Component Architecture
-> >
-> >     >
-> >
-> >     >     > > > > > >  * AML/ASL+ Disassembler version 20190509 (64-bit
-> >     version)
-> >
-> >     >
-> >
-> >     >     > > > > > >  * Copyright (c) 2000 - 2019 Intel Corporation
-> >
-> >     >
-> >
-> >     >     > > > > > >  *
-> >
-> >     >
-> >
-> >     >     > > > > > >  * Disassembling to symbolic ASL+ operators
-> >
-> >     >
-> >
-> >     >     > > > > > >  *
-> >
-> >     >
-> >
-> >     >     > > > > > >  * Disassembly of tests/data/acpi/pc/DSDT.hpbridge, Tue
-> >     Sep 29
-> >
-> >     >     06:51:03 2020
-> >
-> >     >
-> >
-> >     >     > > > > > >  *
-> >
-> >     >
-> >
-> >     >     > > > > > >  * Original Table Header:
-> >
-> >     >
-> >
-> >     >     > > > > > >  *     Signature        "DSDT"
-> >
-> >     >
-> >
-> >     >     > > > > > >  *     Length           0x0000139D (5021)
-> >
-> >     >
-> >
-> >     >     > > > > > >  *     Revision         0x01 **** 32-bit table (V1), no
-> >     64-bit
-> >
-> >     >     math support
-> >
-> >     >
-> >
-> >     >     > > > > > >  *     Checksum         0x05
-> >
-> >     >
-> >
-> >     >     > > > > > >  *     OEM ID           "BOCHS "
-> >
-> >     >
-> >
-> >     >     > > > > > >  *     OEM Table ID     "BXPCDSDT"
-> >
-> >     >
-> >
-> >     >     > > > > > >  *     OEM Revision     0x00000001 (1)
-> >
-> >     >
-> >
-> >     >     > > > > > >  *     Compiler ID      "BXPC"
-> >
-> >     >
-> >
-> >     >     > > > > > >  *     Compiler Version 0x00000001 (1)
-> >
-> >     >
-> >
-> >     >     > > > > > >  */
-> >
-> >     >
-> >
-> >     >     > > > > > > DefinitionBlock ("", "DSDT", 1, "BOCHS ", "BXPCDSDT",
-> >
-> >     >     0x00000001)
-> >
-> >     >
-> >
-> >     >     > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > > > > --
-> >
-> >     >
-> >
-> >     >     > > > > > > MST
-> >
-> >     >
-> >
-> >     >     > > > > > >
-> >
-> >     >
-> >
-> >     >     > > > >
-> >
-> >     >
-> >
-> >     >     > >
-> >
-> >     >
-> >
-> >     >
-> >
-> >     >
-> >
-> >     >
-> >
-> >
-> >
-> >
->
+> > > Going back to Marc-AndrÃ©'s point, why don't we focus on vfio-user so the
+> > > entire device can be moved out of the VMM?
+> > > 
+> > > Stefan
+> > 
+> > The fact that vfio-user adds a kernel component is one issue.
+> 
+> vfio-user only needs a UNIX domain socket. The muser.ko kernel module
+> that was discussed after last KVM Forum is not used by vfio-user.
+> 
+> Stefan
+
+Sorry I will need to go and read the doc which I didn't yet, sorry
+about that.
+
+-- 
+MST
+
 
