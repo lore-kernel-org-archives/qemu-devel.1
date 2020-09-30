@@ -2,103 +2,80 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD24EC4727E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 11:19:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15241C4727F
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 11:27:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF35520708
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 11:19:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R22+LHNu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF35520708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3664420709
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 11:27:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3664420709
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNa8z-0006eN-Tk
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 07:19:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59254)
+	id 1kNaGE-00006X-UO
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 07:27:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60592)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kNa89-0006Dz-JW
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 07:18:41 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42743)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kNaF4-0007a1-4R
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 07:25:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45366)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kNa87-0002wZ-Qx
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 07:18:41 -0400
-Received: by mail-wr1-x443.google.com with SMTP id c18so1336514wrm.9
- for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 04:18:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=wMZ5Ij++IeecN8Sx3NM4s64oMZmw5Awbb8mIkxxgHQk=;
- b=R22+LHNuaYXZRsPe0D2q47SGLuuepzMVTGREPw4/4ZOt3AFICChCgUOKZxEaDiPdtg
- O3R+kKlbbiJSRMpYJZz8hBTbytMdcWiaxgC6aqdfMr9hTZPP9/pGj37nth8IuiZhZAqw
- xMs8uP6rX7TVRSlhT7cusaFAOsO8wQUnvtnm4h3KbroGXr8j0Ph8HY/jq9FEENXPmCL5
- nRjrIYYUD97aBFHU+M+2TSW0gD6MctbZx4P1DDImpWNtv1RFgfwoqB76Yci7+CpczS7J
- DU6POwS1/0FAQQWCl7mskW5E93mghYBxaz5Gp1jeHhJJZUH0fnlUP50ZaQhRkyoSSDdp
- EDOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=wMZ5Ij++IeecN8Sx3NM4s64oMZmw5Awbb8mIkxxgHQk=;
- b=fC/DciH2MrR//qp+Y4hG6socWDe6OYywKqNGmg055ef2MuRN9+6nB5ccd0Y109aFka
- oZAWh5KdnxRxpbuibDYqA6GhPwUG9nt4h7nqrgABtaq/JGZjXPqQnpVFrCL+khcEM4Eo
- /2vJgW2GDyfQ9fAv9FGnHx2YZb5TYY+dCYvkXeEJzyvloPNT9SnM5pb+oGZCozkz+2hb
- 5cv9sinueurprqChxfJcHy0RTCtJkZLEvFykNUsyfHB/B7vuPKoEUIAxnAPTyY8l6qKO
- OX7nVtBPtNn/tVivxlF4gfqlGqW0kbrrxPMceXr6PirtwIABRHnral6y5DVuyVdJLl4Z
- Vb8Q==
-X-Gm-Message-State: AOAM5305r4eDlr/nRxjYvtNSO5iAb8fWrfK0IDmNVD7yGIdH+aA+CFXL
- hFCUhfGz/Plxr7rjwvsdqkMRAvSIxsyNag==
-X-Google-Smtp-Source: ABdhPJzKFgMkHItvcV0GLvkyngtrLkAf4/gCs7qcBeg6mXtJCh5DLV7G8rPTnW8bbEazjYLFCGpuYA==
-X-Received: by 2002:a5d:43cf:: with SMTP id v15mr2794787wrr.149.1601464717417; 
- Wed, 30 Sep 2020 04:18:37 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id l10sm2410476wru.59.2020.09.30.04.18.36
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 30 Sep 2020 04:18:36 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id C698F1FF7E;
- Wed, 30 Sep 2020 12:18:35 +0100 (BST)
-References: <20200925154027.12672-1-alex.bennee@linaro.org>
- <20200925154027.12672-4-alex.bennee@linaro.org>
- <f5fc27fa-0c02-b1a9-7f29-dd48aa40fd6a@redhat.com>
- <87ft70pgpq.fsf@linaro.org>
- <0e0ebdd5-d9b9-17dd-82c9-2c63a73f4eea@redhat.com>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v1 03/15] meson: move libmpathpersist test
-In-reply-to: <0e0ebdd5-d9b9-17dd-82c9-2c63a73f4eea@redhat.com>
-Date: Wed, 30 Sep 2020 12:18:35 +0100
-Message-ID: <87y2kro6lw.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kNaF1-0003PZ-FE
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 07:25:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kNaEz-0005MM-DE
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 11:25:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 62BE62E80DC
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 11:25:45 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Date: Wed, 30 Sep 2020 11:20:36 -0000
+From: Chris <1880066@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: csl-ubuntuone jrcichra
+X-Launchpad-Bug-Reporter: Justin Cichra (jrcichra)
+X-Launchpad-Bug-Modifier: Chris (csl-ubuntuone)
+References: <159011868752.31342.14577516157927235828.malonedeb@wampee.canonical.com>
+Message-Id: <160146483622.12287.11681871291911617500.malone@soybean.canonical.com>
+Subject: [Bug 1880066] Re: Microphone input dies in guest when switching evdev
+ input
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="d685c0a40836eb9844ed835c9700f20633c1d7af"; Instance="production"
+X-Launchpad-Hash: f03612b51e3a4080adbd095c27595af001dbafe2
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 07:16:30
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.001, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -107,49 +84,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Reply-To: Bug 1880066 <1880066@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+I have this exact issue with any VM using Spice audio redirection.
+My setup has Linux (Fedora 32) as host and guest.
+The Guest microphone freezes mid way through most video conferences, which =
+is quite a pain.
+I see the exact same error messages:
 
-Thomas Huth <thuth@redhat.com> writes:
+A bug was just triggered in audio_get_avail
+Context:
+audio: live=3D172895567 sw->hw->conv_buf->size=3D1920
+A bug was just triggered in audio_pcm_hw_get_live_in
+Context:
+audio: live=3D172895567 hw->conv_buf->size=3D1920
 
-> On 30/09/2020 12.51, Alex Benn=C3=A9e wrote:
->>=20
->> Paolo Bonzini <pbonzini@redhat.com> writes:
->>=20
->>> On 25/09/20 17:40, Alex Benn=C3=A9e wrote:
->>>> From: Paolo Bonzini <pbonzini@redhat.com>
->>>>
->>>> This is the first compiler/linker test that has been moved to Meson.
->>>> Add more section headings to keep things clearer.
->>>>
->>>> [thuth: Add check for mpathpersist.found() before showing mpathpersist=
-_new_api]
->>>>
->>>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>> Message-Id: <20200918103430.297167-3-thuth@redhat.com>
->>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> <snip>
->>>
->>> This is not the latest version of the series, can you drop patches 2
->>> and 3?
->>=20
->> Hmm so now I'm seeing failures in the bionic builds thanks to libmpath:
->
-> Paolo's PR with the fix is still not merged yet (see "[PULL v7 00/87]
-> Misc patches for 2020-09-24") ... but maybe you could pick the newer
-> version of the libmpath patches from his PR into your queue?
+Closing the spice client (Boxes or Virtmanager) and reconnecting sometimes =
+restores microphone.
+I have tried AC97 and HD Audio as virtual hardware and have the same result=
+s, AC97 may be proving to be a little less failure prone, but I have not ha=
+d enough events to be sure.
 
-I did pick it as an experiment - but it's still broken and I haven't had
-a chance to dig into the failure yet.
+-- =
 
->
->  Thomas
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1880066
+
+Title:
+  Microphone input dies in guest when switching evdev input
+
+Status in QEMU:
+  New
+
+Bug description:
+  justin@justin-3900x:~$ lsb_release -a
+  No LSB modules are available.
+  Distributor ID:	Ubuntu
+  Description:	Ubuntu 20.04 LTS
+  Release:	20.04
+  Codename:	focal
 
 
---=20
-Alex Benn=C3=A9e
+  justin@justin-3900x:~$ apt list --installed | egrep '*qemu*|*kvm*'
+
+  WARNING: apt does not have a stable CLI interface. Use with caution in
+  scripts.
+
+  ipxe-qemu-256k-compat-efi-roms/focal,focal,now 1.0.0+git-20150424.a25a16d=
+-0ubuntu4 all [installed,automatic]
+  ipxe-qemu/focal,focal,now 1.0.0+git-20190109.133f4c4-0ubuntu3 all [instal=
+led,automatic]
+  libvirt-daemon-driver-qemu/focal,now 6.0.0-0ubuntu8 amd64 [installed,auto=
+matic]
+  qemu-block-extra/focal-updates,focal-security,now 1:4.2-3ubuntu6.1 amd64 =
+[installed,automatic]
+  qemu-kvm/focal-updates,focal-security,now 1:4.2-3ubuntu6.1 amd64 [install=
+ed]
+  qemu-system-common/focal-updates,focal-security,now 1:4.2-3ubuntu6.1 amd6=
+4 [installed,automatic]
+  qemu-system-data/focal-updates,focal-updates,focal-security,focal-securit=
+y,now 1:4.2-3ubuntu6.1 all [installed,automatic]
+  qemu-system-gui/focal-updates,focal-security,now 1:4.2-3ubuntu6.1 amd64 [=
+installed,automatic]
+  qemu-system-x86/focal-updates,focal-security,now 1:4.2-3ubuntu6.1 amd64 [=
+installed]
+  qemu-utils/focal-updates,focal-security,now 1:4.2-3ubuntu6.1 amd64 [insta=
+lled,automatic]
+  qemu/focal-updates,focal-security,now 1:4.2-3ubuntu6.1 amd64 [installed]
+  justin@justin-3900x:~$ =
+
+
+  This did not happen in Eoan (qemu 4.0.0). I was able to switch in/out
+  of a VM with my audio coming through fine. I enabled Eoan in my
+  sources.list, downgraded all my qemu packages, and the issue was
+  resolved.
+
+  This happens on the latest Windows 10 guest when a sound device is
+  listening for the microphone.
+
+  /var/log/libvirt/qemu/<vmname>.log spews this error out when I switch
+  with evdev (which is just the keyboard and mouse, the audio is passed
+  through I assume spice):
+
+  =
+
+  audio: live=3D228193 hw->conv_buf->size=3D1920
+  A bug was just triggered in audio_get_avail
+  Context:
+  audio: live=3D228675 sw->hw->conv_buf->size=3D1920
+  A bug was just triggered in audio_pcm_hw_get_live_in
+  Context:
+  audio: live=3D228675 hw->conv_buf->size=3D1920
+  A bug was just triggered in audio_get_avail
+  Context:
+  audio: live=3D229156 sw->hw->conv_buf->size=3D1920
+  A bug was just triggered in audio_pcm_hw_get_live_in
+  Context:
+  audio: live=3D229156 hw->conv_buf->size=3D1920
+  A bug was just triggered in audio_get_avail
+  Context:
+  audio: live=3D229638 sw->hw->conv_buf->size=3D1920
+  A bug was just triggered in audio_pcm_hw_get_live_in
+  Context:
+  audio: live=3D229638 hw->conv_buf->size=3D1920
+  A bug was just triggered in audio_get_avail
+  Context:
+  audio: live=3D230119 sw->hw->conv_buf->size=3D1920
+  A bug was just triggered in audio_pcm_hw_get_live_in
+  Context:
+  audio: live=3D230119 hw->conv_buf->size=3D1920
+  A bug was just triggered in audio_get_avail
+  Context:
+  audio: live=3D230600 sw->hw->conv_buf->size=3D1920
+  A bug was just triggered in audio_pcm_hw_get_live_in
+  Context:
+  audio: live=3D230600 hw->conv_buf->size=3D1920
+  A bug was just triggered in audio_get_avail
+  Context:
+  audio: live=3D231081 sw->hw->conv_buf->size=3D1920
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1880066/+subscriptions
 
