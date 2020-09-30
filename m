@@ -2,110 +2,88 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D138C4727E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 17:49:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8B4BC4727C
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 17:50:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC1962074B
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 17:49:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1A26720706
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 17:50:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HfcUr0Wp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC1962074B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BycXHsPs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A26720706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNgDu-0004b0-JX
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 13:49:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54978)
+	id 1kNgFg-0006n7-1H
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 13:50:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55202)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kNgDD-00046K-Oi
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 13:48:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38533)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kNgDz-0004y3-E1
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 13:49:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:53918)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kNgDB-0004dm-60
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 13:48:19 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kNgDx-0004h9-7u
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 13:49:07 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601488095;
+ s=mimecast20190719; t=1601488144;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=EZvrSnYm3YGfZv/jW9MTku5rvnXBGTL6dfq7Gux/9s4=;
- b=HfcUr0Wp8hLPuP9gTqI58f8/zPD+hhfrN1IlQPAIvArINkHM9zHJh7iBqLkFUVUpbw3BmS
- uXnim+t7xzpJlbAV2YxumfiDZEnkqXq3gfvnayhgbLI8yCiXWu/5gCO+fQpMy8qOOJMEhA
- n9/yDPb06LpV6hodGukORk6wF1wmLA0=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-259-WbLnaRS3NGWnq-o-pL1rsQ-1; Wed, 30 Sep 2020 13:48:13 -0400
-X-MC-Unique: WbLnaRS3NGWnq-o-pL1rsQ-1
-Received: by mail-wm1-f70.google.com with SMTP id b20so275474wmj.1
- for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 10:48:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to;
- bh=3tY4UGEihUG/tvZ5JYGwPtvK29XTRCAmKkYZxpL5Tuk=;
- b=O7RmhXl5nBbcUN58l3cKQPULbAvFkUPBT1HeMvyXZCbbhdEL98Rs90HEAOXRwJroyP
- t2MNI3pEC+6vq9iD5BH15hShdyxq9GH0HuSWkk4y931ub6lxvHNQsiSueMATlf5JV9CG
- jrSUudO0j6l3dkjmyY3RtpoW3Dbey7Yv3SquLTSF3hX7rUSOGotqc50+FcpEOkF6Ne4o
- j7oir3cqcbyJa1/XEuCj3ChUUuhjIk/dCxk91FeL9kS2Sv1HSuVScL2fcrplG3UVIdDw
- DOBMKAt0qF8IYeH83BmqBhBG01LCqLavBZqqI1Drt8Bnut/xr/9NBSNBpYCUEBj3bLaQ
- Mc4w==
-X-Gm-Message-State: AOAM5332nnHmOUaH5dLch/9sL3PwGqskE+PeE/1vdZphrkW1cGso8SKe
- 4LmnLAoShIVvw0gt8JJKUYqB5t/TKpdEM1wWyaHJinaPb0pmmVCwIxsIKMqWa3gGrHXrEEc04Ee
- QaKLWLGCcXajhFIg=
-X-Received: by 2002:a05:600c:20c:: with SMTP id
- 12mr4461380wmi.40.1601488092007; 
- Wed, 30 Sep 2020 10:48:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxq60XVfELMyIc5OByeHIYXZieFql7TrKd4z75H2KFxG7VYX0LkNBD7qJaNImn4ITWDKjBw6A==
-X-Received: by 2002:a05:600c:20c:: with SMTP id
- 12mr4461367wmi.40.1601488091800; 
- Wed, 30 Sep 2020 10:48:11 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:75e3:aaa7:77d6:f4e4?
- ([2001:b07:6468:f312:75e3:aaa7:77d6:f4e4])
- by smtp.gmail.com with ESMTPSA id z67sm4454538wme.41.2020.09.30.10.48.10
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 30 Sep 2020 10:48:11 -0700 (PDT)
-Subject: Re: [PATCH 01/10] qdev: add "check if address free" callback for buses
-To: Stefan Hajnoczi <stefanha@redhat.com>
-References: <20200925172604.2142227-1-pbonzini@redhat.com>
- <20200925172604.2142227-2-pbonzini@redhat.com>
- <20200928093006.GB44353@stefanha-x1.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ce4b7050-24c3-8d68-8e37-3f12c3970cac@redhat.com>
-Date: Wed, 30 Sep 2020 19:48:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ bh=z9xOuwCEJYSFj7tax+KvuYSl7yT6OpvutN8mRH/aYQQ=;
+ b=BycXHsPsx9aynnf+24Pdse1b4jPF/WjGkF9l60bIBa+AqgdcLL77auvYSEttodDNZ0NIWd
+ 6/xtjgBQRPt/bPNHFlUdXPA0UMT6ifFihNH2jmneFXyljn4Pqy/zS8O/zlogtAVPOOe1ES
+ BNMl3IdN+g7r1RDTu3QQGk1upoHqB/A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-152-M4-ZV1AEPjC8NQlVV4Uq7Q-1; Wed, 30 Sep 2020 13:49:02 -0400
+X-MC-Unique: M4-ZV1AEPjC8NQlVV4Uq7Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BECF78018A4;
+ Wed, 30 Sep 2020 17:49:00 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
+ [10.36.112.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2CB3A5C1D0;
+ Wed, 30 Sep 2020 17:48:57 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 2786243BFB6; Wed, 30 Sep 2020 19:48:56 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 03/12] arm: use acpi_dsdt_add_gpex
+Date: Wed, 30 Sep 2020 19:48:46 +0200
+Message-Id: <20200930174856.11296-4-kraxel@redhat.com>
+In-Reply-To: <20200930174856.11296-1-kraxel@redhat.com>
+References: <20200930174856.11296-1-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200928093006.GB44353@stefanha-x1.localdomain>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="wQZpsgONexfsOiSxOfOIJSF51MJnzbQ7s"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:26:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:31:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -25
 X-Spam_score: -2.6
 X-Spam_bar: --
 X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.469,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,54 +96,226 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, mlevitsk@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Radoslaw Biernacki <rad@semihalf.com>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Leif Lindholm <leif@nuviainc.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wQZpsgONexfsOiSxOfOIJSF51MJnzbQ7s
-Content-Type: multipart/mixed; boundary="7e0Av3VYWFPr8VwStkFYckFwuNenv4bgA"
+Fill gpex config struct from memory map, then call the new
+acpi_dsdt_add_gpex helper function.  No functional change.
 
---7e0Av3VYWFPr8VwStkFYckFwuNenv4bgA
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Message-id: 20200928104256.9241-4-kraxel@redhat.com
+---
+ hw/arm/virt-acpi-build.c | 175 ++-------------------------------------
+ 1 file changed, 9 insertions(+), 166 deletions(-)
 
-On 28/09/20 11:30, Stefan Hajnoczi wrote:
->> +    bool (*check_address)(BusState *bus, DeviceState *dev, Error **errp=
-);
-> Please document this function.
-
-I will add this:
-
-=09/*
-=09 * Return whether the device can be added to @bus,
-=09 * based on the address that was set (via device properties)
-=09 * before realize.  If not, on return @errp contains the
-=09 * human-readable error message.
-=09 */
-
-
---7e0Av3VYWFPr8VwStkFYckFwuNenv4bgA--
-
---wQZpsgONexfsOiSxOfOIJSF51MJnzbQ7s
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAl90xNkACgkQv/vSX3jH
-roM6swf+LZjZ8ma1gPB4Nni92gDHFHCNuCwyS3dh7hRPc6mCq9qEvPQuODxt0qP9
-2o6KOX+QUZHvU4Fy2QW54LeHFLNvlRCcz0CX3wz/bAahsOkBPWQ+j0r/igPio753
-FPxp68ZvyF2nWeSr+YWP9AETIwKkuQjJIKrNGISAt7rt99TgPpM5V1/84pZzpdPI
-gWR9lK8M7Qnlx862nbLw0hHrfUepKFmtLph8QbKyjbciOxqiowYCPfMGPHAq7faA
-qexuDYt9b1oJ5+JiRKkgfSGCdkT/PIzYkMqd2DhTQybE22XWQLcp+WZK9dkxkl6t
-2ZoT2ozLQK+7AtvYmfPutePoM0GR7w==
-=ey7L
------END PGP SIGNATURE-----
-
---wQZpsgONexfsOiSxOfOIJSF51MJnzbQ7s--
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 6bff5e373872..9747a6458f0b 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -44,6 +44,7 @@
+ #include "hw/acpi/tpm.h"
+ #include "hw/pci/pcie_host.h"
+ #include "hw/pci/pci.h"
++#include "hw/pci-host/gpex.h"
+ #include "hw/arm/virt.h"
+ #include "hw/mem/nvdimm.h"
+ #include "hw/platform-bus.h"
+@@ -155,176 +156,18 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+                               uint32_t irq, bool use_highmem, bool highmem_ecam)
+ {
+     int ecam_id = VIRT_ECAM_ID(highmem_ecam);
+-    Aml *method, *crs, *ifctx, *UUID, *ifctx1, *elsectx, *buf;
+-    int i, slot_no;
+-    hwaddr base_mmio = memmap[VIRT_PCIE_MMIO].base;
+-    hwaddr size_mmio = memmap[VIRT_PCIE_MMIO].size;
+-    hwaddr base_pio = memmap[VIRT_PCIE_PIO].base;
+-    hwaddr size_pio = memmap[VIRT_PCIE_PIO].size;
+-    hwaddr base_ecam = memmap[ecam_id].base;
+-    hwaddr size_ecam = memmap[ecam_id].size;
+-    int nr_pcie_buses = size_ecam / PCIE_MMCFG_SIZE_MIN;
+-
+-    Aml *dev = aml_device("%s", "PCI0");
+-    aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A08")));
+-    aml_append(dev, aml_name_decl("_CID", aml_string("PNP0A03")));
+-    aml_append(dev, aml_name_decl("_SEG", aml_int(0)));
+-    aml_append(dev, aml_name_decl("_BBN", aml_int(0)));
+-    aml_append(dev, aml_name_decl("_UID", aml_int(0)));
+-    aml_append(dev, aml_name_decl("_STR", aml_unicode("PCIe 0 Device")));
+-    aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
+-
+-    /* Declare the PCI Routing Table. */
+-    Aml *rt_pkg = aml_varpackage(PCI_SLOT_MAX * PCI_NUM_PINS);
+-    for (slot_no = 0; slot_no < PCI_SLOT_MAX; slot_no++) {
+-        for (i = 0; i < PCI_NUM_PINS; i++) {
+-            int gsi = (i + slot_no) % PCI_NUM_PINS;
+-            Aml *pkg = aml_package(4);
+-            aml_append(pkg, aml_int((slot_no << 16) | 0xFFFF));
+-            aml_append(pkg, aml_int(i));
+-            aml_append(pkg, aml_name("GSI%d", gsi));
+-            aml_append(pkg, aml_int(0));
+-            aml_append(rt_pkg, pkg);
+-        }
+-    }
+-    aml_append(dev, aml_name_decl("_PRT", rt_pkg));
+-
+-    /* Create GSI link device */
+-    for (i = 0; i < PCI_NUM_PINS; i++) {
+-        uint32_t irqs =  irq + i;
+-        Aml *dev_gsi = aml_device("GSI%d", i);
+-        aml_append(dev_gsi, aml_name_decl("_HID", aml_string("PNP0C0F")));
+-        aml_append(dev_gsi, aml_name_decl("_UID", aml_int(i)));
+-        crs = aml_resource_template();
+-        aml_append(crs,
+-                   aml_interrupt(AML_CONSUMER, AML_LEVEL, AML_ACTIVE_HIGH,
+-                                 AML_EXCLUSIVE, &irqs, 1));
+-        aml_append(dev_gsi, aml_name_decl("_PRS", crs));
+-        crs = aml_resource_template();
+-        aml_append(crs,
+-                   aml_interrupt(AML_CONSUMER, AML_LEVEL, AML_ACTIVE_HIGH,
+-                                 AML_EXCLUSIVE, &irqs, 1));
+-        aml_append(dev_gsi, aml_name_decl("_CRS", crs));
+-        method = aml_method("_SRS", 1, AML_NOTSERIALIZED);
+-        aml_append(dev_gsi, method);
+-        aml_append(dev, dev_gsi);
+-    }
+-
+-    method = aml_method("_CBA", 0, AML_NOTSERIALIZED);
+-    aml_append(method, aml_return(aml_int(base_ecam)));
+-    aml_append(dev, method);
+-
+-    method = aml_method("_CRS", 0, AML_NOTSERIALIZED);
+-    Aml *rbuf = aml_resource_template();
+-    aml_append(rbuf,
+-        aml_word_bus_number(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE,
+-                            0x0000, 0x0000, nr_pcie_buses - 1, 0x0000,
+-                            nr_pcie_buses));
+-    aml_append(rbuf,
+-        aml_dword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXED,
+-                         AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000, base_mmio,
+-                         base_mmio + size_mmio - 1, 0x0000, size_mmio));
+-    aml_append(rbuf,
+-        aml_dword_io(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE,
+-                     AML_ENTIRE_RANGE, 0x0000, 0x0000, size_pio - 1, base_pio,
+-                     size_pio));
++    struct GPEXConfig cfg = {
++        .mmio32 = memmap[VIRT_PCIE_MMIO],
++        .pio    = memmap[VIRT_PCIE_PIO],
++        .ecam   = memmap[ecam_id],
++        .irq    = irq,
++    };
+ 
+     if (use_highmem) {
+-        hwaddr base_mmio_high = memmap[VIRT_HIGH_PCIE_MMIO].base;
+-        hwaddr size_mmio_high = memmap[VIRT_HIGH_PCIE_MMIO].size;
+-
+-        aml_append(rbuf,
+-            aml_qword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXED,
+-                             AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000,
+-                             base_mmio_high,
+-                             base_mmio_high + size_mmio_high - 1, 0x0000,
+-                             size_mmio_high));
++        cfg.mmio64 = memmap[VIRT_HIGH_PCIE_MMIO];
+     }
+ 
+-    aml_append(method, aml_return(rbuf));
+-    aml_append(dev, method);
+-
+-    /* Declare an _OSC (OS Control Handoff) method */
+-    aml_append(dev, aml_name_decl("SUPP", aml_int(0)));
+-    aml_append(dev, aml_name_decl("CTRL", aml_int(0)));
+-    method = aml_method("_OSC", 4, AML_NOTSERIALIZED);
+-    aml_append(method,
+-        aml_create_dword_field(aml_arg(3), aml_int(0), "CDW1"));
+-
+-    /* PCI Firmware Specification 3.0
+-     * 4.5.1. _OSC Interface for PCI Host Bridge Devices
+-     * The _OSC interface for a PCI/PCI-X/PCI Express hierarchy is
+-     * identified by the Universal Unique IDentifier (UUID)
+-     * 33DB4D5B-1FF7-401C-9657-7441C03DD766
+-     */
+-    UUID = aml_touuid("33DB4D5B-1FF7-401C-9657-7441C03DD766");
+-    ifctx = aml_if(aml_equal(aml_arg(0), UUID));
+-    aml_append(ifctx,
+-        aml_create_dword_field(aml_arg(3), aml_int(4), "CDW2"));
+-    aml_append(ifctx,
+-        aml_create_dword_field(aml_arg(3), aml_int(8), "CDW3"));
+-    aml_append(ifctx, aml_store(aml_name("CDW2"), aml_name("SUPP")));
+-    aml_append(ifctx, aml_store(aml_name("CDW3"), aml_name("CTRL")));
+-
+-    /*
+-     * Allow OS control for all 5 features:
+-     * PCIeHotplug SHPCHotplug PME AER PCIeCapability.
+-     */
+-    aml_append(ifctx, aml_and(aml_name("CTRL"), aml_int(0x1F),
+-                              aml_name("CTRL")));
+-
+-    ifctx1 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(0x1))));
+-    aml_append(ifctx1, aml_or(aml_name("CDW1"), aml_int(0x08),
+-                              aml_name("CDW1")));
+-    aml_append(ifctx, ifctx1);
+-
+-    ifctx1 = aml_if(aml_lnot(aml_equal(aml_name("CDW3"), aml_name("CTRL"))));
+-    aml_append(ifctx1, aml_or(aml_name("CDW1"), aml_int(0x10),
+-                              aml_name("CDW1")));
+-    aml_append(ifctx, ifctx1);
+-
+-    aml_append(ifctx, aml_store(aml_name("CTRL"), aml_name("CDW3")));
+-    aml_append(ifctx, aml_return(aml_arg(3)));
+-    aml_append(method, ifctx);
+-
+-    elsectx = aml_else();
+-    aml_append(elsectx, aml_or(aml_name("CDW1"), aml_int(4),
+-                               aml_name("CDW1")));
+-    aml_append(elsectx, aml_return(aml_arg(3)));
+-    aml_append(method, elsectx);
+-    aml_append(dev, method);
+-
+-    method = aml_method("_DSM", 4, AML_NOTSERIALIZED);
+-
+-    /* PCI Firmware Specification 3.0
+-     * 4.6.1. _DSM for PCI Express Slot Information
+-     * The UUID in _DSM in this context is
+-     * {E5C937D0-3553-4D7A-9117-EA4D19C3434D}
+-     */
+-    UUID = aml_touuid("E5C937D0-3553-4D7A-9117-EA4D19C3434D");
+-    ifctx = aml_if(aml_equal(aml_arg(0), UUID));
+-    ifctx1 = aml_if(aml_equal(aml_arg(2), aml_int(0)));
+-    uint8_t byte_list[1] = {1};
+-    buf = aml_buffer(1, byte_list);
+-    aml_append(ifctx1, aml_return(buf));
+-    aml_append(ifctx, ifctx1);
+-    aml_append(method, ifctx);
+-
+-    byte_list[0] = 0;
+-    buf = aml_buffer(1, byte_list);
+-    aml_append(method, aml_return(buf));
+-    aml_append(dev, method);
+-
+-    Aml *dev_res0 = aml_device("%s", "RES0");
+-    aml_append(dev_res0, aml_name_decl("_HID", aml_string("PNP0C02")));
+-    crs = aml_resource_template();
+-    aml_append(crs,
+-        aml_qword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXED,
+-                         AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000, base_ecam,
+-                         base_ecam + size_ecam - 1, 0x0000, size_ecam));
+-    aml_append(dev_res0, aml_name_decl("_CRS", crs));
+-    aml_append(dev, dev_res0);
+-    aml_append(scope, dev);
++    acpi_dsdt_add_gpex(scope, &cfg);
+ }
+ 
+ static void acpi_dsdt_add_gpio(Aml *scope, const MemMapEntry *gpio_memmap,
+-- 
+2.27.0
 
 
