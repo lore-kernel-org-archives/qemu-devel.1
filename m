@@ -7,60 +7,59 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00C38C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 05:06:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 264D1C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 05:07:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A5FF206F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 05:06:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A4A0E206F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 05:07:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VZOYmC2X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A5FF206F7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZTW456ZP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4A0E206F7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNUJU-0003AF-HE
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 01:06:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37498)
+	id 1kNUKY-00041R-No
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 01:07:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37556)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNToJ-0001zj-2S
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 00:33:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20300)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNToY-0002QL-0O
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 00:34:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41753)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNToF-0000gt-EH
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 00:33:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601440422;
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNToV-0000jy-TJ
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 00:34:01 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601440439;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=YDriVdbivoRMldDSaG/BJGjcmQgN9RnxVCGq0lWZb1s=;
- b=VZOYmC2Xa6ANvRkx3Fst897k6ZT/qo47lguAQOXNY/b6ZZdbw4xjBm6UL4CYyRAZK2iobd
- MZnyAbb4zSaGsUAdAdUmtfCBIwql8eswnIFYdxrA/GRQ8QEgTYqDiL+S09YUhJSkncQoyY
- GKTtvupfpDpVjW9BBgwZJbwLt0kJHJk=
+ bh=t/abyknJ077SLyyiLDe4jq6y7p12uzRjz9MkvLvt3Og=;
+ b=ZTW456ZPDQiidsNZdWkaxaSDmwPFIBZhejXyYTJD18pndAsYjUYvNlqsZTzv/6G9IDLTr3
+ CXPgKxnBgFLxMgvCsls7LHomNYsfHmp3JJTCR5snak37CKwR9ueqOPw43Fi/N9GHi/APCK
+ EEucHPdLLZb1H7tjQh/OEIMGo6t3rwU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-9-vj8QPr9eOGSq8b07Y3OxIw-1; Wed, 30 Sep 2020 00:33:39 -0400
-X-MC-Unique: vj8QPr9eOGSq8b07Y3OxIw-1
+ us-mta-202-6fLyPnDvN_2pWNP7ro1PUA-1; Wed, 30 Sep 2020 00:33:34 -0400
+X-MC-Unique: 6fLyPnDvN_2pWNP7ro1PUA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B8517802B61;
- Wed, 30 Sep 2020 04:33:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD2A7185A0CD;
+ Wed, 30 Sep 2020 04:33:33 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4154073678;
- Wed, 30 Sep 2020 04:33:36 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BB3E77B40D;
+ Wed, 30 Sep 2020 04:33:31 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 45/46] qapi/visit.py: remove unused parameters from
- gen_visit_object
-Date: Wed, 30 Sep 2020 00:31:49 -0400
-Message-Id: <20200930043150.1454766-46-jsnow@redhat.com>
+Subject: [PATCH v4 43/46] qapi/types.py: remove one-letter variables
+Date: Wed, 30 Sep 2020 00:31:47 -0400
+Message-Id: <20200930043150.1454766-44-jsnow@redhat.com>
 In-Reply-To: <20200930043150.1454766-1-jsnow@redhat.com>
 References: <20200930043150.1454766-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -71,9 +70,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:26:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:31:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
@@ -102,52 +101,91 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-And this fixes the pylint report for this file, so make sure we check
-this in the future, too.
+"John, if pylint told you to jump off a bridge, would you?"
+Hey, if it looked like fun, I might.
+
+Now that this file is clean, enable pylint checks on this file.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: Cleber Rosa <crosa@redhat.com>
-Tested-by: Cleber Rosa <crosa@redhat.com>
 ---
- scripts/qapi/pylintrc | 1 -
- scripts/qapi/visit.py | 4 ++--
- 2 files changed, 2 insertions(+), 3 deletions(-)
+ scripts/qapi/pylintrc |  1 -
+ scripts/qapi/types.py | 29 +++++++++++++++--------------
+ 2 files changed, 15 insertions(+), 15 deletions(-)
 
 diff --git a/scripts/qapi/pylintrc b/scripts/qapi/pylintrc
-index b3c4cf46dbf..b9e077a1642 100644
+index 8badcb11cda..b3c4cf46dbf 100644
 --- a/scripts/qapi/pylintrc
 +++ b/scripts/qapi/pylintrc
 @@ -6,7 +6,6 @@ ignore-patterns=error.py,
                  expr.py,
                  parser.py,
                  schema.py,
--                visit.py,
+-                types.py,
+                 visit.py,
  
  
- [MESSAGES CONTROL]
-diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
-index 4f11fd325b8..e54694e23db 100644
---- a/scripts/qapi/visit.py
-+++ b/scripts/qapi/visit.py
-@@ -250,7 +250,7 @@ def gen_visit_alternate(name, variants):
-     return ret
+diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
+index 766822feb3a..9d1e79d503d 100644
+--- a/scripts/qapi/types.py
++++ b/scripts/qapi/types.py
+@@ -49,14 +49,14 @@ def gen_enum_lookup(name: str,
+     .array = (const char *const[]) {
+ ''',
+                 c_name=c_name(name))
+-    for m in members:
+-        ret += gen_if(m.ifcond)
+-        index = c_enum_const(name, m.name, prefix)
++    for member in members:
++        ret += gen_if(member.ifcond)
++        index = c_enum_const(name, member.name, prefix)
+         ret += mcgen('''
+         [%(index)s] = "%(name)s",
+ ''',
+-                     index=index, name=m.name)
+-        ret += gen_endif(m.ifcond)
++                     index=index, name=member.name)
++        ret += gen_endif(member.ifcond)
  
+     ret += mcgen('''
+     },
+@@ -79,13 +79,13 @@ def gen_enum(name: str,
+ ''',
+                 c_name=c_name(name))
  
--def gen_visit_object(name, base, members, variants):
-+def gen_visit_object(name):
-     return mcgen('''
+-    for m in enum_members:
+-        ret += gen_if(m.ifcond)
++    for member in enum_members:
++        ret += gen_if(member.ifcond)
+         ret += mcgen('''
+     %(c_enum)s,
+ ''',
+-                     c_enum=c_enum_const(name, m.name, prefix))
+-        ret += gen_endif(m.ifcond)
++                     c_enum=c_enum_const(name, member.name, prefix))
++        ret += gen_endif(member.ifcond)
  
- bool visit_type_%(c_name)s
-@@ -343,7 +343,7 @@ def visit_object_type(self, name, info, ifcond, features,
-             if not name.startswith('q_'):
-                 # only explicit types need an allocating visit
-                 self._genh.add(gen_visit_decl(name))
--                self._genc.add(gen_visit_object(name, base, members, variants))
-+                self._genc.add(gen_visit_object(name))
+     ret += mcgen('''
+ } %(c_name)s;
+@@ -148,11 +148,12 @@ def gen_object(name: str, ifcond: List[str],
+     objects_seen.add(name)
  
-     def visit_alternate_type(self, name, info, ifcond, features, variants):
-         with ifcontext(ifcond, self._genh, self._genc):
+     ret = ''
+-    if variants:
+-        for v in variants.variants:
+-            if isinstance(v.type, QAPISchemaObjectType):
+-                ret += gen_object(v.type.name, v.type.ifcond, v.type.base,
+-                                  v.type.local_members, v.type.variants)
++    for variant in variants.variants if variants else ():
++        obj = variant.type
++        if not isinstance(obj, QAPISchemaObjectType):
++            continue
++        ret += gen_object(obj.name, obj.ifcond, obj.base,
++                          obj.local_members, obj.variants)
+ 
+     ret += mcgen('''
+ 
 -- 
 2.26.2
 
