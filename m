@@ -2,135 +2,97 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA9DFC4727C
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 17:22:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03D06C4727E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 17:22:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07616206F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 17:22:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C837206F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 17:22:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZwHfEsDC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07616206F4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hC9UKjK8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C837206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNfo0-0005FI-HR
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 13:22:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48386)
+	id 1kNfo2-0005FM-UW
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 13:22:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48548)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kNflm-00035c-8t
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 13:19:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49258)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kNfmN-0003np-Gx
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 13:20:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26309)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kNflk-0001ev-6f
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 13:19:57 -0400
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kNfmK-0001hK-EF
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 13:20:35 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601486394;
+ s=mimecast20190719; t=1601486431;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=ovsE9udiZpMaS9PEteVJgFoXfb07sOex+i+abUOfeJ4=;
- b=ZwHfEsDC1iblRec/fsNpE4gY5JZPTHD83/7W+XA7w4IHaNqjw96Cz0y9arTX1FEc+lrlZh
- JZJalxs4n97tnjlgVHA/iyNfdEpbTV2Ev1UDZ9tXG9y77icH21DmJlmhk+5byTA9yX72iB
- X+dMpzz0VF1Iu+a+vDXTwSPsNJPs5lw=
+ in-reply-to:in-reply-to:references:references;
+ bh=1CTIgPD9HRYaAQNiAbTzdC8FSpVdIDlD0XJUcnczWpg=;
+ b=hC9UKjK88GFSWLXDkrHzvXHqzaDezh8MRbEvjvFGTSQzhXTKEm7rIDZ3b5rV2XjG+KpPs+
+ OGk3CxA6iELNIRoHLNat/70IUg+lyJl4QC8U18cqfm7fTyWBa11qkiImHoXLanEDji4IB9
+ CVIEBpokX0KgqYxyrMNDNDWR3nJmPyY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-589-kZr448cAOHW1_YHMzLd6RQ-1; Wed, 30 Sep 2020 13:19:48 -0400
-X-MC-Unique: kZr448cAOHW1_YHMzLd6RQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-224-CVtxKFB7NSKlspXaBudwZg-1; Wed, 30 Sep 2020 13:20:28 -0400
+X-MC-Unique: CVtxKFB7NSKlspXaBudwZg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0CB6B1868413;
- Wed, 30 Sep 2020 17:19:47 +0000 (UTC)
-Received: from [10.3.112.131] (ovpn-112-131.phx2.redhat.com [10.3.112.131])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7946A5C1CF;
- Wed, 30 Sep 2020 17:19:40 +0000 (UTC)
-Subject: Re: [PATCH 2/4] nbd: silence maybe-uninitialized warnings
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
-References: <20200930155859.303148-1-borntraeger@de.ibm.com>
- <20200930155859.303148-3-borntraeger@de.ibm.com>
-From: Eric Blake <eblake@redhat.com>
-Autocrypt: addr=eblake@redhat.com; keydata=
- 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
-Organization: Red Hat, Inc.
-Message-ID: <a6cf1fcd-cf09-08ed-774c-30f716b73cfa@redhat.com>
-Date: Wed, 30 Sep 2020 12:19:39 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7CBCC1868420;
+ Wed, 30 Sep 2020 17:20:27 +0000 (UTC)
+Received: from work-vm (ovpn-114-238.ams2.redhat.com [10.36.114.238])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B24E100238C;
+ Wed, 30 Sep 2020 17:20:23 +0000 (UTC)
+Date: Wed, 30 Sep 2020 18:20:20 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH v7 06/13] qmp: Call monitor_set_cur() only in
+ qmp_dispatch()
+Message-ID: <20200930172020.GE2783@work-vm>
+References: <20200909151149.490589-1-kwolf@redhat.com>
+ <20200909151149.490589-7-kwolf@redhat.com>
+ <877dswo0mf.fsf@dusky.pond.sub.org>
+ <20200925151304.GE5731@linux.fritz.box>
+ <87ft72i0v8.fsf@dusky.pond.sub.org>
+ <20200928143052.GH5451@linux.fritz.box>
+ <87h7rfehtr.fsf@dusky.pond.sub.org>
+ <20200930112903.GA9292@linux.fritz.box>
+ <87o8ln9zl3.fsf@dusky.pond.sub.org>
+ <20200930140051.GC9292@linux.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <20200930155859.303148-3-borntraeger@de.ibm.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200930140051.GC9292@linux.fritz.box>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="gBcRPNbWyG3oYS7FRRw8SObPnNVMzU2Tg"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=eblake@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:26:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:31:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -25
 X-Spam_score: -2.6
 X-Spam_bar: --
 X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.469,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -143,90 +105,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-block@nongnu.org, marcandre.lureau@gmail.com,
+ Markus Armbruster <armbru@redhat.com>, stefanha@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---gBcRPNbWyG3oYS7FRRw8SObPnNVMzU2Tg
-Content-Type: multipart/mixed; boundary="x3NmCuZDgmjDbWJnVs8xwmZH9gKbeKrPx";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>,
- Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Message-ID: <a6cf1fcd-cf09-08ed-774c-30f716b73cfa@redhat.com>
-Subject: Re: [PATCH 2/4] nbd: silence maybe-uninitialized warnings
-References: <20200930155859.303148-1-borntraeger@de.ibm.com>
- <20200930155859.303148-3-borntraeger@de.ibm.com>
-In-Reply-To: <20200930155859.303148-3-borntraeger@de.ibm.com>
+* Kevin Wolf (kwolf@redhat.com) wrote:
+> Am 30.09.2020 um 15:14 hat Markus Armbruster geschrieben:
+> > Kevin Wolf <kwolf@redhat.com> writes:
+> > 
+> > > Am 30.09.2020 um 11:26 hat Markus Armbruster geschrieben:
+> > >> Kevin Wolf <kwolf@redhat.com> writes:
+> > >> 
+> > >> > Am 28.09.2020 um 13:42 hat Markus Armbruster geschrieben:
+> > >> >> Kevin Wolf <kwolf@redhat.com> writes:
+> > >> >> 
+> > >> >> > Am 14.09.2020 um 17:10 hat Markus Armbruster geschrieben:
+> > >> >> >> Kevin Wolf <kwolf@redhat.com> writes:
+> > [...]
+> > >> >> >> > diff --git a/monitor/qmp.c b/monitor/qmp.c
+> > >> >> >> > index 8469970c69..922fdb5541 100644
+> > >> >> >> > --- a/monitor/qmp.c
+> > >> >> >> > +++ b/monitor/qmp.c
+> > >> >> >> > @@ -135,16 +135,10 @@ static void monitor_qmp_respond(MonitorQMP *mon, QDict *rsp)
+> > >> >> >> >  
+> > >> >> >> >  static void monitor_qmp_dispatch(MonitorQMP *mon, QObject *req)
+> > >> >> >> >  {
+> > >> >> >> > -    Monitor *old_mon;
+> > >> >> >> >      QDict *rsp;
+> > >> >> >> >      QDict *error;
+> > >> >> >> >  
+> > >> >> >> > -    old_mon = monitor_set_cur(&mon->common);
+> > >> >> >> > -    assert(old_mon == NULL);
+> > >> >> >> > -
+> > >> >> >> > -    rsp = qmp_dispatch(mon->commands, req, qmp_oob_enabled(mon));
+> > >> >> >> > -
+> > >> >> >> > -    monitor_set_cur(NULL);
+> > >> >> >> > +    rsp = qmp_dispatch(mon->commands, req, qmp_oob_enabled(mon), &mon->common);
+> > >> >> >> 
+> > >> >> >> Long line.  Happy to wrap it in my tree.  A few more in PATCH 08-11.
+> > >> >> >
+> > >> >> > It's 79 characters. Should be fine even with your local deviation from
+> > >> >> > the coding style to require less than that for comments?
+> > >> >> 
+> > >> >> Let me rephrase my remark.
+> > >> >> 
+> > >> >> For me,
+> > >> >> 
+> > >> >>     rsp = qmp_dispatch(mon->commands, req, qmp_oob_enabled(mon),
+> > >> >>                        &mon->common);
+> > >> >> 
+> > >> >> is significantly easier to read than
+> > >> >> 
+> > >> >>     rsp = qmp_dispatch(mon->commands, req, qmp_oob_enabled(mon), &mon->common);
+> > >> >
+> > >> > I guess this is highly subjective. I find wrapped lines harder to read.
+> > >> > For answering subjective questions like this, we generally use the
+> > >> > coding style document.
+> > >> >
+> > >> > Anyway, I guess following an idiosyncratic coding style that is
+> > >> > different from every other subsystem in QEMU is possible (if
+> > >> > inconvenient) if I know what it is.
+> > >> 
+> > >> The applicable coding style document is PEP 8.
+> > >
+> > > I'll happily apply PEP 8 to Python code, but this is C. I don't think
+> > > PEP 8 applies very well to C code. (In fact, PEP 7 exists as a C style
+> > > guide, but we're not writing C code for the Python project here...)
+> > 
+> > I got confused (too much Python code review), my apologies.
+> > 
+> > >> > My problem is more that I don't know what the exact rules are. Can they
+> > >> > only be figured out experimentally by submitting patches and seeing
+> > >> > whether you like them or not?
+> > >> 
+> > >> PEP 8:
+> > >> 
+> > >>     A style guide is about consistency.  Consistency with this style
+> > >>     guide is important.  Consistency within a project is more important.
+> > >>     Consistency within one module or function is the most important.
+> > >> 
+> > >> In other words, you should make a reasonable effort to blend in.
+> > >
+> > > The project style guide for C is defined in CODING_STYLE.rst. Missing
+> > > consistency with it is what I'm complaining about.
+> > >
+> > > I also agree that consistency within one module or function is most
+> > > important, which is why I allow you to reformat my code. But I don't
+> > > think it means that local coding style rules shouldn't be documented,
+> > > especially if you can't just look at the code and see immediately how
+> > > it's supposed to be.
+> > >
+> > >> >> Would you mind me wrapping this line in my tree?
+> > >> >
+> > >> > I have no say in this subsystem and I take it that you want all code to
+> > >> > look as if you had written it yourself, so do as you wish.
+> > >> 
+> > >> I'm refusing the bait.
+> > >> 
+> > >> > But I understand that I'll have to respin anyway, so if you could
+> > >> > explain what you're after, I might be able to apply the rules for the
+> > >> > next version of the series.
+> > >> 
+> > >> First, PEP 8 again:
+> > >> 
+> > >>     Limit all lines to a maximum of 79 characters.
+> > >> 
+> > >>     For flowing long blocks of text with fewer structural restrictions
+> > >>     (docstrings or comments), the line length should be limited to 72
+> > >>     characters.
+> > >
+> > > Ok, that's finally clear limits at least.
+> > >
+> > > Any other rules from PEP 8 that you want to see applied to C code?
+> > 
+> > PEP 8 does not apply to C.
+> > 
+> > > Would you mind documenting this somewhere?
+> > >
+> > >> Second, an argument we two had on this list, during review of a prior
+> > >> version of this patch series, talking about C:
+> > >> 
+> > >>     Legibility.  Humans tend to have trouble following long lines with
+> > >>     their eyes (I sure do).  Typographic manuals suggest to limit
+> > >>     columns to roughly 60 characters for exactly that reason[*].
+> > >> 
+> > >>     Code is special.  It's typically indented, and long identifiers push
+> > >>     it further to the right, function arguments in particular.  We
+> > >>     compromised at 80 columns.
+> > >> 
+> > >>     [...]
+> > >> 
+> > >>     [*] https://en.wikipedia.org/wiki/Column_(typography)#Typographic_style
+> > >> 
+> > >> The width of the line not counting indentation matters for legibility.
+> > >> 
+> > >> The line I flagged as long is 75 characters wide not counting
+> > >> indentation.  That's needlessly hard to read for me.
+> > >> 
+> > >> PEP 8's line length limit is a *limit*, not a sacred right to push right
+> > >> to the limit.
+> > >> 
+> > >> Since I get to read this code a lot, I've taken care to avoid illegibly
+> > >> wide lines, and I've guided contributors to blend in.
+> > >
+> > > As I said, I don't mind the exact number much. I do mind predictability,
+> > > though. (And ideally also consistency across the project because
+> > > otherwise I need to change my editor settings for individual files.)
+> > >
+> > > So if you don't like 79 columns, give me any other number. But
+> > > please, do give me something specific I can work with. "illegibly wide"
+> > > is not something I can work with because it's highly subjective.
+> > 
+> > Taste is subjective.
+> > 
+> > We can always make CODING_STYLE.rst more detailed.  I view that as a
+> > last resort when we waste too much time arguing.
+> > 
+> > Back to line length.
+> > 
+> > CODING_STYLE.rst sets a *limit*.
+> > 
+> > Going over the limit violates CODING_STYLE.rst.  There are (rare) cases
+> > where that is justified.
+> > 
+> > CODING_STYLE.rst neither demands nor prohibits breaking lines before the
+> > limit is reached.
+> > 
+> > Until CODING_STYLE.rst prohibits breaking lines unless they exceed the
+> > limit, I will continue to ask for breaking lines when that makes the
+> > code easier to read and more consistent with the code around it, for
+> > code I maintain, and admittedly in my opinion.
+> > 
+> > These requests appear to irk you a great deal.  I don't understand, but
+> > I'm sorry about it all the same.  By arguing about it repeatedly, you've
+> > irked some back.  Brought it on myself, I guess.  However, if that's
+> > what it takes to keep the code I maintain legible and consistent, I'll
+> > pay the price.
+> 
+> I conclude that I'll never be able to submit code that passes your
+> review in the first attempt because I don't know the specific criteria
+> (and you don't seem to know them either before you see the patch).
+> 
+> Fine, I'll live with it. It's just one of the things that makes working
+> in your subsystems more frustrating than in others.
 
---x3NmCuZDgmjDbWJnVs8xwmZH9gKbeKrPx
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Hmm,
+  IMHO the thing here is that there's two different things here:
 
-On 9/30/20 10:58 AM, Christian Borntraeger wrote:
-> gcc 10 from Fedora 32 gives me:
->=20
-> Compiling C object libblock.fa.p/nbd_server.c.o
-> ../nbd/server.c: In function =E2=80=98nbd_co_client_start=E2=80=99:
-> ../nbd/server.c:625:14: error: =E2=80=98namelen=E2=80=99 may be used unin=
-itialized in this function [-Werror=3Dmaybe-uninitialized]
->   625 |         rc =3D nbd_negotiate_send_info(client, NBD_INFO_NAME, nam=
-elen, name,
->       |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~~~~
->   626 |                                      errp);
->       |                                      ~~~~~
-> ../nbd/server.c:564:14: note: =E2=80=98namelen=E2=80=99 was declared here
->   564 |     uint32_t namelen;
->       |              ^~~~~~~
-> cc1: all warnings being treated as errors
->=20
-> As I cannot see how this can happen, let uns silence the warning.
+   a) A CODING_STYLE limit - and personally I use every last character
+of that when appropriate
+   b) For this particular case, Markus is saying he prefers the wrap
+there.
 
-gcc is smart enough to see that nbd_opt_read_name(... &namelen), which
-is the only use of namelen between declaration and use, does not always
-initialize namelen; but fails to see we also exit this function early in
-the same conditions when nbd_opt_read_name left namelen uninit.  The
-workaround is fine.
+I don't think I see (b) as incompatible as a preference, but lets be
+sensible; if it's something you want to change in merge that seems
+reasonable, if it's something that you ask to change in a respin that's
+kind of reasonable, just don't hold up a big patch series for an
+argument over something that's legal in the coding style and isn't
+particularly offensive!
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Dave
 
-I'm happy for this to go in through the trivial tree, but I'll also
-queue it on my NBD tree if that is ready first.
-
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---x3NmCuZDgmjDbWJnVs8xwmZH9gKbeKrPx--
-
---gBcRPNbWyG3oYS7FRRw8SObPnNVMzU2Tg
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl90visACgkQp6FrSiUn
-Q2qS9wf+Jl/ssRsPdWQMlAJli2Xn1TpGmLhb1o/eEoKzIbjKHbiaCzlbApDDO2Ts
-/hshRBRNda6R3LMRVhzM4TbPI1x0avdzFI6HMxVwF1/1D7GtiGlZFZErluZKlpCQ
-p0YuefqA5d7Y35Ep0kueYxHgxnSmiTwkLsoqVYKAWmYqBtbjUHxGVH6AvKz/hqzJ
-3vEBaOIATFPL7UGHCgFUfK7dqN1IO3r33pkwqqWTnak4kakBZ7mlAxNNAwIuq5Am
-gt9sNO1G+qUDWvKjtF6r8ZaS9DOvJg4aYpjxLwnjQBBpcihxu/oQGo74OGdQMpPJ
-4AbEXhvl4qbiJf9kgKM+a11nkMQQzw==
-=kUcB
------END PGP SIGNATURE-----
-
---gBcRPNbWyG3oYS7FRRw8SObPnNVMzU2Tg--
+> Kevin
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
