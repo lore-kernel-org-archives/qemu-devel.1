@@ -2,97 +2,83 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12571C4727E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 10:35:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B00F5C4727F
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 10:35:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C2D12071E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 10:35:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1BCC42075F
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 10:35:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IJRS2uzL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C2D12071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="m+0iyfTI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BCC42075F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNZRr-0005Ty-Jb
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 06:34:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45976)
+	id 1kNZS5-0005nk-52
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 06:35:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48818)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kNZFR-0006cE-4y; Wed, 30 Sep 2020 06:22:09 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:33195)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kNZQb-0004Aw-7D
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 06:33:42 -0400
+Received: from mail-ej1-x629.google.com ([2a00:1450:4864:20::629]:41972)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kNZFP-0006Zw-A7; Wed, 30 Sep 2020 06:22:08 -0400
-Received: by mail-wm1-x342.google.com with SMTP id e11so927397wme.0;
- Wed, 30 Sep 2020 03:22:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=ffvdVpz6qk0ca0WBUblQrsJnJG2P8c1t+fIKqaw2HWg=;
- b=IJRS2uzLRxlsrsU1zvHS0srMz8OWFnTeETmroomLVMYRRci+AnaH8k60n50De9ezou
- McKVN40IIOghwmGHuagWXufS4vZdRJnDjJjTnrjWv5w35EoQy1uyMf8/GeG7HiIhy2nE
- 9m8eqnxeVqtr43lEmA0qUl60kIKQ0Nv3xs/bQPxtPBEUOeasPt5puATwKYa9hNRQdAEL
- wiORZyIdsfoLp86mk0arOm3CTcSHJaFBO5Tfh7nZWKrFMZrE6DC+JC0fvb12FxTOyz2K
- mGe9th+nhKjk1FCXqXD+IlVlzQc6zVBqN+KsPtRINaqG6OQ4mua7MrROpfvqMkB/GZgn
- dR6A==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kNZQU-0007X6-4b
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 06:33:40 -0400
+Received: by mail-ej1-x629.google.com with SMTP id lo4so2020688ejb.8
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 03:33:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:from:date:message-id:subject:to:cc;
+ bh=i05iHsypczvHuk9kq07V8NS2boXN6nDY9vAkChLdbQg=;
+ b=m+0iyfTIzr9bI83PKpMTwPHdhaM0pZQFftwLsuwzSyMii0z8EjZsk6z1LZjZxOu+43
+ pG73WdS+qztKD+PslL5GjV9Hq4utEiE9751iCqkjYxCOvU89vOYcok0Oco25qPgMohkV
+ PDjclBFPNSydJvyL2wMRP7nD2CpzOIkn5C7m7Swf1psRMJCB1W5fLD+v3f0FPRqyGyP2
+ wPPhTpFjPkQASxezcyrsvSr43BhCb4bJG+arPssjuJ4fVh7G+MxanIMiv5SLJmBaGjCv
+ fvu+WgM891s6zAq41pM95CDwwjljkLFbQCSPmdZMLfVhcZMKQTaXWs+L+b9//tg2qI8A
+ 6Dnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ffvdVpz6qk0ca0WBUblQrsJnJG2P8c1t+fIKqaw2HWg=;
- b=nxQNU8PtOYBHDzIAqiebKn6Z7CkQOAJr1EbZIdhRJ9/E86hPTmd4ZSaNEtqPBiGdh4
- 147oy0eudg5SS3IIKQz+GjN3FXAvY/oWtx0XtiMQ/SnE7LYt9s8GsITAffTy1sWre60w
- 8ZJdC7RxbvsOvmtICyYz4yFLp3+Uhxxzz2vmAsskJaphMwV9XBpiPPQf0Kn+6OxE3kmx
- 6EHAWM2F2bukPbbIkxdd+k2+OiJQoXuW+ladcgvVtAK60j5dz8TcwDFnY/VL+uJiena3
- ixqeoD+itgYK1OroxB2mEEAWwEu8APZ4zXdLHMGbBFoz2E+6wa4YWFf7OVSn5rCO9BI2
- ZfrA==
-X-Gm-Message-State: AOAM5323GNnzfX4v1/9lyCWQXfdBokxIcH1ftj3pfn7Bg8/Ideeob5Gr
- QBSupDcGhwL3OUzprTnVMQg=
-X-Google-Smtp-Source: ABdhPJz2WWiA1YgONKSUxgaldMQ25eB8Xpl1kLYEDTGptk3+Mq7R69MWXgSr6o+CvS+NyVJnPaRaBQ==
-X-Received: by 2002:a05:600c:2312:: with SMTP id
- 18mr2143116wmo.141.1601461325013; 
- Wed, 30 Sep 2020 03:22:05 -0700 (PDT)
-Received: from [192.168.1.36] (74.red-83-53-161.dynamicip.rima-tde.net.
- [83.53.161.74])
- by smtp.gmail.com with ESMTPSA id g12sm2066548wro.89.2020.09.30.03.22.04
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 30 Sep 2020 03:22:04 -0700 (PDT)
-Subject: Re: [PATCH] hw/rtc/m48t59: Simplify m48t59_init()
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
-References: <20200914102425.1152962-1-f4bug@amsat.org>
- <ff2fd61b-b0ae-97f2-820e-79209e9882eb@ilande.co.uk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <bcd0d490-da5e-6d43-3f4d-38be88565ac3@amsat.org>
-Date: Wed, 30 Sep 2020 12:22:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+ bh=i05iHsypczvHuk9kq07V8NS2boXN6nDY9vAkChLdbQg=;
+ b=kSczGNAvHjt4U+GY5CoMBFG2BNTJ4A3xP5x9pmtP/C683yXgEp+4fQ+R0dJHbMlXdR
+ XAnf8A3SMnxEsne2bQywDjOzqI9CmtADQcABRBp0j9HsFc+t1iPNfpupNWL/4CVnz6UZ
+ z7MZuHynfiCUwXV01joiDtVA6Ol3JYgeCQcQ7wt12XnE2bFphosCJN5KfGWPQXyKz26K
+ k4vA4bFDZVe95YdA+H5B/4/5OYk/p9HE/BdjU4p0JnWJwDGmfqk+bzx6D8t1C80S3ZjC
+ LmWE9xVD6Me5eORf7Coo6cFzBBOZ29fKIicll/epR63N/4w+OLepL9IWVMM5mvpnVHy6
+ 8v/w==
+X-Gm-Message-State: AOAM533jvWS0BfOL58F9eG8XFjxAR0LKq6Y+0t5FMGiadXahcXAb+JFj
+ hWL8toYvFl/zXpwaBgQe2v+szErZ2oWXxA8zD6peOEmnQ1QnYJVV
+X-Google-Smtp-Source: ABdhPJxbOW/JZ+P9lp9nz4LVHF3LhO3C1RR1csoDgtchzkRThAExueByv2ScBuHBOYztO2P4nao7ixO3gtc0xIVEF0Y=
+X-Received: by 2002:a17:906:d936:: with SMTP id
+ rn22mr2135807ejb.4.1601462011882; 
+ Wed, 30 Sep 2020 03:33:31 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <ff2fd61b-b0ae-97f2-820e-79209e9882eb@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 30 Sep 2020 11:33:21 +0100
+Message-ID: <CAFEAcA-wMzZhO-9EdYhPC3aoPatQ-JEtBJ2nSjGepRbLs-5AdA@mail.gmail.com>
+Subject: use of 'apt' in scripting in our dockerfiles provokes warnings
+To: QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::629;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x629.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -15
-X-Spam_score: -1.6
-X-Spam_bar: -
-X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.199, NICE_REPLY_A=-0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,133 +91,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-ppc@nongnu.org,
- Artyom Tarasenko <atar4qemu@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/30/20 10:35 AM, Mark Cave-Ayland wrote:
-> On 14/09/2020 11:24, Philippe Mathieu-Daudé wrote:
-> 
->> As the 'io_base' argument of m48t59_init() is unused (set to 0),
->> remove it to simplify.
->> To create a device on the ISA bus, m48t59_init_isa() is the
->> preferred function to use.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>  include/hw/rtc/m48t59.h |  2 +-
->>  hw/ppc/ppc405_boards.c  |  2 +-
->>  hw/rtc/m48t59.c         | 10 ++--------
->>  hw/sparc/sun4m.c        |  2 +-
->>  hw/sparc64/sun4u.c      |  2 +-
->>  5 files changed, 6 insertions(+), 12 deletions(-)
->>
->> diff --git a/include/hw/rtc/m48t59.h b/include/hw/rtc/m48t59.h
->> index 04abedf3b2b..62297ee0db1 100644
->> --- a/include/hw/rtc/m48t59.h
->> +++ b/include/hw/rtc/m48t59.h
->> @@ -50,7 +50,7 @@ struct NvramClass {
->>  Nvram *m48t59_init_isa(ISABus *bus, uint32_t io_base, uint16_t size,
->>                         int base_year, int type);
->>  Nvram *m48t59_init(qemu_irq IRQ, hwaddr mem_base,
->> -                   uint32_t io_base, uint16_t size, int base_year,
->> +                   uint16_t size, int base_year,
->>                     int type);
->>  
->>  #endif /* HW_M48T59_H */
->> diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
->> index 6198ec1035b..93ffee801a3 100644
->> --- a/hw/ppc/ppc405_boards.c
->> +++ b/hw/ppc/ppc405_boards.c
->> @@ -227,7 +227,7 @@ static void ref405ep_init(MachineState *machine)
->>      /* Register FPGA */
->>      ref405ep_fpga_init(sysmem, 0xF0300000);
->>      /* Register NVRAM */
->> -    m48t59_init(NULL, 0xF0000000, 0, 8192, 1968, 8);
->> +    m48t59_init(NULL, 0xF0000000, 8192, 1968, 8);
->>      /* Load kernel */
->>      linux_boot = (kernel_filename != NULL);
->>      if (linux_boot) {
->> diff --git a/hw/rtc/m48t59.c b/hw/rtc/m48t59.c
->> index 6525206976b..2d6a095c4e4 100644
->> --- a/hw/rtc/m48t59.c
->> +++ b/hw/rtc/m48t59.c
->> @@ -566,7 +566,7 @@ const MemoryRegionOps m48t59_io_ops = {
->>  
->>  /* Initialisation routine */
->>  Nvram *m48t59_init(qemu_irq IRQ, hwaddr mem_base,
->> -                   uint32_t io_base, uint16_t size, int base_year,
->> +                   uint16_t size, int base_year,
->>                     int model)
->>  {
->>      DeviceState *dev;
->> @@ -584,13 +584,7 @@ Nvram *m48t59_init(qemu_irq IRQ, hwaddr mem_base,
->>          s = SYS_BUS_DEVICE(dev);
->>          sysbus_realize_and_unref(s, &error_fatal);
->>          sysbus_connect_irq(s, 0, IRQ);
->> -        if (io_base != 0) {
->> -            memory_region_add_subregion(get_system_io(), io_base,
->> -                                        sysbus_mmio_get_region(s, 1));
->> -        }
->> -        if (mem_base != 0) {
->> -            sysbus_mmio_map(s, 0, mem_base);
->> -        }
->> +        sysbus_mmio_map(s, 0, mem_base);
->>  
->>          return NVRAM(s);
->>      }
->> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
->> index 947b69d1597..56a0d38f274 100644
->> --- a/hw/sparc/sun4m.c
->> +++ b/hw/sparc/sun4m.c
->> @@ -970,7 +970,7 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
->>          create_unimplemented_device("SUNW,sx", hwdef->sx_base, 0x2000);
->>      }
->>  
->> -    nvram = m48t59_init(slavio_irq[0], hwdef->nvram_base, 0, 0x2000, 1968, 8);
->> +    nvram = m48t59_init(slavio_irq[0], hwdef->nvram_base, 0x2000, 1968, 8);
->>  
->>      slavio_timer_init_all(hwdef->counter_base, slavio_irq[19], slavio_cpu_irq, smp_cpus);
->>  
->> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
->> index b4aabfc076f..1cc57b030a7 100644
->> --- a/hw/sparc64/sun4u.c
->> +++ b/hw/sparc64/sun4u.c
->> @@ -675,7 +675,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
->>      pci_ide_create_devs(pci_dev);
->>  
->>      /* Map NVRAM into I/O (ebus) space */
->> -    nvram = m48t59_init(NULL, 0, 0, NVRAM_SIZE, 1968, 59);
->> +    nvram = m48t59_init(NULL, 0, NVRAM_SIZE, 1968, 59);
->>      s = SYS_BUS_DEVICE(nvram);
->>      memory_region_add_subregion(pci_address_space_io(ebus), 0x2000,
->>                                  sysbus_mmio_get_region(s, 0));
-> 
-> Looks good to me. In fact, if you're working in this area there are a couple of other
-> quick wins here too:
-> 
-> - Remove m48t59_init() and replace with QOM/qdev properties
-> 
-> - Remove m48t59_init_isa() as this seems to be unused, along with the associated
-> complexity of handling the m48txx_isa_info[] array
+While processing a recent pullreq which updated the dockerfile
+dependencies and thus provoked a rebuild, I noticed that we
+use the 'apt' command in ways that provoke a warning:
 
-OK.
+#7 0.789 WARNING: apt does not have a stable CLI interface. Use with
+caution in scripts.
 
-> 
-> Anyhow:
-> 
-> Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+The apt(8) manpage says:
 
-Thanks!
+SCRIPT USAGE AND DIFFERENCES FROM OTHER APT TOOLS
+       The apt(8) commandline is designed as an end-user tool and it may
+       change behavior between versions. While it tries not to break backward
+       compatibility this is not guaranteed either if a change seems
+       beneficial for interactive use.
 
-> 
-> 
-> ATB,
-> 
-> Mark.
-> 
+       All features of apt(8) are available in dedicated APT tools like apt-
+       get(8) and apt-cache(8) as well.  apt(8) just changes the default value
+       of some options (see apt.conf(5) and specifically the Binary scope). So
+       you should prefer using these commands (potentially with some
+       additional options enabled) in your scripts as they keep backward
+       compatibility as much as possible.
+
+That suggests that we should probably be using apt-get instead
+of apt in our dockerfiles...
+
+Also, any idea what this error is about?
+
+#4 importing cache manifest from registry.gitlab.com/qemu-project/qemu/qemu...
+#4       digest:
+sha256:815fb44b573ac7520d148d9b2510c00f31846ca6fa55127d322bc8db3c5d0ec0
+#4         name: "importing cache manifest from
+registry.gitlab.com/qemu-project/qemu/qemu/debian-alpha-cross:latest"
+#4      started: 2020-09-29 22:57:54.371490684 +0000 UTC
+#4    completed: 2020-09-29 22:57:55.064468936 +0000 UTC
+#4     duration: 692.978252ms
+#4        error: "invalid build cache from
+{MediaType:application/vnd.docker.distribution.manifest.v2+json
+Digest:sha256:a1e8a5830bb19b7cddda64872c5d71a0337d4b98bed30fd7684d20467adcd289
+Size:1161 URLs:[] Annotations:map[] Platform:<nil>}"
+
+It didn't seemt to have an adverse effect...
+
+thanks
+-- PMM
 
