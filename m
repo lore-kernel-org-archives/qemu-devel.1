@@ -2,122 +2,78 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D4DAC4727E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 11:35:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82AD9C4727E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 11:36:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D787F20738
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 11:35:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F179820738
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 11:36:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KU05lpqw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D787F20738
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JHpAjHgJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F179820738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43658 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNaOb-0001FV-0d
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 07:35:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34690)
+	id 1kNaPD-0001kB-4F
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 07:36:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33530)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kNaNG-0007jo-ML
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 07:34:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27304)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kNaIR-0002cc-1S
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 07:29:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30357)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kNaNB-0004C3-5u
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 07:34:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601465648;
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kNaIN-0003rd-JC
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 07:29:18 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601465354;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=yGzZAb6CUUfvuB+rABpzetf5qwBH7y5IfxJJd8oY32Y=;
- b=KU05lpqwUylMBQ1JUI5o4oRuxy0X9Lre8EZyEEQ4VbZVH0cIIRuCVfsAjzNLSUPlV7q7AR
- 4LG5w34DXxWEAQTw0M5qJgvKKiur3V0Gtzes4e9oxoMkFaoG1ceP6yB6XuvKFpP8fEbYhD
- 4q6VgCcoqnr2/Zt2P+LCKOaEWZ+bR5Y=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-106-NDGXttYaN6-zJi9dfuxITw-1; Wed, 30 Sep 2020 07:34:04 -0400
-X-MC-Unique: NDGXttYaN6-zJi9dfuxITw-1
-Received: by mail-wm1-f70.google.com with SMTP id u5so511900wme.3
- for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 04:34:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=yGzZAb6CUUfvuB+rABpzetf5qwBH7y5IfxJJd8oY32Y=;
- b=Adf5JBbZll5gC7cOlB6OzE83Ev3lb10GxNePh6nZqLK3rBzizZFZpFJxQmiq3+a2lC
- SaLaZZPCCYu+7DTW3U8PmMJ9iHxSUwWT2WTXEu5z3BmpUc39A693YxBcBJY0xrRPY+ZK
- t6DL/ciggNXTLar1doHiwU1mKJCcXUAbHsguAtToWhrNNHOZZX0RVEEI/L2J23uyTw03
- 3AhUSD9G5ME3QXD+qCeIJ5rjK/fn71w+6GE2hlB5N8j0IFD8/xWV3BZBsTstmcm5i1aF
- 4nN4jeNDWCe6uAzshzX7/zgLwP99/YCsDW+faIZX+f+jBs/bXuG6cg0Oo/FZsgR+ay7r
- 0KXQ==
-X-Gm-Message-State: AOAM530Z1CnL8cVk2ZwHOsbPXSGNVLfOFXUktDvF+50Uqj062PsSDs7W
- uZhbpas10OFB219uLOLeg7bbSyecQqRi5Zb+w/RVhScdTLM6B1igy2raN5lGdkLhusr2RZvykkB
- ayKyna1Nb3dlCCfg=
-X-Received: by 2002:adf:ab46:: with SMTP id r6mr2782766wrc.360.1601465643250; 
- Wed, 30 Sep 2020 04:34:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzCahAtti8/jIRElMMKZkLDYAmEv6FFAYXsHamV1hvfPLJAy5gl7lkB7Y1e/U8mBSmgfjhfLw==
-X-Received: by 2002:adf:ab46:: with SMTP id r6mr2782743wrc.360.1601465643018; 
- Wed, 30 Sep 2020 04:34:03 -0700 (PDT)
-Received: from [192.168.1.36] (74.red-83-53-161.dynamicip.rima-tde.net.
- [83.53.161.74])
- by smtp.gmail.com with ESMTPSA id 92sm2673330wra.19.2020.09.30.04.34.01
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 30 Sep 2020 04:34:02 -0700 (PDT)
-Subject: Re: [PATCH] hw/arm: Restrict APEI tables generation to the 'virt'
- machine
-To: Dongjiu Geng <gengdongjiu@huawei.com>, qemu-devel@nongnu.org
-References: <20200929125609.1088330-1-philmd@redhat.com>
- <12be4400-c37f-2b7f-2f15-f8700dad6003@huawei.com>
- <056736d8-dc89-a94b-7e76-93825492c957@redhat.com>
- <5b5e1b32-0e9b-8154-e645-9b922119db33@huawei.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <4f2f3b35-a0a9-1a2e-4d14-b6aad728d6a6@redhat.com>
-Date: Wed, 30 Sep 2020 13:34:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ in-reply-to:in-reply-to:references:references;
+ bh=F/KTbHxhIpuIp9j8YA3OOM80mFk+8novFfFxYryTHG8=;
+ b=JHpAjHgJeuzm9MwbKsZ7hm6xyeKGcMj0YiNBuagUdgbbGl95s+o9odewWd23tw9CUur6ed
+ xG1xrsOOXsKkTB5m9PTu5tqYk/8ddiGuE6M3OCFf0CaIEuMXDXp6RQ0BfheEXBK4SsZPDL
+ WWGI/8mmUyl3roFJizH0NqJjWTNakAQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-582-2-x25vN5NIKAcCe7xSJ6KA-1; Wed, 30 Sep 2020 07:29:12 -0400
+X-MC-Unique: 2-x25vN5NIKAcCe7xSJ6KA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E4301DE01
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 11:29:11 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
+ [10.36.112.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F224C7BE42;
+ Wed, 30 Sep 2020 11:29:04 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 4E03F9A95; Wed, 30 Sep 2020 13:29:04 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 3/6] chardev/spice: simplify chardev setup
+Date: Wed, 30 Sep 2020 13:29:01 +0200
+Message-Id: <20200930112904.24397-4-kraxel@redhat.com>
+In-Reply-To: <20200930112904.24397-1-kraxel@redhat.com>
+References: <20200930112904.24397-1-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <5b5e1b32-0e9b-8154-e645-9b922119db33@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:31:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -126,9 +82,8 @@ X-Spam_score: -2.6
 X-Spam_bar: --
 X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.469,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -141,92 +96,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S . Tsirkin" <mst@redhat.com>, Xiang Zheng <zhengxiang9@huawei.com>,
- qemu-arm@nongnu.org, Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/30/20 1:05 PM, Dongjiu Geng wrote:
-> 
-> On 2020/9/30 18:35, Philippe Mathieu-Daudé wrote:
->> On 9/30/20 7:08 AM, Dongjiu Geng wrote:
->>> On 2020/9/29 20:56, Philippe Mathieu-Daudé wrote:
->>>> As only the Virt machine uses the RAS Virtualization feature (see
->>>> commit 2afa8c8519: "hw/arm/virt: Introduce a RAS machine option"),
->>>> restrict the APEI tables generation code to the virt machine.
->>>
->>> APEI is a generic feature for X86 and arm64.  X86 platform also can use it, although currently it was mainly
->>> used by ARM64. what is reason that we restrict APEI tables generation to the 'virt' machine?
->>
->> It is currently only selected on (all) the ARM machines, not the X86
->> ones. I am simply restricting it to the 'virt' machine which is the
->> single one enabling the RAS. Without RAS the table is not built, so
->> for the case of the SBSA-Ref machine this code is unreachable, no need
->> to select ACPI_APEI.
->>
->> When a X86 machine configure a RAS it will have to 'select ACPI_APEI'
->> to get it built (I'm not forbidding it, I'm restricting it to where
->> it is used).
-> 
-> Got it, thanks for the explanation.
-> 
-> Reviewed-by: Dongjiu Geng <gengdongjiu@huawei.com>
+Initialize spice before chardevs.  That allows to register the spice
+chardevs directly in the init function and removes the need to maintain
+a linked list of chardevs just for registration.
 
-Thanks, I'll reword the description, ...
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ include/chardev/spice.h |  1 -
+ include/ui/qemu-spice.h |  1 -
+ chardev/spice.c         | 29 ++++++-----------------------
+ softmmu/vl.c            |  9 +++++----
+ ui/spice-app.c          | 17 +++++++++--------
+ ui/spice-core.c         |  2 --
+ 6 files changed, 20 insertions(+), 39 deletions(-)
 
-> 
-> BTW：There is a build test error, but it is seems do not related with this patch.
-> https://patchew.org/logs/20200929125609.1088330-1-philmd@redhat.com/testing.docker-quick@centos7/?type=message
-
-... and look at that error before posting.
-
-> 
->>
->>>
->>>>
->>>> Fixes: aa16508f1d ("ACPI: Build related register address fields via hardware error fw_cfg blob")
->>>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>>> ---
->>>> Cc: Laszlo Ersek <lersek@redhat.com>
->>>> Cc: Xiang Zheng <zhengxiang9@huawei.com>
->>>> Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>
->>>> Cc: Igor Mammedov <imammedo@redhat.com>
->>>> Cc: Dongjiu Geng <gengdongjiu@huawei.com>
->>>> Cc: Michael S. Tsirkin <mst@redhat.com>
->>>> ---
->>>>  default-configs/arm-softmmu.mak | 1 -
->>>>  hw/arm/Kconfig                  | 1 +
->>>>  2 files changed, 1 insertion(+), 1 deletion(-)
->>>>
->>>> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
->>>> index 9a94ebd0be..08a32123b4 100644
->>>> --- a/default-configs/arm-softmmu.mak
->>>> +++ b/default-configs/arm-softmmu.mak
->>>> @@ -43,4 +43,3 @@ CONFIG_FSL_IMX7=y
->>>>  CONFIG_FSL_IMX6UL=y
->>>>  CONFIG_SEMIHOSTING=y
->>>>  CONFIG_ALLWINNER_H3=y
->>>> -CONFIG_ACPI_APEI=y
->>>> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
->>>> index f303c6bead..7d040827af 100644
->>>> --- a/hw/arm/Kconfig
->>>> +++ b/hw/arm/Kconfig
->>>> @@ -26,6 +26,7 @@ config ARM_VIRT
->>>>      select ACPI_MEMORY_HOTPLUG
->>>>      select ACPI_HW_REDUCED
->>>>      select ACPI_NVDIMM
->>>> +    select ACPI_APEI
->>>>  
->>>>  config CHEETAH
->>>>      bool
->>>>
->>>
->>
->> .
->>
-> 
+diff --git a/include/chardev/spice.h b/include/chardev/spice.h
+index 1115502cdfbd..58e5b727e9fe 100644
+--- a/include/chardev/spice.h
++++ b/include/chardev/spice.h
+@@ -13,7 +13,6 @@ struct SpiceChardev {
+     bool                  blocked;
+     const uint8_t         *datapos;
+     int                   datalen;
+-    QLIST_ENTRY(SpiceChardev) next;
+ };
+ typedef struct SpiceChardev SpiceChardev;
+ 
+diff --git a/include/ui/qemu-spice.h b/include/ui/qemu-spice.h
+index 12474d88f40e..0e8ec3f0d776 100644
+--- a/include/ui/qemu-spice.h
++++ b/include/ui/qemu-spice.h
+@@ -45,7 +45,6 @@ int qemu_spice_migrate_info(const char *hostname, int port, int tls_port,
+ #else
+ #define SPICE_NEEDS_SET_MM_TIME 0
+ #endif
+-void qemu_spice_register_ports(void);
+ 
+ #else  /* CONFIG_SPICE */
+ 
+diff --git a/chardev/spice.c b/chardev/spice.c
+index 051c23a84f4c..7d1fb1771894 100644
+--- a/chardev/spice.c
++++ b/chardev/spice.c
+@@ -14,9 +14,6 @@ typedef struct SpiceCharSource {
+     SpiceChardev       *scd;
+ } SpiceCharSource;
+ 
+-static QLIST_HEAD(, SpiceChardev) spice_chars =
+-    QLIST_HEAD_INITIALIZER(spice_chars);
+-
+ static int vmc_write(SpiceCharDeviceInstance *sin, const uint8_t *buf, int len)
+ {
+     SpiceChardev *scd = container_of(sin, SpiceChardev, sin);
+@@ -216,8 +213,6 @@ static void char_spice_finalize(Object *obj)
+ 
+     vmc_unregister_interface(s);
+ 
+-    QLIST_SAFE_REMOVE(s, next);
+-
+     g_free((char *)s->sin.subtype);
+     g_free((char *)s->sin.portname);
+ }
+@@ -256,8 +251,6 @@ static void chr_open(Chardev *chr, const char *subtype)
+ 
+     s->active = false;
+     s->sin.subtype = g_strdup(subtype);
+-
+-    QLIST_INSERT_HEAD(&spice_chars, s, next);
+ }
+ 
+ static void qemu_chr_open_spice_vmc(Chardev *chr,
+@@ -310,28 +303,18 @@ static void qemu_chr_open_spice_port(Chardev *chr,
+         return;
+     }
+ 
++    if (!using_spice) {
++        error_setg(errp, "spice not enabled");
++        return;
++    }
++
+     chr_open(chr, "port");
+ 
+     *be_opened = false;
+     s = SPICE_CHARDEV(chr);
+     s->sin.portname = g_strdup(name);
+ 
+-    if (using_spice) {
+-        /* spice server already created */
+-        vmc_register_interface(s);
+-    }
+-}
+-
+-void qemu_spice_register_ports(void)
+-{
+-    SpiceChardev *s;
+-
+-    QLIST_FOREACH(s, &spice_chars, next) {
+-        if (s->sin.portname == NULL) {
+-            continue;
+-        }
+-        vmc_register_interface(s);
+-    }
++    vmc_register_interface(s);
+ }
+ 
+ static void qemu_chr_parse_spice_vmc(QemuOpts *opts, ChardevBackend *backend,
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index 50d8c2e42e62..48b51201a8f9 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -4125,6 +4125,11 @@ void qemu_init(int argc, char **argv, char **envp)
+                       user_creatable_add_opts_foreach,
+                       object_create_initial, &error_fatal);
+ 
++    /* spice needs the timers to be initialized by this point */
++    /* spice must initialize before audio as it changes the default auiodev */
++    /* spice must initialize before chardevs (for spicevmc and spiceport) */
++    qemu_spice_init();
++
+     qemu_opts_foreach(qemu_find_opts("chardev"),
+                       chardev_init_func, NULL, &error_fatal);
+ 
+@@ -4133,10 +4138,6 @@ void qemu_init(int argc, char **argv, char **envp)
+                       fsdev_init_func, NULL, &error_fatal);
+ #endif
+ 
+-    /* spice needs the timers to be initialized by this point */
+-    /* spice must initialize before audio as it changes the default auiodev */
+-    qemu_spice_init();
+-
+     /*
+      * Note: we need to create audio and block backends before
+      * machine_set_property(), so machine properties can refer to
+diff --git a/ui/spice-app.c b/ui/spice-app.c
+index 7e0550c79fdd..026124ef56a0 100644
+--- a/ui/spice-app.c
++++ b/ui/spice-app.c
+@@ -129,7 +129,6 @@ static void spice_app_atexit(void)
+ static void spice_app_display_early_init(DisplayOptions *opts)
+ {
+     QemuOpts *qopts;
+-    ChardevBackend *be = chr_spice_backend_new();
+     GError *err = NULL;
+ 
+     if (opts->has_full_screen) {
+@@ -174,6 +173,15 @@ static void spice_app_display_early_init(DisplayOptions *opts)
+     qemu_opt_set(qopts, "gl", opts->has_gl ? "on" : "off", &error_abort);
+     display_opengl = opts->has_gl;
+ #endif
++}
++
++static void spice_app_display_init(DisplayState *ds, DisplayOptions *opts)
++{
++    ChardevBackend *be = chr_spice_backend_new();
++    QemuOpts *qopts;
++    GError *err = NULL;
++    gchar *uri;
++
+     be->u.spiceport.data->fqdn = g_strdup("org.qemu.monitor.qmp.0");
+     qemu_chardev_new("org.qemu.monitor.qmp", TYPE_CHARDEV_SPICEPORT,
+                      be, NULL, &error_abort);
+@@ -183,13 +191,6 @@ static void spice_app_display_early_init(DisplayOptions *opts)
+     qemu_opt_set(qopts, "mode", "control", &error_abort);
+ 
+     qapi_free_ChardevBackend(be);
+-}
+-
+-static void spice_app_display_init(DisplayState *ds, DisplayOptions *opts)
+-{
+-    GError *err = NULL;
+-    gchar *uri;
+-
+     uri = g_strjoin("", "spice+unix://", app_dir, "/", "spice.sock", NULL);
+     info_report("Launching display with URI: %s", uri);
+     g_app_info_launch_default_for_uri(uri, NULL, &err);
+diff --git a/ui/spice-core.c b/ui/spice-core.c
+index 10aa309f78f7..47700b220059 100644
+--- a/ui/spice-core.c
++++ b/ui/spice-core.c
+@@ -812,8 +812,6 @@ void qemu_spice_init(void)
+     g_free(x509_cert_file);
+     g_free(x509_cacert_file);
+ 
+-    qemu_spice_register_ports();
+-
+ #ifdef HAVE_SPICE_GL
+     if (qemu_opt_get_bool(opts, "gl", 0)) {
+         if ((port != 0) || (tls_port != 0)) {
+-- 
+2.27.0
 
 
