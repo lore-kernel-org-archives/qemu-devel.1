@@ -2,89 +2,80 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 718C5C4727E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 12:17:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68EB6C4727E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 12:22:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E56012071E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 12:17:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ABraMrUn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E56012071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 86B122071E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 12:22:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86B122071E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNb3I-0001do-4r
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 08:17:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43276)
+	id 1kNb7T-0002z4-E2
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 08:22:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45158)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kNaxR-00048X-L5
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 08:11:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48711)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kNaxP-0007Au-DU
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 08:11:41 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601467898;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=BxOifmMZB4JCULA4CJ3qPK76gnGagJOVBlZRpK0RkzQ=;
- b=ABraMrUnEfgN0t42gIA9Z4j4AIBGQbtHd5H6RQqUnmdJ7wQ7g70dS0LeVWrSZLHQq1bOOW
- 0PQLaajx9PVRhdH3R/xv8Jq8v9srXwXpPwYA7SglrFG9M0pKuFE4YgNbnG2Sah+EHmLkRC
- RDgaaSS/AmICcT9uUD7B4+DCPn1McE4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-212-p46LjV7COYafxFY42S9oGw-1; Wed, 30 Sep 2020 08:11:27 -0400
-X-MC-Unique: p46LjV7COYafxFY42S9oGw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F21201005E6F;
- Wed, 30 Sep 2020 12:11:25 +0000 (UTC)
-Received: from blue.redhat.com (ovpn-112-208.phx2.redhat.com [10.3.112.208])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 913E660C05;
- Wed, 30 Sep 2020 12:11:22 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 5/5] nbd: Add 'qemu-nbd -A' to expose allocation depth
-Date: Wed, 30 Sep 2020 07:11:05 -0500
-Message-Id: <20200930121105.667049-6-eblake@redhat.com>
-In-Reply-To: <20200930121105.667049-1-eblake@redhat.com>
-References: <20200930121105.667049-1-eblake@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kNb6D-0002Zh-HV
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 08:20:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54158)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kNb69-0007lh-ET
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 08:20:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kNb67-0003Kp-A5
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 12:20:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 41A8C2E80E8
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 12:20:39 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:31:59
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.469,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 30 Sep 2020 12:11:53 -0000
+From: Sergiy K <1897481@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: alex-l-williamson sergey-kukunin
+X-Launchpad-Bug-Reporter: Sergiy K (sergey-kukunin)
+X-Launchpad-Bug-Modifier: Sergiy K (sergey-kukunin)
+References: <160123953126.1246.10707501292033522741.malonedeb@gac.canonical.com>
+Message-Id: <160146791367.2879.7984475031810133781.malone@chaenomeles.canonical.com>
+Subject: [Bug 1897481] Re: qemu crashes with VGA pass-through, e-GPU,
+ nvidia 1060
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="d685c0a40836eb9844ed835c9700f20633c1d7af"; Instance="production"
+X-Launchpad-Hash: 5c5c706c2dc5e826fb0818b853872861f62218d7
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 07:16:30
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.001, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -93,315 +84,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, rjones@redhat.com,
- Max Reitz <mreitz@redhat.com>, vsementsov@virtuozzo.com, stefanha@redhat.com
+Reply-To: Bug 1897481 <1897481@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Allow the server to expose an additional metacontext to be requested
-by savvy clients.  qemu-nbd adds a new option -A to expose the
-qemu:allocation-depth metacontext through NBD_CMD_BLOCK_STATUS; this
-can also be set via QMP when using block-export-add.
+Thank you Alex for answering me.
 
-qemu as client can be hacked into viewing this new context by using
-the now-misnamed x-dirty-bitmap option when creating an NBD blockdev
-(even though our x- naming means we could rename it, I did not think
-it worth breaking back-compat of tools that have been using it while
-waiting for a better solution).  It is worth noting the decoding of
-how such context information will appear in 'qemu-img map
---output=json':
+It seems, I've got it working, if I boot the host with the connected GPU fr=
+om the very beginning. =
 
-NBD_STATE_DEPTH_UNALLOC => "zero":false, "data":true
-NBD_STATE_DEPTH_LOCAL   => "zero":false, "data":false
-NBD_STATE_DEPTH_BACKING => "zero":true,  "data":true
+Previously, I tried hotplug and it crashes. =
 
-libnbd as client is probably a nicer way to get at the information
-without having to decipher such hacks in qemu as client. ;)
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- docs/tools/qemu-nbd.rst    |  6 ++++
- qapi/block-core.json       |  7 ++--
- qapi/block-export.json     |  6 +++-
- blockdev-nbd.c             |  2 ++
- nbd/server.c               |  2 ++
- qemu-nbd.c                 | 14 ++++++--
- tests/qemu-iotests/309     | 73 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/309.out | 22 ++++++++++++
- tests/qemu-iotests/group   |  1 +
- 9 files changed, 127 insertions(+), 6 deletions(-)
- create mode 100755 tests/qemu-iotests/309
- create mode 100644 tests/qemu-iotests/309.out
+So previously I had:
+  1. enable the host
+  2. enable GPU
+  3. connect the cable
 
-diff --git a/docs/tools/qemu-nbd.rst b/docs/tools/qemu-nbd.rst
-index 667861cb22e9..0e545a97cfa3 100644
---- a/docs/tools/qemu-nbd.rst
-+++ b/docs/tools/qemu-nbd.rst
-@@ -72,6 +72,12 @@ driver options if ``--image-opts`` is specified.
+And this time I tried:
+  1. enable GPU
+  2. connect the cable
+  3. enable the host
 
-   Export the disk as read-only.
+And this works great. Actually, I was able to install nvidia drivers to
+the Win10 guest and it runs well.
 
-+.. option:: -A, --allocation-depth
-+
-+  Expose allocation depth information via the
-+  ``qemu:allocation-depth`` context accessible through
-+  NBD_OPT_SET_META_CONTEXT.
-+
- .. option:: -B, --bitmap=NAME
+Now, I'm not sure if there is a bug. From one side, it might be an
+expected requirement to exclude hotplug. From the other side, every
+crash is a bug, so there can be an extra check for that. It's up to you
+guys.
 
-   If *filename* has a qcow2 persistent bitmap *NAME*, expose
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index d620bd1302b2..0379eb992db8 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -3874,9 +3874,12 @@
- #
- # @tls-creds: TLS credentials ID
- #
--# @x-dirty-bitmap: A "qemu:dirty-bitmap:NAME" string to query in place of
-+# @x-dirty-bitmap: A metacontext name such as "qemu:dirty-bitmap:NAME" or
-+#                  "qemu:allocation-depth" to query in place of the
- #                  traditional "base:allocation" block status (see
--#                  NBD_OPT_LIST_META_CONTEXT in the NBD protocol) (since 3.0)
-+#                  NBD_OPT_LIST_META_CONTEXT in the NBD protocol; and
-+#                  yes, naming this option x-context would have made
-+#                  more sense) (since 3.0)
- #
- # @reconnect-delay: On an unexpected disconnect, the nbd client tries to
- #                   connect again until succeeding or encountering a serious
-diff --git a/qapi/block-export.json b/qapi/block-export.json
-index 2291d6cb0cbc..45e43984b11d 100644
---- a/qapi/block-export.json
-+++ b/qapi/block-export.json
-@@ -78,11 +78,15 @@
- #          NBD client can use NBD_OPT_SET_META_CONTEXT with
- #          "qemu:dirty-bitmap:NAME" to inspect the bitmap. (since 4.0)
- #
-+# @alloc: Also export the allocation map for @device, so the NBD client
-+#         can use NBD_OPT_SET_META_CONTEXT with "qemu:allocation-depth"
-+#         to inspect allocation details. (since 5.2)
-+#
- # Since: 5.0
- ##
- { 'struct': 'BlockExportOptionsNbd',
-   'data': { '*name': 'str', '*description': 'str',
--            '*bitmap': 'str' } }
-+            '*bitmap': 'str', '*alloc': 'bool' } }
+I'm thankful for your hard work and for the rocket science technologies
+I can use with my laptop.
 
- ##
- # @NbdServerAddOptions:
-diff --git a/blockdev-nbd.c b/blockdev-nbd.c
-index 8174023e5c47..f9012f93e2bb 100644
---- a/blockdev-nbd.c
-+++ b/blockdev-nbd.c
-@@ -212,6 +212,8 @@ void qmp_nbd_server_add(NbdServerAddOptions *arg, Error **errp)
-             .description        = g_strdup(arg->description),
-             .has_bitmap         = arg->has_bitmap,
-             .bitmap             = g_strdup(arg->bitmap),
-+            .has_alloc          = arg->alloc,
-+            .alloc              = arg->alloc,
-         },
-     };
+I'm attaching dmesg for the fresh boot host with the GPU connected from
+the very beginning.
 
-diff --git a/nbd/server.c b/nbd/server.c
-index 830b21000be3..11cdc2eab0b3 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -1598,6 +1598,8 @@ static int nbd_export_create(BlockExport *blk_exp, BlockExportOptions *exp_args,
-         assert(strlen(exp->export_bitmap_context) < NBD_MAX_STRING_SIZE);
-     }
+P.S. I'm sorry for the big files. I've just noticed the ability to
+upload attachments.
 
-+    exp->alloc_context = arg->alloc;
-+
-     blk_add_aio_context_notifier(blk, blk_aio_attached, blk_aio_detach, exp);
 
-     QTAILQ_INSERT_TAIL(&exports, exp, next);
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index e7520261134f..3a92e00464de 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -99,6 +99,7 @@ static void usage(const char *name)
- "\n"
- "Exposing part of the image:\n"
- "  -o, --offset=OFFSET       offset into the image\n"
-+"  -A, --allocation-depth    expose the allocation depth\n"
- "  -B, --bitmap=NAME         expose a persistent dirty bitmap\n"
- "\n"
- "General purpose options:\n"
-@@ -519,7 +520,7 @@ int main(int argc, char **argv)
-     char *device = NULL;
-     QemuOpts *sn_opts = NULL;
-     const char *sn_id_or_name = NULL;
--    const char *sopt = "hVb:o:p:rsnc:dvk:e:f:tl:x:T:D:B:L";
-+    const char *sopt = "hVb:o:p:rsnc:dvk:e:f:tl:x:T:D:AB:L";
-     struct option lopt[] = {
-         { "help", no_argument, NULL, 'h' },
-         { "version", no_argument, NULL, 'V' },
-@@ -528,6 +529,7 @@ int main(int argc, char **argv)
-         { "socket", required_argument, NULL, 'k' },
-         { "offset", required_argument, NULL, 'o' },
-         { "read-only", no_argument, NULL, 'r' },
-+        { "allocation-depth", no_argument, NULL, 'A' },
-         { "bitmap", required_argument, NULL, 'B' },
-         { "connect", required_argument, NULL, 'c' },
-         { "disconnect", no_argument, NULL, 'd' },
-@@ -569,6 +571,7 @@ int main(int argc, char **argv)
-     QDict *options = NULL;
-     const char *export_name = NULL; /* defaults to "" later for server mode */
-     const char *export_description = NULL;
-+    bool alloc_depth = false;
-     const char *bitmap = NULL;
-     const char *tlscredsid = NULL;
-     bool imageOpts = false;
-@@ -693,6 +696,9 @@ int main(int argc, char **argv)
-             readonly = true;
-             flags &= ~BDRV_O_RDWR;
-             break;
-+        case 'A':
-+            alloc_depth = true;
-+            break;
-         case 'B':
-             bitmap = optarg;
-             break;
-@@ -790,8 +796,8 @@ int main(int argc, char **argv)
-             exit(EXIT_FAILURE);
-         }
-         if (export_name || export_description || dev_offset ||
--            device || disconnect || fmt || sn_id_or_name || bitmap ||
--            seen_aio || seen_discard || seen_cache) {
-+            device || disconnect || fmt || sn_id_or_name || alloc_depth ||
-+            bitmap || seen_aio || seen_discard || seen_cache) {
-             error_report("List mode is incompatible with per-device settings");
-             exit(EXIT_FAILURE);
-         }
-@@ -1077,6 +1083,8 @@ int main(int argc, char **argv)
-             .description        = g_strdup(export_description),
-             .has_bitmap         = !!bitmap,
-             .bitmap             = g_strdup(bitmap),
-+            .has_alloc          = alloc_depth,
-+            .alloc              = alloc_depth,
-         },
-     };
-     blk_exp_add(export_opts, &error_fatal);
-diff --git a/tests/qemu-iotests/309 b/tests/qemu-iotests/309
-new file mode 100755
-index 000000000000..16bd269ad2c1
---- /dev/null
-+++ b/tests/qemu-iotests/309
-@@ -0,0 +1,73 @@
-+#!/usr/bin/env bash
-+#
-+# Test qemu-nbd -A
-+#
-+# Copyright (C) 2018-2020 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+seq="$(basename $0)"
-+echo "QA output created by $seq"
-+
-+status=1 # failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_test_img
-+    nbd_server_stop
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+. ./common.nbd
-+
-+_supported_fmt qcow2
-+_supported_proto file
-+_supported_os Linux
-+_require_command QEMU_NBD
-+
-+echo
-+echo "=== Initial image setup ==="
-+echo
-+
-+TEST_IMG="$TEST_IMG.base" _make_test_img 4M
-+$QEMU_IO -c 'w 0 2M' -f $IMGFMT "$TEST_IMG.base" | _filter_qemu_io
-+_make_test_img -b "$TEST_IMG.base" -F $IMGFMT 4M
-+$QEMU_IO -c 'w 1M 2M' -f $IMGFMT "$TEST_IMG" | _filter_qemu_io
-+
-+echo
-+echo "=== Check allocation over NBD ==="
-+echo
-+
-+# Normal -f raw NBD block status loses access to allocation information
-+$QEMU_IMG map --output=json -f qcow2 "$TEST_IMG"
-+IMG="driver=nbd,server.type=unix,server.path=$nbd_unix_socket"
-+nbd_server_start_unix_socket -r -f qcow2 -A "$TEST_IMG"
-+$QEMU_IMG map --output=json --image-opts \
-+    "$IMG" | _filter_qemu_img_map
-+# But since we used -A, and use x-dirty-bitmap as a hack for reading bitmaps,
-+# we can reconstruct it, by abusing block status to report:
-+#    NBD_STATE_DEPTH_UNALLOC => "zero":false, "data":true
-+#    NBD_STATE_DEPTH_LOCAL   => "zero":false, "data":false
-+#    NBD_STATE_DEPTH_BACKING => "zero":true,  "data":true
-+$QEMU_IMG map --output=json --image-opts \
-+    "$IMG,x-dirty-bitmap=qemu:allocation-depth" | _filter_qemu_img_map
-+
-+# success, all done
-+echo '*** done'
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/309.out b/tests/qemu-iotests/309.out
-new file mode 100644
-index 000000000000..db75bb6b0df9
---- /dev/null
-+++ b/tests/qemu-iotests/309.out
-@@ -0,0 +1,22 @@
-+QA output created by 309
-+
-+=== Initial image setup ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=4194304
-+wrote 2097152/2097152 bytes at offset 0
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=4194304 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=IMGFMT
-+wrote 2097152/2097152 bytes at offset 1048576
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=== Check allocation over NBD ===
-+
-+[{ "start": 0, "length": 1048576, "depth": 1, "zero": false, "data": true, "offset": 327680},
-+{ "start": 1048576, "length": 2097152, "depth": 0, "zero": false, "data": true, "offset": 327680},
-+{ "start": 3145728, "length": 1048576, "depth": 1, "zero": true, "data": false}]
-+[{ "start": 0, "length": 3145728, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 3145728, "length": 1048576, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
-+[{ "start": 0, "length": 1048576, "depth": 0, "zero": true, "data": true, "offset": OFFSET},
-+{ "start": 1048576, "length": 2097152, "depth": 0, "zero": false, "data": false},
-+{ "start": 3145728, "length": 1048576, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 9e4f7c01530d..a567fa97d7e5 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -315,3 +315,4 @@
- 304 rw quick
- 305 rw quick
- 307 rw quick export
-+309 rw auto quick
--- 
-2.28.0
+** Attachment added: "dmesg for the working case"
+   https://bugs.launchpad.net/qemu/+bug/1897481/+attachment/5415643/+files/=
+dmesg
 
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1897481
+
+Title:
+  qemu crashes with VGA pass-through, e-GPU, nvidia 1060
+
+Status in QEMU:
+  New
+
+Bug description:
+  I try to pass-through nvidia 1060 6gb card, which is connected via
+  ExpressCard (EXP-GDC converter).
+
+  I can successfully run my virtual machine without pass-through, but
+  when I try to add the devices, qemu crashes.
+
+  The coredump contains:
+
+  Stack trace of thread 3289311:
+  #0  0x0000000000614c49 memory_region_update_container_subregions (qemu-sy=
+stem-x86_64 + 0x214c49)
+  #1  0x00000000005c0e8c vfio_probe_nvidia_bar0_quirk (qemu-system-x86_64 +=
+ 0x1c0e8c)
+  #2  0x00000000005bcec0 vfio_realize (qemu-system-x86_64 + 0x1bcec0)
+  #3  0x000000000079b423 pci_qdev_realize (qemu-system-x86_64 + 0x39b423)
+  #4  0x00000000006facda device_set_realized (qemu-system-x86_64 + 0x2facda)
+  #5  0x0000000000887e57 property_set_bool (qemu-system-x86_64 + 0x487e57)
+  #6  0x000000000088ac48 object_property_set (qemu-system-x86_64 + 0x48ac48)
+  #7  0x000000000088d1d2 object_property_set_qobject (qemu-system-x86_64 + =
+0x48d1d2)
+  #8  0x000000000088b1f7 object_property_set_bool (qemu-system-x86_64 + 0x4=
+8b1f7)
+  #9  0x0000000000693785 qdev_device_add (qemu-system-x86_64 + 0x293785)
+  #10 0x000000000061aad0 device_init_func (qemu-system-x86_64 + 0x21aad0)
+  #11 0x000000000098c87b qemu_opts_foreach (qemu-system-x86_64 + 0x58c87b)
+  #12 0x00000000006211cb qemu_init (qemu-system-x86_64 + 0x2211cb)
+  #13 0x00000000005002aa main (qemu-system-x86_64 + 0x1002aa)
+  #14 0x00007fce8af21152 __libc_start_main (libc.so.6 + 0x28152)
+  #15 0x000000000050087e _start (qemu-system-x86_64 + 0x10087e)
+
+  The whole running command is pretty long, since I use libvirt to
+  manage my machines:
+
+  LC_ALL=3DC \
+  PATH=3D/usr/local/sbin:/usr/local/bin:/usr/bin \
+  HOME=3D/var/lib/libvirt/qemu/domain-2-Win10 \
+  XDG_DATA_HOME=3D/var/lib/libvirt/qemu/domain-2-Win10/.local/share \
+  XDG_CACHE_HOME=3D/var/lib/libvirt/qemu/domain-2-Win10/.cache \
+  XDG_CONFIG_HOME=3D/var/lib/libvirt/qemu/domain-2-Win10/.config \
+  QEMU_AUDIO_DRV=3Dspice \
+  /usr/bin/qemu-system-x86_64 \
+  -name guest=3DWin10,debug-threads=3Don \
+  -S \
+  -blockdev '{"driver":"file","filename":"/usr/share/edk2-ovmf/x64/OVMF_COD=
+E.fd","node-name":"libvirt-pflash0-storage","auto-read-only":true,"discard"=
+:"unmap"}' \
+  -blockdev '{"node-name":"libvirt-pflash0-format","read-only":true,"driver=
+":"raw","file":"libvirt-pflash0-storage"}' \
+  -blockdev '{"driver":"file","filename":"/var/lib/libvirt/qemu/nvram/Win10=
+_VARS.fd","node-name":"libvirt-pflash1-storage","auto-read-only":true,"disc=
+ard":"unmap"}' \
+  -blockdev '{"node-name":"libvirt-pflash1-format","read-only":false,"drive=
+r":"raw","file":"libvirt-pflash1-storage"}' \
+  -machine pc-q35-5.1,accel=3Dkvm,usb=3Doff,vmport=3Doff,dump-guest-core=3D=
+off,pflash0=3Dlibvirt-pflash0-format,pflash1=3Dlibvirt-pflash1-format \
+  -cpu host,migratable=3Don,hv-time,hv-relaxed,hv-vapic,hv-spinlocks=3D0x1f=
+ff \
+  -m 8192 \
+  -overcommit mem-lock=3Doff \
+  -smp 2,sockets=3D2,cores=3D1,threads=3D1 \
+  -uuid 7043c77b-4903-4527-8089-9679d9a17fee \
+  -no-user-config \
+  -nodefaults \
+  -chardev stdio,mux=3Don,id=3Dcharmonitor \
+  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol \
+  -rtc base=3Dlocaltime,driftfix=3Dslew \
+  -global kvm-pit.lost_tick_policy=3Ddelay \
+  -no-hpet \
+  -no-shutdown \
+  -global ICH9-LPC.disable_s3=3D1 \
+  -global ICH9-LPC.disable_s4=3D1 \
+  -boot strict=3Don \
+  -device pcie-root-port,port=3D0x10,chassis=3D1,id=3Dpci.1,bus=3Dpcie.0,mu=
+ltifunction=3Don,addr=3D0x2 \
+  -device pcie-root-port,port=3D0x11,chassis=3D2,id=3Dpci.2,bus=3Dpcie.0,ad=
+dr=3D0x2.0x1 \
+  -device pcie-root-port,port=3D0x12,chassis=3D3,id=3Dpci.3,bus=3Dpcie.0,ad=
+dr=3D0x2.0x2 \
+  -device pcie-root-port,port=3D0x13,chassis=3D4,id=3Dpci.4,bus=3Dpcie.0,ad=
+dr=3D0x2.0x3 \
+  -device pcie-root-port,port=3D0x14,chassis=3D5,id=3Dpci.5,bus=3Dpcie.0,ad=
+dr=3D0x2.0x4 \
+  -device pcie-root-port,port=3D0x15,chassis=3D6,id=3Dpci.6,bus=3Dpcie.0,ad=
+dr=3D0x2.0x5 \
+  -device qemu-xhci,p2=3D15,p3=3D15,id=3Dusb,bus=3Dpci.2,addr=3D0x0 \
+  -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.3,addr=3D0x0 \
+  -blockdev '{"driver":"file","filename":"/home/sergiy/VirtualBox VMs/win4g=
+ames.img","node-name":"libvirt-2-storage","auto-read-only":true,"discard":"=
+unmap"}' \
+  -blockdev '{"node-name":"libvirt-2-format","read-only":false,"driver":"ra=
+w","file":"libvirt-2-storage"}' \
+  -device ide-hd,bus=3Dide.0,drive=3Dlibvirt-2-format,id=3Dsata0-0-0,bootin=
+dex=3D1 \
+  -blockdev '{"driver":"file","filename":"/home/sergiy/Downloads/Win10_2004=
+_Ukrainian_x64.iso","node-name":"libvirt-1-storage","auto-read-only":true,"=
+discard":"unmap"}' \
+  -blockdev '{"node-name":"libvirt-1-format","read-only":true,"driver":"raw=
+","file":"libvirt-1-storage"}' \
+  -device ide-cd,bus=3Dide.1,drive=3Dlibvirt-1-format,id=3Dsata0-0-1 \
+  -chardev pty,id=3Dcharserial0 \
+  -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 \
+  -chardev spicevmc,id=3Dcharchannel0,name=3Dvdagent \
+  -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchanne=
+l0,id=3Dchannel0,name=3Dcom.redhat.spice.0 \
+  -spice port=3D5900,addr=3D127.0.0.1,disable-ticketing,image-compression=
+=3Doff,seamless-migration=3Don \
+  -device qxl-vga,id=3Dvideo0,ram_size=3D67108864,vram_size=3D67108864,vram=
+64_size_mb=3D0,vgamem_mb=3D16,max_outputs=3D1,bus=3Dpcie.0,addr=3D0x1 \
+  -chardev spicevmc,id=3Dcharredir0,name=3Dusbredir \
+  -device usb-redir,chardev=3Dcharredir0,id=3Dredir0,bus=3Dusb.0,port=3D1 \
+  -chardev spicevmc,id=3Dcharredir1,name=3Dusbredir \
+  -device usb-redir,chardev=3Dcharredir1,id=3Dredir1,bus=3Dusb.0,port=3D2 \
+  -device vfio-pci,host=3D0000:04:00.0,id=3Dhostdev0,bus=3Dpci.4,multifunct=
+ion=3Don,addr=3D0x0 \
+  -device vfio-pci,host=3D0000:04:00.1,id=3Dhostdev1,bus=3Dpci.4,addr=3D0x0=
+.0x1 \
+  -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.5,addr=3D0x0 \
+  -sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourc=
+econtrol=3Ddeny \
+  -msg timestamp=3Don
+
+  I've forced vfio_pci module for the VGA, and ensured that lspci shows
+
+    Kernel driver in use: vfio_pci
+
+  My laptop is Thinkpad x230, that runs on Intel(R) Core(TM) i5-3320M CPU @=
+ 2.60GHz. =
+
+  I run 5.8.6-1-MANJARO kernel and run QEMU emulator version 5.1.0.
+
+  Thank you for your attention. I'd love to provide more information,
+  but I don't know what else matters.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1897481/+subscriptions
 
