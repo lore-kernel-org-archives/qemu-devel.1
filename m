@@ -2,104 +2,124 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BAC1C4727E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 14:05:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DECBDC4727E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 14:06:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D330F20754
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 14:05:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 20813206C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 14:06:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h8hmPPRo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D330F20754
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KbnFinfh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20813206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNcjD-0007fr-Ja
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 10:05:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44352)
+	id 1kNckH-00007R-3c
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 10:06:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40094)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kNchK-0005w6-5K
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 10:03:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59258)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kNcT0-0005Mz-0c
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 09:48:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48081)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kNchH-0007lx-M9
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 10:03:09 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601474586;
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kNcSy-0006Bz-61
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 09:48:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601473699;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=HKQ5cleean4ncOTNdDwSEIFXgDg7Y+2njqyY1nePeCQ=;
- b=h8hmPPRoSVlWYQvEgh9p+J6pYlMUxLekGQUcICJy5TcU0+nw3xwoDJhohdKY/PD+2VnsfF
- ZrH8Dhg4ZGjL77Tr4yfgVNT6FkcGInLPtH2zBsvy8om88wgAvm9h340YBPy0/C+lTq3wfo
- V0UMcGUPMSQyi1uCLBxMnoBQyMowwwI=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-245-TWyAsjXUOg-42szo3GbhSA-1; Wed, 30 Sep 2020 10:03:04 -0400
-X-MC-Unique: TWyAsjXUOg-42szo3GbhSA-1
-Received: by mail-wr1-f69.google.com with SMTP id w7so658668wrp.2
- for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 07:03:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=HKQ5cleean4ncOTNdDwSEIFXgDg7Y+2njqyY1nePeCQ=;
- b=iRaa23kyHHD27FefwRwGrmx4uvuEehvgh6NTGXCtrzkqUymq36VHMMrYdAhqajZ4nq
- BLAj6vslaBo5AQuwRUQeVBavS5lavvRaHeMbjylTpQH0Q2E+738QIKC1WUMj4pEXe0xz
- 0I8BSb/nQFJLcSBnvAyZeEikVgNo1qZkEikQkNqrmuYfgXsR1Cwma7ok0ZnX5vZ4zMlO
- BzCAM2LxpZq6ViGVh9R+WwgnCiom+88mTJd8/AcBcq5wi11q9AEmnyS2kD1bi5ahXEq2
- FDXRStkkMrBcEWE5gkY0+GUWfzSRQ1LTATGlEj6STwzFAX04IB+JNjE++RrG2ri0KBgO
- lG2Q==
-X-Gm-Message-State: AOAM530EFGhzFPJMdgrqpNryG4nOn3/IDHHPAcT4R8w2BgVTboxTbMDA
- AxcedHBZeInn1O/sqjpTOVFajmdzVflftcJiZOmSaVI1uZM8MyTjmyFP4VUTmyr/+dc9ApV7P5U
- zYloYdoDE0ZxIcPo=
-X-Received: by 2002:a5d:67d0:: with SMTP id n16mr3652722wrw.198.1601474583484; 
- Wed, 30 Sep 2020 07:03:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxPBugUo9jYq2EfCQSVPL5cQtxjk/Z5PPRDKtTOWr8luDAJ3aa3gOyBzcMXIHW4rX6TCb2gnQ==
-X-Received: by 2002:a5d:67d0:: with SMTP id n16mr3652663wrw.198.1601474583058; 
- Wed, 30 Sep 2020 07:03:03 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:75e3:aaa7:77d6:f4e4?
- ([2001:b07:6468:f312:75e3:aaa7:77d6:f4e4])
- by smtp.gmail.com with ESMTPSA id n14sm2824460wmi.33.2020.09.30.07.03.01
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 30 Sep 2020 07:03:02 -0700 (PDT)
-Subject: Re: [PATCH] PoC: Rust binding for QAPI (qemu-ga only, for now)
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-References: <20200910174850.716104-1-marcandre.lureau@redhat.com>
- <eeead7ec-ebde-637d-de06-31c9b343b3b8@redhat.com>
- <399aad6c-5d86-8988-a44a-e91d650e7273@redhat.com>
- <CAJ+F1CKPyBfjPoaRc5j24swo8Bfy0D7m+txNk5cyAi47rOz2bw@mail.gmail.com>
- <093067ee-e849-be8c-6e02-167d28d3e3ed@redhat.com>
- <CAJ+F1CL1kzvHRmMOTq38r0PNyCJhzyqWeiNb71e7sabaWOwdsQ@mail.gmail.com>
- <ddd2e282-3e0e-1c0e-2af3-7ca59c322ef9@redhat.com>
- <CAJ+F1CL7r31u1bQLRGmbZt-BPLM3XefFdY9O3Mk=VMmgJ76aiw@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <59a29e14-57d8-4246-14ce-375f6c9ce4dc@redhat.com>
-Date: Wed, 30 Sep 2020 16:02:59 +0200
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=9A9uV/P/43kPt5hr81gzsieb1AfHUtQmGkoheYQFvYs=;
+ b=KbnFinfhc/aB9OO3Cxa9WlfGm3oDKR5oG0rX0sL7Rhe9Ox9+C9WqIS5U/rxUE5/Glou/0G
+ juygGnrKEuuvyXugdJvpZhzD/Tt5jxwrannaAzhzgfUD87+/yi4Ne/5rYMbFu6Dy2PFw29
+ 9Z7dVUr0zw00vJptKMyl4+HnZrD2zlA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-69-MGbOGUQOMl6Fco1uQALu0A-1; Wed, 30 Sep 2020 09:48:15 -0400
+X-MC-Unique: MGbOGUQOMl6Fco1uQALu0A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 449941084D68;
+ Wed, 30 Sep 2020 13:48:14 +0000 (UTC)
+Received: from [10.3.112.131] (ovpn-112-131.phx2.redhat.com [10.3.112.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E3A4C672CD;
+ Wed, 30 Sep 2020 13:48:13 +0000 (UTC)
+Subject: Re: [PATCH] qemu-storage-daemon: Fix help line for --export
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200930133909.58820-1-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Autocrypt: addr=eblake@redhat.com; keydata=
+ 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
+Organization: Red Hat, Inc.
+Message-ID: <e775522e-560c-5aa7-71d6-16303068bef1@redhat.com>
+Date: Wed, 30 Sep 2020 08:48:13 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CL7r31u1bQLRGmbZt-BPLM3XefFdY9O3Mk=VMmgJ76aiw@mail.gmail.com>
+In-Reply-To: <20200930133909.58820-1-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="t51SgJDnzRVd4dAZafTOMJu0TD1VfHreV"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=eblake@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:26:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -123,82 +143,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "P. Berrange, Daniel" <berrange@redhat.com>,
- Sergio Lopez Pascual <slp@redhat.com>, "Hajnoczi, Stefan" <stefanha@gmail.com>,
- qemu-devel <qemu-devel@nongnu.org>, "Armbruster, Markus" <armbru@redhat.com>,
- =?UTF-8?Q?Sebastian_Dr=c3=b6ge?= <slomo@circular-chaos.org>,
- John Snow <jsnow@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 30/09/20 11:15, Marc-André Lureau wrote:
-> Why BorrowedMutPointer provides both *const P and *mut P ? The *const P
-> conversion seems overlapping with BorrowedPointer.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--t51SgJDnzRVd4dAZafTOMJu0TD1VfHreV
+Content-Type: multipart/mixed; boundary="AtSJXA2WydKnfQEThqpiq7ohvu0MUhCox";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
+Message-ID: <e775522e-560c-5aa7-71d6-16303068bef1@redhat.com>
+Subject: Re: [PATCH] qemu-storage-daemon: Fix help line for --export
+References: <20200930133909.58820-1-kwolf@redhat.com>
+In-Reply-To: <20200930133909.58820-1-kwolf@redhat.com>
 
-"&mut T" implements Borrow so it seemed obvious to have as_ptr in
-BorrowedMutPointer too.  Though I certainly should implement Borrow in
-BorrowedMutPointer.
+--AtSJXA2WydKnfQEThqpiq7ohvu0MUhCox
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
->     > I don't have your head, so I find it hard to remember & work with.
->     It> uses all possible prefixes: with_, from_, as_, as_mut, to_, and
->     into_.
->     > That just blows my mind, sorry :)
-> 
->     Ahah I don't have your head either!  The idea anyway is to reuse
->     prefixes that are common in Rust code:
-> 
->     * with_: a constructor that uses something to build a type (think
->     Vec::with_capacity) and therefore takes ownership
-> 
-> ForeignConvert::with_foreign (const *P -> T) doesn't take ownership.
-> 
-> The Rust reference for this kind of conversion is CStr::from_ptr.
+On 9/30/20 8:39 AM, Kevin Wolf wrote:
+> Commit 5f479a8d renamed the 'device' option of --export into
+> 'node-name', but forgot to update the help in qemu-storage-daemon.
+>=20
+> Fixes: 5f479a8dc086bfa42c9f94e9ab69962f256e207f
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  storage-daemon/qemu-storage-daemon.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/storage-daemon/qemu-storage-daemon.c b/storage-daemon/qemu-s=
+torage-daemon.c
+> index 7cbdbf0b23..42839c981f 100644
+> --- a/storage-daemon/qemu-storage-daemon.c
+> +++ b/storage-daemon/qemu-storage-daemon.c
+> @@ -92,7 +92,7 @@ static void help(void)
+>  "  --chardev <options>    configure a character device backend\n"
+>  "                         (see the qemu(1) man page for possible options=
+)\n"
+>  "\n"
+> -"  --export [type=3D]nbd,device=3D<node-name>,id=3D<id>,[,name=3D<export=
+-name>]\n"
+> +"  --export [type=3D]nbd,id=3D<id>,node-name=3D<node-name>,[,name=3D<exp=
+ort-name>]\n"
 
-Ok, I'll take a look.
+While touching this, get rid of the doubled comma before the optional
+name key (s/,\[,/\[,/)
 
->     * as_: a cheap conversion to something, it's cheap because it reuses the
->     lifetime (and therefore takes no ownership).  Think Option::as_ref.
-> 
-> as_ shouldn't create any object, and is thus unsuitable for a general
-> rs<->sys conversion function (any).
+With that,
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-as_foreign function does not create anything, it reuses the storage to
-provide a pointer.  It seems similar to as_slice for example.
+>  "           [,writable=3Don|off][,bitmap=3D<name>]\n"
+>  "                         export the specified block node over NBD\n"
+>  "                         (requires --nbd-server)\n"
+>=20
 
->     * from_/to_: a copying and possibly expensive conversion (that you have
->     to write the code for).  Because it's copying, it doesn't consume the
->     argument (for from_) or self (for to_).
-> 
-> and that's what glib-rs uses (and CStr).
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-Sort of, I found the none/full suffixes not really idiomatic for Rust.
 
->     * into_: a conversion that consumes the receiver
-> 
-> That's not used by glib afaik, but we should be able to introduce it for
-> "mut *P -> T", it's not incompatible with FromPtrFull::from_full.
+--AtSJXA2WydKnfQEThqpiq7ohvu0MUhCox--
 
-Right.  It's just a different way to write the same thing.  Usually it
-is a bit more concise because it allows more type inference.
+--t51SgJDnzRVd4dAZafTOMJu0TD1VfHreV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
->     > Then, I don't understand why ForeignConvert should hold both the
->     > "const *P -> T" and "&T -> const *P" conversions. Except the
->     > common types, what's the relation between the two?
-> 
->     Maybe I'm wrong, but why would you need just one?
-> 
-> No I mean they could be on different traits. One could be implemented
-> without the other. Or else I don't understand why the other conversion
-> functions would not be in that trait too.
+-----BEGIN PGP SIGNATURE-----
 
-The other conversion functions require taking ownership, and I was not
-sure if it would always be possible to do so.  For no-ownership-taken
-conversions, however, it seemed to me that you'd rarely be unable to
-implement one of the two directions.  I might be wrong.
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl90jJ0ACgkQp6FrSiUn
+Q2rUkAgAl2Y9qEPgbaifRBGEasAN8vN++amxZBLLZaKi2ZCvIIEbXJhrEevARqJz
+IDFXiBYKI9q15TdYet4AXuBvpFABoUT3+ecqBc+AeC3Sig0TVP/c2gB/n7gFDgXn
++xLsPLuXFlnzoAOkExtbN7N3DBvewj3ZUjCIhwn+xDEQxC6JndYg3/VuvC1za7R6
+nCX27kAdmOXd+1hVh4fX1rL4hOpVFQcmgGIvnadd2pcfqznMbV/HBWLXN0qwV4p6
+mBXkCVPWyUpnlCFzc25vgpeyB7SbhgI3JlfZq/WBStnEA3Yr/5rYFzWcd9CGtLDC
+mY1mCjnanXPVcqN3QcqKjp/m6X3OYQ==
+=nyt0
+-----END PGP SIGNATURE-----
 
-In general though I agree that the changes are mostly cosmetic.
-
-Paolo
+--t51SgJDnzRVd4dAZafTOMJu0TD1VfHreV--
 
 
