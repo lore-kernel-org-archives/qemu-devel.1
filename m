@@ -4,62 +4,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E073C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 04:47:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6EC2C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 04:49:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72B872075A
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 04:47:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 348AC2075A
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 04:49:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XG1j5jv3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72B872075A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aIf54Irz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 348AC2075A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48846 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNU1n-0003Lm-LC
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 00:47:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37274)
+	id 1kNU39-000553-91
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 00:49:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36960)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNTng-0001Kn-30
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 00:33:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41833)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNTn7-0000x3-Ut
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 00:32:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40557)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNTnc-0000cX-7v
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 00:33:07 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNTn6-0000YR-3F
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 00:32:33 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601440383;
+ s=mimecast20190719; t=1601440351;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=NokZjup1s/JJJLtM1cjZYz1WaakVYpJE4WuZHADWMxE=;
- b=XG1j5jv3qPvYDRCJ3aHvIqTfq6JxU/0bHBdThUZnXMyn9buBevByw3dARFFbV92xDPZ+lY
- fxUW+zoqT/IwqRkOkuijxcLK4m3sHA5pM1BoWTKqFcc3ANZdI9fRIwVWDDfZ3ZeGnZGuKr
- aY1/5WI/drIFcoFoI4ROeHtvC3ld80Q=
+ bh=EW9kDSGFfqZGToEfukpDtNLZSJWc7nbVLrWC8RJvEkI=;
+ b=aIf54IrzdaIIrt/Jw2UfLpScQ9DROIHLxE6Z9HdyQxoMH877CXWZVyNiXwJRu0MegFsmnw
+ gemoVAbyR5+SWQukGck9OQAzEh7elBp0Ar06WfpjC90H1xLKl6xw8K9S0eN1I5CwZqJwzj
+ nYFInvU2yxBcl1U5zWN6eJwsCzi0LT4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-479-jNBOpSRyMq-8AW2Fgamm-w-1; Wed, 30 Sep 2020 00:33:01 -0400
-X-MC-Unique: jNBOpSRyMq-8AW2Fgamm-w-1
+ us-mta-420-KXFGTq-KMcq2Zc-NJCvt8A-1; Wed, 30 Sep 2020 00:32:27 -0400
+X-MC-Unique: KXFGTq-KMcq2Zc-NJCvt8A-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CE33E801AE3;
- Wed, 30 Sep 2020 04:32:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 12927802B7A;
+ Wed, 30 Sep 2020 04:32:26 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EE20573678;
- Wed, 30 Sep 2020 04:32:57 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D358673678;
+ Wed, 30 Sep 2020 04:32:24 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 32/46] qapi/gen.py: Enable checking with mypy
-Date: Wed, 30 Sep 2020 00:31:36 -0400
-Message-Id: <20200930043150.1454766-33-jsnow@redhat.com>
+Subject: [PATCH v4 14/46] qapi/common.py: Remove python compatibility
+ workaround
+Date: Wed, 30 Sep 2020 00:31:18 -0400
+Message-Id: <20200930043150.1454766-15-jsnow@redhat.com>
 In-Reply-To: <20200930043150.1454766-1-jsnow@redhat.com>
 References: <20200930043150.1454766-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -70,9 +71,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:26:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:31:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
@@ -104,27 +105,26 @@ Sender: "Qemu-devel"
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: Cleber Rosa <crosa@redhat.com>
-Tested-by: Cleber Rosa <crosa@redhat.com>
 ---
- scripts/qapi/mypy.ini | 5 -----
- 1 file changed, 5 deletions(-)
+ scripts/qapi/common.py | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/scripts/qapi/mypy.ini b/scripts/qapi/mypy.ini
-index 1b8555dfa39..c6960ff2dbd 100644
---- a/scripts/qapi/mypy.ini
-+++ b/scripts/qapi/mypy.ini
-@@ -14,11 +14,6 @@ disallow_untyped_defs = False
- disallow_incomplete_defs = False
- check_untyped_defs = False
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index ba35abea478..cee63eb95c7 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -119,10 +119,7 @@ def cgen(code, **kwds):
+     raw = code % kwds
+     if indent_level:
+         indent = genindent(indent_level)
+-        # re.subn() lacks flags support before Python 2.7, use re.compile()
+-        raw = re.subn(re.compile(r'^(?!(#|$))', re.MULTILINE),
+-                      indent, raw)
+-        raw = raw[0]
++        raw = re.sub(r'^(?!(#|$))', indent, raw, flags=re.MULTILINE)
+     return re.sub(re.escape(eatspace) + r' *', '', raw)
  
--[mypy-qapi.gen]
--disallow_untyped_defs = False
--disallow_incomplete_defs = False
--check_untyped_defs = False
--
- [mypy-qapi.introspect]
- disallow_untyped_defs = False
- disallow_incomplete_defs = False
+ 
 -- 
 2.26.2
 
