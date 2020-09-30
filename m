@@ -2,82 +2,88 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDD27C4727D
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 03:12:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E591C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 04:02:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35F92206C1
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 03:12:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35F92206C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id E18952087D
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 04:02:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E18952087D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNSXA-0006eB-WE
-	for qemu-devel@archiver.kernel.org; Tue, 29 Sep 2020 23:12:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51524)
+	id 1kNTJm-000364-E0
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 00:02:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59796)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <like.xu@linux.intel.com>)
- id 1kNSWW-0006EO-Qp
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 23:11:20 -0400
-Received: from mga17.intel.com ([192.55.52.151]:63463)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <like.xu@linux.intel.com>)
- id 1kNSWQ-000495-Jo
- for qemu-devel@nongnu.org; Tue, 29 Sep 2020 23:11:20 -0400
-IronPort-SDR: mzxtJJj841ke+EE7uUnVmvvebFeKMLbLfAr2Z2JBQ67puxwS16neGXsMam3CbMRgfjHhbjq7X1
- aCJkuIVu1Iog==
-X-IronPort-AV: E=McAfee;i="6000,8403,9759"; a="142358574"
-X-IronPort-AV: E=Sophos;i="5.77,320,1596524400"; d="scan'208";a="142358574"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
- by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 Sep 2020 20:11:08 -0700
-IronPort-SDR: CeD51ajG6jwbcyPEiexMq7XGwE08nmmvxmO0YtOk63aEwOvn2pb4F27VAxeEa3OVbZq8frY+t9
- ktyRAm/RH/Dg==
-X-IronPort-AV: E=Sophos;i="5.77,320,1596524400"; d="scan'208";a="495045608"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.187])
- ([10.238.4.187])
- by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 Sep 2020 20:11:06 -0700
-Subject: Re: [Qemu-devel PATCH v2] target/i386: add "-cpu,lbr-fmt=*" support
- to enable guest LBR
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <20200929061217.118440-1-like.xu@linux.intel.com>
- <20200929173822.GK3717385@habkost.net>
-From: Like Xu <like.xu@linux.intel.com>
-Organization: Intel OTC
-Message-ID: <13744495-bdc3-c649-086b-e5ed2b935fb5@linux.intel.com>
-Date: Wed, 30 Sep 2020 11:11:04 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kNTIn-0002Um-J2
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 00:01:13 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41342)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kNTIl-0007B8-87
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 00:01:13 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kNTIg-0007tr-60
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 04:01:06 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id CFA872E811D
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 04:01:05 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200929173822.GK3717385@habkost.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: none client-ip=192.55.52.151;
- envelope-from=like.xu@linux.intel.com; helo=mga17.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/29 23:11:11
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 30 Sep 2020 03:53:45 -0000
+From: Ubuntu SRU Bot <1849644@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Fix Released; importance=Undecided; assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
+ component=main; status=Fix Committed; importance=Low;
+ assignee=None; 
+X-Launchpad-Bug-Tags: verification-needed verification-needed-focal
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: berrange laurent-vivier npes87184 paelzer racb
+ samuel-t ubuntu-sru-bot
+X-Launchpad-Bug-Reporter: Samuel (samuel-t)
+X-Launchpad-Bug-Modifier: Ubuntu SRU Bot (ubuntu-sru-bot)
+References: <157191258679.29920.9268940625941119092.malonedeb@soybean.canonical.com>
+Message-Id: <20200930035345.D16B22409C2@snakefruit.canonical.com>
+Subject: [Bug 1849644] Autopkgtest regression report (qemu/1:4.2-3ubuntu6.7)
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="d685c0a40836eb9844ed835c9700f20633c1d7af"; Instance="production"
+X-Launchpad-Hash: ea0061ebe9ceb6352287ac2e17670e2501c219c4
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:01:09
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -66
+X-Spam_score: -6.7
+X-Spam_bar: ------
+X-Spam_report: (-6.7 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.199, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,230 +92,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- "Kang, Luwei" <luwei.kang@intel.com>, "Strong,
- Beeman" <beeman.strong@intel.com>, qemu-devel@nongnu.org
+Reply-To: Bug 1849644 <1849644@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Eduardo,
+All autopkgtests for the newly accepted qemu (1:4.2-3ubuntu6.7) for focal h=
+ave finished running.
+The following regressions have been reported in tests triggered by the pack=
+age:
 
-On 2020/9/30 1:38, Eduardo Habkost wrote:
-> (CCing the people from the thread, as kvm_exact_match_flags would
-> be useful for INTEL_PT_IP_LIP)
-> 
-> On Tue, Sep 29, 2020 at 02:12:17PM +0800, Like Xu wrote:
->> The last branch recording (LBR) is a performance monitor unit (PMU)
->> feature on Intel processors that records a running trace of the most
->> recent branches taken by the processor in the LBR stack. The QEMU
->> could configure whether it's enabled or not for each guest via CLI.
->>
->> The LBR feature would be enabled on the guest if:
->> - the KVM is enabled and the PMU is enabled and,
->> - the msr-based-feature IA32_PERF_CAPABILITIES is supporterd on KVM and,
->> - the supported returned value for lbr_fmt from this msr is not zero and,
->> - the requested guest vcpu model does support FEAT_1_ECX.CPUID_EXT_PDCM,
->> - the configured lbr-fmt value is the same as the host lbr_fmt value.
->>
->> Cc: Eduardo Habkost <ehabkost@redhat.com>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> 
-> The approach below looks better, thanks!  Only one problem below,
-> with a few suggestions and questions:
-> 
->> ---
->>   target/i386/cpu.c | 16 ++++++++++++++++
->>   target/i386/cpu.h | 10 ++++++++++
->>   2 files changed, 26 insertions(+)
->>
->> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> index 3ffd877dd5..b10344be01 100644
->> --- a/target/i386/cpu.c
->> +++ b/target/i386/cpu.c
->> @@ -6461,6 +6461,13 @@ static void x86_cpu_filter_features(X86CPU *cpu, bool verbose)
->>               x86_cpu_get_supported_feature_word(w, false);
->>           uint64_t requested_features = env->features[w];
->>           uint64_t unavailable_features = requested_features & ~host_feat;
->> +        if (w == FEAT_PERF_CAPABILITIES &&
->> +            (requested_features & PERF_CAP_LBR_FMT)) {
->> +            if ((host_feat & PERF_CAP_LBR_FMT) !=
->> +                (requested_features & PERF_CAP_LBR_FMT)) {
->> +                unavailable_features |= PERF_CAP_LBR_FMT;
->> +            }
->> +        }
-> 
-> This looks correct, but needs to be conditional on kvm_enabled().
-> 
-> I also have a suggestion: instead of hardcoding the
-> PERF_CAPABILITIES rules in this loop, this could become a
-> FeatureWordInfo field.  It would be very useful for other
-> features like intel-pt, where we need some bits to match the host
-> too.
+casper/1.445.1 (amd64)
 
-The idea looks good to me.
 
-> 
-> Could you please check if the following patch works?
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index b10344be010..d4107dcc026 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -704,6 +704,8 @@ typedef struct FeatureWordInfo {
->       uint64_t migratable_flags; /* Feature flags known to be migratable */
->       /* Features that shouldn't be auto-enabled by "-cpu host" */
->       uint64_t no_autoenable_flags;
-> +    /* Bits that must match host exactly when using KVM */
-> +    uint64_t kvm_exact_match_flags;
->   } FeatureWordInfo;
->   
->   static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-> @@ -1143,6 +1145,11 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->           .msr = {
->               .index = MSR_IA32_PERF_CAPABILITIES,
->           },
-> +        /*
-> +         * KVM is not able to emulate a VCPU with LBR_FMT different
-> +         * from the host, so LBR_FMT must match the host exactly.
-> +         */
-> +        .kvm_exact_match_flags = PERF_CAP_LBR_FMT,
->       },
->   
->       [FEAT_VMX_PROCBASED_CTLS] = {
-> @@ -6457,16 +6464,15 @@ static void x86_cpu_filter_features(X86CPU *cpu, bool verbose)
->       }
->   
->       for (w = 0; w < FEATURE_WORDS; w++) {
-> +        FeatureWordInfo *fi = &feature_word_info[w];
->           uint64_t host_feat =
->               x86_cpu_get_supported_feature_word(w, false);
->           uint64_t requested_features = env->features[w];
->           uint64_t unavailable_features = requested_features & ~host_feat;
-> -        if (w == FEAT_PERF_CAPABILITIES &&
-> -            (requested_features & PERF_CAP_LBR_FMT)) {
-> -            if ((host_feat & PERF_CAP_LBR_FMT) !=
-> -                (requested_features & PERF_CAP_LBR_FMT)) {
-> -                unavailable_features |= PERF_CAP_LBR_FMT;
-> -            }
-> +        if (kvm_enabled()) {
-> +            uint64_t mismatches = (requested_features ^ host_feat) &
-> +                                  fi->kvm_exact_match_flags;
-> +            mark_unavailable_features(cpu, w, mismatches, "feature doesn't match host");
->           }
->           mark_unavailable_features(cpu, w, unavailable_features, prefix);
->       }
->    
-> ---------------------------
+Please visit the excuses page listed below and investigate the failures, pr=
+oceeding afterwards as per the StableReleaseUpdates policy regarding autopk=
+gtest regressions [1].
 
-I may refine this part in this way:
+https://people.canonical.com/~ubuntu-archive/proposed-
+migration/focal/update_excuses.html#qemu
 
-     for (w = 0; w < FEATURE_WORDS; w++) {
-         FeatureWordInfo *fi = &feature_word_info[w];
-         uint64_t match_flags = fi->kvm_exact_match_flags;
-         uint64_t host_feat =
-             x86_cpu_get_supported_feature_word(w, false);
-         uint64_t requested_features = env->features[w];
-         uint64_t unavailable_features = requested_features & ~host_feat;
-         if (kvm_enabled() && match_flags) {
-             uint64_t mismatches = (requested_features & match_flags) &&
-                 (requested_features ^ host_feat) & match_flags;
-             mark_unavailable_features(cpu, w, mismatches, "feature doesn't 
-match host");
-             unavailable_features &= ~match_flags;
-         }
-         mark_unavailable_features(cpu, w, unavailable_features, prefix);
-     }
+[1] https://wiki.ubuntu.com/StableReleaseUpdates#Autopkgtest_Regressions
 
-which helps to:
-- make "-cpu host,pmu=true,lbr-fmt=0" just work as disable-lbr;
-- save a little overhead to get mismatches for non-related FEATURE_WORDS;
-- avoid to do mark_unavailable_features twice;
+Thank you!
 
-> 
->>           mark_unavailable_features(cpu, w, unavailable_features, prefix);
->>       }
->>   
->> @@ -6533,6 +6540,14 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
->>           }
->>       }
->>   
->> +    if (cpu->lbr_fmt) {
->> +        if (!cpu->enable_pmu) {
->> +            error_setg(errp, "LBR is unsupported since guest PMU is disabled.");
->> +            return;
->> +        }
-> 
-> This is not wrong, but looks like an obstacle for making the
-> feature migratable and needs to be addressed as a follow up if
-> you want live migration support.  CPUID[0xA] is exposing host
-> CPUID directly if enable_pmu is enabled.
+-- =
 
-It's true. I have noticed the issue as well and
-will follow up to make pmu-enabled guest migratable.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1849644
 
-> 
-> Also, I don't understand why PDCM is being silently disabled at
-> cpu_x86_cpuid() if enable_pmu is not set.  Isn't it valid to set
-> PDCM=1 without CPUID[0xA]?
+Title:
+  QEMU VNC websocket proxy requires non-standard 'binary' subprotocol
 
-It's invalid to set PDCM=1 w/o CPUID[0xA] since all features
-on the PERF_CAPABILITIES are dependent on the enabled guest pmu
-(which provides basic event counters to make LBR work).
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Focal:
+  Fix Committed
 
-Thanks,
-Like Xu
+Bug description:
+  [Impact]
 
-> 
-> 
->> +        env->features[FEAT_PERF_CAPABILITIES] |= cpu->lbr_fmt;
->> +    }
->> +
->>       /* mwait extended info: needed for Core compatibility */
->>       /* We always wake on interrupt even if host does not have the capability */
->>       cpu->mwait.ecx |= CPUID_MWAIT_EMX | CPUID_MWAIT_IBE;
->> @@ -7157,6 +7172,7 @@ static Property x86_cpu_properties[] = {
->>   #endif
->>       DEFINE_PROP_INT32("node-id", X86CPU, node_id, CPU_UNSET_NUMA_NODE_ID),
->>       DEFINE_PROP_BOOL("pmu", X86CPU, enable_pmu, false),
->> +    DEFINE_PROP_UINT8("lbr-fmt", X86CPU, lbr_fmt, 0),
->>   
->>       DEFINE_PROP_UINT32("hv-spinlocks", X86CPU, hyperv_spinlock_attempts,
->>                          HYPERV_SPINLOCK_NEVER_NOTIFY),
->> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
->> index f519d2bfd4..c1cf8b7160 100644
->> --- a/target/i386/cpu.h
->> +++ b/target/i386/cpu.h
->> @@ -357,6 +357,7 @@ typedef enum X86Seg {
->>   #define ARCH_CAP_TSX_CTRL_MSR		(1<<7)
->>   
->>   #define MSR_IA32_PERF_CAPABILITIES      0x345
->> +#define PERF_CAP_LBR_FMT      0x3f
->>   
->>   #define MSR_IA32_TSX_CTRL		0x122
->>   #define MSR_IA32_TSCDEADLINE            0x6e0
->> @@ -1701,6 +1702,15 @@ struct X86CPU {
->>        */
->>       bool enable_pmu;
->>   
->> +    /*
->> +     * Configure LBR_FMT bits on IA32_PERF_CAPABILITIES MSR.
->> +     * This can't be enabled by default yet because it doesn't have
->> +     * ABI stability guarantees, as it is only allowed to pass all
->> +     * LBR_FMT bits returned by kvm_arch_get_supported_msr_feature()
->> +     * (that depends on host CPU and kernel capabilities) to the guest.
->> +     */
->> +    uint8_t lbr_fmt;
->> +
->>       /* LMCE support can be enabled/disabled via cpu option 'lmce=on/off'. It is
->>        * disabled by default to avoid breaking migration between QEMU with
->>        * different LMCE configurations.
->> -- 
->> 2.21.3
->>
-> 
+   * The exact details of the protocol/subprotocal was slightly unclear
+     between the projects. So qemu ended up insisting on "binary" being
+     used but newer noVNC clients no more used it.
 
+   * Qemu got fixed in 5.0 to be more tolerant and accept an empty sub-
+     protocol as well. This SRU backports that fix to Focal.
+
+  [Test Case]
+
+   * Without the fix the following will "Failed to connect", but with
+  the fix it will work.
+
+  $ sudo apt install qemu-system-x86
+  # will only boot into a failing bootloader, but that is enough
+  $ qemu-system-x86_64 -vnc :0,websocket
+  # We need version 1.2 or later, so use the snap
+  $ snap install novnc
+  $ novnc --vnc localhost:5700
+  Connect browser to http://<IP>:6080/vnc.html
+  Click "Connect"
+
+   * Cross check with an older noVNC (e.g. the one in Focal) if the =
+
+     connectivity still works on those as well
+
+     - Reminders when switching between the noVNC implementations
+       - always refresh the browser with all clear ctrl+alt+f5
+       - start/stop the snapped one via snap.novnc.novncsvc.service
+
+  [Regression Potential]
+
+   * This is exclusive to the functionality of noVNC, so regressions would =
+
+     have to be expected in there. The tests try to exercise the basics, but
+     e.g. Openstack would be a major product using =
+
+
+  [Other Info]
+   =
+
+   * The noVNC in Focal itself does not yet have the offending change, but
+     we want the qemu in focal to be connecteable from ~any type of client
+
+
+  ---
+
+
+  =
+
+  When running a machine using "-vnc" and the "websocket" option QEMU seems=
+ to require the subprotocol called 'binary'. This subprotocol does not exis=
+t in the WebSocket specification. In fact it has never existed in the spec,=
+ in one of the very early drafts of WebSockets it was briefly mentioned but=
+ it never made it to a final version.
+
+  When the WebSocket server requires a non-standard subprotocol any
+  WebSocket client that works correctly won't be able to connect.
+
+  One example of such a client is noVNC, it tells the server that it
+  doesn't want to use any subprotocol. QEMU's WebSocket proxy doesn't
+  let noVNC connect. If noVNC is modified to ask for 'binary' it will
+  work, this is, however, incorrect behavior.
+
+  Looking at the code in "io/channel-websock.c" it seems it's quite
+  hard-coded to binary:
+
+  Look at line 58 and 433 here:
+  https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dio/channel-websock.c
+
+  This code has to be made more dynamic, and shouldn't require binary.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1849644/+subscriptions
 
