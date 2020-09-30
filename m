@@ -2,87 +2,80 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03D06C4727E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 17:22:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C808FC4741F
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 17:23:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C837206F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 17:22:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6DE60206F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 17:23:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hC9UKjK8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C837206F4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hcOEelp+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DE60206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNfo2-0005FM-UW
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 13:22:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48548)
+	id 1kNfpH-00070L-A4
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 13:23:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49148)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kNfmN-0003np-Gx
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 13:20:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26309)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNfo9-0005hq-1t
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 13:22:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25912)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kNfmK-0001hK-EF
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 13:20:35 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNfo6-0001pz-7u
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 13:22:24 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601486431;
+ s=mimecast20190719; t=1601486539;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=1CTIgPD9HRYaAQNiAbTzdC8FSpVdIDlD0XJUcnczWpg=;
- b=hC9UKjK88GFSWLXDkrHzvXHqzaDezh8MRbEvjvFGTSQzhXTKEm7rIDZ3b5rV2XjG+KpPs+
- OGk3CxA6iELNIRoHLNat/70IUg+lyJl4QC8U18cqfm7fTyWBa11qkiImHoXLanEDji4IB9
- CVIEBpokX0KgqYxyrMNDNDWR3nJmPyY=
+ bh=zXyqPTY/QndTAis7sfXLgqFAM8qKGtFjX0pqLPrrf0Q=;
+ b=hcOEelp+GykZfFxHqnIrbcRMLAAwg/+swjhrzLtNzbYEbha70QUxiNepfiw+VBDb8Uii3p
+ /vXJlvmwiC4fhRSfdmuWNuoZ8NDKhwfcWG+sEkSVN38IWZX9dMS9MTG59f7vIq64lJfUVG
+ tRvG8ONA0/faUBP7GFSIr+xkzTAkYgM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-224-CVtxKFB7NSKlspXaBudwZg-1; Wed, 30 Sep 2020 13:20:28 -0400
-X-MC-Unique: CVtxKFB7NSKlspXaBudwZg-1
+ us-mta-400-dVvXA2AYOwSLRAaOPB5GDw-1; Wed, 30 Sep 2020 13:22:15 -0400
+X-MC-Unique: dVvXA2AYOwSLRAaOPB5GDw-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7CBCC1868420;
- Wed, 30 Sep 2020 17:20:27 +0000 (UTC)
-Received: from work-vm (ovpn-114-238.ams2.redhat.com [10.36.114.238])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B24E100238C;
- Wed, 30 Sep 2020 17:20:23 +0000 (UTC)
-Date: Wed, 30 Sep 2020 18:20:20 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH v7 06/13] qmp: Call monitor_set_cur() only in
- qmp_dispatch()
-Message-ID: <20200930172020.GE2783@work-vm>
-References: <20200909151149.490589-1-kwolf@redhat.com>
- <20200909151149.490589-7-kwolf@redhat.com>
- <877dswo0mf.fsf@dusky.pond.sub.org>
- <20200925151304.GE5731@linux.fritz.box>
- <87ft72i0v8.fsf@dusky.pond.sub.org>
- <20200928143052.GH5451@linux.fritz.box>
- <87h7rfehtr.fsf@dusky.pond.sub.org>
- <20200930112903.GA9292@linux.fritz.box>
- <87o8ln9zl3.fsf@dusky.pond.sub.org>
- <20200930140051.GC9292@linux.fritz.box>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B9CC1800683;
+ Wed, 30 Sep 2020 17:22:14 +0000 (UTC)
+Received: from [10.10.119.140] (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A6C2110013C4;
+ Wed, 30 Sep 2020 17:22:13 +0000 (UTC)
+Subject: Re: [PATCH v4 04/46] qapi: modify docstrings to be sphinx-compatible
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200930043150.1454766-1-jsnow@redhat.com>
+ <20200930043150.1454766-5-jsnow@redhat.com>
+ <87wo0bejmy.fsf@dusky.pond.sub.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <96ba9e08-9806-baa3-62d2-2df84a666e62@redhat.com>
+Date: Wed, 30 Sep 2020 13:22:13 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200930140051.GC9292@linux.fritz.box>
-User-Agent: Mutt/1.14.6 (2020-07-11)
+In-Reply-To: <87wo0bejmy.fsf@dusky.pond.sub.org>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:31:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -91,8 +84,9 @@ X-Spam_score: -2.6
 X-Spam_bar: --
 X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.469,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,212 +99,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, marcandre.lureau@gmail.com,
- Markus Armbruster <armbru@redhat.com>, stefanha@redhat.com,
- qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+ Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Kevin Wolf (kwolf@redhat.com) wrote:
-> Am 30.09.2020 um 15:14 hat Markus Armbruster geschrieben:
-> > Kevin Wolf <kwolf@redhat.com> writes:
-> > 
-> > > Am 30.09.2020 um 11:26 hat Markus Armbruster geschrieben:
-> > >> Kevin Wolf <kwolf@redhat.com> writes:
-> > >> 
-> > >> > Am 28.09.2020 um 13:42 hat Markus Armbruster geschrieben:
-> > >> >> Kevin Wolf <kwolf@redhat.com> writes:
-> > >> >> 
-> > >> >> > Am 14.09.2020 um 17:10 hat Markus Armbruster geschrieben:
-> > >> >> >> Kevin Wolf <kwolf@redhat.com> writes:
-> > [...]
-> > >> >> >> > diff --git a/monitor/qmp.c b/monitor/qmp.c
-> > >> >> >> > index 8469970c69..922fdb5541 100644
-> > >> >> >> > --- a/monitor/qmp.c
-> > >> >> >> > +++ b/monitor/qmp.c
-> > >> >> >> > @@ -135,16 +135,10 @@ static void monitor_qmp_respond(MonitorQMP *mon, QDict *rsp)
-> > >> >> >> >  
-> > >> >> >> >  static void monitor_qmp_dispatch(MonitorQMP *mon, QObject *req)
-> > >> >> >> >  {
-> > >> >> >> > -    Monitor *old_mon;
-> > >> >> >> >      QDict *rsp;
-> > >> >> >> >      QDict *error;
-> > >> >> >> >  
-> > >> >> >> > -    old_mon = monitor_set_cur(&mon->common);
-> > >> >> >> > -    assert(old_mon == NULL);
-> > >> >> >> > -
-> > >> >> >> > -    rsp = qmp_dispatch(mon->commands, req, qmp_oob_enabled(mon));
-> > >> >> >> > -
-> > >> >> >> > -    monitor_set_cur(NULL);
-> > >> >> >> > +    rsp = qmp_dispatch(mon->commands, req, qmp_oob_enabled(mon), &mon->common);
-> > >> >> >> 
-> > >> >> >> Long line.  Happy to wrap it in my tree.  A few more in PATCH 08-11.
-> > >> >> >
-> > >> >> > It's 79 characters. Should be fine even with your local deviation from
-> > >> >> > the coding style to require less than that for comments?
-> > >> >> 
-> > >> >> Let me rephrase my remark.
-> > >> >> 
-> > >> >> For me,
-> > >> >> 
-> > >> >>     rsp = qmp_dispatch(mon->commands, req, qmp_oob_enabled(mon),
-> > >> >>                        &mon->common);
-> > >> >> 
-> > >> >> is significantly easier to read than
-> > >> >> 
-> > >> >>     rsp = qmp_dispatch(mon->commands, req, qmp_oob_enabled(mon), &mon->common);
-> > >> >
-> > >> > I guess this is highly subjective. I find wrapped lines harder to read.
-> > >> > For answering subjective questions like this, we generally use the
-> > >> > coding style document.
-> > >> >
-> > >> > Anyway, I guess following an idiosyncratic coding style that is
-> > >> > different from every other subsystem in QEMU is possible (if
-> > >> > inconvenient) if I know what it is.
-> > >> 
-> > >> The applicable coding style document is PEP 8.
-> > >
-> > > I'll happily apply PEP 8 to Python code, but this is C. I don't think
-> > > PEP 8 applies very well to C code. (In fact, PEP 7 exists as a C style
-> > > guide, but we're not writing C code for the Python project here...)
-> > 
-> > I got confused (too much Python code review), my apologies.
-> > 
-> > >> > My problem is more that I don't know what the exact rules are. Can they
-> > >> > only be figured out experimentally by submitting patches and seeing
-> > >> > whether you like them or not?
-> > >> 
-> > >> PEP 8:
-> > >> 
-> > >>     A style guide is about consistency.  Consistency with this style
-> > >>     guide is important.  Consistency within a project is more important.
-> > >>     Consistency within one module or function is the most important.
-> > >> 
-> > >> In other words, you should make a reasonable effort to blend in.
-> > >
-> > > The project style guide for C is defined in CODING_STYLE.rst. Missing
-> > > consistency with it is what I'm complaining about.
-> > >
-> > > I also agree that consistency within one module or function is most
-> > > important, which is why I allow you to reformat my code. But I don't
-> > > think it means that local coding style rules shouldn't be documented,
-> > > especially if you can't just look at the code and see immediately how
-> > > it's supposed to be.
-> > >
-> > >> >> Would you mind me wrapping this line in my tree?
-> > >> >
-> > >> > I have no say in this subsystem and I take it that you want all code to
-> > >> > look as if you had written it yourself, so do as you wish.
-> > >> 
-> > >> I'm refusing the bait.
-> > >> 
-> > >> > But I understand that I'll have to respin anyway, so if you could
-> > >> > explain what you're after, I might be able to apply the rules for the
-> > >> > next version of the series.
-> > >> 
-> > >> First, PEP 8 again:
-> > >> 
-> > >>     Limit all lines to a maximum of 79 characters.
-> > >> 
-> > >>     For flowing long blocks of text with fewer structural restrictions
-> > >>     (docstrings or comments), the line length should be limited to 72
-> > >>     characters.
-> > >
-> > > Ok, that's finally clear limits at least.
-> > >
-> > > Any other rules from PEP 8 that you want to see applied to C code?
-> > 
-> > PEP 8 does not apply to C.
-> > 
-> > > Would you mind documenting this somewhere?
-> > >
-> > >> Second, an argument we two had on this list, during review of a prior
-> > >> version of this patch series, talking about C:
-> > >> 
-> > >>     Legibility.  Humans tend to have trouble following long lines with
-> > >>     their eyes (I sure do).  Typographic manuals suggest to limit
-> > >>     columns to roughly 60 characters for exactly that reason[*].
-> > >> 
-> > >>     Code is special.  It's typically indented, and long identifiers push
-> > >>     it further to the right, function arguments in particular.  We
-> > >>     compromised at 80 columns.
-> > >> 
-> > >>     [...]
-> > >> 
-> > >>     [*] https://en.wikipedia.org/wiki/Column_(typography)#Typographic_style
-> > >> 
-> > >> The width of the line not counting indentation matters for legibility.
-> > >> 
-> > >> The line I flagged as long is 75 characters wide not counting
-> > >> indentation.  That's needlessly hard to read for me.
-> > >> 
-> > >> PEP 8's line length limit is a *limit*, not a sacred right to push right
-> > >> to the limit.
-> > >> 
-> > >> Since I get to read this code a lot, I've taken care to avoid illegibly
-> > >> wide lines, and I've guided contributors to blend in.
-> > >
-> > > As I said, I don't mind the exact number much. I do mind predictability,
-> > > though. (And ideally also consistency across the project because
-> > > otherwise I need to change my editor settings for individual files.)
-> > >
-> > > So if you don't like 79 columns, give me any other number. But
-> > > please, do give me something specific I can work with. "illegibly wide"
-> > > is not something I can work with because it's highly subjective.
-> > 
-> > Taste is subjective.
-> > 
-> > We can always make CODING_STYLE.rst more detailed.  I view that as a
-> > last resort when we waste too much time arguing.
-> > 
-> > Back to line length.
-> > 
-> > CODING_STYLE.rst sets a *limit*.
-> > 
-> > Going over the limit violates CODING_STYLE.rst.  There are (rare) cases
-> > where that is justified.
-> > 
-> > CODING_STYLE.rst neither demands nor prohibits breaking lines before the
-> > limit is reached.
-> > 
-> > Until CODING_STYLE.rst prohibits breaking lines unless they exceed the
-> > limit, I will continue to ask for breaking lines when that makes the
-> > code easier to read and more consistent with the code around it, for
-> > code I maintain, and admittedly in my opinion.
-> > 
-> > These requests appear to irk you a great deal.  I don't understand, but
-> > I'm sorry about it all the same.  By arguing about it repeatedly, you've
-> > irked some back.  Brought it on myself, I guess.  However, if that's
-> > what it takes to keep the code I maintain legible and consistent, I'll
-> > pay the price.
+On 9/30/20 4:47 AM, Markus Armbruster wrote:
+> John Snow <jsnow@redhat.com> writes:
 > 
-> I conclude that I'll never be able to submit code that passes your
-> review in the first attempt because I don't know the specific criteria
-> (and you don't seem to know them either before you see the patch).
+>> I did not say "sphinx beautiful", just "sphinx compatible". They will
+>> not throw errors when parsed and interpreted as ReST.
 > 
-> Fine, I'll live with it. It's just one of the things that makes working
-> in your subsystems more frustrating than in others.
+> "Bang on the keyboard until Sphinx doesn't throw errors anymore" might
+> be good enough for a certain kind of mathematician, but a constructive
+> solution needs a bit more direction.  Is there a specification to
+> follow?  Other useful resources?
+> 
 
-Hmm,
-  IMHO the thing here is that there's two different things here:
+I don't know if you are asking this question rhetorically, or in good faith.
 
-   a) A CODING_STYLE limit - and personally I use every last character
-of that when appropriate
-   b) For this particular case, Markus is saying he prefers the wrap
-there.
+Let me preface this by saying: This series, and these 119 patches, are 
+not about finding a style guide for our docstring utilization or about 
+proposing one. It is also not about rigorously adding such documentation 
+or about finding ways to meaningfully publish it with e.g. Sphinx, or 
+the styling of such pages.
 
-I don't think I see (b) as incompatible as a preference, but lets be
-sensible; if it's something you want to change in merge that seems
-reasonable, if it's something that you ask to change in a respin that's
-kind of reasonable, just don't hold up a big patch series for an
-argument over something that's legal in the coding style and isn't
-particularly offensive!
+Why bother to add docstrings at all, then? Because I needed them for my 
+own sake when learning this code and I felt it would be a waste to just 
+delete them, and I am of sound mind and able body and believe that some 
+documentation was better than none. They are useful even just as plaintext.
 
-Dave
+Having said that, let's explore the actual style I tend to use.
 
-> Kevin
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+I mentioned before in response to a review comment that there isn't 
+really any standard for docstrings. There are a few competing "styles", 
+but none of which are able to be programmatically checked and validated.
+
+The primary guide for docstrings is PEP 257, of which I follow some but 
+not all of the recommendations.
+
+https://www.python.org/dev/peps/pep-0257/
+
+In general,
+
+- Always use triple-double quotes (unenforced)
+- Modules, classes, and functions should have docstrings (pylint)
+- No empty lines before or after the docstring (unenforced)
+- Multi-line docstrings should take the form (unenforced):
+
+"""
+single-line summary of function.
+
+Additional prose if needed describing the function.
+
+:param x: Input such that blah blah.
+:raises y: When input ``x`` is unsuitable because blah blah.
+:returns: A value that blah blah.
+"""
+
+PEP257 suggests a form where the single-line summary appears on the same 
+line as the opening triple quotes. I don't like this, and prefer 
+symmetry. PEP257 *also* suggests that writing it my way is equivalent to 
+their way, because any docstring processor should trim the first line. I 
+take this as tacit admission that my way is acceptable and has merit.
+
+What about the syntax or markup inside the docstring itself? there is 
+*absolutely no standard*, but Sphinx autodoc recognizes a few field 
+lists as significant in its parsing, so I prefer using them:
+
+:param x: Denotes the parameter X. Do not use type information in the 
+string, we rely on mypy for that now.
+
+:raises y: explains a case in which an Exception type y may be raised 
+either directly by this code or anticipated to be allowed to be raised 
+by a helper call. (There's no standard here that I am aware of. I use my 
+judgment. Always document direct raise calls, but use your judgment for 
+sub-calls.)
+
+:returns: explains the semantics of the return value.
+
+That said, literally any sphinx/ReST markup is OK as long as it passes 
+make sphinxdocs. Some sphinx markup is prohibited, like adding new 
+full-throated sections. You can use arbitrary field lists, definition 
+lists, pre-formatted text, examples, code blocks, whatever.
+
+In general, you are not going to find the kind of semantic validation 
+you want to ensure that the parameter names are correct, or that you 
+spelled :param: right, or that you didn't miss a parameter or an 
+exception. None of that tooling exists for Python.
+
+Thus, it's all rather subjective. No right answers, no validation tools. 
+Just whatever seems reasonable to a human eye until such time we 
+actually decide to pursue publishing the API docs in the development 
+manual, if indeed we ever do so at all.
+
+That series sounds like a great opportunity to hash this all out. That 
+is when I would like to remove --missing-docstring, too. There will 
+absolutely be a "docstring series" in the future, but I am insisting 
+stubbornly it happen after strict typing.
+
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>   scripts/qapi/gen.py    | 6 ++++--
+>>   scripts/qapi/parser.py | 9 +++++----
+>>   2 files changed, 9 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
+>> index ca66c82b5b8..fc19b2aeb9b 100644
+>> --- a/scripts/qapi/gen.py
+>> +++ b/scripts/qapi/gen.py
+>> @@ -154,9 +154,11 @@ def _bottom(self):
+>>   
+>>   @contextmanager
+>>   def ifcontext(ifcond, *args):
+>> -    """A 'with' statement context manager to wrap with start_if()/end_if()
+>> +    """
+>> +    A 'with' statement context manager that wraps with `start_if` and `end_if`.
+> 
+> Sadly, the fact that start_if() and end_if() are functions isn't
+> immediately obvious anymore.
+> 
+> I've seen :func:`start_if` elsewhere.  Is this something we should or
+> want to use?
+> 
+
+We *could*.
+
+`start_if` relies on the default role, which I have provisionally set to 
+"any" here, so this is shorthand for :any:`start_if`.
+
+The :any: role means: "cross-reference any type of thing." If there is 
+not exactly one thing that matches, it results in an error during the 
+documentation build.
+
+I like this, because it's nice short-hand syntax that I think 
+communicates effectively to the reader that this is a symbol of some 
+kind without needing a premium of ReST-ese.
+
+CONSTANTS are capitalized, Classes are title cased, and functions are 
+lower_case. `lower_case` references can be assumed to be functions, but 
+I will admit that this is not enforced or necessarily true as we add 
+more cross reference types in the future.
+
+(I am trying to add QMP cross-reference syntax!)
+
+I still prefer `start_if` to :func:`start_if` simply because it's less 
+markup and is easier to read in plaintext contexts. You're right, it 
+doesn't look like a function anymore.
+
+I'm not sure if another annotations would work -- `start_if`() or 
+`start_if()`. Both seem kind of clunky to me, to be honest. Personal 
+feeling is "not really worth the hassle."
+
+>>   
+>> -    *args: any number of QAPIGenCCode
+>> +    :param ifcond: List of conditionals
+>> +    :param args: any number of `QAPIGenCCode`.
+>>   
+>>       Example::
+>>   
+>> diff --git a/scripts/qapi/parser.py b/scripts/qapi/parser.py
+>> index 9d1a3e2eea9..02983979965 100644
+>> --- a/scripts/qapi/parser.py
+>> +++ b/scripts/qapi/parser.py
+>> @@ -381,10 +381,11 @@ def append(self, line):
+>>   
+>>           The way that the line is dealt with depends on which part of
+>>           the documentation we're parsing right now:
+>> -        * The body section: ._append_line is ._append_body_line
+>> -        * An argument section: ._append_line is ._append_args_line
+>> -        * A features section: ._append_line is ._append_features_line
+>> -        * An additional section: ._append_line is ._append_various_line
+>> +
+>> +         * The body section: ._append_line is ._append_body_line
+>> +         * An argument section: ._append_line is ._append_args_line
+>> +         * A features section: ._append_line is ._append_features_line
+>> +         * An additional section: ._append_line is ._append_various_line
+>>           """
+>>           line = line[1:]
+>>           if not line:
+> 
+> I understand why you insert a blank line (reST wants blank lines around
+> lists), I don't understand why you indent.  Can you explain?
+
+I was mistaken about it needing the indent!
+
+--js
 
 
