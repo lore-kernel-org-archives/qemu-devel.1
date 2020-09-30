@@ -2,104 +2,132 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22AB2C4727C
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:40:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60076C4727C
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:40:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B04020759
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:40:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0DF92071E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:40:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PgGnev2u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B04020759
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ngsd5rNn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0DF92071E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNeDB-0004nT-Jg
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 11:40:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42004)
+	id 1kNeDl-0005Zn-S7
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 11:40:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44454)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kNe4t-0004tu-Mx
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 11:31:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60504)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kNeBm-0003qr-Oi
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 11:38:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37139)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kNe4q-0007g0-0K
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 11:31:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601479891;
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kNeBj-00004s-N1
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 11:38:42 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601480318;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=zyOfvk8sXmJI1D/oZfvvwbFEHd5zDPcwN6td8xWbw9s=;
- b=PgGnev2uZakeqPcexcXY5Nia6QUG9ESmbiJhfiag1ft2KCtVArCMlA6C6FJHYTQB5dEOPp
- LfOGuRTfrgG9RneU8f/AEqsTJa2zxmC4rKqy82hIlgeSNDW6io8rM0pnepihEpx3Fsss2Q
- 68RDOeoWrtDReeOIRfrePL2P7VBxAhY=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-5-RqhdN9jlOA2dak381fnHeg-1; Wed, 30 Sep 2020 11:31:29 -0400
-X-MC-Unique: RqhdN9jlOA2dak381fnHeg-1
-Received: by mail-wm1-f69.google.com with SMTP id a25so610895wmb.2
- for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 08:31:28 -0700 (PDT)
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=3umxhrU/2FUwG3HdagnADTtZ7F6SDnjSihkWqnQMnBw=;
+ b=Ngsd5rNnc84gEzsXp7ZUJ9qZh786K7LcsSJd4bp3HA4gHJ/q5SItm2Bm7m4Ov6poG1Z58E
+ OIMZXh7Cl1qArHtheeLsocqKR7ZQ/3ZNYAExMHQHY3PU0OxZhCChIcn6R/iSbLnPsy54Ah
+ tJJ5KUxK6B2rpWFhFFETzOoKUUXLoyE=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-370-OdZAt_Y2PyuVhldH4GQh_Q-1; Wed, 30 Sep 2020 11:38:36 -0400
+X-MC-Unique: OdZAt_Y2PyuVhldH4GQh_Q-1
+Received: by mail-wm1-f70.google.com with SMTP id m19so768030wmg.6
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 08:38:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=zyOfvk8sXmJI1D/oZfvvwbFEHd5zDPcwN6td8xWbw9s=;
- b=OEetIA0r82T3YMndbiZ/j3X5xbEpdbtFnxyJ/djtroEsRI3X2VK4sWFlUKau/gQVAC
- sbwJFw1mVZLNZ4UpbSPGHjnWzm69E3uXn12UHxMMZXt5lyoq4qgTKTuYUhTE5gzT8DPr
- hEcSzIYVu14lKNusX9INHLl7DlTHlMYb50gUb+4xhd0hNzUzlW3VcHw5svU0VP6JRkfe
- h8BYmGxpCr3suVXZThpjwptXilVeTIQQrWo4uQshXurVrhEqqp6ZQT9ad8y7XtLOJPoN
- iSSTPXTjsWPFODMd2zI7eEhGjgIXYKPdewHnXYpEVGuBzy/NA5DtS8cvDBGCAu2F1igX
- idcQ==
-X-Gm-Message-State: AOAM532WpeqUwNDYm0EP9AX85pg4NCh9hJcQqyp7LQVamto+uxI7ikF1
- ak7FNcHeNXbhApWichzzEkwPpN1rI/70Cv/aNLRvrQ67opx5ff8s7GT2LDMgQ/Ce4IJFU2xtskY
- 3Ly2zBGr/G7rcgA0=
-X-Received: by 2002:adf:e8c3:: with SMTP id k3mr3854360wrn.228.1601479887185; 
- Wed, 30 Sep 2020 08:31:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyHndTEGfX49EZmnlZu+6q9vVkU3dCesd8WxSoWCU0S2tPGZAzOSw0GXV8L5uHAsjbxwrxLlg==
-X-Received: by 2002:adf:e8c3:: with SMTP id k3mr3854339wrn.228.1601479887031; 
- Wed, 30 Sep 2020 08:31:27 -0700 (PDT)
-Received: from redhat.com (bzq-79-179-71-128.red.bezeqint.net. [79.179.71.128])
- by smtp.gmail.com with ESMTPSA id d6sm3763159wrq.67.2020.09.30.08.31.24
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 30 Sep 2020 08:31:25 -0700 (PDT)
-Date: Wed, 30 Sep 2020 11:31:22 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: Outline for VHOST_USER_PROTOCOL_F_VDPA
-Message-ID: <20200930112918-mutt-send-email-mst@kernel.org>
-References: <20200928092537.GA44353@stefanha-x1.localdomain>
- <20200929020114-mutt-send-email-mst@kernel.org>
- <20200929085751.GA181609@stefanha-x1.localdomain>
- <20200929055110-mutt-send-email-mst@kernel.org>
- <20200929183824.GC191675@stefanha-x1.localdomain>
- <20200930034807-mutt-send-email-mst@kernel.org>
- <20200930145752.GB320669@stefanha-x1.localdomain>
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=3umxhrU/2FUwG3HdagnADTtZ7F6SDnjSihkWqnQMnBw=;
+ b=O7FXJEWdn1i35upscotghsFSJyAjsUBEovMHJ1Y9Zn1xqC4Pn2CTLpQZBxRYZiyzEw
+ Tn2ptkIIMhVv64f/HkXqQE6hRNTQ1AAUj53Q3TJr+Q8q95F2I98FPfLofl6acNS+UK77
+ gxkj1Ii/Lvn4upLuQCX0OsVZu9sTKEsbVgaLP7Hkzywo6i+Hf3q6SV854f9VwUfOKK+T
+ cxPgaTjVZJT4rLeRrkTjPtqfXv7bekCGu7HamfPJbvVdowHsYWc2aUtoEj6LcEgRgHIp
+ pMXuIy81U1QXAjxU2ikWW080/N8Bv08VgJKuUTiR3gwbOJg3flltMNqgvVMcedHmUJwE
+ 1RiQ==
+X-Gm-Message-State: AOAM530xVGejU3Qo9rW9575oeM1RgnfU7aOMcfOuEHNVSca6tas81rfV
+ F75O5axlrVD1Zl1rWB3+ecS8fX7yXC/rHCU1xnHp3VX0+3gcaL7EmJ5pqpE9DjMIgSkaLAYUWfq
+ TdEIGEE0+EyIxqeI=
+X-Received: by 2002:a5d:67d0:: with SMTP id n16mr4144742wrw.198.1601480315592; 
+ Wed, 30 Sep 2020 08:38:35 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwQKdl9fE2RlUxAYU3QRBFZqEa3VaIQbMvclsSU94tyAIEVRqPOqwLcX9tTQcRchR4Eaimg4g==
+X-Received: by 2002:a5d:67d0:: with SMTP id n16mr4144728wrw.198.1601480315382; 
+ Wed, 30 Sep 2020 08:38:35 -0700 (PDT)
+Received: from [192.168.1.36] (74.red-83-53-161.dynamicip.rima-tde.net.
+ [83.53.161.74])
+ by smtp.gmail.com with ESMTPSA id x17sm3937042wrg.57.2020.09.30.08.38.34
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 30 Sep 2020 08:38:34 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 04/28] hw/arm: Express dependencies of the
+ highbank machines with Kconfig
+To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, 
+ qemu-devel@nongnu.org
+References: <20190505135714.11277-1-thuth@redhat.com>
+ <20190505135714.11277-5-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <f2489790-8fcd-a9c3-4ec3-c8a72240f172@redhat.com>
+Date: Wed, 30 Sep 2020 17:38:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200930145752.GB320669@stefanha-x1.localdomain>
+In-Reply-To: <20190505135714.11277-5-thuth@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:26:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:31:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -25
 X-Spam_score: -2.6
 X-Spam_bar: --
 X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.469,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,23 +140,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lulu@redhat.com, tiwei.bie@intel.com, jasowang@redhat.com,
- qemu-devel@nongnu.org, raphael.norwitz@nutanix.com, maxime.coquelin@redhat.com,
- kraxel@redhat.com, Felipe Franciosi <felipe@nutanix.com>,
- marcandre.lureau@redhat.com, Nikos Dragazis <ndragazis@arrikto.com>,
- changpeng.liu@intel.com, Daniele Buono <dbuono@us.ibm.com>
+Cc: qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 30, 2020 at 03:57:52PM +0100, Stefan Hajnoczi wrote:
-> IMO "Inflight I/O tracking" is best placed into libvhost-user instead of
-> the vhost-user protocol.
+Hi Thomas,
 
-Oh I agree qemu does nothing with it. The reason we have it defined in
-the spec is to facilitate compatibility across backends.
-I have zero confidence in backend developers being able to support
-e.g. cross-version migration consistently, and lots of backends
-do not use libvhost-user.
+On 5/5/19 3:56 PM, Thomas Huth wrote:
+> Add Kconfig dependencies for the highbank machine (and the midway
+> machine).
+> This patch is slightly based on earlier work by Ákos Kovács (i.e.
+> his "hw/arm/Kconfig: Add ARM Kconfig" patch).
+> 
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  default-configs/arm-softmmu.mak |  9 +--------
+>  hw/arm/Kconfig                  | 11 +++++++++++
+>  2 files changed, 12 insertions(+), 8 deletions(-)
+> 
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> index 2a11e76cc7..50a4be3cad 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -8,6 +8,7 @@ CONFIG_PCI_DEVICES=y
+>  CONFIG_PCI_TESTDEV=y
+>  
+>  CONFIG_EXYNOS4=y
+> +CONFIG_HIGHBANK=y
+>  
+>  CONFIG_VGA=y
+>  CONFIG_NAND=y
+> @@ -45,24 +46,17 @@ CONFIG_PLATFORM_BUS=y
+>  CONFIG_VIRTIO_MMIO=y
+>  
+>  CONFIG_ARM11MPCORE=y
+> -CONFIG_A15MPCORE=y
+>  
+>  CONFIG_NETDUINO2=y
+>  
+> -CONFIG_ARM_TIMER=y
+> -CONFIG_PL011=y
+> -CONFIG_PL022=y
+> -CONFIG_PL031=y
+>  CONFIG_PL041=y
+>  CONFIG_PL050=y
+> -CONFIG_PL061=y
+>  CONFIG_PL080=y
+>  CONFIG_PL110=y
+>  CONFIG_PL181=y
+>  CONFIG_PL190=y
+>  CONFIG_PL330=y
+>  CONFIG_CADENCE=y
+> -CONFIG_XGMAC=y
+>  CONFIG_PXA2XX=y
+>  CONFIG_BITBANG_I2C=y
+>  CONFIG_FRAMEBUFFER=y
+> @@ -150,7 +144,6 @@ CONFIG_XILINX_AXI=y
+>  CONFIG_PCI_EXPRESS_DESIGNWARE=y
+>  
+>  CONFIG_STRONGARM=y
+> -CONFIG_HIGHBANK=y
+>  CONFIG_MUSICPAL=y
+>  
+>  # for realview and versatilepb
+> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+> index acd07b2add..0ba377ac18 100644
+> --- a/hw/arm/Kconfig
+> +++ b/hw/arm/Kconfig
+> @@ -18,6 +18,17 @@ config EXYNOS4
+>  
+>  config HIGHBANK
+>      bool
+> +    select A9MPCORE
+> +    select A15MPCORE
+> +    select AHCI
+> +    select ARM_TIMER # sp804
+> +    select ARM_V7M
+
+Hmm I missed that... This machine doesn't use a v7M core, right?
+
+> +    select PL011 # UART
+> +    select PL022 # Serial port
+> +    select PL031 # RTC
+> +    select PL061 # GPIO
+> +    select PL310 # cache controller
+> +    select XGMAC # ethernet
+>  
+>  config INTEGRATOR
+>      bool
+> 
 
 
