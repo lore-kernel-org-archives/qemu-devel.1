@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FE60C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 04:39:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C43C0C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 04:40:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3E192075A
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 04:39:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 515092067D
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 04:40:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RRd5XHMT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3E192075A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UJNqF81y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 515092067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNTth-0001cI-MR
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 00:39:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36848)
+	id 1kNTuw-0003C6-GZ
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 00:40:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37204)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNTmv-0000S6-8L
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 00:32:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38790)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNTnY-0001I9-7B
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 00:33:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39704)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNTmt-0000Wv-5K
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 00:32:20 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNTnT-0000bU-FK
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 00:32:59 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601440338;
+ s=mimecast20190719; t=1601440373;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ClbhNbJZx41KMKTSl7yGK3uSHvo8s3aEc1Ufc7qNXNE=;
- b=RRd5XHMTtH9fx0Rsyy/9+Q1a9h6e8E9XqcrAHpO+rsMnVRKqES84k/cH0RJcHofAOoaEnS
- 3BNbbUh75KKokBVIMm4ZYZZ6jJTWk2j/uihUBKLJX4hD7R4/ugIKP+Npb/MDdp3pFYfJuK
- giRRsXPQI5x20lMYCZKTvDxQjISsmVI=
+ bh=qGw20eIKiIOAoBIIJQ+ThMoU0wWE4UU+clXIwJBFTTg=;
+ b=UJNqF81y6FEeHo4/gEPF7ATVMAgrsCamp8Si+8+HuHl8CazYvbf0XLwzX5r+ywMvX7oz69
+ 34Y/WMbijA3IxJYbkXVAgoWx/GlhnxPwPaDHH6YL5TUDDFCYqowe6qtMSIE77euakMztIN
+ s8jP2cUymYMnCEYmKOXcfaa/hE7JB+w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-396-KG60xvZCN8KkNTkdxNdrzQ-1; Wed, 30 Sep 2020 00:32:16 -0400
-X-MC-Unique: KG60xvZCN8KkNTkdxNdrzQ-1
+ us-mta-538-0HPtvsdrM6ugdpvTFbkxCA-1; Wed, 30 Sep 2020 00:32:51 -0400
+X-MC-Unique: 0HPtvsdrM6ugdpvTFbkxCA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A1691074651;
- Wed, 30 Sep 2020 04:32:15 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4461185A0C3;
+ Wed, 30 Sep 2020 04:32:49 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B51DD7B40D;
- Wed, 30 Sep 2020 04:32:13 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A1BFC7B40D;
+ Wed, 30 Sep 2020 04:32:48 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 11/46] qapi: enforce import order/styling with isort
-Date: Wed, 30 Sep 2020 00:31:15 -0400
-Message-Id: <20200930043150.1454766-12-jsnow@redhat.com>
+Subject: [PATCH v4 28/46] qapi/source.py: add type hint annotations
+Date: Wed, 30 Sep 2020 00:31:32 -0400
+Message-Id: <20200930043150.1454766-29-jsnow@redhat.com>
 In-Reply-To: <20200930043150.1454766-1-jsnow@redhat.com>
 References: <20200930043150.1454766-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -101,121 +101,121 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-While we're mucking around with imports, we might as well formalize the
-style we use. Let's use isort to do it for us.
+Annotations do not change runtime behavior.
+This commit *only* adds annotations.
 
-lines_after_imports=2: Use two lines after imports, to match PEP8's
-desire to have "two lines before and after" class definitions, which are
-likely to start immediately after imports.
+A note on typing of __init__: mypy requires init functions with no
+parameters to document a return type of None to be considered fully
+typed. In the case when there are input parameters, None may be omitted.
 
-force_sort_within_sections: Intermingles "from x" and "import x" style
-statements, such that sorting is always performed strictly on the module
-name itself.
+Since __init__ may never return any value, it is preferred to omit the
+return annotation whenever possible.
 
-force_grid_wrap=4: Four or more imports from a single module will force
-the one-per-line style that's more git-friendly. This will generally
-happen for 'typing' imports.
-
-multi_line_output=3: Uses the one-per-line indented style for long
-imports.
-
-include_trailing_comma: Adds a comma to the last import in a group,
-which makes git conflicts nicer to deal with, generally.
-
-line_length: 72 is chosen to match PEP8's "docstrings and comments" line
-length limit. If you have a single line import that exceeds 72
-characters, your names are too long!
-
-Suggested-by: Cleber Rosa <crosa@redhat.com>
 Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: Cleber Rosa <crosa@redhat.com>
 Tested-by: Cleber Rosa <crosa@redhat.com>
 ---
- scripts/qapi/.isort.cfg    | 7 +++++++
- scripts/qapi/expr.py       | 3 ++-
- scripts/qapi/introspect.py | 7 +++++--
- scripts/qapi/parser.py     | 2 +-
- scripts/qapi/schema.py     | 2 +-
- 5 files changed, 16 insertions(+), 5 deletions(-)
- create mode 100644 scripts/qapi/.isort.cfg
+ scripts/qapi/mypy.ini  |  5 -----
+ scripts/qapi/source.py | 31 ++++++++++++++++++-------------
+ 2 files changed, 18 insertions(+), 18 deletions(-)
 
-diff --git a/scripts/qapi/.isort.cfg b/scripts/qapi/.isort.cfg
-new file mode 100644
-index 00000000000..6d0fd6cc0d3
---- /dev/null
-+++ b/scripts/qapi/.isort.cfg
-@@ -0,0 +1,7 @@
-+[settings]
-+force_grid_wrap=4
-+force_sort_within_sections=True
-+include_trailing_comma=True
-+line_length=72
-+lines_after_imports=2
-+multi_line_output=3
-\ No newline at end of file
-diff --git a/scripts/qapi/expr.py b/scripts/qapi/expr.py
-index 03b31ecfc19..e73b65b6a7e 100644
---- a/scripts/qapi/expr.py
-+++ b/scripts/qapi/expr.py
-@@ -14,8 +14,9 @@
- # This work is licensed under the terms of the GNU GPL, version 2.
- # See the COPYING file in the top-level directory.
+diff --git a/scripts/qapi/mypy.ini b/scripts/qapi/mypy.ini
+index 8ab9ac52cc4..1b8555dfa39 100644
+--- a/scripts/qapi/mypy.ini
++++ b/scripts/qapi/mypy.ini
+@@ -34,11 +34,6 @@ disallow_untyped_defs = False
+ disallow_incomplete_defs = False
+ check_untyped_defs = False
  
--import re
- from collections import OrderedDict
-+import re
+-[mypy-qapi.source]
+-disallow_untyped_defs = False
+-disallow_incomplete_defs = False
+-check_untyped_defs = False
+-
+ [mypy-qapi.types]
+ disallow_untyped_defs = False
+ disallow_incomplete_defs = False
+diff --git a/scripts/qapi/source.py b/scripts/qapi/source.py
+index e97b9a8e15e..1cc6a5b82dc 100644
+--- a/scripts/qapi/source.py
++++ b/scripts/qapi/source.py
+@@ -11,37 +11,42 @@
+ 
+ import copy
+ import sys
++from typing import List, Optional, TypeVar
+ 
+ 
+ class QAPISchemaPragma:
+-    def __init__(self):
++    def __init__(self) -> None:
+         # Are documentation comments required?
+         self.doc_required = False
+         # Whitelist of commands allowed to return a non-dictionary
+-        self.returns_whitelist = []
++        self.returns_whitelist: List[str] = []
+         # Whitelist of entities allowed to violate case conventions
+-        self.name_case_whitelist = []
++        self.name_case_whitelist: List[str] = []
+ 
+ 
+ class QAPISourceInfo:
+-    def __init__(self, fname, line, parent):
++    T = TypeVar('T', bound='QAPISourceInfo')
 +
- from .common import c_name
- from .error import QAPISemError
++    def __init__(self: T, fname: str, line: int, parent: Optional[T]):
+         self.fname = fname
+         self.line = line
+         self.parent = parent
+-        self.pragma = parent.pragma if parent else QAPISchemaPragma()
+-        self.defn_meta = None
+-        self.defn_name = None
++        self.pragma: QAPISchemaPragma = (
++            parent.pragma if parent else QAPISchemaPragma()
++        )
++        self.defn_meta: Optional[str] = None
++        self.defn_name: Optional[str] = None
  
-diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
-index b036fcf9ce7..31acd2f230a 100644
---- a/scripts/qapi/introspect.py
-+++ b/scripts/qapi/introspect.py
-@@ -17,8 +17,11 @@
-     mcgen,
- )
- from .gen import QAPISchemaMonolithicCVisitor
--from .schema import (QAPISchemaArrayType, QAPISchemaBuiltinType,
--                     QAPISchemaType)
-+from .schema import (
-+    QAPISchemaArrayType,
-+    QAPISchemaBuiltinType,
-+    QAPISchemaType,
-+)
+-    def set_defn(self, meta, name):
++    def set_defn(self, meta: str, name: str) -> None:
+         self.defn_meta = meta
+         self.defn_name = name
  
+-    def next_line(self):
++    def next_line(self: T) -> T:
+         info = copy.copy(self)
+         info.line += 1
+         return info
  
- def _make_tree(obj, ifcond, features, extra=None):
-diff --git a/scripts/qapi/parser.py b/scripts/qapi/parser.py
-index a9388eaf765..a6081a0c5d4 100644
---- a/scripts/qapi/parser.py
-+++ b/scripts/qapi/parser.py
-@@ -14,9 +14,9 @@
- # This work is licensed under the terms of the GNU GPL, version 2.
- # See the COPYING file in the top-level directory.
+-    def loc(self):
++    def loc(self) -> str:
+         if self.fname is None:
+             return sys.argv[0]
+         ret = self.fname
+@@ -49,13 +54,13 @@ def loc(self):
+             ret += ':%d' % self.line
+         return ret
  
-+from collections import OrderedDict
- import os
- import re
--from collections import OrderedDict
+-    def in_defn(self):
++    def in_defn(self) -> str:
+         if self.defn_name:
+             return "%s: In %s '%s':\n" % (self.fname,
+                                           self.defn_meta, self.defn_name)
+         return ''
  
- from .error import QAPIParseError, QAPISemError
- from .source import QAPISourceInfo
-diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-index a835ee6fde3..093f7a38d88 100644
---- a/scripts/qapi/schema.py
-+++ b/scripts/qapi/schema.py
-@@ -14,9 +14,9 @@
+-    def include_path(self):
++    def include_path(self) -> str:
+         ret = ''
+         parent = self.parent
+         while parent:
+@@ -63,5 +68,5 @@ def include_path(self):
+             parent = parent.parent
+         return ret
  
- # TODO catching name collisions in generated code would be nice
- 
-+from collections import OrderedDict
- import os
- import re
--from collections import OrderedDict
- 
- from .common import c_name, pointer_suffix
- from .error import QAPIError, QAPISemError
+-    def __str__(self):
++    def __str__(self) -> str:
+         return self.include_path() + self.in_defn() + self.loc()
 -- 
 2.26.2
 
