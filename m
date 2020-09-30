@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81F00C47420
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 17:52:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72A39C47426
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 17:52:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A8C22076A
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 17:52:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 170BB20706
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 17:52:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dxj7U0OY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A8C22076A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iuL3cVP3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 170BB20706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNgHB-0000ku-TX
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 13:52:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55376)
+	id 1kNgHV-0000yB-VW
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 13:52:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55496)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kNgEC-0005Dw-SC
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 13:49:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42711)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kNgEI-0005Mc-Dv
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 13:49:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43216)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kNgE7-0004iR-C3
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 13:49:20 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601488154;
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kNgEC-0004jt-FG
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 13:49:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601488159;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=kGvKBOKygFnWdwFAhzZquiQhuhir/ROm3Ofb8kndR1w=;
- b=Dxj7U0OYt12ScZL3YJAWsUblB+37d5uix1nciLu0vBhmQo/OtpoTEYOMWZRBMdDg+MKE15
- Hs79NtFjk18fG8IYuZSqMlEn0KNsNdEV3+iRN03rvsHYFiT+ppP1fwIY+lQjo74mUSFLsU
- /0YdjOXO9oecGNQGn4C8+r7oWegKTfo=
+ bh=uWqOg4vxL3unZvyw5089/kn8esFL3A3KUwseSu8M10s=;
+ b=iuL3cVP3dgPJ7fmler3H/L2RnC8AaOeV56g2Qig3gaGowQaD81pRb/gX8Whgro/VUZ16jG
+ 5Oo/m4XdK3ORocm0/2MzFirOnQ1mBP+5g+CXW6JTH0AJ4Vvzf9l9bpFmPxPML254/kJ9uZ
+ h4bv/4WVHHfW/f2Y8tKfGAwRiMedjkM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-475-aPA5p7UfM66VD2UiPS4HEw-1; Wed, 30 Sep 2020 13:49:11 -0400
-X-MC-Unique: aPA5p7UfM66VD2UiPS4HEw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-108-5DUQWoHMM-qV7KOjpWJ0gA-1; Wed, 30 Sep 2020 13:49:13 -0400
+X-MC-Unique: 5DUQWoHMM-qV7KOjpWJ0gA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3209F18B9F40;
- Wed, 30 Sep 2020 17:49:10 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3FFBB18B9F4A;
+ Wed, 30 Sep 2020 17:49:12 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
  [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 84B1C7B7A3;
- Wed, 30 Sep 2020 17:49:09 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3C3FE7BE44;
+ Wed, 30 Sep 2020 17:49:10 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 6917332019; Wed, 30 Sep 2020 19:48:56 +0200 (CEST)
+ id 8428D40827; Wed, 30 Sep 2020 19:48:56 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 09/12] tests/acpi: factor out common microvm test setup
-Date: Wed, 30 Sep 2020 19:48:52 +0200
-Message-Id: <20200930174856.11296-10-kraxel@redhat.com>
+Subject: [PULL 12/12] tests/acpi: update expected data files
+Date: Wed, 30 Sep 2020 19:48:55 +0200
+Message-Id: <20200930174856.11296-13-kraxel@redhat.com>
 In-Reply-To: <20200930174856.11296-1-kraxel@redhat.com>
 References: <20200930174856.11296-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:26:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:31:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -25
 X-Spam_score: -2.6
@@ -83,7 +83,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.469,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,45 +108,88 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-... into new test_acpi_microvm_prepare helper
-
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Message-id: 20200928104256.9241-10-kraxel@redhat.com
+Message-id: 20200928104256.9241-13-kraxel@redhat.com
 ---
- tests/qtest/bios-tables-test.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+ tests/qtest/bios-tables-test-allowed-diff.h |   5 -----
+ tests/data/acpi/microvm/DSDT.pcie           | Bin 0 -> 3023 bytes
+ tests/data/acpi/virt/DSDT                   | Bin 5200 -> 5196 bytes
+ tests/data/acpi/virt/DSDT.memhp             | Bin 6561 -> 6557 bytes
+ tests/data/acpi/virt/DSDT.numamem           | Bin 5200 -> 5196 bytes
+ 5 files changed, 5 deletions(-)
 
-diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
-index 3c09b844f9de..7be2b3131e16 100644
---- a/tests/qtest/bios-tables-test.c
-+++ b/tests/qtest/bios-tables-test.c
-@@ -1072,15 +1072,20 @@ static void test_acpi_virt_tcg_memhp(void)
- 
- }
- 
-+static void test_acpi_microvm_prepare(test_data *data)
-+{
-+    memset(data, 0, sizeof(*data));
-+    data->machine = "microvm";
-+    data->required_struct_types = NULL; /* no smbios */
-+    data->required_struct_types_len = 0;
-+    data->blkdev = "virtio-blk-device";
-+}
-+
- static void test_acpi_microvm_tcg(void)
- {
-     test_data data;
- 
--    memset(&data, 0, sizeof(data));
--    data.machine = "microvm";
--    data.required_struct_types = NULL; /* no smbios */
--    data.required_struct_types_len = 0;
--    data.blkdev = "virtio-blk-device";
-+    test_acpi_microvm_prepare(&data);
-     test_acpi_one(" -machine microvm,acpi=on,rtc=off",
-                   &data);
-     free_test_data(&data);
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+index 53109c22a56f..dfb8523c8bf4 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1,6 +1 @@
+ /* List of comma-separated changed AML files to ignore */
+-"tests/data/acpi/microvm/DSDT.pcie32",
+-"tests/data/acpi/microvm/DSDT.pcie64",
+-"tests/data/acpi/virt/DSDT",
+-"tests/data/acpi/virt/DSDT.numamem",
+-"tests/data/acpi/virt/DSDT.memhp",
+diff --git a/tests/data/acpi/microvm/DSDT.pcie b/tests/data/acpi/microvm/DSDT.pcie
+index e69de29bb2d1d6434b8b29ae775ad8c2e48c5391..4b765541e372f4ba4e25529c14acf696516c8f61 100644
+GIT binary patch
+literal 3023
+zcmZveJ!~UI6vyA%>v%o>$l7tfKOE>z2(-2p9Su_KwUZdd$)4A_AbirEgg_i=B7u<L
+zgcMR7kdCuNZKQ~rmhL1fDz2lT;2IhlO0GKde>>USJmoBTcK$Q(y?MX4yR*{?JHy}e
+zM5$ZtLw_&aY`+)y9gJB-#C^WHy<eiR9gWW4+Bx=joM^AtDc<S!k37$7kQ0T&mdZPk
+zKM2c3rFJbh<7TYF7c@F=_=o*^Y+q<S%~(!!)a#&Shgt35s^YHoJpDXP&g(9*&;HDA
+zw-f0_T7J;;ym}Lhz_W-6^mv_;%6~UQX)A~9;B?j<ba$yhG<l)y(bsvFemCsyZ&uf%
+z?%iSTl*RptJAQayrAVb71;>N7IvbrYb4M>090Z>4`FbrR(zfpoyxV$i|6p(k+ATe)
+zvdF@3frN8eQHzgqWKrqo7nCAGUY50}^E%)DDe!yV%lIwtZ6*K<uh#OIEJW%~)NUW>
+z;5;%Mlxu1&AfI~lA#IX}e+RwK=>dI!E5S%75DbQM`=6?_O5V;-r?eaPJkos&{W?_&
+zJg!m@jYOm&np7#;h3OQxSKD1F_JUza&&7T)O(c6FeryX=ZF{BIGcn~7Ytz^hl0A`4
+zY@3cflMK?to`@QornM(b6Um;)DE72t&m;po_DoD|?U^JGX>w)+XD0ScOf%XuNgmSV
+zoDrP3xyUCmospc7CTCV~W(8+fazdJ%j^K0zrz1HbO-{TJMy2ss>gvVC%t=m2lT!&!
+zB{-Gjgfuy^d+3_P_b4wo^O6(N<ir~b&*Xj<1ZP2VLYkaK!C4fXMac<ia+U;VNpO}V
+zC#1<aD>!Eb=d9#}G&x<t=?YF)azdJ%Wx-h%oMp)gX>wKsXGL&UBqyZFIVU*h1m~RO
+zgfuy;g0m_(tCADa<eV3r^MZ3;azdJ%3xab&a4twrNRtzrwDH_73eH8z32AaJ3C<<K
+zxg<FuP0nS(xhy!BB`2iGxgt1M1m}w6gfux<1?Q^ZT$P-VCg+;qToasYk`vP8To;_{
+zf^%JRLYkZ#f^$P~Zb(i@ld~o`Yl5>TIUzOY=)7n17WDEH?Rz`dAL8Kps9{;yt8moN
+zpL~7%NXDu&Q8);#t5Ev96Mx^YL*b-ghQj7`Ba|My4)rc))p$i#DkWoKJG&7}kI7ig
+zSH()pSlHlh#L{C|v8sj0Z@1`@Yw=8%;vl2m|F%de9wM4@V|{}+tH1|G{ymvar+?`#
+zZC<=#%;;&fu)x_x{<a}e?(irG$nl4ReX8!{qQlU)FHXqs9M>m%+40BaIpvP}e>VTC
+zt!@8s{8{VCJAZt1aiVM(G;norZJx5=INWJ+sE6FB8n+Yo@%VxD6=v$Ob$zn%c%0bj
+zVV5UQ*_g*KPkt=vabBc;c~X5d>V$oJ@|w=(>FwYC4!6GSf4}%ofB9FxKgo?hq04gG
+zvbe#qvTqN%p?Kc-49y40rt)so=NVT8)%lmN#t&Z<u8-^9gLAkQRkF6i8HfG{XT+o*
+
+literal 0
+HcmV?d00001
+
+diff --git a/tests/data/acpi/virt/DSDT b/tests/data/acpi/virt/DSDT
+index 9b002836f35fd03afeab9e827fdde3134d26ed2e..bc519abff9cadc1552e4e586b0a3f5f0db498f4a 100644
+GIT binary patch
+delta 43
+zcmcbhaYlp7CD<jzM}&ca>BB@WX~y=AYLc8xe#<vIa^B-$<%o9<3f`<Cq`?FL7G(?c
+
+delta 47
+zcmX@3aY2L2CD<h-K!kyT>DNRqX~yo2YLc8xPAfJ$a^B<M6mjH;cMb|>Sh86~NP`Ig
+DNc#-*
+
+diff --git a/tests/data/acpi/virt/DSDT.memhp b/tests/data/acpi/virt/DSDT.memhp
+index 545a18c3657781d350a006adfa5e58fa63e63922..54728e2b4b8b959f3f829386f6a388ef2600e747 100644
+GIT binary patch
+delta 43
+zcmZ2zJlB}ZCD<iot|S8kli)-yX~vF?YLc8xe#<vIa^B-$<%o9<3f`<CRLKqi{Zk8i
+
+delta 47
+zcmbPhywI4-CD<iop(FzXlk`L`X~v$7YLc8xPAfJ$a^B<M6mjH;cMb|>Sh86~sFEE3
+DEVvAM
+
+diff --git a/tests/data/acpi/virt/DSDT.numamem b/tests/data/acpi/virt/DSDT.numamem
+index 9b002836f35fd03afeab9e827fdde3134d26ed2e..bc519abff9cadc1552e4e586b0a3f5f0db498f4a 100644
+GIT binary patch
+delta 43
+zcmcbhaYlp7CD<jzM}&ca>BB@WX~y=AYLc8xe#<vIa^B-$<%o9<3f`<Cq`?FL7G(?c
+
+delta 47
+zcmX@3aY2L2CD<h-K!kyT>DNRqX~yo2YLc8xPAfJ$a^B<M6mjH;cMb|>Sh86~NP`Ig
+DNc#-*
+
 -- 
 2.27.0
 
