@@ -8,77 +8,77 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C374C4363D
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 20:50:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF3C8C4363D
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 20:52:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D7A22071E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 20:50:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 30BC02071E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 20:52:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XvWlTks2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D7A22071E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UDeTxItL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30BC02071E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNj3C-0006Lq-7i
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 16:50:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37874)
+	id 1kNj58-0007Pp-3Q
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 16:52:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37924)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <cupertinomiranda@gmail.com>)
- id 1kNizv-0003LQ-6F
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 16:46:48 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:35290)
+ id 1kNizz-0003OE-NH
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 16:46:53 -0400
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:40445)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <cupertinomiranda@gmail.com>)
- id 1kNizl-0006Sn-Qu
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 16:46:46 -0400
-Received: by mail-wm1-x342.google.com with SMTP id y15so871862wmi.0
- for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 13:46:37 -0700 (PDT)
+ id 1kNizs-0006TI-9F
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 16:46:51 -0400
+Received: by mail-wr1-x42a.google.com with SMTP id j2so3252724wrx.7
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 13:46:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=buS0UiDWAHgtkN7uoBPP41ehpPrnoj5TzAhRXm7R+7E=;
- b=XvWlTks2PvcT2cCyqb76JToY1qkSmBPk39EoxZR4tt5bDkezaH685iERlm7VZy5/Yd
- 8q8IkHKQj8SbVZw1ZtWrm0oMy1+soYXwgSud+Q7PQGNBS0pv4ptf0SzHLTUp0CoA+f56
- clzCEcQCstxUr9CX2NTKBkjxAgWlFWlc6sJfqA/P9Q33dfgPTxtG/w96GtHRp3Hf5Kib
- zI8ddYUfRJocPY2IcJKnUdzP+0HFJdcudSv8lnlH+8gckE6A9b1Tb4OPCfG0o3DhOiVM
- 3Wq6DdOb8GXu6UyQOTY5E99L+PRgMBwiLXAl+lcOgJt0yJKic3h/YWKKlIJu4dUkUlnT
- kqAA==
+ bh=CSncsY+8z5bk/L4rSojhn9n1mX+1NPxP3kEsCzsTXAk=;
+ b=UDeTxItL9n3KJX9xVmD3h35hBmO3XUUCNIrRiLu/cP1pt9lT35gKxefKyC211DxBA5
+ XaOJUO+UXlHLYTTXEOXngrdO+zltL68c5gdEft4fqdoP5HFx2WryLuF74UBKvTlal9I6
+ N6dlPIHGfLMAcjMm6I1dUuFjLEQr1f+qsMklKKCPD2Z9pfJddQ6oMyNlr0nsK/6bkHLq
+ APFlbM0+XQkZvGUOLuF115V0o65h4VvV8SS9kc/5bxG92L/8XX7JFBZQBEwlSI5Jv+1l
+ pBP43T5i1QORiIzIrJe2aRwyIt+v84xTIY21cytySsdWpYWPCE2Cvcwk/d9Agu61rXrw
+ SMWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=buS0UiDWAHgtkN7uoBPP41ehpPrnoj5TzAhRXm7R+7E=;
- b=sATs5eUn2JoKr66AVjE/SP+TyOkKOsOOFuoYTlJpcKZjS2pcT8yFAf2KLDillInTKs
- SLh/jeeL3iI6oy0wgjm664BKTnXw/MUfFdUAmPXf2PeIgfBuCvNChlgRjXFmlY1i6mTJ
- fDai8dYedJyGRTSEl3EqFSGQTx6P/iA/2nGk1TCf1VaducmoAsvkFz7nrb+24ee1pY4d
- XtIUFSZ4SSziB0Gs/ymGhUa/QjiRl0KEUgglCoWW3/iQsYU/thhzURDv6pQreIfsgC+v
- dKie1gyfjQDxM/IvwqwbVSeq7YYB6De0SnePPLFcq6UHOfcv8/K1BXNRUYAsM0zao/E4
- 8QUw==
-X-Gm-Message-State: AOAM533r2P/1sg1xsdMR6AbR30Mg+V02/G1kvFwsBN7b+fZ/0g+JFNRm
- OgO6s9JFo72fnuWFatvnPCHBwFNeu9ugiA==
-X-Google-Smtp-Source: ABdhPJwcfuU3JnwGgH7xVYYBSfmI620loF61t3P/YClPBePYsF10JaH5jm382zCPE4cDBFvng/JwJg==
-X-Received: by 2002:a1c:7c17:: with SMTP id x23mr5054151wmc.165.1601498794459; 
- Wed, 30 Sep 2020 13:46:34 -0700 (PDT)
+ bh=CSncsY+8z5bk/L4rSojhn9n1mX+1NPxP3kEsCzsTXAk=;
+ b=UNU/9gkIvNOivmk5ylPv+g5wHyfVfJpUhC0Y5wB9b4U2BO8pMSclQFDjdM+rBqKWxY
+ Ym+tmwsd+AfyXMruYYKsQ2UzjmZ+rDAHyjoo8ix6/OCc7CyImvtSKz2ldskWrFQWIUuS
+ F+u/zkYnsrTNbecaD6Cip83Sz29MlFCRwH8BU9XmUBVlR1UZGoevwYi1C3QToQaOC2Zd
+ /1uGk8maoM2a8p/ti7xPu9lZj439jMAaZxwVLOl8Yobun3F1FWJYmhF7cqRrOaMLTvhn
+ MZffcuAZTceA0P4Q0CNLVXDOX8aHaXucRWP/9KUqmVEhzatoUxrOn51AgPphjN4l6UWu
+ poZw==
+X-Gm-Message-State: AOAM530lcCZxOXNI6xQemTlGrkBPx/0CVoMIuvZjLIojZHAIfTWYkcHh
+ k4K/W4Ey2BDWE/uYgvmWzpLpri+3VuBmMw==
+X-Google-Smtp-Source: ABdhPJxq49Ki/UaPvANmSncbq72CMCxAyoBVmPjihASNqsJyfFbNvORm8xUL8mZJJRtxE8bW9xNuLA==
+X-Received: by 2002:a5d:4c86:: with SMTP id z6mr4801320wrs.23.1601498799973;
+ Wed, 30 Sep 2020 13:46:39 -0700 (PDT)
 Received: from cmiranda-laptop.localdomain ([188.251.240.167])
- by smtp.gmail.com with ESMTPSA id v204sm5310764wmg.20.2020.09.30.13.46.33
+ by smtp.gmail.com with ESMTPSA id v204sm5310764wmg.20.2020.09.30.13.46.38
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 30 Sep 2020 13:46:33 -0700 (PDT)
+ Wed, 30 Sep 2020 13:46:39 -0700 (PDT)
 From: cupertinomiranda@gmail.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH 02/14] arc: Decoder code
-Date: Wed, 30 Sep 2020 21:45:52 +0100
-Message-Id: <20200930204604.20663-3-cupertinomiranda@gmail.com>
+Subject: [PATCH 05/14] arc: TCG instruction generator and hand-definitions
+Date: Wed, 30 Sep 2020 21:45:55 +0100
+Message-Id: <20200930204604.20663-6-cupertinomiranda@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200930204604.20663-1-cupertinomiranda@gmail.com>
 References: <20200930204604.20663-1-cupertinomiranda@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=cupertinomiranda@gmail.com; helo=mail-wm1-x342.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42a;
+ envelope-from=cupertinomiranda@gmail.com; helo=mail-wr1-x42a.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -109,499 +109,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Claudiu Zissulescu <claziss@synopsys.com>
+From: Shahab Vahedi <shahab@synopsys.com>
 
-The decoder and the disassembler inspired by ARC GNU binutils.
+Add the most generic parts of TCG constructions. It contains the basic infrastructure
+for fundamental ARC features, such as ZOL (zero overhead loops) and delay-slots.
+Also includes hand crafted TCG for more intricate instructions, such as vector
+instructions.
 
-Signed-off-by: Claudiu Zissulescu <claziss@synopsys.com>
+Signed-off-by: Shahab Vahedi <shahab@synopsys.com>
 ---
- disas/arc.c             |  460 ++++++++++++++
- target/arc/decoder.c    | 1276 +++++++++++++++++++++++++++++++++++++++
- target/arc/decoder.h    |  350 +++++++++++
- target/arc/flags.def    |   85 +++
- target/arc/operands.def |  123 ++++
- 5 files changed, 2294 insertions(+)
- create mode 100644 disas/arc.c
- create mode 100644 target/arc/decoder.c
- create mode 100644 target/arc/decoder.h
- create mode 100644 target/arc/flags.def
- create mode 100644 target/arc/operands.def
+ target/arc/translate.c | 1344 ++++++++++++++++++++++++++++++++++++++++
+ target/arc/translate.h |  202 ++++++
+ 2 files changed, 1546 insertions(+)
+ create mode 100644 target/arc/translate.c
+ create mode 100644 target/arc/translate.h
 
-diff --git a/disas/arc.c b/disas/arc.c
+diff --git a/target/arc/translate.c b/target/arc/translate.c
 new file mode 100644
-index 0000000000..1041b5a5b5
+index 0000000000..1d679db943
 --- /dev/null
-+++ b/disas/arc.c
-@@ -0,0 +1,460 @@
++++ b/target/arc/translate.c
+@@ -0,0 +1,1344 @@
 +/*
-+ * Disassembler code for ARC.
-+ * Copyright 2020 Free Software Foundation, Inc.
-+ * Written by Claudiu Zissulescu.
-+ *
-+ * QEMU ARCv2 Disassembler.
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; either version 2, or (at your option) any later
-+ * version.
-+ *
-+ * This program is distributed in the hope that it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "disas/dis-asm.h"
-+#include "target/arc/arc-common.h"
-+#include "target/arc/decoder.h"
-+#include "target/arc/regs.h"
-+
-+/* Register names. */
-+
-+static const char * const regnames[64] = {
-+    "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7",
-+    "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15",
-+    "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23",
-+    "r24", "r25", "r26", "fp", "sp", "ilink", "r30", "blink",
-+
-+    "r32", "r33", "r34", "r35", "r36", "r37", "r38", "r39",
-+    "r40", "r41", "r42", "r43", "r44", "r45", "r46", "r47",
-+    "r48", "r49", "r50", "r51", "r52", "r53", "r54", "r55",
-+    "r56", "r57", "r58", "r59", "lp_count", "rezerved", "LIMM", "pcl"
-+};
-+
-+#define ARRANGE_ENDIAN(info, buf)                                       \
-+    (info->endian == BFD_ENDIAN_LITTLE ? bfd_getm32(bfd_getl32(buf))    \
-+     : bfd_getb32(buf))
-+
-+/*
-+ * Helper function to convert middle-endian data to something more
-+ * meaningful.
-+ */
-+
-+static bfd_vma bfd_getm32(unsigned int data)
-+{
-+    bfd_vma value = 0;
-+
-+    value  = (data & 0x0000ffff) << 16;
-+    value |= (data & 0xffff0000) >> 16;
-+    return value;
-+}
-+
-+/* Helper for printing instruction flags. */
-+
-+static bfd_boolean special_flag_p(const char *opname, const char *flgname)
-+{
-+    const struct arc_flag_special *flg_spec;
-+    unsigned i, j, flgidx;
-+
-+    for (i = 0; i < arc_num_flag_special; ++i) {
-+        flg_spec = &arc_flag_special_cases[i];
-+
-+        if (strcmp(opname, flg_spec->name) != 0) {
-+            continue;
-+        }
-+
-+        /* Found potential special case instruction. */
-+        for (j = 0; ; ++j) {
-+            flgidx = flg_spec->flags[j];
-+            if (flgidx == 0) {
-+                break; /* End of the array. */
-+            }
-+
-+            if (strcmp(flgname, arc_flag_operands[flgidx].name) == 0) {
-+                return TRUE;
-+            }
-+        }
-+    }
-+    return FALSE;
-+}
-+
-+/* Print instruction flags. */
-+
-+static void print_flags(const struct arc_opcode *opcode,
-+                        uint64_t insn,
-+                        struct disassemble_info *info)
-+{
-+    const unsigned char *flgidx;
-+    unsigned int value;
-+
-+    /* Now extract and print the flags. */
-+    for (flgidx = opcode->flags; *flgidx; flgidx++) {
-+        /* Get a valid flag class. */
-+        const struct arc_flag_class *cl_flags = &arc_flag_classes[*flgidx];
-+        const unsigned *flgopridx;
-+
-+        /* Check first the extensions. Not supported yet. */
-+        if (cl_flags->flag_class & F_CLASS_EXTEND) {
-+            value = insn & 0x1F;
-+        }
-+
-+        for (flgopridx = cl_flags->flags; *flgopridx; ++flgopridx) {
-+            const struct arc_flag_operand *flg_operand =
-+                &arc_flag_operands[*flgopridx];
-+
-+            /* Implicit flags are only used for the insn decoder. */
-+            if (cl_flags->flag_class & F_CLASS_IMPLICIT) {
-+                continue;
-+            }
-+
-+            if (!flg_operand->favail) {
-+                continue;
-+            }
-+
-+            value = (insn >> flg_operand->shift) &
-+                    ((1 << flg_operand->bits) - 1);
-+            if (value == flg_operand->code) {
-+                /* FIXME!: print correctly nt/t flag. */
-+                if (!special_flag_p(opcode->name, flg_operand->name)) {
-+                    (*info->fprintf_func)(info->stream, ".");
-+                }
-+                (*info->fprintf_func)(info->stream, "%s", flg_operand->name);
-+            }
-+        }
-+    }
-+}
-+
-+/*
-+ * When dealing with auxiliary registers, output the proper name if we
-+ * have it.
-+ */
-+
-+static const char *get_auxreg(const struct arc_opcode *opcode,
-+                              int value,
-+                              unsigned isa_mask)
-+{
-+    unsigned int i;
-+    const struct arc_aux_reg_detail *auxr = &arc_aux_regs_detail[0];
-+
-+    if (opcode->insn_class != AUXREG) {
-+        return NULL;
-+    }
-+
-+    for (i = 0; i < ARRAY_SIZE(arc_aux_regs); i++, auxr++) {
-+        if (!(auxr->cpu & isa_mask)) {
-+            continue;
-+        }
-+
-+        if (auxr->subclass != NONE) {
-+            return NULL;
-+        }
-+
-+        if (auxr->address == value) {
-+            return auxr->name;
-+        }
-+    }
-+    return NULL;
-+}
-+
-+/* Print the operands of an instruction. */
-+
-+static void print_operands(const struct arc_opcode *opcode,
-+                           bfd_vma memaddr,
-+                           uint64_t insn,
-+                           uint32_t isa_mask,
-+                           insn_t *pinsn,
-+                           struct disassemble_info *info)
-+{
-+    bfd_boolean need_comma  = FALSE;
-+    bfd_boolean open_braket = FALSE;
-+    int value, vpcl = 0;
-+    bfd_boolean rpcl = FALSE, rset = FALSE;
-+    const unsigned char *opidx;
-+    int i;
-+
-+    for (i = 0, opidx = opcode->operands; *opidx; opidx++) {
-+        const struct arc_operand *operand = &arc_operands[*opidx];
-+
-+        if (open_braket && (operand->flags & ARC_OPERAND_BRAKET)) {
-+            (*info->fprintf_func)(info->stream, "]");
-+            open_braket = FALSE;
-+            continue;
-+        }
-+
-+        /* Only take input from real operands. */
-+        if (ARC_OPERAND_IS_FAKE(operand)) {
-+            continue;
-+        }
-+
-+        if (need_comma) {
-+            (*info->fprintf_func)(info->stream, ",");
-+        }
-+
-+        if (!open_braket && (operand->flags & ARC_OPERAND_BRAKET)) {
-+            (*info->fprintf_func)(info->stream, "[");
-+            open_braket = TRUE;
-+            need_comma  = FALSE;
-+            continue;
-+        }
-+
-+        need_comma = TRUE;
-+
-+        /* Get the decoded */
-+        value = pinsn->operands[i++].value;
-+
-+        if ((operand->flags & ARC_OPERAND_IGNORE) &&
-+            (operand->flags & ARC_OPERAND_IR) &&
-+            value == -1) {
-+            need_comma = FALSE;
-+            continue;
-+        }
-+
-+        if (operand->flags & ARC_OPERAND_PCREL) {
-+            rpcl = TRUE;
-+            vpcl = value;
-+            rset = TRUE;
-+
-+            info->target = (bfd_vma) (memaddr & ~3) + value;
-+        } else if (!(operand->flags & ARC_OPERAND_IR)) {
-+            vpcl = value;
-+            rset = TRUE;
-+        }
-+
-+        /* Print the operand as directed by the flags. */
-+        if (operand->flags & ARC_OPERAND_IR) {
-+            const char *rname;
-+
-+            assert(value >= 0 && value < 64);
-+            rname = regnames[value];
-+            (*info->fprintf_func)(info->stream, "%s", rname);
-+            if (operand->flags & ARC_OPERAND_TRUNCATE) {
-+                /* Make sure we print only legal register pairs. */
-+                if ((value & 0x01) == 0) {
-+                    rname = regnames[value + 1];
-+                }
-+                (*info->fprintf_func)(info->stream, "%s", rname);
-+            }
-+            if (value == 63) {
-+                rpcl = TRUE;
-+            } else {
-+                rpcl = FALSE;
-+            }
-+        } else if (operand->flags & ARC_OPERAND_LIMM) {
-+            value = pinsn->limm;
-+            const char *rname = get_auxreg(opcode, value, isa_mask);
-+
-+            if (rname && open_braket) {
-+                (*info->fprintf_func)(info->stream, "%s", rname);
-+            } else {
-+                (*info->fprintf_func)(info->stream, "%#x", value);
-+            }
-+        } else if (operand->flags & ARC_OPERAND_SIGNED) {
-+            const char *rname = get_auxreg(opcode, value, isa_mask);
-+            if (rname && open_braket) {
-+                (*info->fprintf_func)(info->stream, "%s", rname);
-+            } else {
-+                (*info->fprintf_func)(info->stream, "%d", value);
-+            }
-+        } else {
-+            if (operand->flags & ARC_OPERAND_TRUNCATE   &&
-+                !(operand->flags & ARC_OPERAND_ALIGNED32) &&
-+                !(operand->flags & ARC_OPERAND_ALIGNED16) &&
-+                 value >= 0 && value <= 14) {
-+                /* Leave/Enter mnemonics. */
-+                switch (value) {
-+                case 0:
-+                    need_comma = FALSE;
-+                    break;
-+                case 1:
-+                    (*info->fprintf_func)(info->stream, "r13");
-+                    break;
-+                default:
-+                    (*info->fprintf_func)(info->stream, "r13-%s",
-+                            regnames[13 + value - 1]);
-+                    break;
-+                }
-+                rpcl = FALSE;
-+                rset = FALSE;
-+            } else {
-+                const char *rname = get_auxreg(opcode, value, isa_mask);
-+                if (rname && open_braket) {
-+                    (*info->fprintf_func)(info->stream, "%s", rname);
-+                } else {
-+                    (*info->fprintf_func)(info->stream, "%#x", value);
-+                }
-+            }
-+        }
-+    }
-+
-+    /* Pretty print extra info for pc-relative operands. */
-+    if (rpcl && rset) {
-+        if (info->flags & INSN_HAS_RELOC) {
-+            /*
-+             * If the instruction has a reloc associated with it, then
-+             * the offset field in the instruction will actually be
-+             * the addend for the reloc.  (We are using REL type
-+             * relocs).  In such cases, we can ignore the pc when
-+             * computing addresses, since the addend is not currently
-+             * pc-relative.
-+             */
-+            memaddr = 0;
-+        }
-+
-+        (*info->fprintf_func)(info->stream, "\t;");
-+        (*info->print_address_func)((memaddr & ~3) + vpcl, info);
-+    }
-+}
-+
-+/* Select the proper instructions set for the given architecture. */
-+
-+static int arc_read_mem(bfd_vma memaddr,
-+                        uint64_t *insn,
-+                        uint32_t *isa_mask,
-+                        struct disassemble_info *info)
-+{
-+    bfd_byte buffer[8];
-+    unsigned int highbyte, lowbyte;
-+    int status;
-+    int insn_len = 0;
-+
-+    highbyte = ((info->endian == BFD_ENDIAN_LITTLE) ? 1 : 0);
-+    lowbyte  = ((info->endian == BFD_ENDIAN_LITTLE) ? 0 : 1);
-+
-+    switch (info->mach) {
-+    case bfd_mach_arc_arc700:
-+        *isa_mask = ARC_OPCODE_ARC700;
-+        break;
-+
-+    case bfd_mach_arc_arc601:
-+    case bfd_mach_arc_arc600:
-+        *isa_mask = ARC_OPCODE_ARC600;
-+        break;
-+
-+    case bfd_mach_arc_arcv2em:
-+    case bfd_mach_arc_arcv2:
-+        *isa_mask = ARC_OPCODE_ARCv2EM;
-+        break;
-+    case bfd_mach_arc_arcv2hs:
-+        *isa_mask = ARC_OPCODE_ARCv2HS;
-+        break;
-+    default:
-+        *isa_mask = ARC_OPCODE_ARCv2EM;
-+        break;
-+    }
-+
-+    info->bytes_per_line  = 8;
-+    info->bytes_per_chunk = 2;
-+    info->display_endian = info->endian;
-+
-+    /* Read the insn into a host word. */
-+    status = (*info->read_memory_func)(memaddr, buffer, 2, info);
-+
-+    if (status != 0) {
-+        (*info->memory_error_func)(status, memaddr, info);
-+        return -1;
-+    }
-+
-+    insn_len = arc_insn_length((buffer[highbyte] << 8 |
-+                buffer[lowbyte]), *isa_mask);
-+
-+    switch (insn_len) {
-+    case 2:
-+        *insn = (buffer[highbyte] << 8) | buffer[lowbyte];
-+        break;
-+
-+    case 4:
-+        /* This is a long instruction: Read the remaning 2 bytes. */
-+        status = (*info->read_memory_func)(memaddr + 2, &buffer[2], 2, info);
-+        if (status != 0) {
-+            (*info->memory_error_func)(status, memaddr + 2, info);
-+            return -1;
-+        }
-+        *insn = (uint64_t) ARRANGE_ENDIAN(info, buffer);
-+        break;
-+
-+    case 6:
-+        status = (*info->read_memory_func)(memaddr + 2, &buffer[2], 4, info);
-+        if (status != 0) {
-+            (*info->memory_error_func)(status, memaddr + 2, info);
-+            return -1;
-+        }
-+        *insn  = (uint64_t) ARRANGE_ENDIAN(info, &buffer[2]);
-+        *insn |= ((uint64_t) buffer[highbyte] << 40) |
-+                 ((uint64_t) buffer[lowbyte]  << 32);
-+        break;
-+
-+    case 8:
-+        status = (*info->read_memory_func)(memaddr + 2, &buffer[2], 6, info);
-+        if (status != 0) {
-+            (*info->memory_error_func)(status, memaddr + 2, info);
-+            return -1;
-+        }
-+        *insn = ((((uint64_t) ARRANGE_ENDIAN(info, buffer)) << 32) |
-+                  ((uint64_t) ARRANGE_ENDIAN(info, &buffer[4])));
-+        break;
-+
-+    default:
-+        /* There is no instruction whose length is not 2, 4, 6, or 8. */
-+        g_assert_not_reached();
-+    }
-+    return insn_len;
-+}
-+
-+/* Disassembler main entry function. */
-+
-+int print_insn_arc(bfd_vma memaddr, struct disassemble_info *info)
-+{
-+    const struct arc_opcode *opcode = NULL;
-+    int insn_len = -1;
-+    uint64_t insn;
-+    uint32_t isa_mask;
-+    insn_t dis_insn;
-+
-+    insn_len = arc_read_mem(memaddr, &insn, &isa_mask, info);
-+
-+    if (insn_len < 2) {
-+        return -1;
-+    }
-+
-+    opcode = arc_find_format(&dis_insn, insn, insn_len, isa_mask);
-+
-+    /* If limm is required, read it. */
-+    if (dis_insn.limm_p) {
-+        bfd_byte buffer[4];
-+        int status = (*info->read_memory_func)(memaddr + insn_len, buffer,
-+                                               4, info);
-+        if (status != 0) {
-+            return -1;
-+        }
-+        dis_insn.limm = ARRANGE_ENDIAN(info, buffer);
-+        insn_len += 4;
-+    }
-+
-+    /* Print the mnemonic. */
-+    (*info->fprintf_func)(info->stream, "%s", opcode->name);
-+
-+    print_flags(opcode, insn, info);
-+
-+    if (opcode->operands[0] != 0) {
-+        (*info->fprintf_func)(info->stream, "\t");
-+    }
-+
-+    /* Now extract and print the operands. */
-+    print_operands(opcode, memaddr, insn, isa_mask, &dis_insn, info);
-+
-+    /* Say how many bytes we consumed */
-+    return insn_len;
-+}
-+
-+
-+/*-*-indent-tabs-mode:nil;tab-width:4;indent-line-function:'insert-tab'-*-*/
-+/* vim: set ts=4 sw=4 et: */
-diff --git a/target/arc/decoder.c b/target/arc/decoder.c
-new file mode 100644
-index 0000000000..c3cf84d6ee
---- /dev/null
-+++ b/target/arc/decoder.c
-@@ -0,0 +1,1276 @@
-+/*
-+ * QEMU Decoder for the ARC.
-+ * Copyright (C) 2020 Free Software Foundation, Inc.
++ *  QEMU ARC CPU
++ * Copyright (C) 2019 Free Software Foundation, Inc.
 +
 + * This library is free software; you can redistribute it and/or
 + * modify it under the terms of the GNU Lesser General Public License
@@ -610,1847 +141,1547 @@ index 0000000000..c3cf84d6ee
 +
 + * This library is distributed in the hope that it will be useful, but
 + * WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 + * Lesser General Public License for more details.
 +
 + * You should have received a copy of the GNU General Public License
-+ * along with GAS or GDB; see the file COPYING3. If not, write to
++ * along with GAS or GDB; see the file COPYING3.  If not, write to
 + * the Free Software Foundation, 51 Franklin Street - Fifth Floor, Boston,
 + * MA 02110-1301, USA.
 + */
 +
-+#include "target/arc/decoder.h"
-+#include "qemu/osdep.h"
-+#include "qemu/bswap.h"
-+#include "cpu.h"
++#include "translate.h"
++#include "qemu/qemu-print.h"
++#include "tcg/tcg-op-gvec.h"
++#include "target/arc/semfunc.h"
++#include "target/arc/arc-common.h"
 +
-+/* Extract functions. */
-+static ATTRIBUTE_UNUSED int
-+extract_limm(unsigned long long insn ATTRIBUTE_UNUSED,
-+             bfd_boolean *invalid ATTRIBUTE_UNUSED)
++/* Globals */
++TCGv    cpu_gp;        /*  Global Pointer                      */
++TCGv    cpu_fp;        /*  Frame Pointer                       */
++TCGv    cpu_sp;        /*  Stack Pointer                       */
++TCGv    cpu_ilink1;    /*  Level 1 interrupt link register     */
++TCGv    cpu_ilink2;    /*  Level 2 interrupt link register     */
++TCGv    cpu_blink;     /*  Branch link register                */
++TCGv    cpu_acclo;     /*  64-bit accumulator register: low    */
++TCGv    cpu_acchi;     /*  64-bit accumulator register: high   */
++TCGv    cpu_limm;      /*  Long immediate data indicator       */
++TCGv    cpu_pcl;       /*  Program Counter [31:2], read-only.  */
++
++TCGv    cpu_S1f;
++TCGv    cpu_S2f;
++TCGv    cpu_CSf;
++
++TCGv    cpu_Lf;
++TCGv    cpu_Zf;
++TCGv    cpu_Nf;
++TCGv    cpu_Cf;
++TCGv    cpu_Vf;
++TCGv    cpu_Uf;
++
++TCGv    cpu_DEf;
++TCGv    cpu_ESf;
++TCGv    cpu_AEf;
++TCGv    cpu_Hf;
++TCGv    cpu_IEf;
++TCGv    cpu_Ef;
++
++TCGv    cpu_is_delay_slot_instruction;
++
++TCGv    cpu_l1_Lf;
++TCGv    cpu_l1_Zf;
++TCGv    cpu_l1_Nf;
++TCGv    cpu_l1_Cf;
++TCGv    cpu_l1_Vf;
++TCGv    cpu_l1_Uf;
++
++TCGv    cpu_l1_DEf;
++TCGv    cpu_l1_AEf;
++TCGv    cpu_l1_Hf;
++
++TCGv    cpu_l2_Lf;
++TCGv    cpu_l2_Zf;
++TCGv    cpu_l2_Nf;
++TCGv    cpu_l2_Cf;
++TCGv    cpu_l2_Vf;
++TCGv    cpu_l2_Uf;
++
++TCGv    cpu_l2_DEf;
++TCGv    cpu_l2_AEf;
++TCGv    cpu_l2_Hf;
++
++TCGv    cpu_er_Lf;
++TCGv    cpu_er_Zf;
++TCGv    cpu_er_Nf;
++TCGv    cpu_er_Cf;
++TCGv    cpu_er_Vf;
++TCGv    cpu_er_Uf;
++
++TCGv    cpu_er_DEf;
++TCGv    cpu_er_AEf;
++TCGv    cpu_er_Hf;
++
++TCGv    cpu_eret;
++TCGv    cpu_erbta;
++TCGv    cpu_ecr;
++TCGv    cpu_efa;
++
++TCGv    cpu_bta;
++TCGv    cpu_bta_l1;
++TCGv    cpu_bta_l2;
++
++TCGv    cpu_pc;
++TCGv    cpu_lpc;
++/* replaced by AUX_REG array */
++TCGv    cpu_lps;
++TCGv    cpu_lpe;
++
++TCGv    cpu_r[64];
++
++TCGv    cpu_intvec;
++
++TCGv    cpu_debug_LD;
++TCGv    cpu_debug_SH;
++TCGv    cpu_debug_BH;
++TCGv    cpu_debug_UB;
++TCGv    cpu_debug_ZZ;
++TCGv    cpu_debug_RA;
++TCGv    cpu_debug_IS;
++TCGv    cpu_debug_FH;
++TCGv    cpu_debug_SS;
++
++TCGv    cpu_lock_lf_var;
++
++/* NOTE: Pseudo register required for comparison with lp_end */
++TCGv    cpu_npc;
++
++/* Macros */
++
++#include "exec/gen-icount.h"
++#define REG(x)  (cpu_r[x])
++
++/* macro used to fix middle-endianess. */
++#define ARRANGE_ENDIAN(endianess, buf)                  \
++    ((endianess) ? arc_getm32(buf) : bswap32(buf))
++
++/*
++ * The macro to add boiler plate code for conditional execution.
++ * It will add tcg_gen codes only if there is a condition to
++ * be checked (ctx->insn.cc != 0). This macro assumes that there
++ * is a "ctx" variable of type "DisasCtxt *" in context. Remember
++ * to pair it with CC_EPILOGUE macro.
++ */
++#define CC_PROLOGUE                                   \
++  TCGv cc = tcg_temp_local_new();                     \
++  TCGLabel *done = gen_new_label();                   \
++  do {                                                \
++    if (ctx->insn.cc) {                               \
++        arc_gen_verifyCCFlag(ctx, cc);                \
++        tcg_gen_brcondi_tl(TCG_COND_NE, cc, 1, done); \
++    }                                                 \
++  } while (0)
++
++/*
++ * The finishing counter part of CC_PROLUGE. This is supposed
++ * to be put at the end of the function using it.
++ */
++#define CC_EPILOGUE          \
++    if (ctx->insn.cc) {      \
++        gen_set_label(done); \
++    }                        \
++    tcg_temp_free(cc)
++
++static inline bool use_goto_tb(DisasContext *dc, target_ulong dest)
 +{
-+  unsigned value = 0;
-+
-+  return value;
-+}
-+
-+/* mask = 00000000000000000000111111000000. */
-+static long long int
-+extract_uimm6_20(unsigned long long insn ATTRIBUTE_UNUSED,
-+                 bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  unsigned value = 0;
-+
-+  value |= ((insn >> 6) & 0x003f) << 0;
-+
-+  return value;
-+}
-+
-+/* mask = 00000000000000000000111111222222. */
-+static long long int
-+extract_simm12_20(unsigned long long insn ATTRIBUTE_UNUSED,
-+                  bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  int value = 0;
-+
-+  value |= ((insn >> 6) & 0x003f) << 0;
-+  value |= ((insn >> 0) & 0x003f) << 6;
-+
-+  /* Extend the sign. */
-+  int signbit = 1 << (12 - 1);
-+  value = (value ^ signbit) - signbit;
-+
-+  return value;
-+}
-+
-+/* mask = 0000011100000000. */
-+static ATTRIBUTE_UNUSED int
-+extract_simm3_5_s(unsigned long long insn ATTRIBUTE_UNUSED,
-+                  bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  int value = 0;
-+
-+  value |= ((insn >> 8) & 0x0007) << 0;
-+
-+  /* Extend the sign. */
-+  int signbit = 1 << (3 - 1);
-+  value = (value ^ signbit) - signbit;
-+
-+  return value;
-+}
-+
-+static ATTRIBUTE_UNUSED int
-+extract_limm_s(unsigned long long insn ATTRIBUTE_UNUSED,
-+               bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  unsigned value = 0;
-+
-+  return value;
-+}
-+
-+/* mask = 0000000000011111. */
-+static long long int
-+extract_uimm7_a32_11_s(unsigned long long insn ATTRIBUTE_UNUSED,
-+                       bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  unsigned value = 0;
-+
-+  value |= ((insn >> 0) & 0x001f) << 2;
-+
-+  return value;
-+}
-+
-+/* mask = 0000000001111111. */
-+static long long int
-+extract_uimm7_9_s(unsigned long long insn ATTRIBUTE_UNUSED,
-+                  bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  unsigned value = 0;
-+
-+  value |= ((insn >> 0) & 0x007f) << 0;
-+
-+  return value;
-+}
-+
-+/* mask = 0000000000000111. */
-+static long long int
-+extract_uimm3_13_s(unsigned long long insn ATTRIBUTE_UNUSED,
-+                   bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  unsigned value = 0;
-+
-+  value |= ((insn >> 0) & 0x0007) << 0;
-+
-+  return value;
-+}
-+
-+/* mask = 0000000111111111. */
-+static long long int
-+extract_simm11_a32_7_s(unsigned long long insn ATTRIBUTE_UNUSED,
-+                       bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  int value = 0;
-+
-+  value |= ((insn >> 0) & 0x01ff) << 2;
-+
-+  /* Extend the sign. */
-+  int signbit = 1 << (11 - 1);
-+  value = (value ^ signbit) - signbit;
-+
-+  return value;
-+}
-+
-+/* mask = 0000000002220111. */
-+static long long int
-+extract_uimm6_13_s(unsigned long long insn ATTRIBUTE_UNUSED,
-+                   bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  unsigned value = 0;
-+
-+  value |= ((insn >> 0) & 0x0007) << 0;
-+  value |= ((insn >> 4) & 0x0007) << 3;
-+
-+  return value;
-+}
-+
-+/* mask = 0000000000011111. */
-+static long long int
-+extract_uimm5_11_s(unsigned long long insn ATTRIBUTE_UNUSED,
-+                   bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  unsigned value = 0;
-+
-+  value |= ((insn >> 0) & 0x001f) << 0;
-+
-+  return value;
-+}
-+
-+/* mask = 00000000111111102000000000000000. */
-+static long long int
-+extract_simm9_a16_8(unsigned long long insn ATTRIBUTE_UNUSED,
-+                    bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  int value = 0;
-+
-+  value |= ((insn >> 17) & 0x007f) << 1;
-+  value |= ((insn >> 15) & 0x0001) << 8;
-+
-+  /* Extend the sign. */
-+  int signbit = 1 << (9 - 1);
-+  value = (value ^ signbit) - signbit;
-+
-+  return value;
-+}
-+
-+/* mask = 00000000000000000000111111000000. */
-+static long long int
-+extract_uimm6_8(unsigned long long insn ATTRIBUTE_UNUSED,
-+                bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  unsigned value = 0;
-+
-+  value |= ((insn >> 6) & 0x003f) << 0;
-+
-+  return value;
-+}
-+
-+/* mask = 00000111111111102222222222000000. */
-+static long long int
-+extract_simm21_a16_5(unsigned long long insn ATTRIBUTE_UNUSED,
-+                     bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  int value = 0;
-+
-+  value |= ((insn >> 17) & 0x03ff) << 1;
-+  value |= ((insn >> 6) & 0x03ff) << 11;
-+
-+  /* Extend the sign. */
-+  int signbit = 1 << (21 - 1);
-+  value = (value ^ signbit) - signbit;
-+
-+  return value;
-+}
-+
-+/* mask = 00000111111111102222222222003333. */
-+static long long int
-+extract_simm25_a16_5(unsigned long long insn ATTRIBUTE_UNUSED,
-+                     bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  int value = 0;
-+
-+  value |= ((insn >> 17) & 0x03ff) << 1;
-+  value |= ((insn >> 6) & 0x03ff) << 11;
-+  value |= ((insn >> 0) & 0x000f) << 21;
-+
-+  /* Extend the sign. */
-+  int signbit = 1 << (25 - 1);
-+  value = (value ^ signbit) - signbit;
-+
-+  return value;
-+}
-+
-+/* mask = 0000000111111111. */
-+static long long int
-+extract_simm10_a16_7_s(unsigned long long insn ATTRIBUTE_UNUSED,
-+                       bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  int value = 0;
-+
-+  value |= ((insn >> 0) & 0x01ff) << 1;
-+
-+  /* Extend the sign. */
-+  int signbit = 1 << (10 - 1);
-+  value = (value ^ signbit) - signbit;
-+
-+  return value;
-+}
-+
-+/* mask = 0000000000111111. */
-+static long long int
-+extract_simm7_a16_10_s(unsigned long long insn ATTRIBUTE_UNUSED,
-+                       bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  int value = 0;
-+
-+  value |= ((insn >> 0) & 0x003f) << 1;
-+
-+  /* Extend the sign. */
-+  int signbit = 1 << (7 - 1);
-+  value = (value ^ signbit) - signbit;
-+
-+  return value;
-+}
-+
-+/* mask = 00000111111111002222222222000000. */
-+static long long int
-+extract_simm21_a32_5(unsigned long long insn ATTRIBUTE_UNUSED,
-+                     bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  int value = 0;
-+
-+  value |= ((insn >> 18) & 0x01ff) << 2;
-+  value |= ((insn >> 6) & 0x03ff) << 11;
-+
-+  /* Extend the sign. */
-+  int signbit = 1 << (21 - 1);
-+  value = (value ^ signbit) - signbit;
-+
-+  return value;
-+}
-+
-+/* mask = 00000111111111002222222222003333. */
-+static long long int
-+extract_simm25_a32_5(unsigned long long insn ATTRIBUTE_UNUSED,
-+                     bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  int value = 0;
-+
-+  value |= ((insn >> 18) & 0x01ff) << 2;
-+  value |= ((insn >> 6) & 0x03ff) << 11;
-+  value |= ((insn >> 0) & 0x000f) << 21;
-+
-+  /* Extend the sign. */
-+  int signbit = 1 << (25 - 1);
-+  value = (value ^ signbit) - signbit;
-+
-+  return value;
-+}
-+
-+/* mask = 0000011111111111. */
-+static long long int
-+extract_simm13_a32_5_s(unsigned long long insn ATTRIBUTE_UNUSED,
-+                       bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  int value = 0;
-+
-+  value |= ((insn >> 0) & 0x07ff) << 2;
-+
-+  /* Extend the sign. */
-+  int signbit = 1 << (13 - 1);
-+  value = (value ^ signbit) - signbit;
-+
-+  return value;
-+}
-+
-+/* mask = 0000000001111111. */
-+static long long int
-+extract_simm8_a16_9_s(unsigned long long insn ATTRIBUTE_UNUSED,
-+                      bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  int value = 0;
-+
-+  value |= ((insn >> 0) & 0x007f) << 1;
-+
-+  /* Extend the sign. */
-+  int signbit = 1 << (8 - 1);
-+  value = (value ^ signbit) - signbit;
-+
-+  return value;
-+}
-+
-+/* mask = 00000000000000000000000111000000. */
-+static long long int
-+extract_uimm3_23(unsigned long long insn ATTRIBUTE_UNUSED,
-+                 bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  unsigned value = 0;
-+
-+  value |= ((insn >> 6) & 0x0007) << 0;
-+
-+  return value;
-+}
-+
-+/* mask = 0000001111111111. */
-+static long long int
-+extract_uimm10_6_s(unsigned long long insn ATTRIBUTE_UNUSED,
-+                   bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  unsigned value = 0;
-+
-+  value |= ((insn >> 0) & 0x03ff) << 0;
-+
-+  return value;
-+}
-+
-+/* mask = 0000002200011110. */
-+static long long int
-+extract_uimm6_11_s(unsigned long long insn ATTRIBUTE_UNUSED,
-+                   bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  unsigned value = 0;
-+
-+  value |= ((insn >> 1) & 0x000f) << 0;
-+  value |= ((insn >> 8) & 0x0003) << 4;
-+
-+  return value;
-+}
-+
-+/* mask = 00000000111111112000000000000000. */
-+static long long int
-+extract_simm9_8(unsigned long long insn ATTRIBUTE_UNUSED,
-+                bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  int value = 0;
-+
-+  value |= ((insn >> 16) & 0x00ff) << 0;
-+  value |= ((insn >> 15) & 0x0001) << 8;
-+
-+  /* Extend the sign. */
-+  int signbit = 1 << (9 - 1);
-+  value = (value ^ signbit) - signbit;
-+
-+  return value;
-+}
-+
-+/* mask = 0000000011111111. */
-+static long long int
-+extract_uimm10_a32_8_s(unsigned long long insn ATTRIBUTE_UNUSED,
-+                       bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  unsigned value = 0;
-+
-+  value |= ((insn >> 0) & 0x00ff) << 2;
-+
-+  return value;
-+}
-+
-+/* mask = 0000000111111111. */
-+static long long int
-+extract_simm9_7_s(unsigned long long insn ATTRIBUTE_UNUSED,
-+                  bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  int value = 0;
-+
-+  value |= ((insn >> 0) & 0x01ff) << 0;
-+
-+  /* Extend the sign. */
-+  int signbit = 1 << (9 - 1);
-+  value = (value ^ signbit) - signbit;
-+
-+  return value;
-+}
-+
-+/* mask = 0000000000011111. */
-+static long long int
-+extract_uimm6_a16_11_s(unsigned long long insn ATTRIBUTE_UNUSED,
-+                       bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  unsigned value = 0;
-+
-+  value |= ((insn >> 0) & 0x001f) << 1;
-+
-+  return value;
-+}
-+
-+/* mask = 0000020000011000. */
-+static long long int
-+extract_uimm5_a32_11_s(unsigned long long insn ATTRIBUTE_UNUSED,
-+                       bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  unsigned value = 0;
-+
-+  value |= ((insn >> 3) & 0x0003) << 2;
-+  value |= ((insn >> 10) & 0x0001) << 4;
-+
-+  return value;
-+}
-+
-+/* mask = 0000022222200111. */
-+static long long int
-+extract_simm11_a32_13_s(unsigned long long insn ATTRIBUTE_UNUSED,
-+                        bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  int value = 0;
-+
-+  value |= ((insn >> 0) & 0x0007) << 2;
-+  value |= ((insn >> 5) & 0x003f) << 5;
-+
-+  /* Extend the sign. */
-+  int signbit = 1 << (11 - 1);
-+  value = (value ^ signbit) - signbit;
-+
-+  return value;
-+}
-+
-+/* mask = 0000000022220111. */
-+static long long int
-+extract_uimm7_13_s(unsigned long long insn ATTRIBUTE_UNUSED,
-+                   bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  unsigned value = 0;
-+
-+  value |= ((insn >> 0) & 0x0007) << 0;
-+  value |= ((insn >> 4) & 0x000f) << 3;
-+
-+  return value;
-+}
-+
-+/* mask = 00000000000000000000011111000000. */
-+static long long int
-+extract_uimm6_a16_21(unsigned long long insn ATTRIBUTE_UNUSED,
-+                     bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  unsigned value = 0;
-+
-+  value |= ((insn >> 6) & 0x001f) << 1;
-+
-+  return value;
-+}
-+
-+/* mask = 0000022200011110. */
-+static long long int
-+extract_uimm7_11_s(unsigned long long insn ATTRIBUTE_UNUSED,
-+                   bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  unsigned value = 0;
-+
-+  value |= ((insn >> 1) & 0x000f) << 0;
-+  value |= ((insn >> 8) & 0x0007) << 4;
-+
-+  return value;
-+}
-+
-+/* mask = 00000000000000000000111111000000. */
-+static long long int
-+extract_uimm7_a16_20(unsigned long long insn ATTRIBUTE_UNUSED,
-+                     bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  unsigned value = 0;
-+
-+  value |= ((insn >> 6) & 0x003f) << 1;
-+
-+  return value;
-+}
-+
-+/* mask = 00000000000000000000111111222222. */
-+static long long int
-+extract_simm13_a16_20(unsigned long long insn ATTRIBUTE_UNUSED,
-+                      bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  int value = 0;
-+
-+  value |= ((insn >> 6) & 0x003f) << 1;
-+  value |= ((insn >> 0) & 0x003f) << 7;
-+
-+  /* Extend the sign. */
-+  int signbit = 1 << (13 - 1);
-+  value = (value ^ signbit) - signbit;
-+
-+  return value;
-+}
-+
-+/* mask = 0000000011111111. */
-+static long long int
-+extract_uimm8_8_s(unsigned long long insn ATTRIBUTE_UNUSED,
-+                  bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  unsigned value = 0;
-+
-+  value |= ((insn >> 0) & 0x00ff) << 0;
-+
-+  return value;
-+}
-+
-+/* mask = 0000011111100000. */
-+static long long int
-+extract_uimm6_5_s(unsigned long long insn ATTRIBUTE_UNUSED,
-+                  bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  unsigned value = 0;
-+
-+  value |= ((insn >> 5) & 0x003f) << 0;
-+
-+  return value;
-+}
-+
-+/* mask = 00000000000000000000000000000000. */
-+static ATTRIBUTE_UNUSED int
-+extract_uimm6_axx_(unsigned long long insn ATTRIBUTE_UNUSED,
-+                   bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+  unsigned value = 0;
-+
-+  return value;
-+}
-+
-+static long long int extract_rb(unsigned long long insn ATTRIBUTE_UNUSED,
-+                                bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+    int value = (((insn >> 12) & 0x07) << 3) | ((insn >> 24) & 0x07);
-+
-+    if (value == 0x3e && invalid) {
-+        *invalid = TRUE;
++    if (unlikely(dc->base.singlestep_enabled)) {
++        return false;
 +    }
-+
-+    return value;
++#ifndef CONFIG_USER_ONLY
++    return (dc->base.tb->pc & TARGET_PAGE_MASK) == (dest & TARGET_PAGE_MASK);
++#else
++    return true;
++#endif
 +}
 +
-+static long long int extract_rhv1(unsigned long long insn ATTRIBUTE_UNUSED,
-+                                  bfd_boolean *invalid ATTRIBUTE_UNUSED)
++void gen_goto_tb(DisasContext *ctx, int n, TCGv dest)
 +{
-+    int value = ((insn & 0x7) << 3) | ((insn >> 5) & 0x7);
-+
-+    return value;
++    tcg_gen_mov_tl(cpu_pc, dest);
++    tcg_gen_andi_tl(cpu_pcl, dest, 0xfffffffc);
++    if (ctx->base.singlestep_enabled) {
++        gen_helper_debug(cpu_env);
++    }
++    tcg_gen_exit_tb(NULL, 0);
 +}
 +
-+static long long int extract_rhv2(unsigned long long insn ATTRIBUTE_UNUSED,
-+                                  bfd_boolean *invalid ATTRIBUTE_UNUSED)
++static void gen_gotoi_tb(DisasContext *ctx, int n, target_ulong dest)
 +{
-+    int value = ((insn >> 5) & 0x07) | ((insn & 0x03) << 3);
-+
-+    return value;
-+}
-+
-+static long long int extract_r0(unsigned long long insn ATTRIBUTE_UNUSED,
-+                                bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+    return 0;
-+}
-+
-+static long long int extract_r1(unsigned long long insn ATTRIBUTE_UNUSED,
-+                                bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+    return 1;
-+}
-+
-+static long long int extract_r2(unsigned long long insn ATTRIBUTE_UNUSED,
-+                                bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+    return 2;
-+}
-+
-+static long long int extract_r3(unsigned long long insn ATTRIBUTE_UNUSED,
-+                                bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+    return 3;
-+}
-+
-+static long long int extract_sp(unsigned long long insn ATTRIBUTE_UNUSED,
-+                                bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+    return 28;
-+}
-+
-+static long long int extract_gp(unsigned long long insn ATTRIBUTE_UNUSED,
-+                                bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+    return 26;
-+}
-+
-+static long long int extract_pcl(unsigned long long insn ATTRIBUTE_UNUSED,
-+                                 bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+    return 63;
-+}
-+
-+static long long int extract_blink(unsigned long long insn ATTRIBUTE_UNUSED,
-+                                   bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+    return 31;
-+}
-+
-+static long long int extract_ilink1(unsigned long long insn ATTRIBUTE_UNUSED,
-+                                    bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+    return 29;
-+}
-+
-+static long long int extract_ilink2(unsigned long long insn ATTRIBUTE_UNUSED,
-+                                    bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+    return 30;
-+}
-+
-+static long long int extract_ras(unsigned long long insn ATTRIBUTE_UNUSED,
-+                                 bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+    int value = insn & 0x07;
-+    if (value > 3) {
-+        return value + 8;
++    if (use_goto_tb(ctx, dest)) {
++        tcg_gen_goto_tb(n);
++        tcg_gen_movi_tl(cpu_pc, dest);
++        tcg_gen_movi_tl(cpu_pcl, dest & 0xfffffffc);
++        tcg_gen_exit_tb(ctx->base.tb, n);
 +    } else {
-+        return value;
++        tcg_gen_movi_tl(cpu_pc, dest);
++        tcg_gen_movi_tl(cpu_pcl, dest & 0xfffffffc);
++        if (ctx->base.singlestep_enabled) {
++            gen_helper_debug(cpu_env);
++        }
++        tcg_gen_exit_tb(NULL, 0);
 +    }
 +}
 +
-+static long long int extract_rbs(unsigned long long insn ATTRIBUTE_UNUSED,
-+                                 bfd_boolean *invalid ATTRIBUTE_UNUSED)
++void arc_translate_init(void)
 +{
-+    int value = (insn >> 8) & 0x07;
-+    if (value > 3) {
-+        return value + 8;
-+    } else {
-+        return value;
++    int i;
++    static int init_not_done = 1;
++
++    if (init_not_done == 0) {
++        return;
++    }
++#define ARC_REG_OFFS(x) offsetof(CPUARCState, x)
++
++#define NEW_ARC_REG(x) \
++        tcg_global_mem_new_i32(cpu_env, offsetof(CPUARCState, x), #x)
++
++    cpu_S1f = NEW_ARC_REG(macmod.S1);
++    cpu_S2f = NEW_ARC_REG(macmod.S2);
++    cpu_CSf = NEW_ARC_REG(macmod.CS);
++
++    cpu_Zf  = NEW_ARC_REG(stat.Zf);
++    cpu_Lf  = NEW_ARC_REG(stat.Lf);
++    cpu_Nf  = NEW_ARC_REG(stat.Nf);
++    cpu_Cf  = NEW_ARC_REG(stat.Cf);
++    cpu_Vf  = NEW_ARC_REG(stat.Vf);
++    cpu_Uf  = NEW_ARC_REG(stat.Uf);
++    cpu_DEf = NEW_ARC_REG(stat.DEf);
++    cpu_ESf = NEW_ARC_REG(stat.ESf);
++    cpu_AEf = NEW_ARC_REG(stat.AEf);
++    cpu_Hf  = NEW_ARC_REG(stat.Hf);
++    cpu_IEf = NEW_ARC_REG(stat.IEf);
++    cpu_Ef  = NEW_ARC_REG(stat.Ef);
++
++    cpu_is_delay_slot_instruction = NEW_ARC_REG(stat.is_delay_slot_instruction);
++
++    cpu_l1_Zf = NEW_ARC_REG(stat_l1.Zf);
++    cpu_l1_Lf = NEW_ARC_REG(stat_l1.Lf);
++    cpu_l1_Nf = NEW_ARC_REG(stat_l1.Nf);
++    cpu_l1_Cf = NEW_ARC_REG(stat_l1.Cf);
++    cpu_l1_Vf = NEW_ARC_REG(stat_l1.Vf);
++    cpu_l1_Uf = NEW_ARC_REG(stat_l1.Uf);
++    cpu_l1_DEf = NEW_ARC_REG(stat_l1.DEf);
++    cpu_l1_AEf = NEW_ARC_REG(stat_l1.AEf);
++    cpu_l1_Hf = NEW_ARC_REG(stat_l1.Hf);
++
++    cpu_er_Zf = NEW_ARC_REG(stat_er.Zf);
++    cpu_er_Lf = NEW_ARC_REG(stat_er.Lf);
++    cpu_er_Nf = NEW_ARC_REG(stat_er.Nf);
++    cpu_er_Cf = NEW_ARC_REG(stat_er.Cf);
++    cpu_er_Vf = NEW_ARC_REG(stat_er.Vf);
++    cpu_er_Uf = NEW_ARC_REG(stat_er.Uf);
++    cpu_er_DEf = NEW_ARC_REG(stat_er.DEf);
++    cpu_er_AEf = NEW_ARC_REG(stat_er.AEf);
++    cpu_er_Hf = NEW_ARC_REG(stat_er.Hf);
++
++    cpu_eret = NEW_ARC_REG(eret);
++    cpu_erbta = NEW_ARC_REG(erbta);
++    cpu_ecr = NEW_ARC_REG(ecr);
++    cpu_efa = NEW_ARC_REG(efa);
++    cpu_bta = NEW_ARC_REG(bta);
++    cpu_lps = NEW_ARC_REG(lps);
++    cpu_lpe = NEW_ARC_REG(lpe);
++    cpu_pc = NEW_ARC_REG(pc);
++    cpu_npc = NEW_ARC_REG(npc);
++
++    cpu_bta_l1 = NEW_ARC_REG(bta_l1);
++    cpu_bta_l2 = NEW_ARC_REG(bta_l2);
++
++    cpu_intvec = NEW_ARC_REG(intvec);
++
++    for (i = 0; i < 64; i++) {
++        char name[16];
++
++        sprintf(name, "r[%d]", i);
++
++        cpu_r[i] = tcg_global_mem_new_i32(cpu_env,
++                                          ARC_REG_OFFS(r[i]),
++                                          strdup(name));
++    }
++
++    cpu_gp     = cpu_r[26];
++    cpu_fp     = cpu_r[27];
++    cpu_sp     = cpu_r[28];
++    cpu_ilink1 = cpu_r[29];
++    cpu_ilink2 = cpu_r[30];
++    cpu_blink  = cpu_r[31];
++    cpu_acclo  = cpu_r[58];
++    cpu_acchi  = cpu_r[59];
++    cpu_lpc    = cpu_r[60];
++    cpu_limm   = cpu_r[62];
++    cpu_pcl    = cpu_r[63];
++
++    cpu_debug_LD = NEW_ARC_REG(debug.LD);
++    cpu_debug_SH = NEW_ARC_REG(debug.SH);
++    cpu_debug_BH = NEW_ARC_REG(debug.BH);
++    cpu_debug_UB = NEW_ARC_REG(debug.UB);
++    cpu_debug_ZZ = NEW_ARC_REG(debug.ZZ);
++    cpu_debug_RA = NEW_ARC_REG(debug.RA);
++    cpu_debug_IS = NEW_ARC_REG(debug.IS);
++    cpu_debug_FH = NEW_ARC_REG(debug.FH);
++    cpu_debug_SS = NEW_ARC_REG(debug.SS);
++
++    cpu_lock_lf_var = NEW_ARC_REG(lock_lf_var);
++
++    init_not_done = 0;
++}
++
++static void arc_tr_init_disas_context(DisasContextBase *dcbase,
++                                      CPUState *cs)
++{
++    DisasContext *dc = container_of(dcbase, DisasContext, base);
++
++    dc->base.is_jmp = DISAS_NEXT;
++    dc->mem_idx = dc->base.tb->flags & 1;
++}
++static void arc_tr_tb_start(DisasContextBase *dcbase, CPUState *cpu)
++{
++    /* place holder for now */
++}
++
++static void arc_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
++{
++    DisasContext *dc = container_of(dcbase, DisasContext, base);
++
++
++    tcg_gen_insn_start(dc->base.pc_next);
++    dc->cpc = dc->base.pc_next;
++
++    if (dc->base.num_insns == dc->base.max_insns &&
++        (dc->base.tb->cflags & CF_LAST_IO)) {
++        gen_io_start();
 +    }
 +}
 +
-+static long long int extract_rcs(unsigned long long insn ATTRIBUTE_UNUSED,
-+                                 bfd_boolean *invalid ATTRIBUTE_UNUSED)
++static bool arc_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
++                                    const CPUBreakpoint *bp)
 +{
-+    int value = (insn >> 5) & 0x07;
-+    if (value > 3) {
-+        return value + 8;
-+    } else {
-+        return value;
-+    }
++    DisasContext *dc = container_of(dcbase, DisasContext, base);
++
++    tcg_gen_movi_tl(cpu_pc, dc->cpc);
++    dc->base.is_jmp = DISAS_NORETURN;
++    gen_helper_debug(cpu_env);
++    dc->base.pc_next += 2;
++    return true;
 +}
 +
-+static long long int extract_simm3s(unsigned long long insn ATTRIBUTE_UNUSED,
-+                                    bfd_boolean *invalid ATTRIBUTE_UNUSED)
++static int arc_gen_INVALID(const DisasContext *ctx)
 +{
-+    int value = (insn >> 8) & 0x07;
-+    if (value == 7) {
-+        return -1;
-+    } else {
-+        return value;
-+    }
++    fprintf(stderr, "invalid inst @:%08x\n", ctx->cpc);
++    return DISAS_NEXT;
 +}
 +
-+static long long int extract_rrange(unsigned long long insn  ATTRIBUTE_UNUSED,
-+                                    bfd_boolean * invalid  ATTRIBUTE_UNUSED)
++extern bool enabled_interrupts;
++
++/* Arrange to middle endian, used by LITTLE ENDIAN systems. */
++static uint32_t arc_getm32(uint32_t data)
 +{
-+    return (insn >> 1) & 0x0F;
-+}
++    uint32_t value = 0;
 +
-+static long long int extract_fpel(unsigned long long insn  ATTRIBUTE_UNUSED,
-+                                  bfd_boolean * invalid  ATTRIBUTE_UNUSED)
-+{
-+    return (insn & 0x0100) ? 27 : -1;
-+}
-+
-+static long long int extract_blinkel(unsigned long long insn  ATTRIBUTE_UNUSED,
-+                                     bfd_boolean * invalid  ATTRIBUTE_UNUSED)
-+{
-+    return (insn & 0x0200) ? 31 : -1;
-+}
-+
-+static long long int extract_pclel(unsigned long long insn  ATTRIBUTE_UNUSED,
-+                                   bfd_boolean * invalid  ATTRIBUTE_UNUSED)
-+{
-+    return (insn & 0x0400) ? 63 : -1;
-+}
-+
-+static long long int extract_w6(unsigned long long insn ATTRIBUTE_UNUSED,
-+                                bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+    signed value = 0;
-+
-+    value |= ((insn >> 6) & 0x003f) << 0;
-+
-+    int signbit = 1 << 5;
-+    value = (value ^ signbit) - signbit;
-+
++    value  = (data & 0x0000ffff) << 16;
++    value |= (data & 0xffff0000) >> 16;
 +    return value;
 +}
 +
-+static long long int extract_g_s(unsigned long long insn ATTRIBUTE_UNUSED,
-+                                 bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+    int value = 0;
-+
-+    value |= ((insn >> 8) & 0x0007) << 0;
-+    value |= ((insn >> 3) & 0x0003) << 3;
-+
-+    /* Extend the sign. */
-+    int signbit = 1 << (6 - 1);
-+    value = (value ^ signbit) - signbit;
-+
-+    return value;
-+}
-+
-+static long long int extract_uimm12_20(unsigned long long insn ATTRIBUTE_UNUSED,
-+                                       bfd_boolean *invalid ATTRIBUTE_UNUSED)
-+{
-+    int value = 0;
-+
-+    value |= ((insn >> 6) & 0x003f) << 0;
-+    value |= ((insn >> 0) & 0x003f) << 6;
-+
-+    return value;
-+}
-+
 +/*
-+ * The operands table.
-+ *
-+ * The format of the operands table is:
-+ *
-+ * BITS SHIFT FLAGS EXTRACT_FUN.
++ * Giving a CTX, decode it into an valid OPCODE_P if it
++ * exists. Returns TRUE if successfully.
 + */
-+const struct arc_operand arc_operands[] = {
-+    { 0, 0, 0, 0 },
-+#define ARC_OPERAND(NAME, BITS, SHIFT, RELO, FLAGS, FUN)       \
-+    { BITS, SHIFT, FLAGS, FUN },
-+#include "target/arc/operands.def"
-+#undef ARC_OPERAND
-+    { 0, 0, 0, 0}
-+};
-+
-+enum arc_operands_map {
-+    OPERAND_UNUSED = 0,
-+#define ARC_OPERAND(NAME, BITS, SHIFT, RELO, FLAGS, FUN) OPERAND_##NAME,
-+#include "target/arc/operands.def"
-+#undef ARC_OPERAND
-+    OPERAND_LAST
-+};
-+
-+/*
-+ * The flag operands table.
-+ *
-+ * The format of the table is
-+ * NAME CODE BITS SHIFT FAVAIL.
-+ */
-+const struct arc_flag_operand arc_flag_operands[] = {
-+    { 0, 0, 0, 0, 0},
-+#define ARC_FLAG(NAME, MNEMONIC, CODE, BITS, SHIFT, AVAIL)      \
-+    { MNEMONIC, CODE, BITS, SHIFT, AVAIL },
-+#include "target/arc/flags.def"
-+#undef ARC_FLAG
-+    { 0, 0, 0, 0, 0}
-+};
-+
-+enum arc_flags_map {
-+    F_NULL = 0,
-+#define ARC_FLAG(NAME, MNEMONIC, CODE, BITS, SHIFT, AVAIL) F_##NAME,
-+#include "target/arc/flags.def"
-+#undef ARC_FLAG
-+    F_LAST
-+};
-+
-+/*
-+ * Table of the flag classes.
-+ *
-+ * The format of the table is
-+ * CLASS {FLAG_CODE}.
-+ */
-+const struct arc_flag_class arc_flag_classes[] = {
-+#define C_EMPTY             0
-+    { F_CLASS_NONE, { F_NULL } },
-+
-+#define C_CC_EQ             (C_EMPTY + 1)
-+    {F_CLASS_IMPLICIT | F_CLASS_COND, {F_EQUAL, F_NULL} },
-+
-+#define C_CC_GE             (C_CC_EQ + 1)
-+    {F_CLASS_IMPLICIT | F_CLASS_COND, {F_GE, F_NULL} },
-+
-+#define C_CC_GT             (C_CC_GE + 1)
-+    {F_CLASS_IMPLICIT | F_CLASS_COND, {F_GT, F_NULL} },
-+
-+#define C_CC_HI             (C_CC_GT + 1)
-+    {F_CLASS_IMPLICIT | F_CLASS_COND, {F_HI, F_NULL} },
-+
-+#define C_CC_HS             (C_CC_HI + 1)
-+    {F_CLASS_IMPLICIT | F_CLASS_COND, {F_NOTCARRY, F_NULL} },
-+
-+#define C_CC_LE             (C_CC_HS + 1)
-+    {F_CLASS_IMPLICIT | F_CLASS_COND, {F_LE, F_NULL} },
-+
-+#define C_CC_LO             (C_CC_LE + 1)
-+    {F_CLASS_IMPLICIT | F_CLASS_COND, {F_CARRY, F_NULL} },
-+
-+#define C_CC_LS             (C_CC_LO + 1)
-+    {F_CLASS_IMPLICIT | F_CLASS_COND, {F_LS, F_NULL} },
-+
-+#define C_CC_LT             (C_CC_LS + 1)
-+    {F_CLASS_IMPLICIT | F_CLASS_COND, {F_LT, F_NULL} },
-+
-+#define C_CC_NE             (C_CC_LT + 1)
-+    {F_CLASS_IMPLICIT | F_CLASS_COND, {F_NOTEQUAL, F_NULL} },
-+
-+#define C_AA_AB             (C_CC_NE + 1)
-+    {F_CLASS_IMPLICIT | F_CLASS_WB, {F_AB3, F_NULL} },
-+
-+#define C_AA_AW             (C_AA_AB + 1)
-+    {F_CLASS_IMPLICIT | F_CLASS_WB, {F_AW3, F_NULL} },
-+
-+#define C_ZZ_D              (C_AA_AW + 1)
-+    {F_CLASS_IMPLICIT | F_CLASS_ZZ, {F_SIZED, F_NULL} },
-+
-+#define C_ZZ_H              (C_ZZ_D + 1)
-+    {F_CLASS_IMPLICIT | F_CLASS_ZZ, {F_H1, F_NULL} },
-+
-+#define C_ZZ_B              (C_ZZ_H + 1)
-+    {F_CLASS_IMPLICIT | F_CLASS_ZZ, {F_SIZEB1, F_NULL} },
-+
-+#define C_CC                (C_ZZ_B + 1)
-+    { F_CLASS_OPTIONAL | F_CLASS_EXTEND | F_CLASS_COND,
-+        { F_ALWAYS, F_RA, F_EQUAL, F_ZERO, F_NOTEQUAL,
-+          F_NOTZERO, F_POZITIVE, F_PL, F_NEGATIVE, F_MINUS,
-+          F_CARRY, F_CARRYSET, F_LOWER, F_CARRYCLR,
-+          F_NOTCARRY, F_HIGHER, F_OVERFLOWSET, F_OVERFLOW,
-+          F_NOTOVERFLOW, F_OVERFLOWCLR, F_GT, F_GE, F_LT,
-+          F_LE, F_HI, F_LS, F_PNZ, F_NULL
-+        }
-+    },
-+
-+#define C_AA_ADDR3          (C_CC + 1)
-+#define C_AA27              (C_CC + 1)
-+    { F_CLASS_OPTIONAL | F_CLASS_WB, { F_A3, F_AW3, F_AB3, F_AS3, F_NULL } },
-+#define C_AA_ADDR9          (C_AA_ADDR3 + 1)
-+#define C_AA21              (C_AA_ADDR3 + 1)
-+    { F_CLASS_OPTIONAL | F_CLASS_WB, { F_A9, F_AW9, F_AB9, F_AS9, F_NULL } },
-+#define C_AA_ADDR22         (C_AA_ADDR9 + 1)
-+#define C_AA8               (C_AA_ADDR9 + 1)
-+    { F_CLASS_OPTIONAL | F_CLASS_WB,
-+        { F_A22, F_AW22, F_AB22, F_AS22, F_NULL }
-+    },
-+
-+#define C_F                 (C_AA_ADDR22 + 1)
-+    { F_CLASS_OPTIONAL | F_CLASS_F, { F_FLAG, F_NULL } },
-+#define C_FHARD             (C_F + 1)
-+    { F_CLASS_OPTIONAL | F_CLASS_F, { F_FFAKE, F_NULL } },
-+
-+#define C_T                 (C_FHARD + 1)
-+    { F_CLASS_OPTIONAL, { F_NT, F_T, F_NULL } },
-+#define C_D                 (C_T + 1)
-+    { F_CLASS_OPTIONAL | F_CLASS_D, { F_ND, F_D, F_NULL } },
-+#define C_DNZ_D             (C_D + 1)
-+    { F_CLASS_OPTIONAL | F_CLASS_D, { F_DNZ_ND, F_DNZ_D, F_NULL } },
-+
-+#define C_DHARD             (C_DNZ_D + 1)
-+    { F_CLASS_OPTIONAL | F_CLASS_D, { F_DFAKE, F_NULL } },
-+
-+#define C_DI20              (C_DHARD + 1)
-+    { F_CLASS_OPTIONAL | F_CLASS_DI, { F_DI11, F_NULL } },
-+#define C_DI14              (C_DI20 + 1)
-+    { F_CLASS_OPTIONAL | F_CLASS_DI, { F_DI14, F_NULL } },
-+#define C_DI16              (C_DI14 + 1)
-+    { F_CLASS_OPTIONAL | F_CLASS_DI, { F_DI15, F_NULL } },
-+#define C_DI26              (C_DI16 + 1)
-+    { F_CLASS_OPTIONAL | F_CLASS_DI, { F_DI5, F_NULL } },
-+
-+#define C_X25               (C_DI26 + 1)
-+    { F_CLASS_OPTIONAL | F_CLASS_X, { F_SIGN6, F_NULL } },
-+#define C_X15               (C_X25 + 1)
-+    { F_CLASS_OPTIONAL | F_CLASS_X, { F_SIGN16, F_NULL } },
-+#define C_XHARD             (C_X15 + 1)
-+#define C_X                 (C_X15 + 1)
-+    { F_CLASS_OPTIONAL | F_CLASS_X, { F_SIGNX, F_NULL } },
-+
-+#define C_ZZ13              (C_X + 1)
-+    { F_CLASS_OPTIONAL | F_CLASS_ZZ, { F_SIZEB17, F_SIZEW17, F_H17, F_NULL} },
-+#define C_ZZ23              (C_ZZ13 + 1)
-+    { F_CLASS_OPTIONAL | F_CLASS_ZZ, { F_SIZEB7, F_SIZEW7, F_H7, F_NULL} },
-+#define C_ZZ29              (C_ZZ23 + 1)
-+    { F_CLASS_OPTIONAL | F_CLASS_ZZ, { F_SIZEB1, F_SIZEW1, F_H1, F_NULL} },
-+
-+#define C_AS                (C_ZZ29 + 1)
-+    { F_CLASS_IMPLICIT | F_CLASS_OPTIONAL | F_CLASS_WB, { F_ASFAKE, F_NULL} },
-+
-+#define C_NE                (C_AS + 1)
-+    { F_CLASS_OPTIONAL | F_CLASS_COND, { F_NE, F_NULL} },
-+};
-+
-+/* List with special cases instructions and the applicable flags. */
-+const struct arc_flag_special arc_flag_special_cases[] = {
-+    { "b",  { F_ALWAYS, F_RA, F_EQUAL, F_ZERO, F_NOTEQUAL, F_NOTZERO,
-+              F_POZITIVE, F_PL, F_NEGATIVE, F_MINUS, F_CARRY, F_CARRYSET,
-+              F_LOWER, F_CARRYCLR, F_NOTCARRY, F_HIGHER, F_OVERFLOWSET,
-+              F_OVERFLOW, F_NOTOVERFLOW, F_OVERFLOWCLR, F_GT, F_GE, F_LT,
-+              F_LE, F_HI, F_LS, F_PNZ, F_NULL
-+            }
-+    },
-+    { "bl", { F_ALWAYS, F_RA, F_EQUAL, F_ZERO, F_NOTEQUAL, F_NOTZERO,
-+              F_POZITIVE, F_PL, F_NEGATIVE, F_MINUS, F_CARRY, F_CARRYSET,
-+              F_LOWER, F_CARRYCLR, F_NOTCARRY, F_HIGHER, F_OVERFLOWSET,
-+              F_OVERFLOW, F_NOTOVERFLOW, F_OVERFLOWCLR, F_GT, F_GE, F_LT,
-+              F_LE, F_HI, F_LS, F_PNZ, F_NULL
-+            }
-+    },
-+    { "br", { F_ALWAYS, F_RA, F_EQUAL, F_ZERO, F_NOTEQUAL, F_NOTZERO,
-+              F_POZITIVE, F_PL, F_NEGATIVE, F_MINUS, F_CARRY, F_CARRYSET,
-+              F_LOWER, F_CARRYCLR, F_NOTCARRY, F_HIGHER, F_OVERFLOWSET,
-+              F_OVERFLOW, F_NOTOVERFLOW, F_OVERFLOWCLR, F_GT, F_GE, F_LT,
-+              F_LE, F_HI, F_LS, F_PNZ, F_NULL
-+            }
-+    },
-+    { "j",  { F_ALWAYS, F_RA, F_EQUAL, F_ZERO, F_NOTEQUAL, F_NOTZERO,
-+              F_POZITIVE, F_PL, F_NEGATIVE, F_MINUS, F_CARRY, F_CARRYSET,
-+              F_LOWER, F_CARRYCLR, F_NOTCARRY, F_HIGHER, F_OVERFLOWSET,
-+              F_OVERFLOW, F_NOTOVERFLOW, F_OVERFLOWCLR, F_GT, F_GE, F_LT,
-+              F_LE, F_HI, F_LS, F_PNZ, F_NULL
-+            }
-+    },
-+    { "jl", { F_ALWAYS, F_RA, F_EQUAL, F_ZERO, F_NOTEQUAL, F_NOTZERO,
-+              F_POZITIVE, F_PL, F_NEGATIVE, F_MINUS, F_CARRY, F_CARRYSET,
-+              F_LOWER, F_CARRYCLR, F_NOTCARRY, F_HIGHER, F_OVERFLOWSET,
-+              F_OVERFLOW, F_NOTOVERFLOW, F_OVERFLOWCLR, F_GT, F_GE, F_LT,
-+              F_LE, F_HI, F_LS, F_PNZ, F_NULL
-+            }
-+    },
-+    { "lp", { F_ALWAYS, F_RA, F_EQUAL, F_ZERO, F_NOTEQUAL, F_NOTZERO,
-+              F_POZITIVE, F_PL, F_NEGATIVE, F_MINUS, F_CARRY, F_CARRYSET,
-+              F_LOWER, F_CARRYCLR, F_NOTCARRY, F_HIGHER, F_OVERFLOWSET,
-+              F_OVERFLOW, F_NOTOVERFLOW, F_OVERFLOWCLR, F_GT, F_GE, F_LT,
-+              F_LE, F_HI, F_LS, F_PNZ, F_NULL
-+            }
-+    },
-+    { "set", { F_ALWAYS, F_RA, F_EQUAL, F_ZERO, F_NOTEQUAL, F_NOTZERO,
-+               F_POZITIVE, F_PL, F_NEGATIVE, F_MINUS, F_CARRY, F_CARRYSET,
-+               F_LOWER, F_CARRYCLR, F_NOTCARRY, F_HIGHER, F_OVERFLOWSET,
-+               F_OVERFLOW, F_NOTOVERFLOW, F_OVERFLOWCLR, F_GT, F_GE, F_LT,
-+               F_LE, F_HI, F_LS, F_PNZ, F_NULL
-+             }
-+    },
-+    { "ld", { F_SIZEB17, F_SIZEW17, F_H17, F_NULL } },
-+    { "st", { F_SIZEB1, F_SIZEW1, F_H1, F_NULL } }
-+};
-+
-+const unsigned arc_num_flag_special = ARRAY_SIZE(arc_flag_special_cases);
-+
-+/*
-+ * The opcode table.
-+ *
-+ * The format of the opcode table is:
-+ *
-+ * NAME OPCODE MASK CPU CLASS SUBCLASS { OPERANDS } { FLAGS }.
-+ *
-+ * The table is organised such that, where possible, all instructions with
-+ * the same mnemonic are together in a block. When the assembler searches
-+ * for a suitable instruction the entries are checked in table order, so
-+ * more specific, or specialised cases should appear earlier in the table.
-+ *
-+ * As an example, consider two instructions 'add a,b,u6' and 'add
-+ * a,b,limm'. The first takes a 6-bit immediate that is encoded within the
-+ * 32-bit instruction, while the second takes a 32-bit immediate that is
-+ * encoded in a follow-on 32-bit, making the total instruction length
-+ * 64-bits. In this case the u6 variant must appear first in the table, as
-+ * all u6 immediates could also be encoded using the 'limm' extension,
-+ * however, we want to use the shorter instruction wherever possible.
-+ *
-+ * It is possible though to split instructions with the same mnemonic into
-+ * multiple groups. However, the instructions are still checked in table
-+ * order, even across groups. The only time that instructions with the
-+ * same mnemonic should be split into different groups is when different
-+ * variants of the instruction appear in different architectures, in which
-+ * case, grouping all instructions from a particular architecture together
-+ * might be preferable to merging the instruction into the main instruction
-+ * table.
-+ *
-+ * An example of this split instruction groups can be found with the 'sync'
-+ * instruction. The core arc architecture provides a 'sync' instruction,
-+ * while the nps instruction set extension provides 'sync.rd' and
-+ * 'sync.wr'. The rd/wr flags are instruction flags, not part of the
-+ * mnemonic, so we end up with two groups for the sync instruction, the
-+ * first within the core arc instruction table, and the second within the
-+ * nps extension instructions.
-+ */
-+static const struct arc_opcode arc_opcodes[] = {
-+#include "target/arc/opcodes.def"
-+    { NULL, 0, 0, 0, 0, 0, { 0 }, { 0 } }
-+};
-+
-+/* Return length of an opcode in bytes. */
-+static uint8_t arc_opcode_len(const struct arc_opcode *opcode)
++static bool read_and_decode_context(DisasContext *ctx,
++                                    const struct arc_opcode **opcode_p)
 +{
-+    if (opcode->mask < 0x10000ull) {
-+        return 2;
-+    }
++    uint16_t buffer[2];
++    uint8_t length;
++    uint64_t insn;
 +
-+    if (opcode->mask < 0x100000000ull) {
-+        return 4;
-+    }
++    /* Read the first 16 bits, figure it out what kind of instruction it is. */
++    buffer[0] = cpu_lduw_code(ctx->env, ctx->cpc);
++    length = arc_insn_length(buffer[0], ctx->env->family);
 +
-+    if (opcode->mask < 0x1000000000000ull) {
-+        return 6;
-+    }
-+
-+    return 8;
-+}
-+
-+/*Helper for arc_find_format. */
-+static const struct arc_opcode *find_format(insn_t *pinsn,
-+                                            uint64_t insn,
-+                                            uint8_t insn_len,
-+                                            uint32_t isa_mask)
-+{
-+    uint32_t i = 0;
-+    const struct arc_opcode *opcode = NULL;
-+    const uint8_t *opidx;
-+    const uint8_t *flgidx;
-+    bool has_limm = false;
-+
-+    do {
-+        bool invalid = false;
-+        uint32_t noperands = 0;
-+
-+        opcode = &arc_opcodes[i++];
-+        memset(pinsn, 0, sizeof(*pinsn));
-+
-+        if (!(opcode->cpu & isa_mask)) {
-+            continue;
-+        }
-+
-+        if (arc_opcode_len(opcode) != (int) insn_len) {
-+            continue;
-+        }
-+
-+        if ((insn & opcode->mask) != opcode->opcode) {
-+            continue;
-+        }
-+
-+        has_limm = false;
-+
-+        /* Possible candidate, check the operands. */
-+        for (opidx = opcode->operands; *opidx; ++opidx) {
-+            int value, limmind;
-+            const struct arc_operand *operand = &arc_operands[*opidx];
-+
-+            if (operand->flags & ARC_OPERAND_FAKE) {
-+                continue;
-+            }
-+
-+            if (operand->extract) {
-+                value = (*operand->extract)(insn, &invalid);
-+            } else {
-+                value = (insn >> operand->shift) & ((1 << operand->bits) - 1);
-+            }
-+
-+            /*
-+             * Check for LIMM indicator. If it is there, then make sure
-+             * we pick the right format.
-+             */
-+            limmind = (isa_mask & ARC_OPCODE_ARCV2) ? 0x1E : 0x3E;
-+            if (operand->flags & ARC_OPERAND_IR &&
-+                !(operand->flags & ARC_OPERAND_LIMM)) {
-+                if ((value == 0x3E && insn_len == 4) ||
-+                    (value == limmind && insn_len == 2)) {
-+                    invalid = TRUE;
-+                    break;
-+                }
-+            }
-+
-+            if (operand->flags & ARC_OPERAND_LIMM &&
-+                !(operand->flags & ARC_OPERAND_DUPLICATE)) {
-+                has_limm = true;
-+            }
-+
-+            pinsn->operands[noperands].value = value;
-+            pinsn->operands[noperands].type = operand->flags;
-+            noperands += 1;
-+            pinsn->n_ops = noperands;
-+        }
-+
-+        /* Check the flags. */
-+        for (flgidx = opcode->flags; *flgidx; ++flgidx) {
-+            /* Get a valid flag class. */
-+            const struct arc_flag_class *cl_flags = &arc_flag_classes[*flgidx];
-+            const unsigned *flgopridx;
-+            bool foundA = false, foundB = false;
-+            unsigned int value;
-+
-+            /* FIXME! Add check for EXTENSION flags. */
-+
-+            for (flgopridx = cl_flags->flags; *flgopridx; ++flgopridx) {
-+                const struct arc_flag_operand *flg_operand =
-+                &arc_flag_operands[*flgopridx];
-+
-+                /* Check for the implicit flags. */
-+                if (cl_flags->flag_class & F_CLASS_IMPLICIT) {
-+                    if (cl_flags->flag_class & F_CLASS_COND) {
-+                        pinsn->cc = flg_operand->code;
-+                    } else if (cl_flags->flag_class & F_CLASS_WB) {
-+                        pinsn->aa = flg_operand->code;
-+                    } else if (cl_flags->flag_class & F_CLASS_ZZ) {
-+                        pinsn->zz = flg_operand->code;
-+                    }
-+                    continue;
-+                }
-+
-+                value = (insn >> flg_operand->shift) &
-+                        ((1 << flg_operand->bits) - 1);
-+                if (value == flg_operand->code) {
-+                    if (cl_flags->flag_class & F_CLASS_ZZ) {
-+                        switch (flg_operand->name[0]) {
-+                        case 'b':
-+                            pinsn->zz = 1;
-+                            break;
-+                        case 'h':
-+                        case 'w':
-+                            pinsn->zz = 2;
-+                            break;
-+                        default:
-+                            pinsn->zz = 4;
-+                            break;
-+                        }
-+                    }
-+
-+                    /*
-+                     * TODO: This has a problem: instruction "b label"
-+                     * sets this to true.
-+                     */
-+                    if (cl_flags->flag_class & F_CLASS_D) {
-+                        pinsn->d = value ? true : false;
-+                        if (cl_flags->flags[0] == F_DFAKE) {
-+                            pinsn->d = true;
-+                        }
-+                    }
-+
-+                    if (cl_flags->flag_class & F_CLASS_COND) {
-+                        pinsn->cc = value;
-+                    }
-+
-+                    if (cl_flags->flag_class & F_CLASS_WB) {
-+                        pinsn->aa = value;
-+                    }
-+
-+                    if (cl_flags->flag_class & F_CLASS_F) {
-+                        pinsn->f = true;
-+                    }
-+
-+                    if (cl_flags->flag_class & F_CLASS_DI) {
-+                        pinsn->di = true;
-+                    }
-+
-+                    if (cl_flags->flag_class & F_CLASS_X) {
-+                        pinsn->x = true;
-+                    }
-+
-+                    foundA = true;
-+                }
-+                if (value) {
-+                    foundB = true;
-+                }
-+            }
-+
-+            if (!foundA && foundB) {
-+                invalid = TRUE;
-+                break;
-+            }
-+        }
-+
-+        if (invalid) {
-+            continue;
-+        }
-+
-+        /* The instruction is valid. */
-+        pinsn->limm_p = has_limm;
-+        pinsn->class = (uint32_t) opcode->insn_class;
-+
-+        /*
-+         * FIXME: here add extra info about the instruction
-+         * e.g. delay slot, data size, write back, etc.
-+         */
-+        return opcode;
-+    } while (opcode->mask);
-+
-+    memset(pinsn, 0, sizeof(*pinsn));
-+    return NULL;
-+}
-+
-+/* Main entry point for this file. */
-+const struct arc_opcode *arc_find_format(insn_t *insnd,
-+                                         uint64_t insn,
-+                                         uint8_t insn_len,
-+                                         uint32_t isa_mask)
-+{
-+    memset(insnd, 0, sizeof(*insnd));
-+    return find_format(insnd, insn, insn_len, isa_mask);
-+}
-+
-+/*
-+ * Calculate the instruction length for an instruction starting with
-+ * MSB and LSB, the most and least significant byte. The ISA_MASK is
-+ * used to filter the instructions considered to only those that are
-+ * part of the current architecture.
-+ *
-+ * The instruction lengths are calculated from the ARC_OPCODE table,
-+ * and cached for later use.
-+ */
-+unsigned int arc_insn_length(uint16_t insn, uint16_t cpu_type)
-+{
-+    uint8_t major_opcode;
-+    uint8_t msb, lsb;
-+
-+    msb = (uint8_t)(insn >> 8);
-+    lsb = (uint8_t)(insn & 0xFF);
-+    major_opcode = msb >> 3;
-+
-+    switch (cpu_type) {
-+    case ARC_OPCODE_ARC700:
-+        if (major_opcode == 0xb) {
-+            uint8_t minor_opcode = lsb & 0x1f;
-+
-+            if (minor_opcode < 4) {
-+                return 6;
-+            } else if (minor_opcode == 0x10 || minor_opcode == 0x11) {
-+                return 8;
-+            }
-+        }
-+        if (major_opcode == 0xa) {
-+            return 8;
-+        }
-+        /* Fall through. */
-+    case ARC_OPCODE_ARC600:
-+        return (major_opcode > 0xb) ? 2 : 4;
++    switch (length) {
++    case 2:
++        /* 16-bit instructions. */
++        insn = (uint64_t) buffer[0];
 +        break;
-+
-+    case ARC_OPCODE_ARCv2EM:
-+    case ARC_OPCODE_ARCv2HS:
-+        return (major_opcode > 0x7) ? 2 : 4;
++    case 4:
++        /* 32-bit instructions. */
++        buffer[1] = cpu_lduw_code(ctx->env, ctx->cpc + 2);
++        uint32_t buf = (buffer[0] << 16) | buffer[1];
++        insn = buf;
 +        break;
-+
 +    default:
 +        g_assert_not_reached();
 +    }
++
++    /*
++     * Now, we have read the entire opcode, decode it and place the
++     * relevant info into opcode and ctx->insn.
++     */
++    *opcode_p = arc_find_format(&ctx->insn, insn, length, ctx->env->family);
++
++    if (*opcode_p == NULL) {
++        return false;
++    }
++
++    /*
++     * If the instruction requires long immediate, read the extra 4
++     * bytes and initialize the relevant fields.
++     */
++    if (ctx->insn.limm_p) {
++        ctx->insn.limm = ARRANGE_ENDIAN(true,
++                                        cpu_ldl_code(ctx->env,
++                                        ctx->cpc + length));
++        length += 4;
++    } else {
++        ctx->insn.limm = 0;
++    }
++
++    /* Update context. */
++    ctx->insn.len = length;
++    ctx->npc = ctx->cpc + length;
++    ctx->pcl = ctx->cpc & 0xfffffffc;
++
++    return true;
 +}
++
++/* Check if OPR is a register _and_ an even numbered one. */
++static inline bool is_odd_numbered_register(const operand_t opr)
++{
++   return (opr.type & ARC_OPERAND_IR) && (opr.value & 1);
++}
++
++/*
++ * Going through every operand, if any of those is a register
++ * it is verified to be an even numbered register. Else, an
++ * exception is put in the generated code and FALSE is returned.
++ */
++static bool verify_all_regs_are_even(const DisasCtxt *ctx)
++{
++    for (int nop = 0; nop < ctx->insn.n_ops; ++nop) {
++        if (is_odd_numbered_register(ctx->insn.operands[nop])) {
++            arc_gen_excp(ctx, EXCP_INST_ERROR, 0, 0);
++            return false;
++        }
++    }
++    return true;
++}
++
++/*
++ * Verifies if the destination operand (operand 0) is a register
++ * then it is an even numbered one. Else, an exception is put in
++ * the generated code and FALSE is returned.
++ */
++static bool verify_dest_reg_is_even(const DisasCtxt *ctx)
++{
++    if (is_odd_numbered_register(ctx->insn.operands[0])) {
++        arc_gen_excp(ctx, EXCP_INST_ERROR, 0, 0);
++        return false;
++    }
++    return true;
++}
++
++enum arc_opcode_map {
++    MAP_NONE = -1,
++#define SEMANTIC_FUNCTION(...)
++#define CONSTANT(...)
++#define MAPPING(MNEMONIC, NAME, NOPS, ...) MAP_##MNEMONIC##_##NAME,
++#include "target/arc/semfunc_mapping.def"
++#include "target/arc/extra_mapping.def"
++#undef MAPPING
++#undef CONSTANT
++#undef SEMANTIC_FUNCTION
++    /* Add some include to generated files */
++    MAP_LAST
++};
++
++const char number_of_ops_semfunc[MAP_LAST + 1] = {
++#define SEMANTIC_FUNCTION(...)
++#define CONSTANT(...)
++#define MAPPING(MNEMONIC, NAME, NOPS, ...) NOPS,
++#include "target/arc/semfunc_mapping.def"
++#include "target/arc/extra_mapping.def"
++#undef MAPPING
++#undef CONSTANT
++#undef SEMANTIC_FUNCTION
++    2
++};
++
++static enum arc_opcode_map arc_map_opcode(const struct arc_opcode *opcode)
++{
++#define SEMANTIC_FUNCTION(...)
++#define CONSTANT(...)
++#define MAPPING(MNEMONIC, NAME, ...)         \
++    if (strcmp(opcode->name, #MNEMONIC) == 0) \
++        return MAP_##MNEMONIC##_##NAME;
++#include "target/arc/semfunc_mapping.def"
++#include "target/arc/extra_mapping.def"
++#undef MAPPING
++#undef CONSTANT
++#undef SEMANTIC_FUNCTION
++
++    return MAP_NONE;
++}
++
++/* Code support for constant values coming from semantic function mapping. */
++struct constant_operands {
++    uint8_t operand_number;
++    uint32_t default_value;
++    struct constant_operands *next;
++};
++
++struct constant_operands *map_constant_operands[MAP_LAST];
++
++static void add_constant_operand(enum arc_opcode_map mapping,
++                                 uint8_t operand_number,
++                                 uint32_t value)
++{
++    struct constant_operands **t = &(map_constant_operands[mapping]);
++    while (*t != NULL) {
++        t = &((*t)->next);
++    }
++    *t = (struct constant_operands *) malloc(sizeof(struct constant_operands));
++
++    (*t)->operand_number = operand_number;
++    (*t)->default_value = value;
++    (*t)->next = NULL;
++}
++
++static struct constant_operands *
++constant_entry_for(enum arc_opcode_map mapping,
++                   uint8_t operand_number)
++{
++    struct constant_operands *t = map_constant_operands[mapping];
++    while (t != NULL) {
++        if (t->operand_number == operand_number) {
++            return t;
++        }
++        t = t->next;
++    }
++    return NULL;
++}
++
++static void init_constants(void)
++{
++#define SEMANTIC_FUNCTION(...)
++#define MAPPING(...)
++#define CONSTANT(NAME, MNEMONIC, OP_NUM, VALUE) \
++  add_constant_operand(MAP_##MNEMONIC##_##NAME, OP_NUM, VALUE);
++#include "target/arc/semfunc_mapping.def"
++#include "target/arc/extra_mapping.def"
++#undef MAPPING
++#undef CONSTANT
++#undef SEMANTIC_FUNCTION
++}
++
++static void arc_debug_opcode(const struct arc_opcode *opcode,
++                             DisasContext *ctx,
++                             const char *msg)
++{
++    qemu_log_mask(LOG_UNIMP,
++                  "%s for %s at pc=0x%08x\n",
++                  msg, opcode->name, ctx->cpc);
++}
++
++static TCGv arc_decode_operand(const struct arc_opcode *opcode,
++                               DisasContext *ctx,
++                               unsigned char nop,
++                               enum arc_opcode_map mapping)
++{
++    TCGv ret;
++
++    if (nop >= ctx->insn.n_ops) {
++        struct constant_operands *co = constant_entry_for(mapping, nop);
++        assert(co != NULL);
++        ret = tcg_const_local_i32(co->default_value);
++        return ret;
++    } else {
++        operand_t operand = ctx->insn.operands[nop];
++
++        if (operand.type & ARC_OPERAND_IR) {
++            ret = cpu_r[operand.value];
++            if (operand.value == 63) {
++                tcg_gen_movi_tl(cpu_pcl, ctx->pcl);
++            }
++      } else {
++            int32_t limm = operand.value;
++            if (operand.type & ARC_OPERAND_LIMM) {
++                limm = ctx->insn.limm;
++                tcg_gen_movi_tl(cpu_limm, limm);
++                ret = cpu_r[62];
++            } else {
++                ret = tcg_const_local_i32(limm);
++            }
++        }
++    }
++
++  return ret;
++}
++
++/* See translate.h. */
++void arc_gen_excp(const DisasCtxt *ctx,
++                  uint32_t index,
++                  uint32_t causecode,
++                  uint32_t param)
++{
++    TCGv_i32 tcg_index = tcg_const_i32(index);
++    TCGv_i32 tcg_cause = tcg_const_i32(causecode);
++    TCGv_i32 tcg_param = tcg_const_i32(param);
++
++    tcg_gen_movi_tl(cpu_pc, ctx->cpc);
++    tcg_gen_movi_tl(cpu_eret, ctx->cpc);
++    tcg_gen_movi_tl(cpu_erbta, ctx->npc);
++
++    gen_helper_raise_exception(cpu_env, tcg_index, tcg_cause, tcg_param);
++
++    tcg_temp_free_i32(tcg_index);
++    tcg_temp_free_i32(tcg_cause);
++    tcg_temp_free_i32(tcg_param);
++}
++
++/* Generate trap. */
++static void gen_trap(DisasContext *ctx, uint32_t param)
++{
++    TCGv_i32 tmp0 = tcg_const_i32(EXCP_TRAP);
++    TCGv_i32 tmp1 = tcg_const_i32(0);
++    TCGv_i32 tmp2 = tcg_const_i32(param);
++
++    tcg_gen_movi_tl(cpu_pc, ctx->cpc);
++    tcg_gen_movi_tl(cpu_eret, ctx->npc);
++    tcg_gen_mov_tl(cpu_erbta, cpu_bta);
++
++    gen_helper_raise_exception(cpu_env, tmp0, tmp1, tmp2);
++
++    tcg_temp_free_i32(tmp0);
++    tcg_temp_free_i32(tmp1);
++    tcg_temp_free_i32(tmp2);
++}
++
++/* Generate sleep insn. */
++static void gen_sleep(DisasContext *ctx, TCGv opa)
++{
++    uint32_t param = 0;
++
++    if (ctx->insn.operands[0].type & ARC_OPERAND_IR) {
++        TCGv tmp3 = tcg_temp_local_new_i32();
++        TCGLabel *done_L = gen_new_label();
++
++        tcg_gen_andi_tl(tmp3, opa, 0x10);
++        tcg_gen_brcondi_tl(TCG_COND_NE, tmp3, 0x10, done_L);
++        tcg_gen_andi_tl(cpu_Ef, opa, 0x0f);
++        tcg_gen_movi_tl(cpu_IEf, 1);
++        gen_set_label(done_L);
++
++        tcg_temp_free_i32(tmp3);
++    } else {
++        param = ctx->insn.operands[0].value;
++        if (param & 0x10) {
++            tcg_gen_movi_tl(cpu_IEf, 1);
++            tcg_gen_movi_tl(cpu_Ef, param & 0x0f);
++        }
++    }
++    /* FIXME: setup debug registers as well. */
++
++    TCGv npc = tcg_temp_local_new_i32();
++    tcg_gen_movi_tl(npc, ctx->npc);
++    gen_helper_halt(cpu_env, npc);
++    tcg_temp_free_i32(npc);
++    qemu_log_mask(CPU_LOG_TB_IN_ASM,
++                  "CPU in sleep mode, waiting for an IRQ.\n");
++}
++
++/* Return from exception. */
++static void gen_rtie(DisasContext *ctx)
++{
++    tcg_gen_movi_tl(cpu_pc, ctx->cpc);
++    gen_helper_rtie(cpu_env);
++    tcg_gen_mov_tl(cpu_pc, cpu_pcl);
++    gen_goto_tb(ctx, 1, cpu_pc);
++}
++
++/* accumulator = b32 * c32 (signed multiplication). */
++void
++arc_gen_mpyd(const DisasCtxt *ctx, TCGv_i32 dest,
++              TCGv_i32 b32, TCGv_i32 c32)
++{
++    CC_PROLOGUE;
++    tcg_gen_muls2_i32(cpu_acclo, cpu_acchi, b32, c32);
++    if (ctx->insn.operands[0].type & ARC_OPERAND_IR) {
++        tcg_gen_mov_tl(arc_gen_next_reg(ctx, dest), cpu_acchi);
++        tcg_gen_mov_tl(dest, cpu_acclo);
++    }
++    if (ctx->insn.f) {
++        setNFlag(cpu_acchi);
++        tcg_gen_movi_tl(cpu_Vf, 0);
++    }
++    CC_EPILOGUE;
++}
++
++/* accumulator = b32 * c32 (unsigned multiplication). */
++void
++arc_gen_mpydu(const DisasCtxt *ctx, TCGv_i32 dest,
++               TCGv_i32 b32, TCGv_i32 c32)
++{
++    CC_PROLOGUE;
++    tcg_gen_mulu2_i32(cpu_acclo, cpu_acchi, b32, c32);
++    if (ctx->insn.operands[0].type & ARC_OPERAND_IR) {
++        tcg_gen_mov_tl(arc_gen_next_reg(ctx, dest), cpu_acchi);
++        tcg_gen_mov_tl(dest, cpu_acclo);
++    }
++    if (ctx->insn.f) {
++        tcg_gen_movi_tl(cpu_Vf, 0);
++    }
++    CC_EPILOGUE;
++}
++
++/*
++ * Populates a 64-bit vector with register pair:
++ *   vec64=(REGn+1,REGn)=(REGn+1_hi,REGn+1_lo,REGn_hi,REGn_lo)
++ * REG must be refering to an even numbered register.
++ * Do not forget to free the returned TCGv_i64 when done!
++ */
++static TCGv_i64 pair_reg_to_i64(const DisasCtxt *ctx, TCGv_i32 reg)
++{
++    TCGv_i64 vec64 = tcg_temp_new_i64();
++    tcg_gen_concat_i32_i64(vec64, reg, arc_gen_next_reg(ctx, reg));
++    return vec64;
++}
++
++/*
++ * Populates a 32-bit vector with repeating SHIMM:
++ *   vec32=(0000000000u6,0000000000u6)
++ *   vec32=(sssss12,sssss12)
++ * It's crucial that the s12 part of an encoding is in signed
++ * integer form while passed along in SHIMM, e.g:
++ *   s12 = -125 (0xf803) --> 0xfffff803
++ * Do not forget to free the returned TCGv_i32 when done!
++ */
++static TCGv_i32 dup_shimm_to_i32(int16_t shimm)
++{
++    TCGv_i32 vec32 = tcg_temp_new_i32();
++    int32_t val = shimm;
++    val = ((val << 16) & 0xffff0000) | (val & 0xffff);
++    tcg_gen_movi_i32(vec32, val);
++    return vec32;
++}
++
++/*
++ * Populates a 64-bit vector with repeating LIMM:
++ *   vec64=(limm,limm)=(limm_hi,limm_lo,limm_hi,limm_lo)
++ * Do not forget to free the returned TCGv_i64 when done!
++ */
++static TCGv_i64 dup_limm_to_i64(int32_t limm)
++{
++    TCGv_i64 vec64 = tcg_temp_new_i64();
++    int64_t val = limm;
++    val = (val << 32) | (val & 0xffffffff);
++    tcg_gen_movi_i64(vec64, val);
++    return vec64;
++}
++
++/*
++ * Populates a 64-bit vector with four SHIMM (u6 or s12):
++ *   vec64=(0000000000u6,0000000000u6,0000000000u6,0000000000u6)
++ *   vec64=(sssss12,sssss12,sssss12,sssss12)
++ * It's crucial that the s12 part of an encoding is in signed
++ * integer form while passed along in SHIMM, e.g:
++ *   s12 = -125 (0xf803) --> 0xfffff803
++ * Do not forget to free the returned TCGv_i64 when done!
++ */
++static TCGv_i64 quad_shimm_to_i64(int16_t shimm)
++{
++    TCGv_i64 vec64 = tcg_temp_new_i64();
++    int64_t val = shimm;
++    val = (val << 48) | ((val << 32) & 0x0000ffff00000000) |
++          ((val << 16) & 0x00000000ffff0000) | (val & 0xffff);
++    tcg_gen_movi_i64(vec64, val);
++    return vec64;
++}
++
++/*
++ * gen_vec_op2 emits instructions to perform the desired operation,
++ * defined by OP, on the inputs (B32 and C32) and returns the
++ * result in DEST.
++ *
++ * vector size:     64-bit
++ * vector elements: 2
++ * element size:    32-bit
++ *
++ * (A1, A0) = (B1, B0) op (C1, C0)
++ */
++static void gen_vec_op2(const DisasCtxt *ctx,
++                        void (*OP)(TCGv_i64, TCGv_i64, TCGv_i64),
++                        TCGv_i32 dest,
++                        TCGv_i32 b32,
++                        TCGv_i32 c32)
++{
++    TCGv_i64 d64, b64, c64;
++
++    /* If no real register for result, then this a nop. Bail out! */
++    if (!(ctx->insn.operands[0].type & ARC_OPERAND_IR)) {
++        return;
++    }
++
++    /* Extend B32 to B64 based on its type: {reg, limm}. */
++    if (ctx->insn.operands[1].type & ARC_OPERAND_IR) {
++        b64 = pair_reg_to_i64(ctx, b32);
++    } else if (ctx->insn.operands[1].type & ARC_OPERAND_LIMM) {
++        b64 = dup_limm_to_i64(ctx->insn.limm);
++    } else {
++        g_assert_not_reached();
++    }
++    /* Extend C32 to C64 based on its type: {reg, limm, shimm}. */
++    if (ctx->insn.operands[2].type & ARC_OPERAND_IR) {
++        c64 = pair_reg_to_i64(ctx, c32);
++    } else if (ctx->insn.operands[2].type & ARC_OPERAND_LIMM) {
++        c64 = dup_limm_to_i64(ctx->insn.limm);
++    } else if (ctx->insn.operands[2].type & ARC_OPERAND_SHIMM) {
++        /* At this point SHIMM is extended like LIMM. */
++        c64 = dup_limm_to_i64(ctx->insn.operands[2].value);
++    } else {
++        g_assert_not_reached();
++    }
++    d64 = tcg_temp_new_i64();
++
++    (*OP)(d64, b64, c64);
++    tcg_gen_extrl_i64_i32(dest, d64);
++    tcg_gen_extrh_i64_i32(arc_gen_next_reg(ctx, dest), d64);
++
++    tcg_temp_free_i64(d64);
++    tcg_temp_free_i64(c64);
++    tcg_temp_free_i64(b64);
++    return;
++}
++
++/*
++ * gen_vec_op2h emits instructions to perform the desired operation,
++ * defined by OP, on the inputs (B32 and C32) and returns the
++ * result in DEST.
++ *
++ * vector size:     32-bit
++ * vector elements: 2
++ * element size:    16-bit
++ *
++ * (a1, a0) = (b1, b0) op (c1, c0)
++ */
++static void gen_vec_op2h(const DisasCtxt *ctx,
++                         void (*OP)(TCGv, TCGv, TCGv),
++                         TCGv_i32 dest,
++                         TCGv_i32 b32,
++                         TCGv_i32 c32)
++{
++    TCGv_i32 t0, t1;
++
++    /* If no real register for result, then this a nop. Bail out! */
++    if (!(ctx->insn.operands[0].type & ARC_OPERAND_IR)) {
++        return;
++    }
++
++    t0 = tcg_temp_new();
++    tcg_gen_mov_i32(t0, b32);
++    /*
++     * If the last operand is a u6/s12, say 63, there is no "HI" in it.
++     * Instead, it must be duplicated to form a pair; e.g.: (63, 63).
++     */
++    if (ctx->insn.operands[2].type & ARC_OPERAND_SHIMM) {
++        t1 = dup_shimm_to_i32(ctx->insn.operands[2].value);
++    } else {
++        t1 = tcg_temp_new();
++        tcg_gen_mov_i32(t1, c32);
++    }
++
++    (*OP)(dest, t0, t1);
++
++    tcg_temp_free(t1);
++    tcg_temp_free(t0);
++}
++
++
++/*
++ * gen_vec_op4h emits instructions to perform the desired operation,
++ * defined by OP, on the inputs (B32 and C32) and returns the
++ * result in DEST.
++ *
++ * vector size:     64-bit
++ * vector elements: 4
++ * element size:    16-bit
++ *
++ * (a3, a2, a1, a0) = (b3, b2, b1, b0) op (c3, c2, c1, c0)
++ */
++static void gen_vec_op4h(const DisasCtxt *ctx,
++                         void (*op)(TCGv_i64, TCGv_i64, TCGv_i64),
++                         TCGv_i32 dest,
++                         TCGv_i32 b32,
++                         TCGv_i32 c32)
++{
++    TCGv_i64 d64, b64, c64;
++
++    /* If no real register for result, then this a nop. Bail out! */
++    if (!(ctx->insn.operands[0].type & ARC_OPERAND_IR)) {
++        return;
++    }
++
++    /* Extend B32 to B64 based on its type: {reg, limm}. */
++    if (ctx->insn.operands[1].type & ARC_OPERAND_IR) {
++        b64 = pair_reg_to_i64(ctx, b32);
++    } else if (ctx->insn.operands[1].type & ARC_OPERAND_LIMM) {
++        b64 = dup_limm_to_i64(ctx->insn.limm);
++    } else {
++        g_assert_not_reached();
++    }
++    /* Extend C32 to C64 based on its type: {reg, limm, shimm}. */
++    if (ctx->insn.operands[2].type & ARC_OPERAND_IR) {
++        c64 = pair_reg_to_i64(ctx, c32);
++    } else if (ctx->insn.operands[2].type & ARC_OPERAND_LIMM) {
++        c64 = dup_limm_to_i64(ctx->insn.limm);
++    } else if (ctx->insn.operands[2].type & ARC_OPERAND_SHIMM) {
++        c64 = quad_shimm_to_i64(ctx->insn.operands[2].value);
++    } else {
++        g_assert_not_reached();
++    }
++    d64 = tcg_temp_new_i64();
++
++    (*op)(d64, b64, c64);
++    tcg_gen_extrl_i64_i32(dest, d64);
++    tcg_gen_extrh_i64_i32(arc_gen_next_reg(ctx, dest), d64);
++
++    tcg_temp_free_i64(d64);
++    tcg_temp_free_i64(c64);
++    tcg_temp_free_i64(b64);
++    return;
++}
++
++/*
++ * To use a 32-bit adder to sum two 16-bit numbers:
++ * 1) Mask out the 16th bit in both operands to cause no carry.
++ * 2) Add the numbers.
++ * 3) Put back the 16th bit sum: T0[15] ^ T1[15] ^ CARRY[14]
++ *    (ignoring the possible carry generated)
++ * T0 and T1 values will change. Use temporary ones.
++ */
++static void gen_add16(TCGv_i32 dest, TCGv_i32 t0, TCGv_i32 t1)
++{
++    TCGv_i32 tmp = tcg_temp_new_i32();
++    tcg_gen_xor_i32(tmp, t0, t1);
++    tcg_gen_andi_i32(tmp, tmp, 0x8000);
++    tcg_gen_andi_i32(t0, t0, ~0x8000);
++    tcg_gen_andi_i32(t1, t1, ~0x8000);
++    tcg_gen_add_i32(t0, t0, t1);
++    tcg_gen_xor_i32(dest, t0, tmp);
++    tcg_temp_free_i32(tmp);
++}
++
++/*
++ * To use a 32-bit subtracter to subtract two 16-bit numbers:
++ * 0) Record how T0[15]-T1[15] would result without other bits.
++ * 1) Make the 16th bit for the first operand 1 and the second
++ *    operand 0. This combination of (1 - 0) will absorb any
++ *    possible borrow that may come from the 15th bit.
++ * 2) Subtract the numbers.
++ * 3) Correct the 16th bit result (1 - 0 - B):
++ *    If the 16th bit is 1 --> no borrow was asked.
++ *    If the 16th bit is 0 --> a  borrow was asked.
++ *    and if a borrow was asked, the result of step 0 must be
++ *    inverted (0 -> 1 and 1 -> 0). If not, the result of step
++ *    0 can be used readily:
++ *     STEP2[15] | T0[15]-T1[15] | DEST[15]
++ *     ----------+---------------+---------
++ *         0     |       0       |    1
++ *         0     |       1       |    0
++ *         1     |       0       |    0
++ *         1     |       1       |    1
++ *    This is a truth table for XNOR(a,b):
++ *      NOT(XOR(a,b))=XOR(XOR(a,b),1)
++ * This approach might seem pedantic, but it generates one less
++ * instruction than the obvious mask-and-sub approach and requires
++ * two less TCG variables.
++ * T0 and T1 values will change. Use temporary ones.
++ */
++static void gen_sub16(TCGv_i32 dest, TCGv_i32 t0, TCGv_i32 t1)
++{
++    TCGv_i32 tmp = tcg_temp_new_i32();
++    tcg_gen_xor_i32(tmp, t0, t1);          /* step 0 */
++    tcg_gen_andi_i32(tmp, tmp, 0x8000);    /* step 0 */
++    tcg_gen_ori_i32(t0, t0, 0x8000);       /* step 1 */
++    tcg_gen_andi_i32(t1, t1, ~0x8000);     /* step 1 */
++    tcg_gen_sub_i32(t0, t0, t1);           /* step 2 */
++    tcg_gen_xor_i32(dest, t0, tmp);        /* step 3 */
++    tcg_gen_xori_i32(dest, dest, 0x8000);  /* step 3 */
++    tcg_temp_free_i32(tmp);
++}
++
++void
++arc_gen_vadd2(const DisasCtxt *ctx, TCGv dest, TCGv_i32 b, TCGv_i32 c)
++{
++    CC_PROLOGUE;
++    gen_vec_op2(ctx, tcg_gen_vec_add32_i64, dest, b, c);
++    CC_EPILOGUE;
++}
++
++void
++arc_gen_vadd2h(const DisasCtxt *ctx, TCGv dest, TCGv_i32 b, TCGv_i32 c)
++{
++    CC_PROLOGUE;
++    gen_vec_op2h(ctx, gen_add16, dest, b, c);
++    CC_EPILOGUE;
++}
++
++void
++arc_gen_vadd4h(const DisasCtxt *ctx, TCGv dest, TCGv_i32 b, TCGv_i32 c)
++{
++    CC_PROLOGUE;
++    gen_vec_op4h(ctx, tcg_gen_vec_add16_i64, dest, b, c);
++    CC_EPILOGUE;
++}
++
++void
++arc_gen_vsub2(const DisasCtxt *ctx, TCGv dest, TCGv_i32 b, TCGv_i32 c)
++{
++    CC_PROLOGUE;
++    gen_vec_op2(ctx, tcg_gen_vec_sub32_i64, dest, b, c);
++    CC_EPILOGUE;
++}
++
++void
++arc_gen_vsub2h(const DisasCtxt *ctx, TCGv dest, TCGv_i32 b, TCGv_i32 c)
++{
++    CC_PROLOGUE;
++    gen_vec_op2h(ctx, gen_sub16, dest, b, c);
++    CC_EPILOGUE;
++}
++
++void
++arc_gen_vsub4h(const DisasCtxt *ctx, TCGv dest, TCGv_i32 b, TCGv_i32 c)
++{
++    CC_PROLOGUE;
++    gen_vec_op4h(ctx, tcg_gen_vec_sub16_i64, dest, b, c);
++    CC_EPILOGUE;
++}
++
++
++/* Given a CTX, generate the relevant TCG code for the given opcode. */
++static int arc_decode(DisasContext *ctx, const struct arc_opcode *opcode)
++{
++    int ret = DISAS_NEXT;
++    enum arc_opcode_map mapping;
++    static bool initialized = false;
++
++    if (initialized == false) {
++        init_constants();
++        initialized = true;
++    }
++
++    /* Do the mapping. */
++    mapping = arc_map_opcode(opcode);
++    if (mapping != MAP_NONE) {
++        TCGv ops[10];
++        int i;
++        for (i = 0; i < number_of_ops_semfunc[mapping]; i++) {
++            ops[i] = arc_decode_operand(opcode, ctx, i, mapping);
++        }
++
++        /*
++         * Store some elements statically to implement less dynamic
++         * features of instructions.  Started by the need to keep a
++         * static reference to LP_START and LP_END.
++         */
++
++#define SEMANTIC_FUNCTION_CALL_0(NAME, A)       \
++            arc_gen_##NAME(ctx);
++#define SEMANTIC_FUNCTION_CALL_1(NAME, A)       \
++            arc_gen_##NAME(ctx, ops[A]);
++#define SEMANTIC_FUNCTION_CALL_2(NAME, A, B)            \
++            arc_gen_##NAME(ctx, ops[A], ops[B]);
++#define SEMANTIC_FUNCTION_CALL_3(NAME, A, B, C)                 \
++            arc_gen_##NAME(ctx, ops[A], ops[B], ops[C]);
++#define SEMANTIC_FUNCTION_CALL_4(NAME, A, B, C, D)                      \
++            arc_gen_##NAME(ctx, ops[A], ops[B], ops[C], ops[D]);
++
++#define SEMANTIC_FUNCTION(...)
++#define CONSTANT(...)
++#define MAPPING(MNEMONIC, NAME, NOPS, ...)                              \
++            case MAP_##MNEMONIC##_##NAME:                               \
++                ret = SEMANTIC_FUNCTION_CALL_##NOPS(NAME, __VA_ARGS__); \
++                break;
++        switch (mapping) {
++#include "target/arc/semfunc_mapping.def"
++
++        case MAP_swi_SWI:
++        case MAP_swi_s_SWI:
++            arc_gen_excp(ctx, EXCP_SWI, 0, ctx->insn.operands[0].value);
++            ret = DISAS_NEXT;
++            break;
++
++        case MAP_trap_s_TRAP:
++            gen_trap(ctx, ctx->insn.operands[0].value);
++            ret = DISAS_NORETURN;
++            break;
++
++        case MAP_rtie_RTIE:
++            gen_rtie(ctx);
++            ret = DISAS_NORETURN;
++            break;
++
++        case MAP_sleep_SLEEP:
++            gen_sleep(ctx, ops[0]);
++            ret = DISAS_NEXT;
++            break;
++
++        case MAP_vadd2_VADD:
++            if (verify_all_regs_are_even(ctx)) {
++                arc_gen_vadd2(ctx, ops[0], ops[1], ops[2]);
++            }
++            ret = DISAS_NEXT;
++            break;
++        case MAP_vadd2h_VADD:
++            arc_gen_vadd2h(ctx, ops[0], ops[1], ops[2]);
++            ret = DISAS_NEXT;
++            break;
++        case MAP_vadd4h_VADD:
++            if (verify_all_regs_are_even(ctx)) {
++                arc_gen_vadd4h(ctx, ops[0], ops[1], ops[2]);
++            }
++            ret = DISAS_NEXT;
++            break;
++
++        case MAP_vsub2_VSUB:
++            if (verify_all_regs_are_even(ctx)) {
++                arc_gen_vsub2(ctx, ops[0], ops[1], ops[2]);
++            }
++            ret = DISAS_NEXT;
++            break;
++        case MAP_vsub2h_VSUB:
++            arc_gen_vsub2h(ctx, ops[0], ops[1], ops[2]);
++            ret = DISAS_NEXT;
++            break;
++        case MAP_vsub4h_VSUB:
++            if (verify_all_regs_are_even(ctx)) {
++                arc_gen_vsub4h(ctx, ops[0], ops[1], ops[2]);
++            }
++            ret = DISAS_NEXT;
++            break;
++
++        case MAP_mpyd_MPYD:
++            if (verify_dest_reg_is_even(ctx)) {
++                arc_gen_mpyd(ctx, ops[0], ops[1], ops[2]);
++            }
++            ret = DISAS_NEXT;
++            break;
++        case MAP_mpydu_MPYD:
++            if (verify_dest_reg_is_even(ctx)) {
++                arc_gen_mpydu(ctx, ops[0], ops[1], ops[2]);
++            }
++            ret = DISAS_NEXT;
++            break;
++
++        default:
++            arc_debug_opcode(opcode, ctx, "No handle for map opcode");
++            g_assert(!"Semantic not handled: Use -d unimp to list it.");
++        }
++#undef MAPPING
++#undef CONSTANT
++#undef SEMANTIC_FUNCTION
++#undef SEMANTIC_FUNCTION_CALL_0
++#undef SEMANTIC_FUNCTION_CALL_1
++#undef SEMANTIC_FUNCTION_CALL_2
++#undef SEMANTIC_FUNCTION_CALL_3
++
++        for (i = 0; i < number_of_ops_semfunc[mapping]; i++) {
++            operand_t operand = ctx->insn.operands[i];
++            if (!(operand.type & ARC_OPERAND_LIMM) &&
++                !(operand.type & ARC_OPERAND_IR)) {
++                tcg_temp_free_i32(ops[i]);
++            }
++        }
++
++    } else {
++        arc_debug_opcode(opcode, ctx, "No mapping for opcode");
++        g_assert(!"Semantic not found: Use -d unimp to list it.");
++    }
++
++    return ret;
++}
++
++void decode_opc(CPUARCState *env, DisasContext *ctx)
++{
++    ctx->env = env;
++
++    enabled_interrupts = false;
++
++    const struct arc_opcode *opcode = NULL;
++    if (!read_and_decode_context(ctx, &opcode)) {
++        ctx->base.is_jmp = arc_gen_INVALID(ctx);
++        return;
++    }
++
++    ctx->base.is_jmp = arc_decode(ctx, opcode);
++
++    TCGv npc = tcg_const_local_i32(ctx->npc);
++    gen_helper_zol_verify(cpu_env, npc);
++    tcg_temp_free(npc);
++
++    enabled_interrupts = true;
++}
++
++static void arc_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
++{
++    bool in_a_delayslot_instruction = false;
++    DisasContext *dc = container_of(dcbase, DisasContext, base);
++    CPUARCState *env = cpu->env_ptr;
++
++    /* TODO (issue #62): these must be removed */
++    dc->zero = tcg_const_local_i32(0);
++    dc->one  = tcg_const_local_i32(1);
++
++    if (env->stat.is_delay_slot_instruction == 1) {
++        in_a_delayslot_instruction = true;
++    }
++
++    dc->cpc = dc->base.pc_next;
++    decode_opc(env, dc);
++
++    dc->base.pc_next = dc->npc;
++    tcg_gen_movi_tl(cpu_npc, dc->npc);
++
++    if (in_a_delayslot_instruction == true) {
++        dc->base.is_jmp = DISAS_NORETURN;
++
++        /* Post execution delayslot logic. */
++        TCGLabel *DEf_not_set_label1 = gen_new_label();
++        tcg_gen_brcondi_i32(TCG_COND_NE, cpu_DEf, 1, DEf_not_set_label1);
++        tcg_gen_movi_tl(cpu_DEf, 0);
++        gen_goto_tb(dc, 1, cpu_bta);
++        gen_set_label(DEf_not_set_label1);
++        env->stat.is_delay_slot_instruction = 0;
++    }
++
++    if (dc->base.is_jmp == DISAS_NORETURN) {
++        gen_gotoi_tb(dc, 0, dc->npc);
++    } else if (dc->base.is_jmp == DISAS_NEXT) {
++        target_ulong page_start;
++
++        page_start = dc->base.pc_first & TARGET_PAGE_MASK;
++        if (dc->base.pc_next - page_start >= TARGET_PAGE_SIZE) {
++            dc->base.is_jmp = DISAS_TOO_MANY;
++        }
++    }
++
++    /* TODO (issue #62): these must be removed. */
++    tcg_temp_free_i32(dc->zero);
++    tcg_temp_free_i32(dc->one);
++
++    /* verify if there is any TCG temporaries leakge */
++    translator_loop_temp_check(dcbase);
++}
++
++static void arc_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
++{
++    DisasContext *dc = container_of(dcbase, DisasContext, base);
++
++    switch (dc->base.is_jmp) {
++    case DISAS_TOO_MANY:
++    case DISAS_UPDATE:
++        gen_gotoi_tb(dc, 0, dc->base.pc_next);
++        break;
++    case DISAS_BRANCH_IN_DELAYSLOT:
++    case DISAS_NORETURN:
++        break;
++    default:
++         g_assert_not_reached();
++    }
++
++    if (dc->base.num_insns == dc->base.max_insns &&
++        (dc->base.tb->cflags & CF_LAST_IO)) {
++        gen_io_end();
++    }
++}
++
++static void arc_tr_disas_log(const DisasContextBase *dcbase, CPUState *cpu)
++{
++    DisasContext *dc = container_of(dcbase, DisasContext, base);
++
++    qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
++    log_target_disas(cpu, dc->base.pc_first, dc->base.tb->size);
++}
++
++
++static const TranslatorOps arc_translator_ops = {
++    .init_disas_context = arc_tr_init_disas_context,
++    .tb_start           = arc_tr_tb_start,
++    .insn_start         = arc_tr_insn_start,
++    .breakpoint_check   = arc_tr_breakpoint_check,
++    .translate_insn     = arc_tr_translate_insn,
++    .tb_stop            = arc_tr_tb_stop,
++    .disas_log          = arc_tr_disas_log,
++};
++
++/* generate intermediate code for basic block 'tb'. */
++void gen_intermediate_code(CPUState *cpu,
++                           TranslationBlock *tb,
++                           int max_insns)
++{
++    DisasContext dc;
++    const TranslatorOps *ops = &arc_translator_ops;
++    translator_loop(ops, &dc.base, cpu, tb, max_insns);
++}
++
++void restore_state_to_opc(CPUARCState *env,
++                          TranslationBlock *tb,
++                          target_ulong *data)
++{
++    env->pc = data[0];
++}
++
++void arc_cpu_dump_state(CPUState *cs, FILE *f, int flags)
++{
++    ARCCPU *cpu = ARC_CPU(cs);
++    CPUARCState *env = &cpu->env;
++    int i;
++
++    qemu_fprintf(f, "STATUS:  [ %c %c %c %c %c %c %s %s %s %s %s %s %c]\n",
++                        env->stat.Lf ? 'L' : '-',
++                        env->stat.Zf ? 'Z' : '-',
++                        env->stat.Nf ? 'N' : '-',
++                        env->stat.Cf ? 'C' : '-',
++                        env->stat.Vf ? 'V' : '-',
++                        env->stat.Uf ? 'U' : '-',
++                        env->stat.DEf ? "DE" : "--",
++                        env->stat.AEf ? "AE" : "--",
++                        env->stat.Ef ? "E" : "--",
++                        env->stat.DZf ? "DZ" : "--",
++                        env->stat.SCf ? "SC" : "--",
++                        env->stat.IEf ? "IE" : "--",
++                        env->stat.Hf ? 'H' : '-'
++                        );
++
++    qemu_fprintf(f, "\n");
++    for (i = 0; i < ARRAY_SIZE(env->r); i++) {
++        qemu_fprintf(f, "R[%02d]:  %02x   ", i, env->r[i]);
++
++        if ((i % 8) == 7) {
++            qemu_fprintf(f, "\n");
++        }
++    }
++}
++
 +
 +/*-*-indent-tabs-mode:nil;tab-width:4;indent-line-function:'insert-tab'-*-*/
 +/* vim: set ts=4 sw=4 et: */
-diff --git a/target/arc/decoder.h b/target/arc/decoder.h
+diff --git a/target/arc/translate.h b/target/arc/translate.h
 new file mode 100644
-index 0000000000..62fb1a57a1
+index 0000000000..8237b45692
 --- /dev/null
-+++ b/target/arc/decoder.h
-@@ -0,0 +1,350 @@
++++ b/target/arc/translate.h
+@@ -0,0 +1,202 @@
 +/*
-+ * Decoder for the ARC.
-+ * Copyright 2020 Free Software Foundation, Inc.
++ *  QEMU ARC CPU
 + *
-+ * QEMU ARCv2 Decoder.
++ *  Copyright (c) 2016 Michael Rolnik
 + *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; either version 2, or (at your option) any later
-+ * version.
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
 + *
-+ * This program is distributed in the hope that it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
-+ * more details.
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
 + *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, see
++ *  <http://www.gnu.org/licenses/lgpl-2.1.html>
 + */
 +
-+#ifndef ARC_DECODER_H
-+#define ARC_DECODER_H
++#ifndef ARC_TRANSLATE_H_
++#define ARC_TRANSLATE_H_
++
 +
 +#include "qemu/osdep.h"
 +#include "arc-common.h"
 +
-+#ifndef MAX_INSN_ARGS
-+#define MAX_INSN_ARGS     16
++#include "tcg/tcg.h"
++#include "cpu.h"
++#include "exec/exec-all.h"
++#include "disas/disas.h"
++#include "tcg/tcg-op.h"
++#include "exec/cpu_ldst.h"
++
++#include "exec/helper-proto.h"
++#include "exec/helper-gen.h"
++#include "exec/log.h"
++
++#include "exec/translator.h"
++
++/* signaling the end of translation block */
++#define DISAS_UPDATE        DISAS_TARGET_0
++#define DISAS_BRANCH_IN_DELAYSLOT DISAS_TARGET_1
++
++typedef struct DisasContext {
++    DisasContextBase base;
++
++    uint32_t cpc;   /*  current pc      */
++    uint32_t npc;   /*  next pc         */
++    uint32_t dpc;   /*  next next pc    */
++    uint32_t pcl;
++    uint32_t lpe;
++    uint32_t lps;
++
++    unsigned ds;    /*  we are within ds*/
++
++    /* TODO (issue #62): these must be removed */
++    TCGv     zero;  /*  0x00000000      */
++    TCGv     one;   /*  0x00000001      */
++
++    insn_t insn;
++
++    CPUARCState *env;
++
++    uint16_t buffer[2];
++    uint8_t  mem_idx;
++
++} DisasContext;
++
++
++extern TCGv     cpu_gp;
++extern TCGv     cpu_fp;
++extern TCGv     cpu_sp;
++extern TCGv     cpu_ilink1;
++extern TCGv     cpu_ilink2;
++extern TCGv     cpu_blink;
++extern TCGv     cpu_acclo;
++extern TCGv     cpu_acchi;
++extern TCGv     cpu_pcl;
++extern TCGv     cpu_limm;
++
++extern TCGv     cpu_S1f;
++extern TCGv     cpu_S2f;
++extern TCGv     cpu_CSf;
++
++extern TCGv     cpu_Lf;
++extern TCGv     cpu_Zf;
++extern TCGv     cpu_Nf;
++extern TCGv     cpu_Cf;
++extern TCGv     cpu_Vf;
++extern TCGv     cpu_Uf;
++
++extern TCGv     cpu_DEf;
++extern TCGv     cpu_ESf;
++extern TCGv     cpu_AEf;
++extern TCGv     cpu_IEf;
++extern TCGv     cpu_Hf;
++extern TCGv     cpu_Ef;
++
++extern TCGv    cpu_is_delay_slot_instruction;
++
++extern TCGv     cpu_l1_Lf;
++extern TCGv     cpu_l1_Zf;
++extern TCGv     cpu_l1_Nf;
++extern TCGv     cpu_l1_Cf;
++extern TCGv     cpu_l1_Vf;
++extern TCGv     cpu_l1_Uf;
++
++extern TCGv     cpu_l1_DEf;
++extern TCGv     cpu_l1_AEf;
++extern TCGv     cpu_l1_Hf;
++
++extern TCGv     cpu_l2_Lf;
++extern TCGv     cpu_l2_Zf;
++extern TCGv     cpu_l2_Nf;
++extern TCGv     cpu_l2_Cf;
++extern TCGv     cpu_l2_Vf;
++extern TCGv     cpu_l2_Uf;
++
++extern TCGv     cpu_l2_DEf;
++extern TCGv     cpu_l2_AEf;
++extern TCGv     cpu_l2_Hf;
++
++extern TCGv     cpu_er_Lf;
++extern TCGv     cpu_er_Zf;
++extern TCGv     cpu_er_Nf;
++extern TCGv     cpu_er_Cf;
++extern TCGv     cpu_er_Vf;
++extern TCGv     cpu_er_Uf;
++
++extern TCGv     cpu_er_DEf;
++extern TCGv     cpu_er_AEf;
++extern TCGv     cpu_er_Hf;
++
++extern TCGv     cpu_eret;
++extern TCGv     cpu_erbta;
++extern TCGv     cpu_ecr;
++extern TCGv     cpu_efa;
++
++extern TCGv     cpu_pc;
++extern TCGv     cpu_lpc;
++extern TCGv     cpu_lps;
++extern TCGv     cpu_lpe;
++
++extern TCGv     cpu_npc;
++
++extern TCGv     cpu_bta;
++extern TCGv     cpu_bta_l1;
++extern TCGv     cpu_bta_l2;
++
++extern TCGv     cpu_r[64];
++
++extern TCGv     cpu_intvec;
++
++extern TCGv     cpu_debug_LD;
++extern TCGv     cpu_debug_SH;
++extern TCGv     cpu_debug_BH;
++extern TCGv     cpu_debug_UB;
++extern TCGv     cpu_debug_ZZ;
++extern TCGv     cpu_debug_RA;
++extern TCGv     cpu_debug_IS;
++extern TCGv     cpu_debug_FH;
++extern TCGv     cpu_debug_SS;
++
++extern TCGv     cpu_lock_lf_var;
++
++extern TCGv     cpu_exception_delay_slot_address;
++
++/* TODO: Remove DisasCtxt.  */
++typedef struct DisasContext DisasCtxt;
++
++void gen_goto_tb(DisasContext *ctx, int n, TCGv dest);
++
++void decode_opc(CPUARCState *env, DisasContext *ctx);
++
++/*
++ * Helper function to glue "rasing an exception" in the generated TCGs.
++ *
++ * ctx:         Disassembling context
++ * index:       ECR's index field
++ * causecode:   ECR's cause code filed
++ * param:       ECR's parameter field
++ */
++void arc_gen_excp(const DisasCtxt *ctx, uint32_t index,
++                  uint32_t causecode, uint32_t param);
++
++void arc_gen_vadd2(const DisasCtxt *ctx, TCGv dest, TCGv_i32 b, TCGv_i32 c);
++void arc_gen_vadd2h(const DisasCtxt *ctx, TCGv dest, TCGv_i32 b, TCGv_i32 c);
++void arc_gen_vadd4h(const DisasCtxt *ctx, TCGv dest, TCGv_i32 b, TCGv_i32 c);
++
++void arc_gen_vsub2(const DisasCtxt *ctx, TCGv dest, TCGv_i32 b, TCGv_i32 c);
++void arc_gen_vsub2h(const DisasCtxt *ctx, TCGv dest, TCGv_i32 b, TCGv_i32 c);
++void arc_gen_vsub4h(const DisasCtxt *ctx, TCGv dest, TCGv_i32 b, TCGv_i32 c);
++
++void arc_gen_mpyd(const DisasCtxt *ctx, TCGv dest, TCGv_i32 b, TCGv_i32 c);
++void arc_gen_mpydu(const DisasCtxt *ctx, TCGv dest, TCGv_i32 b, TCGv_i32 c);
++
 +#endif
 +
-+#ifndef MAX_INSN_FLGS
-+#define MAX_INSN_FLGS     4
-+#endif
 +
-+/* Instruction Class. */
-+typedef enum {
-+    NADA = 0,
-+    ARC_ACL,
-+    ARITH,
-+    AUXREG,
-+    BBIT0,
-+    BBIT1,
-+    BI,
-+    BIH,
-+    BITOP,
-+    BITSTREAM,
-+    BMU,
-+    BRANCH,
-+    BRCC,
-+    CONTROL,
-+    DIVREM,
-+    DPI,
-+    DSP,
-+    EI,
-+    ENTER,
-+    ARC_FLOAT,
-+    INVALID,
-+    JLI,
-+    JUMP,
-+    KERNEL,
-+    LEAVE,
-+    LOAD,
-+    LOGICAL,
-+    LOOP,
-+    MEMORY,
-+    MOVE,
-+    MPY,
-+    NET,
-+    PROTOCOL_DECODE,
-+    PMU,
-+    POP,
-+    PUSH,
-+    SJLI,
-+    STORE,
-+    SUB,
-+    XY
-+} insn_class_t;
-+
-+/* Instruction Subclass. */
-+typedef enum {
-+    NONE     = 0,
-+    CVT      = (1U << 1),
-+    BTSCN    = (1U << 2),
-+    CD       = (1U << 3),
-+    CD1      = CD,
-+    CD2      = CD,
-+    COND     = (1U << 4),
-+    DIV      = (1U << 5),
-+    DP       = (1U << 6),
-+    DPA      = (1U << 7),
-+    DPX      = (1U << 8),
-+    MPY1E    = (1U << 9),
-+    MPY6E    = (1U << 10),
-+    MPY7E    = (1U << 11),
-+    MPY8E    = (1U << 12),
-+    MPY9E    = (1U << 13),
-+    QUARKSE1 = (1U << 15),
-+    QUARKSE2 = (1U << 16),
-+    SHFT1    = (1U << 17),
-+    SHFT2    = (1U << 18),
-+    SWAP     = (1U << 19),
-+    SP       = (1U << 20),
-+    SPX      = (1U << 21)
-+} insn_subclass_t;
-+
-+/* Flags class. */
-+typedef enum {
-+    F_CLASS_NONE = 0,
-+
-+    /*
-+     * At most one flag from the set of flags can appear in the
-+     * instruction.
-+     */
-+    F_CLASS_OPTIONAL = (1 << 0),
-+
-+    /*
-+     * Exactly one from from the set of flags must appear in the
-+     * instruction.
-+     */
-+    F_CLASS_REQUIRED = (1 << 1),
-+
-+    /*
-+     * The conditional code can be extended over the standard variants
-+     * via .extCondCode pseudo-op.
-+     */
-+    F_CLASS_EXTEND = (1 << 2),
-+
-+    /* Condition code flag. */
-+    F_CLASS_COND = (1 << 3),
-+
-+    /* Write back mode. */
-+    F_CLASS_WB = (1 << 4),
-+
-+    /* Data size. */
-+    F_CLASS_ZZ = (1 << 5),
-+
-+    /* Implicit flag. */
-+    F_CLASS_IMPLICIT = (1 << 6),
-+
-+    F_CLASS_F = (1 << 7),
-+
-+    F_CLASS_DI = (1 << 8),
-+
-+    F_CLASS_X = (1 << 9),
-+    F_CLASS_D = (1 << 10),
-+
-+} flag_class_t;
-+
-+/* The opcode table is an array of struct arc_opcode. */
-+struct arc_opcode {
-+    /* The opcode name. */
-+    const char *name;
-+
-+    /*
-+     * The opcode itself. Those bits which will be filled in with
-+     * operands are zeroes.
-+     */
-+    unsigned long long opcode;
-+
-+    /*
-+     * The opcode mask. This is used by the disassembler. This is a
-+     * mask containing ones indicating those bits which must match the
-+     * opcode field, and zeroes indicating those bits which need not
-+     * match (and are presumably filled in by operands).
-+     */
-+    unsigned long long mask;
-+
-+    /*
-+     * One bit flags for the opcode. These are primarily used to
-+     * indicate specific processors and environments support the
-+     * instructions. The defined values are listed below.
-+     */
-+    unsigned cpu;
-+
-+    /* The instruction class. */
-+    insn_class_t insn_class;
-+
-+    /* The instruction subclass. */
-+    insn_subclass_t subclass;
-+
-+    /*
-+     * An array of operand codes. Each code is an index into the
-+     * operand table. They appear in the order which the operands must
-+     * appear in assembly code, and are terminated by a zero.
-+     */
-+    unsigned char operands[MAX_INSN_ARGS + 1];
-+
-+    /*
-+     * An array of flag codes. Each code is an index into the flag
-+     * table. They appear in the order which the flags must appear in
-+     * assembly code, and are terminated by a zero.
-+     */
-+    unsigned char flags[MAX_INSN_FLGS + 1];
-+};
-+
-+/* The operands table is an array of struct arc_operand. */
-+struct arc_operand {
-+    /* The number of bits in the operand. */
-+    unsigned int bits;
-+
-+    /* How far the operand is left shifted in the instruction. */
-+    unsigned int shift;
-+
-+    /* One bit syntax flags. */
-+    unsigned int flags;
-+
-+    /*
-+     * Extraction function. This is used by the disassembler. To
-+     * extract this operand type from an instruction, check this
-+     * field.
-+     *
-+     * If it is NULL, compute
-+     * op = ((i) >> o->shift) & ((1 << o->bits) - 1);
-+     * if ((o->flags & ARC_OPERAND_SIGNED) != 0
-+     * && (op & (1 << (o->bits - 1))) != 0)
-+     * op -= 1 << o->bits;
-+     * (i is the instruction, o is a pointer to this structure, and op
-+     * is the result; this assumes twos complement arithmetic).
-+     *
-+     * If this field is not NULL, then simply call it with the
-+     * instruction value. It will return the value of the operand.
-+     * If the INVALID argument is not NULL, *INVALID will be set to
-+     * TRUE if this operand type can not actually be extracted from
-+     * this operand (i.e., the instruction does not match). If the
-+     * operand is valid, *INVALID will not be changed.
-+     */
-+    long long int (*extract) (unsigned long long instruction,
-+                              bool *invalid);
-+};
-+
-+extern const struct arc_operand arc_operands[];
-+
-+/* Values defined for the flags field of a struct arc_operand. */
-+
-+/*
-+ * This operand does not actually exist in the assembler input. This
-+ * is used to support extended mnemonics, for which two operands
-+ * fields are identical. The assembler should call the insert
-+ * function with any op value. The disassembler should call the
-+ * extract function, ignore the return value, and check the value
-+ * placed in the invalid argument.
-+ */
-+#define ARC_OPERAND_FAKE        0x0001
-+
-+/* This operand names an integer register. */
-+#define ARC_OPERAND_IR          0x0002
-+
-+/* This operand takes signed values. */
-+#define ARC_OPERAND_SIGNED      0x0004
-+
-+/*
-+ * This operand takes unsigned values. This exists primarily so that
-+ * a flags value of 0 can be treated as end-of-arguments.
-+ */
-+#define ARC_OPERAND_UNSIGNED    0x0008
-+
-+/* This operand takes short immediate values. */
-+#define ARC_OPERAND_SHIMM   (ARC_OPERAND_SIGNED | ARC_OPERAND_UNSIGNED)
-+
-+/* This operand takes long immediate values. */
-+#define ARC_OPERAND_LIMM        0x0010
-+
-+/* This operand is identical like the previous one. */
-+#define ARC_OPERAND_DUPLICATE   0x0020
-+
-+/* This operand is PC relative. Used for internal relocs. */
-+#define ARC_OPERAND_PCREL       0x0040
-+
-+/*
-+ * This operand is truncated. The truncation is done accordingly to
-+ * operand alignment attribute.
-+ */
-+#define ARC_OPERAND_TRUNCATE    0x0080
-+
-+/* This operand is 16bit aligned. */
-+#define ARC_OPERAND_ALIGNED16   0x0100
-+
-+/* This operand is 32bit aligned. */
-+#define ARC_OPERAND_ALIGNED32   0x0200
-+
-+/*
-+ * This operand can be ignored by matching process if it is not
-+ * present.
-+ */
-+#define ARC_OPERAND_IGNORE      0x0400
-+
-+/* Don't check the range when matching. */
-+#define ARC_OPERAND_NCHK        0x0800
-+
-+/* Mark the braket possition. */
-+#define ARC_OPERAND_BRAKET      0x1000
-+
-+/* Mask for selecting the type for typecheck purposes. */
-+#define ARC_OPERAND_TYPECHECK_MASK               \
-+    (ARC_OPERAND_IR                              \
-+     | ARC_OPERAND_LIMM     | ARC_OPERAND_SIGNED \
-+     | ARC_OPERAND_UNSIGNED | ARC_OPERAND_BRAKET)
-+
-+/* Macro to determine if an operand is a fake operand. */
-+#define ARC_OPERAND_IS_FAKE(op)                     \
-+    ((operand->flags & ARC_OPERAND_FAKE)            \
-+     && !(operand->flags & ARC_OPERAND_BRAKET))
-+
-+/* The flags structure. */
-+struct arc_flag_operand {
-+    /* The flag name. */
-+    const char *name;
-+
-+    /* The flag code. */
-+    unsigned code;
-+
-+    /* The number of bits in the operand. */
-+    unsigned int bits;
-+
-+    /* How far the operand is left shifted in the instruction. */
-+    unsigned int shift;
-+
-+    /* Available for disassembler. */
-+    unsigned char favail;
-+};
-+
-+extern const struct arc_flag_operand arc_flag_operands[];
-+
-+/* The flag's class structure. */
-+struct arc_flag_class {
-+    /* Flag class. */
-+    flag_class_t flag_class;
-+
-+    /* List of valid flags (codes). */
-+    unsigned flags[256];
-+};
-+
-+extern const struct arc_flag_class arc_flag_classes[];
-+
-+/* Structure for special cases. */
-+struct arc_flag_special {
-+    /* Name of special case instruction. */
-+    const char *name;
-+
-+    /* List of flags applicable for special case instruction. */
-+    unsigned flags[32];
-+};
-+
-+extern const struct arc_flag_special arc_flag_special_cases[];
-+extern const unsigned arc_num_flag_special;
-+
-+const struct arc_opcode *arc_find_format(insn_t*, uint64_t, uint8_t, uint32_t);
-+unsigned int arc_insn_length(uint16_t, uint16_t);
-+
-+#endif
-diff --git a/target/arc/flags.def b/target/arc/flags.def
-new file mode 100644
-index 0000000000..b6c3898698
---- /dev/null
-+++ b/target/arc/flags.def
-@@ -0,0 +1,85 @@
-+/*
-+ * QEMU ARC operands
-+ *
-+ * Copyright (c) 2020 Synopsys, Inc.
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+ARC_FLAG(ALWAYS, "al", 0, 0, 0, 0)
-+ARC_FLAG(RA, "ra", 0, 0, 0, 0)
-+ARC_FLAG(EQUAL, "eq", 1, 5, 0, 1)
-+ARC_FLAG(ZERO, "z", 1, 5, 0, 0)
-+ARC_FLAG(NOTEQUAL, "ne", 2, 5, 0, 1)
-+ARC_FLAG(NOTZERO, "nz", 2, 5, 0, 0)
-+ARC_FLAG(POZITIVE, "p", 3, 5, 0, 1)
-+ARC_FLAG(PL, "pl", 3, 5, 0, 0)
-+ARC_FLAG(NEGATIVE, "n", 4, 5, 0, 1)
-+ARC_FLAG(MINUS, "mi", 4, 5, 0, 0)
-+ARC_FLAG(CARRY, "c", 5, 5, 0, 1)
-+ARC_FLAG(CARRYSET, "cs", 5, 5, 0, 0)
-+ARC_FLAG(LOWER, "lo", 5, 5, 0, 0)
-+ARC_FLAG(CARRYCLR, "cc", 6, 5, 0, 0)
-+ARC_FLAG(NOTCARRY, "nc", 6, 5, 0, 1)
-+ARC_FLAG(HIGHER, "hs", 6, 5, 0, 0)
-+ARC_FLAG(OVERFLOWSET, "vs", 7, 5, 0, 0)
-+ARC_FLAG(OVERFLOW, "v", 7, 5, 0, 1)
-+ARC_FLAG(NOTOVERFLOW, "nv", 8, 5, 0, 1)
-+ARC_FLAG(OVERFLOWCLR, "vc", 8, 5, 0, 0)
-+ARC_FLAG(GT, "gt", 9, 5, 0, 1)
-+ARC_FLAG(GE, "ge", 10, 5, 0, 1)
-+ARC_FLAG(LT, "lt", 11, 5, 0, 1)
-+ARC_FLAG(LE, "le", 12, 5, 0, 1)
-+ARC_FLAG(HI, "hi", 13, 5, 0, 1)
-+ARC_FLAG(LS, "ls", 14, 5, 0, 1)
-+ARC_FLAG(PNZ, "pnz", 15, 5, 0, 1)
-+ARC_FLAG(FLAG, "f", 1, 1, 15, 1)
-+ARC_FLAG(FFAKE, "f", 0, 0, 0, 1)
-+ARC_FLAG(ND, "nd", 0, 1, 5, 0)
-+ARC_FLAG(D, "d", 1, 1, 5, 1)
-+ARC_FLAG(DFAKE, "d", 0, 0, 0, 1)
-+ARC_FLAG(DNZ_ND, "nd", 0, 1, 16, 0)
-+ARC_FLAG(DNZ_D, "d", 1, 1, 16, 1)
-+ARC_FLAG(SIZEB1, "b", 1, 2, 1, 1)
-+ARC_FLAG(SIZEB7, "b", 1, 2, 7, 1)
-+ARC_FLAG(SIZEB17, "b", 1, 2, 17, 1)
-+ARC_FLAG(SIZEW1, "w", 2, 2, 1, 0)
-+ARC_FLAG(SIZEW7, "w", 2, 2, 7, 0)
-+ARC_FLAG(SIZEW17, "w", 2, 2, 17, 0)
-+ARC_FLAG(SIGN6, "x", 1, 1, 6, 1)
-+ARC_FLAG(SIGN16, "x", 1, 1, 16, 1)
-+ARC_FLAG(SIGNX, "x", 0, 0, 0, 1)
-+ARC_FLAG(A3, "a", 1, 2, 3, 0)
-+ARC_FLAG(A9, "a", 1, 2, 9, 0)
-+ARC_FLAG(A22, "a", 1, 2, 22, 0)
-+ARC_FLAG(AW3, "aw", 1, 2, 3, 1)
-+ARC_FLAG(AW9, "aw", 1, 2, 9, 1)
-+ARC_FLAG(AW22, "aw", 1, 2, 22, 1)
-+ARC_FLAG(AB3, "ab", 2, 2, 3, 1)
-+ARC_FLAG(AB9, "ab", 2, 2, 9, 1)
-+ARC_FLAG(AB22, "ab", 2, 2, 22, 1)
-+ARC_FLAG(AS3, "as", 3, 2, 3, 1)
-+ARC_FLAG(AS9, "as", 3, 2, 9, 1)
-+ARC_FLAG(AS22, "as", 3, 2, 22, 1)
-+ARC_FLAG(ASFAKE, "as", 3, 0, 0, 1)
-+ARC_FLAG(DI5, "di", 1, 1, 5, 1)
-+ARC_FLAG(DI11, "di", 1, 1, 11, 1)
-+ARC_FLAG(DI14, "di", 1, 1, 14, 1)
-+ARC_FLAG(DI15, "di", 1, 1, 15, 1)
-+ARC_FLAG(NT, "nt", 0, 1, 3, 1)
-+ARC_FLAG(T, "t", 1, 1, 3, 1)
-+ARC_FLAG(H1, "h", 2, 2, 1, 1)
-+ARC_FLAG(H7, "h", 2, 2, 7, 1)
-+ARC_FLAG(H17, "h", 2, 2, 17, 1)
-+ARC_FLAG(SIZED, "dd", 3, 0, 0, 0)
-+ARC_FLAG(NE, "ne", 0, 0, 0, 1)
-diff --git a/target/arc/operands.def b/target/arc/operands.def
-new file mode 100644
-index 0000000000..34b15e0ec2
---- /dev/null
-+++ b/target/arc/operands.def
-@@ -0,0 +1,123 @@
-+/*
-+ * QEMU ARC operands
-+ *
-+ * Copyright (c) 2020 Synopsys, Inc.
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+ARC_OPERAND(IGNORED, 0, 0, 0, ARC_OPERAND_IGNORE | ARC_OPERAND_UNSIGNED | ARC_OPERAND_NCHK, 0)
-+ARC_OPERAND(RA, 6, 0, 0, ARC_OPERAND_IR, 0)
-+ARC_OPERAND(RA_CHK, 6, 0, 0, ARC_OPERAND_IR, 0)
-+ARC_OPERAND(RB, 6, 12, 0, ARC_OPERAND_IR, extract_rb)
-+ARC_OPERAND(RB_CHK, 6, 12, 0, ARC_OPERAND_IR, extract_rb)
-+ARC_OPERAND(RC, 6, 6, 0, ARC_OPERAND_IR, 0)
-+ARC_OPERAND(RBdup, 6, 12, 0, ARC_OPERAND_IR | ARC_OPERAND_DUPLICATE, extract_rb)
-+ARC_OPERAND(RAD, 6, 0, 0, ARC_OPERAND_IR | ARC_OPERAND_TRUNCATE, 0)
-+ARC_OPERAND(RCD, 6, 6, 0, ARC_OPERAND_IR | ARC_OPERAND_TRUNCATE, 0)
-+ARC_OPERAND(RA16, 4, 0, 0, ARC_OPERAND_IR, extract_ras)
-+ARC_OPERAND(RA_S, 4, 0, 0, ARC_OPERAND_IR, extract_ras)
-+ARC_OPERAND(RB16, 4, 8, 0, ARC_OPERAND_IR, extract_rbs)
-+ARC_OPERAND(RB_S, 4, 8, 0, ARC_OPERAND_IR, extract_rbs)
-+ARC_OPERAND(RB16dup, 4, 8, 0, ARC_OPERAND_IR | ARC_OPERAND_DUPLICATE, extract_rbs)
-+ARC_OPERAND(RB_Sdup, 4, 8, 0, ARC_OPERAND_IR | ARC_OPERAND_DUPLICATE, extract_rbs)
-+ARC_OPERAND(RC16, 4, 5, 0, ARC_OPERAND_IR, extract_rcs)
-+ARC_OPERAND(RC_S, 4, 5, 0, ARC_OPERAND_IR, extract_rcs)
-+ARC_OPERAND(R6H, 6, 5, 0, ARC_OPERAND_IR, extract_rhv1)
-+ARC_OPERAND(R5H, 5, 5, 0, ARC_OPERAND_IR, extract_rhv2)
-+ARC_OPERAND(RH_S, 5, 5, 0, ARC_OPERAND_IR, extract_rhv2)
-+ARC_OPERAND(R5Hdup, 5, 5, 0, ARC_OPERAND_IR | ARC_OPERAND_DUPLICATE, extract_rhv2)
-+ARC_OPERAND(RH_Sdup, 5, 5, 0, ARC_OPERAND_IR | ARC_OPERAND_DUPLICATE, extract_rhv2)
-+ARC_OPERAND(RG, 5, 5, 0, ARC_OPERAND_IR, extract_g_s)
-+ARC_OPERAND(G_S, 5, 5, 0, ARC_OPERAND_IR, extract_g_s)
-+ARC_OPERAND(R0, 0, 0, 0, ARC_OPERAND_IR, extract_r0)
-+ARC_OPERAND(R0_S, 0, 0, 0, ARC_OPERAND_IR, extract_r0)
-+ARC_OPERAND(R1, 1, 0, 0, ARC_OPERAND_IR, extract_r1)
-+ARC_OPERAND(R1_S, 1, 0, 0, ARC_OPERAND_IR, extract_r1)
-+ARC_OPERAND(R2, 2, 0, 0, ARC_OPERAND_IR, extract_r2)
-+ARC_OPERAND(R2_S, 2, 0, 0, ARC_OPERAND_IR, extract_r2)
-+ARC_OPERAND(R3, 2, 0, 0, ARC_OPERAND_IR, extract_r3)
-+ARC_OPERAND(R3_S, 2, 0, 0, ARC_OPERAND_IR, extract_r3)
-+ARC_OPERAND(RSP, 5, 0, 0, ARC_OPERAND_IR, extract_sp)
-+ARC_OPERAND(SP_S, 5, 0, 0, ARC_OPERAND_IR, extract_sp)
-+ARC_OPERAND(SPdup, 5, 0, 0, ARC_OPERAND_IR | ARC_OPERAND_DUPLICATE, extract_sp)
-+ARC_OPERAND(SP_Sdup, 5, 0, 0, ARC_OPERAND_IR | ARC_OPERAND_DUPLICATE, extract_sp)
-+ARC_OPERAND(GP, 5, 0, 0, ARC_OPERAND_IR, extract_gp)
-+ARC_OPERAND(GP_S, 5, 0, 0, ARC_OPERAND_IR, extract_gp)
-+ARC_OPERAND(PCL_S, 1, 0, 0, ARC_OPERAND_IR | ARC_OPERAND_NCHK, extract_pcl)
-+ARC_OPERAND(BLINK, 5, 0, 0, ARC_OPERAND_IR, extract_blink)
-+ARC_OPERAND(BLINK_S, 5, 0, 0, ARC_OPERAND_IR, extract_blink)
-+ARC_OPERAND(ILINK1, 5, 0, 0, ARC_OPERAND_IR, extract_ilink1)
-+ARC_OPERAND(ILINK2, 5, 0, 0, ARC_OPERAND_IR, extract_ilink2)
-+ARC_OPERAND(LIMM, 32, 0, 0, ARC_OPERAND_LIMM, 0)
-+ARC_OPERAND(LIMM_S, 32, 0, 0, ARC_OPERAND_LIMM, 0)
-+ARC_OPERAND(LIMMdup, 32, 0, 0, ARC_OPERAND_LIMM | ARC_OPERAND_DUPLICATE, 0)
-+ARC_OPERAND(ZA, 0, 0, 0, ARC_OPERAND_UNSIGNED, 0)
-+ARC_OPERAND(ZB, 0, 0, 0, ARC_OPERAND_UNSIGNED, 0)
-+ARC_OPERAND(ZA_S, 0, 0, 0, ARC_OPERAND_UNSIGNED, 0)
-+ARC_OPERAND(ZB_S, 0, 0, 0, ARC_OPERAND_UNSIGNED, 0)
-+ARC_OPERAND(ZC_S, 0, 0, 0, ARC_OPERAND_UNSIGNED, 0)
-+ARC_OPERAND(RRANGE_EL, 4, 0, 0, ARC_OPERAND_UNSIGNED | ARC_OPERAND_NCHK | ARC_OPERAND_TRUNCATE, extract_rrange)
-+ARC_OPERAND(R13_EL, 1, 0, 0, ARC_OPERAND_IR | ARC_OPERAND_IGNORE | ARC_OPERAND_NCHK, extract_rrange)
-+ARC_OPERAND(FP_EL, 1, 0, 0, ARC_OPERAND_IR | ARC_OPERAND_IGNORE | ARC_OPERAND_NCHK, extract_fpel)
-+ARC_OPERAND(BLINK_EL, 1, 0, 0, ARC_OPERAND_IR | ARC_OPERAND_IGNORE | ARC_OPERAND_NCHK, extract_blinkel)
-+ARC_OPERAND(PCL_EL, 1, 0, 0, ARC_OPERAND_IR | ARC_OPERAND_IGNORE | ARC_OPERAND_NCHK, extract_pclel)
-+ARC_OPERAND(BRAKET, 0, 0, 0, ARC_OPERAND_FAKE | ARC_OPERAND_BRAKET, 0)
-+ARC_OPERAND(BRAKETdup, 0, 0, 0, ARC_OPERAND_FAKE | ARC_OPERAND_BRAKET, 0)
-+ARC_OPERAND(FKT_T, 1, 3, 0, ARC_OPERAND_FAKE, 0)
-+ARC_OPERAND(FKT_NT, 1, 3, 0, ARC_OPERAND_FAKE, 0)
-+ARC_OPERAND(UIMM6_20, 6, 0, 0, ARC_OPERAND_UNSIGNED, extract_uimm6_20)
-+ARC_OPERAND(UIMM6_20R, 6, 0, 0, ARC_OPERAND_UNSIGNED | ARC_OPERAND_PCREL, extract_uimm6_20)
-+ARC_OPERAND(SIMM12_20, 12, 0, 0, ARC_OPERAND_SIGNED, extract_simm12_20)
-+ARC_OPERAND(SIMM12_20R, 12, 0, 0, ARC_OPERAND_SIGNED | ARC_OPERAND_PCREL, extract_simm12_20)
-+ARC_OPERAND(UIMM12_20, 12, 0, 0, ARC_OPERAND_UNSIGNED, extract_uimm12_20)
-+ARC_OPERAND(SIMM3_5_S, 3, 0, 0, ARC_OPERAND_SIGNED | ARC_OPERAND_NCHK, extract_simm3s)
-+ARC_OPERAND(UIMM7_A32_11_S, 7, 0, 0, ARC_OPERAND_UNSIGNED | ARC_OPERAND_ALIGNED32 | ARC_OPERAND_TRUNCATE | ARC_OPERAND_IGNORE, extract_uimm7_a32_11_s)
-+ARC_OPERAND(UIMM7_A32_11R_S, 7, 0, 0, ARC_OPERAND_UNSIGNED | ARC_OPERAND_ALIGNED32 | ARC_OPERAND_TRUNCATE | ARC_OPERAND_IGNORE | ARC_OPERAND_PCREL, extract_uimm7_a32_11_s)
-+ARC_OPERAND(UIMM7_9_S, 7, 0, 0, ARC_OPERAND_UNSIGNED, extract_uimm7_9_s)
-+ARC_OPERAND(UIMM3_13_S, 3, 0, 0, ARC_OPERAND_UNSIGNED, extract_uimm3_13_s)
-+ARC_OPERAND(UIMM3_13R_S, 3, 0, -UIMM3_13R_S, ARC_OPERAND_UNSIGNED | ARC_OPERAND_PCREL, extract_uimm3_13_s)
-+ARC_OPERAND(SIMM11_A32_7_S, 11, 0, 0, ARC_OPERAND_SIGNED | ARC_OPERAND_ALIGNED32 | ARC_OPERAND_TRUNCATE, extract_simm11_a32_7_s)
-+ARC_OPERAND(UIMM6_13_S, 6, 0, 0, ARC_OPERAND_UNSIGNED, extract_uimm6_13_s)
-+ARC_OPERAND(UIMM5_11_S, 5, 0, 0, ARC_OPERAND_UNSIGNED | ARC_OPERAND_IGNORE, extract_uimm5_11_s)
-+ARC_OPERAND(SIMM9_A16_8, 9, 0, -SIMM9_A16_8, ARC_OPERAND_SIGNED | ARC_OPERAND_ALIGNED16 | ARC_OPERAND_PCREL | ARC_OPERAND_TRUNCATE, extract_simm9_a16_8)
-+ARC_OPERAND(UIMM6_8, 6, 0, 0, ARC_OPERAND_UNSIGNED, extract_uimm6_8)
-+ARC_OPERAND(SIMM21_A16_5, 21, 0, 0, ARC_OPERAND_SIGNED | ARC_OPERAND_ALIGNED16 | ARC_OPERAND_TRUNCATE | ARC_OPERAND_PCREL, extract_simm21_a16_5)
-+ARC_OPERAND(SIMM25_A16_5, 25, 0, 0, ARC_OPERAND_SIGNED | ARC_OPERAND_ALIGNED16 | ARC_OPERAND_TRUNCATE | ARC_OPERAND_PCREL, extract_simm25_a16_5)
-+ARC_OPERAND(SIMM10_A16_7_S, 10, 0, 0, ARC_OPERAND_SIGNED | ARC_OPERAND_ALIGNED16 | ARC_OPERAND_TRUNCATE | ARC_OPERAND_PCREL, extract_simm10_a16_7_s)
-+ARC_OPERAND(SIMM10_A16_7_Sbis, 10, 0, 0, ARC_OPERAND_SIGNED | ARC_OPERAND_ALIGNED16 | ARC_OPERAND_TRUNCATE, extract_simm10_a16_7_s)
-+ARC_OPERAND(SIMM7_A16_10_S, 7, 0, 0, ARC_OPERAND_SIGNED | ARC_OPERAND_ALIGNED16 | ARC_OPERAND_TRUNCATE | ARC_OPERAND_PCREL, extract_simm7_a16_10_s)
-+ARC_OPERAND(SIMM21_A32_5, 21, 0, 0, ARC_OPERAND_SIGNED | ARC_OPERAND_ALIGNED32 | ARC_OPERAND_TRUNCATE | ARC_OPERAND_PCREL, extract_simm21_a32_5)
-+ARC_OPERAND(SIMM25_A32_5, 25, 0, 0, ARC_OPERAND_SIGNED | ARC_OPERAND_ALIGNED32 | ARC_OPERAND_TRUNCATE | ARC_OPERAND_PCREL, extract_simm25_a32_5)
-+ARC_OPERAND(SIMM13_A32_5_S, 13, 0, 0, ARC_OPERAND_SIGNED | ARC_OPERAND_ALIGNED32 | ARC_OPERAND_TRUNCATE | ARC_OPERAND_PCREL, extract_simm13_a32_5_s)
-+ARC_OPERAND(SIMM8_A16_9_S, 8, 0, 0, ARC_OPERAND_SIGNED | ARC_OPERAND_ALIGNED16 | ARC_OPERAND_TRUNCATE | ARC_OPERAND_PCREL, extract_simm8_a16_9_s)
-+ARC_OPERAND(UIMM10_6_S_JLIOFF, 12, 0, 0, ARC_OPERAND_UNSIGNED | ARC_OPERAND_ALIGNED32 | ARC_OPERAND_TRUNCATE, extract_uimm10_6_s)
-+ARC_OPERAND(UIMM3_23, 3, 0, 0, ARC_OPERAND_UNSIGNED, extract_uimm3_23)
-+ARC_OPERAND(UIMM10_6_S, 10, 0, 0, ARC_OPERAND_UNSIGNED, extract_uimm10_6_s)
-+ARC_OPERAND(UIMM6_11_S, 6, 0, 0, ARC_OPERAND_UNSIGNED, extract_uimm6_11_s)
-+ARC_OPERAND(SIMM9_8, 9, 0, 0, ARC_OPERAND_SIGNED | ARC_OPERAND_IGNORE, extract_simm9_8)
-+ARC_OPERAND(SIMM9_8R, 9, 0, -SIMM9_8R, ARC_OPERAND_SIGNED | ARC_OPERAND_IGNORE | ARC_OPERAND_PCREL, extract_simm9_8)
-+ARC_OPERAND(UIMM10_A32_8_S, 10, 0, -UIMM10_A32_8_S, ARC_OPERAND_UNSIGNED | ARC_OPERAND_ALIGNED32 | ARC_OPERAND_TRUNCATE | ARC_OPERAND_PCREL, extract_uimm10_a32_8_s)
-+ARC_OPERAND(SIMM9_7_S, 9, 0, 0, ARC_OPERAND_SIGNED, extract_simm9_7_s)
-+ARC_OPERAND(UIMM6_A16_11_S, 6, 0, 0, ARC_OPERAND_UNSIGNED | ARC_OPERAND_ALIGNED16 | ARC_OPERAND_TRUNCATE | ARC_OPERAND_IGNORE, extract_uimm6_a16_11_s)
-+ARC_OPERAND(UIMM5_A32_11_S, 5, 0, 0, ARC_OPERAND_UNSIGNED | ARC_OPERAND_ALIGNED32 | ARC_OPERAND_TRUNCATE | ARC_OPERAND_IGNORE, extract_uimm5_a32_11_s)
-+ARC_OPERAND(SIMM11_A32_13_S, 11, 0, 0, ARC_OPERAND_SIGNED | ARC_OPERAND_ALIGNED32 | ARC_OPERAND_TRUNCATE, extract_simm11_a32_13_s)
-+ARC_OPERAND(UIMM7_13_S, 7, 0, 0, ARC_OPERAND_UNSIGNED, extract_uimm7_13_s)
-+ARC_OPERAND(UIMM6_A16_21, 6, 0, 0, ARC_OPERAND_UNSIGNED | ARC_OPERAND_ALIGNED16 | ARC_OPERAND_TRUNCATE, extract_uimm6_a16_21)
-+ARC_OPERAND(UIMM7_11_S, 7, 0, 0, ARC_OPERAND_UNSIGNED, extract_uimm7_11_s)
-+ARC_OPERAND(UIMM7_A16_20, 7, 0, -UIMM7_A16_20, ARC_OPERAND_UNSIGNED | ARC_OPERAND_ALIGNED16 | ARC_OPERAND_TRUNCATE | ARC_OPERAND_PCREL, extract_uimm7_a16_20)
-+ARC_OPERAND(SIMM13_A16_20, 13, 0, -SIMM13_A16_20, ARC_OPERAND_SIGNED | ARC_OPERAND_ALIGNED16 | ARC_OPERAND_TRUNCATE | ARC_OPERAND_PCREL, extract_simm13_a16_20)
-+ARC_OPERAND(UIMM8_8_S, 8, 0, 0, ARC_OPERAND_UNSIGNED, extract_uimm8_8_s)
-+ARC_OPERAND(UIMM8_8R_S, 8, 0, 0, ARC_OPERAND_UNSIGNED | ARC_OPERAND_PCREL, extract_uimm8_8_s)
-+ARC_OPERAND(W6, 6, 0, 0, ARC_OPERAND_SIGNED, extract_w6)
-+ARC_OPERAND(UIMM6_5_S, 6, 0, 0, ARC_OPERAND_UNSIGNED, extract_uimm6_5_s)
++/*-*-indent-tabs-mode:nil;tab-width:4;indent-line-function:'insert-tab'-*-*/
++/* vim: set ts=4 sw=4 et: */
 -- 
 2.20.1
 
