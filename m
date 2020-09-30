@@ -2,110 +2,86 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38294C4727C
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:54:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BB88C4727C
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:56:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 768DD206D4
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:54:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F4EA206F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:56:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cV1Usv1r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 768DD206D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Em9tANLg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F4EA206F7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNeQe-0004sn-6b
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 11:54:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48844)
+	id 1kNeSY-0006Q9-Gw
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 11:56:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50116)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kNePF-0003og-W0
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 11:52:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47264)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kNeP7-0001Ff-9F
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 11:52:37 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601481147;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=aiFPY6DgDW25pbzHrBw3/r3jRS93ts9OuVONtZOkT5M=;
- b=cV1Usv1rAE0OV/916L4tur6LLvkgw3k4V+Nlezreu/V1fKGKrpR/tFbU2q8HBr4wgQ75fj
- cNO6BPzINNlx2ozXH8lUHxt57vvn7l+buAR6R0C64n3IiFKCfK2SmCmHKe3zMBLYnXfXi7
- SItySSYoY2KchsbYp7wcgIAd/A1MzNA=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-234-X0fqqBZFNsGjc6fHzEECDw-1; Wed, 30 Sep 2020 11:52:25 -0400
-X-MC-Unique: X0fqqBZFNsGjc6fHzEECDw-1
-Received: by mail-wm1-f72.google.com with SMTP id y6so782638wmi.7
- for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 08:52:25 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kNeRe-0005nx-Pm; Wed, 30 Sep 2020 11:55:06 -0400
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:37665)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kNeRc-0001c1-Uy; Wed, 30 Sep 2020 11:55:06 -0400
+Received: by mail-io1-xd42.google.com with SMTP id y13so2333360iow.4;
+ Wed, 30 Sep 2020 08:55:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=bKClRjzFMT0pps90a/PsiFGDtFSBeovqRUJ8PPva6NE=;
+ b=Em9tANLgJXKEqA7KDNZkYUI9JFcK2e1A2lgBounII6B9lo+F31SKis7pOOa+tXPAAK
+ Jk7PNB9Q9Nz+MSxnaYNEIOrosWamidCxrIka+9B7yfvajZzGbcRAudFBQ0sO5ZW7xo3k
+ 2+wG/UHzdDLyQM+zyPvFQMnQkhtk5YPVqfsSTiEKDa4Sp8enuN/vSQ9EGau2z4Z07QiT
+ TC+85sKtgDenqhB0m6vlWjVeJB0mzID0vuiyx71ZtAu6L/jGTG/kFEyQYfGACXNuCyua
+ RMYwQA4Uby24tCH8EejZcpHGgLIeO3brI5DUwWiGTIRFrcb+neAMU3Jl+XIpIkvqDBkh
+ sA8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=aiFPY6DgDW25pbzHrBw3/r3jRS93ts9OuVONtZOkT5M=;
- b=nzvgKjUdo8hsRCc61yTU7fsJOst6Hjso4dZdp2COHUV9zIEWys2UQbd19KyMeXWEfW
- mCj7IMP2j+XgG/p9Qtt5YV7exyQwUrUcE6wQ8uHE+q4WbwOfiD7Sk5q5Y2bSc9PIZ0/a
- Fv+Bch3e9Vo+ZXGBU53552XMkyBdgY7aalMhFOwbIGR3329inhCajRW2KKVoWVhnxGEQ
- GIAlVzAo+4JqOZUuzIUbRu0yF9Sq+hIy81qbH1KN5dP3LAfhjX7il3PZXwSiSSJ64hDX
- ZAfq5r5uHP4R3nogtD+dNddBUaE3ZAvxNvPAznCZuFcmtAEMjuKQ2jv/VKKsG4hNLKGe
- V0Kg==
-X-Gm-Message-State: AOAM532l4aO/rHx/7BGZ9DzJGFXe+N7ZUUellPb4JYJ+U8yYE4o8B422
- zCNq/pGmoGSeWWVx5+k9YDRCBvaGfXRfVX38L6RtSvIA9T6O5zWlqeZ/Y08B8/7IESXEfzoVqIg
- JO4bLyUIdGIolDHQ=
-X-Received: by 2002:a1c:2cc2:: with SMTP id s185mr3882059wms.77.1601481144390; 
- Wed, 30 Sep 2020 08:52:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwHiatQiZ17QhNTIpJSgIEgoYRy5DSa4lBTT45g+oZeWVMejhHN8fekQu89mMqbO74ZNo8rsA==
-X-Received: by 2002:a1c:2cc2:: with SMTP id s185mr3881982wms.77.1601481143485; 
- Wed, 30 Sep 2020 08:52:23 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:75e3:aaa7:77d6:f4e4?
- ([2001:b07:6468:f312:75e3:aaa7:77d6:f4e4])
- by smtp.gmail.com with ESMTPSA id c16sm4107511wrx.31.2020.09.30.08.52.21
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 30 Sep 2020 08:52:22 -0700 (PDT)
-Subject: Re: [PULL 13/13] qemu/atomic.h: rename atomic_ to qatomic_
-To: Andrew Jones <drjones@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-References: <20200923161031.69474-1-stefanha@redhat.com>
- <20200923161031.69474-14-stefanha@redhat.com>
- <20200930152805.tycn6lcm4qx74phi@kamzik.brq.redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <63f0fefc-1429-d454-cc65-012bed584b2f@redhat.com>
-Date: Wed, 30 Sep 2020 17:52:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=bKClRjzFMT0pps90a/PsiFGDtFSBeovqRUJ8PPva6NE=;
+ b=qyYyuSA4wlfzJN/c9vRgo8A8rUuyi1KR7BKCkRkcGr7M9qJMv7C3iKA/ac6hvLSdP3
+ wRhYU2VQBkKNPdmIl0Qh3FENN2UgIQnRsVQAJi2qrEB5OznozZvTSPiO8mTF7RPYt5UD
+ w2wkwxRNvAeMB+oymocSZjtmM3emTawuhorrXt5qyo48j3Dv3I+GF12jaHCtPAnEwXgU
+ fNNgxnYoVB1ivk/NhgY+lH4lJ7aI5Xd7+R5S1fAbu2zdXVdTat0Sodw3S5DbHSTjZHt3
+ 7PgtcNKiFmh50lV5H2V6BM5zxg6Or3G7oGhhZ1a+AcCoDTII+KaQfeZgkYx8+YV8Yq73
+ bTFg==
+X-Gm-Message-State: AOAM531YSKKZcMTD5pTCx71e2DFJD56fWT529+rLkhXaglVfQpoHR9GD
+ VWvum0nsaYU2wIO89/BcTwgVSLq+HJbi27wQ8EU=
+X-Google-Smtp-Source: ABdhPJyN2IzpGqG9Lkhk9mRB+eMXAWHs/qqK4d/p3P94a/UNiZkhE23bKhDtm2ECV75za1pt713Edv7HwVxvGpw7Tno=
+X-Received: by 2002:a02:5584:: with SMTP id e126mr2574689jab.26.1601481303401; 
+ Wed, 30 Sep 2020 08:55:03 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200930152805.tycn6lcm4qx74phi@kamzik.brq.redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:31:59
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.469,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+References: <20200930095321.2006-1-zhaolichang@huawei.com>
+ <20200930095321.2006-4-zhaolichang@huawei.com>
+In-Reply-To: <20200930095321.2006-4-zhaolichang@huawei.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 30 Sep 2020 08:43:34 -0700
+Message-ID: <CAKmqyKMR7eKFmJW=5x1R4X7HObjgZo9Y93jPfsRS+6h=F4TBWg@mail.gmail.com>
+Subject: Re: [PATCH RFC 03/14] riscv/: fix some comment spelling errors
+To: zhaolichang <zhaolichang@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d42;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd42.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,32 +94,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 30/09/20 17:28, Andrew Jones wrote:
-> pvrdma_ring.h is an update-linux-headers.sh file. When running the
-> script again we lose the atomic_ to qatomic_ renaming. I've hacked
-> the script by adding
-> 
->  -e 's/\batomic_read/qatomic_read/g;s/\batomic_set/qatomic_set/g'
-> 
-> to the cp_portable() sed command, but only considering the two
-> qatomic_ functions currently used is obviously not a complete
-> solution.
-> 
-> Any ideas?
+On Wed, Sep 30, 2020 at 2:56 AM zhaolichang <zhaolichang@huawei.com> wrote:
+>
+> I found that there are many spelling errors in the comments of qemu/target/riscv.
+> I used spellcheck to check the spelling errors and found some errors in the folder.
+>
+> Signed-off-by: zhaolichang <zhaolichang@huawei.com>
 
-My first thought was that it's strange that there are atomics in a uapi/
-file, and in fact the file is not uapi/ but rather part of the driver.
-I think we should just copy the file into QEMU sources, and remove it
-from update-linux-headers.sh.  The "s/atomic_t/int/" can go as well.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Paolo
+Alistair
 
+> ---
+>  target/riscv/cpu.c           | 2 +-
+>  target/riscv/cpu_bits.h      | 2 +-
+>  target/riscv/csr.c           | 6 +++---
+>  target/riscv/vector_helper.c | 2 +-
+>  4 files changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> index 0bbfd7f..f40a0b2 100644
+> --- a/target/riscv/cpu.c
+> +++ b/target/riscv/cpu.c
+> @@ -472,7 +472,7 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+>                      return;
+>                  }
+>              } else {
+> -                qemu_log("vector verison is not specified, "
+> +                qemu_log("vector version is not specified, "
+>                          "use the default value v0.7.1\n");
+>              }
+>              set_vext_version(env, vext_version);
+> diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+> index bd36062..6e11555 100644
+> --- a/target/riscv/cpu_bits.h
+> +++ b/target/riscv/cpu_bits.h
+> @@ -536,7 +536,7 @@
+>  /* Leaf page shift amount */
+>  #define PGSHIFT             12
+>
+> -/* Default Reset Vector adress */
+> +/* Default Reset Vector address */
+>  #define DEFAULT_RSTVEC      0x1000
+>
+>  /* Exception causes */
+> diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+> index 26ae347..559db11 100644
+> --- a/target/riscv/csr.c
+> +++ b/target/riscv/csr.c
+> @@ -624,7 +624,7 @@ static int write_mcounteren(CPURISCVState *env, int csrno, target_ulong val)
+>      return 0;
+>  }
+>
+> -/* This regiser is replaced with CSR_MCOUNTINHIBIT in 1.11.0 */
+> +/* This register is replaced with CSR_MCOUNTINHIBIT in 1.11.0 */
+>  static int read_mscounteren(CPURISCVState *env, int csrno, target_ulong *val)
+>  {
+>      if (env->priv_ver < PRIV_VERSION_1_11_0) {
+> @@ -634,7 +634,7 @@ static int read_mscounteren(CPURISCVState *env, int csrno, target_ulong *val)
+>      return 0;
+>  }
+>
+> -/* This regiser is replaced with CSR_MCOUNTINHIBIT in 1.11.0 */
+> +/* This register is replaced with CSR_MCOUNTINHIBIT in 1.11.0 */
+>  static int write_mscounteren(CPURISCVState *env, int csrno, target_ulong val)
+>  {
+>      if (env->priv_ver < PRIV_VERSION_1_11_0) {
+> @@ -1278,7 +1278,7 @@ int riscv_csrrw(CPURISCVState *env, int csrno, target_ulong *ret_value,
+>          !riscv_cpu_virt_enabled(env)) {
+>          /*
+>           * We are in S mode without virtualisation, therefore we are in HS Mode.
+> -         * Add 1 to the effective privledge level to allow us to access the
+> +         * Add 1 to the effective privilege level to allow us to access the
+>           * Hypervisor CSRs.
+>           */
+>          effective_priv++;
+> diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+> index a156573..fa89a6e 100644
+> --- a/target/riscv/vector_helper.c
+> +++ b/target/riscv/vector_helper.c
+> @@ -709,7 +709,7 @@ typedef void vext_amo_noatomic_fn(void *vs3, target_ulong addr,
+>                                    uint32_t wd, uint32_t idx, CPURISCVState *env,
+>                                    uintptr_t retaddr);
+>
+> -/* no atomic opreation for vector atomic insructions */
+> +/* no atomic operation for vector atomic insructions */
+>  #define DO_SWAP(N, M) (M)
+>  #define DO_AND(N, M)  (N & M)
+>  #define DO_XOR(N, M)  (N ^ M)
+> --
+> 2.26.2.windows.1
+>
+>
 
