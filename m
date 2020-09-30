@@ -2,94 +2,100 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EF1AC4727C
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 19:03:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A19CFC4727C
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 19:08:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DABF02084C
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 19:03:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 219E52072E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 19:08:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BaskzTZa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DABF02084C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KxYDv6ef"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 219E52072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNhO8-0005uo-2N
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 15:03:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43648)
+	id 1kNhSe-000783-Q7
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 15:08:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44512)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNhNT-0005VN-Dg
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 15:02:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47586)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kNhRU-0006gH-5o
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 15:07:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56344)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kNhNQ-00036l-Vq
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 15:02:59 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kNhRS-0003IO-HA
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 15:07:07 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601492575;
+ s=mimecast20190719; t=1601492825;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=9Lx5n93EJG6DO0amlXI0CJkmd9GvfZUar2WyDmuPxh4=;
- b=BaskzTZaA5eCPIxoee+wMCHH4+IAx3i7E2rCuFym2a4p1zu+9o0Qv/LGBHjRC2g93iPmHK
- iF2FU4z4BQvMnq7bmHofgpwtHu9tUpalLuCdPvAmuYDpu14ho3KqwqfP3CUPjAXzQTbVLm
- 1XHWxjuTn+P6/cD5whcOdJzI1oCQBvE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-582-7645-dH5Ps-qGMOOhWJNxA-1; Wed, 30 Sep 2020 15:02:52 -0400
-X-MC-Unique: 7645-dH5Ps-qGMOOhWJNxA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01A20186DD3C;
- Wed, 30 Sep 2020 19:02:51 +0000 (UTC)
-Received: from [10.10.119.140] (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8D7F11001281;
- Wed, 30 Sep 2020 19:02:49 +0000 (UTC)
-Subject: Re: [PATCH v4 39/46] qapi/introspect.py: Unify return type of
- _make_tree()
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <20200930043150.1454766-1-jsnow@redhat.com>
- <20200930043150.1454766-40-jsnow@redhat.com>
- <20200930182408.GV3717385@habkost.net>
- <20fa2354-e65b-0849-78e1-687a248b329b@redhat.com>
- <20200930185756.GZ3717385@habkost.net>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <74df6745-0628-7845-3d93-4d9f0c0d5ab2@redhat.com>
-Date: Wed, 30 Sep 2020 15:02:48 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ bh=ZlX+k3mrdrg9pzzi3b1KH/xW2/J/U03Sp15IKcxQxe4=;
+ b=KxYDv6efjHzcpVsThgcJcHTh+/C4ypr4rqENeVOY2TyKOZTzh2KcyZG8OCVlPp3QapbkI4
+ oMZaNcbvijs4Mtppui67RURwu3umln7kjeDHIQMynfpOfS8JKDedwGXb3UD0qM7+aUQPK1
+ BSQ42ci+fNF/uVKou2cudHXfFtZO3EQ=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-497-o_7HusOTMsmCBx7SovQf-A-1; Wed, 30 Sep 2020 15:05:15 -0400
+X-MC-Unique: o_7HusOTMsmCBx7SovQf-A-1
+Received: by mail-ej1-f71.google.com with SMTP id rs9so1176937ejb.17
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 12:05:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ZlX+k3mrdrg9pzzi3b1KH/xW2/J/U03Sp15IKcxQxe4=;
+ b=poKICJYTiikkV1ELBnU/TMJOSIajImaUO3nGNnaMESGgYK47gfLLvVgf0mhCImbY8Q
+ AePMyZaaLdi2VLh+jlS2iEGW3hWF1pxuFfEQJ/g+XE6qVyxUAYH+A/6MIfApeeGuonSI
+ cYscuvnTY5T5JKxI5cuVTNlY31PEcQtJgoYxfECfC6JOWMqCpKlVhnrL68D8a+5Fz8ex
+ JmNKaqdIEV8H2YkL35YcwyL3LITaXru36Nx+fpd28H2JP9Bt0MCGSloiowWII5AETlJN
+ SsQfUGHxG37AQkM9aOdjMZMqUBc0wT4qVcs5Bzf2pgoZIEW9frbo8uMPzemAKrcOc3iq
+ I+lQ==
+X-Gm-Message-State: AOAM530JRC+rbFcP5IQX3/opTd2kvwuFoRxfsbz2Yu8odCFzstm0HDfx
+ 9VbZxzrMi33jbSUUP7w91nU29x61Jir3ErdyrgAp5mgQODfjRK9i4YEw/DKFsZIg34sDEkLX/pm
+ VK41JKp+g49a1ABFjqqZMj5SiYQmHqgI=
+X-Received: by 2002:a17:906:b88e:: with SMTP id
+ hb14mr4164826ejb.543.1601492714390; 
+ Wed, 30 Sep 2020 12:05:14 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzsXnER/32c4vtdMgtXcfpjmk2SzcBQU5yHJBRBZh+byga4exSQw7nPZYBVTbsLogJ1Z3ZjESEgER0pCyFmD1U=
+X-Received: by 2002:a17:906:b88e:: with SMTP id
+ hb14mr4164778ejb.543.1601492714000; 
+ Wed, 30 Sep 2020 12:05:14 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200930185756.GZ3717385@habkost.net>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+References: <20200930164949.1425294-1-philmd@redhat.com>
+ <20200930171529.GR3717385@habkost.net>
+ <0c46bedf-9aa6-4ea9-40e1-b0f85a767bb5@redhat.com> <87lfgrnle1.fsf@linaro.org>
+In-Reply-To: <87lfgrnle1.fsf@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 30 Sep 2020 21:05:02 +0200
+Message-ID: <CABgObfazj_msv60wByUhumfzHfw5txwid_bR17b-g3Ho42+MdA@mail.gmail.com>
+Subject: Re: [PATCH v3 00/11] user-mode: Prune build dependencies (part 3)
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
+Content-Type: multipart/alternative; boundary="00000000000054307605b08c94b8"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:31:59
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:26:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -25
 X-Spam_score: -2.6
 X-Spam_bar: --
 X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.469,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
  RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,170 +108,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, Peter Lieven <pl@kamp.de>,
+ Markus Armbruster <armbru@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>, Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/30/20 2:57 PM, Eduardo Habkost wrote:
-> On Wed, Sep 30, 2020 at 02:32:49PM -0400, John Snow wrote:
->> On 9/30/20 2:24 PM, Eduardo Habkost wrote:
->>> On Wed, Sep 30, 2020 at 12:31:43AM -0400, John Snow wrote:
->>>> Returning a *something* or a Tuple of *something* is hard to accurately
->>>> type. Let's just always return a tuple for structural consistency.
->>>>
->>>> Instances of the 'TreeNode' type can be replaced with the slightly more
->>>> specific 'AnnotatedNode' type.
->>>>
->>>> Signed-off-by: John Snow <jsnow@redhat.com>
->>>
->>> So, the only place where this seems to make a difference is
->>> _tree_to_qlit().
->>>
->>> We just need to prove that
->>>     _tree_to_qlit(o, ...)
->>> will have exactly the same result as
->>>     _tree_to_qlit((o, None), ...).
->>>
->>> For reference, this is the beginning of _tree_to_qlit():
->>>
->>> | def _tree_to_qlit(obj: TreeNode,
->>> |                   level: int = 0,
->>> |                   suppress_first_indent: bool = False) -> str:
->>> |
->>> |     def indent(level: int) -> str:
->>> |         return level * 4 * ' '
->>> |
->>> |     if isinstance(obj, tuple):
->>> |         ifobj, extra = obj
->>>
->>> `obj` is the return value of _make_tree()
->>>
->>> `ifobj` is the original `obj` argument to _make_tree().
->>>
->>> |         ifcond = extra.get('if')
->>>
->>> ifcond will be None.
->>>
->>> |         comment = extra.get('comment')
->>>
->>> comment will be None
->>>
->>> |         ret = ''
->>> |         if comment:
->>> |             ret += indent(level) + '/* %s */\n' % comment
->>>
->>> nop
->>>
->>> |         if ifcond:
->>> |             ret += gen_if(ifcond)
->>>
->>> nop
->>>
->>> |         ret += _tree_to_qlit(ifobj, level)
->>>
->>> ret will be '', so this is equivalent to:
->>>
->>>     ret = _tree_to_qlit(ifobj, level)
->>>
->>> which is almost good.
->>>
->>> The only difference seems to that suppress_first_indent=True will
->>> be ignored.  We should pass suppress_first_indent as argument in
->>> the recursive call above, just in case.
->>>
->>
->> This is a really good spot, and I indeed hadn't considered it at all when I
->> did this.
->>
->> (I simply made the change and observed it worked just fine!)
->>
->>> The existing code will behave weirdly if there are comments or
->>> conditions and suppress_first_indent=True, but I suggest we try
->>> to address this issue later.
->>>
->>> |         if ifcond:
->>> |             ret += '\n' + gen_endif(ifcond)
->>>
->>> nop
->>>
->>> |         return ret
->>>
->>
->> Hm, yes, it's a hypothetical case, but perhaps we can use an assertion to
->> help guard against it if development creates that case later by accident.
->>
->> That ought to be good enough for now to not waste time accommodating a
->> (presently) fictional circumstance?
->>
->> Thanks for the good sleuthing here.
-> 
-> With the current code, both
->    ret += _tree_to_qlit(ifobj, level)
-> and
->    ret += _tree_to_qlit(ifobj, level, suppress_first_indent)
-> will behave exactly the same.
-> 
-> The former will behave weirdly if we wrap a dictionary value using
-> _tree_node().  We don't do that today.
-> 
-> The latter will behave weirdly if there's a comment or ifcond
-> attached in a dictionary value.  We don't do that today.
-> 
-> I believe the latter is less likely to be triggered by accident.
-> 
-> But I'd be happy with either:
-> 
->    # _make_tree() shouldn't be use to wrap nodes that
->    # may be printed using suppress_first_indent=True
->    # (in other words, dictionary values shouldn't be wrapped using _make_tree())
->    assert(not suppress_first_indent)
->    ret += _tree_to_qlit(ifobj, level)
-> 
-> or
-> 
->    # we can't add ifcond or comments to nodes that may be
->    # printed using suppress_first_indent=True
->    # (in other words, dictionary values can't have ifcond or comments)
->    assert(not suppress_first_indent or (not comment and not ifcond))
->    ret += _tree_to_qlit(ifobj, level, suppress_first_indent)
-> 
-> 
-> If we have time to spare later, we could do this:
-> 
->    def _value_to_qlit(obj: Union[None, str, Dict[str, object], List[object], bool],
->                       level: int = 0,
->                       suppress_first_indent: bool = False) -> str:
->        ...
->        if obj is None:
->            ...
->        elif isinstance(obj, str):
->            ...
->        elif isinstance(obj, list):
->            ...
->        ...
->    
->    def _tree_to_qlit(obj: TreeNode, level: int = 0) -> str:
->        if isinstance(obj, AnnotatedNode):
->           ...
->        else:
->           return _value_to_qlit(obj, level)
-> 
-> This way, it will be impossible to set suppress_first_indent=True
-> on an annotated node.
-> 
+--00000000000054307605b08c94b8
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Maybe it's the right thing to separate out container types from leaf 
-types and make this mutually recursive.
+Il mer 30 set 2020, 20:57 Alex Benn=C3=A9e <alex.bennee@linaro.org> ha scri=
+tto:
 
-I debating doing that earlier, but the patches were already so strangled 
-and messy I was afraid of plunging deeper into refactors.
+> > 1-8 is fine, but I think 9-11 is too much complication (especially not
+> > really future-proof) for the benefit.
+>
+> Isn't qdev considered an internal API for our object and device lifetime
+> handling (which should be shared) versus QAPI which only exists for
+> system emulation and tool integration?
+>
 
-Maybe I'll go take a nap and do it when I wake up. :)
+qdev is nothing more than a bunch of QOM classes, and QAPI is an integral
+part of QOM (though properties, which are used when setting up CPUs in user
+more emulation)
 
---js
+Therefore, even though most of the QAPI schema is specific to system
+emulation and tools, a small part is used by common code.
+
+Paolo
+
+>
+
+--00000000000054307605b08c94b8
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
+class=3D"gmail_attr">Il mer 30 set 2020, 20:57 Alex Benn=C3=A9e &lt;<a href=
+=3D"mailto:alex.bennee@linaro.org">alex.bennee@linaro.org</a>&gt; ha scritt=
+o:</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border=
+-left:1px #ccc solid;padding-left:1ex">
+&gt; 1-8 is fine, but I think 9-11 is too much complication (especially not=
+<br>
+&gt; really future-proof) for the benefit.<br>
+<br>
+Isn&#39;t qdev considered an internal API for our object and device lifetim=
+e<br>
+handling (which should be shared) versus QAPI which only exists for<br>
+system emulation and tool integration?<br></blockquote></div></div><div dir=
+=3D"auto"><br></div><div dir=3D"auto">qdev is nothing more than a bunch of =
+QOM classes, and QAPI is an integral part of QOM (though properties, which =
+are used when setting up CPUs in user more emulation)</div><div dir=3D"auto=
+"><br></div><div dir=3D"auto">Therefore, even though most of the QAPI schem=
+a is specific to system emulation and tools, a small part is used by common=
+ code.</div><div dir=3D"auto"><br></div><div dir=3D"auto">Paolo</div><div d=
+ir=3D"auto"><div class=3D"gmail_quote"><blockquote class=3D"gmail_quote" st=
+yle=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
+</blockquote></div></div></div>
+
+--00000000000054307605b08c94b8--
 
 
