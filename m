@@ -2,64 +2,67 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 357EDC4727E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 12:47:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 918B0C47420
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 12:47:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9FE5C20789
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 12:47:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EB19620789
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 12:47:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HN+/e2yL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FE5C20789
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W1lsQPRO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB19620789
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNbWR-0007PE-Ak
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 08:47:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51062)
+	id 1kNbWS-0007SE-PN
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 08:47:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51154)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kNbUp-0005wf-UP
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 08:46:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28600)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kNbUw-0005zA-73
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 08:46:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41405)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kNbUo-0001AB-9y
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 08:46:11 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kNbUt-0001B4-IT
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 08:46:17 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601469968;
+ s=mimecast20190719; t=1601469973;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=ew6AVuU1qrxq3Xvj3vDsOtrOvY1C9V98pjmXX2m0Bv8=;
- b=HN+/e2yLGOzLX5NfzzNCCp02iqrqyieqHCuCFbRYs9C3qFL4O1ewqlTDdggtz9ddQRfrd9
- rR/rTi0fn2bPo+MKM4I3NAeK9tbL7aj/Bde5E6VSIueZ9+g7v5fpHytymYt0RM5O9WxoNJ
- hoN9cJhp3U3fdBci8SX3SMUfByADXxE=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=AOCG3yx142Vn4Zm36ciK2UKGuyDIp7ek+VRYOsioH7g=;
+ b=W1lsQPROV0ENMl4vDnEwsVR/s62sU9uytNCvISAyStE7utc61/XCjkd9kcrSy60aJkuaRT
+ xiHwB0F1islp++F3IfWUFyLMFrvwxnSC61CKTacddkAMGfCe2qC5aMgzRQoNbsGrWVHgwz
+ 61ewyDP+GXrvQf55oyjvsD0hlkv18YU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-504-p3vKRBdPPROSoM2e0DdQzg-1; Wed, 30 Sep 2020 08:46:06 -0400
-X-MC-Unique: p3vKRBdPPROSoM2e0DdQzg-1
+ us-mta-199-woezYpeMN1m7C58EwDpNRw-1; Wed, 30 Sep 2020 08:46:11 -0400
+X-MC-Unique: woezYpeMN1m7C58EwDpNRw-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E61741084D68;
- Wed, 30 Sep 2020 12:46:05 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D27FE1084D8A;
+ Wed, 30 Sep 2020 12:46:10 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-113-128.ams2.redhat.com
  [10.36.113.128])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A7D0A60C05;
- Wed, 30 Sep 2020 12:46:04 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 941C160C05;
+ Wed, 30 Sep 2020 12:46:09 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 0/4] qemu-storage-daemon: Remove QemuOpts from --object
- parser
-Date: Wed, 30 Sep 2020 14:45:53 +0200
-Message-Id: <20200930124557.51835-1-kwolf@redhat.com>
+Subject: [PATCH v2 3/4] qom: Add user_creatable_print_help_from_qdict()
+Date: Wed, 30 Sep 2020 14:45:56 +0200
+Message-Id: <20200930124557.51835-4-kwolf@redhat.com>
+In-Reply-To: <20200930124557.51835-1-kwolf@redhat.com>
+References: <20200930124557.51835-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
@@ -68,9 +71,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kwolf@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:31:59
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:26:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -25
 X-Spam_score: -2.6
@@ -97,28 +100,55 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This replaces the QemuOpts-based help code for --object in the storage
-daemon with code based on the keyval parser.
+This adds a function that, given a QDict of non-help options, prints
+help for user creatable objects.
 
-v2:
-- Fixed double comma by reusing the existing key and value parsers [Eric]
-- More tests to cover the additional cases
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ include/qom/object_interfaces.h | 9 +++++++++
+ qom/object_interfaces.c         | 9 +++++++++
+ 2 files changed, 18 insertions(+)
 
-Kevin Wolf (4):
-  keyval: Parse help options
-  qom: Factor out helpers from user_creatable_print_help()
-  qom: Add user_creatable_print_help_from_qdict()
-  qemu-storage-daemon: Remove QemuOpts from --object parser
-
- include/qemu/option.h                |   2 +-
- include/qom/object_interfaces.h      |   9 ++
- qapi/qobject-input-visitor.c         |   2 +-
- qom/object_interfaces.c              |  99 ++++++++-----
- storage-daemon/qemu-storage-daemon.c |  15 +-
- tests/test-keyval.c                  | 205 +++++++++++++++++++--------
- util/keyval.c                        |  38 ++++-
- 7 files changed, 252 insertions(+), 118 deletions(-)
-
+diff --git a/include/qom/object_interfaces.h b/include/qom/object_interfaces.h
+index f118fb516b..53b114b11a 100644
+--- a/include/qom/object_interfaces.h
++++ b/include/qom/object_interfaces.h
+@@ -161,6 +161,15 @@ int user_creatable_add_opts_foreach(void *opaque,
+  */
+ bool user_creatable_print_help(const char *type, QemuOpts *opts);
+ 
++/**
++ * user_creatable_print_help_from_qdict:
++ * @args: options to create
++ *
++ * Prints help considering the other options given in @args (if "qom-type" is
++ * given and valid, print properties for the type, otherwise print valid types)
++ */
++void user_creatable_print_help_from_qdict(QDict *args);
++
+ /**
+  * user_creatable_del:
+  * @id: the unique ID for the object
+diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
+index 3fd1da157e..ed896fe764 100644
+--- a/qom/object_interfaces.c
++++ b/qom/object_interfaces.c
+@@ -279,6 +279,15 @@ bool user_creatable_print_help(const char *type, QemuOpts *opts)
+     return false;
+ }
+ 
++void user_creatable_print_help_from_qdict(QDict *args)
++{
++    const char *type = qdict_get_try_str(args, "qom-type");
++
++    if (!type || !user_creatable_print_type_properites(type)) {
++        user_creatable_print_types();
++    }
++}
++
+ bool user_creatable_del(const char *id, Error **errp)
+ {
+     Object *container;
 -- 
 2.25.4
 
