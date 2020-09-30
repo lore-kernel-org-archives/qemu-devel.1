@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68EB6C4727E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 12:22:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A69EC4727E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 12:33:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86B122071E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 12:22:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86B122071E
+	by mail.kernel.org (Postfix) with ESMTPS id 64BAD2071E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 12:33:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64BAD2071E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNb7T-0002z4-E2
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 08:22:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45158)
+	id 1kNbIG-0004PD-79
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 08:33:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47580)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kNb6D-0002Zh-HV
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 08:20:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54158)
+ id 1kNbGG-0003vl-IN
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 08:31:08 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56320)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kNb69-0007lh-ET
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 08:20:45 -0400
+ id 1kNbGE-0008O4-9I
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 08:31:08 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kNb67-0003Kp-A5
- for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 12:20:39 +0000
+ id 1kNbGC-0004bc-E6
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 12:31:04 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 41A8C2E80E8
- for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 12:20:39 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 6881D2E8072
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 12:31:04 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 30 Sep 2020 12:11:53 -0000
+Date: Wed, 30 Sep 2020 12:19:28 -0000
 From: Sergiy K <1897481@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -53,7 +53,7 @@ X-Launchpad-Bug-Commenters: alex-l-williamson sergey-kukunin
 X-Launchpad-Bug-Reporter: Sergiy K (sergey-kukunin)
 X-Launchpad-Bug-Modifier: Sergiy K (sergey-kukunin)
 References: <160123953126.1246.10707501292033522741.malonedeb@gac.canonical.com>
-Message-Id: <160146791367.2879.7984475031810133781.malone@chaenomeles.canonical.com>
+Message-Id: <160146836850.23397.12735228986797329809.malone@gac.canonical.com>
 Subject: [Bug 1897481] Re: qemu crashes with VGA pass-through, e-GPU,
  nvidia 1060
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -61,7 +61,7 @@ X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="d685c0a40836eb9844ed835c9700f20633c1d7af"; Instance="production"
-X-Launchpad-Hash: 5c5c706c2dc5e826fb0818b853872861f62218d7
+X-Launchpad-Hash: 44ea08c31596e6827872ec768daf3d61581bcebb
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 07:16:30
@@ -89,45 +89,25 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thank you Alex for answering me.
+What's more interesting, it doesn't crash if I hotplug GPU after it was boo=
+t with it. So if I do
+  =
 
-It seems, I've got it working, if I boot the host with the connected GPU fr=
-om the very beginning. =
-
-Previously, I tried hotplug and it crashes. =
-
-
-So previously I had:
-  1. enable the host
-  2. enable GPU
-  3. connect the cable
-
-And this time I tried:
   1. enable GPU
-  2. connect the cable
+  2. connect the cord
   3. enable the host
+  4. run qemu (I'm not sure, if it's mandatory)
+  5. disable cord
+  6. disable GPU
+  7. enable GPU
+  8. enable cord
+  9. run qemu again
 
-And this works great. Actually, I was able to install nvidia drivers to
-the Win10 guest and it runs well.
+qemu doesn't crash. but the windows guest doesn't load too - it just
+hangs with a single core 100% load.
 
-Now, I'm not sure if there is a bug. From one side, it might be an
-expected requirement to exclude hotplug. From the other side, every
-crash is a bug, so there can be an extra check for that. It's up to you
-guys.
-
-I'm thankful for your hard work and for the rocket science technologies
-I can use with my laptop.
-
-I'm attaching dmesg for the fresh boot host with the GPU connected from
-the very beginning.
-
-P.S. I'm sorry for the big files. I've just noticed the ability to
-upload attachments.
-
-
-** Attachment added: "dmesg for the working case"
-   https://bugs.launchpad.net/qemu/+bug/1897481/+attachment/5415643/+files/=
-dmesg
+Not sure, if it's related, but trying to provide as much info as
+possible
 
 -- =
 
