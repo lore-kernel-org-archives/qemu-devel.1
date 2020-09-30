@@ -2,143 +2,126 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,PI_IMPORTANCE_HIGH,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D794C4363D
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 21:06:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 121D3C4363D
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 21:09:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C42820759
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 21:06:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 36D4220759
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 21:09:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="XwW0dInb";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="h6qQKXSH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C42820759
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="TqVHypUh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36D4220759
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNjIv-0003OV-AD
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 17:06:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38258)
+	id 1kNjME-0007g7-5I
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 17:09:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39960)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <tsimpson@quicinc.com>)
- id 1kNj0i-0004OI-Cl
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 16:47:36 -0400
-Received: from alexa-out-sd-02.qualcomm.com ([199.106.114.39]:5310)
- by eggs.gnu.org with esmtps (TLS1.2:RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <tsimpson@quicinc.com>)
- id 1kNj0f-0006ZA-I8
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 16:47:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
- t=1601498853; x=1633034853;
- h=from:to:cc:subject:date:message-id:references:
- in-reply-to:content-transfer-encoding:mime-version;
- bh=42Ge5efPkaXPSnMOLe26ep3+T7RPN39vDhzafqasT2A=;
- b=XwW0dInb+y/UFzCco1RR2iROPt+pdj6xpfrufsA6s/ng8D5ZMZAjv+3+
- 3FjZhR8jBB24MyFDWPoORak2T3Gsdn7ZZBNAvXUa2XUilkGAxuWBZfLv/
- DeYY2io41VZUWTfS867WQAmXpctd35A03Mo9oDDc7eGPRq/IFxcooKU/N I=;
-Received: from unknown (HELO ironmsg02-sd.qualcomm.com) ([10.53.140.142])
- by alexa-out-sd-02.qualcomm.com with ESMTP; 30 Sep 2020 13:47:29 -0700
-X-QCInternal: smtphost
-Received: from nasanexm03d.na.qualcomm.com ([10.85.0.91])
- by ironmsg02-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
- 30 Sep 2020 13:47:29 -0700
-Received: from nasanexm03g.na.qualcomm.com (10.85.0.49) by
- nasanexm03d.na.qualcomm.com (10.85.0.91) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Wed, 30 Sep 2020 13:47:28 -0700
-Received: from NAM04-CO1-obe.outbound.protection.outlook.com (199.106.107.6)
- by nasanexm03g.na.qualcomm.com (10.85.0.49) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2 via Frontend Transport; Wed, 30 Sep 2020 13:47:28 -0700
-Received: from BYAPR02MB4886.namprd02.prod.outlook.com (2603:10b6:a03:46::32)
- by BYAPR02MB5479.namprd02.prod.outlook.com (2603:10b6:a03:a5::31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.24; Wed, 30 Sep
- 2020 20:47:00 +0000
-Received: from BYAPR02MB4886.namprd02.prod.outlook.com
- ([fe80::76:5029:2fff:f10c]) by BYAPR02MB4886.namprd02.prod.outlook.com
- ([fe80::76:5029:2fff:f10c%6]) with mapi id 15.20.3433.032; Wed, 30 Sep 2020
- 20:47:00 +0000
-From: Taylor Simpson <tsimpson@quicinc.com>
-To: Laurent Vivier <laurent@vivier.eu>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>
-Subject: RE: [RFC PATCH v4 27/29] Hexagon (linux-user/hexagon) Linux user
- emulation
-Thread-Topic: [RFC PATCH v4 27/29] Hexagon (linux-user/hexagon) Linux user
- emulation
-Thread-Index: AQHWlb0HzVWcjEM2c02U1Hzjcbp8lKl+igOAgAMem5A=
-Date: Wed, 30 Sep 2020 20:47:00 +0000
-Message-ID: <BYAPR02MB488639031FDA8E05DA560CD5DE330@BYAPR02MB4886.namprd02.prod.outlook.com>
-References: <1601314138-9930-1-git-send-email-tsimpson@quicinc.com>
- <1601314138-9930-28-git-send-email-tsimpson@quicinc.com>
- <97b7864c-f4b2-ae8a-9ad0-d1d3c1fb309c@vivier.eu>
-In-Reply-To: <97b7864c-f4b2-ae8a-9ad0-d1d3c1fb309c@vivier.eu>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: vivier.eu; dkim=none (message not signed)
- header.d=none;vivier.eu; dmarc=none action=none header.from=quicinc.com;
-x-originating-ip: [76.120.51.212]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 0881e991-6d04-4f01-6679-08d86581fac0
-x-ms-traffictypediagnostic: BYAPR02MB5479:
-x-microsoft-antispam-prvs: <BYAPR02MB5479F3C1692916FD070D84B8DE330@BYAPR02MB5479.namprd02.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3044;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: fJvKEjHuiRUuq8iOIEQV9+2A7bwi10velM7FU9cVAwm5oM3qNqWxbaKMigTWr6Bu7QTwz0DCXg+G7P2izzfXn9XbcPp9Lyn8YsBh7C/xZ0sqsUTOHdf1f+716SgvkxFcMOLYHH8xf7V9US9Z68BxYw0UQKBamUz//xkSE7B79eQskWSb5qRP9C14GBcgLJsbnHQ9SJbu2HW9XHHgVJuM1My4ZxbW96GsXZe2bcsl9ZT8ZUPJ1YEmZk6V4KuQKlu5Y2BSSUQaUDdN/7psCQWQS7cW56RX9V+3UMYtcZAGqTd8uxQeKn4oNPUx4e7TmpLIg7Q6gStumwBxpcxHs6n32JRf1YVn4jUVxvRr2xp6Cqvt0sO4KcjtH6RyVZvSL3qO
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:BYAPR02MB4886.namprd02.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(39860400002)(346002)(396003)(366004)(136003)(376002)(83380400001)(478600001)(110136005)(4326008)(33656002)(7696005)(2906002)(26005)(186003)(316002)(54906003)(8676002)(6506007)(53546011)(66476007)(66556008)(64756008)(66446008)(8936002)(55016002)(86362001)(66946007)(76116006)(52536014)(5660300002)(71200400001)(9686003);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-antispam-messagedata: 0h+Sx44xVjnCq+CPPgM8Z6tU4yzh/oRDgYN8lp+0g0fDqqX7SVMBB29eXAcIHUJOGQu40qCM+0kn3HzGiHsygfIyGpONtvD6phQAbt19FrHbAsP+CX7Z5GEI+V14UUL+LeS8Hqf4W7dJ2+nYdzyRTOCHe4K//hcdb6J80SXDzEl+r11e6mG2w4hlOW/2hOsaF8gR0Qq8M45NO5O+sv3NsD5JNlSPoXvwnVInNOvKkeeAqRrlhQ/nN0eMNGuBhoUQp82PICZvxk2d2pKPMaPVrcP02eFPDbujTxowhLUhxjDu+IKnHJm8d6vgsFeeD5Sxabc15RXG4MGZniRlicg98xYaBwN7BqV/HDXTiYjBNt7QF+/VMsZHaJZcgvDBwhSDrAAnEUDq6iQZNwUrwoUuOofTIzh4l1HAHpqbnwhjbrcysTMJDI6EfFQMH9EEEvSsxwi5BEgd6K1h+NBXYlnCwjO3JzcdaelZt7jlnGMLoRhPhoLVBepCtm0/OtJS5npZuHsr0qFQXdZaRfci0SvHjlTbPceYF5N0h+H2wVt4Lny38CGIpVsH2P2AonhdbACE3gLuclkuuswZbD6k6/i3FPg23HbV4023hcyE8KhOQRdvdC9cvbWbNwcC8ZuPox0LSd+qIkOSeZStBf2QYreFVw==
-x-ms-exchange-transport-forked: True
-arc-seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MYReo1EzZvOwIuAhn+CQyryVYPlm6Yb9I+iUTDnu263yqZppsjbhthG+SnRaUr6t4jP2nIJzpaG68edXdSpUN7s+q+sIIsBnlNWK2A0VUqWB4aC2pe8f0H67OeBBtzAvmgQN7wYIs2VE2AwxxCO5F1EsfSWErF9QNVsUemEGrJyLFvWF6Ibml282oF2e8bsMeuC5KkRw9ZfpPGdzCCHfXGRW1kxK9oWHR+L9wIHIYAIZSyGTcv8qEu7gZoyW5G2xIkhc04NjG+yFfKaI3fAtUw/kzJgd02R/NsP+Q50MbsCVZXanKb7zhHjfYec5LBtO0FRhnX84AKnr0E7OwVdX3w==
-arc-message-signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ (Exim 4.90_1) (envelope-from <Wei.Huang2@amd.com>)
+ id 1kNjBT-0005or-Ue
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 16:58:46 -0400
+Received: from mail-eopbgr690052.outbound.protection.outlook.com
+ ([40.107.69.52]:36746 helo=NAM04-CO1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <Wei.Huang2@amd.com>)
+ id 1kNjBN-0007fA-DI
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 16:58:42 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=adZXIg/ekdy/CC6LVI/tcn/KSIsaO+x+5hDJw1ZfmNmDlT60APVDBJw3Dpk+Euaxjfw6HC2BG+B8XqZPKbaxzxOsMcuwzKnoF0ixpoGxUOM31661MJ8ZtyYaUUs6KjXAmAPqq3opYH52iwo1QWEUtClATLrCsanaUzeRBVTI+qxSZBZ+MAElRWLqX2zozukp0ag1ryGhQLQ8ADh6L6MjNNSKCByDxSWeILbJLPEJmiKXVFzD4ZtK2OxSF35x38Pb3yRNivEaTOZz8OP82BANTmI5u4iSJNWTklD6Gaagy26jpeozJbX12MuiGADOJH0Ui5w/4IKu1ADRAo2YdOdHUA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Gft0Vi/Qyb/YrRqyLJJuu2hM97rHNzqLUEyp473/8+4=;
- b=YCFfE9om/wpj4QXxlJhveSq/hPjRue5NOo9iNhlQKizlJG498AxgI4Ebup3PWr+ErwSmaA06nK0ZMKHj7l3AOeTL3p/gssnz4hpp447WRRiuCM0ArabvXU8GPjDSSneFO3X6iYIwYfJZSzdWkrVASGc9UqSJ5QzxgJRCQLHms90G+N+2B2tzDXpzw5LaRJF/mvMssdZKz/EH/vzqHm4LtWDSfpk085cXSRqc2ZEhmt/OZ2mITBseFqEsaaPCPMNwzZ/m57hqSDwsXUUdNbCCCd3AqcyGC7/tABD3jJZd6YJDbxGLW/sqaWyBF3h7V9i9UBkG6y4AEqhQw+qKZw719w==
-arc-authentication-results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
- dkim=pass header.d=quicinc.com; arc=none
-dkim-signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
+ bh=4UFXVc8aHXdKRtpaXN2Qgmo61VtaGWwY4A7Z19EmO0s=;
+ b=QH+ej8oJ0aDP2KyLOL6H6uX9DluMk9P4e2KDiUQVc9SneU22XSsuDZpFJ44+2VZrgDf9eS2lRioKazJj4zIDEPW/y0lyZash5wDBWenbaFl9luWFOAipTQJKxhQdTZ61OxL1QiHdMATV1iJXPrnB0KQrZy/71+T66x9OLeVpNeYhFgOPVWvn061Edu6N6gFjpfKSHg05li4PcmAL4LOUmZE806qFAABWxZAmy10pvx9jpr6ZWFJV33tacjANT89kXtIGkndXkB80MhVFZSXzrzRlJfSYMGNwfVKWBiCUtVUZl/qtro62FuWuXmvUt+qoIDhRVEgUk2eu0XVFDEchGA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Gft0Vi/Qyb/YrRqyLJJuu2hM97rHNzqLUEyp473/8+4=;
- b=h6qQKXSH/wmwB6aWurWNCDC/aenIP5kP2AG3LEyA/JQDqGnmCXgdBJGoUwFvqmh1ELWPqCc+ZtG6ZtFL3IBWOhCzH0EQ4B4QRj3yxg3ZZQTPewUU5G7LRxb/7QSIaujn52iYklPId1A5W6gfbMWA/XlV5b9mszo9soAsPkJ6Qqo=
-x-ms-exchange-crosstenant-authas: Internal
-x-ms-exchange-crosstenant-authsource: BYAPR02MB4886.namprd02.prod.outlook.com
-x-ms-exchange-crosstenant-network-message-id: 0881e991-6d04-4f01-6679-08d86581fac0
-x-ms-exchange-crosstenant-originalarrivaltime: 30 Sep 2020 20:47:00.3046 (UTC)
-x-ms-exchange-crosstenant-fromentityheader: Hosted
-x-ms-exchange-crosstenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
-x-ms-exchange-crosstenant-mailboxtype: HOSTED
-x-ms-exchange-crosstenant-userprincipalname: cVz8hBjnD9zzdmSR/G58WugtdRUXlQeaDhgbZRBLQFmhPsB3heM/CdNU2gyKIkDKlbRWU8/yGCeo4LWmozpFHg==
-x-ms-exchange-transport-crosstenantheadersstamped: BYAPR02MB5479
-x-originatororg: quicinc.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ bh=4UFXVc8aHXdKRtpaXN2Qgmo61VtaGWwY4A7Z19EmO0s=;
+ b=TqVHypUhpfPtZveE5mv8tcnnpKdbl2P7Lh06o3PtLjj65ZTnhLkGV6tF0QMrFYANnPo8RzufYjrdQhnK9cmMHEYrF/KS8iAFMv1fPOl3GOa1F9JfYIk8FKREsGhtLxgRo8iaVCNaO90dFqlhR1MTHLHzuFzE4BhkY8d47j5LY14=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
+Received: from CY4PR12MB1494.namprd12.prod.outlook.com (2603:10b6:910:f::22)
+ by CY4PR1201MB0022.namprd12.prod.outlook.com (2603:10b6:910:1e::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3433.35; Wed, 30 Sep
+ 2020 20:43:29 +0000
+Received: from CY4PR12MB1494.namprd12.prod.outlook.com
+ ([fe80::11f9:59c8:16c0:7718]) by CY4PR12MB1494.namprd12.prod.outlook.com
+ ([fe80::11f9:59c8:16c0:7718%8]) with mapi id 15.20.3412.029; Wed, 30 Sep 2020
+ 20:43:29 +0000
+Date: Wed, 30 Sep 2020 15:43:26 -0500
+From: Wei Huang <wei.huang2@amd.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH V1 2/3] amd-iommu: Sync IOVA-to-GPA translation during
+ page invalidation
+Message-ID: <20200930204326.GA1024738@weilap>
+References: <20200928200506.75441-1-wei.huang2@amd.com>
+ <20200928200506.75441-3-wei.huang2@amd.com>
+ <20200929133414.41982c53@x1.home>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200929133414.41982c53@x1.home>
+X-Originating-IP: [24.55.15.93]
+X-ClientProxiedBy: MN2PR14CA0026.namprd14.prod.outlook.com
+ (2603:10b6:208:23e::31) To CY4PR12MB1494.namprd12.prod.outlook.com
+ (2603:10b6:910:f::22)
+Importance: high
+X-Priority: 1
 MIME-Version: 1.0
-Received-SPF: pass client-ip=199.106.114.39; envelope-from=tsimpson@quicinc.com;
- helo=alexa-out-sd-02.qualcomm.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 16:47:30
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost (24.55.15.93) by
+ MN2PR14CA0026.namprd14.prod.outlook.com (2603:10b6:208:23e::31) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3433.36 via Frontend
+ Transport; Wed, 30 Sep 2020 20:43:28 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 85370383-001c-44c6-2897-08d865817cce
+X-MS-TrafficTypeDiagnostic: CY4PR1201MB0022:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <CY4PR1201MB00221EDA47EC71351858BBA7CF330@CY4PR1201MB0022.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3968;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: k6btmSrwY/K0/+WRpjOkBuxnkeZBHrxhoLRPPzh51SEHYmHILQ8hB7C3BktgKmW99cwmPCI/X926di2v4V3HwpfRGe+rsArwU/XlddUcv8H2Iqc93q2m5QQwM11PkrFQDGCey1j1dnyGJmRF0fwVvhDUtqib96lFMmEY9Qiu1TIPcfD2+y+4eoqmCYp9vXEuLMYfy7ZwNvPasNK7AzYhMD+Bmlb+eaVz9VUXo0rL4r1T2E3gZ+28smZHbx+LbwMxPX4kUnTNCoH3XCDZBboZ4FefwS9vzmQZZbfprE9IbyUr2fapRyaNQopoiIOJAicMgGV+I+khUzW4JIjrqW5ILw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:CY4PR12MB1494.namprd12.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(7916004)(4636009)(366004)(39860400002)(136003)(376002)(396003)(346002)(6916009)(33716001)(6496006)(52116002)(1076003)(66946007)(66556008)(4326008)(83380400001)(478600001)(956004)(33656002)(316002)(66476007)(86362001)(5660300002)(26005)(8936002)(8676002)(186003)(16526019)(6486002)(2906002)(9686003);
+ DIR:OUT; SFP:1101; 
+X-MS-Exchange-AntiSpam-MessageData: 1/I+My+wCc8bmYpTI1zUMOiwADIKPw62g/H2CCMQBhSTc1VPWQ9Ku9YAowPlY+Go8oAGblB5ajKJEH/K2NsJz1/UMVy+ilRAfGKR01KovD8GDeUQck8Ad0ZqVN2NfsMhuwQe5FcdAxZlcE0AbLTYstPd33BPA7gWC2wHuNf25T0uO8LhNE48QGS3rM1VcKx9aUWGu8DxELEOoHRbrLsuiANq69MIK6dY3M4n2GiSAB7WLhknEA/vdAe6LaKSuOd6j+9X/4MVtPBKnR1S+HwmQvuywbNzo6vaDUmuW3yC7zYwe5wJJ9GvtxsxqlMM8J08ahW6ulyETNY0UNRqHUdj4e5QsOkyworKplFbHABrjjqRo2S/qJPY0ADTbFPTtXGztU3usdbw9m6ZRYmetZEoCrNsKF7vKx81iUK27oLqj3ECWb3AASzyyf9QsqDpjdWTxZ3lWvbJVqo215h8o3fW5lDrv9eFiWhpQz0uCoMFcrEzHzq9h/Yw1fLUa0J4bDCkEg8ptHXkS0UQ0ABWtH8xxR89T1FWoWXMb7bdgRcY1YcMRUZ9x77bFDq9P1nMZL4RaYL7RC5Zd4r/mvZsNk4GlOCP6WtM8jmfmHGaH9QgpTggXxBnKddfGzzOZdjUfbRGZPKRA8Heq4H4K9F2vswskg==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 85370383-001c-44c6-2897-08d865817cce
+X-MS-Exchange-CrossTenant-AuthSource: CY4PR12MB1494.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Sep 2020 20:43:29.5105 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qIobociy7+K+u/buw/wNFWFpNczMyHaLX9AYLGWf+DAl+YwtemeKub3HCi2bhfdc
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1201MB0022
+Received-SPF: none client-ip=40.107.69.52; envelope-from=Wei.Huang2@amd.com;
+ helo=NAM04-CO1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 16:58:34
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -19
+X-Spam_score: -2.0
+X-Spam_bar: --
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, FORGED_SPF_HELO=1, MSGID_FROM_MTA_HEADER=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.373, SPF_HELO_PASS=-0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -151,40 +134,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "ale@rev.ng" <ale@rev.ng>, "philmd@redhat.com" <philmd@redhat.com>,
- "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "aleksandar.m.mail@gmail.com" <aleksandar.m.mail@gmail.com>
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ peterx@redhat.com, pbonzini@redhat.com, Suravee.Suthikulpanit@amd.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTGF1cmVudCBWaXZpZXIg
-PGxhdXJlbnRAdml2aWVyLmV1Pg0KPiBTZW50OiBNb25kYXksIFNlcHRlbWJlciAyOCwgMjAyMCAz
-OjAzIFBNDQo+IFRvOiBUYXlsb3IgU2ltcHNvbiA8dHNpbXBzb25AcXVpY2luYy5jb20+OyBxZW11
-LWRldmVsQG5vbmdudS5vcmcNCj4gQ2M6IHJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmc7IHBo
-aWxtZEByZWRoYXQuY29tOyByaWt1LnZvaXBpb0Bpa2kuZmk7DQo+IGFsZWtzYW5kYXIubS5tYWls
-QGdtYWlsLmNvbTsgYWxlQHJldi5uZw0KPiBTdWJqZWN0OiBSZTogW1JGQyBQQVRDSCB2NCAyNy8y
-OV0gSGV4YWdvbiAobGludXgtdXNlci9oZXhhZ29uKSBMaW51eCB1c2VyDQo+IGVtdWxhdGlvbg0K
-Pg0KPiA+ICsNCj4gPiArc3lzY2FsbF9ucl9nZW5lcmF0b3JzICs9IHsNCj4gPiArICAnaGV4YWdv
-bic6IGdlbmVyYXRvcihzaCwNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICBhcmd1bWVudHM6
-IFsgJ2NhdCcsICdzeXNjYWxsX25yLmgnLCAnPicsICdAT1VUUFVUQCcgXSwNCj4gPiArICAgICAg
-ICAgICAgICAgICAgICAgb3V0cHV0OiAnQEJBU0VOQU1FQF9uci5oJykNCj4NCj4gV2h5IGRvIHdl
-IG5lZWQgdGhhdD8NCj4gVGhlIHN5c2NhbGxfbnJfZ2VuZXJhdG9ycyBpcyB1c2VkIHRvIGdlbmVy
-YXRlIHN5c2NhbGxfbnIuaCBmcm9tIHN5c2NhbGwudGJsDQoNClRoZSBvdGhlciBsaW51eC11c2Vy
-IHRhcmdldHMgaGF2ZSB0aGlzIGluIHRoZWlyIG1lc29uLmJ1aWxkIGZpbGVzLiAgSSdsbCByZW1v
-dmUgaWYgaXQncyBub3QgbmVlZGVkLg0KDQo+DQo+ID4gK30NCj4gPiBkaWZmIC0tZ2l0IGEvbGlu
-dXgtdXNlci9tZXNvbi5idWlsZCBiL2xpbnV4LXVzZXIvbWVzb24uYnVpbGQNCj4gPiBpbmRleCAy
-Yjk0ZTRiLi44YjFkZmM4IDEwMDY0NA0KPiA+IC0tLSBhL2xpbnV4LXVzZXIvbWVzb24uYnVpbGQN
-Cj4gPiArKysgYi9saW51eC11c2VyL21lc29uLmJ1aWxkDQo+ID4gQEAgLTIyLDYgKzIyLDcgQEAg
-c3lzY2FsbF9ucl9nZW5lcmF0b3JzID0ge30NCj4gPg0KPiA+ICBzdWJkaXIoJ2FscGhhJykNCj4g
-PiAgc3ViZGlyKCdhcm0nKQ0KPiA+ICtzdWJkaXIoJ2hleGFnb24nKQ0KPg0KPiBzbyB5b3UgZG9u
-J3QgbmVlZCB0aGF0IGVpdGhlcg0KDQpPSw0KDQo+ID4gLSAgICBncmVwIC1lICIjZGVmaW5lIF9f
-TlJfIiAtZSAiI2RlZmluZSBfX05SMzI2NCINCj4gPiArICAgIGdyZXAgLWUgIiNkZWZpbmUgX19O
-Ul8iIC1lICIjZGVmaW5lIF9fTlIzMjY0IiB8IGdyZXAgLXYNCj4gX19OUl9zeXNjYWxscw0KPg0K
-PiBXaHkgZG8geW91IHJlbW92ZSBfX05SX3N5c2NhbGxzPw0KDQpPbGRlciBrZXJuZWxzIGhhdmUg
-YSBidW5jaCBvZg0KI3VuZGVmIF9fTlJfc3lzY2FsbHMNCiNkZWZpbmUgX19OUl9zeXNjYWxscyAg
-WA0KDQpUaGUgc2NyaXB0IHJlbW92ZXMgYWxsICN1bmRlZidzIGJ1dCBsZWF2ZXMgdGhlICNkZWZp
-bmUncywgc28gd2UgZ2V0IGNvbXBpbGUgZXJyb3JzLiAgVGhhdCBzeW1ib2wgaXNuJ3QgdXNlZCBi
-eSBxZW11IHNvIGl0J3Mgc2FmZSB0byByZW1vdmUuDQoNCg0K
+On 09/29 01:34, Alex Williamson wrote:
+> On Mon, 28 Sep 2020 15:05:05 -0500
+> Wei Huang <wei.huang2@amd.com> wrote:
+> 
+> > Add support to sync the IOVA-to-GPA translation at the time of IOMMU
+> > page invalidation. This function is called when two IOMMU commands,
+> > AMDVI_CMD_INVAL_AMDVI_PAGES and AMDVI_CMD_INVAL_AMDVI_ALL, are
+> > intercepted. Address space notifiers are called accordingly.
+> > 
+> > Co-developed-by: Wei Huang <wei.huang2@amd.com>
+> > Signed-off-by: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
+> > ---
+> >  hw/i386/amd_iommu.c | 177 ++++++++++++++++++++++++++++++++++++++++++++
+> >  hw/i386/amd_iommu.h |  10 +++
+> >  hw/vfio/common.c    |   3 +-
+> >  3 files changed, 189 insertions(+), 1 deletion(-)
+> ...
+> > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> > index 13471ae29436..243216499ce0 100644
+> > --- a/hw/vfio/common.c
+> > +++ b/hw/vfio/common.c
+> > @@ -346,7 +346,8 @@ static int vfio_dma_map(VFIOContainer *container, hwaddr iova,
+> >       * the VGA ROM space.
+> >       */
+> >      if (ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0 ||
+> > -        (errno == EBUSY && vfio_dma_unmap(container, iova, size) == 0 &&
+> > +        ((errno == EEXIST || errno == EBUSY) &&
+> > +         vfio_dma_unmap(container, iova, size) == 0 &&
+> >           ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0)) {
+> >          return 0;
+> >      }
+> 
+> 
+> This seems like it should be a separate patch.  AFAICT the commit log
+> doesn't even hint at why this change is necessary.  I think the -EBUSY
+> error pre-dates vIOMMU as well.  Responding the same for an -EEXIST
+> almost suggests a coherency issue between QEMU and the kernel, or a
+> direct mapping replacement without an invalidation, which doesn't seem
+> to be what this patch is implementing.  Thanks,
+
+I went back to check it. Removing this checking code (original code) didn't
+trigger any issues with Intel 10G passthru NIC. I think this was from the
+residual debugging code when we started to implement it. Sorry for the
+confusion. I will remove this code in V2 with more tests.
+
+-Wei
+
+> 
+> Alex
+> 
 
