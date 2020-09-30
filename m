@@ -6,66 +6,65 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66EDBC4727E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 11:05:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3903DC4727E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 11:06:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD3772068E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 11:05:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 939C0206FC
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 11:06:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M0FplFNz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD3772068E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D7wMSvnV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 939C0206FC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33734 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNZvk-0001EH-Ro
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 07:05:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55582)
+	id 1kNZwA-0001xP-H8
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 07:06:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55116)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kNZuJ-0008Ny-CT
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 07:04:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30061)
+ id 1kNZti-00086V-BU
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 07:03:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52932)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kNZuF-0001Ws-Ih
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 07:04:23 -0400
+ id 1kNZtg-0001Rf-9l
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 07:03:45 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601463858;
+ s=mimecast20190719; t=1601463822;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=A/CznNpuyJvbv4JQjnk+aGX1+MTREStmMXL97Rg0LDo=;
- b=M0FplFNzkQNAM+rpTk9bkX5d/0uLSnb9l9Ej78MlOGXzJSavxVc6mJ1f99N1NGMEKFaHnO
- cmQqYYTegsHpanB9s5CpASi5vJi6mR6zCpDYswpGX75K1K7BvhOCidVpdNqkb6knXXc7aP
- haPdExGGVyenard67s6C2d8GOj4hfWA=
+ bh=E3+glWeiPUvt1n6JbCH7MZWYFGqCSGzNrwq15y5sKl4=;
+ b=D7wMSvnVP0Q9r8JhCLi+pn1X50lekukI+FvM1mAwN1y7EqnJ1zdcEvrXcsft+rxOHf/+OI
+ 8NXcmM1XxXej25zUWqGyL1lAOd5Sanf1QfYJwDvtRz34oUNu0xrhXEEu17ZeEgDAA/izkZ
+ ib1xy13iYKMK2dbc6Qe9Hzl39rc3NCY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-442-hEyy78ZWPROQpULe8ga6ug-1; Wed, 30 Sep 2020 07:04:14 -0400
-X-MC-Unique: hEyy78ZWPROQpULe8ga6ug-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-174-SJROutHSP7uwRQmy5AzPxw-1; Wed, 30 Sep 2020 07:03:40 -0400
+X-MC-Unique: SJROutHSP7uwRQmy5AzPxw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 350821018F65;
- Wed, 30 Sep 2020 11:04:13 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C958F425CE;
+ Wed, 30 Sep 2020 11:03:39 +0000 (UTC)
 Received: from localhost (unknown [10.10.67.5])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E9E6C7B40D;
- Wed, 30 Sep 2020 11:04:12 +0000 (UTC)
-Date: Wed, 30 Sep 2020 07:04:12 -0400
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 88F5E19D61;
+ Wed, 30 Sep 2020 11:03:39 +0000 (UTC)
+Date: Wed, 30 Sep 2020 07:03:38 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v4 36/46] qapi/introspect.py: assert obj is a dict when
- features are given
-Message-ID: <20200930110412.GP3717385@habkost.net>
+Subject: Re: [PATCH v4 30/46] qapi/gen.py: Fix edge-case of _is_user_module
+Message-ID: <20200930110338.GO3717385@habkost.net>
 References: <20200930043150.1454766-1-jsnow@redhat.com>
- <20200930043150.1454766-37-jsnow@redhat.com>
+ <20200930043150.1454766-31-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200930043150.1454766-37-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200930043150.1454766-31-jsnow@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -103,11 +102,12 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 30, 2020 at 12:31:40AM -0400, John Snow wrote:
-> This is necessary to keep mypy passing in the next patch when we add
-> preliminary type hints. It will be removed shortly.
+On Wed, Sep 30, 2020 at 12:31:34AM -0400, John Snow wrote:
+> The edge case is that if the name is '', this expression returns a
+> string instead of a bool, which violates our declared type.
 > 
 > Signed-off-by: John Snow <jsnow@redhat.com>
+> Reviewed-by: Cleber Rosa <crosa@redhat.com>
 
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
