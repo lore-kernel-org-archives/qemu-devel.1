@@ -2,80 +2,83 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-4.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFCF1C4727C
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 18:04:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF5E8C4727C
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 18:07:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEDE420759
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 18:04:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 256942076A
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 18:07:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JSOMPhvU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEDE420759
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dlgpHRoB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 256942076A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNgT0-0003ay-PS
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 14:04:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55528)
+	id 1kNgVM-000628-8u
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 14:07:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58788)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kNgEJ-0005Qg-PU
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 13:49:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21416)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1kNgSH-0003SX-4s
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 14:03:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34070)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kNgEH-0004l4-5o
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 13:49:27 -0400
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1kNgSD-00062i-JF
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 14:03:52 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601488164;
+ s=mimecast20190719; t=1601489023;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=RekXMZJJi9/OYXpPR25DJMNK7IVPaYnVxBZCNzQlolM=;
- b=JSOMPhvU8l1MY1FoY3Ok7tJgQYMkT40J5wIhkDNCsqiSHZtf1M9CXYLleO8a4yu27atOCj
- sRepv60/o1pl97G8thxHKbfV0rqjUezOwDujpf3tlW3ogOcClVNWmFCtbH2e6TQZ4LFUwG
- 0oCnE7qvqggU41VvCp6ynaprbvyHlxA=
+ bh=c69AuHOCVWxj7KVRoZ+yeYpM6mrEE2McSVVh5laBh58=;
+ b=dlgpHRoBtanU91piYtyOR+WoVaj9c88KItprAl0UZHTnbg4Ego1sQkyD1Idn+zsFX/A40t
+ NzxDiiKnIdni1n3ijiV4hANVJbt6JzedR9uORKBF+tpxztk8AXklTLMiSDD7l9Lb/o9c1X
+ 3Uoqihz/VRCsuRuWs8m4OZB9iVJMyJ4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-211-sd68iLxxMZagu1doMA2Gtw-1; Wed, 30 Sep 2020 13:49:21 -0400
-X-MC-Unique: sd68iLxxMZagu1doMA2Gtw-1
+ us-mta-184-qomsOYGUO8CyUaqnEfQO6Q-1; Wed, 30 Sep 2020 14:03:41 -0400
+X-MC-Unique: qomsOYGUO8CyUaqnEfQO6Q-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 117B3801FD5;
- Wed, 30 Sep 2020 17:49:20 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
- [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8AF461002C0A;
- Wed, 30 Sep 2020 17:49:09 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 723EA3F118; Wed, 30 Sep 2020 19:48:56 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 10/12] tests/acpi: add microvm pcie test
-Date: Wed, 30 Sep 2020 19:48:53 +0200
-Message-Id: <20200930174856.11296-11-kraxel@redhat.com>
-In-Reply-To: <20200930174856.11296-1-kraxel@redhat.com>
-References: <20200930174856.11296-1-kraxel@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C97F81E20B
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 18:03:40 +0000 (UTC)
+Received: from starship (unknown [10.35.206.29])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EBBDF1002C1C;
+ Wed, 30 Sep 2020 18:03:29 +0000 (UTC)
+Message-ID: <04df3e246ceeefbef0d832841b87fcfcb1baa9ad.camel@redhat.com>
+Subject: Re: [PATCH 06/10] device-core: use atomic_set on .realized property
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Date: Wed, 30 Sep 2020 21:03:27 +0300
+In-Reply-To: <e2cf2854-72bc-2f17-88b8-a2548f184583@redhat.com>
+References: <20200925172604.2142227-1-pbonzini@redhat.com>
+ <20200925172604.2142227-7-pbonzini@redhat.com>
+ <9182aa173b31989e07668194e18f4dcb31981388.camel@redhat.com>
+ <e2cf2854-72bc-2f17-88b8-a2548f184583@redhat.com>
+User-Agent: Evolution 3.36.3 (3.36.3-1.fc32)
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mlevitsk@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mlevitsk@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:26:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:31:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -25
 X-Spam_score: -2.6
@@ -96,59 +99,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Radoslaw Biernacki <rad@semihalf.com>,
- Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Leif Lindholm <leif@nuviainc.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Message-id: 20200928104256.9241-11-kraxel@redhat.com
----
- tests/qtest/bios-tables-test.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+On Wed, 2020-09-30 at 19:44 +0200, Paolo Bonzini wrote:
+> On 30/09/20 16:31, Maxim Levitsky wrote:
+> > > +
+> > > +        qatomic_set(&dev->realized, value);
+> > > +        /*
+> > > +         * Ensure that concurrent users see this update prior to
+> > > +         * any other changes done by unrealize.
+> > > +         */
+> > > +        smp_wmb();
+> > 
+> > I''l probably never fully understand where to use read/write/full barrier.
+> > If I understand corrctly, read barrier prevents reads done by this thread to be reordered,
+> > by the CPU and write barrier prevents writes done by this CPU to be re-ordered.
+> 
+> I must say that the above is not really satisfactory.  The right thing
+> to do would be to say which changes are done by unrealize; then you
+> should make sure that *after* reading something that unrealize could
+> undo you check if dev->realized is still true.
+I didn't fully understand this to be honest.
 
-diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
-index 7be2b3131e16..edf672d26f0b 100644
---- a/tests/qtest/bios-tables-test.c
-+++ b/tests/qtest/bios-tables-test.c
-@@ -1091,6 +1091,18 @@ static void test_acpi_microvm_tcg(void)
-     free_test_data(&data);
- }
- 
-+static void test_acpi_microvm_pcie_tcg(void)
-+{
-+    test_data data;
-+
-+    test_acpi_microvm_prepare(&data);
-+    data.variant = ".pcie";
-+    data.tcg_only = true; /* need constant host-phys-bits */
-+    test_acpi_one(" -machine microvm,acpi=on,rtc=off,pcie=on",
-+                  &data);
-+    free_test_data(&data);
-+}
-+
- static void test_acpi_virt_tcg_numamem(void)
- {
-     test_data data = {
-@@ -1213,6 +1225,9 @@ int main(int argc, char *argv[])
-         qtest_add_func("acpi/piix4/acpihmat", test_acpi_piix4_tcg_acpi_hmat);
-         qtest_add_func("acpi/q35/acpihmat", test_acpi_q35_tcg_acpi_hmat);
-         qtest_add_func("acpi/microvm", test_acpi_microvm_tcg);
-+        if (strcmp(arch, "x86_64") == 0) {
-+            qtest_add_func("acpi/microvm/pcie", test_acpi_microvm_pcie_tcg);
-+        }
-     } else if (strcmp(arch, "aarch64") == 0) {
-         qtest_add_func("acpi/virt", test_acpi_virt_tcg);
-         qtest_add_func("acpi/virt/numamem", test_acpi_virt_tcg_numamem);
--- 
-2.27.0
+I just wanted to explain what I know and what I don't know about hardware barriers.
+
+I know that read barriers should be paired with write barriers, like if one CPU has a write barrier,
+which ensures the orders of writes to two memory locations, the other CPU can then use a read barrier to ensure
+that it sees those writes in this order.
+
+I thus think that reads of dev->realized should be paired with read barrier, 
+but here a full memory barrier isn't really needed.
+
+Best regards,
+	Maxim Levitsky
+
+> 
+> scsi_device_find is one such case, but I'm not convinced it is enough.
+> 
+> Paolo
+> 
+> > Both (depending on the macro) usually imply compiler barrier (to avoid compilier re-ordering
+> > stuff...)
+
 
 
