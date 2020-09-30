@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98A05C4727C
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:17:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8694DC4727E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:21:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 965802071E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:17:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EEFB12071E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:21:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dRTdS+Aw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 965802071E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dBmy1j+V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEFB12071E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNdrb-0007w1-70
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 11:17:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60194)
+	id 1kNdvE-00020d-M9
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 11:21:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60510)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kNdWU-0004Kr-L9
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 10:56:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47304)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kNdWj-0004qM-Tx
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 10:56:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50393)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kNdWO-0004Yh-61
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 10:56:02 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kNdWa-0004an-8O
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 10:56:17 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601477755;
+ s=mimecast20190719; t=1601477767;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=x4LCiAqgooe34+SkheYO0tpyF+RaQ0QN3qOLcYiyCc8=;
- b=dRTdS+Awtm5ryyH4JXWXdcUEhRaLWGiGikVeqLfteOabUWBFbRUWspqg9s33VBVkhWpePp
- u0Nn0xHpJInONysUnV26Psn3HhxevuDOC0vu2uNX0e+/wV1Elv6tRjzgNlJgmhOEK7H5q9
- 0BOHsZ4bP9jNbGLw7KEdhrWU7bdZK5k=
+ bh=IX2Z9mOEG2EBJSY/JwVni8dnEhaWd6X971tJ1/9Og94=;
+ b=dBmy1j+VUBZnvnUBiD1n7GX3uUTyYB5QzOSraYKaza4mGQAD5crxFEb9cv4N0f0IN4czdt
+ A73tFVeT7D6XL4G2KsI5ysUL54E0weTO5Prdfr6w3ldv1Znhg3xa6EN6rLknBzveBcsKaj
+ JiP2VPZpJq4ari4TeURBJmG6rEodMwE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-339-VuSjdRMnN-q83-Ux4g1icw-1; Wed, 30 Sep 2020 10:55:53 -0400
-X-MC-Unique: VuSjdRMnN-q83-Ux4g1icw-1
+ us-mta-505-WmDvmeDmO-ag7J_0bgllSw-1; Wed, 30 Sep 2020 10:56:03 -0400
+X-MC-Unique: WmDvmeDmO-ag7J_0bgllSw-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31D658015B0;
- Wed, 30 Sep 2020 14:55:52 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B844580B73A;
+ Wed, 30 Sep 2020 14:56:02 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-113-220.ams2.redhat.com [10.36.113.220])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 572285C1C4;
- Wed, 30 Sep 2020 14:55:50 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8243A5C1C4;
+ Wed, 30 Sep 2020 14:56:00 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 09/20] s390x/tcg: Implement 32/128 bit for VECTOR FP
- COMPARE *
-Date: Wed, 30 Sep 2020 16:55:12 +0200
-Message-Id: <20200930145523.71087-10-david@redhat.com>
+Subject: [PATCH v1 14/20] s390x/tcg: Implement 32/128 bit for VECTOR FP SQUARE
+ ROOT
+Date: Wed, 30 Sep 2020 16:55:17 +0200
+Message-Id: <20200930145523.71087-15-david@redhat.com>
 In-Reply-To: <20200930145523.71087-1-david@redhat.com>
 References: <20200930145523.71087-1-david@redhat.com>
 MIME-Version: 1.0
@@ -81,7 +81,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.469,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,470 +101,113 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In addition to 32/128bit variants, we also have to support the
-"Signal-on-QNaN (SQ)" bit ... let's pass it as a simple flag, I don't
-feel like duplicating all helpers and coming up with names like
-"...s_cc_sq".
-
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/helper.h           |  18 +++
- target/s390x/translate_vx.c.inc |  91 +++++++++---
- target/s390x/vec_fpu_helper.c   | 250 ++++++++++++++++++++++----------
- 3 files changed, 258 insertions(+), 101 deletions(-)
+ target/s390x/helper.h           |  3 +++
+ target/s390x/translate_vx.c.inc | 26 +++++++++++++++++++++-----
+ target/s390x/vec_fpu_helper.c   | 28 +++++++++++++++-------------
+ 3 files changed, 39 insertions(+), 18 deletions(-)
 
 diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 6bf4d3e7d0..538d55420b 100644
+index 79e3fa14f8..bee283e3d4 100644
 --- a/target/s390x/helper.h
 +++ b/target/s390x/helper.h
-@@ -258,18 +258,36 @@ DEF_HELPER_4(gvec_wfc64, void, cptr, cptr, env, i32)
- DEF_HELPER_4(gvec_wfk64, void, cptr, cptr, env, i32)
- DEF_HELPER_4(gvec_wfc128, void, cptr, cptr, env, i32)
- DEF_HELPER_4(gvec_wfk128, void, cptr, cptr, env, i32)
-+DEF_HELPER_FLAGS_5(gvec_vfce32, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
-+DEF_HELPER_FLAGS_5(gvec_vfce32s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
- DEF_HELPER_FLAGS_5(gvec_vfce64, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
- DEF_HELPER_FLAGS_5(gvec_vfce64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
-+DEF_HELPER_FLAGS_5(gvec_vfce128, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
-+DEF_HELPER_5(gvec_vfce32_cc, void, ptr, cptr, cptr, env, i32)
-+DEF_HELPER_5(gvec_vfce32s_cc, void, ptr, cptr, cptr, env, i32)
- DEF_HELPER_5(gvec_vfce64_cc, void, ptr, cptr, cptr, env, i32)
- DEF_HELPER_5(gvec_vfce64s_cc, void, ptr, cptr, cptr, env, i32)
-+DEF_HELPER_5(gvec_vfce128_cc, void, ptr, cptr, cptr, env, i32)
-+DEF_HELPER_FLAGS_5(gvec_vfch32, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
-+DEF_HELPER_FLAGS_5(gvec_vfch32s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
- DEF_HELPER_FLAGS_5(gvec_vfch64, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
- DEF_HELPER_FLAGS_5(gvec_vfch64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
-+DEF_HELPER_FLAGS_5(gvec_vfch128, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
-+DEF_HELPER_5(gvec_vfch32_cc, void, ptr, cptr, cptr, env, i32)
-+DEF_HELPER_5(gvec_vfch32s_cc, void, ptr, cptr, cptr, env, i32)
- DEF_HELPER_5(gvec_vfch64_cc, void, ptr, cptr, cptr, env, i32)
- DEF_HELPER_5(gvec_vfch64s_cc, void, ptr, cptr, cptr, env, i32)
-+DEF_HELPER_5(gvec_vfch128_cc, void, ptr, cptr, cptr, env, i32)
-+DEF_HELPER_FLAGS_5(gvec_vfche32, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
-+DEF_HELPER_FLAGS_5(gvec_vfche32s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
- DEF_HELPER_FLAGS_5(gvec_vfche64, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
- DEF_HELPER_FLAGS_5(gvec_vfche64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
-+DEF_HELPER_FLAGS_5(gvec_vfche128, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
-+DEF_HELPER_5(gvec_vfche32_cc, void, ptr, cptr, cptr, env, i32)
-+DEF_HELPER_5(gvec_vfche32s_cc, void, ptr, cptr, cptr, env, i32)
- DEF_HELPER_5(gvec_vfche64_cc, void, ptr, cptr, cptr, env, i32)
- DEF_HELPER_5(gvec_vfche64s_cc, void, ptr, cptr, cptr, env, i32)
-+DEF_HELPER_5(gvec_vfche128_cc, void, ptr, cptr, cptr, env, i32)
- DEF_HELPER_FLAGS_4(gvec_vcdg64, TCG_CALL_NO_WG, void, ptr, cptr, env, i32)
- DEF_HELPER_FLAGS_4(gvec_vcdg64s, TCG_CALL_NO_WG, void, ptr, cptr, env, i32)
- DEF_HELPER_FLAGS_4(gvec_vcdlg64, TCG_CALL_NO_WG, void, ptr, cptr, env, i32)
+@@ -321,8 +321,11 @@ DEF_HELPER_FLAGS_6(gvec_vfma64, TCG_CALL_NO_WG, void, ptr, cptr, cptr, cptr, env
+ DEF_HELPER_FLAGS_6(gvec_vfma64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, cptr, env, i32)
+ DEF_HELPER_FLAGS_6(gvec_vfms64, TCG_CALL_NO_WG, void, ptr, cptr, cptr, cptr, env, i32)
+ DEF_HELPER_FLAGS_6(gvec_vfms64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, cptr, env, i32)
++DEF_HELPER_FLAGS_4(gvec_vfsq32, TCG_CALL_NO_WG, void, ptr, cptr, env, i32)
++DEF_HELPER_FLAGS_4(gvec_vfsq32s, TCG_CALL_NO_WG, void, ptr, cptr, env, i32)
+ DEF_HELPER_FLAGS_4(gvec_vfsq64, TCG_CALL_NO_WG, void, ptr, cptr, env, i32)
+ DEF_HELPER_FLAGS_4(gvec_vfsq64s, TCG_CALL_NO_WG, void, ptr, cptr, env, i32)
++DEF_HELPER_FLAGS_4(gvec_vfsq128, TCG_CALL_NO_WG, void, ptr, cptr, env, i32)
+ DEF_HELPER_FLAGS_5(gvec_vfs32, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
+ DEF_HELPER_FLAGS_5(gvec_vfs32s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
+ DEF_HELPER_FLAGS_5(gvec_vfs64, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
 diff --git a/target/s390x/translate_vx.c.inc b/target/s390x/translate_vx.c.inc
-index cc745784e5..fd1cd6f6d5 100644
+index ee79d97e19..7d4811ccf7 100644
 --- a/target/s390x/translate_vx.c.inc
 +++ b/target/s390x/translate_vx.c.inc
-@@ -2646,45 +2646,90 @@ static DisasJumpType op_vfc(DisasContext *s, DisasOps *o)
-     const uint8_t m5 = get_field(s, m5);
-     const uint8_t m6 = get_field(s, m6);
-     const bool se = extract32(m5, 3, 1);
-+    const bool sq = extract32(m5, 2, 1);
-     const bool cs = extract32(m6, 0, 1);
--    gen_helper_gvec_3_ptr *fn;
--
--    if (fpf != FPF_LONG || extract32(m5, 0, 3) || extract32(m6, 1, 3)) {
--        gen_program_exception(s, PGM_SPECIFICATION);
--        return DISAS_NORETURN;
--    }
-+    gen_helper_gvec_3_ptr *fn = NULL;
+@@ -2955,16 +2955,32 @@ static DisasJumpType op_vfsq(DisasContext *s, DisasOps *o)
+ {
+     const uint8_t fpf = get_field(s, m3);
+     const uint8_t m4 = get_field(s, m4);
+-    gen_helper_gvec_2_ptr *fn = gen_helper_gvec_vfsq64;
++    const bool se = extract32(m4, 3, 1);
++    gen_helper_gvec_2_ptr *fn = NULL;
  
--    if (cs) {
--        switch (s->fields.op2) {
--        case 0xe8:
--            fn = se ? gen_helper_gvec_vfce64s_cc : gen_helper_gvec_vfce64_cc;
-+    switch (s->fields.op2) {
-+    case 0xe8:
-+        switch (fpf) {
-+        case FPF_SHORT:
-+            fn = se ? gen_helper_gvec_vfce32s : gen_helper_gvec_vfce32;
-+            if (cs) {
-+                fn = se ? gen_helper_gvec_vfce32s_cc :
-+                          gen_helper_gvec_vfce32_cc;
-+            }
-             break;
--        case 0xeb:
--            fn = se ? gen_helper_gvec_vfch64s_cc : gen_helper_gvec_vfch64_cc;
-+        case FPF_LONG:
-+            fn = se ? gen_helper_gvec_vfce64s : gen_helper_gvec_vfce64;
-+            if (cs) {
-+                fn = se ? gen_helper_gvec_vfce64s_cc :
-+                          gen_helper_gvec_vfce64_cc;
-+            }
-             break;
--        case 0xea:
--            fn = se ? gen_helper_gvec_vfche64s_cc : gen_helper_gvec_vfche64_cc;
-+        case FPF_EXT:
-+            fn = cs ? gen_helper_gvec_vfce128_cc : gen_helper_gvec_vfce128;
-             break;
-         default:
--            g_assert_not_reached();
-+            break;
-         }
--    } else {
--        switch (s->fields.op2) {
--        case 0xe8:
--            fn = se ? gen_helper_gvec_vfce64s : gen_helper_gvec_vfce64;
-+        break;
-+    case 0xeb:
-+        switch (fpf) {
-+        case FPF_SHORT:
-+            fn = se ? gen_helper_gvec_vfch32s : gen_helper_gvec_vfch32;
-+            if (cs) {
-+                fn = se ? gen_helper_gvec_vfch32s_cc : gen_helper_gvec_vfch32_cc;
-+            }
-             break;
--        case 0xeb:
-+        case FPF_LONG:
-             fn = se ? gen_helper_gvec_vfch64s : gen_helper_gvec_vfch64;
-+            if (cs) {
-+                fn = se ? gen_helper_gvec_vfch64s_cc : gen_helper_gvec_vfch64_cc;
-+            }
-+            break;
-+        case FPF_EXT:
-+            fn = cs ? gen_helper_gvec_vfch128_cc : gen_helper_gvec_vfch128;
-             break;
--        case 0xea:
-+        default:
-+            break;
+-    if (fpf != FPF_LONG || extract32(m4, 0, 3)) {
++    switch (fpf) {
++    case FPF_SHORT:
++        if (s390_has_feat(S390_FEAT_VECTOR_ENH)) {
++            fn = se ? gen_helper_gvec_vfsq32s : gen_helper_gvec_vfsq32;
 +        }
 +        break;
-+    case 0xea:
-+        switch (fpf) {
-+        case FPF_SHORT:
-+            fn = se ? gen_helper_gvec_vfche32s : gen_helper_gvec_vfche32;
-+            if (cs) {
-+                fn = se ? gen_helper_gvec_vfche32s_cc :
-+                          gen_helper_gvec_vfche32_cc;
-+            }
-+            break;
-+        case FPF_LONG:
-             fn = se ? gen_helper_gvec_vfche64s : gen_helper_gvec_vfche64;
-+            if (cs) {
-+                fn = se ? gen_helper_gvec_vfche64s_cc :
-+                          gen_helper_gvec_vfche64_cc;
-+            }
-+            break;
-+        case FPF_EXT:
-+            fn = cs ? gen_helper_gvec_vfche128_cc : gen_helper_gvec_vfche128;
-             break;
-         default:
--            g_assert_not_reached();
-+            break;
-         }
++    case FPF_LONG:
++        fn = se ? gen_helper_gvec_vfsq64s : gen_helper_gvec_vfsq64;
++        break;
++    case FPF_EXT:
++        if (s390_has_feat(S390_FEAT_VECTOR_ENH)) {
++            fn = gen_helper_gvec_vfsq128;
++        }
++        break;
 +    default:
 +        break;
-     }
-+
-+    if (!fn || extract32(m5, 0, 2) || extract32(m6, 1, 3) ||
-+        (!s390_has_feat(S390_FEAT_VECTOR_ENH) && (fpf != FPF_LONG || sq))) {
-+        gen_program_exception(s, PGM_SPECIFICATION);
-+        return DISAS_NORETURN;
 +    }
 +
-+    /* Pass the "sq" flag as data. */
-     gen_gvec_3_ptr(get_field(s, v1), get_field(s, v2),
--                   get_field(s, v3), cpu_env, 0, fn);
-+                   get_field(s, v3), cpu_env, sq, fn);
-     if (cs) {
-         set_cc_static(s);
++    if (!fn || extract32(m4, 0, 3)) {
+         gen_program_exception(s, PGM_SPECIFICATION);
+         return DISAS_NORETURN;
      }
+ 
+-    if (extract32(m4, 3, 1)) {
+-        fn = gen_helper_gvec_vfsq64s;
+-    }
+     gen_gvec_2_ptr(get_field(s, v1), get_field(s, v2), cpu_env,
+                    0, fn);
+     return DISAS_NEXT;
 diff --git a/target/s390x/vec_fpu_helper.c b/target/s390x/vec_fpu_helper.c
-index 1b78b6c088..e8ae608da6 100644
+index f8ebd04516..b7045e85d6 100644
 --- a/target/s390x/vec_fpu_helper.c
 +++ b/target/s390x/vec_fpu_helper.c
-@@ -20,6 +20,10 @@
- #include "exec/helper-proto.h"
- #include "fpu/softfloat.h"
+@@ -744,22 +744,24 @@ void HELPER(gvec_vfms64s)(void *v1, const void *v2, const void *v3,
+     vfma64(v1, v2, v3, v4, env, true, float_muladd_negate_c, GETPC());
+ }
  
-+const float32 float32_ones = make_float32(-1u);
-+const float64 float64_ones = make_float64(-1ull);
-+const float128 float128_ones = make_float128(-1ull, -1ull);
-+
- #define VIC_INVALID         0x1
- #define VIC_DIVBYZERO       0x2
- #define VIC_OVERFLOW        0x3
-@@ -227,109 +231,199 @@ DEF_GVEC_WFK(32)
- DEF_GVEC_WFK(64)
- DEF_GVEC_WFK(128)
- 
--typedef bool (*vfc64_fn)(float64 a, float64 b, float_status *status);
--static int vfc64(S390Vector *v1, const S390Vector *v2, const S390Vector *v3,
--                 CPUS390XState *env, bool s, vfc64_fn fn, uintptr_t retaddr)
+-static uint64_t vfsq64(uint64_t a, float_status *s)
 -{
--    uint8_t vxc, vec_exc = 0;
--    S390Vector tmp = {};
--    int match = 0;
--    int i;
+-    return float64_sqrt(a, s);
+-}
 -
--    for (i = 0; i < 2; i++) {
--        const float64 a = s390_vec_read_element64(v2, i);
--        const float64 b = s390_vec_read_element64(v3, i);
--
--        /* swap the order of the parameters, so we can use existing functions */
--        if (fn(b, a, &env->fpu_status)) {
--            match++;
--            s390_vec_write_element64(&tmp, i, -1ull);
--        }
--        vxc = check_ieee_exc(env, i, false, &vec_exc);
--        if (s || vxc) {
--            break;
--        }
--    }
--
--    handle_ieee_exc(env, vxc, vec_exc, retaddr);
--    *v1 = tmp;
--    if (match) {
--        return s || match == 2 ? 0 : 1;
--    }
--    return 3;
-+#define DEF_VFC(BITS)                                                          \
-+typedef bool (*vfc##BITS##_fn)(float##BITS a, float##BITS b,                   \
-+                               float_status *status);                          \
-+static int vfc##BITS(S390Vector *v1, const S390Vector *v2,                     \
-+                     const S390Vector *v3, CPUS390XState *env, bool s,         \
-+                     vfc##BITS##_fn fn, uintptr_t retaddr)                     \
-+{                                                                              \
-+    uint8_t vxc, vec_exc = 0;                                                  \
-+    S390Vector tmp = {};                                                       \
-+    int match = 0;                                                             \
-+    int i;                                                                     \
-+                                                                               \
-+    for (i = 0; i < (128 / BITS); i++) {                                       \
-+        const float##BITS a = s390_vec_read_float##BITS(v2, i);                \
-+        const float##BITS b = s390_vec_read_float##BITS(v3, i);                \
-+                                                                               \
-+        /* swap the parameters, so we can use existing functions */            \
-+        if (fn(b, a, &env->fpu_status)) {                                      \
-+            match++;                                                           \
-+            s390_vec_write_float##BITS(&tmp, i, float##BITS##_ones);           \
-+        }                                                                      \
-+        vxc = check_ieee_exc(env, i, false, &vec_exc);                         \
-+        if (s || vxc) {                                                        \
-+            break;                                                             \
-+        }                                                                      \
-+    }                                                                          \
-+                                                                               \
-+    handle_ieee_exc(env, vxc, vec_exc, retaddr);                               \
-+    *v1 = tmp;                                                                 \
-+    if (match) {                                                               \
-+        return s || match == (128 / BITS) ? 0 : 1;                             \
-+    }                                                                          \
-+    return 3;                                                                  \
- }
-+DEF_VFC(32)
-+DEF_VFC(64)
-+DEF_VFC(128)
- 
--void HELPER(gvec_vfce64)(void *v1, const void *v2, const void *v3,
--                         CPUS390XState *env, uint32_t desc)
+-void HELPER(gvec_vfsq64)(void *v1, const void *v2, CPUS390XState *env,
+-                         uint32_t desc)
 -{
--    vfc64(v1, v2, v3, env, false, float64_eq_quiet, GETPC());
-+#define DEF_GVEC_VFCE(BITS)                                                    \
-+void HELPER(gvec_vfce##BITS)(void *v1, const void *v2, const void *v3,         \
-+                             CPUS390XState *env, uint32_t desc)                \
+-    vop64_2(v1, v2, env, false, false, 0, vfsq64, GETPC());
++#define DEF_GVEC_VFSQ(BITS)                                                    \
++void HELPER(gvec_vfsq##BITS)(void *v1, const void *v2, CPUS390XState *env,     \
++                             uint32_t desc)                                    \
 +{                                                                              \
-+    const bool sq = simd_data(desc);                                           \
-+                                                                               \
-+    vfc##BITS(v1, v2, v3, env, false,                                          \
-+              sq ? float##BITS##_eq : float##BITS##_eq_quiet, GETPC());        \
++    vop##BITS##_2(v1, v2, env, false, false, 0, float##BITS##_sqrt, GETPC());  \
  }
-+DEF_GVEC_VFCE(32)
-+DEF_GVEC_VFCE(64)
-+DEF_GVEC_VFCE(128)
++DEF_GVEC_VFSQ(32)
++DEF_GVEC_VFSQ(64)
++DEF_GVEC_VFSQ(128)
  
--void HELPER(gvec_vfce64s)(void *v1, const void *v2, const void *v3,
--                          CPUS390XState *env, uint32_t desc)
+-void HELPER(gvec_vfsq64s)(void *v1, const void *v2, CPUS390XState *env,
+-                          uint32_t desc)
 -{
--    vfc64(v1, v2, v3, env, true, float64_eq_quiet, GETPC());
-+#define DEF_GVEC_VFCE_S(BITS)                                                  \
-+void HELPER(gvec_vfce##BITS##s)(void *v1, const void *v2, const void *v3,      \
-+                                CPUS390XState *env, uint32_t desc)             \
+-    vop64_2(v1, v2, env, true, false, 0, vfsq64, GETPC());
++#define DEF_GVEC_VFSQ_S(BITS)                                                  \
++void HELPER(gvec_vfsq##BITS##s)(void *v1, const void *v2, CPUS390XState *env,  \
++                                uint32_t desc)                                 \
 +{                                                                              \
-+    const bool sq = simd_data(desc);                                           \
-+                                                                               \
-+    vfc##BITS(v1, v2, v3, env, true,                                           \
-+              sq ? float##BITS##_eq : float##BITS##_eq_quiet, GETPC());        \
++    vop##BITS##_2(v1, v2, env, true, false, 0, float##BITS##_sqrt, GETPC());   \
  }
-+DEF_GVEC_VFCE_S(32)
-+DEF_GVEC_VFCE_S(64)
++DEF_GVEC_VFSQ_S(32)
++DEF_GVEC_VFSQ_S(64)
  
--void HELPER(gvec_vfce64_cc)(void *v1, const void *v2, const void *v3,
--                            CPUS390XState *env, uint32_t desc)
--{
--    env->cc_op = vfc64(v1, v2, v3, env, false, float64_eq_quiet, GETPC());
-+#define DEF_GVEC_VFCE_CC(BITS)                                                 \
-+void HELPER(gvec_vfce##BITS##_cc)(void *v1, const void *v2, const void *v3,    \
-+                                  CPUS390XState *env, uint32_t desc)           \
-+{                                                                              \
-+    const bool sq = simd_data(desc);                                           \
-+                                                                               \
-+    env->cc_op = vfc##BITS(v1, v2, v3, env, false,                             \
-+                           sq ? float##BITS##_eq : float##BITS##_eq_quiet,     \
-+                           GETPC());                                           \
- }
-+DEF_GVEC_VFCE_CC(32)
-+DEF_GVEC_VFCE_CC(64)
-+DEF_GVEC_VFCE_CC(128)
- 
--void HELPER(gvec_vfce64s_cc)(void *v1, const void *v2, const void *v3,
--                            CPUS390XState *env, uint32_t desc)
--{
--    env->cc_op = vfc64(v1, v2, v3, env, true, float64_eq_quiet, GETPC());
-+#define DEF_GVEC_VFCE_S_CC(BITS)                                               \
-+void HELPER(gvec_vfce##BITS##s_cc)(void *v1, const void *v2, const void *v3,   \
-+                                   CPUS390XState *env, uint32_t desc)          \
-+{                                                                              \
-+    const bool sq = simd_data(desc);                                           \
-+                                                                               \
-+    env->cc_op = vfc##BITS(v1, v2, v3, env, true,                              \
-+                           sq ? float##BITS##_eq : float##BITS##_eq_quiet,     \
-+                           GETPC());                                           \
- }
-+DEF_GVEC_VFCE_S_CC(32)
-+DEF_GVEC_VFCE_S_CC(64)
- 
--void HELPER(gvec_vfch64)(void *v1, const void *v2, const void *v3,
--                         CPUS390XState *env, uint32_t desc)
--{
--    vfc64(v1, v2, v3, env, false, float64_lt_quiet, GETPC());
-+#define DEF_GVEC_VFCH(BITS)                                                    \
-+void HELPER(gvec_vfch##BITS)(void *v1, const void *v2, const void *v3,         \
-+                             CPUS390XState *env, uint32_t desc)                \
-+{                                                                              \
-+    const bool sq = simd_data(desc);                                           \
-+                                                                               \
-+    vfc##BITS(v1, v2, v3, env, false,                                          \
-+              sq ? float##BITS##_lt : float##BITS##_lt_quiet, GETPC());        \
- }
-+DEF_GVEC_VFCH(32)
-+DEF_GVEC_VFCH(64)
-+DEF_GVEC_VFCH(128)
- 
--void HELPER(gvec_vfch64s)(void *v1, const void *v2, const void *v3,
--                          CPUS390XState *env, uint32_t desc)
--{
--    vfc64(v1, v2, v3, env, true, float64_lt_quiet, GETPC());
-+#define DEF_GVEC_VFCH_S(BITS)                                                  \
-+void HELPER(gvec_vfch##BITS##s)(void *v1, const void *v2, const void *v3,      \
-+                                CPUS390XState *env, uint32_t desc)             \
-+{                                                                              \
-+    const bool sq = simd_data(desc);                                           \
-+                                                                               \
-+    vfc##BITS(v1, v2, v3, env, true,                                           \
-+              sq ? float##BITS##_lt : float##BITS##_lt_quiet, GETPC());        \
- }
-+DEF_GVEC_VFCH_S(32)
-+DEF_GVEC_VFCH_S(64)
- 
--void HELPER(gvec_vfch64_cc)(void *v1, const void *v2, const void *v3,
--                            CPUS390XState *env, uint32_t desc)
--{
--    env->cc_op = vfc64(v1, v2, v3, env, false, float64_lt_quiet, GETPC());
-+#define DEF_GVEC_VFCH_CC(BITS)                                                 \
-+void HELPER(gvec_vfch##BITS##_cc)(void *v1, const void *v2, const void *v3,    \
-+                                  CPUS390XState *env, uint32_t desc)           \
-+{                                                                              \
-+    const bool sq = simd_data(desc);                                           \
-+                                                                               \
-+    env->cc_op = vfc##BITS(v1, v2, v3, env, false,                             \
-+                           sq ? float##BITS##_lt : float##BITS##_lt_quiet,     \
-+                           GETPC());                                           \
- }
-+DEF_GVEC_VFCH_CC(32)
-+DEF_GVEC_VFCH_CC(64)
-+DEF_GVEC_VFCH_CC(128)
- 
--void HELPER(gvec_vfch64s_cc)(void *v1, const void *v2, const void *v3,
--                             CPUS390XState *env, uint32_t desc)
--{
--    env->cc_op = vfc64(v1, v2, v3, env, true, float64_lt_quiet, GETPC());
-+#define DEF_GVEC_VFCH_S_CC(BITS)                                               \
-+void HELPER(gvec_vfch##BITS##s_cc)(void *v1, const void *v2, const void *v3,   \
-+                                   CPUS390XState *env, uint32_t desc)          \
-+{                                                                              \
-+    const bool sq = simd_data(desc);                                           \
-+                                                                               \
-+    env->cc_op = vfc##BITS(v1, v2, v3, env, true,                              \
-+                           sq ? float##BITS##_lt : float##BITS##_lt_quiet,     \
-+                           GETPC());                                           \
- }
-+DEF_GVEC_VFCH_S_CC(32)
-+DEF_GVEC_VFCH_S_CC(64)
- 
--void HELPER(gvec_vfche64)(void *v1, const void *v2, const void *v3,
--                          CPUS390XState *env, uint32_t desc)
--{
--    vfc64(v1, v2, v3, env, false, float64_le_quiet, GETPC());
-+#define DEF_GVEC_VFCHE(BITS)                                                   \
-+void HELPER(gvec_vfche##BITS)(void *v1, const void *v2, const void *v3,        \
-+                              CPUS390XState *env, uint32_t desc)               \
-+{                                                                              \
-+    const bool sq = simd_data(desc);                                           \
-+                                                                               \
-+    vfc##BITS(v1, v2, v3, env, false,                                          \
-+              sq ? float##BITS##_le : float##BITS##_le_quiet, GETPC());        \
- }
-+DEF_GVEC_VFCHE(32)
-+DEF_GVEC_VFCHE(64)
-+DEF_GVEC_VFCHE(128)
- 
--void HELPER(gvec_vfche64s)(void *v1, const void *v2, const void *v3,
--                           CPUS390XState *env, uint32_t desc)
--{
--    vfc64(v1, v2, v3, env, true, float64_le_quiet, GETPC());
-+#define DEF_GVEC_VFCHE_S(BITS)                                                 \
-+void HELPER(gvec_vfche##BITS##s)(void *v1, const void *v2, const void *v3,     \
-+                                 CPUS390XState *env, uint32_t desc)            \
-+{                                                                              \
-+    const bool sq = simd_data(desc);                                           \
-+                                                                               \
-+    vfc##BITS(v1, v2, v3, env, true,                                           \
-+              sq ? float##BITS##_le : float##BITS##_le_quiet, GETPC());        \
- }
-+DEF_GVEC_VFCHE_S(32)
-+DEF_GVEC_VFCHE_S(64)
- 
--void HELPER(gvec_vfche64_cc)(void *v1, const void *v2, const void *v3,
--                             CPUS390XState *env, uint32_t desc)
--{
--    env->cc_op = vfc64(v1, v2, v3, env, false, float64_le_quiet, GETPC());
-+#define DEF_GVEC_VFCHE_CC(BITS)                                                \
-+void HELPER(gvec_vfche##BITS##_cc)(void *v1, const void *v2, const void *v3,   \
-+                                   CPUS390XState *env, uint32_t desc)          \
-+{                                                                              \
-+    const bool sq = simd_data(desc);                                           \
-+                                                                               \
-+    env->cc_op = vfc##BITS(v1, v2, v3, env, false,                             \
-+                           sq ? float##BITS##_le : float##BITS##_le_quiet,     \
-+                           GETPC());                                           \
- }
-+DEF_GVEC_VFCHE_CC(32)
-+DEF_GVEC_VFCHE_CC(64)
-+DEF_GVEC_VFCHE_CC(128)
- 
--void HELPER(gvec_vfche64s_cc)(void *v1, const void *v2, const void *v3,
--                              CPUS390XState *env, uint32_t desc)
--{
--    env->cc_op = vfc64(v1, v2, v3, env, true, float64_le_quiet, GETPC());
-+#define DEF_GVEC_VFCHE_S_CC(BITS)                                              \
-+void HELPER(gvec_vfche##BITS##s_cc)(void *v1, const void *v2, const void *v3,  \
-+                                    CPUS390XState *env, uint32_t desc)         \
-+{                                                                              \
-+    const bool sq = simd_data(desc);                                           \
-+                                                                               \
-+    env->cc_op = vfc##BITS(v1, v2, v3, env, true,                              \
-+                           sq ? float##BITS##_le : float##BITS##_le_quiet,     \
-+                           GETPC());                                           \
- }
-+DEF_GVEC_VFCHE_S_CC(32)
-+DEF_GVEC_VFCHE_S_CC(64)
- 
- static uint64_t vcdg64(uint64_t a, float_status *s)
- {
+ #define DEF_GVEC_FVS(BITS)                                                     \
+ void HELPER(gvec_vfs##BITS)(void *v1, const void *v2, const void *v3,          \
 -- 
 2.26.2
 
