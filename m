@@ -2,86 +2,86 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC146C4727C
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:28:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1128C4727C
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:29:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 137DC20759
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:28:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0582120759
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:29:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QzYre/R0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 137DC20759
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JMaIzgR/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0582120759
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNe25-0001Hk-1a
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 11:28:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37826)
+	id 1kNe2P-0001kI-Us
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 11:29:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33088)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kNdsi-0000Oo-D2
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 11:19:04 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:37389)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kNdsf-0006RQ-NY
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 11:19:00 -0400
-Received: by mail-ed1-x541.google.com with SMTP id n22so2286339edt.4
- for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 08:18:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=9f8yvg4nHDtbp4k+M6DrVvog15lTAgRwMYiFIt1HueI=;
- b=QzYre/R09wOAy8rY9ggS6++AGIoiBnwSf13ocfcWBx4XRGRJdr/yl/24t19PablQ2x
- sj0kMg4M71L61eGX13eHQCxX/5O6blgDt8dXtrC7OvXroueIeEaOR5Bqm1koLJLBcp/K
- sqDubxkxevInD1GG091NA9VzQCuNFSAqzLMLklyPnmiu33PNe2yBdWqjX/pDInlB31vx
- +hWQVjy5dg+Tw99ZmvThIK5oR89VqAShayuFEbOq5ufvTATnR6hEiInw99p9mZAqc7Vc
- SDGAM8YGirkqgVjM7dfQ7Q7UuUOZhdmiNdEzB9Dm0b12UeVobC7FziQwPW2uuFjcFyzs
- WUYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=9f8yvg4nHDtbp4k+M6DrVvog15lTAgRwMYiFIt1HueI=;
- b=aKfLq9z8lIj6R3dUsw8mTyMdyMvEEo0KT1oK2mQwHi8Hf5H2rtnn7rMCXubp5kqW0X
- YxKzsJkIQTssbdKWI5xj6myWYSx/gc5cJ/wgV4nZP0GBkZ2ogzCI+rZ2MJ7OMvedBPD7
- a81TSW1I1y9OY8iStlHbUH9gtV1fdur9khvXWnLaJ/5UqxECZDgVUpKEfMe+TBc+Xqpm
- cgtfiOh9SjovnV8HnENKrr159uQZ8mWswFzYVIAkDXqMcljQSkKttK8HoDiATCz9r3MD
- 0YZVl5txm2hmJVGdhyTHWNnMzH1aiAEQ94MuDnKiKD8gUKmmrdyyePXwmMaeMvvaApyF
- sAIQ==
-X-Gm-Message-State: AOAM533tRLGeRNfW7bqTzi0rqw9TmJncR4DX/eHeV4zfzbUg5OrXmYzP
- PuwgBiH5Z8xBQR+CNRSRQEDiw3kKVobzv0KaOnSUkg==
-X-Google-Smtp-Source: ABdhPJwh5vFEmd5U+rE4guUw6GwbF63dIzpVkeE2/MhBCH7+CRS4HbgZfmVRnVBoiq6k7fMZxtsjcvAK6amIYe1HcnA=
-X-Received: by 2002:a05:6402:202a:: with SMTP id
- ay10mr3388600edb.36.1601479135646; 
- Wed, 30 Sep 2020 08:18:55 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kNdaP-0000Py-Gi
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 11:00:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57426)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kNdaM-0004qv-UO
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 11:00:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601478001;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=oaxIrjAAZuND/5ibAxHZym3FBLBB5xpRBUY0DxobS2A=;
+ b=JMaIzgR/GMcm/dXyGnWUhEyv+Qo3hU5CSvsO5cz9z3ibwjD2bqIo+NOFIh2SE4qtCkgK8Z
+ ZNDxwSLbJ1Ozrfkbdr8MPhqqGOs1rT2Ek39eHB3/5mjB4Cg1k/gqqH5w+nQcx68ZVBIbUv
+ A5J3UcgSduepaLaHBrlZ3VjY07nRfig=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-132-nmOQ-SmEOE6hcJzDmReWOA-1; Wed, 30 Sep 2020 10:59:57 -0400
+X-MC-Unique: nmOQ-SmEOE6hcJzDmReWOA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B9B8364155;
+ Wed, 30 Sep 2020 14:59:56 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-113-128.ams2.redhat.com [10.36.113.128])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D53D6100239A;
+ Wed, 30 Sep 2020 14:59:55 +0000 (UTC)
+Date: Wed, 30 Sep 2020 16:59:54 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH] qemu-storage-daemon: Fix help line for --export
+Message-ID: <20200930145954.GE9292@linux.fritz.box>
+References: <20200930133909.58820-1-kwolf@redhat.com>
+ <e775522e-560c-5aa7-71d6-16303068bef1@redhat.com>
 MIME-Version: 1.0
-References: <20200930083552.506733-1-mst@redhat.com>
-In-Reply-To: <20200930083552.506733-1-mst@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 30 Sep 2020 16:18:44 +0100
-Message-ID: <CAFEAcA_fhNYeed=E1-Ym1sbwdUwr=qKUUoeUC0cWkOf-D6HJ_Q@mail.gmail.com>
-Subject: Re: [PULL 0/2] acpi: unit test
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::541;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x541.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <e775522e-560c-5aa7-71d6-16303068bef1@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="MnLPg7ZWsaic7Fhd"
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:31:59
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.469,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,50 +94,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 30 Sep 2020 at 09:36, Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> The following changes since commit f142e4ede72853aaa7d306bc79b099caed45769b:
->
->   tests/acpi: drop unnecessary files (2020-09-29 07:10:37 -0400)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->
-> for you to fetch changes up to 42803552319a5481e90e93382d74a7336dfab496:
->
->   tests/acpi: add DSDT.hpbrroot DSDT table blob to test global i440fx hotplug (2020-09-30 04:10:51 -0400)
->
-> ----------------------------------------------------------------
-> acpi: unit test
->
-> This just adds a unit test for previously merged functionality.
-> A bit unusual, but we have a contribitor under a deadline,
-> let's be nice and merge the unit test right away - does no harm.
-> Hopefully this won't be a beginning of a trend ...
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->
-> ----------------------------------------------------------------
-> Ani Sinha (2):
->       tests/acpi: unit test exercising global pci hotplug off for i440fx
->       tests/acpi: add DSDT.hpbrroot DSDT table blob to test global i440fx hotplug
->
->  tests/qtest/bios-tables-test.c   |  17 +++++++++++++++++
->  tests/data/acpi/pc/DSDT.hpbrroot | Bin 0 -> 3079 bytes
->  2 files changed, 17 insertions(+)
->  create mode 100644 tests/data/acpi/pc/DSDT.hpbrroot
+--MnLPg7ZWsaic7Fhd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+Am 30.09.2020 um 15:48 hat Eric Blake geschrieben:
+> On 9/30/20 8:39 AM, Kevin Wolf wrote:
+> > Commit 5f479a8d renamed the 'device' option of --export into
+> > 'node-name', but forgot to update the help in qemu-storage-daemon.
+> >=20
+> > Fixes: 5f479a8dc086bfa42c9f94e9ab69962f256e207f
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >  storage-daemon/qemu-storage-daemon.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >=20
+> > diff --git a/storage-daemon/qemu-storage-daemon.c b/storage-daemon/qemu=
+-storage-daemon.c
+> > index 7cbdbf0b23..42839c981f 100644
+> > --- a/storage-daemon/qemu-storage-daemon.c
+> > +++ b/storage-daemon/qemu-storage-daemon.c
+> > @@ -92,7 +92,7 @@ static void help(void)
+> >  "  --chardev <options>    configure a character device backend\n"
+> >  "                         (see the qemu(1) man page for possible optio=
+ns)\n"
+> >  "\n"
+> > -"  --export [type=3D]nbd,device=3D<node-name>,id=3D<id>,[,name=3D<expo=
+rt-name>]\n"
+> > +"  --export [type=3D]nbd,id=3D<id>,node-name=3D<node-name>,[,name=3D<e=
+xport-name>]\n"
+>=20
+> While touching this, get rid of the doubled comma before the optional
+> name key (s/,\[,/\[,/)
 
-Applied, thanks.
+Somehow I didn't even notice even though I reordered the options before
+it. I'm removing the extra comma now.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
-for any user-visible changes.
+> With that,
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
--- PMM
+Thanks, applied.
+
+Kevin
+
+--MnLPg7ZWsaic7Fhd
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEE3D3rFZqa+V09dFb+fwmycsiPL9YFAl90nWoACgkQfwmycsiP
+L9YdBRAAqJnDxRj+4v20c+8wfJbf1kjRhnZF9NpVTsmw7hz4+7LZS7kcAnrWvMd9
+htMkmvQiuZbWAgewHCz7Pr9bj8YEWDVXOuv2bEoz3pZ6fQImxpWLJR2h6t6sVPEv
+qftsE6CZLQfMDTWbf8GkvFRDgo5RifzB4wgevGQW25VCUXNZ7pE7ThGxEErFIT4s
+B4Hp1+Jh9Mu3qUdgbIhxWNpyt6bjZQfjdTTpJ8zjDLiAr431fgvQxuJIvbEEQL7I
+8gKufQSS0X5oEeD5x4e/4lRk9RoBFq7DkhsAVmCYpIsHgG53YbnCy+lWuOqhFAtX
++rR7UxBDO/rMG7L6jDd+1ZZGkYIdsChFjYOP39Jazo4q1QdwX7IsQDFjlH/mhhd3
+gVY9bbfsZ6jOXu6lxg7AGgLIQ04szPKw8LGouLObYuEGOD+cDlYtCeSEmwb+2Dwc
+f9gNrhIgmFh6VYeHUrPgRs5bKW7RkOlIDmXzpMLhZ6E49L0dDd5KiKSBROzzo4Sy
+VbQWoamJaNDWimQ7zjLlDTGjWfi/RTtxw7OaI0Q+p9xCHhRMXT83H+hNB1AVti7D
+7hkd9dl8ZjN0kzqwo9UGL4GwE0hoR0LlhsV47sCMd/Yu2Hmmeq4rhmDKv/bbHpA3
+7a3ebDa2b97+Lh7j47zdrcdZpe36TdbI5BBtZmxrGqYDOnX7at8=
+=tpC0
+-----END PGP SIGNATURE-----
+
+--MnLPg7ZWsaic7Fhd--
+
 
