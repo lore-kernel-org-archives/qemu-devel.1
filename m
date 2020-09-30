@@ -2,104 +2,70 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 887D1C4727C
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:35:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F50BC47420
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:35:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E778520759
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:35:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8BA9C2071E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:35:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PQVhUpQ8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E778520759
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="B1u5Ooek"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BA9C2071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNe8d-00009Y-RA
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 11:35:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42832)
+	id 1kNe97-0000dn-IV
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 11:35:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38682)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kNe7b-0007RF-Vr
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 11:34:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34419)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kNe7Z-0007zq-4m
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 11:34:23 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601480059;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=GaxBUhpeQWJOmbZy+nQBPpF+NHsTmA0oFPmpf8cup2I=;
- b=PQVhUpQ8+/ZpfNNBXL7GJ9jF9L4Y9ewZ3+yEtQ60bWdyv2Xu2aN9uApLWVUaBYnGjZmb83
- rm2dQpJDzlAVwXpelc8Q+K5sWOrafxksBQbIxrMy4Dwlpzm8HKFKhQvPlTU1Z/gKto6sdZ
- SBUGSBPujAW/gK3YIrNW6t7zdOVlzH8=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-393-BmnxxYtaNa2PiKXcuhry1A-1; Wed, 30 Sep 2020 11:34:17 -0400
-X-MC-Unique: BmnxxYtaNa2PiKXcuhry1A-1
-Received: by mail-wm1-f69.google.com with SMTP id a7so764703wmc.2
- for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 08:34:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=GaxBUhpeQWJOmbZy+nQBPpF+NHsTmA0oFPmpf8cup2I=;
- b=QkUdiVTUFejMxzxJE3lcf8B3s56Hw7FRrDzqZTEi0X9K6XiUdupYAjN1fxA1jKHrQr
- K0ljKsmGRIOThXCxc6zvtWE/GOTBNJuO4s2XA/N9pvm+XuRcm9nAHIzExL93bTTpZhhX
- 8KYtt1CPTwIz7jdnX5V0XQLRXGL1rzKxoXcd3LNbcpGOU4GReXd9+uQfk7fmo+nbnP6R
- AJNVBGPyXf6fXVoCf3OMEAPaQtvO3BHtysPiFocd9x3TuhXJTJS27SYdtY8KWTXFxJh/
- 7bdPTjeb6PtixT1Kg9vY6JSMozgaavpiEBbn4/bZIImf+/0L/aIZMmdR8Ql58kv2hCrK
- FeNg==
-X-Gm-Message-State: AOAM533KsGV0ijiJW4iEz3hF2KQIw9gGW+FQyTIoDJ/TtDM/ANS2bKkw
- eh8jcW5sWjiw2dFZ3lQ4EYjVNg8NAcSeQNvG5Rl2aEWjgSqReWn0DGdODIdBNJAd8nduK3feZc0
- ysha2ZJaBxZjLSBQ=
-X-Received: by 2002:adf:e6c2:: with SMTP id y2mr4016239wrm.117.1601480056737; 
- Wed, 30 Sep 2020 08:34:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwvH/9Vkape21q/KMroSRDKSgTEggrTUtwkkKEAHZPZ1Ou+S5Zh2bgY7GNwFMU20Rwv/g843Q==
-X-Received: by 2002:adf:e6c2:: with SMTP id y2mr4016213wrm.117.1601480056544; 
- Wed, 30 Sep 2020 08:34:16 -0700 (PDT)
-Received: from redhat.com (bzq-79-179-71-128.red.bezeqint.net. [79.179.71.128])
- by smtp.gmail.com with ESMTPSA id e1sm3816141wrp.49.2020.09.30.08.34.14
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 30 Sep 2020 08:34:15 -0700 (PDT)
-Date: Wed, 30 Sep 2020 11:34:12 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: Outline for VHOST_USER_PROTOCOL_F_VDPA
-Message-ID: <20200930113129-mutt-send-email-mst@kernel.org>
-References: <20200928092537.GA44353@stefanha-x1.localdomain>
- <20200929020114-mutt-send-email-mst@kernel.org>
- <20200929085751.GA181609@stefanha-x1.localdomain>
- <20200929055110-mutt-send-email-mst@kernel.org>
- <20200929183824.GC191675@stefanha-x1.localdomain>
- <20200930034807-mutt-send-email-mst@kernel.org>
- <20200930145752.GB320669@stefanha-x1.localdomain>
+ (Exim 4.90_1) (envelope-from <kbusch@kernel.org>)
+ id 1kNdvh-00034P-38; Wed, 30 Sep 2020 11:22:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53742)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kbusch@kernel.org>)
+ id 1kNdvc-0006fa-Aw; Wed, 30 Sep 2020 11:22:04 -0400
+Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 3666520759;
+ Wed, 30 Sep 2020 15:21:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1601479318;
+ bh=yswQoqiLQCU5KuopekWmYl+nzUffqD6lN/FZd4aw8/o=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=B1u5OoekBBQkx1+q+1F1MrijcOMLXEexdV0WDGTqXnVc9GfVY6fO65Nx2x/w90rtf
+ /vhaCQIVahCKAvf8YLoU0JYp0CGPXCHN7PqPy/EYQSUYgf6fI7k73ormTQZG+hzXd5
+ dKEAtWKzVNqz1V0fxoHO/6rFy+JH13fXlN5erVnI=
+Date: Wed, 30 Sep 2020 08:21:55 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Subject: Re: [PATCH v5 03/14] hw/block/nvme: Introduce the Namespace Types
+ definitions
+Message-ID: <20200930152155.GB516327@dhcp-10-100-145-180.wdl.wdc.com>
+References: <20200928023528.15260-1-dmitry.fomichev@wdc.com>
+ <20200928023528.15260-4-dmitry.fomichev@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <20200930145752.GB320669@stefanha-x1.localdomain>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:26:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.469,
+In-Reply-To: <20200928023528.15260-4-dmitry.fomichev@wdc.com>
+Received-SPF: pass client-ip=198.145.29.99; envelope-from=kbusch@kernel.org;
+ helo=mail.kernel.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 11:21:58
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -75
+X-Spam_score: -7.6
+X-Spam_bar: -------
+X-Spam_report: (-7.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.469,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,35 +78,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lulu@redhat.com, tiwei.bie@intel.com, jasowang@redhat.com,
- qemu-devel@nongnu.org, raphael.norwitz@nutanix.com, maxime.coquelin@redhat.com,
- kraxel@redhat.com, Felipe Franciosi <felipe@nutanix.com>,
- marcandre.lureau@redhat.com, Nikos Dragazis <ndragazis@arrikto.com>,
- changpeng.liu@intel.com, Daniele Buono <dbuono@us.ibm.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
+ Niklas Cassel <niklas.cassel@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
+ qemu-devel@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Matias Bjorling <matias.bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 30, 2020 at 03:57:52PM +0100, Stefan Hajnoczi wrote:
-> > Architecturally, I think we can have 3 processes:
-> > 
-> > 
-> > VMM -- guest device emulation -- host backend
-> > 
-> > 
-> > to me this looks like increasing our defence in depth strength,
-> > as opposed to just shifting things around ...
+On Mon, Sep 28, 2020 at 11:35:17AM +0900, Dmitry Fomichev wrote:
+> From: Niklas Cassel <niklas.cassel@wdc.com>
 > 
-> Cool idea.
+> Define the structures and constants required to implement
+> Namespace Types support.
 > 
-> Performance will be hard because there is separation between the guest
-> device emulation and the host backend.
+> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
+> Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+> ---
+>  hw/block/nvme-ns.h   |  2 ++
+>  hw/block/nvme.c      |  2 +-
+>  include/block/nvme.h | 74 +++++++++++++++++++++++++++++++++++---------
+>  3 files changed, 63 insertions(+), 15 deletions(-)
+> 
+> diff --git a/hw/block/nvme-ns.h b/hw/block/nvme-ns.h
+> index 83734f4606..cca23bc0b3 100644
+> --- a/hw/block/nvme-ns.h
+> +++ b/hw/block/nvme-ns.h
+> @@ -21,6 +21,8 @@
+>  
+>  typedef struct NvmeNamespaceParams {
+>      uint32_t nsid;
+> +    uint8_t  csi;
+> +    QemuUUID uuid;
 
-Absolutely. As a tradeoff we could put some data path things in the backend,
-e.g. for virtio it is practical to have control path in emulation layer,
-data path in the backend.
-
--- 
-MST
-
+Neither of these new params are used anywhere in this patch.
 
