@@ -2,86 +2,72 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3903DC4727E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 11:06:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A19BC4727F
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 11:07:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 939C0206FC
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 11:06:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D7wMSvnV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 939C0206FC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B3154206FC
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 11:07:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3154206FC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNZwA-0001xP-H8
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 07:06:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55116)
+	id 1kNZxB-0002zx-Oc
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 07:07:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56386)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kNZti-00086V-BU
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 07:03:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52932)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kNZtg-0001Rf-9l
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 07:03:45 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601463822;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=E3+glWeiPUvt1n6JbCH7MZWYFGqCSGzNrwq15y5sKl4=;
- b=D7wMSvnVP0Q9r8JhCLi+pn1X50lekukI+FvM1mAwN1y7EqnJ1zdcEvrXcsft+rxOHf/+OI
- 8NXcmM1XxXej25zUWqGyL1lAOd5Sanf1QfYJwDvtRz34oUNu0xrhXEEu17ZeEgDAA/izkZ
- ib1xy13iYKMK2dbc6Qe9Hzl39rc3NCY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-SJROutHSP7uwRQmy5AzPxw-1; Wed, 30 Sep 2020 07:03:40 -0400
-X-MC-Unique: SJROutHSP7uwRQmy5AzPxw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C958F425CE;
- Wed, 30 Sep 2020 11:03:39 +0000 (UTC)
-Received: from localhost (unknown [10.10.67.5])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 88F5E19D61;
- Wed, 30 Sep 2020 11:03:39 +0000 (UTC)
-Date: Wed, 30 Sep 2020 07:03:38 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v4 30/46] qapi/gen.py: Fix edge-case of _is_user_module
-Message-ID: <20200930110338.GO3717385@habkost.net>
-References: <20200930043150.1454766-1-jsnow@redhat.com>
- <20200930043150.1454766-31-jsnow@redhat.com>
+ (Exim 4.90_1) (envelope-from <gengdongjiu@huawei.com>)
+ id 1kNZvL-0000ja-6r; Wed, 30 Sep 2020 07:05:27 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2937 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <gengdongjiu@huawei.com>)
+ id 1kNZvI-0001ie-Fh; Wed, 30 Sep 2020 07:05:26 -0400
+Received: from dggeme755-chm.china.huawei.com (unknown [172.30.72.57])
+ by Forcepoint Email with ESMTP id 7FFA86550E074EF41B34;
+ Wed, 30 Sep 2020 19:05:15 +0800 (CST)
+Received: from [10.140.157.78] (10.140.157.78) by
+ dggeme755-chm.china.huawei.com (10.3.19.101) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1913.5; Wed, 30 Sep 2020 19:05:14 +0800
+Subject: Re: [PATCH] hw/arm: Restrict APEI tables generation to the 'virt'
+ machine
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ <qemu-devel@nongnu.org>
+References: <20200929125609.1088330-1-philmd@redhat.com>
+ <12be4400-c37f-2b7f-2f15-f8700dad6003@huawei.com>
+ <056736d8-dc89-a94b-7e76-93825492c957@redhat.com>
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Message-ID: <5b5e1b32-0e9b-8154-e645-9b922119db33@huawei.com>
+Date: Wed, 30 Sep 2020 19:05:14 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200930043150.1454766-31-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:31:59
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.469,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <056736d8-dc89-a94b-7e76-93825492c957@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.140.157.78]
+X-ClientProxiedBy: dggeme704-chm.china.huawei.com (10.1.199.100) To
+ dggeme755-chm.china.huawei.com (10.3.19.101)
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.187;
+ envelope-from=gengdongjiu@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 07:05:16
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,24 +80,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Cleber Rosa <crosa@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S . Tsirkin" <mst@redhat.com>, Xiang Zheng <zhengxiang9@huawei.com>,
+ qemu-arm@nongnu.org, Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 30, 2020 at 12:31:34AM -0400, John Snow wrote:
-> The edge case is that if the name is '', this expression returns a
-> string instead of a bool, which violates our declared type.
+
+On 2020/9/30 18:35, Philippe Mathieu-Daudé wrote:
+> On 9/30/20 7:08 AM, Dongjiu Geng wrote:
+>> On 2020/9/29 20:56, Philippe Mathieu-Daudé wrote:
+>>> As only the Virt machine uses the RAS Virtualization feature (see
+>>> commit 2afa8c8519: "hw/arm/virt: Introduce a RAS machine option"),
+>>> restrict the APEI tables generation code to the virt machine.
+>>
+>> APEI is a generic feature for X86 and arm64.  X86 platform also can use it, although currently it was mainly
+>> used by ARM64. what is reason that we restrict APEI tables generation to the 'virt' machine?
 > 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> Reviewed-by: Cleber Rosa <crosa@redhat.com>
+> It is currently only selected on (all) the ARM machines, not the X86
+> ones. I am simply restricting it to the 'virt' machine which is the
+> single one enabling the RAS. Without RAS the table is not built, so
+> for the case of the SBSA-Ref machine this code is unreachable, no need
+> to select ACPI_APEI.
+> 
+> When a X86 machine configure a RAS it will have to 'select ACPI_APEI'
+> to get it built (I'm not forbidding it, I'm restricting it to where
+> it is used).
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Got it, thanks for the explanation.
 
--- 
-Eduardo
+Reviewed-by: Dongjiu Geng <gengdongjiu@huawei.com>
 
+BTW：There is a build test error, but it is seems do not related with this patch.
+https://patchew.org/logs/20200929125609.1088330-1-philmd@redhat.com/testing.docker-quick@centos7/?type=message
+
+> 
+>>
+>>>
+>>> Fixes: aa16508f1d ("ACPI: Build related register address fields via hardware error fw_cfg blob")
+>>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>> ---
+>>> Cc: Laszlo Ersek <lersek@redhat.com>
+>>> Cc: Xiang Zheng <zhengxiang9@huawei.com>
+>>> Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+>>> Cc: Igor Mammedov <imammedo@redhat.com>
+>>> Cc: Dongjiu Geng <gengdongjiu@huawei.com>
+>>> Cc: Michael S. Tsirkin <mst@redhat.com>
+>>> ---
+>>>  default-configs/arm-softmmu.mak | 1 -
+>>>  hw/arm/Kconfig                  | 1 +
+>>>  2 files changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+>>> index 9a94ebd0be..08a32123b4 100644
+>>> --- a/default-configs/arm-softmmu.mak
+>>> +++ b/default-configs/arm-softmmu.mak
+>>> @@ -43,4 +43,3 @@ CONFIG_FSL_IMX7=y
+>>>  CONFIG_FSL_IMX6UL=y
+>>>  CONFIG_SEMIHOSTING=y
+>>>  CONFIG_ALLWINNER_H3=y
+>>> -CONFIG_ACPI_APEI=y
+>>> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+>>> index f303c6bead..7d040827af 100644
+>>> --- a/hw/arm/Kconfig
+>>> +++ b/hw/arm/Kconfig
+>>> @@ -26,6 +26,7 @@ config ARM_VIRT
+>>>      select ACPI_MEMORY_HOTPLUG
+>>>      select ACPI_HW_REDUCED
+>>>      select ACPI_NVDIMM
+>>> +    select ACPI_APEI
+>>>  
+>>>  config CHEETAH
+>>>      bool
+>>>
+>>
+> 
+> .
+> 
 
