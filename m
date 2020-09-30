@@ -2,98 +2,97 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B912C4727C
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 16:12:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0AF2C4727E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 16:14:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F4024206F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 16:12:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 32D8F20789
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 16:14:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="buPPDvSS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F4024206F7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aFEbzxJq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32D8F20789
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNeit-0004bN-Rb
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 12:12:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53740)
+	id 1kNekC-0005wS-9W
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 12:14:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56372)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kNea0-0002km-OD; Wed, 30 Sep 2020 12:03:44 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44800)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kNegX-0002Vo-Pb
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 12:10:29 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38062)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kNeZy-0002QS-SV; Wed, 30 Sep 2020 12:03:44 -0400
-Received: by mail-wr1-x442.google.com with SMTP id s12so2405361wrw.11;
- Wed, 30 Sep 2020 09:03:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=i5C+7Rqzn0WqSvRSkD6ysP0eb9nCoXsspnqsgMajfAE=;
- b=buPPDvSSTCgDCDk3Tv+m1Lk0IB7mB3tpEl5ADUiFVq/W6K+LROSvgOWthQkgfLej9i
- sVKWSEXfmgDlqOQi0vLfEGLJHfZE/2T+UO9fjSHI/VUe0wllK0q7JBFkTr1UxL/S7cow
- 0ws9m352CZKYpF3DRB9NAkBlo7ruaVsPGQa/OGh0T+ncUpVvX3vBoMk6wmS7GMnw0Cvl
- cr24gUj47HTRR2PDcTtnPUuw7vryV17YbXnWmxgc59E/KJqVw1f1ibV38+1DceLYpwFR
- whD8LMtSs+2i6lYVGJOvAC2dhfCpzXm2RabIt1xKUBjeutCHfzNCEyEw/N+VNiM+QWWT
- 4EfQ==
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kNegU-0003C1-U8
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 12:10:29 -0400
+Received: by mail-wr1-x443.google.com with SMTP id g4so2453240wrs.5
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 09:10:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=iunHu55sigd55xo5y01pJ1wT3hnlwEkRst1zp/vR5Ys=;
+ b=aFEbzxJqukiO0YM4gq8b0sKA3tivqU2ut+jQGF7alRki1PT9MJ7FVIpR1FFPJ++eVO
+ id9Hp4qjxEe5/+ELO2WIdt26ng2whiEfC/cVWqK5X1mpRvpDanR8e9PKMPBWcFVkC8hc
+ YJWKRWj0705gXL0D1f/Chz1IeRh57Tl01Auj30PUbXo/1aEe1BqZUqMFTpGSuIxwdPks
+ n9elAqYlX6Ol/+cKCixE5rvfXrXHJNX257xuaWno+GdtE/TdQ+X6u5fotopSaf7IJ8EY
+ X7+3VjAKFpkkigUOAKf6EjRDrxuNQuPYo97v8ZuSvhrVGtt4EZtV+LRQMfFPUxpE6mIF
+ WRBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=i5C+7Rqzn0WqSvRSkD6ysP0eb9nCoXsspnqsgMajfAE=;
- b=gMOU/+QJGT4x46VXBKDJxB8ZeDPaFEgtcJOI4W/Fd/9fBaeCJR6TfdD3cJNR5p13wR
- patWqruo2gHeZrTlBJ977qYjfrsLqaZIODZHyEKFCTdrbCdPMm9++9JTnRzKbhUF6sh8
- BKxCHDa9Y2TLQG+anHIRq1WB2V0Pu2XjrgE6KUDUH1f4Dvzljw+Wwkrl7XLC5RU3rDo8
- e811VrG4iy4FGkkIEDfoVSGVBsqULcAI1JYOqnLxtAnTWN1H+lm8Y+cHyxq4/fwCH0Il
- jb79chpNwnKsvqMxgFfvJDlZF6BiFnZERSYBGjMWClx5rqRfB3jjql9Os1oTf9gKtGLZ
- iiTw==
-X-Gm-Message-State: AOAM533vb8vOMVzDqTk++WADVQRDrlMYZrzrh/8Lz7ZRqN05YgRLJF5Z
- oNZdmtzaLPdMxsezhq5SYTQNRLLPXZE=
-X-Google-Smtp-Source: ABdhPJzdczqi5i1omn4hyGtjICaMMyaxjlgIg7Hy4rs137/QhnKMQAgWJeZ3lEUxmhN/fQsAk3jCUA==
-X-Received: by 2002:adf:f14f:: with SMTP id y15mr3784050wro.69.1601481820488; 
- Wed, 30 Sep 2020 09:03:40 -0700 (PDT)
-Received: from [192.168.1.36] (74.red-83-53-161.dynamicip.rima-tde.net.
- [83.53.161.74])
- by smtp.gmail.com with ESMTPSA id s11sm3585182wrt.43.2020.09.30.09.03.38
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 30 Sep 2020 09:03:39 -0700 (PDT)
-Subject: Re: [PATCH RFC 08/14] m68k/: fix some comment spelling errors
-To: Laurent Vivier <laurent@vivier.eu>, zhaolichang <zhaolichang@huawei.com>, 
- qemu-trivial@nongnu.org
-References: <20200930095321.2006-1-zhaolichang@huawei.com>
- <20200930095321.2006-9-zhaolichang@huawei.com>
- <a1e3bd75-8eb5-0f7f-7c2f-81e3de0a0114@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6a8cd8ab-3a8c-bb24-2193-67b0a1cebf16@amsat.org>
-Date: Wed, 30 Sep 2020 18:03:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=iunHu55sigd55xo5y01pJ1wT3hnlwEkRst1zp/vR5Ys=;
+ b=C8/wn/P+3D2Tz0ZbjwcGokzI/Ixj3SC3LWEnPYrD67FW0ITSauTUL4ZnGDu8/SYRt3
+ kjo+Ys1R2UQtnAae54i0WtiFq4DDn0dWE7A0hZaObXhsgMOea9SyXaONrgwlJTa8X0ct
+ mnba2V8z1Yo0tk8pL3pXTYFWv0jFsNSy5wAPC9hMhDwRHCC25jIJdOWOLJOiAabn39CN
+ 2DaOcc6YTuCg8Ux/aqI+y9HS8w0VVs8D8bIgtp+0aDb5w3QMNyBstxFVZqQfrjZFJiYN
+ KY2bx4MQZCep65U6sAfHkZu9UyqDHRc7AaeIQqfeP/GFDQ4aW2Ar9W3ZerD6i2xXHftB
+ +sRg==
+X-Gm-Message-State: AOAM533NyNxV1/02U0tA0jDCGkzsoULzoeXjUW7oV/NRLd79LKKug58T
+ GQTpleOI+0M1l9hEKnrJvS7aEg==
+X-Google-Smtp-Source: ABdhPJxH9rgtlXsN7N6v+g4WO6AEWRPXE2cbawmKEKzJE5UAGTNhno1XITAjDicVrxLijaOQye8Jkw==
+X-Received: by 2002:a5d:56cd:: with SMTP id m13mr3853942wrw.261.1601482223699; 
+ Wed, 30 Sep 2020 09:10:23 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id j14sm3929222wrr.66.2020.09.30.09.10.22
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 30 Sep 2020 09:10:22 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id CA5CA1FF7E;
+ Wed, 30 Sep 2020 17:10:21 +0100 (BST)
+References: <20200930145523.71087-1-david@redhat.com>
+ <20200930145523.71087-2-david@redhat.com>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v1 01/20] softfloat: Implement
+ float128_(min|minnum|minnummag|max|maxnum|maxnummag)
+In-reply-to: <20200930145523.71087-2-david@redhat.com>
+Date: Wed, 30 Sep 2020 17:10:21 +0100
+Message-ID: <87o8lnnt3m.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <a1e3bd75-8eb5-0f7f-7c2f-81e3de0a0114@vivier.eu>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001, NICE_REPLY_A=-0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,102 +105,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/30/20 12:26 PM, Laurent Vivier wrote:
-> Le 30/09/2020 à 11:53, zhaolichang a écrit :
->> I found that there are many spelling errors in the comments of qemu/target/m68k.
->> I used spellcheck to check the spelling errors and found some errors in the folder.
->>
->> Signed-off-by: zhaolichang <zhaolichang@huawei.com>
->> ---
->>  target/m68k/translate.c | 16 ++++++++--------
->>  1 file changed, 8 insertions(+), 8 deletions(-)
->>
->> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
->> index 3fc67aa..133a404 100644
->> --- a/target/m68k/translate.c
->> +++ b/target/m68k/translate.c
->> @@ -438,7 +438,7 @@ static TCGv gen_addr_index(DisasContext *s, uint16_t ext, TCGv tmp)
->>  }
->>  
->>  /*
->> - * Handle a base + index + displacement effective addresss.
->> + * Handle a base + index + displacement effective address.
->>   * A NULL_QREG base means pc-relative.
->>   */
->>  static TCGv gen_lea_indexed(CPUM68KState *env, DisasContext *s, TCGv base)
->> @@ -1696,7 +1696,7 @@ static void bcd_add(TCGv dest, TCGv src)
->>  
->>      /*
->>       * t1 = (src + 0x066) + dest + X
->> -     *    = result with some possible exceding 0x6
->> +     *    = result with some possible exceeding 0x6
->>       */
->>  
->>      t0 = tcg_const_i32(0x066);
->> @@ -1706,7 +1706,7 @@ static void bcd_add(TCGv dest, TCGv src)
->>      tcg_gen_add_i32(t1, t0, dest);
->>      tcg_gen_add_i32(t1, t1, QREG_CC_X);
->>  
->> -    /* we will remove exceding 0x6 where there is no carry */
->> +    /* we will remove exceeding 0x6 where there is no carry */
->>  
->>      /*
->>       * t0 = (src + 0x0066) ^ dest
->> @@ -1736,7 +1736,7 @@ static void bcd_add(TCGv dest, TCGv src)
->>      tcg_temp_free(t0);
->>  
->>      /*
->> -     * remove the exceding 0x6
->> +     * remove the exceeding 0x6
->>       * for digits that have not generated a carry
->>       */
->>  
->> @@ -2638,7 +2638,7 @@ DISAS_INSN(negx)
->>      gen_flush_flags(s); /* compute old Z */
->>  
->>      /*
->> -     * Perform substract with borrow.
->> +     * Perform subtract with borrow.
->>       * (X, N) =  -(src + X);
->>       */
->>  
->> @@ -2653,7 +2653,7 @@ DISAS_INSN(negx)
->>      /*
->>       * Compute signed-overflow for negation.  The normal formula for
->>       * subtraction is (res ^ src) & (src ^ dest), but with dest==0
->> -     * this simplies to res & src.
->> +     * this simplifies to res & src.
->>       */
->>  
->>      tcg_gen_and_i32(QREG_CC_V, QREG_CC_N, src);
->> @@ -3159,7 +3159,7 @@ static inline void gen_subx(DisasContext *s, TCGv src, TCGv dest, int opsize)
->>      gen_flush_flags(s); /* compute old Z */
->>  
->>      /*
->> -     * Perform substract with borrow.
->> +     * Perform subtract with borrow.
->>       * (X, N) = dest - (src + X);
->>       */
->>  
->> @@ -3169,7 +3169,7 @@ static inline void gen_subx(DisasContext *s, TCGv src, TCGv dest, int opsize)
->>      gen_ext(QREG_CC_N, QREG_CC_N, opsize, 1);
->>      tcg_gen_andi_i32(QREG_CC_X, QREG_CC_X, 1);
->>  
->> -    /* Compute signed-overflow for substract.  */
->> +    /* Compute signed-overflow for subtract.  */
->>  
->>      tcg_gen_xor_i32(QREG_CC_V, QREG_CC_N, dest);
->>      tcg_gen_xor_i32(tmp, dest, src);
->>
-> 
-> Reviewed-by: Laurent Vivier <laurent@vivier>
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+David Hildenbrand <david@redhat.com> writes:
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Implementation inspired by minmax_floats(). Unfortuantely, we don't have
+> any tests we can simply adjust/unlock.
+>
+> Cc: Aurelien Jarno <aurelien@aurel32.net>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: "Alex Benn=C3=A9e" <alex.bennee@linaro.org>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  fpu/softfloat.c         | 100 ++++++++++++++++++++++++++++++++++++++++
+>  include/fpu/softfloat.h |   6 +++
+>  2 files changed, 106 insertions(+)
+>
+> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+> index 9af75b9146..9463c5ea56 100644
+> --- a/fpu/softfloat.c
+> +++ b/fpu/softfloat.c
+> @@ -621,6 +621,8 @@ static inline FloatParts float64_unpack_raw(float64 f)
+>      return unpack_raw(float64_params, f);
+>  }
+>=20=20
+> +static void float128_unpack(FloatParts128 *p, float128 a, float_status *=
+status);
+> +
+>  /* Pack a float from parts, but do not canonicalize.  */
+>  static inline uint64_t pack_raw(FloatFmt fmt, FloatParts p)
+>  {
+> @@ -3180,6 +3182,89 @@ static FloatParts minmax_floats(FloatParts a, Floa=
+tParts b, bool ismin,
+>      }
+>  }
+
+It would be desirable to share as much logic for this as possible with
+the existing minmax_floats code. I appreciate at some point we end up
+having to deal with fractions and we haven't found a good way to
+efficiently handle dealing with FloatParts and FloatParts128 in the same
+unrolled code, however:
+
+>=20=20
+> +static float128 float128_minmax(float128 a, float128 b, bool ismin, bool=
+ ieee,
+> +                                bool ismag, float_status *s)
+> +{
+> +    FloatParts128 pa, pb;
+> +    int a_exp, b_exp;
+> +    bool a_less;
+> +
+> +    float128_unpack(&pa, a, s);
+> +    float128_unpack(&pb, b, s);
+> +
+
+From here:
+> +    if (unlikely(is_nan(pa.cls) || is_nan(pb.cls))) {
+> +        /* See comment in minmax_floats() */
+> +        if (ieee && !is_snan(pa.cls) && !is_snan(pb.cls)) {
+> +            if (is_nan(pa.cls) && !is_nan(pb.cls)) {
+> +                return b;
+> +            } else if (is_nan(pb.cls) && !is_nan(pa.cls)) {
+> +                return a;
+> +            }
+> +        }
+> +
+> +        /* Similar logic to pick_nan(), avoiding re-packing. */
+> +        if (is_snan(pa.cls) || is_snan(pb.cls)) {
+> +            s->float_exception_flags |=3D float_flag_invalid;
+> +        }
+> +        if (s->default_nan_mode) {
+> +            return float128_default_nan(s);
+> +        }
+
+to here is common logic - is there anyway we could share it?
+
+> +        if (pickNaN(pa.cls, pb.cls,
+> +                    pa.frac0 > pb.frac0 ||
+> +                    (pa.frac0 =3D=3D pb.frac0 && pa.frac1 > pb.frac1) ||
+> +                    (pa.frac0 =3D=3D pb.frac0 && pa.frac1 =3D=3D pb.frac=
+1 &&
+> +                     pa.sign < pb.sign), s)) {
+> +            return is_snan(pb.cls) ? float128_silence_nan(b, s) : b;
+> +        }
+> +        return is_snan(pa.cls) ? float128_silence_nan(a, s) : a;
+> +    }
+> +
+> +    switch (pa.cls) {
+> +    case float_class_normal:
+> +        a_exp =3D pa.exp;
+> +        break;
+> +    case float_class_inf:
+> +        a_exp =3D INT_MAX;
+> +        break;
+> +    case float_class_zero:
+> +        a_exp =3D INT_MIN;
+> +        break;
+> +    default:
+> +        g_assert_not_reached();
+> +        break;
+> +    }
+
+Likewise I wonder if there is scope for a float_minmax_exp helper that
+could be shared here?
+
+> +    switch (pb.cls) {
+> +    case float_class_normal:
+> +        b_exp =3D pb.exp;
+> +        break;
+> +    case float_class_inf:
+> +        b_exp =3D INT_MAX;
+> +        break;
+> +    case float_class_zero:
+> +        b_exp =3D INT_MIN;
+> +        break;
+> +    default:
+> +        g_assert_not_reached();
+> +        break;
+> +    }
+> +
+> +    a_less =3D a_exp < b_exp;
+> +    if (a_exp =3D=3D b_exp) {
+> +        a_less =3D pa.frac0 < pb.frac0;
+> +        if (pa.frac0 =3D=3D pb.frac0) {
+> +            a_less =3D pa.frac1 < pb.frac1;
+> +        }
+> +    }
+> +
+> +    if (ismag &&
+> +        (a_exp !=3D b_exp || pa.frac0 !=3D pb.frac0 || pa.frac1 !=3D pb.=
+frac1)) {
+> +        return a_less ^ ismin ? b : a;
+> +    } else if (pa.sign =3D=3D pb.sign) {
+> +        return pa.sign ^ a_less ^ ismin ? b : a;
+> +    }
+> +    return pa.sign ^ ismin ? b : a;
+> +}
+
+Otherwise it seems sane to me.
+
+--=20
+Alex Benn=C3=A9e
 
