@@ -7,50 +7,49 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B210C4363D
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 22:10:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB8E3C4363D
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 22:12:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87D22206CA
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 22:10:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4506F206F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 22:12:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZBQmWQSA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87D22206CA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vu7WjPW6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4506F206F7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNkIo-0003rv-Jt
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 18:10:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56166)
+	id 1kNkKv-0005ZM-AB
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 18:12:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56190)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kbusch@kernel.org>)
- id 1kNkD7-0005Sn-3D; Wed, 30 Sep 2020 18:04:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50512)
+ id 1kNkD8-0005US-5z; Wed, 30 Sep 2020 18:04:30 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50536)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kbusch@kernel.org>)
- id 1kNkD5-0007w4-DA; Wed, 30 Sep 2020 18:04:28 -0400
+ id 1kNkD6-0007wJ-84; Wed, 30 Sep 2020 18:04:29 -0400
 Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 59CD220719;
- Wed, 30 Sep 2020 22:04:25 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 2142220EDD;
+ Wed, 30 Sep 2020 22:04:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1601503465;
- bh=mMc68FIh8W0+zRlwRlchGGSCuLIK+a02janutn/ldHc=;
+ s=default; t=1601503466;
+ bh=IgJOlL/p+MXEmzcFTdPv3A6bJxzQs5kaNTmkpFYutxE=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=ZBQmWQSAVEWv70Se9onvBb/HWIVgnZuMkyv6trBgbTiYH3Bhg2RXgRY2yIIkFR/FH
- x9uphVeHE0T/iByOxt7hUVk4//qbjjCYiLwJ03wCbct6k9gyxuLrPaiDofYvKzlFaK
- 09ECLceUxhgse/lJySymOhEMQcutgwmoPRP8/dMk=
+ b=Vu7WjPW6xncJuGzeJA1HPVy0+CiCQ9t6xASkJuicK/THWUxDbvwpj+5Cit3RN4PqG
+ FhibnvvFz8Hudxd5XmiSuDMuf2l5ZpmekXqCuzuJWLtPES33w/mM+ZaXHD/R8Cdyc+
+ 599W/3JDS4mm2Zdgn17wthjMqly/MenXkAKjW57I=
 From: Keith Busch <kbusch@kernel.org>
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org,
  Klaus Jensen <k.jensen@samsung.com>
-Subject: [PATCH 6/9] hw/block/nvme: reject io commands if only admin command
- set selected
-Date: Wed, 30 Sep 2020 15:04:11 -0700
-Message-Id: <20200930220414.562527-7-kbusch@kernel.org>
+Subject: [PATCH 7/9] hw/block/nvme: add nsid to get/setfeat trace events
+Date: Wed, 30 Sep 2020 15:04:12 -0700
+Message-Id: <20200930220414.562527-8-kbusch@kernel.org>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200930220414.562527-1-kbusch@kernel.org>
 References: <20200930220414.562527-1-kbusch@kernel.org>
@@ -89,50 +88,52 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-If the host sets CC.CSS to 111b, all commands submitted to I/O queues
-should be completed with status Invalid Command Opcode.
-
-Note that this is technically a v1.4 feature, but it does not hurt to
-implement before we finally bump the reported version implemented.
+Include the namespace id in the pci_nvme_{get,set}feat trace events.
 
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- hw/block/nvme.c      | 4 ++++
- include/block/nvme.h | 5 +++++
- 2 files changed, 9 insertions(+)
+ hw/block/nvme.c       | 4 ++--
+ hw/block/trace-events | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index ec7363ea40..80730e1c03 100644
+index 80730e1c03..dc971c9653 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -1026,6 +1026,10 @@ static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeRequest *req)
-     trace_pci_nvme_io_cmd(nvme_cid(req), nsid, nvme_sqid(req),
-                           req->cmd.opcode, nvme_io_opc_str(req->cmd.opcode));
+@@ -1643,7 +1643,7 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeRequest *req)
+         [NVME_ARBITRATION] = NVME_ARB_AB_NOLIMIT,
+     };
  
-+    if (NVME_CC_CSS(n->bar.cc) == NVME_CC_CSS_ADMIN_ONLY) {
-+        return NVME_INVALID_OPCODE | NVME_DNR;
-+    }
-+
-     if (!nvme_nsid_valid(n, nsid)) {
-         return NVME_INVALID_NSID | NVME_DNR;
-     }
-diff --git a/include/block/nvme.h b/include/block/nvme.h
-index 521533fd2a..6de2d5aa75 100644
---- a/include/block/nvme.h
-+++ b/include/block/nvme.h
-@@ -115,6 +115,11 @@ enum NvmeCcMask {
- #define NVME_CC_IOSQES(cc) ((cc >> CC_IOSQES_SHIFT) & CC_IOSQES_MASK)
- #define NVME_CC_IOCQES(cc) ((cc >> CC_IOCQES_SHIFT) & CC_IOCQES_MASK)
+-    trace_pci_nvme_getfeat(nvme_cid(req), fid, sel, dw11);
++    trace_pci_nvme_getfeat(nvme_cid(req), nsid, fid, sel, dw11);
  
-+enum NvmeCcCss {
-+    NVME_CC_CSS_NVM        = 0x0,
-+    NVME_CC_CSS_ADMIN_ONLY = 0x7,
-+};
-+
- enum NvmeCstsShift {
-     CSTS_RDY_SHIFT      = 0,
-     CSTS_CFS_SHIFT      = 1,
+     if (!nvme_feature_support[fid]) {
+         return NVME_INVALID_FIELD | NVME_DNR;
+@@ -1781,7 +1781,7 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeRequest *req)
+     uint8_t fid = NVME_GETSETFEAT_FID(dw10);
+     uint8_t save = NVME_SETFEAT_SAVE(dw10);
+ 
+-    trace_pci_nvme_setfeat(nvme_cid(req), fid, save, dw11);
++    trace_pci_nvme_setfeat(nvme_cid(req), nsid, fid, save, dw11);
+ 
+     if (save) {
+         return NVME_FID_NOT_SAVEABLE | NVME_DNR;
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index 7720e1b4d9..180c43d258 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -53,8 +53,8 @@ pci_nvme_identify_ns(uint32_t ns) "nsid %"PRIu32""
+ pci_nvme_identify_nslist(uint32_t ns) "nsid %"PRIu32""
+ pci_nvme_identify_ns_descr_list(uint32_t ns) "nsid %"PRIu32""
+ pci_nvme_get_log(uint16_t cid, uint8_t lid, uint8_t lsp, uint8_t rae, uint32_t len, uint64_t off) "cid %"PRIu16" lid 0x%"PRIx8" lsp 0x%"PRIx8" rae 0x%"PRIx8" len %"PRIu32" off %"PRIu64""
+-pci_nvme_getfeat(uint16_t cid, uint8_t fid, uint8_t sel, uint32_t cdw11) "cid %"PRIu16" fid 0x%"PRIx8" sel 0x%"PRIx8" cdw11 0x%"PRIx32""
+-pci_nvme_setfeat(uint16_t cid, uint8_t fid, uint8_t save, uint32_t cdw11) "cid %"PRIu16" fid 0x%"PRIx8" save 0x%"PRIx8" cdw11 0x%"PRIx32""
++pci_nvme_getfeat(uint16_t cid, uint32_t nsid, uint8_t fid, uint8_t sel, uint32_t cdw11) "cid %"PRIu16" nsid 0x%"PRIx32" fid 0x%"PRIx8" sel 0x%"PRIx8" cdw11 0x%"PRIx32""
++pci_nvme_setfeat(uint16_t cid, uint32_t nsid, uint8_t fid, uint8_t save, uint32_t cdw11) "cid %"PRIu16" nsid 0x%"PRIx32" fid 0x%"PRIx8" save 0x%"PRIx8" cdw11 0x%"PRIx32""
+ pci_nvme_getfeat_vwcache(const char* result) "get feature volatile write cache, result=%s"
+ pci_nvme_getfeat_numq(int result) "get feature number of queues, result=%d"
+ pci_nvme_setfeat_numq(int reqcq, int reqsq, int gotcq, int gotsq) "requested cq_count=%d sq_count=%d, responding with cq_count=%d sq_count=%d"
 -- 
 2.24.1
 
