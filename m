@@ -2,132 +2,93 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60076C4727C
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:40:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD00C4727C
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:46:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0DF92071E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:40:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EDB5820754
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 15:46:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ngsd5rNn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0DF92071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="lWBTZQcu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDB5820754
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNeDl-0005Zn-S7
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 11:40:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44454)
+	id 1kNeJc-00083e-Gc
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 11:46:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46362)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kNeBm-0003qr-Oi
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 11:38:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37139)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kNeBj-00004s-N1
- for qemu-devel@nongnu.org; Wed, 30 Sep 2020 11:38:42 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601480318;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=3umxhrU/2FUwG3HdagnADTtZ7F6SDnjSihkWqnQMnBw=;
- b=Ngsd5rNnc84gEzsXp7ZUJ9qZh786K7LcsSJd4bp3HA4gHJ/q5SItm2Bm7m4Ov6poG1Z58E
- OIMZXh7Cl1qArHtheeLsocqKR7ZQ/3ZNYAExMHQHY3PU0OxZhCChIcn6R/iSbLnPsy54Ah
- tJJ5KUxK6B2rpWFhFFETzOoKUUXLoyE=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-370-OdZAt_Y2PyuVhldH4GQh_Q-1; Wed, 30 Sep 2020 11:38:36 -0400
-X-MC-Unique: OdZAt_Y2PyuVhldH4GQh_Q-1
-Received: by mail-wm1-f70.google.com with SMTP id m19so768030wmg.6
- for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 08:38:36 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kNeIz-0007dS-EL
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 11:46:09 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36065)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kNeIs-0000gG-2f
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 11:46:09 -0400
+Received: by mail-wr1-x441.google.com with SMTP id z1so2361520wrt.3
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 08:46:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=o9ESt7glrTCg1ZtyepmzJPbDHGX2skVpsfAbtWGHDSk=;
+ b=lWBTZQcu/HiXMX4NEiDg2z8j/+Y1H48+IZtug19TfCnZK00Fr/bvRPPf4G/Sv2QMbz
+ kr4rRhg17dMkkZgkph0We9mkkuKbRaxArwqHTvqOr3h5m+Or1mrmtMDPxgieUDuzeaUe
+ XjtqquieUw6NSgblNeovKNI59sEbR6CFW5mE3Y7A43FqBvlxhnM/8w3VMTumOgdiZ44w
+ oGJV0MiQRWfiUH/bHr9vrUB3qfPclLOM3cu9hQrWnGTB1V87kPiwZTzmnV+MrCWjCvlf
+ 8O9iw0nfjX9VmULg0THIUFQ+1j1nOsJaBsd7/VV6JmBeM8J1jQETovF76g/W2cTtZUpA
+ VbnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=3umxhrU/2FUwG3HdagnADTtZ7F6SDnjSihkWqnQMnBw=;
- b=O7FXJEWdn1i35upscotghsFSJyAjsUBEovMHJ1Y9Zn1xqC4Pn2CTLpQZBxRYZiyzEw
- Tn2ptkIIMhVv64f/HkXqQE6hRNTQ1AAUj53Q3TJr+Q8q95F2I98FPfLofl6acNS+UK77
- gxkj1Ii/Lvn4upLuQCX0OsVZu9sTKEsbVgaLP7Hkzywo6i+Hf3q6SV854f9VwUfOKK+T
- cxPgaTjVZJT4rLeRrkTjPtqfXv7bekCGu7HamfPJbvVdowHsYWc2aUtoEj6LcEgRgHIp
- pMXuIy81U1QXAjxU2ikWW080/N8Bv08VgJKuUTiR3gwbOJg3flltMNqgvVMcedHmUJwE
- 1RiQ==
-X-Gm-Message-State: AOAM530xVGejU3Qo9rW9575oeM1RgnfU7aOMcfOuEHNVSca6tas81rfV
- F75O5axlrVD1Zl1rWB3+ecS8fX7yXC/rHCU1xnHp3VX0+3gcaL7EmJ5pqpE9DjMIgSkaLAYUWfq
- TdEIGEE0+EyIxqeI=
-X-Received: by 2002:a5d:67d0:: with SMTP id n16mr4144742wrw.198.1601480315592; 
- Wed, 30 Sep 2020 08:38:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwQKdl9fE2RlUxAYU3QRBFZqEa3VaIQbMvclsSU94tyAIEVRqPOqwLcX9tTQcRchR4Eaimg4g==
-X-Received: by 2002:a5d:67d0:: with SMTP id n16mr4144728wrw.198.1601480315382; 
- Wed, 30 Sep 2020 08:38:35 -0700 (PDT)
-Received: from [192.168.1.36] (74.red-83-53-161.dynamicip.rima-tde.net.
- [83.53.161.74])
- by smtp.gmail.com with ESMTPSA id x17sm3937042wrg.57.2020.09.30.08.38.34
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 30 Sep 2020 08:38:34 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 04/28] hw/arm: Express dependencies of the
- highbank machines with Kconfig
-To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, 
- qemu-devel@nongnu.org
-References: <20190505135714.11277-1-thuth@redhat.com>
- <20190505135714.11277-5-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <f2489790-8fcd-a9c3-4ec3-c8a72240f172@redhat.com>
-Date: Wed, 30 Sep 2020 17:38:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=o9ESt7glrTCg1ZtyepmzJPbDHGX2skVpsfAbtWGHDSk=;
+ b=sEvAG+SNvdDOEZQdRSDKXldOSC1vGbCNdatYpezX5vX8vpbaC63H0SN6MkABlVILQw
+ J5OF8ZWuMQpmMBUavpzP81QuFuoCblNGmLy2/N3yVSlRT3nErUs2E88NEF1arSWdDfFt
+ Pc20bUMH/eTi+6N2IH2CQbP8MbfgLOyVatJGnbyjRYVaT/4VsQTuyY82ZhwkYgJkV9r7
+ sASntout2MZz92m/+fVrfYDKkJMB8d26gZfVUnofUYg569Nuq1ctDAnecWIc6mlgXIMH
+ OXFqsJQl3BplGpvXNL7jBS4JEL+pPhZF0o2Up2g6FK2UitaZ/nyftFowbEhtq2IhYvP4
+ aEOQ==
+X-Gm-Message-State: AOAM530yh36QmD6qJyNOhkCfjIZglpQIc5W6ftmqwnzAirTjCTTry17A
+ 54ME/nefbds4NgKEp6HQBbD7GD1wLkBOXbJIi2OhTw==
+X-Google-Smtp-Source: ABdhPJxfA9aa6bLiznyEIDm1UUgL7A4ApZY/TZCbiCoKmRZGejp/v9wcFMYFkLPJtVoPE9k8LLZL6tMnz3AFJw1j5Po=
+X-Received: by 2002:a5d:518b:: with SMTP id k11mr3754338wrv.369.1601480759962; 
+ Wed, 30 Sep 2020 08:45:59 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190505135714.11277-5-thuth@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 00:31:59
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.469,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <CAARzgwzdYfVn6Kdic+rj7xSxdvP6RAM48wr8Pt_MpDwuYvDSiw@mail.gmail.com>
+ <20200929073523-mutt-send-email-mst@kernel.org>
+ <CAARzgwyNHnG_dzhD9mZbico2V3-c=XL-fNo7xO=rP2jfVMqtdw@mail.gmail.com>
+ <20200930033540-mutt-send-email-mst@kernel.org>
+ <CAARzgwyAE1bL5VnkH7dKBeMEtwcsZBhuhtRxx+BUxYsd8ZRi_A@mail.gmail.com>
+ <20200930034220-mutt-send-email-mst@kernel.org>
+ <CAARzgwy_+kVWQs5sQo4qAYC3Gi5LhdLoMQDPzKadwRPZ1D8Brw@mail.gmail.com>
+ <20200930040207-mutt-send-email-mst@kernel.org>
+ <CAARzgwz1TJpyVZfxJF=yCoj4pBMsUxOvaVmZCCn0Dfni-dB5kw@mail.gmail.com>
+ <CAARzgwzDdYnkKGBUdjr367qqZ3As4bqEhhWiaLqRzwXN2VKhHA@mail.gmail.com>
+ <20200930112631-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200930112631-mutt-send-email-mst@kernel.org>
+From: Ani Sinha <ani@anisinha.ca>
+Date: Wed, 30 Sep 2020 21:15:48 +0530
+Message-ID: <CAARzgwyt5qwoXXTCbcV0sDnivSBsK3MpkCBYxymXHjL4nXpk-g@mail.gmail.com>
+Subject: Re: [PATCH v10 13/13] tests/acpi: add DSDT.hpbrroot DSDT table blob
+ to test global i440fx hotplug
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: none client-ip=2a00:1450:4864:20::441;
+ envelope-from=ani@anisinha.ca; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -140,97 +101,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Julia Suvorova <jusual@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Thomas,
+On Wed, Sep 30, 2020 at 8:59 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Wed, Sep 30, 2020 at 03:00:56PM +0530, Ani Sinha wrote:
+> >
+> >     > >     > Please let's not wait another week or so.
+> >
+> >     > >
+> >
+> >     > >
+> >
+> >     > >
+> >
+> >     > >
+> >
+> >     > >
+> >
+> >     > >     OK it's not too much work but ... could you please add
+> >     justification
+> >
+> >     > >
+> >
+> >     > >     about why adding this one unit test is needed so urgently?
+> >
+> >     > >
+> >
+> >     > >     That motivation would be quite helpful for the pull request.
+> >
+> >     > >
+> >
+> >     > >
+> >
+> >     > > A patch without unit test doesn't complete the patch work. A unit test
+> >     makes
+> >
+> >     > > sure that the change would not get broken by other changes that come in
+> >     later.
+> >
+> >     > > Typically all code changes are accompanied by unit test in the same
+> >     patch.
+> >
+> >     > > Hence since the main work has already been merged, the unit test should
+> >     merge
+> >
+> >     > > ASAP so that no breakage can happen in between.
+> >
+> >     > >
+> >
+> >     > > Plus this completes an entire series of work which I've been working
+> >     for a
+> >
+> >     > > while. I really would love to see it all merged cleanly and fully
+> >     completed.
+> >
+> >     > >
+> >
+> >     >
+> >
+> >     > Absolutely, thanks for the great work!
+> >
+> >     > I am not sure that's a good justification to rushing a pull request
+> >
+> >     > though ... are you waiting to get paid and it hinges on the test, or are
+> >
+> >     > under a deadline, or something like this? It's okay to say so if so.
+> >
+> >
+> >
+> >     Yes I am under a deadline too. Unfortunately can't disclose more details.
+> >
+> >
+> > Thanks Michael. Very much appreciate your help here.
+> >
+>
+> OK Peter merged this. Hope this helps.
+> Let's not make this a pattern please.
 
-On 5/5/19 3:56 PM, Thomas Huth wrote:
-> Add Kconfig dependencies for the highbank machine (and the midway
-> machine).
-> This patch is slightly based on earlier work by Ákos Kovács (i.e.
-> his "hw/arm/Kconfig: Add ARM Kconfig" patch).
-> 
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  default-configs/arm-softmmu.mak |  9 +--------
->  hw/arm/Kconfig                  | 11 +++++++++++
->  2 files changed, 12 insertions(+), 8 deletions(-)
-> 
-> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index 2a11e76cc7..50a4be3cad 100644
-> --- a/default-configs/arm-softmmu.mak
-> +++ b/default-configs/arm-softmmu.mak
-> @@ -8,6 +8,7 @@ CONFIG_PCI_DEVICES=y
->  CONFIG_PCI_TESTDEV=y
->  
->  CONFIG_EXYNOS4=y
-> +CONFIG_HIGHBANK=y
->  
->  CONFIG_VGA=y
->  CONFIG_NAND=y
-> @@ -45,24 +46,17 @@ CONFIG_PLATFORM_BUS=y
->  CONFIG_VIRTIO_MMIO=y
->  
->  CONFIG_ARM11MPCORE=y
-> -CONFIG_A15MPCORE=y
->  
->  CONFIG_NETDUINO2=y
->  
-> -CONFIG_ARM_TIMER=y
-> -CONFIG_PL011=y
-> -CONFIG_PL022=y
-> -CONFIG_PL031=y
->  CONFIG_PL041=y
->  CONFIG_PL050=y
-> -CONFIG_PL061=y
->  CONFIG_PL080=y
->  CONFIG_PL110=y
->  CONFIG_PL181=y
->  CONFIG_PL190=y
->  CONFIG_PL330=y
->  CONFIG_CADENCE=y
-> -CONFIG_XGMAC=y
->  CONFIG_PXA2XX=y
->  CONFIG_BITBANG_I2C=y
->  CONFIG_FRAMEBUFFER=y
-> @@ -150,7 +144,6 @@ CONFIG_XILINX_AXI=y
->  CONFIG_PCI_EXPRESS_DESIGNWARE=y
->  
->  CONFIG_STRONGARM=y
-> -CONFIG_HIGHBANK=y
->  CONFIG_MUSICPAL=y
->  
->  # for realview and versatilepb
-> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index acd07b2add..0ba377ac18 100644
-> --- a/hw/arm/Kconfig
-> +++ b/hw/arm/Kconfig
-> @@ -18,6 +18,17 @@ config EXYNOS4
->  
->  config HIGHBANK
->      bool
-> +    select A9MPCORE
-> +    select A15MPCORE
-> +    select AHCI
-> +    select ARM_TIMER # sp804
-> +    select ARM_V7M
+No this is a one time thing. Thanks to you and Peter for making an exception.
 
-Hmm I missed that... This machine doesn't use a v7M core, right?
-
-> +    select PL011 # UART
-> +    select PL022 # Serial port
-> +    select PL031 # RTC
-> +    select PL061 # GPIO
-> +    select PL310 # cache controller
-> +    select XGMAC # ethernet
->  
->  config INTEGRATOR
->      bool
-> 
-
+>
+> --
+> MST
+>
 
