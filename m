@@ -2,62 +2,89 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 363A5C4727F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D614DC47426
 	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 10:08:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 659DF2074A
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 10:08:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 659DF2074A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 496EF2074A
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 10:08:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="dgiZWHYf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 496EF2074A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bytedance.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNZ1v-0006WS-Iq
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 06:08:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39624)
+	id 1kNZ1w-0006Xb-AW
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 06:08:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41502)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1kNYp1-0007sm-Lk; Wed, 30 Sep 2020 05:54:51 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:49976 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1kNYon-0004QU-6k; Wed, 30 Sep 2020 05:54:51 -0400
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 96FD6E9574FEB3C54B7C;
- Wed, 30 Sep 2020 17:54:34 +0800 (CST)
-Received: from localhost (10.174.185.186) by DGGEMS412-HUB.china.huawei.com
- (10.3.19.212) with Microsoft SMTP Server id 14.3.487.0; Wed, 30 Sep 2020
- 17:54:25 +0800
-From: zhaolichang <zhaolichang@huawei.com>
-To: <qemu-trivial@nongnu.org>
-Subject: [PATCH RFC 14/14] target/: fix some comment spelling errors
-Date: Wed, 30 Sep 2020 17:53:21 +0800
-Message-ID: <20200930095321.2006-15-zhaolichang@huawei.com>
-X-Mailer: git-send-email 2.26.2.windows.1
-In-Reply-To: <20200930095321.2006-1-zhaolichang@huawei.com>
-References: <20200930095321.2006-1-zhaolichang@huawei.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.174.185.186]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.35;
- envelope-from=zhaolichang@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/30 05:46:53
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+ (Exim 4.90_1) (envelope-from <pizhenwei@bytedance.com>)
+ id 1kNYyj-0003Bb-Ag
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 06:04:53 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:44208)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <pizhenwei@bytedance.com>)
+ id 1kNYyf-0005Cn-Te
+ for qemu-devel@nongnu.org; Wed, 30 Sep 2020 06:04:51 -0400
+Received: by mail-pl1-x642.google.com with SMTP id j7so735528plk.11
+ for <qemu-devel@nongnu.org>; Wed, 30 Sep 2020 03:04:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=qkISPEvs2HSa1jdrSv5pc1AMksIAz5SfeO1sHOXjAF0=;
+ b=dgiZWHYfH5Wa0+J5rsouL75Ha+UUEweanMxD4/8AenU67hSnUZ6B48yYLpen9twyM3
+ WhYiZjkemGPqj/AVWSXDawXJ1f5ps2JNkppwMHlGPxatifDXmaXA27hi5IRAQFsnQjhm
+ AIJrzymeF6BRGF+o3LO0QpOtdlCI+xQIrsmym7lJSOehho1I9IpDU9T6iEGZM1PmdKsV
+ oT8YkdKDPrm/oetIxvzIv4hY+XVEX7gphXebgKQtPb1lUcPbRoroc7O7n3SpkCC1IRYk
+ 9mnk9CISOHsETod50aiAEYkzuuR/snzgcramVpJNMb+Dc/Bk58BKFjXOXLRRtf7YwmMR
+ wc6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=qkISPEvs2HSa1jdrSv5pc1AMksIAz5SfeO1sHOXjAF0=;
+ b=OshJKK/Jho78oiw7INehZ4forYpWiuAxvLEQDUxogXQbSWTz3kPAPaXxEPxlh56ih9
+ BPNn2Jp44lDJrRm1lYkDMnvsQfXKZsqCRFdvOPA59akD8hr3IbPITnSbU5AV0aMIqhRK
+ 6bsHwaC3ZVudhh5PIe+APpqc3vZNhrDWAsNf8yYk0NAjNZSAVFokhdERArFy1upi+oy6
+ 9UVIGq08juX9jEaz2cyiM2KuNOSdOyMOe8PqPxs/rz5i/ZxchALZu555QiimwmcjpjA/
+ J08EuMXlVqv5qG5Q8jxitkyapZZyi3g4h50vmZxQr7gvCqVXhXXpETN3tPRsbq57oV/T
+ /9/A==
+X-Gm-Message-State: AOAM530qfiQczXm4pwL7OpAhIYoTRMp3kFWdayczcSBm9cv5fP39OiS3
+ /3p/TP5cjkfk9RZ659gZEpu6JA==
+X-Google-Smtp-Source: ABdhPJxFjGJkaaLHaFpSoKkaYz/e5Rdh8dA9LeyVmXYAbzJM8hE2XRFkuetcfIh/hvNM+aDiTrRfFA==
+X-Received: by 2002:a17:90a:2dcd:: with SMTP id
+ q13mr1799447pjm.202.1601460288737; 
+ Wed, 30 Sep 2020 03:04:48 -0700 (PDT)
+Received: from libai.bytedance.net ([61.120.150.71])
+ by smtp.gmail.com with ESMTPSA id c185sm1884230pfb.123.2020.09.30.03.04.46
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 30 Sep 2020 03:04:48 -0700 (PDT)
+From: zhenwei pi <pizhenwei@bytedance.com>
+To: pbonzini@redhat.com,
+	peter.maydell@linaro.org
+Subject: [PATCH v3 1/3] target-i386: seperate MCIP & MCE_MASK error reason
+Date: Wed, 30 Sep 2020 18:04:38 +0800
+Message-Id: <20200930100440.1060708-2-pizhenwei@bytedance.com>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20200930100440.1060708-1-pizhenwei@bytedance.com>
+References: <20200930100440.1060708-1-pizhenwei@bytedance.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=pizhenwei@bytedance.com; helo=mail-pl1-x642.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -71,61 +98,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhaolichang <zhaolichang@huawei.com>, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, zhenwei pi <pizhenwei@bytedance.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I found that there are many spelling errors in the comments of qemu/target.
-I used spellcheck to check the spelling errors and found some errors in the folder.
+Previously we can only get a simple string "Triple fault" in qemu
+log. Add detailed message for the two reasons to describe why qemu
+has to reset the guest.
 
-Signed-off-by: zhaolichang <zhaolichang@huawei.com>
+Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
 ---
- target/openrisc/cpu.h        | 2 +-
- target/sparc/asi.h           | 2 +-
- target/unicore32/translate.c | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+ target/i386/helper.c | 25 ++++++++++++++++++-------
+ 1 file changed, 18 insertions(+), 7 deletions(-)
 
-diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
-index bd42faf..8ca8605 100644
---- a/target/openrisc/cpu.h
-+++ b/target/openrisc/cpu.h
-@@ -291,7 +291,7 @@ typedef struct CPUOpenRISCState {
-     int is_counting;
+diff --git a/target/i386/helper.c b/target/i386/helper.c
+index 70be53e2c3..17e1684ff9 100644
+--- a/target/i386/helper.c
++++ b/target/i386/helper.c
+@@ -857,6 +857,8 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
+     X86CPU *cpu = X86_CPU(cs);
+     CPUX86State *cenv = &cpu->env;
+     uint64_t *banks = cenv->mce_banks + 4 * params->bank;
++    g_autofree char *msg = NULL;
++    bool need_reset = false;
  
-     uint32_t picmr;         /* Interrupt mask register */
--    uint32_t picsr;         /* Interrupt contrl register*/
-+    uint32_t picsr;         /* Interrupt control register*/
- #endif
-     void *irq[32];          /* Interrupt irq input */
- } CPUOpenRISCState;
-diff --git a/target/sparc/asi.h b/target/sparc/asi.h
-index bb58735..4e9f1d5 100644
---- a/target/sparc/asi.h
-+++ b/target/sparc/asi.h
-@@ -231,7 +231,7 @@
- #define ASI_INTR_ID		0x63 /* (CMT) Interrupt ID register	*/
- #define ASI_CORE_ID		0x63 /* (CMT) LP ID register		*/
- #define ASI_CESR_ID		0x63 /* (CMT) CESR ID register		*/
--#define ASI_IC_INSTR		0x66 /* Insn cache instrucion ram diag	*/
-+#define ASI_IC_INSTR		0x66 /* Insn cache instruction ram diag	*/
- #define ASI_IC_TAG		0x67 /* Insn cache tag/valid ram diag 	*/
- #define ASI_IC_STAG		0x68 /* (III) Insn cache snoop tag ram	*/
- #define ASI_IC_PRE_DECODE	0x6e /* Insn cache pre-decode ram diag	*/
-diff --git a/target/unicore32/translate.c b/target/unicore32/translate.c
-index d4b06df..2e91b05 100644
---- a/target/unicore32/translate.c
-+++ b/target/unicore32/translate.c
-@@ -119,7 +119,7 @@ static void load_reg_var(DisasContext *s, TCGv var, int reg)
- {
-     if (reg == 31) {
-         uint32_t addr;
--        /* normaly, since we updated PC */
-+        /* normally, since we updated PC */
-         addr = (long)s->pc;
-         tcg_gen_movi_i32(var, addr);
-     } else {
+     cpu_synchronize_state(cs);
+ 
+@@ -894,16 +896,25 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
+             return;
+         }
+ 
+-        if ((cenv->mcg_status & MCG_STATUS_MCIP) ||
+-            !(cenv->cr[4] & CR4_MCE_MASK)) {
+-            monitor_printf(params->mon,
+-                           "CPU %d: Previous MCE still in progress, raising"
+-                           " triple fault\n",
+-                           cs->cpu_index);
+-            qemu_log_mask(CPU_LOG_RESET, "Triple fault\n");
++        if (cenv->mcg_status & MCG_STATUS_MCIP) {
++            need_reset = true;
++            msg = g_strdup_printf("CPU %d: Previous MCE still in progress, "
++                                  "raising triple fault", cs->cpu_index);
++        }
++
++        if (!(cenv->cr[4] & CR4_MCE_MASK)) {
++            need_reset = true;
++            msg = g_strdup_printf("CPU %d: MCE capability is not enabled, "
++                                  "raising triple fault", cs->cpu_index);
++        }
++
++        if (need_reset) {
++            monitor_printf(params->mon, "%s", msg);
++            qemu_log_mask(CPU_LOG_RESET, "%s\n", msg);
+             qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+             return;
+         }
++
+         if (banks[1] & MCI_STATUS_VAL) {
+             params->status |= MCI_STATUS_OVER;
+         }
 -- 
-2.26.2.windows.1
+2.11.0
 
 
