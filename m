@@ -4,51 +4,53 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C082C4363D
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 22:10:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B210C4363D
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 22:10:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13204206CA
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 22:10:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 87D22206CA
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 22:10:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="zoFDSf2/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13204206CA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZBQmWQSA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87D22206CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNkIb-0003hU-4r
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 18:10:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56126)
+	id 1kNkIo-0003rv-Jt
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 18:10:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56166)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kbusch@kernel.org>)
- id 1kNkD5-0005Ol-7A; Wed, 30 Sep 2020 18:04:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50474)
+ id 1kNkD7-0005Sn-3D; Wed, 30 Sep 2020 18:04:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50512)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kbusch@kernel.org>)
- id 1kNkD3-0007vT-3r; Wed, 30 Sep 2020 18:04:26 -0400
+ id 1kNkD5-0007w4-DA; Wed, 30 Sep 2020 18:04:28 -0400
 Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 0BACB20BED;
- Wed, 30 Sep 2020 22:04:22 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 59CD220719;
+ Wed, 30 Sep 2020 22:04:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1601503463;
- bh=bAD+jfXU6J1t0RBHkb7mu5AtcCOwQGtCOjdgO5scJiA=;
+ s=default; t=1601503465;
+ bh=mMc68FIh8W0+zRlwRlchGGSCuLIK+a02janutn/ldHc=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=zoFDSf2/QzPlDaQqWjiJZeYZ9N9AKz+H0mrNFJoVnWaJ3VUsGNafyImMVlXKg7RUt
- 4EYird2YhaHAvNJ9d1Tbk570HhQ5qOv7VI36h7Lz1Da970jCpVtmJzUYxTFVLc5+SN
- XTHkzYzWs3ts2N4/RZN5EUMWP41g2kInm9FTXlVw=
+ b=ZBQmWQSAVEWv70Se9onvBb/HWIVgnZuMkyv6trBgbTiYH3Bhg2RXgRY2yIIkFR/FH
+ x9uphVeHE0T/iByOxt7hUVk4//qbjjCYiLwJ03wCbct6k9gyxuLrPaiDofYvKzlFaK
+ 09ECLceUxhgse/lJySymOhEMQcutgwmoPRP8/dMk=
 From: Keith Busch <kbusch@kernel.org>
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org,
  Klaus Jensen <k.jensen@samsung.com>
-Subject: [PATCH 3/9] hw/block/nvme: support per-namespace smart log
-Date: Wed, 30 Sep 2020 15:04:08 -0700
-Message-Id: <20200930220414.562527-4-kbusch@kernel.org>
+Subject: [PATCH 6/9] hw/block/nvme: reject io commands if only admin command
+ set selected
+Date: Wed, 30 Sep 2020 15:04:11 -0700
+Message-Id: <20200930220414.562527-7-kbusch@kernel.org>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200930220414.562527-1-kbusch@kernel.org>
 References: <20200930220414.562527-1-kbusch@kernel.org>
@@ -85,128 +87,52 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let the user specify a specific namespace if they want to get access
-stats for a specific namespace.
+From: Klaus Jensen <k.jensen@samsung.com>
 
+If the host sets CC.CSS to 111b, all commands submitted to I/O queues
+should be completed with status Invalid Command Opcode.
+
+Note that this is technically a v1.4 feature, but it does not hurt to
+implement before we finally bump the reported version implemented.
+
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- hw/block/nvme.c      | 66 +++++++++++++++++++++++++++-----------------
- include/block/nvme.h |  1 +
- 2 files changed, 41 insertions(+), 26 deletions(-)
+ hw/block/nvme.c      | 4 ++++
+ include/block/nvme.h | 5 +++++
+ 2 files changed, 9 insertions(+)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 8d2b5be567..41389b2b09 100644
+index ec7363ea40..80730e1c03 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -1164,48 +1164,62 @@ static uint16_t nvme_create_sq(NvmeCtrl *n, NvmeRequest *req)
-     return NVME_SUCCESS;
- }
+@@ -1026,6 +1026,10 @@ static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeRequest *req)
+     trace_pci_nvme_io_cmd(nvme_cid(req), nsid, nvme_sqid(req),
+                           req->cmd.opcode, nvme_io_opc_str(req->cmd.opcode));
  
-+struct nvme_stats {
-+    uint64_t units_read;
-+    uint64_t units_written;
-+    uint64_t read_commands;
-+    uint64_t write_commands;
-+};
++    if (NVME_CC_CSS(n->bar.cc) == NVME_CC_CSS_ADMIN_ONLY) {
++        return NVME_INVALID_OPCODE | NVME_DNR;
++    }
 +
-+static void nvme_set_blk_stats(NvmeNamespace *ns, struct nvme_stats *stats)
-+{
-+    BlockAcctStats *s = blk_get_stats(ns->blkconf.blk);
-+
-+    stats->units_read += s->nr_bytes[BLOCK_ACCT_READ] >> BDRV_SECTOR_BITS;
-+    stats->units_written += s->nr_bytes[BLOCK_ACCT_WRITE] >> BDRV_SECTOR_BITS;
-+    stats->read_commands += s->nr_ops[BLOCK_ACCT_READ];
-+    stats->write_commands += s->nr_ops[BLOCK_ACCT_WRITE];
-+}
-+
- static uint16_t nvme_smart_info(NvmeCtrl *n, uint8_t rae, uint32_t buf_len,
-                                 uint64_t off, NvmeRequest *req)
- {
-     uint32_t nsid = le32_to_cpu(req->cmd.nsid);
--
-+    struct nvme_stats stats = { 0 };
-+    NvmeSmartLog smart = { 0 };
-     uint32_t trans_len;
-+    NvmeNamespace *ns;
-     time_t current_ms;
--    uint64_t units_read = 0, units_written = 0;
--    uint64_t read_commands = 0, write_commands = 0;
--    NvmeSmartLog smart;
--
--    if (nsid && nsid != 0xffffffff) {
--        return NVME_INVALID_FIELD | NVME_DNR;
--    }
- 
-     if (off >= sizeof(smart)) {
-         return NVME_INVALID_FIELD | NVME_DNR;
+     if (!nvme_nsid_valid(n, nsid)) {
+         return NVME_INVALID_NSID | NVME_DNR;
      }
- 
--    for (int i = 1; i <= n->num_namespaces; i++) {
--        NvmeNamespace *ns = nvme_ns(n, i);
--        if (!ns) {
--            continue;
--        }
--
--        BlockAcctStats *s = blk_get_stats(ns->blkconf.blk);
-+    if (nsid != 0xffffffff) {
-+        ns = nvme_ns(n, nsid);
-+        if (!ns)
-+            return NVME_INVALID_NSID | NVME_DNR;
-+        nvme_set_blk_stats(ns, &stats);
-+    } else {
-+        int i;
- 
--        units_read += s->nr_bytes[BLOCK_ACCT_READ] >> BDRV_SECTOR_BITS;
--        units_written += s->nr_bytes[BLOCK_ACCT_WRITE] >> BDRV_SECTOR_BITS;
--        read_commands += s->nr_ops[BLOCK_ACCT_READ];
--        write_commands += s->nr_ops[BLOCK_ACCT_WRITE];
-+        for (i = 1; i <= n->num_namespaces; i++) {
-+            ns = nvme_ns(n, i);
-+            if (!ns) {
-+                continue;
-+            }
-+            nvme_set_blk_stats(ns, &stats);
-+        }
-     }
- 
-     trans_len = MIN(sizeof(smart) - off, buf_len);
- 
--    memset(&smart, 0x0, sizeof(smart));
--
--    smart.data_units_read[0] = cpu_to_le64(DIV_ROUND_UP(units_read, 1000));
--    smart.data_units_written[0] = cpu_to_le64(DIV_ROUND_UP(units_written,
-+    smart.data_units_read[0] = cpu_to_le64(DIV_ROUND_UP(stats.units_read,
-+                                                        1000));
-+    smart.data_units_written[0] = cpu_to_le64(DIV_ROUND_UP(stats.units_written,
-                                                            1000));
--    smart.host_read_commands[0] = cpu_to_le64(read_commands);
--    smart.host_write_commands[0] = cpu_to_le64(write_commands);
-+    smart.host_read_commands[0] = cpu_to_le64(stats.read_commands);
-+    smart.host_write_commands[0] = cpu_to_le64(stats.write_commands);
- 
-     smart.temperature = cpu_to_le16(n->temperature);
- 
-@@ -2708,7 +2722,7 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
-     id->acl = 3;
-     id->aerl = n->params.aerl;
-     id->frmw = (NVME_NUM_FW_SLOTS << 1) | NVME_FRMW_SLOT1_RO;
--    id->lpa = NVME_LPA_EXTENDED;
-+    id->lpa = NVME_LPA_NS_SMART | NVME_LPA_EXTENDED;
- 
-     /* recommended default value (~70 C) */
-     id->wctemp = cpu_to_le16(NVME_TEMPERATURE_WARNING);
 diff --git a/include/block/nvme.h b/include/block/nvme.h
-index 58647bcdad..868cf53f0b 100644
+index 521533fd2a..6de2d5aa75 100644
 --- a/include/block/nvme.h
 +++ b/include/block/nvme.h
-@@ -849,6 +849,7 @@ enum NvmeIdCtrlFrmw {
- };
+@@ -115,6 +115,11 @@ enum NvmeCcMask {
+ #define NVME_CC_IOSQES(cc) ((cc >> CC_IOSQES_SHIFT) & CC_IOSQES_MASK)
+ #define NVME_CC_IOCQES(cc) ((cc >> CC_IOCQES_SHIFT) & CC_IOCQES_MASK)
  
- enum NvmeIdCtrlLpa {
-+    NVME_LPA_NS_SMART = 1 << 0,
-     NVME_LPA_EXTENDED = 1 << 2,
- };
- 
++enum NvmeCcCss {
++    NVME_CC_CSS_NVM        = 0x0,
++    NVME_CC_CSS_ADMIN_ONLY = 0x7,
++};
++
+ enum NvmeCstsShift {
+     CSTS_RDY_SHIFT      = 0,
+     CSTS_CFS_SHIFT      = 1,
 -- 
 2.24.1
 
