@@ -2,54 +2,56 @@ Return-Path: <SRS0=HfOj=DH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B843C4363D
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 22:06:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0B6DC4363D
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 22:06:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D35A2206BE
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 22:06:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 230B3206BE
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Sep 2020 22:06:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="FgtkE3El"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D35A2206BE
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="UHKc6J6s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 230B3206BE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNkEa-0006mN-Lx
-	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 18:06:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56072)
+	id 1kNkEh-00072M-1O
+	for qemu-devel@archiver.kernel.org; Wed, 30 Sep 2020 18:06:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56178)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kbusch@kernel.org>)
- id 1kNkD3-0005NK-4N; Wed, 30 Sep 2020 18:04:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50384)
+ id 1kNkD7-0005TO-I1; Wed, 30 Sep 2020 18:04:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50502)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kbusch@kernel.org>)
- id 1kNkD1-0007vA-5W; Wed, 30 Sep 2020 18:04:24 -0400
+ id 1kNkD4-0007vs-L2; Wed, 30 Sep 2020 18:04:29 -0400
 Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id AD1C820719;
- Wed, 30 Sep 2020 22:04:20 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 91F9D20C09;
+ Wed, 30 Sep 2020 22:04:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1601503461;
- bh=s2wAl/3xB6v3exDiLG5O0uRXNeKF7WV4JveoQPEkHdY=;
- h=From:To:Cc:Subject:Date:From;
- b=FgtkE3ElJTj1zP7ZmhmLSzSIBnIpYDn9mVZMdQNm4gFUfUo7gOEOwzTRUd+0SPEQs
- qn61qmXw6KH+qvuCgc5IfRwxkW+e9Y+Unw3QZIAk8zlDCMDlz0rQx4V/vTtDR7IXLt
- xQK39v/ts1HGJXLJUIfQplDymkVthgvYIxMeQ5bk=
+ s=default; t=1601503465;
+ bh=80ZjOCIc2WjjQPb7N7sA3OGjEt0PtsQvDwhUpEhRQ/I=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=UHKc6J6srpIuk+2aVNKF/fcY80JnrVdlyqvKfq5RV1HyF6ixsLXPCOMtgF0Ml8w34
+ GqbkO82mpe9EizrE6BJAz2+/03/cRg/QkLyFbWRU3JYFb7+dW87PRTUBXcqXe0P3uq
+ vo67wKPioyfv1DbGWRIk8AFW5LE2GCuCwc+Uagak=
 From: Keith Busch <kbusch@kernel.org>
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org,
  Klaus Jensen <k.jensen@samsung.com>
-Subject: [PATCH 0/9] nvme qemu cleanups and fixes
-Date: Wed, 30 Sep 2020 15:04:05 -0700
-Message-Id: <20200930220414.562527-1-kbusch@kernel.org>
+Subject: [PATCH 5/9] hw/block/nvme: support for admin-only command set
+Date: Wed, 30 Sep 2020 15:04:10 -0700
+Message-Id: <20200930220414.562527-6-kbusch@kernel.org>
 X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200930220414.562527-1-kbusch@kernel.org>
+References: <20200930220414.562527-1-kbusch@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=198.145.29.99; envelope-from=kbusch@kernel.org;
@@ -83,37 +85,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-After going through the zns enabling, I notice the controller enabling
-is not correct. Then I just continued maked more stuff. The series, I
-think, contains some of the less controversial patches from the two
-conflicting zns series, preceeded by some cleanups and fixes from me.
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ hw/block/nvme.c      | 1 +
+ include/block/nvme.h | 3 ++-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-If this is all fine, I took the liberty of porting the zns enabling to
-it and made a public branch for consideration here:
-
- http://git.infradead.org/qemu-nvme.git/shortlog/refs/heads/kb-zns 
-
-Dmitry Fomichev (1):
-  hw/block/nvme: report actual LBA data shift in LBAF
-
-Keith Busch (5):
-  hw/block/nvme: remove pointless rw indirection
-  hw/block/nvme: fix log page offset check
-  hw/block/nvme: support per-namespace smart log
-  hw/block/nvme: validate command set selected
-  hw/block/nvme: support for admin-only command set
-
-Klaus Jensen (3):
-  hw/block/nvme: reject io commands if only admin command set selected
-  hw/block/nvme: add nsid to get/setfeat trace events
-  hw/block/nvme: add trace event for requests with non-zero status code
-
- hw/block/nvme-ns.c    |   5 ++
- hw/block/nvme.c       | 194 ++++++++++++++++++++----------------------
- hw/block/trace-events |   6 +-
- include/block/nvme.h  |  11 +++
- 4 files changed, 114 insertions(+), 102 deletions(-)
-
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 6c582e6874..ec7363ea40 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -2755,6 +2755,7 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
+     NVME_CAP_SET_CQR(n->bar.cap, 1);
+     NVME_CAP_SET_TO(n->bar.cap, 0xf);
+     NVME_CAP_SET_CSS(n->bar.cap, NVME_CAP_CSS_NVM);
++    NVME_CAP_SET_CSS(n->bar.cap, NVME_CAP_CSS_ADMIN_ONLY);
+     NVME_CAP_SET_MPSMAX(n->bar.cap, 4);
+ 
+     n->bar.vs = NVME_SPEC_VER;
+diff --git a/include/block/nvme.h b/include/block/nvme.h
+index bc20a2ba5e..521533fd2a 100644
+--- a/include/block/nvme.h
++++ b/include/block/nvme.h
+@@ -83,7 +83,8 @@ enum NvmeCapMask {
+                                                             << CAP_PMR_SHIFT)
+ 
+ enum NvmeCapCss {
+-    NVME_CAP_CSS_NVM = 1 << 0,
++    NVME_CAP_CSS_NVM        = 1 << 0,
++    NVME_CAP_CSS_ADMIN_ONLY = 1 << 7,
+ };
+ 
+ enum NvmeCcShift {
 -- 
 2.24.1
 
