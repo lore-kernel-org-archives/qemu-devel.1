@@ -2,93 +2,98 @@ Return-Path: <SRS0=M6H1=DI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF526C4727C
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 15:01:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6168BC4727C
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 15:02:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62EB820780
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 15:01:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 83B2420780
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 15:02:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K0wFdEMA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62EB820780
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yXr52+JQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83B2420780
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kO05c-0005h8-Gh
-	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 11:01:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42974)
+	id 1kO06D-0005wx-99
+	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 11:02:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45284)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kNzsT-0004oR-MH
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 10:48:13 -0400
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:39417)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kNzz3-0005Xl-G0
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 10:55:01 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:46432)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kNzsR-0002x4-Nv
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 10:48:13 -0400
-Received: by mail-wr1-x432.google.com with SMTP id k10so6120356wru.6
- for <qemu-devel@nongnu.org>; Thu, 01 Oct 2020 07:48:11 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kNzz1-0003so-3P
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 10:55:01 -0400
+Received: by mail-oi1-x241.google.com with SMTP id u126so5824779oif.13
+ for <qemu-devel@nongnu.org>; Thu, 01 Oct 2020 07:54:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=7IRmJR4QLq1yyKkeN0MLbFHRplQff2bZm6Ce52F5OFc=;
- b=K0wFdEMAOc+stAy/xWe+yZhe/qeJrWcAI6FXxTve7h6UUNibEs0StQhdGiheTC6xLt
- qSW9VrMhNbanDtzH1hbrKnA7a+GUSoPLbppFphN/2GcME/OlXO7PJwa0y8X2/6gSup6b
- nM/3Kv4jofGf/boWd5IKEfNANHuWlwE7PhFL57F/wzC1QJJVAfJMIxj3FYuGmXu63tBo
- 5efwdfvpqD/N4+fli7evo0loUFgW6aRg2+JBuO7kgnWFNdtjwWC1QRqgvBTnI4iLnHgt
- GRilFtx1vPk5IX66tkQ0Jd8+XnylOzPcHXGsP/Rf2CkrB+lv86ptiHAQQlGlnl0tZcKm
- 8kKw==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=chIpvnOJ9GqCVXP7N22LNRA9r//HjN8pKJCFVZKqYZY=;
+ b=yXr52+JQZmU+oFP2NdrXO1OkCtJOnWboZVSbfSmDYx6FYg8NnzGn3eg1+pKSt27wu4
+ EFDS/KA7dQNA5s8oN9wjLuy52XPRJqygOOWcuUUbj73udcZf18hbJXf66vAd67ff+0re
+ 3kfx+Z6NtEc3oKS0TQGpq9SWqf380aZK45cH9uvlQ4zWedJd2TNTSgVUKmZIQ1Qyy8Q3
+ rDHntKZbhgnT6Tk/huRx8FMvh6FEjSkcJODdlskpCsfC6u2RD9Azh3JNEcI/GqkLIJHm
+ 5GidTFg7o31qVhfPr7lqm9pIcjYFRJubeFcB9n81X9xEtBxZwLTeyOKl6RAZhH8RHyGN
+ lVJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=7IRmJR4QLq1yyKkeN0MLbFHRplQff2bZm6Ce52F5OFc=;
- b=dcpFULG6TGtsl5TQKC/JNZQ7BOpEJ7HGnYZL+cwJX1LyXDPztLhVt5tK4ct00V9N6S
- Rx31g2QMpugqEO8FelPpadfyvGNT7bnzYHAiW4ZnecwVkzGhCHJQmA1E7x9KYBXz+uxu
- VjrbulnrkFkpMYhjjeRzSbH1mUT4IDzCoZjyZCaqx8ZLb+gm9h/MmzMw8HO2fMqBuFLN
- usoY3VrTzprNA/XvaU3LDqrE8Fn0RXA7G+QfYz5J0kmeUFVxPpmEOwGSyKH6T4vz7S2W
- 70af1bBdOwB1sY3rF6ExFkJHo+WhFvrp3ECFR9rOn1K9AbwxBWoEfO7+UBBFzZ/X2SfO
- OCeg==
-X-Gm-Message-State: AOAM531ozUqWacADIv2/+UlpocXfriiPRGJyweRNrXPdav/hUQLjD+69
- QUysO3CE+RDwUUAPKdXTvuaIqsizXcYEeue/
-X-Google-Smtp-Source: ABdhPJy2D0tCtalSgxU8XAvJeJP54toi44akejCLNrejYTQqd+G/yPOOEpoJ4QYu2PoVx5OLqIMIeg==
-X-Received: by 2002:a5d:6551:: with SMTP id z17mr9450772wrv.200.1601563689663; 
- Thu, 01 Oct 2020 07:48:09 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 70sm342052wme.15.2020.10.01.07.48.08
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 01 Oct 2020 07:48:08 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 03/18] hw/intc/armv7m_nvic: Only show ID register values for
- Main Extension CPUs
-Date: Thu,  1 Oct 2020 15:47:44 +0100
-Message-Id: <20201001144759.5964-4-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201001144759.5964-1-peter.maydell@linaro.org>
-References: <20201001144759.5964-1-peter.maydell@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=chIpvnOJ9GqCVXP7N22LNRA9r//HjN8pKJCFVZKqYZY=;
+ b=AuOpcraqqcGQJr0iItbKTwFHu2l/jXbHABYsO8Ah+rroAn1yG/3iIcRorlJMQ8GisU
+ TQ3WXvfcFq0ZdZ0fpJO+S+FXOPcDOLVyigg9whT5OzMk3lq32uN4uyzvqy1pswHnryD+
+ SjrTAE4yUQmKZJ0XTyR8MPk5gTYlTwEzVKtXALJBiXSPXqlFWr7WYo6YjM3ZdDgk2oVT
+ qAdKKf1k3X7PhEhnXFP1gYPOZDv6bjsNCCr8w6dsg2wlFBcZZZdaRttxTeTr9iGkOuq9
+ wkV6y7gNrj0wJPppq+IksJ40LksOf0Exi4UaYShsSPK/b6dlH2/+smzdrKnC3cegk0hB
+ OSQg==
+X-Gm-Message-State: AOAM533FYIVGgpH+vrpJCndaeOOYN0Gi7fTlecg+1kRXZyoiX7P7/oaw
+ OQBIUtPqnhzkhLKdQZNQhB2quQ==
+X-Google-Smtp-Source: ABdhPJw+rDP2RkWD/7UuRx9nhuIAfHDwOYcN8ur/VbkKZL1xlqBHmiyyGo+Z0Qyv2EH2EVJJUrOQMg==
+X-Received: by 2002:aca:55c5:: with SMTP id j188mr230018oib.138.1601564097948; 
+ Thu, 01 Oct 2020 07:54:57 -0700 (PDT)
+Received: from [10.10.73.179] (fixed-187-189-51-144.totalplay.net.
+ [187.189.51.144])
+ by smtp.gmail.com with ESMTPSA id l25sm1254832otb.4.2020.10.01.07.54.56
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 01 Oct 2020 07:54:57 -0700 (PDT)
+Subject: Re: [PATCH v2 7/9] s390x/tcg: Implement MULTIPLY SINGLE (MSC, MSGC,
+ MSGRKC, MSRKC)
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20200928122717.30586-1-david@redhat.com>
+ <20200928122717.30586-8-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <13e5607d-77cc-4e18-a2fa-0cfe07322806@linaro.org>
+Date: Thu, 1 Oct 2020 09:54:54 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::432;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x432.google.com
+In-Reply-To: <20200928122717.30586-8-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
+ envelope-from=richard.henderson@linaro.org; helo=mail-oi1-x241.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-Spam_score_int: -23
+X-Spam_score: -2.4
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.26,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,111 +106,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+ Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-M-profile CPUs only implement the ID registers as guest-visible if
-the CPU implements the Main Extension (all our current CPUs except
-the Cortex-M0 do).
+On 9/28/20 7:27 AM, David Hildenbrand wrote:
+> We need new CC handling, determining the CC based on the intermediate
+> result (64bit for MSC and MSRKC, 128bit for MSGC and MSGRKC).
+> 
+> We want to store out2 ("low") after muls128 to r1, so add
+> "wout_out2_r1".
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/cc_helper.c   | 32 ++++++++++++++++++++++++++++++++
+>  target/s390x/helper.c      |  2 ++
+>  target/s390x/insn-data.def |  4 ++++
+>  target/s390x/internal.h    |  2 ++
+>  target/s390x/translate.c   | 19 +++++++++++++++++++
+>  5 files changed, 59 insertions(+)
 
-Currently we handle this by having the Cortex-M0 leave the ID
-register values in the ARMCPU struct as zero, but this conflicts with
-our design decision to make QEMU behaviour be keyed off ID register
-fields wherever possible.
-
-Explicitly code the ID registers in the NVIC to return 0 if the Main
-Extension is not implemented, so we can make the M0 model set the
-ARMCPU struct fields to obtain the correct behaviour without those
-values becoming guest-visible.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200910173855.4068-4-peter.maydell@linaro.org
----
- hw/intc/armv7m_nvic.c | 42 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
 
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index a28be49c1e9..42b1ad59e65 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -1238,32 +1238,74 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
-                       "Aux Fault status registers unimplemented\n");
-         return 0;
-     case 0xd40: /* PFR0.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_offset;
-+        }
-         return cpu->isar.id_pfr0;
-     case 0xd44: /* PFR1.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_offset;
-+        }
-         return cpu->isar.id_pfr1;
-     case 0xd48: /* DFR0.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_offset;
-+        }
-         return cpu->isar.id_dfr0;
-     case 0xd4c: /* AFR0.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_offset;
-+        }
-         return cpu->id_afr0;
-     case 0xd50: /* MMFR0.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_offset;
-+        }
-         return cpu->isar.id_mmfr0;
-     case 0xd54: /* MMFR1.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_offset;
-+        }
-         return cpu->isar.id_mmfr1;
-     case 0xd58: /* MMFR2.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_offset;
-+        }
-         return cpu->isar.id_mmfr2;
-     case 0xd5c: /* MMFR3.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_offset;
-+        }
-         return cpu->isar.id_mmfr3;
-     case 0xd60: /* ISAR0.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_offset;
-+        }
-         return cpu->isar.id_isar0;
-     case 0xd64: /* ISAR1.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_offset;
-+        }
-         return cpu->isar.id_isar1;
-     case 0xd68: /* ISAR2.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_offset;
-+        }
-         return cpu->isar.id_isar2;
-     case 0xd6c: /* ISAR3.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_offset;
-+        }
-         return cpu->isar.id_isar3;
-     case 0xd70: /* ISAR4.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_offset;
-+        }
-         return cpu->isar.id_isar4;
-     case 0xd74: /* ISAR5.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_offset;
-+        }
-         return cpu->isar.id_isar5;
-     case 0xd78: /* CLIDR */
-         return cpu->clidr;
--- 
-2.20.1
-
+r~
 
