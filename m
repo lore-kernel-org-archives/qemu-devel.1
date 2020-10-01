@@ -2,91 +2,86 @@ Return-Path: <SRS0=M6H1=DI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACAC9C4727E
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 18:13:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AC36C4727E
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 18:14:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1AF06206C9
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 18:12:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DD51F206C9
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 18:14:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kKc2TIuK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AF06206C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AxZHTl5f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD51F206C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kO34d-0006Jh-3g
-	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 14:12:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39020)
+	id 1kO362-0007me-Vg
+	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 14:14:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36766)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kO2nq-0006X7-Uz; Thu, 01 Oct 2020 13:55:38 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35858)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kO2nn-00081d-7R; Thu, 01 Oct 2020 13:55:38 -0400
-Received: by mail-wr1-x444.google.com with SMTP id z1so6836969wrt.3;
- Thu, 01 Oct 2020 10:55:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=M7t19Tqf063/zL/LgCE73iryE3zXZ+xrQJRxmqL2iCE=;
- b=kKc2TIuKF92KNBFSi2URXn92T85dgW2C8SiSZJ/RHPnyVPsl7jVgJFIyjIsQasMnuY
- ofmCFk0C2l1E4Fn5bICHm5J8gYcBsk0U/XOiXPdGwTUOl5lXsIXc3pLYhjyKqdqVI91x
- CR5E/tK0uLg2oDwgO2Yhy0CcptH4kIr7e/inmUsFSA/vfJfgHwYgiKIIAD/2ROcQcx5y
- CrO7d506C5pqz/4jwzVS6EpE2D/AUyItDeBBLW7z1bqUrA5f8p5oOzN13zy+RLK+FtGx
- HgaVw0FE3okAF3OITQNEtnbNh9CNNL21ih/htJQqhNWUemj20Iiy3Cs+rIPt3WHEglr4
- a3kQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=M7t19Tqf063/zL/LgCE73iryE3zXZ+xrQJRxmqL2iCE=;
- b=Oc6VKw3ilRrKLtCsh6oaV4r0kQuP0APwyRrSXIRL8Kevn/ru2T2j8YzCTCz8e2X9UB
- rAUkGQKHftof5R0hOGcKNiRFozvkQb/bpcY6Ed5nOoqR+SIuDQWCmEAieuE2QpAs/ZON
- 2135BOaFJ7eWx6jB0GFkLkktZnfyOdejDpM67A+fR27JB0M7cgRuLJQo6M8fwPPwP+oe
- 7Bd3Iikjcx1x+bPLPbOWQL9X34Zluqu1i3aBDrx44OjgbDyuMz5o/KBI1nPxp8/JxU75
- Gy0JNs7RU9QycQtS8WCqWx9foV5HE2kYyeVQpWD2q8NFhK+3XxcBDTuRnuSQ8tS1T4FF
- cWNw==
-X-Gm-Message-State: AOAM530uMfTe053+Rx5WWPHac8H+Bj4miPL3wFwtfzer0vFOXqDhko/N
- lNH8DxRuw+KRdUcDinzBfWhwIwbaaVA=
-X-Google-Smtp-Source: ABdhPJxoOib+QkZmeVBWkef8EGZKrstXlCvY0qmY/+U6AO/kYKPIz2PInu86qUIPOI4j+cub6vN3kg==
-X-Received: by 2002:a5d:460c:: with SMTP id t12mr10449649wrq.225.1601574933052; 
- Thu, 01 Oct 2020 10:55:33 -0700 (PDT)
-Received: from x1w.redhat.com (74.red-83-53-161.dynamicip.rima-tde.net.
- [83.53.161.74])
- by smtp.gmail.com with ESMTPSA id i26sm1019315wmb.17.2020.10.01.10.55.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 01 Oct 2020 10:55:32 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] cpus: Do not dump CPU state when calling hw_error()
-Date: Thu,  1 Oct 2020 19:55:31 +0200
-Message-Id: <20201001175531.1623361-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.26.2
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kO2fa-0003Y1-05
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 13:47:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41409)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kO2fW-0006pO-Rk
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 13:47:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601574422;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Hsx9Nql06fYoiWOehfxk009P/c16XD32+LqOt/kOyJA=;
+ b=AxZHTl5fX+iYfGKjzeFyFD+C7skXy0IqmFGS5Tpu6qVJjAMSCyHM6O/EMa0wGtu3kklp6R
+ +2UjLjS0diorcgt2L/+jqt/gaAs5gYSemjR44qy71lP+HUBbiiVviHAkL+QA+fjPQfYy/z
+ IrmAFfMXELu4HFqVOwExDbJrvv50QzM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-71-XK7JhAEZPlSmkHF-SCZ0Sw-1; Thu, 01 Oct 2020 13:47:00 -0400
+X-MC-Unique: XK7JhAEZPlSmkHF-SCZ0Sw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F018801AC2;
+ Thu,  1 Oct 2020 17:46:59 +0000 (UTC)
+Received: from scv.redhat.com (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B3A3E5C1CF;
+ Thu,  1 Oct 2020 17:46:58 +0000 (UTC)
+From: John Snow <jsnow@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+	qemu-devel@nongnu.org
+Subject: [PULL 5/9] ide: model HOB correctly
+Date: Thu,  1 Oct 2020 13:46:45 -0400
+Message-Id: <20201001174649.1911016-6-jsnow@redhat.com>
+In-Reply-To: <20201001174649.1911016-1-jsnow@redhat.com>
+References: <20201001174649.1911016-1-jsnow@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 04:25:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,48 +94,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Dumping the state of all CPUs is not helpful in any of the contexts
-where hw_error() is used.
-We already have cpu_abort() to dump CPU states and abort.
+I have been staring at this FIXME for years and I never knew what it
+meant. I finally stumbled across it!
 
-Restrict hw_error() to peripheral errors, hoping we can completely
-remove it by proper functions from "error-report.h" in the future.
+When writing to the command registers, the old value is shifted into a
+HOB copy of the register and the new value is written into the primary
+register. When reading registers, the value retrieved is dependent on
+the HOB bit in the CONTROL register.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+By setting bit 7 (0x80) in CONTROL, any register read will, if it has
+one, yield the HOB value for that register instead.
+
+Our code has a problem: We were using bit 7 of the DEVICE register to
+model this. We use bus->cmd roughly as the control register already, as
+it stores the value from ide_ctrl_write.
+
+Lastly, all command register writes reset the HOB, so fix that, too.
+
+Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- softmmu/cpus.c | 5 -----
- 1 file changed, 5 deletions(-)
+ include/hw/ide/internal.h |  1 +
+ hw/ide/core.c             | 15 +++++++--------
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/softmmu/cpus.c b/softmmu/cpus.c
-index ac8940d52e..da45cbf989 100644
---- a/softmmu/cpus.c
-+++ b/softmmu/cpus.c
-@@ -913,16 +913,11 @@ static void stop_tcg_kick_timer(void)
- void hw_error(const char *fmt, ...)
- {
-     va_list ap;
--    CPUState *cpu;
+diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
+index a23bb2f3481..5b7b0e47e60 100644
+--- a/include/hw/ide/internal.h
++++ b/include/hw/ide/internal.h
+@@ -58,6 +58,7 @@ OBJECT_DECLARE_SIMPLE_TYPE(IDEBus, IDE_BUS)
+ #define TAG_MASK		0xf8
  
-     va_start(ap, fmt);
-     fprintf(stderr, "qemu: hardware error: ");
-     vfprintf(stderr, fmt, ap);
-     fprintf(stderr, "\n");
--    CPU_FOREACH(cpu) {
--        fprintf(stderr, "CPU #%d:\n", cpu->cpu_index);
--        cpu_dump_state(cpu, stderr, CPU_DUMP_FPU);
--    }
-     va_end(ap);
-     abort();
+ /* Bits of Device Control register */
++#define IDE_CTRL_HOB            0x80
+ #define IDE_CTRL_RESET          0x04
+ #define IDE_CTRL_DISABLE_IRQ    0x02
+ 
+diff --git a/hw/ide/core.c b/hw/ide/core.c
+index 29dc5dc4b45..6ececa5dfee 100644
+--- a/hw/ide/core.c
++++ b/hw/ide/core.c
+@@ -1215,8 +1215,7 @@ static void ide_cmd_lba48_transform(IDEState *s, int lba48)
+ static void ide_clear_hob(IDEBus *bus)
+ {
+     /* any write clears HOB high bit of device control register */
+-    bus->ifs[0].select &= ~(1 << 7);
+-    bus->ifs[1].select &= ~(1 << 7);
++    bus->cmd &= ~(IDE_CTRL_HOB);
  }
+ 
+ /* IOport [W]rite [R]egisters */
+@@ -1256,12 +1255,14 @@ void ide_ioport_write(void *opaque, uint32_t addr, uint32_t val)
+         return;
+     }
+ 
++    /* NOTE: Device0 and Device1 both receive incoming register writes.
++     * (They're on the same bus! They have to!) */
++
+     switch (reg_num) {
+     case 0:
+         break;
+     case ATA_IOPORT_WR_FEATURES:
+         ide_clear_hob(bus);
+-        /* NOTE: data is written to the two drives */
+         bus->ifs[0].hob_feature = bus->ifs[0].feature;
+         bus->ifs[1].hob_feature = bus->ifs[1].feature;
+         bus->ifs[0].feature = val;
+@@ -1296,7 +1297,7 @@ void ide_ioport_write(void *opaque, uint32_t addr, uint32_t val)
+         bus->ifs[1].hcyl = val;
+         break;
+     case ATA_IOPORT_WR_DEVICE_HEAD:
+-        /* FIXME: HOB readback uses bit 7 */
++        ide_clear_hob(bus);
+         bus->ifs[0].select = val | 0xa0;
+         bus->ifs[1].select = val | 0xa0;
+         /* select drive */
+@@ -1304,7 +1305,7 @@ void ide_ioport_write(void *opaque, uint32_t addr, uint32_t val)
+         break;
+     default:
+     case ATA_IOPORT_WR_COMMAND:
+-        /* command */
++        ide_clear_hob(bus);
+         ide_exec_cmd(bus, val);
+         break;
+     }
+@@ -2142,9 +2143,7 @@ uint32_t ide_ioport_read(void *opaque, uint32_t addr)
+     int ret, hob;
+ 
+     reg_num = addr & 7;
+-    /* FIXME: HOB readback uses bit 7, but it's always set right now */
+-    //hob = s->select & (1 << 7);
+-    hob = 0;
++    hob = bus->cmd & (IDE_CTRL_HOB);
+     switch (reg_num) {
+     case ATA_IOPORT_RR_DATA:
+         ret = 0xff;
 -- 
 2.26.2
 
