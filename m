@@ -2,70 +2,66 @@ Return-Path: <SRS0=M6H1=DI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72379C4727C
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 06:18:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F8F2C47420
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 06:18:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 028A1221E8
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 06:18:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 114E3221E8
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 06:18:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QhyUjCvt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 028A1221E8
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g6kPRmo7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 114E3221E8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNrvX-0005sa-SS
-	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 02:18:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38298)
+	id 1kNrvZ-0005xN-7P
+	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 02:18:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38300)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1kNruI-00049J-48
+ id 1kNruI-00049w-DY
  for qemu-devel@nongnu.org; Thu, 01 Oct 2020 02:17:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54407)
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28508)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1kNruG-0003rc-A0
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 02:17:33 -0400
+ id 1kNruD-0003r4-UL
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 02:17:34 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601533051;
+ s=mimecast20190719; t=1601533049;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=JYA+zFKDmKH8V8HXIMs/oeL/JdVQqc9A9vJ3k5IO9KY=;
- b=QhyUjCvtNw0NSTpz7WLWfX29C9g0ixbZpMVFYfeyloQPkJprPFDip2e4TgzCoezs61PfJe
- yBiR+DiCmF920t74Gt8NmAvUGuv9jQjWAnK+7Uer+U3h/gA1HF7frU42Kj06lZniqeUdjp
- t7AsVJakW3U/+mTDw9q2IeZAuxoxnO8=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=8eBQ4xArbNe0H4b51EnwvK//0iqdyYTLDLzz0NqmkOk=;
+ b=g6kPRmo7pQnWntj1NzBAxqqw4fD8z5vzaLAKXPvovIBCK9kRyVF0zGUhkZJiehE9gkjybB
+ WPlv0R8u/RjhZnJs01VDvv0haHBEt/CboT4phH8rZwdqsoagK+w53RzeMFmi9NYzpU4WyC
+ hYOryPeudz4h6P8Pwd7BXY/GezN0VX4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-571-APwsy-Q3OPib-FGkSGNRTA-1; Thu, 01 Oct 2020 02:17:29 -0400
-X-MC-Unique: APwsy-Q3OPib-FGkSGNRTA-1
+ us-mta-285-0t21fm0lNFevAFt8wBbkrA-1; Thu, 01 Oct 2020 02:17:26 -0400
+X-MC-Unique: 0t21fm0lNFevAFt8wBbkrA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B743851B2;
- Thu,  1 Oct 2020 06:17:28 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D304E185A0E1;
+ Thu,  1 Oct 2020 06:17:24 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.40.193.24])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4830355797;
- Thu,  1 Oct 2020 06:17:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 063275578D;
+ Thu,  1 Oct 2020 06:17:19 +0000 (UTC)
 From: Andrew Jones <drjones@redhat.com>
 To: qemu-devel@nongnu.org,
 	qemu-arm@nongnu.org
-Subject: [PATCH v4 2/6] target/arm/kvm: Make uncalled stubs explicitly
- unreachable
-Date: Thu,  1 Oct 2020 08:17:14 +0200
-Message-Id: <20201001061718.101915-3-drjones@redhat.com>
-In-Reply-To: <20201001061718.101915-1-drjones@redhat.com>
-References: <20201001061718.101915-1-drjones@redhat.com>
+Subject: [PATCH v4 0/6] hw/arm/virt: Introduce kvm-steal-time
+Date: Thu,  1 Oct 2020 08:17:12 +0200
+Message-Id: <20201001061718.101915-1-drjones@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
@@ -102,104 +98,64 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When we compile without KVM support !defined(CONFIG_KVM) we generate
-stubs for functions that the linker will still encounter. Sometimes
-these stubs can be executed safely and are placed in paths where they
-get executed with or without KVM. Other functions should never be
-called without KVM. Those functions should be guarded by kvm_enabled(),
-but should also be robust to refactoring mistakes. Putting a
-g_assert_not_reached() in the function should help. Additionally,
-the g_assert_not_reached() calls may actually help the linker remove
-some code.
+v4:
+  - Rebased to latest master
+  - Added an official linux header synch patch, replacing the
+    hack patch used in v3
+  - Added a patch to restore the arm-cpu-features test for AArch64
+    that got lost in the meson shuffle
+  - Added Eric's R-b's
 
-We remove the stubs for kvm_arm_get/put_virtual_time(), as they aren't
-necessary at all - the only caller is in kvm.c
+v3:
+  - Rebased: 5.2 machine type and kvm32 drop now included
+  - Switched to using new KVM cap that has been merged upstream
+  - Picked up some r-b's and some of Eric's comments from v2
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- target/arm/kvm_arm.h | 51 +++++++++++++++++++++++++++-----------------
- 1 file changed, 32 insertions(+), 19 deletions(-)
+v2: https://www.mail-archive.com/qemu-devel@nongnu.org/msg727588.html
 
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index bc178eeb84c0..f513702176a7 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -344,18 +344,10 @@ int kvm_arm_set_irq(int cpu, int irqtype, int irq, int level);
- 
- #else
- 
--static inline void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
--{
--    /*
--     * This should never actually be called in the "not KVM" case,
--     * but set up the fields to indicate an error anyway.
--     */
--    cpu->kvm_target = QEMU_KVM_ARM_TARGET_NONE;
--    cpu->host_cpu_probe_failed = true;
--}
--
--static inline void kvm_arm_add_vcpu_properties(Object *obj) {}
--
-+/*
-+ * It's safe to call these functions without KVM support.
-+ * They should either do nothing or return "not supported".
-+ */
- static inline bool kvm_arm_aarch32_supported(void)
- {
-     return false;
-@@ -371,23 +363,44 @@ static inline bool kvm_arm_sve_supported(void)
-     return false;
- }
- 
-+/*
-+ * These functions should never actually be called without KVM support.
-+ */
-+static inline void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
-+{
-+    g_assert_not_reached();
-+}
-+
-+static inline void kvm_arm_add_vcpu_properties(Object *obj)
-+{
-+    g_assert_not_reached();
-+}
-+
- static inline int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
- {
--    return -ENOENT;
-+    g_assert_not_reached();
- }
- 
- static inline int kvm_arm_vgic_probe(void)
- {
--    return 0;
-+    g_assert_not_reached();
- }
- 
--static inline void kvm_arm_pmu_set_irq(CPUState *cs, int irq) {}
--static inline void kvm_arm_pmu_init(CPUState *cs) {}
-+static inline void kvm_arm_pmu_set_irq(CPUState *cs, int irq)
-+{
-+    g_assert_not_reached();
-+}
- 
--static inline void kvm_arm_sve_get_vls(CPUState *cs, unsigned long *map) {}
-+static inline void kvm_arm_pmu_init(CPUState *cs)
-+{
-+    g_assert_not_reached();
-+}
-+
-+static inline void kvm_arm_sve_get_vls(CPUState *cs, unsigned long *map)
-+{
-+    g_assert_not_reached();
-+}
- 
--static inline void kvm_arm_get_virtual_time(CPUState *cs) {}
--static inline void kvm_arm_put_virtual_time(CPUState *cs) {}
- #endif
- 
- static inline const char *gic_class_name(void)
+KVM supports the ability to publish the amount of time that VCPUs
+were runnable, but not running due to other host threads running
+instead, to the guest. The guest scheduler may use that information
+when making decisions and the guest may expose it to its userspace
+(Linux publishes this information in /proc/stat). This feature is
+called "steal time" as it represents the amount of time stolen from
+a guest by scheduling out its VCPUs. To enable this feature KVM
+userspace must provide a memory region that will be used to publish
+the information to the guest. The memory region is typical migratable
+region. The GPA of the region is given to KVM through a VCPU device
+ioctl interface. This feature is only available for 64-bit guests
+per the Arm PVTIME specification (DEN0057A).
+
+This series provides the QEMU support of this feature. It will
+be enabled by default for 5.2 machine types and later, but may
+be disabled with a new CPU property "kvm-steal-time".
+
+Thanks,
+drew
+
+
+Andrew Jones (6):
+  linux headers: sync to 5.9-rc7
+  target/arm/kvm: Make uncalled stubs explicitly unreachable
+  hw/arm/virt: Move post cpu realize check into its own function
+  hw/arm/virt: Move kvm pmu setup to virt_cpu_post_init
+  tests/qtest: Restore aarch64 arm-cpu-features test
+  hw/arm/virt: Implement kvm-steal-time
+
+ docs/system/arm/cpu-features.rst |  11 ++++
+ hw/arm/virt.c                    | 110 ++++++++++++++++++++++---------
+ include/hw/arm/virt.h            |   5 ++
+ linux-headers/linux/kvm.h        |   6 +-
+ target/arm/cpu.c                 |   8 +++
+ target/arm/cpu.h                 |   4 ++
+ target/arm/kvm.c                 |  16 +++++
+ target/arm/kvm64.c               |  64 ++++++++++++++++--
+ target/arm/kvm_arm.h             |  94 ++++++++++++++++++++------
+ target/arm/monitor.c             |   2 +-
+ tests/qtest/arm-cpu-features.c   |  25 +++++--
+ tests/qtest/meson.build          |   3 +-
+ 12 files changed, 286 insertions(+), 62 deletions(-)
+
 -- 
 2.26.2
 
