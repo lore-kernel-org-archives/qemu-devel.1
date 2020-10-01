@@ -7,62 +7,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B31DC4727C
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 06:20:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0B12C4727C
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 06:22:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D224F206D9
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 06:20:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 256C92075F
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 06:22:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZDHnwfga"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D224F206D9
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iEPvECuU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 256C92075F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNrxa-0000Vp-0K
-	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 02:20:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38396)
+	id 1kNryr-00022N-AK
+	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 02:22:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38340)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1kNruP-0004Sl-Bw
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 02:17:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27392)
+ id 1kNruM-0004M5-Pg
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 02:17:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42825)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1kNruN-0003sn-Hv
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 02:17:40 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601533058;
+ id 1kNruJ-0003sE-PD
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 02:17:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601533055;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=64SmcdMkYwsAhSqPe415zi6gYv89e19emOMuW+84nos=;
- b=ZDHnwfgaG/nDyy66FKEdMGfCzkZtrFlj0WtQov1d2/1bojhIy+v4WkDfOfRz/zXWeQqRhQ
- +l9TjpDqr75W+z8g3M1Np3g1DOPdOgUvRMAHrz4ASg54uhP+ZcD4yeQCAEIUOeqRGS4bWY
- YPNCGkgvdIVbJB7ARPBJjr1W0oj+Xq0=
+ bh=jlrJ3kLUFV/YV4bCTxJQhgwV/nme212RrN8MphOvkyM=;
+ b=iEPvECuUllH0Zg4TYBL2CsCCP8lt1HYrhg0wt79g44kMte51LcOZKEMh8iA13DPdu9Lchv
+ WVseNVr2l075XMSXRmK1oTqs1+htqH0QQvFWH4hlW8cR3/ezRhLtL6XNDtypjPQ6oqejem
+ MyYbhCVXN7APDo8gpuADb7XYxpM19Gk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-438-gdTuDkUTNK6NmS9NL2vPOQ-1; Thu, 01 Oct 2020 02:17:35 -0400
-X-MC-Unique: gdTuDkUTNK6NmS9NL2vPOQ-1
+ us-mta-21-zvIE77b3M4W4CAqok1rnRQ-1; Thu, 01 Oct 2020 02:17:33 -0400
+X-MC-Unique: zvIE77b3M4W4CAqok1rnRQ-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45D231868410;
- Thu,  1 Oct 2020 06:17:34 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.193.24])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C95685577A;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6A9A31868433;
  Thu,  1 Oct 2020 06:17:32 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.193.24])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 21FCA5577A;
+ Thu,  1 Oct 2020 06:17:28 +0000 (UTC)
 From: Andrew Jones <drjones@redhat.com>
 To: qemu-devel@nongnu.org,
 	qemu-arm@nongnu.org
-Subject: [PATCH v4 4/6] hw/arm/virt: Move kvm pmu setup to virt_cpu_post_init
-Date: Thu,  1 Oct 2020 08:17:16 +0200
-Message-Id: <20201001061718.101915-5-drjones@redhat.com>
+Subject: [PATCH v4 3/6] hw/arm/virt: Move post cpu realize check into its own
+ function
+Date: Thu,  1 Oct 2020 08:17:15 +0200
+Message-Id: <20201001061718.101915-4-drjones@redhat.com>
 In-Reply-To: <20201001061718.101915-1-drjones@redhat.com>
 References: <20201001061718.101915-1-drjones@redhat.com>
 MIME-Version: 1.0
@@ -73,9 +74,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=drjones@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=drjones@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 02:15:30
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 00:27:22
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -25
 X-Spam_score: -2.6
@@ -101,84 +102,86 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move the KVM PMU setup part of fdt_add_pmu_nodes() to
-virt_cpu_post_init(), which is a more appropriate location. Now
-fdt_add_pmu_nodes() is also named more appropriately, because it
-no longer does anything but fdt node creation.
+We'll add more to this new function in coming patches so we also
+state the gic must be created and call it below create_gic().
 
 No functional change intended.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- hw/arm/virt.c | 34 ++++++++++++++++++----------------
- 1 file changed, 18 insertions(+), 16 deletions(-)
+ hw/arm/virt.c | 43 +++++++++++++++++++++++++++----------------
+ 1 file changed, 27 insertions(+), 16 deletions(-)
 
 diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 524eafe22df8..92ab0fd094dc 100644
+index 1231a197c850..524eafe22df8 100644
 --- a/hw/arm/virt.c
 +++ b/hw/arm/virt.c
-@@ -521,21 +521,12 @@ static void fdt_add_gic_node(VirtMachineState *vms)
- 
- static void fdt_add_pmu_nodes(const VirtMachineState *vms)
- {
--    CPUState *cpu;
--    ARMCPU *armcpu;
-+    ARMCPU *armcpu = ARM_CPU(first_cpu);
-     uint32_t irqflags = GIC_FDT_IRQ_FLAGS_LEVEL_HI;
- 
--    CPU_FOREACH(cpu) {
--        armcpu = ARM_CPU(cpu);
--        if (!arm_feature(&armcpu->env, ARM_FEATURE_PMU)) {
--            return;
--        }
--        if (kvm_enabled()) {
--            if (kvm_irqchip_in_kernel()) {
--                kvm_arm_pmu_set_irq(cpu, PPI(VIRTUAL_PMU_IRQ));
--            }
--            kvm_arm_pmu_init(cpu);
--        }
-+    if (!arm_feature(&armcpu->env, ARM_FEATURE_PMU)) {
-+        assert(!object_property_get_bool(OBJECT(armcpu), "pmu", NULL));
-+        return;
+@@ -1672,6 +1672,31 @@ static void finalize_gic_version(VirtMachineState *vms)
      }
+ }
  
-     if (vms->gic_version == VIRT_GIC_VERSION_2) {
-@@ -544,7 +535,6 @@ static void fdt_add_pmu_nodes(const VirtMachineState *vms)
-                              (1 << vms->smp_cpus) - 1);
-     }
- 
--    armcpu = ARM_CPU(qemu_get_cpu(0));
-     qemu_fdt_add_subnode(vms->fdt, "/pmu");
-     if (arm_feature(&armcpu->env, ARM_FEATURE_V8)) {
-         const char compat[] = "arm,armv8-pmuv3";
-@@ -1678,11 +1668,23 @@ static void finalize_gic_version(VirtMachineState *vms)
-  */
- static void virt_cpu_post_init(VirtMachineState *vms)
- {
--    bool aarch64;
-+    bool aarch64, pmu;
-+    CPUState *cpu;
- 
-     aarch64 = object_property_get_bool(OBJECT(first_cpu), "aarch64", NULL);
-+    pmu = object_property_get_bool(OBJECT(first_cpu), "pmu", NULL);
- 
--    if (!kvm_enabled()) {
-+    if (kvm_enabled()) {
-+        CPU_FOREACH(cpu) {
-+            if (pmu) {
-+                assert(arm_feature(&ARM_CPU(cpu)->env, ARM_FEATURE_PMU));
-+                if (kvm_irqchip_in_kernel()) {
-+                    kvm_arm_pmu_set_irq(cpu, PPI(VIRTUAL_PMU_IRQ));
-+                }
-+                kvm_arm_pmu_init(cpu);
++/*
++ * virt_cpu_post_init() must be called after the CPUs have
++ * been realized and the GIC has been created.
++ */
++static void virt_cpu_post_init(VirtMachineState *vms)
++{
++    bool aarch64;
++
++    aarch64 = object_property_get_bool(OBJECT(first_cpu), "aarch64", NULL);
++
++    if (!kvm_enabled()) {
++        if (aarch64 && vms->highmem) {
++            int requested_pa_size = 64 - clz64(vms->highest_gpa);
++            int pamax = arm_pamax(ARM_CPU(first_cpu));
++
++            if (pamax < requested_pa_size) {
++                error_report("VCPU supports less PA bits (%d) than "
++                             "requested by the memory map (%d)",
++                             pamax, requested_pa_size);
++                exit(1);
 +            }
 +        }
-+    } else {
-         if (aarch64 && vms->highmem) {
-             int requested_pa_size = 64 - clz64(vms->highest_gpa);
-             int pamax = arm_pamax(ARM_CPU(first_cpu));
++    }
++}
++
+ static void machvirt_init(MachineState *machine)
+ {
+     VirtMachineState *vms = VIRT_MACHINE(machine);
+@@ -1886,22 +1911,6 @@ static void machvirt_init(MachineState *machine)
+     fdt_add_timer_nodes(vms);
+     fdt_add_cpu_nodes(vms);
+ 
+-   if (!kvm_enabled()) {
+-        ARMCPU *cpu = ARM_CPU(first_cpu);
+-        bool aarch64 = object_property_get_bool(OBJECT(cpu), "aarch64", NULL);
+-
+-        if (aarch64 && vms->highmem) {
+-            int requested_pa_size, pamax = arm_pamax(cpu);
+-
+-            requested_pa_size = 64 - clz64(vms->highest_gpa);
+-            if (pamax < requested_pa_size) {
+-                error_report("VCPU supports less PA bits (%d) than requested "
+-                            "by the memory map (%d)", pamax, requested_pa_size);
+-                exit(1);
+-            }
+-        }
+-    }
+-
+     memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base,
+                                 machine->ram);
+     if (machine->device_memory) {
+@@ -1913,6 +1922,8 @@ static void machvirt_init(MachineState *machine)
+ 
+     create_gic(vms);
+ 
++    virt_cpu_post_init(vms);
++
+     fdt_add_pmu_nodes(vms);
+ 
+     create_uart(vms, VIRT_UART, sysmem, serial_hd(0));
 -- 
 2.26.2
 
