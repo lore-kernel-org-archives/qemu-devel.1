@@ -2,85 +2,87 @@ Return-Path: <SRS0=M6H1=DI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DACCC4727F
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 11:25:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D473C4727F
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 11:34:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6AACB20691
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 11:25:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6577220B1F
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 11:34:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Y279SwrB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AACB20691
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AjHB41Cq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6577220B1F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNwiS-0000Gc-IC
-	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 07:25:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44154)
+	id 1kNwr5-0002wn-Hc
+	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 07:34:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46776)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kNwgA-0007GT-JD
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 07:23:18 -0400
-Received: from mail-ed1-x534.google.com ([2a00:1450:4864:20::534]:35517)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kNwg6-0007jx-Nn
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 07:23:18 -0400
-Received: by mail-ed1-x534.google.com with SMTP id i1so5234438edv.2
- for <qemu-devel@nongnu.org>; Thu, 01 Oct 2020 04:23:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=xySL5VQqL4BUYQTB2jhg5a64LEKQGIQJaxw03S1Jtos=;
- b=Y279SwrBCWZ1OCvFtwRkQPnsWyzyUqLTX3HZbvRhlCo4slosifkJfSq1GzzJbWTiBa
- AJ/FiaM+cIk9CJ3Ncq1Z3ppSfz7Cbg3ODf5Y1EBVLA5o6Ulv+NmkLlgy1OziqsDEjLpT
- pso6h5isTfsjBbseCIwVnu5jAZi8zlPTDqCvbRnxorGZoulUEwiq++Th0bus975yGphn
- Y5vknEen8C4STQKND0QfqLdKq+r4aR54R6jqyPGn8OO4BAXTDZeBNounAbwWiVrE0SEE
- 10yLk3X58+NWFCorGkqfU7xP/hB6OhHolzjXvwjP3ITHt+kXtvp8bSJjmblMJqhFmK1d
- Z1DA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=xySL5VQqL4BUYQTB2jhg5a64LEKQGIQJaxw03S1Jtos=;
- b=RmXupoT50UmGXZXwlJ0cdEYH8NGB9XJsU3TG5r3uz8tfSJIIhMJ1btgqwebL5FvzHe
- bSp1khwdKTQPNInpKx8CPYW9g9CqQhjb/i9TApHJ/OGsAf4a8xKs0yB3YCEgGJeBMlIh
- phK/wpeqWZI259uow5fb98YCr1cEWj1sFUNVkZ1C6UQcpO08pims6mjNx/vp0gTcGzVG
- Lmhj+3r+OsFfDs9IZa9AtR94C0ItOxC9dEk6w1+A1Yr/7e2a/9v4UCHnepnqSlbuzz7X
- RDMRfvhECkCPPQvXq5wAXJSx5EpcvHGZ93lv00cX7IXCx2fG0W1nobtlTyFo6qr7WGNN
- UsOQ==
-X-Gm-Message-State: AOAM531vSoi7R2tPQU0YoRYLMBCBmFHFJoyZbTNxXQAhXSSoNLCbxLXm
- 1TL9uO40uLiqeQ3qRpoRqKWeTIKQkjdYQfyaNDqoAw==
-X-Google-Smtp-Source: ABdhPJwKQC0VPI/9o7TqlWVa2GWHAFEDClhlvxp7J55Rgu7Sf8HrHzsSGGhdj301DH68iCQdw4IP+auzmMe+lKDGbuc=
-X-Received: by 2002:a50:f1cf:: with SMTP id y15mr7766364edl.204.1601551391844; 
- Thu, 01 Oct 2020 04:23:11 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kNwqW-0002Ww-QZ
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 07:34:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44280)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kNwqU-0000d8-Fy
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 07:34:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601552037;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=M0eMtFwx7HCmClTeR5uMXzCUF6n3RdR6tsK84I44RNI=;
+ b=AjHB41CqxnzuGppNLEQe1TVL/pPG/nyk+w3Y6OTBWQfyJElwG/jK+JvSMRnTkhhekmapGR
+ O1duRMxtQpHsnBH7sxYfp8jpfGCFdpBy6KS2hJAdtp+BC5WipMbMVtawkyn1LZduLRMk4f
+ HoVdz2EuGY0ZVNmRZQAQjsiNwroTP1w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-386-_o3AVmP3Oiq_xUl8Kb0D5g-1; Thu, 01 Oct 2020 07:33:55 -0400
+X-MC-Unique: _o3AVmP3Oiq_xUl8Kb0D5g-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8E61064082;
+ Thu,  1 Oct 2020 11:33:54 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-114-92.ams2.redhat.com [10.36.114.92])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 463F85C1D0;
+ Thu,  1 Oct 2020 11:33:53 +0000 (UTC)
+Date: Thu, 1 Oct 2020 13:33:51 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH v2 1/4] keyval: Parse help options
+Message-ID: <20201001113351.GB6673@linux.fritz.box>
+References: <20200930124557.51835-1-kwolf@redhat.com>
+ <20200930124557.51835-2-kwolf@redhat.com>
+ <001c321e-7400-f680-45ce-c920f078d5d8@redhat.com>
+ <20200930151006.GF9292@linux.fritz.box>
+ <87lfgq1bfx.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20200930101305.305302-1-stefanha@redhat.com>
-In-Reply-To: <20200930101305.305302-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 1 Oct 2020 12:23:00 +0100
-Message-ID: <CAFEAcA87+50vkXLkLwVtrtNn4No4Fvsjd+LDEEu2cmhJcQdZ=A@mail.gmail.com>
-Subject: Re: [PULL 00/17] Block patches
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::534;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x534.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <87lfgq1bfx.fsf@dusky.pond.sub.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 02:15:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,71 +95,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Eduardo Habkost <ehabkost@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 30 Sep 2020 at 11:13, Stefan Hajnoczi <stefanha@redhat.com> wrote:
->
-> The following changes since commit b150cb8f67bf491a49a1cb1c7da151eeacbdbcc9:
->
->   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2020-09-29 13:18:54 +0100)
->
-> are available in the Git repository at:
->
->   https://gitlab.com/stefanha/qemu.git tags/block-pull-request
->
-> for you to fetch changes up to bc47831ff28d6f5830c9c8d74220131dc54c5253:
->
->   util/vfio-helpers: Rework the IOVA allocator to avoid IOVA reserved regions (2020-09-30 10:23:05 +0100)
->
-> ----------------------------------------------------------------
-> Pull request
->
-> Note I have switched from GitHub to GitLab.
->
-> ----------------------------------------------------------------
+Am 01.10.2020 um 12:34 hat Markus Armbruster geschrieben:
+> Kevin Wolf <kwolf@redhat.com> writes:
+> 
+> > Am 30.09.2020 um 15:35 hat Eric Blake geschrieben:
+> >> On 9/30/20 7:45 AM, Kevin Wolf wrote:
+> >> > This adds a new parameter 'help' to keyval_parse() that enables parsing
+> >> > of help options. If NULL is passed, the function behaves the same as
+> >> > before. But if a bool pointer is given, it contains the information
+> >> > whether an option "help" without value was given (which would otherwise
+> >> > either result in an error or be interpreted as the value for an implied
+> >> > key).
+> >> > 
+> >> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> [...]
+> >> > +++ b/util/keyval.c
+> >> > @@ -166,7 +166,7 @@ static QObject *keyval_parse_put(QDict *cur,
+> >> >   * On failure, return NULL.
+> >> >   */
+> >> >  static const char *keyval_parse_one(QDict *qdict, const char *params,
+> >> > -                                    const char *implied_key,
+> >> > +                                    const char *implied_key, bool *help,
+> >> >                                      Error **errp)
+> >> >  {
+> >> >      const char *key, *key_end, *s, *end;
+> >> > @@ -238,13 +238,20 @@ static const char *keyval_parse_one(QDict *qdict, const char *params,
+> >> >      if (key == implied_key) {
+> >> >          assert(!*s);
+> >> >          s = params;
+> >> > +    } else if (*s == '=') {
+> >> > +        s++;
+> >> >      } else {
+> >> > -        if (*s != '=') {
+> >> > +        if (help && !strncmp(key, "help", s - key)) {
+> >> 
+> >> Should this use is_help_option() to also accept "?", or are we okay
+> >> demanding exactly "help"?
+> >
+> > The comment for is_help_option() calls "?" deprecated, so I think we
+> > don't want to enable it in a new parser.
+> 
+> Valid point.
+> 
+> But do we really want comparisons for "help" inline everywhere we want
+> to check for non-deprecated help requests?  Would a common helper
+> function be better?
 
-This produces this error message on ppc64be Linux:
+How many more parsers are we going to add? I thought we intended the
+keyval parser to be the one canoncial place in the long term?
 
-make: Entering directory `/home/pm215/qemu/build/all'
-make[1]: Entering directory `/home/pm215/qemu/slirp'
-make[1]: Nothing to be done for `all'.
-make[1]: Leaving directory `/home/pm215/qemu/slirp'
-Generating qemu-version.h with a meson_exe.py custom command
-Generating qemu-options.def with a meson_exe.py custom command
-Generating block-gen.c with a custom command
-YAML:1:83: error: unknown enumerated scalar
-{"IndentWidth": 4, "BraceWrapping": {"AfterFunction": true},
-"BreakBeforeBraces": "Custom", "SortIncludes": false,
-"MaxEmptyLinesToKeep": 2}
+If you prefer, I can make this a second static inline function in
+include/qemu/help_option.h (that would have to work both as strcmp and
+as strncmp), but I don't see a second user that would make it a "common"
+helper.
 
-           ^~~~~~~~
-Error parsing -style: Invalid argument, using LLVM style
-YAML:1:83: error: unknown enumerated scalar
-{"IndentWidth": 4, "BraceWrapping": {"AfterFunction": true},
-"BreakBeforeBraces": "Custom", "SortIncludes": false,
-"MaxEmptyLinesToKeep": 2}
+> On the deprecation of "?": the comment is more than eight years old
+> (commit c8057f951d6).  We didn't have a deprecation process back then,
+> but we did purge '?' from the documentation.  Can we finally drop it?
+> I'm going to ask that in a new thread.
 
-           ^~~~~~~~
-Error parsing -style: Invalid argument, using LLVM style
-Compiling C object libqemuutil.a.p/util_qemu-error.c.o
-Compiling C object libqemuutil.a.p/util_qemu-sockets.c.o
-Compiling C object libqemuutil.a.p/util_aio-posix.c.o
-Compiling C object libqemuutil.a.p/util_osdep.c.o
+I guess we can.
 
-The error does not cause the build to fail, which seems
-like it's also a bug...
+Kevin
 
-(My guess is this is due to some script implicitly wanting
-a newer version of something or other than the PPC box
-happens to have installed, rather than being an endianness
-issue.)
-
-thanks
--- PMM
 
