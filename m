@@ -2,92 +2,91 @@ Return-Path: <SRS0=M6H1=DI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEE62C4727C
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 15:11:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BED6C4727C
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 15:11:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 565B520897
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 15:11:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E44720897
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 15:11:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K8LusoQn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 565B520897
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OX4DA2M4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E44720897
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kO0EY-0000Zp-0Z
-	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 11:11:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43226)
+	id 1kO0FN-00020W-67
+	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 11:11:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48480)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kNzsg-0005Iw-Ih
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 10:48:26 -0400
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:41783)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kNzse-00030M-NY
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 10:48:26 -0400
-Received: by mail-wr1-x435.google.com with SMTP id w5so6109747wrp.8
- for <qemu-devel@nongnu.org>; Thu, 01 Oct 2020 07:48:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=uTbLU0RMMX1YLcqLkOSI8U6uV/lVcqOS45S2U0pseyk=;
- b=K8LusoQnfADNrQXqHC9Khus/78eeCGB+NtrqK22qAG6aIz0gMwK+qUhqMcxh/W41Wp
- YwRbCfcWLaHYkLu2QQW2bIJyVMaHUP+wMBFBmODn4ViB2a2qeysst1v/ytbI1bYO1L3l
- tOwMjHQwCqq+w7IuNJ71ZKjZv3XqGk6nb6cGpcIj2f7gdqLbDWBzzuomfqNdd6oFybqG
- dj2vl9VaMi6puiFRG24J423J0YKwCsFSLMX91EE5kdpCz8H8jOgwSCqumfbnjGgyA5j2
- kbAIIVmXiz2hmgj9AbaEp7tJLymsHFFRw1eIXAx9nQtor43nPhXlcO9jb3JAYUnuebZE
- 9v4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=uTbLU0RMMX1YLcqLkOSI8U6uV/lVcqOS45S2U0pseyk=;
- b=oK3yEZUxSQkG2YMImAr9mnXwagH9AU5hW7J8tQtNfNrhw/uQfsUBgrznwCl7fXk78O
- b+Mf8hFLqX8gb1UjS/fvAyZr7tivMp7FNTJJVUDJ6fdwMis5t215K/Li6OImBkCdziL5
- O/LykLMFl/phCAXMrY/YyVAi4+VsQqkHlZ2bbXM6Vxsd2p6Z+Ov50C82zQuaZW/NkH1y
- y8ouEKs4Zb3K/qDfOfZwPhaHtEncNd8vqA2gvmFRDQJCimjYlL8QszYZ62AtsTOKcLaa
- oaQEMgCtExyoBXChiyoJ7xz5mRfcIHet/asO2HXANC65I/1w0k7G8vkquKgqtcjjKmfL
- YW3g==
-X-Gm-Message-State: AOAM532T1mwImT4kuaAdieYpPA3W2FQp+QmSopT58c+cdcksTxuNY4jH
- ANn/5FlDsJ4G/h26bn21YTTf4ycVgF0JBXZq
-X-Google-Smtp-Source: ABdhPJzuQAhrMofNwSrXA8UuZVk6mVMvwxAARnZZ/Z8U3RtO/iCtm6U8kDYEBaPgIQLdzpICTxCZ+Q==
-X-Received: by 2002:a5d:44cc:: with SMTP id z12mr9739519wrr.189.1601563703177; 
- Thu, 01 Oct 2020 07:48:23 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 70sm342052wme.15.2020.10.01.07.48.22
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 01 Oct 2020 07:48:22 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 16/18] hw/arm/raspi: Introduce RaspiProcessorId enum
-Date: Thu,  1 Oct 2020 15:47:57 +0100
-Message-Id: <20201001144759.5964-17-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201001144759.5964-1-peter.maydell@linaro.org>
-References: <20201001144759.5964-1-peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kO08h-0001fs-F3
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 11:04:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47793)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kO08e-0005fv-Bu
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 11:04:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601564695;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=SCQUZl2S+lveCaCCrAob2GlsoNWmoFSFf02KJUGAzHE=;
+ b=OX4DA2M4VqNnYVQkl1he+d0gb8jTHRqn1VCf8QqqANd6XsLYns6RXwhOpQiL2y1buXry1c
+ Iqjga40Bol06tLwxE2zIGqfgp3BCXBY4NAVgOASzB8kAKubmpEhbPTPPsspLGpVvoc/aCC
+ MTHNkcDY3rU0obq0k4v82ojigcSd48k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-593-fIfPxOCZPnmsQXivF31mgQ-1; Thu, 01 Oct 2020 11:04:53 -0400
+X-MC-Unique: fIfPxOCZPnmsQXivF31mgQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B95A78030CD;
+ Thu,  1 Oct 2020 15:04:52 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-107.ams2.redhat.com [10.36.112.107])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1915119C78;
+ Thu,  1 Oct 2020 15:04:50 +0000 (UTC)
+Subject: Re: Use of "?" for help has been deprecated for 8 years, can we drop
+ it?
+To: Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+References: <87k0wa1bf8.fsf@dusky.pond.sub.org>
+ <54b77382-78c8-e6bf-45d4-616595baa87f@redhat.com>
+ <20201001131714.GC6673@linux.fritz.box>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <a6c8482f-df8b-cb86-5aee-2601acdb875f@redhat.com>
+Date: Thu, 1 Oct 2020 17:04:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::435;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x435.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <20201001131714.GC6673@linux.fritz.box>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 04:25:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -23
+X-Spam_score: -2.4
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.26, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,101 +100,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On 01/10/2020 15.17, Kevin Wolf wrote:
+> Am 01.10.2020 um 15:06 hat Eric Blake geschrieben:
+>> On 10/1/20 5:35 AM, Markus Armbruster wrote:
+>>> We deprecated "?" more than eight years ago.  We didn't have a
+>>> deprecation process back then, but we did purge "?" from the
+>>> documentation and from help texts.  Can we finally drop it?
+>>>
+>>> I'm asking because there is a patch on the list that bypasses
+>>> is_help_option() to not add deprecated "?" to a new place: "[PATCH v2
+>>> 1/4] keyval: Parse help options".
+>>>
+>>
+>> Did we ever issue a warning when it was used?  It's easier to argue that
+>> it can be dropped if users had notice of some form or another.  That
+>> said, I'm not heartbroken if we yank it immediately instead of letting
+>> it live for 2 more releases.
+> 
+> A deprecation warning for a help option would somehow feel strange.
+> 
+> I would consider this a human-only interface that can be changed at
+> will, like HMP syntax.
 
-As we only support a reduced set of the REV_CODE_PROCESSOR id
-encoded in the board revision, define the PROCESSOR_ID values
-as an enum. We can simplify the board_soc_type and cores_count
-methods.
+I'm not so sure ... for example we use "-device help" in the qemu-iotest
+scripts, so other people out there might use "-device ?" in their
+scripts, too, to check for the availability of devices... so IMHO we
+should follow the deprecation process properly here.
 
-Reviewed-by: Luc Michel <luc.michel@greensocs.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20200924111808.77168-7-f4bug@amsat.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/arm/raspi.c | 45 +++++++++++++++++++++------------------------
- 1 file changed, 21 insertions(+), 24 deletions(-)
-
-diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index 3426521379e..0d8e5a34c78 100644
---- a/hw/arm/raspi.c
-+++ b/hw/arm/raspi.c
-@@ -69,16 +69,33 @@ FIELD(REV_CODE, MANUFACTURER,      16, 4);
- FIELD(REV_CODE, MEMORY_SIZE,       20, 3);
- FIELD(REV_CODE, STYLE,             23, 1);
- 
-+typedef enum RaspiProcessorId {
-+    PROCESSOR_ID_BCM2836 = 1,
-+    PROCESSOR_ID_BCM2837 = 2,
-+} RaspiProcessorId;
-+
-+static const struct {
-+    const char *type;
-+    int cores_count;
-+} soc_property[] = {
-+    [PROCESSOR_ID_BCM2836] = {TYPE_BCM2836, BCM283X_NCPUS},
-+    [PROCESSOR_ID_BCM2837] = {TYPE_BCM2837, BCM283X_NCPUS},
-+};
-+
- static uint64_t board_ram_size(uint32_t board_rev)
- {
-     assert(FIELD_EX32(board_rev, REV_CODE, STYLE)); /* Only new style */
-     return 256 * MiB << FIELD_EX32(board_rev, REV_CODE, MEMORY_SIZE);
- }
- 
--static int board_processor_id(uint32_t board_rev)
-+static RaspiProcessorId board_processor_id(uint32_t board_rev)
- {
-+    int proc_id = FIELD_EX32(board_rev, REV_CODE, PROCESSOR);
-+
-     assert(FIELD_EX32(board_rev, REV_CODE, STYLE)); /* Only new style */
--    return FIELD_EX32(board_rev, REV_CODE, PROCESSOR);
-+    assert(proc_id < ARRAY_SIZE(soc_property) && soc_property[proc_id].type);
-+
-+    return proc_id;
- }
- 
- static int board_version(uint32_t board_rev)
-@@ -88,32 +105,12 @@ static int board_version(uint32_t board_rev)
- 
- static const char *board_soc_type(uint32_t board_rev)
- {
--    static const char *soc_types[] = {
--        NULL, TYPE_BCM2836, TYPE_BCM2837,
--    };
--    int proc_id = board_processor_id(board_rev);
--
--    if (proc_id >= ARRAY_SIZE(soc_types) || !soc_types[proc_id]) {
--        error_report("Unsupported processor id '%d' (board revision: 0x%x)",
--                     proc_id, board_rev);
--        exit(1);
--    }
--    return soc_types[proc_id];
-+    return soc_property[board_processor_id(board_rev)].type;
- }
- 
- static int cores_count(uint32_t board_rev)
- {
--    static const int soc_cores_count[] = {
--        0, BCM283X_NCPUS, BCM283X_NCPUS,
--    };
--    int proc_id = board_processor_id(board_rev);
--
--    if (proc_id >= ARRAY_SIZE(soc_cores_count) || !soc_cores_count[proc_id]) {
--        error_report("Unsupported processor id '%d' (board revision: 0x%x)",
--                     proc_id, board_rev);
--        exit(1);
--    }
--    return soc_cores_count[proc_id];
-+    return soc_property[board_processor_id(board_rev)].cores_count;
- }
- 
- static const char *board_type(uint32_t board_rev)
--- 
-2.20.1
+ Thomas
 
 
