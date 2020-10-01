@@ -7,76 +7,77 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC32AC4727E
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 17:34:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 553F4C47423
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 17:34:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CEEB2085B
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 17:34:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E89632085B
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 17:34:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wod3zl8n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CEEB2085B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kry9AVeF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E89632085B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kO2Ti-0005eH-1G
-	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 13:34:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59584)
+	id 1kO2Tk-0005jc-1b
+	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 13:34:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59498)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kO2L5-0004Rs-Jo
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 13:25:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:31399)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kO2Kw-0004Oc-Fb
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 13:25:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48766)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kO2L2-0004GO-6c
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 13:25:55 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kO2Kq-0004FD-O7
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 13:25:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601573150;
+ s=mimecast20190719; t=1601573139;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=7v9DMG4y2YQic36rWlYyposJbVK+Y5f+qipPBVV3YB0=;
- b=Wod3zl8nkToKe8+GHvJbLK5Rg/Wk7TuLsOs/RnmwZCRLOh2ge4d7OIOCrquKI9a8Y3Lv5z
- w2NhkVOQ9fsmXIfUMDUFU+TN1YIBz+PNMRHxOfjdBw7fJpF85QuxZZO8oG/szE7AzuIYHc
- yOxcNOvI2qI9Jb33GTfrJ+i6JE+Jdqo=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-380-7kpzytT-MBO3Kf2o9NShUw-1; Thu, 01 Oct 2020 13:25:47 -0400
-X-MC-Unique: 7kpzytT-MBO3Kf2o9NShUw-1
-Received: by mail-wr1-f71.google.com with SMTP id r16so2309305wrm.18
- for <qemu-devel@nongnu.org>; Thu, 01 Oct 2020 10:25:47 -0700 (PDT)
+ bh=D38Rl8stPDowIAHnj4YR4yXUaHyYT1kHxdVb7Vz4dLo=;
+ b=Kry9AVeFboHb98lHfqocXeg1Vx3qRNDk4mKUGAauEUDIehwhlWN9ZE54ObD3TdIZN5O2wR
+ uENJBeAwlA9snv0KF5f9aWDjk1FB3ze0LLCHzdE3K4VLRZzeDkfsqbdYWmPGt1h9bCoAqz
+ 1POcgFLrhgA2NMANLBfhtV3UtrycudM=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-525-J6nLmgWyMUu4a7JhvsMGmQ-1; Thu, 01 Oct 2020 13:25:33 -0400
+X-MC-Unique: J6nLmgWyMUu4a7JhvsMGmQ-1
+Received: by mail-wr1-f69.google.com with SMTP id a10so2290068wrw.22
+ for <qemu-devel@nongnu.org>; Thu, 01 Oct 2020 10:25:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=7v9DMG4y2YQic36rWlYyposJbVK+Y5f+qipPBVV3YB0=;
- b=LClGsBNtW7eVVdQA6xBoNM/G8Hz8W+xWJufjrLvMElF7+lalnFat6EjPjwBvYGy5W3
- A1JXvTAACynSSrwodBbGARUTrQRhqknecy8aXQtZJAz2Ja9qrLNjgsrJPECkZ1ksQAUe
- ChuG7JA2Wt875Rbc/P7yN696N4M7mp3Zdej3KK7GFpcO6nkEh6UJVc6S7TnKJX4g/Xt2
- qCx63TdlXrbfWxNuxS/kPlN6iyEwQtNMlW2Kp/S8bsRAuLnF+5akKTuaxyohinKrPFoJ
- hTKZI+zs+vBr85nB1o0ZGpD9pM7na3rt4XqhZOayAXdqvt+9A9aTlWeSRgxMF8FUXPWY
- qljQ==
-X-Gm-Message-State: AOAM533G2GPzYkDfeQA1uiSdndVMINCcKqWUECqaKCSqbIiPHQuydSds
- yn+EjoixYQXbLnkN8duUpJqGIi+ecBsZnePREHNyCuzCTW47KckRY3YnKP+nlhVvHaFAGV8qqpq
- vme82n6aKX6qMWqU=
-X-Received: by 2002:a1c:408a:: with SMTP id n132mr1013263wma.45.1601573146318; 
- Thu, 01 Oct 2020 10:25:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz4MC9kQdd9yQsBPBSvY6hQkXKAQjPlgUSNTJfxBi1lN3ymzU7o++7Mxayaa49BcnFN50Q/tA==
-X-Received: by 2002:a1c:408a:: with SMTP id n132mr1013255wma.45.1601573146153; 
- Thu, 01 Oct 2020 10:25:46 -0700 (PDT)
+ bh=D38Rl8stPDowIAHnj4YR4yXUaHyYT1kHxdVb7Vz4dLo=;
+ b=f/K2yyxT8uX9w2q01c2EKgJwvS6i9Kegl+HbRporI5dEFu1FrmMBN/l8499VKba1pj
+ vPiKtogYwvhRRnN+Bhft5Qiksq5yyge6T98LXr7pfxx89oQWhQykfSxnNLNMOnBBHGRj
+ y3Kf1YYhoBfKh8MvckpjDmiD8J/91dfxJqDceDWF/FTf7+DbtJwHILKtm3BeOa/Nnurp
+ eDy8Ofk0Og1mfjillbKNecuS3k1uNtyP/YyRZkTAU90PZt7NTy+PPxqW2B5DPjF3Nnbc
+ 3pTFvBRFbe6nWwippPAljg/mdqtsHhKftcIYPETSXlu1+N0e2ug47evQWdGa6GyDqqtg
+ /cNw==
+X-Gm-Message-State: AOAM533+ge07l6KfVD80q3h6S3IbxIEHIZnH26jc0nySWXGZTuokbJ1M
+ lBRGF1936XNg8fF7Mx3P/LOVmnv+jAApx0DfX3kuWVBZCZ0bSitIqXkMfY1RWGouqPELCsfIcsT
+ h4qMh7y9fwxejgM4=
+X-Received: by 2002:adf:f80a:: with SMTP id s10mr10826933wrp.351.1601573131718; 
+ Thu, 01 Oct 2020 10:25:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz5u1Y98czRZyz399fxOS74PBTWqTEND2+WAOqwJU68kXF1PABB8dUoiALGfqLUPtLwxKerGA==
+X-Received: by 2002:adf:f80a:: with SMTP id s10mr10826918wrp.351.1601573131504; 
+ Thu, 01 Oct 2020 10:25:31 -0700 (PDT)
 Received: from x1w.redhat.com (74.red-83-53-161.dynamicip.rima-tde.net.
  [83.53.161.74])
- by smtp.gmail.com with ESMTPSA id t202sm964651wmt.14.2020.10.01.10.25.44
+ by smtp.gmail.com with ESMTPSA id e19sm2388302wme.2.2020.10.01.10.25.30
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 01 Oct 2020 10:25:45 -0700 (PDT)
+ Thu, 01 Oct 2020 10:25:30 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH RESEND v2 05/16] dma: Let dma_memory_rw() propagate MemTxResult
-Date: Thu,  1 Oct 2020 19:25:08 +0200
-Message-Id: <20201001172519.1620782-6-philmd@redhat.com>
+Subject: [PATCH RESEND v2 02/16] docs/devel/loads-stores: Add regexp for DMA
+ functions
+Date: Thu,  1 Oct 2020 19:25:05 +0200
+Message-Id: <20201001172519.1620782-3-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201001172519.1620782-1-philmd@redhat.com>
 References: <20201001172519.1620782-1-philmd@redhat.com>
@@ -87,9 +88,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 02:15:30
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 04:25:37
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -115,66 +116,26 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-address_space_rw() returns a MemTxResult type.
-Do not discard it, return it to the caller.
-
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- include/sysemu/dma.h | 30 ++++++++++++++++++++++--------
- 1 file changed, 22 insertions(+), 8 deletions(-)
+ docs/devel/loads-stores.rst | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/include/sysemu/dma.h b/include/sysemu/dma.h
-index 37cd9f1121..04687d8825 100644
---- a/include/sysemu/dma.h
-+++ b/include/sysemu/dma.h
-@@ -80,12 +80,13 @@ static inline bool dma_memory_valid(AddressSpace *as,
-                                       MEMTXATTRS_UNSPECIFIED);
- }
+diff --git a/docs/devel/loads-stores.rst b/docs/devel/loads-stores.rst
+index 9a944ef1af..5b20f907e4 100644
+--- a/docs/devel/loads-stores.rst
++++ b/docs/devel/loads-stores.rst
+@@ -477,6 +477,8 @@ make sure our existing code is doing things correctly.
  
--static inline int dma_memory_rw_relaxed(AddressSpace *as, dma_addr_t addr,
--                                        void *buf, dma_addr_t len,
--                                        DMADirection dir)
-+static inline MemTxResult dma_memory_rw_relaxed(AddressSpace *as,
-+                                                dma_addr_t addr,
-+                                                void *buf, dma_addr_t len,
-+                                                DMADirection dir)
- {
--    return (bool)address_space_rw(as, addr, MEMTXATTRS_UNSPECIFIED,
--                                  buf, len, dir == DMA_DIRECTION_FROM_DEVICE);
-+    return address_space_rw(as, addr, MEMTXATTRS_UNSPECIFIED,
-+                            buf, len, dir == DMA_DIRECTION_FROM_DEVICE);
- }
+ Regexes for git grep
+  - ``\<dma_memory_\(read\|write\|rw\)\>``
++ - ``\<ldu\?[bwlq]\(_[bl]e\)\?_dma\>``
++ - ``\<st[bwlq]\(_[bl]e\)\?_dma\>``
  
- static inline int dma_memory_read_relaxed(AddressSpace *as, dma_addr_t addr,
-@@ -101,9 +102,22 @@ static inline int dma_memory_write_relaxed(AddressSpace *as, dma_addr_t addr,
-                                  DMA_DIRECTION_FROM_DEVICE);
- }
- 
--static inline int dma_memory_rw(AddressSpace *as, dma_addr_t addr,
--                                void *buf, dma_addr_t len,
--                                DMADirection dir)
-+/**
-+ * dma_memory_rw: Read from or write to an address space from DMA controller.
-+ *
-+ * Return a MemTxResult indicating whether the operation succeeded
-+ * or failed (eg unassigned memory, device rejected the transaction,
-+ * IOMMU fault).
-+ *
-+ * @as: #AddressSpace to be accessed
-+ * @addr: address within that address space
-+ * @buf: buffer with the data transferred
-+ * @len: the number of bytes to read or write
-+ * @dir: indicates the transfer direction
-+ */
-+static inline MemTxResult dma_memory_rw(AddressSpace *as, dma_addr_t addr,
-+                                        void *buf, dma_addr_t len,
-+                                        DMADirection dir)
- {
-     dma_barrier(as, dir);
- 
+ ``pci_dma_*`` and ``{ld,st}*_pci_dma``
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -- 
 2.26.2
 
