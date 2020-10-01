@@ -2,120 +2,85 @@ Return-Path: <SRS0=M6H1=DI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NORMAL_HTTP_TO_IP,
+	NUMERIC_HTTP_ADDR,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E43AC4727C
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 14:19:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8332BC4727F
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 14:22:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A40EE20796
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 14:19:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XNP5o1YE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A40EE20796
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 688642087D
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 14:22:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 688642087D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50734 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNzQo-0003lG-Ey
-	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 10:19:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34642)
+	id 1kNzT8-00064g-Ep
+	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 10:22:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35234)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kNzPu-0002se-Dj
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 10:18:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21099)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kNzPr-0007Gs-UI
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 10:18:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601561918;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=JiIm316CXm7TJNcJXFVzRosBJ5WcxDhBm4d337O1ezI=;
- b=XNP5o1YEjirnxrB1npVdmgJHJuxLex8KCvDNN5Ijuy4wHcLfBSrfVsUDIo1N814vR+DAi0
- 3AWIH8s8PcavXaGImhHCoFl4KuUlQ1CQBVD8E2ZfcfTpfhKEs2B3vbVnqlmbIhNfdumhkz
- 9ze8BnyeQvOPgOtaMPV99jmzn22pqAo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-576-cuJ1gj4ENx-YqWo5ZFgarA-1; Thu, 01 Oct 2020 10:18:36 -0400
-X-MC-Unique: cuJ1gj4ENx-YqWo5ZFgarA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C93B61074664;
- Thu,  1 Oct 2020 14:18:34 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-181.ams2.redhat.com
- [10.36.113.181])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 96D5978806;
- Thu,  1 Oct 2020 14:18:32 +0000 (UTC)
-Subject: Re: [PATCH qemu 1/4] drive-mirror: add support for sync=bitmap
- mode=never
-To: =?UTF-8?Q?Fabian_Gr=c3=bcnbichler?= <f.gruenbichler@proxmox.com>,
- qemu-devel@nongnu.org
-References: <20200922091418.53562-1-f.gruenbichler@proxmox.com>
- <20200922091418.53562-2-f.gruenbichler@proxmox.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <408ee1bb-9932-c724-ca43-6ab9a9014a0e@redhat.com>
-Date: Thu, 1 Oct 2020 16:18:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kNzRv-00052K-Ks
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 10:20:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34062)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kNzRq-0007ZM-VC
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 10:20:47 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kNzRo-00010t-JW
+ for <qemu-devel@nongnu.org>; Thu, 01 Oct 2020 14:20:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 8D3BD2E807B
+ for <qemu-devel@nongnu.org>; Thu,  1 Oct 2020 14:20:40 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200922091418.53562-2-f.gruenbichler@proxmox.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="myLzpRLFoyaqjfhx0pw0btyeIU7MODDLE"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 02:15:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -23
-X-Spam_score: -2.4
-X-Spam_bar: --
-X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.26, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 01 Oct 2020 14:14:00 -0000
+From: Lee Yarwood <1894804@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Incomplete; importance=Undecided; assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: berrange james-page kashyapc lyarwood paelzer
+ sean-k-mooney
+X-Launchpad-Bug-Reporter: Lee Yarwood (lyarwood)
+X-Launchpad-Bug-Modifier: Lee Yarwood (lyarwood)
+References: <159955374051.12161.5076756019458607363.malonedeb@chaenomeles.canonical.com>
+Message-Id: <160156164052.5695.10436204198419859735.malone@soybean.canonical.com>
+Subject: [Bug 1894804] Re: Second DEVICE_DELETED event missing during
+ virtio-blk disk device detach
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="d50d1e75c500726862802414f880ee3e3bb759bf"; Instance="production"
+X-Launchpad-Hash: dbaa4c8be5827a4c3d8d2fca2d92683f3f800be9
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 10:00:51
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -53
+X-Spam_score: -5.4
+X-Spam_bar: -----
+X-Spam_report: (-5.4 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, NORMAL_HTTP_TO_IP=0.001,
+ NUMERIC_HTTP_ADDR=1.242, RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ WEIRD_PORT=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -124,119 +89,673 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Ma Haocong <mahaocong@didichuxing.com>, Markus Armbruster <armbru@redhat.com>,
- John Snow <jsnow@redhat.com>
+Reply-To: Bug 1894804 <1894804@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---myLzpRLFoyaqjfhx0pw0btyeIU7MODDLE
-Content-Type: multipart/mixed; boundary="O72jMQwYIXwUprHn06KUuXOFhhJqMm8Lh"
+Here's an example from QMP_requests_and_replies_from_libvirtd.log.gz
+attached earlier to the bug by Kashyap. We can see two device_del
+commands prior to only seeing a single event emitted by QEMU:
 
---O72jMQwYIXwUprHn06KUuXOFhhJqMm8Lh
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+http://paste.openstack.org/show/798607/
 
-On 22.09.20 11:14, Fabian Gr=C3=BCnbichler wrote:
-> From: John Snow <jsnow@redhat.com>
->=20
-> This patch adds support for the "BITMAP" sync mode to drive-mirror and
-> blockdev-mirror. It adds support only for the BitmapSyncMode "never,"
-> because it's the simplest mode.
->=20
-> This mode simply uses a user-provided bitmap as an initial copy
-> manifest, and then does not clear any bits in the bitmap at the
-> conclusion of the operation.
->=20
-> Any new writes dirtied during the operation are copied out, in contrast
-> to backup. Note that whether these writes are reflected in the bitmap
-> at the conclusion of the operation depends on whether that bitmap is
-> actually recording!
->=20
-> This patch was originally based on one by Ma Haocong, but it has since
-> been modified pretty heavily.
->=20
-> Suggested-by: Ma Haocong <mahaocong@didichuxing.com>
-> Signed-off-by: Ma Haocong <mahaocong@didichuxing.com>
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> Signed-off-by: Fabian Gr=C3=BCnbichler <f.gruenbichler@proxmox.com>
-> ---
->  include/block/block_int.h   |  4 +-
->  block/mirror.c              | 98 ++++++++++++++++++++++++++++++-------
->  blockdev.c                  | 39 +++++++++++++--
->  tests/test-block-iothread.c |  4 +-
->  qapi/block-core.json        | 29 +++++++++--
->  5 files changed, 145 insertions(+), 29 deletions(-)
+# zgrep 0x7f768806eaf0 QMP_requests_and_replies_from_libvirtd.log.gz | egre=
+p '(device_del|DEVICE_DELETED)'
+2020-09-07 19:50:11.315+0000: 65558: info : qemuMonitorSend:993 : QEMU_MONI=
+TOR_SEND_MSG: mon=3D0x7f768806eaf0 msg=3D{"execute":"device_del","arguments=
+":{"id":"virtio-disk1"},"id":"libvirt-367"}
+2020-09-07 19:50:17.535+0000: 65557: info : qemuMonitorSend:993 : QEMU_MONI=
+TOR_SEND_MSG: mon=3D0x7f768806eaf0 msg=3D{"execute":"device_del","arguments=
+":{"id":"virtio-disk1"},"id":"libvirt-369"}
+2020-09-07 19:50:18.138+0000: 65555: info : qemuMonitorJSONIOProcessLine:23=
+4 : QEMU_MONITOR_RECV_EVENT: mon=3D0x7f768806eaf0 event=3D{"timestamp": {"s=
+econds": 1599508218, "microseconds": 138046}, "event": "DEVICE_DELETED", "d=
+ata": {"path": "/machine/peripheral/virtio-disk1/virtio-backend"}}
+2020-09-07 19:50:24.549+0000: 65556: info : qemuMonitorSend:993 : QEMU_MONI=
+TOR_SEND_MSG: mon=3D0x7f768806eaf0 msg=3D{"execute":"device_del","arguments=
+":{"id":"virtio-disk1"},"id":"libvirt-371"}
+2020-09-07 19:50:33.561+0000: 65556: info : qemuMonitorSend:993 : QEMU_MONI=
+TOR_SEND_MSG: mon=3D0x7f768806eaf0 msg=3D{"execute":"device_del","arguments=
+":{"id":"virtio-disk1"},"id":"libvirt-373"}
+2020-09-07 19:50:44.572+0000: 65557: info : qemuMonitorSend:993 : QEMU_MONI=
+TOR_SEND_MSG: mon=3D0x7f768806eaf0 msg=3D{"execute":"device_del","arguments=
+":{"id":"virtio-disk1"},"id":"libvirt-375"}
+2020-09-07 19:50:57.583+0000: 65558: info : qemuMonitorSend:993 : QEMU_MONI=
+TOR_SEND_MSG: mon=3D0x7f768806eaf0 msg=3D{"execute":"device_del","arguments=
+":{"id":"virtio-disk1"},"id":"libvirt-377"}
+2020-09-07 19:51:12.595+0000: 65556: info : qemuMonitorSend:993 : QEMU_MONI=
+TOR_SEND_MSG: mon=3D0x7f768806eaf0 msg=3D{"execute":"device_del","arguments=
+":{"id":"virtio-disk1"},"id":"libvirt-379"}
+2020-09-07 19:51:30.548+0000: 65557: info : qemuMonitorSend:993 : QEMU_MONI=
+TOR_SEND_MSG: mon=3D0x7f768806eaf0 msg=3D{"execute":"device_del","arguments=
+":{"id":"virtio-disk1"},"id":"libvirt-381"}
+2020-09-07 19:51:51.804+0000: 65559: info : qemuMonitorSend:993 : QEMU_MONI=
+TOR_SEND_MSG: mon=3D0x7f768806eaf0 msg=3D{"execute":"device_del","arguments=
+":{"id":"virtio-disk1"},"id":"libvirt-383"}
+2020-09-07 19:53:33.286+0000: 65559: info : qemuMonitorSend:993 : QEMU_MONI=
+TOR_SEND_MSG: mon=3D0x7f768806eaf0 msg=3D{"execute":"device_del","arguments=
+":{"id":"virtio-disk1"},"id":"libvirt-385"}
+2020-09-07 19:53:40.310+0000: 65558: info : qemuMonitorSend:993 : QEMU_MONI=
+TOR_SEND_MSG: mon=3D0x7f768806eaf0 msg=3D{"execute":"device_del","arguments=
+":{"id":"virtio-disk1"},"id":"libvirt-387"}
+2020-09-07 19:53:49.353+0000: 65556: info : qemuMonitorSend:993 : QEMU_MONI=
+TOR_SEND_MSG: mon=3D0x7f768806eaf0 msg=3D{"execute":"device_del","arguments=
+":{"id":"virtio-disk1"},"id":"libvirt-389"}
+2020-09-07 19:54:00.771+0000: 65560: info : qemuMonitorSend:993 : QEMU_MONI=
+TOR_SEND_MSG: mon=3D0x7f768806eaf0 msg=3D{"execute":"device_del","arguments=
+":{"id":"virtio-disk1"},"id":"libvirt-391"}
+2020-09-07 19:54:15.737+0000: 65559: info : qemuMonitorSend:993 : QEMU_MONI=
+TOR_SEND_MSG: mon=3D0x7f768806eaf0 msg=3D{"execute":"device_del","arguments=
+":{"id":"virtio-disk1"},"id":"libvirt-393"}
+2020-09-07 19:54:30.767+0000: 65557: info : qemuMonitorSend:993 : QEMU_MONI=
+TOR_SEND_MSG: mon=3D0x7f768806eaf0 msg=3D{"execute":"device_del","arguments=
+":{"id":"virtio-disk1"},"id":"libvirt-395"}
+2020-09-07 19:54:47.778+0000: 65560: info : qemuMonitorSend:993 : QEMU_MONI=
+TOR_SEND_MSG: mon=3D0x7f768806eaf0 msg=3D{"execute":"device_del","arguments=
+":{"id":"virtio-disk1"},"id":"libvirt-397"}
+2020-09-07 19:55:06.793+0000: 65559: info : qemuMonitorSend:993 : QEMU_MONI=
+TOR_SEND_MSG: mon=3D0x7f768806eaf0 msg=3D{"execute":"device_del","arguments=
+":{"id":"virtio-disk1"},"id":"libvirt-399"}
 
-[...]
+-- =
 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 2d94873ca0..dac5497084 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1894804
 
-[...]
+Title:
+  Second DEVICE_DELETED event missing during virtio-blk disk device
+  detach
 
-> @@ -2270,10 +2281,19 @@
->  #        (all the disk, only the sectors allocated in the topmost image,=
- or
->  #        only new I/O).
->  #
-> +# @bitmap: The name of a bitmap to use for sync=3Dbitmap mode. This argu=
-ment must
-> +#          be present for bitmap mode and absent otherwise. The bitmap's
-> +#          granularity is used instead of @granularity (since 5.2).
-> +#
-> +# @bitmap-mode: Specifies the type of data the bitmap should contain aft=
-er
-> +#               the operation concludes. Must be present if sync is "bit=
-map".
-> +#               Must NOT be present otherwise. (Since 5.2)
-> +#
->  # @granularity: granularity of the dirty bitmap, default is 64K
->  #               if the image format doesn't have clusters, 4K if the clu=
-sters
->  #               are smaller than that, else the cluster size.  Must be a
-> -#               power of 2 between 512 and 64M
-> +#               power of 2 between 512 and 64M . Must not be specified i=
-f
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  Incomplete
 
-s/ \./\./
+Bug description:
+  We are in the process of moving OpenStack CI across to use 20.04 Focal
+  as the underlying OS and encountering the following issue in any test
+  attempting to detach disk devices from running QEMU instances.
 
-(What a cheerful-looking regex.)
+  We can see a single DEVICE_DELETED event raised to libvirtd for the
+  /machine/peripheral/virtio-disk1/virtio-backend device but we do not
+  see a second event for the actual disk. As a result the device is
+  still marked as present in libvirt but QEMU reports it as missing in
+  subsequent attempts to remove the device.
 
-With that fixed:
+  The following log snippets can also be found in the following pastebin
+  that's slightly easier to gork:
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+  http://paste.openstack.org/show/797564/
 
-> +#               @bitmap is present.
->  #
->  # @buf-size: maximum amount of data in flight from source to
->  #            target
+  https://review.opendev.org/#/c/746981/ libvirt: Bump
+  MIN_{LIBVIRT,QEMU}_VERSION and NEXT_MIN_{LIBVIRT,QEMU}_VERSION
 
+  https://zuul.opendev.org/t/openstack/build/4c56def513884c5eb3ba7b0adf7fa2=
+60
+  nova-ceph-multistore
 
---O72jMQwYIXwUprHn06KUuXOFhhJqMm8Lh--
+  https://zuul.opendev.org/t/openstack/build/4c56def513884c5eb3ba7b0adf7fa2=
+60/log/controller/logs/dpkg-l.txt
 
---myLzpRLFoyaqjfhx0pw0btyeIU7MODDLE
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  ii  libvirt-daemon                       6.0.0-0ubuntu8.3                =
+      amd64        Virtualization daemon
+  ii  libvirt-daemon-driver-qemu           6.0.0-0ubuntu8.3                =
+      amd64        Virtualization daemon QEMU connection driver
+  ii  libvirt-daemon-system                6.0.0-0ubuntu8.3                =
+      amd64        Libvirt daemon configuration files
+  ii  libvirt-daemon-system-systemd        6.0.0-0ubuntu8.3                =
+      amd64        Libvirt daemon configuration files (systemd)
+  ii  libvirt-dev:amd64                    6.0.0-0ubuntu8.3                =
+      amd64        development files for the libvirt library
+  ii  libvirt0:amd64                       6.0.0-0ubuntu8.3                =
+      amd64        library for interfacing with different virtualization sy=
+stems
+  [..]
+  ii  qemu-block-extra:amd64               1:4.2-3ubuntu6.4                =
+      amd64        extra block backend modules for qemu-system and qemu-uti=
+ls
+  ii  qemu-slof                            20191209+dfsg-1                 =
+      all          Slimline Open Firmware -- QEMU PowerPC version
+  ii  qemu-system                          1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries
+  ii  qemu-system-arm                      1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries (arm)
+  ii  qemu-system-common                   1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries (common files)
+  ii  qemu-system-data                     1:4.2-3ubuntu6.4                =
+      all          QEMU full system emulation (data files)
+  ii  qemu-system-mips                     1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries (mips)
+  ii  qemu-system-misc                     1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries (miscellaneous)
+  ii  qemu-system-ppc                      1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries (ppc)
+  ii  qemu-system-s390x                    1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries (s390x)
+  ii  qemu-system-sparc                    1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries (sparc)
+  ii  qemu-system-x86                      1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries (x86)
+  ii  qemu-utils                           1:4.2-3ubuntu6.4                =
+      amd64        QEMU utilities
 
------BEGIN PGP SIGNATURE-----
+  https://zuul.opendev.org/t/openstack/build/4c56def513884c5eb3ba7b0adf7fa2=
+60/log/controller/logs/libvirt/qemu
+  /instance-0000003a_log.txt
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl915TYACgkQ9AfbAGHV
-z0DgtggAjp9fYLn0Bs6YtauELsoXNNAc4wpbWjOhkgl6HoHYqwDb4iGMVm39QfOJ
-aVhJcFfvcRysx/CWo4nyeLLv+7ERUiPlNX/M4uEBacu10k6EtENJ579iCYvHzsoD
-N2+OCFGiCbK7+WHENNJw22mQsmprnmrcqx1hgquMeLhhxu+twjOxyttGh968fxBT
-mrQBEv8DYowZxPla8z9CujmkMwnVeiY9lmsb7dg8/8OFAg7WlLlnV2dT4LZDpCGX
-P5ILKP0Z+/th0eH/wce50RgP76/rwLi7ez38wbkokORQyOiWZtbzsgX/dbcakxtr
-kiLxk5aafjoAdjtDBWKNiyeT/6Z/yQ==
-=Xoaq
------END PGP SIGNATURE-----
+  2020-09-07 19:29:55.021+0000: starting up libvirt version: 6.0.0, package=
+: 0ubuntu8.3 (Marc Deslauriers <marc.deslauriers@ubuntu.com> Thu, 30 Jul 20=
+20 06:40:28 -0400), qemu version: 4.2.0Debian 1:4.2-3ubuntu6.4, kernel: 5.4=
+.0-45-generic, hostname: ubuntu-focal-ovh-bhs1-0019682147
+  LC_ALL=3DC \
+  PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+  HOME=3D/var/lib/libvirt/qemu/domain-86-instance-0000003a \
+  XDG_DATA_HOME=3D/var/lib/libvirt/qemu/domain-86-instance-0000003a/.local/=
+share \
+  XDG_CACHE_HOME=3D/var/lib/libvirt/qemu/domain-86-instance-0000003a/.cache=
+ \
+  XDG_CONFIG_HOME=3D/var/lib/libvirt/qemu/domain-86-instance-0000003a/.conf=
+ig \
+  QEMU_AUDIO_DRV=3Dnone \
+  /usr/bin/qemu-system-x86_64 \
+  -name guest=3Dinstance-0000003a,debug-threads=3Don \
+  -S \
+  -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/=
+domain-86-instance-0000003a/master-key.aes \
+  -machine pc-i440fx-4.2,accel=3Dtcg,usb=3Doff,dump-guest-core=3Doff \
+  -cpu qemu64 \
+  -m 128 \
+  -overcommit mem-lock=3Doff \
+  -smp 1,sockets=3D1,cores=3D1,threads=3D1 \
+  -uuid 0d59f238-daef-40d4-adf9-a4fa24c35231 \
+  -smbios 'type=3D1,manufacturer=3DOpenStack Foundation,product=3DOpenStack=
+ Nova,version=3D21.1.0,serial=3D0d59f238-daef-40d4-adf9-a4fa24c35231,uuid=
+=3D0d59f238-daef-40d4-adf9-a4fa24c35231,family=3DVirtual Machine' \
+  -no-user-config \
+  -nodefaults \
+  -chardev socket,id=3Dcharmonitor,fd=3D39,server,nowait \
+  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol \
+  -rtc base=3Dutc \
+  -no-shutdown \
+  -boot strict=3Don \
+  -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 \
+  -object secret,id=3Dlibvirt-3-storage-secret0,data=3DzT+XibedVJZM2du1+PXp=
+IXHMVJ9a0pVcKihOtCGwlB0=3D,keyid=3DmasterKey0,iv=3D536Lfw+nsyvDhFBTOQG4zA=
+=3D=3D,format=3Dbase64 \
+  -blockdev '{"driver":"rbd","pool":"vms","image":"0d59f238-daef-40d4-adf9-=
+a4fa24c35231_disk","server":[{"host":"158.69.70.115","port":"6789"}],"user"=
+:"cinder","auth-client-required":["cephx","none"],"key-secret":"libvirt-3-s=
+torage-secret0","node-name":"libvirt-3-storage","cache":{"direct":false,"no=
+-flush":false},"auto-read-only":true,"discard":"unmap"}' \
+  -blockdev '{"node-name":"libvirt-3-format","read-only":false,"cache":{"di=
+rect":false,"no-flush":false},"driver":"raw","file":"libvirt-3-storage"}' \
+  -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Dlibvirt-=
+3-format,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don \
+  -object secret,id=3Dlibvirt-2-storage-secret0,data=3DSO9AgCCTvkBBMYHZe+LV=
+zoCF4GUNgvBtkFwRRIji7WI=3D,keyid=3DmasterKey0,iv=3DMzGu/h2Api4mMG9lL8hvdg=
+=3D=3D,format=3Dbase64 \
+  -blockdev '{"driver":"rbd","pool":"volumes","image":"volume-04dd79b2-3c05=
+-4492-b1d7-7969d24df768","server":[{"host":"158.69.70.115","port":"6789"}],=
+"user":"cinder","auth-client-required":["cephx","none"],"key-secret":"libvi=
+rt-2-storage-secret0","node-name":"libvirt-2-storage","cache":{"direct":fal=
+se,"no-flush":false},"auto-read-only":true,"discard":"unmap"}' \
+  -blockdev '{"node-name":"libvirt-2-format","read-only":false,"discard":"u=
+nmap","cache":{"direct":false,"no-flush":false},"driver":"raw","file":"libv=
+irt-2-storage"}' \
+  -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x7,drive=3Dlibvirt-=
+2-format,id=3Dvirtio-disk1,write-cache=3Don,serial=3D04dd79b2-3c05-4492-b1d=
+7-7969d24df768 \
+  -object secret,id=3Dlibvirt-1-storage-secret0,data=3DlhbR9+ewiXiaf3dKoQWP=
+3bk6hlLMLRXnbhh9ZkjZ9dQ=3D,keyid=3DmasterKey0,iv=3DWWHpGuOHkwXqxlLxGUqpcA=
+=3D=3D,format=3Dbase64 \
+  -blockdev '{"driver":"rbd","pool":"vms","image":"0d59f238-daef-40d4-adf9-=
+a4fa24c35231_disk.config","server":[{"host":"158.69.70.115","port":"6789"}]=
+,"user":"cinder","auth-client-required":["cephx","none"],"key-secret":"libv=
+irt-1-storage-secret0","node-name":"libvirt-1-storage","cache":{"direct":fa=
+lse,"no-flush":false},"auto-read-only":true,"discard":"unmap"}' \
+  -blockdev '{"node-name":"libvirt-1-format","read-only":true,"cache":{"dir=
+ect":false,"no-flush":false},"driver":"raw","file":"libvirt-1-storage"}' \
+  -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Dlibvirt-1-format,id=3Dide0-0-=
+0,write-cache=3Don \
+  -netdev tap,fd=3D41,id=3Dhostnet0 \
+  -device virtio-net-pci,host_mtu=3D1400,netdev=3Dhostnet0,id=3Dnet0,mac=3D=
+fa:16:3e:4d:bb:0b,bus=3Dpci.0,addr=3D0x3 \
+  -add-fd set=3D2,fd=3D43 \
+  -chardev pty,id=3Dcharserial0,logfile=3D/dev/fdset/2,logappend=3Don \
+  -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 \
+  -vnc 0.0.0.0:3 \
+  -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 \
+  -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 \
+  -object rng-random,id=3Dobjrng0,filename=3D/dev/urandom \
+  -device virtio-rng-pci,rng=3Dobjrng0,id=3Drng0,bus=3Dpci.0,addr=3D0x6 \
+  -sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourc=
+econtrol=3Ddeny \
+  -msg timestamp=3Don
+  char device redirected to /dev/pts/1 (label charserial0)
 
---myLzpRLFoyaqjfhx0pw0btyeIU7MODDLE--
+  https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644=
+c/zuul_opendev_logs_4c5/746981/5/check
+  /nova-ceph-multistore/4c56def/testr_results.html
 
+  tempest.api.compute.servers.test_server_rescue_negative.ServerRescueNegat=
+iveTestJSON.test_rescued_vm_detach_volume
+
+  2020-09-07 19:30:13,764 100285 INFO     [tempest.lib.common.rest_client] =
+Request (ServerRescueNegativeTestJSON:_run_cleanups): 202 DELETE https://15=
+8.69.70.115/compute/v2.1/servers/0d59f238-daef-40d4-adf9-a4fa24c35231/os-vo=
+lume_attachments/04dd79b2-3c05-4492-b1d7-7969d24df768 1.261s
+  2020-09-07 19:30:13,764 100285 DEBUG    [tempest.lib.common.rest_client] =
+Request - Headers: {'Content-Type': 'application/json', 'Accept': 'applicat=
+ion/json', 'X-Auth-Token': '<omitted>'}
+          Body: None
+      Response - Headers: {'date': 'Mon, 07 Sep 2020 19:30:12 GMT', 'server=
+': 'Apache/2.4.41 (Ubuntu)', 'content-length': '0', 'content-type': 'applic=
+ation/json', 'openstack-api-version': 'compute 2.1', 'x-openstack-nova-api-=
+version': '2.1', 'vary': 'OpenStack-API-Version,X-OpenStack-Nova-API-Versio=
+n', 'x-openstack-request-id': 'req-502a0106-3eb9-4d42-9dd4-c43ba89187b6', '=
+x-compute-request-id': 'req-502a0106-3eb9-4d42-9dd4-c43ba89187b6', 'connect=
+ion': 'close', 'status': '202', 'content-location': 'https://158.69.70.115/=
+compute/v2.1/servers/0d59f238-daef-40d4-adf9-a4fa24c35231/os-volume_attachm=
+ents/04dd79b2-3c05-4492-b1d7-7969d24df768'}
+          Body: b''
+
+  # First attempt to detach the device  by n-cpu
+
+  https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644=
+c/zuul_opendev_logs_4c5/746981/5/check
+  /nova-ceph-multistore/4c56def/controller/logs/screen-n-cpu.txt
+  (gzipped)
+
+  29957 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [None req-502a0106-3eb9-4d42-9dd4-c=
+43ba89187b6 tempest-ServerRescueNegativeTestJSON-73411582 tempest-ServerRes=
+cueNegativeTestJSON-73411582] detach device xml: <disk type=3D"network" de
+  29958 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  29959 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  29960 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  29961 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  29962 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  29963 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  29964 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  29965 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+  29966 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:  {{(pid=3D92697) detach_device /opt/stack/nova/nova/virt/libvirt/=
+guest.py:510}}
+
+  # DEVICE_DELETED only raised for /machine/peripheral/virtio-disk1
+  /virtio-backend
+
+  https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644=
+c/zuul_opendev_logs_4c5/746981/5/check
+  /nova-ceph-multistore/4c56def/controller/logs/libvirt/libvirtd_log.txt
+  (gzipped)
+
+  329344 2020-09-07 19:30:14.165+0000: 65559: debug : qemuDomainObjEnterMon=
+itorInternal:9869 : Entering monitor (mon=3D0x7f769405e470 vm=3D0x7f768c0df=
+0b0 name=3Dinstance-0000003a)
+  329345 2020-09-07 19:30:14.165+0000: 65559: debug : qemuMonitorDelDevice:=
+2848 : devalias=3Dvirtio-disk1
+  329346 2020-09-07 19:30:14.165+0000: 65559: debug : qemuMonitorDelDevice:=
+2850 : mon:0x7f769405e470 vm:0x7f768c0df0b0 fd:39
+  329347 2020-09-07 19:30:14.165+0000: 65559: info : qemuMonitorSend:993 : =
+QEMU_MONITOR_SEND_MSG: mon=3D0x7f769405e470 msg=3D{"execute":"device_del","=
+arguments":{"id":"virtio-disk1"},"id":"libvirt-367"}^M
+  329348  fd=3D-1                                                          =
+                =
+
+  329349 2020-09-07 19:30:14.165+0000: 65555: info : qemuMonitorIOWrite:450=
+ : QEMU_MONITOR_IO_WRITE: mon=3D0x7f769405e470 buf=3D{"execute":"device_del=
+","arguments":{"id":"virtio-disk1"},"id":"libvirt-367"}^M
+  329350  len=3D79 ret=3D79 errno=3D0                                      =
+                    =
+
+  329351 2020-09-07 19:30:14.168+0000: 65555: debug : qemuMonitorJSONIOProc=
+essLine:220 : Line [{"return": {}, "id": "libvirt-367"}]
+  329352 2020-09-07 19:30:14.168+0000: 65555: info : qemuMonitorJSONIOProce=
+ssLine:239 : QEMU_MONITOR_RECV_REPLY: mon=3D0x7f769405e470 reply=3D{"return=
+": {}, "id": "libvirt-367"}
+  329353 2020-09-07 19:30:14.168+0000: 65559: debug : qemuDomainObjExitMoni=
+torInternal:9892 : Exited monitor (mon=3D0x7f769405e470 vm=3D0x7f768c0df0b0=
+ name=3Dinstance-0000003a)
+  329354 2020-09-07 19:30:14.201+0000: 65555: debug : qemuMonitorJSONIOProc=
+essLine:220 : Line [{"timestamp": {"seconds": 1599507014, "microseconds": 2=
+01037}, "event": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/vi=
+rtio-disk1/virtio-backend"}}]
+  329355 2020-09-07 19:30:14.208+0000: 65555: info : qemuMonitorJSONIOProce=
+ssLine:234 : QEMU_MONITOR_RECV_EVENT: mon=3D0x7f769405e470 event=3D{"timest=
+amp": {"seconds": 1599507014, "microseconds": 201037}, "event": "DEVICE_DEL=
+ETED", "data": {"path": "/machine/peripheral/virtio-disk1/virtio-backend"}}
+  329356 2020-09-07 19:30:14.208+0000: 65555: debug : qemuMonitorJSONIOProc=
+essEvent:181 : mon=3D0x7f769405e470 obj=3D0x55dd95d0cba0
+  329357 2020-09-07 19:30:14.208+0000: 65555: debug : qemuMonitorEmitEvent:=
+1198 : mon=3D0x7f769405e470 event=3DDEVICE_DELETED
+  329358 2020-09-07 19:30:14.208+0000: 65555: debug : qemuProcessHandleEven=
+t:549 : vm=3D0x7f768c0df0b0
+  329359 2020-09-07 19:30:14.208+0000: 65555: debug : virObjectEventNew:631=
+ : obj=3D0x55dd95d3bf60
+  329360 2020-09-07 19:30:14.208+0000: 65555: debug : qemuMonitorJSONIOProc=
+essEvent:205 : handle DEVICE_DELETED handler=3D0x7f7691732840 data=3D0x55dd=
+95eae3c0
+  329361 2020-09-07 19:30:14.208+0000: 65555: debug : qemuMonitorJSONHandle=
+DeviceDeleted:1287 : missing device in device deleted event
+
+  # Second attempt to detach the device by n-cpu
+
+  https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644=
+c/zuul_opendev_logs_4c5/746981/5/check
+  /nova-ceph-multistore/4c56def/controller/logs/screen-n-cpu.txt
+  (gzipped)
+
+  30046 Sep 07 19:30:19.192548 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG oslo.service.loopingcall [None req-502a0106-3eb9-4d42-9dd4-=
+c43ba89187b6 tempest-ServerRescueNegativeTestJSON-73411582 tempest-ServerRe=
+scueNegativeTestJSON-73411582] Waiting for function nova.virt.libvirt.gu
+  30047 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
+=3D"network" device=3D"disk">
+  30048 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  30049 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  30050 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  30051 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  30052 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  30053 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  30054 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  30055 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+  30056 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:  {{(pid=3D92697) detach_device /opt/stack/nova/nova/virt/libvirt/=
+guest.py:510}}
+
+  # DeviceNotFound raised by QEMU
+
+  https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644=
+c/zuul_opendev_logs_4c5/746981/5/check
+  /nova-ceph-multistore/4c56def/controller/logs/libvirt/libvirtd_log.txt
+  (gzipped)
+
+  332479 2020-09-07 19:30:19.196+0000: 65560: debug : qemuDomainObjBeginJob=
+Internal:9416 : Starting job: job=3Dmodify agentJob=3Dnone asyncJob=3Dnone =
+(vm=3D0x7f768c0df0b0 name=3Dinstance-0000003a, current job=3Dnone agentJob=
+=3Dnone async=3Dnone)
+  332480 2020-09-07 19:30:19.196+0000: 65560: debug : qemuDomainObjBeginJob=
+Internal:9470 : Started job: modify (async=3Dnone vm=3D0x7f768c0df0b0 name=
+=3Dinstance-0000003a)
+  332481 2020-09-07 19:30:19.196+0000: 65560: debug : qemuDomainObjEnterMon=
+itorInternal:9869 : Entering monitor (mon=3D0x7f769405e470 vm=3D0x7f768c0df=
+0b0 name=3Dinstance-0000003a)
+  332482 2020-09-07 19:30:19.196+0000: 65560: debug : qemuMonitorDelDevice:=
+2848 : devalias=3Dvirtio-disk1
+  332483 2020-09-07 19:30:19.196+0000: 65560: debug : qemuMonitorDelDevice:=
+2850 : mon:0x7f769405e470 vm:0x7f768c0df0b0 fd:39
+  332484 2020-09-07 19:30:19.196+0000: 65560: info : qemuMonitorSend:993 : =
+QEMU_MONITOR_SEND_MSG: mon=3D0x7f769405e470 msg=3D{"execute":"device_del","=
+arguments":{"id":"virtio-disk1"},"id":"libvirt-369"}^M
+  332485  fd=3D-1                                                          =
+                =
+
+  332486 2020-09-07 19:30:19.196+0000: 65555: info : qemuMonitorIOWrite:450=
+ : QEMU_MONITOR_IO_WRITE: mon=3D0x7f769405e470 buf=3D{"execute":"device_del=
+","arguments":{"id":"virtio-disk1"},"id":"libvirt-369"}^M
+  332487  len=3D79 ret=3D79 errno=3D0                                      =
+                    =
+
+  332488 2020-09-07 19:30:19.197+0000: 65555: debug : qemuMonitorJSONIOProc=
+essLine:220 : Line [{"id": "libvirt-369", "error": {"class": "DeviceNotFoun=
+d", "desc": "Device 'virtio-disk1' not found"}}]
+  332489 2020-09-07 19:30:19.197+0000: 65555: info : qemuMonitorJSONIOProce=
+ssLine:239 : QEMU_MONITOR_RECV_REPLY: mon=3D0x7f769405e470 reply=3D{"id": "=
+libvirt-369", "error": {"class": "DeviceNotFound", "desc": "Device 'virtio-=
+disk1' not found"}}
+  332490 2020-09-07 19:30:19.197+0000: 65560: debug : qemuDomainObjExitMoni=
+torInternal:9892 : Exited monitor (mon=3D0x7f769405e470 vm=3D0x7f768c0df0b0=
+ name=3Dinstance-0000003a)
+  332491 2020-09-07 19:30:19.197+0000: 65560: debug : qemuDomainDeleteDevic=
+e:128 : Detaching of device virtio-disk1 failed and no event arrived
+
+  # n-cpu continues to retry the detach
+
+  30245 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
+=3D"network" device=3D"disk">
+  30246 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  30247 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  30248 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  30249 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  30250 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  30251 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  30252 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  30253 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+
+  30276 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
+=3D"network" device=3D"disk">
+  30277 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  30278 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  30279 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  30280 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  30281 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  30282 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  30283 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  30284 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+
+  30356 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
+=3D"network" device=3D"disk">
+  30357 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  30358 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  30359 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  30360 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  30361 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  30362 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  30363 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  30364 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+
+  30381 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
+=3D"network" device=3D"disk">
+  30382 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  30383 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  30384 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  30385 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  30386 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  30387 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  30388 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  30389 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+
+  30478 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
+=3D"network" device=3D"disk">
+  30479 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  30480 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  30481 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  30482 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  30483 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  30484 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  30485 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  30486 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+
+  30796 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
+=3D"network" device=3D"disk">
+  30797 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  30798 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  30799 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  30800 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  30801 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  30802 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  30803 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  30804 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+
+  31050 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
+=3D"network" device=3D"disk">
+  31051 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  31052 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  31053 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  31054 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  31055 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  31056 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  31057 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  31058 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+
+  # n-cpu eventually gives up trying to detach the device
+
+  https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644=
+c/zuul_opendev_logs_4c5/746981/5/check
+  /nova-ceph-multistore/4c56def/controller/logs/screen-n-cpu.txt
+  (gzipped)
+
+  31102 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall [-] Dynamic interval looping call =
+'oslo_service.loopingcall.RetryDecorator.__call__.<locals>._func' failed: n=
+ova.exception.DeviceDetachFailed: Device detach failed for vdb: Unable t
+  31103 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall Traceback (most recent call last):
+  31104 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall   File "/usr/local/lib/python3.8/d=
+ist-packages/oslo_service/loopingcall.py", line 150, in _run_loop
+  31105 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall     result =3D func(*self.args, **=
+self.kw)
+  31106 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall   File "/usr/local/lib/python3.8/d=
+ist-packages/oslo_service/loopingcall.py", line 428, in _func
+  31107 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall     return self._sleep_time
+  31108 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall   File "/usr/local/lib/python3.8/d=
+ist-packages/oslo_utils/excutils.py", line 220, in __exit__
+  31109 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall     self.force_reraise()
+  31110 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall   File "/usr/local/lib/python3.8/d=
+ist-packages/oslo_utils/excutils.py", line 196, in force_reraise
+  31111 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall     six.reraise(self.type_, self.v=
+alue, self.tb)
+  31112 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall   File "/usr/local/lib/python3.8/d=
+ist-packages/six.py", line 703, in reraise
+  31113 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall     raise value
+  31114 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall   File "/usr/local/lib/python3.8/d=
+ist-packages/oslo_service/loopingcall.py", line 407, in _func
+  31115 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall     result =3D f(*args, **kwargs)
+  31116 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall   File "/opt/stack/nova/nova/virt/=
+libvirt/guest.py", line 489, in _do_wait_and_retry_detach
+  31117 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall     raise exception.DeviceDetachFa=
+iled(
+  31118 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall nova.exception.DeviceDetachFailed:=
+ Device detach failed for vdb: Unable to detach the device from the live co=
+nfig.
+  31119 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1894804/+subscriptions
 
