@@ -2,85 +2,98 @@ Return-Path: <SRS0=M6H1=DI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F08CFC4727E
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 19:38:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4117BC4741F
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 19:55:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3ED6A20759
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 19:38:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A2CBA20780
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 19:55:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ezrnK4qT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ED6A20759
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u2fTmqT4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2CBA20780
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kO4PQ-0002RC-VN
-	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 15:38:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34906)
+	id 1kO4g4-0006Jw-FF
+	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 15:55:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37892)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <maxim.uvarov@linaro.org>)
- id 1kO4OD-0001x5-Ee
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 15:37:17 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:45562)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kO4ee-0005lG-5l
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 15:54:16 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:45009)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <maxim.uvarov@linaro.org>)
- id 1kO4OA-00046e-W1
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 15:37:17 -0400
-Received: by mail-lj1-x241.google.com with SMTP id c2so5631880ljj.12
- for <qemu-devel@nongnu.org>; Thu, 01 Oct 2020 12:37:10 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kO4eY-0005rG-L2
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 15:54:14 -0400
+Received: by mail-oi1-x243.google.com with SMTP id 185so6890513oie.11
+ for <qemu-devel@nongnu.org>; Thu, 01 Oct 2020 12:54:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id;
- bh=GmmUD0Sn+qQi/NhtdKmjr33dcXy4hdjy4T79nkspUT4=;
- b=ezrnK4qTue9wxixp6NT6ZLuhnfE2NkeiA+tMtXG3oK+0BL6NCqMj5MRY6uGVR3kZx9
- rTUDeuUQcql5cLtBojt7+ZOXr55POVPrpgSMjBNUT72UQ15FVSJ22lbwFj5f320KacE5
- BQdr90ESoURIVVTyhVs+pL1GPWvrK86vVHlJWMgSpcbt4E2sRx6gDGtThScH3RJxgeq3
- TvIh4wUjykb6D0LN2c2TBQpbK0Qmc26c2neaiWxWUNDxB9A3wrCeFyCjPCvxg0G6vyXf
- Anx+8Vny11ZH/OywV5zLV5RlLNpwdYoZ3QT/iv8/4HI00rtAS2DWZ3Q4aoSmjYwoizct
- Jmyg==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=FIiMlwa+CEKj+QiLXG4kK4OYHDirOmqDxqyURsN9uFg=;
+ b=u2fTmqT4PAww9FFcg7gGnENNXmXSkuI/NU39vDYDjWKU9f75kGbmlOBWxBmUJtoFfc
+ unLREX1rz0yLS7zDO07Tw3Gail7pvuMogCamGakQLlgg/iMqsBoSaDMjEP79f1UTW3DS
+ r4fq0Ln9Fsaeq+Cu1QTi5m6mnV1cOShmyqkA5NXzHDc6uvMTTEdPR9XXj5L6KhKFSp+6
+ w2RD2CdOq1MTMsrq0+lez1UpN/I5JRP9fXncXIyuG1w0UeZW68t2uaLpekHHGcutKdzJ
+ 6YrJ5AC0mOhx4buyiQH1u+4cwRMqYNkrEc1SY8s21UlshR87ZrAKVzyzY9UksT5G2NRM
+ TaXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=GmmUD0Sn+qQi/NhtdKmjr33dcXy4hdjy4T79nkspUT4=;
- b=FpyWHBC6ZWB/WCl42H2RdBma5TT4TY7b5dqrKN0LNW445kzZtJIcrXgpxYCNfe0NdI
- ZJoWdtZuE69DGuAxggUQlxnvhGmLbX2IMCdO1/LwZE3mTTw8Yub71Q4qsJaN/U5MqcsB
- B+Yoq3WIl9GddKaghaDSATYl+NDlw+bd7DnMt82ycLwC+r6M42QvyKmEQFZfalw0m0ZT
- E/l5znehtL7ypz1f1EBmk229kaBpvFF/Tu5mvfDxS0TXQJyrFj5hgkV00Y1HuIUn2Dkv
- ppf8pKAhEpDiuuQg/W07+s5eMKYplaowXMTssnlreI2flRZs4i6lFl0UvvC5mD3POMrE
- EPbg==
-X-Gm-Message-State: AOAM532ko7cUeFiXXsjOI7jo67vbdhcXRg/MLWhkPAw4cqAMSciD2SCS
- Gs8h6eTideQo55w7XMpg7gOawA==
-X-Google-Smtp-Source: ABdhPJzqaCDqk8egAMGcEAo+AZDrE6ejvRqLSOdBvEzPYksdYyWDGGMuWTiUZC//9c4Y+gCNeAHX/Q==
-X-Received: by 2002:a2e:5049:: with SMTP id v9mr2645614ljd.396.1601581028885; 
- Thu, 01 Oct 2020 12:37:08 -0700 (PDT)
-Received: from localhost.localdomain (128-68-29-119.broadband.corbina.ru.
- [128.68.29.119])
- by smtp.gmail.com with ESMTPSA id x12sm531139ljd.130.2020.10.01.12.37.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 01 Oct 2020 12:37:08 -0700 (PDT)
-From: Maxim Uvarov <maxim.uvarov@linaro.org>
-To: peter.maydell@linaro.org,
-	qemu-arm@nongnu.org
-Subject: [PATCH] hw: wdt: implement sbsa watchdog
-Date: Thu,  1 Oct 2020 22:36:59 +0300
-Message-Id: <20201001193659.21685-1-maxim.uvarov@linaro.org>
-X-Mailer: git-send-email 2.17.1
-Received-SPF: pass client-ip=2a00:1450:4864:20::241;
- envelope-from=maxim.uvarov@linaro.org; helo=mail-lj1-x241.google.com
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=FIiMlwa+CEKj+QiLXG4kK4OYHDirOmqDxqyURsN9uFg=;
+ b=hbZtLr+4tnb+6IfEB4aVMbYPX2N279ZJFnaJAN8A/H+LVTU/pUGcp6yJ9bVWy9mTO4
+ INFfd4EHJuX53FtQckUakdmkm+mBYHGO1qFIDlmm2naSoeDgBm1klOH786R12XawAKFc
+ aQB6WXBSGSG/LJrKOAF9lib65N6r9dVyzBOCyjmBxJcVm0bQChPD/SGKoeq9pfB6Dr9S
+ h3aFZ0yH9aByY6B/y1mdEhqR6fEbHVAwGTrpUZMBEq+t6vJSPrxnPs3ORPR0SUF7Lufg
+ sxWQI1U3tzFdTocZ+iwdSLvihfCxv0f9KKV5BylS6pWc5cpJ4oyEr0AQmJeqPXRV1qAt
+ tizQ==
+X-Gm-Message-State: AOAM533vAzMIFi/5glOGEaVMc0CwddC9l0frTaJrCJEHTsRFJ6cRVnWR
+ +YmNDpv4Sk+hzpFKLM+1rjM4Tw==
+X-Google-Smtp-Source: ABdhPJxl6QxvoO5Z960qMeldoGeRh41xTbQ5c4EXNhrlWNs2tZyi2JT2wRS93Zdj40bI7lh8kdRJeA==
+X-Received: by 2002:aca:d409:: with SMTP id l9mr979417oig.70.1601582043828;
+ Thu, 01 Oct 2020 12:54:03 -0700 (PDT)
+Received: from [10.10.73.179] (fixed-187-189-51-144.totalplay.net.
+ [187.189.51.144])
+ by smtp.gmail.com with ESMTPSA id m12sm1473004otq.8.2020.10.01.12.54.01
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 01 Oct 2020 12:54:02 -0700 (PDT)
+Subject: Re: [RFC PATCH v4 19/29] Hexagon (target/hexagon) generator phase 3 -
+ C preprocessor for decode tree
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Taylor Simpson <tsimpson@quicinc.com>, qemu-devel@nongnu.org
+References: <1601314138-9930-1-git-send-email-tsimpson@quicinc.com>
+ <1601314138-9930-20-git-send-email-tsimpson@quicinc.com>
+ <a4da7010-474f-6df3-a74a-2966c44df931@amsat.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <5502293e-face-7b06-3077-9c446ac6b0b9@linaro.org>
+Date: Thu, 1 Oct 2020 14:54:00 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <a4da7010-474f-6df3-a74a-2966c44df931@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=richard.henderson@linaro.org; helo=mail-oi1-x243.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-Spam_score_int: -23
+X-Spam_score: -2.4
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.26,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -95,471 +108,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Maxim Uvarov <maxim.uvarov@linaro.org>, qemu-devel@nongnu.org
+Cc: ale@rev.ng, riku.voipio@iki.fi, laurent@vivier.eu,
+ aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Initial virtual driver matching linux kernel sbsa_gwdt
-driver. Driver implements basic functionality and makes
-watchdog works on virtual machine and allows to reboot
-secure OS. I.e. atf->optee->efi/uboot->kernel. More
-information about that device can be found under:
-ARM DEN0029B - Server Base System Architecture (SBSA)
+On 9/29/20 6:37 AM, Philippe Mathieu-Daudé wrote:
+> On 9/28/20 7:28 PM, Taylor Simpson wrote:
+>> Run the C preprocessor across the instruction definition and encoding
+>> files to expand macros and prepare the iset.py file.  The resulting
+>> fill contains python data structures used to build the decode tree.
+>>
+>> Signed-off-by: Taylor Simpson <tsimpson@quicinc.com>
+>> ---
+>>  target/hexagon/gen_dectree_import.c | 191 ++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 191 insertions(+)
+>>  create mode 100644 target/hexagon/gen_dectree_import.c
+>>
+>> diff --git a/target/hexagon/gen_dectree_import.c b/target/hexagon/gen_dectree_import.c
+>> new file mode 100644
+>> index 0000000..237726e
+>> --- /dev/null
+>> +++ b/target/hexagon/gen_dectree_import.c
+>> @@ -0,0 +1,191 @@
+>> +/*
+>> + *  Copyright(c) 2019-2020 Qualcomm Innovation Center, Inc. All Rights Reserved.
+>> + *
+>> + *  This program is free software; you can redistribute it and/or modify
+>> + *  it under the terms of the GNU General Public License as published by
+>> + *  the Free Software Foundation; either version 2 of the License, or
+>> + *  (at your option) any later version.
+>> + *
+>> + *  This program is distributed in the hope that it will be useful,
+>> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>> + *  GNU General Public License for more details.
+>> + *
+>> + *  You should have received a copy of the GNU General Public License
+>> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+>> + */
+>> +
+>> +/*
+>> + * This program generates the encodings file that is processed by
+>> + * the dectree.py script to produce the decoding tree.  We use the C
+>> + * preprocessor to manipulate the files imported from the Hexagon
+>> + * architecture library.
+>> + */
+>> +#include "qemu/osdep.h"
+>> +#include "opcodes.h"
+>> +
+>> +#define STRINGIZE(X)    #X
+>> +
+>> +const char *opcode_names[] = {
+> 
+> Richard will probably ask to use "const char *const opcode_names[]".
 
-Signed-off-by: Maxim Uvarov <maxim.uvarov@linaro.org>
----
- hw/arm/virt.c                  |  28 ++++
- hw/watchdog/Kconfig            |   5 +
- hw/watchdog/meson.build        |   1 +
- hw/watchdog/sbsa_wdt.c         | 293 +++++++++++++++++++++++++++++++++
- include/hw/arm/virt.h          |   2 +
- include/hw/watchdog/sbsa-wdt.h |  40 +++++
- 6 files changed, 369 insertions(+)
- create mode 100644 hw/watchdog/sbsa_wdt.c
- create mode 100644 include/hw/watchdog/sbsa-wdt.h
+It is good practice, even if this is a generator and so doesn't actually impact
+the qemu executable itself.  ;-)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index acf9bfbece..516110a4d7 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -77,6 +77,7 @@
- #include "hw/acpi/generic_event_device.h"
- #include "hw/virtio/virtio-iommu.h"
- #include "hw/char/pl011.h"
-+#include "hw/watchdog/sbsa-wdt.h"
- #include "qemu/guest-random.h"
- 
- #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
-@@ -745,6 +746,31 @@ static void create_gic(VirtMachineState *vms)
-     }
- }
- 
-+static void create_sbsa_watchdog(VirtMachineState *vms)
-+{
-+    char *nodename;
-+    const char compat[] = "arm,sbsa-gwdt";
-+
-+    object_initialize_child(OBJECT(vms), "arm,sbsa-gwdt", &vms->watchdog,
-+            TYPE_SBSA_WATCHDOG);
-+    sysbus_realize(SYS_BUS_DEVICE(&vms->watchdog), &error_fatal);
-+    /* contol */
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&vms->watchdog), 0, 0x2a440000UL);
-+    /* refresh */
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&vms->watchdog), 1, 0x2a450000UL);
-+    /* dtb */
-+    nodename = g_strdup_printf("/watchdog@%" PRIx64, 0x2a440000UL);
-+    qemu_fdt_add_subnode(vms->fdt, nodename);
-+
-+    qemu_fdt_setprop(vms->fdt, nodename, "compatible",
-+                     compat, sizeof(compat));
-+    qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
-+                                 2, 0x2a440000UL, 2, 0x1000,
-+                                 2, 0x2a450000UL, 2, 0x1000);
-+    qemu_fdt_setprop_cell(vms->fdt, nodename, "timeout-sec", 30);
-+    g_free(nodename);
-+}
-+
- static void create_uart(const VirtMachineState *vms, int uart,
-                         MemoryRegion *mem, Chardev *chr)
- {
-@@ -1913,6 +1939,8 @@ static void machvirt_init(MachineState *machine)
- 
-     create_gic(vms);
- 
-+    create_sbsa_watchdog(vms);
-+
-     fdt_add_pmu_nodes(vms);
- 
-     create_uart(vms, VIRT_UART, sysmem, serial_hd(0));
-diff --git a/hw/watchdog/Kconfig b/hw/watchdog/Kconfig
-index 293209b291..8f14fd6a7c 100644
---- a/hw/watchdog/Kconfig
-+++ b/hw/watchdog/Kconfig
-@@ -17,3 +17,8 @@ config WDT_DIAG288
- 
- config WDT_IMX2
-     bool
-+
-+config WDT_SBSA
-+   bool
-+   default y
-+   select PTIMER
-diff --git a/hw/watchdog/meson.build b/hw/watchdog/meson.build
-index 9b8725e642..0f9dbdc535 100644
---- a/hw/watchdog/meson.build
-+++ b/hw/watchdog/meson.build
-@@ -5,3 +5,4 @@ softmmu_ss.add(when: 'CONFIG_WDT_IB700', if_true: files('wdt_ib700.c'))
- softmmu_ss.add(when: 'CONFIG_WDT_DIAG288', if_true: files('wdt_diag288.c'))
- softmmu_ss.add(when: 'CONFIG_ASPEED_SOC', if_true: files('wdt_aspeed.c'))
- softmmu_ss.add(when: 'CONFIG_WDT_IMX2', if_true: files('wdt_imx2.c'))
-+softmmu_ss.add(when: 'CONFIG_WDT_SBSA', if_true: files('sbsa_wdt.c'))
-diff --git a/hw/watchdog/sbsa_wdt.c b/hw/watchdog/sbsa_wdt.c
-new file mode 100644
-index 0000000000..5eec1a1cbb
---- /dev/null
-+++ b/hw/watchdog/sbsa_wdt.c
-@@ -0,0 +1,293 @@
-+/*
-+ * ARM SBSA watchdog emulation
-+ *
-+ * Copyright (c) 2020 Linaro Limited
-+ * Written by Maxim Uvarov
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License version 2 or
-+ *  (at your option) any later version.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "trace.h"
-+#include "qapi/error.h"
-+#include "qemu/module.h"
-+#include "sysemu/watchdog.h"
-+#include "hw/sysbus.h"
-+#include "hw/qdev-properties.h"
-+#include "hw/registerfields.h"
-+#include "hw/watchdog/sbsa-wdt.h"
-+#include "migration/vmstate.h"
-+
-+#define DEFAULT_TIMEOUT  10 /* seconds */
-+#define TIMERFREQ  62500000 /*arch_timer_get_cntfrq()*/
-+
-+/* SBSA Generic Watchdog register definitions */
-+/* refresh frame */
-+REG32(SBSA_GWDT_WRR, 0x000)
-+
-+    /* control frame */
-+REG32(SBSA_GWDT_WCS, 0x000)
-+    FIELD(SBSA_GWDT_WCS, EN,  0, 1)
-+    FIELD(SBSA_GWDT_WCS, WS0, 1, 1)
-+    FIELD(SBSA_GWDT_WCS, WS1, 2, 1)
-+
-+REG32(SBSA_GWDT_WOR, 0x008)
-+REG32(SBSA_GWDT_WCV, 0x010)
-+
-+static inline void log_watchdog(const char *name, uint64_t offset,
-+                                uint64_t data, unsigned size)
-+{
-+    if (0) {
-+        struct timeval _now;
-+
-+        gettimeofday(&_now, NULL);
-+        qemu_log("%d@%zu.%06zu:%s: offset 0x%" PRIx64 " "
-+                 "data 0x%" PRIx64 " size %u" "\n",
-+                qemu_get_thread_id(),
-+                (size_t)_now.tv_sec, (size_t)_now.tv_usec,
-+                name,
-+                offset, data, size);
-+    }
-+}
-+
-+static uint64_t sbsa_watchdog_control_read(void *opaque, hwaddr offset,
-+        unsigned size)
-+{
-+    SBSAWatchdog *s = SBSA_WATCHDOG(opaque);
-+    uint64_t r;
-+
-+    switch (offset) {
-+    case A_SBSA_GWDT_WCS:
-+        r = R_SBSA_GWDT_WCS_WS1_MASK;
-+        break;
-+    case A_SBSA_GWDT_WOR:
-+        r = ptimer_get_count(s->timer) * TIMERFREQ * 2; /* time left */
-+        break;
-+    case A_SBSA_GWDT_WCV:
-+        r = 0; /* TBD */
-+        break;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                "SBSA watchdog control read: bad offset %x\n", (int)offset);
-+        r = 0;
-+        break;
-+    }
-+    log_watchdog(__func__, offset, r, size);
-+    return r;
-+}
-+
-+static void sbsa_watchdog_control_write(void *opaque, hwaddr offset,
-+        uint64_t value, unsigned size)
-+{
-+    SBSAWatchdog *s = SBSA_WATCHDOG(opaque);
-+    int timeout;
-+
-+    log_watchdog(__func__, offset, value, size);
-+    switch (offset) {
-+    case A_SBSA_GWDT_WCS:
-+        if (value & R_SBSA_GWDT_WCS_EN_MASK) {
-+            /* enable watchdog */
-+            ptimer_transaction_begin(s->timer);
-+            s->cur_tick = ptimer_get_limit(s->timer);
-+            ptimer_set_count(s->timer, 0);
-+            ptimer_run(s->timer, 0);
-+            ptimer_transaction_commit(s->timer);
-+            s->enable = 1;
-+        } else {
-+            /*
-+             * never stop to be able to reboot machin,
-+             * just lower timeout for faster reboot
-+             */
-+            ptimer_transaction_begin(s->timer);
-+            ptimer_set_limit(s->timer, 2, 1);
-+            s->cur_tick = ptimer_get_limit(s->timer);
-+            ptimer_set_count(s->timer, 0);
-+            ptimer_run(s->timer, 0);
-+            ptimer_transaction_commit(s->timer);
-+        }
-+
-+        if (value & R_SBSA_GWDT_WCS_WS0_MASK) {
-+            /* ignore, write is not used in linux driver */
-+        }
-+        if (value & R_SBSA_GWDT_WCS_WS1_MASK) {
-+            /* ignore, write is not used in linux driver */
-+        }
-+        break;
-+    case A_SBSA_GWDT_WOR:
-+        timeout = value / TIMERFREQ * 2;
-+        ptimer_transaction_begin(s->timer);
-+        ptimer_set_limit(s->timer, value, timeout);
-+        ptimer_transaction_commit(s->timer);
-+        break;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                "SBSA watchdog write: bad offset 0x%x\n",
-+                (int)offset);
-+        break;
-+    }
-+}
-+
-+static uint64_t sbsa_watchdog_refresh_read(void *opaque, hwaddr offset,
-+        unsigned size)
-+{
-+    uint64_t r;
-+
-+    switch (offset) {
-+    /* No reads from refresh registeres */
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                "SBSA watchdog refresh read: bad offset %x\n", (int)offset);
-+        r = 0;
-+        break;
-+    }
-+    log_watchdog(__func__, offset, r, size);
-+    return r;
-+}
-+
-+static void sbsa_watchdog_refresh_write(void *opaque, hwaddr offset,
-+        uint64_t value, unsigned size)
-+{
-+    SBSAWatchdog *s = SBSA_WATCHDOG(opaque);
-+
-+    log_watchdog(__func__, offset, value, size);
-+    switch (offset) {
-+    case A_SBSA_GWDT_WRR:
-+        /*
-+         * Writing WRR for an explicit watchdog refresh.
-+         * You can write anyting (like 0).
-+         */
-+        if (s->enable) {
-+            ptimer_transaction_begin(s->timer);
-+            ptimer_set_count(s->timer, 0);
-+            s->cur_tick = ptimer_get_limit(s->timer);
-+            ptimer_transaction_commit(s->timer);
-+        }
-+        break;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                "SBSA watchdog refresh write: bad offset 0x%x\n",
-+                (int)offset);
-+        break;
-+    }
-+}
-+
-+static const MemoryRegionOps sbsa_watchdog_control_ops = {
-+    .read = sbsa_watchdog_control_read,
-+    .write = sbsa_watchdog_control_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    /* byte/halfword accesses are just zero-padded on reads and writes */
-+    .impl.min_access_size = 4,
-+    .impl.max_access_size = 4,
-+    .valid.min_access_size = 1,
-+    .valid.max_access_size = 4,
-+};
-+
-+static const MemoryRegionOps sbsa_watchdog_refresh_ops = {
-+    .read = sbsa_watchdog_refresh_read,
-+    .write = sbsa_watchdog_refresh_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    /* byte/halfword accesses are just zero-padded on reads and writes */
-+    .impl.min_access_size = 4,
-+    .impl.max_access_size = 4,
-+    .valid.min_access_size = 1,
-+    .valid.max_access_size = 4,
-+};
-+
-+static void sbsa_watchdog_tick(void *opaque)
-+{
-+    SBSAWatchdog *s = SBSA_WATCHDOG(opaque);
-+
-+    if (!s->enable) {
-+        return;
-+    }
-+
-+    s->cur_tick--;
-+
-+    if (!s->cur_tick) {
-+        watchdog_perform_action();
-+    }
-+}
-+
-+static void sbsa_watchdog_reset(DeviceState *dev)
-+{
-+    SBSAWatchdog *s = SBSA_WATCHDOG(dev);
-+
-+    s->enable = 0;
-+    /* Set the limit and the count */
-+    ptimer_transaction_begin(s->timer);
-+    ptimer_set_limit(s->timer, DEFAULT_TIMEOUT, 1);
-+    s->cur_tick = ptimer_get_limit(s->timer);
-+    ptimer_run(s->timer, 0);
-+    ptimer_transaction_commit(s->timer);
-+}
-+
-+static void sbsa_watchdog_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    SBSAWatchdog *s = SBSA_WATCHDOG(obj);
-+
-+    memory_region_init_io(&s->iomem_control, obj, &sbsa_watchdog_control_ops,
-+            s, "sbsa-wdt-control", 0x1000);
-+    sysbus_init_mmio(sbd, &s->iomem_control);
-+    memory_region_init_io(&s->iomem_refresh, obj, &sbsa_watchdog_refresh_ops,
-+            s, "sbsa-wdt-refresh", 0x1000);
-+    sysbus_init_mmio(sbd, &s->iomem_refresh);
-+}
-+
-+static void sbsa_watchdog_realize(DeviceState *dev, Error **errp)
-+{
-+    SBSAWatchdog *s = SBSA_WATCHDOG(dev);
-+
-+    s->timer = ptimer_init(sbsa_watchdog_tick, s,
-+                           PTIMER_POLICY_WRAP_AFTER_ONE_PERIOD |
-+                           PTIMER_POLICY_TRIGGER_ONLY_ON_DECREMENT |
-+                           PTIMER_POLICY_NO_IMMEDIATE_RELOAD |
-+                           PTIMER_POLICY_NO_COUNTER_ROUND_DOWN);
-+
-+    ptimer_transaction_begin(s->timer);
-+    ptimer_set_freq(s->timer, 1); /* one second */
-+    ptimer_transaction_commit(s->timer);
-+}
-+
-+static const VMStateDescription sbsa_watchdog_vmstate = {
-+    .name = "sbsa-watchdog",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_PTIMER(timer, SBSAWatchdog),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static Property sbsa_watchdog_properties[] = {
-+    DEFINE_PROP_UINT32("arm,sbsa-gwdt", SBSAWatchdog, timeout_sec, 0),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void sbsa_watchdog_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = sbsa_watchdog_realize;
-+    dc->vmsd = &sbsa_watchdog_vmstate;
-+    dc->reset = sbsa_watchdog_reset;
-+    device_class_set_props(dc, sbsa_watchdog_properties);
-+}
-+
-+static const TypeInfo sbsa_watchdog_info = {
-+    .name = TYPE_SBSA_WATCHDOG,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(SBSAWatchdog),
-+    .instance_init = sbsa_watchdog_init,
-+    .class_init = sbsa_watchdog_class_init,
-+};
-+
-+static void sbsa_watchdog_register_types(void)
-+{
-+    type_register_static(&sbsa_watchdog_info);
-+}
-+
-+type_init(sbsa_watchdog_register_types);
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index d018a4f297..c0fdd46303 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -37,6 +37,7 @@
- #include "hw/block/flash.h"
- #include "sysemu/kvm.h"
- #include "hw/intc/arm_gicv3_common.h"
-+#include "hw/watchdog/sbsa-wdt.h"
- #include "qom/object.h"
- 
- #define NUM_GICV2M_SPIS       64
-@@ -163,6 +164,7 @@ struct VirtMachineState {
-     DeviceState *gic;
-     DeviceState *acpi_dev;
-     Notifier powerdown_notifier;
-+    SBSAWatchdog watchdog;
- };
- 
- #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
-diff --git a/include/hw/watchdog/sbsa-wdt.h b/include/hw/watchdog/sbsa-wdt.h
-new file mode 100644
-index 0000000000..62d03abae9
---- /dev/null
-+++ b/include/hw/watchdog/sbsa-wdt.h
-@@ -0,0 +1,40 @@
-+/*
-+ * ARM SBSA watchdog emulation
-+ *
-+ * Copyright (c) 2020 Linaro Limited
-+ * Written by Maxim Uvarov
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License version 2 or
-+ *  (at your option) any later version.
-+ */
-+
-+#ifndef SBSA_WATCHDOG_H
-+#define SBSA_WATCHDOG_H
-+
-+#include "hw/sysbus.h"
-+#include "hw/ptimer.h"
-+#include "qom/object.h"
-+
-+#define TYPE_SBSA_WATCHDOG "sbsa-watchdog"
-+OBJECT_DECLARE_SIMPLE_TYPE(SBSAWatchdog, SBSA_WATCHDOG)
-+
-+#define TYPE_LUMINARY_WATCHDOG "sbsa-watchdog"
-+
-+struct SBSAWatchdog {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+
-+    /*< public >*/
-+    MemoryRegion iomem_control;
-+    MemoryRegion iomem_refresh;
-+    qemu_irq wdogint;
-+    uint32_t timeout_sec;
-+    bool is_two_stages; /* tbd */
-+    struct ptimer_state *timer;
-+
-+    bool enable;
-+    uint64_t cur_tick;
-+};
-+
-+#endif
--- 
-2.17.1
 
+>> +const char *opcode_syntax[XX_LAST_OPCODE];
+>> +
+>> +/*
+>> + * Process the instruction definitions
+>> + *     Scalar core instructions have the following form
+>> + *         Q6INSN(A2_add,"Rd32=add(Rs32,Rt32)",ATTRIBS(),
+>> + *         "Add 32-bit registers",
+>> + *         { RdV=RsV+RtV;})
+>> + */
+>> +void opcode_init(void)
+>> +{
+>> +#define Q6INSN(TAG, BEH, ATTRIBS, DESCR, SEM) \
+>> +   opcode_syntax[TAG] = BEH;
+>> +#define EXTINSN(TAG, BEH, ATTRIBS, DESCR, SEM) \
+>> +   opcode_syntax[TAG] = BEH;
+>> +#include "imported/allidefs.def"
+>> +#undef Q6INSN
+>> +#undef EXTINSN
+>> +}
+
+What is it that about this case that can't be initialized at compile time?
+
+
+r~
 
