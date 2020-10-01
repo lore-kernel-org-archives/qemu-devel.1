@@ -2,91 +2,85 @@ Return-Path: <SRS0=M6H1=DI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E178C47420
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D775C4727E
 	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 17:12:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E42D120872
+	by mail.kernel.org (Postfix) with ESMTPS id B51E92085B
 	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 17:12:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G3Fg/Rkp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E42D120872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FdM+37SS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B51E92085B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kO286-00074u-1b
-	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 13:12:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54918)
+	id 1kO285-00075Y-TA
+	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 13:12:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53352)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kO22z-0000or-SD
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 13:07:13 -0400
-Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:33032)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kO22x-0001Wg-Qg
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 13:07:13 -0400
-Received: by mail-il1-x143.google.com with SMTP id o18so2646660ilg.0
- for <qemu-devel@nongnu.org>; Thu, 01 Oct 2020 10:07:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=KHDHpOYB+PDjXXF4mqlGcuHsX0U8A29kJBUR9WNuH38=;
- b=G3Fg/Rkp9Yx3XTaV3NlNvckDslf1rcqiymmP2q8LFse+mKnC9UZyfUBDx8yICV0J3y
- b+40yBfsFgVwlBEKwuOWHyCeNa5Tf4WVa/wSXckByuWVEQhcbk2wFgI16u1iiFjvQ5X4
- EtRh+ZiXol5QxNnXsEIUjMiP6BiLDqS2Yk39Pxt2zX8QYEr7u/nzJCrEVsQhkdXeZLGP
- AM34w5M6DXLi04ZgJGLnQh8/Cuu21QkxEvJ1Rhs7C8NI9OI9uwW9u7yZ2PD07K1KhKgO
- IWPL1YalBxbxht6eb3+elnpQm4rKU5AeI8LfWayXRQp9wivoB/8Pw6Av+CiMVT2AdKYn
- Dt9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=KHDHpOYB+PDjXXF4mqlGcuHsX0U8A29kJBUR9WNuH38=;
- b=RZLHDmvx4WRhNw6aKLjiN0heieYzvmNzEXoKBv6e+Up9VMLDwrB3Xu0DBp/u+vn/pt
- XeO+qSzpR+3FQZsQPUrcV0u/e9OPm9D2IdOx8m8Q8OI2shoU5Ur9p7Ld81wbVWq4YAqz
- /EEslRQrS1oNNPVjozVebWD+L9HL4UD/msHrVp50CTcCp4Ozg1nnhtvQx1RGMx7ASaZt
- rK8+LMkKfU/Gny40rAie0grib2B1hB77+rIeoDWVLudJeHu/+Z1Urnkss2dlf8SKQqlv
- yB+Pv8s1uUaDHIvRX46aPiTxeA6xWsc59CsaKln65VeiDmbN4FD9w98yTu8MrA/z8lm9
- ZpGQ==
-X-Gm-Message-State: AOAM532y6Zzpc1dovhNtciCFp/WjayM3bxFIAaTcuTOeWtufkk8fie5n
- Ol5XS5Oe2I4f6UHiP8vX8QNXc32vjevW5n8yw08=
-X-Google-Smtp-Source: ABdhPJykiDln7dkgUnDVUGw/QXkXXtnhXAZ7Z93nFMnaPdWqQWZO55L0V+V/Yho2prg/isi7hXy6MxXVDcAdUJh9poY=
-X-Received: by 2002:a92:cd49:: with SMTP id v9mr3386643ilq.177.1601572030028; 
- Thu, 01 Oct 2020 10:07:10 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kO1yN-0004YA-CF
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 13:02:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28972)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kO1yL-0000oX-58
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 13:02:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601571744;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=RQJyKMmAAh3eicwjygdet3fi6fPczL8TJ/5IygDqzdw=;
+ b=FdM+37SSCAn+DxUtZXbtpRDHahC80ZviGyj/JT5gVTyuz7KRpK4b3wooZVDcklWtOyCxRs
+ 7uja/8HOBN0/fDnlWdwneIIms55yddp5N9ei3XwDlob9pWs0gLrxJ0utjnnYgGHlfn8rNm
+ w9gEVzQCbXjjlBh3QOYikN18dVQzeRs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-349-Yc0JYledP5ORGzIeiaiZag-1; Thu, 01 Oct 2020 13:02:22 -0400
+X-MC-Unique: Yc0JYledP5ORGzIeiaiZag-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B4601018F8E;
+ Thu,  1 Oct 2020 17:02:21 +0000 (UTC)
+Received: from gondolin (ovpn-112-102.ams2.redhat.com [10.36.112.102])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 55A065D9EF;
+ Thu,  1 Oct 2020 17:02:16 +0000 (UTC)
+Date: Thu, 1 Oct 2020 19:02:14 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v2 0/9] s390x/tcg: Implement some z14 facilities
+Message-ID: <20201001190214.210cbcee.cohuck@redhat.com>
+In-Reply-To: <20200928122717.30586-1-david@redhat.com>
+References: <20200928122717.30586-1-david@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <20201001164322.1585392-1-f4bug@amsat.org>
- <20201001164322.1585392-2-f4bug@amsat.org>
-In-Reply-To: <20201001164322.1585392-2-f4bug@amsat.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 1 Oct 2020 09:55:45 -0700
-Message-ID: <CAKmqyKOEGnPE7WRSSc96kWSNV-oprN=tPwBskJGgx4P3EagACw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] util/cutils: Introduce freq_to_str() to display
- Hertz units
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 04:25:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,88 +93,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
- Peter Maydell <peter.maydell@linaro.org>, Luc Michel <luc@lmichel.fr>,
- Eduardo Habkost <ehabkost@redhat.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Havard Skinnemoen <hskinnemoen@google.com>, Tyrone Ting <kfting@nuvoton.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Damien Hedde <damien.hedde@greensocs.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Oct 1, 2020 at 9:57 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
-> wrote:
->
-> Introduce freq_to_str() to convert frequency values in human
-> friendly units using the SI units for Hertz.
->
-> Suggested-by: Luc Michel <luc@lmichel.fr>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+On Mon, 28 Sep 2020 14:27:08 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> With this patchset, I can boot a kernel compiled for z14 (requiring
+> Miscellaneous-Instruction-Extensions Facility 2) (using -cpu max).
+> 
+> I am currently working on "vector-enhancements facility 1", I have most
+> stuff in place except:
+> - VECTOR FP (MAXIMUM|MINIMUM): needs some manual work to cover all types of
+>                                comparisons.
+> 
+> Once we have that in place, we can convert the QEMU machine to a
+> stripped-down z14.
+> 
+> v1 -> v2:
+> - "s390x/cpu_model: S390_FEAT_MISC_INSTRUCTION_EXT ->
+>    S390_FEAT_MISC_INSTRUCTION_EXT2"
+> -- Added
+> - "s390x/tcg: Implement BRANCH INDIRECT ON CONDITION (BIC)"
+> -- Use new helper instead
+> - "s390x/tcg: Implement MULTIPLY SINGLE (MSC, MSGC, MSGRKC, MSRKC)"
+> -- Tune comparisons in CC computation
+> 
+> David Hildenbrand (9):
+>   s390x/cpu_model: S390_FEAT_MISC_INSTRUCTION_EXT ->
+>     S390_FEAT_MISC_INSTRUCTION_EXT2
+>   s390x/tcg: Implement ADD HALFWORD (AGH)
+>   s390x/tcg: Implement SUBTRACT HALFWORD (SGH)
+>   s390x/tcg: Implement MULTIPLY (MG, MGRK)
+>   s390x/tcg: Implement MULTIPLY HALFWORD (MGH)
+>   s390x/tcg: Implement BRANCH INDIRECT ON CONDITION (BIC)
+>   s390x/tcg: Implement MULTIPLY SINGLE (MSC, MSGC, MSGRKC, MSRKC)
+>   s390x/tcg: We support Miscellaneous-Instruction-Extensions Facility 2
+>   s390x/tcg: Implement CIPHER MESSAGE WITH AUTHENTICATION (KMA)
+> 
+>  target/s390x/cc_helper.c            | 32 +++++++++++++++++++
+>  target/s390x/cpu_features_def.h.inc |  2 +-
+>  target/s390x/gen-features.c         |  4 ++-
+>  target/s390x/helper.c               |  2 ++
+>  target/s390x/insn-data.def          | 12 ++++++++
+>  target/s390x/internal.h             |  2 ++
+>  target/s390x/translate.c            | 48 +++++++++++++++++++++++++++++
+>  7 files changed, 100 insertions(+), 2 deletions(-)
+> 
 
-Alistair
+Thanks, applied.
 
-> ---
->  include/qemu/cutils.h | 12 ++++++++++++
->  util/cutils.c         | 14 ++++++++++++++
->  2 files changed, 26 insertions(+)
->
-> diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
-> index 3a86ec0321..4bbf4834ea 100644
-> --- a/include/qemu/cutils.h
-> +++ b/include/qemu/cutils.h
-> @@ -158,6 +158,18 @@ int qemu_strtosz_metric(const char *nptr, const char=
- **end, uint64_t *result);
->
->  char *size_to_str(uint64_t val);
->
-> +/**
-> + * freq_to_str:
-> + * @freq_hz: frequency to stringify
-> + *
-> + * Return human readable string for frequency @freq_hz.
-> + * Use SI units like KHz, MHz, and so forth.
-> + *
-> + * The caller is responsible for releasing the value returned
-> + * with g_free() after use.
-> + */
-> +char *freq_to_str(uint64_t freq_hz);
-> +
->  /* used to print char* safely */
->  #define STR_OR_NULL(str) ((str) ? (str) : "null")
->
-> diff --git a/util/cutils.c b/util/cutils.c
-> index 8da34e04b0..be4e43a9ef 100644
-> --- a/util/cutils.c
-> +++ b/util/cutils.c
-> @@ -885,6 +885,20 @@ char *size_to_str(uint64_t val)
->      return g_strdup_printf("%0.3g %sB", (double)val / div, suffixes[i]);
->  }
->
-> +char *freq_to_str(uint64_t freq_hz)
-> +{
-> +    static const char *const suffixes[] =3D { "", "K", "M", "G", "T", "P=
-", "E" };
-> +    double freq =3D freq_hz;
-> +    size_t idx =3D 0;
-> +
-> +    while (freq >=3D 1000.0 && idx < ARRAY_SIZE(suffixes)) {
-> +        freq /=3D 1000.0;
-> +        idx++;
-> +    }
-> +
-> +    return g_strdup_printf("%0.3g %sHz", freq, suffixes[idx]);
-> +}
-> +
->  int qemu_pstrcmp0(const char **str1, const char **str2)
->  {
->      return g_strcmp0(*str1, *str2);
-> --
-> 2.26.2
->
->
 
