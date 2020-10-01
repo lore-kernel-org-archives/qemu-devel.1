@@ -2,83 +2,82 @@ Return-Path: <SRS0=M6H1=DI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FDD9C4727C
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 10:23:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CA00C4727C
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 10:26:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 040ED20848
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 10:23:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61F0B2085B
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 10:26:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JktZE7Ld"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 040ED20848
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ECqc2aqD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61F0B2085B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNvkT-0007ab-6d
-	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 06:23:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60348)
+	id 1kNvmi-0000Qt-5U
+	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 06:26:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60744)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kNvjB-0006ll-Tl
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 06:22:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27209)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kNvkt-00081v-I0
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 06:24:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58437)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kNvj8-0000Bx-Pb
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 06:22:21 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kNvkr-0000M3-05
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 06:24:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601547737;
+ s=mimecast20190719; t=1601547842;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=04WCg1kJ7NYBTu0MogV133WIoa+AyFeKIay2LeMdEJ0=;
- b=JktZE7Ldu/7frKGsZ8PSPyNWLxTWBo+fkNlc2y4rVTE0e9F+ubi1tWof3ONme7z0T8+Apn
- +OKV6xZPIyFXBl90NHDxwo1GAolcmhjKRwG8zdPpzSDh1RFEkE8f4YeIw+yJ31pZlu7L64
- Y0WCR+DcGlq3s9c9YbhSjzIQp+BLn7I=
+ bh=4zdrZ95qTMqjyDQ7NmIEXDiSPD0rjBNhZXraWN8m/w0=;
+ b=ECqc2aqD2/szA5ZQsRzszhqwndL7hIpUKi9JZx30zX5tORP7z9rx8f7EQLQnDJF/kbF7QA
+ F+kwytVg/VES2nYFIyVsRecBVVxZTFkSYkFKjuWGgZctREbSu5HWVQuMzQPhXXgzpPYW5h
+ i9LVBV/dxSONhBkLHrkOvEqJpvYLYN4=
 Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
  [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-386-kEP4id6mMpech8cXVaZwFA-1; Thu, 01 Oct 2020 06:22:16 -0400
-X-MC-Unique: kEP4id6mMpech8cXVaZwFA-1
-Received: by mail-wr1-f70.google.com with SMTP id v12so1858087wrm.9
- for <qemu-devel@nongnu.org>; Thu, 01 Oct 2020 03:22:15 -0700 (PDT)
+ us-mta-508-AyWm9-qTNq-LLJnSG9OIgg-1; Thu, 01 Oct 2020 06:23:59 -0400
+X-MC-Unique: AyWm9-qTNq-LLJnSG9OIgg-1
+Received: by mail-wr1-f70.google.com with SMTP id b2so1844707wrs.7
+ for <qemu-devel@nongnu.org>; Thu, 01 Oct 2020 03:23:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=04WCg1kJ7NYBTu0MogV133WIoa+AyFeKIay2LeMdEJ0=;
- b=HqBmaQI5gzPhteR5qNRoBDtZ3KI8BA2DVzKoCcEiJPb0zw3sIKGn4/lAgecQT23Gtu
- tJq8ELPNaE9xr/jbn+pfd8u9Gm6YeaXIXxaAxKJBV6QAl9tpZDOpUMYiA4XFKuS46/10
- 9brp2XBJoDS36oOd2j4x7H7D0Fu0YS6HAW2APomu6/+f9PIWXEu8WXK4jf1nrKVdaLCf
- 6kSBu2kaWKzG8hFYP241KOfPa1PLfHq6c//tLMTeiE+4SY4ithEDJs2NuUMJoSwvjMs0
- vOooFuRHXSJpoXpfnmdNY0b3YkyZKYT+bjFJoNyoxYsjviigI6x3NRj6aCRVJjPe83PH
- jQQw==
-X-Gm-Message-State: AOAM530VOuAMWUSq7y1QnbDZU8QBVFINi9hAOe0nZT8+jVlY8eGvSygX
- DsO6IzUvWKIP2nzQYuBTRZMv0jNj8bMs4+xAzIqtwLXNrNTUa8jQbA6YrYpO7MKgyLLONKQPCHR
- 9P/IqIx5WonbDMIo=
-X-Received: by 2002:a5d:444e:: with SMTP id x14mr7735174wrr.235.1601547734877; 
- Thu, 01 Oct 2020 03:22:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyU9PE1Mivs0p9NiDh0723gaHPIiNXHhbZ42yMOdo9SMumsfaPv4QwjKxIAIyZvRZo3GvajXQ==
-X-Received: by 2002:a5d:444e:: with SMTP id x14mr7735154wrr.235.1601547734710; 
- Thu, 01 Oct 2020 03:22:14 -0700 (PDT)
+ bh=4zdrZ95qTMqjyDQ7NmIEXDiSPD0rjBNhZXraWN8m/w0=;
+ b=EUu0dYbbeLHm3Qi1GMXJ7upy9w52lT/6lvMpl8bci/yEDukV4Xtq5WBcHpMvecDef2
+ bhLu7rbrB8ZXMu+9rbyDIL0eGih6O1fRpyJLDmYa4Ba258cMUEnyZmap0X+IQtVmCFzo
+ ugkHR8RhegW2p0l6ROrZL0uQg/IIkdec/7o3usdZK0GlfGRYQ6Y7monAZJE6Uo+T+bHH
+ jsuMt2GusDWtPVHQiSCwaCseGPkrecwXuwDHsR8TR0hKodufNg0y2JLWJ2izJiODekmd
+ UyEA9eS3Evw4VDFb6kjcuJ6xndLN5tQAccUBApMF/obmSWstIwC5XPtLaxcHichQBdV8
+ 1Nlg==
+X-Gm-Message-State: AOAM533HWtvcsJLpl/TrSvu9gwY4aeoZqd0HJOqcPtmDcsMWJNkG9kt1
+ 6bY5OFYD8hxkNYv4jXautKzXXReZxVmGJwc6ylYVC2gUeOUtKEBU4XtzC4AVoJk3TeB34wd7fXZ
+ Z86YfckU0RucgGSc=
+X-Received: by 2002:a1c:1f87:: with SMTP id f129mr6895045wmf.182.1601547838698; 
+ Thu, 01 Oct 2020 03:23:58 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyWQOkMtKLqSe56Pj8VY8Poh2h0StrS0bpo9vhDFkU5e4Dw31dTdF38UeeXMEmWwfPXeQYpZg==
+X-Received: by 2002:a1c:1f87:: with SMTP id f129mr6895008wmf.182.1601547838383; 
+ Thu, 01 Oct 2020 03:23:58 -0700 (PDT)
 Received: from [192.168.1.36] (74.red-83-53-161.dynamicip.rima-tde.net.
  [83.53.161.74])
- by smtp.gmail.com with ESMTPSA id m10sm7835517wmi.9.2020.10.01.03.22.13
+ by smtp.gmail.com with ESMTPSA id m12sm7419813wml.38.2020.10.01.03.23.56
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 01 Oct 2020 03:22:13 -0700 (PDT)
-Subject: Re: [PATCH v3 01/11] qapi: Restrict query-uuid command to block code
-To: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+ Thu, 01 Oct 2020 03:23:57 -0700 (PDT)
+Subject: Re: [PATCH v3 11/11] qapi: Restrict code generated for user-mode
+To: Markus Armbruster <armbru@redhat.com>
 References: <20200930164949.1425294-1-philmd@redhat.com>
- <20200930164949.1425294-2-philmd@redhat.com>
- <87r1qi4jvj.fsf@dusky.pond.sub.org>
+ <20200930164949.1425294-12-philmd@redhat.com>
+ <87mu164jnr.fsf@dusky.pond.sub.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -103,12 +102,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <38e2b34b-7bb8-9e4b-680c-22e1fd21c3ef@redhat.com>
-Date: Thu, 1 Oct 2020 12:22:12 +0200
+Message-ID: <8bdc109f-bbd1-fe8c-905d-039f5b4dea0f@redhat.com>
+Date: Thu, 1 Oct 2020 12:23:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <87r1qi4jvj.fsf@dusky.pond.sub.org>
+In-Reply-To: <87mu164jnr.fsf@dusky.pond.sub.org>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -127,7 +126,7 @@ X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.469,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
  RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -143,61 +142,130 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Kevin Wolf <kwolf@redhat.com>,
  =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
  Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
+ Richard Henderson <richard.henderson@linaro.org>,
  Richard Henderson <rth@twiddle.net>, Peter Lieven <pl@kamp.de>,
  qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>, Max Reitz <mreitz@redhat.com>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-+Igor
-
-On 10/1/20 7:04 AM, Markus Armbruster wrote:
+On 10/1/20 7:09 AM, Markus Armbruster wrote:
 > Philippe Mathieu-Daudé <philmd@redhat.com> writes:
 > 
->> In commit f68c01470b we restricted the query-uuid command to
->> machine code, but it is incorrect, as it is also used by the
->> tools.  Therefore move this command again, but to block.json,
->> which is shared by machine code and tools.
+>> A lot of QAPI generated code is never used by user-mode.
 >>
->> Fixes: f68c01470b ("qapi: Restrict query-uuid command to machine code")
+>> Split out qapi_system_modules and qapi_system_or_tools_modules
+>> from the qapi_all_modules array. We now have 3 groups:
+>> - always used
+>> - use by system-mode or tools (usually by the block layer)
+>> - only used by system-mode
 >>
 >> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>> Resetting due to Meson update:
+>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  qapi/meson.build | 51 ++++++++++++++++++++++++++++++++++--------------
+>>  1 file changed, 36 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/qapi/meson.build b/qapi/meson.build
+>> index 7c4a89a882..ba9677ba97 100644
+>> --- a/qapi/meson.build
+>> +++ b/qapi/meson.build
+>> @@ -14,39 +14,60 @@ util_ss.add(files(
+>>  ))
+>>  
+>>  qapi_all_modules = [
+>> +  'common',
+>> +  'introspect',
+>> +  'misc',
+>> +]
+>> +
+>> +qapi_system_modules = [
+>>    'acpi',
+>>    'audio',
+>> +  'dump',
+>> +  'machine-target',
+>> +  'machine',
+>> +  'migration',
+>> +  'misc-target',
+>> +  'net',
+>> +  'pci',
+>> +  'qdev',
+>> +  'rdma',
+>> +  'rocker',
+>> +  'tpm',
+>> +  'trace',
+>> +]
+>> +
+>> +# system or tools
+>> +qapi_block_modules = [
+>>    'authz',
+>>    'block-core',
+>>    'block',
+>>    'char',
+>> -  'common',
+>>    'control',
+>>    'crypto',
+>> -  'dump',
+>>    'error',
+>> -  'introspect',
+>>    'job',
+>> -  'machine',
+>> -  'machine-target',
+>> -  'migration',
+>> -  'misc',
+>> -  'misc-target',
+>> -  'net',
+>>    'pragma',
+>> -  'qdev',
+>> -  'pci',
+>>    'qom',
+>> -  'rdma',
+>> -  'rocker',
+>>    'run-state',
+>>    'sockets',
+>> -  'tpm',
+>> -  'trace',
+>>    'transaction',
+>>    'ui',
+>>  ]
 > 
-> UUIDs are not really a block-specific thing.
+> Most of these aren't "block modules".  Name the thing
+> qapi_system_or_tools_modules?
 
-This is the discussion we had in v1 with Igor...
-
-UuidInfo is a iSCSI-specific "thing", the original commit
-is f9dadc9855 ("iSCSI: add configuration variables for iSCSI")
-then Paolo introduced 'UuidInfo' in commit 5accc8408f
-("scsi: prefer UUID to VM name for the initiator name") but
-is misnamed?
+This is why I used first, then realized this is defined
+as:
+  have_block = have_system or have_tools
 
 > 
-> QMP query-uuid and HMP info uuid are about the VM, like query-name.
-> That's why they used to be next to query-name in misc.json.
+>> +if have_system
+>> +  qapi_all_modules += qapi_system_modules
+>> +elif have_user
+>> +  # Temporary kludge because X86CPUFeatureWordInfo is not
+>> +  # restricted to system-mode. This should be removed (along
+>> +  # with target/i386/feature-stub.c) once target/i386/cpu.c
+>> +  # has been cleaned.
+>> +  qapi_all_modules += ['machine-target']
+>> +endif
+>> +
+>> +if have_block
+> 
+> Aha, precedence for using "block" as an abbreviation of "system or
+> tools".  I find that confusing.
 
-This is GuidInfo, not UuidInfo...
-
-GuidInfo is correctly in machine.json.
+I'll use qapi_system_or_tools_modules back, it is clearer, thanks.
 
 > 
-> There's one additional use in block/iscsi.c's get_initiator_name().  I
-> figure that's what pulls it into tools via qemu-img.
-
-Yes.
-
+>> +  qapi_all_modules += qapi_block_modules
+>> +endif
+>> +
+>>  qapi_storage_daemon_modules = [
+>>    'block-core',
+>>    'char',
 > 
-> Which other QAPI modules are shared by all the executables that use it?
-
-None?
-
-> 
-> What about reverting the commit?  How bad would that be for user mode?
-> 
-
-The problem is not user-mode, is linking tools.
 
 
