@@ -2,101 +2,85 @@ Return-Path: <SRS0=M6H1=DI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4117BC4741F
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 19:55:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6047C4727E
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 20:33:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2CBA20780
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 19:55:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 59A1020739
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 20:33:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u2fTmqT4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2CBA20780
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=dcomp-ufs-br.20150623.gappssmtp.com header.i=@dcomp-ufs-br.20150623.gappssmtp.com header.b="iwdGP1m+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59A1020739
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dcomp.ufs.br
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kO4g4-0006Jw-FF
-	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 15:55:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37892)
+	id 1kO5GU-0006Ba-8T
+	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 16:33:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45242)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kO4ee-0005lG-5l
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 15:54:16 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:45009)
+ (Exim 4.90_1) (envelope-from <bruno.otavio@gmail.com>)
+ id 1kO3Bb-00048D-GM
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 14:20:11 -0400
+Received: from mail-oo1-xc2a.google.com ([2607:f8b0:4864:20::c2a]:34235)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kO4eY-0005rG-L2
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 15:54:14 -0400
-Received: by mail-oi1-x243.google.com with SMTP id 185so6890513oie.11
- for <qemu-devel@nongnu.org>; Thu, 01 Oct 2020 12:54:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=FIiMlwa+CEKj+QiLXG4kK4OYHDirOmqDxqyURsN9uFg=;
- b=u2fTmqT4PAww9FFcg7gGnENNXmXSkuI/NU39vDYDjWKU9f75kGbmlOBWxBmUJtoFfc
- unLREX1rz0yLS7zDO07Tw3Gail7pvuMogCamGakQLlgg/iMqsBoSaDMjEP79f1UTW3DS
- r4fq0Ln9Fsaeq+Cu1QTi5m6mnV1cOShmyqkA5NXzHDc6uvMTTEdPR9XXj5L6KhKFSp+6
- w2RD2CdOq1MTMsrq0+lez1UpN/I5JRP9fXncXIyuG1w0UeZW68t2uaLpekHHGcutKdzJ
- 6YrJ5AC0mOhx4buyiQH1u+4cwRMqYNkrEc1SY8s21UlshR87ZrAKVzyzY9UksT5G2NRM
- TaXg==
+ (Exim 4.90_1) (envelope-from <bruno.otavio@gmail.com>)
+ id 1kO3BZ-0002WD-30
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 14:20:11 -0400
+Received: by mail-oo1-xc2a.google.com with SMTP id o20so1737005ook.1
+ for <qemu-devel@nongnu.org>; Thu, 01 Oct 2020 11:20:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=dcomp-ufs-br.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=xRpi/SLAOr5/jfyMH0LPVLexqnJ/F0iFg0GDKdiDpWs=;
+ b=iwdGP1m+DFUfROSsQtXcYZrYfRp0QIC4xiOOTVnOi4EhASGL55tq/XNKb+QAlyNwBb
+ vjd9dRFvQp4sqqyugqXD0tAJ83mKz3Ghg+EJCLr7xnrE3TFRJTsTLD8i3JwIjr8jArEX
+ AJt94iqTXnjF8W3uBzKU9dWyrTgmODV6AhYYMfosck4lQe6zEwEgzuIH6+pnoI1CXQee
+ qkvLuQd5Hh3DD+Vn0fpl2Lve7PSrt86ez9w7R5TaBxoweGDVsW9d/QnY2h10MM4uIXMu
+ vNopsfeMUJLGJVJy0QT+NIGrY1Mc0hPpcDYbuZnG8Lyo+Fz94b4VnU3vTwPstnhZsLz0
+ UdFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=FIiMlwa+CEKj+QiLXG4kK4OYHDirOmqDxqyURsN9uFg=;
- b=hbZtLr+4tnb+6IfEB4aVMbYPX2N279ZJFnaJAN8A/H+LVTU/pUGcp6yJ9bVWy9mTO4
- INFfd4EHJuX53FtQckUakdmkm+mBYHGO1qFIDlmm2naSoeDgBm1klOH786R12XawAKFc
- aQB6WXBSGSG/LJrKOAF9lib65N6r9dVyzBOCyjmBxJcVm0bQChPD/SGKoeq9pfB6Dr9S
- h3aFZ0yH9aByY6B/y1mdEhqR6fEbHVAwGTrpUZMBEq+t6vJSPrxnPs3ORPR0SUF7Lufg
- sxWQI1U3tzFdTocZ+iwdSLvihfCxv0f9KKV5BylS6pWc5cpJ4oyEr0AQmJeqPXRV1qAt
- tizQ==
-X-Gm-Message-State: AOAM533vAzMIFi/5glOGEaVMc0CwddC9l0frTaJrCJEHTsRFJ6cRVnWR
- +YmNDpv4Sk+hzpFKLM+1rjM4Tw==
-X-Google-Smtp-Source: ABdhPJxl6QxvoO5Z960qMeldoGeRh41xTbQ5c4EXNhrlWNs2tZyi2JT2wRS93Zdj40bI7lh8kdRJeA==
-X-Received: by 2002:aca:d409:: with SMTP id l9mr979417oig.70.1601582043828;
- Thu, 01 Oct 2020 12:54:03 -0700 (PDT)
-Received: from [10.10.73.179] (fixed-187-189-51-144.totalplay.net.
- [187.189.51.144])
- by smtp.gmail.com with ESMTPSA id m12sm1473004otq.8.2020.10.01.12.54.01
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 01 Oct 2020 12:54:02 -0700 (PDT)
-Subject: Re: [RFC PATCH v4 19/29] Hexagon (target/hexagon) generator phase 3 -
- C preprocessor for decode tree
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Taylor Simpson <tsimpson@quicinc.com>, qemu-devel@nongnu.org
-References: <1601314138-9930-1-git-send-email-tsimpson@quicinc.com>
- <1601314138-9930-20-git-send-email-tsimpson@quicinc.com>
- <a4da7010-474f-6df3-a74a-2966c44df931@amsat.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <5502293e-face-7b06-3077-9c446ac6b0b9@linaro.org>
-Date: Thu, 1 Oct 2020 14:54:00 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=xRpi/SLAOr5/jfyMH0LPVLexqnJ/F0iFg0GDKdiDpWs=;
+ b=IGjqfX1A8JuysVpGbu+j6iE772M/5eZnjO780HmNs6zI0DsntAcUNFOxB2PpZWF9Rw
+ TP1VcMdcOq2svVNEXty1PLH58pOC/9q0qqCjxFm/BOtPLb0+pENMkIF5VP0hd6d0D7oR
+ 0qi2l+waMH9XI1cjSxTBavplv2qKZKTzj+20+Y6hJEqYNoG17LQWZUtKgjFfDlTWPGrj
+ 7P/gEK4ZUOxuKnAiMWNmg/Lni/PKcxyedUAJO3IZE6uI/KuqQXfkWt9UVVe+sCZHnTQz
+ TdCedzUWlA+cXjrF3QmB3Cb3QxVWPWHeGJrhzWrQv+G4JTr3GqVXIpujWH4LUcAWo3ZC
+ ms2Q==
+X-Gm-Message-State: AOAM533VbnobIOZdQZJ6/DNFfPg8EtccF8d6WkzPm53l18+bamQR43bz
+ TajNJ3YBKxY2C3pzKOdEX63ff2H+r6yrtPdkmnmRVYOO
+X-Google-Smtp-Source: ABdhPJxLZA1F+vHxfU4bgY3dK+3bVGvu4y7l5II9IsxKq9CBt7dgZAolJxaXWutq6kuMtuUELoeSSrN4XQd/avyDpIc=
+X-Received: by 2002:a4a:b30d:: with SMTP id m13mr6459830ooo.50.1601576407420; 
+ Thu, 01 Oct 2020 11:20:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <a4da7010-474f-6df3-a74a-2966c44df931@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
- envelope-from=richard.henderson@linaro.org; helo=mail-oi1-x243.google.com
+From: Bruno Prado <bruno@dcomp.ufs.br>
+Date: Thu, 1 Oct 2020 15:19:31 -0300
+Message-ID: <CAD5Umjr6Nu6fddP2LgkfxtTTKduHEMs=C49C2r_ZcMkopsYidw@mail.gmail.com>
+Subject: ARM semihosting issue
+To: qemu-devel@nongnu.org
+Content-Type: multipart/alternative; boundary="000000000000d8546e05b0a0106f"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c2a;
+ envelope-from=bruno.otavio@gmail.com; helo=mail-oo1-xc2a.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -23
-X-Spam_score: -2.4
-X-Spam_bar: --
-X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.26,
+X-Spam_score_int: -15
+X-Spam_score: -1.6
+X-Spam_bar: -
+X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, HTML_MESSAGE=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
+X-Mailman-Approved-At: Thu, 01 Oct 2020 16:32:00 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,88 +92,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ale@rev.ng, riku.voipio@iki.fi, laurent@vivier.eu,
- aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/29/20 6:37 AM, Philippe Mathieu-Daudé wrote:
-> On 9/28/20 7:28 PM, Taylor Simpson wrote:
->> Run the C preprocessor across the instruction definition and encoding
->> files to expand macros and prepare the iset.py file.  The resulting
->> fill contains python data structures used to build the decode tree.
->>
->> Signed-off-by: Taylor Simpson <tsimpson@quicinc.com>
->> ---
->>  target/hexagon/gen_dectree_import.c | 191 ++++++++++++++++++++++++++++++++++++
->>  1 file changed, 191 insertions(+)
->>  create mode 100644 target/hexagon/gen_dectree_import.c
->>
->> diff --git a/target/hexagon/gen_dectree_import.c b/target/hexagon/gen_dectree_import.c
->> new file mode 100644
->> index 0000000..237726e
->> --- /dev/null
->> +++ b/target/hexagon/gen_dectree_import.c
->> @@ -0,0 +1,191 @@
->> +/*
->> + *  Copyright(c) 2019-2020 Qualcomm Innovation Center, Inc. All Rights Reserved.
->> + *
->> + *  This program is free software; you can redistribute it and/or modify
->> + *  it under the terms of the GNU General Public License as published by
->> + *  the Free Software Foundation; either version 2 of the License, or
->> + *  (at your option) any later version.
->> + *
->> + *  This program is distributed in the hope that it will be useful,
->> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> + *  GNU General Public License for more details.
->> + *
->> + *  You should have received a copy of the GNU General Public License
->> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
->> + */
->> +
->> +/*
->> + * This program generates the encodings file that is processed by
->> + * the dectree.py script to produce the decoding tree.  We use the C
->> + * preprocessor to manipulate the files imported from the Hexagon
->> + * architecture library.
->> + */
->> +#include "qemu/osdep.h"
->> +#include "opcodes.h"
->> +
->> +#define STRINGIZE(X)    #X
->> +
->> +const char *opcode_names[] = {
-> 
-> Richard will probably ask to use "const char *const opcode_names[]".
+--000000000000d8546e05b0a0106f
+Content-Type: text/plain; charset="UTF-8"
 
-It is good practice, even if this is a generator and so doesn't actually impact
-the qemu executable itself.  ;-)
+Hi,
 
+I was able to use stdout, stderr for output and files for both input and
+output in qemu-system-arm, but stdin is not working (always returns -1 from
+syscall). I found no information and have already checked the code for
+possible hints.
 
->> +const char *opcode_syntax[XX_LAST_OPCODE];
->> +
->> +/*
->> + * Process the instruction definitions
->> + *     Scalar core instructions have the following form
->> + *         Q6INSN(A2_add,"Rd32=add(Rs32,Rt32)",ATTRIBS(),
->> + *         "Add 32-bit registers",
->> + *         { RdV=RsV+RtV;})
->> + */
->> +void opcode_init(void)
->> +{
->> +#define Q6INSN(TAG, BEH, ATTRIBS, DESCR, SEM) \
->> +   opcode_syntax[TAG] = BEH;
->> +#define EXTINSN(TAG, BEH, ATTRIBS, DESCR, SEM) \
->> +   opcode_syntax[TAG] = BEH;
->> +#include "imported/allidefs.def"
->> +#undef Q6INSN
->> +#undef EXTINSN
->> +}
+I am on Arch Linux LTS + QEMU 5.1.0.
 
-What is it that about this case that can't be initialized at compile time?
+Thanks,
+----
+Bruno Prado
 
+--000000000000d8546e05b0a0106f
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-r~
+<div dir=3D"ltr">Hi,<div><br></div><div>I was able to use stdout, stderr fo=
+r output and files for both input and output in qemu-system-arm, but stdin =
+is not working (always returns -1 from syscall). I found no information and=
+ have already checked the code for possible hints.</div><div><br></div><div=
+>I am on Arch Linux LTS=C2=A0+ QEMU 5.1.0.</div><div><br></div><div>Thanks,=
+<br clear=3D"all"><div><div dir=3D"ltr" class=3D"gmail_signature" data-smar=
+tmail=3D"gmail_signature">----<br>Bruno Prado</div></div></div></div>
+
+--000000000000d8546e05b0a0106f--
 
