@@ -2,90 +2,76 @@ Return-Path: <SRS0=M6H1=DI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D0E6C4727E
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 07:19:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB4BBC4727C
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 07:22:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FBFA21531
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 07:19:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A/lglWpJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FBFA21531
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 603F921481
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 07:22:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 603F921481
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNsrx-0005aG-Fp
-	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 03:19:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48956)
+	id 1kNsvQ-0006wr-GV
+	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 03:22:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49724)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kNsr8-000536-Gv
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 03:18:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32893)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kNsr5-0002SM-6a
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 03:18:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601536697;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=jJdefKwxfsuuI3jzq1cM0w47KKRu5t8z+Ju7Aaa6geA=;
- b=A/lglWpJ4kJoszsS+HExPE5wnCYnwxEbmhgF2Cm4H6sr3MpU0julb7vkW6nc69Is3x016U
- PFuqiPN70eaNt2yhcl5CRCuH+1yEovEWpdGI3VR1+hE1Oacuo/cs2XQu8enOUXEGiQBowV
- t8HQLZJGdK4hPO3Cyst4J11ffsDB/e0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-mcEjE8JINr6SDYcXiGnafg-1; Thu, 01 Oct 2020 03:18:15 -0400
-X-MC-Unique: mcEjE8JINr6SDYcXiGnafg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68ADE100D929;
- Thu,  1 Oct 2020 07:18:14 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-113-110.ams2.redhat.com
- [10.36.113.110])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2130555786;
- Thu,  1 Oct 2020 07:18:06 +0000 (UTC)
-Subject: Re: [PULL 5/5] crypto/tls-cipher-suites: Produce fw_cfg consumable
- blob
-To: Kevin Wolf <kwolf@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <philmd@redhat.com>
-References: <20200704163927.28188-1-philmd@redhat.com>
- <20200704163927.28188-6-philmd@redhat.com>
- <20200929154651.GC4398@linux.fritz.box>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <d454d4ae-3c8b-72fb-698d-938e11d18d3a@redhat.com>
-Date: Thu, 1 Oct 2020 09:18:06 +0200
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1kNsud-0006P3-PG; Thu, 01 Oct 2020 03:21:59 -0400
+Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:59103)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1kNsub-0002xo-8X; Thu, 01 Oct 2020 03:21:59 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.108.20.2])
+ by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 020AC60CD283;
+ Thu,  1 Oct 2020 09:21:52 +0200 (CEST)
+Received: from kaod.org (37.59.142.103) by DAG4EX1.mxp5.local (172.16.2.31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Thu, 1 Oct 2020
+ 09:21:52 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-103G005aef4187a-d417-48cf-8b9d-dffdaaa9e142,
+ 2FD1C644E9D11323632A639817FC6AC7C89AF497) smtp.auth=clg@kaod.org
+Subject: Re: [PATCH] ssi: Display chip select polarity in monitor 'info qtree'
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ <qemu-devel@nongnu.org>
+References: <20200927091946.65491-1-f4bug@amsat.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <9b1175fa-9837-f3c9-0931-34965e6db14a@kaod.org>
+Date: Thu, 1 Oct 2020 09:21:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200929154651.GC4398@linux.fritz.box>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lersek@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200927091946.65491-1-f4bug@amsat.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=lersek@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 02:15:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
+X-Originating-IP: [37.59.142.103]
+X-ClientProxiedBy: DAG2EX2.mxp5.local (172.16.2.12) To DAG4EX1.mxp5.local
+ (172.16.2.31)
+X-Ovh-Tracer-GUID: a482203b-b840-4422-a4de-6b8db3bebbbd
+X-Ovh-Tracer-Id: 9480077218061781923
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrfeefgdduvdduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfhisehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepjeekudeuudevleegudeugeekleffveeludejteffiedvledvgfekueefudehheefnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehfgegsuhhgsegrmhhsrghtrdhorhhg
+Received-SPF: pass client-ip=178.32.125.2; envelope-from=clg@kaod.org;
+ helo=smtpout1.mo529.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 03:21:53
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -22
+X-Spam_score: -2.3
 X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.469,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.373, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,91 +84,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, qemu-arm@nongnu.org,
+ Alistair Francis <alistair@alistair23.me>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/29/20 17:46, Kevin Wolf wrote:
-> Am 04.07.2020 um 18:39 hat Philippe Mathieu-Daudé geschrieben:
->> Since our format is consumable by the fw_cfg device,
->> we can implement the FW_CFG_DATA_GENERATOR interface.
->>
->> Example of use to dump the cipher suites (if tracing enabled):
->>
->>   $ qemu-system-x86_64 -S \
->>     -object tls-cipher-suites,id=mysuite1,priority=@SYSTEM \
->>     -fw_cfg name=etc/path/to/ciphers,gen_id=mysuite1 \
->>     -trace qcrypto\*
->>   1590664444.197123:qcrypto_tls_cipher_suite_priority priority: @SYSTEM
->>   1590664444.197219:qcrypto_tls_cipher_suite_info data=[0x13,0x02] version=TLS1.3 name=TLS_AES_256_GCM_SHA384
->>   1590664444.197228:qcrypto_tls_cipher_suite_info data=[0x13,0x03] version=TLS1.3 name=TLS_CHACHA20_POLY1305_SHA256
->>   1590664444.197233:qcrypto_tls_cipher_suite_info data=[0x13,0x01] version=TLS1.3 name=TLS_AES_128_GCM_SHA256
->>   1590664444.197236:qcrypto_tls_cipher_suite_info data=[0x13,0x04] version=TLS1.3 name=TLS_AES_128_CCM_SHA256
->>   1590664444.197240:qcrypto_tls_cipher_suite_info data=[0xc0,0x30] version=TLS1.2 name=TLS_ECDHE_RSA_AES_256_GCM_SHA384
->>   1590664444.197245:qcrypto_tls_cipher_suite_info data=[0xcc,0xa8] version=TLS1.2 name=TLS_ECDHE_RSA_CHACHA20_POLY1305
->>   1590664444.197250:qcrypto_tls_cipher_suite_info data=[0xc0,0x14] version=TLS1.0 name=TLS_ECDHE_RSA_AES_256_CBC_SHA1
->>   1590664444.197254:qcrypto_tls_cipher_suite_info data=[0xc0,0x2f] version=TLS1.2 name=TLS_ECDHE_RSA_AES_128_GCM_SHA256
->>   1590664444.197258:qcrypto_tls_cipher_suite_info data=[0xc0,0x13] version=TLS1.0 name=TLS_ECDHE_RSA_AES_128_CBC_SHA1
->>   1590664444.197261:qcrypto_tls_cipher_suite_info data=[0xc0,0x2c] version=TLS1.2 name=TLS_ECDHE_ECDSA_AES_256_GCM_SHA384
->>   1590664444.197266:qcrypto_tls_cipher_suite_info data=[0xcc,0xa9] version=TLS1.2 name=TLS_ECDHE_ECDSA_CHACHA20_POLY1305
->>   1590664444.197270:qcrypto_tls_cipher_suite_info data=[0xc0,0xad] version=TLS1.2 name=TLS_ECDHE_ECDSA_AES_256_CCM
->>   1590664444.197274:qcrypto_tls_cipher_suite_info data=[0xc0,0x0a] version=TLS1.0 name=TLS_ECDHE_ECDSA_AES_256_CBC_SHA1
->>   1590664444.197278:qcrypto_tls_cipher_suite_info data=[0xc0,0x2b] version=TLS1.2 name=TLS_ECDHE_ECDSA_AES_128_GCM_SHA256
->>   1590664444.197283:qcrypto_tls_cipher_suite_info data=[0xc0,0xac] version=TLS1.2 name=TLS_ECDHE_ECDSA_AES_128_CCM
->>   1590664444.197287:qcrypto_tls_cipher_suite_info data=[0xc0,0x09] version=TLS1.0 name=TLS_ECDHE_ECDSA_AES_128_CBC_SHA1
->>   1590664444.197291:qcrypto_tls_cipher_suite_info data=[0x00,0x9d] version=TLS1.2 name=TLS_RSA_AES_256_GCM_SHA384
->>   1590664444.197296:qcrypto_tls_cipher_suite_info data=[0xc0,0x9d] version=TLS1.2 name=TLS_RSA_AES_256_CCM
->>   1590664444.197300:qcrypto_tls_cipher_suite_info data=[0x00,0x35] version=TLS1.0 name=TLS_RSA_AES_256_CBC_SHA1
->>   1590664444.197304:qcrypto_tls_cipher_suite_info data=[0x00,0x9c] version=TLS1.2 name=TLS_RSA_AES_128_GCM_SHA256
->>   1590664444.197308:qcrypto_tls_cipher_suite_info data=[0xc0,0x9c] version=TLS1.2 name=TLS_RSA_AES_128_CCM
->>   1590664444.197312:qcrypto_tls_cipher_suite_info data=[0x00,0x2f] version=TLS1.0 name=TLS_RSA_AES_128_CBC_SHA1
->>   1590664444.197316:qcrypto_tls_cipher_suite_info data=[0x00,0x9f] version=TLS1.2 name=TLS_DHE_RSA_AES_256_GCM_SHA384
->>   1590664444.197320:qcrypto_tls_cipher_suite_info data=[0xcc,0xaa] version=TLS1.2 name=TLS_DHE_RSA_CHACHA20_POLY1305
->>   1590664444.197325:qcrypto_tls_cipher_suite_info data=[0xc0,0x9f] version=TLS1.2 name=TLS_DHE_RSA_AES_256_CCM
->>   1590664444.197329:qcrypto_tls_cipher_suite_info data=[0x00,0x39] version=TLS1.0 name=TLS_DHE_RSA_AES_256_CBC_SHA1
->>   1590664444.197333:qcrypto_tls_cipher_suite_info data=[0x00,0x9e] version=TLS1.2 name=TLS_DHE_RSA_AES_128_GCM_SHA256
->>   1590664444.197337:qcrypto_tls_cipher_suite_info data=[0xc0,0x9e] version=TLS1.2 name=TLS_DHE_RSA_AES_128_CCM
->>   1590664444.197341:qcrypto_tls_cipher_suite_info data=[0x00,0x33] version=TLS1.0 name=TLS_DHE_RSA_AES_128_CBC_SHA1
->>   1590664444.197345:qcrypto_tls_cipher_suite_count count: 29
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
->> Acked-by: Laszlo Ersek <lersek@redhat.com>
->> Message-Id: <20200623172726.21040-6-philmd@redhat.com>
+On 9/27/20 11:19 AM, Philippe Mathieu-Daudé wrote:
+> It is sometime useful to verify a device chip select polarity
+> on a SPI bus. Since we have this information available, display
+> it in the 'info qtree' monitor output:
 > 
-> I noticed only now that this breaks '--object help' in
-> qemu-storage-daemon:
+>   $ qemu-system-arm -M lm3s6965evb -monitor stdio -S
+>   (qemu) info qtree
+>   [...]
+>   dev: pl022, id ""
+>     gpio-out "sysbus-irq" 1
+>     mmio 0000000040008000/0000000000001000
+>     bus: ssi
+>       type SSI
+>       dev: ssd0323, id ""
+>         gpio-in "" 1
+>         gpio-in "ssi-gpio-cs" 1
+>         chip select polarity: high           <---
+>       dev: ssi-sd, id ""
+>         gpio-in "ssi-gpio-cs" 1
+>         chip select polarity: low            <---
+>         bus: sd-bus
+>           type sd-bus
+>           dev: sd-card, id ""
+>             spec_version = 2 (0x2)
+>             drive = "sd0"
+>             spi = true
 > 
-> $ qemu-storage-daemon --object help
-> List of user creatable objects:
-> qemu-storage-daemon: missing interface 'fw_cfg-data-generator' for object 'tls-creds'
-> Aborted (core dumped)
-> 
-> The reason is that we don't (and can't) link hw/nvram/fw_cfg.c into the
-> storage daemon because it requires other system emulator stuff.
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Ouch. I've been completely oblivious to "--object help" and how it
-affects qemu-storage-daemon. Sorry about that.
-
-Could you please include a backtrace about the abort()?
-
-Grepping for the error message, I can find type_initialize() in
-"qom/object.c", but my knowledge about QOM internals is practically nil.
-
-The error message seems bogus FWIW -- why would
-TYPE_FW_CFG_DATA_GENERATOR_INTERFACE be *required* from "tls-creds"?
-
-TYPE_FW_CFG_DATA_GENERATOR_INTERFACE is implemented by
-"tls-cipher-suites", and required by "-fw_cfg name=...,gen_id=...". If
-that -fw_cfg switch is not used, then why would anything look for the
-TYPE_FW_CFG_DATA_GENERATOR_INTERFACE interface? Especially under the
-tls-creds object?
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+Tested-by: Cédric Le Goater <clg@kaod.org>
 
 Thanks,
-Laszlo
+
+C.
+
+  dev: aspeed.spi2-ast2600, id ""
+    gpio-out "sysbus-irq" 2
+    num-cs = 1 (0x1)
+    inject-failure = false
+    sdram-base = 0 (0x0)
+    mmio 000000001e641000/0000000000000100
+    mmio 0000000050000000/0000000010000000
+    bus: spi
+      type SSI
+  dev: aspeed.spi1-ast2600, id ""
+    gpio-out "sysbus-irq" 2
+    num-cs = 1 (0x1)
+    inject-failure = false
+    sdram-base = 0 (0x0)
+    mmio 000000001e630000/0000000000000100
+    mmio 0000000030000000/0000000010000000
+    bus: spi
+      type SSI
+      dev: mx66l1g45g, id ""
+        gpio-in "ssi-gpio-cs" 1
+        nonvolatile-cfg = 36863 (0x8fff)
+        spansion-cr1nv = 0 (0x0)
+        spansion-cr2nv = 8 (0x8)
+        spansion-cr3nv = 2 (0x2)
+        spansion-cr4nv = 16 (0x10)
+        drive = "mtd2"
+        chip select polarity: low
+  dev: aspeed.fmc-ast2600, id ""
+    gpio-out "sysbus-irq" 3
+    num-cs = 2 (0x2)
+    inject-failure = false
+    sdram-base = 2147483648 (0x80000000)
+    mmio 000000001e620000/0000000000000100
+    mmio 0000000020000000/0000000010000000
+    bus: spi
+      type SSI
+      dev: mx66l1g45g, id ""
+        gpio-in "ssi-gpio-cs" 1
+        nonvolatile-cfg = 36863 (0x8fff)
+        spansion-cr1nv = 0 (0x0)
+        spansion-cr2nv = 8 (0x8)
+        spansion-cr3nv = 2 (0x2)
+        spansion-cr4nv = 16 (0x10)
+        drive = "mtd1"
+        chip select polarity: low
+      dev: mx66l1g45g, id ""
+        gpio-in "ssi-gpio-cs" 1
+        nonvolatile-cfg = 36863 (0x8fff)
+        spansion-cr1nv = 0 (0x0)
+        spansion-cr2nv = 8 (0x8)
+        spansion-cr3nv = 2 (0x2)
+        spansion-cr4nv = 16 (0x10)
+        drive = "mtd0"
+        chip select polarity: low
 
 
