@@ -2,134 +2,98 @@ Return-Path: <SRS0=M6H1=DI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E356C4727C
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 15:58:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E29BAC4727E
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 15:58:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C650D20872
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 15:58:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4F41A20872
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 15:58:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PWZJO1AE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C650D20872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cO6n5khr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F41A20872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kO0yI-00052D-Q9
-	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 11:58:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34460)
+	id 1kO0yh-0005Vk-DP
+	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 11:58:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59530)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kO0xQ-0003xg-9N
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 11:57:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34982)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kO0xN-0006F5-9a
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 11:57:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601567839;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=lLhgaKsAuj+WKn4W+SZti0pTbhlGxZy5ViL6pDcCLoA=;
- b=PWZJO1AEkhA2JrDzzYqRyS79trwiK71v4plYBBIObmD4D9uHNEraSi14xq6Z/f5RGm+ZqJ
- S9ZsDvfdjZB0zik6P4owzpyrBM/mKq5tmLvW4oPdQ7bHrVroo0nLhTeieeWm1AnRLsk7l6
- NKGM4LmQfq67+N+p1cZgLDTu5pFLVcQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-494-s3YCCS9kPNuRWVFnxJ11Dg-1; Thu, 01 Oct 2020 11:57:17 -0400
-X-MC-Unique: s3YCCS9kPNuRWVFnxJ11Dg-1
-Received: by mail-wm1-f70.google.com with SMTP id b14so1050190wmj.3
- for <qemu-devel@nongnu.org>; Thu, 01 Oct 2020 08:57:17 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kO0ld-0007SI-MH
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 11:45:15 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:47007)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kO0lb-0004ZX-MK
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 11:45:13 -0400
+Received: by mail-ot1-x342.google.com with SMTP id a13so3075632otl.13
+ for <qemu-devel@nongnu.org>; Thu, 01 Oct 2020 08:45:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=SAx4gnhtdHruOhWaRLw9QvsHsofhvpQMskdiZBpshkk=;
+ b=cO6n5khrUYR6utXhHKtrbdCabb1XzKu+EWxLF8SXEOHiqz2iD8EFJleoLTSc9/CbeP
+ UXupQl98+OcTvrznecDsdLEtbh8VrXwiKVNrUnP5PDdSZ0CL0ci8DVXAGBD3ttYk2zUu
+ basVG/IbQlAeFzcA3G+/8sJLOS1awoyQBAquw5T5Q7YFnhVT+LlmIgXwH/nBf2McbGQv
+ uZ5hbvjfA+yMGvnYH1rlkAqpT6n/FW0zgbq40/gzBz/0A1OR+rNSwrUD1kXd9YH16Q1+
+ r2xZu9Cs7UTTP7oDNdRJD+0EqqZ46d54zAJGJlHohr7g2PPMbJ1zXr3qbcIkL5iKhcpE
+ XEbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=lLhgaKsAuj+WKn4W+SZti0pTbhlGxZy5ViL6pDcCLoA=;
- b=hGT0iu7elJPDV0cFP95/VAgd13Rfmrg5M7Kfglp8Bgc/clxhmvg560brvHRgFE4vQk
- hRBXkTNhu7z2AYnAWoROu7Mdp6+a67G0TG5vjsLBMWZTtj4g1m9DvMfO17mdX9/iwFXy
- 3yNwIbq+VZD/gy9XsRyPnQtrp8YHH3QvMxY25G084CC2eSTPZW9C9TyC9Z0ZXECH9nA3
- MGIX5epmG8RTGZL7simJdZ6wdSZ1F0jeUsv1SKYrUjPPSsB/IgZstNX+hYwYX+V6eWmx
- IkO+3UU97SO4CCizJQbmpqpSPr6JUFbBujDocVhhi38NXLCLZJxYqpCnaBnDuvDs3951
- 4O5Q==
-X-Gm-Message-State: AOAM530pz8qlzwL0n/d2HlBvvvGd+tfxNlwoYCuye73a8XnnsfBElIug
- n1og2Vf8AqrmzzishXk/M3melMm+Ptx4618T/eDw+t88t3Rv5/rEnQIpWDs9TGTNTaTvvNWmdXh
- TrSPehvr0t4mFEkg=
-X-Received: by 2002:adf:9e05:: with SMTP id u5mr9727480wre.78.1601567836535;
- Thu, 01 Oct 2020 08:57:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwQEO+Y5GSTTvkuXghNOAb2mRIpDjMduEfLv4gfNel/GPq/wqac1HqmXRMEmQe/hIdZKcZvmA==
-X-Received: by 2002:adf:9e05:: with SMTP id u5mr9727448wre.78.1601567836269;
- Thu, 01 Oct 2020 08:57:16 -0700 (PDT)
-Received: from [192.168.1.36] (74.red-83-53-161.dynamicip.rima-tde.net.
- [83.53.161.74])
- by smtp.gmail.com with ESMTPSA id k15sm10196060wrv.90.2020.10.01.08.57.14
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=SAx4gnhtdHruOhWaRLw9QvsHsofhvpQMskdiZBpshkk=;
+ b=ppHPFGuiTnIC5WrN35MgcsWny1CjeDo107Cv7UZ05fil7WGmZCXtGh6qToiuTusbjA
+ PQ2SwYMzIs9uNgZvrLNS6g6hwnUmXx7ZUdLjZf0/qTzRUr/oTiqTx+xcl1E/oBJkbYtf
+ YptcTevPGh0tobBnZAHIlHZglbH9sVZ2G+yGI45OFZgIJrSrY7rjshR3QO01IWQjHDh7
+ 3TrQJqAvpCdelSUqrAFQzI4FSu8jpSnVhPKTs1vwUACVmFBhLEDO9AD/VaZcFawFP/Re
+ +s01RTfeTqfYJEZ/E0P/V1fjQb919ulZG7BregMSHXeZlrGu41UeclgiutpNdag0gTSc
+ yeUg==
+X-Gm-Message-State: AOAM533NneTTpOCviOCJ2hHgroCa30OFV0kBng/xDcOc2TWKoeKugvc9
+ iBln9SEFlf02SVeRHN5oM1LDwQ==
+X-Google-Smtp-Source: ABdhPJz4nfPUAh28uZWhzPAS0sOQDHroJeGdceP2lELr6+QRo0bjwpiIprfn+SQ6rdxY8dqQk9tIPw==
+X-Received: by 2002:a05:6830:1bf9:: with SMTP id
+ k25mr5382059otb.310.1601567110235; 
+ Thu, 01 Oct 2020 08:45:10 -0700 (PDT)
+Received: from [10.10.73.179] (fixed-187-189-51-144.totalplay.net.
+ [187.189.51.144])
+ by smtp.gmail.com with ESMTPSA id 187sm1113366oie.42.2020.10.01.08.45.08
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 01 Oct 2020 08:57:15 -0700 (PDT)
-Subject: Re: [PATCH v4 2/3] target/i386/cpu: Restrict some of feature-words
- uses to system-mode
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <20201001144152.1555659-1-philmd@redhat.com>
- <20201001144152.1555659-3-philmd@redhat.com>
- <933089b7-a088-d142-bf0c-55cae3e9bd70@redhat.com>
- <53758e35-f596-8e17-12cf-58b1a81f98e3@redhat.com>
- <20201001153725.GD3717385@habkost.net>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <0766785b-29a5-b145-2685-781fbee86add@redhat.com>
-Date: Thu, 1 Oct 2020 17:57:14 +0200
+ Thu, 01 Oct 2020 08:45:09 -0700 (PDT)
+Subject: Re: [PATCH v1 04/20] s390x/tcg: Implement 32/128 bit for VECTOR FP ADD
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20200930145523.71087-1-david@redhat.com>
+ <20200930145523.71087-5-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <eda4575a-574b-1aa9-c51b-cb205786130c@linaro.org>
+Date: Thu, 1 Oct 2020 10:45:06 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20201001153725.GD3717385@habkost.net>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200930145523.71087-5-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 02:15:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
+ envelope-from=richard.henderson@linaro.org; helo=mail-ot1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -23
 X-Spam_score: -2.4
 X-Spam_bar: --
-X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.26, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.26,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -142,49 +106,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
- Laurent Vivier <laurent@vivier.eu>, Markus Armbruster <armbru@redhat.com>,
- qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+ Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/1/20 5:37 PM, Eduardo Habkost wrote:
-> On Thu, Oct 01, 2020 at 05:27:32PM +0200, Philippe Mathieu-Daudé wrote:
->> On 10/1/20 5:14 PM, Paolo Bonzini wrote:
->>> On 01/10/20 16:41, Philippe Mathieu-Daudé wrote:
->>>> The feature-words properties are not used in user-mode emulation,
->>>> restrict it to system-mode.
->>>>
->>>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>>
->>> This seems a bit pointless honestly.  It's going to be a few KBs of code
->>> at most.  I would end the work with the patches that have already been
->>> queued.
->>
->> I'll let Eduardo and you discuss that, as he suggested the #ifdef
->> instead of the stub. The two options are on the list, whichever
->> you guys prefer :)
-> 
-> Having neither the stub or the #ifdef is even better.  :)
-> 
-> I assumed the stub was necessary as a means for an end, but now I
-> don't understand why the stub was necessary in the first place.
+On 9/30/20 9:55 AM, David Hildenbrand wrote:
+> -typedef uint64_t (*vop64_3_fn)(uint64_t a, uint64_t b, float_status *s);
+> -static void vop64_3(S390Vector *v1, const S390Vector *v2, const S390Vector *v3,
+> -                    CPUS390XState *env, bool s, vop64_3_fn fn,
+> -                    uintptr_t retaddr)
+> -{
+> -    uint8_t vxc, vec_exc = 0;
+> -    S390Vector tmp = {};
+> -    int i;
+> -
+> -    for (i = 0; i < 2; i++) {
+> -        const uint64_t a = s390_vec_read_element64(v2, i);
+> -        const uint64_t b = s390_vec_read_element64(v3, i);
+> -
+> -        s390_vec_write_element64(&tmp, i, fn(a, b, &env->fpu_status));
+> -        vxc = check_ieee_exc(env, i, false, &vec_exc);
+> -        if (s || vxc) {
+> -            break;
+> -        }
+> -    }
+> -    handle_ieee_exc(env, vxc, vec_exc, retaddr);
+> -    *v1 = tmp;
+> -}
+...
+> +#define DEF_VOP_3(BITS)                                                        \
+> +typedef float##BITS (*vop##BITS##_3_fn)(float##BITS a, float##BITS b,          \
+> +                                        float_status *s);                      \
+> +static void vop##BITS##_3(S390Vector *v1, const S390Vector *v2,                \
+> +                          const S390Vector *v3, CPUS390XState *env, bool s,    \
+> +                          vop##BITS##_3_fn fn, uintptr_t retaddr)              \
+> +{                                                                              \
+> +    uint8_t vxc, vec_exc = 0;                                                  \
+> +    S390Vector tmp = {};                                                       \
+> +    int i;                                                                     \
+> +                                                                               \
+> +    for (i = 0; i < (128 / BITS); i++) {                                       \
+> +        const float##BITS a = s390_vec_read_float##BITS(v2, i);                \
+> +        const float##BITS b = s390_vec_read_float##BITS(v3, i);                \
+> +                                                                               \
+> +        s390_vec_write_float##BITS(&tmp, i, fn(a, b, &env->fpu_status));       \
+> +        vxc = check_ieee_exc(env, i, false, &vec_exc);                         \
+> +        if (s || vxc) {                                                        \
+> +            break;                                                             \
+> +        }                                                                      \
+> +    }                                                                          \
+> +    handle_ieee_exc(env, vxc, vec_exc, retaddr);                               \
+> +    *v1 = tmp;                                                                 \
+> +}
+> +DEF_VOP_3(32)
+> +DEF_VOP_3(64)
+> +DEF_VOP_3(128)
 
-x86_cpu_get_feature_words() calls QAPI-generated
-visit_type_X86CPUFeatureWordInfoList().
+While this works, you won't be able to step through this function in the
+debugger anymore, because it now has one source line: at the point of expansion.
 
-Since "Only qemu-system-FOO and qemu-storage-daemon provide QMP
-monitors", this code is unreachable on user-mode.
+We do have plenty of these around the code base, I know.  This is small enough
+that I think it's reasonable to simply have three copies, one for each type.
 
-I tried to get a "no ifdef/no stub" codebase by not removing the
-QAPI uses from user-mode code, and build it without QAPI-generated
-files. I could only start the work and realized it is a huge effort.
-In particular since nobody sees the point of doing this cleanup...
+> +#define DEF_GVEC_FVA(BITS)                                                     \
+> +void HELPER(gvec_vfa##BITS)(void *v1, const void *v2, const void *v3,          \
+> +                            CPUS390XState *env, uint32_t desc)                 \
+> +{                                                                              \
+> +    vop##BITS##_3(v1, v2, v3, env, false, float##BITS##_add, GETPC());         \
+> +}
+> +DEF_GVEC_FVA(32)
+> +DEF_GVEC_FVA(64)
+> +DEF_GVEC_FVA(128)
+> +
+> +#define DEF_GVEC_FVA_S(BITS)                                                   \
+> +void HELPER(gvec_vfa##BITS##s)(void *v1, const void *v2, const void *v3,       \
+> +                               CPUS390XState *env, uint32_t desc)              \
+> +{                                                                              \
+> +    vop##BITS##_3(v1, v2, v3, env, true, float##BITS##_add, GETPC());          \
+> +}
+> +DEF_GVEC_FVA_S(32)
+> +DEF_GVEC_FVA_S(64)
+I think you're defining these macros with the wrong parameters.  Think of how
+to use the same macros for all of add/sub/etc.
 
-Regards,
+E.g.
 
-Phil.
+#define DEF_FOP3_B(NAME, OP, BITS) \...
+  void HELPER(gvec_##NAME##BITS)(void *v1, const void *v2,
+      const void *v3, CPUS390XState *env, uint32_t desc)
+  {
+    vop##BITS##_3(v1, v2, v3, env, false,
+                  float##BITS##_##OP, GETPC());
+  }
+  void HELPER(gvec_##NAME##BITS##s)(void *v1, const void *v2,
+      const void *v3, CPUS390XState *env, uint32_t desc)
+  {
+    vop##BITS##_3(v1, v2, v3, env, true,
+                  float##BITS##_##OP, GETPC());
+  }
 
+#define DEF_FOP3(NAME, OP) \
+  DEF_FOP3_B(NAME, OP, 32) \
+  DEF_FOP3_B(NAME, OP, 64) \
+  DEF_FOP3_B(NAME, OP, 128)
+
+DEF_FOP3(vfa, add)
+DEF_FOP3(vfd, div)
+DEF_FOP3(vfm, mul)
+
+etc.
+
+
+r~
 
