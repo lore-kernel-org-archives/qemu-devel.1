@@ -2,94 +2,102 @@ Return-Path: <SRS0=M6H1=DI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C3CBC4727E
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 22:01:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3750BC4727E
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 22:20:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8BD3206FC
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 22:01:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OGvFtc1R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8BD3206FC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 747CE20738
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 22:20:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 747CE20738
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kO6eA-0007O8-Jt
-	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 18:01:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34674)
+	id 1kO6vz-00024A-Tj
+	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 18:20:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39262)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kO6bu-0006hZ-Ae
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 17:59:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47050)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kO6bq-00041G-Ea
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 17:59:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601589568;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=N4uP3DJlDSs57FZmTVaCSiAgusoYFv+YV3PJ1v0rB5w=;
- b=OGvFtc1Rynqp4D+xD0JF7rsklJ13glge/SIPL24xWP/2Es/RWSmuOcs43KkGn9fCZQ8vuf
- TCUahHNKjgOfzmWgSR/zvI9UPyyjB6lcy3733ugiPMTGFbXkVrBsuNxuiJu2NhtC6Y7aj+
- iJRWbv1zwJevsTxgV1sp8Emu4BspKPc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-502-BgUVBl2fMN208bEn3h-uIQ-1; Thu, 01 Oct 2020 17:59:25 -0400
-X-MC-Unique: BgUVBl2fMN208bEn3h-uIQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D497E85C732;
- Thu,  1 Oct 2020 21:59:23 +0000 (UTC)
-Received: from [10.10.120.38] (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4DA3E10013C4;
- Thu,  1 Oct 2020 21:59:22 +0000 (UTC)
-Subject: Re: [PATCH 1/9] scripts/performance: Refactor topN_perf.py
-From: John Snow <jsnow@redhat.com>
-To: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>, qemu-devel@nongnu.org,
- aleksandar.qemu.devel@gmail.com, philmd@redhat.com, alex.bennee@linaro.org,
- eblake@redhat.com, ldoktor@redhat.com, rth@twiddle.net, ehabkost@redhat.com,
- crosa@redhat.com
-References: <20200828104102.4490-1-ahmedkhaledkaraman@gmail.com>
- <20200828104102.4490-2-ahmedkhaledkaraman@gmail.com>
- <ec6e7528-0281-9bdc-5afc-4b9c8a541f13@redhat.com>
-Message-ID: <85440dcc-07cf-b699-98b1-09e1f9b291d5@redhat.com>
-Date: Thu, 1 Oct 2020 17:59:21 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kO6rS-0001M5-GF; Thu, 01 Oct 2020 18:15:38 -0400
+Received: from new3-smtp.messagingengine.com ([66.111.4.229]:48953)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kO6rL-0006DB-3i; Thu, 01 Oct 2020 18:15:38 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+ by mailnew.nyi.internal (Postfix) with ESMTP id 88DB258037F;
+ Thu,  1 Oct 2020 18:15:29 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+ by compute4.internal (MEProxy); Thu, 01 Oct 2020 18:15:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-type:in-reply-to; s=fm1; bh=VLz1KqoNzlvjJUj3Qlz2TyBtgjb
+ FurZ8RBsakM0WISA=; b=KEyBb2zBwIFx8HSj+G6eZHsD2CrGQ4+PvnHtxSnaFYm
+ lJyH6pIMKdQG58D7Q36K6aYeBZIpvyMw2/EUW7XjklSGQSEcHfc1E82JpGn3j+Nu
+ UQ/07JWCbPNijvymv6T46lZPdAcnIB2BihX1r+FDl5WUUmFQ9Qp/pBaz5rEjDa2A
+ LIr3mde7Orr1oOH1Mfuv7AiQsRoRLq/ncCTMTLUqeQOe63hLHiQFEHIrG9ojD3ZE
+ pWPzmjOTQGwbakOmFb3Tk0MxFiHN/IlslVuKty7sdlAwin+SV2WvtNjZ6XHpEW7v
+ znSMNhfq/kkLY8hD51WIPR5rAr6GJ8HyQPAtooOfmGg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-type:date:from:in-reply-to
+ :message-id:mime-version:references:subject:to:x-me-proxy
+ :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=VLz1Kq
+ oNzlvjJUj3Qlz2TyBtgjbFurZ8RBsakM0WISA=; b=BM93O6jxeExQiOnurop7jP
+ HWJvMuh7ymVKBMaFN16As7c0BGC2MDiOKvlE93fClawJcxTDehNTBYqhzAkMrxZa
+ IaGFFbXKOlyB/YeAecsFlAtNXnqrEbuEctw4yBvUkO0KWO7uiANrK31BGgxmJsQX
+ tTlixPm3E+gve1IKKXlgiYHjMPQh/0O2a1Eu/GvV1fS4OJcmZWxV6gU1iBR7PFI0
+ KDpsF9GL8rdFmJBmouBFdR1QZd2gs2FUW5vPiKIgP5CMdfopytWm/zqELtL38mGy
+ xtOncsJcYkf6ozM52rwnN7BKLnug2ZSvFvevLJ5R/570tMjhh/dWgUTKNFm9ZQag
+ ==
+X-ME-Sender: <xms:_1R2X8KSHQF2Sq2XG5fLEipXEJTxKU-x2TSMRJHvxl51hZwxhqcDpQ>
+ <xme:_1R2X8LkP9rNKMZV-2eox6EezHzgxT6YcRKoRo_NGBWAfysxFeY0vEhuTDouncWIe
+ vygniSBUW4mgLPtKJw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrfeehgddtfecutefuodetggdotefrodftvf
+ curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+ uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+ fjughrpeffhffvuffkfhggtggujgesghdtreertddtjeenucfhrhhomhepmfhlrghushcu
+ lfgvnhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrdgukheqnecuggftrfgrthhtvg
+ hrnhepfeefgfdvleeitdehhfevffegleduieffgfdujeeuhfeluddthffgjeegkefhkedt
+ necuffhomhgrihhnpehuuhhiugdruggrthgrnecukfhppeektddrudeijedrleekrddule
+ dtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepihht
+ shesihhrrhgvlhgvvhgrnhhtrdgukh
+X-ME-Proxy: <xmx:_1R2X8sK82rloFZlH9id2a3tV3bT6bAfr5tISZMKz4aWXLnWOXOHCQ>
+ <xmx:_1R2X5ZmNSehKCJYde6VkZsXLtaaAiM4EiDHrkzjuRVwnQF1efj2sA>
+ <xmx:_1R2XzY2c45XFcXS1Iqs-rcgyWXhsOyZVHH8MLSZxVIqmNOjDVK_vQ>
+ <xmx:AFV2XxA8_92KxF1dbOjuN53r9C3r3ajmr5AJBmKT36xs3dyPcrgsw0rYHa8>
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by mail.messagingengine.com (Postfix) with ESMTPA id 4BF8B3064674;
+ Thu,  1 Oct 2020 18:15:23 -0400 (EDT)
+Date: Fri, 2 Oct 2020 00:15:20 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Subject: Re: [PATCH v5 05/14] hw/block/nvme: Add support for Namespace Types
+Message-ID: <20201001221520.GA841624@apples.localdomain>
+References: <20200928023528.15260-1-dmitry.fomichev@wdc.com>
+ <20200928023528.15260-6-dmitry.fomichev@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <ec6e7528-0281-9bdc-5afc-4b9c8a541f13@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 02:15:30
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="xHFwDpU9dbj6ez1V"
+Content-Disposition: inline
+In-Reply-To: <20200928023528.15260-6-dmitry.fomichev@wdc.com>
+Received-SPF: pass client-ip=66.111.4.229; envelope-from=its@irrelevant.dk;
+ helo=new3-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 17:51:05
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -23
-X-Spam_score: -2.4
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.26, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,50 +110,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
+ Niklas Cassel <niklas.cassel@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
+ qemu-devel@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>, Keith Busch <kbusch@kernel.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Matias Bjorling <matias.bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/1/20 4:41 PM, John Snow wrote:
-> I realize this review comes well after you are no longer being paid to 
-> work on this, so I am offering my time to help polish your patches if 
-> you would like.
 
-Actually, I see now that you are adding your name to the MAINTAINERS 
-file here, so I suspect you probably rather want to be more involved 
-than not.
+--xHFwDpU9dbj6ez1V
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I cleaned up patch 1/9 provisionally with my own style preferences, but 
-it's all just style stuff, and it's mostly things I wouldn't actually 
-require you to do (...I went way overboard.)
+On Sep 28 11:35, Dmitry Fomichev wrote:
+> From: Niklas Cassel <niklas.cassel@wdc.com>
+>=20
+> Namespace Types introduce a new command set, "I/O Command Sets",
+> that allows the host to retrieve the command sets associated with
+> a namespace. Introduce support for the command set and enable
+> detection for the NVM Command Set.
+>=20
+> The new workflows for identify commands rely heavily on zero-filled
+> identify structs. E.g., certain CNS commands are defined to return
+> a zero-filled identify struct when an inactive namespace NSID
+> is supplied.
+>=20
+> Add a helper function in order to avoid code duplication when
+> reporting zero-filled identify structures.
+>=20
+> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
+> Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+> ---
+>  hw/block/nvme-ns.c |   3 +
+>  hw/block/nvme.c    | 210 +++++++++++++++++++++++++++++++++++++--------
+>  2 files changed, 175 insertions(+), 38 deletions(-)
+>=20
+> diff --git a/hw/block/nvme-ns.c b/hw/block/nvme-ns.c
+> index bbd7879492..31b7f986c3 100644
+> --- a/hw/block/nvme-ns.c
+> +++ b/hw/block/nvme-ns.c
 
-https://gitlab.com/jsnow/qemu/-/commit/c66a4a6ca8ccc3d406b92796935f92057bf1e48d
+The following looks like a rebase gone wrong.
+
+There are some redundant checks and wrong return values.
+
+>  static uint16_t nvme_identify_ns_descr_list(NvmeCtrl *n, NvmeRequest *re=
+q)
+>  {
+>      NvmeIdentify *c =3D (NvmeIdentify *)&req->cmd;
+> +    NvmeNamespace *ns;
+>      uint32_t nsid =3D le32_to_cpu(c->nsid);
+> -    uint8_t list[NVME_IDENTIFY_DATA_SIZE];
+> -
+> -    struct data {
+> -        struct {
+> -            NvmeIdNsDescr hdr;
+> -            uint8_t v[16];
+> -        } uuid;
+> -    };
+> -
+> -    struct data *ns_descrs =3D (struct data *)list;
+> +    NvmeIdNsDescr *desc;
+> +    uint8_t list[NVME_IDENTIFY_DATA_SIZE] =3D {};
+> +    static const int data_len =3D sizeof(list);
+> +    void *list_ptr =3D list;
+
+Oh maaan, please do not replace my nicely cleaned up code with pointer
+arithmetics :(
+
+> =20
+>      trace_pci_nvme_identify_ns_descr_list(nsid);
+> =20
+> -    if (!nvme_nsid_valid(n, nsid) || nsid =3D=3D NVME_NSID_BROADCAST) {
+> -        return NVME_INVALID_NSID | NVME_DNR;
+> -    }
+> -
+
+This removal looks wrong.
+
+>      if (unlikely(!nvme_ns(n, nsid))) {
+>          return NVME_INVALID_FIELD | NVME_DNR;
+>      }
+> =20
+> -    memset(list, 0x0, sizeof(list));
+> +    ns =3D nvme_ns(n, nsid);
+> +    if (unlikely(!ns)) {
+> +        return nvme_rpt_empty_id_struct(n, req);
+> +    }
+> =20
+
+And this doesnt look like it belongs (its checked just a few lines
+before, and it returns an error status as it should).
+
+>      /*
+>       * Because the NGUID and EUI64 fields are 0 in the Identify Namespac=
+e data
+> @@ -1597,12 +1667,31 @@ static uint16_t nvme_identify_ns_descr_list(NvmeC=
+trl *n, NvmeRequest *req)
+>       * Namespace Identification Descriptor. Add a very basic Namespace U=
+UID
+>       * here.
+>       */
+> -    ns_descrs->uuid.hdr.nidt =3D NVME_NIDT_UUID;
+> -    ns_descrs->uuid.hdr.nidl =3D NVME_NIDL_UUID;
+> -    stl_be_p(&ns_descrs->uuid.v, nsid);
+> +    desc =3D list_ptr;
+> +    desc->nidt =3D NVME_NIDT_UUID;
+> +    desc->nidl =3D NVME_NIDL_UUID;
+> +    list_ptr +=3D sizeof(*desc);
+> +    memcpy(list_ptr, ns->params.uuid.data, NVME_NIDL_UUID);
+> +    list_ptr +=3D NVME_NIDL_UUID;
+> =20
+> -    return nvme_dma(n, list, NVME_IDENTIFY_DATA_SIZE,
+> -                    DMA_DIRECTION_FROM_DEVICE, req);
+> +    desc =3D list_ptr;
+> +    desc->nidt =3D NVME_NIDT_CSI;
+> +    desc->nidl =3D NVME_NIDL_CSI;
+> +    list_ptr +=3D sizeof(*desc);
+> +    *(uint8_t *)list_ptr =3D NVME_CSI_NVM;
+> +
+> +    return nvme_dma(n, list, data_len, DMA_DIRECTION_FROM_DEVICE, req);
+> +}
+> +
 
 
-What I'd recommend for your cleanup is actually *much* simpler;
+--xHFwDpU9dbj6ez1V
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Use pylint 2.6.0 and flake8 3.8.3:
+-----BEGIN PGP SIGNATURE-----
 
- > pip3 install --user pylint==2.6.0 flake8==3.8.3
+iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl92VPYACgkQTeGvMW1P
+DeksFAf8Co61TeUCBEFv/M+IZyBAu22zArHxUNscJ7sytzAzSMaQM2XklCiHu5HF
+FChz+qH8u6owipxAXBWKv6D4QLa4+laRKb8Ek/7mKcHGqFIbqgbBKxX6U0D55/ix
+EdwrUwxj7gnaNzrDg6nu0Mc83GmyOgoKbzi0mImWa+gfzeF8dVqfkpWqOCbGp7YE
+5r49UpXSRYOplBwb0SRl077sMYmqzPLsKRgNF8e8RNuj9EFFk0WNA41HBm+VPbGL
+kmqAN0qBdwkLoMygzwPOWeVqKcthQJcLb1Pa5mv0Vq84ESZQlAXOkc9yUUzjkeWT
+4Hu2i4dwp/zCq2vKRPUt3NnGcC0Qkg==
+=h6e0
+-----END PGP SIGNATURE-----
 
-flake8's default settings should be pretty good, but pylint has a lot of 
-warnings you can ignore.
-
-In particular, it's OK to use script-style python (Scripts with a 
-#!/usr/bin/env python3, and where you do not use python functions to 
-avoid side-effects that occur on 'import'.) In this case, IGNORE any of 
-pylint's warnings telling you that you have too many lines, that you 
-need to UPPERCASE variable names, etc. It just hurts readability here.
-
-So I'd actually ask that you revise these patches to remove all of the 
-UPPERCASE variable names, and then check your code with these:
-
-flake8 topN_perf.py
-pylint --disable=invalid-name topN_perf.py
-
-Use your best judgment -- If something seems like it looks worse, it 
-probably is. If in doubt, please reach out and ask.
-
---js
-
+--xHFwDpU9dbj6ez1V--
 
