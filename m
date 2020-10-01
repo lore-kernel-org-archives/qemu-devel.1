@@ -2,89 +2,98 @@ Return-Path: <SRS0=M6H1=DI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 479FBC4727E
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 17:58:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57D46C4727E
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 17:59:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D81B021707
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 17:58:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B008C21707
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 17:59:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H0vyucP9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D81B021707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q/HEsNaB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B008C21707
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kO2r3-0001bp-ST
-	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 13:58:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33778)
+	id 1kO2rK-0002Fi-O3
+	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 13:59:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35462)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kO2UK-0006xf-Dk; Thu, 01 Oct 2020 13:35:28 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:45233)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kO2bx-0007el-6I
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 13:43:21 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:33122)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kO2UI-0005MF-DZ; Thu, 01 Oct 2020 13:35:28 -0400
-Received: by mail-pf1-x442.google.com with SMTP id x22so5205453pfo.12;
- Thu, 01 Oct 2020 10:35:25 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kO2bv-0006Ec-FO
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 13:43:20 -0400
+Received: by mail-wm1-x344.google.com with SMTP id e11so2742085wme.0
+ for <qemu-devel@nongnu.org>; Thu, 01 Oct 2020 10:43:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=ISGs5OEQLGnXagQuHrQpiO7zWMUyVJljF11LPlE9tYg=;
- b=H0vyucP9BSwZUEQNPOZEPuts4b+yyofuoJUNP/HSCSwPCLMWmJJ99igcopygeqQGi/
- WwNN1DgImB8Flb4nLyMJNYRholzfCNGaofS4Npzjn9wbU5F5RXd3ZuJumDS4e/vryJ7t
- Hme0/Z+uF0mQ2APeN1Sm6H5giwNNlWd3YUqugrVM3hK0cem5ZMQERDktwf2QC89kDKGH
- JbRRT1RlfP967/PAWoE/jEIFPg5Ku0EQ9ezqzYMbwAwOHc4uQvU6pn3WL5BdG6HVWRYP
- cPbY5KbzSKHgbyFMnKZzmtm1usNXwdQteorHE5O4rBsgDpSUKVbtFk/mTjsiWo999gdK
- 6R/w==
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=DR7G6fqST4DGgaQEMsHDS7bxbufaO21QgHcV0e/spsU=;
+ b=q/HEsNaBbMPCCQZ/GiNlC/vPctg6uD/580tPIPw8Kwkp6xejkeCyAgNfDwguysvdeb
+ PuoIatsOmhgCR0AVKEeYbPWSPtoyGuwt4jrfoH9c1+D+7fkCz3HcWymxjMMS2Kl8gtUf
+ STYJrtQz/O9PHak1cmbZVoKia6vPhC9q4kt3pqQ/M5J0suXpjMOsRxxUhN4yg1/eB7/O
+ 6WxABfVOcdTl+FjhaXO5mRgGkzXv+3XehbwrdLkNt2c3PX1nfVMZGke54D75zM2IvYQ5
+ oK21QaLbCbkRBE4RJaoz4Jtc7g5aqmyF120pyMBOFxNIwpId24SMS+rMRCiC2k3vhLEt
+ tW8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=ISGs5OEQLGnXagQuHrQpiO7zWMUyVJljF11LPlE9tYg=;
- b=kh3B9BrxXuIwTXp37I5K4q7jefYr7eO6qdYC5bnzEnhPR+Q2HeudIcGztqNEztF8ox
- o2eDPHAc7+Vd0RQmbGrr+Tr1Fke/jF7bYI9QsXSwTBa189gb4MUnbBqcRqEICd7/wO0/
- CxNHtjmNlmwrX9GB4WaQrKIDysKYAZMjVZzXEvcb30CHzAIMmjcbmQlJCgUNGujTIpav
- BA0KtiDw6PcPgp1yO0Dm+0l7eNM8TZm8nBDvBiHPKcf6QEZYZZxsGSSGc75FUGazUJ6b
- CmCBH5UCmSrekx3visD/QEVWh9fhQSkDTIUfDuHQ5KGRS+4Ulz/KKxMJNKSLc734lFyO
- eNvA==
-X-Gm-Message-State: AOAM533HtZGCZYNLAIuAM1resLLqYdTy2hDpUm1GS8p7cbEMzREM+Ahu
- jXIoP0GU4r4tJJlwkA0NJQkWsts34mY+uA==
-X-Google-Smtp-Source: ABdhPJxpAQWaGLW3bm79J50b98xUfkYvTEoD/zdL6Aqu9iSv8ZafP2dcTjLo39K25JbubPRaUENrHA==
-X-Received: by 2002:a63:d251:: with SMTP id t17mr7021974pgi.280.1601573724208; 
- Thu, 01 Oct 2020 10:35:24 -0700 (PDT)
-Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id b7sm4445646pjq.1.2020.10.01.10.35.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 01 Oct 2020 10:35:23 -0700 (PDT)
-From: Yonggang Luo <luoyonggang@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/2] doc: Remove texi referenced in qemu-img-cmds.hx and
- target/i386/cpu.c
-Date: Fri,  2 Oct 2020 01:35:03 +0800
-Message-Id: <20201001173503.1107-2-luoyonggang@gmail.com>
-X-Mailer: git-send-email 2.28.0.windows.1
-In-Reply-To: <20201001173503.1107-1-luoyonggang@gmail.com>
-References: <20201001173503.1107-1-luoyonggang@gmail.com>
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=DR7G6fqST4DGgaQEMsHDS7bxbufaO21QgHcV0e/spsU=;
+ b=BuoEv02kW9DCaJ3yFe8EGLI6jIzuFAG7qma9bNOkR4gN2R3ruEsIX9euVwheTz8FjM
+ jZjTC4RT/P3rivdw9ywZ+iOhrahHuKJBnJpsyUs/fI2FWWLcMbkd9TFNOgrb+fKSwx04
+ WsgBM/yISWWzCrCVC99S6g+oQZEsWKo9Rdlab+DMND5mPBinU/fOanPkh1RFYJZUwyjv
+ rLH0gFXRqZFXT3liWcj7jHKomSiyOxOilAbL5D5kvPhjN9c8JyIP/rj3oBYpG8lFtsNp
+ 5ZERTXh7sUbhIr0Z/+QZ2dGAuPsWwiwsRyMh9+Z7VMz9XCAJClAZvs/uzH9PIpOsQTyX
+ Z9pg==
+X-Gm-Message-State: AOAM532iru+M7zQIKWI66uLbUNRvJgWcoM/IDWFTljnfgLRi3t2Idvy6
+ aD3iKnBx46kDCj1sjCaqcQ4=
+X-Google-Smtp-Source: ABdhPJyDFPi44TTSBA9HnvV6gCiPpL5kGylcu2JhqQtGBfO+PRvI0TxLnp9eesTELKKb/cCPodwVGw==
+X-Received: by 2002:a7b:cc84:: with SMTP id p4mr1200931wma.58.1601574198131;
+ Thu, 01 Oct 2020 10:43:18 -0700 (PDT)
+Received: from [192.168.1.36] (74.red-83-53-161.dynamicip.rima-tde.net.
+ [83.53.161.74])
+ by smtp.gmail.com with ESMTPSA id s12sm894108wmd.20.2020.10.01.10.43.16
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 01 Oct 2020 10:43:17 -0700 (PDT)
+Subject: Re: [PULL v2 13/15] hw/rx: Add RX GDB simulator
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200622191746.18031-1-f4bug@amsat.org>
+ <20200622191746.18031-2-f4bug@amsat.org>
+ <CAFEAcA9SK1BmrY9_LO6ERy-e22rXOVUP1+vSmUYSTEwWywuzuA@mail.gmail.com>
+ <24fc5d34-8af3-53cb-3257-62b3b07defcb@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <7bcad3ac-b2a1-7bab-cc33-668518b7cf75@amsat.org>
+Date: Thu, 1 Oct 2020 19:43:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
+In-Reply-To: <24fc5d34-8af3-53cb-3257-62b3b07defcb@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
- envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x442.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-Spam_score_int: -19
+X-Spam_score: -2.0
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.26,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -99,45 +108,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Yonggang Luo <luoyonggang@gmail.com>, QEMU Trivial <qemu-trivial@nongnu.org>
+Cc: Yoshinori Sato <ysato@users.sourceforge.jp>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There is no texi document anymore
+On 9/9/20 7:56 PM, Philippe Mathieu-Daudé wrote:
+> Hi Yoshinori,
+> 
+> On 9/7/20 3:13 PM, Peter Maydell wrote:
+>> On Mon, 22 Jun 2020 at 20:20, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>>
+>>> From: Yoshinori Sato <ysato@users.sourceforge.jp>
+>>>
+>>> Add the RX machine internally simulated in GDB.
+>>
+>> Hi; Coverity points out a memory leak (CID 1432307) in this function:
+>>
+>>> +static void rx_gdbsim_init(MachineState *machine)
+>>> +{
+>>
+>>> +        if (dtb_filename) {
+>>> +            ram_addr_t dtb_offset;
+>>> +            int dtb_size;
+>>> +            void *dtb;
+>>> +
+>>> +            dtb = load_device_tree(dtb_filename, &dtb_size);
+>>
+>> This allocates memory...
+>>
+>>> +            if (dtb == NULL) {
+>>> +                error_report("Couldn't open dtb file %s", dtb_filename);
+>>> +                exit(1);
+>>> +            }
+>>> +            if (machine->kernel_cmdline &&
+>>> +                qemu_fdt_setprop_string(dtb, "/chosen", "bootargs",
+>>> +                                        machine->kernel_cmdline) < 0) {
+>>> +                error_report("Couldn't set /chosen/bootargs");
+>>> +                exit(1);
+>>> +            }
+>>> +            /* DTB is located at the end of SDRAM space. */
+>>> +            dtb_offset = machine->ram_size - dtb_size;
+>>> +            rom_add_blob_fixed("dtb", dtb, dtb_size,
+>>> +                               SDRAM_BASE + dtb_offset);
+>>
+>> ...and rom_add_blob_fixed() copies that memory, it doesn't take
+>> ownership of it, so after we've called it we need to
+>>     g_free(fdt);
+> 
+> Can you send a patch to fix this please?
 
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
----
- qemu-img-cmds.hx  | 2 +-
- target/i386/cpu.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ping?
 
-diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
-index b89c019b76..cab8234235 100644
---- a/qemu-img-cmds.hx
-+++ b/qemu-img-cmds.hx
-@@ -1,5 +1,5 @@
- HXCOMM Keep the list of subcommands sorted by name.
--HXCOMM Use DEFHEADING() to define headings in both help text and texi
-+HXCOMM Use DEFHEADING() to define headings in both help text and rST
- HXCOMM Text between SRST and ERST are copied to rST version and
- HXCOMM discarded from C version
- HXCOMM DEF(command, callback, arg_string) is used to construct
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index f37eb7b675..f8231f56b6 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -4127,7 +4127,7 @@ static PropValue tcg_default_props[] = {
-  * We resolve CPU model aliases using -v1 when using "-machine
-  * none", but this is just for compatibility while libvirt isn't
-  * adapted to resolve CPU model versions before creating VMs.
-- * See "Runnability guarantee of CPU models" at * qemu-deprecated.texi.
-+ * See "Runnability guarantee of CPU models" at * deprecated.rst.
-  */
- X86CPUVersion default_cpu_version = 1;
- 
--- 
-2.28.0.windows.1
+> 
+>>
+>>> +            /* Set dtb address to R1 */
+>>> +            RXCPU(first_cpu)->env.regs[1] = SDRAM_BASE + dtb_offset;
+>>> +        }
+>>> +    }
+>>
+>> thanks
+>> -- PMM
+>>
+> 
 
 
