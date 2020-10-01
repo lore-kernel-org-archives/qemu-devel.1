@@ -4,95 +4,123 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC0D1C47423
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 17:55:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BB74C4741F
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 17:55:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2608B22207
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 17:55:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E1CC921707
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 17:55:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M7g4MSkN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2608B22207
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CgGUoduN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1CC921707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kO2nG-0004xH-MX
-	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 13:55:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34656)
+	id 1kO2ni-0005jv-NR
+	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 13:55:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60400)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kO2YV-0003c6-9E
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 13:39:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52346)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kO2NK-00081e-TE
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 13:28:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37032)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kO2YT-0005nU-HB
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 13:39:47 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kO2NI-0004by-NX
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 13:28:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601573977;
+ s=mimecast20190719; t=1601573289;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=vdKnzQC7OvgfaF8qc5DfBGDdy/pgB0tgqxXcU+y1lJE=;
- b=M7g4MSkNj7P5uC8hV/qpFAc89K8yWqC/4P0InCDGAwvGN5m8AKGKyoVl9dea+qiyJvqEsz
- q6f+AUnluhzvKNrYJYFm+RjdWBZ0dxw0Qh0hZd1kwvWordj2AfZDfq+3Q4YPWEp4ZoWeQZ
- nLfC9rqAb6uyEmRckRWhDFjLmgznIiA=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-27-0NM8dm4OOvO5Az1M8H75ZA-1; Thu, 01 Oct 2020 13:39:36 -0400
-X-MC-Unique: 0NM8dm4OOvO5Az1M8H75ZA-1
-Received: by mail-wr1-f70.google.com with SMTP id g6so2349708wrv.3
- for <qemu-devel@nongnu.org>; Thu, 01 Oct 2020 10:39:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=vdKnzQC7OvgfaF8qc5DfBGDdy/pgB0tgqxXcU+y1lJE=;
- b=OFOd2WueVOaCwPBaDuO4gDDNWeocWYIh2S/jm95ObtJ0A/uHglJdp5eydcMbgJ0jT3
- XJW1FMy7nk53oZbG0zbpfpQCBiijB5vQjjjjAdw1o5dkUSZAkWcC2SSGxjUFZuWuak6t
- c9DUcFGmGV+ucGrDnl9L+8U02T8T2LCe7ksr/jtUbstq9OeP5Vj5jww98lSwb9RX+p4C
- +1chFrEuSFY2hTqV/N/a++Ehv09vJ0ef4Dy3sLcG/tj0ECqNqBbYVPJb4qvXPR0JIZTp
- N1G/DIagJMdc3zrve4A0hFpUNKTozcwhDT1RidKqITxM2Z98MDgf/ENzgNKfI1KGw56i
- +hrg==
-X-Gm-Message-State: AOAM5332RzcOwkHYPxnSsGj9WmG8iG5ATPLJy+mRF6FgplH/xYZPbT+Q
- DeUqkQW7y9TROivWiXjf1qez/EpifAkQlpyFukrYQNoX6WIiHGh1YJntA4qm5Cq4qQfslkQBfxg
- G8U5XLrMvbqgh4GI=
-X-Received: by 2002:adf:9e05:: with SMTP id u5mr10214098wre.78.1601573975184; 
- Thu, 01 Oct 2020 10:39:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzFG38XqySDse+n104PsikO+ZWX3Zb+X+g2Q5vs3MUFXtf0TsqsOYGaXAUT97M7FsvnWe8idQ==
-X-Received: by 2002:adf:9e05:: with SMTP id u5mr10214075wre.78.1601573974925; 
- Thu, 01 Oct 2020 10:39:34 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:86de:492a:fae3:16f2?
- ([2001:b07:6468:f312:86de:492a:fae3:16f2])
- by smtp.gmail.com with ESMTPSA id o129sm996755wmb.25.2020.10.01.10.39.33
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 01 Oct 2020 10:39:34 -0700 (PDT)
-Subject: Re: [PATCH v6 0/4] Fixes curses on msys2/mingw
-To: Yonggang Luo <luoyonggang@gmail.com>, qemu-devel@nongnu.org
-References: <20201001173230.829-1-luoyonggang@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <89710921-1d64-14fd-f8ce-05ee58f412c5@redhat.com>
-Date: Thu, 1 Oct 2020 19:39:33 +0200
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=wDoHdzoesQVFz7Aw+AwSeN8FBVe2o3ehF8dLRMZWWjQ=;
+ b=CgGUoduNEOBTOW6YG3RwdDQtRrQ3OUwK86CnBFERwejKcltE2+E3rZAXZ9thkSXbeutST+
+ 5l5MRguMnKOCMnqDjU01KxJXLHlstXyWcivS08DwZXI4mWCneAZcPqRDrSWcyCNCSV4JcH
+ q5o3n5+ZUB96aW/lWxXYhvtc3zunuh4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-473-3y2DK4zlMdi9TsCQF5YEUg-1; Thu, 01 Oct 2020 13:28:06 -0400
+X-MC-Unique: 3y2DK4zlMdi9TsCQF5YEUg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18BC51DE00;
+ Thu,  1 Oct 2020 17:28:05 +0000 (UTC)
+Received: from [10.36.112.77] (ovpn-112-77.ams2.redhat.com [10.36.112.77])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DB35419C78;
+ Thu,  1 Oct 2020 17:28:03 +0000 (UTC)
+Subject: Re: [PATCH v1 02/20] s390x/tcg: Implement VECTOR BIT PERMUTE
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200930145523.71087-1-david@redhat.com>
+ <20200930145523.71087-3-david@redhat.com>
+ <84292bd0-7751-1cc8-afc8-83b40d89a754@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat GmbH
+Message-ID: <04d983fd-442e-b4b8-8c83-2c9a9d91f0b0@redhat.com>
+Date: Thu, 1 Oct 2020 19:28:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20201001173230.829-1-luoyonggang@gmail.com>
+In-Reply-To: <84292bd0-7751-1cc8-afc8-83b40d89a754@linaro.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=david@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 04:25:37
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -116,47 +144,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>, Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+ Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 01/10/20 19:32, Yonggang Luo wrote:
-> And also convert related configure script to meson.
-> V5-V6
-> Dropping configure: Fixes ncursesw detection under msys2/mingw by convert the=
-> m to meson first.
-> That need the meson 0.56 upstream to fixes the curses detection.
-> Add
-> * configure: fixes indent of $meson setup
+On 01.10.20 17:17, Richard Henderson wrote:
+> On 9/30/20 9:55 AM, David Hildenbrand wrote:
+>> +        bit = !!(s390_vec_read_element8(v2, bit_nr / 8) &
+>> +                 (0x80 >> (bit_nr % 8)));
 > 
-> Yonggang Luo (4):
->   configure: fixes indent of $meson setup
->   curses: Fixes compiler error that complain don't have langinfo.h on
->     msys2/mingw
->   curses: Fixes curses compiling errors.
->   win32: Simplify gmtime_r detection not depends on if  _POSIX_C_SOURCE
->     are defined on msys2/mingw
+> I think this would be clearer as
 > 
->  configure                 | 42 ++++-----------------------------------
->  include/sysemu/os-win32.h |  4 ++--
->  ui/curses.c               | 14 ++++++-------
->  util/oslib-win32.c        |  4 ++--
->  4 files changed, 15 insertions(+), 49 deletions(-)
+>   bit = (s390_vec_read_element8(v2, bit_nr / 8)
+>          >> (7 - (bit_nr % 8))) & 1;
+
+Can do, thanks!
+
 > 
-> --=20
-> 2.28.0.windows.1
+> Otherwise,
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 > 
+> 
+> r~
 > 
 
-Looks good (though there is no conversion to meson yet in this version).
 
-Not trivial, but perhaps Gerd can take it?
+-- 
+Thanks,
 
-Paolo
+David / dhildenb
 
 
