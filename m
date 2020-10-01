@@ -2,87 +2,131 @@ Return-Path: <SRS0=M6H1=DI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C211C4727C
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 10:08:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33236C47420
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 10:12:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71A202137B
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 10:08:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BDA9E21531
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 10:12:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bZvP8wfk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71A202137B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UgsT8neU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDA9E21531
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNvWA-0001oK-Aw
-	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 06:08:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56344)
+	id 1kNvZy-00032f-Re
+	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 06:12:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56830)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kNvVD-0001M4-Ut
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 06:07:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38012)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kNvYR-0002Vx-6I
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 06:11:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29468)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kNvVA-0006mp-OI
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 06:07:54 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kNvYP-00079c-Oj
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 06:11:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601546871;
+ s=mimecast20190719; t=1601547073;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=St6e7zk6zp84xDX13u9TEBD5G/28tvinQJMCO+PXUbQ=;
- b=bZvP8wfkupTYpr5n3CN5K4Wy049iTboY0VrTPF9xOXxmjyJlOLH+lkTM12vFkzq6yfPcxQ
- HB8odhaWsCxJQaULK9ld1nr87qltSWA1276YzawmL6lfg9BQIRYxwqWzpsK21YzKd7uA+K
- JEj2ONqoFVQv0vjjgHPiBps1kJoQXgU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-594-fKpBq8ZRP4ynCTP7acytLg-1; Thu, 01 Oct 2020 06:07:47 -0400
-X-MC-Unique: fKpBq8ZRP4ynCTP7acytLg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C542A1007466;
- Thu,  1 Oct 2020 10:07:44 +0000 (UTC)
-Received: from gondolin (ovpn-112-102.ams2.redhat.com [10.36.112.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4A6745579A;
- Thu,  1 Oct 2020 10:07:33 +0000 (UTC)
-Date: Thu, 1 Oct 2020 12:07:30 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH v26 09/17] vfio: Add load state functions to SaveVMHandlers
-Message-ID: <20201001120730.36eb76dd.cohuck@redhat.com>
-In-Reply-To: <1600817059-26721-10-git-send-email-kwankhede@nvidia.com>
-References: <1600817059-26721-1-git-send-email-kwankhede@nvidia.com>
- <1600817059-26721-10-git-send-email-kwankhede@nvidia.com>
-Organization: Red Hat GmbH
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=0jBGbmeL4lcA0BEOQVaUl4HJp9b/4o3tsk7PRGW4L9k=;
+ b=UgsT8neUNXLOPknCD4vpDuGPvW7hFr2r2knmZH3WYEB67lFPChZNU+j/x5/hXS0/1fB4na
+ i75SVNblidsLpJXAODIOV/MhL/VxjB1k0xaHWrGtX3+/HL1KQSY8Ezq9J9LG4aIE/lSn3S
+ 3Fzx3gFHFb9P6pKG8fQW01FNVkviJf4=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-239-4wxfMsIIPoCyWO1hwCu3_Q-1; Thu, 01 Oct 2020 06:11:09 -0400
+X-MC-Unique: 4wxfMsIIPoCyWO1hwCu3_Q-1
+Received: by mail-wm1-f69.google.com with SMTP id t8so748269wmj.6
+ for <qemu-devel@nongnu.org>; Thu, 01 Oct 2020 03:11:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=0jBGbmeL4lcA0BEOQVaUl4HJp9b/4o3tsk7PRGW4L9k=;
+ b=i40smpueK83WzwKPLAz/aOtYFW1uPRvfpH8qqKlld4RmOfmvmsxiLIt48VhTQEkN0i
+ keHRK0E19Lsg8MQaEIM6npm4EIka/bmoQnDQ43zvbZjXk3k9O9hDaB+LpOja2JDjBrxj
+ d/bCh7ZQJMVHitEmgqzgneOl23gqzNR6MS99cux7YAeVOueVTP4N35gKL6q3pT4nRm3Y
+ OoTaAXn7OgmQPPGibfxC4Z0LlQcGQBaNETRmbcCO9Jml5bsFdFDtwB4Broo854sfq0tv
+ E6075vrVDqOSht7vmBX5XOL1NQ7MXg8cmZex7QK8tccZjSz+H97TejhSl4rgLXsmNUjU
+ njIQ==
+X-Gm-Message-State: AOAM533rjntAivbPtWsnH9MRw7Kr29q9vNBLkd+eZ2Jtb8da5ewOY/0P
+ VR/oh20/F8dR2Nxr0qg3KY7V90Gy4dLnOTZ0FCY4h5Ibzk8q1p6IQTRna70eZVSs82F++4A3oYn
+ BdO780ht2EbvUiGY=
+X-Received: by 2002:adf:e7c4:: with SMTP id e4mr7824909wrn.113.1601547068298; 
+ Thu, 01 Oct 2020 03:11:08 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwL0XqYsU5B0BYMwJkEU2e0WjZOhut4AlqleI0kd95O0dZ7NEpdyEFWGeHp/6+/BXH5Ea9heA==
+X-Received: by 2002:adf:e7c4:: with SMTP id e4mr7824887wrn.113.1601547068114; 
+ Thu, 01 Oct 2020 03:11:08 -0700 (PDT)
+Received: from [192.168.1.36] (74.red-83-53-161.dynamicip.rima-tde.net.
+ [83.53.161.74])
+ by smtp.gmail.com with ESMTPSA id z13sm8054049wro.97.2020.10.01.03.11.06
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 01 Oct 2020 03:11:07 -0700 (PDT)
+Subject: Re: [PATCH 2/9] hw/block/nvme: fix log page offset check
+To: Keith Busch <kbusch@kernel.org>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, Klaus Jensen <k.jensen@samsung.com>
+References: <20200930220414.562527-1-kbusch@kernel.org>
+ <20200930220414.562527-3-kbusch@kernel.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <981f1254-3a97-8564-38df-377e928e0814@redhat.com>
+Date: Thu, 1 Oct 2020 12:11:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20200930220414.562527-3-kbusch@kernel.org>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=cohuck@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 02:15:30
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 04:25:37
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -25
 X-Spam_score: -2.6
 X-Spam_bar: --
 X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.469,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,260 +139,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cjia@nvidia.com, aik@ozlabs.ru, Zhengxiao.zx@Alibaba-inc.com,
- shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, peterx@redhat.com,
- eauger@redhat.com, yi.l.liu@intel.com, quintela@redhat.com,
- ziye.yang@intel.com, armbru@redhat.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, felipe@nutanix.com, zhi.a.wang@intel.com,
- kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
- alex.williamson@redhat.com, changpeng.liu@intel.com, eskultet@redhat.com,
- Ken.Xue@amd.com, jonathan.davies@nutanix.com, pbonzini@redhat.com
+Cc: Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+ Niklas Cassel <Niklas.Cassel@wdc.com>, Kevin Wolf <kwolf@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 23 Sep 2020 04:54:11 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
-
-> Sequence  during _RESUMING device state:
-> While data for this device is available, repeat below steps:
-> a. read data_offset from where user application should write data.
-> b. write data of data_size to migration region from data_offset.
-> c. write data_size which indicates vendor driver that data is written in
->    staging buffer.
+On 10/1/20 12:04 AM, Keith Busch wrote:
+> Return error if the requested offset starts after the size of the log
+> being returned. Also, move the check for earlier in the function so
+> we're not doing unnecessary calculations.
 > 
-> For user, data is opaque. User should write data in the same order as
-> received.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
 > ---
->  hw/vfio/migration.c  | 170 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  hw/vfio/trace-events |   3 +
->  2 files changed, 173 insertions(+)
-> 
-> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> index 4611bb972228..ffd70282dd0e 100644
-> --- a/hw/vfio/migration.c
-> +++ b/hw/vfio/migration.c
-> @@ -328,6 +328,33 @@ static int vfio_save_device_config_state(QEMUFile *f, void *opaque)
->      return qemu_file_get_error(f);
->  }
->  
-> +static int vfio_load_device_config_state(QEMUFile *f, void *opaque)
-> +{
-> +    VFIODevice *vbasedev = opaque;
-> +    uint64_t data;
-> +
-> +    if (vbasedev->ops && vbasedev->ops->vfio_load_config) {
-> +        int ret;
-> +
-> +        ret = vbasedev->ops->vfio_load_config(vbasedev, f);
-> +        if (ret) {
-> +            error_report("%s: Failed to load device config space",
-> +                         vbasedev->name);
-> +            return ret;
-> +        }
-> +    }
-> +
-> +    data = qemu_get_be64(f);
-> +    if (data != VFIO_MIG_FLAG_END_OF_STATE) {
-> +        error_report("%s: Failed loading device config space, "
-> +                     "end flag incorrect 0x%"PRIx64, vbasedev->name, data);
+>  hw/block/nvme.c | 22 ++++++++++------------
+>  1 file changed, 10 insertions(+), 12 deletions(-)
 
-I'm confused here: If we don't have a vfio_load_config callback, or if
-that callback did not read everything, we also might end up with a
-value that's not END_OF_STATE... in that case, the problem is not with
-the stream, but rather with the consumer?
-
-> +        return -EINVAL;
-> +    }
-> +
-> +    trace_vfio_load_device_config_state(vbasedev->name);
-> +    return qemu_file_get_error(f);
-> +}
-> +
->  /* ---------------------------------------------------------------------- */
->  
->  static int vfio_save_setup(QEMUFile *f, void *opaque)
-> @@ -502,12 +529,155 @@ static int vfio_save_complete_precopy(QEMUFile *f, void *opaque)
->      return ret;
->  }
->  
-> +static int vfio_load_setup(QEMUFile *f, void *opaque)
-> +{
-> +    VFIODevice *vbasedev = opaque;
-> +    VFIOMigration *migration = vbasedev->migration;
-> +    int ret = 0;
-> +
-> +    if (migration->region.mmaps) {
-> +        ret = vfio_region_mmap(&migration->region);
-> +        if (ret) {
-> +            error_report("%s: Failed to mmap VFIO migration region %d: %s",
-> +                         vbasedev->name, migration->region.nr,
-> +                         strerror(-ret));
-> +            error_report("%s: Falling back to slow path", vbasedev->name);
-> +        }
-> +    }
-> +
-> +    ret = vfio_migration_set_state(vbasedev, ~VFIO_DEVICE_STATE_MASK,
-> +                                   VFIO_DEVICE_STATE_RESUMING);
-> +    if (ret) {
-> +        error_report("%s: Failed to set state RESUMING", vbasedev->name);
-> +    }
-> +    return ret;
-
-If I follow the code correctly, the cleanup callback will not be
-invoked if you return != 0 here... should you clean up possible
-mappings on error here?
-
-> +}
-> +
-> +static int vfio_load_cleanup(void *opaque)
-> +{
-> +    vfio_save_cleanup(opaque);
-> +    return 0;
-> +}
-> +
-> +static int vfio_load_state(QEMUFile *f, void *opaque, int version_id)
-> +{
-> +    VFIODevice *vbasedev = opaque;
-> +    VFIOMigration *migration = vbasedev->migration;
-> +    int ret = 0;
-> +    uint64_t data, data_size;
-> +
-> +    data = qemu_get_be64(f);
-> +    while (data != VFIO_MIG_FLAG_END_OF_STATE) {
-> +
-> +        trace_vfio_load_state(vbasedev->name, data);
-> +
-> +        switch (data) {
-> +        case VFIO_MIG_FLAG_DEV_CONFIG_STATE:
-> +        {
-> +            ret = vfio_load_device_config_state(f, opaque);
-> +            if (ret) {
-> +                return ret;
-> +            }
-> +            break;
-> +        }
-> +        case VFIO_MIG_FLAG_DEV_SETUP_STATE:
-> +        {
-> +            data = qemu_get_be64(f);
-> +            if (data == VFIO_MIG_FLAG_END_OF_STATE) {
-> +                return ret;
-> +            } else {
-> +                error_report("%s: SETUP STATE: EOS not found 0x%"PRIx64,
-> +                             vbasedev->name, data);
-> +                return -EINVAL;
-> +            }
-> +            break;
-> +        }
-> +        case VFIO_MIG_FLAG_DEV_DATA_STATE:
-> +        {
-> +            VFIORegion *region = &migration->region;
-> +            uint64_t data_offset = 0, size;
-
-I think this function would benefit from splitting this off into a
-function handling DEV_DATA_STATE. It is quite hard to follow through
-all the checks and find out when we continue, and when we break off.
-
-Some documentation about the markers would also be really helpful.
-The logic seems to be:
-- DEV_CONFIG_STATE has config data and must be ended by END_OF_STATE
-- DEV_SETUP_STATE has only END_OF_STATE, no data
-- DEV_DATA_STATE has... data; if there's any END_OF_STATE, it's buried
-  far down in the called functions
-
-
-> +
-> +            data_size = size = qemu_get_be64(f);
-> +            if (data_size == 0) {
-> +                break;
-> +            }
-> +
-> +            ret = vfio_mig_read(vbasedev, &data_offset, sizeof(data_offset),
-> +                                region->fd_offset +
-> +                                offsetof(struct vfio_device_migration_info,
-> +                                         data_offset));
-> +            if (ret < 0) {
-> +                return ret;
-> +            }
-> +
-> +            trace_vfio_load_state_device_data(vbasedev->name, data_offset,
-> +                                              data_size);
-> +
-> +            while (size) {
-> +                void *buf = NULL;
-> +                uint64_t sec_size;
-> +                bool buf_alloc = false;
-> +
-> +                buf = get_data_section_size(region, data_offset, size,
-> +                                            &sec_size);
-> +
-> +                if (!buf) {
-> +                    buf = g_try_malloc(sec_size);
-> +                    if (!buf) {
-> +                        error_report("%s: Error allocating buffer ", __func__);
-> +                        return -ENOMEM;
-> +                    }
-> +                    buf_alloc = true;
-> +                }
-> +
-> +                qemu_get_buffer(f, buf, sec_size);
-> +
-> +                if (buf_alloc) {
-> +                    ret = vfio_mig_write(vbasedev, buf, sec_size,
-> +                                         region->fd_offset + data_offset);
-> +                    g_free(buf);
-> +
-> +                    if (ret < 0) {
-> +                        return ret;
-> +                    }
-> +                }
-> +                size -= sec_size;
-> +                data_offset += sec_size;
-> +            }
-> +
-> +            ret = vfio_mig_write(vbasedev, &data_size, sizeof(data_size),
-> +                                 region->fd_offset +
-> +                       offsetof(struct vfio_device_migration_info, data_size));
-> +            if (ret < 0) {
-> +                return ret;
-> +            }
-> +            break;
-> +        }
-> +
-> +        default:
-> +            error_report("%s: Unknown tag 0x%"PRIx64, vbasedev->name, data);
-> +            return -EINVAL;
-> +        }
-> +
-> +        data = qemu_get_be64(f);
-> +        ret = qemu_file_get_error(f);
-> +        if (ret) {
-> +            return ret;
-> +        }
-> +    }
-> +
-> +    return ret;
-> +}
-> +
->  static SaveVMHandlers savevm_vfio_handlers = {
->      .save_setup = vfio_save_setup,
->      .save_cleanup = vfio_save_cleanup,
->      .save_live_pending = vfio_save_pending,
->      .save_live_iterate = vfio_save_iterate,
->      .save_live_complete_precopy = vfio_save_complete_precopy,
-> +    .load_setup = vfio_load_setup,
-> +    .load_cleanup = vfio_load_cleanup,
-
-Unrelated to this patch: It's a bit odd that load_cleanup() (unlike
-save_cleanup()) has a return code (that seems unused).
-
-> +    .load_state = vfio_load_state,
->  };
->  
->  /* ---------------------------------------------------------------------- */
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 
