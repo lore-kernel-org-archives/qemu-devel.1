@@ -7,88 +7,91 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D9A3C4727E
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 21:52:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BEC7C4727F
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 21:56:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AAE1E206C9
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 21:52:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RNJtL65k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAE1E206C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id B3454206C9
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 21:56:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3454206C9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kO6VB-0001DM-I7
-	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 17:52:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60918)
+	id 1kO6YX-0002Kj-4B
+	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 17:56:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60796)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kO6U3-0000dr-IF
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 17:51:27 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37190)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kO6U0-00034a-QJ
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 17:51:27 -0400
-Received: by mail-wr1-x444.google.com with SMTP id z4so362398wrr.4
- for <qemu-devel@nongnu.org>; Thu, 01 Oct 2020 14:51:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kO6Tm-0000Yo-4N; Thu, 01 Oct 2020 17:51:10 -0400
+Received: from new3-smtp.messagingengine.com ([66.111.4.229]:43859)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kO6Tj-00032F-Au; Thu, 01 Oct 2020 17:51:09 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+ by mailnew.nyi.internal (Postfix) with ESMTP id ECC0158037C;
+ Thu,  1 Oct 2020 17:51:05 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+ by compute4.internal (MEProxy); Thu, 01 Oct 2020 17:51:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
  h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=7Pi2MLqv9eXoByMXGqOMrEtbyvdvwGhIllgml8Al4t0=;
- b=RNJtL65ksVu4fuKTPMzDNBBB8MUL0ykcWhBIkOW/YGSEcAP+PBOsNehssXrYESJWEI
- SsJF4t55AHGjVKd4iQLhtD8Y+SJAxr+Xp+eWkXBU1CI05Kwg9vGYedjIy4CqkfkUf1P0
- 5uOn3sgDESSxXx4XAp5Ublc9LaN3H5zUxYNBedIBUnuSoP1wQ9vp55KY/7x0MeLXrmMu
- 6k/F2dvx+aqFQRhjZI1ua2Z6q+h0KDgdwqR6IaXgj+igYWrd/0xRjPrT3xavBGsugtNK
- 0Gcxoa9TCHcudLi06SeCcEfDUacXsNi9ArDfFKLYW+Ta+C+E6fxCM8Y+xWxznjILKa2Y
- nXiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=7Pi2MLqv9eXoByMXGqOMrEtbyvdvwGhIllgml8Al4t0=;
- b=Jn4SApRlWipzRR9WlWWPcuQwflZYKqxUz+yoywcYsO1wWbE82DmLk6R1fpL3ztcd1u
- scd9FyLZIRlM9Xu9B1s8Qv3WuR/diPBHURurWTdNgm9LKgVHUMhHyHBka70bhgJoHmZb
- c4yLFrdozTTF4SUvsrms3T0S4kZ2hXVp4lf6wDVL/UpBNVtWhNhR0DvDfMND4pb97hhQ
- Rv+4Ot5keG2e8n9e/2V0zfb8/4/V0y2z3VMBlr4xCMfrxCq1Q+MaWk16QE3if+sfxY12
- A8FpEj2uq7qR/06JBCTuU+NT9EwejYIh6eFeLeG8EZUwPEy5E67s9p7Kr9MxLv01Ny5K
- ptCg==
-X-Gm-Message-State: AOAM530EcP3cwTSIGnh16DlVpKxmdQacdKnWmIxcqowFLnda1t0H525T
- QW52AdEMNlL/rlXaFQzM5aViHw==
-X-Google-Smtp-Source: ABdhPJwc2F+4faW9HRTZZAsZAS9s8yBLHkHwSY4hm1IordkiXNOLwWBhvo+3rgaIfspaBSomKWvVEg==
-X-Received: by 2002:adf:82ce:: with SMTP id 72mr11103641wrc.404.1601589082944; 
- Thu, 01 Oct 2020 14:51:22 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id t5sm11280966wrb.21.2020.10.01.14.51.21
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 01 Oct 2020 14:51:21 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 398DD1FF7E;
- Thu,  1 Oct 2020 22:51:21 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+ :content-transfer-encoding; s=fm1; bh=69KbuJ5TP5kHHpffzp5vYjWymk
+ RtPuJpGFhuSRVXHfQ=; b=JHWdse2HiJG3rtPOC2EA8BVhNi00rS+2eAWgLkBddV
+ xD4DfyrbR4plHCe4FhEd2UF3mlKzGk31kOpeRa6hQj/e/Ifnt+ou9QhHqBljFr7m
+ mztNQCQOTruuYnKWBJKsztN+rM+F7i/OfLIFRFHQhr3/dRgwIPh2H2m8E3iCRGtY
+ JScYBEJzG9UkUJUVRBNcS9qRgONxnC8I1kmsy8jJUpV7B+QypB4NG7DrT+orA0YI
+ li1YFpwl7ZGcc9dIIWYPxUThv7A0Y7jm/vj5x1xeEXQZoOBXeY+sc6By7lZ/drBl
+ 0OFo9LVYACb0Ok4OQQUiK+fSk/41SKyH8vISO0n9CtFQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-transfer-encoding:date:from
+ :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
+ :x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=69KbuJ5TP5kHHpffz
+ p5vYjWymkRtPuJpGFhuSRVXHfQ=; b=FywRjGHI8Hp0vak0rBCfaOMxDQcvlXB7+
+ nD7jOLng01DxnsA16P+4Qi1fT+PA4hWAsXfE841dMm/X57QIHMMk3HumxvjtvVga
+ lAggsJkMZnla3z1Eg0yZaGfCKFNjx7WbEE4+IBHUfPUGjm/Bs3gIagr07v/1ACUi
+ VP3RVi/ynTliXdIiC4kIqhFc339jjuvX9n202J3WQuYW2SqfPrrCY7fi9KIiBRka
+ CEgj2zV8KMpRaP9WSm2ZgbbSfRs8wEu92Hz4tOZAoHvGceuXlUYTAy9IqiKtx9i2
+ WmcYANyVd2KPjVm+fiLbxt05EZc+Rao5UrFZ2IMkAJ8KHEuu2LNAg==
+X-ME-Sender: <xms:SE92X1mzK-au76JB0yoKKLFw_tNL6P46KCPHHV-JGnkC3y_miP8RhQ>
+ <xme:SE92Xw1vvw8JZCcaZc8dl5PRfMnhfyDxlTWTci_CODW_n50qa8Oacwcz00fFVpNIY
+ w-VPBNv0zUXcsqSBg4>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrfeeggdduieekucetufdoteggodetrfdotf
+ fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+ uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+ cujfgurhephffvufffkffoggfgsedtkeertdertddtnecuhfhrohhmpefmlhgruhhsucfl
+ vghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtthgvrh
+ hnpeefveelvdeikeduueffteeggeefhedvffffjeeuueeludehvdegjeevjefhtdetheen
+ ucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedtnecurf
+ grrhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
+X-ME-Proxy: <xmx:SE92X7pOpE-YYhkzqUJ9Use6ervVHaeDqV9h73jResyKXjipUhIpNA>
+ <xmx:SE92X1kNDKx02z6RD6i5jUsrKtq7og6tk0mv9VyVaRiWzXmfJalw-A>
+ <xmx:SE92Xz1pb831mCS1qeixvm0keM8QZAcJ9LvbZDm4i4eiIWFKbnVwWg>
+ <xmx:SU92X-SgHH8GgmQyqmgl6hFU2srzbbvOrK8Dga2OAa6-4NPtCyx5pQ>
+Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by mail.messagingengine.com (Postfix) with ESMTPA id E719D328005A;
+ Thu,  1 Oct 2020 17:51:01 -0400 (EDT)
+From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] gitlab: move linux-user plugins test across to gitlab
-Date: Thu,  1 Oct 2020 22:51:14 +0100
-Message-Id: <20201001215114.28154-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
+Subject: [PATCH] hw/block/nvme: update nsid when registered
+Date: Thu,  1 Oct 2020 23:50:59 +0200
+Message-Id: <20201001215059.866660-1-its@irrelevant.dk>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Received-SPF: pass client-ip=66.111.4.229; envelope-from=its@irrelevant.dk;
+ helo=new3-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 17:51:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,84 +104,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Klaus Jensen <k.jensen@samsung.com>, Max Reitz <mreitz@redhat.com>,
+ Klaus Jensen <its@irrelevant.dk>, Keith Busch <kbusch@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Even with the recent split moving beefier plugins into contrib and
-dropping them from the check-tcg tests we are still hitting time
-limits. This possibly points to a slow down of --debug-tcg but seeing
-as we are migrating stuff to gitlab we might as well take advantage of
-the ability to properly split our builds.
+From: Klaus Jensen <k.jensen@samsung.com>
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+If the user does not specify an nsid parameter on the nvme-ns device,
+nvme_register_namespace will find the first free namespace id and assign
+that.
+
+This fix makes sure the assigned id is saved.
+
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 ---
- .gitlab-ci.yml | 23 +++++++++++++++++++++++
- .travis.yml    | 11 -----------
- 2 files changed, 23 insertions(+), 11 deletions(-)
+ hw/block/nvme.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index c265e7f8ab..cc16385d65 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -244,6 +244,29 @@ build-user:
-     CONFIGURE_ARGS: --disable-tools --disable-system
-     MAKE_CHECK_ARGS: check-tcg
- 
-+# Run check-tcg against linux-user (with plugins)
-+# we skip sparc64-linux-user until it has been fixed somewhat
-+# we skip cris-linux-user as it doesn't use the common run loop
-+build-user-plugins:
-+  <<: *native_build_job_definition
-+  variables:
-+    IMAGE: debian-all-test-cross
-+    CONFIGURE_ARGS: --disable-tools --disable-system --enable-plugins --enable-debug-tcg --target-list-exclude=sparc64-linux-user,cris-linux-user
-+    MAKE_CHECK_ARGS: build-tcg
-+  artifacts:
-+    expire_in: 2 days
-+    paths:
-+      - build
-+
-+check-user-plugins:
-+  <<: *native_test_job_definition
-+  needs:
-+    - job: build-user-plugins
-+      artifacts: true
-+  variables:
-+    IMAGE: debian-all-test-cross
-+    MAKE_CHECK_ARGS: check-tcg
-+
- build-clang:
-   <<: *native_build_job_definition
-   variables:
-diff --git a/.travis.yml b/.travis.yml
-index c255c331a7..519e62432d 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -311,17 +311,6 @@ jobs:
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
- 
- 
--    # Run check-tcg against linux-user (with plugins)
--    # we skip sparc64-linux-user until it has been fixed somewhat
--    # we skip cris-linux-user as it doesn't use the common run loop
--    - name: "GCC plugins check-tcg (user)"
--      env:
--        - CONFIG="--disable-system --enable-plugins --enable-debug-tcg --target-list-exclude=sparc64-linux-user,cris-linux-user"
--        - TEST_BUILD_CMD="make build-tcg"
--        - TEST_CMD="make check-tcg"
--        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
--
--
-     # Run check-tcg against softmmu targets
-     - name: "GCC check-tcg (some-softmmu)"
-       env:
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index da8344f196a8..bb1ee009cd31 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -2583,7 +2583,7 @@ int nvme_register_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **errp)
+         for (int i = 1; i <= n->num_namespaces; i++) {
+             NvmeNamespace *ns = nvme_ns(n, i);
+             if (!ns) {
+-                nsid = i;
++                nsid = ns->params.nsid = i;
+                 break;
+             }
+         }
 -- 
-2.20.1
+2.28.0
 
 
