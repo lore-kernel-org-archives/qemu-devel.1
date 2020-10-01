@@ -2,81 +2,70 @@ Return-Path: <SRS0=M6H1=DI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B8EDC4727E
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 18:25:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64A3BC47423
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 18:28:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA7C120754
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 18:25:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 867B520754
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 18:28:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C9/xLkGc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA7C120754
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YXAJD+Rp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 867B520754
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kO3GH-0008WR-DN
-	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 14:25:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44466)
+	id 1kO3JO-0003Ci-Ah
+	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 14:28:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45620)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1kO396-00027b-Fp
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 14:17:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57373)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kO3Cv-0005AG-QT
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 14:21:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51662)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1kO394-0002HC-41
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 14:17:35 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kO3Cs-0002pm-Na
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 14:21:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601576252;
+ s=mimecast20190719; t=1601576489;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=UXzznIjJVNS9qNIq9jmUcprvdsno5DoL8tPNsUgnK3Q=;
- b=C9/xLkGcHoSy3JcFrzcDeKoijG6sazLDT7HO02F6a/C5jXuwmh814pgjq/0PBOQWcagH0F
- CB7vBHa4IMFe4KQBUjfeNm7BitC1zyI9FNUPHafKilO7CEBPjNgWgrnSXISYROO74EXnhv
- otQsmgDVGBZEmUKgxAIqcwKTTZKc8fQ=
+ to:to:cc:cc:content-type:content-type;
+ bh=XovN2yUCiekbmBAKdpWLRIt4i1lJ0Bmc1UNkl7nCvwU=;
+ b=YXAJD+RpHjMU/w0Xw8TvcrxJtQRuuCiu/vigiRnktv0RoTA7zdmgQj3WPVVuUg1qRJ3Bg2
+ F5rFr4kjuqnc+aTEn6lFAyARh61VZ36noqzahduUqXuElr2c1vzdYIzZCRS0cAjC/WMaV/
+ 4wIbGnKiziu2Bh8GtWucHANHD/1x/98=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-1-AlIoXtmlNgOKY6xO0f9DIQ-1; Thu, 01 Oct 2020 14:17:28 -0400
-X-MC-Unique: AlIoXtmlNgOKY6xO0f9DIQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-575-pzuGm37mNd2DR_HrlrpD9A-1; Thu, 01 Oct 2020 14:21:27 -0400
+X-MC-Unique: pzuGm37mNd2DR_HrlrpD9A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8468210082EC;
- Thu,  1 Oct 2020 18:17:27 +0000 (UTC)
-Received: from kaapi (unknown [10.40.192.20])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 99C9A10013D7;
- Thu,  1 Oct 2020 18:17:24 +0000 (UTC)
-Date: Thu, 1 Oct 2020 23:47:21 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-X-X-Sender: pjp@kaapi
-To: Darren Kenny <darren.kenny@oracle.com>
-Subject: Re: About 'qemu-security' mailing list
-In-Reply-To: <m2mu166uyg.fsf@oracle.com>
-Message-ID: <nycvar.YSQ.7.78.906.2010012320290.830962@xnncv>
-References: <nycvar.YSQ.7.78.906.2009111910280.36374@xnncv>
- <CAFEAcA_9BVbqFCHJqS8jj6L3OqVNc60NCjAjRs516VyLH2EFfw@mail.gmail.com>
- <20200914101517.GD579094@stefanha-x1.localdomain>
- <nycvar.YSQ.7.78.906.2009151536090.10832@xnncv>
- <20200916111025.GA756728@stefanha-x1.localdomain>
- <nycvar.YSQ.7.78.906.2009181031500.10832@xnncv> <m2362z8dvx.fsf@oracle.com>
- <nycvar.YSQ.7.78.906.2010011502290.830962@xnncv> <m2mu166uyg.fsf@oracle.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F54710866A0;
+ Thu,  1 Oct 2020 18:21:26 +0000 (UTC)
+Received: from thuth.com (ovpn-112-107.ams2.redhat.com [10.36.112.107])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3B9175C1CF;
+ Thu,  1 Oct 2020 18:21:24 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] hw/rtc/twl92230: Silence warnings about missing fallthrough
+ statements
+Date: Thu,  1 Oct 2020 20:21:21 +0200
+Message-Id: <20201001182121.187122-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=ppandit@redhat.com;
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 04:25:37
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -86,7 +75,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,54 +88,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>,
- Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
- =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, peter.maydell@linaro.org
+Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-+-- On Thu, 1 Oct 2020, Darren Kenny wrote --+
-| The storage of reproducers would indeed be good to have in something
-| like Gitlab - but that'd require someone to extract it and store it, but
-| under what naming would be another issue... But really that's behind the
-| scenes.
+When compiling with -Werror=implicit-fallthrough, gcc complains about
+missing fallthrough annotations in this file. Looking at the code,
+the fallthrough is indeed wanted here, but instead of adding the
+annotations, it can be done more efficiently by simply calculating
+the offset with a subtraction instead of increasing a local variable
+one by one.
 
-  Yes.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/rtc/twl92230.c | 50 +++++++++++++++++++++++------------------------
+ 1 file changed, 24 insertions(+), 26 deletions(-)
+
+diff --git a/hw/rtc/twl92230.c b/hw/rtc/twl92230.c
+index f838913b37..499f421932 100644
+--- a/hw/rtc/twl92230.c
++++ b/hw/rtc/twl92230.c
+@@ -271,37 +271,36 @@ static void menelaus_gpio_set(void *opaque, int line, int level)
+ static uint8_t menelaus_read(void *opaque, uint8_t addr)
+ {
+     MenelausState *s = (MenelausState *) opaque;
+-    int reg = 0;
  
-| > Maybe we could start with a moderated list and improvise as we go forward?
-| 
-| I really think that encryption of the details of a vulnerability is 
-| important, if somehow it gets intercepted - which is not that difficult with 
-| e-mail - then there is the potential for a malicious party to exploit it 
-| before a fix is available to distros, and deployed.
-
-  Encrypted list, open to receive non-encrypted reports seems okay. Will have 
-to check how to set it up and its workflow.
+     switch (addr) {
+     case MENELAUS_REV:
+         return 0x22;
  
-| Something that has happened since the Intel Spectre/Meltdown vulnerabilities 
-| were initially brought to light is more communication between security teams 
-| in various orgs. To do this those discussions have started being done on 
-| Keybase, which provides secure chats as well as secured Git repos.
-| 
-| Has anything like that being considered as the point for subsequent 
-| discussions on issues post the initial disclosure?
-
-  That has not come up for QEMU issues yet. Maybe we could consider it in 
-future if required.
-
-+-- On Thu, 1 Oct 2020, Konrad Rzeszutek Wilk wrote --+
-| The problem with Keybase was how to review patches. Now if they had a 
-| encrypted mailing list as part of their Git repos that would be awesome. 
-| (Trying to find a "Feature request" but not having much luck :-()
-
- True. Email + PGP/GPG has been around for so many years, yet there is no 
-seamless combination of the two. :(
-
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
+-    case MENELAUS_VCORE_CTRL5: reg ++;
+-    case MENELAUS_VCORE_CTRL4: reg ++;
+-    case MENELAUS_VCORE_CTRL3: reg ++;
+-    case MENELAUS_VCORE_CTRL2: reg ++;
++    case MENELAUS_VCORE_CTRL5:
++    case MENELAUS_VCORE_CTRL4:
++    case MENELAUS_VCORE_CTRL3:
++    case MENELAUS_VCORE_CTRL2:
+     case MENELAUS_VCORE_CTRL1:
+-        return s->vcore[reg];
++        return s->vcore[addr - MENELAUS_VCORE_CTRL1];
+ 
+-    case MENELAUS_DCDC_CTRL3: reg ++;
+-    case MENELAUS_DCDC_CTRL2: reg ++;
++    case MENELAUS_DCDC_CTRL3:
++    case MENELAUS_DCDC_CTRL2:
+     case MENELAUS_DCDC_CTRL1:
+-        return s->dcdc[reg];
+-
+-    case MENELAUS_LDO_CTRL8: reg ++;
+-    case MENELAUS_LDO_CTRL7: reg ++;
+-    case MENELAUS_LDO_CTRL6: reg ++;
+-    case MENELAUS_LDO_CTRL5: reg ++;
+-    case MENELAUS_LDO_CTRL4: reg ++;
+-    case MENELAUS_LDO_CTRL3: reg ++;
+-    case MENELAUS_LDO_CTRL2: reg ++;
++        return s->dcdc[addr - MENELAUS_VCORE_CTRL1];
++
++    case MENELAUS_LDO_CTRL8:
++    case MENELAUS_LDO_CTRL7:
++    case MENELAUS_LDO_CTRL6:
++    case MENELAUS_LDO_CTRL5:
++    case MENELAUS_LDO_CTRL4:
++    case MENELAUS_LDO_CTRL3:
++    case MENELAUS_LDO_CTRL2:
+     case MENELAUS_LDO_CTRL1:
+-        return s->ldo[reg];
++        return s->ldo[addr - MENELAUS_LDO_CTRL1];
+ 
+-    case MENELAUS_SLEEP_CTRL2: reg ++;
++    case MENELAUS_SLEEP_CTRL2:
+     case MENELAUS_SLEEP_CTRL1:
+-        return s->sleep[reg];
++        return s->sleep[addr - MENELAUS_SLEEP_CTRL1];
+ 
+     case MENELAUS_DEVICE_OFF:
+         return 0;
+@@ -395,10 +394,10 @@ static uint8_t menelaus_read(void *opaque, uint8_t addr)
+     case MENELAUS_S2_PULL_DIR:
+         return s->pull[3];
+ 
+-    case MENELAUS_MCT_CTRL3: reg ++;
+-    case MENELAUS_MCT_CTRL2: reg ++;
++    case MENELAUS_MCT_CTRL3:
++    case MENELAUS_MCT_CTRL2:
+     case MENELAUS_MCT_CTRL1:
+-        return s->mmc_ctrl[reg];
++        return s->mmc_ctrl[addr - MENELAUS_MCT_CTRL1];
+     case MENELAUS_MCT_PIN_ST:
+         /* TODO: return the real Card Detect */
+         return 0;
+@@ -418,7 +417,6 @@ static void menelaus_write(void *opaque, uint8_t addr, uint8_t value)
+ {
+     MenelausState *s = (MenelausState *) opaque;
+     int line;
+-    int reg = 0;
+     struct tm tm;
+ 
+     switch (addr) {
+@@ -496,9 +494,9 @@ static void menelaus_write(void *opaque, uint8_t addr, uint8_t value)
+         s->ldo[7] = value & 3;
+         break;
+ 
+-    case MENELAUS_SLEEP_CTRL2: reg ++;
++    case MENELAUS_SLEEP_CTRL2:
+     case MENELAUS_SLEEP_CTRL1:
+-        s->sleep[reg] = value;
++        s->sleep[addr - MENELAUS_SLEEP_CTRL1] = value;
+         break;
+ 
+     case MENELAUS_DEVICE_OFF:
+-- 
+2.18.2
 
 
