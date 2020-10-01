@@ -2,86 +2,98 @@ Return-Path: <SRS0=M6H1=DI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BCD7C4727E
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 20:47:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34A36C47423
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 20:52:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF21920738
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 20:47:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 75B1420739
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 20:52:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IxCOUkle"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF21920738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="yYoCp3qB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75B1420739
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55576 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kO5U3-0004Nx-0M
-	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 16:47:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46448)
+	id 1kO5YW-0005qr-8M
+	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 16:52:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47634)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kO5Qq-0002vt-W0
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 16:44:05 -0400
-Received: from mail-ej1-x632.google.com ([2a00:1450:4864:20::632]:35778)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kO5Qo-0003bq-P2
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 16:44:04 -0400
-Received: by mail-ej1-x632.google.com with SMTP id u21so10064833eja.2
- for <qemu-devel@nongnu.org>; Thu, 01 Oct 2020 13:44:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=5oevqRAFxrqeQWPL5P+j27bB5XvzUmA/h22wi4aIPCo=;
- b=IxCOUklePeIeXsMxrgX6uDT8IWJ2XsFzwv7qinQhG06YYFpi3wdki9fFOwCSm6j6yC
- gaokS9zHGYEPizGKfEjPFt8AA6CBeVOUcr3SbSAKD7m5vCyD/oxclFcqiNWhHvohgPXc
- 1Seg/dh1nTfaY7GQ3AjwIqiifnLrRlJvpwngDye1QapY7KkT5pRtScn4qecVBtnlTG2H
- ZLQf4/DZLrFxQYHGcOrELEBSNvfuFfZ3czGCcrgtRF9sbYhuKP50DVMu5FYXL1NwPzYW
- vZEeV3k8j5z0icFNiU0Y5oLE/TY9WT/kJnQKvVIeTcVGjYrUvYAfYlDZjUmfpYX2w1pp
- 99Vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=5oevqRAFxrqeQWPL5P+j27bB5XvzUmA/h22wi4aIPCo=;
- b=Q0BBLezBiqtKYX8MfFCKDazemzGC9BsSzaaQJUNbLrztpPXQed3AFleGnbzETK90pR
- AqvF9V2FRWoGj8bBvgEvPfwGduIv8xFvixLNboEOsswxWgmukjLWICUOQ4SXucJzYcuy
- 9OHjMMqJYzWdDQGMtMZ56mX85WefywNjVNUiLEucqjj9e7mE8maN8UD5hNF6q2b/CJDb
- 5lA611P5FVlOBVtRZ3Q7at9hUbw1sfByyZ2AZ7Yh8H6jp8ukeu05RUj/5Y0qPZ3g64Bh
- hrjRKn3VCj57EoDoH7Uf2SBmwhNOICZD0sXDW+LvihOqYh4h+hdJfN7NSWM1toPtQ+7h
- FCbA==
-X-Gm-Message-State: AOAM530A/iVD85e3V10hD7cmmDuRS9MeYwmoyyvsQv+XlNO0MpmC+dnF
- ZYqfXbu9Dt/atq4a/C7WiyM1TAhVnm+R8kAIwMGa4Q==
-X-Google-Smtp-Source: ABdhPJwlTNLMjNFbGpwntkSJRQqS3zDkaMU8Qyof8MyKTuG8R7+52I1RcPPJfU1CH3KoOYQxxCp5zY9Wa2DyCl7WjEA=
-X-Received: by 2002:a17:907:20d9:: with SMTP id
- qq25mr9597536ejb.382.1601585040942; 
- Thu, 01 Oct 2020 13:44:00 -0700 (PDT)
-MIME-Version: 1.0
-References: <20201001174649.1911016-1-jsnow@redhat.com>
-In-Reply-To: <20201001174649.1911016-1-jsnow@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 1 Oct 2020 21:43:50 +0100
-Message-ID: <CAFEAcA8PJrX=_R+9Sb1Lb97PfPhgN+qRRjn98VxLrE6u4yjCRQ@mail.gmail.com>
-Subject: Re: [PULL 0/9] Ide patches
-To: John Snow <jsnow@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::632;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x632.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <si-wei.liu@oracle.com>)
+ id 1kO5XS-0005PT-Km; Thu, 01 Oct 2020 16:50:54 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:60756)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <si-wei.liu@oracle.com>)
+ id 1kO5XQ-0004Nn-HA; Thu, 01 Oct 2020 16:50:54 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 091KjAkG062179;
+ Thu, 1 Oct 2020 20:50:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id; s=corp-2020-01-29;
+ bh=8H9Ag6o6uaSag0bF0YbC/ln1A3v4HCanhVapMPjUJ0k=;
+ b=yYoCp3qBMgFB3u8fW1xEBcb5N2iEfdf174bOyKGX8IE8yBSa0eLH4OOHurr8NZ3sueUp
+ iyzVvabRaKMQG79iXVx/o2nD+Nl5+7WJVNMTadB/wbJi9UheKnX1ycsRYNUS6TrZtkV9
+ IausLKPKf29xJYByCOUb5w4XvV1qttEp2ptCN9e/G3OyWr89oAXaEQn2qHqAI2tSiRqd
+ N/kyUlO2Iakp2O9ZoldbElNtNryrKY0EW+IX7c820hC317JIwPogFD47ruE+mq9lbzVL
+ Hq/2ipLKsSGck9/YkedE0GYiBxZiMksW2EV/AzUIXVW7neebm8/sVrL6Z2TxRxn/XO25 Fg== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by userp2120.oracle.com with ESMTP id 33sx9ng8uq-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+ Thu, 01 Oct 2020 20:50:48 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 091KiwNv097719;
+ Thu, 1 Oct 2020 20:50:47 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by aserp3030.oracle.com with ESMTP id 33uv2hdxp8-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 01 Oct 2020 20:50:47 +0000
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 091Kok7q003698;
+ Thu, 1 Oct 2020 20:50:46 GMT
+Received: from ban25x6uut24.us.oracle.com (/10.153.73.24)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Thu, 01 Oct 2020 13:50:46 -0700
+From: Si-Wei Liu <si-wei.liu@oracle.com>
+To: mst@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org
+Subject: [PATCH] vhost-vdpa: negotiate VIRTIO_NET_F_STATUS with driver
+Date: Thu,  1 Oct 2020 16:09:45 -0400
+Message-Id: <1601582985-14944-1-git-send-email-si-wei.liu@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9761
+ signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ spamscore=0 adultscore=0
+ suspectscore=0 malwarescore=0 bulkscore=0 mlxlogscore=999 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2010010168
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9761
+ signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
+ suspectscore=0
+ phishscore=0 mlxscore=0 lowpriorityscore=0 adultscore=0 clxscore=1011
+ spamscore=0 impostorscore=0 malwarescore=0 bulkscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2010010168
+Received-SPF: pass client-ip=156.151.31.85; envelope-from=si-wei.liu@oracle.com;
+ helo=userp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 16:50:49
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,35 +106,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+Cc: joao.m.martins@oracle.com, boris.ostrovsky@oracle.com,
+ qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 1 Oct 2020 at 18:46, John Snow <jsnow@redhat.com> wrote:
->
-> The following changes since commit 37a712a0f969ca2df7f01182409a6c4825cebfb5:
->
->   Merge remote-tracking branch 'remotes/bonzini-gitlab/tags/for-upstream' into staging (2020-10-01 12:23:19 +0100)
->
-> are available in the Git repository at:
->
->   https://gitlab.com/jsnow/qemu.git tags/ide-pull-request
->
-> for you to fetch changes up to 55adb3c45620c31f29978f209e2a44a08d34e2da:
->
->   ide: cancel pending callbacks on SRST (2020-10-01 13:04:16 -0400)
->
-> ----------------------------------------------------------------
-> Pull request
->
-> ----------------------------------------------------------------
+Vendor driver may not support or implement config
+interrupt delivery for link status notifications.
+In this event, vendor driver is expected to NACK
+the feature, but guest will keep link always up.
 
+Signed-off-by: Si-Wei Liu <si-wei.liu@oracle.com>
+---
+ net/vhost-vdpa.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Applied, thanks.
+diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
+index bc0e0d2..55e01d9 100644
+--- a/net/vhost-vdpa.c
++++ b/net/vhost-vdpa.c
+@@ -55,6 +55,7 @@ const int vdpa_feature_bits[] = {
+     VIRTIO_F_IOMMU_PLATFORM,
+     VIRTIO_F_RING_PACKED,
+     VIRTIO_NET_F_GUEST_ANNOUNCE,
++    VIRTIO_NET_F_STATUS,
+     VHOST_INVALID_FEATURE_BIT
+ };
+ 
+-- 
+1.8.3.1
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
-for any user-visible changes.
-
--- PMM
 
