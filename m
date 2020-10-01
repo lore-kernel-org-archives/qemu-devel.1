@@ -2,106 +2,132 @@ Return-Path: <SRS0=M6H1=DI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C033C4727C
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 15:47:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4299BC4727E
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 15:48:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 824F6206A1
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 15:47:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B397E206A1
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 15:48:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="uf5VTgaR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 824F6206A1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F6Zz5lJy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B397E206A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kO0ns-000178-7R
-	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 11:47:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58958)
+	id 1kO0or-0001rU-LJ
+	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 11:48:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57570)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
- id 1kO0jE-0004Ro-D8
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 11:42:44 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:53376)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
- id 1kO0jB-0004H2-5B
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 11:42:43 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 091Fd98C038087;
- Thu, 1 Oct 2020 15:42:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : in-reply-to : references : date : message-id : mime-version :
- content-type; s=corp-2020-01-29;
- bh=YlHduj9Zy7EmZSaNb/IUMUZJPZhicT//8k8I+eUTBss=;
- b=uf5VTgaR/eiZDQyYVdtYJCPGA5k/bZX0muSXgW+9UTK+hMThm/0f1bZKEwFcm8nth/E6
- myF7BOIQTOBfjRlutWp5GW2nh8EjwDmMiixIEdI9KbqZEM6A3TpUJYjuIDtENZ+odh4w
- XJbx2pwsIjyWb18+vPnIDBKtUX9WnjlM4Vj3RreQn66FqrYZx1V+TnDNmJiuNrhV6Azr
- DwclLVVtu+uZQ9Bk1Ifoq8LxnVMTz7/Ud0yEJ+lMg+MzrH7VDZJVnppg8XR3CBLUhdVF
- kYeedPEYlfbRH8olDeSzcbHd9+oUwfTxshTEXD2ZK0w8W1bXHFLsNWBxJt6i1RB/g+3v HA== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by userp2120.oracle.com with ESMTP id 33sx9neqrw-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Thu, 01 Oct 2020 15:42:38 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 091FL16o093476;
- Thu, 1 Oct 2020 15:40:37 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by aserp3030.oracle.com with ESMTP id 33uv2h3gay-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 01 Oct 2020 15:40:37 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 091FeZwD018693;
- Thu, 1 Oct 2020 15:40:35 GMT
-Received: from starbug-mbp.localdomain (/79.97.215.145)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 01 Oct 2020 08:40:35 -0700
-Received: by starbug-mbp.localdomain (Postfix, from userid 501)
- id E196918EE5DB; Thu,  1 Oct 2020 16:40:31 +0100 (IST)
-From: Darren Kenny <darren.kenny@oracle.com>
-To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
-Subject: Re: [PATCH v3 11/16] scripts/oss-fuzz: Add general-fuzzer build script
-In-Reply-To: <20200921022506.873303-12-alxndr@bu.edu>
-References: <20200921022506.873303-1-alxndr@bu.edu>
- <20200921022506.873303-12-alxndr@bu.edu>
-Date: Thu, 01 Oct 2020 16:40:31 +0100
-Message-ID: <m2blhm6jkg.fsf@oracle.com>
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kO0eK-0007Td-DU
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 11:37:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32336)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kO0eI-0003Dj-5u
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 11:37:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601566655;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=ylEXgl4yUI/EHL23DZ/WWkmoo/HeckrVbLG15QKKjvY=;
+ b=F6Zz5lJyOI0w7Jdjm84jK18yj00eTvg7M5h1QcOw1jqQOUB+vBZANU2ud6rQqyp6ozd8Pq
+ yYc9aPEi37/EHNVMXl7N5D1XhVLtSD25WMWO4EVwrH9CwkCYMxYG2vSJufFpZKnhsfFPTz
+ F69lilU0VB4Rg82guaSy6KCfd51DEH0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-274-BwZogFrwOb6l2fzUGiIwYg-1; Thu, 01 Oct 2020 11:37:33 -0400
+X-MC-Unique: BwZogFrwOb6l2fzUGiIwYg-1
+Received: by mail-wm1-f71.google.com with SMTP id 13so85600wmf.0
+ for <qemu-devel@nongnu.org>; Thu, 01 Oct 2020 08:37:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=ylEXgl4yUI/EHL23DZ/WWkmoo/HeckrVbLG15QKKjvY=;
+ b=GSvWFQIkHAOLhWE3siaPeoY4GcfeRdqeQEWhQQZJhQ1UY25SvdoXSskUiR4TsXHUeh
+ 76+1nIoNljpifJOn2mPuUHqNwng1VzQMLCG3QiCrW6UHOrU/JJUgmuhbjo4VbI/dRLMh
+ DhpotyushuM/ZY4XqMIER5GunFhtvxgAp4rj0TJLvoJLFcrPFxjQUisqdrBgDoZ1qXON
+ vxySriSd0QWwPZmJrrhTc+blOmLYax/fNn9tvKFcYYQXLSPPASt+ddnyoOJ2zUurSJaJ
+ dWoYRd2mJRQYgANoBdtpBU5ken8dlgXjo3YVXqkIZbDeOprFRZ0a5chVj7D1E5BV/FBi
+ M1AQ==
+X-Gm-Message-State: AOAM530x5z+tofoiKBFPzbBUS5pdxAid0EUqjtzNdNp6CSKUrrWXITvx
+ ibBergIRQkPr5JYPXJLYz9bLi1Pf6T6ve8lvaklgiTkrNzTqdZO92LlagCzU2IoEReQp2GZimXi
+ v5T2YULKARZgeDMw=
+X-Received: by 2002:a7b:c305:: with SMTP id k5mr86294wmj.102.1601566649208;
+ Thu, 01 Oct 2020 08:37:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyxGOmvJpHy6noxCLyoKiY5ycaQj0o47Ou88Tfl4CAsrCPyjLpsy19rmBMoLusSFJfkDhBZnQ==
+X-Received: by 2002:a7b:c305:: with SMTP id k5mr86254wmj.102.1601566648883;
+ Thu, 01 Oct 2020 08:37:28 -0700 (PDT)
+Received: from [192.168.1.36] (74.red-83-53-161.dynamicip.rima-tde.net.
+ [83.53.161.74])
+ by smtp.gmail.com with ESMTPSA id z15sm8376143wrv.94.2020.10.01.08.37.27
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 01 Oct 2020 08:37:28 -0700 (PDT)
+Subject: Re: [PATCH v4 3/3] target/i386: Restrict X86CPUFeatureWord to X86
+ targets
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <20201001144152.1555659-1-philmd@redhat.com>
+ <20201001144152.1555659-4-philmd@redhat.com>
+ <20201001152905.GC3717385@habkost.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <27bf4922-545e-e7e5-29fa-1dd80283e41a@redhat.com>
+Date: Thu, 1 Oct 2020 17:37:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9761
- signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- spamscore=0 adultscore=0
- suspectscore=2 malwarescore=0 bulkscore=0 mlxlogscore=999 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2010010132
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9761
- signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
- suspectscore=2
- phishscore=0 mlxscore=0 lowpriorityscore=0 adultscore=0 clxscore=1015
- spamscore=0 impostorscore=0 malwarescore=0 bulkscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2010010133
-Received-SPF: pass client-ip=156.151.31.85;
- envelope-from=darren.kenny@oracle.com; helo=userp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 11:29:20
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+In-Reply-To: <20201001152905.GC3717385@habkost.net>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 02:15:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -23
+X-Spam_score: -2.4
+X-Spam_bar: --
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.26, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -114,126 +140,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Alexander Bulekov <alxndr@bu.edu>,
- bsd@redhat.com, stefanha@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
- philmd@redhat.com
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+ Michael Tokarev <mjt@tls.msk.ru>, Markus Armbruster <armbru@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-trivial@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Alex,
+On 10/1/20 5:29 PM, Eduardo Habkost wrote:
+> On Thu, Oct 01, 2020 at 04:41:52PM +0200, Philippe Mathieu-Daudé wrote:
+>> Only qemu-system-FOO and qemu-storage-daemon provide QMP
+>> monitors, therefore such declarations and definitions are
+>> irrelevant for user-mode emulation.
+>>
+>> Restricting the x86-specific commands to machine-target.json
+>> pulls less QAPI-generated code into user-mode.
+> 
+> Is this still true without "qapi: Restrict code generated for
+> user-mode"?
 
-On Sunday, 2020-09-20 at 22:25:01 -04, Alexander Bulekov wrote:
-> This parses a yaml file containing general-fuzzer configs and builds a
-> separate oss-fuzz wrapper binary for each one, changing some
-> preprocessor macros for each configuration. To avoid dealing with
-> escaping and stringifying, convert each string into a byte-array
-> representation
->
-> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
-> ---
->  scripts/oss-fuzz/build_general_fuzzers.py | 69 +++++++++++++++++++++++
->  1 file changed, 69 insertions(+)
->  create mode 100755 scripts/oss-fuzz/build_general_fuzzers.py
->
-> diff --git a/scripts/oss-fuzz/build_general_fuzzers.py b/scripts/oss-fuzz/build_general_fuzzers.py
-> new file mode 100755
-> index 0000000000..918f1143a5
-> --- /dev/null
-> +++ b/scripts/oss-fuzz/build_general_fuzzers.py
-> @@ -0,0 +1,69 @@
-> +#!/usr/bin/env python3
-> +# -*- coding: utf-8 -*-
-> +
-> +"""
-> +This script creates wrapper binaries that invoke the general-device-fuzzer with
-> +configurations specified in a yaml config file.
-> +"""
-> +import sys
-> +import os
-> +import yaml
-> +import tempfile
-> +
-> +CC = ""
-> +TEMPLATE_FILENAME = "target_template.c"
-> +TEMPLATE_PATH = ""
-> +
-> +
-> +def usage():
-> +    print("Usage: CC=COMPILER {} CONFIG_PATH \
-> +OUTPUT_PATH_PREFIX".format(sys.argv[0]))
+The correct description so far is:
 
-The indentation of this seems off.
+"Restricting the x86-specific commands to machine-target.json
+pulls less QAPI-generated code into non-x86 targets.", as of
+this commit the X86CPURegister32 definitions are not built in
+the other ARM/S390/PPC/... targets.
 
-Python will concatenate 2 or more strings that appear one after the
-other, so it might be cleaner to write them like:
+I still have some hope "qapi: Restrict code generated for user-mode"
+get merged some day.
 
-    print("Usage: CC=COMPILER {} CONFIG_PATH "
-          "OUTPUT_PATH_PREFIX".format(sys.argv[0]))
+> 
+> Markus, Eric: what's the difference between machine.json and
+> machine-target.json? commit 7f7b4e7abef4 ("qapi: Split
+> machine-target.json off target.json and misc.json") explains what
+> but not why.
+> 
+>>
+>> Acked-by: Richard Henderson <richard.henderson@linaro.org>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> 
+> Why the visit_type_X86CPUFeatureWordInfoList() stub was required
+> in v3, but not in this version?
 
-There is no need for the backslash at the end due to the use of the
-braces '()' here.
+Because it is ifdef'ed out in the previous (new) patch:
+"target/i386/cpu: Restrict some of feature-words uses to system-mode".
 
+> 
+> 
+>> ---
+>>  qapi/machine-target.json | 45 ++++++++++++++++++++++++++++++++++++++++
+>>  qapi/machine.json        | 42 -------------------------------------
+>>  target/i386/cpu.c        |  2 +-
+>>  3 files changed, 46 insertions(+), 43 deletions(-)
+>>
+>> diff --git a/qapi/machine-target.json b/qapi/machine-target.json
+>> index 698850cc78..b4d769a53b 100644
+>> --- a/qapi/machine-target.json
+>> +++ b/qapi/machine-target.json
+>> @@ -4,6 +4,51 @@
+>>  # This work is licensed under the terms of the GNU GPL, version 2 or later.
+>>  # See the COPYING file in the top-level directory.
+>>  
+>> +##
+>> +# @X86CPURegister32:
+>> +#
+>> +# A X86 32-bit register
+>> +#
+>> +# Since: 1.5
+>> +##
+>> +{ 'enum': 'X86CPURegister32',
+>> +  'data': [ 'EAX', 'EBX', 'ECX', 'EDX', 'ESP', 'EBP', 'ESI', 'EDI' ],
+>> +  'if': 'defined(TARGET_I386)' }
+>> +
+>> +##
+>> +# @X86CPUFeatureWordInfo:
+>> +#
+>> +# Information about a X86 CPU feature word
+>> +#
+>> +# @cpuid-input-eax: Input EAX value for CPUID instruction for that feature word
+>> +#
+>> +# @cpuid-input-ecx: Input ECX value for CPUID instruction for that
+>> +#                   feature word
+>> +#
+>> +# @cpuid-register: Output register containing the feature bits
+>> +#
+>> +# @features: value of output register, containing the feature bits
+>> +#
+>> +# Since: 1.5
+>> +##
+>> +{ 'struct': 'X86CPUFeatureWordInfo',
+>> +  'data': { 'cpuid-input-eax': 'int',
+>> +            '*cpuid-input-ecx': 'int',
+>> +            'cpuid-register': 'X86CPURegister32',
+>> +            'features': 'int' },
+>> +  'if': 'defined(TARGET_I386)' }
+>> +
+>> +##
+>> +# @DummyForceArrays:
+>> +#
+>> +# Not used by QMP; hack to let us use X86CPUFeatureWordInfoList internally
+>> +#
+>> +# Since: 2.5
+>> +##
+>> +{ 'struct': 'DummyForceArrays',
+>> +  'data': { 'unused': ['X86CPUFeatureWordInfo'] },
+>> +  'if': 'defined(TARGET_I386)' }
+>> +
+>>  ##
+>>  # @CpuModelInfo:
+>>  #
+>> diff --git a/qapi/machine.json b/qapi/machine.json
+>> index 756dacb06f..995e972858 100644
+>> --- a/qapi/machine.json
+>> +++ b/qapi/machine.json
+>> @@ -574,48 +574,6 @@
+>>     'dst': 'uint16',
+>>     'val': 'uint8' }}
+>>  
+>> -##
+>> -# @X86CPURegister32:
+>> -#
+>> -# A X86 32-bit register
+>> -#
+>> -# Since: 1.5
+>> -##
+>> -{ 'enum': 'X86CPURegister32',
+>> -  'data': [ 'EAX', 'EBX', 'ECX', 'EDX', 'ESP', 'EBP', 'ESI', 'EDI' ] }
+>> -
+>> -##
+>> -# @X86CPUFeatureWordInfo:
+>> -#
+>> -# Information about a X86 CPU feature word
+>> -#
+>> -# @cpuid-input-eax: Input EAX value for CPUID instruction for that feature word
+>> -#
+>> -# @cpuid-input-ecx: Input ECX value for CPUID instruction for that
+>> -#                   feature word
+>> -#
+>> -# @cpuid-register: Output register containing the feature bits
+>> -#
+>> -# @features: value of output register, containing the feature bits
+>> -#
+>> -# Since: 1.5
+>> -##
+>> -{ 'struct': 'X86CPUFeatureWordInfo',
+>> -  'data': { 'cpuid-input-eax': 'int',
+>> -            '*cpuid-input-ecx': 'int',
+>> -            'cpuid-register': 'X86CPURegister32',
+>> -            'features': 'int' } }
+>> -
+>> -##
+>> -# @DummyForceArrays:
+>> -#
+>> -# Not used by QMP; hack to let us use X86CPUFeatureWordInfoList internally
+>> -#
+>> -# Since: 2.5
+>> -##
+>> -{ 'struct': 'DummyForceArrays',
+>> -  'data': { 'unused': ['X86CPUFeatureWordInfo'] } }
+>> -
+>>  ##
+>>  # @NumaCpuOptions:
+>>  #
+>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>> index 9f72342506..848a65ded2 100644
+>> --- a/target/i386/cpu.c
+>> +++ b/target/i386/cpu.c
+>> @@ -38,7 +38,7 @@
+>>  #include "qemu/option.h"
+>>  #include "qemu/config-file.h"
+>>  #include "qapi/error.h"
+>> -#include "qapi/qapi-visit-machine.h"
+>> +#include "qapi/qapi-visit-machine-target.h"
+>>  #include "qapi/qapi-visit-run-state.h"
+>>  #include "qapi/qmp/qdict.h"
+>>  #include "qapi/qmp/qerror.h"
+>> -- 
+>> 2.26.2
+>>
+> 
 
-> +    sys.exit(0)
-> +
-> +
-> +def str_to_c_byte_array(s):
-> +    """
-> +    Convert strings to byte-arrays so we don't worry about formatting
-> +    strings to play nicely with cc -DQEMU_FUZZARGS etc
-> +    """
-> +    return ','.join('0x{:02x}'.format(ord(x)) for x in s)
-> +
-> +
-> +def compile_wrapper(cfg, path):
-> +    os.system('$CC -DQEMU_FUZZ_ARGS="{fuzz_args}" \
-> +               -DQEMU_FUZZ_OBJECTS="{fuzz_objs}" \
-> +               {wrapper_template} -o {output_bin}'.format(
-> +                   fuzz_args=str_to_c_byte_array(cfg["args"].replace("\n", " ")),
-> +                   fuzz_objs=str_to_c_byte_array(cfg["objects"].replace("\n", " ")),
-> +                   wrapper_template=TEMPLATE_PATH,
-> +                   output_bin=path))
-> +
-
-Similarly here, it might look better as:
-
-    os.system('$CC -DQEMU_FUZZ_ARGS="{fuzz_args}" '
-              '-DQEMU_FUZZ_OBJECTS="{fuzz_objs}" '
-              '{wrapper_template} -o {output_bin}'.format(
-                   fuzz_args=str_to_c_byte_array(cfg["args"].replace("\n", " ")),
-                   fuzz_objs=str_to_c_byte_array(cfg["objects"].replace("\n", " ")),
-                   wrapper_template=TEMPLATE_PATH,
-                   output_bin=path))
-
-> +
-> +
-> +def main():
-> +    global CC
-> +    global TEMPLATE_PATH
-> +    global OUTPUT_BIN_NAME
-> +
-> +    if len(sys.argv) != 3:
-> +        usage()
-> +
-> +    cfg_path = sys.argv[1]
-> +    out_path = sys.argv[2]
-> +
-> +    CC = os.getenv("CC", default="cc")
-> +    TEMPLATE_PATH = os.path.join(os.path.dirname(__file__), TEMPLATE_FILENAME)
-> +    if not os.path.exists(TEMPLATE_PATH):
-> +        print("Error {} doesn't exist".format(TEMPLATE_PATH))
-> +        sys.exit(1)
-> +
-> +    with open(cfg_path, "r") as f:
-> +        configs = yaml.load(f)["configs"]
-
-Just in case, the use of .get("config". []) might work better here.
-
-But also check if yaml.load() could possibly throw an exception if the
-file, despite existing isn't able to be parsed.
-
-Thanks,
-
-Darren.
 
