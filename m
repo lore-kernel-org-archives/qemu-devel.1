@@ -2,120 +2,84 @@ Return-Path: <SRS0=M6H1=DI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33236C47420
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 10:12:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C34FC4727C
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 10:15:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDA9E21531
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 10:12:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A239920838
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Oct 2020 10:15:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UgsT8neU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDA9E21531
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jg1866Hg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A239920838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kNvZy-00032f-Re
-	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 06:12:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56830)
+	id 1kNvc3-00045u-Hr
+	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 06:14:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57208)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kNvYR-0002Vx-6I
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 06:11:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29468)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kNvbQ-0003a6-55
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 06:14:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59475)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kNvYP-00079c-Oj
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 06:11:14 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kNvbN-0007Kh-Lt
+ for qemu-devel@nongnu.org; Thu, 01 Oct 2020 06:14:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601547073;
+ s=mimecast20190719; t=1601547256;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=0jBGbmeL4lcA0BEOQVaUl4HJp9b/4o3tsk7PRGW4L9k=;
- b=UgsT8neUNXLOPknCD4vpDuGPvW7hFr2r2knmZH3WYEB67lFPChZNU+j/x5/hXS0/1fB4na
- i75SVNblidsLpJXAODIOV/MhL/VxjB1k0xaHWrGtX3+/HL1KQSY8Ezq9J9LG4aIE/lSn3S
- 3Fzx3gFHFb9P6pKG8fQW01FNVkviJf4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-239-4wxfMsIIPoCyWO1hwCu3_Q-1; Thu, 01 Oct 2020 06:11:09 -0400
-X-MC-Unique: 4wxfMsIIPoCyWO1hwCu3_Q-1
-Received: by mail-wm1-f69.google.com with SMTP id t8so748269wmj.6
- for <qemu-devel@nongnu.org>; Thu, 01 Oct 2020 03:11:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=0jBGbmeL4lcA0BEOQVaUl4HJp9b/4o3tsk7PRGW4L9k=;
- b=i40smpueK83WzwKPLAz/aOtYFW1uPRvfpH8qqKlld4RmOfmvmsxiLIt48VhTQEkN0i
- keHRK0E19Lsg8MQaEIM6npm4EIka/bmoQnDQ43zvbZjXk3k9O9hDaB+LpOja2JDjBrxj
- d/bCh7ZQJMVHitEmgqzgneOl23gqzNR6MS99cux7YAeVOueVTP4N35gKL6q3pT4nRm3Y
- OoTaAXn7OgmQPPGibfxC4Z0LlQcGQBaNETRmbcCO9Jml5bsFdFDtwB4Broo854sfq0tv
- E6075vrVDqOSht7vmBX5XOL1NQ7MXg8cmZex7QK8tccZjSz+H97TejhSl4rgLXsmNUjU
- njIQ==
-X-Gm-Message-State: AOAM533rjntAivbPtWsnH9MRw7Kr29q9vNBLkd+eZ2Jtb8da5ewOY/0P
- VR/oh20/F8dR2Nxr0qg3KY7V90Gy4dLnOTZ0FCY4h5Ibzk8q1p6IQTRna70eZVSs82F++4A3oYn
- BdO780ht2EbvUiGY=
-X-Received: by 2002:adf:e7c4:: with SMTP id e4mr7824909wrn.113.1601547068298; 
- Thu, 01 Oct 2020 03:11:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwL0XqYsU5B0BYMwJkEU2e0WjZOhut4AlqleI0kd95O0dZ7NEpdyEFWGeHp/6+/BXH5Ea9heA==
-X-Received: by 2002:adf:e7c4:: with SMTP id e4mr7824887wrn.113.1601547068114; 
- Thu, 01 Oct 2020 03:11:08 -0700 (PDT)
-Received: from [192.168.1.36] (74.red-83-53-161.dynamicip.rima-tde.net.
- [83.53.161.74])
- by smtp.gmail.com with ESMTPSA id z13sm8054049wro.97.2020.10.01.03.11.06
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 01 Oct 2020 03:11:07 -0700 (PDT)
-Subject: Re: [PATCH 2/9] hw/block/nvme: fix log page offset check
-To: Keith Busch <kbusch@kernel.org>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, Klaus Jensen <k.jensen@samsung.com>
-References: <20200930220414.562527-1-kbusch@kernel.org>
- <20200930220414.562527-3-kbusch@kernel.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <981f1254-3a97-8564-38df-377e928e0814@redhat.com>
-Date: Thu, 1 Oct 2020 12:11:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ in-reply-to:in-reply-to:references:references;
+ bh=PEAe9srwxHXOzf70Gmcjq2LMH3oLoQhzs3Mf7awNs18=;
+ b=Jg1866Hgpbx7fbeccUswkgEpOcnrpKBffMFw8kTFqnycn5pi3PE7GnaUiGxvZuCxh/eWv5
+ e4+XhUpcuPuExm6FsUvztrS1YQFlrEouRTd45xX2UNvy5caQjc5orYsJW5KR/+qJvA1Sp8
+ vDNz5urcgjXpmrJIs7lhKCJuP6JkUc4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-465-Txe2j9A6PDeRkmSHcEI9JQ-1; Thu, 01 Oct 2020 06:14:13 -0400
+X-MC-Unique: Txe2j9A6PDeRkmSHcEI9JQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8824D425DA;
+ Thu,  1 Oct 2020 10:14:12 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-114-92.ams2.redhat.com [10.36.114.92])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2C9E55578D;
+ Thu,  1 Oct 2020 10:14:05 +0000 (UTC)
+Date: Thu, 1 Oct 2020 12:14:03 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH v7 06/13] qmp: Call monitor_set_cur() only in
+ qmp_dispatch()
+Message-ID: <20201001101403.GA6673@linux.fritz.box>
+References: <20200909151149.490589-7-kwolf@redhat.com>
+ <877dswo0mf.fsf@dusky.pond.sub.org>
+ <20200925151304.GE5731@linux.fritz.box>
+ <87ft72i0v8.fsf@dusky.pond.sub.org>
+ <20200928143052.GH5451@linux.fritz.box>
+ <87h7rfehtr.fsf@dusky.pond.sub.org>
+ <20200930112903.GA9292@linux.fritz.box>
+ <87o8ln9zl3.fsf@dusky.pond.sub.org>
+ <20200930140051.GC9292@linux.fritz.box>
+ <20200930172020.GE2783@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20200930220414.562527-3-kbusch@kernel.org>
+In-Reply-To: <20200930172020.GE2783@work-vm>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 04:25:37
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -124,9 +88,8 @@ X-Spam_score: -2.6
 X-Spam_bar: --
 X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.469,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -139,22 +102,221 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Dmitry Fomichev <dmitry.fomichev@wdc.com>,
- Niklas Cassel <Niklas.Cassel@wdc.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, marcandre.lureau@gmail.com,
+ Markus Armbruster <armbru@redhat.com>, stefanha@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/1/20 12:04 AM, Keith Busch wrote:
-> Return error if the requested offset starts after the size of the log
-> being returned. Also, move the check for earlier in the function so
-> we're not doing unnecessary calculations.
+Am 30.09.2020 um 19:20 hat Dr. David Alan Gilbert geschrieben:
+> * Kevin Wolf (kwolf@redhat.com) wrote:
+> > Am 30.09.2020 um 15:14 hat Markus Armbruster geschrieben:
+> > > Kevin Wolf <kwolf@redhat.com> writes:
+> > > 
+> > > > Am 30.09.2020 um 11:26 hat Markus Armbruster geschrieben:
+> > > >> Kevin Wolf <kwolf@redhat.com> writes:
+> > > >> 
+> > > >> > Am 28.09.2020 um 13:42 hat Markus Armbruster geschrieben:
+> > > >> >> Kevin Wolf <kwolf@redhat.com> writes:
+> > > >> >> 
+> > > >> >> > Am 14.09.2020 um 17:10 hat Markus Armbruster geschrieben:
+> > > >> >> >> Kevin Wolf <kwolf@redhat.com> writes:
+> > > [...]
+> > > >> >> >> > diff --git a/monitor/qmp.c b/monitor/qmp.c
+> > > >> >> >> > index 8469970c69..922fdb5541 100644
+> > > >> >> >> > --- a/monitor/qmp.c
+> > > >> >> >> > +++ b/monitor/qmp.c
+> > > >> >> >> > @@ -135,16 +135,10 @@ static void monitor_qmp_respond(MonitorQMP *mon, QDict *rsp)
+> > > >> >> >> >  
+> > > >> >> >> >  static void monitor_qmp_dispatch(MonitorQMP *mon, QObject *req)
+> > > >> >> >> >  {
+> > > >> >> >> > -    Monitor *old_mon;
+> > > >> >> >> >      QDict *rsp;
+> > > >> >> >> >      QDict *error;
+> > > >> >> >> >  
+> > > >> >> >> > -    old_mon = monitor_set_cur(&mon->common);
+> > > >> >> >> > -    assert(old_mon == NULL);
+> > > >> >> >> > -
+> > > >> >> >> > -    rsp = qmp_dispatch(mon->commands, req, qmp_oob_enabled(mon));
+> > > >> >> >> > -
+> > > >> >> >> > -    monitor_set_cur(NULL);
+> > > >> >> >> > +    rsp = qmp_dispatch(mon->commands, req, qmp_oob_enabled(mon), &mon->common);
+> > > >> >> >> 
+> > > >> >> >> Long line.  Happy to wrap it in my tree.  A few more in PATCH 08-11.
+> > > >> >> >
+> > > >> >> > It's 79 characters. Should be fine even with your local deviation from
+> > > >> >> > the coding style to require less than that for comments?
+> > > >> >> 
+> > > >> >> Let me rephrase my remark.
+> > > >> >> 
+> > > >> >> For me,
+> > > >> >> 
+> > > >> >>     rsp = qmp_dispatch(mon->commands, req, qmp_oob_enabled(mon),
+> > > >> >>                        &mon->common);
+> > > >> >> 
+> > > >> >> is significantly easier to read than
+> > > >> >> 
+> > > >> >>     rsp = qmp_dispatch(mon->commands, req, qmp_oob_enabled(mon), &mon->common);
+> > > >> >
+> > > >> > I guess this is highly subjective. I find wrapped lines harder to read.
+> > > >> > For answering subjective questions like this, we generally use the
+> > > >> > coding style document.
+> > > >> >
+> > > >> > Anyway, I guess following an idiosyncratic coding style that is
+> > > >> > different from every other subsystem in QEMU is possible (if
+> > > >> > inconvenient) if I know what it is.
+> > > >> 
+> > > >> The applicable coding style document is PEP 8.
+> > > >
+> > > > I'll happily apply PEP 8 to Python code, but this is C. I don't think
+> > > > PEP 8 applies very well to C code. (In fact, PEP 7 exists as a C style
+> > > > guide, but we're not writing C code for the Python project here...)
+> > > 
+> > > I got confused (too much Python code review), my apologies.
+> > > 
+> > > >> > My problem is more that I don't know what the exact rules are. Can they
+> > > >> > only be figured out experimentally by submitting patches and seeing
+> > > >> > whether you like them or not?
+> > > >> 
+> > > >> PEP 8:
+> > > >> 
+> > > >>     A style guide is about consistency.  Consistency with this style
+> > > >>     guide is important.  Consistency within a project is more important.
+> > > >>     Consistency within one module or function is the most important.
+> > > >> 
+> > > >> In other words, you should make a reasonable effort to blend in.
+> > > >
+> > > > The project style guide for C is defined in CODING_STYLE.rst. Missing
+> > > > consistency with it is what I'm complaining about.
+> > > >
+> > > > I also agree that consistency within one module or function is most
+> > > > important, which is why I allow you to reformat my code. But I don't
+> > > > think it means that local coding style rules shouldn't be documented,
+> > > > especially if you can't just look at the code and see immediately how
+> > > > it's supposed to be.
+> > > >
+> > > >> >> Would you mind me wrapping this line in my tree?
+> > > >> >
+> > > >> > I have no say in this subsystem and I take it that you want all code to
+> > > >> > look as if you had written it yourself, so do as you wish.
+> > > >> 
+> > > >> I'm refusing the bait.
+> > > >> 
+> > > >> > But I understand that I'll have to respin anyway, so if you could
+> > > >> > explain what you're after, I might be able to apply the rules for the
+> > > >> > next version of the series.
+> > > >> 
+> > > >> First, PEP 8 again:
+> > > >> 
+> > > >>     Limit all lines to a maximum of 79 characters.
+> > > >> 
+> > > >>     For flowing long blocks of text with fewer structural restrictions
+> > > >>     (docstrings or comments), the line length should be limited to 72
+> > > >>     characters.
+> > > >
+> > > > Ok, that's finally clear limits at least.
+> > > >
+> > > > Any other rules from PEP 8 that you want to see applied to C code?
+> > > 
+> > > PEP 8 does not apply to C.
+> > > 
+> > > > Would you mind documenting this somewhere?
+> > > >
+> > > >> Second, an argument we two had on this list, during review of a prior
+> > > >> version of this patch series, talking about C:
+> > > >> 
+> > > >>     Legibility.  Humans tend to have trouble following long lines with
+> > > >>     their eyes (I sure do).  Typographic manuals suggest to limit
+> > > >>     columns to roughly 60 characters for exactly that reason[*].
+> > > >> 
+> > > >>     Code is special.  It's typically indented, and long identifiers push
+> > > >>     it further to the right, function arguments in particular.  We
+> > > >>     compromised at 80 columns.
+> > > >> 
+> > > >>     [...]
+> > > >> 
+> > > >>     [*] https://en.wikipedia.org/wiki/Column_(typography)#Typographic_style
+> > > >> 
+> > > >> The width of the line not counting indentation matters for legibility.
+> > > >> 
+> > > >> The line I flagged as long is 75 characters wide not counting
+> > > >> indentation.  That's needlessly hard to read for me.
+> > > >> 
+> > > >> PEP 8's line length limit is a *limit*, not a sacred right to push right
+> > > >> to the limit.
+> > > >> 
+> > > >> Since I get to read this code a lot, I've taken care to avoid illegibly
+> > > >> wide lines, and I've guided contributors to blend in.
+> > > >
+> > > > As I said, I don't mind the exact number much. I do mind predictability,
+> > > > though. (And ideally also consistency across the project because
+> > > > otherwise I need to change my editor settings for individual files.)
+> > > >
+> > > > So if you don't like 79 columns, give me any other number. But
+> > > > please, do give me something specific I can work with. "illegibly wide"
+> > > > is not something I can work with because it's highly subjective.
+> > > 
+> > > Taste is subjective.
+> > > 
+> > > We can always make CODING_STYLE.rst more detailed.  I view that as a
+> > > last resort when we waste too much time arguing.
+> > > 
+> > > Back to line length.
+> > > 
+> > > CODING_STYLE.rst sets a *limit*.
+> > > 
+> > > Going over the limit violates CODING_STYLE.rst.  There are (rare) cases
+> > > where that is justified.
+> > > 
+> > > CODING_STYLE.rst neither demands nor prohibits breaking lines before the
+> > > limit is reached.
+> > > 
+> > > Until CODING_STYLE.rst prohibits breaking lines unless they exceed the
+> > > limit, I will continue to ask for breaking lines when that makes the
+> > > code easier to read and more consistent with the code around it, for
+> > > code I maintain, and admittedly in my opinion.
+> > > 
+> > > These requests appear to irk you a great deal.  I don't understand, but
+> > > I'm sorry about it all the same.  By arguing about it repeatedly, you've
+> > > irked some back.  Brought it on myself, I guess.  However, if that's
+> > > what it takes to keep the code I maintain legible and consistent, I'll
+> > > pay the price.
+> > 
+> > I conclude that I'll never be able to submit code that passes your
+> > review in the first attempt because I don't know the specific criteria
+> > (and you don't seem to know them either before you see the patch).
+> > 
+> > Fine, I'll live with it. It's just one of the things that makes working
+> > in your subsystems more frustrating than in others.
 > 
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
-> ---
->  hw/block/nvme.c | 22 ++++++++++------------
->  1 file changed, 10 insertions(+), 12 deletions(-)
+> Hmm,
+>   IMHO the thing here is that there's two different things here:
+> 
+>    a) A CODING_STYLE limit - and personally I use every last character
+> of that when appropriate
+>    b) For this particular case, Markus is saying he prefers the wrap
+> there.
+> 
+> I don't think I see (b) as incompatible as a preference, but lets be
+> sensible; if it's something you want to change in merge that seems
+> reasonable, if it's something that you ask to change in a respin that's
+> kind of reasonable, just don't hold up a big patch series for an
+> argument over something that's legal in the coding style and isn't
+> particularly offensive!
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+I'll just change this one in the next version. Changing a single
+well-known instance not a big problem. It's just unfortunate that there
+are "A few more in PATCH 08-11" and I don't know how to identify them.
+
+So Markus will have to comment again in the next version (as he did in
+other places in previous versions of this series) and potentially modify
+my patches while applying to match his taste. The latter is something I
+try hard to avoid as a maintainer, but I admit this means compromising
+instead of perfectionism. And the former is just a bit tiring when with
+every version of a series you get additional comments about style
+preferences.
+
+Kevin
 
 
