@@ -2,89 +2,89 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B35E6C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 10:51:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5132C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 10:53:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1E78206A4
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 10:51:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D2BC206CD
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 10:53:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="heZ5GtQs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1E78206A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CF5NSvn8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D2BC206CD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59716 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOIex-0001d9-Rr
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 06:51:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39328)
+	id 1kOIgx-0002aV-Gl
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 06:53:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39692)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kOIdn-00013o-DU
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 06:50:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47082)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kOIdh-0002C8-KL
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 06:50:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601635811;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=Hnn1emY8H+WAJnd488Oh/MGNPFslFJsdjMr/cy1pzYM=;
- b=heZ5GtQsd3J0RNumlhHb5QfNP8KM8T8STb8/HhAQH7VMgfs5S2lcEFZAZH8QB6DoysloVC
- 2OIEddqw96gKFudZHPtg4/sKi7RTWe+DHLaCB3FZMAAOScQHVjTW9wzLc7h1IHPsS6ngVS
- kxOZo+Dm1wHxb+J+kfrw4OyqA2m8r5w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-20-WUPK4YsPNAa-YruwHfjvZg-1; Fri, 02 Oct 2020 06:50:10 -0400
-X-MC-Unique: WUPK4YsPNAa-YruwHfjvZg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C5004101FFA2;
- Fri,  2 Oct 2020 10:50:08 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
- [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2E4D85D9D3;
- Fri,  2 Oct 2020 10:50:07 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 3FC389CA5; Fri,  2 Oct 2020 12:50:06 +0200 (CEST)
-Date: Fri, 2 Oct 2020 12:50:06 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: Re: Use of "?" for help has been deprecated for 8 years, can we drop
- it?
-Message-ID: <20201002105006.2wy4iiljvah2wj3s@sirius.home.kraxel.org>
-References: <87k0wa1bf8.fsf@dusky.pond.sub.org>
- <54b77382-78c8-e6bf-45d4-616595baa87f@redhat.com>
- <b2ac33d8-6358-7e19-9ced-1febbf191dfd@eik.bme.hu>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kOIg9-00028W-9E
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 06:52:48 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:38792)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kOIg7-0002XT-CZ
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 06:52:44 -0400
+Received: by mail-wm1-x341.google.com with SMTP id v12so1258113wmh.3
+ for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 03:52:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=2ZOYJQFgwtkRMUbE80VKve55fsHkUx0xDSOrENJ6dJU=;
+ b=CF5NSvn88v4DupqwVj70RIEXi4/If7/u1Fm0kELJTQzHJAgbgIKLLS+2QR6R9EQm5g
+ PoMVhGgUxTIGO3A3WvPA/gHTWOQrEiMoicYal04Qm7oWitGTU8Iiff9pMTWwhD7mkB1V
+ jM4dpB1IoVyFdcpA2LzA0yFWHqpNi5g291aXi+QACup/e7q17PAWX89ItCgzfdyk1ywf
+ pZ+PW3g9taKQOeQ1tJLsqitoVou3ATE4aXQOGKuEEsZF1b5Bw3WCBFW9CNJ/4PlBqza0
+ WMOKvFijlGQpLHyaNtAcTvMdJ8AnRNoNyHAdDmGGar4a/GGFxu1L26btrtX2IkbX+cM7
+ DohQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=2ZOYJQFgwtkRMUbE80VKve55fsHkUx0xDSOrENJ6dJU=;
+ b=q8T175xnIKeysAI7gV55QKOGmTYC5+bCe3vDm5v3Rnj5vUWAN77Cj+t2B0foJVa91h
+ Xmt/pFRc0gc/fvEL2WfItz+xdmSQ7LBWbbti7YHquDGQmgyO7vF6Px1Y1WUx7KXo5bQj
+ u3Zoz2aC0T3x4Ql60o6vkKA+CHhNfT8ndzHDuFQxCe50ay0DtdnGhh1Mpq12vR7uWjVM
+ H4mF3ppg0PU1QAydKZRnLLfKiYJJD97g/SW1kGPMENNJ9C2UR8MMV3MhMZBPlXnzzY/c
+ eC+1Af3IzLLT+JWwZvr7CZE13IvJTY47kiE3fPKCLBZ+UX7Zq5tDqXdxHHg3Cnenj3eU
+ yOXw==
+X-Gm-Message-State: AOAM530c3No4xWqSO7Hi+kp7LfCFg6q94od+gQz+mfojq0WCSvapgDWD
+ wEqCk6qnenESGtRxLAGG5L67aA1J8POqnilC
+X-Google-Smtp-Source: ABdhPJxX5AwH5rMIsTZ0LgzTtS3Q0RRmJofw7mpTWe+XscrtRnSIA5Yp2kGQKeDGOFonLkfVkXSCDA==
+X-Received: by 2002:a1c:e046:: with SMTP id x67mr2161200wmg.35.1601635961423; 
+ Fri, 02 Oct 2020 03:52:41 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id l17sm1336430wme.11.2020.10.02.03.52.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 02 Oct 2020 03:52:40 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] meson.build: Don't look for libudev for static builds
+Date: Fri,  2 Oct 2020 11:52:39 +0100
+Message-Id: <20201002105239.2444-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <b2ac33d8-6358-7e19-9ced-1febbf191dfd@eik.bme.hu>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 23:37:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,35 +97,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  Hi,
+commit f01496a314d916 moved the logic for detecting libudev from
+configure to meson.build, but in the process it dropped the condition
+that meant we only ask pkg-config about libudev for a non-static
+build.
 
-> > Did we ever issue a warning when it was used?  It's easier to argue that
-> > it can be dropped if users had notice of some form or another.  That
-> > said, I'm not heartbroken if we yank it immediately instead of letting
-> > it live for 2 more releases.
-> 
-> How about keeping it as a convenience? I find it easier to type ? than help
-> and often use it instead.
+This breaks static builds of the system emulators on at least Ubuntu
+18.04.4, because on that host there is no static libudev but
+pkg-config still claims it exists.
 
-Well, ? has the problem that it is a shell glob char[1], which is for me
-enough reason to avoid it at least standalone ("-device ?").  When
-querying properties ("-device foo,?") it is much less likely to trip you
-up.
+Reinstate the logic that we had in the configure check.
 
-On the other hand I don't see any harm in keeping it.  What would we
-save when we drop it?  Given we already have a helper function to check
-it is only 2-3 lines of extra code I guess?
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+We could certainly do something cleverer here, but basic "convert
+from configure to meson" should in general not also be changing the
+detection logic IMHO.  We can make the logic smarter as a follow-on
+patch if desired.
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-take care,
-  Gerd
-
-[1] IIRC that was the reason to add "help" in the first place.
+diff --git a/meson.build b/meson.build
+index 3161c1f037a..07da66e1d81 100644
+--- a/meson.build
++++ b/meson.build
+@@ -271,7 +271,7 @@ if 'CONFIG_CURL' in config_host
+                             link_args: config_host['CURL_LIBS'].split())
+ endif
+ libudev = not_found
+-if targetos == 'linux' and (have_system or have_tools)
++if targetos == 'linux' and (have_system or have_tools) and not enable_static
+   libudev = dependency('libudev',
+                        required: get_option('mpath').enabled(),
+                        static: enable_static)
+-- 
+2.20.1
 
 
