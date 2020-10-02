@@ -2,87 +2,89 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 378F4C4727D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:41:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA2FBC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:43:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1D0920679
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:41:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 07CF920672
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:43:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T0dCy0+X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1D0920679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jNWkCRwA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07CF920672
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOKNO-0007Rq-N8
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 08:41:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35380)
+	id 1kOKOx-0000QF-1o
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 08:43:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35544)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kOKMP-0006le-JY
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:40:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34656)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kOKMN-000730-Mc
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:40:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601642426;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=wBHth+zBdENXWz8dYgWbeheAt9El7VbwKvgpqtJu8UE=;
- b=T0dCy0+XuXuFoFIpn0SI9T5VWrJbi3AA3v6X99WO26ePADzZcVNY2iRdQxmwj2S8AQULrk
- ABBJTQJ853TUqka6VGCs6zdtC9GHW03XJ6a95t41rQAqTTpo7qTWUPlbooMpL5RqAZ8H8w
- 9bv7Vh1YhtV1Lmpm3o5MXUF7BFtgQIw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-107-NlRPNz8YNCGGJgAdw--t8Q-1; Fri, 02 Oct 2020 08:40:23 -0400
-X-MC-Unique: NlRPNz8YNCGGJgAdw--t8Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D0D81084C85;
- Fri,  2 Oct 2020 12:40:22 +0000 (UTC)
-Received: from dgilbert-t580.localhost (ovpn-114-192.ams2.redhat.com
- [10.36.114.192])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B67C078806;
- Fri,  2 Oct 2020 12:40:18 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org,
-	alex.bennee@linaro.org,
-	stefanha@redhat.com
-Subject: [PATCH] virtiofsd: Call qemu_init_exec_dir
-Date: Fri,  2 Oct 2020 13:40:15 +0100
-Message-Id: <20201002124015.44820-1-dgilbert@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kOKN1-0007MO-SK
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:41:09 -0400
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:45051)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kOKMz-0007HP-CO
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:41:07 -0400
+Received: by mail-ed1-x543.google.com with SMTP id b12so1469879edz.11
+ for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 05:41:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=4lj7wFOKksjbC5te72hpMm9u37ZJNaIbp0yvMq7z1UM=;
+ b=jNWkCRwAPwCTd9qJht+GbQEYgpWkixshgDTvYvRkkwGBId28lBYyXayNzuII1TMg3K
+ YJvEdGRL1xIJ2QoTxRxDt4Fa/oJvvaXBEcKPXnQlkT4Q8HuZ1MGZ68+wKOu58AMfIKUH
+ Qs9RQL22sSQUkRmKw00oIiAvqEeshZ7N7mtIVxlikZANqFhyz1S28AYvxQOeVJxPJ1m8
+ 3UP+uCXGpigIkKWzI+hIgANQFiH3Z9haxMWlSQWHElc0JufWHg9YYfej14rQUr536hkw
+ 9UJ2IOZdrjTU1K6+aCJS+1Dklh4hi3FBCECxFzhR5xRpv8QdIkHi0GdAZzSnn43BaCvJ
+ Q7kw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=4lj7wFOKksjbC5te72hpMm9u37ZJNaIbp0yvMq7z1UM=;
+ b=CzA3/m7x6Pb6ubTsSU22SZ+LjTHjnGqQujWUU11/GiEOADKEsmtuuSCoSrU7gKMVt6
+ DfBdWCK6okVxeWZdV1tKHWDFz1W8R+afVhLOBHnaPE4JCm7gqL8Yg6BO5xbp1lj0u7w1
+ oAWlD6ZSHtw0izYnef2F+mvR3U6Cu6QMLQgOHFJR8EWh4tkDd5lgByIoH4P2o4aRBgGI
+ VloA72dnXkiMsgSU0rmr20/FwJrYh0CH4kGpdaK4vyK8DQ35fg12R0Elc7LKTrje28ge
+ 4+lR/qTwsVzwcfi0UXgf+yPO6LD3ck2lEh/xHFT26GDrOUwpC+OBvp3o6GmAoWaVKPlD
+ FrTQ==
+X-Gm-Message-State: AOAM5313jFGrDQDgQj/XFgckObDuESwSccX/aTMYdKHW41cw38pI3yO6
+ bdzzLMl8/fx1FXCE+BfCSucYf3cSHNSOYC4CyehlMhtIADSUjQ==
+X-Google-Smtp-Source: ABdhPJyq7QJe9PN1zEZM4Hzn4nCo2GOC1Vl2CpsxfFtGfn49lblEynCGq+1F/Y7q0igt6h3HQSJ6FjSSCNHJbfRji/o=
+X-Received: by 2002:aa7:da94:: with SMTP id q20mr2176567eds.52.1601642463457; 
+ Fri, 02 Oct 2020 05:41:03 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 01:13:31
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <1597278668-339715-1-git-send-email-fnu.vikram@xilinx.com>
+ <CAFEAcA8gYXDJKMS3nUSW96hhwmC37=QX1EhVfWj7j0smKGvXgA@mail.gmail.com>
+ <CAFEAcA-Y8GQXSU6F3-AWcW=5VcWOtT0w_Fi4SAbfT2M2zjxB1Q@mail.gmail.com>
+ <20200914222838.GA75143@xilinx.com>
+ <BYAPR02MB4823111774CAC3DA1577EF17BC300@BYAPR02MB4823.namprd02.prod.outlook.com>
+In-Reply-To: <BYAPR02MB4823111774CAC3DA1577EF17BC300@BYAPR02MB4823.namprd02.prod.outlook.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 2 Oct 2020 13:40:51 +0100
+Message-ID: <CAFEAcA-yeb7tKcb0C5L-JSKwAwMr_Hq6BobM+-EY-WUnSPsRNg@mail.gmail.com>
+Subject: Re: [PATCH v9 0/4] Introduce Xilinx ZynqMP CAN controller
+To: Vikram Garhwal <fnuv@xilinx.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::543;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x543.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,37 +97,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Thu, 1 Oct 2020 at 18:57, Vikram Garhwal <fnuv@xilinx.com> wrote:
+>
+> Hi Peter,
+> I sent rebased V10 series three weeks back as there were some issues with meson build on v9. Would it possible for you to apply the patch series?
 
-Since fcb4f59c879 qemu_get_local_state_pathname relies on the
-init_exec_dir, and virtiofsd asserts because we never set it.
-Set it.
+Oops, sorry -- I didn't notice the resent series. I've put it on
+my list to handle.
 
-Reported-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- tools/virtiofsd/passthrough_ll.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
-index 0b229ebd57..cce983ca63 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -2839,6 +2839,8 @@ int main(int argc, char *argv[])
-     /* Don't mask creation mode, kernel already did that */
-     umask(0);
- 
-+    qemu_init_exec_dir(argv[0]);
-+
-     pthread_mutex_init(&lo.mutex, NULL);
-     lo.inodes = g_hash_table_new(lo_key_hash, lo_key_equal);
-     lo.root.fd = -1;
--- 
-2.26.2
-
+thanks
+-- PMM
 
