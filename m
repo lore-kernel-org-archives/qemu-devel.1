@@ -2,97 +2,91 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23656C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 07:36:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4E83C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 07:38:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D4CB20758
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 07:36:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3AA97206C1
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 07:38:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FDP42Bsl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D4CB20758
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P6r3XwVj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AA97206C1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOFbu-0008BQ-SB
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 03:36:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57038)
+	id 1kOFdq-0001L3-CS
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 03:38:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57260)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
- id 1kOFb6-0007ZW-Cf
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 03:35:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21283)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kOFcF-0000Eg-Gy
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 03:36:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38107)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
- id 1kOFb2-0003WD-F3
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 03:35:19 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kOFcD-0003n5-N4
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 03:36:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601624111;
+ s=mimecast20190719; t=1601624188;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=fnU+IOGvc3pSPHiHxqEALo+mCsruplku0v8NMmQL9Bw=;
- b=FDP42Bsley6zbOlXGrqHT7/br9APqSsLBKNAIZJehjR7079l2++lXiT2m7Zrd+/K3TOG56
- 34gF9rpwOFzzWH+9HLDQvfpafTw2Qu1WF7E0glXiC2as7CHwZTc/nXX9oEluegFG7g9YxW
- /tdWOGRi26bKboiCpSYW+K3B3Pj9y1Q=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=JqCLMkqBYj754181eZJ8yJ6p2u3RwNxOA4vmvwiEdvk=;
+ b=P6r3XwVjTJk8ya9lVhitUCmuaJOzv101PqcAHFqT4nzZP+HZCLMDXtXo6bXgah84hz+0Wf
+ nTGhzNQc7KHknPuMxCIYD4kgQqWIHDIGAPtNuJTvJVifC0anOYbeT0AKukJ4xmt5tSoof7
+ gmXuXv7MhdWedJxHrjnLoNKzMVeQkh8=
 Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
  [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-240-ATImYo9TPX6e7c7Or8UOPQ-1; Fri, 02 Oct 2020 03:35:02 -0400
-X-MC-Unique: ATImYo9TPX6e7c7Or8UOPQ-1
-Received: by mail-wr1-f69.google.com with SMTP id d13so220476wrr.23
- for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 00:35:01 -0700 (PDT)
+ us-mta-269-AXBEoOE5PYOwMwMZfhy8RQ-1; Fri, 02 Oct 2020 03:36:25 -0400
+X-MC-Unique: AXBEoOE5PYOwMwMZfhy8RQ-1
+Received: by mail-wr1-f69.google.com with SMTP id b2so233412wrs.7
+ for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 00:36:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=fnU+IOGvc3pSPHiHxqEALo+mCsruplku0v8NMmQL9Bw=;
- b=opUyAzFVpCLDLmEQ1o/zg5lePbQ5Kda3pZ2JbBZpul2DbjORZXxbiQW+LSsTYDRuR3
- eNPBzShmG8EP2+UJ0KCkPdalbuEv05T8ZHYJ5yILKLhuKdc/dUa/9+avyaB9W0WWd2Q/
- qEmtfMNP3Oquo4ZkAd7cgynBalUgw0Z7JH5/a4D2F108jAjIMJH8z8S4PVh1ixixq/Tf
- 48bvBSqIT1+sBhnSMP3Kg1raIKr03vMXujSTTcpU+mh3hf5bDspSQoJoU2HAWgwnl3gm
- j4vd2uryzWlmiLK1bfo9Nk9pP//nOdVyWaVhJn3CSIhVj+1Gr44LcEgSirvnQsNQ0h1Z
- YjaA==
-X-Gm-Message-State: AOAM532xbp1GQgHzNAHvWBReTrITGqw40T3BL07RoDLs5OtmxrOdj1YV
- BTMD1rXO1O6ZvbH+O80qOaYoBE1jDl3MRkhAziD6DqFN8pYttprkezSzaOLMLWyvtk7iurt21Pa
- fs31ZesiiZ5lkwK8=
-X-Received: by 2002:a05:600c:22c5:: with SMTP id
- 5mr1315259wmg.34.1601624100628; 
- Fri, 02 Oct 2020 00:35:00 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxzMBKKBBNkc0ohKpB95hgvY5gE8aBYAF+r4Fhl+DemnPV0/O9rE+hfuyYIV6r+RX1doafvxA==
-X-Received: by 2002:a05:600c:22c5:: with SMTP id
- 5mr1315242wmg.34.1601624100328; 
- Fri, 02 Oct 2020 00:35:00 -0700 (PDT)
-Received: from steredhat (host-79-27-201-176.retail.telecomitalia.it.
- [79.27.201.176])
- by smtp.gmail.com with ESMTPSA id m10sm795455wmc.9.2020.10.02.00.34.59
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=JqCLMkqBYj754181eZJ8yJ6p2u3RwNxOA4vmvwiEdvk=;
+ b=OCYFYuznA9hPr9HcLqQI0YzXbsFN+XzmPM7iEBDDv7Ydy6Ewk26IaN7uNCbJ8R1FhW
+ 9hHyngmzcqeq5NnoOz9LrzRxjxOPyIvNl/X9YbDdy0h1EfIeIHMez8BIwpwtIs/vnBXk
+ cRFytDhVWWFz1H6RqZvrH4Nqnb+Z3IoGa16gvvh58L2i4NK17EHBs/qqB/dCOibVkyRu
+ Du3L/SQS8ehrdms473nNraQytTQQ0615IzAEIjiY7K5dComS8UIJi030L1xjf/H07Q/c
+ I8owPL/oLQqHcMQzVswn22bpauLXXjCpLftE4Bbul91TlJt/wMosI54BgJtC8X3K0Cf0
+ xlxw==
+X-Gm-Message-State: AOAM532BTp/HAvWzrjI91fKrL5TtEeQGk2Zfu2OudrimSCXvD9F963g6
+ xTjNMPjhtYMI/Z9T6jsum3pqqIOuaXgxKRQsTzOvMNDKHn8uRBCfb+u1GWjHMbCipz5c2UTo0ZZ
+ AevW93PtGYyqi/ZQ=
+X-Received: by 2002:a1c:ed05:: with SMTP id l5mr1301689wmh.106.1601624184224; 
+ Fri, 02 Oct 2020 00:36:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwUbu8NfvCw/b5dq3GOkswir7KxmzP46GOMWTlbV8aTHIeiY3Ky21awAKPL1KFgcI5Ie8fudw==
+X-Received: by 2002:a1c:ed05:: with SMTP id l5mr1301662wmh.106.1601624183947; 
+ Fri, 02 Oct 2020 00:36:23 -0700 (PDT)
+Received: from localhost.localdomain (74.red-83-53-161.dynamicip.rima-tde.net.
+ [83.53.161.74])
+ by smtp.gmail.com with ESMTPSA id q12sm725004wrs.48.2020.10.02.00.36.22
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 02 Oct 2020 00:34:59 -0700 (PDT)
-Date: Fri, 2 Oct 2020 09:34:57 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Ju Hyung Park <qkrwngud825@gmail.com>
-Subject: Re: io_uring possibly the culprit for qemu hang (linux-5.4.y)
-Message-ID: <20201002073457.jzkmefo5c65zlka7@steredhat>
-References: <CAD14+f3G2f4QEK+AQaEjAG4syUOK-9bDagXa8D=RxdFWdoi5fQ@mail.gmail.com>
- <20201001085900.ms5ix2zyoid7v3ra@steredhat>
- <CAD14+f1m8Xk-VC1nyMh-X4BfWJgObb74_nExhO0VO3ezh_G2jA@mail.gmail.com>
+ Fri, 02 Oct 2020 00:36:23 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 0/1] user-mode: Prune build dependencies (part 3)
+Date: Fri,  2 Oct 2020 09:36:20 +0200
+Message-Id: <20201002073621.1653924-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <CAD14+f1m8Xk-VC1nyMh-X4BfWJgObb74_nExhO0VO3ezh_G2jA@mail.gmail.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=sgarzare@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=sgarzare@redhat.com;
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 23:37:29
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 01:13:31
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -113,218 +107,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
- qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Ju,
+This is the third part of a series reducing user-mode
+dependencies. By stripping out unused code, the build
+and testing time is reduced (as is space used by objects).
 
-On Thu, Oct 01, 2020 at 11:30:14PM +0900, Ju Hyung Park wrote:
-> Hi Stefano,
-> 
-> On Thu, Oct 1, 2020 at 5:59 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
-> > Please, can you share the qemu command line that you are using?
-> > This can be useful for the analysis.
-> 
-> Sure.
+Part 3:
+- Reduce user-mode QAPI generated files
 
-Thanks for sharing.
+Since v3:
+- Keep qdev.json in user-mode (no need for qdev-system
+  stub for qapi_event_send_device_deleted, Paolo)
+- Keep machine.json in user-mode (no need to restrict
+  X86CPUFeatureWord to x86 architecture, Eduardo)
 
-The issue seems related to io_uring and the new io_uring fd monitoring
-implementation available from QEMU 5.0.
+Since v2:
+- Fixed UuidInfo placed in incorrect json
+- Rebased on Meson
+- Include X86CPUFeatureWord unmerged from part 2
 
-I'll try to reproduce.
+Since v1:
+- Addressed Richard and Paolo review comments
 
-For now, as a workaround, you can rebuild qemu by disabling io-uring support:
+v3: https://www.mail-archive.com/qemu-devel@nongnu.org/msg746423.html
+v2: https://www.mail-archive.com/qemu-devel@nongnu.org/msg688879.html
+v1: https://www.mail-archive.com/qemu-devel@nongnu.org/msg688486.html
 
-  ../configure --disable-linux-io-uring ...
+Based on https://github.com/ehabkost/qemu.git machine-next
 
+Philippe Mathieu-Daudé (1):
+  qapi: Restrict code generated for user-mode
 
-Thanks,
-Stefano
+ qapi/meson.build | 51 ++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 36 insertions(+), 15 deletions(-)
 
-> 
-> QEMU:
-> /usr/bin/qemu-system-x86_64 -name guest=win10,debug-threads=on -S
-> -object secret,id=masterKey0,format=raw,file=/var/lib/libvirt/qemu/domain-1-win10/master-key.aes
-> -blockdev {"driver":"file","filename":"/usr/share/OVMF/OVMF_CODE.fd","node-name":"libvirt-pflash0-storage","auto-read-only":true,"discard":"unmap"}
-> -blockdev {"node-name":"libvirt-pflash0-format","read-only":true,"driver":"raw","file":"libvirt-pflash0-storage"}
-> -blockdev {"driver":"file","filename":"/var/lib/libvirt/qemu/nvram/win10_VARS.fd","node-name":"libvirt-pflash1-storage","auto-read-only":true,"discard":"unmap"}
-> -blockdev {"node-name":"libvirt-pflash1-format","read-only":false,"driver":"raw","file":"libvirt-pflash1-storage"}
-> -machine pc-q35-5.0,accel=kvm,usb=off,vmport=off,dump-guest-core=off,mem-merge=off,pflash0=libvirt-pflash0-format,pflash1=libvirt-pflash1-format
-> -cpu Skylake-Client-IBRS,ss=on,vmx=on,hypervisor=on,tsc-adjust=on,clflushopt=on,umip=on,md-clear=on,stibp=on,arch-capabilities=on,ssbd=on,xsaves=on,pdpe1gb=on,ibpb=on,amd-ssbd=on,fma=off,avx=off,f16c=off,rdrand=off,bmi1=off,hle=off,avx2=off,bmi2=off,rtm=off,rdseed=off,adx=off,hv-time,hv-relaxed,hv-vapic,hv-spinlocks=0x1fff,hv-vpindex,hv-runtime,hv-synic,hv-stimer,hv-reset
-> -m 8192 -mem-prealloc -mem-path /dev/hugepages/libvirt/qemu/1-win10
-> -overcommit mem-lock=off -smp 4,sockets=1,dies=1,cores=2,threads=2
-> -uuid 7ccc3031-1dab-4267-b72a-d60065b5ff7f -display none
-> -no-user-config -nodefaults -chardev
-> socket,id=charmonitor,fd=32,server,nowait -mon
-> chardev=charmonitor,id=monitor,mode=control -rtc
-> base=localtime,driftfix=slew -global kvm-pit.lost_tick_policy=delay
-> -no-hpet -no-shutdown -global ICH9-LPC.disable_s3=1 -global
-> ICH9-LPC.disable_s4=1 -boot menu=off,strict=on -device
-> pcie-root-port,port=0x8,chassis=1,id=pci.1,bus=pcie.0,multifunction=on,addr=0x1
-> -device pcie-root-port,port=0x9,chassis=2,id=pci.2,bus=pcie.0,addr=0x1.0x1
-> -device pcie-root-port,port=0xa,chassis=3,id=pci.3,bus=pcie.0,addr=0x1.0x2
-> -device pcie-root-port,port=0xb,chassis=4,id=pci.4,bus=pcie.0,addr=0x1.0x3
-> -device pcie-pci-bridge,id=pci.5,bus=pci.2,addr=0x0 -device
-> qemu-xhci,id=usb,bus=pci.1,addr=0x0 -blockdev
-> {"driver":"host_device","filename":"/dev/disk/by-partuuid/05c3750b-060f-4703-95ea-6f5e546bf6e9","node-name":"libvirt-1-storage","cache":{"direct":false,"no-flush":true},"auto-read-only":true,"discard":"unmap"}
-> -blockdev {"node-name":"libvirt-1-format","read-only":false,"discard":"unmap","detect-zeroes":"unmap","cache":{"direct":false,"no-flush":true},"driver":"raw","file":"libvirt-1-storage"}
-> -device virtio-blk-pci,scsi=off,bus=pcie.0,addr=0xa,drive=libvirt-1-format,id=virtio-disk0,bootindex=1,write-cache=on
-> -netdev tap,fd=34,id=hostnet0 -device
-> e1000,netdev=hostnet0,id=net0,mac=52:54:00:c6:bb:bc,bus=pcie.0,addr=0x3
-> -device ich9-intel-hda,id=sound0,bus=pcie.0,addr=0x4 -device
-> hda-duplex,id=sound0-codec0,bus=sound0.0,cad=0 -device
-> vfio-pci,host=0000:00:02.0,id=hostdev0,bus=pcie.0,addr=0x2,rombar=0
-> -device virtio-balloon-pci,id=balloon0,bus=pcie.0,addr=0x8 -object
-> rng-random,id=objrng0,filename=/dev/urandom -device
-> virtio-rng-pci,rng=objrng0,id=rng0,bus=pcie.0,addr=0x9 -msg
-> timestamp=on
-> 
-> And I use libvirt 6.3.0 to manage the VM. Here's an xml of my VM.
-> 
-> <domain type="kvm">
->   <name>win10</name>
->   <uuid>7ccc3031-1dab-4267-b72a-d60065b5ff7f</uuid>
->   <metadata>
->     <libosinfo:libosinfo
-> xmlns:libosinfo="http://libosinfo.org/xmlns/libvirt/domain/1.0">
->       <libosinfo:os id="http://microsoft.com/win/10"/>
->     </libosinfo:libosinfo>
->   </metadata>
->   <memory unit="KiB">8388608</memory>
->   <currentMemory unit="KiB">8388608</currentMemory>
->   <memoryBacking>
->     <hugepages/>
->     <nosharepages/>
->   </memoryBacking>
->   <vcpu placement="static">4</vcpu>
->   <cputune>
->     <vcpupin vcpu="0" cpuset="0"/>
->     <vcpupin vcpu="1" cpuset="2"/>
->     <vcpupin vcpu="2" cpuset="1"/>
->     <vcpupin vcpu="3" cpuset="3"/>
->   </cputune>
->   <os>
->     <type arch="x86_64" machine="pc-q35-5.0">hvm</type>
->     <loader readonly="yes" type="pflash">/usr/share/OVMF/OVMF_CODE.fd</loader>
->     <nvram>/var/lib/libvirt/qemu/nvram/win10_VARS.fd</nvram>
->     <boot dev="hd"/>
->     <bootmenu enable="no"/>
->   </os>
->   <features>
->     <acpi/>
->     <apic/>
->     <hyperv>
->       <relaxed state="on"/>
->       <vapic state="on"/>
->       <spinlocks state="on" retries="8191"/>
->       <vpindex state="on"/>
->       <runtime state="on"/>
->       <synic state="on"/>
->       <stimer state="on"/>
->       <reset state="on"/>
->     </hyperv>
->     <vmport state="off"/>
->   </features>
->   <cpu mode="host-model" check="partial">
->     <topology sockets="1" dies="1" cores="2" threads="2"/>
->   </cpu>
->   <clock offset="localtime">
->     <timer name="rtc" tickpolicy="catchup"/>
->     <timer name="pit" tickpolicy="delay"/>
->     <timer name="hpet" present="no"/>
->     <timer name="hypervclock" present="yes"/>
->   </clock>
->   <on_poweroff>destroy</on_poweroff>
->   <on_reboot>restart</on_reboot>
->   <on_crash>destroy</on_crash>
->   <pm>
->     <suspend-to-mem enabled="no"/>
->     <suspend-to-disk enabled="no"/>
->   </pm>
->   <devices>
->     <emulator>/usr/bin/qemu-system-x86_64</emulator>
->     <disk type="block" device="disk">
->       <driver name="qemu" type="raw" cache="unsafe" discard="unmap"
-> detect_zeroes="unmap"/>
->       <source dev="/dev/disk/by-partuuid/05c3750b-060f-4703-95ea-6f5e546bf6e9"/>
->       <target dev="vda" bus="virtio"/>
->       <address type="pci" domain="0x0000" bus="0x00" slot="0x0a"
-> function="0x0"/>
->     </disk>
->     <controller type="pci" index="0" model="pcie-root"/>
->     <controller type="pci" index="1" model="pcie-root-port">
->       <model name="pcie-root-port"/>
->       <target chassis="1" port="0x8"/>
->       <address type="pci" domain="0x0000" bus="0x00" slot="0x01"
-> function="0x0" multifunction="on"/>
->     </controller>
->     <controller type="pci" index="2" model="pcie-root-port">
->       <model name="pcie-root-port"/>
->       <target chassis="2" port="0x9"/>
->       <address type="pci" domain="0x0000" bus="0x00" slot="0x01"
-> function="0x1"/>
->     </controller>
->     <controller type="pci" index="3" model="pcie-root-port">
->       <model name="pcie-root-port"/>
->       <target chassis="3" port="0xa"/>
->       <address type="pci" domain="0x0000" bus="0x00" slot="0x01"
-> function="0x2"/>
->     </controller>
->     <controller type="pci" index="4" model="pcie-root-port">
->       <model name="pcie-root-port"/>
->       <target chassis="4" port="0xb"/>
->       <address type="pci" domain="0x0000" bus="0x00" slot="0x01"
-> function="0x3"/>
->     </controller>
->     <controller type="pci" index="5" model="pcie-to-pci-bridge">
->       <model name="pcie-pci-bridge"/>
->       <address type="pci" domain="0x0000" bus="0x02" slot="0x00"
-> function="0x0"/>
->     </controller>
->     <controller type="usb" index="0" model="qemu-xhci">
->       <address type="pci" domain="0x0000" bus="0x01" slot="0x00"
-> function="0x0"/>
->     </controller>
->     <controller type="sata" index="0">
->       <address type="pci" domain="0x0000" bus="0x00" slot="0x1f"
-> function="0x2"/>
->     </controller>
->     <interface type="network">
->       <mac address="52:54:00:c6:bb:bc"/>
->       <source network="default"/>
->       <model type="e1000"/>
->       <address type="pci" domain="0x0000" bus="0x00" slot="0x03"
-> function="0x0"/>
->     </interface>
->     <input type="mouse" bus="ps2"/>
->     <input type="keyboard" bus="ps2"/>
->     <sound model="ich9">
->       <address type="pci" domain="0x0000" bus="0x00" slot="0x04"
-> function="0x0"/>
->     </sound>
->     <hostdev mode="subsystem" type="pci" managed="yes">
->       <source>
->         <address domain="0x0000" bus="0x00" slot="0x02" function="0x0"/>
->       </source>
->       <rom bar="off"/>
->       <address type="pci" domain="0x0000" bus="0x00" slot="0x02"
-> function="0x0"/>
->     </hostdev>
->     <memballoon model="virtio">
->       <address type="pci" domain="0x0000" bus="0x00" slot="0x08"
-> function="0x0"/>
->     </memballoon>
->     <rng model="virtio">
->       <backend model="random">/dev/urandom</backend>
->       <address type="pci" domain="0x0000" bus="0x00" slot="0x09"
-> function="0x0"/>
->     </rng>
->   </devices>
-> </domain>
-> 
+-- 
+2.26.2
 
 
