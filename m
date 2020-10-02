@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA2FBC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:43:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC492C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:43:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07CF920672
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:43:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4017320672
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:43:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jNWkCRwA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07CF920672
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DwGT3dKT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4017320672
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOKOx-0000QF-1o
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 08:43:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35544)
+	id 1kOKPe-0000nR-9X
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 08:43:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34546)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kOKN1-0007MO-SK
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:41:09 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:45051)
+ id 1kOKJ6-0003X9-AG
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:37:04 -0400
+Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:45224)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kOKMz-0007HP-CO
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:41:07 -0400
-Received: by mail-ed1-x543.google.com with SMTP id b12so1469879edz.11
- for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 05:41:04 -0700 (PDT)
+ id 1kOKJ4-0006j6-MA
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:37:04 -0400
+Received: by mail-ej1-x641.google.com with SMTP id i26so1724685ejb.12
+ for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 05:37:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=4lj7wFOKksjbC5te72hpMm9u37ZJNaIbp0yvMq7z1UM=;
- b=jNWkCRwAPwCTd9qJht+GbQEYgpWkixshgDTvYvRkkwGBId28lBYyXayNzuII1TMg3K
- YJvEdGRL1xIJ2QoTxRxDt4Fa/oJvvaXBEcKPXnQlkT4Q8HuZ1MGZ68+wKOu58AMfIKUH
- Qs9RQL22sSQUkRmKw00oIiAvqEeshZ7N7mtIVxlikZANqFhyz1S28AYvxQOeVJxPJ1m8
- 3UP+uCXGpigIkKWzI+hIgANQFiH3Z9haxMWlSQWHElc0JufWHg9YYfej14rQUr536hkw
- 9UJ2IOZdrjTU1K6+aCJS+1Dklh4hi3FBCECxFzhR5xRpv8QdIkHi0GdAZzSnn43BaCvJ
- Q7kw==
+ :cc; bh=j63E2tRroDA+OMewjGQyEGOgm0+HubdVlbniVt+SiO8=;
+ b=DwGT3dKT85NdwiMhqBNVmdCqd12TUJ+pLGPTI+X7jVMXvV+ubsjR1m2atq28MDguM4
+ RxBlVlXem9FI3sotIIgaZ3FtJU72giVvQyPjY47I/xFpZ18i/FAglGKhHhs+9HOfGIkP
+ wah/VTG1dr+4w+CuoVF+iRglVJvK/DoBB7PE/eShdgaVj0I9OLWieTGmp0UvXoxN6Fjb
+ RMT9U+W2bTgAAxKZ+foG0+kN1mMY2b5f+1snWb9aOpwgi7kQofsWukC7elEx4nbM+NBM
+ u+d4HpXSZu9s2rQ0D9Hrwf8vi8HOY1P1mxYjfSH7a2H2uzXYIp2GMbUBJXP/VYe4G7WT
+ q2qA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=4lj7wFOKksjbC5te72hpMm9u37ZJNaIbp0yvMq7z1UM=;
- b=CzA3/m7x6Pb6ubTsSU22SZ+LjTHjnGqQujWUU11/GiEOADKEsmtuuSCoSrU7gKMVt6
- DfBdWCK6okVxeWZdV1tKHWDFz1W8R+afVhLOBHnaPE4JCm7gqL8Yg6BO5xbp1lj0u7w1
- oAWlD6ZSHtw0izYnef2F+mvR3U6Cu6QMLQgOHFJR8EWh4tkDd5lgByIoH4P2o4aRBgGI
- VloA72dnXkiMsgSU0rmr20/FwJrYh0CH4kGpdaK4vyK8DQ35fg12R0Elc7LKTrje28ge
- 4+lR/qTwsVzwcfi0UXgf+yPO6LD3ck2lEh/xHFT26GDrOUwpC+OBvp3o6GmAoWaVKPlD
- FrTQ==
-X-Gm-Message-State: AOAM5313jFGrDQDgQj/XFgckObDuESwSccX/aTMYdKHW41cw38pI3yO6
- bdzzLMl8/fx1FXCE+BfCSucYf3cSHNSOYC4CyehlMhtIADSUjQ==
-X-Google-Smtp-Source: ABdhPJyq7QJe9PN1zEZM4Hzn4nCo2GOC1Vl2CpsxfFtGfn49lblEynCGq+1F/Y7q0igt6h3HQSJ6FjSSCNHJbfRji/o=
-X-Received: by 2002:aa7:da94:: with SMTP id q20mr2176567eds.52.1601642463457; 
- Fri, 02 Oct 2020 05:41:03 -0700 (PDT)
+ bh=j63E2tRroDA+OMewjGQyEGOgm0+HubdVlbniVt+SiO8=;
+ b=OtKDx1wRJYkXj6M8Ia7LyUY85whKxh+v1bVaEtipMktKtSdD9rq3sNp6ahQkh1bref
+ R4RvEib1OAGNAmwe/n2XDN0NkgP3sY/QhLeZIoX2aMWrUHSAIyzKGooF6pqlA4T4GPkv
+ wOeSOouEfVVpOILhNrCU1j292QAyUOXb35PiM6jauxXMu8yl9cZSml6jX4J3QgkIW3J5
+ raYdtflRumiIEXdHUsO4J2ayKzjF/gqVQafS+7Oh+7ycSiHstbfMHww7F0H2jrU6Tv52
+ 6OqyrcL4McpY+Vjy43FcyUWYfS7q37VgR3Lu88yrM69Bl3PY5DqFiZK4GvjwJ9SnsB2I
+ GQOg==
+X-Gm-Message-State: AOAM5327XE1lVBUV4udPFwg11cWXfGpDiNpJ2HXLJZtisL+jAj+kr4Yi
+ R7Ooyrx2BsJAVdyI/kNfm0CCgQppqKVg84+KGrD/UQ==
+X-Google-Smtp-Source: ABdhPJwFBiKxFL+4hjkVhHIOmkggbXzXHhiJXDxL068mS/hNLk9jPD6mn1t0pBux9mcmzuH7OE4fqzeVZcLrPerUTYU=
+X-Received: by 2002:a17:906:d936:: with SMTP id
+ rn22mr2092079ejb.4.1601642220917; 
+ Fri, 02 Oct 2020 05:37:00 -0700 (PDT)
 MIME-Version: 1.0
-References: <1597278668-339715-1-git-send-email-fnu.vikram@xilinx.com>
- <CAFEAcA8gYXDJKMS3nUSW96hhwmC37=QX1EhVfWj7j0smKGvXgA@mail.gmail.com>
- <CAFEAcA-Y8GQXSU6F3-AWcW=5VcWOtT0w_Fi4SAbfT2M2zjxB1Q@mail.gmail.com>
- <20200914222838.GA75143@xilinx.com>
- <BYAPR02MB4823111774CAC3DA1577EF17BC300@BYAPR02MB4823.namprd02.prod.outlook.com>
-In-Reply-To: <BYAPR02MB4823111774CAC3DA1577EF17BC300@BYAPR02MB4823.namprd02.prod.outlook.com>
+References: <20201002105239.2444-1-peter.maydell@linaro.org>
+ <b1a6000a-c9a1-43fb-7646-b6ea87797b2e@redhat.com>
+ <CAFEAcA9PbBByROzJ3+pfxycAoP-C5JnmfxQEt5jm6+3A3n2fbw@mail.gmail.com>
+In-Reply-To: <CAFEAcA9PbBByROzJ3+pfxycAoP-C5JnmfxQEt5jm6+3A3n2fbw@mail.gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 2 Oct 2020 13:40:51 +0100
-Message-ID: <CAFEAcA-yeb7tKcb0C5L-JSKwAwMr_Hq6BobM+-EY-WUnSPsRNg@mail.gmail.com>
-Subject: Re: [PATCH v9 0/4] Introduce Xilinx ZynqMP CAN controller
-To: Vikram Garhwal <fnuv@xilinx.com>
+Date: Fri, 2 Oct 2020 13:36:49 +0100
+Message-ID: <CAFEAcA96sZqqSNSJT7TET8qfArLnWJr5tu1YLqFGBsnca3YoFQ@mail.gmail.com>
+Subject: Re: [PATCH] meson.build: Don't look for libudev for static builds
+To: Paolo Bonzini <pbonzini@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::543;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x543.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::641;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x641.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -102,14 +101,15 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 1 Oct 2020 at 18:57, Vikram Garhwal <fnuv@xilinx.com> wrote:
+On Fri, 2 Oct 2020 at 13:35, Peter Maydell <peter.maydell@linaro.org> wrote:
 >
-> Hi Peter,
-> I sent rebased V10 series three weeks back as there were some issues with meson build on v9. Would it possible for you to apply the patch series?
+> On Fri, 2 Oct 2020 at 13:02, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > - the workaround: just leave things as they are and add
+> > --disable-libudev to your script.
+>
+> There is no --disable-udev !
 
-Oops, sorry -- I didn't notice the resent series. I've put it on
-my list to handle.
+...and there's no --disable-libudev either :-)
 
-thanks
 -- PMM
 
