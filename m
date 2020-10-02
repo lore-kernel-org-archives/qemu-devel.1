@@ -2,76 +2,80 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E879EC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:33:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DF1CC4727D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:35:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 938B2206DB
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:33:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 17A7D207EA
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:35:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ka1yE2kU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 938B2206DB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QoB5WOoT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17A7D207EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOKFu-0007cs-Pg
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 08:33:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57168)
+	id 1kOKHO-0000xD-NJ
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 08:35:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57390)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kOJvl-00050Z-Tj
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:12:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41957)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kOJwv-0006Vr-ED
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:14:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59281)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kOJvj-0003YH-0v
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:12:57 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kOJwq-0003h8-7Y
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:14:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601640768;
+ s=mimecast20190719; t=1601640843;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=p15fEnU2x5Cdrh43KCW+kcJvwkIB+VO7T2snwCcFnoo=;
- b=Ka1yE2kUrIgZX0xpMZRpBu2S5twJvr3uHD/gOCekIw4CNq7ZIdbK2LD9e88RXnJxqIdzir
- p4+DigxInMDrIvA2EBC5JznM0QgLWnLKgiU5M5xpGNzQCkYF575FGiWSzif6JN49wGzzFU
- d+Nh1ZJlLooJ72pqPe0k21efhep1vQE=
+ bh=xC+9Zbv8CwpV4K4LSWFeMCh8KwxR9LCp7tAUcfvDSrM=;
+ b=QoB5WOoT6dnZ/AMxpeIrA9nmpZfPgE1GK8pn4XyXdUecNH4OaPEQYLgB+ckt52YQMcvTTz
+ SSg5Rt/HT7EBwOxP8Vfhcze7pKwpcKPdC5/vlWaH2MqK7EO2KmYiscljMfDivcTBQ2gO2x
+ MGqwCkIwKXdu7oLungrBe0QGlid7cvk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-493-ok6c72I1P2aNL-eOavot9g-1; Fri, 02 Oct 2020 08:12:46 -0400
-X-MC-Unique: ok6c72I1P2aNL-eOavot9g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-529-a4W1PYysNzeytbD1DZpkPg-1; Fri, 02 Oct 2020 08:14:02 -0400
+X-MC-Unique: a4W1PYysNzeytbD1DZpkPg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A7151084C8F;
- Fri,  2 Oct 2020 12:12:45 +0000 (UTC)
-Received: from localhost (ovpn-112-216.ams2.redhat.com [10.36.112.216])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E9FE15C1D7;
- Fri,  2 Oct 2020 12:12:41 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 19/19] s390x/tcg: Implement CIPHER MESSAGE WITH AUTHENTICATION
- (KMA)
-Date: Fri,  2 Oct 2020 14:11:18 +0200
-Message-Id: <20201002121118.180315-20-cohuck@redhat.com>
-In-Reply-To: <20201002121118.180315-1-cohuck@redhat.com>
-References: <20201002121118.180315-1-cohuck@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B6941882FA3;
+ Fri,  2 Oct 2020 12:14:01 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-101.ams2.redhat.com
+ [10.36.112.101])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A83CE10013BD;
+ Fri,  2 Oct 2020 12:14:00 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 31EA11132784; Fri,  2 Oct 2020 14:13:59 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH v2 2/4] qom: Factor out helpers from
+ user_creatable_print_help()
+References: <20200930124557.51835-1-kwolf@redhat.com>
+ <20200930124557.51835-3-kwolf@redhat.com>
+Date: Fri, 02 Oct 2020 14:13:59 +0200
+In-Reply-To: <20200930124557.51835-3-kwolf@redhat.com> (Kevin Wolf's message
+ of "Wed, 30 Sep 2020 14:45:55 +0200")
+Message-ID: <87d020kepk.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=cohuck@redhat.com;
+Content-Type: text/plain
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 01:13:31
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -94,78 +98,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Hildenbrand <david@redhat.com>
+Kevin Wolf <kwolf@redhat.com> writes:
 
-As with the other crypto functions, we only implement subcode 0 (query)
-and no actual encryption/decryption. We now implement S390_FEAT_MSA_EXT_8.
+> This creates separate helper functions for printing a list of user
+> creatable object types and for printing a list of properties of a given
+> type. This allows using these parts without having a QemuOpts.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200928122717.30586-10-david@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- target/s390x/gen-features.c | 1 +
- target/s390x/insn-data.def  | 1 +
- target/s390x/translate.c    | 7 +++++++
- 3 files changed, 9 insertions(+)
+Does the last sentence allude to a future patch?  If yes, I suggest to
+phrase it as "This will allow ..."
 
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index 02ec0a673517..a6ec918e901e 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -719,6 +719,7 @@ static uint16_t qemu_MAX[] = {
-     /* features introduced after the z13 */
-     S390_FEAT_INSTRUCTION_EXEC_PROT,
-     S390_FEAT_MISC_INSTRUCTION_EXT2,
-+    S390_FEAT_MSA_EXT_8,
- };
- 
- /****** END FEATURE DEFS ******/
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index fc83a6ec32a4..d3bcdfd67b3c 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -982,6 +982,7 @@
-     D(0xb92d, KMCTR,   RRF_b, MSA4, 0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_KMCTR)
-     D(0xb92e, KM,      RRE,   MSA,  0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_KM)
-     D(0xb92f, KMC,     RRE,   MSA,  0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_KMC)
-+    D(0xb929, KMA,     RRF_b, MSA8, 0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_KMA)
-     D(0xb93c, PPNO,    RRE,   MSA5, 0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_PPNO)
-     D(0xb93e, KIMD,    RRE,   MSA,  0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_KIMD)
-     D(0xb93f, KLMD,    RRE,   MSA,  0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_KLMD)
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index bcc65893e4ff..ac10f42f1045 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -2710,6 +2710,12 @@ static DisasJumpType op_msa(DisasContext *s, DisasOps *o)
-     TCGv_i32 t_r1, t_r2, t_r3, type;
- 
-     switch (s->insn->data) {
-+    case S390_FEAT_TYPE_KMA:
-+        if (r3 == r1 || r3 == r2) {
-+            gen_program_exception(s, PGM_SPECIFICATION);
-+            return DISAS_NORETURN;
-+        }
-+        /* FALL THROUGH */
-     case S390_FEAT_TYPE_KMCTR:
-         if (r3 & 1 || !r3) {
-             gen_program_exception(s, PGM_SPECIFICATION);
-@@ -6154,6 +6160,7 @@ enum DisasInsnEnum {
- #define FAC_MSA3        S390_FEAT_MSA_EXT_3 /* msa-extension-3 facility */
- #define FAC_MSA4        S390_FEAT_MSA_EXT_4 /* msa-extension-4 facility */
- #define FAC_MSA5        S390_FEAT_MSA_EXT_5 /* msa-extension-5 facility */
-+#define FAC_MSA8        S390_FEAT_MSA_EXT_8 /* msa-extension-8 facility */
- #define FAC_ECT         S390_FEAT_EXTRACT_CPU_TIME
- #define FAC_PCI         S390_FEAT_ZPCI /* z/PCI facility */
- #define FAC_AIS         S390_FEAT_ADAPTER_INT_SUPPRESSION
--- 
-2.25.4
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  qom/object_interfaces.c | 90 ++++++++++++++++++++++++-----------------
+>  1 file changed, 52 insertions(+), 38 deletions(-)
+>
+> diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
+> index e8e1523960..3fd1da157e 100644
+> --- a/qom/object_interfaces.c
+> +++ b/qom/object_interfaces.c
+> @@ -214,54 +214,68 @@ char *object_property_help(const char *name, const char *type,
+>      return g_string_free(str, false);
+>  }
+>  
+> -bool user_creatable_print_help(const char *type, QemuOpts *opts)
+> +static void user_creatable_print_types(void)
+> +{
+> +    GSList *l, *list;
+> +
+> +    printf("List of user creatable objects:\n");
+> +    list = object_class_get_list_sorted(TYPE_USER_CREATABLE, false);
+> +    for (l = list; l != NULL; l = l->next) {
+> +        ObjectClass *oc = OBJECT_CLASS(l->data);
+> +        printf("  %s\n", object_class_get_name(oc));
+> +    }
+> +    g_slist_free(list);
+> +}
+> +
+> +static bool user_creatable_print_type_properites(const char *type)
+>  {
+>      ObjectClass *klass;
+> +    ObjectPropertyIterator iter;
+> +    ObjectProperty *prop;
+> +    GPtrArray *array;
+> +    int i;
+>  
+> -    if (is_help_option(type)) {
+> -        GSList *l, *list;
+> +    klass = object_class_by_name(type);
+> +    if (!klass) {
+> +        return false;
+> +    }
+>  
+> -        printf("List of user creatable objects:\n");
+> -        list = object_class_get_list_sorted(TYPE_USER_CREATABLE, false);
+> -        for (l = list; l != NULL; l = l->next) {
+> -            ObjectClass *oc = OBJECT_CLASS(l->data);
+> -            printf("  %s\n", object_class_get_name(oc));
+> +    array = g_ptr_array_new();
+> +    object_class_property_iter_init(&iter, klass);
+> +    while ((prop = object_property_iter_next(&iter))) {
+> +        if (!prop->set) {
+> +            continue;
+>          }
+> -        g_slist_free(list);
+> -        return true;
+> +
+> +        g_ptr_array_add(array,
+> +                        object_property_help(prop->name, prop->type,
+> +                                             prop->defval, prop->description));
+>      }
+> +    g_ptr_array_sort(array, (GCompareFunc)qemu_pstrcmp0);
+> +    if (array->len > 0) {
+> +        printf("%s options:\n", type);
+> +    } else {
+> +        printf("There are no options for %s.\n", type);
+> +    }
+> +    for (i = 0; i < array->len; i++) {
+> +        printf("%s\n", (char *)array->pdata[i]);
+> +    }
+> +    g_ptr_array_set_free_func(array, g_free);
+> +    g_ptr_array_free(array, true);
+> +    return true;
+> +}
+>  
+> -    klass = object_class_by_name(type);
+> -    if (klass && qemu_opt_has_help_opt(opts)) {
+> -        ObjectPropertyIterator iter;
+> -        ObjectProperty *prop;
+> -        GPtrArray *array = g_ptr_array_new();
+> -        int i;
+> -
+> -        object_class_property_iter_init(&iter, klass);
+> -        while ((prop = object_property_iter_next(&iter))) {
+> -            if (!prop->set) {
+> -                continue;
+> -            }
+> -
+> -            g_ptr_array_add(array,
+> -                            object_property_help(prop->name, prop->type,
+> -                                                 prop->defval, prop->description));
+> -        }
+> -        g_ptr_array_sort(array, (GCompareFunc)qemu_pstrcmp0);
+> -        if (array->len > 0) {
+> -            printf("%s options:\n", type);
+> -        } else {
+> -            printf("There are no options for %s.\n", type);
+> -        }
+> -        for (i = 0; i < array->len; i++) {
+> -            printf("%s\n", (char *)array->pdata[i]);
+> -        }
+> -        g_ptr_array_set_free_func(array, g_free);
+> -        g_ptr_array_free(array, true);
+> +bool user_creatable_print_help(const char *type, QemuOpts *opts)
+> +{
+> +    if (is_help_option(type)) {
+> +        user_creatable_print_types();
+>          return true;
+>      }
+>  
+> +    if (qemu_opt_has_help_opt(opts)) {
+> +        return user_creatable_print_type_properites(type);
+> +    }
+> +
+>      return false;
+>  }
+
+I'd make user_creatable_print_types() return true for summetry with
+user_creatable_print_type_properites(), but that's a matter of taste.
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
 
