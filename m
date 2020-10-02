@@ -2,90 +2,62 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 552A6C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 18:47:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C43BC35257
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 18:51:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D711020758
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 18:47:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XbZfmApc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D711020758
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8A925206CA
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 18:51:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A925206CA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43848 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOQ5b-0003Oh-VB
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 14:47:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58238)
+	id 1kOQ9a-0007OQ-Np
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 14:51:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58476)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kOQ4O-0002WM-8p
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 14:46:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55158)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kOQ4M-0002tg-FM
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 14:46:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601664373;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=Wxv1f5bAZmH1CZsP11xbe3Qws/ihKLiV02+pmWsIfB4=;
- b=XbZfmApcRJc8d3L+q6rlgjNAK1KP0QY4Hd6tvllKdl5W7cz0cjeLlVcBp/G8Uo0HWR8UYW
- ZbRPPgsaV8OFAoNKOYk+nbDsPn7xAg8G1GUUG9R/zbEiQyM0hg1lMYA1MHHBCPljJd32zO
- VSn1bQwFm1oEY6rtgYLfBiUOdwLvSyg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-184-qJaih-L5NAWTvxqWUYgGmg-1; Fri, 02 Oct 2020 14:46:10 -0400
-X-MC-Unique: qJaih-L5NAWTvxqWUYgGmg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C709F10BBECD;
- Fri,  2 Oct 2020 18:46:09 +0000 (UTC)
-Received: from localhost (ovpn-119-102.rdu2.redhat.com [10.10.119.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8F39F60BE2;
- Fri,  2 Oct 2020 18:46:09 +0000 (UTC)
-Date: Fri, 2 Oct 2020 14:46:08 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 2/8] docs: tweak kernel-doc for QEMU coding standards
-Message-ID: <20201002184608.GG7303@habkost.net>
-References: <20191129140217.17797-1-pbonzini@redhat.com>
- <20191129140217.17797-3-pbonzini@redhat.com>
- <CAFEAcA-svKVfBGRfwX6d5woqOW0z--rV3-gC9Qi9NqypYfZ=hw@mail.gmail.com>
- <20201002183455.GF7303@habkost.net>
- <CAFEAcA_KXvADFm7uQX1a4peofK_On3DaFH2ZCUtWteaiABM-yA@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>)
+ id 1kOQ5d-0003hT-Kx; Fri, 02 Oct 2020 14:47:33 -0400
+Received: from relay68.bu.edu ([128.197.228.73]:34463)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>)
+ id 1kOQ5b-0002yZ-Ux; Fri, 02 Oct 2020 14:47:33 -0400
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: mozz.bu.edu [128.197.127.33]
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id 092Il5kl001741
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+ Fri, 2 Oct 2020 14:47:09 -0400
+Date: Fri, 2 Oct 2020 14:47:05 -0400
+From: Alexander Bulekov <alxndr@bu.edu>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH] gitlab-ci.yml: Only run one test-case per fuzzer
+Message-ID: <20201002184705.uipujm4cqujcyfyl@mozz.bu.edu>
+References: <20201002143524.56930-1-alxndr@bu.edu>
+ <6564a712-71e5-460b-c9d6-1d2c245ff6ea@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_KXvADFm7uQX1a4peofK_On3DaFH2ZCUtWteaiABM-yA@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 23:37:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6564a712-71e5-460b-c9d6-1d2c245ff6ea@redhat.com>
+Received-SPF: pass client-ip=128.197.228.73; envelope-from=alxndr@bu.edu;
+ helo=relay68.bu.edu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 14:47:30
+X-ACL-Warn: Detected OS   = Linux 2.6.x
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
+ HK_RANDOM_FROM=0.821, RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,82 +70,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-trivial@nongnu.org,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 02, 2020 at 07:43:09PM +0100, Peter Maydell wrote:
-> On Fri, 2 Oct 2020 at 19:35, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >
-> > On Mon, Dec 02, 2019 at 06:01:16PM +0000, Peter Maydell wrote:
-> > > On Fri, 29 Nov 2019 at 14:02, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > > >
-> > > > Surprisingly, QEMU does have a pretty consistent doc comment style and
-> > > > it is not very different from the Linux kernel's.  Of the documentation
-> > > > "sigils", only "#" separates the QEMU doc comment style from Linux's,
-> > > > and it has 200+ instances vs. 6 for the kernel's '&struct foo' (all in
-> > > > accel/tcg/translate-all.c), so it's clear that the two standards are
-> > > > different in this respect.  In addition, our structs are typedefed and
-> > > > recognized by CamelCase names.
-> > > >
-> > > > Adjust kernel-doc's parser for these two aspects of the QEMU coding
-> > > > standards.  The patch has been valid, with hardly any change, for over
-> > > > two years, so it should not be an issue to keep kernel-doc in sync with
-> > > > the Linux copy.
-> > > >
-> > > > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > [...]
-> > > > @@ -1906,7 +1914,9 @@ sub process_name($$) {
-> > > >             ++$warnings;
-> > > >         }
-> > > >
-> > > > -       if ($identifier =~ m/^struct\b/) {
-> > > > +       if ($identifier =~ m/^[A-Z]/) {
-> > > > +           $decl_type = 'type name';
-> > > > +       } elsif ($identifier =~ m/^struct\b/) {
-> > > >             $decl_type = 'struct';
-> > > >         } elsif ($identifier =~ m/^union\b/) {
-> > > >             $decl_type = 'union';
-> > >
-> > > The match for 'type name' is pretty wide but I guess
-> > > we can find out through experience if we need to narrow it.
-> >
-> > This change seems to make it impossible to document any macros
-> > with uppercase names.
-> >
-> > (for example, most of the macros in object.h are not included in
-> > the generated docs)
-> >
-> > What exactly is the purpose of the hunk above?
+On 201002 1715, Thomas Huth wrote:
+> On 02/10/2020 16.35, Alexander Bulekov wrote:
+> > With 1000 runs, there is a non-negligible chance that the fuzzer can
+> > trigger a crash. With this CI job, we care about catching build/runtime
+> > issues in the core fuzzing code. Actual device fuzzing takes place on
+> > oss-fuzz. For these purposes, only running one input should be
+> > sufficient.
+> > 
+> > Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+> > Suggested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> > ---
+> >  .gitlab-ci.yml | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+> > index a51c89554f..075c15d45c 100644
+> > --- a/.gitlab-ci.yml
+> > +++ b/.gitlab-ci.yml
+> > @@ -303,7 +303,7 @@ build-oss-fuzz:
+> >                        | grep -v slirp); do
+> >          grep "LLVMFuzzerTestOneInput" ${fuzzer} > /dev/null 2>&1 || continue ;
+> >          echo Testing ${fuzzer} ... ;
+> > -        "${fuzzer}" -runs=1000 -seed=1 || exit 1 ;
+> > +        "${fuzzer}" -runs=1 -seed=1 || exit 1 ;
 > 
-> It's so that QEMU's bare type names like MemoryRegionSection get
-> recognized as being types. Kernel naming style always
-> prefers to say "struct MemoryRegionSection" where we use the
-> typedef and say "MemoryRegionSection", which is why the upstream
-> kernel-doc doesn't care about this. IIRC, without it, doc comments
-> which reference a type like '#TypeName' like:
+> ... but we're apparently already using a fixed seed for running the
+> test, so it should be pretty much deterministic, shouldn't it? So the
+> chance that the fuzzer hits a crash here for a pre-existing problem
+> should be close to zero? ... so I'm not quite sure whether we really
+> need this? Anyway, I certainly also won't object this patch, so in case
+> anybody wants to merge it:
+
+In addition to using an RNG+seed, libfuzzer also uses coverage
+information to guide mutations. My guess is that as QEMU changes, this
+coverage can change as well, so I wouldn't assume that using the same
+seed will result in the same inputs generated, in the longer term.
+
+Its true that the main benefit will probably be a few minutes shaved off
+the 400 minute limit...
+Thanks
+-Alex
+
 > 
->      * @log_sync:
->      *
->      * Called by memory_region_snapshot_and_clear_dirty() and
->      * memory_global_dirty_log_sync(), before accessing QEMU's "official"
->      * copy of the dirty memory bitmap for a #MemoryRegionSection.
->      *
+> Acked-by: Thomas Huth <thuth@redhat.com>
 > 
-> don't correctly render the typename into a link to the
-> struct definition.
-
-This is not the code that parses "#MemoryRegionSection", it is
-the code that parses:
-
-/**
- * MemoryRegionSection: describes a fragment of a #MemoryRegion
-   ^^^^^^^ this line
-
-
--- 
-Eduardo
-
 
