@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C461C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 17:45:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6F05C4363C
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 17:48:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F38C206A5
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 17:45:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B65C206DD
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 17:48:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oOdc85EI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F38C206A5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cvFEqyRD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B65C206DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOP82-0001Nw-7j
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 13:45:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45068)
+	id 1kOPAJ-0003Ti-Cx
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 13:48:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45102)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kOOyY-0000Yi-3l
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 13:36:10 -0400
-Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:35657)
+ id 1kOOyZ-0000Z7-Ll
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 13:36:11 -0400
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:44702)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kOOyW-0003KN-04
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 13:36:09 -0400
-Received: by mail-wm1-x32f.google.com with SMTP id y15so2574517wmi.0
- for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 10:36:07 -0700 (PDT)
+ id 1kOOyX-0003Ko-Rd
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 13:36:11 -0400
+Received: by mail-wr1-x436.google.com with SMTP id s12so2661477wrw.11
+ for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 10:36:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ZPbac6yldkPR9wbmEuvA0p1poWNownh7RtPwmzH/4gc=;
- b=oOdc85EI4W3FKST0yJcry7ZwPq6+GyCFzwdhbEYAbPTD7qBEFSQMh6v1exLLslLdws
- XXb7sPuZg36mEynvdTSHIIU6TUII2uK6rDAC0sEf712nptOtQpfuz6m9Qe0rEoneZi6n
- rbUyvRYOJM7iJ0wsy5G9sCRqhRCkPKPZit5K9yuLXgAnDiaXTbULfhA9USP597fIPZ64
- McM4+xAmFf6ucANeQwYsWoahxosCLfK1Rz2q+oXgHRk873dCGd5oudMDvLTwlwcdcXQu
- dG5T97boaTktihbaf3C2Rmg8jWmhzuNeu5yU4c5Z823K7Vf9P+DfBqickqBiUhTsMljn
- k9tQ==
+ bh=Pt5SqnBPWAurqH7od5/LojSGd2ksGXHGLBemqG3ZaZc=;
+ b=cvFEqyRD4TcbaogQkN/LkgTXJhdPZyidbuRUvFGdMM7lxGphRkkoNXliH95KLI5Xt1
+ PUM+Bkv6uHerNU08wF5eFrIGJWvkdpF5n1qgEW9CdQJhK2tKdMZHGMCo1ESGI9NNr4Ca
+ 4AGjxXudctL5MsC9EG5CoLF8LFtr8eH6r1UqmoV0GYFQD7O5oySF0VY3ZSuIGGbCxtMt
+ mIPmR5r6O8evaOXdN7LmbTyffi6TI8/XDR9e9fIBVYzPendKtkzJSvw3t7EUYey7KJvq
+ 3JjbFVn5Z5+F2ZOAdLErt1afqKlgPUQqhgbxlZPdEhl+zTwcl9m5BY+An3FLSxajC9Gn
+ nTVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=ZPbac6yldkPR9wbmEuvA0p1poWNownh7RtPwmzH/4gc=;
- b=UnKRb4tcEQ3gfYW84/pyedvZwE/073YYLD8M2zGpbi+qfaqGfehDZ6NJzb1Y7pCsPi
- tH2d4WZBw2b8mkKuZBP121xk6i1djEKQdIdhgesfDF1H29jLyzh/5Qf1FCcRiX1wz4Oh
- zIlmkTMrlzCZDEJ/CiCLz5ekmmn12qiYtM26JILVLGF+OK1+phf8VwQz7SAyWsKJIr+i
- egvEQwIX+9WpH5NEbo/5y7SHh/IRFiLee3cniyJCGbtBKAWMDNrnun5JFTCv8acRjI5m
- Ty86jBivPkSGjCRAqczQkuzk5/OfLUGd7Ody8nGU7CUXcrZpMGJzBX68JQj8QqUIK78A
- OWEg==
-X-Gm-Message-State: AOAM5323NBPhpwWh0DNJ9vmq5qtGC/m5D26uqOjjfh9pFAcyjDcnHooi
- oCQXPNkOCy7SKIW0zK2gJDHpV2ghbls=
-X-Google-Smtp-Source: ABdhPJzw6ONK159SmQaIfdjsJfS6cXvrlj2imZg/u7eq/eC/9ut8EDwVnWFwcye/do752nsplh2Wqg==
-X-Received: by 2002:a1c:9c8c:: with SMTP id f134mr4033591wme.27.1601660166396; 
- Fri, 02 Oct 2020 10:36:06 -0700 (PDT)
+ bh=Pt5SqnBPWAurqH7od5/LojSGd2ksGXHGLBemqG3ZaZc=;
+ b=DXa3BcPR2V+auSguvugb73wjTFB182wpe/Z4URTAeqSYZmSaJs9y2hLBhUsobHgH0o
+ zeqWKXlzOGPaELjLHdzvoTMA9819yEECGHx7uL9nkpIccl5i7S/1fnDDz5K/io5mgtkb
+ NnHzs9SE8tuh0AVUglO9VdDfVVwS6K8zCBwvEptLVIU/odbHedQhN/7l7kNHStOAESaT
+ kg2QMuznPrUqu9dcWNbrpaJipiOWJ5tYPXyXRdRgOekLitSwyFnSvCKwcMUQdn+OSCNA
+ nJxxTrU2sOMZr+qgKPR9rplo+CDShhD5gHn9jM+Z1/ich1qG7myn6u0zmGRan72O07e6
+ ZfqQ==
+X-Gm-Message-State: AOAM532epWi4CKAdEgn+airxowINlpGhlvbamKCZsLTn0lj1OqZyaoqc
+ Qupi1VGC52RjyRx7cI34Ae2ZFIji7gQ=
+X-Google-Smtp-Source: ABdhPJwb3KtapC6Y727xtAZg64kSi8RuweGJeDIQMzesiHkSqz6cP0Qxdi0xmju1RNTPCIa6ubdz6Q==
+X-Received: by 2002:adf:e74d:: with SMTP id c13mr4139767wrn.45.1601660168090; 
+ Fri, 02 Oct 2020 10:36:08 -0700 (PDT)
 Received: from donizetti.redhat.com ([2001:b07:6468:f312:47e0:e742:75ba:b84d])
  by smtp.gmail.com with ESMTPSA id
- l8sm2516454wrx.22.2020.10.02.10.36.05
+ l8sm2516454wrx.22.2020.10.02.10.36.07
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 02 Oct 2020 10:36:05 -0700 (PDT)
+ Fri, 02 Oct 2020 10:36:07 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 07/10] scsi/scsi-bus: scsi_device_find: don't return
- unrealized devices
-Date: Fri,  2 Oct 2020 19:35:55 +0200
-Message-Id: <20201002173558.232960-8-pbonzini@redhat.com>
+Subject: [PATCH v6 09/10] virtio-scsi: use scsi_device_get
+Date: Fri,  2 Oct 2020 19:35:57 +0200
+Message-Id: <20201002173558.232960-10-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201002173558.232960-1-pbonzini@redhat.com>
 References: <20201002173558.232960-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32f;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x32f.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::436;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x436.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -102,134 +101,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The device core first places a device on the bus and then realizes it.
-Make scsi_device_find avoid returing such devices to avoid
-races in drivers that use an iothread (currently virtio-scsi)
+From: Maxim Levitsky <mlevitsk@redhat.com>
 
-Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1812399
+This will help us to avoid the scsi device disappearing
+after we took a reference to it.
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+It doesn't by itself forbid case when we try to access
+an unrealized device
+
+Suggested-by: Stefan Hajnoczi <stefanha@gmail.com>
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20200913160259.32145-7-mlevitsk@redhat.com>
+Message-Id: <20200913160259.32145-9-mlevitsk@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/scsi-bus.c | 83 +++++++++++++++++++++++++++++-----------------
- 1 file changed, 53 insertions(+), 30 deletions(-)
+ hw/scsi/virtio-scsi.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
-diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index 4ab9811cd8..7599113efe 100644
---- a/hw/scsi/scsi-bus.c
-+++ b/hw/scsi/scsi-bus.c
-@@ -24,6 +24,55 @@ static void scsi_target_free_buf(SCSIRequest *req);
- 
- static int next_scsi_bus;
- 
-+static SCSIDevice *do_scsi_device_find(SCSIBus *bus,
-+                                       int channel, int id, int lun,
-+                                       bool include_unrealized)
-+{
-+    BusChild *kid;
-+    SCSIDevice *retval = NULL;
-+
-+    QTAILQ_FOREACH_RCU(kid, &bus->qbus.children, sibling) {
-+        DeviceState *qdev = kid->child;
-+        SCSIDevice *dev = SCSI_DEVICE(qdev);
-+
-+        if (dev->channel == channel && dev->id == id) {
-+            if (dev->lun == lun) {
-+                retval = dev;
-+                break;
-+            }
-+
-+            /*
-+             * If we don't find exact match (channel/bus/lun),
-+             * we will return the first device which matches channel/bus
-+             */
-+
-+            if (!retval) {
-+                retval = dev;
-+            }
-+        }
-+    }
-+
-+    /*
-+     * This function might run on the IO thread and we might race against
-+     * main thread hot-plugging the device.
-+     * We assume that as soon as .realized is set to true we can let
-+     * the user access the device.
-+     */
-+
-+    if (retval && !include_unrealized &&
-+        !qatomic_load_acquire(&retval->qdev.realized)) {
-+        retval = NULL;
-+    }
-+
-+    return retval;
-+}
-+
-+SCSIDevice *scsi_device_find(SCSIBus *bus, int channel, int id, int lun)
-+{
-+    RCU_READ_LOCK_GUARD();
-+    return do_scsi_device_find(bus, channel, id, lun, false);
-+}
-+
- static void scsi_device_realize(SCSIDevice *s, Error **errp)
- {
-     SCSIDeviceClass *sc = SCSI_DEVICE_GET_CLASS(s);
-@@ -137,7 +186,10 @@ static bool scsi_bus_is_address_free(SCSIBus *bus,
- 				     int channel, int target, int lun,
- 				     SCSIDevice **p_dev)
- {
--    SCSIDevice *d = scsi_device_find(bus, channel, target, lun);
-+    SCSIDevice *d;
-+
-+    RCU_READ_LOCK_GUARD();
-+    d = do_scsi_device_find(bus, channel, target, lun, true);
-     if (d && d->lun == lun) {
-         if (p_dev) {
-             *p_dev = d;
-@@ -1570,35 +1622,6 @@ static char *scsibus_get_fw_dev_path(DeviceState *dev)
-                            qdev_fw_name(dev), d->id, d->lun);
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index 971afbb217..3db9a8aae9 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -33,7 +33,7 @@ static inline int virtio_scsi_get_lun(uint8_t *lun)
+     return ((lun[2] << 8) | lun[3]) & 0x3FFF;
  }
  
--SCSIDevice *scsi_device_find(SCSIBus *bus, int channel, int id, int lun)
--{
--    BusChild *kid;
--    SCSIDevice *target_dev = NULL;
--
--    RCU_READ_LOCK_GUARD();
--    QTAILQ_FOREACH_RCU(kid, &bus->qbus.children, sibling) {
--        DeviceState *qdev = kid->child;
--        SCSIDevice *dev = SCSI_DEVICE(qdev);
--
--        if (dev->channel == channel && dev->id == id) {
--            if (dev->lun == lun) {
--                return dev;
--            }
--
--            /*
--             * If we don't find exact match (channel/bus/lun),
--             * we will return the first device which matches channel/bus
--             */
--
--            if (!target_dev) {
--                target_dev = dev;
--            }
--        }
--    }
--
--    return target_dev;
--}
--
- /* SCSI request list.  For simplicity, pv points to the whole device */
+-static inline SCSIDevice *virtio_scsi_device_find(VirtIOSCSI *s, uint8_t *lun)
++static inline SCSIDevice *virtio_scsi_device_get(VirtIOSCSI *s, uint8_t *lun)
+ {
+     if (lun[0] != 1) {
+         return NULL;
+@@ -41,7 +41,7 @@ static inline SCSIDevice *virtio_scsi_device_find(VirtIOSCSI *s, uint8_t *lun)
+     if (lun[2] != 0 && !(lun[2] >= 0x40 && lun[2] < 0x80)) {
+         return NULL;
+     }
+-    return scsi_device_find(&s->bus, 0, lun[1], virtio_scsi_get_lun(lun));
++    return scsi_device_get(&s->bus, 0, lun[1], virtio_scsi_get_lun(lun));
+ }
  
- static int put_scsi_requests(QEMUFile *f, void *pv, size_t size,
+ void virtio_scsi_init_req(VirtIOSCSI *s, VirtQueue *vq, VirtIOSCSIReq *req)
+@@ -256,7 +256,7 @@ static inline void virtio_scsi_ctx_check(VirtIOSCSI *s, SCSIDevice *d)
+  *  case of async cancellation. */
+ static int virtio_scsi_do_tmf(VirtIOSCSI *s, VirtIOSCSIReq *req)
+ {
+-    SCSIDevice *d = virtio_scsi_device_find(s, req->req.tmf.lun);
++    SCSIDevice *d = virtio_scsi_device_get(s, req->req.tmf.lun);
+     SCSIRequest *r, *next;
+     BusChild *kid;
+     int target;
+@@ -370,10 +370,10 @@ static int virtio_scsi_do_tmf(VirtIOSCSI *s, VirtIOSCSIReq *req)
+ 
+         rcu_read_lock();
+         QTAILQ_FOREACH_RCU(kid, &s->bus.qbus.children, sibling) {
+-             d = SCSI_DEVICE(kid->child);
+-             if (d->channel == 0 && d->id == target) {
+-                qdev_reset_all(&d->qdev);
+-             }
++            SCSIDevice *d1 = SCSI_DEVICE(kid->child);
++            if (d1->channel == 0 && d1->id == target) {
++                qdev_reset_all(&d1->qdev);
++            }
+         }
+         rcu_read_unlock();
+ 
+@@ -386,14 +386,17 @@ static int virtio_scsi_do_tmf(VirtIOSCSI *s, VirtIOSCSIReq *req)
+         break;
+     }
+ 
++    object_unref(OBJECT(d));
+     return ret;
+ 
+ incorrect_lun:
+     req->resp.tmf.response = VIRTIO_SCSI_S_INCORRECT_LUN;
++    object_unref(OBJECT(d));
+     return ret;
+ 
+ fail:
+     req->resp.tmf.response = VIRTIO_SCSI_S_BAD_TARGET;
++    object_unref(OBJECT(d));
+     return ret;
+ }
+ 
+@@ -564,7 +567,7 @@ static int virtio_scsi_handle_cmd_req_prepare(VirtIOSCSI *s, VirtIOSCSIReq *req)
+         }
+     }
+ 
+-    d = virtio_scsi_device_find(s, req->req.cmd.lun);
++    d = virtio_scsi_device_get(s, req->req.cmd.lun);
+     if (!d) {
+         req->resp.cmd.response = VIRTIO_SCSI_S_BAD_TARGET;
+         virtio_scsi_complete_cmd_req(req);
+@@ -580,10 +583,12 @@ static int virtio_scsi_handle_cmd_req_prepare(VirtIOSCSI *s, VirtIOSCSIReq *req)
+             req->sreq->cmd.xfer > req->qsgl.size)) {
+         req->resp.cmd.response = VIRTIO_SCSI_S_OVERRUN;
+         virtio_scsi_complete_cmd_req(req);
++        object_unref(OBJECT(d));
+         return -ENOBUFS;
+     }
+     scsi_req_ref(req->sreq);
+     blk_io_plug(d->conf.blk);
++    object_unref(OBJECT(d));
+     return 0;
+ }
+ 
 -- 
 2.26.2
 
