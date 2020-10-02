@@ -2,84 +2,92 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B58C0C4363C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:41:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AA8CC4363C
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:43:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4ABDC206A4
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:41:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 80A252074B
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:43:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XzOFfRrh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4ABDC206A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="fKYpi4cv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80A252074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kONBt-0003W9-8B
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 11:41:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41930)
+	id 1kONDb-0005VY-Ja
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 11:43:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48026)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kOMnf-0002Bz-9q
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 11:16:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48739)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kOMnd-00013T-Bo
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 11:16:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601651803;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=G2fpkYqU9iJCXIBox2lJsKSpHcKUZmyboo4d5mAPzLM=;
- b=XzOFfRrhwsR/tNUeIeFHfaIQUWCcASE88tA0Uike/6kjMUhif/HcnOIfczPeQHhYhn56QD
- T1xiyepvwPpe/YOBFLjf9w5deaSWSZgeLtRR7SQLOT9ctL4+fd599lgPkKtPIAI5wPvDU8
- BRq/wNmK32P2jjDpBajVwl+jwQds8+4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-423-8bnMP2yQMveGWDrI6HNghg-1; Fri, 02 Oct 2020 11:16:40 -0400
-X-MC-Unique: 8bnMP2yQMveGWDrI6HNghg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1A3B84F226;
- Fri,  2 Oct 2020 15:16:39 +0000 (UTC)
-Received: from [10.10.120.38] (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 380325C1DA;
- Fri,  2 Oct 2020 15:16:39 +0000 (UTC)
-Subject: Re: KVM call for agenda for 2020-10-06
-To: quintela@redhat.com, kvm-devel <kvm@vger.kernel.org>, qemu-devel@nongnu.org
-References: <874kndm1t3.fsf@secure.mitica>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <c64f5686-b656-226d-8c4c-95965dcc574a@redhat.com>
-Date: Fri, 2 Oct 2020 11:16:38 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1)
+ (envelope-from <prvs=537b2d3de=alistair.francis@wdc.com>)
+ id 1kONCG-0004EF-7P; Fri, 02 Oct 2020 11:42:12 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:56208)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=537b2d3de=alistair.francis@wdc.com>)
+ id 1kONCE-00045p-0n; Fri, 02 Oct 2020 11:42:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1601653547; x=1633189547;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=yqzJylZKVBoQLrbRf8f30FXXBLs3GyNMgU46lH2ELio=;
+ b=fKYpi4cvuJMCSN5mmSXLuTXdMLTQ8HDDkNbRoIH6pk9sy3IWA4voGPvH
+ VlZ7ze9HIoM33RDc2Epp3KwilEEoAPZhxD5FsFuJT8hpoNyoSrzSodpTn
+ dDXQ30Gj0osb0VKTw4iVcZ5hGzVZsqWWSo4sQjqi8B7HJ/R1sySPSOE8G
+ Dh9ta2JZMX4//4EDVuI6F3oGOo+1VnsRIxLkIEmKpwdcy9h5NrLDZlef3
+ oTkBojNpuiiRi6q99nbeQvQZ46GQ3Lyv1vv0HyIzZpL30+JktXYiBsoXu
+ kwd2U8ysenprH0qEQaBAVfeKK6QL76TuJ+3OpbWA+lxsP7Q1kdGfkmwCk g==;
+IronPort-SDR: MS6kGOvM6xYJB1ey1BvrgDon9+sxjAxdtjswv90VFDlxn/d7jC28/Af6wjpv57+MqARHs71rPG
+ BD1uA9BPvn5iY1yWnKkpJ9dV10oJEmT4rQqe6vE6CtkZc3DpCeGV4cFroLDmbIkybm4QuotWT/
+ U+uVTXVcHGcjwCdNxOuB0ZDh9YAncpWnziWKGnRtwfoUN8iit6hkDnV7x9af1fm7Bi410SEfSf
+ FMS6QrrtCz6AlRnrdwhLld3O6VVVMxEvqNR0+wYasHKEoWJEquYcxl9km+kGncYh+yMcpq2/SU
+ nL8=
+X-IronPort-AV: E=Sophos;i="5.77,328,1596470400"; d="scan'208";a="252338169"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 02 Oct 2020 23:45:45 +0800
+IronPort-SDR: IZFzHTq9+VrF5Xq+05yiW9qNNXLy9M1BsWa8E7L3r+Xodqrwkqy4RitavioL+kL7Rt4TCbnsiU
+ SbTYQadhqKVw==
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 02 Oct 2020 08:28:04 -0700
+IronPort-SDR: w0lVzOato0+43o5+FEcQx0W5sep/GuD/moYP001i42tt5krx//FlFJrW33jmcR+y2l+EzIqdtb
+ O3lLV0ZjVIdA==
+WDCIronportException: Internal
+Received: from dbzljc2.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.59.174])
+ by uls-op-cesaip01.wdc.com with ESMTP; 02 Oct 2020 08:42:07 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v1 2/4] hw/riscv: Return the end address of the loaded firmware
+Date: Fri,  2 Oct 2020 08:31:08 -0700
+Message-Id: <dc18ce8e762658aa80337a97e6e9c978ab9e1696.1601652616.git.alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <cover.1601652616.git.alistair.francis@wdc.com>
+References: <cover.1601652616.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <874kndm1t3.fsf@secure.mitica>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 01:13:31
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -23
-X-Spam_score: -2.4
-X-Spam_bar: --
-X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.256, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=68.232.143.124;
+ envelope-from=prvs=537b2d3de=alistair.francis@wdc.com;
+ helo=esa2.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 11:42:05
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -93,54 +101,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: alistair.francis@wdc.com, palmer@dabbelt.com, alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/2/20 5:09 AM, Juan Quintela wrote:
-> 
-> 
-> Hi
-> 
-> Please, send any topic that you are interested in covering.
-> 
-> At the end of Monday I will send an email with the agenda or the
-> cancellation of the call, so hurry up.
-> 
-> 
-> For this call, we have agenda!!
-> 
-> John Snow wants to talk about his new (and excting) developments with
-> x-configure.  Stay tuned.
-> 
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ include/hw/riscv/boot.h |  8 ++++----
+ hw/riscv/boot.c         | 28 +++++++++++++++++-----------
+ 2 files changed, 21 insertions(+), 15 deletions(-)
 
-I'm working on an email to qemu-devel now detailing some of our work 
-trying to make good on a renewed effort for better APIs for QEMU.
-
-In short, I'd like to discuss a roadmap for converting our CLI to 
-something QAPI-based, and discuss ways to coordinate and distribute this 
-work to interested maintainers and developers.
-
-Look out for it!
-
---js
-
-> 
-> After discussions on the QEMU Summit, we are going to have always open a
-> KVM call where you can add topics.
-> 
->   Call details:
-> 
-> By popular demand, a google calendar public entry with it
-> 
->    https://www.google.com/calendar/embed?src=dG9iMXRqcXAzN3Y4ZXZwNzRoMHE4a3BqcXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ
-> 
-> (Let me know if you have any problems with the calendar entry.  I just
-> gave up about getting right at the same time CEST, CET, EDT and DST).
-> 
-> If you need phone number details,  contact me privately
-> 
-> Thanks, Juan.
-> 
+diff --git a/include/hw/riscv/boot.h b/include/hw/riscv/boot.h
+index 451338780a..0acbd8aa6e 100644
+--- a/include/hw/riscv/boot.h
++++ b/include/hw/riscv/boot.h
+@@ -23,10 +23,10 @@
+ #include "exec/cpu-defs.h"
+ #include "hw/loader.h"
+ 
+-void riscv_find_and_load_firmware(MachineState *machine,
+-                                  const char *default_machine_firmware,
+-                                  hwaddr firmware_load_addr,
+-                                  symbol_fn_t sym_cb);
++target_ulong riscv_find_and_load_firmware(MachineState *machine,
++                                          const char *default_machine_firmware,
++                                          hwaddr firmware_load_addr,
++                                          symbol_fn_t sym_cb);
+ char *riscv_find_firmware(const char *firmware_filename);
+ target_ulong riscv_load_firmware(const char *firmware_filename,
+                                  hwaddr firmware_load_addr,
+diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
+index 21adaae56e..fa699308a0 100644
+--- a/hw/riscv/boot.c
++++ b/hw/riscv/boot.c
+@@ -40,12 +40,13 @@
+ #define fw_dynamic_info_data(__val)     cpu_to_le64(__val)
+ #endif
+ 
+-void riscv_find_and_load_firmware(MachineState *machine,
+-                                  const char *default_machine_firmware,
+-                                  hwaddr firmware_load_addr,
+-                                  symbol_fn_t sym_cb)
++target_ulong riscv_find_and_load_firmware(MachineState *machine,
++                                          const char *default_machine_firmware,
++                                          hwaddr firmware_load_addr,
++                                          symbol_fn_t sym_cb)
+ {
+     char *firmware_filename = NULL;
++    target_ulong firmware_end_addr = firmware_load_addr;
+ 
+     if ((!machine->firmware) || (!strcmp(machine->firmware, "default"))) {
+         /*
+@@ -60,9 +61,12 @@ void riscv_find_and_load_firmware(MachineState *machine,
+ 
+     if (firmware_filename) {
+         /* If not "none" load the firmware */
+-        riscv_load_firmware(firmware_filename, firmware_load_addr, sym_cb);
++        firmware_end_addr = riscv_load_firmware(firmware_filename,
++                                                firmware_load_addr, sym_cb);
+         g_free(firmware_filename);
+     }
++
++    return firmware_end_addr;
+ }
+ 
+ char *riscv_find_firmware(const char *firmware_filename)
+@@ -91,17 +95,19 @@ target_ulong riscv_load_firmware(const char *firmware_filename,
+                                  hwaddr firmware_load_addr,
+                                  symbol_fn_t sym_cb)
+ {
+-    uint64_t firmware_entry;
++    uint64_t firmware_entry, firmware_size, firmware_end;
+ 
+     if (load_elf_ram_sym(firmware_filename, NULL, NULL, NULL,
+-                         &firmware_entry, NULL, NULL, NULL,
++                         &firmware_entry, NULL, &firmware_end, NULL,
+                          0, EM_RISCV, 1, 0, NULL, true, sym_cb) > 0) {
+-        return firmware_entry;
++        return firmware_end;
+     }
+ 
+-    if (load_image_targphys_as(firmware_filename, firmware_load_addr,
+-                               ram_size, NULL) > 0) {
+-        return firmware_load_addr;
++    firmware_size = load_image_targphys_as(firmware_filename,
++                                           firmware_load_addr, ram_size, NULL);
++
++    if (firmware_size > 0) {
++        return firmware_load_addr + firmware_size;
+     }
+ 
+     error_report("could not load firmware '%s'", firmware_filename);
+-- 
+2.28.0
 
 
