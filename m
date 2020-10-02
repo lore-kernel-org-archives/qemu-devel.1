@@ -2,81 +2,101 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AD53C35257
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 22:46:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4A61C35257
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 22:55:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A93A206C9
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 22:46:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A93A206C9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 62D2C206DD
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 22:55:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wlo3diP3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62D2C206DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOTp7-00042M-AL
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 18:46:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42716)
+	id 1kOTxW-0006wA-DM
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 18:55:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44236)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kOTo6-0003Pm-2A
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 18:45:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35230)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kOTwt-0006Ti-4X
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 18:54:47 -0400
+Received: from mail-oo1-xc32.google.com ([2607:f8b0:4864:20::c32]:45295)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kOTo3-0003tT-AY
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 18:45:41 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kOTo1-0002Ac-7L
- for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 22:45:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 350842E80DB
- for <qemu-devel@nongnu.org>; Fri,  2 Oct 2020 22:45:37 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kOTwp-0004tJ-LO
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 18:54:46 -0400
+Received: by mail-oo1-xc32.google.com with SMTP id h8so758907ooc.12
+ for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 15:54:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=8d9P+VKui+tfhiRAvIZlxXoig5uZIWgDPjzu2OoFYWY=;
+ b=wlo3diP3sO2n+ZCOv0Ss3B8zDYlq7k9cDfCD1VgdpKBJrNaYhJE7WIeXTAs+O2D+Cx
+ pAw8IEtmSRORjlRHeq8h8Qz3W586e8eJGopmZ6O2UXmvbDsEdJSbsszlhi7+jeGEuJzG
+ u9dIMw9CMUnR2MUELbPa6f6ltuNuDOQmsKzvoRdxFP2241p/H78shFuktd7p7KT9STJO
+ OX+9HK0A7JUYZuVl1KqSVB7d9QdxBft5QZJlsAAH+cm617gI/7VPXmMcn8L1PpAa8FIy
+ yFuWwbFuRm9Fq8lAT0yGMlVd+MGUNLEHyz/kHtyo4qAtgiMEC8WDXps6FHY4b/WArNHb
+ TEUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=8d9P+VKui+tfhiRAvIZlxXoig5uZIWgDPjzu2OoFYWY=;
+ b=hRUl7kjwQ3aNFERNrkHdrXhqAdHRcKMD/jywBlzHvUmOGcGFFUPBcifgKqPCWjX0HR
+ GLw51hzjDuTo9/FkQPrr0Yb4gXM4lFfyRcCRG3JsTGviV0OWk3RAmANYq++rr9YhzmeX
+ PCCx8bKmtzCDAXSKfXLhHDug2pR6UA2VXNEnhR301knJv4XmO+hBq43GcxjihIXVE1J5
+ Zr7ey7lTsYvC0m845ZTN/ncMVz0jUGsPxnVIcsDMyufK4mqSxeeJNrdRcfTa/1d9MLvO
+ GkPDFGCdj7cb+Cm6I1dfmVX6IDXdE8iD2Djme8LzEtCKM5tjpwiaaTQ9QAZ8LXug36KE
+ CDSg==
+X-Gm-Message-State: AOAM531F1hh68apXRO8OIUZ6O+bexhueBWcbEpMjrnmhCnAsu227rzN9
+ jF3WgBTig9Q5xjnG2U/+pBYEO/k2RSQl2Hek
+X-Google-Smtp-Source: ABdhPJxME98iaiA4lzj0pOrpOvlvjacjT57Xr5GRz/En1+mVxkmBOHM50ahYSgUNNEQ6w217J4HjBQ==
+X-Received: by 2002:a4a:5d84:: with SMTP id w126mr3569066ooa.1.1601679281379; 
+ Fri, 02 Oct 2020 15:54:41 -0700 (PDT)
+Received: from [10.10.73.179] (fixed-187-189-51-144.totalplay.net.
+ [187.189.51.144])
+ by smtp.gmail.com with ESMTPSA id q81sm591348oia.46.2020.10.02.15.54.40
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 02 Oct 2020 15:54:40 -0700 (PDT)
+Subject: Re: [PULL v2 00/11] capstone + disassembler patch queue
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20201002165127.130369-1-richard.henderson@linaro.org>
+ <CAFEAcA_kr5M+TbLDiYVMZbSMgpZE8fN+ae27rgOVkpOj2b9-xQ@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <2d325c7f-1627-3fb7-164b-58caafe22e06@linaro.org>
+Date: Fri, 2 Oct 2020 17:54:38 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 02 Oct 2020 22:34:00 -0000
-From: Richard Henderson <1898011@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ksserebr rth
-X-Launchpad-Bug-Reporter: Kostya Serebryany (ksserebr)
-X-Launchpad-Bug-Modifier: Richard Henderson (rth)
-References: <160153380394.6201.10648910301442382269.malonedeb@soybean.canonical.com>
-Message-Id: <160167804013.13277.5302166593333035509.malone@gac.canonical.com>
-Subject: [Bug 1898011] Re: mmap MAP_NORESERVE of 2^42 bytes consumes 16Gb of
- actual RAM
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="d50d1e75c500726862802414f880ee3e3bb759bf"; Instance="production"
-X-Launchpad-Hash: eeaa0bf14abc9cf1f73f680bb9dee5831ccf7c31
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 16:00:49
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <CAFEAcA_kr5M+TbLDiYVMZbSMgpZE8fN+ae27rgOVkpOj2b9-xQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c32;
+ envelope-from=richard.henderson@linaro.org; helo=mail-oo1-xc32.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -23
+X-Spam_score: -2.4
+X-Spam_bar: --
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.256,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,73 +105,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1898011 <1898011@bugs.launchpad.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Without actually looking, an allocation of 2**42 (4PB) requires
-2**30 (1G) pages, and thus 1G page table entries, so 16GB memory
-allocation sounds about right for qemu's internal page table allocation.
+On 10/2/20 3:37 PM, Peter Maydell wrote:
+> Meson warning on the BSDs:
+> 
+> Configuring sparc-bsd-user-config-target.h using configuration
+> Configuring sparc64-bsd-user-config-target.h using configuration
+> Configuring x86_64-bsd-user-config-target.h using configuration
+> Did not find CMake 'cmake'
+> Found CMake: NO
+> Run-time dependency capstone found: NO (tried pkgconfig and cmake)
+> ../src/meson.build:753: WARNING: Trying to compare values of different
+> types (bool, str) using ==.
+> The result of this is undefined and will become a hard error in a
+> future Meson release.
+> Configuring config-host.h using configuration
+> Program scripts/hxtool found: YES
+> Program scripts/shaderinclude.pl found: YES
+> Program scripts/qapi-gen.py found: YES
+> Program scripts/qemu-version.sh found: YES
+> Run-time dependency threads found: YES
+> Program keycodemapdb/tools/keymap-gen found: YES
+> Program scripts/decodetree.py found: YES
+> 
+> Warning from ppc64be box (gcc compilefarm one):
+> 
+> Configuring sh4eb-linux-user-config-target.h using configuration
+> Configuring sparc-linux-user-config-target.h using configuration
+> Configuring sparc32plus-linux-user-config-target.h using configuration
+> Configuring sparc64-linux-user-config-target.h using configuration
+> Configuring x86_64-linux-user-config-target.h using configuration
+> Configuring xtensa-linux-user-config-target.h using configuration
+> Configuring xtensaeb-linux-user-config-target.h using configuration
+> Found CMake: /usr/bin/cmake (2.8.12.2)
+> WARNING: The version of CMake /usr/bin/cmake is 2.8.12.2 but version
+>> =3.4 is required
+> Run-time dependency capstone found: NO (tried pkgconfig and cmake)
+> Configuring capstone-defs.h using configuration
+> Configuring config-host.h using configuration
+> 
+> We shouldn't be looking for or using cmake at all.
 
-We need to change data structures for representing guest memory,
-probably akin to the kernel's VMAs.
+Huh.  I hadn't noticed that before.
+I think it's coming from meson internally, but I'm not sure what's causing.
+Certainly it is not something I asked for.
 
-** Changed in: qemu
-       Status: New =3D> Confirmed
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1898011
-
-Title:
-  mmap MAP_NORESERVE of 2^42 bytes consumes 16Gb of actual RAM
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  Run this program:
-
-  #include <sys/mman.h>
-  #include <stdio.h>
-  int main() {
-          for (int i =3D 30; i <=3D 44; i++) {
-                  fprintf(stderr, "trying 2**%d\n", i);
-                  mmap((void*)0x600000000000,1ULL << i,
-                          PROT_NONE,
-                          MAP_PRIVATE|MAP_ANONYMOUS|MAP_FIXED|MAP_NORESERVE=
-,-1,0);
-          }
-  }
-
-  (tried qemu-x86_64 and qemu-aarch64, 4.2.1 and trunk/5.1.50)
-
-  On each iteration qemu will consume 2x more physical RAM, =
-
-  e.g. when mapping 2^42 it will have RSS of 16Gb.
-
-  On normal linux it works w/o consuming much RAM, due to MAP_NORESERVE.
-
-  Also: qemu -strace prints 0 instead of the correct size starting from siz=
-e=3D2^32
-  and prints -2147483648 for size=3D2^31. =
+So it's a warning.  Does the build succeed?
 
 
-  mmap(0x0000600000000000,1073741824,PROT_NONE,MAP_PRIVATE|MAP_ANONYMOUS|MA=
-P_FIXED|MAP_NORESERVE,-1,0)
-  =3D 0x0000600000000000
-
-  mmap(0x0000600000000000,-2147483648,PROT_NONE,MAP_PRIVATE|MAP_ANONYMOUS|M=
-AP_FIXED|MAP_NORESERVE,-1,0)
-  =3D 0x0000600000000000
-
-  mmap(0x0000600000000000,0,PROT_NONE,MAP_PRIVATE|MAP_ANONYMOUS|MAP_FIXED|M=
-AP_NORESERVE,-1,0)
-  =3D 0x0000600000000000
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1898011/+subscriptions
+r~
 
