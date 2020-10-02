@@ -2,62 +2,93 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8C93C4363C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 16:09:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BC9EC4363C
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 16:12:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D67C1206FA
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 16:09:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D67C1206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 90600206FA
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 16:12:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=permerror (0-bit key) header.d=wdc.com header.i=@wdc.com header.b="Lf6S9nAF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90600206FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kONcE-0002zf-Uo
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 12:09:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52482)
+	id 1kONf9-0005mP-IR
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 12:12:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53074)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kONVC-00034t-Qd
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 12:01:46 -0400
-Received: from mail.ispras.ru ([83.149.199.84]:53516)
- by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kONV9-0007K9-SZ
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 12:01:46 -0400
-Received: from [192.168.0.183] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id B7FE740A1DAC;
- Fri,  2 Oct 2020 16:01:38 +0000 (UTC)
-Subject: Re: [PATCH v6 00/14] Reverse debugging
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <160137726426.31007.12061315974029139983.stgit@pasha-ThinkPad-X280>
- <74dc59b1-7a2b-4f6b-a022-3d796f86b9c7@redhat.com>
-From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
-Message-ID: <0a5cfebd-086b-dbff-75d1-7f3dd1a4dc2d@ispras.ru>
-Date: Fri, 2 Oct 2020 19:01:38 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1)
+ (envelope-from <prvs=537b2d3de=alistair.francis@wdc.com>)
+ id 1kONXu-0005wN-Gb
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 12:04:35 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:62433)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=537b2d3de=alistair.francis@wdc.com>)
+ id 1kONXq-0007i5-J7
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 12:04:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1601655573; x=1633191573;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=ykyOHQKd0DnNB+7usZoiN44NfPlbxAfGZT6Ewc/BDLc=;
+ b=Lf6S9nAFxy8KQGXGMchCJp0azYzUmCHR4hw5pUDtuzWc6ZzDF7xsuIKb
+ nLR+NDS388OPEtUah0GE19s5kl1YBmnO/c2CKZoloTA/Lqww80QCz9B8c
+ yCyiFHvm+QkXFesaZy6qS75xVZSSlRIx1DFkaZb+l6nO7Q3q0KNNcHzYK
+ EGvcVpjMtNbH5FtMr0TxIYorWxMHqi9FDF10OiiPb7WnKvpXjwVICqxh2
+ 6wE/B95cUeBn2hAjtFQm3iNybGR9jrmwPc8dn2XWRLjLkp6lEsxodHJCz
+ vj1m8j/C4F69b7/I8v4k49VaKT7jkvj5qTVgIhqiZeeHrodMUuClCzGRA Q==;
+IronPort-SDR: ht+n7i5i4FCD9QN4rqD/GwV8XS8R8KZuaCM9KqSMdUtuVIuGYh9C7AL8bz9wke6lHKBnqO9uC2
+ 2fKT10kBuFQTTdsHMrq9+n5VRTj/9RcraRue24lx3lMKR3A6KZ/JirRgx8xck3rJgb+XD4TLU0
+ 3xPuDzMm4aHQj7ll/E23UhhOD9qK32aGz5trayojGO/rfZfOMU5Dhkk/9+Y+wEeLM5nDJjgP/q
+ mgbd/v6pfmsmdHyc0u866JPOuQWS9aAosE2swSRQAh37IJqIcP/pxd+ZcX72By9zoc4Ann3LUK
+ c8E=
+X-IronPort-AV: E=Sophos;i="5.77,328,1596470400"; d="scan'208";a="252339369"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 03 Oct 2020 00:19:29 +0800
+IronPort-SDR: Ze0TH+RfBE765+86JvtzdcoBAFMi5DkokvUvWKcKwAGyhXM7o1Xa8YXwTMekJSePtgUflInd6R
+ 5PvCZzXTqX3A==
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 02 Oct 2020 08:50:23 -0700
+IronPort-SDR: /GNh5Xtjgktm1l/dtTntGjN1PcOkMWyKiXwBv8VbcIpmsXcb97wmeSJO85HXKRLguyi82flUDE
+ B0N4sZ3TtYuA==
+WDCIronportException: Internal
+Received: from lpt-park-h.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.59.178])
+ by uls-op-cesaip01.wdc.com with ESMTP; 02 Oct 2020 09:04:27 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	ehabkost@redhat.com
+Subject: [PATCH v2 1/1] register: Remove unnecessary NULL check
+Date: Fri,  2 Oct 2020 08:53:27 -0700
+Message-Id: <2d8747944b70d105c7ce320be0151c4c4ec78d24.1601653938.git.alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-In-Reply-To: <74dc59b1-7a2b-4f6b-a022-3d796f86b9c7@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=83.149.199.84;
- envelope-from=pavel.dovgalyuk@ispras.ru; helo=mail.ispras.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 12:01:39
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -21
-X-Spam_score: -2.2
-X-Spam_bar: --
-X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.256,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=68.232.143.124;
+ envelope-from=prvs=537b2d3de=alistair.francis@wdc.com;
+ helo=esa2.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 11:42:05
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,145 +101,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, ehabkost@redhat.com, philmd@redhat.com,
- mtosatti@redhat.com, stefanha@redhat.com, armbru@redhat.com, mreitz@redhat.com,
- wrampazz@redhat.com, crosa@redhat.com, alex.bennee@linaro.org,
- zhiwei_liu@c-sky.com, rth@twiddle.net
+Cc: peter.maydell@linaro.org, alistair.francis@wdc.com, f4bug@amsat.org,
+ alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02.10.2020 18:39, Paolo Bonzini wrote:
-> On 29/09/20 13:01, Pavel Dovgalyuk wrote:
->> GDB remote protocol supports reverse debugging of the targets.
->> It includes 'reverse step' and 'reverse continue' operations.
->> The first one finds the previous step of the execution,
->> and the second one is intended to stop at the last breakpoint that
->> would happen when the program is executed normally.
->>
->> Reverse debugging is possible in the replay mode, when at least
->> one snapshot was created at the record or replay phase.
->> QEMU can use these snapshots for travelling back in time with GDB.
->>
->> Running the execution in replay mode allows using GDB reverse debugging
->> commands:
->>   - reverse-stepi (or rsi): Steps one instruction to the past.
->>     QEMU loads on of the prior snapshots and proceeds to the desired
->>     instruction forward. When that step is reaches, execution stops.
->>   - reverse-continue (or rc): Runs execution "backwards".
->>     QEMU tries to find breakpoint or watchpoint by loaded prior snapshot
->>     and replaying the execution. Then QEMU loads snapshots again and
->>     replays to the latest breakpoint. When there are no breakpoints in
->>     the examined section of the execution, QEMU finds one more snapshot
->>     and tries again. After the first snapshot is processed, execution
->>     stops at this snapshot.
->>
->> The set of patches include the following modifications:
->>   - gdbstub update for reverse debugging support
->>   - functions that automatically perform reverse step and reverse
->>     continue operations
->>   - hmp/qmp commands for manipulating the replay process
->>   - improvement of the snapshotting for saving the execution step
->>     in the snapshot parameters
->>   - avocado-based acceptance tests for reverse debugging
->>
->> The patches are available in the repository:
->> https://github.com/ispras/qemu/tree/rr-200901
-> 
-> Hi Pavel,
-> 
-> I'm still seeing failures in "make check-block":
-> 
-> https://gitlab.com/bonzini/qemu/-/jobs/769653852
+This patch fixes CID 1432800 by removing an unnecessary check.
 
-I saw a message from Alex about it, but I don't see any errors when run 
-'make check' myself. Could it be caused by new patches that also were 
-added to your branch?
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ hw/core/register.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-It seems, that some 'valid' test output should be updated, because 
-patches changed the qcow2 snapshot extra data size.
-
-
-> 
-> Paolo
-> 
->> v6 changes:
->>   - removed passing err variable without checking it's value after
->> v5 changes:
->>   - disabled reverse debugging tests for gitlab-based testing
->>     due to the unidentified timeout problem
->> v4 changes:
->>   - added VM snapshot creation on gdb connect (suggested by Alex Bennée)
->>   - removed useless calls to error_free
->>   - updated poll interrupt processing
->>   - minor changes
->> v3 changes:
->>   - rebased to support the new build system
->>   - bumped avocado framework version for using fixed remote gdb client
->> v2 changes:
->>   - rebased to the latest upstream version
->>   - fixed replaying of the POLL interrupts after the latest debug changes
->>
->> ---
->>
->> Pavel Dovgaluk (11):
->>        replay: provide an accessor for rr filename
->>        qcow2: introduce icount field for snapshots
->>        qapi: introduce replay.json for record/replay-related stuff
->>        replay: introduce info hmp/qmp command
->>        replay: introduce breakpoint at the specified step
->>        replay: implement replay-seek command
->>        replay: flush rr queue before loading the vmstate
->>        gdbstub: add reverse step support in replay mode
->>        gdbstub: add reverse continue support in replay mode
->>        replay: describe reverse debugging in docs/replay.txt
->>        tests/acceptance: add reverse debugging test
->>
->> Pavel Dovgalyuk (3):
->>        replay: don't record interrupt poll
->>        migration: introduce icount field for snapshots
->>        replay: create temporary snapshot at debugger connection
->>
->>
->>   MAINTAINERS                           |    2
->>   accel/tcg/cpu-exec.c                  |   21 ++
->>   accel/tcg/translator.c                |    1
->>   block/qapi.c                          |   18 +-
->>   block/qcow2-snapshot.c                |    9 +
->>   block/qcow2.h                         |    3
->>   blockdev.c                            |   10 +
->>   docs/interop/qcow2.txt                |    5
->>   docs/replay.txt                       |   46 +++++
->>   exec.c                                |    8 +
->>   gdbstub.c                             |   64 ++++++
->>   hmp-commands-info.hx                  |   11 +
->>   hmp-commands.hx                       |   50 +++++
->>   include/block/snapshot.h              |    1
->>   include/monitor/hmp.h                 |    4
->>   include/sysemu/replay.h               |   26 +++
->>   migration/savevm.c                    |   17 +-
->>   qapi/block-core.json                  |   11 +
->>   qapi/meson.build                      |    1
->>   qapi/misc.json                        |   18 --
->>   qapi/qapi-schema.json                 |    1
->>   qapi/replay.json                      |  121 ++++++++++++
->>   replay/meson.build                    |    1
->>   replay/replay-debugging.c             |  332 +++++++++++++++++++++++++++++++++
->>   replay/replay-events.c                |    4
->>   replay/replay-internal.h              |    6 -
->>   replay/replay.c                       |   22 ++
->>   softmmu/cpus.c                        |   19 ++
->>   stubs/replay.c                        |   15 +
->>   tests/acceptance/reverse_debugging.py |  208 +++++++++++++++++++++
->>   tests/qemu-iotests/267.out            |   48 ++---
->>   31 files changed, 1039 insertions(+), 64 deletions(-)
->>   create mode 100644 qapi/replay.json
->>   create mode 100644 replay/replay-debugging.c
->>   create mode 100644 tests/acceptance/reverse_debugging.py
->>
->> --
->> Pavel Dovgalyuk
->>
-> 
+diff --git a/hw/core/register.c b/hw/core/register.c
+index 31038bd7cc..3600ef5bde 100644
+--- a/hw/core/register.c
++++ b/hw/core/register.c
+@@ -258,10 +258,6 @@ static RegisterInfoArray *register_init_block(DeviceState *owner,
+         int index = rae[i].addr / data_size;
+         RegisterInfo *r = &ri[index];
+ 
+-        if (data + data_size * index == 0 || !&rae[i]) {
+-            continue;
+-        }
+-
+         /* Init the register, this will zero it. */
+         object_initialize((void *)r, sizeof(*r), TYPE_REGISTER);
+ 
+-- 
+2.28.0
 
 
