@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAF6AC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:53:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF257C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:55:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A676206DC
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:53:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 42ACB206DC
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:55:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="bQRIGI8C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A676206DC
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="EhDGbgM+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42ACB206DC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOKZP-0001uv-GM
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 08:53:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37822)
+	id 1kOKbM-0003SU-Dm
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 08:55:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38134)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
- (envelope-from <813e27cea046e75b0c8a249637a4ebf20d687d02@lizzy.crudebyte.com>)
- id 1kOKYQ-0001FS-S6
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:52:54 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:56089)
+ (envelope-from <08d91b5509f34ca77940588e0bbe530408f9f8b8@lizzy.crudebyte.com>)
+ id 1kOKZS-00029E-0j
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:53:58 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:37299)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
- (envelope-from <813e27cea046e75b0c8a249637a4ebf20d687d02@lizzy.crudebyte.com>)
- id 1kOKYP-0008Q6-Ac
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:52:54 -0400
+ (envelope-from <08d91b5509f34ca77940588e0bbe530408f9f8b8@lizzy.crudebyte.com>)
+ id 1kOKZQ-0008V0-4E
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:53:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
  d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
  Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
- Content-Description; bh=iovGPj5Q92eV7i24vjrQeAdFBH4d8kiFupqK9XpeZzs=; b=bQRIG
- I8CdoDpZkhpZnGOVGeDZstJRMUzzuBJhAWzWi0J4/bP/r+oCstfOlA0Fy7FkoG78hHrWcQS3Wv5Ix
- 72p6+dvc1BmXx21dtwFea7WQLZKrBuPvLZZX4y7/mHNsFKXZxKBkn4QFaUdk3lwPHHjm8QRfjCF0c
- P2RDIIrEEzxJNSh2HJzLS9JRv3Y3m1q8EN8PYsVtm7tE0azKqRKaTouJ5gWVTLmuzL55iAYU1VbrY
- k3hAI0wUgAr8xK2sxgBfTxdds9iQKj9GQMoPHElCv+fZbSZCSNM84M3soJS8Va2wvazgjxYV1Xgzx
- INFHJw++hVU9sGa6Bm3TNP72emLDA==;
-Message-Id: <813e27cea046e75b0c8a249637a4ebf20d687d02.1601639563.git.qemu_oss@crudebyte.com>
+ Content-Description; bh=baW8d6Af0E+xPV7T/Dn1dnU1Plbu8QKi0pyhr5ugh2A=; b=EhDGb
+ gM+cUceHATB5uVzPRygsEzE0DOlsxqz+WB+OMLPu3s2n72E6o8j+/WiQ0TEebm/9B9lhkC2avS+Hp
+ A3H8iEGjCR9jpsqTOIyd8pI1+ODGPllHFwjrtwX2udQ23KySZI31oQW051DtEGG3+ag0F41U9fIIo
+ Jr8y7v2cXTcqHX7Ba0Bk/ZQWgH/fPEtVZ1YOPbvbGCNd7AbrQ7zWB2CQYYQKtYSSoDQU06uJzN1W2
+ hEnoyzIJlNdwtXFIyEGSR6gh3Ph7m5vu+xjEDABY/TCVfuNmbhh/EzK7eb7kfaj4QheOrXsh8GHkn
+ dPAWjWhkSlVn6WDpTV7+g9tn/92gA==;
+Message-Id: <08d91b5509f34ca77940588e0bbe530408f9f8b8.1601639563.git.qemu_oss@crudebyte.com>
 In-Reply-To: <cover.1601639563.git.qemu_oss@crudebyte.com>
 References: <cover.1601639563.git.qemu_oss@crudebyte.com>
 From: Christian Schoenebeck <qemu_oss@crudebyte.com>
 Date: Fri, 2 Oct 2020 13:51:54 +0200
-Subject: [PATCH v2 06/11] tests/qtest/qos-test: dump QEMU command if verbose
+Subject: [PATCH v2 02/11] libqos/qgraph: add qos_node_create_driver_named()
 To: qemu-devel@nongnu.org
 Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
  Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
  Greg Kurz <groug@kaod.org>
 Received-SPF: none client-ip=91.194.90.13;
- envelope-from=813e27cea046e75b0c8a249637a4ebf20d687d02@lizzy.crudebyte.com;
+ envelope-from=08d91b5509f34ca77940588e0bbe530408f9f8b8@lizzy.crudebyte.com;
  helo=lizzy.crudebyte.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 08:18:24
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -83,33 +83,143 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If qtests are run in verbose mode (i.e. if --verbose CL argument
-was provided) then print the assembled qemu command line for each
-test.
+So far the qos subsystem of the qtest framework had the limitation
+that only one instance of the same official QEMU (QMP) driver name
+could be created for qtests. That's because a) the created qos
+node names must always be unique, b) the node name must match the
+official QEMU driver name being instantiated and c) all nodes are
+in a global space shared by all tests.
 
-Instead of using g_test_message() rather use printf() in combination
-with g_test_verbose(), to avoid g_test_message() cluttering the
-output.
+This patch removes this limitation by introducing a new function
+qos_node_create_driver_named() which allows test case authors to
+specify a node name being different from the actual associated
+QEMU driver name. It fills the new 'qemu_name' field of
+QOSGraphNode for that purpose.
+
+Adjust build_driver_cmd_line() and qos_graph_node_set_availability()
+to correctly deal with either accessing node name vs. node's
+qemu_name correctly.
 
 Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
 ---
- tests/qtest/qos-test.c | 3 +++
- 1 file changed, 3 insertions(+)
+ tests/qtest/libqos/qgraph.c | 53 ++++++++++++++++++++++++++++++++++---
+ tests/qtest/libqos/qgraph.h | 16 +++++++++++
+ 2 files changed, 66 insertions(+), 3 deletions(-)
 
-diff --git a/tests/qtest/qos-test.c b/tests/qtest/qos-test.c
-index fe240b32a7..b9f0942386 100644
---- a/tests/qtest/qos-test.c
-+++ b/tests/qtest/qos-test.c
-@@ -89,6 +89,9 @@ static void qos_set_machines_devices_available(void)
- 
- static void restart_qemu_or_continue(char *path)
+diff --git a/tests/qtest/libqos/qgraph.c b/tests/qtest/libqos/qgraph.c
+index e42f3eaafa..61faf6b27d 100644
+--- a/tests/qtest/libqos/qgraph.c
++++ b/tests/qtest/libqos/qgraph.c
+@@ -287,7 +287,8 @@ static void build_machine_cmd_line(QOSGraphNode *node, const char *args)
+  */
+ static void build_driver_cmd_line(QOSGraphNode *node)
  {
-+    if (g_test_verbose()) {
-+        printf("Run QEMU with: '%s'\n", path);
+-    node->command_line = g_strconcat(" -device ", node->name, NULL);
++    const char *name = node->qemu_name ?: node->name;
++    node->command_line = g_strconcat(" -device ", name, NULL);
+ }
+ 
+ /* qos_print_cb(): callback prints all path found by the DFS algorithm. */
+@@ -632,6 +633,15 @@ void qos_node_create_driver(const char *name, QOSCreateDriverFunc function)
+     node->u.driver.constructor = function;
+ }
+ 
++void qos_node_create_driver_named(const char *name, const char *qemu_name,
++                                  QOSCreateDriverFunc function)
++{
++    QOSGraphNode *node = create_node(name, QNODE_DRIVER);
++    node->qemu_name = g_strdup(qemu_name);
++    build_driver_cmd_line(node);
++    node->u.driver.constructor = function;
++}
++
+ void qos_node_contains(const char *container, const char *contained,
+                        QOSGraphEdgeOptions *opts, ...)
+ {
+@@ -664,7 +674,7 @@ void qos_node_consumes(const char *consumer, const char *interface,
+     add_edge(interface, consumer, QEDGE_CONSUMED_BY, opts);
+ }
+ 
+-void qos_graph_node_set_availability(const char *node, bool av)
++static void qos_graph_node_set_availability_explicit(const char *node, bool av)
+ {
+     QOSGraphEdgeList *elist;
+     QOSGraphNode *n = search_node(node);
+@@ -679,9 +689,46 @@ void qos_graph_node_set_availability(const char *node, bool av)
+     }
+     QSLIST_FOREACH_SAFE(e, elist, edge_list, next) {
+         if (e->type == QEDGE_CONTAINS || e->type == QEDGE_PRODUCES) {
+-            qos_graph_node_set_availability(e->dest, av);
++            qos_graph_node_set_availability_explicit(e->dest, av);
++        }
 +    }
-     /* compares the current command line with the
-      * one previously executed: if they are the same,
-      * don't restart QEMU, if they differ, stop previous
++}
++
++/*
++ * Behaves as qos_graph_node_set_availability_explicit(), except that the
++ * former always matches by node name only, whereas this function matches both
++ * by node name and node's optional 'qemu_name' field.
++ */
++void qos_graph_node_set_availability(const char *node, bool av)
++{
++    GList *l;
++    QOSGraphEdgeList *elist;
++    QOSGraphEdge *e, *next;
++    QOSGraphNode *n;
++    GList *keys = g_hash_table_get_keys(node_table);
++
++    for (l = keys; l != NULL; l = l->next) {
++        const gchar *key = l->data;
++        n = g_hash_table_lookup(node_table, key);
++        /*
++         * node's 'qemu_name' is set if there is more than one device with
++         * the same QEMU (QMP) device name
++         */
++        const char *node_name = n->qemu_name ?: n->name;
++        if (g_strcmp0(node_name, node) == 0) {
++            n->available = av;
++            elist = get_edgelist(n->name);
++            if (elist) {
++                QSLIST_FOREACH_SAFE(e, elist, edge_list, next) {
++                    if (e->type == QEDGE_CONTAINS || e->type == QEDGE_PRODUCES)
++                    {
++                        qos_graph_node_set_availability_explicit(e->dest, av);
++                    }
++                }
++            }
+         }
+     }
++    g_list_free(keys);
+ }
+ 
+ void qos_graph_foreach_test_path(QOSTestCallback fn)
+diff --git a/tests/qtest/libqos/qgraph.h b/tests/qtest/libqos/qgraph.h
+index 5f63d352ca..f472949f68 100644
+--- a/tests/qtest/libqos/qgraph.h
++++ b/tests/qtest/libqos/qgraph.h
+@@ -452,6 +452,22 @@ void qos_node_create_machine_args(const char *name,
+  */
+ void qos_node_create_driver(const char *name, QOSCreateDriverFunc function);
+ 
++/**
++ * Behaves as qos_node_create_driver() with the extension of allowing to
++ * specify a different node name vs. associated QEMU device name.
++ *
++ * Use this function instead of qos_node_create_driver() if you need to create
++ * several instances of the same QEMU device. You are free to choose a custom
++ * node name, however the chosen node name must always be unique.
++ *
++ * @param name: custom, unique name of the node to be created
++ * @param qemu_name: actual (official) QEMU driver name the node shall be
++ *                   associated with
++ * @param function: driver constructor
++ */
++void qos_node_create_driver_named(const char *name, const char *qemu_name,
++                                  QOSCreateDriverFunc function);
++
+ /**
+  * qos_node_contains(): creates one or more edges of type QEDGE_CONTAINS
+  * and adds them to the edge list mapped to @container in the
 -- 
 2.20.1
 
