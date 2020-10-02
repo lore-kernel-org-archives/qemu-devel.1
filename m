@@ -2,80 +2,114 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46BE8C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 20:01:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7005FC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 20:08:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5486E206CA
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 20:01:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5486E206CA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0350C20719
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 20:08:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="CB+/aRw/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0350C20719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kORFU-00052f-Cz
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 16:01:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43726)
+	id 1kORM0-0008LH-U5
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 16:08:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44904)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kOREl-0004cs-Kg
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 16:01:09 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39324)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kOREc-0003EU-HJ
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 16:01:02 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kOREX-0002RD-Jq
- for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 20:00:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 5EBD12E80E8
- for <qemu-devel@nongnu.org>; Fri,  2 Oct 2020 20:00:49 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 02 Oct 2020 19:54:45 -0000
-From: John Snow <1896342@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: fysnet jnsnow
-X-Launchpad-Bug-Reporter: Benjamin David Lunt (fysnet)
-X-Launchpad-Bug-Modifier: John Snow (jnsnow)
-References: <160054207000.14948.11107647546582134186.malonedeb@gac.canonical.com>
-Message-Id: <160166848552.8719.13901119576504368187.malone@wampee.canonical.com>
-Subject: [Bug 1896342] Re: IDE ATA IDENTIFY WORD 106
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="d50d1e75c500726862802414f880ee3e3bb759bf"; Instance="production"
-X-Launchpad-Hash: ae0f475364e56775fc40cfb89d41032133c42313
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 16:00:49
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
+ id 1kORKE-0006i3-7H; Fri, 02 Oct 2020 16:06:42 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56552
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
+ id 1kORKB-0003oH-Tj; Fri, 02 Oct 2020 16:06:41 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 092K2Jav110817; Fri, 2 Oct 2020 16:06:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=from : to : cc : subject : date : message-id; s=pp1;
+ bh=+JYwpC35tUm/nlFFYqmK4F+lxWr/aRuhCz48GQWyD0k=;
+ b=CB+/aRw/ks6mUxhkT5hiHsAWRzO9eYOgMLbgsTiSYg2H74wfiFGxhn+maRr+t3Z8DFcV
+ JloVp3PtycRqjdhjkG8QqJjH9TM46fvAx4ZfJ5TPi/6+gdNNSaCu/lF+B688hQCH9rzb
+ LezwrmnY9AGjD8Asbsv92/4W3E2k0FQVCIthrPymZSEQc5lr1K38kIHihSDESoHK3/NK
+ Xi4oaPVIPg5vuCoMpCh1ySHrFdq69osTbA8AXe+sRWun/CK8dvbLUb9HNWEAUlkeCwsH
+ K0kVTHxtj7ZIyN9OVuEeIBKYhLSPwsNFNPrF2rdKF6/tvtg9fZVIp+NvhUOEEDDAMD1F yw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 33xaqmrb0e-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 02 Oct 2020 16:06:37 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 092K5HvV125763;
+ Fri, 2 Oct 2020 16:06:37 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com
+ [169.55.91.170])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 33xaqmrb05-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 02 Oct 2020 16:06:37 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+ by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 092Jl8D5005732;
+ Fri, 2 Oct 2020 20:06:36 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com
+ (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+ by ppma02wdc.us.ibm.com with ESMTP id 33sw9a09g2-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 02 Oct 2020 20:06:36 +0000
+Received: from b03ledav005.gho.boulder.ibm.com
+ (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+ by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 092K6VsO32833974
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 2 Oct 2020 20:06:31 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 46D7FBE054;
+ Fri,  2 Oct 2020 20:06:35 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id F031BBE04F;
+ Fri,  2 Oct 2020 20:06:33 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.163.4.25])
+ by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Fri,  2 Oct 2020 20:06:33 +0000 (GMT)
+From: Matthew Rosato <mjrosato@linux.ibm.com>
+To: cohuck@redhat.com, thuth@redhat.com
+Subject: [PATCH v2 0/9] Retrieve zPCI hardware information from VFIO
+Date: Fri,  2 Oct 2020 16:06:22 -0400
+Message-Id: <1601669191-6731-1-git-send-email-mjrosato@linux.ibm.com>
+X-Mailer: git-send-email 1.8.3.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-10-02_14:2020-10-02,
+ 2020-10-02 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 impostorscore=0
+ mlxlogscore=999 mlxscore=0 lowpriorityscore=0 adultscore=0
+ priorityscore=1501 phishscore=0 malwarescore=0 spamscore=0 suspectscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2010020142
+Received-SPF: pass client-ip=148.163.158.5;
+ envelope-from=mjrosato@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 16:06:37
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
+X-Spam_bar: --
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,59 +118,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1896342 <1896342@bugs.launchpad.net>
+Cc: kvm@vger.kernel.org, pmorel@linux.ibm.com, david@redhat.com,
+ schnelle@linux.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
+ pasic@linux.ibm.com, borntraeger@de.ibm.com, alex.williamson@redhat.com,
+ mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-You might be right, though at present it seems like it doesn't hurt
-anything that I am aware of to claim that our mapping is 1:1 in such
-cases.
+This patchset exploits the VFIO ZPCI CLP region, which provides hardware
+information about passed-through s390 PCI devices that can be shared with
+the guest.
 
-Patches welcome; especially if there is any proof that this has caused
-any problems anywhere.
+The retrieval of this information is done once per function (and for a
+subset of data, once per function group) and is performed at time of device
+plug.  Some elements provided in the CLP region must still be forced to
+default values for now to reflect what QEMU actually provides support for.
 
---js
+The original work for this feature was done by Pierre Morel.
 
--- =
+Associated kernel patchset:
+https://lkml.org/lkml/2020/10/2/981
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1896342
+Changes from v1:
+- Added 2 patches to the front of this set that move the s390-pci-bus.h and
+  s390-pci-inst.h files to include + associated MAINTAINERS hit.  These
+  can be applied separately, but are included here for the sake of
+  simplicity.
+- Patch 4: header update placeholder refreshed to rc7
+- Patch 5: Move new s390-pci-clp.h to include folder
+- Patch 6+: s/grp/group/ and fallout from this
+- Patch 9: Move new s390-pci-vfio.h to include folder
 
-Title:
-  IDE ATA IDENTIFY WORD 106
 
-Status in QEMU:
-  New
+Matthew Rosato (6):
+  s390x/pci: Move header files to include/hw/s390x
+  MAINTAINERS: Update s390 PCI entry to include headers
+  update-linux-headers: Add vfio_zdev.h
+  linux-headers: update against 5.9-rc7
+  s390x/pci: clean up s390 PCI groups
+  s390x/pci: get zPCI function info from host
 
-Bug description:
-  The code at line 202 in hw/ide/core.c
-   (https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dhw/ide/core.c;#l201)
-  hard codes bit 13 set.  However, get_physical_block_exp() can and may ret=
-urn 0, which is a valid response. If get_physical_block_exp() does return z=
-ero, bit 13 should not be set.
+Pierre Morel (3):
+  s390x/pci: create a header dedicated to PCI CLP
+  s390x/pci: use a PCI Group structure
+  s390x/pci: use a PCI Function structure
 
-  ATAPI8 states (Section 7.17.7.73):
-   "Bit 13 of word 106 shall be set to one to indicate that the device has =
-more than one logical sector per physical sector"
+ MAINTAINERS                                        |   1 +
+ hw/s390x/meson.build                               |   1 +
+ hw/s390x/s390-pci-bus.c                            |  86 ++++-
+ hw/s390x/s390-pci-bus.h                            | 372 --------------------
+ hw/s390x/s390-pci-inst.c                           |  33 +-
+ hw/s390x/s390-pci-inst.h                           | 312 -----------------
+ hw/s390x/s390-pci-vfio.c                           | 235 +++++++++++++
+ hw/s390x/s390-virtio-ccw.c                         |   2 +-
+ include/hw/s390x/s390-pci-bus.h                    | 385 +++++++++++++++++++++
+ include/hw/s390x/s390-pci-clp.h                    | 215 ++++++++++++
+ include/hw/s390x/s390-pci-inst.h                   | 116 +++++++
+ include/hw/s390x/s390-pci-vfio.h                   |  19 +
+ .../drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h |  14 +-
+ linux-headers/linux/kvm.h                          |   6 +-
+ linux-headers/linux/vfio.h                         |   5 +
+ scripts/update-linux-headers.sh                    |   2 +-
+ 16 files changed, 1085 insertions(+), 719 deletions(-)
+ delete mode 100644 hw/s390x/s390-pci-bus.h
+ delete mode 100644 hw/s390x/s390-pci-inst.h
+ create mode 100644 hw/s390x/s390-pci-vfio.c
+ create mode 100644 include/hw/s390x/s390-pci-bus.h
+ create mode 100644 include/hw/s390x/s390-pci-clp.h
+ create mode 100644 include/hw/s390x/s390-pci-inst.h
+ create mode 100644 include/hw/s390x/s390-pci-vfio.h
 
-  and gives the examples:
-    Bits (3:0): 0 =3D 2^0 =3D 1 logical sector per physical sector
-    Bits (3:0): 1 =3D 2^1 =3D 2 logical sector per physical sector
-    Bits (3:0): 2 =3D 2^2 =3D 4 logical sector per physical sector
-    Bits (3:0): 3 =3D 2^3 =3D 8 logical sector per physical sector
+-- 
+1.8.3.1
 
-  Therefore, if bit 13 is set, bits 3:0 must be greater than zero.
-
-  If get_physical_block_exp() returns zero then there is a 1:1 ratio and
-  bit 13 must be 0.
-
-  Just my opinion.
-
-  Thanks,
-  Ben
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1896342/+subscriptions
 
