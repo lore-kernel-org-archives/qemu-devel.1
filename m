@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5760EC4363C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 17:55:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EAC6C4363C
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 17:55:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC656206DD
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 17:55:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 20106206DD
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 17:55:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CpriClCh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC656206DD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OT+U63Vv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20106206DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOPH7-0002VC-SF
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 13:55:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48080)
+	id 1kOPHA-0002bX-7T
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 13:55:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48106)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kOPFZ-0001I5-0s
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 13:53:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55109)
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kOPFa-0001IW-RN
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 13:53:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57882)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kOPFX-00056r-AQ
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 13:53:44 -0400
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kOPFY-000575-8K
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 13:53:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601661222;
+ s=mimecast20190719; t=1601661223;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=n4IR530G0jn3KaGrAMU+kHWU9guPG9Q80wHEffp3OJw=;
- b=CpriClChmq0QWDaCZV2w70Vxcg57nFNXim7hp+uzFT6lTTNv9YUWCnfutLTaTsV6oTwPwR
- l4ZRylWT61SLvqnms4jKsjwf0OggvxAG4TcEzn59dTrFyVgcTxBFo6M8e3dO/bGAB6LqI8
- V4bdHtumOPMM3aAlbLmnbE81PHVBCcA=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-346-iHJH8sICNOuIXoPy1FEVUA-1; Fri, 02 Oct 2020 13:53:40 -0400
-X-MC-Unique: iHJH8sICNOuIXoPy1FEVUA-1
-Received: by mail-qt1-f198.google.com with SMTP id y20so143019qta.6
- for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 10:53:40 -0700 (PDT)
+ bh=hSeDqMHpB+FHPSAPyKgXEXUo5azyTlLZe7OlYAX6W4M=;
+ b=OT+U63VvLxpHCAUuCF4jO/xBZcs39ckU53PNZjEnfVlJmWDassrpWQRNPcN26vEGiEksP/
+ whYvaD15MSwSddm9bypieAD7zIjrppI6AKH3zO2jGnFJ2+KgGNzlOv5ZD3/I3NKGXrYX8b
+ GHnbHJ5VscaENM+KNNn9GjaidDdPnb4=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-138-OkiZA_ivN6eqHlGdn-OsGw-1; Fri, 02 Oct 2020 13:53:42 -0400
+X-MC-Unique: OkiZA_ivN6eqHlGdn-OsGw-1
+Received: by mail-qt1-f199.google.com with SMTP id f5so1568982qtk.11
+ for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 10:53:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=n4IR530G0jn3KaGrAMU+kHWU9guPG9Q80wHEffp3OJw=;
- b=mJhQgRyLcxqxHL1Pm7AZ9DGM4fheu+SDYWOghrR+7P9ReQT91tXOWqID7/cu2Ops0+
- RibKkauuc3Vnv/DWJ9Lm9D+/3Pip+8MwdbDaDsZ/4MVCOjFhMuSh4b5RBrhJDyG4PqDf
- hwgCS5tr2wZC8IYBdv4Rbghy6ie7zCYgwb+FtsA6Cnsct910kuRlPqVBQblevejQnWYx
- dlXL5HD1u5p7BRdk6cQu4FB+xRYDlp8bOW8GO7SkZBhDu3w7ZXwEczeh3c2zErAclWHS
- YazdapSw3oADLkAGf1k9rkCZ6Cy+OBVioIyLcYdM1XlESgbowRoAfWkjkCIzO/lVAeRX
- QwKQ==
-X-Gm-Message-State: AOAM530obCJ6V5+MSwRXehxhkufSk28ne0q1kemd6Rn0lpf7WWvoOIyl
- siRAOv/unQYrpY1VwwJ45eiJYVDcEOuz7L1+4RRAkh0V3sG68T6sALnrLttYjo/kgK4zxbvAR9N
- eggf9eLlPIZlHbwE=
-X-Received: by 2002:aed:278a:: with SMTP id a10mr3579714qtd.261.1601661220211; 
- Fri, 02 Oct 2020 10:53:40 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy7DN7dwDxIW3w9Rmt7xM7ZdW13boK2yoAnuKZENMhrjpAOuqT4kZ81tLEmcajYW2Dy1gMpVA==
-X-Received: by 2002:aed:278a:: with SMTP id a10mr3579691qtd.261.1601661219987; 
- Fri, 02 Oct 2020 10:53:39 -0700 (PDT)
+ bh=hSeDqMHpB+FHPSAPyKgXEXUo5azyTlLZe7OlYAX6W4M=;
+ b=fKTjHd8khOLmzTHxLMkzRDgIlD+4yhbXIC4PAMGLdNv2nwprmsh0KMkAmFshcBDL+p
+ K1qah0n5h9mAVQzSaKhBMWIi4FJtb1bmB4WCh9qfXlyXkCueWJlaqdMNXmhbrFmBctRO
+ XGFukcfbqDqAkoOFUiRSYQkG0bp/OAX8uFl7v17Hjup2ueX6k+X0zhE1Sufd2I608MrU
+ hS7IFe6yS8avTtfj2wtY2YB/wA1Riv8kraO334O70aZJN4WbguFEwYrxyr2XqzNJFKxv
+ 8FdI5KdfMMkNbQxIULqh706YbDXRbxmql5VN311IMtRUMl9qzOaXblZdc93uPovEQNWI
+ /reg==
+X-Gm-Message-State: AOAM533IP8IVNrHp5ZzpjkeoII7/k0F1bSx/4b6S8L9KOTsFfdPMQjF1
+ 8V1vmdCjywDziqiWe8rTqC5Qofqb/vvrAaIJPjWwkWtUR3KRblzd9Zp18dxyslWfxg8zA9RAqHK
+ HtO30/VYo7jOS13I=
+X-Received: by 2002:ac8:4658:: with SMTP id f24mr3476265qto.158.1601661221582; 
+ Fri, 02 Oct 2020 10:53:41 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxfx/otY6zgjxIY+jEr+ON6ECTGV4tt+ojztdSnRtEZ6F4anDX7tIqREb5Zc56uzJdzUjhCMQ==
+X-Received: by 2002:ac8:4658:: with SMTP id f24mr3476248qto.158.1601661221383; 
+ Fri, 02 Oct 2020 10:53:41 -0700 (PDT)
 Received: from xz-x1.redhat.com
  (toroon474qw-lp130-09-184-147-14-204.dsl.bell.ca. [184.147.14.204])
- by smtp.gmail.com with ESMTPSA id a3sm1562229qtp.63.2020.10.02.10.53.38
+ by smtp.gmail.com with ESMTPSA id a3sm1562229qtp.63.2020.10.02.10.53.40
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 02 Oct 2020 10:53:39 -0700 (PDT)
+ Fri, 02 Oct 2020 10:53:40 -0700 (PDT)
 From: Peter Xu <peterx@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 1/4] migration: Pass incoming state into
- qemu_ufd_copy_ioctl()
-Date: Fri,  2 Oct 2020 13:53:33 -0400
-Message-Id: <20201002175336.30858-2-peterx@redhat.com>
+Subject: [PATCH v4 2/4] migration: Introduce
+ migrate_send_rp_message_req_pages()
+Date: Fri,  2 Oct 2020 13:53:34 -0400
+Message-Id: <20201002175336.30858-3-peterx@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201002175336.30858-1-peterx@redhat.com>
 References: <20201002175336.30858-1-peterx@redhat.com>
@@ -117,51 +117,58 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It'll be used in follow up patches to access more fields out of it.  Meanwhile
-fetch the userfaultfd inside the function.
+This is another layer wrapper for sending a page request to the source VM.  The
+new migrate_send_rp_message_req_pages() will be used elsewhere in coming
+patches.
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/postcopy-ram.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ migration/migration.c | 10 ++++++++--
+ migration/migration.h |  2 ++
+ 2 files changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index 0a2f88a87d..722034dc01 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -1128,10 +1128,12 @@ int postcopy_ram_incoming_setup(MigrationIncomingState *mis)
-     return 0;
+diff --git a/migration/migration.c b/migration/migration.c
+index aca7fdcd0b..b2dac6b39c 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -316,8 +316,8 @@ error:
+  *   Start: Address offset within the RB
+  *   Len: Length in bytes required - must be a multiple of pagesize
+  */
+-int migrate_send_rp_req_pages(MigrationIncomingState *mis, RAMBlock *rb,
+-                              ram_addr_t start)
++int migrate_send_rp_message_req_pages(MigrationIncomingState *mis,
++                                      RAMBlock *rb, ram_addr_t start)
+ {
+     uint8_t bufc[12 + 1 + 255]; /* start (8), len (4), rbname up to 256 */
+     size_t msglen = 12; /* start + len */
+@@ -353,6 +353,12 @@ int migrate_send_rp_req_pages(MigrationIncomingState *mis, RAMBlock *rb,
+     return migrate_send_rp_message(mis, msg_type, msglen, bufc);
  }
  
--static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
-+static int qemu_ufd_copy_ioctl(MigrationIncomingState *mis, void *host_addr,
-                                void *from_addr, uint64_t pagesize, RAMBlock *rb)
- {
-+    int userfault_fd = mis->userfault_fd;
-     int ret;
++int migrate_send_rp_req_pages(MigrationIncomingState *mis,
++                              RAMBlock *rb, ram_addr_t start)
++{
++    return migrate_send_rp_message_req_pages(mis, rb, start);
++}
 +
-     if (from_addr) {
-         struct uffdio_copy copy_struct;
-         copy_struct.dst = (uint64_t)(uintptr_t)host_addr;
-@@ -1185,7 +1187,7 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
-      * which would be slightly cheaper, but we'd have to be careful
-      * of the order of updating our page state.
-      */
--    if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, from, pagesize, rb)) {
-+    if (qemu_ufd_copy_ioctl(mis, host, from, pagesize, rb)) {
-         int e = errno;
-         error_report("%s: %s copy host: %p from: %p (size: %zd)",
-                      __func__, strerror(e), host, from, pagesize);
-@@ -1212,7 +1214,7 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
-      * but it's not available for everything (e.g. hugetlbpages)
-      */
-     if (qemu_ram_is_uf_zeroable(rb)) {
--        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, NULL, pagesize, rb)) {
-+        if (qemu_ufd_copy_ioctl(mis, host, NULL, pagesize, rb)) {
-             int e = errno;
-             error_report("%s: %s zero host: %p",
-                          __func__, strerror(e), host);
+ static bool migration_colo_enabled;
+ bool migration_incoming_colo_enabled(void)
+ {
+diff --git a/migration/migration.h b/migration/migration.h
+index deb411aaad..e853ccf8b1 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -333,6 +333,8 @@ void migrate_send_rp_pong(MigrationIncomingState *mis,
+                           uint32_t value);
+ int migrate_send_rp_req_pages(MigrationIncomingState *mis, RAMBlock *rb,
+                               ram_addr_t start);
++int migrate_send_rp_message_req_pages(MigrationIncomingState *mis,
++                                      RAMBlock *rb, ram_addr_t start);
+ void migrate_send_rp_recv_bitmap(MigrationIncomingState *mis,
+                                  char *block_name);
+ void migrate_send_rp_resume_ack(MigrationIncomingState *mis, uint32_t value);
 -- 
 2.26.2
 
