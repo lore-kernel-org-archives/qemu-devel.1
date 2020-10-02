@@ -2,82 +2,81 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9445C4363C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 16:04:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57C34C35257
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 16:04:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CA65206FA
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 16:04:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F12D42085B
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 16:04:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FwP687BX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CA65206FA
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cw6oDUQL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F12D42085B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kONXL-0004lt-7E
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 12:03:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51234)
+	id 1kONXc-0005AQ-GI
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 12:04:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51716)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kONQo-00080a-Sq
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 11:57:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29756)
+ (Exim 4.90_1) (envelope-from <mprivozn@redhat.com>)
+ id 1kONSj-0001IB-2b
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 11:59:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46679)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kONQh-0006Ti-NP
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 11:57:14 -0400
+ (Exim 4.90_1) (envelope-from <mprivozn@redhat.com>)
+ id 1kONSf-0006kM-SW
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 11:59:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601654227;
+ s=mimecast20190719; t=1601654348;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=jD08GHLw1dN5FJ/1MiB6++eGHLu7lu6c2UpUB2upZAU=;
- b=FwP687BXh4ccp2mzEXx4zI38fkzXkqLxSZyz670qLr0RJKupil/OloBz/C0BPB/PaVSgXF
- 0qGj60cA+Vhqiih0iz6IcQlU5eWEGCgxEt1HsIJ1yy3TVU4Ngt1w3l9s5sQ1K0Vk1kDwdV
- QK4IG3MH25kJMc2QImiz7wbj5WTd9vc=
+ bh=Q/o2GY+NVP0T5ocYDgyLVCU2vtGBhNtGWTzTt7e69yI=;
+ b=cw6oDUQL3zzLC9BYBThvm/nP7v5vmOxobNB1Wi12Gda0vfRm/NmcJavyInJh5SAbsfIUFG
+ k8/NT8aiPg/sgBJ8p3SEHeJY/yn7gzM/ZKmeJKQg+jn8Xsg1HT563+UVT2xR2h0wuR7ywz
+ XUXjRbotDfH+nwnCtt7ACfHZ44yyTJE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-439-Mk9apIXfPw-Nk4I3OIx6Sg-1; Fri, 02 Oct 2020 11:57:05 -0400
-X-MC-Unique: Mk9apIXfPw-Nk4I3OIx6Sg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-403-GRY6rsHOPvGGGLjtikzF3w-1; Fri, 02 Oct 2020 11:58:58 -0400
+X-MC-Unique: GRY6rsHOPvGGGLjtikzF3w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 540AE18B9EC3;
- Fri,  2 Oct 2020 15:57:04 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-90.ams2.redhat.com [10.36.112.90])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B2E6C5DF58;
- Fri,  2 Oct 2020 15:56:55 +0000 (UTC)
-Subject: Re: [PATCH] gitlab-ci.yml: Only run one test-case per fuzzer
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
-References: <20201002143524.56930-1-alxndr@bu.edu>
- <6564a712-71e5-460b-c9d6-1d2c245ff6ea@redhat.com>
- <746477ee-01db-e52b-8348-c42aad18e9da@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <aec1f5d0-1d2f-5d20-cd11-a4c5c30ffb61@redhat.com>
-Date: Fri, 2 Oct 2020 17:56:54 +0200
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A02AC800C60
+ for <qemu-devel@nongnu.org>; Fri,  2 Oct 2020 15:58:57 +0000 (UTC)
+Received: from [10.40.192.152] (unknown [10.40.192.152])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AE9D55C1D7;
+ Fri,  2 Oct 2020 15:58:56 +0000 (UTC)
+Subject: Re: [PULL v8 00/86] Misc QEMU patches for 2020-09-24
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ ehabkost@redhat.com
+References: <20200930195850.278104-1-pbonzini@redhat.com>
+From: =?UTF-8?B?TWljaGFsIFByw612b3puw61r?= <mprivozn@redhat.com>
+Message-ID: <a0b8e23a-cccb-3c5d-dbf7-f489c0d95f93@redhat.com>
+Date: Fri, 2 Oct 2020 17:58:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <746477ee-01db-e52b-8348-c42aad18e9da@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200930195850.278104-1-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mprivozn@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mprivozn@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 01:13:31
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -101,52 +100,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/10/2020 17.53, Philippe Mathieu-Daudé wrote:
-> On 10/2/20 5:15 PM, Thomas Huth wrote:
->> On 02/10/2020 16.35, Alexander Bulekov wrote:
->>> With 1000 runs, there is a non-negligible chance that the fuzzer can
->>> trigger a crash. With this CI job, we care about catching build/runtime
->>> issues in the core fuzzing code. Actual device fuzzing takes place on
->>> oss-fuzz. For these purposes, only running one input should be
->>> sufficient.
->>>
->>> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
->>> Suggested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>> ---
->>>  .gitlab-ci.yml | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
->>> index a51c89554f..075c15d45c 100644
->>> --- a/.gitlab-ci.yml
->>> +++ b/.gitlab-ci.yml
->>> @@ -303,7 +303,7 @@ build-oss-fuzz:
->>>                        | grep -v slirp); do
->>>          grep "LLVMFuzzerTestOneInput" ${fuzzer} > /dev/null 2>&1 || continue ;
->>>          echo Testing ${fuzzer} ... ;
->>> -        "${fuzzer}" -runs=1000 -seed=1 || exit 1 ;
->>> +        "${fuzzer}" -runs=1 -seed=1 || exit 1 ;
->>
->> ... but we're apparently already using a fixed seed for running the
->> test, so it should be pretty much deterministic, shouldn't it? So the
->> chance that the fuzzer hits a crash here for a pre-existing problem
->> should be close to zero? ... so I'm not quite sure whether we really
->> need this?
-> 
-> You are right, "non-negligible chance that the fuzzer can trigger a
-> crash" shouldn't be a problem. What matters is we don't waste CI
-> resources, 1 run is enough to test the fuzzer is working.
+On 9/30/20 9:58 PM, Paolo Bonzini wrote:
+ >
+> Eduardo Habkost (10):
+<snip/>
+>        docs: Create docs/devel/qom.rst
 
-Ok, considering that gitlab is currently thinking about limiting the
-free CI minutes, that's a valid reason, indeed.
+cd442a45db60a1a72fcf980c24bd1227f13f8a87 is the first bad commit
 
- Thomas
+Sorry for noticing this earlier, but is this known? The build starts 
+failing for me after this commit:
+
+/usr/bin/sphinx-build -Dversion=5.1.50 -Drelease= -W 
+-Ddepfile=docs/devel.d -Ddepfile_stamp=docs/devel.stamp -b html -d 
+/home/zippy/work/qemu/qemu.git/build/docs/devel.p 
+/home/zippy/work/qemu/qemu.git/docs/devel 
+/home/zippy/work/qemu/qemu.git/build/docs/devel
+Running Sphinx v3.2.1
+building [mo]: targets for 0 po files that are out of date
+building [html]: targets for 20 source files that are out of date
+updating environment: [new config] 20 added, 0 changed, 0 removed
+reading sources... [100%] testing 
+ 
+ 
+
+
+Warning, treated as error:
+/home/zippy/work/qemu/qemu.git/docs/../include/qom/object.h:747:Error in 
+declarator
+If declarator-id with parameters (e.g., 'void f(int arg)'):
+   Invalid C declaration: Expected identifier in nested name. [error at 24]
+     object_initialize_child ( parent,  propname,  child,  type)
+     ------------------------^
+If parenthesis in noptr-declarator (e.g., 'void (*f(int arg))(double)'):
+   Error in declarator or parameters
+   Invalid C declaration: Expecting "(" in parameters. [error at 32]
+     object_initialize_child ( parent,  propname,  child,  type)
+     --------------------------------^
+
+make[1]: *** [Makefile.ninja:9898: docs/devel.stamp] Error 2
+make[1]: *** Deleting file 'docs/devel.stamp'
+make[1]: Leaving directory '/home/zippy/work/qemu/qemu.git/build'
+make: *** [GNUmakefile:11: all] Error 2
+
+
+Michal
 
 
