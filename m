@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2227EC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:18:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59B74C4727D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:18:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95CF3206FA
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:18:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E2AC820708
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:18:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bgyQ5h+D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95CF3206FA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bTHoTE/J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2AC820708
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOK0h-0000Ym-PR
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 08:18:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56688)
+	id 1kOK0m-0000kf-Vr
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 08:18:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56768)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kOJuw-0003wU-CV
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:12:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55431)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kOJv5-00040e-8R
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:12:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57963)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kOJud-0003PG-8i
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:11:59 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kOJue-0003Q8-Na
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:12:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601640693;
+ s=mimecast20190719; t=1601640702;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=kv32205fTbXd7bSoM1c0KKvgWJtfChslxWXaK/dr3/U=;
- b=bgyQ5h+DH8UcO1vuI7Aba5h7piL7KeLtOUoj4frAskIH0f+k2mw9WC5mK3DDjean2xEtAn
- 07vgkAdznYqLp3ikaavawcMxCSio4PZ78LDgCspWUrwMVKqX4aV71vIj1W2XTHOqmIw07x
- rkmwoYM7Z7OXNTCQztn6q6r2n3PmYLM=
+ bh=G2xhT7syXzz3rk5fFDEFlekGdnSQCQMc7jIOHykHsno=;
+ b=bTHoTE/JLBrMXiMUuoKwdG5PB31oKjan0iAZU+6c1kJLctifVNDOQLRDCh6d7fdym1uAPG
+ IAfWyUDp5+EW5+OftkoLJ5s47RjUqkdyXWZieDgaxtLk5Rco7c7ELfEQ7q2gBrSeJAGjGw
+ 0EoJqdKqEI1Cm60w+L1T+sGvwWxiDRs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-23-2AL4nSUIM_aw4mHtAPiHNQ-1; Fri, 02 Oct 2020 08:11:30 -0400
-X-MC-Unique: 2AL4nSUIM_aw4mHtAPiHNQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-551-wAqQJA_1OHKDoZBAqg946g-1; Fri, 02 Oct 2020 08:11:40 -0400
+X-MC-Unique: wAqQJA_1OHKDoZBAqg946g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 762A61DDFB;
- Fri,  2 Oct 2020 12:11:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA71F1074644;
+ Fri,  2 Oct 2020 12:11:38 +0000 (UTC)
 Received: from localhost (ovpn-112-216.ams2.redhat.com [10.36.112.216])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 538D110023A5;
- Fri,  2 Oct 2020 12:11:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5FD8573693;
+ Fri,  2 Oct 2020 12:11:35 +0000 (UTC)
 From: Cornelia Huck <cohuck@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 02/19] s390/sclp: get machine once during read scp/cpu info
-Date: Fri,  2 Oct 2020 14:11:01 +0200
-Message-Id: <20201002121118.180315-3-cohuck@redhat.com>
+Subject: [PULL 05/19] s390/sclp: check sccb len before filling in data
+Date: Fri,  2 Oct 2020 14:11:04 +0200
+Message-Id: <20201002121118.180315-6-cohuck@redhat.com>
 In-Reply-To: <20201002121118.180315-1-cohuck@redhat.com>
 References: <20201002121118.180315-1-cohuck@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -93,70 +93,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, qemu-s390x@nongnu.org,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Collin Walling <walling@linux.ibm.com>
+Cc: Collin Walling <walling@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Collin Walling <walling@linux.ibm.com>
 
-Functions within read scp/cpu info will need access to the machine
-state. Let's make a call to retrieve the machine state once and
-pass the appropriate data to the respective functions.
+The SCCB must be checked for a sufficient length before it is filled
+with any data. If the length is insufficient, then the SCLP command
+is suppressed and the proper response code is set in the SCCB header.
 
+While we're at it, let's cleanup the length check by placing the
+calculation inside a macro.
+
+Fixes: 832be0d8a3bb ("s390x: sclp: Report insufficient SCCB length")
 Signed-off-by: Collin Walling <walling@linux.ibm.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Message-Id: <20200915194416.107460-2-walling@linux.ibm.com>
+Message-Id: <20200915194416.107460-5-walling@linux.ibm.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/s390x/sclp.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ hw/s390x/sclp.c | 26 ++++++++++++++------------
+ 1 file changed, 14 insertions(+), 12 deletions(-)
 
 diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-index a0ce444b4bf2..28b973de8fd2 100644
+index 4ae6fb400b40..0d54075309d5 100644
 --- a/hw/s390x/sclp.c
 +++ b/hw/s390x/sclp.c
-@@ -49,9 +49,8 @@ static inline bool sclp_command_code_valid(uint32_t code)
-     return false;
+@@ -78,6 +78,8 @@ static void prepare_cpu_entries(MachineState *ms, CPUEntry *entry, int *count)
+     }
  }
  
--static void prepare_cpu_entries(SCLPDevice *sclp, CPUEntry *entry, int *count)
-+static void prepare_cpu_entries(MachineState *ms, CPUEntry *entry, int *count)
++#define SCCB_REQ_LEN(s, max_cpus) (sizeof(s) + max_cpus * sizeof(CPUEntry))
++
+ /* Provide information about the configuration, CPUs and storage */
+ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
  {
--    MachineState *ms = MACHINE(qdev_get_machine());
-     uint8_t features[SCCB_CPU_FEATURE_LEN] = { 0 };
-     int i;
- 
-@@ -77,7 +76,7 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+@@ -86,6 +88,12 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+     int cpu_count;
+     int rnsize, rnmax;
      IplParameterBlock *ipib = s390_ipl_get_iplb();
++    int required_len = SCCB_REQ_LEN(ReadInfo, machine->possible_cpus->len);
++
++    if (be16_to_cpu(sccb->h.length) < required_len) {
++        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
++        return;
++    }
  
      /* CPU information */
--    prepare_cpu_entries(sclp, read_info->entries, &cpu_count);
-+    prepare_cpu_entries(machine, read_info->entries, &cpu_count);
-     read_info->entries_cpu = cpu_to_be16(cpu_count);
-     read_info->offset_cpu = cpu_to_be16(offsetof(ReadInfo, entries));
-     read_info->highest_cpu = cpu_to_be16(machine->smp.max_cpus - 1);
-@@ -132,10 +131,11 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
- /* Provide information about the CPU */
- static void sclp_read_cpu_info(SCLPDevice *sclp, SCCB *sccb)
- {
-+    MachineState *machine = MACHINE(qdev_get_machine());
+     prepare_cpu_entries(machine, read_info->entries, &cpu_count);
+@@ -95,12 +103,6 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+ 
+     read_info->ibc_val = cpu_to_be32(s390_get_ibc_val());
+ 
+-    if (be16_to_cpu(sccb->h.length) <
+-            (sizeof(ReadInfo) + cpu_count * sizeof(CPUEntry))) {
+-        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
+-        return;
+-    }
+-
+     /* Configuration Characteristic (Extension) */
+     s390_get_feat_block(S390_FEAT_TYPE_SCLP_CONF_CHAR,
+                          read_info->conf_char);
+@@ -146,18 +148,18 @@ static void sclp_read_cpu_info(SCLPDevice *sclp, SCCB *sccb)
+     MachineState *machine = MACHINE(qdev_get_machine());
      ReadCpuInfo *cpu_info = (ReadCpuInfo *) sccb;
      int cpu_count;
++    int required_len = SCCB_REQ_LEN(ReadCpuInfo, machine->possible_cpus->len);
++
++    if (be16_to_cpu(sccb->h.length) < required_len) {
++        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
++        return;
++    }
  
--    prepare_cpu_entries(sclp, cpu_info->entries, &cpu_count);
-+    prepare_cpu_entries(machine, cpu_info->entries, &cpu_count);
+     prepare_cpu_entries(machine, cpu_info->entries, &cpu_count);
      cpu_info->nr_configured = cpu_to_be16(cpu_count);
      cpu_info->offset_configured = cpu_to_be16(offsetof(ReadCpuInfo, entries));
      cpu_info->nr_standby = cpu_to_be16(0);
+ 
+-    if (be16_to_cpu(sccb->h.length) <
+-            (sizeof(ReadCpuInfo) + cpu_count * sizeof(CPUEntry))) {
+-        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
+-        return;
+-    }
+-
+     /* The standby offset is 16-byte for each CPU */
+     cpu_info->offset_standby = cpu_to_be16(cpu_info->offset_configured
+         + cpu_info->nr_configured*sizeof(CPUEntry));
 -- 
 2.25.4
 
