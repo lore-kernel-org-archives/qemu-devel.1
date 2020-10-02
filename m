@@ -7,63 +7,64 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C7CFC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:29:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 237E5C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:31:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7995920665
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:29:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 95DB2206DB
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:31:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CaflgcL0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7995920665
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g1pzzaVY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95DB2206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOKBy-0003wa-Kn
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 08:29:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57044)
+	id 1kOKDy-0005P8-N3
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 08:31:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57134)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kOJvP-0004pN-BJ
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:12:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31993)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kOJvk-0004xx-Ho
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:12:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59527)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kOJvN-0003Wz-Gx
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:12:35 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kOJvj-0003Y4-0i
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:12:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601640752;
+ s=mimecast20190719; t=1601640766;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=W5jeL73icdSoEitdtgj4079z9kZgec574FtVJbMWvcM=;
- b=CaflgcL0mx5Hj9WF11wdXHVkFmdu7OIxP9tOmqX0j5a+9j+omsmyld/+iBgxABQ0B0PzE9
- FyNpI8E8qz/dJYwduydaLj+dJrGCzNND7W81miX3RBiVtIFn2nuVZeW6ylXYlXyQ+WvCVW
- IlX1eec4D3+v8K0sXwvQLF8ONmIpEmc=
+ bh=XowRrk/lXOLUH3goliD+mz4/xyaIoBaMmRz83JRYToU=;
+ b=g1pzzaVYxee9iUvj8HlA2Y03jdfJZXq5kPWPkJLyjeA5VCGPMkgak4mu+uNjtFHx1TzzjW
+ Igm2O+Z/g9CWdgvwwW4upau9MepsZZW6hX5nzfwtey13Mg7GwFjKsoSoNS7aWJhNU1abzY
+ 39f0o/b4uLbDKI2wbiuiWcqZn4meBHU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-473-GjkcAVbvM_-cMIYqXhhyhg-1; Fri, 02 Oct 2020 08:12:30 -0400
-X-MC-Unique: GjkcAVbvM_-cMIYqXhhyhg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-567-GDYwNfo7NyamNzhEsTchKw-1; Fri, 02 Oct 2020 08:12:41 -0400
+X-MC-Unique: GDYwNfo7NyamNzhEsTchKw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8390A873119;
- Fri,  2 Oct 2020 12:12:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 373501882FA0;
+ Fri,  2 Oct 2020 12:12:40 +0000 (UTC)
 Received: from localhost (ovpn-112-216.ams2.redhat.com [10.36.112.216])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 57C865D9D5;
- Fri,  2 Oct 2020 12:12:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C0CB560C05;
+ Fri,  2 Oct 2020 12:12:36 +0000 (UTC)
 From: Cornelia Huck <cohuck@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 16/19] s390x/tcg: Implement BRANCH INDIRECT ON CONDITION (BIC)
-Date: Fri,  2 Oct 2020 14:11:15 +0200
-Message-Id: <20201002121118.180315-17-cohuck@redhat.com>
+Subject: [PULL 18/19] s390x/tcg: We support
+ Miscellaneous-Instruction-Extensions Facility 2
+Date: Fri,  2 Oct 2020 14:11:17 +0200
+Message-Id: <20201002121118.180315-19-cohuck@redhat.com>
 In-Reply-To: <20201002121118.180315-1-cohuck@redhat.com>
 References: <20201002121118.180315-1-cohuck@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -80,7 +81,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,52 +103,28 @@ Sender: "Qemu-devel"
 
 From: David Hildenbrand <david@redhat.com>
 
-Just like BRANCH ON CONDITION - however the address is read from memory
-(always 8 bytes are read), we have to wrap the address manually. The
-address is read using current CPU DAT/address-space controls, just like
-ordinary data.
+We implement all relevant instructions.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200928122717.30586-7-david@redhat.com>
+Message-Id: <20200928122717.30586-9-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/insn-data.def | 2 ++
- target/s390x/translate.c   | 8 ++++++++
- 2 files changed, 10 insertions(+)
+ target/s390x/gen-features.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index bf18d8aaf43e..3322e5f2a504 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -115,6 +115,8 @@
- /* BRANCH RELATIVE AND SAVE */
-     C(0xa705, BRAS,    RI_b,  Z,   0, 0, r1, 0, basi, 0)
-     C(0xc005, BRASL,   RIL_b, Z,   0, 0, r1, 0, basi, 0)
-+/* BRANCH INDIRECT ON CONDITION */
-+    C(0xe347, BIC,     RXY_b, MIE2,0, m2_64w, 0, 0, bc, 0)
- /* BRANCH ON CONDITION */
-     C(0x0700, BCR,     RR_b,  Z,   0, r2_nz, 0, 0, bc, 0)
-     C(0x4700, BC,      RX_b,  Z,   0, a2, 0, 0, bc, 0)
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 66a3693d128c..27fb7af8fb1c 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -5956,6 +5956,14 @@ static void in2_m2_64(DisasContext *s, DisasOps *o)
- }
- #define SPEC_in2_m2_64 0
+diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+index e3fd0c0a2ef3..02ec0a673517 100644
+--- a/target/s390x/gen-features.c
++++ b/target/s390x/gen-features.c
+@@ -718,6 +718,7 @@ static uint16_t qemu_MAX[] = {
+     S390_FEAT_MSA_EXT_5,
+     /* features introduced after the z13 */
+     S390_FEAT_INSTRUCTION_EXEC_PROT,
++    S390_FEAT_MISC_INSTRUCTION_EXT2,
+ };
  
-+static void in2_m2_64w(DisasContext *s, DisasOps *o)
-+{
-+    in2_a2(s, o);
-+    tcg_gen_qemu_ld64(o->in2, o->in2, get_mem_index(s));
-+    gen_addi_and_wrap_i64(s, o->in2, o->in2, 0);
-+}
-+#define SPEC_in2_m2_64w 0
-+
- #ifndef CONFIG_USER_ONLY
- static void in2_m2_64a(DisasContext *s, DisasOps *o)
- {
+ /****** END FEATURE DEFS ******/
 -- 
 2.25.4
 
