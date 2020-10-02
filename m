@@ -2,85 +2,91 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01BDCC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 20:38:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06741C35257
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 20:43:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5CABD206C9
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 20:38:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 617EC2064B
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 20:43:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zGsADtw1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CABD206C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cVgC3uBQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 617EC2064B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55144 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kORog-0008DH-H1
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 16:38:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50620)
+	id 1kORtv-0001V6-74
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 16:43:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51322)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kORo0-0007K5-2M
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 16:37:28 -0400
-Received: from mail-ej1-x629.google.com ([2a00:1450:4864:20::629]:44916)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kORny-0007Ch-39
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 16:37:27 -0400
-Received: by mail-ej1-x629.google.com with SMTP id a3so3641607ejy.11
- for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 13:37:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=qpnnYN2a+q6hE9qh5hkDUkqRIGYH42dajsAzWgWVais=;
- b=zGsADtw1uUrvPu2I0NdDXH8JXI6P7OVRdXQXotl5+liiSFU1/kBK9/Aw+yG6U0Ht/I
- bkmd/C2c4PyVb4ldmb1EMWUkk4RgCJ3+ahAKOynG72VvB4y0DlZwUkheV9McgSQO4kAx
- zv7joMDFJJDRijEd4JHpEVb9x/Dvb4GzF/2mYjjUGG4Plw8lIW8n82vJlT4qG+w3fQE4
- DwgBfQraf0Wdr9cGAEaZLki9Vj4U+NfdrpF19tMvRhbZcB1gNTkT1hi8lLA5bKHOk/7P
- 34RRzBk2CHM0H3VO/A0fM9GBs2yGfa4yLpn8RabS4QkF5KGgE+j7uoLpV4pZE7plSurc
- idaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=qpnnYN2a+q6hE9qh5hkDUkqRIGYH42dajsAzWgWVais=;
- b=OYxZuZ8qsD7f9+E9H+jshJld/lc2TsFN2UIML5pHOHts3Wp1VsqmxlnN+li8DjPBIh
- vj1PB8d971AdvOIoIBD5iHj5z37Ew+eDN2k9tOYPjZpgt8y1sFD8uu3IuXSDTq0xVq8W
- 6kl3qxQFqfPghGO0+3EmeW/WHbqsaLwQ6jHyracgo4xSp1zGGJUkjTv6JVYlPls652tn
- tf4tYZY3pNtsZyodlmhFC/3Dek0sTfaTT9GAQWknJLISXSuQEgK286NyMmqOlEKmQlyd
- 7Ohw9KwskduEYmJwvhI/E2V+jjGhi4USTKkwLVCOwV2uxYHN5KBY+TEBo6klf/6eTNRy
- IwKw==
-X-Gm-Message-State: AOAM531hYcQIpm0Ii9xpLkDARUTnChjntEE/+ou2riq5VKoKg1qVzP9b
- aKcF1l7TmIa7CW81iPajMUB4AcPIrbTMEi+UZs8r5w==
-X-Google-Smtp-Source: ABdhPJz14gw+J5R4VyXhtJgrYJmO9OLgNsfoO4Nzz7tC9Yj4Q26zc0yGtSEFQnkOjmqvVNL+P5Ahy5L3FEIY7J1SYG0=
-X-Received: by 2002:a17:906:1f42:: with SMTP id
- d2mr3931594ejk.407.1601671044574; 
- Fri, 02 Oct 2020 13:37:24 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kORsa-0000r3-8U
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 16:42:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55169)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kORsX-0007ee-OH
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 16:42:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601671327;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+pnd48btZ+ojFZD7fywCGNuhmWCzwbcMsuMGqQ46Bsw=;
+ b=cVgC3uBQM8VDaQ+kngMsz9kOl2whWTIz0McbpknqlhWAgJFlJFT1LYdJneQm1rN31K9Av7
+ Rjs97nx2xtczoan7zEIcUfDVltMzYxVXDw1jt3mMBmAi3//EG8EyKzE499aoe1X1DGb1b+
+ +Ln3uZcJRH2b0N8jgoNzSnqbAxUHn+M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-75-1DIZH4LiNCKien_XBz4WMw-1; Fri, 02 Oct 2020 16:42:06 -0400
+X-MC-Unique: 1DIZH4LiNCKien_XBz4WMw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 149641006703;
+ Fri,  2 Oct 2020 20:42:05 +0000 (UTC)
+Received: from [10.10.120.38] (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A68965D9D3;
+ Fri,  2 Oct 2020 20:42:04 +0000 (UTC)
+Subject: Re: [PATCH] scripts/qmp/qom-set: Allow setting integer value
+To: Jonatan Palsson <jonatan.p@gmail.com>
+References: <20201002201933.250878-1-jonatan.p@gmail.com>
+ <c22a0594-9f8f-3531-cbc3-862ba15d89c9@redhat.com>
+ <CAKm+giO8LQCw8g==0zKV2LYvfqxVmimnJ9oWcsdvFZtmPzcq_g@mail.gmail.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <eb61cb73-2627-7872-0846-9f663fe4043b@redhat.com>
+Date: Fri, 2 Oct 2020 16:42:03 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20201002165127.130369-1-richard.henderson@linaro.org>
-In-Reply-To: <20201002165127.130369-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 2 Oct 2020 21:37:13 +0100
-Message-ID: <CAFEAcA_kr5M+TbLDiYVMZbSMgpZE8fN+ae27rgOVkpOj2b9-xQ@mail.gmail.com>
-Subject: Re: [PULL v2 00/11] capstone + disassembler patch queue
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::629;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x629.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <CAKm+giO8LQCw8g==0zKV2LYvfqxVmimnJ9oWcsdvFZtmPzcq_g@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 01:13:31
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -23
+X-Spam_score: -2.4
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.256, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,79 +100,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 2 Oct 2020 at 17:51, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Version 2 retains a dummy capstone/all makefile target, to avoid
-> the build failure that Peter saw.
->
->
-> r~
->
->
-> The following changes since commit dd8c1e808f1ca311e1f50bff218c3ee3198b1f02:
->
->   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20201002' into staging (2020-10-02 14:29:49 +0100)
->
-> are available in the Git repository at:
->
->   https://gitlab.com/rth7680/qemu.git tags/pull-cap-20201002
->
-> for you to fetch changes up to 94816249a1e14f90f56a2f6e1d566e959e9bc26d:
->
->   disas/capstone: Add skipdata hook for s390x (2020-10-02 11:05:07 -0500)
->
-> ----------------------------------------------------------------
-> Update capstone submodule from v3.0.5 to v5 ("next").
-> Convert submodule build to meson.
-> Enable capstone disassembly for s390x.
-> Code cleanups in disas.c
->
+On 10/2/20 4:36 PM, Jonatan Palsson wrote:
+> On Fri, Oct 2, 2020 at 10:29 PM John Snow <jsnow@redhat.com> wrote:
+>>
+>> On 10/2/20 4:19 PM, Jonatan Pålsson wrote:
+>>> If the value appears to be an integer, parse it as such.
+>>>
+>>> This allows the following:
+>>>
+>>>       qmp/qom-set -s ~/qmp.sock sensor.temperature 20000
+>>>
+>>> .. where sensor is a tmp105 device, and temperature is an integer
+>>> property.
+>>>
+>>> Signed-off-by: Jonatan Pålsson <jonatan.p@gmail.com>
+>>> ---
+>>>    scripts/qmp/qom-set | 5 ++++-
+>>>    1 file changed, 4 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/scripts/qmp/qom-set b/scripts/qmp/qom-set
+>>> index 240a78187f..61920680eb 100755
+>>> --- a/scripts/qmp/qom-set
+>>> +++ b/scripts/qmp/qom-set
+>>> @@ -56,7 +56,10 @@ if len(args) > 1:
+>>>            path, prop = args[0].rsplit('.', 1)
+>>>        except:
+>>>            usage_error("invalid format for path/property/value")
+>>> -    value = args[1]
+>>> +    try:
+>>> +        value = int(args[1])
+>>> +    except:
+>>> +        value = args[1]
+>>
+>> Please catch the ValueError explicitly.
+> 
+> Sure, I'll send a v2.
+> 
+>>
+>>>    else:
+>>>        usage_error("not enough arguments")
+>>>
+>>>
+>>
+>> What happens when you don't convert it to int specifically? Does
+>> something break? My understanding was that QOM received everything as a
+>> string anyway, and does its own parsing.
+> 
+> With the current implementation, I see this:
+> 
+> scripts/qmp/qom-set -s ~/qmp.sock sensor.temperature 20000
+> Traceback (most recent call last):
+>    File "scripts/qmp/qom-set", line 66, in <module>
+>      print(srv.command('qom-set', path=path, property=prop, value=value))
+>    File "scripts/qmp/../../python/qemu/qmp.py", line 274, in command
+>      raise QMPResponseError(ret)
+> qemu.qmp.QMPResponseError: Invalid parameter type for 'temperature',
+> expected: integer
+> 
 
-Meson warning on the BSDs:
+Oh, unfortunate. I hope there aren't any cases where QOM expects a 
+string, but can accept a string where a numerical value is otherwise valid.
 
-Configuring sparc-bsd-user-config-target.h using configuration
-Configuring sparc64-bsd-user-config-target.h using configuration
-Configuring x86_64-bsd-user-config-target.h using configuration
-Did not find CMake 'cmake'
-Found CMake: NO
-Run-time dependency capstone found: NO (tried pkgconfig and cmake)
-../src/meson.build:753: WARNING: Trying to compare values of different
-types (bool, str) using ==.
-The result of this is undefined and will become a hard error in a
-future Meson release.
-Configuring config-host.h using configuration
-Program scripts/hxtool found: YES
-Program scripts/shaderinclude.pl found: YES
-Program scripts/qapi-gen.py found: YES
-Program scripts/qemu-version.sh found: YES
-Run-time dependency threads found: YES
-Program keycodemapdb/tools/keymap-gen found: YES
-Program scripts/decodetree.py found: YES
+These are just debugging scripts, so I guess this is probably okay to 
+just change and see if anything explodes.
 
-Warning from ppc64be box (gcc compilefarm one):
+(A more robust solution might actually attempt to query QEMU to get the 
+QOM property types and judiciously apply conversions. A problem for 
+another day?)
 
-Configuring sh4eb-linux-user-config-target.h using configuration
-Configuring sparc-linux-user-config-target.h using configuration
-Configuring sparc32plus-linux-user-config-target.h using configuration
-Configuring sparc64-linux-user-config-target.h using configuration
-Configuring x86_64-linux-user-config-target.h using configuration
-Configuring xtensa-linux-user-config-target.h using configuration
-Configuring xtensaeb-linux-user-config-target.h using configuration
-Found CMake: /usr/bin/cmake (2.8.12.2)
-WARNING: The version of CMake /usr/bin/cmake is 2.8.12.2 but version
->=3.4 is required
-Run-time dependency capstone found: NO (tried pkgconfig and cmake)
-Configuring capstone-defs.h using configuration
-Configuring config-host.h using configuration
+--js
 
-We shouldn't be looking for or using cmake at all.
-
-thanks
--- PMM
 
