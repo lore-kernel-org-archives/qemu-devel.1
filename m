@@ -2,95 +2,86 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89C38C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 11:51:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BDBFC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 11:53:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C117E206B6
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 11:51:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1E442206B7
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 11:53:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="k39KOTs+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C117E206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dUyHqT8t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E442206B7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOJbA-00059g-Ma
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 07:51:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48656)
+	id 1kOJd2-0006TB-43
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 07:53:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50674)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kOJNK-0006vv-Ld
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 07:37:22 -0400
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:40364)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kOJND-0007dc-BX
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 07:37:22 -0400
-Received: by mail-wr1-x432.google.com with SMTP id j2so1445945wrx.7
- for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 04:37:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=MBf1qUg7JcJrCu84N6vb1LPcLVQ94tKpJ0eYWnc5ilw=;
- b=k39KOTs+iZrYeTkhNoafUr2kyJlTMWDGk1GDv5ZheRUF50+EEsrEc58tfUJbeGnsuu
- oFpAIyt745a0qvu73kCrG3R/RBONBKvyqxN6bm+0OkW1iMoXteOTzVKV227mwR4JjUGO
- OXop2qxkMgraYm6/u5iHplDrvN3gqHAIlbl4LZUDWPlFwOyz+YiiVFPvl0IAlKc7MyT5
- Vh+njKTRLIPZFdgCnVEXf/B0VYozYArA9iSG6VQbY7H/jwUfFKxC20pKS4XhPAlMsOB8
- 79PHQQad3mcPjp7sI1Nm092iyulkIu5v02u5ALqbuEroDSXCN5i+n2yRQDPnOYmrTgvq
- UGBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=MBf1qUg7JcJrCu84N6vb1LPcLVQ94tKpJ0eYWnc5ilw=;
- b=knV4wYMxAViFp/gmQNpyw37YuWDHaUdj71ign5XBkgBs8PwiLtLUL0cv6RkHt+Vii0
- 5N8k94EBu5muMm0MjYp1oSaoLcQ25aVVh2O+iGFdSIuJwWH/QjNN5rk7zUz79KhJ4MDR
- 8yAgzhXEQbWPARTPR3w7u0lSuYMVyxT7ePplVEaG6gulDXX2EgLdQmRZ0iFcLMOHZqOR
- E0el40vwj7/xnAhnEtTb5vhVxkJQt8Tp3NrDDBIhiVU4nRr4jNA5AqEfGb1K+2MK/Nd6
- W69xqGKPHnOG3OZ7GeXw70fgCdlQGlkigW7+Cvuc1FuebtoPz5ur8k+6vBg7KNaKbRGe
- VFJQ==
-X-Gm-Message-State: AOAM532G+KNcvLHJofonUkyI+PBQHx7cO/EhXNSdfZ9YQY7vLN+o17+F
- VO/jbiYrLrNAj4lpq4vJuJacIA==
-X-Google-Smtp-Source: ABdhPJwsoOfPXbdEYzR/NjyCuFGLO0D0IRrIVrdJDbT30YpXE5m5ZA0H7nsrUPalcsJyHMY6dSSuUw==
-X-Received: by 2002:adf:ee8d:: with SMTP id b13mr2758487wro.249.1601638631177; 
- Fri, 02 Oct 2020 04:37:11 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id t10sm1485615wmi.1.2020.10.02.04.36.51
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 02 Oct 2020 04:37:01 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id D926B1FF99;
- Fri,  2 Oct 2020 12:36:46 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Subject: [PULL 10/14] tests/docker: Remove old Debian 9 containers
-Date: Fri,  2 Oct 2020 12:36:41 +0100
-Message-Id: <20201002113645.17693-11-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201002113645.17693-1-alex.bennee@linaro.org>
-References: <20201002113645.17693-1-alex.bennee@linaro.org>
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kOJVt-0007qU-SD
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 07:46:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29149)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kOJVp-0000EU-Js
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 07:46:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601639166;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=FE068GphyT3N3wRrBI2NNYfUgehWHgiVKdwZiJbQi78=;
+ b=dUyHqT8t4sM4E1pgmDD5F2Rj5n+94juwQjns2RLSZHINsBmDiBx2lXhVK3RWJpRL7yO/aJ
+ XPDvgWZe7G0pmrhNrS34/8Y/gIIveg3zzhI1H8cpttHn+tq35OukjZEemhCr5SgZ2XxZfG
+ qLWt7mPp1ZonXBU4jrRAFw6arADwlWs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-1-RrPovBd6P1aOFQgplJyFoA-1; Fri, 02 Oct 2020 07:46:05 -0400
+X-MC-Unique: RrPovBd6P1aOFQgplJyFoA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9675F1018F84;
+ Fri,  2 Oct 2020 11:46:03 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-112-139.ams2.redhat.com [10.36.112.139])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1B5A119C66;
+ Fri,  2 Oct 2020 11:46:01 +0000 (UTC)
+Date: Fri, 2 Oct 2020 13:46:00 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: mingwei <gongwilliam@163.com>
+Subject: Re: [PATCH v1 1/1] sheepdog driver patch: fixs the problem of qemu
+ process become crashed when the sheepdog gateway break the IO and then
+ recover
+Message-ID: <20201002114600.GC4996@linux.fritz.box>
+References: <20201001022127.7315-1-gongwilliam@163.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::432;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x432.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20201001022127.7315-1-gongwilliam@163.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 01:13:31
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,210 +94,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: namei.unix@gmail.com, sheepdog@lists.wpkg.org, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+Am 01.10.2020 um 04:21 hat mingwei geschrieben:
+> this patch fixs the problem of qemu process become crashed when the sheepdog gateway break the IO for a few seconds and then recover.
+> 
+> problem reproduce:
+> 1.start a fio process in qemu to produce IOs to sheepdog gateway, whatever IO type you like.
+> 2.kill the sheepdog gateway.
+> 3.wait for a few seconds.
+> 4.restart the sheepdog gateway.
+> 5.qemu process crashed with segfault error 6.
 
-We do not support Debian 9 in QEMU anymore, and the Debian 9 containers
-are now no longer used in the gitlab-CI. Time to remove them.
+Can you post a stack trace?
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20200921174320.46062-6-thuth@redhat.com>
-Message-Id: <20200925154027.12672-14-alex.bennee@linaro.org>
+Signal 6 is not a segfault, but SIGABRT.
 
-diff --git a/.gitlab-ci.d/containers.yml b/.gitlab-ci.d/containers.yml
-index 089cea7c14..11d079ea58 100644
---- a/.gitlab-ci.d/containers.yml
-+++ b/.gitlab-ci.d/containers.yml
-@@ -48,18 +48,6 @@ amd64-debian11-container:
-   variables:
-     NAME: debian11
- 
--amd64-debian9-container:
--  <<: *container_job_definition
--  variables:
--    NAME: debian9
--
--amd64-debian9-mxe-container:
--  <<: *container_job_definition
--  stage: containers-layer2
--  needs: ['amd64-debian9-container']
--  variables:
--    NAME: debian9-mxe
--
- alpha-debian-cross-container:
-   <<: *container_job_definition
-   stage: containers-layer2
-diff --git a/tests/docker/dockerfiles/debian-win32-cross.docker b/tests/docker/dockerfiles/debian-win32-cross.docker
-deleted file mode 100644
-index b045e821b9..0000000000
---- a/tests/docker/dockerfiles/debian-win32-cross.docker
-+++ /dev/null
-@@ -1,38 +0,0 @@
--#
--# Docker mingw32 cross-compiler target
--#
--# This docker target builds on the debian Stretch MXE base image.
--#
--FROM qemu/debian9-mxe
--
--MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
--
--ENV TARGET i686
--
--ENV PATH $PATH:/usr/lib/mxe/usr/bin:/usr/lib/mxe/usr/$TARGET-w64-mingw32.shared/bin
--
--ENV PKG_CONFIG_PATH \
--    $PKG_CONFIG_PATH:/usr/lib/mxe/usr/$TARGET-w64-mingw32.shared/lib/pkgconfig
--
--RUN apt-get update && \
--    DEBIAN_FRONTEND=noninteractive eatmydata \
--    apt-get install -y --no-install-recommends \
--        mxe-$TARGET-w64-mingw32.shared-bzip2 \
--        mxe-$TARGET-w64-mingw32.shared-curl \
--        mxe-$TARGET-w64-mingw32.shared-glib \
--        mxe-$TARGET-w64-mingw32.shared-libgcrypt \
--        mxe-$TARGET-w64-mingw32.shared-libusb1 \
--        mxe-$TARGET-w64-mingw32.shared-lzo \
--        mxe-$TARGET-w64-mingw32.shared-nettle \
--        mxe-$TARGET-w64-mingw32.shared-ncurses \
--        mxe-$TARGET-w64-mingw32.shared-nsis \
--        mxe-$TARGET-w64-mingw32.shared-pixman \
--        mxe-$TARGET-w64-mingw32.shared-pkgconf \
--        mxe-$TARGET-w64-mingw32.shared-pthreads \
--        mxe-$TARGET-w64-mingw32.shared-sdl2 \
--        mxe-$TARGET-w64-mingw32.shared-sdl2-mixer \
--        mxe-$TARGET-w64-mingw32.shared-sdl2-gfx \
--        mxe-$TARGET-w64-mingw32.shared-zlib
--
--# Specify the cross prefix for this image (see tests/docker/common.rc)
--ENV QEMU_CONFIGURE_OPTS --cross-prefix=$TARGET-w64-mingw32.shared-
-diff --git a/tests/docker/dockerfiles/debian-win64-cross.docker b/tests/docker/dockerfiles/debian-win64-cross.docker
-deleted file mode 100644
-index 4cc4a3f365..0000000000
---- a/tests/docker/dockerfiles/debian-win64-cross.docker
-+++ /dev/null
-@@ -1,45 +0,0 @@
--#
--# Docker mingw64 cross-compiler target
--#
--# This docker target builds on the debian Stretch MXE base image.
--#
--FROM qemu/debian9-mxe
--
--MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
--
--ENV TARGET x86-64
--
--ENV PATH $PATH:/usr/lib/mxe/usr/$TARGET-w64-mingw32.shared/bin
--
--ENV PKG_CONFIG_PATH \
--    $PKG_CONFIG_PATH:/usr/lib/mxe/usr/$TARGET-w64-mingw32.shared/lib/pkgconfig
--
--RUN apt-get update && \
--    DEBIAN_FRONTEND=noninteractive eatmydata \
--    apt-get install -y --no-install-recommends \
--        mxe-$TARGET-w64-mingw32.shared-bzip2 \
--        mxe-$TARGET-w64-mingw32.shared-curl \
--        mxe-$TARGET-w64-mingw32.shared-glib \
--        mxe-$TARGET-w64-mingw32.shared-libgcrypt \
--        mxe-$TARGET-w64-mingw32.shared-libusb1 \
--        mxe-$TARGET-w64-mingw32.shared-lzo \
--        mxe-$TARGET-w64-mingw32.shared-nettle \
--        mxe-$TARGET-w64-mingw32.shared-ncurses \
--        mxe-$TARGET-w64-mingw32.shared-nsis \
--        mxe-$TARGET-w64-mingw32.shared-pixman \
--        mxe-$TARGET-w64-mingw32.shared-pkgconf \
--        mxe-$TARGET-w64-mingw32.shared-pthreads \
--        mxe-$TARGET-w64-mingw32.shared-sdl2 \
--        mxe-$TARGET-w64-mingw32.shared-sdl2-mixer \
--        mxe-$TARGET-w64-mingw32.shared-sdl2-gfx \
--        mxe-$TARGET-w64-mingw32.shared-zlib \
--        curl && \
--    curl -s -S -o /usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/WinHvEmulation.h \
--        "https://sourceforge.net/p/mingw-w64/mingw-w64/ci/master/tree/mingw-w64-headers/include/winhvemulation.h?format=raw" && \
--    curl -s -S -o /usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/WinHvPlatform.h \
--        "https://sourceforge.net/p/mingw-w64/mingw-w64/ci/master/tree/mingw-w64-headers/include/winhvplatform.h?format=raw" && \
--    curl -s -S -o /usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/winhvplatformdefs.h \
--        "https://sourceforge.net/p/mingw-w64/mingw-w64/ci/master/tree/mingw-w64-headers/include/winhvplatformdefs.h?format=raw"
--
--# Specify the cross prefix for this image (see tests/docker/common.rc)
--ENV QEMU_CONFIGURE_OPTS --cross-prefix=x86_64-w64-mingw32.shared-
-diff --git a/tests/docker/dockerfiles/debian9-mxe.docker b/tests/docker/dockerfiles/debian9-mxe.docker
-deleted file mode 100644
-index ae2c222a6f..0000000000
---- a/tests/docker/dockerfiles/debian9-mxe.docker
-+++ /dev/null
-@@ -1,21 +0,0 @@
--#
--# Docker mingw cross-compiler target
--#
--# This docker target builds on the debian Stretch base image.
--#
--FROM qemu/debian9
--
--MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
--
--RUN DEBIAN_FRONTEND=noninteractive eatmydata \
--    apt install -y --no-install-recommends gnupg dirmngr
--
--# Add the foreign architecture we want and install dependencies
--RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C6BF758A33A3A276 && \
--    echo "deb http://pkg.mxe.cc/repos/apt stretch main" > /etc/apt/sources.list.d/mxeapt.list
--RUN apt-get update && \
--    DEBIAN_FRONTEND=noninteractive eatmydata \
--    apt-get install -y --no-install-recommends \
--        $(apt-get -s install -y --no-install-recommends gw32.shared-mingw-w64 | egrep "^Inst mxe-x86-64-unknown-" | cut -d\  -f2)
--
--ENV PATH $PATH:/usr/lib/mxe/usr/bin/
-diff --git a/tests/docker/dockerfiles/debian9.docker b/tests/docker/dockerfiles/debian9.docker
-deleted file mode 100644
-index 3edb5147ef..0000000000
---- a/tests/docker/dockerfiles/debian9.docker
-+++ /dev/null
-@@ -1,32 +0,0 @@
--#
--# Docker multiarch cross-compiler target
--#
--# This docker target is builds on Debian cross compiler targets to build distro
--# with a selection of cross compilers for building test binaries.
--#
--# On its own you can't build much but the docker-foo-cross targets
--# build on top of the base debian image.
--#
--FROM debian:stretch-slim
--
--# Duplicate deb line as deb-src
--RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/sources.list
--
--# Install common build utilities
--RUN apt update && \
--    DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata && \
--    DEBIAN_FRONTEND=noninteractive eatmydata \
--    apt install -y --no-install-recommends \
--        bc \
--        build-essential \
--        ca-certificates \
--        clang \
--        gdb-multiarch \
--        gettext \
--        git \
--        libncurses5-dev \
--        pkg-config \
--        psmisc \
--        python3 \
--        python3-setuptools \
--        $(apt-get -s build-dep qemu | egrep ^Inst | fgrep '[all]' | cut -d\  -f2)
--- 
-2.20.1
+> problem cause:
+> the last io coroutine will be destroyed after reconnect to sheepdog gateway, but the coroutine still be scheduled and the s->co_recv is still the last io coroutine pointer which had been destroyed, so when this coroutine go to coroutine context switch, it will make qemu process crashed.
+> 
+> problem fix:
+> just make s->co_recv = NULL when the last io coroutine reconnect to sheepdog gateway.
+> 
+> Signed-off-by: mingwei <gongwilliam@163.com>
+> ---
+>  block/sheepdog.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/block/sheepdog.c b/block/sheepdog.c
+> index 2f5c0eb376..3a00f0c1e1 100644
+> --- a/block/sheepdog.c
+> +++ b/block/sheepdog.c
+> @@ -727,6 +727,7 @@ static coroutine_fn void reconnect_to_sdog(void *opaque)
+>                         NULL, NULL, NULL);
+>      close(s->fd);
+>      s->fd = -1;
+> +    s->co_recv = NULL;
+
+If s->co_revc != NULL before this, there is still a coroutine running
+that hasn't terminated yet. Don't we need to make sure that the
+coroutine actually terminates instead of just overwriting the pointer to
+it?
+
+Otherwise, we either leak the coroutine and the memory used for its
+stack, or the coroutine continues to run at some point and might
+interfer with the operation of the new instance.
+
+>      /* Wait for outstanding write requests to be completed. */
+>      while (s->co_send != NULL) {
+           co_write_request(opaque);
+       }
+
+This existing code after your change is wrong, too, by the way. It
+potentially calls aio_co_wake() multiple times in a row, which will
+crash if it ends up only scheduling the coroutine instead of directly
+entering it.
+
+Kevin
 
 
