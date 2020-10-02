@@ -2,84 +2,76 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB333C4363C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:59:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 961E2C4363C
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:59:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20B6B206FA
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:59:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 06A4A206FA
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:59:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U+xlen66"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20B6B206FA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gNenE9t7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06A4A206FA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kONSr-00016H-6m
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 11:59:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51098)
+	id 1kONSx-0001Ap-2H
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 11:59:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51000)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kONQF-0007kC-UP
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 11:56:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59943)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kONPf-0007JC-Sw
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 11:56:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47496)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kONQ4-0006NJ-2c
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 11:56:34 -0400
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kONPd-0006Lp-R4
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 11:56:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601654187;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
+ s=mimecast20190719; t=1601654159;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=/vU7/rX1RmuOlDxg8zsajDMlz96tOhIoFHNZANkcxJc=;
- b=U+xlen669Ip8TrRFJJcikIfW31qQxTuD0IHCzayL9N1GHp5svy9eGRh9soAoMZJ55N9R/f
- LJwtmBwm57iWaOorAS1hgUntvNkgmwi7LFWuKGGcV2HOHKi8q9VbUM30rV382BY0n3bHiJ
- 4B1bGjFmCvy97u9lhHQ4r7O8x1kGq/0=
+ bh=/rF37OcPhN5IDHWM0r32+rP449QCmlHlgw5aAm2fsCk=;
+ b=gNenE9t7bxCdSx7uQViSYrmi40hMp+1P0spErf1Gc9ssvnFkjUktOu7XHhMxU2AMe7sHH4
+ vHttrk34C9duXxUcmmA5Y+8jOgjqxLInmXnKiCICtJe/rT59jozZyOeuPsN6HiIXh/zmi/
+ 9QP2wrLofaq6lg0jwd58+zn6LrAIWuA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-224-5AY9jjJtMHqC3JvieaKdZA-1; Fri, 02 Oct 2020 11:56:25 -0400
-X-MC-Unique: 5AY9jjJtMHqC3JvieaKdZA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-378-RDemEiNwNxOjr7MxADosDg-1; Fri, 02 Oct 2020 11:55:55 -0400
+X-MC-Unique: RDemEiNwNxOjr7MxADosDg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B162A186842A;
- Fri,  2 Oct 2020 15:56:23 +0000 (UTC)
-Received: from redhat.com (ovpn-114-9.ams2.redhat.com [10.36.114.9])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E87F72C31E;
- Fri,  2 Oct 2020 15:56:19 +0000 (UTC)
-Date: Fri, 2 Oct 2020 16:56:17 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH v4 9/9] migration: introduce snapshot-{save, load,
- delete} QMP commands
-Message-ID: <20201002155617.GN2338114@redhat.com>
-References: <20200915113523.2520317-1-berrange@redhat.com>
- <20200915113523.2520317-10-berrange@redhat.com>
- <87tuvyt9sf.fsf@dusky.pond.sub.org>
- <0b8eef3d-db87-f82b-798d-2a0cb7ec1198@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31D1B89CCC1;
+ Fri,  2 Oct 2020 15:55:54 +0000 (UTC)
+Received: from localhost (ovpn-119-102.rdu2.redhat.com [10.10.119.102])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E86385C1D7;
+ Fri,  2 Oct 2020 15:55:53 +0000 (UTC)
+Date: Fri, 2 Oct 2020 11:55:53 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Alistair Francis <alistair.francis@wdc.com>
+Subject: Re: [PATCH v1 1/1] register: Remove unnecessary NULL check
+Message-ID: <20201002155553.GA7303@habkost.net>
+References: <00b3ad01ce01027870a036bc4f6adc873bc3f7d7.1601652718.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <0b8eef3d-db87-f82b-798d-2a0cb7ec1198@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <00b3ad01ce01027870a036bc4f6adc873bc3f7d7.1601652718.git.alistair.francis@wdc.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 23:37:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -102,118 +94,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- John Snow <jsnow@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, alistair23@gmail.com,
+ f4bug@amsat.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 21, 2020 at 01:16:16PM -0500, Eric Blake wrote:
-> On 9/16/20 3:17 AM, Markus Armbruster wrote:
-> > Daniel P. Berrangé <berrange@redhat.com> writes:
-> > 
-> > > savevm, loadvm and delvm are some of the few HMP commands that have never
-> > > been converted to use QMP. The reasons for the lack of conversion are
-> > > that they blocked execution of the event thread, and the semantics
-> > > around choice of disks were ill-defined.
-> > > 
-> > > Despite this downside, however, libvirt and applications using libvirt
-> > > have used these commands for as long as QMP has existed, via the
-> > > "human-monitor-command" passthrough command. IOW, while it is clearly
-> > > desirable to be able to fix the problems, they are not a blocker to
-> > > all real world usage.
-> > > 
-> > > Meanwhile there is a need for other features which involve adding new
-> > > parameters to the commands. This is possible with HMP passthrough, but
-> > > it provides no reliable way for apps to introspect features, so using
-> > > QAPI modelling is highly desirable.
-> > > 
-> > > This patch thus introduces new snapshot-{load,save,delete} commands to
-> > > QMP that are intended to replace the old HMP counterparts. The new
-> > > commands are given different names, because they will be using the new
-> > > QEMU job framework and thus will have diverging behaviour from the HMP
-> > > originals. It would thus be misleading to keep the same name.
-> > > 
-> > > While this design uses the generic job framework, the current impl is
-> > > still blocking. The intention that the blocking problem is fixed later.
-> > > None the less applications using these new commands should assume that
-> > > they are asynchronous and thus wait for the job status change event to
-> > > indicate completion.
-> > > 
-> > > In addition to using the job framework, the new commands require the
-> > > caller to be explicit about all the block device nodes used in the
-> > > snapshot operations, with no built-in default heuristics in use.
-> > > 
-> > > Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-> > [...]
-> > > diff --git a/qapi/job.json b/qapi/job.json
-> > > index 280c2f76f1..b2cbb4fead 100644
-> > > --- a/qapi/job.json
-> > > +++ b/qapi/job.json
-> > > @@ -22,10 +22,17 @@
-> > >   #
-> > >   # @amend: image options amend job type, see "x-blockdev-amend" (since 5.1)
-> > >   #
-> > > +# @snapshot-load: snapshot load job type, see "snapshot-load" (since 5.2)
-> > > +#
-> > > +# @snapshot-save: snapshot save job type, see "snapshot-save" (since 5.2)
-> > > +#
-> > > +# @snapshot-delete: snapshot delete job type, see "snapshot-delete" (since 5.2)
-> > > +#
-> > >   # Since: 1.7
-> > >   ##
-> > >   { 'enum': 'JobType',
-> > > -  'data': ['commit', 'stream', 'mirror', 'backup', 'create', 'amend'] }
-> > > +  'data': ['commit', 'stream', 'mirror', 'backup', 'create', 'amend',
-> > > +           'snapshot-load', 'snapshot-save', 'snapshot-delete'] }
-> > >   ##
-> > >   # @JobStatus:
-> > > diff --git a/qapi/migration.json b/qapi/migration.json
-> > > index 675f70bb67..b584c0be31 100644
-> > > --- a/qapi/migration.json
-> > > +++ b/qapi/migration.json
-> > > @@ -1720,3 +1720,123 @@
-> > >   ##
-> > >   { 'event': 'UNPLUG_PRIMARY',
-> > >     'data': { 'device-id': 'str' } }
-> > > +
-> > > +##
-> > > +# @snapshot-save:
-> > > +#
-> > > +# Save a VM snapshot
-> > > +#
-> > > +# @job-id: identifier for the newly created job
-> > > +# @tag: name of the snapshot to create
-> > > +# @devices: list of block device node names to save a snapshot to
-> > 
-> > Looks like you dropped the idea to also accept drive IDs.  Is that for
-> > good, or would you like to add it later?
+On Fri, Oct 02, 2020 at 08:33:40AM -0700, Alistair Francis wrote:
+> This patch fixes CID 1432800 by removing an unnecessary check.
 > 
-> Is it necessary?  Several of our newer block interfaces have required node
-> names, rather than permitting alternation.  If we rewrite the existing HMP
-> commands to operate on top of the new QMP command, it is still possible for
-> HMP to support drive names even when QMP does not.  I don't think the
-> complexity of worrying about drive names is worth it; after all, the QMP
-> command is new enough that the only libvirt that will use it is also a
-> libvirt that knows how to use -blockdev, and thus node names are sufficient.
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  hw/core/register.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Yes, we can add drive ids later if I turn out to be wrong, but for now, I'm
-> hoping their exclusion is intentional.
+> diff --git a/hw/core/register.c b/hw/core/register.c
+> index 31038bd7cc..9ac9bc6bfe 100644
+> --- a/hw/core/register.c
+> +++ b/hw/core/register.c
+> @@ -258,7 +258,7 @@ static RegisterInfoArray *register_init_block(DeviceState *owner,
+>          int index = rae[i].addr / data_size;
+>          RegisterInfo *r = &ri[index];
+>  
+> -        if (data + data_size * index == 0 || !&rae[i]) {
+> +        if (!&rae[i]) {
 
-I didn't realize we have precedent for new commands only accepting
-node names. Given that, I'm going to stick with this design and
-only support node names.
+I thought you were going to remove both checks.
 
-Regards,
-Daniel
+rae can't be NULL, so &rae[i] will never be NULL.
+
+>              continue;
+>          }
+>  
+> -- 
+> 2.28.0
+> 
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Eduardo
 
 
