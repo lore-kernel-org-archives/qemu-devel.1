@@ -2,90 +2,140 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 648CAC4727E
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 03:06:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4C6DC4727E
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 03:09:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D53B7206E3
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 03:06:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F22E220796
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 03:09:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WWWD79/N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D53B7206E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="KgA5NB/D";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="D9JkCapE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F22E220796
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOBOc-0007HO-Np
-	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 23:06:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42494)
+	id 1kOBRp-0008Ov-19
+	for qemu-devel@archiver.kernel.org; Thu, 01 Oct 2020 23:09:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43546)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <raphael.s.norwitz@gmail.com>)
- id 1kOBLL-0005aI-8M
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 23:02:47 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:43492)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <raphael.s.norwitz@gmail.com>)
- id 1kOBLH-0000s2-M6
- for qemu-devel@nongnu.org; Thu, 01 Oct 2020 23:02:46 -0400
-Received: by mail-oi1-x241.google.com with SMTP id l85so689455oih.10
- for <qemu-devel@nongnu.org>; Thu, 01 Oct 2020 20:02:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=/S0cyTIlKfoS7uxi3RvX7jz4YG/oJp2EYp1FHN3/LAc=;
- b=WWWD79/NrRfhiTz5/zl+N6i533r3QZ5YvX64xuq/exL73kp4nqPX+2aKcnAWsqXlKS
- 2XR75NG/2IPBX8LDJQaPZQi1DCzgDIZZu0Tv4ykaC8py2MsVcGSrrnC0tgTTeFRKu+wv
- P/wiJazflNMZVuYA6GJzLsVL6pxM5uDa2RZ8pGgm7hKMLjMaOADUn5YpZWwsQTWf0fez
- q/1oHoiShkeDgZNRay3/NNgxECRN6XPnfdA0AWSDSOFAUOlk9XaOaFmcuy7ditZz0q0U
- FGmy+bhP+Rwq7d/oiKdOevs+0DljJIyuVkaRr+wxrXDJJxxxNcL3ZOaB7ztTG0DvjJKJ
- FnvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=/S0cyTIlKfoS7uxi3RvX7jz4YG/oJp2EYp1FHN3/LAc=;
- b=c5s7esbdgKAdwtzXTtulm2AjEon39ie6OLrd9r+qtuYCTNEdO1/thEJFezfIG6lzEo
- KuaDPQhYqPPqwLFYFdfbhfjiFj87d/I5Cccsy8Zbm4efFreKCz2cKkk7i1h3g4rPQrm1
- 5vkSZgcll8bmvyTHEuskARDHgBBwgubRS+1j6oH19knDk7cPVNaGqWm++6yClq14LpwB
- Im8Izb9yNPzCCd6twL+mJSbmvUjp3VRVr+T4m9UJbChvFX/o2RNDatcVuVJYAmoe+9dX
- qmUpoM/mjM98vxYAzI/q5YCg6lEOKsH9bIg4+i4ymChiMn8/Y2/kUiJNmlV+X8lum2He
- hPEA==
-X-Gm-Message-State: AOAM532gnDpF59i7wz40/hJRahmj2ChzvAPsTMuQ8j43nLM7GGo5KkwW
- kykDyB+ZXEjlO73oFXGLNdRqdfubOcBKWueChHM=
-X-Google-Smtp-Source: ABdhPJz4A+76j/4jHMSWjhMDhWTOu81dMVYLgH5q68p3n8rUsHbCT9/Un7D736RXaPWSPBswGvRMGzCyFvmxirjKDKE=
-X-Received: by 2002:a05:6808:3ce:: with SMTP id
- o14mr38549oie.157.1601607762198; 
- Thu, 01 Oct 2020 20:02:42 -0700 (PDT)
+ (Exim 4.90_1)
+ (envelope-from <prvs=537860369=Dmitry.Fomichev@wdc.com>)
+ id 1kOBR9-0007xk-Pz; Thu, 01 Oct 2020 23:08:48 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:40623)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=537860369=Dmitry.Fomichev@wdc.com>)
+ id 1kOBR6-0002af-4k; Thu, 01 Oct 2020 23:08:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1601608123; x=1633144123;
+ h=from:to:cc:subject:date:message-id:references:
+ in-reply-to:content-transfer-encoding:mime-version;
+ bh=Rx8uK/R6uYiQ0DVH5EuwiG09tFunFnoGXCUf8120p3Y=;
+ b=KgA5NB/D5qRqp4NhAXWFlCT9W1Gg0o7YBmwuz/Hvp7/ZEQ8ZwVt4rzv+
+ kiePxTWaYSh5MLW6MJ0OmOUvjn8LfiENB1RG4M9QrMywnoyzDye4S6a+3
+ Pxme++7M+Ob7vSN2AkrkpFyFzSKWFNOyrxMUavElzAjdvmMcunLcP58GT
+ e2yvR6RVtiPnqPPZhiopeTH37IzjdbFqoXx4AWq000wV44QkuovtR3w++
+ +tlv6qWaqlC3CEJFIUZPvCF5yAmAYESS/6UT8bfDYGLy3Ch/QPqCdVFTm
+ Bcof1BDZ1PrO0bH5lU2/NR7R9xSZCZkFd0sm4xSpnXgzUHZ4C2lfztYJ/ g==;
+IronPort-SDR: EDBRZId2WQZgyQPWrYwnFue0fdFr8nu/5N+CGaJNgPopu3GHKXFEEcDcTK126b0zIfYcgLiP9O
+ 0Tzrmxz4laR9ti+8h/5mKE2tsbzwyH/UOZQozSXUKeFkDpIxpiCk2s6WirMKKyF9sSVPmZw5IJ
+ 0o8cGT8SsHBmRP4pnT/KOisAEUxPsdPC7Vo3kxguFotqBmQYni3UpGGX6Q6q1DIFK+2PqBZZcJ
+ xoIbrfA+1LZS7pysT+SIBp+hP4otWjAvf6g3/yGI6KvyFXqbRU3vGitx5DiCwJi45YrlJ40CiF
+ SIg=
+X-IronPort-AV: E=Sophos;i="5.77,326,1596470400"; d="scan'208";a="148785839"
+Received: from mail-bn7nam10lp2105.outbound.protection.outlook.com (HELO
+ NAM10-BN7-obe.outbound.protection.outlook.com) ([104.47.70.105])
+ by ob1.hgst.iphmx.com with ESMTP; 02 Oct 2020 11:08:39 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KurR3wtoh7ne8UQdCb5ESuhx/vo+A6pHo7tqCZ2EVf4e6NYdr/q1YDOXK9XU6wxmXKgevQa76lShior6dB+Ehzp77gGAuB9PS2wizxz56wCT9OVOw7ERY6jnkFcvQBi3lXkQ9dElC32qmcI9yeXVFm9py7dTwm1bSA07t9YuhVXo94MXSSsiXalmUdLYWcVB2Letjvly03V/2Xfw4PBsZtaTe2Xel9nUKihEiB5xGDi6Go+4FBkecojat0ujQGrOafRQGHCFiiddWDCtkjwdoXLuWvrNzUhl/xkF7adLI2vpnM4/8KlMwMtDRn6glPk7lk2YlbQHUD5udTb1z+HFtg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9xeD/jE8a/K5lqzQaCs2Nk2e2aquve5bsqke0ZRqyOw=;
+ b=H5oCTsUAC3SBGdH54oqflndhbwoBVIzzKv+PcM96l5MsU7fDrGJMDC4zxztpwi/bSTIs4sAEg+R9WD+oqXtgtefZdkKVvwNEN4pTrgFzr1tShY9L667tCZ7qK6aQKH5yHYsMY3WeTJr2InKgbqdPgyYvX2Wwrl/aqrsomAYSUV2qLbNPvnBC0BN7CtsLT/OWnS/S6ZLKfP9J7LomAIDwKQoTKs48zF/cfchXMpTafjbZGYg/tJKCitnFxD+0kup5gmpvf9t8tOM5O0mGdOi9axn+l10JMHgSZMee27ZcL/jxG6jc0dT0jSo0dzlqr/uiMdPxT3uTwYnLiLggYPbOBQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9xeD/jE8a/K5lqzQaCs2Nk2e2aquve5bsqke0ZRqyOw=;
+ b=D9JkCapErVRM4lZQbJaY0u0wyW1+okyUXzZgOxCIHmSi6PUY5Kf8IW9k9InJ2pG9AmxT+1kaBdIjrJsUDZUmF7hmRHs/j/l3jdmZOdG9SMcPtmBqB5LjfmxJU0l7JXA9eQAAH0azhqscP/nPf4GzF5x4hll38bn+71nPM/A/wXw=
+Received: from MN2PR04MB5951.namprd04.prod.outlook.com (2603:10b6:208:3f::13)
+ by MN2PR04MB5998.namprd04.prod.outlook.com (2603:10b6:208:dc::27)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3433.32; Fri, 2 Oct
+ 2020 03:08:35 +0000
+Received: from MN2PR04MB5951.namprd04.prod.outlook.com
+ ([fe80::44d8:522e:db29:bb94]) by MN2PR04MB5951.namprd04.prod.outlook.com
+ ([fe80::44d8:522e:db29:bb94%6]) with mapi id 15.20.3433.034; Fri, 2 Oct 2020
+ 03:08:35 +0000
+From: Dmitry Fomichev <Dmitry.Fomichev@wdc.com>
+To: Klaus Jensen <its@irrelevant.dk>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Subject: RE: [PATCH] hw/block/nvme: update nsid when registered
+Thread-Topic: [PATCH] hw/block/nvme: update nsid when registered
+Thread-Index: AQHWmD3yB6R1PMUhiEC+xPvzDKJuf6mDoUqA
+Date: Fri, 2 Oct 2020 03:08:35 +0000
+Message-ID: <MN2PR04MB5951FE6AF6E3DA3E3EF950BBE1310@MN2PR04MB5951.namprd04.prod.outlook.com>
+References: <20201001215059.866660-1-its@irrelevant.dk>
+In-Reply-To: <20201001215059.866660-1-its@irrelevant.dk>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: irrelevant.dk; dkim=none (message not signed)
+ header.d=none;irrelevant.dk; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [199.255.45.62]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 2838a42d-e7d4-4027-1335-08d8668073b8
+x-ms-traffictypediagnostic: MN2PR04MB5998:
+x-microsoft-antispam-prvs: <MN2PR04MB5998DC0CBAF7E9E56FE04166E1310@MN2PR04MB5998.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:4714;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: N7an3Oq8MdKavAaV4akjNc5ZVt3VEDvqk1efYoycy5UNu/gqObL4aWK4nFT8wRX96yMI4Du016nPhFPU7UvL9VJjZ6SRgQv7PoHp+X/Yn/Tidofn09k1W2r43Z/lgAEhy/6lUTKMiUCMtZGaJLXzfYlf1d/Hun36qWfBW4y/YF8xWqgI3af9AQzFpED9X4YOIv8etPsKwNf05y2EprSSx1RBa4x5QEtgxsIHfaNOFX0p4RKOPWB6RF1UzEfUS5mBwzyXew6bS+x/9XAhOVgX/fWX+dnGE7yi4T1G8OEALHKAZflPQCLJeRZE9OLuEnQcgt0SlBY7nr6Uz3TaRghkJQ==
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:MN2PR04MB5951.namprd04.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(396003)(366004)(376002)(136003)(346002)(39860400002)(76116006)(71200400001)(86362001)(8936002)(8676002)(9686003)(83380400001)(33656002)(4326008)(55016002)(478600001)(6506007)(54906003)(53546011)(316002)(2906002)(186003)(110136005)(26005)(66946007)(66476007)(66556008)(64756008)(66446008)(5660300002)(7696005)(15650500001)(52536014);
+ DIR:OUT; SFP:1102; 
+x-ms-exchange-antispam-messagedata: PG461QFoYiNHesmy8d09sQtBEK7/CgJePMIEspLUEA+h3/88BHS6BAgSCBD/pad1Ef5EkmLer02QazZm29Zxh5+NrlxE0/x5wap3/8fYZEyklJIAZwwTUFPx3PLk4onZQkL+K0Lnzf8yowc1B0WhdX2nN9OXXcJilrRbeM29ejOpc6zi3IsNNeSZpeLOXNIYGCNwXN8ObU1ktTYkHKibSh/r2gLvrqMlhf3aS1MLRdc3QZ5P7s4DUJ3uHnGz8IgFT8zX4yGWKKbtPiUsLR/yqaT1CVinp3UY/OiEU/t9xE2wzkQr0LHY+bKTOzIy6ubjD1t4KWK4uN/iUtkGlPu+Fxx3NuNjkCknUnlhaciKpWGQqL+Qwh2ivlrQY94ri2Vg8MBnIYApQ8Yl80DDjtdGIrbKsGauGqLds6v72svkhQ5aYXUXaPYyNYJaBbMOo0wzbNmJA7CwbxniL9tbujCqa7PEJg2oaVXkGZQ/tJ6R3AVK77CGsD2Z1XMjwfxoge3x+Ad0aQMa8lvzTqGqNtRb6yq4MScyC5kAJ5Srwbi6QeBLjTMgwOjVELXn7kaPwtYYiRu7oklE3Us69zbT29+gS9GpkgpSd4w8O8pUe7ZA00wlRapnpx0Fn//DHSXQx/275jUbh+US60UGAifJEd3EcA==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20200910134851.7817-1-jin.yu@intel.com>
- <CAFubqFuBY9-KpxUfb7HorV-q960Ns4EiCLCzq-TRFciDuaUiUQ@mail.gmail.com>
- <MN2PR11MB372522EE6FFC2CD0ECF2ADE680200@MN2PR11MB3725.namprd11.prod.outlook.com>
- <CAFubqFtpkNUVq5ZYa2LK96LF0CRcBGx7PtkxNGb8L++nhZOUHA@mail.gmail.com>
- <DM6PR11MB3723ADFFE72C294947BE95AF803B0@DM6PR11MB3723.namprd11.prod.outlook.com>
-In-Reply-To: <DM6PR11MB3723ADFFE72C294947BE95AF803B0@DM6PR11MB3723.namprd11.prod.outlook.com>
-From: Raphael Norwitz <raphael.s.norwitz@gmail.com>
-Date: Thu, 1 Oct 2020 23:02:31 -0400
-Message-ID: <CAFubqFu9YobuZKnpnNKZjug_rrp-54o8+B4Lef-UMeuMvpOaqg@mail.gmail.com>
-Subject: Re: [PATCH] vhost-blk: set features before setting inflight feature
-To: "Yu, Jin" <jin.yu@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
- envelope-from=raphael.s.norwitz@gmail.com; helo=mail-oi1-x241.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR04MB5951.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2838a42d-e7d4-4027-1335-08d8668073b8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Oct 2020 03:08:35.4186 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: EPaxjwqw/XkO4HCmjM+fBZlY6JJB94z5dK7cAKc/Kc46pq1qs8ddAFdBd3tOAuXaqWzydQBWf7Z07t1woCaIxw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB5998
+Received-SPF: pass client-ip=216.71.154.42;
+ envelope-from=prvs=537860369=Dmitry.Fomichev@wdc.com; helo=esa4.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 23:08:40
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,159 +149,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, QEMU <qemu-devel@nongnu.org>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>, Max Reitz <mreitz@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Klaus Jensen <k.jensen@samsung.com>,
+ Keith Busch <kbusch@kernel.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I see you're right - or rather even if a vhost-net backend negotiates
-the inflight feature, QEMU never sets/gets an inflight fd. That clears
-up all my concerns - I support the change.
+> -----Original Message-----
+> From: Qemu-devel <qemu-devel-
+> bounces+dmitry.fomichev=3Dwdc.com@nongnu.org> On Behalf Of Klaus
+> Jensen
+> Sent: Thursday, October 1, 2020 5:51 PM
+> To: qemu-devel@nongnu.org
+> Cc: Kevin Wolf <kwolf@redhat.com>; qemu-block@nongnu.org; Klaus Jensen
+> <k.jensen@samsung.com>; Max Reitz <mreitz@redhat.com>; Klaus Jensen
+> <its@irrelevant.dk>; Keith Busch <kbusch@kernel.org>
+> Subject: [PATCH] hw/block/nvme: update nsid when registered
+>=20
+> From: Klaus Jensen <k.jensen@samsung.com>
+>=20
+> If the user does not specify an nsid parameter on the nvme-ns device,
+> nvme_register_namespace will find the first free namespace id and assign
+> that.
+>=20
+> This fix makes sure the assigned id is saved.
+>=20
+> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 
-I don't like sending an additional VHOST_USER_SET_FEATURES message in
-vhost_dev_start() right after we've sent one in
-vhost_dev_prepare_inflight(), but I don't see a clean way around it.
-We could add a flag in vhost_dev, set it in
-vhost_dev_prepare_inflight() and then check and set it back in
-vhost_dev_set_features(), but that seems quite ugly. Unless anyone can
-think of a better option, I say we go with the patch as is.
+Yep, this makes autogenerated NSIDs work.
+Reviewed-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 
-Acked-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
+> ---
+>  hw/block/nvme.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index da8344f196a8..bb1ee009cd31 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -2583,7 +2583,7 @@ int nvme_register_namespace(NvmeCtrl *n,
+> NvmeNamespace *ns, Error **errp)
+>          for (int i =3D 1; i <=3D n->num_namespaces; i++) {
+>              NvmeNamespace *ns =3D nvme_ns(n, i);
+>              if (!ns) {
+> -                nsid =3D i;
+> +                nsid =3D ns->params.nsid =3D i;
+>                  break;
+>              }
+>          }
+> --
+> 2.28.0
+>=20
 
-On Tue, Sep 22, 2020 at 3:03 AM Yu, Jin <jin.yu@intel.com> wrote:
->
-> > -----Original Message-----
-> > From: Raphael Norwitz <raphael.s.norwitz@gmail.com>
-> > Sent: Tuesday, September 22, 2020 7:03 AM
-> > To: Yu, Jin <jin.yu@intel.com>
-> > Cc: Michael S. Tsirkin <mst@redhat.com>; Raphael Norwitz
-> > <raphael.norwitz@nutanix.com>; Kevin Wolf <kwolf@redhat.com>; Max
-> > Reitz <mreitz@redhat.com>; QEMU <qemu-devel@nongnu.org>
-> > Subject: Re: [PATCH] vhost-blk: set features before setting inflight feature
-> >
-> > I see your point - all the open source backends I could find which support
-> > VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD rely on knowing the vq type
-> > to allocate the fd.
-> >
-> > That said, it looks like dpdk supports both
-> > VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD and packed vqs without
-> > needing such an API
-> > https://github.com/DPDK/dpdk/blob/main/lib/librte_vhost/vhost_user.c#L1
-> > 509.
-> > I'm not sure exactly how the VQ state is sent to DPDK before the inflight fd
-> > negotiation, but ideally vhost-user-blk could be made to work the same way.
-> > Maybe someone with more vhost-net and dpdk knowledge could chime in on
-> > how vhost-net backends do it?
-> >
-> I checked the code of vhost-net in QEMU, it did not use the inflight feature,
-> which should be different from storage, after all, the network can lose packets
-> and retransmit.
->
-> Of course, as you said, we need an expert familiar with vhost-net and dpdk.
->
-> Thanks
-> > On Mon, Sep 14, 2020 at 10:52 PM Yu, Jin <jin.yu@intel.com> wrote:
-> > >
-> > > > -----Original Message-----
-> > > > From: Raphael Norwitz <raphael.s.norwitz@gmail.com>
-> > > > Sent: Tuesday, September 15, 2020 9:25 AM
-> > > > To: Yu, Jin <jin.yu@intel.com>
-> > > > Cc: Michael S. Tsirkin <mst@redhat.com>; Raphael Norwitz
-> > > > <raphael.norwitz@nutanix.com>; Kevin Wolf <kwolf@redhat.com>; Max
-> > > > Reitz <mreitz@redhat.com>; QEMU <qemu-devel@nongnu.org>
-> > > > Subject: Re: [PATCH] vhost-blk: set features before setting inflight
-> > > > feature
-> > > >
-> > > > Backends already receive the format in vhost_dev_start before the
-> > > > memory tables are set or any of the virtqueues are started. Can you
-> > > > elaborate on why you need to know the virtqueue format before setting
-> > the inflight FD?
-> > > >
-> > > First, when the backend receives the get_inflight_fd sent by QEMU, it
-> > > needs to allocate vq's inflight memory, and it needs to know the format of
-> > vq.
-> > > Second, when the backend reconnects to QEMU, QEMU sends
-> > set_inflight_fd, and the backend restores the inflight memory of vq.
-> > > It also needs to know the format of vq.
-> > > Thanks.
-> > > > On Thu, Sep 10, 2020 at 2:15 AM Jin Yu <jin.yu@intel.com> wrote:
-> > > > >
-> > > > > Virtqueue has split and packed, so before setting inflight, you
-> > > > > need to inform the back-end virtqueue format.
-> > > > >
-> > > > > Signed-off-by: Jin Yu <jin.yu@intel.com>
-> > > > > ---
-> > > > >  hw/block/vhost-user-blk.c |  6 ++++++
-> > > > >  hw/virtio/vhost.c         | 18 ++++++++++++++++++
-> > > > >  include/hw/virtio/vhost.h |  1 +
-> > > > >  3 files changed, 25 insertions(+)
-> > > > >
-> > > > > diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-> > > > > index 39aec42dae..9e0e9ebec0 100644
-> > > > > --- a/hw/block/vhost-user-blk.c
-> > > > > +++ b/hw/block/vhost-user-blk.c
-> > > > > @@ -131,6 +131,12 @@ static int vhost_user_blk_start(VirtIODevice
-> > > > > *vdev)
-> > > > >
-> > > > >      s->dev.acked_features = vdev->guest_features;
-> > > > >
-> > > > > +    ret = vhost_dev_prepare_inflight(&s->dev);
-> > > > > +    if (ret < 0) {
-> > > > > +        error_report("Error set inflight format: %d", -ret);
-> > > > > +        goto err_guest_notifiers;
-> > > > > +    }
-> > > > > +
-> > > > >      if (!s->inflight->addr) {
-> > > > >          ret = vhost_dev_get_inflight(&s->dev, s->queue_size, s->inflight);
-> > > > >          if (ret < 0) {
-> > > > > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c index
-> > > > > 1a1384e7a6..4027c11886 100644
-> > > > > --- a/hw/virtio/vhost.c
-> > > > > +++ b/hw/virtio/vhost.c
-> > > > > @@ -1616,6 +1616,24 @@ int vhost_dev_load_inflight(struct
-> > > > > vhost_inflight
-> > > > *inflight, QEMUFile *f)
-> > > > >      return 0;
-> > > > >  }
-> > > > >
-> > > > > +int vhost_dev_prepare_inflight(struct vhost_dev *hdev) {
-> > > > > +    int r;
-> > > > > +
-> > > > > +    if (hdev->vhost_ops->vhost_get_inflight_fd == NULL ||
-> > > > > +        hdev->vhost_ops->vhost_set_inflight_fd == NULL) {
-> > > > > +        return 0;
-> > > > > +    }
-> > > > > +
-> > > > > +    r = vhost_dev_set_features(hdev, hdev->log_enabled);
-> > > > > +    if (r < 0) {
-> > > > > +        VHOST_OPS_DEBUG("vhost_dev_prepare_inflight failed");
-> > > > > +        return r;
-> > > > > +    }
-> > > > > +
-> > > > > +    return 0;
-> > > > > +}
-> > > > > +
-> > > > >  int vhost_dev_set_inflight(struct vhost_dev *dev,
-> > > > >                             struct vhost_inflight *inflight)  {
-> > > > > diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
-> > > > > index
-> > > > > 767a95ec0b..4e2fc75528 100644
-> > > > > --- a/include/hw/virtio/vhost.h
-> > > > > +++ b/include/hw/virtio/vhost.h
-> > > > > @@ -140,6 +140,7 @@ void vhost_dev_reset_inflight(struct
-> > > > > vhost_inflight *inflight);  void vhost_dev_free_inflight(struct
-> > > > > vhost_inflight *inflight);  void vhost_dev_save_inflight(struct
-> > > > > vhost_inflight *inflight, QEMUFile *f);  int
-> > > > > vhost_dev_load_inflight(struct vhost_inflight *inflight, QEMUFile
-> > > > > *f);
-> > > > > +int vhost_dev_prepare_inflight(struct vhost_dev *hdev);
-> > > > >  int vhost_dev_set_inflight(struct vhost_dev *dev,
-> > > > >                             struct vhost_inflight *inflight);  int
-> > > > > vhost_dev_get_inflight(struct vhost_dev *dev, uint16_t queue_size,
-> > > > > --
-> > > > > 2.17.2
-> > > > >
-> > > > >
 
