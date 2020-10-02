@@ -2,90 +2,86 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C599C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:37:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06FF4C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:38:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C610A20644
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:37:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 91C3520644
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:38:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UfCUGy4S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C610A20644
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wJNpL5XI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91C3520644
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52854 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOKJd-0003o5-UX
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 08:37:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34256)
+	id 1kOKKl-00055u-N2
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 08:38:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34208)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kOKIL-0002Oi-V2
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:36:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43639)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kOKII-0006cn-EL
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:36:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601642173;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=aauS9YLt+EUdAZJPId3R7yAPWdCLOUG4meeNzb1X5dE=;
- b=UfCUGy4ShB18qTXTAGRjrSW0pLwvhc7x9uv31IN5ypayzejuZdubG8+ZhgxmzLkC6n64jI
- 0++KNvh3ZFrB9yBMItgOnkqkTqSXH23lsUnI+44c3kxgdvoDRbY3k9QsIyRkwPqMQB5Dan
- u01o76ysRXK0jJ/M7Iz/LVvd3mwA6QM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-107-MxsCiZxAMlurhRIBAepkqw-1; Fri, 02 Oct 2020 08:36:11 -0400
-X-MC-Unique: MxsCiZxAMlurhRIBAepkqw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7A7B425DB;
- Fri,  2 Oct 2020 12:36:10 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-101.ams2.redhat.com
- [10.36.112.101])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A9A4F5D9D3;
- Fri,  2 Oct 2020 12:36:10 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 2E94B1132784; Fri,  2 Oct 2020 14:36:09 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH v2 3/4] qom: Add user_creatable_print_help_from_qdict()
-References: <20200930124557.51835-1-kwolf@redhat.com>
- <20200930124557.51835-4-kwolf@redhat.com>
- <878scoke5z.fsf@dusky.pond.sub.org>
-Date: Fri, 02 Oct 2020 14:36:09 +0200
-In-Reply-To: <878scoke5z.fsf@dusky.pond.sub.org> (Markus Armbruster's message
- of "Fri, 02 Oct 2020 14:25:44 +0200")
-Message-ID: <87a6x4iz46.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kOKII-0002Ip-71
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:36:14 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:42144)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kOKIE-0006cU-Ll
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:36:13 -0400
+Received: by mail-ed1-x542.google.com with SMTP id j2so1457826eds.9
+ for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 05:36:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=z1MGB7e7iKO9Iof+fHKLrEADbXc8otwFgEoTiN8RdEs=;
+ b=wJNpL5XI0DYUQPokkb3KXSs83dG8hKfRFsg1xfN6kGMPm5WetlAVeUBmB8PkFTPbw+
+ o+Xn4ABpf9/GDYgncAkCe6KcKa5myJaf+SGPXvjY0EnVUsaJLbw8uZl19Aw1VO0hk4Sb
+ qfgpRszpvtzKdIsdr7rnLXYdcnIWUt0R43bDv73v42yr/7wyTdoWXrs/45ktIW/3Zvhi
+ tSxZVxIwATIXQKBCsPLsqTf5qIhs+nuAbuwAhmzsN+bltCBQ0LCwYDf2YjaOc55mXDPC
+ mY4l5dwggu+Bo3eBHv3KMwI+r+Aqho/7sDzn1iervC/8cBnQHxnOJ2FUBUjJMXvN4n6u
+ 5XhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=z1MGB7e7iKO9Iof+fHKLrEADbXc8otwFgEoTiN8RdEs=;
+ b=qP6CxrjrrNtzfa7ICNIdgrgCd86rXrcfBzpGFZbzsPa26FVgMlkBNI/+SaXeu7/yMs
+ Dgye8OxWXUXtXQXTKqSMzoJJVKgAnfj8eVcnHrHt9sewp6PI3Sobh/ag2kN5FagjtVwW
+ YSM2Ga4MjL4KS6A/4sJDzF+GymBFcCoHu7oj7dApeuEvrZmJMtD/ra8rTO1kACVTBpsG
+ OlT+bZjuKmQdmBJUZNgp7wykCM9eEL099gfg2t3q5y+PE0JGA5INORJ7bz3ekBX8Fl+t
+ pjpIwzwnxP7jayjSEdh7FqslFCQOh8u5PaExP7Cozs5A24czZjEJNoOtx1jpYMJgtmoc
+ iEzw==
+X-Gm-Message-State: AOAM531A5dae0i7j6CYkXP9R5vjoIgFztlJHDICXh5u3mxmrSlx12lSY
+ O3VUCoII3XUr+QsgOSDBmitDV3eFVNPrsCHw9nNB/A==
+X-Google-Smtp-Source: ABdhPJyvgOLbhf2J1lol8SnE8icQP506VtEOJ0QJatpoHvbjCZFBKjg8hGnmSaK+wo8/wLz0St14eRCs+u3zGNKwcBo=
+X-Received: by 2002:a50:e68a:: with SMTP id z10mr2153957edm.100.1601642168977; 
+ Fri, 02 Oct 2020 05:36:08 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 01:13:31
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20201002105239.2444-1-peter.maydell@linaro.org>
+ <b1a6000a-c9a1-43fb-7646-b6ea87797b2e@redhat.com>
+In-Reply-To: <b1a6000a-c9a1-43fb-7646-b6ea87797b2e@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 2 Oct 2020 13:35:57 +0100
+Message-ID: <CAFEAcA9PbBByROzJ3+pfxycAoP-C5JnmfxQEt5jm6+3A3n2fbw@mail.gmail.com>
+Subject: Re: [PATCH] meson.build: Don't look for libudev for static builds
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::542;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x542.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,111 +94,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Markus Armbruster <armbru@redhat.com> writes:
-
-> Kevin Wolf <kwolf@redhat.com> writes:
+On Fri, 2 Oct 2020 at 13:02, Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
->> This adds a function that, given a QDict of non-help options, prints
->> help for user creatable objects.
->>
->> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->> ---
->>  include/qom/object_interfaces.h | 9 +++++++++
->>  qom/object_interfaces.c         | 9 +++++++++
->>  2 files changed, 18 insertions(+)
->>
->> diff --git a/include/qom/object_interfaces.h b/include/qom/object_interfaces.h
->> index f118fb516b..53b114b11a 100644
->> --- a/include/qom/object_interfaces.h
->> +++ b/include/qom/object_interfaces.h
->> @@ -161,6 +161,15 @@ int user_creatable_add_opts_foreach(void *opaque,
->>   */
->>  bool user_creatable_print_help(const char *type, QemuOpts *opts);
->>  
->> +/**
->> + * user_creatable_print_help_from_qdict:
->> + * @args: options to create
->> + *
->> + * Prints help considering the other options given in @args (if "qom-type" is
->> + * given and valid, print properties for the type, otherwise print valid types)
->> + */
->> +void user_creatable_print_help_from_qdict(QDict *args);
->> +
->>  /**
->>   * user_creatable_del:
->>   * @id: the unique ID for the object
->> diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
->> index 3fd1da157e..ed896fe764 100644
->> --- a/qom/object_interfaces.c
->> +++ b/qom/object_interfaces.c
->> @@ -279,6 +279,15 @@ bool user_creatable_print_help(const char *type, QemuOpts *opts)
->>      return false;
->>  }
->>  
->> +void user_creatable_print_help_from_qdict(QDict *args)
->> +{
->> +    const char *type = qdict_get_try_str(args, "qom-type");
->> +
->> +    if (!type || !user_creatable_print_type_properites(type)) {
->> +        user_creatable_print_types();
->> +    }
+> On 02/10/20 12:52, Peter Maydell wrote:
+> > commit f01496a314d916 moved the logic for detecting libudev from
+> > configure to meson.build, but in the process it dropped the condition
+> > that meant we only ask pkg-config about libudev for a non-static
+> > build.
+> >
+> > This breaks static builds of the system emulators on at least Ubuntu
+> > 18.04.4, because on that host there is no static libudev but
+> > pkg-config still claims it exists.
+> >
+> > Reinstate the logic that we had in the configure check.
+> >
+> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 >
-> Existing user_creatable_print_help():
+> I don't think this is a good idea.  Having a completely new build system
+> also lets us notice all these weird one-off tests, decide whether they
+> are worth being kept (like the SDL -Wno-undef workaround) or not, and
+> possibly come up with a policy that avoids having to make one-off decisions.
 >
-> 1. "qom-type=help,..." and its sugared forms, in particular "help"
+> If "../configure --static" worked and now doesn't then it would be a
+> clear regression, but a one off check should have a bigger justification
+> than "39 --disable switches have worked so far and 39 < 40".
+
+My configure command line used to work and now it doesn't.
+There is no workaround that I'm aware of that I can use
+by tweaking the configure options. That's a clear regression.
+
+> Here are three alternatives to the patch:
 >
->    List QOM types and succeed.
->
-> 2. "qom-type=T,help,..." 
->
-> 2a. If T names a QOM type
->
->     List T's properties and succeed.
->
-> 2b. If T does not name a QOM type
->
->     Fail.  Callers typically interpret this as "no help requested",
->     proceed, then choke on invalid qom-type=T.
+> - the workaround: just leave things as they are and add
+> --disable-libudev to your script.
 
-And of course
+There is no --disable-udev ! If there was I'd just have
+used it.
 
-  3. Else
+e104462:bionic:static-sys$  '../../configure'
+'--target-list=arm-softmmu' '--enable-debug' '--static'
+'--disable-tools' '--disable-sdl' '--disable-gtk' '--disable-vnc'
+'--disable-virtfs' '--disable-attr' '--disable-libiscsi'
+'--disable-libnfs' '--disable-libusb' '--disable-opengl'
+'--disable-numa' '--disable-usb-redir' '--disable-bzip2'
+'--audio-drv-list=' '--disable-guest-agent' '--disable-vte'
+--disable-udev
+ERROR: unknown option --disable-udev
+Try '../../configure --help' for more information
 
-     No help requested; fail.
+> We have just added a month ago a
+> completely new dependency that would have the same issue (libu2f); we
+> didn't add "test $static" just because you don't have libu2f installed
+> and therefore you didn't notice.  The day you updated your system ended
+> up with libu2f-dev installed, you would probably just add
+> --disable-libu2f instead of adding a test for $static.  So why should
+> libudev be treated differently?
 
-> New user_creatable_print_help() treats case 2b like case 1.
->
-> Intentional?
+The last time this came up it was in an all-in-configure
+test, so I took the approach of making the test a bit smarter
+to sanity check that what it was getting from pkg-config
+really worked:
+https://patchew.org/QEMU/20200928160402.7961-1-peter.maydell@linaro.org/
+I don't know enough meson to do that in meson, so this patch is
+the simple change that fixes the regression by reinstating the
+logic configure had.
 
-The next patch relies on this, so I figure the answer is yes.
+> - the complicated fix: check which statically linked libraries are
+> available in e.g. Debian and disable _all_ other dependencies with
+> --static (most of them will be the ones that you already have to disable
+>  in your script, and most of them will be in configure).  Based on the
+> outcome, decide whether it's actually possible to build a statically
+> linked emulator that makes sense.
 
-The difference to user_creatable_print_help() is subtle.  Perhaps the
-contract should point it out explicitly.  Up to you.
+I don't think we want to try to say "look at what statically
+linked libraries are in Debian". The point of configure
+style logic is to look at what is present when we try to compile
+and, when something is an optional feature, only compile it
+in if it's going to work.
 
-By the way, the contract of user_creatable_print_help() is inaccurate:
+It would be better to do the "see if a static library is present"
+test. This isn't too hard to do in configure (compare that
+six line fix to the detection of libgio). Hopefully it is
+not too hard to do in meson ?
 
- * Prints help if requested in @opts.
- *
- * Returns: true if @opts contained a help option and help was printed, false
- * if no help option was found.
+> Finally, no matter how we proceed, static building of system emulators
+> is not covered by either CI or tests/docker (only user-mode emulators
+> are).  Even if we deprecate it, we should make sure that your
+> configuration is reproduced in either Travis or GitLab, otherwise people
+> will keep on breaking it.  That would also document that building a
+> statically-linked system emulator is messy and requires a few dozen
+> --disable options.
 
-One, it prints help when either @type or @opts request it.
+I agree that we don't really very solidly support this use case,
+and it's pretty much "if it doesn't work we accept point-fixes
+to the build machinery and/or recommend more use of --disable-foo".
+But it is still useful sometimes to have.
 
-Two, "if no help option was found" is misleading: case 2b.
-
-Not this patch's problem.
->
->> +}
->> +
->>  bool user_creatable_del(const char *id, Error **errp)
->>  {
->>      Object *container;
-
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-
+thanks
+-- PMM
 
