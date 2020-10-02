@@ -7,45 +7,46 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A184C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 08:32:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53C89C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 08:34:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A17B8206B8
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 08:32:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A17B8206B8
+	by mail.kernel.org (Postfix) with ESMTPS id EEF6C206B8
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 08:34:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEF6C206B8
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42564 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOGUA-0003Rz-Pm
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 04:32:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39916)
+	id 1kOGVs-00055g-2e
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 04:34:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39918)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <f.gruenbichler@proxmox.com>)
- id 1kOGSm-0002cv-Ky
+ id 1kOGSm-0002cz-Pn
  for qemu-devel@nongnu.org; Fri, 02 Oct 2020 04:30:48 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:9729)
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:17926)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <f.gruenbichler@proxmox.com>)
- id 1kOGSk-0002Zz-Ha
+ id 1kOGSk-0002Zx-UD
  for qemu-devel@nongnu.org; Fri, 02 Oct 2020 04:30:48 -0400
 Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
- by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 678CC45B95;
- Fri,  2 Oct 2020 10:23:31 +0200 (CEST)
-Date: Fri, 02 Oct 2020 10:23:24 +0200
+ by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 2376745B99;
+ Fri,  2 Oct 2020 10:23:40 +0200 (CEST)
+Date: Fri, 02 Oct 2020 10:23:33 +0200
 From: Fabian =?iso-8859-1?q?Gr=FCnbichler?= <f.gruenbichler@proxmox.com>
-Subject: Re: [PATCH qemu 4/4] iotests: add test for bitmap mirror
+Subject: Re: [PATCH qemu 2/4] drive-mirror: add support for conditional and
+ always bitmap sync modes
 To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
 References: <20200922091418.53562-1-f.gruenbichler@proxmox.com>
- <20200922091418.53562-5-f.gruenbichler@proxmox.com>
- <5336db8d-b54a-0881-5675-ca23f9645e65@redhat.com>
-In-Reply-To: <5336db8d-b54a-0881-5675-ca23f9645e65@redhat.com>
+ <20200922091418.53562-3-f.gruenbichler@proxmox.com>
+ <5af05c55-3e19-23d6-ee87-554090b56310@redhat.com>
+In-Reply-To: <5af05c55-3e19-23d6-ee87-554090b56310@redhat.com>
 MIME-Version: 1.0
 User-Agent: astroid/0.15.0 (https://github.com/astroidmail/astroid)
-Message-Id: <1601624180.56wvsjysei.astroid@nora.none>
+Message-Id: <1601623989.wcs44caouc.astroid@nora.none>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Received-SPF: pass client-ip=212.186.127.180;
@@ -75,170 +76,94 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On October 1, 2020 7:31 pm, Max Reitz wrote:
+On October 1, 2020 7:01 pm, Max Reitz wrote:
 > On 22.09.20 11:14, Fabian Gr=C3=BCnbichler wrote:
->> heavily based on/practically forked off iotest 257 for bitmap backups,
->> but:
+>> From: John Snow <jsnow@redhat.com>
 >>=20
->> - no writes to filter node 'mirror-top' between completion and
->> finalization, as those seem to deadlock?
->> - no inclusion of not-yet-available full/top sync modes in combination
->> with bitmaps
->> - extra set of reference/test mirrors to verify that writes in parallel
->> with active mirror work
+>> Teach mirror two new tricks for using bitmaps:
 >>=20
->> intentionally keeping copyright and ownership of original test case to
->> honor provenance.
+>> Always: no matter what, we synchronize the copy_bitmap back to the
+>> sync_bitmap. In effect, this allows us resume a failed mirror at a later
+>> date, since the target bdrv should be exactly in the state referenced by
+>> the bitmap.
+>>=20
+>> Conditional: On success only, we sync the bitmap. This is akin to
+>> incremental backup modes; we can use this bitmap to later refresh a
+>> successfully created mirror, or possibly re-try the whole failed mirror
+>> if we are able to rollback the target to the state before starting the
+>> mirror.
+>>=20
+>> Based on original work by John Snow.
 >>=20
 >> Signed-off-by: Fabian Gr=C3=BCnbichler <f.gruenbichler@proxmox.com>
 >> ---
->>  tests/qemu-iotests/306     |  546 +++++++
->>  tests/qemu-iotests/306.out | 2846 ++++++++++++++++++++++++++++++++++++
->>  tests/qemu-iotests/group   |    1 +
->>  3 files changed, 3393 insertions(+)
->>  create mode 100755 tests/qemu-iotests/306
->>  create mode 100644 tests/qemu-iotests/306.out
+>>  block/mirror.c | 28 ++++++++++++++++++++--------
+>>  blockdev.c     |  3 +++
+>>  2 files changed, 23 insertions(+), 8 deletions(-)
 >>=20
->> diff --git a/tests/qemu-iotests/306 b/tests/qemu-iotests/306
->> new file mode 100755
->> index 0000000000..1bb8bd4138
->> --- /dev/null
->> +++ b/tests/qemu-iotests/306
+>> diff --git a/block/mirror.c b/block/mirror.c
+>> index d64c8203ef..bc4f4563d9 100644
+>> --- a/block/mirror.c
+>> +++ b/block/mirror.c
 >=20
 > [...]
 >=20
->> +def test_bitmap_sync(bsync_mode, msync_mode=3D'bitmap', failure=3DNone)=
-:
->> +    """
->> +    Test bitmap mirror routines.
->> +
->> +    :param bsync_mode: Is the Bitmap Sync mode, and can be any of:
->> +        - on-success: This is the "incremental" style mode. Bitmaps are
->> +                      synchronized to what was copied out only on succe=
-ss.
->> +                      (Partial images must be discarded.)
->> +        - never:      This is the "differential" style mode.
->> +                      Bitmaps are never synchronized.
->> +        - always:     This is a "best effort" style mode.
->> +                      Bitmaps are always synchronized, regardless of fa=
-ilure.
->> +                      (Partial images must be kept.)
->> +
->> +    :param msync_mode: The mirror sync mode to use for the first mirror=
-.
->> +                       Can be any one of:
->> +        - bitmap: mirrors based on bitmap manifest.
->> +        - full:   Full mirrors.
->> +        - top:    Full mirrors of the top layer only.
->> +
->> +    :param failure: Is the (optional) failure mode, and can be any of:
->> +        - None:         No failure. Test the normative path. Default.
->> +        - simulated:    Cancel the job right before it completes.
->> +                        This also tests writes "during" the job.
->> +        - intermediate: This tests a job that fails mid-process and pro=
-duces
->> +                        an incomplete mirror. Testing limitations preve=
-nt
->> +                        testing competing writes.
->> +    """
->> +    with iotests.FilePath('img', 'bsync1', 'bsync2', 'bsync3',
->> +                            'fmirror0', 'fmirror1', 'fmirror2', 'fmirro=
-r3') as \
+>> @@ -1781,8 +1793,8 @@ static BlockJob *mirror_start_job(
+>>      }
+>> =20
+>>      if (s->sync_mode =3D=3D MIRROR_SYNC_MODE_BITMAP) {
+>> -        bdrv_merge_dirty_bitmap(s->dirty_bitmap, s->sync_bitmap,
+>> -                                NULL, &local_err);
+>> +        bdrv_dirty_bitmap_merge_internal(s->dirty_bitmap, s->sync_bitma=
+p,
+>> +                                         NULL, true);
 >=20
-> The indentation is off now.
->=20
->> +                            (img_path, bsync1, bsync2, bsync3,
->> +                             fmirror0, fmirror1, fmirror2, fmirror3), \
->> +         iotests.VM() as vm:
-> Hm.  On tmpfs, this test fails for me:
->=20
-> ($ TEST_DIR=3D/tmp/iotest ./check -qcow2 306)
->=20
-> @@ -170,7 +170,7 @@
->      "drive0": [
->        {
->          "busy": false,
-> -        "count": 262144,
-> +        "count": 458752,
->          "granularity": 65536,
->          "persistent": false,
->          "recording": true,
-> @@ -464,7 +464,7 @@
->      "drive0": [
->        {
->          "busy": false,
-> -        "count": 262144,
-> +        "count": 458752,
->          "granularity": 65536,
->          "persistent": false,
->          "recording": true,
-> @@ -760,7 +760,7 @@
->      "drive0": [
->        {
->          "busy": false,
-> -        "count": 262144,
-> +        "count": 393216,
->          "granularity": 65536,
->          "persistent": false,
->          "recording": true,
-> @@ -1056,7 +1056,7 @@
->      "drive0": [
->        {
->          "busy": false,
-> -        "count": 262144,
-> +        "count": 458752,
->          "granularity": 65536,
->          "persistent": false,
->          "recording": true,
-> @@ -1350,7 +1350,7 @@
->      "drive0": [
->        {
->          "busy": false,
-> -        "count": 262144,
-> +        "count": 458752,
->          "granularity": 65536,
->          "persistent": false,
->          "recording": true,
-> @@ -2236,7 +2236,7 @@
->      "drive0": [
->        {
->          "busy": false,
-> -        "count": 262144,
-> +        "count": 458752,
->          "granularity": 65536,
->          "persistent": false,
->          "recording": true,
->=20
-> Can you see the same?
+> (Sorry for not catching it in the previous version, but) this hunk needs
+> to go into patch 1, doesn=E2=80=99t it?
 
-yes, but also only on tmpfs. ext4, xfs, ZFS all work fine.. the numbers=20
-for tmpfs vary between runs, each wrong count is sometimes 393216 (256k=20
-expected + 128k extra), sometimes 458752 (+192k). it's always the dirty=20
-bitmap used by the mirror job which is 'wrong', not the passed-in sync=20
-bitmap which verifies correctly. the final mirror results also seem=20
-correct.
+yes. this was a result of keeping the original patches #1 and #2, and=20
+doing the cleanup on-top as separate patches. I missed folding it into=20
+the first instead of (now combined) second patch.
 
-for the first diff hunk (bitmap + never + simulated), we did
+> Or, rather...  Do we need it at all?  Is there anything that would
+> prohibit just moving this merge call to before the set_busy call?
+> (Which again is probably something that should be done in patch 1.)
+>=20
+> (If you decide to keep calling *_internal, I think it would be nice to
+> add a comment above the call stating why we have to use *_internal here
+> (because the sync bitmap is busy now), and why it=E2=80=99s safe to do so
+> (because blockdev.c and/or mirror_start_job() have already checked the
+> bitmap).  But if it=E2=80=99s possible to do the merge before marking the
+> sync_bitmap busy, we probably should rather do that.)
 
-- reference mirror #0
-- add sync bitmap 'bitmap0'
-- do writes to dirty 6 sectors (393216)
-- reference mirror #1
-- test mirror #1
-- bitmap0 still has count 393216
-- reference mirror #2
-- test mirror #2
--- while that is not yet completed, do 4 more writes
--- bitmap0 now has count 393216 + 262144 655360
--- dirty bitmap 'should have' count 262144, but has 458752 or 393216
+I think it should be possible for this instance. for the other end of=20
+the job, merging back happens before setting the bitmap to un-busy, so we=20
+need to use _internal there. will add a comment for that one why we are=20
+allowed to do so.
 
-this is not what actually interests us at this point: how far the mirror=20
-has progressed does not matter, we just want to see that the writes we=20
-did while it was ongoing have been reflected in the sync bitmap. so=20
-unless there is some hunch that this difference in mirroring 'speed'=20
-between the file systems is something that we need to take a look at,=20
-I'd say we just dump bitmap0 after the writes have been performed,=20
-instead of all bitmaps (in line 230f).
+>=20
+>>          if (local_err) {
+>>              goto fail;
+>>          }
+>> diff --git a/blockdev.c b/blockdev.c
+>> index 6baa1a33f5..0fd30a392d 100644
+>> --- a/blockdev.c
+>> +++ b/blockdev.c
+>> @@ -3019,6 +3019,9 @@ static void blockdev_mirror_common(const char *job=
+_id, BlockDriverState *bs,
+>>          if (bdrv_dirty_bitmap_check(bitmap, BDRV_BITMAP_ALLOW_RO, errp)=
+) {
+>>              return;
+>>          }
+>> +    } else if (has_bitmap_mode) {
+>> +        error_setg(errp, "Cannot specify bitmap sync mode without a bit=
+map");
+>> +        return;
+>>      }
+>=20
+> This too I would move into patch 1.
+
+Ack.
 =
 
 
