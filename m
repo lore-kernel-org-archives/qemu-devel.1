@@ -7,81 +7,81 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A25E4C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 11:49:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89C38C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 11:51:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46CE1206B7
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 11:49:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C117E206B6
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 11:51:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="P/GMOXfY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46CE1206B7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="k39KOTs+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C117E206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOJZ3-0002yD-D8
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 07:49:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48606)
+	id 1kOJbA-00059g-Ma
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 07:51:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48656)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kOJNI-0006vB-NY
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 07:37:21 -0400
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:41132)
+ id 1kOJNK-0006vv-Ld
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 07:37:22 -0400
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:40364)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kOJND-0007cw-7t
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 07:37:20 -0400
-Received: by mail-wr1-x42d.google.com with SMTP id w5so1436843wrp.8
- for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 04:37:02 -0700 (PDT)
+ id 1kOJND-0007dc-BX
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 07:37:22 -0400
+Received: by mail-wr1-x432.google.com with SMTP id j2so1445945wrx.7
+ for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 04:37:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=DGPu6xjpfVcU2cvvFnAej/PDIX48+sbuTihWwVf3EwU=;
- b=P/GMOXfY1MSIp/9VqV+MovMG4OzhnGnTjZHpUhQRCA+tXr2yMR0L9ZZniVy7kshy8V
- XNQuLF2vQSDwtQj0oCmarryr7HmG5gZx+gmkr4DErsy01JdwWs90kHTFX/hSiDdNI+wG
- Q69oV49pjTxl3pkKZKqRw0koi00fzZJ4anKtnt/R3EUr0LaHKoELLxtSGbktbvD0AnEJ
- +Hh3oHT6W8n5Cb7LihTwTN/2A2sWE2Z9aD7I8anMi34o26XfBcSeaYF2TiPoplrMk80l
- ew5BqQ2Y5x3sKbgHA7zhT59xdJZXUSs61AecYU3L55fHkwm0KqyTPRFYj2vWmiGICLW9
- f96g==
+ bh=MBf1qUg7JcJrCu84N6vb1LPcLVQ94tKpJ0eYWnc5ilw=;
+ b=k39KOTs+iZrYeTkhNoafUr2kyJlTMWDGk1GDv5ZheRUF50+EEsrEc58tfUJbeGnsuu
+ oFpAIyt745a0qvu73kCrG3R/RBONBKvyqxN6bm+0OkW1iMoXteOTzVKV227mwR4JjUGO
+ OXop2qxkMgraYm6/u5iHplDrvN3gqHAIlbl4LZUDWPlFwOyz+YiiVFPvl0IAlKc7MyT5
+ Vh+njKTRLIPZFdgCnVEXf/B0VYozYArA9iSG6VQbY7H/jwUfFKxC20pKS4XhPAlMsOB8
+ 79PHQQad3mcPjp7sI1Nm092iyulkIu5v02u5ALqbuEroDSXCN5i+n2yRQDPnOYmrTgvq
+ UGBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=DGPu6xjpfVcU2cvvFnAej/PDIX48+sbuTihWwVf3EwU=;
- b=I38/0caeeIugC8040CbTCZKDELtRmx7eWPrQAwreVcyEdVrhUbISJwYQAECvGZweRD
- PoohuPvCFXO1rlP+PuNDeZgZlalaH2RTxWDS5nWdwCLFqxa9EH13yFk2oMMoZLsVQY0f
- DJoP9Asis/6UsX28BXc/zndjhlZlG8ff0cYMd/KkOQDT1rTB2VX4aYgoKAbulYq0pLoY
- uk/Hu7xHpvWhAy4H5BL/rJ+wvVVmy4/Bt7zQlM9Vi+g0sbEhWE4840iOE53NkVVykD72
- 77yqAiCU8pW06Zi70nMl1IYZwbbLi1PbqtGghqw+lLBlXmDOHE4E83LS+Hv+1dUQKmcY
- chYA==
-X-Gm-Message-State: AOAM530qth7G6N+TMAdUdnXTCKfZ1JXy8v0GvY7kBr698WLm0I3WgmG3
- F1sCMJPE7dEa1Edcl72OBRg3LbDGHUBtOQ==
-X-Google-Smtp-Source: ABdhPJx1oOG1dtvMTzeUDBI6/JNQIq+1+TQGpsWvqtXCPKZJl3rCuUZbIhNj+1PNsviC7zXu+rif3Q==
-X-Received: by 2002:adf:e5c8:: with SMTP id a8mr2631011wrn.5.1601638621859;
- Fri, 02 Oct 2020 04:37:01 -0700 (PDT)
+ bh=MBf1qUg7JcJrCu84N6vb1LPcLVQ94tKpJ0eYWnc5ilw=;
+ b=knV4wYMxAViFp/gmQNpyw37YuWDHaUdj71ign5XBkgBs8PwiLtLUL0cv6RkHt+Vii0
+ 5N8k94EBu5muMm0MjYp1oSaoLcQ25aVVh2O+iGFdSIuJwWH/QjNN5rk7zUz79KhJ4MDR
+ 8yAgzhXEQbWPARTPR3w7u0lSuYMVyxT7ePplVEaG6gulDXX2EgLdQmRZ0iFcLMOHZqOR
+ E0el40vwj7/xnAhnEtTb5vhVxkJQt8Tp3NrDDBIhiVU4nRr4jNA5AqEfGb1K+2MK/Nd6
+ W69xqGKPHnOG3OZ7GeXw70fgCdlQGlkigW7+Cvuc1FuebtoPz5ur8k+6vBg7KNaKbRGe
+ VFJQ==
+X-Gm-Message-State: AOAM532G+KNcvLHJofonUkyI+PBQHx7cO/EhXNSdfZ9YQY7vLN+o17+F
+ VO/jbiYrLrNAj4lpq4vJuJacIA==
+X-Google-Smtp-Source: ABdhPJwsoOfPXbdEYzR/NjyCuFGLO0D0IRrIVrdJDbT30YpXE5m5ZA0H7nsrUPalcsJyHMY6dSSuUw==
+X-Received: by 2002:adf:ee8d:: with SMTP id b13mr2758487wro.249.1601638631177; 
+ Fri, 02 Oct 2020 04:37:11 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a10sm1424062wmj.38.2020.10.02.04.36.48
+ by smtp.gmail.com with ESMTPSA id t10sm1485615wmi.1.2020.10.02.04.36.51
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 02 Oct 2020 04:36:51 -0700 (PDT)
+ Fri, 02 Oct 2020 04:37:01 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 619241FF91;
+ by zen.linaroharston (Postfix) with ESMTP id D926B1FF99;
  Fri,  2 Oct 2020 12:36:46 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 05/14] travis.yml: Drop the Python 3.5 build
-Date: Fri,  2 Oct 2020 12:36:36 +0100
-Message-Id: <20201002113645.17693-6-alex.bennee@linaro.org>
+Subject: [PULL 10/14] tests/docker: Remove old Debian 9 containers
+Date: Fri,  2 Oct 2020 12:36:41 +0100
+Message-Id: <20201002113645.17693-11-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201002113645.17693-1-alex.bennee@linaro.org>
 References: <20201002113645.17693-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42d;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42d.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::432;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x432.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,44 +103,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
  Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Thomas Huth <thuth@redhat.com>
 
-We are soon going to remove the support for Python 3.5. So remove
-the CI job now.
+We do not support Debian 9 in QEMU anymore, and the Debian 9 containers
+are now no longer used in the gitlab-CI. Time to remove them.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200922070441.48844-1-thuth@redhat.com>
-Message-Id: <20200925154027.12672-9-alex.bennee@linaro.org>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20200921174320.46062-6-thuth@redhat.com>
+Message-Id: <20200925154027.12672-14-alex.bennee@linaro.org>
 
-diff --git a/.travis.yml b/.travis.yml
-index 990dd11e6f..c255c331a7 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -253,15 +253,6 @@ jobs:
-         - TEST_CMD=""
+diff --git a/.gitlab-ci.d/containers.yml b/.gitlab-ci.d/containers.yml
+index 089cea7c14..11d079ea58 100644
+--- a/.gitlab-ci.d/containers.yml
++++ b/.gitlab-ci.d/containers.yml
+@@ -48,18 +48,6 @@ amd64-debian11-container:
+   variables:
+     NAME: debian11
  
- 
--    # Python builds
--    - name: "GCC Python 3.5 (x86_64-softmmu)"
--      env:
--        - CONFIG="--target-list=x86_64-softmmu"
--        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
--      language: python
--      python: 3.5
+-amd64-debian9-container:
+-  <<: *container_job_definition
+-  variables:
+-    NAME: debian9
 -
+-amd64-debian9-mxe-container:
+-  <<: *container_job_definition
+-  stage: containers-layer2
+-  needs: ['amd64-debian9-container']
+-  variables:
+-    NAME: debian9-mxe
 -
-     # Using newer GCC with sanitizers
-     - name: "GCC9 with sanitizers (softmmu)"
-       dist: bionic
+ alpha-debian-cross-container:
+   <<: *container_job_definition
+   stage: containers-layer2
+diff --git a/tests/docker/dockerfiles/debian-win32-cross.docker b/tests/docker/dockerfiles/debian-win32-cross.docker
+deleted file mode 100644
+index b045e821b9..0000000000
+--- a/tests/docker/dockerfiles/debian-win32-cross.docker
++++ /dev/null
+@@ -1,38 +0,0 @@
+-#
+-# Docker mingw32 cross-compiler target
+-#
+-# This docker target builds on the debian Stretch MXE base image.
+-#
+-FROM qemu/debian9-mxe
+-
+-MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
+-
+-ENV TARGET i686
+-
+-ENV PATH $PATH:/usr/lib/mxe/usr/bin:/usr/lib/mxe/usr/$TARGET-w64-mingw32.shared/bin
+-
+-ENV PKG_CONFIG_PATH \
+-    $PKG_CONFIG_PATH:/usr/lib/mxe/usr/$TARGET-w64-mingw32.shared/lib/pkgconfig
+-
+-RUN apt-get update && \
+-    DEBIAN_FRONTEND=noninteractive eatmydata \
+-    apt-get install -y --no-install-recommends \
+-        mxe-$TARGET-w64-mingw32.shared-bzip2 \
+-        mxe-$TARGET-w64-mingw32.shared-curl \
+-        mxe-$TARGET-w64-mingw32.shared-glib \
+-        mxe-$TARGET-w64-mingw32.shared-libgcrypt \
+-        mxe-$TARGET-w64-mingw32.shared-libusb1 \
+-        mxe-$TARGET-w64-mingw32.shared-lzo \
+-        mxe-$TARGET-w64-mingw32.shared-nettle \
+-        mxe-$TARGET-w64-mingw32.shared-ncurses \
+-        mxe-$TARGET-w64-mingw32.shared-nsis \
+-        mxe-$TARGET-w64-mingw32.shared-pixman \
+-        mxe-$TARGET-w64-mingw32.shared-pkgconf \
+-        mxe-$TARGET-w64-mingw32.shared-pthreads \
+-        mxe-$TARGET-w64-mingw32.shared-sdl2 \
+-        mxe-$TARGET-w64-mingw32.shared-sdl2-mixer \
+-        mxe-$TARGET-w64-mingw32.shared-sdl2-gfx \
+-        mxe-$TARGET-w64-mingw32.shared-zlib
+-
+-# Specify the cross prefix for this image (see tests/docker/common.rc)
+-ENV QEMU_CONFIGURE_OPTS --cross-prefix=$TARGET-w64-mingw32.shared-
+diff --git a/tests/docker/dockerfiles/debian-win64-cross.docker b/tests/docker/dockerfiles/debian-win64-cross.docker
+deleted file mode 100644
+index 4cc4a3f365..0000000000
+--- a/tests/docker/dockerfiles/debian-win64-cross.docker
++++ /dev/null
+@@ -1,45 +0,0 @@
+-#
+-# Docker mingw64 cross-compiler target
+-#
+-# This docker target builds on the debian Stretch MXE base image.
+-#
+-FROM qemu/debian9-mxe
+-
+-MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
+-
+-ENV TARGET x86-64
+-
+-ENV PATH $PATH:/usr/lib/mxe/usr/$TARGET-w64-mingw32.shared/bin
+-
+-ENV PKG_CONFIG_PATH \
+-    $PKG_CONFIG_PATH:/usr/lib/mxe/usr/$TARGET-w64-mingw32.shared/lib/pkgconfig
+-
+-RUN apt-get update && \
+-    DEBIAN_FRONTEND=noninteractive eatmydata \
+-    apt-get install -y --no-install-recommends \
+-        mxe-$TARGET-w64-mingw32.shared-bzip2 \
+-        mxe-$TARGET-w64-mingw32.shared-curl \
+-        mxe-$TARGET-w64-mingw32.shared-glib \
+-        mxe-$TARGET-w64-mingw32.shared-libgcrypt \
+-        mxe-$TARGET-w64-mingw32.shared-libusb1 \
+-        mxe-$TARGET-w64-mingw32.shared-lzo \
+-        mxe-$TARGET-w64-mingw32.shared-nettle \
+-        mxe-$TARGET-w64-mingw32.shared-ncurses \
+-        mxe-$TARGET-w64-mingw32.shared-nsis \
+-        mxe-$TARGET-w64-mingw32.shared-pixman \
+-        mxe-$TARGET-w64-mingw32.shared-pkgconf \
+-        mxe-$TARGET-w64-mingw32.shared-pthreads \
+-        mxe-$TARGET-w64-mingw32.shared-sdl2 \
+-        mxe-$TARGET-w64-mingw32.shared-sdl2-mixer \
+-        mxe-$TARGET-w64-mingw32.shared-sdl2-gfx \
+-        mxe-$TARGET-w64-mingw32.shared-zlib \
+-        curl && \
+-    curl -s -S -o /usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/WinHvEmulation.h \
+-        "https://sourceforge.net/p/mingw-w64/mingw-w64/ci/master/tree/mingw-w64-headers/include/winhvemulation.h?format=raw" && \
+-    curl -s -S -o /usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/WinHvPlatform.h \
+-        "https://sourceforge.net/p/mingw-w64/mingw-w64/ci/master/tree/mingw-w64-headers/include/winhvplatform.h?format=raw" && \
+-    curl -s -S -o /usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/winhvplatformdefs.h \
+-        "https://sourceforge.net/p/mingw-w64/mingw-w64/ci/master/tree/mingw-w64-headers/include/winhvplatformdefs.h?format=raw"
+-
+-# Specify the cross prefix for this image (see tests/docker/common.rc)
+-ENV QEMU_CONFIGURE_OPTS --cross-prefix=x86_64-w64-mingw32.shared-
+diff --git a/tests/docker/dockerfiles/debian9-mxe.docker b/tests/docker/dockerfiles/debian9-mxe.docker
+deleted file mode 100644
+index ae2c222a6f..0000000000
+--- a/tests/docker/dockerfiles/debian9-mxe.docker
++++ /dev/null
+@@ -1,21 +0,0 @@
+-#
+-# Docker mingw cross-compiler target
+-#
+-# This docker target builds on the debian Stretch base image.
+-#
+-FROM qemu/debian9
+-
+-MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
+-
+-RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+-    apt install -y --no-install-recommends gnupg dirmngr
+-
+-# Add the foreign architecture we want and install dependencies
+-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C6BF758A33A3A276 && \
+-    echo "deb http://pkg.mxe.cc/repos/apt stretch main" > /etc/apt/sources.list.d/mxeapt.list
+-RUN apt-get update && \
+-    DEBIAN_FRONTEND=noninteractive eatmydata \
+-    apt-get install -y --no-install-recommends \
+-        $(apt-get -s install -y --no-install-recommends gw32.shared-mingw-w64 | egrep "^Inst mxe-x86-64-unknown-" | cut -d\  -f2)
+-
+-ENV PATH $PATH:/usr/lib/mxe/usr/bin/
+diff --git a/tests/docker/dockerfiles/debian9.docker b/tests/docker/dockerfiles/debian9.docker
+deleted file mode 100644
+index 3edb5147ef..0000000000
+--- a/tests/docker/dockerfiles/debian9.docker
++++ /dev/null
+@@ -1,32 +0,0 @@
+-#
+-# Docker multiarch cross-compiler target
+-#
+-# This docker target is builds on Debian cross compiler targets to build distro
+-# with a selection of cross compilers for building test binaries.
+-#
+-# On its own you can't build much but the docker-foo-cross targets
+-# build on top of the base debian image.
+-#
+-FROM debian:stretch-slim
+-
+-# Duplicate deb line as deb-src
+-RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/sources.list
+-
+-# Install common build utilities
+-RUN apt update && \
+-    DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata && \
+-    DEBIAN_FRONTEND=noninteractive eatmydata \
+-    apt install -y --no-install-recommends \
+-        bc \
+-        build-essential \
+-        ca-certificates \
+-        clang \
+-        gdb-multiarch \
+-        gettext \
+-        git \
+-        libncurses5-dev \
+-        pkg-config \
+-        psmisc \
+-        python3 \
+-        python3-setuptools \
+-        $(apt-get -s build-dep qemu | egrep ^Inst | fgrep '[all]' | cut -d\  -f2)
 -- 
 2.20.1
 
