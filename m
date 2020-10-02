@@ -2,78 +2,84 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31F84C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 10:27:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4F0EC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 10:33:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 386722053B
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 10:27:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 23E70206B6
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 10:33:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aRc5ofGt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 386722053B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SDr2Md+a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23E70206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOIHh-0001xM-0v
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 06:27:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35320)
+	id 1kOINb-0003kz-R0
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 06:33:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36356)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kOIGF-0001PD-Cu
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 06:25:59 -0400
-Received: from mail-ed1-x534.google.com ([2a00:1450:4864:20::534]:37568)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kOIMZ-0003IC-3Y
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 06:32:31 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51884)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kOIGA-000849-Fr
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 06:25:59 -0400
-Received: by mail-ed1-x534.google.com with SMTP id n22so1120882edt.4
- for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 03:25:53 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kOIMW-0000Hx-DR
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 06:32:30 -0400
+Received: by mail-wm1-x341.google.com with SMTP id w2so1135414wmi.1
+ for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 03:32:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=HEnshM4rYAZH6lizCkp0zzUBJ9TWuvjhn2KfMnre5jg=;
- b=aRc5ofGtfeQSqa2wOXaDRctnkAV+JbHW15AGIS3tlU09b3BatqOmWTeBRT0Ut6QE54
- tAiStOtjLUccNyay4a5+pW7CGn9Uarx45CeSTCU9axlrStI4/o4LS5OL9UW2ha0BpBc+
- Nubo64vU0Qkkoaure7CSA8NPM+CQci7q7IysIsnh2ns2my8AJRC8Pcba2u9/uq8qPCZr
- D/BZlBQP2BMsDsMMGxm2bpb2LH4JZtzTXWECc2fjBjy5JvbF1WhUfGwEYbXYFDNxjnKf
- IzyySem1FAsN+Nvd+vbWkntMxqwgx1oHGnQv/LGmaLz5jz9BmbfNays97ujLwvAVko6L
- sTww==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=SjTBlRRC5dzBrQAGy139YYIuxmAQhfYfFMHZmhkZzw4=;
+ b=SDr2Md+arG/wQkaOW3ZH0oPwt7M3hfmU/ZwmdCpGNI33LPx5gaaECSicKmj5e/GnYM
+ PD2Y2mrxNO8juxa9UeLtqfblAI5y4YrGoQQJYbxBMpfFkm2LBwbJ7vrxc75xxw6pCSHZ
+ wgyEqlONfUrIUec/tcg96exGKtUNWKKIFOxd9Mi4eoH3Cl1APxt1CYMw2C1sofLCm8o6
+ X9SG1bfhGi98qTwxTnTuSfyhZYeRloL+URLQ60kBl8A3riisRfw2/S6cWyj25mW7VFXT
+ rA6aNNzQFkv/gYf2/0iyDVm47wjNFxDnCPSoqjlzFPHLeAgNW/cVnDI6x+s2ZxYpK1Bh
+ kHog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=HEnshM4rYAZH6lizCkp0zzUBJ9TWuvjhn2KfMnre5jg=;
- b=i/vi3JzwDlPdAZTr0xc8+3RbLU0NIbpuTHjIcbFyYHi3FDYj9hR8plDbBXytfJn5Kq
- wtElGvOUIZ+N37c/yhRrU9Tr8hUMcqt13cBm6M+Idf7ywjrZ+24FZrZJrT0n0NPskev6
- r7nGIceROn8paPd5oCSdo372Dsk8U2K+eP1DvklcADemzfsFxYpryHc0al1Rx7R4Qotd
- 1yYl5AufMUaqfSIfQ57ik4VyjmcCBsYmMqKU+p4wu8oyH133p0AvYoQrVmqkxhEF9Wkk
- US8hTQXtiXA9thZubesGuUCa0HCEIpZC3mLygHRJqyOiG0CZKkMX///3D36M3gxGZrvZ
- INNA==
-X-Gm-Message-State: AOAM532CiOKr7rjivK4E0QKPf6FEA+qGlJ9fGMjgcLKzukiM8Ezda46C
- FlJeLkiM52aagBOg6W+WTPeuz+gW1SIL+oNlCCPFRoakqpUd3w==
-X-Google-Smtp-Source: ABdhPJw//PikmvdG2FoutomMVVdi0YZZgHPgbBfFxRvGetEvxNMBszkDdyfke18OA+HC0fFcHgoSsG0GjbWJess4zeE=
-X-Received: by 2002:aa7:dd4b:: with SMTP id o11mr1497393edw.251.1601634352727; 
- Fri, 02 Oct 2020 03:25:52 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=SjTBlRRC5dzBrQAGy139YYIuxmAQhfYfFMHZmhkZzw4=;
+ b=pNuP1ek5RFTzz06jARCci6b5+NLiklChT0dE2ifqz6Am3UtCYBh5VbeCmoGk189x/V
+ VzgduW58UaDSYincBoTau3Xf7BNbo7BUr8srxW4p4/jqVDn6P1Sy/3ssldS4YNU5DPK3
+ r2DNAiLh5JMgXTwT+qkLfNO1t//ed8cSRrjOpya2ggD+eNi4jtaImY7cG4kM9WpDi0Y5
+ 287P0vwDbdyYBBPz27MDUVsCwSf63a9UuqFiElGv/zciKzSk6uBjPYKWiGGn/eR7gtny
+ Zog65guDK8BkeKg38AC/S5KjT9imxHbiXnCNtgYJNOSBlh6N1RkP/H+NXE3QuFD/ruTm
+ qDpw==
+X-Gm-Message-State: AOAM530wU4IJR9QZGWMW9mcwSb+SNWMHoBLchOgUBezgo4diPXd0rM9z
+ 85p6QbdwGxfMqKJvzH6/TE8pZg==
+X-Google-Smtp-Source: ABdhPJw0OiWOwerIOAN1QhCMSrwseBaLpioK63VFCLXl+c+hmB01SG+obesIZJsL1gFR71iQOLm7ZA==
+X-Received: by 2002:a7b:cb17:: with SMTP id u23mr2057373wmj.166.1601634746965; 
+ Fri, 02 Oct 2020 03:32:26 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id j206sm1257716wmj.5.2020.10.02.03.32.25
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 02 Oct 2020 03:32:25 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 0C2051FF7E;
+ Fri,  2 Oct 2020 11:32:25 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] gitlab: move linux-user plugins test across to gitlab
+Date: Fri,  2 Oct 2020 11:32:23 +0100
+Message-Id: <20201002103223.24022-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <CAD5Umjr6Nu6fddP2LgkfxtTTKduHEMs=C49C2r_ZcMkopsYidw@mail.gmail.com>
- <CAFEAcA_AjzNKzrHBU7QQzB=dxia9mYuw5oAsya3h42JEQAemaA@mail.gmail.com>
- <CAD5UmjrjORJbP0sj-DnGQFaQ443-vYMBa-1qCBzJsnUG+gU=jw@mail.gmail.com>
-In-Reply-To: <CAD5UmjrjORJbP0sj-DnGQFaQ443-vYMBa-1qCBzJsnUG+gU=jw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 2 Oct 2020 11:25:41 +0100
-Message-ID: <CAFEAcA9JecdSwd=gXSu7mhDHVysLP5JP4dtRBgBVr7=bt=j6Tw@mail.gmail.com>
-Subject: Re: ARM semihosting issue
-To: Bruno Prado <bruno@dcomp.ufs.br>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::534;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x534.google.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -95,35 +101,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 1 Oct 2020 at 22:21, Bruno Prado <bruno@dcomp.ufs.br> wrote:
-> Thanks for the reply... I am attaching some code and output:
->
-> #include <stdio.h>
-> int main() {
->        char name[50] = "Nobody";
->        FILE* file = fopen("name", "r");
->        printf("What is your name?\n");
->        fprintf(stdout, "Reading from file...\n");
->        fscanf(file, "%s", name);
->        fscanf(stdin, "%s", name);
->        printf("My name is %s\n", name);
->        fprintf(stderr, "I am alive!!!\n");
->        fclose(file);
->        return 0;
-> }
+Even with the recent split moving beefier plugins into contrib and
+dropping them from the check-tcg tests we are still hitting time
+limits. This possibly points to a slow down of --debug-tcg but seeing
+as we are migrating stuff to gitlab we might as well move there and
+bump the timeout.
 
-This is not making direct semihosting calls. The behaviour
-of these function calls will depend on whatever the C
-standard library implementation you're linking with is doing.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-You're not checking for errors from any of your function
-calls, incidentally.
+---
+v2
+  - use timeout instead of split build
+---
+ .gitlab-ci.yml | 11 +++++++++++
+ .travis.yml    | 11 -----------
+ 2 files changed, 11 insertions(+), 11 deletions(-)
 
-thanks
--- PMM
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index c265e7f8ab..346f23acf7 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -244,6 +244,17 @@ build-user:
+     CONFIGURE_ARGS: --disable-tools --disable-system
+     MAKE_CHECK_ARGS: check-tcg
+ 
++# Run check-tcg against linux-user (with plugins)
++# we skip sparc64-linux-user until it has been fixed somewhat
++# we skip cris-linux-user as it doesn't use the common run loop
++build-user-plugins:
++  <<: *native_build_job_definition
++  variables:
++    IMAGE: debian-all-test-cross
++    CONFIGURE_ARGS: --disable-tools --disable-system --enable-plugins --enable-debug-tcg --target-list-exclude=sparc64-linux-user,cris-linux-user
++    MAKE_CHECK_ARGS: check-tcg
++  timeout: 1h 30m
++
+ build-clang:
+   <<: *native_build_job_definition
+   variables:
+diff --git a/.travis.yml b/.travis.yml
+index c255c331a7..519e62432d 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -311,17 +311,6 @@ jobs:
+         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
+ 
+ 
+-    # Run check-tcg against linux-user (with plugins)
+-    # we skip sparc64-linux-user until it has been fixed somewhat
+-    # we skip cris-linux-user as it doesn't use the common run loop
+-    - name: "GCC plugins check-tcg (user)"
+-      env:
+-        - CONFIG="--disable-system --enable-plugins --enable-debug-tcg --target-list-exclude=sparc64-linux-user,cris-linux-user"
+-        - TEST_BUILD_CMD="make build-tcg"
+-        - TEST_CMD="make check-tcg"
+-        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
+-
+-
+     # Run check-tcg against softmmu targets
+     - name: "GCC check-tcg (some-softmmu)"
+       env:
+-- 
+2.20.1
+
 
