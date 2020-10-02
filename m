@@ -2,91 +2,84 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8317BC4363C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:41:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B58C0C4363C
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:41:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A87320795
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:41:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4ABDC206A4
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:41:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="SY/NXHRb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A87320795
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XzOFfRrh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4ABDC206A4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42848 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kONBU-0002xt-5Q
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 11:41:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46174)
+	id 1kONBt-0003W9-8B
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 11:41:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41930)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=537b2d3de=alistair.francis@wdc.com>)
- id 1kON5f-0003Rv-Qq; Fri, 02 Oct 2020 11:35:25 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:19124)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=537b2d3de=alistair.francis@wdc.com>)
- id 1kON5b-00037J-Bi; Fri, 02 Oct 2020 11:35:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1601652919; x=1633188919;
- h=from:to:cc:subject:date:message-id:mime-version:
- content-transfer-encoding;
- bh=nXky0hiYQL7unFY+phKwUBeEu45GGUWKv+isyp58oyU=;
- b=SY/NXHRbdS3ySvKXh17rBf+K99eSTtI5w3KpS98EBiw9m5OgKP7CXniV
- gXmbpzVeuu/GU7CVJOPhM2Xw/2qHWl67q/NQDyfA9s/GEW5IFuaaUuCw+
- CazyG9E2qyYJrNO+j2n6pxKH059yuYAUI6iN+vi6ApeRaC++L+u4laovL
- E+xe1WuIfI6l87UjBvM/yQE4uPkZ5BsfJkQTWmLGRX0zYpkzFvr37/XUP
- 7QgGsXtRwx+byfmGeziXzb5EKXk5uDMZCo8Xh5Q0Usv7gYl5ba6OpxuhD
- 59AkRhxMFxUUxiMjNyton3Kj33YUdJTeQOrgjPwD9fuRlDW0OHOj79EWq A==;
-IronPort-SDR: trE8bIZRI36N4K8rcUvcVDvrvnrovqGyW+HwuYUEirvj/2wBsTJ25UMJ/sWXgBQbSjGNZ7Ckca
- Y2IMEFLbrhvdmLmsaPkTiOFrkeZG37aJzHJlRJ1hcnIDUjg0RIrtrWTFl5ubN6EaR6MjNC8iM0
- uP+9gzWgjQ+woxFN031YqBPsItceQED5VoURwlUJf6mH/JShta/HWFz+guXhOLHT8RJF8A8dOn
- O5XADg2dL4kZOWIcinluAQpqXWm1mHUDaVF59kkHtr2UtzJmehcvVClAmlFUmv7pnN702KbFlo
- g1Y=
-X-IronPort-AV: E=Sophos;i="5.77,328,1596470400"; d="scan'208";a="148830306"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 02 Oct 2020 23:35:14 +0800
-IronPort-SDR: 1VPL5GCtSXyVNkHb9KHixifoT7Iioi2QJbAeks52hq7xGhWRhCich9Te1NGk2W6j00mMH295ox
- x5J1C9xKUg8Q==
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 02 Oct 2020 08:21:10 -0700
-IronPort-SDR: LmSpcdF9ZN4T9IsuShKObBGsUNUW3Do3wONzvDoIXNQXwVabeCKxXRIOnv9Aq3TegCYyzNmaLZ
- LbsbQzSX1Vtg==
-WDCIronportException: Internal
-Received: from dbzljc2.ad.shared (HELO risc6-mainframe.hgst.com)
- ([10.86.59.174])
- by uls-op-cesaip01.wdc.com with ESMTP; 02 Oct 2020 08:35:15 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v2 1/1] riscv: Convert interrupt logs to use qemu_log_mask()
-Date: Fri,  2 Oct 2020 08:24:14 -0700
-Message-Id: <29a8c766c7c4748d0f2711c3a0abb81208138c5e.1601652179.git.alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.28.0
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kOMnf-0002Bz-9q
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 11:16:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48739)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kOMnd-00013T-Bo
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 11:16:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601651803;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=G2fpkYqU9iJCXIBox2lJsKSpHcKUZmyboo4d5mAPzLM=;
+ b=XzOFfRrhwsR/tNUeIeFHfaIQUWCcASE88tA0Uike/6kjMUhif/HcnOIfczPeQHhYhn56QD
+ T1xiyepvwPpe/YOBFLjf9w5deaSWSZgeLtRR7SQLOT9ctL4+fd599lgPkKtPIAI5wPvDU8
+ BRq/wNmK32P2jjDpBajVwl+jwQds8+4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-423-8bnMP2yQMveGWDrI6HNghg-1; Fri, 02 Oct 2020 11:16:40 -0400
+X-MC-Unique: 8bnMP2yQMveGWDrI6HNghg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1A3B84F226;
+ Fri,  2 Oct 2020 15:16:39 +0000 (UTC)
+Received: from [10.10.120.38] (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 380325C1DA;
+ Fri,  2 Oct 2020 15:16:39 +0000 (UTC)
+Subject: Re: KVM call for agenda for 2020-10-06
+To: quintela@redhat.com, kvm-devel <kvm@vger.kernel.org>, qemu-devel@nongnu.org
+References: <874kndm1t3.fsf@secure.mitica>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <c64f5686-b656-226d-8c4c-95965dcc574a@redhat.com>
+Date: Fri, 2 Oct 2020 11:16:38 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.154.42;
- envelope-from=prvs=537b2d3de=alistair.francis@wdc.com;
- helo=esa4.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 11:35:14
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
+In-Reply-To: <874kndm1t3.fsf@secure.mitica>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 01:13:31
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -23
+X-Spam_score: -2.4
+X-Spam_bar: --
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.256, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,58 +93,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair.francis@wdc.com, palmer@dabbelt.com, alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently we log interrupts and exceptions using the trace backend in
-riscv_cpu_do_interrupt(). We also log exceptions using the interrupt log
-mask (-d int) in riscv_raise_exception().
+On 10/2/20 5:09 AM, Juan Quintela wrote:
+> 
+> 
+> Hi
+> 
+> Please, send any topic that you are interested in covering.
+> 
+> At the end of Monday I will send an email with the agenda or the
+> cancellation of the call, so hurry up.
+> 
+> 
+> For this call, we have agenda!!
+> 
+> John Snow wants to talk about his new (and excting) developments with
+> x-configure.  Stay tuned.
+> 
 
-This patch converts riscv_cpu_do_interrupt() to log both interrupts and
-exceptions with the interrupt log mask, so that both are printed when a
-user runs QEMU with -d int.
+I'm working on an email to qemu-devel now detailing some of our work 
+trying to make good on a renewed effort for better APIs for QEMU.
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- target/riscv/cpu_helper.c | 8 +++++++-
- target/riscv/op_helper.c  | 1 -
- 2 files changed, 7 insertions(+), 2 deletions(-)
+In short, I'd like to discuss a roadmap for converting our CLI to 
+something QAPI-based, and discuss ways to coordinate and distribute this 
+work to interested maintainers and developers.
 
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 904899054d..6c68239a46 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -895,7 +895,13 @@ void riscv_cpu_do_interrupt(CPUState *cs)
-     }
- 
-     trace_riscv_trap(env->mhartid, async, cause, env->pc, tval,
--        riscv_cpu_get_trap_name(cause, async));
-+                     riscv_cpu_get_trap_name(cause, async));
-+
-+    qemu_log_mask(CPU_LOG_INT,
-+                  "%s: hart:"TARGET_FMT_ld", async:%d, cause:"TARGET_FMT_lx", "
-+                  "epc:0x"TARGET_FMT_lx", tval:0x"TARGET_FMT_lx", desc=%s\n",
-+                  __func__, env->mhartid, async, cause, env->pc, tval,
-+                  riscv_cpu_get_trap_name(cause, async));
- 
-     if (env->priv <= PRV_S &&
-             cause < TARGET_LONG_BITS && ((deleg >> cause) & 1)) {
-diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-index 9b9ada45a9..e987bd262f 100644
---- a/target/riscv/op_helper.c
-+++ b/target/riscv/op_helper.c
-@@ -29,7 +29,6 @@ void QEMU_NORETURN riscv_raise_exception(CPURISCVState *env,
-                                           uint32_t exception, uintptr_t pc)
- {
-     CPUState *cs = env_cpu(env);
--    qemu_log_mask(CPU_LOG_INT, "%s: %d\n", __func__, exception);
-     cs->exception_index = exception;
-     cpu_loop_exit_restore(cs, pc);
- }
--- 
-2.28.0
+Look out for it!
+
+--js
+
+> 
+> After discussions on the QEMU Summit, we are going to have always open a
+> KVM call where you can add topics.
+> 
+>   Call details:
+> 
+> By popular demand, a google calendar public entry with it
+> 
+>    https://www.google.com/calendar/embed?src=dG9iMXRqcXAzN3Y4ZXZwNzRoMHE4a3BqcXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ
+> 
+> (Let me know if you have any problems with the calendar entry.  I just
+> gave up about getting right at the same time CEST, CET, EDT and DST).
+> 
+> If you need phone number details,  contact me privately
+> 
+> Thanks, Juan.
+> 
 
 
