@@ -7,57 +7,56 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53C89C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 08:34:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FC42C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 08:46:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEF6C206B8
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 08:34:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEF6C206B8
+	by mail.kernel.org (Postfix) with ESMTPS id EF4CD206DC
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 08:46:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF4CD206DC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42564 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOGVs-00055g-2e
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 04:34:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39918)
+	id 1kOGi0-0007L8-Qg
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 04:46:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42714)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <f.gruenbichler@proxmox.com>)
- id 1kOGSm-0002cz-Pn
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 04:30:48 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:17926)
+ id 1kOGh5-0006e5-EX; Fri, 02 Oct 2020 04:45:35 -0400
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:18408)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <f.gruenbichler@proxmox.com>)
- id 1kOGSk-0002Zx-UD
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 04:30:48 -0400
+ id 1kOGh3-0004Fk-AD; Fri, 02 Oct 2020 04:45:35 -0400
 Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
- by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 2376745B99;
- Fri,  2 Oct 2020 10:23:40 +0200 (CEST)
-Date: Fri, 02 Oct 2020 10:23:33 +0200
+ by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 3D8D54588F;
+ Fri,  2 Oct 2020 10:45:28 +0200 (CEST)
+Date: Fri, 02 Oct 2020 10:45:15 +0200
 From: Fabian =?iso-8859-1?q?Gr=FCnbichler?= <f.gruenbichler@proxmox.com>
-Subject: Re: [PATCH qemu 2/4] drive-mirror: add support for conditional and
- always bitmap sync modes
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Subject: Re: [PATCH qemu 1/4] drive-mirror: add support for sync=bitmap
+ mode=never
+To: Markus Armbruster <armbru@redhat.com>
 References: <20200922091418.53562-1-f.gruenbichler@proxmox.com>
- <20200922091418.53562-3-f.gruenbichler@proxmox.com>
- <5af05c55-3e19-23d6-ee87-554090b56310@redhat.com>
-In-Reply-To: <5af05c55-3e19-23d6-ee87-554090b56310@redhat.com>
+ <20200922091418.53562-2-f.gruenbichler@proxmox.com>
+ <87o8llrtse.fsf@dusky.pond.sub.org>
+In-Reply-To: <87o8llrtse.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 User-Agent: astroid/0.15.0 (https://github.com/astroidmail/astroid)
-Message-Id: <1601623989.wcs44caouc.astroid@nora.none>
+Message-Id: <1601627258.kk9bqebpq1.astroid@nora.none>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Received-SPF: pass client-ip=212.186.127.180;
  envelope-from=f.gruenbichler@proxmox.com; helo=proxmox-new.maurer-it.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 04:23:32
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SORTED_RECIPS=2.499, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,100 +69,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Ma Haocong <mahaocong@didichuxing.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On October 1, 2020 7:01 pm, Max Reitz wrote:
-> On 22.09.20 11:14, Fabian Gr=C3=BCnbichler wrote:
+On October 2, 2020 9:06 am, Markus Armbruster wrote:
+> Fabian Gr=C3=BCnbichler <f.gruenbichler@proxmox.com> writes:
+>=20
 >> From: John Snow <jsnow@redhat.com>
->>=20
->> Teach mirror two new tricks for using bitmaps:
->>=20
->> Always: no matter what, we synchronize the copy_bitmap back to the
->> sync_bitmap. In effect, this allows us resume a failed mirror at a later
->> date, since the target bdrv should be exactly in the state referenced by
->> the bitmap.
->>=20
->> Conditional: On success only, we sync the bitmap. This is akin to
->> incremental backup modes; we can use this bitmap to later refresh a
->> successfully created mirror, or possibly re-try the whole failed mirror
->> if we are able to rollback the target to the state before starting the
->> mirror.
->>=20
->> Based on original work by John Snow.
->>=20
+>>
+>> This patch adds support for the "BITMAP" sync mode to drive-mirror and
+>> blockdev-mirror. It adds support only for the BitmapSyncMode "never,"
+>> because it's the simplest mode.
+>>
+>> This mode simply uses a user-provided bitmap as an initial copy
+>> manifest, and then does not clear any bits in the bitmap at the
+>> conclusion of the operation.
+>>
+>> Any new writes dirtied during the operation are copied out, in contrast
+>> to backup. Note that whether these writes are reflected in the bitmap
+>> at the conclusion of the operation depends on whether that bitmap is
+>> actually recording!
+>>
+>> This patch was originally based on one by Ma Haocong, but it has since
+>> been modified pretty heavily.
+>>
+>> Suggested-by: Ma Haocong <mahaocong@didichuxing.com>
+>> Signed-off-by: Ma Haocong <mahaocong@didichuxing.com>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
 >> Signed-off-by: Fabian Gr=C3=BCnbichler <f.gruenbichler@proxmox.com>
 >> ---
->>  block/mirror.c | 28 ++++++++++++++++++++--------
->>  blockdev.c     |  3 +++
->>  2 files changed, 23 insertions(+), 8 deletions(-)
->>=20
->> diff --git a/block/mirror.c b/block/mirror.c
->> index d64c8203ef..bc4f4563d9 100644
->> --- a/block/mirror.c
->> +++ b/block/mirror.c
->=20
 > [...]
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index 2d94873ca0..dac5497084 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -1961,10 +1961,19 @@
+>>  #        (all the disk, only the sectors allocated in the topmost image=
+, or
+>>  #        only new I/O).
+>>  #
+>> +# @bitmap: The name of a bitmap to use for sync=3Dbitmap mode. This arg=
+ument must
+>> +#          be present for bitmap mode and absent otherwise. The bitmap'=
+s
 >=20
->> @@ -1781,8 +1793,8 @@ static BlockJob *mirror_start_job(
->>      }
->> =20
->>      if (s->sync_mode =3D=3D MIRROR_SYNC_MODE_BITMAP) {
->> -        bdrv_merge_dirty_bitmap(s->dirty_bitmap, s->sync_bitmap,
->> -                                NULL, &local_err);
->> +        bdrv_dirty_bitmap_merge_internal(s->dirty_bitmap, s->sync_bitma=
-p,
->> +                                         NULL, true);
+> What is "bitmap mode"?  Do you mean "present when @bitmap-mode is, else
+> absent"?
+
+bitmap mode is sync=3Dbitmap , as in the first sentence. if you set=20
+sync=3Dbitmap, you must specify a bitmap and a bitmap-mode. if you use=20
+another sync mode, you must not specify a bitmap or a bitmap-mode.
+
+there is also a 'sugar' sync mode 'incremental' that desugars to=20
+sync=3Dbitmap with bitmap-mode=3Don-success.  I guess that should also be=20
+mentioned somewhere in QAPI, it's mainly there since MirrorSyncMode has=20
+it as possible value, it's semantics are straight-forward to map onto=20
+this combination, and it's how the sync modes are known from backup=20
+jobs.
+
+maybe the following is easier to understand and more aligned with=20
+bitmap-mode:
+
+The name of the bitmap to use for sync=3Dbitmap/sync=3Dincremental mode.=20
+Must be present if sync is "bitmap" or "incremental". Must NOT be=20
+present otherwise.
+
+>> +#          granularity is used instead of @granularity (since 5.2).
+>> +#
+>> +# @bitmap-mode: Specifies the type of data the bitmap should contain af=
+ter
+>> +#               the operation concludes. Must be present if sync is "bi=
+tmap".
+>> +#               Must NOT be present otherwise. (Since 5.2)
+
+Specifies the type of data the bitmap should contain after the operation=20
+concludes. Must be present if sync is "bitmap". Must be "on-success" or=20
+absent if sync is "incremental". Must NOT be present otherwise.
+
+>> +#
+>>  # @granularity: granularity of the dirty bitmap, default is 64K
+>>  #               if the image format doesn't have clusters, 4K if the cl=
+usters
+>>  #               are smaller than that, else the cluster size.  Must be =
+a
+>> -#               power of 2 between 512 and 64M (since 1.4).
+>> +#               power of 2 between 512 and 64M. Must not be specified i=
+f
+>> +#               @bitmap is present (since 1.4).
+>>  #
 >=20
-> (Sorry for not catching it in the previous version, but) this hunk needs
-> to go into patch 1, doesn=E2=80=99t it?
+> Is @granularity forbidden with @bitmap because it makes no sense?
 
-yes. this was a result of keeping the original patches #1 and #2, and=20
-doing the cleanup on-top as separate patches. I missed folding it into=20
-the first instead of (now combined) second patch.
-
-> Or, rather...  Do we need it at all?  Is there anything that would
-> prohibit just moving this merge call to before the set_busy call?
-> (Which again is probably something that should be done in patch 1.)
->=20
-> (If you decide to keep calling *_internal, I think it would be nice to
-> add a comment above the call stating why we have to use *_internal here
-> (because the sync bitmap is busy now), and why it=E2=80=99s safe to do so
-> (because blockdev.c and/or mirror_start_job() have already checked the
-> bitmap).  But if it=E2=80=99s possible to do the merge before marking the
-> sync_bitmap busy, we probably should rather do that.)
-
-I think it should be possible for this instance. for the other end of=20
-the job, merging back happens before setting the bitmap to un-busy, so we=20
-need to use _internal there. will add a comment for that one why we are=20
-allowed to do so.
+yes.
 
 >=20
->>          if (local_err) {
->>              goto fail;
->>          }
->> diff --git a/blockdev.c b/blockdev.c
->> index 6baa1a33f5..0fd30a392d 100644
->> --- a/blockdev.c
->> +++ b/blockdev.c
->> @@ -3019,6 +3019,9 @@ static void blockdev_mirror_common(const char *job=
-_id, BlockDriverState *bs,
->>          if (bdrv_dirty_bitmap_check(bitmap, BDRV_BITMAP_ALLOW_RO, errp)=
-) {
->>              return;
->>          }
->> +    } else if (has_bitmap_mode) {
->> +        error_setg(errp, "Cannot specify bitmap sync mode without a bit=
-map");
->> +        return;
->>      }
->=20
-> This too I would move into patch 1.
+> If yes, then it doesn't actually default to anything then, does it?
 
-Ack.
+we must use the same granularity as the sync bitmap passed in via=20
+'bitmap', so the caller can't set a different one.
+
+> Looks like we have
+>=20
+>     sync            'bitmap'            anything else
+>     -------------------------------------------------
+>     bitmap          required            forbidden
+>     bitmap-mode     required            forbidden
+>     granularity     forbidden           optional
+>=20
+> Correct?
+
+yes. with the addition of sync=3Dincremental as subset of sync=3Dbitmap, as=
+=20
+described above.
+
+>=20
+>>  # @buf-size: maximum amount of data in flight from source to
+>>  #            target (since 1.4).
+>> @@ -2002,7 +2011,9 @@
+>>  { 'struct': 'DriveMirror',
+>>    'data': { '*job-id': 'str', 'device': 'str', 'target': 'str',
+>>              '*format': 'str', '*node-name': 'str', '*replaces': 'str',
+>> -            'sync': 'MirrorSyncMode', '*mode': 'NewImageMode',
+>> +            'sync': 'MirrorSyncMode', '*bitmap': 'str',
+>> +            '*bitmap-mode': 'BitmapSyncMode',
+>> +            '*mode': 'NewImageMode',
+>>              '*speed': 'int', '*granularity': 'uint32',
+>>              '*buf-size': 'int', '*on-source-error': 'BlockdevOnError',
+>>              '*on-target-error': 'BlockdevOnError',
+> [Same for blockdev-mirror...]
+>=20
+>=20
+>=20
+>=20
 =
 
 
