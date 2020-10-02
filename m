@@ -2,101 +2,97 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E0F8C47423
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 09:10:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2B3BC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 09:16:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DDEF420672
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 09:10:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MBjBDnyb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDEF420672
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 180D32068E
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 09:16:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 180D32068E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOH5H-0006y2-2Y
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 05:10:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47584)
+	id 1kOHAi-0000C4-12
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 05:16:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48654)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <quintela@redhat.com>)
- id 1kOH4c-0006Tp-Ad
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 05:09:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59062)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <quintela@redhat.com>)
- id 1kOH4a-00076S-8q
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 05:09:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601629790;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:mime-version:mime-version:
- content-type:content-type; bh=LLY7W9DKJou6LoXrOLGaFqgZXvA9GsySl0Xr1TMIq1k=;
- b=MBjBDnyb63oTDQDg9KOWy2PT7xpvBipqCqwRdRBw9Qejx6Mglh4SPK5yNwlbPL+fKf/tTv
- 3rkQ/WO7VEMgd0vYiBQYpT8H7k9M7zqHklzXFqkUX8/27De+Gw4uo0U60QgPgnes2rxEAS
- WocY+zblpbWz0hJuXMquCKjqcUqMrSo=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-280-c0LMktT8M363af7p7YqshQ-1; Fri, 02 Oct 2020 05:09:48 -0400
-X-MC-Unique: c0LMktT8M363af7p7YqshQ-1
-Received: by mail-wm1-f72.google.com with SMTP id y83so316887wmc.8
- for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 02:09:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:user-agent:reply-to:date
- :message-id:mime-version;
- bh=LLY7W9DKJou6LoXrOLGaFqgZXvA9GsySl0Xr1TMIq1k=;
- b=pP4IqCL3mpKPXQ3/QjNBBNriMz1ceCqsh/fBzonhrGHLJGBJOC51EGGq0b1hdmuskH
- F4CE15+sg0Z1OcLfFgdCTSRdpqYs01wwtHXqQTxc6sWCja/aMRkLG37GvaYxgxV8Eaoo
- IrlnMQaA9Ht/yfsuzAYblmmoDuTG7orYIm4d5sEHe4VRxy61Pi+huiwZMiQ7iHrFoXw9
- Y8GDbAVXeSAr8LrXHSfE8IG2jboaQp2BBT2oqO3tt7Famo62Bhrgi81zRS/+T1TwJw57
- sH+HenR4nDlxKWoR8UuIXtSAJlX+KiIItwtHtqj4Lg1tQ+TODEq5uOBdB6FBD8uUAPwB
- lbNw==
-X-Gm-Message-State: AOAM532EBTUoxd31pbNPoSlWAfzgHIwbRkxx7NL4Ndzpu3AtCYdOo4cZ
- 6sFnM7vvhVnxJglCTymptyw/sqS1nDK1T1I+oquexX1tHLRAlZiFVFOiNj2k9jjOarjwTHF+3Th
- LY3joz0KA09VjGn4=
-X-Received: by 2002:a05:600c:20c8:: with SMTP id
- y8mr1675182wmm.108.1601629786847; 
- Fri, 02 Oct 2020 02:09:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzZK9qEvHj04yc/0eHdit3b1zXLDyx0gaAVoYt2N5f88LvHJNF+gKyApwXGkzohhGbsHgANGg==
-X-Received: by 2002:a05:600c:20c8:: with SMTP id
- y8mr1675155wmm.108.1601629786550; 
- Fri, 02 Oct 2020 02:09:46 -0700 (PDT)
-Received: from localhost (62.117.241.112.dyn.user.ono.com. [62.117.241.112])
- by smtp.gmail.com with ESMTPSA id v9sm180778wmh.23.2020.10.02.02.09.45
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 02 Oct 2020 02:09:45 -0700 (PDT)
-From: Juan Quintela <quintela@redhat.com>
-To: kvm-devel <kvm@vger.kernel.org>, qemu-devel@nongnu.org, John Snow
- <jsnow@redhat.com>
-Subject: KVM call for agenda for 2020-10-06
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
-Date: Fri, 02 Oct 2020 11:09:44 +0200
-Message-ID: <874kndm1t3.fsf@secure.mitica>
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1kOH9g-0007sX-EG; Fri, 02 Oct 2020 05:15:08 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:26614)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1kOH9e-0007rM-Pe; Fri, 02 Oct 2020 05:15:08 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 0929278I145846; Fri, 2 Oct 2020 05:14:48 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com
+ [159.122.73.71])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33x122gkd7-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 02 Oct 2020 05:14:48 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+ by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0929DTA6014851;
+ Fri, 2 Oct 2020 09:14:45 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com
+ (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+ by ppma02fra.de.ibm.com with ESMTP id 33sw983c49-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 02 Oct 2020 09:14:45 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+ [9.149.105.59])
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 0929Eho720382070
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 2 Oct 2020 09:14:43 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 63644A404D;
+ Fri,  2 Oct 2020 09:14:43 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 2F637A4040;
+ Fri,  2 Oct 2020 09:14:43 +0000 (GMT)
+Received: from smtp.tlslab.ibm.com (unknown [9.101.4.1])
+ by d06av23.portsmouth.uk.ibm.com (Postfix) with SMTP;
+ Fri,  2 Oct 2020 09:14:43 +0000 (GMT)
+Received: from yukon.ibmuc.com (sig-9-145-51-183.uk.ibm.com [9.145.51.183])
+ by smtp.tlslab.ibm.com (Postfix) with ESMTP id 7D9C2220062;
+ Fri,  2 Oct 2020 11:14:42 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH v2] ppc/pnv: Increase max firmware size
+Date: Fri,  2 Oct 2020 11:14:40 +0200
+Message-Id: <20201002091440.1349326-1-clg@kaod.org>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=quintela@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=quintela@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 23:37:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-10-02_05:2020-10-02,
+ 2020-10-02 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0
+ suspectscore=0 phishscore=0 adultscore=0 malwarescore=0 clxscore=1034
+ mlxscore=0 spamscore=0 lowpriorityscore=0 mlxlogscore=769 bulkscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2010020066
+Received-SPF: softfail client-ip=148.163.156.1; envelope-from=clg@kaod.org;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 05:15:04
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_SOFTFAIL=0.665 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,41 +105,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Builds enabling GCOV can be bigger than 4MB and the limit on FSP
+systems is 16MB.
 
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ hw/ppc/pnv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Hi
-
-Please, send any topic that you are interested in covering.
-
-At the end of Monday I will send an email with the agenda or the
-cancellation of the call, so hurry up.
-
-
-For this call, we have agenda!!
-
-John Snow wants to talk about his new (and excting) developments with
-x-configure.  Stay tuned.
-
-
-After discussions on the QEMU Summit, we are going to have always open a
-KVM call where you can add topics.
-
- Call details:
-
-By popular demand, a google calendar public entry with it
-
-  https://www.google.com/calendar/embed?src=dG9iMXRqcXAzN3Y4ZXZwNzRoMHE4a3BqcXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ
-
-(Let me know if you have any problems with the calendar entry.  I just
-gave up about getting right at the same time CEST, CET, EDT and DST).
-
-If you need phone number details,  contact me privately
-
-Thanks, Juan.
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 6670967e26a9..d9e52873ea70 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -61,7 +61,7 @@
+=20
+ #define FW_FILE_NAME            "skiboot.lid"
+ #define FW_LOAD_ADDR            0x0
+-#define FW_MAX_SIZE             (4 * MiB)
++#define FW_MAX_SIZE             (16 * MiB)
+=20
+ #define KERNEL_LOAD_ADDR        0x20000000
+ #define KERNEL_MAX_SIZE         (256 * MiB)
+--=20
+2.25.4
 
 
