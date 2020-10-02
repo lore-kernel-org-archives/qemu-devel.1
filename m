@@ -2,89 +2,88 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60597C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 20:31:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87547C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 20:37:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE9CD206FA
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 20:31:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C2436206C9
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 20:37:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fQEo7hSF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE9CD206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bp77XZiz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2436206C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kORhq-0004YL-M6
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 16:31:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49078)
+	id 1kORoT-0007sQ-N1
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 16:37:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50262)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kORgp-000477-Tz
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 16:30:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33712)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kORgn-0006Jv-KA
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 16:30:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601670600;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=L2AmZktScKYoTGNOf6I4ClAsBCCXpJTffhR7BLpIuRs=;
- b=fQEo7hSFFWZ+g0muLsQOxknTCMqebBqlTAx0yP15/zcqo7oxYaVZCJrUaLfoQPw1E5aMmo
- uF4HENLW8eEJ4KnWgKpVg2xhE8JgWqzX4Iqi5/vGWSoDDLq3yombrqkjJJuUAcoKrofzyP
- sNNLosoEjYnCtvz3a+iShcyNCGSqn+Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-40-plhBdV2GO6-_yRoKFrAgqQ-1; Fri, 02 Oct 2020 16:29:54 -0400
-X-MC-Unique: plhBdV2GO6-_yRoKFrAgqQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F310C807351;
- Fri,  2 Oct 2020 20:29:52 +0000 (UTC)
-Received: from [10.10.120.38] (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9A34273683;
- Fri,  2 Oct 2020 20:29:52 +0000 (UTC)
-Subject: Re: [PATCH] scripts/qmp/qom-set: Allow setting integer value
-To: =?UTF-8?Q?Jonatan_P=c3=a5lsson?= <jonatan.p@gmail.com>,
- qemu-devel@nongnu.org
-References: <20201002201933.250878-1-jonatan.p@gmail.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <c22a0594-9f8f-3531-cbc3-862ba15d89c9@redhat.com>
-Date: Fri, 2 Oct 2020 16:29:51 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <jonatan.p@gmail.com>)
+ id 1kORmw-0006kD-VK
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 16:36:23 -0400
+Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:37817)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <jonatan.p@gmail.com>)
+ id 1kORmv-00076K-9X
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 16:36:22 -0400
+Received: by mail-il1-x141.google.com with SMTP id j13so2441737ilc.4
+ for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 13:36:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=fsxEuBFc8xqo9BALWEZzORq+cDkRYS3zFi8sT3gxjuE=;
+ b=bp77XZizOIOyAi4OwxBGdENEz2SRaYt5g3daLLk1u26rpFTORrI32rFrYXpRlDy50T
+ ZIhTzljtASI0swtxBssFZG7p6lCaBjWBRFunK7AytevWxbtnjHRWfj4Ln0gzHIYzgNWO
+ pF/hmPHX31o9eajrAexMQzicg7SG2HiOHebqi8VhDlOhGQKKYFC1dimZLWywl69Vb4Hm
+ pV5RhBNvR3DoYytp331I40ReH4r9V/Fylkt/fefkOp+jcZt7+Y/4Zb1e2NtFAehluc+G
+ eMv483XgkS72HWg94MV+Azc5G5CdDylrnlpTzQd0yJiodSdQ+nhYzkAEKMcuPBUVUFjg
+ sARg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=fsxEuBFc8xqo9BALWEZzORq+cDkRYS3zFi8sT3gxjuE=;
+ b=BJuPZT40LRJjIQnpSoxLV7z28tZnFlUf+u97GcaktDQWZ2LFgy9LkCcEx4qwBjgPVj
+ 35Gqw6LvXjWnU+Or84JZ8ZMcLq7cvE8e7HVfmw1h4sEYiCJ7H/3BK/08fEpVA7SZ4f6q
+ P2SzC77qb4PGaSxbf7FW+lvcQ5EZRed+8jXaVzQYBD/cpZSliuD5or5xEC4tkuIzggBr
+ sjSVBT2D6jxN6fNcxQqOEofZ1JaSImFyrP/AAN5QeOjuGctkibPcaO/Pu5R/9BcBSqjt
+ oeuiUyjx1B1Fjef1rG8ne5MOKSzzk6/dcgQ19qyEt4Wi4bL3zQ7XRTx4apq4fJrEFPeg
+ 6lbQ==
+X-Gm-Message-State: AOAM5338yT+9jnzo03uJetqY4+RUYbOLxQ+oI9ZYtW0sj4mE2Xr+/lnJ
+ eWF8K4e/WWSKbf+9nUPIER9JqmCXP+TJ98TiIeM=
+X-Google-Smtp-Source: ABdhPJzm4R8lZEEn221NAb8T8Cga2fRJ4OYFVFbtT2ObkNyhZPYsoujU//xyah6QakwHv0gM4t3Rjf8MuyeKnP+MY/o=
+X-Received: by 2002:a92:5e48:: with SMTP id s69mr3202608ilb.199.1601670979218; 
+ Fri, 02 Oct 2020 13:36:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20201002201933.250878-1-jonatan.p@gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 23:37:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -23
-X-Spam_score: -2.4
+References: <20201002201933.250878-1-jonatan.p@gmail.com>
+ <c22a0594-9f8f-3531-cbc3-862ba15d89c9@redhat.com>
+In-Reply-To: <c22a0594-9f8f-3531-cbc3-862ba15d89c9@redhat.com>
+From: Jonatan Palsson <jonatan.p@gmail.com>
+Date: Fri, 2 Oct 2020 22:36:07 +0200
+Message-ID: <CAKm+giO8LQCw8g==0zKV2LYvfqxVmimnJ9oWcsdvFZtmPzcq_g@mail.gmail.com>
+Subject: Re: [PATCH] scripts/qmp/qom-set: Allow setting integer value
+To: John Snow <jsnow@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
+ envelope-from=jonatan.p@gmail.com; helo=mail-il1-x141.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.256, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,48 +97,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/2/20 4:19 PM, Jonatan Pålsson wrote:
-> If the value appears to be an integer, parse it as such.
-> 
-> This allows the following:
-> 
->      qmp/qom-set -s ~/qmp.sock sensor.temperature 20000
-> 
-> .. where sensor is a tmp105 device, and temperature is an integer
-> property.
-> 
-> Signed-off-by: Jonatan Pålsson <jonatan.p@gmail.com>
-> ---
->   scripts/qmp/qom-set | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/scripts/qmp/qom-set b/scripts/qmp/qom-set
-> index 240a78187f..61920680eb 100755
-> --- a/scripts/qmp/qom-set
-> +++ b/scripts/qmp/qom-set
-> @@ -56,7 +56,10 @@ if len(args) > 1:
->           path, prop = args[0].rsplit('.', 1)
->       except:
->           usage_error("invalid format for path/property/value")
-> -    value = args[1]
-> +    try:
-> +        value = int(args[1])
-> +    except:
-> +        value = args[1]
+On Fri, Oct 2, 2020 at 10:29 PM John Snow <jsnow@redhat.com> wrote:
+>
+> On 10/2/20 4:19 PM, Jonatan P=C3=A5lsson wrote:
+> > If the value appears to be an integer, parse it as such.
+> >
+> > This allows the following:
+> >
+> >      qmp/qom-set -s ~/qmp.sock sensor.temperature 20000
+> >
+> > .. where sensor is a tmp105 device, and temperature is an integer
+> > property.
+> >
+> > Signed-off-by: Jonatan P=C3=A5lsson <jonatan.p@gmail.com>
+> > ---
+> >   scripts/qmp/qom-set | 5 ++++-
+> >   1 file changed, 4 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/scripts/qmp/qom-set b/scripts/qmp/qom-set
+> > index 240a78187f..61920680eb 100755
+> > --- a/scripts/qmp/qom-set
+> > +++ b/scripts/qmp/qom-set
+> > @@ -56,7 +56,10 @@ if len(args) > 1:
+> >           path, prop =3D args[0].rsplit('.', 1)
+> >       except:
+> >           usage_error("invalid format for path/property/value")
+> > -    value =3D args[1]
+> > +    try:
+> > +        value =3D int(args[1])
+> > +    except:
+> > +        value =3D args[1]
+>
+> Please catch the ValueError explicitly.
 
-Please catch the ValueError explicitly.
+Sure, I'll send a v2.
 
->   else:
->       usage_error("not enough arguments")
->   
-> 
+>
+> >   else:
+> >       usage_error("not enough arguments")
+> >
+> >
+>
+> What happens when you don't convert it to int specifically? Does
+> something break? My understanding was that QOM received everything as a
+> string anyway, and does its own parsing.
 
-What happens when you don't convert it to int specifically? Does 
-something break? My understanding was that QOM received everything as a 
-string anyway, and does its own parsing.
+With the current implementation, I see this:
 
+scripts/qmp/qom-set -s ~/qmp.sock sensor.temperature 20000
+Traceback (most recent call last):
+  File "scripts/qmp/qom-set", line 66, in <module>
+    print(srv.command('qom-set', path=3Dpath, property=3Dprop, value=3Dvalu=
+e))
+  File "scripts/qmp/../../python/qemu/qmp.py", line 274, in command
+    raise QMPResponseError(ret)
+qemu.qmp.QMPResponseError: Invalid parameter type for 'temperature',
+expected: integer
 
