@@ -2,71 +2,88 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6243AC47423
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:57:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5049DC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:59:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05761206E3
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:57:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E6C14206DC
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:59:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="lbqA845C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05761206E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jAMg6k1A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6C14206DC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34318 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOKdB-0005ER-7K
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 08:57:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37592)
+	id 1kOKf1-0007Lx-33
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 08:59:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38574)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <a6b048f6393d0d8dfcf760dc875557ea15addc2a@lizzy.crudebyte.com>)
- id 1kOKXP-0000Ss-U5
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:51:53 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:59039)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <a6b048f6393d0d8dfcf760dc875557ea15addc2a@lizzy.crudebyte.com>)
- id 1kOKXM-0008K0-1v
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:51:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
- Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
- Content-Description; bh=AnO5hDBjL13vnsmw8rZQ8n8acmgU4cSW+h2SSlexQGo=; b=lbqA8
- 45CJu2X5ca51znopA8OYHtd1OkuLulyXFFROBUSr9aec5OrvXDgRRijoW2V+LszAjIf6ug0pbM/F6
- lH5wMDKaeQqn21VPElijio63aPBlcG1+R6Xcnjf9Ms/hZx4mCmLFfdKNu4SYF9nqTtHYVnVXZbQ6U
- Cv6xDzJyawLtaw/O457pupTRyssrXRm5eu+gD6oo59yhyqhzRYIN36XeGZzv5SpjT5EKQT1wyZc7T
- X+vNKncE4voieKp4prCdraU+zjhyc95o1TrWMfmj3NHNi+5HZQCEp/xsqj1ixDV0EgibWxEXxJuUn
- 3aFRCxhwso3yZn5UWh10Gd5dOyOOA==;
-Message-Id: <a6b048f6393d0d8dfcf760dc875557ea15addc2a.1601639563.git.qemu_oss@crudebyte.com>
-In-Reply-To: <cover.1601639563.git.qemu_oss@crudebyte.com>
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kOKcE-0004la-Sm
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:56:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42569)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kOKcC-0000Xx-Bc
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:56:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601643407;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=blHH8DSiKDHbbEfBC4YD+mrTxgmHGFh0Ou6/dt1hLts=;
+ b=jAMg6k1AeHpgeqK3EnjSRO5tOnArdbOxGfYW+aM/zLReN8BJad0yq7GR7JIwHoWhUkJDO0
+ huGKB1NIKc2H1/UMy2my89xSjdV25LgglOXINF7hcAqOaiauqiyM4nJOEzcQdjaoLnimIG
+ dvX++UB793GNwof5vQsw7uY0ytmHeRE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-430-bOHcXcPXNXuXNKDbCsbLLQ-1; Fri, 02 Oct 2020 08:56:28 -0400
+X-MC-Unique: bOHcXcPXNXuXNKDbCsbLLQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32D116408B;
+ Fri,  2 Oct 2020 12:56:27 +0000 (UTC)
+Received: from redhat.com (ovpn-114-9.ams2.redhat.com [10.36.114.9])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 549E36198B;
+ Fri,  2 Oct 2020 12:56:17 +0000 (UTC)
+Date: Fri, 2 Oct 2020 13:56:14 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PATCH v2 11/11] tests/9pfs: add local Tmkdir test
+Message-ID: <20201002125614.GA2338114@redhat.com>
 References: <cover.1601639563.git.qemu_oss@crudebyte.com>
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Date: Fri, 2 Oct 2020 13:51:54 +0200
-Subject: [PATCH v2 09/11] tests/9pfs: wipe local 9pfs test directory
-To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
- Greg Kurz <groug@kaod.org>
-Received-SPF: none client-ip=91.194.90.13;
- envelope-from=a6b048f6393d0d8dfcf760dc875557ea15addc2a@lizzy.crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 08:18:24
+ <9488e95ff86b6ceea0254dab6a7dff67cbe0bf16.1601639563.git.qemu_oss@crudebyte.com>
+MIME-Version: 1.0
+In-Reply-To: <9488e95ff86b6ceea0254dab6a7dff67cbe0bf16.1601639563.git.qemu_oss@crudebyte.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 23:37:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,52 +96,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
+ qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Before running the first 9pfs test case, make sure the test directory
-for running the 9pfs 'local' tests on is entirely empty. For that
-reason simply delete the test directory (if any) before (re)creating
-it on test suite startup.
+On Fri, Oct 02, 2020 at 01:51:54PM +0200, Christian Schoenebeck wrote:
+> This test case uses the 9pfs 'local' driver to create a directory
+> and then checks if the expected directory was actually created
+> (as real directory) on host side.
+> 
+> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> ---
+>  tests/qtest/virtio-9p-test.c | 139 +++++++++++++++++++++++++++++++++++
+>  1 file changed, 139 insertions(+)
+> 
+> diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
+> index af7e169d3a..93161a4b35 100644
+> --- a/tests/qtest/virtio-9p-test.c
+> +++ b/tests/qtest/virtio-9p-test.c
+> @@ -18,6 +18,62 @@
+>  #define QVIRTIO_9P_TIMEOUT_US (10 * 1000 * 1000)
+>  static QGuestAllocator *alloc;
+>  
+> +/*
+> + * Used to auto generate new fids. Start with arbitrary high value to avoid
+> + * collision with hard coded fids in basic test code.
+> + */
+> +static uint32_t fid_generator = 1000;
+> +
+> +static uint32_t genfid(void)
+> +{
+> +    return fid_generator++;
+> +}
+> +
+> +/**
+> + * Splits the @a in string by @a delim into individual (non empty) strings
+> + * and outputs them to @a out. The output array @a out is NULL terminated.
+> + *
+> + * Output array @a out must be freed by calling split_free().
+> + *
+> + * @returns number of individual elements in output array @a out (without the
+> + *          final NULL terminating element)
+> + */
+> +static int split(const char *in, const char *delim, char ***out)
+> +{
+> +    int n = 0, i = 0;
+> +    char *tmp, *p;
+> +
+> +    tmp = g_strdup(in);
+> +    for (p = strtok(tmp, delim); p != NULL; p = strtok(NULL, delim)) {
+> +        if (strlen(p) > 0) {
+> +            ++n;
+> +        }
+> +    }
+> +    g_free(tmp);
+> +
+> +    *out = g_malloc0(n * sizeof(char *) + 1); /* last element NULL delimiter */
 
-Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
----
- tests/qtest/libqos/virtio-9p.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+Surely this should be  (n + 1) * sizeof(char *), because the last
+element still needs to be large enough to hold a pointer, not a
+single extra byte.
 
-diff --git a/tests/qtest/libqos/virtio-9p.c b/tests/qtest/libqos/virtio-9p.c
-index 86e40e5d56..6cd8c8964b 100644
---- a/tests/qtest/libqos/virtio-9p.c
-+++ b/tests/qtest/libqos/virtio-9p.c
-@@ -82,6 +82,18 @@ static void create_local_test_dir(void)
-     g_assert((st.st_mode & S_IFMT) == S_IFDIR);
- }
- 
-+/* Deletes directory previously created by create_local_test_dir(). */
-+static void remove_local_test_dir(void)
-+{
-+    g_assert(local_test_path != NULL);
-+    char *cmd = strpr("rm -r '%s'\n", local_test_path);
-+    int res = system(cmd);
-+    if (res < 0) {
-+        /* ignore error, dummy check to prevent compiler error */
-+    }
-+    g_free(cmd);
-+}
-+
- static void virtio_9p_cleanup(QVirtio9P *interface)
- {
-     qvirtqueue_cleanup(interface->vdev->bus, interface->vq, alloc);
-@@ -249,6 +261,7 @@ static void virtio_9p_register_nodes(void)
- 
-     /* make sure test dir for the 'local' tests exists and is clean */
-     init_local_test_path();
-+    remove_local_test_dir();
-     create_local_test_dir();
- 
-     QPCIAddress addr = {
+> +
+> +    tmp = g_strdup(in);
+> +    for (p = strtok(tmp, delim); p != NULL; p = strtok(NULL, delim)) {
+> +        if (strlen(p) > 0) {
+> +            (*out)[i++] = g_strdup(p);
+> +        }
+> +    }
+> +    g_free(tmp);
+> +
+> +    return n;
+> +}
+
+This seems to largely re-invent g_strsplit 
+
+https://developer.gnome.org/glib/2.62/glib-String-Utility-Functions.html#g-strsplit
+
+> +
+> +static void split_free(char ***out)
+> +{
+> +    int i;
+> +    for (i = 0; (*out)[i]; ++i) {
+> +        g_free((*out)[i]);
+> +    }
+> +    g_free(*out);
+> +    *out = NULL;
+> +}
+
+And g_strfreev
+
+
+
+Regards,
+Daniel
 -- 
-2.20.1
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
