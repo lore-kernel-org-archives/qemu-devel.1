@@ -2,87 +2,130 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD8D9C4363C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 16:13:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF952C4363C
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 16:13:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24084206FA
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 16:13:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5B808206FA
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 16:13:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vj/v2Uku"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24084206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fno3Mjl/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B808206FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kONgK-0007ak-8u
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 12:13:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52854)
+	id 1kONgm-00086j-76
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 12:13:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54198)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kONWr-0004rZ-8v
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 12:03:29 -0400
-Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:46404)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kONWp-0007Y5-4n
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 12:03:28 -0400
-Received: by mail-il1-x142.google.com with SMTP id l16so1685321ilt.13
- for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 09:03:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=5oKIWj/qbyq9bdnwTdh3j0nVEG4Zi3tOm4DJ7FEQ3F0=;
- b=Vj/v2Uku1I0kR6y4gN4BS//LPqbb8djqSrlL1LoUSItCFgvkIUtS/2e1pP++1uionS
- /RURXROaaLamNOm6/3sj9t7ggt4UeM4suN8DXWzIdQyUl4xeK6ZQjCR2nYJK0MLX3Ev4
- lpF/6h281v0vd7nx794zpOIyBGhBijP2iQQj4mWge/vNzTOrtEX73GEMNXg9HqoJBJ6v
- LUoSRC9j17enur9TJlqbykaM+2J8WUtkgujl9mn7nmK1d3D71s1Jdxm4vnQhOT+0jSD9
- /0rQu2owdYNrODsuByKBiCmF37OSnetnY+xRS+60CEUz7NYaU0El9kqXMJ/qrt7rIJzV
- z5LA==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kONcg-0003vH-Lj
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 12:09:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22895)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kONce-0000L3-O5
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 12:09:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601654967;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=v77O4D+B1h106BOw8BG714KC3w9llPv2M4ws/EzNo94=;
+ b=fno3Mjl/VFIDi3cRTRGXDAQ3821iN8kX9ZbcJacOFBJu6lgiQMRApGKrS1ts/mYLujCpET
+ cKs9K5KD4nIPwa7zKSRQIYMSld9OF7xrxCXalGDHczeYp2PMJiKN9wf6YJdzUy41zuPtgP
+ BosT9D4NRhvQTJvRSBkjWzUubl90prc=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-558-LJKdkCDJMSOM8AsRLIL1uw-1; Fri, 02 Oct 2020 12:09:25 -0400
+X-MC-Unique: LJKdkCDJMSOM8AsRLIL1uw-1
+Received: by mail-wr1-f72.google.com with SMTP id f18so717490wrv.19
+ for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 09:09:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=5oKIWj/qbyq9bdnwTdh3j0nVEG4Zi3tOm4DJ7FEQ3F0=;
- b=EWcUSVdVpSxSLMyZjqs870WLxhPb5ZyfHWg12vTl2jzqhqmMvdSG6Qu3/RPfE+e6MU
- LCAEhr6xzwSkHqGyHm4NWLLI+93vRHZ8rSYeIxXCfm6cuCaOefNaA0WnU7zRU7gc7z7U
- NHHsfeA4driPqmyjCU/Fsu9o9NTUctrvCJ5lio6zeVIHjNqLbTjZBe1ytF0VulLtaeYi
- AMYJknq+gmWHefUMr9SVhG11vJLXa+0XT+zBDNetp61a8MfmNe/bEzZcSAcL5JGe2Gcn
- YbSabw+fsGc0uRQtQD/YaFCJC3L/tyLfGG2WSuWE2WYml8up8iZEX/zQuEmEbea2XBDD
- WUww==
-X-Gm-Message-State: AOAM530MXxYFNX/B5ID2p0Ea00awAjcSsp3pnRmahRTlKBxleXt+ojCF
- qS7GfTNEbtxyjSR6QMwi8PJVxCdyfocujUr2nxg=
-X-Google-Smtp-Source: ABdhPJzb6uxWrJzC3lM4kAevNrqCQOu/KODTFbJXQ99sTmKnRYLB3Lcj42EsO0GQunzYMdUVX+bKzGq0MXQRw8LHxgk=
-X-Received: by 2002:a92:5a47:: with SMTP id o68mr1801068ilb.267.1601654605626; 
- Fri, 02 Oct 2020 09:03:25 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=v77O4D+B1h106BOw8BG714KC3w9llPv2M4ws/EzNo94=;
+ b=UZO23oyaIgfzckA8WH7aedwzio3U/i2iQVLtPVVcxc8SP5FD91va3rCBjUQ1cZ70JR
+ JRPW5OW2dYOBEtJoI1QQ3vasfJqyM33qCnKqTuz2CYjRH8cR6ot2XCz8C3ZbFn5zutel
+ Y29ofUFXHcfcVqeE70DU1efznSOKkI3byLtahzyRvrupi/8+Ic/f7ZDQjdgJVQ+ocqD6
+ ngGMR/RlEXfTnjbk7KJoSBBAZCnmFLpZz8mC6zgCLOGaope4oH5Bsj8ebcNjPd6R1QDm
+ 2YYK/st/NNpBTHvGCpdv8ihZmEP52JVom+tSgmwgDV9yJ/HcgEr+UDmqyL14Yr5sM3LN
+ etEA==
+X-Gm-Message-State: AOAM530Pc5s6htkZo0KGquo+VKZK+6b7/J4+9ldidcGmWXiYum9HKcas
+ /CL74sSRfLIYxMrRMOwcCGN510z4h+nED9gBbXuXUlZpJ/eLfRpUQ2dOrf7Zcqda/uk9e5SE5pR
+ wXpiq3DxSjx3hJJE=
+X-Received: by 2002:adf:ec4d:: with SMTP id w13mr4026106wrn.334.1601654964349; 
+ Fri, 02 Oct 2020 09:09:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwj8ap4BRD7ejoxqSu+bLlkV22KLPynezKWzsXm2ZYeqCwQVkG+E4lyeZeRVZRINzY9TuSQOA==
+X-Received: by 2002:adf:ec4d:: with SMTP id w13mr4026063wrn.334.1601654964007; 
+ Fri, 02 Oct 2020 09:09:24 -0700 (PDT)
+Received: from [192.168.1.36] (74.red-83-53-161.dynamicip.rima-tde.net.
+ [83.53.161.74])
+ by smtp.gmail.com with ESMTPSA id a5sm2325376wrp.37.2020.10.02.09.09.22
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 02 Oct 2020 09:09:23 -0700 (PDT)
+Subject: Re: [PATCH] hw/acpi/piix4: Rename piix4_pm_add_propeties() to
+ piix4_pm_add_properties()
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+References: <160165476743.57452.2128307974125615413.stgit@bahia.lan>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <9fc9a729-f806-52a9-3583-df2b5602ed19@redhat.com>
+Date: Fri, 2 Oct 2020 18:09:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <00b3ad01ce01027870a036bc4f6adc873bc3f7d7.1601652718.git.alistair.francis@wdc.com>
- <20201002155553.GA7303@habkost.net>
-In-Reply-To: <20201002155553.GA7303@habkost.net>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 2 Oct 2020 08:51:59 -0700
-Message-ID: <CAKmqyKNUzAnXFpktK601-L=FURWZ5wFnuoPLL=S8rfa=sbvc-g@mail.gmail.com>
-Subject: Re: [PATCH v1 1/1] register: Remove unnecessary NULL check
-To: Eduardo Habkost <ehabkost@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::142;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x142.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <160165476743.57452.2128307974125615413.stgit@bahia.lan>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 23:37:29
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -23
+X-Spam_score: -2.4
+X-Spam_bar: --
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.256, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,55 +139,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Alistair Francis <alistair.francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-trivial@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 2, 2020 at 8:55 AM Eduardo Habkost <ehabkost@redhat.com> wrote:
->
-> On Fri, Oct 02, 2020 at 08:33:40AM -0700, Alistair Francis wrote:
-> > This patch fixes CID 1432800 by removing an unnecessary check.
-> >
-> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> > ---
-> >  hw/core/register.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/hw/core/register.c b/hw/core/register.c
-> > index 31038bd7cc..9ac9bc6bfe 100644
-> > --- a/hw/core/register.c
-> > +++ b/hw/core/register.c
-> > @@ -258,7 +258,7 @@ static RegisterInfoArray *register_init_block(DeviceState *owner,
-> >          int index = rae[i].addr / data_size;
-> >          RegisterInfo *r = &ri[index];
-> >
-> > -        if (data + data_size * index == 0 || !&rae[i]) {
-> > +        if (!&rae[i]) {
->
-> I thought you were going to remove both checks.
+On 10/2/20 6:06 PM, Greg Kurz wrote:
 
-Argh, I didn't realise that. I'll send a v2.
+Maybe add "Fix a typo" to make it obvious.
 
->
-> rae can't be NULL, so &rae[i] will never be NULL.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Yep, good point.
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  hw/acpi/piix4.c |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> index 894d357f8c35..67a1ea41914f 100644
+> --- a/hw/acpi/piix4.c
+> +++ b/hw/acpi/piix4.c
+> @@ -437,7 +437,7 @@ static void piix4_pm_machine_ready(Notifier *n, void *opaque)
+>          (memory_region_present(io_as, 0x2f8) ? 0x90 : 0);
+>  }
+>  
+> -static void piix4_pm_add_propeties(PIIX4PMState *s)
+> +static void piix4_pm_add_properties(PIIX4PMState *s)
+>  {
+>      static const uint8_t acpi_enable_cmd = ACPI_ENABLE;
+>      static const uint8_t acpi_disable_cmd = ACPI_DISABLE;
+> @@ -509,7 +509,7 @@ static void piix4_pm_realize(PCIDevice *dev, Error **errp)
+>                                     pci_get_bus(dev), s);
+>      qbus_set_hotplug_handler(BUS(pci_get_bus(dev)), OBJECT(s));
+>  
+> -    piix4_pm_add_propeties(s);
+> +    piix4_pm_add_properties(s);
+>  }
+>  
+>  I2CBus *piix4_pm_init(PCIBus *bus, int devfn, uint32_t smb_io_base,
+> 
+> 
+> 
 
-Alistair
-
->
-> >              continue;
-> >          }
-> >
-> > --
-> > 2.28.0
-> >
->
-> --
-> Eduardo
->
 
