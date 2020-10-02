@@ -2,89 +2,99 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9FE3C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 13:48:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CC23C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 13:51:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D567206DB
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 13:48:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BA4EC20679
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 13:51:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Scaotr+z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D567206DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="riP4D1WT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA4EC20679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOLQa-000805-IE
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 09:48:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50812)
+	id 1kOLTK-0001OZ-Kx
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 09:51:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51040)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kOLPn-0007Zy-4U
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 09:48:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58832)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kOLPl-0006Vy-Ba
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 09:48:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601646478;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=6+2ResME6lZ6n86fO1xRsrDcdeHaTr9VKZeazux5P5E=;
- b=Scaotr+zEI4K6+QvvP8OIc80OcHWjtNQ6dzppXpY9RkwNT0eFfcwESbIwq71NOSt/DyqXd
- CKHvh2yOxK0ST6G0UH2BsmmHGFG2eJWzVlfPvIHIFXdhXrbOoyCDd/xtHAs6+KAIJXmQAb
- KysTV12zVz/rhkTmE1gykPH0gI9kfs8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-258-_YVsT83EMsSZcj9io_TFMA-1; Fri, 02 Oct 2020 09:47:56 -0400
-X-MC-Unique: _YVsT83EMsSZcj9io_TFMA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F0F9427C4;
- Fri,  2 Oct 2020 13:47:55 +0000 (UTC)
-Received: from localhost (ovpn-114-195.ams2.redhat.com [10.36.114.195])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0877778809;
- Fri,  2 Oct 2020 13:47:54 +0000 (UTC)
-Date: Fri, 2 Oct 2020 14:47:53 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH 1/2] block/export: add vhost-user-blk multi-queue support
-Message-ID: <20201002134753.GC579943@stefanha-x1.localdomain>
-References: <20201001144604.559733-1-stefanha@redhat.com>
- <20201001144604.559733-2-stefanha@redhat.com>
- <87tuvdry4o.fsf@dusky.pond.sub.org>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kOLRJ-0008TI-Vi
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 09:49:38 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38913)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kOLRH-0006cH-8b
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 09:49:37 -0400
+Received: by mail-wm1-x344.google.com with SMTP id t17so1836665wmi.4
+ for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 06:49:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=RML21w01yLrsBh7+LKzrPlhCw4WlEmlQLil1ya3FxhM=;
+ b=riP4D1WTZ3PI/NkXX4SwqF/LocH24eVxPN7WF4t/YWnenOB6wX/RWQGNRJSc5V0x+I
+ IMSH/2Zdr/xd71rx0tp9NmjVT/rBPmIPlSZ7ciGHG0WzZVkJZEvvaghQ1uj0Wyvj1M7s
+ T/PA68IacURsp5QLySv8Uqr3Uv14ZCGx+lWAqYBYB7euviL+qkLJ/saoMmw5bx76WIF4
+ D/Cu+ZEHCbcehsJToaQe1iJI0lLj5g+0KY654giHI1YtDAVXG/G9QLCAy0UwdaHE0fa9
+ TIAJlug/2Vflowzja0Ti78jLUCzI+drMKPwTGy+oXhkG3yel/x+AzcwlczDtOA+vw2aJ
+ zJNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=RML21w01yLrsBh7+LKzrPlhCw4WlEmlQLil1ya3FxhM=;
+ b=PtwgQKp47eCTJZuQZy1ox6KlGoKP/hqUpSxed/Ly5uWDdQSgjYskF090a04c3JFtI3
+ 4v5OXhuRXqdqxJIyz2wTx4x27wRbrzDtGDfVFt7QRUHmb6oOJAhiwHBdRf6oZ3fKmarl
+ kjqKSnSqrR15H0J/IAH8sLe+9P0HYTbJf2c101Zj2ImP6SzmN6LEsOQVzWyI9JhHpRop
+ JnFKAQDk4sBCj9kLdYNLSOlRRpV1CSAWf9CXKDRorwPDgsq6dhJXEVtxkc1SAVkVBydL
+ uBzq+3NHbcLmNLMtOaq6465wgQlZrNGIKNYsbU1w1LK8ZD7jmy+UL1d2gxZY77VdhlPW
+ QsSA==
+X-Gm-Message-State: AOAM530zk5nJHs3eHzCqSg3m8ydKkYTRF91HmvWJpmvhXDSHJlzE6xg+
+ TZhnxl5GmJQkyaz3TK0Jpd8=
+X-Google-Smtp-Source: ABdhPJyA5usdxZwGfWCM4gydYozYhkfOD9SixaF1MSI/lAezulKEUtpOP//7nzqvSgBvTWO+Eww0Yg==
+X-Received: by 2002:a1c:b18a:: with SMTP id a132mr2618731wmf.59.1601646573560; 
+ Fri, 02 Oct 2020 06:49:33 -0700 (PDT)
+Received: from [192.168.1.36] (74.red-83-53-161.dynamicip.rima-tde.net.
+ [83.53.161.74])
+ by smtp.gmail.com with ESMTPSA id v4sm1754572wml.46.2020.10.02.06.49.32
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 02 Oct 2020 06:49:32 -0700 (PDT)
+Subject: Re: [PATCH v10 3/4] tests/qtest: Introduce tests for Xilinx ZynqMP
+ CAN controller
+To: Vikram Garhwal <fnu.vikram@xilinx.com>, qemu-devel@nongnu.org
+References: <1600121324-31337-1-git-send-email-fnu.vikram@xilinx.com>
+ <1600121324-31337-4-git-send-email-fnu.vikram@xilinx.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <45862419-9bb8-ab23-baef-29d4b2c41ffc@amsat.org>
+Date: Fri, 2 Oct 2020 15:49:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <87tuvdry4o.fsf@dusky.pond.sub.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="2JFBq9zoW8cOFH7v"
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 23:37:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <1600121324-31337-4-git-send-email-fnu.vikram@xilinx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -19
+X-Spam_score: -2.0
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.256,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,107 +107,417 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Coiby Xu <Coiby.Xu@gmail.com>, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, peter.maydell@linaro.org,
+ Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ francisco.iglesias@xilinx.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---2JFBq9zoW8cOFH7v
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Vikram,
 
-On Fri, Oct 02, 2020 at 07:32:39AM +0200, Markus Armbruster wrote:
-> Stefan Hajnoczi <stefanha@redhat.com> writes:
->=20
-> > Allow the number of queues to be configured using --export
-> > vhost-user-blk,num-queues=3DN. This setting should match the QEMU --dev=
-ice
-> > vhost-user-blk-pci,num-queues=3DN setting but QEMU vhost-user-blk.c low=
-ers
-> > its own value if the vhost-user-blk backend offers fewer queues than
-> > QEMU.
-> >
-> > The vhost-user-blk-server.c code is already capable of multi-queue. All
-> > virtqueue processing runs in the same AioContext. No new locking is
-> > needed.
-> >
-> > Add the num-queues=3DN option and set the VIRTIO_BLK_F_MQ feature bit.
-> > Note that the feature bit only announces the presence of the num_queues
-> > configuration space field. It does not promise that there is more than =
-1
-> > virtqueue, so we can set it unconditionally.
-> >
-> > I tested multi-queue by running a random read fio test with numjobs=3D4=
- on
-> > an -smp 4 guest. After the benchmark finished the guest /proc/interrupt=
-s
-> > file showed activity on all 4 virtio-blk MSI-X. The /sys/block/vda/mq/
-> > directory shows that Linux blk-mq has 4 queues configured.
-> >
-> > An automated test is included in the next commit.
-> >
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > ---
-> >  qapi/block-export.json               |  6 +++++-
-> >  block/export/vhost-user-blk-server.c | 24 ++++++++++++++++++------
-> >  2 files changed, 23 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/qapi/block-export.json b/qapi/block-export.json
-> > index a793e34af9..17020de257 100644
-> > --- a/qapi/block-export.json
-> > +++ b/qapi/block-export.json
-> > @@ -93,11 +93,15 @@
-> >  #        SocketAddress types are supported. Passed fds must be UNIX do=
-main
-> >  #        sockets.
-> >  # @logical-block-size: Logical block size in bytes. Defaults to 512 by=
-tes.
-> > +# @num-queues: Number of request virtqueues. Must be greater than 0. D=
-efaults
-> > +#              to 1.
-> >  #
-> >  # Since: 5.2
-> >  ##
-> >  { 'struct': 'BlockExportOptionsVhostUserBlk',
-> > -  'data': { 'addr': 'SocketAddress', '*logical-block-size': 'size' } }
-> > +  'data': { 'addr': 'SocketAddress',
-> > +=09    '*logical-block-size': 'size',
->=20
-> Tab damage.
+On 9/15/20 12:08 AM, Vikram Garhwal wrote:
+> The QTests perform five tests on the Xilinx ZynqMP CAN controller:
+>     Tests the CAN controller in loopback, sleep and snoop mode.
+>     Tests filtering of incoming CAN messages.
+> 
+> Reviewed-by: Francisco Iglesias <francisco.iglesias@xilinx.com>
+> Signed-off-by: Vikram Garhwal <fnu.vikram@xilinx.com>
+> ---
+>  tests/qtest/meson.build     |   1 +
+>  tests/qtest/xlnx-can-test.c | 359 ++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 360 insertions(+)
+>  create mode 100644 tests/qtest/xlnx-can-test.c
+> 
+> diff --git a/tests/qtest/meson.build b/tests/qtest/meson.build
+> index 874b5be..945f86c 100644
+> --- a/tests/qtest/meson.build
+> +++ b/tests/qtest/meson.build
+> @@ -148,6 +148,7 @@ qtests_aarch64 = \
+>    (config_all_devices.has_key('CONFIG_TPM_TIS_SYSBUS') ? ['tpm-tis-device-swtpm-test'] : []) +  \
+>    ['numa-test',
+>     'boot-serial-test',
+> +   'xlnx-can-test',
+>     'migration-test']
+>  
+>  qtests_s390x = \
+> diff --git a/tests/qtest/xlnx-can-test.c b/tests/qtest/xlnx-can-test.c
+> new file mode 100644
+> index 0000000..d04189f
+> --- /dev/null
+> +++ b/tests/qtest/xlnx-can-test.c
+> @@ -0,0 +1,359 @@
+> +/*
+> + * QTests for the Xilinx ZynqMP CAN controller.
+> + *
+> + * Copyright (c) 2020 Xilinx Inc.
+> + *
+> + * Written-by: Vikram Garhwal<fnu.vikram@xilinx.com>
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "libqos/libqtest.h"
+> +
+> +/* Base address. */
+> +#define CAN0_BASE_ADDR          0xFF060000
+> +#define CAN1_BASE_ADDR          0xFF070000
+> +
+> +/* Register addresses. */
+> +#define R_SRR_OFFSET            0x00
+> +#define R_MSR_OFFSET            0x04
+> +#define R_SR_OFFSET             0x18
+> +#define R_ISR_OFFSET            0x1C
+> +#define R_ICR_OFFSET            0x24
+> +#define R_TXID_OFFSET           0x30
+> +#define R_TXDLC_OFFSET          0x34
+> +#define R_TXDATA1_OFFSET        0x38
+> +#define R_TXDATA2_OFFSET        0x3C
+> +#define R_RXID_OFFSET           0x50
+> +#define R_RXDLC_OFFSET          0x54
+> +#define R_RXDATA1_OFFSET        0x58
+> +#define R_RXDATA2_OFFSET        0x5C
+> +#define R_AFR                   0x60
+> +#define R_AFMR1                 0x64
+> +#define R_AFIR1                 0x68
+> +#define R_AFMR2                 0x6C
+> +#define R_AFIR2                 0x70
+> +#define R_AFMR3                 0x74
+> +#define R_AFIR3                 0x78
+> +#define R_AFMR4                 0x7C
+> +#define R_AFIR4                 0x80
+> +
+> +/* CAN modes. */
+> +#define CONFIG_MODE             0x00
+> +#define NORMAL_MODE             0x00
+> +#define LOOPBACK_MODE           0x02
+> +#define SNOOP_MODE              0x04
+> +#define SLEEP_MODE              0x01
+> +#define ENABLE_CAN              (1 << 1)
+> +#define STATUS_NORMAL_MODE      (1 << 3)
+> +#define STATUS_LOOPBACK_MODE    (1 << 1)
+> +#define STATUS_SNOOP_MODE       (1 << 12)
+> +#define STATUS_SLEEP_MODE       (1 << 2)
+> +#define ISR_TXOK                (1 << 1)
+> +#define ISR_RXOK                (1 << 4)
+> +
+> +static void match_rx_tx_data(uint32_t *buf_tx, uint32_t *buf_rx,
+> +                             uint8_t can_timestamp)
 
-Oops, thanks! I have updated my editor configuration to use 4-space
-indents for .json files :).
+Both buf_tx/buf_rx should be const.
 
-> > +            '*num-queues': 'uint16'} }
->=20
-> Out of curiosity: what made you pick 16 bit signed?  net.json uses both
-> 32 and 64 bit signed.  Odd...
+> +{
+> +    uint16_t size = 0;
+> +    uint8_t len = 4;
+> +
+> +    while (size < len) {
+> +        if (R_RXID_OFFSET + 4 * size == R_RXDLC_OFFSET)  {
+> +            g_assert_cmpint(buf_rx[size], ==, buf_tx[size] + can_timestamp);
+> +        } else {
+> +            g_assert_cmpint(buf_rx[size], ==, buf_tx[size]);
+> +        }
+> +
+> +        size++;
+> +    }
+> +}
+> +
+> +static void read_data(QTestState *qts, uint64_t can_base_addr, uint32_t *buf_rx)
+> +{
+> +    uint32_t int_status;
+> +
+> +    /* Read the interrupt on CAN rx. */
+> +    int_status = qtest_readl(qts, can_base_addr + R_ISR_OFFSET) & ISR_RXOK;
+> +
+> +    g_assert_cmpint(int_status, ==, ISR_RXOK);
+> +
+> +    /* Read the RX register data for CAN. */
+> +    buf_rx[0] = qtest_readl(qts, can_base_addr + R_RXID_OFFSET);
+> +    buf_rx[1] = qtest_readl(qts, can_base_addr + R_RXDLC_OFFSET);
+> +    buf_rx[2] = qtest_readl(qts, can_base_addr + R_RXDATA1_OFFSET);
+> +    buf_rx[3] = qtest_readl(qts, can_base_addr + R_RXDATA2_OFFSET);
+> +
+> +    /* Clear the RX interrupt. */
+> +    qtest_writel(qts, CAN1_BASE_ADDR + R_ICR_OFFSET, ISR_RXOK);
+> +}
+> +
+> +static void send_data(QTestState *qts, uint64_t can_base_addr, uint32_t *buf_tx)
+> +{
 
-struct virtio_blk_config {
-    __u16 num_queues;
-}
+buf_tx should be const.
 
-Also, virtio-pci and virtio-ccw use 16-bit types for the queue count.
+> +    uint32_t int_status;
+> +
+> +    /* Write the TX register data for CAN. */
+> +    qtest_writel(qts, can_base_addr + R_TXID_OFFSET, buf_tx[0]);
+> +    qtest_writel(qts, can_base_addr + R_TXDLC_OFFSET, buf_tx[1]);
+> +    qtest_writel(qts, can_base_addr + R_TXDATA1_OFFSET, buf_tx[2]);
+> +    qtest_writel(qts, can_base_addr + R_TXDATA2_OFFSET, buf_tx[3]);
+> +
+> +    /* Read the interrupt on CAN for tx. */
+> +    int_status = qtest_readl(qts, can_base_addr + R_ISR_OFFSET) & ISR_TXOK;
+> +
+> +    g_assert_cmpint(int_status, ==, ISR_TXOK);
+> +
+> +    /* Clear the interrupt for tx. */
+> +    qtest_writel(qts, CAN0_BASE_ADDR + R_ICR_OFFSET, ISR_TXOK);
+> +}
+> +
+> +/*
+> + * This test will be transferring data from CAN0 and CAN1 through canbus. CAN0
+> + * initiate the data transfer to can-bus, CAN1 receives the data. Test compares
+> + * the data sent from CAN0 with received on CAN1.
+> + */
+> +static void test_can_bus(void)
+> +{
+> +    uint32_t buf_tx[4] = { 0xFF, 0x80000000, 0x12345678, 0x87654321 };
 
---2JFBq9zoW8cOFH7v
-Content-Type: application/pgp-signature; name="signature.asc"
+buf_tx should be const (similarly in the followng tests).
 
------BEGIN PGP SIGNATURE-----
+Can probably be cleaned on top of this patch, so:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl93L4kACgkQnKSrs4Gr
-c8h4xggAgaeXRLwDpejl34j/F2yZKgTjk0SDM99OYJQHWWEu44M05GXv+JE50GAl
-N0THTADXrGC2/92dD/fUK6boDW/ykg4GuVv2Jb2hAS+mBwXbAJOFRHQxTPKopgZH
-cCIN5kxeLYbivxdOdaHHRNHS6pLtucL/iNsE2jLFfummGMat10DnyEDf6tT5cK1X
-8vnBaj6AFQF8CD7uU5rfMzMXnaCCUNeCyMs16+DzN2p2jf1o51BVIedtQu3Xa0Ts
-/MdHvi/h+lJk0HeTk4H96tigXR1ndyTc5sBGLIjHxvAptSZDE2ExG8fj4F3ZhKZP
-X7gmQtTox/B7ALGGTZdWMNOfD+Rz6A==
-=jRaj
------END PGP SIGNATURE-----
-
---2JFBq9zoW8cOFH7v--
+> +    uint32_t buf_rx[4] = { 0x00, 0x00, 0x00, 0x00 };
+> +    uint32_t status = 0;
+> +    uint8_t can_timestamp = 1;
+> +
+> +    QTestState *qts = qtest_init("-machine xlnx-zcu102"
+> +                " -object can-bus,id=canbus0"
+> +                " -machine xlnx-zcu102.canbus0=canbus0"
+> +                " -machine xlnx-zcu102.canbus1=canbus0"
+> +                );
+> +
+> +    /* Configure the CAN0 and CAN1. */
+> +    qtest_writel(qts, CAN0_BASE_ADDR + R_SRR_OFFSET, ENABLE_CAN);
+> +    qtest_writel(qts, CAN0_BASE_ADDR + R_MSR_OFFSET, NORMAL_MODE);
+> +    qtest_writel(qts, CAN1_BASE_ADDR + R_SRR_OFFSET, ENABLE_CAN);
+> +    qtest_writel(qts, CAN1_BASE_ADDR + R_MSR_OFFSET, NORMAL_MODE);
+> +
+> +    /* Check here if CAN0 and CAN1 are in normal mode. */
+> +    status = qtest_readl(qts, CAN0_BASE_ADDR + R_SR_OFFSET);
+> +    g_assert_cmpint(status, ==, STATUS_NORMAL_MODE);
+> +
+> +    status = qtest_readl(qts, CAN1_BASE_ADDR + R_SR_OFFSET);
+> +    g_assert_cmpint(status, ==, STATUS_NORMAL_MODE);
+> +
+> +    send_data(qts, CAN0_BASE_ADDR, buf_tx);
+> +
+> +    read_data(qts, CAN1_BASE_ADDR, buf_rx);
+> +    match_rx_tx_data(buf_tx, buf_rx, can_timestamp);
+> +
+> +    qtest_quit(qts);
+> +}
+> +
+> +/*
+> + * This test is performing loopback mode on CAN0 and CAN1. Data sent from TX of
+> + * each CAN0 and CAN1 are compared with RX register data for respective CAN.
+> + */
+> +static void test_can_loopback(void)
+> +{
+> +    uint32_t buf_tx[4] = { 0xFF, 0x80000000, 0x12345678, 0x87654321 };
+> +    uint32_t buf_rx[4] = { 0x00, 0x00, 0x00, 0x00 };
+> +    uint32_t status = 0;
+> +
+> +    QTestState *qts = qtest_init("-machine xlnx-zcu102"
+> +                " -object can-bus,id=canbus0"
+> +                " -machine xlnx-zcu102.canbus0=canbus0"
+> +                " -machine xlnx-zcu102.canbus1=canbus0"
+> +                );
+> +
+> +    /* Configure the CAN0 in loopback mode. */
+> +    qtest_writel(qts, CAN0_BASE_ADDR + R_SRR_OFFSET, CONFIG_MODE);
+> +    qtest_writel(qts, CAN0_BASE_ADDR + R_MSR_OFFSET, LOOPBACK_MODE);
+> +    qtest_writel(qts, CAN0_BASE_ADDR + R_SRR_OFFSET, ENABLE_CAN);
+> +
+> +    /* Check here if CAN0 is set in loopback mode. */
+> +    status = qtest_readl(qts, CAN0_BASE_ADDR + R_SR_OFFSET);
+> +
+> +    g_assert_cmpint(status, ==, STATUS_LOOPBACK_MODE);
+> +
+> +    send_data(qts, CAN0_BASE_ADDR, buf_tx);
+> +    read_data(qts, CAN0_BASE_ADDR, buf_rx);
+> +    match_rx_tx_data(buf_tx, buf_rx, 0);
+> +
+> +    /* Configure the CAN1 in loopback mode. */
+> +    qtest_writel(qts, CAN1_BASE_ADDR + R_SRR_OFFSET, CONFIG_MODE);
+> +    qtest_writel(qts, CAN1_BASE_ADDR + R_MSR_OFFSET, LOOPBACK_MODE);
+> +    qtest_writel(qts, CAN1_BASE_ADDR + R_SRR_OFFSET, ENABLE_CAN);
+> +
+> +    /* Check here if CAN1 is set in loopback mode. */
+> +    status = qtest_readl(qts, CAN1_BASE_ADDR + R_SR_OFFSET);
+> +
+> +    g_assert_cmpint(status, ==, STATUS_LOOPBACK_MODE);
+> +
+> +    send_data(qts, CAN1_BASE_ADDR, buf_tx);
+> +    read_data(qts, CAN1_BASE_ADDR, buf_rx);
+> +    match_rx_tx_data(buf_tx, buf_rx, 0);
+> +
+> +    qtest_quit(qts);
+> +}
+> +
+> +/*
+> + * Enable filters for CAN1. This will filter incoming messages with ID. In this
+> + * test message will pass through filter 2.
+> + */
+> +static void test_can_filter(void)
+> +{
+> +    uint32_t buf_tx[4] = { 0x14, 0x80000000, 0x12345678, 0x87654321 };
+> +    uint32_t buf_rx[4] = { 0x00, 0x00, 0x00, 0x00 };
+> +    uint32_t status = 0;
+> +    uint8_t can_timestamp = 1;
+> +
+> +    QTestState *qts = qtest_init("-machine xlnx-zcu102"
+> +                " -object can-bus,id=canbus0"
+> +                " -machine xlnx-zcu102.canbus0=canbus0"
+> +                " -machine xlnx-zcu102.canbus1=canbus0"
+> +                );
+> +
+> +    /* Configure the CAN0 and CAN1. */
+> +    qtest_writel(qts, CAN0_BASE_ADDR + R_SRR_OFFSET, ENABLE_CAN);
+> +    qtest_writel(qts, CAN0_BASE_ADDR + R_MSR_OFFSET, NORMAL_MODE);
+> +    qtest_writel(qts, CAN1_BASE_ADDR + R_SRR_OFFSET, ENABLE_CAN);
+> +    qtest_writel(qts, CAN1_BASE_ADDR + R_MSR_OFFSET, NORMAL_MODE);
+> +
+> +    /* Check here if CAN0 and CAN1 are in normal mode. */
+> +    status = qtest_readl(qts, CAN0_BASE_ADDR + R_SR_OFFSET);
+> +    g_assert_cmpint(status, ==, STATUS_NORMAL_MODE);
+> +
+> +    status = qtest_readl(qts, CAN1_BASE_ADDR + R_SR_OFFSET);
+> +    g_assert_cmpint(status, ==, STATUS_NORMAL_MODE);
+> +
+> +    /* Set filter for CAN1 for incoming messages. */
+> +    qtest_writel(qts, CAN1_BASE_ADDR + R_AFR, 0x0);
+> +    qtest_writel(qts, CAN1_BASE_ADDR + R_AFMR1, 0xF7);
+> +    qtest_writel(qts, CAN1_BASE_ADDR + R_AFIR1, 0x121F);
+> +    qtest_writel(qts, CAN1_BASE_ADDR + R_AFMR2, 0x5431);
+> +    qtest_writel(qts, CAN1_BASE_ADDR + R_AFIR2, 0x14);
+> +    qtest_writel(qts, CAN1_BASE_ADDR + R_AFMR3, 0x1234);
+> +    qtest_writel(qts, CAN1_BASE_ADDR + R_AFIR3, 0x5431);
+> +    qtest_writel(qts, CAN1_BASE_ADDR + R_AFMR4, 0xFFF);
+> +    qtest_writel(qts, CAN1_BASE_ADDR + R_AFIR4, 0x1234);
+> +
+> +    qtest_writel(qts, CAN1_BASE_ADDR + R_AFR, 0xF);
+> +
+> +    send_data(qts, CAN0_BASE_ADDR, buf_tx);
+> +
+> +    read_data(qts, CAN1_BASE_ADDR, buf_rx);
+> +    match_rx_tx_data(buf_tx, buf_rx, can_timestamp);
+> +
+> +    qtest_quit(qts);
+> +}
+> +
+> +/* Testing sleep mode on CAN0 while CAN1 is in normal mode. */
+> +static void test_can_sleepmode(void)
+> +{
+> +    uint32_t buf_tx[4] = { 0x14, 0x80000000, 0x12345678, 0x87654321 };
+> +    uint32_t buf_rx[4] = { 0x00, 0x00, 0x00, 0x00 };
+> +    uint32_t status = 0;
+> +    uint8_t can_timestamp = 1;
+> +
+> +    QTestState *qts = qtest_init("-machine xlnx-zcu102"
+> +                " -object can-bus,id=canbus0"
+> +                " -machine xlnx-zcu102.canbus0=canbus0"
+> +                " -machine xlnx-zcu102.canbus1=canbus0"
+> +                );
+> +
+> +    /* Configure the CAN0. */
+> +    qtest_writel(qts, CAN0_BASE_ADDR + R_SRR_OFFSET, CONFIG_MODE);
+> +    qtest_writel(qts, CAN0_BASE_ADDR + R_MSR_OFFSET, SLEEP_MODE);
+> +    qtest_writel(qts, CAN0_BASE_ADDR + R_SRR_OFFSET, ENABLE_CAN);
+> +
+> +    qtest_writel(qts, CAN1_BASE_ADDR + R_SRR_OFFSET, ENABLE_CAN);
+> +    qtest_writel(qts, CAN1_BASE_ADDR + R_MSR_OFFSET, NORMAL_MODE);
+> +
+> +    /* Check here if CAN0 is in SLEEP mode and CAN1 in normal mode. */
+> +    status = qtest_readl(qts, CAN0_BASE_ADDR + R_SR_OFFSET);
+> +    g_assert_cmpint(status, ==, STATUS_SLEEP_MODE);
+> +
+> +    status = qtest_readl(qts, CAN1_BASE_ADDR + R_SR_OFFSET);
+> +    g_assert_cmpint(status, ==, STATUS_NORMAL_MODE);
+> +
+> +    send_data(qts, CAN1_BASE_ADDR, buf_tx);
+> +
+> +    /*
+> +     * Once CAN1 sends data on can-bus. CAN0 should exit sleep mode.
+> +     * Check the CAN0 status now. It should exit the sleep mode and receive the
+> +     * incoming data.
+> +     */
+> +    status = qtest_readl(qts, CAN0_BASE_ADDR + R_SR_OFFSET);
+> +    g_assert_cmpint(status, ==, STATUS_NORMAL_MODE);
+> +
+> +    read_data(qts, CAN0_BASE_ADDR, buf_rx);
+> +
+> +    match_rx_tx_data(buf_tx, buf_rx, can_timestamp);
+> +
+> +    qtest_quit(qts);
+> +}
+> +
+> +/* Testing Snoop mode on CAN0 while CAN1 is in normal mode. */
+> +static void test_can_snoopmode(void)
+> +{
+> +    uint32_t buf_tx[4] = { 0x14, 0x80000000, 0x12345678, 0x87654321 };
+> +    uint32_t buf_rx[4] = { 0x00, 0x00, 0x00, 0x00 };
+> +    uint32_t status = 0;
+> +    uint8_t can_timestamp = 1;
+> +
+> +    QTestState *qts = qtest_init("-machine xlnx-zcu102"
+> +                " -object can-bus,id=canbus0"
+> +                " -machine xlnx-zcu102.canbus0=canbus0"
+> +                " -machine xlnx-zcu102.canbus1=canbus0"
+> +                );
+> +
+> +    /* Configure the CAN0. */
+> +    qtest_writel(qts, CAN0_BASE_ADDR + R_SRR_OFFSET, CONFIG_MODE);
+> +    qtest_writel(qts, CAN0_BASE_ADDR + R_MSR_OFFSET, SNOOP_MODE);
+> +    qtest_writel(qts, CAN0_BASE_ADDR + R_SRR_OFFSET, ENABLE_CAN);
+> +
+> +    qtest_writel(qts, CAN1_BASE_ADDR + R_SRR_OFFSET, ENABLE_CAN);
+> +    qtest_writel(qts, CAN1_BASE_ADDR + R_MSR_OFFSET, NORMAL_MODE);
+> +
+> +    /* Check here if CAN0 is in SNOOP mode and CAN1 in normal mode. */
+> +    status = qtest_readl(qts, CAN0_BASE_ADDR + R_SR_OFFSET);
+> +    g_assert_cmpint(status, ==, STATUS_SNOOP_MODE);
+> +
+> +    status = qtest_readl(qts, CAN1_BASE_ADDR + R_SR_OFFSET);
+> +    g_assert_cmpint(status, ==, STATUS_NORMAL_MODE);
+> +
+> +    send_data(qts, CAN1_BASE_ADDR, buf_tx);
+> +
+> +    read_data(qts, CAN0_BASE_ADDR, buf_rx);
+> +
+> +    match_rx_tx_data(buf_tx, buf_rx, can_timestamp);
+> +
+> +    qtest_quit(qts);
+> +}
+> +
+> +int main(int argc, char **argv)
+> +{
+> +    g_test_init(&argc, &argv, NULL);
+> +
+> +    qtest_add_func("/net/can/can_bus", test_can_bus);
+> +    qtest_add_func("/net/can/can_loopback", test_can_loopback);
+> +    qtest_add_func("/net/can/can_filter", test_can_filter);
+> +    qtest_add_func("/net/can/can_test_snoopmode", test_can_snoopmode);
+> +    qtest_add_func("/net/can/can_test_sleepmode", test_can_sleepmode);
+> +
+> +    return g_test_run();
+> +}
+> 
 
 
