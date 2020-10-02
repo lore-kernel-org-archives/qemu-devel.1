@@ -2,90 +2,80 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CCF4C4363C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:15:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A8D9C4363C
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:16:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D0C6206CA
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:15:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZdCTK0Ik"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D0C6206CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 15943206CA
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:16:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15943206CA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOMmc-0008Iv-LY
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 11:15:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35098)
+	id 1kOMn9-0000lp-3J
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 11:16:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37314)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kOMIa-0002Y4-JM
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:44:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27836)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kOMIY-0004fU-7J
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:44:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601649877;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VfAW0sgeOpQZHfy459xZQal4BcPCQqKUIsMEWZUCPD4=;
- b=ZdCTK0IksfyAwinOBoL1gxSW3cX2aes1R7qyPY7Righ3NQbTFCzSEodky41ZW+uoFvyCKr
- sJj4G+Uk0/jTUVTeYFiGlnCB/Pu+7ahCeJon2Aj0tMOjHH9/EnOu+4knRA5azmmdQCYUSW
- 1Q9WTLW6k48OYJyIf/GhJsA28lr69aE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-447-2JKfhgEBMXK2m3ObsVaKhQ-1; Fri, 02 Oct 2020 10:44:35 -0400
-X-MC-Unique: 2JKfhgEBMXK2m3ObsVaKhQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 691E0A7421;
- Fri,  2 Oct 2020 14:44:34 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-112-139.ams2.redhat.com
- [10.36.112.139])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 754D95D9D3;
- Fri,  2 Oct 2020 14:44:33 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL 30/37] nbd: Merge nbd_export_new() and nbd_export_create()
-Date: Fri,  2 Oct 2020 16:43:38 +0200
-Message-Id: <20201002144345.253865-31-kwolf@redhat.com>
-In-Reply-To: <20201002144345.253865-1-kwolf@redhat.com>
-References: <20201002144345.253865-1-kwolf@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kOMTI-0008Sz-K1
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:55:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43212)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kOMTE-0005sO-7M
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:55:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kOMTA-0008C0-Uj
+ for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 14:55:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id CB3C82E80E9
+ for <qemu-devel@nongnu.org>; Fri,  2 Oct 2020 14:55:36 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 01:13:31
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 02 Oct 2020 14:48:33 -0000
+From: Frederic Bezies <1898215@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: fredb74
+X-Launchpad-Bug-Reporter: Frederic Bezies (fredb74)
+X-Launchpad-Bug-Modifier: Frederic Bezies (fredb74)
+References: <160164961305.8642.6420581526403273155.malonedeb@wampee.canonical.com>
+Message-Id: <160165011405.9105.6862577215577395635.malone@wampee.canonical.com>
+Subject: [Bug 1898215] Re: [git][archlinux]Build process is busted in
+ spice-display.c
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="d50d1e75c500726862802414f880ee3e3bb759bf"; Instance="production"
+X-Launchpad-Hash: fa3d300e97919ed4ec087471973c52c8e1311d2b
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 10:45:38
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -94,235 +84,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+Reply-To: Bug 1898215 <1898215@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There is no real reason any more why nbd_export_new() and
-nbd_export_create() should be separate functions. The latter only
-performs a few checks before it calls the former.
+Full build log with make V=3D1.
 
-What makes the current state stand out is that it's the only function in
-BlockExportDriver that is not a static function inside nbd/server.c, but
-a small wrapper in blockdev-nbd.c that then calls back into nbd/server.c
-for the real functionality.
+** Attachment added: "qemu-v=3D1.log"
+   https://bugs.launchpad.net/qemu/+bug/1898215/+attachment/5416684/+files/=
+qemu-v%3D1.log
 
-Move all the checks to nbd/server.c and make the resulting function
-static to improve readability.
+-- =
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20200924152717.287415-27-kwolf@redhat.com>
-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- include/block/nbd.h |  7 +-----
- blockdev-nbd.c      | 40 +++++----------------------------
- nbd/server.c        | 54 ++++++++++++++++++++++++++++++++-------------
- 3 files changed, 45 insertions(+), 56 deletions(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1898215
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 5270b7eadd..3dd9a04546 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -330,12 +330,6 @@ int nbd_errno_to_system_errno(int err);
- typedef struct NBDExport NBDExport;
- typedef struct NBDClient NBDClient;
- 
--int nbd_export_create(BlockExport *exp, BlockExportOptions *exp_args,
--                      Error **errp);
--int nbd_export_new(BlockExport *blk_exp,
--                   const char *name, const char *desc,
--                   const char *bitmap, bool readonly, bool shared,
--                   Error **errp);
- void nbd_export_set_on_eject_blk(BlockExport *exp, BlockBackend *blk);
- 
- AioContext *nbd_export_aio_context(NBDExport *exp);
-@@ -349,6 +343,7 @@ void nbd_client_get(NBDClient *client);
- void nbd_client_put(NBDClient *client);
- 
- void nbd_server_is_qemu_nbd(bool value);
-+bool nbd_server_is_running(void);
- void nbd_server_start(SocketAddress *addr, const char *tls_creds,
-                       const char *tls_authz, uint32_t max_connections,
-                       Error **errp);
-diff --git a/blockdev-nbd.c b/blockdev-nbd.c
-index 30e165c23f..8174023e5c 100644
---- a/blockdev-nbd.c
-+++ b/blockdev-nbd.c
-@@ -37,6 +37,11 @@ void nbd_server_is_qemu_nbd(bool value)
-     is_qemu_nbd = value;
- }
- 
-+bool nbd_server_is_running(void)
-+{
-+    return nbd_server || is_qemu_nbd;
-+}
-+
- static void nbd_blockdev_client_closed(NBDClient *client, bool ignored)
- {
-     nbd_client_put(client);
-@@ -173,41 +178,6 @@ void qmp_nbd_server_start(SocketAddressLegacy *addr,
-     qapi_free_SocketAddress(addr_flat);
- }
- 
--int nbd_export_create(BlockExport *exp, BlockExportOptions *exp_args,
--                      Error **errp)
--{
--    BlockExportOptionsNbd *arg = &exp_args->u.nbd;
--
--    assert(exp_args->type == BLOCK_EXPORT_TYPE_NBD);
--
--    if (!nbd_server && !is_qemu_nbd) {
--        error_setg(errp, "NBD server not running");
--        return -EINVAL;
--    }
--
--    if (!arg->has_name) {
--        arg->name = exp_args->node_name;
--    }
--
--    if (strlen(arg->name) > NBD_MAX_STRING_SIZE) {
--        error_setg(errp, "export name '%s' too long", arg->name);
--        return -EINVAL;
--    }
--
--    if (arg->description && strlen(arg->description) > NBD_MAX_STRING_SIZE) {
--        error_setg(errp, "description '%s' too long", arg->description);
--        return -EINVAL;
--    }
--
--    if (nbd_export_find(arg->name)) {
--        error_setg(errp, "NBD server already has export named '%s'", arg->name);
--        return -EEXIST;
--    }
--
--    return nbd_export_new(exp, arg->name, arg->description, arg->bitmap,
--                          !exp_args->writable, !exp_args->writable, errp);
--}
--
- void qmp_nbd_server_add(NbdServerAddOptions *arg, Error **errp)
- {
-     BlockExport *export;
-diff --git a/nbd/server.c b/nbd/server.c
-index 465ec9e762..f74766add7 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -1507,17 +1507,44 @@ void nbd_export_set_on_eject_blk(BlockExport *exp, BlockBackend *blk)
-     blk_add_remove_bs_notifier(blk, &nbd_exp->eject_notifier);
- }
- 
--int nbd_export_new(BlockExport *blk_exp,
--                   const char *name, const char *desc,
--                   const char *bitmap, bool readonly, bool shared,
--                   Error **errp)
-+static int nbd_export_create(BlockExport *blk_exp, BlockExportOptions *exp_args,
-+                             Error **errp)
- {
-     NBDExport *exp = container_of(blk_exp, NBDExport, common);
-+    BlockExportOptionsNbd *arg = &exp_args->u.nbd;
-     BlockBackend *blk = blk_exp->blk;
-     int64_t size;
-     uint64_t perm, shared_perm;
-+    bool readonly = !exp_args->writable;
-+    bool shared = !exp_args->writable;
-     int ret;
- 
-+    assert(exp_args->type == BLOCK_EXPORT_TYPE_NBD);
-+
-+    if (!nbd_server_is_running()) {
-+        error_setg(errp, "NBD server not running");
-+        return -EINVAL;
-+    }
-+
-+    if (!arg->has_name) {
-+        arg->name = exp_args->node_name;
-+    }
-+
-+    if (strlen(arg->name) > NBD_MAX_STRING_SIZE) {
-+        error_setg(errp, "export name '%s' too long", arg->name);
-+        return -EINVAL;
-+    }
-+
-+    if (arg->description && strlen(arg->description) > NBD_MAX_STRING_SIZE) {
-+        error_setg(errp, "description '%s' too long", arg->description);
-+        return -EINVAL;
-+    }
-+
-+    if (nbd_export_find(arg->name)) {
-+        error_setg(errp, "NBD server already has export named '%s'", arg->name);
-+        return -EEXIST;
-+    }
-+
-     size = blk_getlength(blk);
-     if (size < 0) {
-         error_setg_errno(errp, -size,
-@@ -1525,8 +1552,6 @@ int nbd_export_new(BlockExport *blk_exp,
-         return size;
-     }
- 
--    assert(name && strlen(name) <= NBD_MAX_STRING_SIZE);
--
-     /* Don't allow resize while the NBD server is running, otherwise we don't
-      * care what happens with the node. */
-     blk_get_perm(blk, &perm, &shared_perm);
-@@ -1538,9 +1563,8 @@ int nbd_export_new(BlockExport *blk_exp,
-     blk_set_allow_aio_context_change(blk, true);
- 
-     QTAILQ_INIT(&exp->clients);
--    exp->name = g_strdup(name);
--    assert(!desc || strlen(desc) <= NBD_MAX_STRING_SIZE);
--    exp->description = g_strdup(desc);
-+    exp->name = g_strdup(arg->name);
-+    exp->description = g_strdup(arg->description);
-     exp->nbdflags = (NBD_FLAG_HAS_FLAGS | NBD_FLAG_SEND_FLUSH |
-                      NBD_FLAG_SEND_FUA | NBD_FLAG_SEND_CACHE);
-     if (readonly) {
-@@ -1554,12 +1578,12 @@ int nbd_export_new(BlockExport *blk_exp,
-     }
-     exp->size = QEMU_ALIGN_DOWN(size, BDRV_SECTOR_SIZE);
- 
--    if (bitmap) {
-+    if (arg->bitmap) {
-         BlockDriverState *bs = blk_bs(blk);
-         BdrvDirtyBitmap *bm = NULL;
- 
-         while (bs) {
--            bm = bdrv_find_dirty_bitmap(bs, bitmap);
-+            bm = bdrv_find_dirty_bitmap(bs, arg->bitmap);
-             if (bm != NULL) {
-                 break;
-             }
-@@ -1569,7 +1593,7 @@ int nbd_export_new(BlockExport *blk_exp,
- 
-         if (bm == NULL) {
-             ret = -ENOENT;
--            error_setg(errp, "Bitmap '%s' is not found", bitmap);
-+            error_setg(errp, "Bitmap '%s' is not found", arg->bitmap);
-             goto fail;
-         }
- 
-@@ -1583,15 +1607,15 @@ int nbd_export_new(BlockExport *blk_exp,
-             ret = -EINVAL;
-             error_setg(errp,
-                        "Enabled bitmap '%s' incompatible with readonly export",
--                       bitmap);
-+                       arg->bitmap);
-             goto fail;
-         }
- 
-         bdrv_dirty_bitmap_set_busy(bm, true);
-         exp->export_bitmap = bm;
--        assert(strlen(bitmap) <= BDRV_BITMAP_MAX_NAME_SIZE);
-+        assert(strlen(arg->bitmap) <= BDRV_BITMAP_MAX_NAME_SIZE);
-         exp->export_bitmap_context = g_strdup_printf("qemu:dirty-bitmap:%s",
--                                                     bitmap);
-+                                                     arg->bitmap);
-         assert(strlen(exp->export_bitmap_context) < NBD_MAX_STRING_SIZE);
-     }
- 
--- 
-2.25.4
+Title:
+  [git][archlinux]Build process is busted in spice-display.c
 
+Status in QEMU:
+  New
+
+Bug description:
+  Linux distribution: Archlinux. Crash log added is based on a build
+  from scratch.
+
+  Gcc version: 10.2.0
+
+  Configure options used:
+
+  configure \
+      --prefix=3D/usr \
+      --sysconfdir=3D/etc \
+      --localstatedir=3D/var \
+      --libexecdir=3D/usr/lib/qemu \
+      --extra-ldflags=3D"$LDFLAGS" \
+      --smbd=3D/usr/bin/smbd \
+      --enable-modules \
+      --enable-sdl \
+      --disable-werror \
+      --enable-slirp=3Dsystem \
+      --enable-xfsctl \
+      --audio-drv-list=3D"pa alsa sdl"
+
+  Crash log:
+
+  ../ui/spice-display.c: In function 'interface_client_monitors_config':
+  ../ui/spice-display.c:682:25: error: 'VD_AGENT_CONFIG_MONITORS_FLAG_PHYSI=
+CAL_SIZE' undeclared (first use in this function); did you mean 'VD_AGENT_C=
+ONFIG_MONITORS_FLAG_USE_POS'?
+    682 |         if (mc->flags & VD_AGENT_CONFIG_MONITORS_FLAG_PHYSICAL_SI=
+ZE) {
+        |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
+~~
+        |                         VD_AGENT_CONFIG_MONITORS_FLAG_USE_POS
+  ../ui/spice-display.c:682:25: note: each undeclared identifier is reporte=
+d only once for each function it appears in
+  ../ui/spice-display.c:683:13: error: unknown type name 'VDAgentMonitorMM'
+    683 |             VDAgentMonitorMM *mm =3D (void *)&mc->monitors[mc->nu=
+m_of_monitors];
+        |             ^~~~~~~~~~~~~~~~
+  ../ui/spice-display.c:684:37: error: request for member 'width' in someth=
+ing not a structure or union
+    684 |             info.width_mm =3D mm[head].width;
+        |                                     ^
+  ../ui/spice-display.c:685:38: error: request for member 'height' in somet=
+hing not a structure or union
+    685 |             info.height_mm =3D mm[head].height;
+        |                                      ^
+  make: *** [Makefile.ninja:2031: libcommon.fa.p/ui_spice-display.c.o] Erro=
+r 1
+  make: *** Waiting for unfinished jobs....
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1898215/+subscriptions
 
