@@ -2,85 +2,71 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2E53C4363C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 17:19:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF43EC4363C
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 17:21:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8035F20665
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 17:19:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6B30720665
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 17:21:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n8cYeEqJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8035F20665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="ESWEi5e+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B30720665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOOiF-0001yn-Mp
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 13:19:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40908)
+	id 1kOOk7-0003aX-JI
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 13:21:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41574)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kOOfq-000740-95; Fri, 02 Oct 2020 13:16:50 -0400
-Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:35805)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kOOfo-00016V-GO; Fri, 02 Oct 2020 13:16:49 -0400
-Received: by mail-ej1-x644.google.com with SMTP id u21so3017145eja.2;
- Fri, 02 Oct 2020 10:16:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=cMa4HcF1qD//+Q9EjGI9OvrlBKY3nCOhDzrnwd/FzsE=;
- b=n8cYeEqJKgL6sbxEcNG7CePo8fkSjgEMjjdRn3UZBJuWOlaz5Ivsf0k7pMyIJxtGwr
- /KbKVqcPsD4+cQ5G3kwZ/wIBn7VLnZasFKqmC+EI4UuAuw7h4Z8SUYOROE0ZJg3I+McY
- 1TXT7Vlk/w5hP2F868VY0pf6M0koYoWhbmuPO5Bzc5CHSWtqa9jh5XUmXl2KaHfzUoO3
- rxtoAw1Dmg8pai6l3ruNqYSZWzBFBqtW8srQr8Yfwexp1IP1h/L+l4YxRqM4vgwwUNF7
- 7wuUyVAqOJAGcdenW8qqLhb/CUfHgEYKfJqkq6GOu6Gb5Y9UScm+CqkClgZywHz8ZKDX
- s/jA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=cMa4HcF1qD//+Q9EjGI9OvrlBKY3nCOhDzrnwd/FzsE=;
- b=pshnZFK+SKl0OV+nObXiTrX0XQl70ll2stqyMofLgTQsKnPGiMnIrq1YIUv6F/HbX0
- WaextI6bClFEHp0b47FGtGrm2+Poyr1A8fYKZ7Zhy7G3jWEQE+zm5N62YP8r8Ht2MNIm
- NBam0QZFacey1mNn7nr8Bdo5tV3nJqcD9Iaq/3tuH0orGZdlxKoUDR4InIcnqI200HDm
- itOUli1QYZlTPBchn5EB62UGMR6HY+VP4VkYk0T7xTGSQmBwb7w58ZMhYl0xvghSgiSV
- kiRq1Pct29xY/zCNko38q6jau5oSb0ByfTPr8IQ6jXE5FLOSwXyIA4SlZWS6L6Wbnul4
- m0Rg==
-X-Gm-Message-State: AOAM530YsSlTAFlpLVOG2KTELbM30sQnD7eOcdbOex9QH/IN99xbFJkI
- VFoDPQV4pKX5pF7BhYqRsxiT24nA2ARjruBftuQ=
-X-Google-Smtp-Source: ABdhPJxYGKhhbzWJOV0ffHoKRoFj/lEMArKkN8rAx/M/ThGx2PMwmeAhwKd1FfLws+tZpmvK4NUyFJVITssvQWp0Ums=
-X-Received: by 2002:a17:906:a88a:: with SMTP id
- ha10mr3505350ejb.532.1601659006094; 
- Fri, 02 Oct 2020 10:16:46 -0700 (PDT)
-MIME-Version: 1.0
-References: <20201002171343.283426-1-thuth@redhat.com>
-In-Reply-To: <20201002171343.283426-1-thuth@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 2 Oct 2020 21:16:34 +0400
-Message-ID: <CAJ+F1CKzAR3s+1W6BZHNVV531N7RY4NMDPo86+69rxmDWna7zQ@mail.gmail.com>
-Subject: Re: [PATCH] tests/test-char: Use a proper fallthrough comment
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000001c10af05b0b34c1b"
-Received-SPF: pass client-ip=2a00:1450:4864:20::644;
- envelope-from=marcandre.lureau@gmail.com; helo=mail-ej1-x644.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+ (Exim 4.90_1)
+ (envelope-from <1bb273a60bd944539a3db28c0da4ccac8c0126ad@lizzy.crudebyte.com>)
+ id 1kOOiR-0002RB-TY
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 13:19:31 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:54705)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <1bb273a60bd944539a3db28c0da4ccac8c0126ad@lizzy.crudebyte.com>)
+ id 1kOOiQ-0001Do-9N
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 13:19:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
+ Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
+ Content-Description; bh=61K9IPek47Lb/jUIgvqHI9x1BIex8Psn2YIHGCS3rpk=; b=ESWEi
+ 5e+I5WnAEbzmB/i0N9ohLq5NqZkucfv0Zsx4mENYdMf5UhdpXv6hJmFFopXE5hxiJN1qR0eMuCDpC
+ 8oqlCMSPAXH6DgFF9fW8tk//bVzhKAhxYUxalCM8LsbrIbBw37u5fbcKzOz8gZx2jx2j3bDP+cZ9s
+ rA1YxM9Ge28AEaMU39k/5gNjo3B5n4nCHVw/5NycLopPXRW2tx2JRE78nXrFUfaq6ukPWoloV7rE/
+ LPuryvnoyiSKPrWOg9BIpwwfhD4MvPDrmHz3uYvQSwKlJmxJJsRB+omCyPtc1veVS8i8mLUJLn64/
+ zxiU5xO2MtFHGAYQ/odwQmLXAr3bQ==;
+Message-Id: <1bb273a60bd944539a3db28c0da4ccac8c0126ad.1601655308.git.qemu_oss@crudebyte.com>
+In-Reply-To: <cover.1601655308.git.qemu_oss@crudebyte.com>
+References: <cover.1601655308.git.qemu_oss@crudebyte.com>
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Date: Fri, 2 Oct 2020 18:15:05 +0200
+Subject: [PATCH v3 07/11] tests/9pfs: change qtest name prefix to synth
+To: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
+ Greg Kurz <groug@kaod.org>, berrange@redhat.com
+Received-SPF: none client-ip=91.194.90.13;
+ envelope-from=1bb273a60bd944539a3db28c0da4ccac8c0126ad@lizzy.crudebyte.com;
+ helo=lizzy.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 08:18:24
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,97 +79,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu trival <qemu-trivial@nongnu.org>, QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000001c10af05b0b34c1b
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+All existing 9pfs test cases are using the 'synth' fs driver so far, which
+means they are not accessing real files, but a purely simulated (in RAM
+only) file system.
 
-On Fri, Oct 2, 2020 at 9:14 PM Thomas Huth <thuth@redhat.com> wrote:
+Let's make this clear by changing the prefix of the individual qtest case
+names from 'fs/' to 'synth/'. That way they'll be easily distinguishable
+from upcoming new 9pfs test cases supposed to be using a different fs
+driver.
 
-> For being able to compile with -Werror=3Dimplicit-fallthrough we need
-> to use comments that the compiler recognizes. Use "fallthrough" instead
-> of "no break" here.
->
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
->
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
+Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
 ---
->  tests/test-char.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/tests/test-char.c b/tests/test-char.c
-> index d35cc839bc..9196e566e9 100644
-> --- a/tests/test-char.c
-> +++ b/tests/test-char.c
-> @@ -70,7 +70,7 @@ static void fe_event(void *opaque, QEMUChrEvent event)
->              h->openclose_mismatch =3D true;
->          }
->          h->is_open =3D new_open_state;
-> -        /* no break */
-> +        /* fallthrough */
->      default:
->          quit =3D true;
->          break;
-> --
-> 2.18.2
->
->
->
+ tests/qtest/virtio-9p-test.c | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
 
---=20
-Marc-Andr=C3=A9 Lureau
+diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
+index de30b717b6..3281153b9c 100644
+--- a/tests/qtest/virtio-9p-test.c
++++ b/tests/qtest/virtio-9p-test.c
+@@ -897,26 +897,26 @@ static void fs_readdir_split_512(void *obj, void *data,
+ 
+ static void register_virtio_9p_test(void)
+ {
+-    qos_add_test("config", "virtio-9p", pci_config, NULL);
+-    qos_add_test("fs/version/basic", "virtio-9p", fs_version, NULL);
+-    qos_add_test("fs/attach/basic", "virtio-9p", fs_attach, NULL);
+-    qos_add_test("fs/walk/basic", "virtio-9p", fs_walk, NULL);
+-    qos_add_test("fs/walk/no_slash", "virtio-9p", fs_walk_no_slash,
++    qos_add_test("synth/config", "virtio-9p", pci_config, NULL);
++    qos_add_test("synth/version/basic", "virtio-9p", fs_version, NULL);
++    qos_add_test("synth/attach/basic", "virtio-9p", fs_attach, NULL);
++    qos_add_test("synth/walk/basic", "virtio-9p", fs_walk, NULL);
++    qos_add_test("synth/walk/no_slash", "virtio-9p", fs_walk_no_slash,
+                  NULL);
+-    qos_add_test("fs/walk/dotdot_from_root", "virtio-9p",
++    qos_add_test("synth/walk/dotdot_from_root", "virtio-9p",
+                  fs_walk_dotdot, NULL);
+-    qos_add_test("fs/lopen/basic", "virtio-9p", fs_lopen, NULL);
+-    qos_add_test("fs/write/basic", "virtio-9p", fs_write, NULL);
+-    qos_add_test("fs/flush/success", "virtio-9p", fs_flush_success,
++    qos_add_test("synth/lopen/basic", "virtio-9p", fs_lopen, NULL);
++    qos_add_test("synth/write/basic", "virtio-9p", fs_write, NULL);
++    qos_add_test("synth/flush/success", "virtio-9p", fs_flush_success,
+                  NULL);
+-    qos_add_test("fs/flush/ignored", "virtio-9p", fs_flush_ignored,
++    qos_add_test("synth/flush/ignored", "virtio-9p", fs_flush_ignored,
+                  NULL);
+-    qos_add_test("fs/readdir/basic", "virtio-9p", fs_readdir, NULL);
+-    qos_add_test("fs/readdir/split_512", "virtio-9p",
++    qos_add_test("synth/readdir/basic", "virtio-9p", fs_readdir, NULL);
++    qos_add_test("synth/readdir/split_512", "virtio-9p",
+                  fs_readdir_split_512, NULL);
+-    qos_add_test("fs/readdir/split_256", "virtio-9p",
++    qos_add_test("synth/readdir/split_256", "virtio-9p",
+                  fs_readdir_split_256, NULL);
+-    qos_add_test("fs/readdir/split_128", "virtio-9p",
++    qos_add_test("synth/readdir/split_128", "virtio-9p",
+                  fs_readdir_split_128, NULL);
+ }
+ 
+-- 
+2.20.1
 
---0000000000001c10af05b0b34c1b
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Fri, Oct 2, 2020 at 9:14 PM Thomas=
- Huth &lt;<a href=3D"mailto:thuth@redhat.com">thuth@redhat.com</a>&gt; wrot=
-e:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0=
-.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">For being abl=
-e to compile with -Werror=3Dimplicit-fallthrough we need<br>
-to use comments that the compiler recognizes. Use &quot;fallthrough&quot; i=
-nstead<br>
-of &quot;no break&quot; here.<br>
-<br>
-Signed-off-by: Thomas Huth &lt;<a href=3D"mailto:thuth@redhat.com" target=
-=3D"_blank">thuth@redhat.com</a>&gt;<br></blockquote><div><br></div><div>Re=
-viewed-by: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lureau@re=
-dhat.com">marcandre.lureau@redhat.com</a>&gt;=C2=A0 <br></div><div><br></di=
-v><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;borde=
-r-left:1px solid rgb(204,204,204);padding-left:1ex">
----<br>
-=C2=A0tests/test-char.c | 2 +-<br>
-=C2=A01 file changed, 1 insertion(+), 1 deletion(-)<br>
-<br>
-diff --git a/tests/test-char.c b/tests/test-char.c<br>
-index d35cc839bc..9196e566e9 100644<br>
---- a/tests/test-char.c<br>
-+++ b/tests/test-char.c<br>
-@@ -70,7 +70,7 @@ static void fe_event(void *opaque, QEMUChrEvent event)<br=
->
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0h-&gt;openclose_mismatch =
-=3D true;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0h-&gt;is_open =3D new_open_state;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* no break */<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* fallthrough */<br>
-=C2=A0 =C2=A0 =C2=A0default:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0quit =3D true;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
--- <br>
-2.18.2<br>
-<br>
-<br>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
-mail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
-
---0000000000001c10af05b0b34c1b--
 
