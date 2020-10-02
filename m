@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 309DAC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 14:51:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CDC2C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 14:53:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C37512065D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 14:51:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D25AB20665
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 14:53:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gM7NiTRN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C37512065D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="epSpJsJY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D25AB20665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOMOw-0002YB-Pv
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 10:51:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34496)
+	id 1kOMQh-0004Tx-Ni
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 10:53:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34442)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kOMI8-0001M3-VP
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:44:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28379)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kOMI7-0001Go-4H
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:44:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33486)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kOMI4-0004Wb-Vg
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:44:12 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kOMI2-0004Vr-8d
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:44:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601649848;
+ s=mimecast20190719; t=1601649844;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=H8qcK/ddyCpTHZBpFfTTy51guRhiXH+ajIgUHTVxNCc=;
- b=gM7NiTRNcDQOxgo/V1LMaRRT0q8/o1LJfkpfyM54XEIjjytytJ+VCRda2OpjGX+TUbH8tq
- bq1omO98z9zLYLG/8R5wQV/OoKJTxviVk3kzWZJ37spS1WWZbHHbYDgoGbkWrJVaPVCd6S
- VTyt2gLe1cqT+Rc6bRmUyifCxNLSbd0=
+ bh=sXxg/FT/4Y3mCvoxUibNIpE+K9W0Tiw7lZIkheb+Ff4=;
+ b=epSpJsJY2iDs+NKNdnET8tZipUBRdkK0dctM8pIRKoRn0o1okEJmMBcKjqD6GQQytJa1nt
+ mZX6yEk4SyQKgn2ElRjXnIPWI1AQdIC/rsoy+MNOi/wlHD8MfcBchE+uChvFCkJaNJeEEF
+ y7j8mtPOvrXVsgX38o5J7wD7GAcGO0g=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-239-pg1GNC3cNP2cChKaRtaJNw-1; Fri, 02 Oct 2020 10:44:06 -0400
-X-MC-Unique: pg1GNC3cNP2cChKaRtaJNw-1
+ us-mta-173-TkzH2ye-ORqJ0yJW15DhiA-1; Fri, 02 Oct 2020 10:44:01 -0400
+X-MC-Unique: TkzH2ye-ORqJ0yJW15DhiA-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1F63A192AB60;
- Fri,  2 Oct 2020 14:44:05 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE8A6192AB60;
+ Fri,  2 Oct 2020 14:43:59 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-112-139.ams2.redhat.com
  [10.36.112.139])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 851865D9D3;
- Fri,  2 Oct 2020 14:44:01 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 070F05D9D3;
+ Fri,  2 Oct 2020 14:43:58 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 09/37] qemu-storage-daemon: Use qmp_block_export_add()
-Date: Fri,  2 Oct 2020 16:43:17 +0200
-Message-Id: <20201002144345.253865-10-kwolf@redhat.com>
+Subject: [PULL 07/37] qapi: Rename BlockExport to BlockExportOptions
+Date: Fri,  2 Oct 2020 16:43:15 +0200
+Message-Id: <20201002144345.253865-8-kwolf@redhat.com>
 In-Reply-To: <20201002144345.253865-1-kwolf@redhat.com>
 References: <20201002144345.253865-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -99,50 +99,148 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-No reason to duplicate the functionality locally, we can now just reuse
-the QMP command block-export-add for --export.
+The name BlockExport will be used for the struct containing the runtime
+state of block exports, so change the name of export creation options.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20200924152717.287415-6-kwolf@redhat.com>
+Message-Id: <20200924152717.287415-4-kwolf@redhat.com>
 Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- storage-daemon/qemu-storage-daemon.c | 13 +------------
- 1 file changed, 1 insertion(+), 12 deletions(-)
+ qapi/block-export.json               | 12 ++++++------
+ block/monitor/block-hmp-cmds.c       |  6 +++---
+ blockdev-nbd.c                       |  2 +-
+ storage-daemon/qemu-storage-daemon.c |  8 ++++----
+ 4 files changed, 14 insertions(+), 14 deletions(-)
 
+diff --git a/qapi/block-export.json b/qapi/block-export.json
+index b21b8e3f4d..6ac3a63123 100644
+--- a/qapi/block-export.json
++++ b/qapi/block-export.json
+@@ -57,7 +57,7 @@
+             '*tls-authz': 'str'} }
+ 
+ ##
+-# @BlockExportNbd:
++# @BlockExportOptionsNbd:
+ #
+ # An NBD block export.
+ #
+@@ -78,7 +78,7 @@
+ #
+ # Since: 5.0
+ ##
+-{ 'struct': 'BlockExportNbd',
++{ 'struct': 'BlockExportOptionsNbd',
+   'data': {'device': 'str', '*name': 'str', '*description': 'str',
+            '*writable': 'bool', '*bitmap': 'str' } }
+ 
+@@ -93,7 +93,7 @@
+ # Since: 1.3.0
+ ##
+ { 'command': 'nbd-server-add',
+-  'data': 'BlockExportNbd', 'boxed': true }
++  'data': 'BlockExportOptionsNbd', 'boxed': true }
+ 
+ ##
+ # @NbdServerRemoveMode:
+@@ -159,16 +159,16 @@
+   'data': [ 'nbd' ] }
+ 
+ ##
+-# @BlockExport:
++# @BlockExportOptions:
+ #
+ # Describes a block export, i.e. how single node should be exported on an
+ # external interface.
+ #
+ # Since: 4.2
+ ##
+-{ 'union': 'BlockExport',
++{ 'union': 'BlockExportOptions',
+   'base': { 'type': 'BlockExportType' },
+   'discriminator': 'type',
+   'data': {
+-      'nbd': 'BlockExportNbd'
++      'nbd': 'BlockExportOptionsNbd'
+    } }
+diff --git a/block/monitor/block-hmp-cmds.c b/block/monitor/block-hmp-cmds.c
+index 6ce0f8f87c..fb632b1189 100644
+--- a/block/monitor/block-hmp-cmds.c
++++ b/block/monitor/block-hmp-cmds.c
+@@ -398,7 +398,7 @@ void hmp_nbd_server_start(Monitor *mon, const QDict *qdict)
+     Error *local_err = NULL;
+     BlockInfoList *block_list, *info;
+     SocketAddress *addr;
+-    BlockExportNbd export;
++    BlockExportOptionsNbd export;
+ 
+     if (writable && !all) {
+         error_setg(&local_err, "-w only valid together with -a");
+@@ -431,7 +431,7 @@ void hmp_nbd_server_start(Monitor *mon, const QDict *qdict)
+             continue;
+         }
+ 
+-        export = (BlockExportNbd) {
++        export = (BlockExportOptionsNbd) {
+             .device         = info->value->device,
+             .has_writable   = true,
+             .writable       = writable,
+@@ -458,7 +458,7 @@ void hmp_nbd_server_add(Monitor *mon, const QDict *qdict)
+     bool writable = qdict_get_try_bool(qdict, "writable", false);
+     Error *local_err = NULL;
+ 
+-    BlockExportNbd export = {
++    BlockExportOptionsNbd export = {
+         .device         = (char *) device,
+         .has_name       = !!name,
+         .name           = (char *) name,
+diff --git a/blockdev-nbd.c b/blockdev-nbd.c
+index 0f6b80c58f..98ee1b6170 100644
+--- a/blockdev-nbd.c
++++ b/blockdev-nbd.c
+@@ -148,7 +148,7 @@ void qmp_nbd_server_start(SocketAddressLegacy *addr,
+     qapi_free_SocketAddress(addr_flat);
+ }
+ 
+-void qmp_nbd_server_add(BlockExportNbd *arg, Error **errp)
++void qmp_nbd_server_add(BlockExportOptionsNbd *arg, Error **errp)
+ {
+     BlockDriverState *bs = NULL;
+     BlockBackend *on_eject_blk;
 diff --git a/storage-daemon/qemu-storage-daemon.c b/storage-daemon/qemu-storage-daemon.c
-index ed26097254..b6f678d3ab 100644
+index ed9d2afcf3..ed26097254 100644
 --- a/storage-daemon/qemu-storage-daemon.c
 +++ b/storage-daemon/qemu-storage-daemon.c
-@@ -150,17 +150,6 @@ static void init_qmp_commands(void)
+@@ -150,7 +150,7 @@ static void init_qmp_commands(void)
                           qmp_marshal_qmp_capabilities, QCO_ALLOW_PRECONFIG);
  }
  
--static void init_export(BlockExportOptions *export, Error **errp)
--{
--    switch (export->type) {
--    case BLOCK_EXPORT_TYPE_NBD:
--        qmp_nbd_server_add(&export->u.nbd, errp);
--        break;
--    default:
--        g_assert_not_reached();
--    }
--}
--
- static void process_options(int argc, char *argv[])
+-static void init_export(BlockExport *export, Error **errp)
++static void init_export(BlockExportOptions *export, Error **errp)
  {
-     int c;
-@@ -241,7 +230,7 @@ static void process_options(int argc, char *argv[])
-                 visit_type_BlockExportOptions(v, NULL, &export, &error_fatal);
+     switch (export->type) {
+     case BLOCK_EXPORT_TYPE_NBD:
+@@ -235,14 +235,14 @@ static void process_options(int argc, char *argv[])
+         case OPTION_EXPORT:
+             {
+                 Visitor *v;
+-                BlockExport *export;
++                BlockExportOptions *export;
+ 
+                 v = qobject_input_visitor_new_str(optarg, "type", &error_fatal);
+-                visit_type_BlockExport(v, NULL, &export, &error_fatal);
++                visit_type_BlockExportOptions(v, NULL, &export, &error_fatal);
                  visit_free(v);
  
--                init_export(export, &error_fatal);
-+                qmp_block_export_add(export, &error_fatal);
-                 qapi_free_BlockExportOptions(export);
+                 init_export(export, &error_fatal);
+-                qapi_free_BlockExport(export);
++                qapi_free_BlockExportOptions(export);
                  break;
              }
+         case OPTION_MONITOR:
 -- 
 2.25.4
 
