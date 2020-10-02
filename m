@@ -2,83 +2,75 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02BA2C47423
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 14:35:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5130CC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 14:37:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87ADC206B2
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 14:35:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VvWkwXpJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87ADC206B2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B8D54206B2
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 14:36:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8D54206B2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOM9D-0001Vg-IK
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 10:34:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59930)
+	id 1kOMB8-0003Xc-QF
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 10:36:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60282)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1kOM5Y-0006Pn-48
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:31:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43720)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1kOM5S-00038c-6y
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:31:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601649065;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=6w0V8EWUZL7+ka00V8gnHTVP9p//YAdOcs3LvFlyo4Y=;
- b=VvWkwXpJK73XNCv4wV+9kF+BOVlidXVQeGkG+tnz9XL/IJtEQP50S9am2aKyuOKAyVrdEp
- ZbiDW9Jky0L+ZaedVh7RNYVhphD9Fjg0rsWDPNagIsJRCUNjcELv5bS4wWJVEDc9hlP5uE
- 8dlo0tXraHav5IgBa9/5m7COG4s2Kvs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-495-Pkq3nWpoON6r4qTB-DF20w-1; Fri, 02 Oct 2020 10:31:00 -0400
-X-MC-Unique: Pkq3nWpoON6r4qTB-DF20w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 070B48015B0;
- Fri,  2 Oct 2020 14:30:57 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.194.110])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1ADD35D9D3;
- Fri,  2 Oct 2020 14:30:52 +0000 (UTC)
-Date: Fri, 2 Oct 2020 16:30:50 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH v3 2/2] arm64: kvm: Introduce MTE VCPU feature
-Message-ID: <20201002143050.zamkpmqysy6k5ngl@kamzik.brq.redhat.com>
-References: <20200925093607.3051-1-steven.price@arm.com>
- <20200925093607.3051-3-steven.price@arm.com>
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kOM7M-0008VH-02
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:33:04 -0400
+Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:36385)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kOM7I-0003Hc-SL
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:33:03 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.108.4.132])
+ by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 76938616A3EB;
+ Fri,  2 Oct 2020 16:32:57 +0200 (CEST)
+Received: from kaod.org (37.59.142.99) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Fri, 2 Oct 2020
+ 16:32:56 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-99G003d2dc109c-95f3-4a9c-acfa-6851068a12bc,
+ 0341F95EB5BC96075CB197F7895ABA4104766D23) smtp.auth=groug@kaod.org
+Date: Fri, 2 Oct 2020 16:32:55 +0200
+From: Greg Kurz <groug@kaod.org>
+To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
+Subject: Re: [PATCH v2 11/11] tests/9pfs: add local Tmkdir test
+Message-ID: <20201002163255.67087341@bahia.lan>
+In-Reply-To: <20201002125614.GA2338114@redhat.com>
+References: <cover.1601639563.git.qemu_oss@crudebyte.com>
+ <9488e95ff86b6ceea0254dab6a7dff67cbe0bf16.1601639563.git.qemu_oss@crudebyte.com>
+ <20201002125614.GA2338114@redhat.com>
+X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200925093607.3051-3-steven.price@arm.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=drjones@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 01:13:31
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Originating-IP: [37.59.142.99]
+X-ClientProxiedBy: DAG7EX1.mxp5.local (172.16.2.61) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: 2a408529-895b-47eb-8bd6-5977ebcdb198
+X-Ovh-Tracer-Id: 4186377331974576489
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrfeeigdejiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgihesthhqfedtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepgedvvdetjedvvdffvdfgjeetfefhteegfffgudevgfelgefguefgtddvueehudelnecuffhomhgrihhnpehgnhhomhgvrdhorhhgnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrdelleenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepvgdrvghmrghnuhgvlhgvghhiuhhsvghpphgvsehgmhgrihhlrdgtohhm
+Received-SPF: pass client-ip=178.32.125.2; envelope-from=groug@kaod.org;
+ helo=smtpout1.mo529.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 10:32:57
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,175 +83,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Rutland <mark.rutland@arm.com>,
- Peter Maydell <peter.maydell@linaro.org>, Haibo Xu <Haibo.Xu@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- James Morse <james.morse@arm.com>,
- Julien Thierry <julien.thierry.kdev@gmail.com>, kvmarm@lists.cs.columbia.edu,
- Marc Zyngier <maz@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Will Deacon <will@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org, Paolo
+ Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 25, 2020 at 10:36:07AM +0100, Steven Price wrote:
-> Add a new VM feature 'KVM_ARM_CAP_MTE' which enables memory tagging
-> for a VM. This exposes the feature to the guest and automatically tags
-> memory pages touched by the VM as PG_mte_tagged (and clears the tags
-> storage) to ensure that the guest cannot see stale tags, and so that the
-> tags are correctly saved/restored across swap.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_emulate.h |  3 +++
->  arch/arm64/include/asm/kvm_host.h    |  3 +++
->  arch/arm64/kvm/arm.c                 |  9 +++++++++
->  arch/arm64/kvm/mmu.c                 | 15 +++++++++++++++
->  arch/arm64/kvm/sys_regs.c            |  6 +++++-
->  include/uapi/linux/kvm.h             |  1 +
->  6 files changed, 36 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 49a55be2b9a2..4923a566ae6e 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -79,6 +79,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
->  	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
->  	    vcpu_el1_is_32bit(vcpu))
->  		vcpu->arch.hcr_el2 |= HCR_TID2;
-> +
-> +	if (vcpu->kvm->arch.mte_enabled)
-> +		vcpu->arch.hcr_el2 |= HCR_ATA;
->  }
->  
->  static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 4f4360dd149e..1379300c1487 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -110,6 +110,9 @@ struct kvm_arch {
->  	 * supported.
->  	 */
->  	bool return_nisv_io_abort_to_user;
-> +
-> +	/* Memory Tagging Extension enabled for the guest */
-> +	bool mte_enabled;
->  };
->  
->  struct kvm_vcpu_fault_info {
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 46dc3d75cf13..624edca0a1fa 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -87,6 +87,12 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->  		r = 0;
->  		kvm->arch.return_nisv_io_abort_to_user = true;
->  		break;
-> +	case KVM_CAP_ARM_MTE:
-> +		if (!system_supports_mte() || kvm->created_vcpus)
-> +			return -EINVAL;
-> +		r = 0;
-> +		kvm->arch.mte_enabled = true;
-> +		break;
->  	default:
->  		r = -EINVAL;
->  		break;
-> @@ -206,6 +212,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  		 */
->  		r = 1;
->  		break;
-> +	case KVM_CAP_ARM_MTE:
-> +		r = system_supports_mte();
-> +		break;
->  	default:
->  		r = kvm_arch_vm_ioctl_check_extension(kvm, ext);
->  		break;
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index ba00bcc0c884..befb9e1f0aa6 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1949,6 +1949,21 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	if (vma_pagesize == PAGE_SIZE && !force_pte)
->  		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
->  							   &pfn, &fault_ipa);
-> +	if (system_supports_mte() && kvm->arch.mte_enabled && pfn_valid(pfn)) {
+On Fri, 2 Oct 2020 13:56:14 +0100
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 
-'system_supports_mte() && kvm->arch.mte_enabled' is redundant, but I
-assume system_supports_mte() is there to improve the efficiency of the
-branch, as it's using cpus_have_const_cap(). Maybe a helper like
+> On Fri, Oct 02, 2020 at 01:51:54PM +0200, Christian Schoenebeck wrote:
+> > This test case uses the 9pfs 'local' driver to create a directory
+> > and then checks if the expected directory was actually created
+> > (as real directory) on host side.
+> >=20
+> > Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> > ---
+> >  tests/qtest/virtio-9p-test.c | 139 +++++++++++++++++++++++++++++++++++
+> >  1 file changed, 139 insertions(+)
+> >=20
+> > diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
+> > index af7e169d3a..93161a4b35 100644
+> > --- a/tests/qtest/virtio-9p-test.c
+> > +++ b/tests/qtest/virtio-9p-test.c
+> > @@ -18,6 +18,62 @@
+> >  #define QVIRTIO_9P_TIMEOUT_US (10 * 1000 * 1000)
+> >  static QGuestAllocator *alloc;
+> > =20
+> > +/*
+> > + * Used to auto generate new fids. Start with arbitrary high value to =
+avoid
+> > + * collision with hard coded fids in basic test code.
+> > + */
+> > +static uint32_t fid_generator =3D 1000;
+> > +
+> > +static uint32_t genfid(void)
+> > +{
+> > +    return fid_generator++;
+> > +}
+> > +
+> > +/**
+> > + * Splits the @a in string by @a delim into individual (non empty) str=
+ings
+> > + * and outputs them to @a out. The output array @a out is NULL termina=
+ted.
+> > + *
+> > + * Output array @a out must be freed by calling split_free().
+> > + *
+> > + * @returns number of individual elements in output array @a out (with=
+out the
+> > + *          final NULL terminating element)
+> > + */
+> > +static int split(const char *in, const char *delim, char ***out)
+> > +{
+> > +    int n =3D 0, i =3D 0;
+> > +    char *tmp, *p;
+> > +
+> > +    tmp =3D g_strdup(in);
+> > +    for (p =3D strtok(tmp, delim); p !=3D NULL; p =3D strtok(NULL, del=
+im)) {
+> > +        if (strlen(p) > 0) {
+> > +            ++n;
+> > +        }
+> > +    }
+> > +    g_free(tmp);
+> > +
+> > +    *out =3D g_malloc0(n * sizeof(char *) + 1); /* last element NULL d=
+elimiter */
+>=20
+> Surely this should be  (n + 1) * sizeof(char *), because the last
+> element still needs to be large enough to hold a pointer, not a
+> single extra byte.
+>=20
 
- static inline bool kvm_arm_mte_enabled(struct kvm *kvm)
- {
-   return system_supports_mte() && kvm->arch.mte_enabled;
- }
+If you decide to keep this split() function, maybe use g_new0(char *, n + 1=
+) ?
+This buys you the math and does type checking as an extra.
 
-would allow both the more efficient branch and look less confusing
-where it gets used.
-
-> +		/*
-> +		 * VM will be able to see the page's tags, so we must ensure
-> +		 * they have been initialised.
-> +		 */
-> +		struct page *page = pfn_to_page(pfn);
-> +		long i, nr_pages = compound_nr(page);
-> +
-> +		/* if PG_mte_tagged is set, tags have already been initialised */
-> +		for (i = 0; i < nr_pages; i++, page++) {
-> +			if (!test_and_set_bit(PG_mte_tagged, &page->flags))
-> +				mte_clear_page_tags(page_address(page));
-> +		}
-> +	}
-> +
->  	if (writable)
->  		kvm_set_pfn_dirty(pfn);
->  
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index a655f172b5ad..5010a47152b4 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1132,7 +1132,8 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
->  			val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
->  		val &= ~(0xfUL << ID_AA64PFR0_AMU_SHIFT);
->  	} else if (id == SYS_ID_AA64PFR1_EL1) {
-> -		val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
-> +		if (!vcpu->kvm->arch.mte_enabled)
-> +			val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
->  	} else if (id == SYS_ID_AA64ISAR1_EL1 && !vcpu_has_ptrauth(vcpu)) {
->  		val &= ~((0xfUL << ID_AA64ISAR1_APA_SHIFT) |
->  			 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
-> @@ -1394,6 +1395,9 @@ static bool access_mte_regs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
->  				   const struct sys_reg_desc *rd)
->  {
-> +	if (vcpu->kvm->arch.mte_enabled)
-> +		return 0;
-> +
->  	return REG_HIDDEN_USER | REG_HIDDEN_GUEST;
->  }
->  
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index f6d86033c4fa..87678ed82ab4 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1035,6 +1035,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_LAST_CPU 184
->  #define KVM_CAP_SMALLER_MAXPHYADDR 185
->  #define KVM_CAP_S390_DIAG318 186
-> +#define KVM_CAP_ARM_MTE 188
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
->  
-> -- 
-> 2.20.1
-> 
->
-
-Besides the helper suggestion nit
-
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+> > +
+> > +    tmp =3D g_strdup(in);
+> > +    for (p =3D strtok(tmp, delim); p !=3D NULL; p =3D strtok(NULL, del=
+im)) {
+> > +        if (strlen(p) > 0) {
+> > +            (*out)[i++] =3D g_strdup(p);
+> > +        }
+> > +    }
+> > +    g_free(tmp);
+> > +
+> > +    return n;
+> > +}
+>=20
+> This seems to largely re-invent g_strsplit=20
+>=20
+> https://developer.gnome.org/glib/2.62/glib-String-Utility-Functions.html#=
+g-strsplit
+>=20
+> > +
+> > +static void split_free(char ***out)
+> > +{
+> > +    int i;
+> > +    for (i =3D 0; (*out)[i]; ++i) {
+> > +        g_free((*out)[i]);
+> > +    }
+> > +    g_free(*out);
+> > +    *out =3D NULL;
+> > +}
+>=20
+> And g_strfreev
+>=20
+>=20
+>=20
+> Regards,
+> Daniel
 
 
