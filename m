@@ -2,96 +2,69 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCFB2C4363C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 17:22:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F64EC4363C
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 17:24:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3912120679
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 17:22:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 06D8220679
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 17:24:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Aw17ZCFr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3912120679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="mabER9cA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06D8220679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOOlO-0004YS-6u
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 13:22:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41726)
+	id 1kOOmy-0006jm-Vc
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 13:24:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42332)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kOOjC-00032h-9Y
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 13:20:21 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:37984)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kOOj9-0001N4-2m
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 13:20:16 -0400
-Received: by mail-oi1-x243.google.com with SMTP id 26so1934986ois.5
- for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 10:20:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=RS7Me5rbRQvs4pHxmBUOrRLZOIJtNuM9wVtAI9//W80=;
- b=Aw17ZCFrqIyQB6SLrjuBiMAixCIDmcLEwaHkLKx7rDG0E8IDAvBDF+EuPAglNpoFn4
- cVcAF4fSwL55jyUD/7L3a2ESE9H+Bnl0+BMHixpKEAPGQuRGQOXmX/pZef6JnDaIN40u
- TzKcpisWlHCs4DGpehN63m2x8YSvTe1mAOT5Unuerl0Jx14HReC1x+RFRswD9tvB6Pod
- oTLkBq6D8qrQdZduTlcWOUg3xnhUHYCUgrOy41wHDnH16689aujf9tGlW5tFRxZCrNSz
- fbrXTH4AHqrCoqWy/PT+gqMDBJHVAJsn8IqQZ+mOeWqq7v9iRz3ae5TGZkaXqfkakn0I
- dgZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=RS7Me5rbRQvs4pHxmBUOrRLZOIJtNuM9wVtAI9//W80=;
- b=buwHliBmFUzsrGMigYupDG/XQR73WBsLZKA4qAO2bcoTzOihtcI4kFrac6LJpp+rUW
- P7zA6vBD8xW9LAjndkZ6fB6n67ckLuyX4FV6+eS8KGx6DMoikIWHs25ITzcw+NTK6pTY
- ElCJPx1nhCaVQS5sCp4tQUv5NTLVcGXndnsPoT8X34h04EHTP/yP+hI3WS9CPP6fmFH5
- 32n/Zoo2ZPdsHcnAGyRr7EW2b2JRnufPqO7PyK3Xr4ChkHqR8hFoY+2uy7ysTiMVsNM8
- aIDfLOopVZJv2nuhCNqWisv1A0CTCWPGaULSFqRRzIFhaBoE+IccMb3ZM7luLdVIgIwy
- KMaw==
-X-Gm-Message-State: AOAM530zwaNHrP+LAqHu+Vw4tNtMZdwCVB0fdzZC0bBK5srJhse/1JbE
- J5nBicW5GWIHiowPAHJlccNpcg==
-X-Google-Smtp-Source: ABdhPJzN2FkrWC13qndq9j0szUgfHW7SVtyylzuF2TI8T4dsOHgJnsw3zh7Ayyscnz2aZ2P16AOmuA==
-X-Received: by 2002:aca:df84:: with SMTP id w126mr1908150oig.103.1601659213868; 
- Fri, 02 Oct 2020 10:20:13 -0700 (PDT)
-Received: from [10.10.73.179] (fixed-187-189-51-144.totalplay.net.
- [187.189.51.144])
- by smtp.gmail.com with ESMTPSA id 109sm487797oty.59.2020.10.02.10.20.12
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 02 Oct 2020 10:20:13 -0700 (PDT)
-Subject: Re: [PATCH 0/4] linux-user: update syscall_nr headers to Linux 5.9-rc7
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-References: <20200930003033.554124-1-laurent@vivier.eu>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <27c34cc5-d5e2-2672-1d7a-370f81e14ea5@linaro.org>
-Date: Fri, 2 Oct 2020 12:20:10 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <20200930003033.554124-1-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
- envelope-from=richard.henderson@linaro.org; helo=mail-oi1-x243.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -23
-X-Spam_score: -2.4
+ (Exim 4.90_1)
+ (envelope-from <4c1954a3515f63081ebb2e6870837b8edd0b4eab@lizzy.crudebyte.com>)
+ id 1kOOlX-0005PJ-Dq
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 13:22:43 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:56913)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <4c1954a3515f63081ebb2e6870837b8edd0b4eab@lizzy.crudebyte.com>)
+ id 1kOOlV-0001eb-GX
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 13:22:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:Message-Id:Content-Type:
+ Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Content-ID:
+ Content-Description; bh=FEDszQGwAHF3EmeYMtCz93DBWQkbbbmeed4tnfwjebY=; b=mabER
+ 9cADYSR0xsU05+B3sTJXiPekxMRROUNoqrkYKBMrQ2tupEId5G85pblvkLXPBM/A9aOmcSAe91+YD
+ 8DE5fsLBjkGjWMgi9SpMgIOFpbbeINPWLC0Hw553EwSWe/vDJsoh/7Mk7Yxq0DLmZzmQ97Jz+bOMN
+ zI0tRcDuIGRkyYZLLzEpwnSLAl6tnYBQgdmb7QrxpL7uKdM55827rHwUQoYkRXM+rGyonlHHjoM8u
+ 7Herezb65fhTIh20/1F1BkspA0TnZcpkTat6ZH0SjdojqwfY+cjtcyY/fLznbTfWp7oD7RYSTGZ1z
+ 3frdTwtEkDmg2qA9BU1u8xZccbMFA==;
+Message-Id: <cover.1601655308.git.qemu_oss@crudebyte.com>
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Date: Fri, 2 Oct 2020 18:15:08 +0200
+Subject: [PATCH v3 00/11] 9pfs: add tests using local fs driver
+To: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
+ Greg Kurz <groug@kaod.org>, berrange@redhat.com
+Received-SPF: none client-ip=91.194.90.13;
+ envelope-from=4c1954a3515f63081ebb2e6870837b8edd0b4eab@lizzy.crudebyte.com;
+ helo=lizzy.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 08:18:24
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.256,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,23 +77,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aurelien Jarno <aurelien@aurel32.net>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Jiaxun Yang <jiaxun.yang@flygoat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/29/20 7:30 PM, Laurent Vivier wrote:
-> Laurent Vivier (4):
->   linux-user: update syscall_nr.h to Linux 5.9-rc7
->   linux-user: update mips/syscall-args-o32.c.inc to Linux 5.9-rc7
->   linux-user: update syscall.tbl to Linux 5.9-rc7
->   linux-user: remove _sysctl
+The currently existing 9pfs test cases are all solely using the 9pfs 'synth'
+fileystem driver, which is a very simple and purely simulated (in RAM only)
+filesystem. There are issues though where the 'synth' fs driver is not
+sufficient. For example the following two bugs need test cases running the
+9pfs 'local' fs driver:
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+https://bugs.launchpad.net/qemu/+bug/1336794
+https://bugs.launchpad.net/qemu/+bug/1877384
 
+This patch set for that reason introduces 9pfs test cases using the 9pfs
+'local' filesystem driver along to the already existing tests on 'synth'.
+It consists of 3 parts:
 
-r~
+1. libqos patches 1 and 2 remove a limitation of the qtest/libqos subsystem:
+   support for more than one device using the same (official) QEMU device
+   name.
+
+2. Patches 3 to 6 enhance debugging issues with the qtest framework.
+
+3. Patches 7 to 11 actually introduce 9pfs 'local' test cases using the qtest
+   framework. These 'local' tests are adding a test directory 'qtest-9p-local'
+   inside the current working directory (using get_current_dir()), which is
+   typically the build directory, before running the tests. That test
+   directory is automatically recreated next time the test suite is run again,
+   to ensure the 9pfs 'local' tests always run consistently on a clean test
+   directory. The test directory is used by the 'local' driver as root of its
+   export path. So it will add/read/write/delete real files and directories
+   inside that test directory.
+
+v2->v3:
+
+  * concat_path() is now just a wrapper for g_build_filename() (patch 8).
+
+  * Dropped function strpr(), using g_strdup_printf() instead (patch 8, 9).
+
+  * Fixed incorrect size for array allocation in split() function
+    (patch 11).
+
+v1->v2:
+
+  * The libqos debugging features are now turned on by command line argument
+    '--verbose' instead of using environment variables (patches 4, 5, 6).
+
+  * The new 9pfs 'local' tests no longer depend on patches 1 and 2 by no
+    longer using a libqos multi-device approach, but rather modifying the
+    final QEMU command line for each test instead; see discussion of v1
+    for reason (patches 7 to 11).
+
+  * Use GCC_FMT_ATTR on helper function strpr() (patch 8).
+
+  * Updated commit log comments.
+
+Christian Schoenebeck (11):
+  libqos/qgraph: add qemu_name to QOSGraphNode
+  libqos/qgraph: add qos_node_create_driver_named()
+  libqos/qgraph: add qos_dump_graph()
+  tests/qtest/qos-test: dump qos graph if verbose
+  tests/qtest/qos-test: dump environment variables if verbose
+  tests/qtest/qos-test: dump QEMU command if verbose
+  tests/9pfs: change qtest name prefix to synth
+  tests/9pfs: introduce local tests
+  tests/9pfs: wipe local 9pfs test directory
+  tests/9pfs: add virtio_9p_test_path()
+  tests/9pfs: add local Tmkdir test
+
+ tests/qtest/libqos/qgraph.c          | 108 ++++++++++++++-
+ tests/qtest/libqos/qgraph.h          |  36 +++++
+ tests/qtest/libqos/qgraph_internal.h |   1 +
+ tests/qtest/libqos/virtio-9p.c       |  90 ++++++++++++
+ tests/qtest/libqos/virtio-9p.h       |  10 ++
+ tests/qtest/qos-test.c               |  15 +-
+ tests/qtest/virtio-9p-test.c         | 197 ++++++++++++++++++++++++---
+ 7 files changed, 432 insertions(+), 25 deletions(-)
+
+-- 
+2.20.1
+
 
