@@ -2,86 +2,122 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B983FC47425
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:04:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05AA5C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:04:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 472112074B
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:04:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D799C206CA
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:04:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ECN2TEqz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 472112074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CWs5clq0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D799C206CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOMbU-0001AW-Bg
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 11:04:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34830)
+	id 1kOMc4-0001mS-1B
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 11:04:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36688)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kOMIO-00021D-Hf
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:44:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57771)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kOMIK-0004bA-Tv
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:44:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601649864;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VTrRirk6Zxuin2KOh+1DA9ZoczyFozOMYFd/oQTKhlA=;
- b=ECN2TEqzXz8UYAGY0Dfn5S/hSFGkO3vO7ywsiRfqlPaAz2KEz0ytyZf7pUxmcYnTgzMJzR
- 9fySRm+u7+yR0kYEyc/O9O1wjprk9cMTRPy5B6QadfLoht49myfxkh4tmrKcdPJ/JHOfM4
- /izWBtRzkiEcn+UF3zQbazLXSNEo3P4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-263-7oCybpBNMJWRUNkMp0RzxQ-1; Fri, 02 Oct 2020 10:44:20 -0400
-X-MC-Unique: 7oCybpBNMJWRUNkMp0RzxQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 02CB3A742B;
- Fri,  2 Oct 2020 14:44:19 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-112-139.ams2.redhat.com
- [10.36.112.139])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0A4C75D9D3;
- Fri,  2 Oct 2020 14:44:17 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL 20/37] block/export: Allocate BlockExport in blk_exp_add()
-Date: Fri,  2 Oct 2020 16:43:28 +0200
-Message-Id: <20201002144345.253865-21-kwolf@redhat.com>
-In-Reply-To: <20201002144345.253865-1-kwolf@redhat.com>
-References: <20201002144345.253865-1-kwolf@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kOMP9-0003V0-KK; Fri, 02 Oct 2020 10:51:27 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38030)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kOMP7-0005VZ-O7; Fri, 02 Oct 2020 10:51:27 -0400
+Received: by mail-wr1-x444.google.com with SMTP id g4so2141485wrs.5;
+ Fri, 02 Oct 2020 07:51:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:from:to:cc:references:autocrypt:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=1Qv7lZXTUX4YgEJVoDxTSAbbt05YOrcXEI/iCwJvaDE=;
+ b=CWs5clq0pwGaV5VKySbyHE+z3tRarVGBXj4JWgIcv8RFDj+oil7hQcjx4XIIQIz9Qt
+ +HCpOG6KjW5yH0JbaVciRPpPbsJUaGmdPyKvZ+axnIvzPqWT48fv0yIlvPt7jQm42iHz
+ uqt6CZ27mwYvHVS9fLose9see5Z/2h32jlciv1zn9SEqYg+mba91Tuv7XhwxdSa+fXDT
+ TsHyLdA48mU2zAG9gFz5LI7HD8nMSLH4nAz4Widmb14DuUf3XhxFFqYSoCE0kfOuWiwZ
+ 3/n/lyrnxX9BjygTEout9YwAQ1Bdb7a4JFHwwci5Zi+HUnW78ZYTDGqXLa0WubpfbWlD
+ 3FYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:from:to:cc:references:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=1Qv7lZXTUX4YgEJVoDxTSAbbt05YOrcXEI/iCwJvaDE=;
+ b=DvYgPvRCFv/yp3xJN8tdB/39suFnbNqkPgT4TwC3CLhBw453i8riiMgo6bV6lIX3JV
+ QDbdvyHoUjsd6hGf+EzCMlj47MFuXwVhpCMgAyXojkxTyEqMwIbOrXZ20gNwh6LS6rlH
+ 2OgDocsYiCpcsRcCkbeC2w4y68Z7VH+hlA73rb9FkNUhlTMxTA1d9mECuQaiktbOcMlI
+ pTqVp/2BBgVaB76a1s4qYJLHxqDBfMpPscZjJ1p6jkmVhbrzFX+JIdqdrQC8uF6pxITd
+ SNS8mozL4uXt876Ockaz22iIhdzZFX36onG7Kzz6BdcH8uyahoz/pMFj/wpv60XAKoMw
+ 5XAA==
+X-Gm-Message-State: AOAM530PXttKKREd4IjqHPdXOcVf1dakyVbbSUpjbHE9bZPzry2tctOb
+ l8z1Mfpj2E0ItVIDAquKJPo=
+X-Google-Smtp-Source: ABdhPJz3leHHOkIZJ/tjSri/C1ryDN1A4LE25vWE0dLbu8WasQyol9tHPRXVORNi1EpxWjJEKPB//w==
+X-Received: by 2002:adf:91c2:: with SMTP id 60mr3795018wri.292.1601650283167; 
+ Fri, 02 Oct 2020 07:51:23 -0700 (PDT)
+Received: from [192.168.1.36] (74.red-83-53-161.dynamicip.rima-tde.net.
+ [83.53.161.74])
+ by smtp.gmail.com with ESMTPSA id n2sm2265268wma.29.2020.10.02.07.51.22
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 02 Oct 2020 07:51:22 -0700 (PDT)
+Subject: Re: [PATCH 10/14] hw/misc/bcm2835_cprman: implement clock mux
+ behaviour
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Luc Michel <luc@lmichel.fr>, qemu-devel@nongnu.org
+References: <20200925101731.2159827-1-luc@lmichel.fr>
+ <20200925101731.2159827-11-luc@lmichel.fr>
+ <76aae8af-dff0-b76f-cf04-0e3231eaf2bb@amsat.org>
+Autocrypt: addr=f4bug@amsat.org; keydata=
+ mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
+ u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
+ HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
+ YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
+ ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
+ dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
+ ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
+ Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
+ HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
+ Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
+ CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
+ klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
+ jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
+ 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
+ loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
+ sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
+ JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
+ 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
+ K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
+ n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
+ CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
+Message-ID: <2ca8802e-3295-bd22-e705-931ae8dbbd1d@amsat.org>
+Date: Fri, 2 Oct 2020 16:51:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <76aae8af-dff0-b76f-cf04-0e3231eaf2bb@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 01:13:31
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -19
+X-Spam_score: -2.0
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.256,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,303 +130,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Instead of letting the driver allocate and return the BlockExport
-object, allocate it already in blk_exp_add() and pass it. This allows us
-to initialise the generic part before calling into the driver so that
-the driver can just use these values instead of having to parse the
-options a second time.
+On 9/26/20 11:40 PM, Philippe Mathieu-Daudé wrote:
+> On 9/25/20 12:17 PM, Luc Michel wrote:
+>> A clock mux can be configured to select one of its 10 sources through
+>> the cm_ctl register. It also embeds yet another clock divider, composed
+>> of an integer part and a fractionnal part. The number of bits of each
+> 
+> Typo "fractional".
+> 
+>> part is mux dependant.
+> 
+> Typo "dependent"?
+> 
+>>
+>> Signed-off-by: Luc Michel <luc@lmichel.fr>
+>> ---
+>>  hw/misc/bcm2835_cprman.c | 43 +++++++++++++++++++++++++++++++++++++++-
+>>  1 file changed, 42 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/misc/bcm2835_cprman.c b/hw/misc/bcm2835_cprman.c
+>> index 8df2db0fd9..75bc11939b 100644
+>> --- a/hw/misc/bcm2835_cprman.c
+>> +++ b/hw/misc/bcm2835_cprman.c
+>> @@ -229,19 +229,60 @@ static const TypeInfo cprman_pll_channel_info = {
+>>  };
+>>  
+>>  
+>>  /* clock mux */
+>>  
+>> +static bool clock_mux_is_enabled(CprmanClockMuxState *mux)
+>> +{
+>> +    return FIELD_EX32(*mux->reg_cm, CM_CLOCKx_CTL, ENABLE);
+>> +}
+>> +
+>>  static void clock_mux_update(CprmanClockMuxState *mux)
+>>  {
+>> -    clock_update(mux->out, 0);
+>> +    uint64_t freq, div;
+>> +    uint32_t src = FIELD_EX32(*mux->reg_cm, CM_CLOCKx_CTL, SRC);
+>> +    bool enabled = clock_mux_is_enabled(mux);
+>> +
+>> +    *mux->reg_cm = FIELD_DP32(*mux->reg_cm, CM_CLOCKx_CTL, BUSY, enabled);
+>> +
+>> +    if (!enabled) {
+>> +        clock_update(mux->out, 0);
+>> +        return;
+>> +    }
+>> +
+>> +    freq = clock_get_hz(mux->srcs[src]);
+>> +
+>> +    if (mux->int_bits == 0 && mux->frac_bits == 0) {
+>> +        clock_update_hz(mux->out, freq);
+>> +        return;
+>> +    }
+>> +
+>> +    /*
+>> +     * The divider has an integer and a fractional part. The size of each part
+>> +     * varies with the muxes (int_bits and frac_bits). Both parts are
+>> +     * concatenated, with the integer part always starting at bit 12.
+>> +     */
+>> +    div = mux->reg_cm[1] >> (R_CM_CLOCKx_DIV_FRAC_LENGTH - mux->frac_bits);
+>> +    div &= (1 << (mux->int_bits + mux->frac_bits)) - 1;
 
-For symmetry, move freeing the BlockExport to blk_exp_unref().
+Eventually:
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20200924152717.287415-17-kwolf@redhat.com>
-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- include/block/export.h |  8 +++++++-
- include/block/nbd.h    | 11 ++++++-----
- block/export/export.c  | 18 +++++++++++++++++-
- blockdev-nbd.c         | 26 ++++++++++++++------------
- nbd/server.c           | 30 +++++++++++++-----------------
- 5 files changed, 57 insertions(+), 36 deletions(-)
+    div &= MAKE_64BIT_MASK(mux->int_bits + mux->frac_bits, 64);
 
-diff --git a/include/block/export.h b/include/block/export.h
-index e6f96f4e1e..cf9b1c9dad 100644
---- a/include/block/export.h
-+++ b/include/block/export.h
-@@ -22,8 +22,14 @@ typedef struct BlockExportDriver {
-     /* The export type that this driver services */
-     BlockExportType type;
- 
-+    /*
-+     * The size of the driver-specific state that contains BlockExport as its
-+     * first field.
-+     */
-+    size_t instance_size;
-+
-     /* Creates and starts a new block export */
--    BlockExport *(*create)(BlockExportOptions *, Error **);
-+    int (*create)(BlockExport *, BlockExportOptions *, Error **);
- 
-     /*
-      * Frees a removed block export. This function is only called after all
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index e3bd112227..fc2c153d5b 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -330,11 +330,12 @@ int nbd_errno_to_system_errno(int err);
- typedef struct NBDExport NBDExport;
- typedef struct NBDClient NBDClient;
- 
--BlockExport *nbd_export_create(BlockExportOptions *exp_args, Error **errp);
--NBDExport *nbd_export_new(BlockDriverState *bs,
--                          const char *name, const char *desc,
--                          const char *bitmap, bool readonly, bool shared,
--                          bool writethrough, Error **errp);
-+int nbd_export_create(BlockExport *exp, BlockExportOptions *exp_args,
-+                      Error **errp);
-+int nbd_export_new(BlockExport *blk_exp, BlockDriverState *bs,
-+                   const char *name, const char *desc,
-+                   const char *bitmap, bool readonly, bool shared,
-+                   bool writethrough, Error **errp);
- void nbd_export_set_on_eject_blk(BlockExport *exp, BlockBackend *blk);
- void nbd_export_close(NBDExport *exp);
- void nbd_export_remove(NBDExport *exp, NbdServerRemoveMode mode, Error **errp);
-diff --git a/block/export/export.c b/block/export/export.c
-index 8635318ef1..6b2b29078b 100644
---- a/block/export/export.c
-+++ b/block/export/export.c
-@@ -39,6 +39,8 @@ static const BlockExportDriver *blk_exp_find_driver(BlockExportType type)
- BlockExport *blk_exp_add(BlockExportOptions *export, Error **errp)
- {
-     const BlockExportDriver *drv;
-+    BlockExport *exp;
-+    int ret;
- 
-     drv = blk_exp_find_driver(export->type);
-     if (!drv) {
-@@ -46,7 +48,20 @@ BlockExport *blk_exp_add(BlockExportOptions *export, Error **errp)
-         return NULL;
-     }
- 
--    return drv->create(export, errp);
-+    assert(drv->instance_size >= sizeof(BlockExport));
-+    exp = g_malloc0(drv->instance_size);
-+    *exp = (BlockExport) {
-+        .drv        = drv,
-+        .refcount   = 1,
-+    };
-+
-+    ret = drv->create(exp, export, errp);
-+    if (ret < 0) {
-+        g_free(exp);
-+        return NULL;
-+    }
-+
-+    return exp;
- }
- 
- /* Callers must hold exp->ctx lock */
-@@ -62,6 +77,7 @@ void blk_exp_unref(BlockExport *exp)
-     assert(exp->refcount > 0);
-     if (--exp->refcount == 0) {
-         exp->drv->delete(exp);
-+        g_free(exp);
-     }
- }
- 
-diff --git a/blockdev-nbd.c b/blockdev-nbd.c
-index ef14303b25..b34f159888 100644
---- a/blockdev-nbd.c
-+++ b/blockdev-nbd.c
-@@ -173,18 +173,19 @@ void qmp_nbd_server_start(SocketAddressLegacy *addr,
-     qapi_free_SocketAddress(addr_flat);
- }
- 
--BlockExport *nbd_export_create(BlockExportOptions *exp_args, Error **errp)
-+int nbd_export_create(BlockExport *exp, BlockExportOptions *exp_args,
-+                      Error **errp)
- {
-     BlockExportOptionsNbd *arg = &exp_args->u.nbd;
-     BlockDriverState *bs = NULL;
--    NBDExport *exp = NULL;
-     AioContext *aio_context;
-+    int ret;
- 
-     assert(exp_args->type == BLOCK_EXPORT_TYPE_NBD);
- 
-     if (!nbd_server && !is_qemu_nbd) {
-         error_setg(errp, "NBD server not running");
--        return NULL;
-+        return -EINVAL;
-     }
- 
-     if (!arg->has_name) {
-@@ -193,22 +194,22 @@ BlockExport *nbd_export_create(BlockExportOptions *exp_args, Error **errp)
- 
-     if (strlen(arg->name) > NBD_MAX_STRING_SIZE) {
-         error_setg(errp, "export name '%s' too long", arg->name);
--        return NULL;
-+        return -EINVAL;
-     }
- 
-     if (arg->description && strlen(arg->description) > NBD_MAX_STRING_SIZE) {
-         error_setg(errp, "description '%s' too long", arg->description);
--        return NULL;
-+        return -EINVAL;
-     }
- 
-     if (nbd_export_find(arg->name)) {
-         error_setg(errp, "NBD server already has export named '%s'", arg->name);
--        return NULL;
-+        return -EEXIST;
-     }
- 
-     bs = bdrv_lookup_bs(NULL, exp_args->node_name, errp);
-     if (!bs) {
--        return NULL;
-+        return -ENOENT;
-     }
- 
-     aio_context = bdrv_get_aio_context(bs);
-@@ -218,6 +219,7 @@ BlockExport *nbd_export_create(BlockExportOptions *exp_args, Error **errp)
-         arg->writable = false;
-     }
-     if (bdrv_is_read_only(bs) && arg->writable) {
-+        ret = -EINVAL;
-         error_setg(errp, "Cannot export read-only node as writable");
-         goto out;
-     }
-@@ -226,22 +228,22 @@ BlockExport *nbd_export_create(BlockExportOptions *exp_args, Error **errp)
-         exp_args->writethrough = false;
-     }
- 
--    exp = nbd_export_new(bs, arg->name, arg->description, arg->bitmap,
-+    ret = nbd_export_new(exp, bs, arg->name, arg->description, arg->bitmap,
-                          !arg->writable, !arg->writable,
-                          exp_args->writethrough, errp);
--    if (!exp) {
-+    if (ret < 0) {
-         goto out;
-     }
- 
-     /* The list of named exports has a strong reference to this export now and
-      * our only way of accessing it is through nbd_export_find(), so we can drop
-      * the strong reference that is @exp. */
--    blk_exp_unref((BlockExport*) exp);
-+    blk_exp_unref(exp);
- 
-+    ret = 0;
-  out:
-     aio_context_release(aio_context);
--    /* TODO Remove the cast: nbd_export_new() will return a BlockExport. */
--    return (BlockExport*) exp;
-+    return ret;
- }
- 
- void qmp_nbd_server_add(NbdServerAddOptions *arg, Error **errp)
-diff --git a/nbd/server.c b/nbd/server.c
-index 7cf81646fc..f31d8bbb60 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -1514,14 +1514,14 @@ void nbd_export_set_on_eject_blk(BlockExport *exp, BlockBackend *blk)
-     blk_add_remove_bs_notifier(blk, &nbd_exp->eject_notifier);
- }
- 
--NBDExport *nbd_export_new(BlockDriverState *bs,
--                          const char *name, const char *desc,
--                          const char *bitmap, bool readonly, bool shared,
--                          bool writethrough, Error **errp)
-+int nbd_export_new(BlockExport *blk_exp, BlockDriverState *bs,
-+                   const char *name, const char *desc,
-+                   const char *bitmap, bool readonly, bool shared,
-+                   bool writethrough, Error **errp)
- {
-+    NBDExport *exp = container_of(blk_exp, NBDExport, common);
-     AioContext *ctx;
-     BlockBackend *blk;
--    NBDExport *exp;
-     int64_t size;
-     uint64_t perm;
-     int ret;
-@@ -1530,17 +1530,11 @@ NBDExport *nbd_export_new(BlockDriverState *bs,
-     if (size < 0) {
-         error_setg_errno(errp, -size,
-                          "Failed to determine the NBD export's length");
--        return NULL;
-+        return size;
-     }
- 
-     ctx = bdrv_get_aio_context(bs);
--
--    exp = g_new0(NBDExport, 1);
--    exp->common = (BlockExport) {
--        .drv        = &blk_exp_nbd,
--        .refcount   = 1,
--        .ctx        = ctx,
--    };
-+    blk_exp->ctx = ctx;
- 
-     /*
-      * NBD exports are used for non-shared storage migration.  Make sure
-@@ -1599,16 +1593,19 @@ NBDExport *nbd_export_new(BlockDriverState *bs,
-         }
- 
-         if (bm == NULL) {
-+            ret = -ENOENT;
-             error_setg(errp, "Bitmap '%s' is not found", bitmap);
-             goto fail;
-         }
- 
-         if (bdrv_dirty_bitmap_check(bm, BDRV_BITMAP_ALLOW_RO, errp)) {
-+            ret = -EINVAL;
-             goto fail;
-         }
- 
-         if (readonly && bdrv_is_writable(bs) &&
-             bdrv_dirty_bitmap_enabled(bm)) {
-+            ret = -EINVAL;
-             error_setg(errp,
-                        "Enabled bitmap '%s' incompatible with readonly export",
-                        bitmap);
-@@ -1628,14 +1625,13 @@ NBDExport *nbd_export_new(BlockDriverState *bs,
-     blk_exp_ref(&exp->common);
-     QTAILQ_INSERT_TAIL(&exports, exp, next);
- 
--    return exp;
-+    return 0;
- 
- fail:
-     blk_unref(blk);
-     g_free(exp->name);
-     g_free(exp->description);
--    g_free(exp);
--    return NULL;
-+    return ret;
- }
- 
- NBDExport *nbd_export_find(const char *name)
-@@ -1722,12 +1718,12 @@ static void nbd_export_delete(BlockExport *blk_exp)
-     }
- 
-     QTAILQ_REMOVE(&closed_exports, exp, next);
--    g_free(exp);
-     aio_wait_kick();
- }
- 
- const BlockExportDriver blk_exp_nbd = {
-     .type               = BLOCK_EXPORT_TYPE_NBD,
-+    .instance_size      = sizeof(NBDExport),
-     .create             = nbd_export_create,
-     .delete             = nbd_export_delete,
- };
--- 
-2.25.4
+>> +
+>> +    freq = (freq << mux->frac_bits) / div;
 
+Maybe:
+
+    freq = muldiv64(freq, 1 << mux->frac_bits, div);
+
+>> +
+>> +    clock_update_hz(mux->out, freq);
+>>  }
+>>  
+>>  static void clock_mux_src_update(void *opaque)
+>>  {
+>>      CprmanClockMuxState **backref = opaque;
+>>      CprmanClockMuxState *s = *backref;
+>> +    CprmanClockMuxSource src = backref - s->backref;
+>> +    uint32_t current_src;
+
+Maybe avoid current_src and use in place.
+
+Otherwise:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+>> +
+>> +    current_src = FIELD_EX32(*s->reg_cm, CM_CLOCKx_CTL, SRC);
+>> +
+>> +    if (current_src != src) {
+>> +        return;
+>> +    }
+>>  
+>>      clock_mux_update(s);
+>>  }
+>>  
+>>  static void clock_mux_init(Object *obj)
+>>
+> 
 
