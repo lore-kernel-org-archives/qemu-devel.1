@@ -2,61 +2,110 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FC42C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 08:46:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56F3CC4727F
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 08:51:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF4CD206DC
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 08:46:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF4CD206DC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+	by mail.kernel.org (Postfix) with ESMTPS id B6B2A206C3
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 08:51:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J75B9eD7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6B2A206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOGi0-0007L8-Qg
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 04:46:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42714)
+	id 1kOGmh-0001a1-TS
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 04:51:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43536)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <f.gruenbichler@proxmox.com>)
- id 1kOGh5-0006e5-EX; Fri, 02 Oct 2020 04:45:35 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:18408)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <f.gruenbichler@proxmox.com>)
- id 1kOGh3-0004Fk-AD; Fri, 02 Oct 2020 04:45:35 -0400
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
- by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 3D8D54588F;
- Fri,  2 Oct 2020 10:45:28 +0200 (CEST)
-Date: Fri, 02 Oct 2020 10:45:15 +0200
-From: Fabian =?iso-8859-1?q?Gr=FCnbichler?= <f.gruenbichler@proxmox.com>
-Subject: Re: [PATCH qemu 1/4] drive-mirror: add support for sync=bitmap
- mode=never
-To: Markus Armbruster <armbru@redhat.com>
-References: <20200922091418.53562-1-f.gruenbichler@proxmox.com>
- <20200922091418.53562-2-f.gruenbichler@proxmox.com>
- <87o8llrtse.fsf@dusky.pond.sub.org>
-In-Reply-To: <87o8llrtse.fsf@dusky.pond.sub.org>
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kOGlf-0000aa-Qb
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 04:50:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24109)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kOGld-0004mt-Fy
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 04:50:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601628616;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=0CIzjEYp18qgsiX7wwR7uxH0uREo1M9QGA/xyPD+Dgk=;
+ b=J75B9eD72tKmTKhje8A7GQnS7TrohLSbuot9OxgmPAOHl7ONoRt75yGOHObif6s3EtcQ/J
+ g2GAIus8pymGmuZFCIE8g6gvaQ94U86nxvfgaqdQkQ3fbLkP6xCkuNKPlohUShhFWrftpE
+ LQLFy01taG1qJwfPP84IeEmrDHJqse4=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-157-mwXpZb30OquK71P7lWjMSg-1; Fri, 02 Oct 2020 04:50:14 -0400
+X-MC-Unique: mwXpZb30OquK71P7lWjMSg-1
+Received: by mail-wm1-f71.google.com with SMTP id r10so370297wmh.0
+ for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 01:50:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=0CIzjEYp18qgsiX7wwR7uxH0uREo1M9QGA/xyPD+Dgk=;
+ b=N1DWNCRRWsLfy9N0qVE6Hryj7QYbwYxXq4zufNCaP6vhS+xE1WvwfF4GnpkxpwKc6M
+ dtYXFjptPkMQE2+kLGfMFWqpIscuhPqVjIWpv53Y8+5ZmjyHSKiRhGkaGwN3XCcAotGE
+ qwssVaSN4/EGxh8SBMNXn7zUus/q8uonH4NLwyZzbGEOXn7W4i9L90iCCPTALp6LF1qi
+ hqVowoC0N9DbT78pQ6I1tXtQBYXtqJh2s4MC+nbBc6gIyE2P4DpC1xwU2btmvjh75J7t
+ 8INSGmZpdvNctFNNslT+C/j3tIBE4cFa5hA1Uk8dVZktr6Nc/SQO9YYIc86c5mogtBNQ
+ HshA==
+X-Gm-Message-State: AOAM532mE6WvOOSn2EwRQhqj6lNUbzOF5mCjWCtY4J48UqDgzZ5V0Lf6
+ 92smMFA/sTUbf74vjYRjxnArbDARYZ810PKepjbXEO6PQGxm5cLapECYZ2HCEkAFjhcSxMnHdXU
+ ZVk4zHeat2EkEmZs=
+X-Received: by 2002:a7b:c1c5:: with SMTP id a5mr1581964wmj.187.1601628613326; 
+ Fri, 02 Oct 2020 01:50:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJybAXnAAaOnv3xgJ2kxjiXvzq1EJf6lnpHVsUvX6ndzfEnhFrHh5gq+AKYzzuSaJ5tIRCakAA==
+X-Received: by 2002:a7b:c1c5:: with SMTP id a5mr1581938wmj.187.1601628613114; 
+ Fri, 02 Oct 2020 01:50:13 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:11eb:3314:c22:e3c7?
+ ([2001:b07:6468:f312:11eb:3314:c22:e3c7])
+ by smtp.gmail.com with ESMTPSA id r19sm960802wmh.7.2020.10.02.01.50.12
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 02 Oct 2020 01:50:12 -0700 (PDT)
+Subject: Re: [PATCH v4 1/1] qapi: Restrict code generated for user-mode
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20201002073621.1653924-1-philmd@redhat.com>
+ <20201002073621.1653924-2-philmd@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <17772b79-07db-98ff-96c5-01a9ac1cbcca@redhat.com>
+Date: Fri, 2 Oct 2020 10:50:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-User-Agent: astroid/0.15.0 (https://github.com/astroidmail/astroid)
-Message-Id: <1601627258.kk9bqebpq1.astroid@nora.none>
+In-Reply-To: <20201002073621.1653924-2-philmd@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=212.186.127.180;
- envelope-from=f.gruenbichler@proxmox.com; helo=proxmox-new.maurer-it.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 04:23:32
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 01:13:31
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SORTED_RECIPS=2.499, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -23
+X-Spam_score: -2.4
+X-Spam_bar: --
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.26, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -69,142 +118,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Ma Haocong <mahaocong@didichuxing.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On October 2, 2020 9:06 am, Markus Armbruster wrote:
-> Fabian Gr=C3=BCnbichler <f.gruenbichler@proxmox.com> writes:
->=20
->> From: John Snow <jsnow@redhat.com>
->>
->> This patch adds support for the "BITMAP" sync mode to drive-mirror and
->> blockdev-mirror. It adds support only for the BitmapSyncMode "never,"
->> because it's the simplest mode.
->>
->> This mode simply uses a user-provided bitmap as an initial copy
->> manifest, and then does not clear any bits in the bitmap at the
->> conclusion of the operation.
->>
->> Any new writes dirtied during the operation are copied out, in contrast
->> to backup. Note that whether these writes are reflected in the bitmap
->> at the conclusion of the operation depends on whether that bitmap is
->> actually recording!
->>
->> This patch was originally based on one by Ma Haocong, but it has since
->> been modified pretty heavily.
->>
->> Suggested-by: Ma Haocong <mahaocong@didichuxing.com>
->> Signed-off-by: Ma Haocong <mahaocong@didichuxing.com>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> Signed-off-by: Fabian Gr=C3=BCnbichler <f.gruenbichler@proxmox.com>
->> ---
-> [...]
->> diff --git a/qapi/block-core.json b/qapi/block-core.json
->> index 2d94873ca0..dac5497084 100644
->> --- a/qapi/block-core.json
->> +++ b/qapi/block-core.json
->> @@ -1961,10 +1961,19 @@
->>  #        (all the disk, only the sectors allocated in the topmost image=
-, or
->>  #        only new I/O).
->>  #
->> +# @bitmap: The name of a bitmap to use for sync=3Dbitmap mode. This arg=
-ument must
->> +#          be present for bitmap mode and absent otherwise. The bitmap'=
-s
->=20
-> What is "bitmap mode"?  Do you mean "present when @bitmap-mode is, else
-> absent"?
+On 02/10/20 09:36, Philippe Mathieu-Daudé wrote:
+> A lot of QAPI generated code is never used by user-mode.
+> 
+> Split out qapi_system_modules and qapi_system_or_tools_modules
+> from the qapi_all_modules array. We now have 4 groups:
+> - always used
+> - only used by system-mode
+> - not used by user-mode
+> - not used by tools
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  qapi/meson.build | 51 ++++++++++++++++++++++++++++++++++--------------
+>  1 file changed, 36 insertions(+), 15 deletions(-)
+> 
+> diff --git a/qapi/meson.build b/qapi/meson.build
+> index 7c4a89a882..10cf01ef65 100644
+> --- a/qapi/meson.build
+> +++ b/qapi/meson.build
+> @@ -14,39 +14,60 @@ util_ss.add(files(
+>  ))
+>  
+>  qapi_all_modules = [
+> +  'common',
+> +  'introspect',
+> +  'misc',
+> +]
+> +
+> +qapi_system_modules = [
+>    'acpi',
+>    'audio',
+> +  'dump',
+> +  'machine-target',
+> +  'migration',
+> +  'misc-target',
+> +  'net',
+> +  'pci',
+> +  'rdma',
+> +  'rocker',
+> +  'tpm',
+> +  'trace',
+> +]
+> +
+> +qapi_system_or_user_modules = [
+> +  'machine', # X86CPUFeatureWordInfo
+> +  'qdev',
+> +]
+> +
+> +qapi_system_or_tools_modules = [
+>    'authz',
+>    'block-core',
+>    'block',
+>    'char',
+> -  'common',
+>    'control',
+>    'crypto',
+> -  'dump',
+>    'error',
+> -  'introspect',
+>    'job',
+> -  'machine',
+> -  'machine-target',
+> -  'migration',
+> -  'misc',
+> -  'misc-target',
+> -  'net',
+>    'pragma',
+> -  'qdev',
+> -  'pci',
+>    'qom',
+> -  'rdma',
+> -  'rocker',
+>    'run-state',
+>    'sockets',
+> -  'tpm',
+> -  'trace',
+>    'transaction',
+>    'ui',
+>  ]
+>  
+> +if have_system
+> +  qapi_all_modules += qapi_system_modules
+> +endif
+> +
+> +if have_system or have_user
+> +  qapi_all_modules += qapi_system_or_user_modules
+> +endif
+> +
+> +if have_system or have_tools
+> +  qapi_all_modules += qapi_system_or_tools_modules
+> +endif
+> +
+>  qapi_storage_daemon_modules = [
+>    'block-core',
+>    'char',
+> 
 
-bitmap mode is sync=3Dbitmap , as in the first sentence. if you set=20
-sync=3Dbitmap, you must specify a bitmap and a bitmap-mode. if you use=20
-another sync mode, you must not specify a bitmap or a bitmap-mode.
-
-there is also a 'sugar' sync mode 'incremental' that desugars to=20
-sync=3Dbitmap with bitmap-mode=3Don-success.  I guess that should also be=20
-mentioned somewhere in QAPI, it's mainly there since MirrorSyncMode has=20
-it as possible value, it's semantics are straight-forward to map onto=20
-this combination, and it's how the sync modes are known from backup=20
-jobs.
-
-maybe the following is easier to understand and more aligned with=20
-bitmap-mode:
-
-The name of the bitmap to use for sync=3Dbitmap/sync=3Dincremental mode.=20
-Must be present if sync is "bitmap" or "incremental". Must NOT be=20
-present otherwise.
-
->> +#          granularity is used instead of @granularity (since 5.2).
->> +#
->> +# @bitmap-mode: Specifies the type of data the bitmap should contain af=
-ter
->> +#               the operation concludes. Must be present if sync is "bi=
-tmap".
->> +#               Must NOT be present otherwise. (Since 5.2)
-
-Specifies the type of data the bitmap should contain after the operation=20
-concludes. Must be present if sync is "bitmap". Must be "on-success" or=20
-absent if sync is "incremental". Must NOT be present otherwise.
-
->> +#
->>  # @granularity: granularity of the dirty bitmap, default is 64K
->>  #               if the image format doesn't have clusters, 4K if the cl=
-usters
->>  #               are smaller than that, else the cluster size.  Must be =
-a
->> -#               power of 2 between 512 and 64M (since 1.4).
->> +#               power of 2 between 512 and 64M. Must not be specified i=
-f
->> +#               @bitmap is present (since 1.4).
->>  #
->=20
-> Is @granularity forbidden with @bitmap because it makes no sense?
-
-yes.
-
->=20
-> If yes, then it doesn't actually default to anything then, does it?
-
-we must use the same granularity as the sync bitmap passed in via=20
-'bitmap', so the caller can't set a different one.
-
-> Looks like we have
->=20
->     sync            'bitmap'            anything else
->     -------------------------------------------------
->     bitmap          required            forbidden
->     bitmap-mode     required            forbidden
->     granularity     forbidden           optional
->=20
-> Correct?
-
-yes. with the addition of sync=3Dincremental as subset of sync=3Dbitmap, as=
-=20
-described above.
-
->=20
->>  # @buf-size: maximum amount of data in flight from source to
->>  #            target (since 1.4).
->> @@ -2002,7 +2011,9 @@
->>  { 'struct': 'DriveMirror',
->>    'data': { '*job-id': 'str', 'device': 'str', 'target': 'str',
->>              '*format': 'str', '*node-name': 'str', '*replaces': 'str',
->> -            'sync': 'MirrorSyncMode', '*mode': 'NewImageMode',
->> +            'sync': 'MirrorSyncMode', '*bitmap': 'str',
->> +            '*bitmap-mode': 'BitmapSyncMode',
->> +            '*mode': 'NewImageMode',
->>              '*speed': 'int', '*granularity': 'uint32',
->>              '*buf-size': 'int', '*on-source-error': 'BlockdevOnError',
->>              '*on-target-error': 'BlockdevOnError',
-> [Same for blockdev-mirror...]
->=20
->=20
->=20
->=20
-=
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
 
