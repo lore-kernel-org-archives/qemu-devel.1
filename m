@@ -2,80 +2,123 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A8D9C4363C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:16:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83198C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:16:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 15943206CA
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:16:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15943206CA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id E2070206A1
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:16:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="EXbwckKv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2070206A1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOMn9-0000lp-3J
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 11:16:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37314)
+	id 1kOMnR-0001Dk-22
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 11:16:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41138)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kOMTI-0008Sz-K1
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:55:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43212)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kOMTE-0005sO-7M
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:55:44 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kOMTA-0008C0-Uj
- for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 14:55:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id CB3C82E80E9
- for <qemu-devel@nongnu.org>; Fri,  2 Oct 2020 14:55:36 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 02 Oct 2020 14:48:33 -0000
-From: Frederic Bezies <1898215@bugs.launchpad.net>
+ (Exim 4.90_1) (envelope-from <Wei.Huang2@amd.com>)
+ id 1kOMlJ-0007hu-I2
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 11:14:21 -0400
+Received: from mail-eopbgr760050.outbound.protection.outlook.com
+ ([40.107.76.50]:56724 helo=NAM02-CY1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <Wei.Huang2@amd.com>)
+ id 1kOMlH-0000YW-PR
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 11:14:21 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LmDOmMzjc9wnvcCAXcb22WnSZD5bJcIJsuiagnBODLd8yZQbNznFE27eVr1G+e9KfBR6xm3XfyR9++dON4QJH+kqeO4zXLkTfnLG1BFumDrjy6hUCgBEZnHbOccf6DgcogbWu+HzgZFVL4uCoqeUty7DvUyBeFwZHjal0zxFtYWv33fOy5f/9F1ZU8ffDTM5tpdffi4vYhEWDbSHnfKeyWZCaKYuvg3If8bUfhJUC8kQMPgF785hf2aJkD5dZhEo5p4Q86+/rwyqDRUD14+NS2bOSnZu6O9JNoJJrY5fODG0++kzDXMkCMGAZgWKwHib8Iusf9vZIehjqsR0ESNZig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=x79xrtU3Ls9lT/cuxa8oVXbUHFhrJWyup/zQn5stInA=;
+ b=Nez1adtj8ro4eiacPvUt8LwRU0HVC4PvcVP0ue29s2XJRBZIzX3z/xjmbXUit4WlPFfZkgAO2q0AvvzseAjS2yJGVUdwUKvYJA0CPVwmWIMaUBSBaZrOVjE3UA0gkyArImwHAlb7bSCTDt+BR4I/SexP0s8e+pg0tyru1a9QEAOPvNBJ5cZY5Pb/3K7LPidGw7BwIMsvY/RdaSyQkgCwQMGWYd5B7+yPD2LKn6GZThRLQQQmDht8mhP2O0RALopD5dIjq6fERfnwyblYdTRD1IzmxSXeEZ/9pGrQewKlkDsC0bo8h2dneme4ge2tz/RrgrctiOFTNovKi75CbSTPXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=x79xrtU3Ls9lT/cuxa8oVXbUHFhrJWyup/zQn5stInA=;
+ b=EXbwckKvedpwTAWUlMKY2OE/6jIP4Rt06gczUNsaVKhtd+qmuNjBdoojvjk6dwrQfFhZBxaihAdq/G02dGc+9Wj9w1u+TPVa17np5TJkyYAuzkZsZkFlPyh9TYGt0Tr3DVqnXq97oXPv2s1FC9Nskjg11ceQQ8tWynX9xqNyPKk=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
+Received: from CY4PR12MB1494.namprd12.prod.outlook.com (2603:10b6:910:f::22)
+ by CY4PR1201MB2485.namprd12.prod.outlook.com (2603:10b6:903:d2::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3433.32; Fri, 2 Oct
+ 2020 14:59:14 +0000
+Received: from CY4PR12MB1494.namprd12.prod.outlook.com
+ ([fe80::11f9:59c8:16c0:7718]) by CY4PR12MB1494.namprd12.prod.outlook.com
+ ([fe80::11f9:59c8:16c0:7718%8]) with mapi id 15.20.3433.038; Fri, 2 Oct 2020
+ 14:59:14 +0000
+From: Wei Huang <wei.huang2@amd.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: fredb74
-X-Launchpad-Bug-Reporter: Frederic Bezies (fredb74)
-X-Launchpad-Bug-Modifier: Frederic Bezies (fredb74)
-References: <160164961305.8642.6420581526403273155.malonedeb@wampee.canonical.com>
-Message-Id: <160165011405.9105.6862577215577395635.malone@wampee.canonical.com>
-Subject: [Bug 1898215] Re: [git][archlinux]Build process is busted in
- spice-display.c
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="d50d1e75c500726862802414f880ee3e3bb759bf"; Instance="production"
-X-Launchpad-Hash: fa3d300e97919ed4ec087471973c52c8e1311d2b
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 10:45:38
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Subject: [PATCH V2 0/3] Passthru device support under emulated amd-iommu
+Date: Fri,  2 Oct 2020 09:59:04 -0500
+Message-Id: <20201002145907.1294353-1-wei.huang2@amd.com>
+X-Mailer: git-send-email 2.25.2
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [165.204.78.2]
+X-ClientProxiedBy: SA9PR10CA0027.namprd10.prod.outlook.com
+ (2603:10b6:806:a7::32) To CY4PR12MB1494.namprd12.prod.outlook.com
+ (2603:10b6:910:f::22)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from ethanolx56bbhost.amd.com (165.204.78.2) by
+ SA9PR10CA0027.namprd10.prod.outlook.com (2603:10b6:806:a7::32) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3433.35 via Frontend Transport; Fri, 2 Oct 2020 14:59:13 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: ed2121fe-9c58-437e-2926-08d866e3ba61
+X-MS-TrafficTypeDiagnostic: CY4PR1201MB2485:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <CY4PR1201MB248500C5E922645FFB3C04F4CF310@CY4PR1201MB2485.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: RJYyqHvofR2cM3L26rGk6kEhxoZk8vhV1aeK+/yoO/XQ+GGSfPPq7VrQJg+NZlpByyWAvjohtWw9y77r9V9U7uahSJq4mdOvWXZHOyWR2/UcUyXf32wkQEO/0Px3DGM6qJjVX4xlf3a5PoSW7knvME34Tzi3311DUxAMvc4F72Ys3XnHdDQdEdecFHkEWhoLt5BIiS450OVsCrRy4iDft9THP8FIfBsNYsVAvBH1KPvuHZI0osaQZ0gbcygeRArzGVRxHP3eB/TnjXF0vPeguwRYOH+zDHdyh0ul2j2lT3MZNgfVEcQ12gi8m11IPxnNWm0ZgrIr0mHzw/IrmTYy1Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:CY4PR12MB1494.namprd12.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(376002)(366004)(346002)(136003)(39860400002)(396003)(8936002)(6916009)(7696005)(6486002)(186003)(8676002)(478600001)(4326008)(26005)(316002)(2616005)(956004)(6666004)(83380400001)(1076003)(52116002)(5660300002)(2906002)(36756003)(16526019)(86362001)(4744005)(66946007)(66476007)(66556008);
+ DIR:OUT; SFP:1101; 
+X-MS-Exchange-AntiSpam-MessageData: HKBa21GMEDYfjg2I/bDQgJMhZvWUpgLHpXD+KNkg1219/n7HUfyLDXbtUMgBM80SS20TRkghFtGWxeYMWjJuW9JCAKOHe5OwILIkSIl3kWMano9x3eLcTxGt1FeHvinsq8Qjrntc+JSI4lTKy6B+KC8gaLQmSrKBC9bT3sUCy9C77L5Rm3VEcWIiDUICnCSKhbNO/HK1GzkVxoxNQSShUCQ4trNzVTEAo+EH7BYYgrFxVqJQQ6oyYTXvtgnOX6YgysWXCxvI1M/qb+e4ipJ/T5CT8T0AJn467q2sYe7JzZGuGe9gXTSiNZdwhlS5ZZJFsC9sJU4ZD7irO2q8M2AdURKwQMnt4XxjT55/wiNiXr5vMrcS89u0WgYrTQlMa5vaxFx9eWvMfSe+BjKfmT3Sj3Yl6hpLtjS+WxMyEDq5P+ueM1luPp5UfqkbTnElcPHK98g/BvRNok33vxCn+sU9ZG9OzZ8PvgVr5EuRGGfhKeI+X0e46dUmv4gRGJmw3kSX79SBHqL9leO3Q/5kyXHibHo+cd4XbKiViLGuE5G/NJcVioQnAdDvwak2R9uOP/BO1wjPldb8lXW1ZzLPQGST/XSvaxLBfo8g39ACiCtGU4ZSGPflpYJwCkge3qnjICW8lqG3ljFWWOLDgkge+bUEtw==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ed2121fe-9c58-437e-2926-08d866e3ba61
+X-MS-Exchange-CrossTenant-AuthSource: CY4PR12MB1494.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Oct 2020 14:59:14.6292 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VxyG7le4FR1zBudTC3gUEZPx6F26D2HMOn4GEVgjRCqV9iUz7nOd1lsrEOqp1dVY
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1201MB2485
+Received-SPF: none client-ip=40.107.76.50; envelope-from=Wei.Huang2@amd.com;
+ helo=NAM02-CY1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 11:14:18
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -8
+X-Spam_score: -0.9
+X-Spam_bar: /
+X-Spam_report: (-0.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, FORGED_SPF_HELO=1, MSGID_FROM_MTA_HEADER=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_NONE=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,80 +127,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1898215 <1898215@bugs.launchpad.net>
+Cc: ehabkost@redhat.com, mst@redhat.com, wei.huang2@amd.com, peterx@redhat.com,
+ alex.williamson@redhat.com, pbonzini@redhat.com, Suravee.Suthikulpanit@amd.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Full build log with make V=3D1.
+This patchset adds support for passthru devices to run inside VMs under
+the management of an emulated amd-iommu device (vIOMMU). This feature
+has a variety of benefits, including enhanced I/O security and user-mode
+driver support, for guest VMs.
 
-** Attachment added: "qemu-v=3D1.log"
-   https://bugs.launchpad.net/qemu/+bug/1898215/+attachment/5416684/+files/=
-qemu-v%3D1.log
+This patchset has been tested with various 1G and 10G (SR-IOV) NICs on
+AMD boxes.
 
--- =
+V1->V2:
+ * Remove unnecessary VFIO_IOMMU_MAP_DMA errno check (Alex Williamson)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1898215
+Thanks,
+-Wei
 
-Title:
-  [git][archlinux]Build process is busted in spice-display.c
+Wei Huang (3):
+  amd-iommu: Add address space notifier and replay support
+  amd-iommu: Sync IOVA-to-GPA translation during page invalidation
+  amd-iommu: Fix amdvi_mmio_trace() to differentiate MMIO R/W
 
-Status in QEMU:
-  New
+ hw/i386/amd_iommu.c | 243 ++++++++++++++++++++++++++++++++++++++++++--
+ hw/i386/amd_iommu.h |  13 +++
+ 2 files changed, 245 insertions(+), 11 deletions(-)
 
-Bug description:
-  Linux distribution: Archlinux. Crash log added is based on a build
-  from scratch.
+-- 
+2.25.2
 
-  Gcc version: 10.2.0
-
-  Configure options used:
-
-  configure \
-      --prefix=3D/usr \
-      --sysconfdir=3D/etc \
-      --localstatedir=3D/var \
-      --libexecdir=3D/usr/lib/qemu \
-      --extra-ldflags=3D"$LDFLAGS" \
-      --smbd=3D/usr/bin/smbd \
-      --enable-modules \
-      --enable-sdl \
-      --disable-werror \
-      --enable-slirp=3Dsystem \
-      --enable-xfsctl \
-      --audio-drv-list=3D"pa alsa sdl"
-
-  Crash log:
-
-  ../ui/spice-display.c: In function 'interface_client_monitors_config':
-  ../ui/spice-display.c:682:25: error: 'VD_AGENT_CONFIG_MONITORS_FLAG_PHYSI=
-CAL_SIZE' undeclared (first use in this function); did you mean 'VD_AGENT_C=
-ONFIG_MONITORS_FLAG_USE_POS'?
-    682 |         if (mc->flags & VD_AGENT_CONFIG_MONITORS_FLAG_PHYSICAL_SI=
-ZE) {
-        |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~
-        |                         VD_AGENT_CONFIG_MONITORS_FLAG_USE_POS
-  ../ui/spice-display.c:682:25: note: each undeclared identifier is reporte=
-d only once for each function it appears in
-  ../ui/spice-display.c:683:13: error: unknown type name 'VDAgentMonitorMM'
-    683 |             VDAgentMonitorMM *mm =3D (void *)&mc->monitors[mc->nu=
-m_of_monitors];
-        |             ^~~~~~~~~~~~~~~~
-  ../ui/spice-display.c:684:37: error: request for member 'width' in someth=
-ing not a structure or union
-    684 |             info.width_mm =3D mm[head].width;
-        |                                     ^
-  ../ui/spice-display.c:685:38: error: request for member 'height' in somet=
-hing not a structure or union
-    685 |             info.height_mm =3D mm[head].height;
-        |                                      ^
-  make: *** [Makefile.ninja:2031: libcommon.fa.p/ui_spice-display.c.o] Erro=
-r 1
-  make: *** Waiting for unfinished jobs....
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1898215/+subscriptions
 
