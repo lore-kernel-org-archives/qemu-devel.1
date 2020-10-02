@@ -2,117 +2,93 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAD74C4363C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 16:46:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DC96C4363C
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 16:47:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5685D206FA
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 16:46:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A8C4420719
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 16:47:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ZL6lpAo7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5685D206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TsMIULxz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8C4420719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOOCD-0000QZ-G2
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 12:46:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34382)
+	id 1kOOCx-0001Ho-Qj
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 12:46:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34036)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
- id 1kOOAr-0007kK-9h; Fri, 02 Oct 2020 12:44:49 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44874)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
- id 1kOOAo-0005s2-Ge; Fri, 02 Oct 2020 12:44:48 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 092GVwrx006908; Fri, 2 Oct 2020 12:43:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=2+A3Co7DfxkWQ8HV8UobuhVZsZR1j3dufeR3zFyNIJM=;
- b=ZL6lpAo76UUwp11NPj6zYDs8uDEd5Eg4s8Bnu+x6A9pDfY4v17ur2V5/VQAm1Xsa8WoZ
- jF57ZhyECCCEOAt7VEtCJ+X/62wSfpjwuK8OmQILaGAJlfyt2IHdnxk4i2PTbV8C5+y2
- E8QrbmluwZPKJ8nkfjZ4pV2KHv9Srg8dbS4C4+LjouCp1w1golKNt2NX64W5vFoFU3mx
- GraG/FKAidg+fls6cQa0tWqYA9UpnCVqQINCGpM6utTnAAyg9W8PYf1GW7PzOz6aQuMF
- ueSdxKKi3wtCWnYS16nDlnkvuNyIusRowWITviL71dULf4YjNRCfBzdgzDBNFIg1cgvz Tg== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33x5rycn28-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 02 Oct 2020 12:43:16 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 092GWgtP009181;
- Fri, 2 Oct 2020 12:43:15 -0400
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.27])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33x5rycn1m-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 02 Oct 2020 12:43:15 -0400
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
- by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 092GcU34023331;
- Fri, 2 Oct 2020 16:43:13 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
- [9.57.198.26]) by ppma05wdc.us.ibm.com with ESMTP id 33sw99y7yv-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 02 Oct 2020 16:43:13 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
- [9.57.199.111])
- by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 092GhDIh14615524
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 2 Oct 2020 16:43:13 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 120D4AC05B;
- Fri,  2 Oct 2020 16:43:13 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4E754AC059;
- Fri,  2 Oct 2020 16:43:04 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.163.4.25])
- by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
- Fri,  2 Oct 2020 16:43:04 +0000 (GMT)
-Subject: Re: [PATCH v3] qemu/atomic.h: rename atomic_ to qatomic_
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-References: <20200923105646.47864-1-stefanha@redhat.com>
-From: Matthew Rosato <mjrosato@linux.ibm.com>
-Message-ID: <4e65d6fa-0a7e-015b-eb6f-5dd1cc3ddd91@linux.ibm.com>
-Date: Fri, 2 Oct 2020 12:43:03 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kOO8Y-0004F5-8F; Fri, 02 Oct 2020 12:42:26 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38436)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kOO8W-0005d2-84; Fri, 02 Oct 2020 12:42:25 -0400
+Received: by mail-wr1-x443.google.com with SMTP id g4so2516654wrs.5;
+ Fri, 02 Oct 2020 09:42:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=Lo+NLeYd13T3W4hIWAIUPXQaMQ+IojORhmIinFsRoSc=;
+ b=TsMIULxzGGPcU4okfRIFLxzgrQHifjQEWoMpRpcgj4qOEJ78d4CpNdD0BcBfmH+0Bz
+ Xry7qMNAH/jOvNnh3aXA6LlT9Qf+iVTt/NnhaZEZddJ7+jkQR/DY2J3h3rwgnwjceyxS
+ KXSZd8bUv3f9NURpDAsqo5kQrxd111ILJOPWY8iDLieuusYxVxy3D99EzJ6jpyzUfvMK
+ xhweUAmnpgf75gimCIQXB2mf1G00e3krAgWX+JUH7lXPDEhauTtunOzPkgX9OEZ6Gdfc
+ LIPG5uv9d/A4Uv+fBdrQGxoopNXWKykDMKn+PbBCZ+iEe321HRvvBdjTvsdm3hGv6SUk
+ iUmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=Lo+NLeYd13T3W4hIWAIUPXQaMQ+IojORhmIinFsRoSc=;
+ b=GpkmFqIrUBG+whw0h8GpyuOaJfRk8aDPnR/oeU8dvsKEs4uy7yfBooFpdFd+EFn/5B
+ OS3Og6TgOKW7ifTv5UUjkaab/S0g6BoVkYHSRln6bN5D2DNcTPRP21+QT/AoUPXAzngH
+ R+SrRCu0NAbwV/QObvf799BYIFg4wOPbkEpreNcHqeL0+ioN0jnrQB5SGFyE6vy6ajhw
+ FH2MhkdZp95I/wwceNQ1zwq+IHQMbACD9o5gMBbotbP92Uoi686VoLJUEQzTIhOFIgH5
+ T9hb/0WA9uqBs1rDGfd225NBcW57N9Vla1TIkwihTywGMdYZz7rwiwX9d8b/YYX+uOhu
+ g3GA==
+X-Gm-Message-State: AOAM532s87k7m+XWdfNk9/GsCn+vnSUQ/Csdn9yMWTQE/cE+A3Qz2Nm2
+ Rbp7IjOMHDr+hrJpJaGvd2TTX/7hnKk=
+X-Google-Smtp-Source: ABdhPJzpndBOLDlDQ0y61K4+51BjzCGnXVqU2F0jJfYL2kOIeJjJ+w3VFobVpzYPN0Vj7E1bYnC0zA==
+X-Received: by 2002:adf:e852:: with SMTP id d18mr4288673wrn.40.1601656942235; 
+ Fri, 02 Oct 2020 09:42:22 -0700 (PDT)
+Received: from localhost.localdomain (74.red-83-53-161.dynamicip.rima-tde.net.
+ [83.53.161.74])
+ by smtp.gmail.com with ESMTPSA id t17sm2378673wrx.82.2020.10.02.09.42.21
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 02 Oct 2020 09:42:21 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 3/4] hw/timer/bcm2835: Support the timer COMPARE registers
+Date: Fri,  2 Oct 2020 18:42:15 +0200
+Message-Id: <20201002164216.1741110-4-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201002164216.1741110-1-f4bug@amsat.org>
+References: <20201002164216.1741110-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20200923105646.47864-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-10-02_10:2020-10-02,
- 2020-10-02 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 suspectscore=0
- phishscore=0 adultscore=0 spamscore=0 lowpriorityscore=0 malwarescore=0
- clxscore=1011 bulkscore=0 priorityscore=1501 mlxlogscore=999
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2010020121
-Received-SPF: pass client-ip=148.163.156.1;
- envelope-from=mjrosato@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 12:44:42
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -29
-X-Spam_score: -3.0
-X-Spam_bar: ---
-X-Spam_report: (-3.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.256,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -125,116 +101,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- sheepdog@lists.wpkg.org, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Yuval Shaia <yuval.shaia.ml@gmail.com>, Markus Armbruster <armbru@redhat.com>,
- Max Filippov <jcmvbkbc@gmail.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Huacai Chen <chenhc@lemote.com>,
- Jiri Slaby <jslaby@suse.cz>, Stefano Stabellini <sstabellini@kernel.org>,
- Alberto Garcia <berto@igalia.com>, xen-devel@lists.xenproject.org,
- Yoshinori Sato <ysato@users.sourceforge.jp>,
- Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Anthony Perard <anthony.perard@citrix.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Stefan Weil <sw@weilnetz.de>, Peter Lieven <pl@kamp.de>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paul Durrant <paul@xen.org>,
- qemu-s390x@nongnu.org, qemu-arm@nongnu.org, Liu Yuan <namei.unix@gmail.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Sunil Muthuswamy <sunilmut@microsoft.com>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-riscv@nongnu.org, qemu-block@nongnu.org,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Cornelia Huck <cohuck@redhat.com>,
- Hailiang Zhang <zhang.zhanghailiang@huawei.com>, Max Reitz <mreitz@redhat.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Palmer Dabbelt <palmer@dabbelt.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Laurent Vivier <laurent@vivier.eu>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Luc Michel <luc@lmichel.fr>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Paul Zimmerman <pauldzim@gmail.com>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/23/20 6:56 AM, Stefan Hajnoczi wrote:
-> clang's C11 atomic_fetch_*() functions only take a C11 atomic type
-> pointer argument. QEMU uses direct types (int, etc) and this causes a
-> compiler error when a QEMU code calls these functions in a source file
-> that also included <stdatomic.h> via a system header file:
-> 
->    $ CC=clang CXX=clang++ ./configure ... && make
->    ../util/async.c:79:17: error: address argument to atomic operation must be a pointer to _Atomic type ('unsigned int *' invalid)
-> 
-> Avoid using atomic_*() names in QEMU's atomic.h since that namespace is
-> used by <stdatomic.h>. Prefix QEMU's APIs with 'q' so that atomic.h
-> and <stdatomic.h> can co-exist. I checked /usr/include on my machine and
-> searched GitHub for existing "qatomic_" users but there seem to be none.
-> 
-> This patch was generated using:
-> 
->    $ git grep -h -o '\<atomic\(64\)\?_[a-z0-9_]\+' include/qemu/atomic.h | \
->      sort -u >/tmp/changed_identifiers
->    $ for identifier in $(</tmp/changed_identifiers); do
->          sed -i "s%\<$identifier\>%q$identifier%g" \
->              $(git grep -I -l "\<$identifier\>")
->      done
-> 
-> I manually fixed line-wrap issues and misaligned rST tables.
-> 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-..snip..
-> diff --git a/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h b/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h
-> index acd4c8346d..7b4062a1a1 100644
-> --- a/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h
-> +++ b/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h
-> @@ -68,7 +68,7 @@ static inline int pvrdma_idx_valid(uint32_t idx, uint32_t max_elems)
->   
->   static inline int32_t pvrdma_idx(int *var, uint32_t max_elems)
->   {
-> -	const unsigned int idx = atomic_read(var);
-> +	const unsigned int idx = qatomic_read(var);
->   
->   	if (pvrdma_idx_valid(idx, max_elems))
->   		return idx & (max_elems - 1);
-> @@ -77,17 +77,17 @@ static inline int32_t pvrdma_idx(int *var, uint32_t max_elems)
->   
->   static inline void pvrdma_idx_ring_inc(int *var, uint32_t max_elems)
->   {
-> -	uint32_t idx = atomic_read(var) + 1;	/* Increment. */
-> +	uint32_t idx = qatomic_read(var) + 1;	/* Increment. */
->   
->   	idx &= (max_elems << 1) - 1;		/* Modulo size, flip gen. */
-> -	atomic_set(var, idx);
-> +	qatomic_set(var, idx);
->   }
->   
->   static inline int32_t pvrdma_idx_ring_has_space(const struct pvrdma_ring *r,
->   					      uint32_t max_elems, uint32_t *out_tail)
->   {
-> -	const uint32_t tail = atomic_read(&r->prod_tail);
-> -	const uint32_t head = atomic_read(&r->cons_head);
-> +	const uint32_t tail = qatomic_read(&r->prod_tail);
-> +	const uint32_t head = qatomic_read(&r->cons_head);
->   
->   	if (pvrdma_idx_valid(tail, max_elems) &&
->   	    pvrdma_idx_valid(head, max_elems)) {
-> @@ -100,8 +100,8 @@ static inline int32_t pvrdma_idx_ring_has_space(const struct pvrdma_ring *r,
->   static inline int32_t pvrdma_idx_ring_has_data(const struct pvrdma_ring *r,
->   					     uint32_t max_elems, uint32_t *out_head)
->   {
-> -	const uint32_t tail = atomic_read(&r->prod_tail);
-> -	const uint32_t head = atomic_read(&r->cons_head);
-> +	const uint32_t tail = qatomic_read(&r->prod_tail);
-> +	const uint32_t head = qatomic_read(&r->cons_head);
->   
->   	if (pvrdma_idx_valid(tail, max_elems) &&
->   	    pvrdma_idx_valid(head, max_elems)) {
+This peripheral has 1 free-running timer and 4 compare registers.
 
+Only the free-running timer is implemented. Add support the
+COMPARE registers (each register is wired to an IRQ).
 
-It looks like the changes in this file are going to get reverted the 
-next time someone does a linux header sync.
+Reference: "BCM2835 ARM Peripherals" datasheet [*]
+            chapter 12 "System Timer":
+
+  The System Timer peripheral provides four 32-bit timer channels
+  and a single 64-bit free running counter. Each channel has an
+  output compare register, which is compared against the 32 least
+  significant bits of the free running counter values. When the
+  two values match, the system timer peripheral generates a signal
+  to indicate a match for the appropriate channel. The match signal
+  is then fed into the interrupt controller.
+
+This peripheral is used since Linux 3.7, commit ee4af5696720
+("ARM: bcm2835: add system timer").
+
+[*] https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Peripherals.pdf
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+v3:
+- Only compare 32 least significant bits of the free running
+  counter values (Luc)
+---
+ include/hw/timer/bcm2835_systmr.h | 11 ++++++--
+ hw/timer/bcm2835_systmr.c         | 45 ++++++++++++++++++++-----------
+ hw/timer/trace-events             |  4 ++-
+ 3 files changed, 41 insertions(+), 19 deletions(-)
+
+diff --git a/include/hw/timer/bcm2835_systmr.h b/include/hw/timer/bcm2835_systmr.h
+index f15788a78d..bd3097d746 100644
+--- a/include/hw/timer/bcm2835_systmr.h
++++ b/include/hw/timer/bcm2835_systmr.h
+@@ -11,6 +11,7 @@
+ 
+ #include "hw/sysbus.h"
+ #include "hw/irq.h"
++#include "qemu/timer.h"
+ #include "qom/object.h"
+ 
+ #define TYPE_BCM2835_SYSTIMER "bcm2835-sys-timer"
+@@ -18,18 +19,24 @@ OBJECT_DECLARE_SIMPLE_TYPE(BCM2835SystemTimerState, BCM2835_SYSTIMER)
+ 
+ #define BCM2835_SYSTIMER_COUNT 4
+ 
++typedef struct {
++    unsigned id;
++    QEMUTimer timer;
++    qemu_irq irq;
++    BCM2835SystemTimerState *state;
++} BCM2835SystemTimerCompare;
++
+ struct BCM2835SystemTimerState {
+     /*< private >*/
+     SysBusDevice parent_obj;
+ 
+     /*< public >*/
+     MemoryRegion iomem;
+-    qemu_irq irq;
+-
+     struct {
+         uint32_t ctrl_status;
+         uint32_t compare[BCM2835_SYSTIMER_COUNT];
+     } reg;
++    BCM2835SystemTimerCompare tmr[BCM2835_SYSTIMER_COUNT];
+ };
+ 
+ #endif
+diff --git a/hw/timer/bcm2835_systmr.c b/hw/timer/bcm2835_systmr.c
+index b234e83824..66a1d4d6b8 100644
+--- a/hw/timer/bcm2835_systmr.c
++++ b/hw/timer/bcm2835_systmr.c
+@@ -28,20 +28,13 @@ REG32(COMPARE1,     0x10)
+ REG32(COMPARE2,     0x14)
+ REG32(COMPARE3,     0x18)
+ 
+-static void bcm2835_systmr_update_irq(BCM2835SystemTimerState *s)
++static void bcm2835_systmr_timer_expire(void *opaque)
+ {
+-    bool enable = !!s->reg.ctrl_status;
++    BCM2835SystemTimerCompare *tmr = opaque;
+ 
+-    trace_bcm2835_systmr_irq(enable);
+-    qemu_set_irq(s->irq, enable);
+-}
+-
+-static void bcm2835_systmr_update_compare(BCM2835SystemTimerState *s,
+-                                          unsigned timer_index)
+-{
+-    /* TODO fow now, since neither Linux nor U-boot use these timers. */
+-    qemu_log_mask(LOG_UNIMP, "COMPARE register %u not implemented\n",
+-                  timer_index);
++    trace_bcm2835_systmr_timer_expired(tmr->id);
++    tmr->state->reg.ctrl_status |= 1 << tmr->id;
++    qemu_set_irq(tmr->irq, 1);
+ }
+ 
+ static uint64_t bcm2835_systmr_read(void *opaque, hwaddr offset,
+@@ -78,16 +71,29 @@ static void bcm2835_systmr_write(void *opaque, hwaddr offset,
+                                  uint64_t value, unsigned size)
+ {
+     BCM2835SystemTimerState *s = BCM2835_SYSTIMER(opaque);
++    int index;
++    uint64_t now;
++    uint64_t triggers_delay_us;
+ 
+     trace_bcm2835_systmr_write(offset, value);
+     switch (offset) {
+     case A_CTRL_STATUS:
+         s->reg.ctrl_status &= ~value; /* Ack */
+-        bcm2835_systmr_update_irq(s);
++        for (index = 0; index < ARRAY_SIZE(s->tmr); index++) {
++            if (extract32(value, index, 1)) {
++                trace_bcm2835_systmr_irq_ack(index);
++                qemu_set_irq(s->tmr[index].irq, 0);
++            }
++        }
+         break;
+     case A_COMPARE0 ... A_COMPARE3:
+-        s->reg.compare[(offset - A_COMPARE0) >> 2] = value;
+-        bcm2835_systmr_update_compare(s, (offset - A_COMPARE0) >> 2);
++        index = (offset - A_COMPARE0) >> 2;
++        s->reg.compare[index] = value;
++        now = qemu_clock_get_us(QEMU_CLOCK_VIRTUAL);
++        /* Compare lower 32-bits of the free-running counter. */
++        triggers_delay_us = value - (now & UINT32_MAX);
++        trace_bcm2835_systmr_run(index, triggers_delay_us);
++        timer_mod(&s->tmr[index].timer, now + triggers_delay_us);
+         break;
+     case A_COUNTER_LOW:
+     case A_COUNTER_HIGH:
+@@ -125,7 +131,14 @@ static void bcm2835_systmr_realize(DeviceState *dev, Error **errp)
+     memory_region_init_io(&s->iomem, OBJECT(dev), &bcm2835_systmr_ops,
+                           s, "bcm2835-sys-timer", 0x20);
+     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->iomem);
+-    sysbus_init_irq(SYS_BUS_DEVICE(dev), &s->irq);
++
++    for (size_t i = 0; i < ARRAY_SIZE(s->tmr); i++) {
++        s->tmr[i].id = i;
++        s->tmr[i].state = s;
++        sysbus_init_irq(SYS_BUS_DEVICE(dev), &s->tmr[i].irq);
++        timer_init_us(&s->tmr[i].timer, QEMU_CLOCK_VIRTUAL,
++                      bcm2835_systmr_timer_expire, &s->tmr[i]);
++    }
+ }
+ 
+ static const VMStateDescription bcm2835_systmr_vmstate = {
+diff --git a/hw/timer/trace-events b/hw/timer/trace-events
+index b996d99200..f4ca31d495 100644
+--- a/hw/timer/trace-events
++++ b/hw/timer/trace-events
+@@ -77,9 +77,11 @@ nrf51_timer_write(uint8_t timer_id, uint64_t addr, uint32_t value, unsigned size
+ nrf51_timer_set_count(uint8_t timer_id, uint8_t counter_id, uint32_t value) "timer %u counter %u count 0x%" PRIx32
+ 
+ # bcm2835_systmr.c
+-bcm2835_systmr_irq(bool enable) "timer irq state %u"
++bcm2835_systmr_timer_expired(unsigned id) "timer #%u expired"
++bcm2835_systmr_irq_ack(unsigned id) "timer #%u acked"
+ bcm2835_systmr_read(uint64_t offset, uint64_t data) "timer read: offset 0x%" PRIx64 " data 0x%" PRIx64
+ bcm2835_systmr_write(uint64_t offset, uint64_t data) "timer write: offset 0x%" PRIx64 " data 0x%" PRIx64
++bcm2835_systmr_run(unsigned id, uint64_t delay_us) "timer #%u expiring in %"PRIu64" us"
+ 
+ # avr_timer16.c
+ avr_timer16_read(uint8_t addr, uint8_t value) "timer16 read addr:%u value:%u"
+-- 
+2.26.2
 
 
