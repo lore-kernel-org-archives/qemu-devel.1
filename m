@@ -7,82 +7,81 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D748C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 11:44:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99EB0C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 11:44:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EB6A206E3
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 11:44:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3BD9120719
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 11:44:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ax9awmYz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EB6A206E3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QrYtfUb6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BD9120719
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43168 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOJTp-0004WG-1A
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 07:44:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48546)
+	id 1kOJUT-0005G1-C5
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 07:44:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48594)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kOJNG-0006ti-EN
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 07:37:18 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:46227)
+ id 1kOJNI-0006vA-Cj
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 07:37:21 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:44743)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kOJND-0007bv-8G
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 07:37:18 -0400
-Received: by mail-wr1-x430.google.com with SMTP id o5so1423756wrn.13
- for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 04:36:53 -0700 (PDT)
+ id 1kOJND-0007dT-BM
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 07:37:20 -0400
+Received: by mail-wr1-x431.google.com with SMTP id s12so1431354wrw.11
+ for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 04:37:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=WQ/czQxQGLcgdCZRtqh/qd37OiFdMr4lYxa9jTrDLXM=;
- b=Ax9awmYza45IcjCecOQZFeZDTtozRWbmzHVCloPKqfExgjPQ86XKcUAF2YVuQ8Ddy0
- t7/mP2nr+9Cr0plRyPvTCe+euwNZWOLJjmT40QaCK36FIEezkDvSg2X0r3wYjsciDVNp
- n8B2W9ERun05VH78gMFy2Qg0QjJA6xxmdcH0oSzSKqC+qBaCdBoI2gmBqeGq8CQ4gdgR
- qowou4FCEhKHm7kVfe6cONhxuBy2TWqO4Tc0AHMPrDjvIwBxd2f+orHufrm3JMxFqSVm
- qXg1vc4zkFF1YlahQLm4js5XXjR5sE1zDZvWPBs8HiBbJpyWV365WWeLBQpTdMCkbRA7
- 5+zA==
+ bh=V8w5gFyqs3rkDT9U+8pSjZ6LqA4RWs5w6dFBc0m5Qgc=;
+ b=QrYtfUb6qXRSi/bmvk0rEdi5naBRbgytq6PBeXPPoQ3sZoC3m/jDV6h0f5XZl1Mu+I
+ poqfxJnCyTNKEf47sP8sqb4+hrrAinEronKY903SijNYElQ4fMWSOe82KokrSdgIdXW+
+ uIs2ldIUYGqnvfaBywLX3VvkMoQaHnaQ1rlA5cnNiTNdWtxfFkGmOweJ7ZkqvGDwEa58
+ Q2WFcioA58CCw3fBsVORXRnBwBDCmHf4BivPAi675Ssy+gBQHhvWrgLuLZuJ71St4hk2
+ Pt2fpYYFgoLRPHrYG3FxNdMS1rWfiXfi2/IgUj9fgIM5Uklwk9eph5uMqkzFboARELRq
+ ccSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=WQ/czQxQGLcgdCZRtqh/qd37OiFdMr4lYxa9jTrDLXM=;
- b=eUcjrQPeH9AH5oR7POGwQhf4nQnBG3FSmcZ+XVRzTOvlv21dSaaWJUdCc7soNN/rMz
- zowVKA/hHyO/V0Zdr1or2pKKCZ9zUWJCgmHP5knDusIl4qcUo3zPUxIdQLZ5ltfx1MYB
- xK77LQ1OB7QUXxxzI0l9HOxW6fRDGrGhy2qwy68Y8ZgAl0vdeZ+5up2u+0pVNGw8qtBZ
- /KPi3lSk6hHGeibeawVMd5et63OrkKOZsubEaQJnQLvIuuiNQL0gYfeifIRQVZrcgdyb
- i3vrN5eZs/5B5B4pFKcCYuKmYPF/QMxcK/nahpIZ4SNoK/CBP2O3a5Nkrg1bzmPBNPSw
- /gyw==
-X-Gm-Message-State: AOAM531ywo+yofjYcClobSy/FoIwMwPjy3rWh+BOuPjj8k4HcPgWK90H
- at+getmfggxUPdpbrnV+66lF2g==
-X-Google-Smtp-Source: ABdhPJzRPX98rxSrVAjWff11i/wB+FrE1tdpVuoHYdgT+GVG8vMQ1r8pppK1A3XLmt0i/wuduJOv1A==
-X-Received: by 2002:a5d:6311:: with SMTP id i17mr2462024wru.243.1601638612881; 
- Fri, 02 Oct 2020 04:36:52 -0700 (PDT)
+ bh=V8w5gFyqs3rkDT9U+8pSjZ6LqA4RWs5w6dFBc0m5Qgc=;
+ b=qWDw/+YIf6MpzYyWk1ur90w6T46aP6BqMa3hzMjjxP7sBOkotu6CAlhCqtjIo43gNK
+ X7nKjgnrgL+F+9nasqM9wCmW9HqJYcaq+fDw6uYVdVCinPqX28HavJ05UXQ5rVCbnix2
+ x2eo2hiLE/kP9K0kgN2npNHsdJD3Wo8ELpQN83+JiIzTusyeNDtx+rpu/4yZcFaLwOYq
+ UhLJJxLnNA378awzO0lAVO+kPZMkPLwI7SyamEgmuoiwxtyXgWa5BheRx6Hz74gn1m4n
+ 2WhiSfOILkZeXTV/bC1Jk8+pNcjwnZ4bTVvsc6bWewHcxAp/+/LbFM4FZA7bgc+LveNY
+ CtkQ==
+X-Gm-Message-State: AOAM533sHUhiB7yOEYn7ECF9wY9Bga3mG6TojsyY0Fq+s3CS/0C8a3+k
+ q2Z05eowmM4DkJAJySShE855aw==
+X-Google-Smtp-Source: ABdhPJw4Ia+EleDNsDf5XyotuTl77+zNmyy1QzQulCOPQX5TUyOrxnQdXnoFoozSBZN8RPbghu6ofA==
+X-Received: by 2002:adf:a34b:: with SMTP id d11mr2553815wrb.7.1601638629024;
+ Fri, 02 Oct 2020 04:37:09 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id c4sm1418184wme.27.2020.10.02.04.36.46
+ by smtp.gmail.com with ESMTPSA id f14sm1591402wrv.72.2020.10.02.04.36.55
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 02 Oct 2020 04:36:50 -0700 (PDT)
+ Fri, 02 Oct 2020 04:37:01 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 36BC11FF8F;
- Fri,  2 Oct 2020 12:36:46 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 29DA41FF9C;
+ Fri,  2 Oct 2020 12:36:47 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 03/14] travis.yml: Update Travis to use Bionic and Focal
- instead of Xenial
-Date: Fri,  2 Oct 2020 12:36:34 +0100
-Message-Id: <20201002113645.17693-4-alex.bennee@linaro.org>
+Subject: [PULL 13/14] gitlab: move linux-user plugins test across to gitlab
+Date: Fri,  2 Oct 2020 12:36:44 +0100
+Message-Id: <20201002113645.17693-14-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201002113645.17693-1-alex.bennee@linaro.org>
 References: <20201002113645.17693-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::430;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x430.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::431;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x431.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,137 +105,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Cleber Rosa <crosa@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+Even with the recent split moving beefier plugins into contrib and
+dropping them from the check-tcg tests we are still hitting time
+limits. This possibly points to a slow down of --debug-tcg but seeing
+as we are migrating stuff to gitlab we might as well move there and
+bump the timeout.
 
-According to our support policy, we do not support Xenial anymore.
-Time to switch the bigger parts of the builds to Focal instead.
-Some few jobs have to be updated to Bionic instead, since they are
-currently still failing on Focal otherwise. Also "--disable-pie" is
-causing linker problems with newer versions of Ubuntu ... so remove
-that switch from the jobs now (we still test it in a gitlab CI job,
-so we don't lose much test coverage here).
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Tested-by: Cleber Rosa <crosa@redhat.com>
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
-Message-Id: <20200918103430.297167-6-thuth@redhat.com>
-Message-Id: <20200925154027.12672-7-alex.bennee@linaro.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20201002103223.24022-1-alex.bennee@linaro.org>
 
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index c265e7f8ab..346f23acf7 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -244,6 +244,17 @@ build-user:
+     CONFIGURE_ARGS: --disable-tools --disable-system
+     MAKE_CHECK_ARGS: check-tcg
+ 
++# Run check-tcg against linux-user (with plugins)
++# we skip sparc64-linux-user until it has been fixed somewhat
++# we skip cris-linux-user as it doesn't use the common run loop
++build-user-plugins:
++  <<: *native_build_job_definition
++  variables:
++    IMAGE: debian-all-test-cross
++    CONFIGURE_ARGS: --disable-tools --disable-system --enable-plugins --enable-debug-tcg --target-list-exclude=sparc64-linux-user,cris-linux-user
++    MAKE_CHECK_ARGS: check-tcg
++  timeout: 1h 30m
++
+ build-clang:
+   <<: *native_build_job_definition
+   variables:
 diff --git a/.travis.yml b/.travis.yml
-index b2d492f8c6..65b825ff64 100644
+index c255c331a7..519e62432d 100644
 --- a/.travis.yml
 +++ b/.travis.yml
-@@ -2,7 +2,7 @@
- # Additional builds with specific requirements for a full VM need to
- # be added as additional matrix: entries later on
- os: linux
--dist: xenial
-+dist: focal
- language: c
- compiler:
-   - gcc
-@@ -10,7 +10,7 @@ cache:
-   # There is one cache per branch and compiler version.
-   # characteristics of each job are used to identify the cache:
-   # - OS name (currently only linux)
--  # - OS distribution (for Linux, xenial, trusty, or precise)
-+  # - OS distribution (for Linux, bionic or focal)
-   # - Names and values of visible environment variables set in .travis.yml or Settings panel
-   timeout: 1200
-   ccache: true
-@@ -27,7 +27,7 @@ addons:
-       - libattr1-dev
-       - libbrlapi-dev
-       - libcap-ng-dev
--      - libgcc-4.8-dev
-+      - libgcc-7-dev
-       - libgnutls28-dev
-       - libgtk-3-dev
-       - libiscsi-dev
-@@ -210,8 +210,10 @@ jobs:
+@@ -311,17 +311,6 @@ jobs:
+         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
  
-     # gprof/gcov are GCC features
-     - name: "GCC gprof/gcov"
-+      dist: bionic
+ 
+-    # Run check-tcg against linux-user (with plugins)
+-    # we skip sparc64-linux-user until it has been fixed somewhat
+-    # we skip cris-linux-user as it doesn't use the common run loop
+-    - name: "GCC plugins check-tcg (user)"
+-      env:
+-        - CONFIG="--disable-system --enable-plugins --enable-debug-tcg --target-list-exclude=sparc64-linux-user,cris-linux-user"
+-        - TEST_BUILD_CMD="make build-tcg"
+-        - TEST_CMD="make check-tcg"
+-        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
+-
+-
+     # Run check-tcg against softmmu targets
+     - name: "GCC check-tcg (some-softmmu)"
        env:
--        - CONFIG="--enable-gprof --enable-gcov --disable-pie --target-list=${MAIN_SOFTMMU_TARGETS}"
-+        - CONFIG="--enable-gprof --enable-gcov --disable-libssh
-+                  --target-list=${MAIN_SOFTMMU_TARGETS}"
-       after_success:
-         - ${SRC_DIR}/scripts/travis/coverage-summary.sh
- 
-@@ -270,6 +272,7 @@ jobs:
- 
-     # Using newer GCC with sanitizers
-     - name: "GCC9 with sanitizers (softmmu)"
-+      dist: bionic
-       addons:
-         apt:
-           update: true
-@@ -285,7 +288,7 @@ jobs:
-             - libattr1-dev
-             - libbrlapi-dev
-             - libcap-ng-dev
--            - libgnutls-dev
-+            - libgnutls28-dev
-             - libgtk-3-dev
-             - libiscsi-dev
-             - liblttng-ust-dev
-@@ -293,14 +296,13 @@ jobs:
-             - libncurses5-dev
-             - libnss3-dev
-             - libpixman-1-dev
--            - libpng12-dev
-+            - libpng-dev
-             - librados-dev
-             - libsdl2-dev
-             - libsdl2-image-dev
-             - libseccomp-dev
-             - libspice-protocol-dev
-             - libspice-server-dev
--            - libssh-dev
-             - liburcu-dev
-             - libusb-1.0-0-dev
-             - libvte-2.91-dev
-@@ -310,11 +312,11 @@ jobs:
-       compiler: none
-       env:
-         - COMPILER_NAME=gcc CXX=g++-9 CC=gcc-9
--        - CONFIG="--cc=gcc-9 --cxx=g++-9 --disable-pie --disable-linux-user"
-+        - CONFIG="--cc=gcc-9 --cxx=g++-9 --disable-linux-user"
-         - TEST_CMD=""
-       before_script:
-         - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
--        - ${SRC_DIR}/configure ${CONFIG} --extra-cflags="-g3 -O0 -Wno-error=stringop-truncation -fsanitize=thread" --extra-ldflags="-fuse-ld=gold" || { cat config.log && exit 1; }
-+        - ${SRC_DIR}/configure ${CONFIG} --extra-cflags="-g3 -O0 -fsanitize=thread" || { cat config.log && exit 1; }
- 
- 
-     # Run check-tcg against linux-user
-@@ -356,7 +358,7 @@ jobs:
- 
-     - name: "[aarch64] GCC check-tcg"
-       arch: arm64
--      dist: xenial
-+      dist: focal
-       addons:
-         apt_packages:
-           - libaio-dev
-@@ -389,7 +391,7 @@ jobs:
- 
-     - name: "[ppc64] GCC check-tcg"
-       arch: ppc64le
--      dist: xenial
-+      dist: focal
-       addons:
-         apt_packages:
-           - libaio-dev
 -- 
 2.20.1
 
