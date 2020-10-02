@@ -7,78 +7,80 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4F94C4363C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 17:42:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE274C4363C
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 17:43:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A548206A5
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 17:42:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7165E206A5
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 17:43:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jM994VAw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A548206A5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G01H/Ecy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7165E206A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOP4N-0005wt-2s
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 13:42:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45136)
+	id 1kOP63-0007qj-IX
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 13:43:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44996)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kOOyc-0000a5-5C
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 13:36:15 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:34154)
+ id 1kOOyT-0000PW-UP
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 13:36:05 -0400
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:54463)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kOOyY-0003L3-Th
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 13:36:12 -0400
-Received: by mail-wm1-x343.google.com with SMTP id l15so1578467wmh.1
- for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 10:36:10 -0700 (PDT)
+ id 1kOOyS-0003JE-EE
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 13:36:05 -0400
+Received: by mail-wm1-x32d.google.com with SMTP id s13so2429761wmh.4
+ for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 10:36:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=3dT+wfpw6iT83ImSmB/t0Y9AbcGGqtgwVgpoltnvTmU=;
- b=jM994VAwFUd4S6HLbQikrvILMHMn7E6vYTB7EcTD3IqNL9SHCAvCm46tfv1s9bpMwo
- +5ZdUDrE6OtbQtO4dQso6RfvNda5aB3jX35s1g5RiXR8UwBKEifsp1GmTpE5iimE58AT
- B7hc2eG3PjtKdDQlpdpK52QUs0z6TOFaVIDst7JTCw/mmR1oFf41scQo+0RI1FE+ErPq
- sc3K/hRugS49YU8kVSKTUC7IBxRQVGfH06Z5gCkduMWcirgJfiNiMg/9FD9TO7JGoUed
- 4aTB1XPnH/f/cWaxpUa2SNkN/tnnOwKUHDhCTwHBtlCMsKOUKOkie5AprHIypZRoGArd
- WZoA==
+ bh=hDip1TuoGE2uTB5vESfk4LG+Rb+6jGwMeV9JdwzMKi4=;
+ b=G01H/EcyvqF2YmQZc5uOTabHzb3JS1Jc6ZdneEb/xlYwL+yDSZhNW/y+xqWGtesRzn
+ 0q1syvn1/xfXhMoyDUH77NICImuGynHtEFB5ySQa8/q5lkoz/P76lRYXz2JDPg3DbOj1
+ gJ6oqUa5lH0H2JXn4Bi1oKJYsYow3qArKh+SdyIlG5yvEqgn55X1rdgPSN7gEYkOlDgb
+ zmGwIBpvZ9OeixyGvHAxvVuQHmYXakueSthTRIvWtbGG4tXDc0BmAN9foRO0QX1c/Jvr
+ u/RYwwLyojhYQn50AEU1mDOPIM1kPIZ/3de2wh+J78fOPOYe/d3o8dhfy5JAPCgpFlKd
+ fw7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=3dT+wfpw6iT83ImSmB/t0Y9AbcGGqtgwVgpoltnvTmU=;
- b=GxR9r6k+/VNYEywFYgOfffjvpEDrnUjWCPNiOO+GWeH9MOd9ZCeCmxeZ5pU3HtnC1n
- xKYoaXhqv6f7WsUJauhVwyp+JrMvafZhTM0vfE75FcDAthV3+uJ4Xva0SIPGDA7S57Ea
- muaIIfZ1m+Ky09DHIiGD3nr1+tY2TH+z+ASeq7kCtNQtDAR1037LRwTvfHRcLOcnLSob
- ck22mIEYS26e29PGkgMLgnOm32/vxEryLESDxosvKbcoY4+GZknoFKARGnXj3q5VKpqP
- SXsBss7SuqU5iJR8uff1o2aaqN+VJlvmcX7eG8NdQPTvotQqL+CQr1BTqpwqj9dCEQjg
- 5Z9A==
-X-Gm-Message-State: AOAM530tmOZNbJBHb8KuD1LlFoofpRMaG8xYh0knTAe7jFDwCksUDeLO
- c6Nf138ETSpvZ2d2xrAzzJTOqM7GbvQ=
-X-Google-Smtp-Source: ABdhPJyYuF53zLkewCty6KI9zEMvxliH6sNtLoTafWZ/3+3Fs1FBMvnsO6IoycuRe8jY/qCTTesBxg==
-X-Received: by 2002:a1c:7405:: with SMTP id p5mr4042979wmc.35.1601660169085;
- Fri, 02 Oct 2020 10:36:09 -0700 (PDT)
+ bh=hDip1TuoGE2uTB5vESfk4LG+Rb+6jGwMeV9JdwzMKi4=;
+ b=cWy4g7AJz39QjOtJjwsFU6e0oUZlEFrAVprNFSANoMRzszrOdQW59EbQLmVIIX9p9v
+ tu8GDj3ABBrSkBeCU+ZOa+gbPGDihKYGaKvI+Gv8FA/+rPBaVbMj9Td64o4++t1waU59
+ C3oMtQICoaX+5nitKaFuxAdqirjfA733gEKW4BbBPobjtCAf3YBc1l4bwlPMyowpNBnZ
+ 8coJ92h57aEBJABWaAFqahq/2srn6Pg3WkNSHCkRoKs1EB8uc+UM1HGMTMtFgvMayeAt
+ KVPe1gtPpl5K19WRb64Yhyqu2jrsJyEPqLgiQtkVuJ2H2lKfcfiLFJ1aFH++7uuRSDLW
+ 0wXA==
+X-Gm-Message-State: AOAM533XT5KziJ2u5m79e8qS3YGYuZDxbc+GP9Qx3gTWZzGoXwRmYNLW
+ q7+ez+hD8aHIfBdyLFaIZdAnyZJaMak=
+X-Google-Smtp-Source: ABdhPJwwZmc8UGnvwiBJtCM53oIJH/kIksxq0VUqQ0TIJXth3yanVdHe73NJ0y3rau+nKuhokhnM7g==
+X-Received: by 2002:a05:600c:2186:: with SMTP id
+ e6mr4329959wme.189.1601660162749; 
+ Fri, 02 Oct 2020 10:36:02 -0700 (PDT)
 Received: from donizetti.redhat.com ([2001:b07:6468:f312:47e0:e742:75ba:b84d])
  by smtp.gmail.com with ESMTPSA id
- l8sm2516454wrx.22.2020.10.02.10.36.08
+ l8sm2516454wrx.22.2020.10.02.10.36.01
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 02 Oct 2020 10:36:08 -0700 (PDT)
+ Fri, 02 Oct 2020 10:36:02 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 10/10] scsi/scsi_bus: fix races in REPORT LUNS
-Date: Fri,  2 Oct 2020 19:35:58 +0200
-Message-Id: <20201002173558.232960-11-pbonzini@redhat.com>
+Subject: [PATCH v6 03/10] scsi/scsi_bus: switch search direction in
+ scsi_device_find
+Date: Fri,  2 Oct 2020 19:35:51 +0200
+Message-Id: <20201002173558.232960-4-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201002173558.232960-1-pbonzini@redhat.com>
 References: <20201002173558.232960-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x343.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32d;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x32d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -108,128 +110,49 @@ Sender: "Qemu-devel"
 
 From: Maxim Levitsky <mlevitsk@redhat.com>
 
-Currently scsi_target_emulate_report_luns iterates over the child device list
-twice, and there is no guarantee that this list is the same in both iterations.
-
-The reason for iterating twice is that the first iteration calculates
-how much memory to allocate.  However if we use a dynamic array we can
-avoid iterating twice, and therefore we avoid this race.
-
-Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1866707
+This change will allow us to convert the bus children list to RCU,
+while not changing the logic of this function
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20200913160259.32145-10-mlevitsk@redhat.com>
+Message-Id: <20200913160259.32145-2-mlevitsk@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/scsi-bus.c | 68 ++++++++++++++++++++++------------------------
- 1 file changed, 33 insertions(+), 35 deletions(-)
+ hw/scsi/scsi-bus.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index eda8cb7e70..b901e701f0 100644
+index 94921c04b1..69d7c3f90c 100644
 --- a/hw/scsi/scsi-bus.c
 +++ b/hw/scsi/scsi-bus.c
-@@ -438,19 +438,23 @@ struct SCSITargetReq {
- static void store_lun(uint8_t *outbuf, int lun)
- {
-     if (lun < 256) {
-+        /* Simple logical unit addressing method*/
-+        outbuf[0] = 0;
-         outbuf[1] = lun;
--        return;
-+    } else {
-+        /* Flat space addressing method */
-+        outbuf[0] = 0x40 | (lun >> 8);
-+        outbuf[1] = (lun & 255);
-     }
--    outbuf[1] = (lun & 255);
--    outbuf[0] = (lun >> 8) | 0x40;
- }
- 
- static bool scsi_target_emulate_report_luns(SCSITargetReq *r)
- {
+@@ -1571,7 +1571,7 @@ SCSIDevice *scsi_device_find(SCSIBus *bus, int channel, int id, int lun)
      BusChild *kid;
--    int i, len, n;
-     int channel, id;
--    bool found_lun0;
-+    uint8_t tmp[8] = {0};
-+    int len = 0;
-+    GByteArray *buf;
+     SCSIDevice *target_dev = NULL;
  
-     if (r->req.cmd.xfer < 16) {
-         return false;
-@@ -458,46 +462,40 @@ static bool scsi_target_emulate_report_luns(SCSITargetReq *r)
-     if (r->req.cmd.buf[2] > 2) {
-         return false;
-     }
-+
-+    /* reserve space for 63 LUNs*/
-+    buf = g_byte_array_sized_new(512);
-+
-     channel = r->req.dev->channel;
-     id = r->req.dev->id;
--    found_lun0 = false;
--    n = 0;
+-    QTAILQ_FOREACH_REVERSE(kid, &bus->qbus.children, sibling) {
++    QTAILQ_FOREACH(kid, &bus->qbus.children, sibling) {
+         DeviceState *qdev = kid->child;
+         SCSIDevice *dev = SCSI_DEVICE(qdev);
  
--    RCU_READ_LOCK_GUARD();
-+    /* add size (will be updated later to correct value */
-+    g_byte_array_append(buf, tmp, 8);
-+    len += 8;
- 
--    QTAILQ_FOREACH_RCU(kid, &r->req.bus->qbus.children, sibling) {
--        DeviceState *qdev = kid->child;
--        SCSIDevice *dev = SCSI_DEVICE(qdev);
-+    /* add LUN0 */
-+    g_byte_array_append(buf, tmp, 8);
-+    len += 8;
- 
--        if (dev->channel == channel && dev->id == id) {
--            if (dev->lun == 0) {
--                found_lun0 = true;
-+    WITH_RCU_READ_LOCK_GUARD() {
-+        QTAILQ_FOREACH_RCU(kid, &r->req.bus->qbus.children, sibling) {
-+            DeviceState *qdev = kid->child;
-+            SCSIDevice *dev = SCSI_DEVICE(qdev);
-+
-+            if (dev->channel == channel && dev->id == id && dev->lun != 0) {
-+                store_lun(tmp, dev->lun);
-+                g_byte_array_append(buf, tmp, 8);
-+                len += 8;
+@@ -1579,7 +1579,15 @@ SCSIDevice *scsi_device_find(SCSIBus *bus, int channel, int id, int lun)
+             if (dev->lun == lun) {
+                 return dev;
              }
--            n += 8;
+-            target_dev = dev;
++
++            /*
++             * If we don't find exact match (channel/bus/lun),
++             * we will return the first device which matches channel/bus
++             */
++
++            if (!target_dev) {
++                target_dev = dev;
++            }
          }
      }
--    if (!found_lun0) {
--        n += 8;
--    }
--
--    scsi_target_alloc_buf(&r->req, n + 8);
--
--    len = MIN(n + 8, r->req.cmd.xfer & ~7);
--    memset(r->buf, 0, len);
--    stl_be_p(&r->buf[0], n);
--    i = found_lun0 ? 8 : 16;
--    QTAILQ_FOREACH_RCU(kid, &r->req.bus->qbus.children, sibling) {
--        DeviceState *qdev = kid->child;
--        SCSIDevice *dev = SCSI_DEVICE(qdev);
- 
--        if (dev->channel == channel && dev->id == id) {
--            store_lun(&r->buf[i], dev->lun);
--            i += 8;
--        }
--    }
-+    r->buf_len = len;
-+    r->buf = g_byte_array_free(buf, FALSE);
-+    r->len = MIN(len, r->req.cmd.xfer & ~7);
- 
--    assert(i == n + 8);
--    r->len = len;
-+    /* store the LUN list length */
-+    stl_be_p(&r->buf[0], len - 8);
-     return true;
- }
- 
+     return target_dev;
 -- 
 2.26.2
+
 
 
