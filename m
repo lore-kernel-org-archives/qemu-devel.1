@@ -2,97 +2,85 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NORMAL_HTTP_TO_IP,
+	NUMERIC_HTTP_ADDR,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08E6EC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 09:21:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7973BC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 10:07:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24B58206A5
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 09:21:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aqGI1MbA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24B58206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DABBE206DD
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 10:07:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DABBE206DD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOHGF-0004eN-Um
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 05:21:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50342)
+	id 1kOHyN-0005RC-T2
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 06:07:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59710)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kOHEi-0003wn-5z
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 05:20:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58964)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kOHEf-0000H1-5n
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 05:20:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601630416;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=/EI8yV8NtxCs87QgI+LOow+919u5Vz2RZxZCec+C4qw=;
- b=aqGI1MbA5jZAwf5QiyxYK1h5gtnP8rvd3NK3ciMWl2RJDQElK+kBaApUomUfBE2a6snz14
- zBTUGpLOvmj5O6cIN0rrTaMuyRnFJROpY5Q4v00sf2k0GRchg1gIMJuuqd36ysLN0P22r4
- JWF1wpeGF+fu3QScTUjxA7lrSdYGxlA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-242-Kt1zWB_eMxCEWbF3Y5340w-1; Fri, 02 Oct 2020 05:20:07 -0400
-X-MC-Unique: Kt1zWB_eMxCEWbF3Y5340w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1A798064D9;
- Fri,  2 Oct 2020 09:19:50 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-101.ams2.redhat.com
- [10.36.112.101])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6726978820;
- Fri,  2 Oct 2020 09:19:50 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C83C11132784; Fri,  2 Oct 2020 11:19:48 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v4 04/46] qapi: modify docstrings to be sphinx-compatible
-References: <20200930043150.1454766-1-jsnow@redhat.com>
- <20200930043150.1454766-5-jsnow@redhat.com>
- <87wo0bejmy.fsf@dusky.pond.sub.org>
- <96ba9e08-9806-baa3-62d2-2df84a666e62@redhat.com>
- <87blhm49bk.fsf@dusky.pond.sub.org>
- <5f3e38fd-6d18-5d28-31cd-6c0faa8c675d@redhat.com>
-Date: Fri, 02 Oct 2020 11:19:48 +0200
-In-Reply-To: <5f3e38fd-6d18-5d28-31cd-6c0faa8c675d@redhat.com> (John Snow's
- message of "Thu, 1 Oct 2020 10:48:35 -0400")
-Message-ID: <877ds9m1cb.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kOHwv-0004NV-MX
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 06:06:01 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51250)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kOHwr-0005kD-47
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 06:06:01 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kOHwp-0008HU-5S
+ for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 10:05:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 271572E802E
+ for <qemu-devel@nongnu.org>; Fri,  2 Oct 2020 10:05:55 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 23:37:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 02 Oct 2020 09:56:14 -0000
+From: Lee Yarwood <1894804@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Incomplete; importance=Undecided; assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: berrange james-page kashyapc lyarwood paelzer
+ sean-k-mooney
+X-Launchpad-Bug-Reporter: Lee Yarwood (lyarwood)
+X-Launchpad-Bug-Modifier: Lee Yarwood (lyarwood)
+References: <159955374051.12161.5076756019458607363.malonedeb@chaenomeles.canonical.com>
+Message-Id: <160163257423.9839.9604979580111041894.malone@wampee.canonical.com>
+Subject: [Bug 1894804] Re: Second DEVICE_DELETED event missing during
+ virtio-blk disk device detach
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="d50d1e75c500726862802414f880ee3e3bb759bf"; Instance="production"
+X-Launchpad-Hash: 408338e73b4f10b919556d5078c894d3c926469c
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 05:05:51
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -53
+X-Spam_score: -5.4
+X-Spam_bar: -----
+X-Spam_report: (-5.4 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, NORMAL_HTTP_TO_IP=0.001,
+ NUMERIC_HTTP_ADDR=1.242, RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ WEIRD_PORT=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -101,367 +89,831 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Reply-To: Bug 1894804 <1894804@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-John Snow <jsnow@redhat.com> writes:
+Thanks Christian,
 
-> On 10/1/20 4:52 AM, Markus Armbruster wrote:
->> John Snow <jsnow@redhat.com> writes:
->> 
->>> On 9/30/20 4:47 AM, Markus Armbruster wrote:
->>>> John Snow <jsnow@redhat.com> writes:
->>>>
->>>>> I did not say "sphinx beautiful", just "sphinx compatible". They will
->>>>> not throw errors when parsed and interpreted as ReST.
->>>> "Bang on the keyboard until Sphinx doesn't throw errors anymore"
->>>> might
->>>> be good enough for a certain kind of mathematician, but a constructive
->>>> solution needs a bit more direction.  Is there a specification to
->>>> follow?  Other useful resources?
->>>>
->>>
->>> I don't know if you are asking this question rhetorically, or in good faith.
->> I ask to make sure I understand goals and limitations of your doc
->> string
->> work in this series.
->> Also, even a passing to Sphinx becomes more useful when accompanied
->> by a
->> link to relevant documentation.
->> 
->>> Let me preface this by saying: This series, and these 119 patches, are
->>> not about finding a style guide for our docstring utilization or about
->>> proposing one. It is also not about rigorously adding such
->>> documentation or about finding ways to meaningfully publish it with
->>> e.g. Sphinx, or the styling of such pages.
->>>
->>> Why bother to add docstrings at all, then? Because I needed them for
->>> my own sake when learning this code and I felt it would be a waste to
->>> just delete them, and I am of sound mind and able body and believe
->>> that some documentation was better than none. They are useful even
->>> just as plaintext.
->>>
->>> Having said that, let's explore the actual style I tend to use.
->>>
->>> I mentioned before in response to a review comment that there isn't
->>> really any standard for docstrings. There are a few competing
->>> "styles", but none of which are able to be programmatically checked
->>> and validated.
->>>
->>> The primary guide for docstrings is PEP 257, of which I follow some
->>> but not all of the recommendations.
->>>
->>> https://www.python.org/dev/peps/pep-0257/
->> 
->> I find PEP 257 frustrating.  It leaves me with more questions than
->> answers.
->
-> Yeah, sorry. That's what we're dealing with. It's very open-ended.
->
->>> In general,
->>>
->>> - Always use triple-double quotes (unenforced)
->>> - Modules, classes, and functions should have docstrings (pylint)
->>> - No empty lines before or after the docstring (unenforced)
->>> - Multi-line docstrings should take the form (unenforced):
->>>
->>> """
->>> single-line summary of function.
->>>
->>> Additional prose if needed describing the function.
->>>
->>> :param x: Input such that blah blah.
->>> :raises y: When input ``x`` is unsuitable because blah blah.
->>> :returns: A value that blah blah.
->> This paragraph is already not PEP 257.
->> 
->
-> Right -- well, it isn't NOT PEP 257 either. It just suggests you have
-> to describe these features, but it doesn't say HOW.
+I'll confirm that we see error from [2] with that PPA shortly.
 
-Yep.  Frustrating.
+In the meantime I've removed the device detach retry logic from
+OpenStack Nova and now always see two DEVICE_DELETED events raised by
+QEMU after a single device_del request from libvirt:
 
->>> """
->>>
->>> PEP257 suggests a form where the single-line summary appears on the
->>> same line as the opening triple quotes. I don't like this, and prefer
->>> symmetry. PEP257 *also* suggests that writing it my way is equivalent
->>> to their way, because any docstring processor should trim the first
->>> line. I take this as tacit admission that my way is acceptable and has
->>> merit.
->> I prefer the symmetric form myself.
->> 
->>> What about the syntax or markup inside the docstring itself? there is
->>> *absolutely no standard*, but Sphinx autodoc recognizes a few field
->>> lists as significant in its parsing, so I prefer using them:
->> 
->> Doc link?
->
-> Hard to search for in my opinion;
+http://paste.openstack.org/show/798637/
 
-More reason to provide a link!
+# zgrep 'debug.*"event": "DEVICE_DELETED"' libvirtd_log.txt.gz =
 
->                                   you want to search for "sphinx
-> python domain", and then click on "field lists" on the sidebar.
->
-> https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#info-field-lists
->
-> It has a special understanding for:
->
-> param/parameter/arg/argument/key/keyword: I prefer "param"
-> here. Possibly key/keyword if we use a **kwargs form with a key that
-> we specially recognize, but I've not tested that yet. I know pycharm 
-> understands "param" in a semantic way, and that's been good enough for me.
->
-> type: Defines the type of a parameter. In my opinion, do not use
-> this. Let native type hints do the lifting.
+2020-10-01 21:37:33.180+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601588253, "microseconds": 179881}, "=
+event": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/virtio-disk=
+1/virtio-backend"}}]
+2020-10-01 21:37:33.242+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601588253, "microseconds": 242565}, "=
+event": "DEVICE_DELETED", "data": {"device": "virtio-disk1", "path": "/mach=
+ine/peripheral/virtio-disk1"}}]
 
-Agree.
+2020-10-01 21:40:17.062+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601588417, "microseconds": 62704}, "e=
+vent": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/virtio-disk1=
+/virtio-backend"}}]
+2020-10-01 21:40:17.114+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601588417, "microseconds": 113888}, "=
+event": "DEVICE_DELETED", "data": {"device": "virtio-disk1", "path": "/mach=
+ine/peripheral/virtio-disk1"}}]
 
-> raises/raise/except/exception: I prefer "raises". "raises ErrorType
-> when...." is a good sentence.
->
-> var/ivar/cvar: Describes a variable, presumably in the body of the
-> function below. I've never used this, I always describe it in prose
-> instead.
->
-> vartype: Defines a type for a variable; I would again defer to the
-> native type system instead now.
->
-> returns/return: I prefer "returns" for grammatical reasons
-> again. ("Returns such-and-such when...")
+2020-10-01 21:40:20.911+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601588420, "microseconds": 911560}, "=
+event": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/virtio-disk=
+1/virtio-backend"}}]
+2020-10-01 21:40:20.985+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601588420, "microseconds": 985753}, "=
+event": "DEVICE_DELETED", "data": {"device": "virtio-disk1", "path": "/mach=
+ine/peripheral/virtio-disk1"}}]
 
-"Return such-and-such when..." is just as correct: imperative mood.  I
-prefer imperative mood for function contracts.
+2020-10-01 21:42:53.528+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601588573, "microseconds": 528330}, "=
+event": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/net1/virtio=
+-backend"}}]
+2020-10-01 21:42:53.583+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601588573, "microseconds": 583063}, "=
+event": "DEVICE_DELETED", "data": {"device": "net1", "path": "/machine/peri=
+pheral/net1"}}]
 
-> rtype: again, type information. Don't use.
->
-> meta: For directives to sphinx, e.g. :meta private: or :meta public:
-> to toggle the visibility class from its default. I don't use this.
->
->
-> None of these are validated or checked in any meaningful way; you can
-> use arbitrarily field lists (and I do in a few places!) to define your 
-> own terms and so on.
->
->
-> (I would like to improve autodoc in the future to validate your
-> docstrings such that you can enforce :param:, :raises: and :return:
-> and it uses the type hints and introspection information to raise an
-> error when you make an obvious mistake. I am not there yet, but I am
-> using Peter Maydell's work to help inform how I might write such an
-> extension to autodoc. This work is not critical, but it will likely
-> occur upstream, outside of the QEMU context because I believe this is
-> a good thing to do for the ecosystem in general, to allow autodoc to
-> function slightly more like e.g. Doxygen does.)
+2020-10-01 21:44:21.156+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601588661, "microseconds": 155903}, "=
+event": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/net1/virtio=
+-backend"}}]
+2020-10-01 21:44:21.214+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601588661, "microseconds": 213714}, "=
+event": "DEVICE_DELETED", "data": {"device": "net1", "path": "/machine/peri=
+pheral/net1"}}]
 
-Sounds useful, but yes, it's clearly outside QEMU context.
+2020-10-01 21:45:55.422+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601588755, "microseconds": 422238}, "=
+event": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/net1/virtio=
+-backend"}}]
+2020-10-01 21:45:55.479+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601588755, "microseconds": 479250}, "=
+event": "DEVICE_DELETED", "data": {"device": "net1", "path": "/machine/peri=
+pheral/net1"}}]
 
->>> :param x: Denotes the parameter X. Do not use type information in the
->>> string, we rely on mypy for that now.
->>>
->>> :raises y: explains a case in which an Exception type y may be raised
->>> either directly by this code or anticipated to be allowed to be raised
->>> by a helper call. (There's no standard here that I am aware of. I use
->>> my judgment. Always document direct raise calls, but use your judgment
->>> for sub-calls.)
->>>
->>> :returns: explains the semantics of the return value.
->>>
->>> That said, literally any sphinx/ReST markup is OK as long as it passes
->>> make sphinxdocs. Some sphinx markup is prohibited, like adding new
->>> full-throated sections. You can use arbitrary field lists, definition
->>> lists, pre-formatted text, examples, code blocks, whatever.
->>>
->>> In general, you are not going to find the kind of semantic validation
->>> you want to ensure that the parameter names are correct, or that you
->>> spelled :param: right, or that you didn't miss a parameter or an
->>> exception. None of that tooling exists for Python.
->>>
->>> Thus, it's all rather subjective. No right answers, no validation
->>> tools. Just whatever seems reasonable to a human eye until such time
->>> we actually decide to pursue publishing the API docs in the
->>> development manual, if indeed we ever do so at all.
->>>
->>> That series sounds like a great opportunity to hash this all out. That
->>> is when I would like to remove --missing-docstring, too. There will
->>> absolutely be a "docstring series" in the future, but I am insisting
->>> stubbornly it happen after strict typing.
->> 
->> Okay.  Nevertheless, I'd prefer a bit more information in the commit
->> message.  Here's my try:
->> 
->>      qapi: Modify docstrings to be sphinx-compatible
->> 
->>      I did not say "sphinx beautiful", just "sphinx compatible". They
->>      will not throw errors when parsed and interpreted as ReST.  Finding
->>      a comprehensive style guide for our docstring utilization is left
->>      for another day.
->> 
->>      For now, use field lists recognized by Sphinx autodoc.
->>      FIXME link to their documentation
->
-> That I can do -- and I will double down on my IOU for a more formal
-> style guide: https://gitlab.com/jsnow/qemu/-/issues/7
->
-> I didn't bother writing it in any of the commits because I felt like
-> it'd get lost there and would be mostly useless; but a .rst doc inside 
-> the package folder would be hard to miss.
->
-> I plan to check in something like ./python/README.rst or
-> ./python/CODING_STYLE.rst to try and formalize a lot of what I am
-> doing here, where it's going to be harder to miss.
+2020-10-01 21:46:09.001+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601588769, "microseconds": 970}, "eve=
+nt": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/net1/virtio-ba=
+ckend"}}]
+2020-10-01 21:46:09.059+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601588769, "microseconds": 58799}, "e=
+vent": "DEVICE_DELETED", "data": {"device": "net1", "path": "/machine/perip=
+heral/net1"}}]
 
-Makes sense.
+2020-10-01 21:48:05.182+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601588885, "microseconds": 182382}, "=
+event": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/virtio-disk=
+1/virtio-backend"}}]
+2020-10-01 21:48:05.246+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601588885, "microseconds": 246077}, "=
+event": "DEVICE_DELETED", "data": {"device": "virtio-disk1", "path": "/mach=
+ine/peripheral/virtio-disk1"}}]
 
->>>>>
->>>>> Signed-off-by: John Snow <jsnow@redhat.com>
->>>>> ---
->>>>>    scripts/qapi/gen.py    | 6 ++++--
->>>>>    scripts/qapi/parser.py | 9 +++++----
->>>>>    2 files changed, 9 insertions(+), 6 deletions(-)
->>>>>
->>>>> diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
->>>>> index ca66c82b5b8..fc19b2aeb9b 100644
->>>>> --- a/scripts/qapi/gen.py
->>>>> +++ b/scripts/qapi/gen.py
->>>>> @@ -154,9 +154,11 @@ def _bottom(self):
->>>>>      @contextmanager
->>>>>    def ifcontext(ifcond, *args):
->>>>> -    """A 'with' statement context manager to wrap with start_if()/end_if()
->>>>> +    """
->>>>> +    A 'with' statement context manager that wraps with `start_if` and `end_if`.
->>>> Sadly, the fact that start_if() and end_if() are functions isn't
->>>> immediately obvious anymore.
->>>> I've seen :func:`start_if` elsewhere.  Is this something we should
->>>> or
->>>> want to use?
->>>>
->>>
->>> We *could*.
->>>
->>> `start_if` relies on the default role, which I have provisionally set
->>> to "any" here, so this is shorthand for :any:`start_if`.
->>>
->>> The :any: role means: "cross-reference any type of thing." If there is
->>> not exactly one thing that matches, it results in an error during the
->>> documentation build.
->>>
->>> I like this, because it's nice short-hand syntax that I think
->>> communicates effectively to the reader that this is a symbol of some
->>> kind without needing a premium of ReST-ese.
->>>
->>> CONSTANTS are capitalized, Classes are title cased, and functions are
->>> lower_case. `lower_case` references can be assumed to be functions,
->> 
->> `lower_case` could also refer to an attribute, variable, or
->> parameter.
->
-> Hm. Attribute yes, actually. variable and parameter no -- sphinx does
-> not presently provide syntax or roles for creating anchors to
-> parameter names or variables, so they are not able to be
-> cross-referenced.
+2020-10-01 21:48:08.211+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601588888, "microseconds": 211386}, "=
+event": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/net1/virtio=
+-backend"}}]
+2020-10-01 21:48:08.269+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601588888, "microseconds": 269371}, "=
+event": "DEVICE_DELETED", "data": {"device": "net1", "path": "/machine/peri=
+pheral/net1"}}]
 
-How would you mark up variable names in doc strings?  Often, their
-"variableness" is obvious from context, but not always.  In C comments,
-we tend to use @var [*].
+2020-10-01 21:51:58.384+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601589118, "microseconds": 384455}, "=
+event": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/virtio-disk=
+1/virtio-backend"}}]
+2020-10-01 21:51:58.443+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601589118, "microseconds": 442848}, "=
+event": "DEVICE_DELETED", "data": {"device": "virtio-disk1", "path": "/mach=
+ine/peripheral/virtio-disk1"}}]
 
-> Attributes CAN be cross-referenced, but only when they are documented.
->
-> Another style guide thing:
->
-> #: x is a number that represents "The Answer". See `Douglas Adams`_.
-> self.x = 42
->
-> You can use the special comment form "#:" to add a one-line
-> description of an attribute that Sphinx will pick up. Sphinx skips
-> these attributes otherwise. If you consider them part of the interface
-> of the module, it's maybe a good idea to do this.
->
-> You can also use docstrings, but the ordering changes:
->
-> self.x = 42
-> """x is a number that represents "The Answer". See `Douglas Adams`_.
->
-> I kind of like the #: form because it announces what follows, but I
-> admit it's a bit of special sphinx magic.
+2020-10-01 21:52:02.482+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601589122, "microseconds": 361461}, "=
+event": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/virtio-disk=
+2/virtio-backend"}}]
+2020-10-01 21:52:02.482+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601589122, "microseconds": 427718}, "=
+event": "DEVICE_DELETED", "data": {"device": "virtio-disk2", "path": "/mach=
+ine/peripheral/virtio-disk2"}}]
 
-Are both equally available in Python IDEs and in interactive Python?
+2020-10-01 21:52:18.258+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601589138, "microseconds": 258652}, "=
+event": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/virtio-disk=
+1/virtio-backend"}}]
+2020-10-01 21:52:18.326+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601589138, "microseconds": 325449}, "=
+event": "DEVICE_DELETED", "data": {"device": "virtio-disk1", "path": "/mach=
+ine/peripheral/virtio-disk1"}}]
 
->>> but I will admit that this is not enforced or necessarily true as we
->>> add more cross reference types in the future.
->>>
->>> (I am trying to add QMP cross-reference syntax!)
->>>
->>> I still prefer `start_if` to :func:`start_if` simply because it's less
->>> markup and is easier to read in plaintext contexts. You're right, it
->>> doesn't look like a function anymore.
->> Yes, :func:`start_if` is rather heavy.  I asked because I wanted to
->> understand what :func: buys us.  Not meant as endorsement.
->> 
->
-> It specifically targets only cross-references of that exact type. In
-> the case that the :any: reference is ambiguous, :func: is the
-> disambiguation.
->
->> GDK-Doc seems smart enough to recognize start_if().  Sphinx isn't,
->> because it's built around reST syntax.  We put our money on the Sphinx
->> horse, so...
->> 
->>> I'm not sure if another annotations would work -- `start_if`() or
->>> `start_if()`. Both seem kind of clunky to me, to be honest. Personal
->>> feeling is "not really worth the hassle."
->> 
->> You later reported the latter works.
->> I prefer `start_if()` to `start_if`.  Matter of taste.
->
-> Change made.
+2020-10-01 21:52:43.585+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601589163, "microseconds": 585656}, "=
+event": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/virtio-disk=
+1/virtio-backend"}}]
+2020-10-01 21:52:43.656+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601589163, "microseconds": 656097}, "=
+event": "DEVICE_DELETED", "data": {"device": "virtio-disk1", "path": "/mach=
+ine/peripheral/virtio-disk1"}}]
 
-Thanks!
+2020-10-01 21:53:00.216+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601589180, "microseconds": 216080}, "=
+event": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/virtio-disk=
+1/virtio-backend"}}]
+2020-10-01 21:53:00.277+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601589180, "microseconds": 276944}, "=
+event": "DEVICE_DELETED", "data": {"device": "virtio-disk1", "path": "/mach=
+ine/peripheral/virtio-disk1"}}]
 
->>>>>    -    *args: any number of QAPIGenCCode
->>>>> +    :param ifcond: List of conditionals
->>>>> +    :param args: any number of `QAPIGenCCode`.
->>>>>          Example::
->>>>>    diff --git a/scripts/qapi/parser.py b/scripts/qapi/parser.py
->>>>> index 9d1a3e2eea9..02983979965 100644
->>>>> --- a/scripts/qapi/parser.py
->>>>> +++ b/scripts/qapi/parser.py
->>>>> @@ -381,10 +381,11 @@ def append(self, line):
->>>>>              The way that the line is dealt with depends on which
->>>>> part of
->>>>>            the documentation we're parsing right now:
->>>>> -        * The body section: ._append_line is ._append_body_line
->>>>> -        * An argument section: ._append_line is ._append_args_line
->>>>> -        * A features section: ._append_line is ._append_features_line
->>>>> -        * An additional section: ._append_line is ._append_various_line
->>>>> +
->>>>> +         * The body section: ._append_line is ._append_body_line
->>>>> +         * An argument section: ._append_line is ._append_args_line
->>>>> +         * A features section: ._append_line is ._append_features_line
->>>>> +         * An additional section: ._append_line is ._append_various_line
->>>>>            """
->>>>>            line = line[1:]
->>>>>            if not line:
->>>> I understand why you insert a blank line (reST wants blank lines
->>>> around
->>>> lists), I don't understand why you indent.  Can you explain?
->>>
->>> I was mistaken about it needing the indent!
->> Easy enough to tidy up :)
->> 
->
-> Already done!
+2020-10-01 21:53:18.426+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601589198, "microseconds": 425877}, "=
+event": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/virtio-disk=
+1/virtio-backend"}}]
+2020-10-01 21:53:18.477+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601589198, "microseconds": 477615}, "=
+event": "DEVICE_DELETED", "data": {"device": "virtio-disk1", "path": "/mach=
+ine/peripheral/virtio-disk1"}}]
 
-Thanks again!
+2020-10-01 21:53:35.651+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601589215, "microseconds": 252907}, "=
+event": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/virtio-disk=
+1/virtio-backend"}}]
+2020-10-01 21:53:35.652+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601589215, "microseconds": 304900}, "=
+event": "DEVICE_DELETED", "data": {"device": "virtio-disk1", "path": "/mach=
+ine/peripheral/virtio-disk1"}}]
 
+2020-10-01 22:02:58.751+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601589778, "microseconds": 751743}, "=
+event": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/virtio-disk=
+1/virtio-backend"}}]
+2020-10-01 22:02:58.782+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601589778, "microseconds": 782611}, "=
+event": "DEVICE_DELETED", "data": {"device": "virtio-disk1", "path": "/mach=
+ine/peripheral/virtio-disk1"}}]
 
-[*] GTK-Doc says @var is just for parameters, but since it offers
-nothing for variables, we sometimes use it for variables as well.
+2020-10-01 22:03:02.982+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601589782, "microseconds": 982181}, "=
+event": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/virtio-disk=
+1/virtio-backend"}}]
+2020-10-01 22:03:03.045+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601589783, "microseconds": 45393}, "e=
+vent": "DEVICE_DELETED", "data": {"device": "virtio-disk1", "path": "/machi=
+ne/peripheral/virtio-disk1"}}]
 
+2020-10-01 22:04:05.845+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601589845, "microseconds": 845577}, "=
+event": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/virtio-disk=
+1/virtio-backend"}}]
+2020-10-01 22:04:05.907+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601589845, "microseconds": 907294}, "=
+event": "DEVICE_DELETED", "data": {"device": "virtio-disk1", "path": "/mach=
+ine/peripheral/virtio-disk1"}}]
+
+2020-10-01 22:04:08.004+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601589848, "microseconds": 4374}, "ev=
+ent": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/virtio-disk1/=
+virtio-backend"}}]
+2020-10-01 22:04:08.066+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601589848, "microseconds": 66444}, "e=
+vent": "DEVICE_DELETED", "data": {"device": "virtio-disk1", "path": "/machi=
+ne/peripheral/virtio-disk1"}}]
+
+2020-10-01 22:05:52.990+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601589952, "microseconds": 990549}, "=
+event": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/virtio-disk=
+1/virtio-backend"}}]
+2020-10-01 22:05:53.015+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601589953, "microseconds": 14845}, "e=
+vent": "DEVICE_DELETED", "data": {"device": "virtio-disk1", "path": "/machi=
+ne/peripheral/virtio-disk1"}}]
+
+2020-10-01 22:07:37.477+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601590057, "microseconds": 477326}, "=
+event": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/virtio-disk=
+1/virtio-backend"}}]
+2020-10-01 22:07:37.544+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601590057, "microseconds": 544586}, "=
+event": "DEVICE_DELETED", "data": {"device": "virtio-disk1", "path": "/mach=
+ine/peripheral/virtio-disk1"}}]
+
+2020-10-01 22:08:15.655+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601590095, "microseconds": 655117}, "=
+event": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/virtio-disk=
+1/virtio-backend"}}]
+2020-10-01 22:08:15.717+0000: 55842: debug : qemuMonitorJSONIOProcessLine:2=
+20 : Line [{"timestamp": {"seconds": 1601590095, "microseconds": 716847}, "=
+event": "DEVICE_DELETED", "data": {"device": "virtio-disk1", "path": "/mach=
+ine/peripheral/virtio-disk1"}}]
+
+I'll close this bug out as invalid once I've tested with the PPA and
+confirmed that we hit the new check.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1894804
+
+Title:
+  Second DEVICE_DELETED event missing during virtio-blk disk device
+  detach
+
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  Incomplete
+
+Bug description:
+  We are in the process of moving OpenStack CI across to use 20.04 Focal
+  as the underlying OS and encountering the following issue in any test
+  attempting to detach disk devices from running QEMU instances.
+
+  We can see a single DEVICE_DELETED event raised to libvirtd for the
+  /machine/peripheral/virtio-disk1/virtio-backend device but we do not
+  see a second event for the actual disk. As a result the device is
+  still marked as present in libvirt but QEMU reports it as missing in
+  subsequent attempts to remove the device.
+
+  The following log snippets can also be found in the following pastebin
+  that's slightly easier to gork:
+
+  http://paste.openstack.org/show/797564/
+
+  https://review.opendev.org/#/c/746981/ libvirt: Bump
+  MIN_{LIBVIRT,QEMU}_VERSION and NEXT_MIN_{LIBVIRT,QEMU}_VERSION
+
+  https://zuul.opendev.org/t/openstack/build/4c56def513884c5eb3ba7b0adf7fa2=
+60
+  nova-ceph-multistore
+
+  https://zuul.opendev.org/t/openstack/build/4c56def513884c5eb3ba7b0adf7fa2=
+60/log/controller/logs/dpkg-l.txt
+
+  ii  libvirt-daemon                       6.0.0-0ubuntu8.3                =
+      amd64        Virtualization daemon
+  ii  libvirt-daemon-driver-qemu           6.0.0-0ubuntu8.3                =
+      amd64        Virtualization daemon QEMU connection driver
+  ii  libvirt-daemon-system                6.0.0-0ubuntu8.3                =
+      amd64        Libvirt daemon configuration files
+  ii  libvirt-daemon-system-systemd        6.0.0-0ubuntu8.3                =
+      amd64        Libvirt daemon configuration files (systemd)
+  ii  libvirt-dev:amd64                    6.0.0-0ubuntu8.3                =
+      amd64        development files for the libvirt library
+  ii  libvirt0:amd64                       6.0.0-0ubuntu8.3                =
+      amd64        library for interfacing with different virtualization sy=
+stems
+  [..]
+  ii  qemu-block-extra:amd64               1:4.2-3ubuntu6.4                =
+      amd64        extra block backend modules for qemu-system and qemu-uti=
+ls
+  ii  qemu-slof                            20191209+dfsg-1                 =
+      all          Slimline Open Firmware -- QEMU PowerPC version
+  ii  qemu-system                          1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries
+  ii  qemu-system-arm                      1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries (arm)
+  ii  qemu-system-common                   1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries (common files)
+  ii  qemu-system-data                     1:4.2-3ubuntu6.4                =
+      all          QEMU full system emulation (data files)
+  ii  qemu-system-mips                     1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries (mips)
+  ii  qemu-system-misc                     1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries (miscellaneous)
+  ii  qemu-system-ppc                      1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries (ppc)
+  ii  qemu-system-s390x                    1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries (s390x)
+  ii  qemu-system-sparc                    1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries (sparc)
+  ii  qemu-system-x86                      1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries (x86)
+  ii  qemu-utils                           1:4.2-3ubuntu6.4                =
+      amd64        QEMU utilities
+
+  https://zuul.opendev.org/t/openstack/build/4c56def513884c5eb3ba7b0adf7fa2=
+60/log/controller/logs/libvirt/qemu
+  /instance-0000003a_log.txt
+
+  2020-09-07 19:29:55.021+0000: starting up libvirt version: 6.0.0, package=
+: 0ubuntu8.3 (Marc Deslauriers <marc.deslauriers@ubuntu.com> Thu, 30 Jul 20=
+20 06:40:28 -0400), qemu version: 4.2.0Debian 1:4.2-3ubuntu6.4, kernel: 5.4=
+.0-45-generic, hostname: ubuntu-focal-ovh-bhs1-0019682147
+  LC_ALL=3DC \
+  PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+  HOME=3D/var/lib/libvirt/qemu/domain-86-instance-0000003a \
+  XDG_DATA_HOME=3D/var/lib/libvirt/qemu/domain-86-instance-0000003a/.local/=
+share \
+  XDG_CACHE_HOME=3D/var/lib/libvirt/qemu/domain-86-instance-0000003a/.cache=
+ \
+  XDG_CONFIG_HOME=3D/var/lib/libvirt/qemu/domain-86-instance-0000003a/.conf=
+ig \
+  QEMU_AUDIO_DRV=3Dnone \
+  /usr/bin/qemu-system-x86_64 \
+  -name guest=3Dinstance-0000003a,debug-threads=3Don \
+  -S \
+  -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/=
+domain-86-instance-0000003a/master-key.aes \
+  -machine pc-i440fx-4.2,accel=3Dtcg,usb=3Doff,dump-guest-core=3Doff \
+  -cpu qemu64 \
+  -m 128 \
+  -overcommit mem-lock=3Doff \
+  -smp 1,sockets=3D1,cores=3D1,threads=3D1 \
+  -uuid 0d59f238-daef-40d4-adf9-a4fa24c35231 \
+  -smbios 'type=3D1,manufacturer=3DOpenStack Foundation,product=3DOpenStack=
+ Nova,version=3D21.1.0,serial=3D0d59f238-daef-40d4-adf9-a4fa24c35231,uuid=
+=3D0d59f238-daef-40d4-adf9-a4fa24c35231,family=3DVirtual Machine' \
+  -no-user-config \
+  -nodefaults \
+  -chardev socket,id=3Dcharmonitor,fd=3D39,server,nowait \
+  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol \
+  -rtc base=3Dutc \
+  -no-shutdown \
+  -boot strict=3Don \
+  -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 \
+  -object secret,id=3Dlibvirt-3-storage-secret0,data=3DzT+XibedVJZM2du1+PXp=
+IXHMVJ9a0pVcKihOtCGwlB0=3D,keyid=3DmasterKey0,iv=3D536Lfw+nsyvDhFBTOQG4zA=
+=3D=3D,format=3Dbase64 \
+  -blockdev '{"driver":"rbd","pool":"vms","image":"0d59f238-daef-40d4-adf9-=
+a4fa24c35231_disk","server":[{"host":"158.69.70.115","port":"6789"}],"user"=
+:"cinder","auth-client-required":["cephx","none"],"key-secret":"libvirt-3-s=
+torage-secret0","node-name":"libvirt-3-storage","cache":{"direct":false,"no=
+-flush":false},"auto-read-only":true,"discard":"unmap"}' \
+  -blockdev '{"node-name":"libvirt-3-format","read-only":false,"cache":{"di=
+rect":false,"no-flush":false},"driver":"raw","file":"libvirt-3-storage"}' \
+  -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Dlibvirt-=
+3-format,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don \
+  -object secret,id=3Dlibvirt-2-storage-secret0,data=3DSO9AgCCTvkBBMYHZe+LV=
+zoCF4GUNgvBtkFwRRIji7WI=3D,keyid=3DmasterKey0,iv=3DMzGu/h2Api4mMG9lL8hvdg=
+=3D=3D,format=3Dbase64 \
+  -blockdev '{"driver":"rbd","pool":"volumes","image":"volume-04dd79b2-3c05=
+-4492-b1d7-7969d24df768","server":[{"host":"158.69.70.115","port":"6789"}],=
+"user":"cinder","auth-client-required":["cephx","none"],"key-secret":"libvi=
+rt-2-storage-secret0","node-name":"libvirt-2-storage","cache":{"direct":fal=
+se,"no-flush":false},"auto-read-only":true,"discard":"unmap"}' \
+  -blockdev '{"node-name":"libvirt-2-format","read-only":false,"discard":"u=
+nmap","cache":{"direct":false,"no-flush":false},"driver":"raw","file":"libv=
+irt-2-storage"}' \
+  -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x7,drive=3Dlibvirt-=
+2-format,id=3Dvirtio-disk1,write-cache=3Don,serial=3D04dd79b2-3c05-4492-b1d=
+7-7969d24df768 \
+  -object secret,id=3Dlibvirt-1-storage-secret0,data=3DlhbR9+ewiXiaf3dKoQWP=
+3bk6hlLMLRXnbhh9ZkjZ9dQ=3D,keyid=3DmasterKey0,iv=3DWWHpGuOHkwXqxlLxGUqpcA=
+=3D=3D,format=3Dbase64 \
+  -blockdev '{"driver":"rbd","pool":"vms","image":"0d59f238-daef-40d4-adf9-=
+a4fa24c35231_disk.config","server":[{"host":"158.69.70.115","port":"6789"}]=
+,"user":"cinder","auth-client-required":["cephx","none"],"key-secret":"libv=
+irt-1-storage-secret0","node-name":"libvirt-1-storage","cache":{"direct":fa=
+lse,"no-flush":false},"auto-read-only":true,"discard":"unmap"}' \
+  -blockdev '{"node-name":"libvirt-1-format","read-only":true,"cache":{"dir=
+ect":false,"no-flush":false},"driver":"raw","file":"libvirt-1-storage"}' \
+  -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Dlibvirt-1-format,id=3Dide0-0-=
+0,write-cache=3Don \
+  -netdev tap,fd=3D41,id=3Dhostnet0 \
+  -device virtio-net-pci,host_mtu=3D1400,netdev=3Dhostnet0,id=3Dnet0,mac=3D=
+fa:16:3e:4d:bb:0b,bus=3Dpci.0,addr=3D0x3 \
+  -add-fd set=3D2,fd=3D43 \
+  -chardev pty,id=3Dcharserial0,logfile=3D/dev/fdset/2,logappend=3Don \
+  -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 \
+  -vnc 0.0.0.0:3 \
+  -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 \
+  -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 \
+  -object rng-random,id=3Dobjrng0,filename=3D/dev/urandom \
+  -device virtio-rng-pci,rng=3Dobjrng0,id=3Drng0,bus=3Dpci.0,addr=3D0x6 \
+  -sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourc=
+econtrol=3Ddeny \
+  -msg timestamp=3Don
+  char device redirected to /dev/pts/1 (label charserial0)
+
+  https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644=
+c/zuul_opendev_logs_4c5/746981/5/check
+  /nova-ceph-multistore/4c56def/testr_results.html
+
+  tempest.api.compute.servers.test_server_rescue_negative.ServerRescueNegat=
+iveTestJSON.test_rescued_vm_detach_volume
+
+  2020-09-07 19:30:13,764 100285 INFO     [tempest.lib.common.rest_client] =
+Request (ServerRescueNegativeTestJSON:_run_cleanups): 202 DELETE https://15=
+8.69.70.115/compute/v2.1/servers/0d59f238-daef-40d4-adf9-a4fa24c35231/os-vo=
+lume_attachments/04dd79b2-3c05-4492-b1d7-7969d24df768 1.261s
+  2020-09-07 19:30:13,764 100285 DEBUG    [tempest.lib.common.rest_client] =
+Request - Headers: {'Content-Type': 'application/json', 'Accept': 'applicat=
+ion/json', 'X-Auth-Token': '<omitted>'}
+          Body: None
+      Response - Headers: {'date': 'Mon, 07 Sep 2020 19:30:12 GMT', 'server=
+': 'Apache/2.4.41 (Ubuntu)', 'content-length': '0', 'content-type': 'applic=
+ation/json', 'openstack-api-version': 'compute 2.1', 'x-openstack-nova-api-=
+version': '2.1', 'vary': 'OpenStack-API-Version,X-OpenStack-Nova-API-Versio=
+n', 'x-openstack-request-id': 'req-502a0106-3eb9-4d42-9dd4-c43ba89187b6', '=
+x-compute-request-id': 'req-502a0106-3eb9-4d42-9dd4-c43ba89187b6', 'connect=
+ion': 'close', 'status': '202', 'content-location': 'https://158.69.70.115/=
+compute/v2.1/servers/0d59f238-daef-40d4-adf9-a4fa24c35231/os-volume_attachm=
+ents/04dd79b2-3c05-4492-b1d7-7969d24df768'}
+          Body: b''
+
+  # First attempt to detach the device  by n-cpu
+
+  https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644=
+c/zuul_opendev_logs_4c5/746981/5/check
+  /nova-ceph-multistore/4c56def/controller/logs/screen-n-cpu.txt
+  (gzipped)
+
+  29957 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [None req-502a0106-3eb9-4d42-9dd4-c=
+43ba89187b6 tempest-ServerRescueNegativeTestJSON-73411582 tempest-ServerRes=
+cueNegativeTestJSON-73411582] detach device xml: <disk type=3D"network" de
+  29958 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  29959 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  29960 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  29961 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  29962 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  29963 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  29964 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  29965 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+  29966 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:  {{(pid=3D92697) detach_device /opt/stack/nova/nova/virt/libvirt/=
+guest.py:510}}
+
+  # DEVICE_DELETED only raised for /machine/peripheral/virtio-disk1
+  /virtio-backend
+
+  https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644=
+c/zuul_opendev_logs_4c5/746981/5/check
+  /nova-ceph-multistore/4c56def/controller/logs/libvirt/libvirtd_log.txt
+  (gzipped)
+
+  329344 2020-09-07 19:30:14.165+0000: 65559: debug : qemuDomainObjEnterMon=
+itorInternal:9869 : Entering monitor (mon=3D0x7f769405e470 vm=3D0x7f768c0df=
+0b0 name=3Dinstance-0000003a)
+  329345 2020-09-07 19:30:14.165+0000: 65559: debug : qemuMonitorDelDevice:=
+2848 : devalias=3Dvirtio-disk1
+  329346 2020-09-07 19:30:14.165+0000: 65559: debug : qemuMonitorDelDevice:=
+2850 : mon:0x7f769405e470 vm:0x7f768c0df0b0 fd:39
+  329347 2020-09-07 19:30:14.165+0000: 65559: info : qemuMonitorSend:993 : =
+QEMU_MONITOR_SEND_MSG: mon=3D0x7f769405e470 msg=3D{"execute":"device_del","=
+arguments":{"id":"virtio-disk1"},"id":"libvirt-367"}^M
+  329348  fd=3D-1                                                          =
+                =
+
+  329349 2020-09-07 19:30:14.165+0000: 65555: info : qemuMonitorIOWrite:450=
+ : QEMU_MONITOR_IO_WRITE: mon=3D0x7f769405e470 buf=3D{"execute":"device_del=
+","arguments":{"id":"virtio-disk1"},"id":"libvirt-367"}^M
+  329350  len=3D79 ret=3D79 errno=3D0                                      =
+                    =
+
+  329351 2020-09-07 19:30:14.168+0000: 65555: debug : qemuMonitorJSONIOProc=
+essLine:220 : Line [{"return": {}, "id": "libvirt-367"}]
+  329352 2020-09-07 19:30:14.168+0000: 65555: info : qemuMonitorJSONIOProce=
+ssLine:239 : QEMU_MONITOR_RECV_REPLY: mon=3D0x7f769405e470 reply=3D{"return=
+": {}, "id": "libvirt-367"}
+  329353 2020-09-07 19:30:14.168+0000: 65559: debug : qemuDomainObjExitMoni=
+torInternal:9892 : Exited monitor (mon=3D0x7f769405e470 vm=3D0x7f768c0df0b0=
+ name=3Dinstance-0000003a)
+  329354 2020-09-07 19:30:14.201+0000: 65555: debug : qemuMonitorJSONIOProc=
+essLine:220 : Line [{"timestamp": {"seconds": 1599507014, "microseconds": 2=
+01037}, "event": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/vi=
+rtio-disk1/virtio-backend"}}]
+  329355 2020-09-07 19:30:14.208+0000: 65555: info : qemuMonitorJSONIOProce=
+ssLine:234 : QEMU_MONITOR_RECV_EVENT: mon=3D0x7f769405e470 event=3D{"timest=
+amp": {"seconds": 1599507014, "microseconds": 201037}, "event": "DEVICE_DEL=
+ETED", "data": {"path": "/machine/peripheral/virtio-disk1/virtio-backend"}}
+  329356 2020-09-07 19:30:14.208+0000: 65555: debug : qemuMonitorJSONIOProc=
+essEvent:181 : mon=3D0x7f769405e470 obj=3D0x55dd95d0cba0
+  329357 2020-09-07 19:30:14.208+0000: 65555: debug : qemuMonitorEmitEvent:=
+1198 : mon=3D0x7f769405e470 event=3DDEVICE_DELETED
+  329358 2020-09-07 19:30:14.208+0000: 65555: debug : qemuProcessHandleEven=
+t:549 : vm=3D0x7f768c0df0b0
+  329359 2020-09-07 19:30:14.208+0000: 65555: debug : virObjectEventNew:631=
+ : obj=3D0x55dd95d3bf60
+  329360 2020-09-07 19:30:14.208+0000: 65555: debug : qemuMonitorJSONIOProc=
+essEvent:205 : handle DEVICE_DELETED handler=3D0x7f7691732840 data=3D0x55dd=
+95eae3c0
+  329361 2020-09-07 19:30:14.208+0000: 65555: debug : qemuMonitorJSONHandle=
+DeviceDeleted:1287 : missing device in device deleted event
+
+  # Second attempt to detach the device by n-cpu
+
+  https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644=
+c/zuul_opendev_logs_4c5/746981/5/check
+  /nova-ceph-multistore/4c56def/controller/logs/screen-n-cpu.txt
+  (gzipped)
+
+  30046 Sep 07 19:30:19.192548 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG oslo.service.loopingcall [None req-502a0106-3eb9-4d42-9dd4-=
+c43ba89187b6 tempest-ServerRescueNegativeTestJSON-73411582 tempest-ServerRe=
+scueNegativeTestJSON-73411582] Waiting for function nova.virt.libvirt.gu
+  30047 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
+=3D"network" device=3D"disk">
+  30048 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  30049 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  30050 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  30051 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  30052 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  30053 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  30054 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  30055 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+  30056 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:  {{(pid=3D92697) detach_device /opt/stack/nova/nova/virt/libvirt/=
+guest.py:510}}
+
+  # DeviceNotFound raised by QEMU
+
+  https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644=
+c/zuul_opendev_logs_4c5/746981/5/check
+  /nova-ceph-multistore/4c56def/controller/logs/libvirt/libvirtd_log.txt
+  (gzipped)
+
+  332479 2020-09-07 19:30:19.196+0000: 65560: debug : qemuDomainObjBeginJob=
+Internal:9416 : Starting job: job=3Dmodify agentJob=3Dnone asyncJob=3Dnone =
+(vm=3D0x7f768c0df0b0 name=3Dinstance-0000003a, current job=3Dnone agentJob=
+=3Dnone async=3Dnone)
+  332480 2020-09-07 19:30:19.196+0000: 65560: debug : qemuDomainObjBeginJob=
+Internal:9470 : Started job: modify (async=3Dnone vm=3D0x7f768c0df0b0 name=
+=3Dinstance-0000003a)
+  332481 2020-09-07 19:30:19.196+0000: 65560: debug : qemuDomainObjEnterMon=
+itorInternal:9869 : Entering monitor (mon=3D0x7f769405e470 vm=3D0x7f768c0df=
+0b0 name=3Dinstance-0000003a)
+  332482 2020-09-07 19:30:19.196+0000: 65560: debug : qemuMonitorDelDevice:=
+2848 : devalias=3Dvirtio-disk1
+  332483 2020-09-07 19:30:19.196+0000: 65560: debug : qemuMonitorDelDevice:=
+2850 : mon:0x7f769405e470 vm:0x7f768c0df0b0 fd:39
+  332484 2020-09-07 19:30:19.196+0000: 65560: info : qemuMonitorSend:993 : =
+QEMU_MONITOR_SEND_MSG: mon=3D0x7f769405e470 msg=3D{"execute":"device_del","=
+arguments":{"id":"virtio-disk1"},"id":"libvirt-369"}^M
+  332485  fd=3D-1                                                          =
+                =
+
+  332486 2020-09-07 19:30:19.196+0000: 65555: info : qemuMonitorIOWrite:450=
+ : QEMU_MONITOR_IO_WRITE: mon=3D0x7f769405e470 buf=3D{"execute":"device_del=
+","arguments":{"id":"virtio-disk1"},"id":"libvirt-369"}^M
+  332487  len=3D79 ret=3D79 errno=3D0                                      =
+                    =
+
+  332488 2020-09-07 19:30:19.197+0000: 65555: debug : qemuMonitorJSONIOProc=
+essLine:220 : Line [{"id": "libvirt-369", "error": {"class": "DeviceNotFoun=
+d", "desc": "Device 'virtio-disk1' not found"}}]
+  332489 2020-09-07 19:30:19.197+0000: 65555: info : qemuMonitorJSONIOProce=
+ssLine:239 : QEMU_MONITOR_RECV_REPLY: mon=3D0x7f769405e470 reply=3D{"id": "=
+libvirt-369", "error": {"class": "DeviceNotFound", "desc": "Device 'virtio-=
+disk1' not found"}}
+  332490 2020-09-07 19:30:19.197+0000: 65560: debug : qemuDomainObjExitMoni=
+torInternal:9892 : Exited monitor (mon=3D0x7f769405e470 vm=3D0x7f768c0df0b0=
+ name=3Dinstance-0000003a)
+  332491 2020-09-07 19:30:19.197+0000: 65560: debug : qemuDomainDeleteDevic=
+e:128 : Detaching of device virtio-disk1 failed and no event arrived
+
+  # n-cpu continues to retry the detach
+
+  30245 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
+=3D"network" device=3D"disk">
+  30246 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  30247 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  30248 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  30249 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  30250 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  30251 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  30252 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  30253 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+
+  30276 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
+=3D"network" device=3D"disk">
+  30277 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  30278 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  30279 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  30280 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  30281 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  30282 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  30283 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  30284 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+
+  30356 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
+=3D"network" device=3D"disk">
+  30357 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  30358 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  30359 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  30360 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  30361 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  30362 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  30363 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  30364 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+
+  30381 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
+=3D"network" device=3D"disk">
+  30382 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  30383 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  30384 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  30385 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  30386 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  30387 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  30388 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  30389 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+
+  30478 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
+=3D"network" device=3D"disk">
+  30479 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  30480 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  30481 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  30482 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  30483 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  30484 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  30485 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  30486 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+
+  30796 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
+=3D"network" device=3D"disk">
+  30797 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  30798 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  30799 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  30800 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  30801 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  30802 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  30803 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  30804 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+
+  31050 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
+=3D"network" device=3D"disk">
+  31051 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  31052 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  31053 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  31054 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  31055 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  31056 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  31057 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  31058 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+
+  # n-cpu eventually gives up trying to detach the device
+
+  https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644=
+c/zuul_opendev_logs_4c5/746981/5/check
+  /nova-ceph-multistore/4c56def/controller/logs/screen-n-cpu.txt
+  (gzipped)
+
+  31102 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall [-] Dynamic interval looping call =
+'oslo_service.loopingcall.RetryDecorator.__call__.<locals>._func' failed: n=
+ova.exception.DeviceDetachFailed: Device detach failed for vdb: Unable t
+  31103 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall Traceback (most recent call last):
+  31104 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall   File "/usr/local/lib/python3.8/d=
+ist-packages/oslo_service/loopingcall.py", line 150, in _run_loop
+  31105 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall     result =3D func(*self.args, **=
+self.kw)
+  31106 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall   File "/usr/local/lib/python3.8/d=
+ist-packages/oslo_service/loopingcall.py", line 428, in _func
+  31107 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall     return self._sleep_time
+  31108 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall   File "/usr/local/lib/python3.8/d=
+ist-packages/oslo_utils/excutils.py", line 220, in __exit__
+  31109 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall     self.force_reraise()
+  31110 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall   File "/usr/local/lib/python3.8/d=
+ist-packages/oslo_utils/excutils.py", line 196, in force_reraise
+  31111 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall     six.reraise(self.type_, self.v=
+alue, self.tb)
+  31112 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall   File "/usr/local/lib/python3.8/d=
+ist-packages/six.py", line 703, in reraise
+  31113 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall     raise value
+  31114 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall   File "/usr/local/lib/python3.8/d=
+ist-packages/oslo_service/loopingcall.py", line 407, in _func
+  31115 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall     result =3D f(*args, **kwargs)
+  31116 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall   File "/opt/stack/nova/nova/virt/=
+libvirt/guest.py", line 489, in _do_wait_and_retry_detach
+  31117 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall     raise exception.DeviceDetachFa=
+iled(
+  31118 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall nova.exception.DeviceDetachFailed:=
+ Device detach failed for vdb: Unable to detach the device from the live co=
+nfig.
+  31119 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1894804/+subscriptions
 
