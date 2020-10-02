@@ -2,71 +2,87 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 888B7C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:49:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 857A0C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:50:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D214C206DC
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:49:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 249A7206DC
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 12:50:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="gByHI1ei"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D214C206DC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JYJs233R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 249A7206DC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOKVT-0006GP-0l
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 08:49:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36762)
+	id 1kOKWI-000774-75
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 08:50:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36832)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <8dd7d15176ca1e947054dd6891e478cdf7902f7e@lizzy.crudebyte.com>)
- id 1kOKTF-000454-6n
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:47:33 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:36651)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <8dd7d15176ca1e947054dd6891e478cdf7902f7e@lizzy.crudebyte.com>)
- id 1kOKTD-0007si-6f
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:47:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
- Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
- Content-Description; bh=/aSVUozxY1tMmMejsjPy+mqBzCD41WyLrj4EhDow/XE=; b=gByHI
- 1eituVnGJj+mOvnC/lr6oQrHbUtpORhBnE6nmT7OI6KMofV7t4K9WqMmx3P5qMx30MhxRZEGTp+Rm
- blkcNei39wItdc24UrUElEr5QYMZrm6VHD1IZGFo87JsGHVOMgUrhg1cufXVyusRj61uzFZch6Fqd
- h568aMvP7dzvDC9OUPzCsg6LVzhppU0QlHSR8gGXIysrmYtcS4Z8t+1Hsne4Q+JsRvUqRQ3mc1tNm
- K9KycljeXHKNTYQZS14iZpljwW/QMc5Nrwk6zDxf4713Ba3ZYNCmyz25JqQ6vlZWJDlrPb9gvuMnw
- AtiTka8Rsnf9Sz/0h0TGzX+xeLhbQ==;
-Message-Id: <8dd7d15176ca1e947054dd6891e478cdf7902f7e.1601639563.git.qemu_oss@crudebyte.com>
-In-Reply-To: <cover.1601639563.git.qemu_oss@crudebyte.com>
-References: <cover.1601639563.git.qemu_oss@crudebyte.com>
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Date: Fri, 2 Oct 2020 13:51:54 +0200
-Subject: [PATCH v2 08/11] tests/9pfs: introduce local tests
-To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
- Greg Kurz <groug@kaod.org>
-Received-SPF: none client-ip=91.194.90.13;
- envelope-from=8dd7d15176ca1e947054dd6891e478cdf7902f7e@lizzy.crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 08:18:24
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kOKTZ-0004OA-AS
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:47:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51904)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kOKTX-0007zX-HZ
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 08:47:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601642870;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=OrkmzMv/0VWKCk+2+WI5ZhEbUjhpuS4ELN8u5HTArqY=;
+ b=JYJs233RPywZ9pwbeYX4bOW3nS2SCriG38HaAX5ebeIG3q3gvhy3rIDLyaTbMLoTDYF09Z
+ u+a4DbxYBiUOLDMrUGw9JUEOQ9noYor/8eN56DCQu0FHDCkmw9kFEkgb7er4Zvu65nznlp
+ hTEkHaAtZmfffMBWzc2JqY9AlL/f7kE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-293-Afb1-OyCNs2k7ob10nxtTg-1; Fri, 02 Oct 2020 08:47:47 -0400
+X-MC-Unique: Afb1-OyCNs2k7ob10nxtTg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D220C1882FA0;
+ Fri,  2 Oct 2020 12:47:45 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
+ [10.36.112.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9059C60BE2;
+ Fri,  2 Oct 2020 12:47:45 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id CAA9317538; Fri,  2 Oct 2020 14:47:44 +0200 (CEST)
+Date: Fri, 2 Oct 2020 14:47:44 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v6 0/4] Fixes curses on msys2/mingw
+Message-ID: <20201002124744.whdgh4xtmvifi72y@sirius.home.kraxel.org>
+References: <20201001173230.829-1-luoyonggang@gmail.com>
+ <89710921-1d64-14fd-f8ce-05ee58f412c5@redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <89710921-1d64-14fd-f8ce-05ee58f412c5@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 01:13:31
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,230 +95,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Laurent Vivier <laurent@vivier.eu>, Yonggang Luo <luoyonggang@gmail.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch introduces 9pfs test cases using the 9pfs 'local'
-filesystem driver which reads/writes/creates/deletes real files
-and directories.
+On Thu, Oct 01, 2020 at 07:39:33PM +0200, Paolo Bonzini wrote:
+> On 01/10/20 19:32, Yonggang Luo wrote:
+> > And also convert related configure script to meson.
+> > V5-V6
+> > Dropping configure: Fixes ncursesw detection under msys2/mingw by convert the=
+> > m to meson first.
+> > That need the meson 0.56 upstream to fixes the curses detection.
+> > Add
+> > * configure: fixes indent of $meson setup
+> > 
+> > Yonggang Luo (4):
+> >   configure: fixes indent of $meson setup
+> >   curses: Fixes compiler error that complain don't have langinfo.h on
+> >     msys2/mingw
+> >   curses: Fixes curses compiling errors.
+> >   win32: Simplify gmtime_r detection not depends on if  _POSIX_C_SOURCE
+> >     are defined on msys2/mingw
+> > 
+> >  configure                 | 42 ++++-----------------------------------
+> >  include/sysemu/os-win32.h |  4 ++--
+> >  ui/curses.c               | 14 ++++++-------
+> >  util/oslib-win32.c        |  4 ++--
+> >  4 files changed, 15 insertions(+), 49 deletions(-)
+> > 
+> > --=20
+> > 2.28.0.windows.1
+> > 
+> > 
+> 
+> Looks good (though there is no conversion to meson yet in this version).
+> 
+> Not trivial, but perhaps Gerd can take it?
 
-In this initial version, there is only one local test which actually
-only checks if the 9pfs 'local' device was created successfully.
+Sure, series looks good.
 
-Before the 9pfs 'local' tests are run, a test directory 'qtest-9p-local'
-is created (with world rwx permissions) under the current working
-directory. At this point that test directory is not auto deleted yet.
+Can't finish this today due to -ENOTIME and I'm offline next week so
+this has to wait a bit in the UI patch queue ...
 
-Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
----
- tests/qtest/libqos/virtio-9p.c | 100 +++++++++++++++++++++++++++++++++
- tests/qtest/libqos/virtio-9p.h |   5 ++
- tests/qtest/virtio-9p-test.c   |  44 ++++++++++-----
- 3 files changed, 135 insertions(+), 14 deletions(-)
-
-diff --git a/tests/qtest/libqos/virtio-9p.c b/tests/qtest/libqos/virtio-9p.c
-index 2e300063e3..86e40e5d56 100644
---- a/tests/qtest/libqos/virtio-9p.c
-+++ b/tests/qtest/libqos/virtio-9p.c
-@@ -24,6 +24,63 @@
- #include "qgraph.h"
- 
- static QGuestAllocator *alloc;
-+static char *local_test_path;
-+
-+static char *strpr(const char* format, ...) GCC_FMT_ATTR(1, 2);
-+
-+/* Concatenates the passed 2 pathes. Returned result must be freed. */
-+static char *concat_path(const char* a, const char* b)
-+{
-+    const int len = strlen(a) + strlen("/") + strlen(b);
-+    char *path = g_malloc0(len + 1);
-+    snprintf(path, len + 1, "%s/%s", a, b);
-+    g_assert(strlen(path) == len);
-+    return path;
-+}
-+
-+/*
-+ * Lazy sprintf() implementation which auto allocates buffer. Returned result
-+ * must be freed.
-+ */
-+static char *strpr(const char* format, ...)
-+{
-+    va_list argp;
-+
-+    va_start(argp, format);
-+    const int sz = vsnprintf(NULL, 0, format, argp) + 1;
-+    va_end(argp);
-+
-+    g_assert(sz > 0);
-+    char *s = g_malloc0(sz);
-+
-+    va_start(argp, format);
-+    const int len = vsnprintf(s, sz, format, argp);
-+    va_end(argp);
-+
-+    g_assert(len + 1 == sz);
-+    return s;
-+}
-+
-+static void init_local_test_path(void)
-+{
-+    char *pwd = get_current_dir_name();
-+    local_test_path = concat_path(pwd, "qtest-9p-local");
-+    free(pwd);
-+}
-+
-+/* Creates the directory for the 9pfs 'local' filesystem driver to access. */
-+static void create_local_test_dir(void)
-+{
-+    struct stat st;
-+
-+    g_assert(local_test_path != NULL);
-+    mkdir(local_test_path, 0777);
-+
-+    /* ensure test directory exists now ... */
-+    g_assert(stat(local_test_path, &st) == 0);
-+    /* ... and is actually a directory */
-+    g_assert((st.st_mode & S_IFMT) == S_IFDIR);
-+}
- 
- static void virtio_9p_cleanup(QVirtio9P *interface)
- {
-@@ -146,11 +203,54 @@ static void *virtio_9p_pci_create(void *pci_bus, QGuestAllocator *t_alloc,
-     return obj;
- }
- 
-+void virtio_9p_assign_local_driver(GString *cmd_line, const char *args)
-+{
-+    GRegex *regex;
-+    char *s, *arg_repl;
-+
-+    g_assert_nonnull(local_test_path);
-+
-+    /* replace 'synth' driver by 'local' driver */
-+    regex = g_regex_new("-fsdev synth,", 0, 0, NULL);
-+    s = g_regex_replace_literal(
-+        regex, cmd_line->str, -1, 0, "-fsdev local,", 0, NULL
-+    );
-+    g_string_assign(cmd_line, s);
-+    g_free(s);
-+    g_regex_unref(regex);
-+
-+    /* add 'path=...' to '-fsdev ...' group */
-+    regex = g_regex_new("(-fsdev \\w+)(\\s*)", 0, 0, NULL);
-+    arg_repl = strpr("\\1\\2,path='%s'", local_test_path);
-+    s = g_regex_replace(
-+        regex, cmd_line->str, -1, 0, arg_repl, 0, NULL
-+    );
-+    g_string_assign(cmd_line, s);
-+    g_free(arg_repl);
-+    g_free(s);
-+    g_regex_unref(regex);
-+
-+    /* add passed args to '-fsdev ...' group */
-+    regex = g_regex_new("(-fsdev \\w+)(\\s*)", 0, 0, NULL);
-+    arg_repl = strpr("\\1\\2,%s", args);
-+    s = g_regex_replace(
-+        regex, cmd_line->str, -1, 0, arg_repl, 0, NULL
-+    );
-+    g_string_assign(cmd_line, s);
-+    g_free(arg_repl);
-+    g_free(s);
-+    g_regex_unref(regex);
-+}
-+
- static void virtio_9p_register_nodes(void)
- {
-     const char *str_simple = "fsdev=fsdev0,mount_tag=" MOUNT_TAG;
-     const char *str_addr = "fsdev=fsdev0,addr=04.0,mount_tag=" MOUNT_TAG;
- 
-+    /* make sure test dir for the 'local' tests exists and is clean */
-+    init_local_test_path();
-+    create_local_test_dir();
-+
-     QPCIAddress addr = {
-         .devfn = QPCI_DEVFN(4, 0),
-     };
-diff --git a/tests/qtest/libqos/virtio-9p.h b/tests/qtest/libqos/virtio-9p.h
-index b1e6badc4a..326a603f72 100644
---- a/tests/qtest/libqos/virtio-9p.h
-+++ b/tests/qtest/libqos/virtio-9p.h
-@@ -44,4 +44,9 @@ struct QVirtio9PDevice {
-     QVirtio9P v9p;
- };
- 
-+/**
-+ * Prepares QEMU command line for 9pfs tests using the 'local' fs driver.
-+ */
-+void virtio_9p_assign_local_driver(GString *cmd_line, const char *args);
-+
- #endif
-diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
-index 3281153b9c..af7e169d3a 100644
---- a/tests/qtest/virtio-9p-test.c
-+++ b/tests/qtest/virtio-9p-test.c
-@@ -895,29 +895,45 @@ static void fs_readdir_split_512(void *obj, void *data,
-     fs_readdir_split(obj, data, t_alloc, 512);
- }
- 
-+static void *assign_9p_local_driver(GString *cmd_line, void *arg)
-+{
-+    virtio_9p_assign_local_driver(cmd_line, "security_model=mapped-xattr");
-+    return arg;
-+}
-+
- static void register_virtio_9p_test(void)
- {
--    qos_add_test("synth/config", "virtio-9p", pci_config, NULL);
--    qos_add_test("synth/version/basic", "virtio-9p", fs_version, NULL);
--    qos_add_test("synth/attach/basic", "virtio-9p", fs_attach, NULL);
--    qos_add_test("synth/walk/basic", "virtio-9p", fs_walk, NULL);
-+
-+    QOSGraphTestOptions opts = {
-+    };
-+
-+    /* 9pfs test cases using the 'synth' filesystem driver */
-+    qos_add_test("synth/config", "virtio-9p", pci_config, &opts);
-+    qos_add_test("synth/version/basic", "virtio-9p", fs_version,  &opts);
-+    qos_add_test("synth/attach/basic", "virtio-9p", fs_attach,  &opts);
-+    qos_add_test("synth/walk/basic", "virtio-9p", fs_walk,  &opts);
-     qos_add_test("synth/walk/no_slash", "virtio-9p", fs_walk_no_slash,
--                 NULL);
-+                  &opts);
-     qos_add_test("synth/walk/dotdot_from_root", "virtio-9p",
--                 fs_walk_dotdot, NULL);
--    qos_add_test("synth/lopen/basic", "virtio-9p", fs_lopen, NULL);
--    qos_add_test("synth/write/basic", "virtio-9p", fs_write, NULL);
-+                 fs_walk_dotdot,  &opts);
-+    qos_add_test("synth/lopen/basic", "virtio-9p", fs_lopen,  &opts);
-+    qos_add_test("synth/write/basic", "virtio-9p", fs_write,  &opts);
-     qos_add_test("synth/flush/success", "virtio-9p", fs_flush_success,
--                 NULL);
-+                  &opts);
-     qos_add_test("synth/flush/ignored", "virtio-9p", fs_flush_ignored,
--                 NULL);
--    qos_add_test("synth/readdir/basic", "virtio-9p", fs_readdir, NULL);
-+                  &opts);
-+    qos_add_test("synth/readdir/basic", "virtio-9p", fs_readdir,  &opts);
-     qos_add_test("synth/readdir/split_512", "virtio-9p",
--                 fs_readdir_split_512, NULL);
-+                 fs_readdir_split_512,  &opts);
-     qos_add_test("synth/readdir/split_256", "virtio-9p",
--                 fs_readdir_split_256, NULL);
-+                 fs_readdir_split_256,  &opts);
-     qos_add_test("synth/readdir/split_128", "virtio-9p",
--                 fs_readdir_split_128, NULL);
-+                 fs_readdir_split_128,  &opts);
-+
-+
-+    /* 9pfs test cases using the 'local' filesystem driver */
-+    opts.before = assign_9p_local_driver;
-+    qos_add_test("local/config", "virtio-9p", pci_config,  &opts);
- }
- 
- libqos_init(register_virtio_9p_test);
--- 
-2.20.1
+take care,
+  Gerd
 
 
