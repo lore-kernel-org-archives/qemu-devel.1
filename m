@@ -2,73 +2,87 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C65FC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 14:10:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8BB7C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 14:19:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA8B6206DD
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 14:10:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43D0D206A5
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 14:19:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="f+7wof0w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA8B6206DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CGggeLTQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43D0D206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOLls-0002IA-Pv
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 10:10:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55294)
+	id 1kOLto-0006eg-5z
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 10:19:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56966)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kOLl3-0001Ts-Nq
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:10:02 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:35141)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kOLl0-0000RQ-Cw
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:10:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=qX6J3Ocw8+Pya6W2Sez8EkpvDSzAZLMl0yAnWiiHpeg=; b=f+7wof0wH5hh/pIS6LmCzEa70w
- GTyxSU5vKrDUVvPUYguOx/Y/dIPHbdtzK7/L/k592/R6foNzIW4soLopWuigcKOS9SqO8lATZ40jG
- IFAFwaeSfwvh5AW/ZJdu5opxzzr4JmDZSn+10zwFU7OzNwyg/cDIhPa2s0D2KoRVj+ayWLCWt1Kpa
- m1hb8OuwK7QuIBNE86gsGo1HaYIMhYwlbEFVBjUe/o+biUqqMO40nqloBNPJrkfkvB1qcY1qEHePX
- ezocO40eYMAQCCCABL1dww2Xk08vTz70WTCVfnGu4GOmqUfoNyLR9MEpZiubtWQVQz1jMnvYYVoGJ
- Q9j/OGRg==;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org,
- Daniel =?ISO-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
- Greg Kurz <groug@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 11/11] tests/9pfs: add local Tmkdir test
-Date: Fri, 02 Oct 2020 16:09:53 +0200
-Message-ID: <2008745.A24TOvDVlx@silver>
-In-Reply-To: <20201002134440.GD2338114@redhat.com>
-References: <cover.1601639563.git.qemu_oss@crudebyte.com>
- <2826440.YJNrgBH8pc@silver> <20201002134440.GD2338114@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kOLs6-0005aR-45
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:17:18 -0400
+Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:44775)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kOLs3-0001Tu-Df
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:17:17 -0400
+Received: by mail-ej1-x641.google.com with SMTP id a3so2191311ejy.11
+ for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 07:17:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=JzF260npFDfcZ9JASf9Kvb/IM6bbY7fKtyDop8EwStI=;
+ b=CGggeLTQz7l2zsGH2CsPH53lOjJtEC2h29DFQjPZ6aCVpv3gzqHoyHZC6bkgfQH1ib
+ WO2bzxkJ2ztOeoag5FiCvE2dbugfwF+s+REPEHbEfC3tsFaJ38yCBU43cnKLjNypGhNl
+ cMto0UkJPEDoOQMuZ92gVuYsJ3inUiL6KbrOs3R5fQ1Lhw+X9z9QmexSQwpSplHc9tpM
+ UOS/yTeYWiAhwsyYx5h8CjjrM1KG2I7+7FcDc1vwIioxV+xPxEbKKvGfzUueJR3mG+CX
+ Jmov51vkpAE9u9LMjM8vQ95miyzi3QZQ+eOqNXV+UAbDmCwvtGJNRZELEQJPEDupAqL4
+ aG0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=JzF260npFDfcZ9JASf9Kvb/IM6bbY7fKtyDop8EwStI=;
+ b=NfCa62LW8IisijM434+ALt5lGkMDmjLQ1y+yNEgjoYd7NA7kSKe6a1psiCTF+4Jkb/
+ NSHrcBtClUtfQqroFr5tycyuvD+D5rsj5E1WtKzYxejuMwg/Gtvv0BcECy9SlNNEYEQG
+ zIHfiPjFSNiZcRqPt4AKZzTAzUTuVx+vQM2gyOe5Pp+8u/pAId8bAm3cyP1UOjRR+16h
+ Z5xe9062f/VnMIzuhoiUd5mxp3xOB8xI0YcNOVz2wkZpwIP9jpImLwiJ5son+C5wLo3x
+ M8OgLFOF4hILd/gzmBKyazOMr2dL7anrjJuoS/ko6MhuqdL2WiUMIvhrIJeiNr7wBLa2
+ 7ZPw==
+X-Gm-Message-State: AOAM532hukPbahGRjQWO0/qj7irLwIqDXv5L+5Vd3ff6/+MaxFEoWhfe
+ kHoB1pvvp4UbWllJc2La15+Wqh6gHRyDTNjVj4yx/w==
+X-Google-Smtp-Source: ABdhPJxW+JUu5AzxXeAD43FK+HAqEFgJVkPcajSUVCzQ7ZqdB2Al8uErp8dMSGp1WfrCp92aZS0bgBwshimrcpJXRTk=
+X-Received: by 2002:a17:906:d936:: with SMTP id
+ rn22mr2552663ejb.4.1601648233570; 
+ Fri, 02 Oct 2020 07:17:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
-Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 08:18:24
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20201001193659.21685-1-maxim.uvarov@linaro.org>
+ <CAFEAcA_76y5DoNw3tirFFaC9FfE6NnxwAkdgV5eSv9NUeBxdhw@mail.gmail.com>
+ <CAD8XO3ZWW87Ze+gX9xWtrZ=XaETvE63WqzobQamoGM2_tb-4Zw@mail.gmail.com>
+In-Reply-To: <CAD8XO3ZWW87Ze+gX9xWtrZ=XaETvE63WqzobQamoGM2_tb-4Zw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 2 Oct 2020 15:17:01 +0100
+Message-ID: <CAFEAcA9U=hrGZQ=1ZVHsFVJc1Ghygcueq0caE2U9nk29aBGCwA@mail.gmail.com>
+Subject: Re: [PATCH] hw: wdt: implement sbsa watchdog
+To: Maxim Uvarov <maxim.uvarov@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::641;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x641.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,128 +95,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ =?UTF-8?Q?Fran=C3=A7ois_Ozog?= <francois.ozog@linaro.org>,
+ Shashi Mallela <shashi.mallela@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Freitag, 2. Oktober 2020 15:44:40 CEST Daniel P. Berrang=E9 wrote:
-> On Fri, Oct 02, 2020 at 03:41:07PM +0200, Christian Schoenebeck wrote:
-> > On Freitag, 2. Oktober 2020 14:56:14 CEST Daniel P. Berrang=E9 wrote:
-> > > On Fri, Oct 02, 2020 at 01:51:54PM +0200, Christian Schoenebeck wrote:
-> > > > This test case uses the 9pfs 'local' driver to create a directory
-> > > > and then checks if the expected directory was actually created
-> > > > (as real directory) on host side.
-> > > >=20
-> > > > Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> > > > ---
-> > > >=20
-> > > >  tests/qtest/virtio-9p-test.c | 139
-> > > >  +++++++++++++++++++++++++++++++++++
-> > > >  1 file changed, 139 insertions(+)
-> > > >=20
-> > > > diff --git a/tests/qtest/virtio-9p-test.c
-> > > > b/tests/qtest/virtio-9p-test.c
-> > > > index af7e169d3a..93161a4b35 100644
-> > > > --- a/tests/qtest/virtio-9p-test.c
-> > > > +++ b/tests/qtest/virtio-9p-test.c
-> > > > @@ -18,6 +18,62 @@
-> > > >=20
-> > > >  #define QVIRTIO_9P_TIMEOUT_US (10 * 1000 * 1000)
-> > > >  static QGuestAllocator *alloc;
-> > > >=20
-> > > > +/*
-> > > > + * Used to auto generate new fids. Start with arbitrary high value=
- to
-> > > > avoid + * collision with hard coded fids in basic test code.
-> > > > + */
-> > > > +static uint32_t fid_generator =3D 1000;
-> > > > +
-> > > > +static uint32_t genfid(void)
-> > > > +{
-> > > > +    return fid_generator++;
-> > > > +}
-> > > > +
-> > > > +/**
-> > > > + * Splits the @a in string by @a delim into individual (non empty)
-> > > > strings
-> > > > + * and outputs them to @a out. The output array @a out is NULL
-> > > > terminated.
-> > > > + *
-> > > > + * Output array @a out must be freed by calling split_free().
-> > > > + *
-> > > > + * @returns number of individual elements in output array @a out
-> > > > (without
-> > > > the + *          final NULL terminating element)
-> > > > + */
-> > > > +static int split(const char *in, const char *delim, char ***out)
-> > > > +{
-> > > > +    int n =3D 0, i =3D 0;
-> > > > +    char *tmp, *p;
-> > > > +
-> > > > +    tmp =3D g_strdup(in);
-> > > > +    for (p =3D strtok(tmp, delim); p !=3D NULL; p =3D strtok(NULL,=
- delim))
-> > > > {
-> > > > +        if (strlen(p) > 0) {
-> > > > +            ++n;
-> > > > +        }
-> > > > +    }
-> > > > +    g_free(tmp);
-> > > > +
-> > > > +    *out =3D g_malloc0(n * sizeof(char *) + 1); /* last element NU=
-LL
-> > > > delimiter */
-> > >=20
-> > > Surely this should be  (n + 1) * sizeof(char *), because the last
-> > > element still needs to be large enough to hold a pointer, not a
-> > > single extra byte.
-> >=20
-> > Right, good catch!
-> >=20
-> > > > +
-> > > > +    tmp =3D g_strdup(in);
-> > > > +    for (p =3D strtok(tmp, delim); p !=3D NULL; p =3D strtok(NULL,=
- delim))
-> > > > {
-> > > > +        if (strlen(p) > 0) {
-> > > > +            (*out)[i++] =3D g_strdup(p);
-> > > > +        }
-> > > > +    }
-> > > > +    g_free(tmp);
-> > > > +
-> > > > +    return n;
-> > > > +}
-> > >=20
-> > > This seems to largely re-invent g_strsplit
-> > >=20
-> > > https://developer.gnome.org/glib/2.62/glib-String-Utility-Functions.h=
-tml
-> > > #g-s trsplit
-> >=20
-> > Yes, except that g_strsplit() outputs empty array elements as well. Tha=
-t's
-> > not desired/working for this patch.
->=20
-> Either make the caller ignore/skip over empty elements, or make
+On Fri, 2 Oct 2020 at 15:06, Maxim Uvarov <maxim.uvarov@linaro.org> wrote:
+>
+> On Thu, 1 Oct 2020 at 23:36, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > Hi; what's the relationship between this SBSA watchdog
+> > device model and the one that Shashi posted recently?
+> > https://patchew.org/QEMU/20200929180410.33058-1-shashi.mallela@linaro.org/
 
-Not an option, since it would create too much test code overhead. I really=
-=20
-need [const int elements] and [array without empty elements].
+> Nice it's the same driver written a little bit differently. I did not
+> see his patch before. 2 things missing in Sashis driver which are
+> useful for me:
+> 1. Add sbsa watchdog to machine virt also. That helped me to reboot a
+> virtual machine with secure payload.
+> 2. I specially did not disable timer on driver close. I.e. "reboot"
+> linux path reboots with that watchdog.  And make timeout lower to not
+> wait for a long period.
 
-> this method call g_strsplit and then filter out the empty elements.
+You should get together and figure out a single version of
+the patchset that you want to upstream...
 
-Mmm, so you're suggesting to allocate a new array, copy elements from=20
-g_strsplit() array to the new array, and eventually pass that manually=20
-allocated array to g_strfreev()? Wouldn't that be a bit unsafe regarding=20
-potential future changes in how glib allocates/structures those string arra=
-ys?
+> Can this driver also be considered for virt machine?
 
-At least I don't see a glib function that would filter string arrays out of=
-=20
-the box.
+Maybe, but you'd need to explain why it's useful (ie why
+you can't just plug in the wdt_i6300esb, which I think
+is a PCI watchdog device). We try not to add devices to
+virt unless we have to, because they increase the security
+attack surface.
 
-Best regards,
-Christian Schoenebeck
-
-
+thanks
+-- PMM
 
