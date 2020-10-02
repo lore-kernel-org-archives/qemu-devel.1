@@ -2,112 +2,72 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,NORMAL_HTTP_TO_IP,NUMERIC_HTTP_ADDR,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 978B7C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 14:09:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C65FC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 14:10:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6912206DB
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 14:09:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AA8B6206DD
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 14:10:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LCmEJXi8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6912206DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="f+7wof0w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA8B6206DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOLki-0001GG-1C
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 10:09:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55100)
+	id 1kOLls-0002IA-Pv
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 10:10:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55294)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kOLk7-0000pB-G7
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:09:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29262)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kOLk4-0000O7-Vl
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:09:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601647738;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=7a+95HcwMGJni20WxrXIKy/jgCukmOeZlgWordW/2d4=;
- b=LCmEJXi8wGermF6+LLob8QasKKjr/r35IpAqZWAqO+bCTfEifeCH/i/dr8EcPvkHUdP/Xq
- hAByukFs8n6qnzl89B7MArCAYMiEQAx5zGcDOUjnhS9MKRjokrPmLEQ/us1YzLgLlRDTkE
- JVwfd59nwINxrjt31ntY98/pSr9AQAM=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-474-79yNUVUKNo-mrXgchTGUZQ-1; Fri, 02 Oct 2020 10:08:55 -0400
-X-MC-Unique: 79yNUVUKNo-mrXgchTGUZQ-1
-Received: by mail-wr1-f72.google.com with SMTP id v5so584297wrs.17
- for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 07:08:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=7a+95HcwMGJni20WxrXIKy/jgCukmOeZlgWordW/2d4=;
- b=Et98BX77MkF0tHy7ffHraUgWnzl94igf+VywsIwD4csriCCxoptyxOpLqg56FGwodv
- O1ColNSQxd4+pt78FbqrsuCGEpvk8u59W5ZKFM0KIrwNAk6UWJzD4+YK4UnuIoXjr1MJ
- FPCzqHDmaOhOUYd4YI9eqM+/l6oAIBVJ4txXyI3gHk5PIt6BXqykueqZ9CQ+sZ8LXoOG
- RaEuuhSpzFB4noUNsZQ2GKXVfZ+QolzDgtjFkhyiUGGam2MgZKMUzBmCDEfWO/l5H8+L
- UMAgrdLPoU4IrhTv1iNhd6SJbD+lUfWn4yetiUY5bYNRi6VoGUkBmH/+peeA/GNuxwz+
- LEfQ==
-X-Gm-Message-State: AOAM5308Wcpaa4R84kU2b31o1tqSJs/kn3G2YYXFMjvsnZpVYD4Re3ZG
- P/SUpv3R2UJDXhLQ6y/Eb6Buus2lj9BUmkzx/OBdcmFFX8odLfN9rtqPt7O1IObxmBmvi45NQqC
- 8X9pjuwuVkhpssPY=
-X-Received: by 2002:adf:f585:: with SMTP id f5mr3469026wro.64.1601647734284;
- Fri, 02 Oct 2020 07:08:54 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJybVBHlPJNvpF+Jk4jYKpLHHS48MsQlBJBvNjEZYsGR1AGXUrFNR9LElPSp9cdnaA1UNjqRMQ==
-X-Received: by 2002:adf:f585:: with SMTP id f5mr3468992wro.64.1601647733921;
- Fri, 02 Oct 2020 07:08:53 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:47e0:e742:75ba:b84d?
- ([2001:b07:6468:f312:47e0:e742:75ba:b84d])
- by smtp.gmail.com with ESMTPSA id m3sm1855791wrs.83.2020.10.02.07.08.52
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 02 Oct 2020 07:08:52 -0700 (PDT)
-Subject: Re: [PATCH] meson.build: Don't look for libudev for static builds
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20201002105239.2444-1-peter.maydell@linaro.org>
- <b1a6000a-c9a1-43fb-7646-b6ea87797b2e@redhat.com>
- <CAFEAcA9PbBByROzJ3+pfxycAoP-C5JnmfxQEt5jm6+3A3n2fbw@mail.gmail.com>
- <df5bd19c-da9d-d3b0-71a9-4deed67450bf@redhat.com>
- <CAFEAcA9M_BP9mnZHCLM93aYvMxrRHYFELQZ3FvsyH3hNvXtHDA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <405d680b-d088-58ff-9364-fcfcea1345dc@redhat.com>
-Date: Fri, 2 Oct 2020 16:08:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1kOLl3-0001Ts-Nq
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:10:02 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:35141)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1kOLl0-0000RQ-Cw
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:10:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=qX6J3Ocw8+Pya6W2Sez8EkpvDSzAZLMl0yAnWiiHpeg=; b=f+7wof0wH5hh/pIS6LmCzEa70w
+ GTyxSU5vKrDUVvPUYguOx/Y/dIPHbdtzK7/L/k592/R6foNzIW4soLopWuigcKOS9SqO8lATZ40jG
+ IFAFwaeSfwvh5AW/ZJdu5opxzzr4JmDZSn+10zwFU7OzNwyg/cDIhPa2s0D2KoRVj+ayWLCWt1Kpa
+ m1hb8OuwK7QuIBNE86gsGo1HaYIMhYwlbEFVBjUe/o+biUqqMO40nqloBNPJrkfkvB1qcY1qEHePX
+ ezocO40eYMAQCCCABL1dww2Xk08vTz70WTCVfnGu4GOmqUfoNyLR9MEpZiubtWQVQz1jMnvYYVoGJ
+ Q9j/OGRg==;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org,
+ Daniel =?ISO-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
+ Greg Kurz <groug@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 11/11] tests/9pfs: add local Tmkdir test
+Date: Fri, 02 Oct 2020 16:09:53 +0200
+Message-ID: <2008745.A24TOvDVlx@silver>
+In-Reply-To: <20201002134440.GD2338114@redhat.com>
+References: <cover.1601639563.git.qemu_oss@crudebyte.com>
+ <2826440.YJNrgBH8pc@silver> <20201002134440.GD2338114@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9M_BP9mnZHCLM93aYvMxrRHYFELQZ3FvsyH3hNvXtHDA@mail.gmail.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/01 23:37:29
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
+Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
+ helo=lizzy.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 08:18:24
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -23
-X-Spam_score: -2.4
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.256, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -121,49 +81,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/10/20 15:09, Peter Maydell wrote:
-> This duplicates the information that the thing that depends
-> on libudev is mpath. Can we put this in a wrapper around
-> dependency() so that we could just say something like
->   libudev = compile_checked_dependency('libudev',
->                        required: get_option('mpath').enabled(),
->                        static: enable_static)
-> 
-> for those dependencies that want to do the "does this compile"
-> check ?
+On Freitag, 2. Oktober 2020 15:44:40 CEST Daniel P. Berrang=E9 wrote:
+> On Fri, Oct 02, 2020 at 03:41:07PM +0200, Christian Schoenebeck wrote:
+> > On Freitag, 2. Oktober 2020 14:56:14 CEST Daniel P. Berrang=E9 wrote:
+> > > On Fri, Oct 02, 2020 at 01:51:54PM +0200, Christian Schoenebeck wrote:
+> > > > This test case uses the 9pfs 'local' driver to create a directory
+> > > > and then checks if the expected directory was actually created
+> > > > (as real directory) on host side.
+> > > >=20
+> > > > Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> > > > ---
+> > > >=20
+> > > >  tests/qtest/virtio-9p-test.c | 139
+> > > >  +++++++++++++++++++++++++++++++++++
+> > > >  1 file changed, 139 insertions(+)
+> > > >=20
+> > > > diff --git a/tests/qtest/virtio-9p-test.c
+> > > > b/tests/qtest/virtio-9p-test.c
+> > > > index af7e169d3a..93161a4b35 100644
+> > > > --- a/tests/qtest/virtio-9p-test.c
+> > > > +++ b/tests/qtest/virtio-9p-test.c
+> > > > @@ -18,6 +18,62 @@
+> > > >=20
+> > > >  #define QVIRTIO_9P_TIMEOUT_US (10 * 1000 * 1000)
+> > > >  static QGuestAllocator *alloc;
+> > > >=20
+> > > > +/*
+> > > > + * Used to auto generate new fids. Start with arbitrary high value=
+ to
+> > > > avoid + * collision with hard coded fids in basic test code.
+> > > > + */
+> > > > +static uint32_t fid_generator =3D 1000;
+> > > > +
+> > > > +static uint32_t genfid(void)
+> > > > +{
+> > > > +    return fid_generator++;
+> > > > +}
+> > > > +
+> > > > +/**
+> > > > + * Splits the @a in string by @a delim into individual (non empty)
+> > > > strings
+> > > > + * and outputs them to @a out. The output array @a out is NULL
+> > > > terminated.
+> > > > + *
+> > > > + * Output array @a out must be freed by calling split_free().
+> > > > + *
+> > > > + * @returns number of individual elements in output array @a out
+> > > > (without
+> > > > the + *          final NULL terminating element)
+> > > > + */
+> > > > +static int split(const char *in, const char *delim, char ***out)
+> > > > +{
+> > > > +    int n =3D 0, i =3D 0;
+> > > > +    char *tmp, *p;
+> > > > +
+> > > > +    tmp =3D g_strdup(in);
+> > > > +    for (p =3D strtok(tmp, delim); p !=3D NULL; p =3D strtok(NULL,=
+ delim))
+> > > > {
+> > > > +        if (strlen(p) > 0) {
+> > > > +            ++n;
+> > > > +        }
+> > > > +    }
+> > > > +    g_free(tmp);
+> > > > +
+> > > > +    *out =3D g_malloc0(n * sizeof(char *) + 1); /* last element NU=
+LL
+> > > > delimiter */
+> > >=20
+> > > Surely this should be  (n + 1) * sizeof(char *), because the last
+> > > element still needs to be large enough to hold a pointer, not a
+> > > single extra byte.
+> >=20
+> > Right, good catch!
+> >=20
+> > > > +
+> > > > +    tmp =3D g_strdup(in);
+> > > > +    for (p =3D strtok(tmp, delim); p !=3D NULL; p =3D strtok(NULL,=
+ delim))
+> > > > {
+> > > > +        if (strlen(p) > 0) {
+> > > > +            (*out)[i++] =3D g_strdup(p);
+> > > > +        }
+> > > > +    }
+> > > > +    g_free(tmp);
+> > > > +
+> > > > +    return n;
+> > > > +}
+> > >=20
+> > > This seems to largely re-invent g_strsplit
+> > >=20
+> > > https://developer.gnome.org/glib/2.62/glib-String-Utility-Functions.h=
+tml
+> > > #g-s trsplit
+> >=20
+> > Yes, except that g_strsplit() outputs empty array elements as well. Tha=
+t's
+> > not desired/working for this patch.
+>=20
+> Either make the caller ignore/skip over empty elements, or make
 
-No, there's no functions at all.  You can of course put the detection and
-test in a single loop:
+Not an option, since it would create too much test code overhead. I really=
+=20
+need [const int elements] and [array without empty elements].
 
-  dependencies = {}
-  ...
-  if targetos == 'linux' and (have_system or have_tools)
-    dependencies += {'libudev': 'mpath'}
-  endif
-  ...
-  skeleton = 'int main(void) { return 0; }'
-  foreach var, option: dependencies
-    dep = dependency(var,
-                     required: get_option(option).enabled(),
-                     static: enable_static)
-    if dep.found() and enable_static and not cc.links(skeleton, dependencies: get_variable(var))
-      if get_option(option).enabled()
-          error('Cannot link with @0@'.format(var))
-        else
-          warning('Cannot link with @0@, disabling'.format(skeleton))
-          set_variable(var, not_found)
-        endif
-      endif
-    endif
-  endforeach
+> this method call g_strsplit and then filter out the empty elements.
 
-Doing this check for all libraries is certainly a good idea.
+Mmm, so you're suggesting to allocate a new array, copy elements from=20
+g_strsplit() array to the new array, and eventually pass that manually=20
+allocated array to g_strfreev()? Wouldn't that be a bit unsafe regarding=20
+potential future changes in how glib allocates/structures those string arra=
+ys?
 
-Paolo
+At least I don't see a glib function that would filter string arrays out of=
+=20
+the box.
+
+Best regards,
+Christian Schoenebeck
+
 
 
