@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDE84C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:06:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EE27C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:07:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F6A620672
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:06:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 002A92074B
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:07:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aeXI5Peh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F6A620672
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eBcDC5nN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 002A92074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOMdz-0004P2-3k
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 11:06:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34900)
+	id 1kOMeV-00056O-Ua
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 11:07:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34978)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kOMIT-0002ES-5v
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:44:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22958)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kOMIV-0002Kq-SX
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:44:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21933)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kOMIQ-0004cG-Q6
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:44:32 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kOMIS-0004dn-GX
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:44:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601649870;
+ s=mimecast20190719; t=1601649871;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3Sp2E3TCR+IAgBNX/9r7YwRIHN/iBQ503C6KrlQZ/68=;
- b=aeXI5PehcavdEXTPvEBNIok4RaLIQbdcdYiyoCJuD7Sn/joLXGYX+Weea6Fc2QCLqzbSYo
- czB29y/6/GPcjFBhYg8s+O+2MRZgqGKLEaQsXPiqIQhlC+ZlGGfT/XEnF2uyv20TWg5Ad+
- hdpZ9kNf5QRvqkkitSG4t9NoCKtXz+M=
+ bh=GITbdY6pLDlqJYgdhfAJTvphBqSdq44GJuim85Z4UX0=;
+ b=eBcDC5nN61hKPfn079XVvoGCvqnVZxVUl4NHNJmpFwSo/+nWNIcUOzOXubhAfFmfL5EwJ+
+ 404EJS+pBqpAzpqm6fIW9OaowcxClER4xB9yl0PMdVH3ekLqHdYvCZUAiRUMbMfZL8viOS
+ fK8BRDRhslaos9OJMIvG9757rj7eBSE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-124-TBoOqqUFOqGj-ci08xKIYw-1; Fri, 02 Oct 2020 10:44:27 -0400
-X-MC-Unique: TBoOqqUFOqGj-ci08xKIYw-1
+ us-mta-178-0artsL8iO3qOjwLQJI4uvw-1; Fri, 02 Oct 2020 10:44:29 -0400
+X-MC-Unique: 0artsL8iO3qOjwLQJI4uvw-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA708A7420;
- Fri,  2 Oct 2020 14:44:26 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 209361084C94;
+ Fri,  2 Oct 2020 14:44:28 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-112-139.ams2.redhat.com
  [10.36.112.139])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BB7895D9D3;
- Fri,  2 Oct 2020 14:44:25 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2D9CE5D9D3;
+ Fri,  2 Oct 2020 14:44:27 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 24/37] block/export: Add block-export-del
-Date: Fri,  2 Oct 2020 16:43:32 +0200
-Message-Id: <20201002144345.253865-25-kwolf@redhat.com>
+Subject: [PULL 25/37] block/export: Add BLOCK_EXPORT_DELETED event
+Date: Fri,  2 Oct 2020 16:43:33 +0200
+Message-Id: <20201002144345.253865-26-kwolf@redhat.com>
 In-Reply-To: <20201002144345.253865-1-kwolf@redhat.com>
 References: <20201002144345.253865-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -81,7 +81,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,270 +99,125 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Implement a new QMP command block-export-del and make nbd-server-remove
-a wrapper around it.
+Clients may want to know when an export has finally disappeard
+(block-export-del returns earlier than that in the general case), so add
+a QAPI event for it.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20200924152717.287415-21-kwolf@redhat.com>
+Message-Id: <20200924152717.287415-22-kwolf@redhat.com>
 Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/block-export.json         | 32 ++++++++++++++++++++-----
- include/block/export.h         |  1 +
- include/block/nbd.h            |  1 -
- block/export/export.c          | 43 +++++++++++++++++++++++++++++++++-
- block/monitor/block-hmp-cmds.c |  4 ++--
- blockdev-nbd.c                 | 25 +++++---------------
- nbd/server.c                   | 14 -----------
- 7 files changed, 77 insertions(+), 43 deletions(-)
+ qapi/block-export.json     | 12 ++++++++++++
+ block/export/export.c      |  2 ++
+ tests/qemu-iotests/140     |  9 ++++++++-
+ tests/qemu-iotests/140.out |  2 +-
+ tests/qemu-iotests/223.out |  4 ++++
+ 5 files changed, 27 insertions(+), 2 deletions(-)
 
 diff --git a/qapi/block-export.json b/qapi/block-export.json
-index 658bdf05e1..3d22527c84 100644
+index 3d22527c84..76e014c406 100644
 --- a/qapi/block-export.json
 +++ b/qapi/block-export.json
-@@ -116,9 +116,9 @@
-   'data': 'NbdServerAddOptions', 'boxed': true }
- 
+@@ -233,3 +233,15 @@
  ##
--# @NbdServerRemoveMode:
-+# @BlockExportRemoveMode:
- #
--# Mode for removing an NBD export.
-+# Mode for removing a block export.
- #
- # @safe: Remove export if there are no existing connections, fail otherwise.
- #
-@@ -134,16 +134,16 @@
- #
- # Since: 2.12
- ##
--{'enum': 'NbdServerRemoveMode', 'data': ['safe', 'hard']}
-+{'enum': 'BlockExportRemoveMode', 'data': ['safe', 'hard']}
- 
- ##
- # @nbd-server-remove:
- #
- # Remove NBD export by name.
- #
--# @name: Export name.
-+# @name: Block export id.
- #
--# @mode: Mode of command operation. See @NbdServerRemoveMode description.
-+# @mode: Mode of command operation. See @BlockExportRemoveMode description.
- #        Default is 'safe'.
- #
- # Returns: error if
-@@ -154,7 +154,7 @@
- # Since: 2.12
- ##
- { 'command': 'nbd-server-remove',
--  'data': {'name': 'str', '*mode': 'NbdServerRemoveMode'} }
-+  'data': {'name': 'str', '*mode': 'BlockExportRemoveMode'} }
- 
- ##
- # @nbd-server-stop:
-@@ -213,3 +213,23 @@
- ##
- { 'command': 'block-export-add',
-   'data': 'BlockExportOptions', 'boxed': true }
+ { 'command': 'block-export-del',
+   'data': { 'id': 'str', '*mode': 'BlockExportRemoveMode' } }
 +
 +##
-+# @block-export-del:
++# @BLOCK_EXPORT_DELETED:
 +#
-+# Request to remove a block export. This drops the user's reference to the
-+# export, but the export may still stay around after this command returns until
-+# the shutdown of the export has completed.
++# Emitted when a block export is removed and its id can be reused.
 +#
 +# @id: Block export id.
 +#
-+# @mode: Mode of command operation. See @BlockExportRemoveMode description.
-+#        Default is 'safe'.
-+#
-+# Returns: Error if the export is not found or @mode is 'safe' and the export
-+#          is still in use (e.g. by existing client connections)
-+#
 +# Since: 5.2
 +##
-+{ 'command': 'block-export-del',
-+  'data': { 'id': 'str', '*mode': 'BlockExportRemoveMode' } }
-diff --git a/include/block/export.h b/include/block/export.h
-index 4833947e89..ff54d35872 100644
---- a/include/block/export.h
-+++ b/include/block/export.h
-@@ -76,6 +76,7 @@ struct BlockExport {
- };
- 
- BlockExport *blk_exp_add(BlockExportOptions *export, Error **errp);
-+BlockExport *blk_exp_find(const char *id);
- void blk_exp_ref(BlockExport *exp);
- void blk_exp_unref(BlockExport *exp);
- void blk_exp_request_shutdown(BlockExport *exp);
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 0b9f3e5d4e..a4dc1f9e54 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -337,7 +337,6 @@ int nbd_export_new(BlockExport *blk_exp, BlockDriverState *bs,
-                    const char *bitmap, bool readonly, bool shared,
-                    bool writethrough, Error **errp);
- void nbd_export_set_on_eject_blk(BlockExport *exp, BlockBackend *blk);
--void nbd_export_remove(NBDExport *exp, NbdServerRemoveMode mode, Error **errp);
- 
- AioContext *nbd_export_aio_context(NBDExport *exp);
- NBDExport *nbd_export_find(const char *name);
++{ 'event': 'BLOCK_EXPORT_DELETED',
++  'data': { 'id': 'str' } }
 diff --git a/block/export/export.c b/block/export/export.c
-index 62699dfa05..d186beffe9 100644
+index d186beffe9..87940d5c40 100644
 --- a/block/export/export.c
 +++ b/block/export/export.c
-@@ -29,7 +29,7 @@ static const BlockExportDriver *blk_exp_drivers[] = {
- static QLIST_HEAD(, BlockExport) block_exports =
-     QLIST_HEAD_INITIALIZER(block_exports);
+@@ -19,6 +19,7 @@
+ #include "block/nbd.h"
+ #include "qapi/error.h"
+ #include "qapi/qapi-commands-block-export.h"
++#include "qapi/qapi-events-block-export.h"
+ #include "qemu/id.h"
  
--static BlockExport *blk_exp_find(const char *id)
-+BlockExport *blk_exp_find(const char *id)
- {
-     BlockExport *exp;
+ static const BlockExportDriver *blk_exp_drivers[] = {
+@@ -113,6 +114,7 @@ static void blk_exp_delete_bh(void *opaque)
+     assert(exp->refcount == 0);
+     QLIST_REMOVE(exp, next);
+     exp->drv->delete(exp);
++    qapi_event_send_block_export_deleted(exp->id);
+     g_free(exp->id);
+     g_free(exp);
  
-@@ -143,12 +143,23 @@ void blk_exp_request_shutdown(BlockExport *exp)
-     AioContext *aio_context = exp->ctx;
+diff --git a/tests/qemu-iotests/140 b/tests/qemu-iotests/140
+index 8d2ce5d9e3..309b177e77 100755
+--- a/tests/qemu-iotests/140
++++ b/tests/qemu-iotests/140
+@@ -81,10 +81,17 @@ $QEMU_IO_PROG -f raw -r -c 'read -P 42 0 64k' \
+     "nbd+unix:///drv?socket=$SOCK_DIR/nbd" 2>&1 \
+     | _filter_qemu_io | _filter_nbd
  
-     aio_context_acquire(aio_context);
++# The order of 'return' and the BLOCK_EXPORT_DELETED event is undefined. Just
++# wait until we've twice seen one of them. Filter the 'return' line out so that
++# the output is defined.
+ _send_qemu_cmd $QEMU_HANDLE \
+     "{ 'execute': 'eject',
+        'arguments': { 'device': 'drv' }}" \
+-    'return'
++    'return\|BLOCK_EXPORT_DELETED' |
++    grep -v 'return'
 +
-+    /*
-+     * If the user doesn't own the export any more, it is already shutting
-+     * down. We must not call .request_shutdown and decrease the refcount a
-+     * second time.
-+     */
-+    if (!exp->user_owned) {
-+        goto out;
-+    }
-+
-     exp->drv->request_shutdown(exp);
++_send_qemu_cmd $QEMU_HANDLE '' 'return\|BLOCK_EXPORT_DELETED' |
++    grep -v 'return'
  
-     assert(exp->user_owned);
-     exp->user_owned = false;
-     blk_exp_unref(exp);
- 
-+out:
-     aio_context_release(aio_context);
- }
- 
-@@ -199,3 +210,33 @@ void qmp_block_export_add(BlockExportOptions *export, Error **errp)
- {
-     blk_exp_add(export, errp);
- }
-+
-+void qmp_block_export_del(const char *id,
-+                          bool has_mode, BlockExportRemoveMode mode,
-+                          Error **errp)
-+{
-+    ERRP_GUARD();
-+    BlockExport *exp;
-+
-+    exp = blk_exp_find(id);
-+    if (exp == NULL) {
-+        error_setg(errp, "Export '%s' is not found", id);
-+        return;
-+    }
-+    if (!exp->user_owned) {
-+        error_setg(errp, "Export '%s' is already shutting down", id);
-+        return;
-+    }
-+
-+    if (!has_mode) {
-+        mode = BLOCK_EXPORT_REMOVE_MODE_SAFE;
-+    }
-+    if (mode == BLOCK_EXPORT_REMOVE_MODE_SAFE && exp->refcount > 1) {
-+        error_setg(errp, "export '%s' still in use", exp->id);
-+        error_append_hint(errp, "Use mode='hard' to force client "
-+                          "disconnect\n");
-+        return;
-+    }
-+
-+    blk_exp_request_shutdown(exp);
-+}
-diff --git a/block/monitor/block-hmp-cmds.c b/block/monitor/block-hmp-cmds.c
-index db357cafcb..d15a2be827 100644
---- a/block/monitor/block-hmp-cmds.c
-+++ b/block/monitor/block-hmp-cmds.c
-@@ -476,8 +476,8 @@ void hmp_nbd_server_remove(Monitor *mon, const QDict *qdict)
-     bool force = qdict_get_try_bool(qdict, "force", false);
-     Error *err = NULL;
- 
--    /* Rely on NBD_SERVER_REMOVE_MODE_SAFE being the default */
--    qmp_nbd_server_remove(name, force, NBD_SERVER_REMOVE_MODE_HARD, &err);
-+    /* Rely on BLOCK_EXPORT_REMOVE_MODE_SAFE being the default */
-+    qmp_nbd_server_remove(name, force, BLOCK_EXPORT_REMOVE_MODE_HARD, &err);
-     hmp_handle_error(mon, err);
- }
- 
-diff --git a/blockdev-nbd.c b/blockdev-nbd.c
-index 9efbaef8f7..4a9a1be571 100644
---- a/blockdev-nbd.c
-+++ b/blockdev-nbd.c
-@@ -307,31 +307,18 @@ fail:
- }
- 
- void qmp_nbd_server_remove(const char *name,
--                           bool has_mode, NbdServerRemoveMode mode,
-+                           bool has_mode, BlockExportRemoveMode mode,
-                            Error **errp)
- {
--    NBDExport *exp;
--    AioContext *aio_context;
--
--    if (!nbd_server) {
--        error_setg(errp, "NBD server not running");
--        return;
--    }
-+    BlockExport *exp;
- 
--    exp = nbd_export_find(name);
--    if (exp == NULL) {
--        error_setg(errp, "Export '%s' is not found", name);
-+    exp = blk_exp_find(name);
-+    if (exp && exp->drv->type != BLOCK_EXPORT_TYPE_NBD) {
-+        error_setg(errp, "Block export '%s' is not an NBD export", name);
-         return;
-     }
- 
--    if (!has_mode) {
--        mode = NBD_SERVER_REMOVE_MODE_SAFE;
--    }
--
--    aio_context = nbd_export_aio_context(exp);
--    aio_context_acquire(aio_context);
--    nbd_export_remove(exp, mode, errp);
--    aio_context_release(aio_context);
-+    qmp_block_export_del(name, has_mode, mode, errp);
- }
- 
- void qmp_nbd_server_stop(Error **errp)
-diff --git a/nbd/server.c b/nbd/server.c
-index 22a1d66168..1a0e1db401 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -1669,20 +1669,6 @@ static void nbd_export_request_shutdown(BlockExport *blk_exp)
-     blk_exp_unref(&exp->common);
- }
- 
--void nbd_export_remove(NBDExport *exp, NbdServerRemoveMode mode, Error **errp)
--{
--    ERRP_GUARD();
--    if (mode == NBD_SERVER_REMOVE_MODE_HARD || QTAILQ_EMPTY(&exp->clients)) {
--        nbd_export_request_shutdown(&exp->common);
--        return;
--    }
--
--    assert(mode == NBD_SERVER_REMOVE_MODE_SAFE);
--
--    error_setg(errp, "export '%s' still in use", exp->name);
--    error_append_hint(errp, "Use mode='hard' to force client disconnect\n");
--}
--
- static void nbd_export_delete(BlockExport *blk_exp)
- {
-     NBDExport *exp = container_of(blk_exp, NBDExport, common);
+ $QEMU_IO_PROG -f raw -r -c close \
+     "nbd+unix:///drv?socket=$SOCK_DIR/nbd" 2>&1 \
+diff --git a/tests/qemu-iotests/140.out b/tests/qemu-iotests/140.out
+index 86b985da75..62d9c3ab3c 100644
+--- a/tests/qemu-iotests/140.out
++++ b/tests/qemu-iotests/140.out
+@@ -11,7 +11,7 @@ wrote 65536/65536 bytes at offset 0
+ read 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ { 'execute': 'eject', 'arguments': { 'device': 'drv' }}
+-{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_EXPORT_DELETED", "data": {"id": "drv"}}
+ qemu-io: can't open device nbd+unix:///drv?socket=SOCK_DIR/nbd: Requested export not available
+ server reported: export 'drv' not present
+ { 'execute': 'quit' }
+diff --git a/tests/qemu-iotests/223.out b/tests/qemu-iotests/223.out
+index 31ce9e6fe0..f6eac23f04 100644
+--- a/tests/qemu-iotests/223.out
++++ b/tests/qemu-iotests/223.out
+@@ -102,8 +102,10 @@ read 2097152/2097152 bytes at offset 2097152
+ {"execute":"nbd-server-remove", "arguments":{"name":"n"}}
+ {"return": {}}
+ {"execute":"nbd-server-remove", "arguments":{"name":"n2"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_EXPORT_DELETED", "data": {"id": "n"}}
+ {"return": {}}
+ {"execute":"nbd-server-remove", "arguments":{"name":"n2"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_EXPORT_DELETED", "data": {"id": "n2"}}
+ {"error": {"class": "GenericError", "desc": "Export 'n2' is not found"}}
+ {"execute":"nbd-server-stop"}
+ {"return": {}}
+@@ -183,8 +185,10 @@ read 2097152/2097152 bytes at offset 2097152
+ {"execute":"nbd-server-remove", "arguments":{"name":"n"}}
+ {"return": {}}
+ {"execute":"nbd-server-remove", "arguments":{"name":"n2"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_EXPORT_DELETED", "data": {"id": "n"}}
+ {"return": {}}
+ {"execute":"nbd-server-remove", "arguments":{"name":"n2"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_EXPORT_DELETED", "data": {"id": "n2"}}
+ {"error": {"class": "GenericError", "desc": "Export 'n2' is not found"}}
+ {"execute":"nbd-server-stop"}
+ {"return": {}}
 -- 
 2.25.4
 
