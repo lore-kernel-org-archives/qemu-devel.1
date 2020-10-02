@@ -2,101 +2,90 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46EE6C47423
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 08:51:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1F4DC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 09:00:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2F822064B
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 08:51:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2F822064B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id 0815220719
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 09:00:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BhgYEpRV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0815220719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOGmp-0000ts-8Q
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 04:51:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43190)
+	id 1kOGvg-0004Cu-PS
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 05:00:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45112)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kOGjd-0007uF-0N; Fri, 02 Oct 2020 04:48:14 -0400
-Received: from new1-smtp.messagingengine.com ([66.111.4.221]:37909)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kOGja-0004a3-Eu; Fri, 02 Oct 2020 04:48:12 -0400
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
- by mailnew.nyi.internal (Postfix) with ESMTP id 841725803F7;
- Fri,  2 Oct 2020 04:48:07 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
- by compute4.internal (MEProxy); Fri, 02 Oct 2020 04:48:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-type:in-reply-to; s=fm1; bh=NleZoGEpq+9ky9YfmCELoSGaqjp
- tlF4a2o9ZrgakjfA=; b=dz3k9TAoCOnPj/mipsCQZtxDcdD6QRdnTg66zVlRVEy
- 9SED3/GEHXHVso7+ek4DBnd6bAt2tAztS/u8y8o6IOF5A/HVHTZRJdya7W1EZmIG
- 9T7H2aPH6zBNpKit3krJq9p+oAfgMq3Qdk4tVsVk/2GDEAbdQmolCkyVE9uZGFue
- nW3lN17l8TRDjWAX40uR6l+EIpi2UFUmXvBdWTPaYF/vWr/zGcQSrEJyVJbsFZxI
- NDhzLXbVv8kfqvO/8pVLQcSxR4xcQcmcsCjkrY5zgf7hOtw2zGzmrERtIhHKt9C6
- sMbx8+g6aIQjIM4ey6k25GBixIE17mK8kE+g6YuFRcA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-type:date:from:in-reply-to
- :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=NleZoG
- Epq+9ky9YfmCELoSGaqjptlF4a2o9ZrgakjfA=; b=tghya2SJLRknvsEpaiKhj6
- 75kyNrQVjDhU9XGyoY+GOPggOzL7cEqc1OsCUrqRXhVVJiT4lpzJ/S5gw5YUmn3L
- Wo7zwAJK1Z/KEHUIjfsxYlR/qLQEyBD6BT9FWIHN2ozB1Tk8b70LS2PdigTQsmQm
- 6jDKe0IEgKTf4MBM/RXJwvw6loHxWhAW+PKKSQnZsW0DC6zQrTLcBg2t6a47eM6F
- 8BWUCrrDFe9LR0cw8AN5wcu2morNVQ/dBtGni9pOLVNPNRPYJ6SoR7XTnWLGoP2p
- sJbRxoCMXxjpD7OYz/Kf0Jg4jb/kv6fX89FpQI2LKPoiix9lA4+mINRclZMqQSOw
- ==
-X-ME-Sender: <xms:Rul2X8QfYCNZULF9J2kEC3KTNdC86kP5s2bGZXiGiSEND_Q1bdzWng>
- <xme:Rul2X5y6HfV1jM1ikWLe9ZjltV_2UMTOx2b9FU7aAey5msEMGkfhawB_vRjJS3Zqy
- rLLlvnPxyXI9NlI4JU>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrfeeigddtlecutefuodetggdotefrodftvf
- curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
- uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
- fjughrpeffhffvuffkfhggtggujgesghdtreertddtjeenucfhrhhomhepmfhlrghushcu
- lfgvnhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrdgukheqnecuggftrfgrthhtvg
- hrnhepjeegudffueeiteekieelkedvueelteevjeduieeludfffeejgeffhfduvdduffek
- necukfhppeektddrudeijedrleekrdduledtnecuvehluhhsthgvrhfuihiivgeptdenuc
- frrghrrghmpehmrghilhhfrhhomhepihhtshesihhrrhgvlhgvvhgrnhhtrdgukh
-X-ME-Proxy: <xmx:Rul2X530gFrayj_z8XtCq_xWiQ7PsMcmYlyaBco2bfspU-E8RudOpQ>
- <xmx:Rul2XwChTFA_mKu_ZjVX0qUJhwQnSpaisNtkV97SESzEyBg1paE4QA>
- <xmx:Rul2X1hRirHyCPiKGhgAnvraoZkngf1-E9gk2Ir6lndpy3ZxeMfngw>
- <xmx:R-l2XzZCEtMY2yukw-Bclq_-6m0PctkW-QWwpDOTCntidUKUaFLmFA>
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id 706EA306468B;
- Fri,  2 Oct 2020 04:48:05 -0400 (EDT)
-Date: Fri, 2 Oct 2020 10:48:03 +0200
-From: Klaus Jensen <its@irrelevant.dk>
-To: Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH 3/9] hw/block/nvme: support per-namespace smart log
-Message-ID: <20201002084803.GB877411@apples.localdomain>
-References: <20200930220414.562527-1-kbusch@kernel.org>
- <20200930220414.562527-4-kbusch@kernel.org>
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kOGuW-0003iI-Vc
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 04:59:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44980)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kOGuU-0005pZ-Jr
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 04:59:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601629165;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=gSQLEzjCoofHvLRyic7Egg1QTCB+2StV2VfL+d22ipE=;
+ b=BhgYEpRV66PKI5GHQ+ra9guiUxfwOj0laLQg5ejrjdMZs8QRwpVcIUcQQQyZbfLPTrV+1z
+ mHP1Jai2fd00AD+W3DZi1Auj/488ecikV2k01B2Xi1dyucrHnqpj3WAJht5mBNqmIWmYMG
+ zf/AJM/Awr02xZj3PZ4fuF+ZgXXyl/4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-121--3E7gdo5P9aRgYWDxpkf4Q-1; Fri, 02 Oct 2020 04:59:23 -0400
+X-MC-Unique: -3E7gdo5P9aRgYWDxpkf4Q-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A953A1015ED6;
+ Fri,  2 Oct 2020 08:58:52 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-101.ams2.redhat.com
+ [10.36.112.101])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4630160C05;
+ Fri,  2 Oct 2020 08:58:52 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id BECDD1132784; Fri,  2 Oct 2020 10:58:50 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH] elfload: use g_new instead of malloc
+References: <20201001123807.42978-1-eafanasova@gmail.com>
+ <87r1qhtdxt.fsf@dusky.pond.sub.org>
+ <b4ab229a-0e84-9d0b-1287-846c52a667bb@redhat.com>
+Date: Fri, 02 Oct 2020 10:58:50 +0200
+In-Reply-To: <b4ab229a-0e84-9d0b-1287-846c52a667bb@redhat.com> (Thomas Huth's
+ message of "Fri, 2 Oct 2020 07:18:06 +0200")
+Message-ID: <87eemhm2b9.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="LpQ9ahxlCli8rRTG"
-Content-Disposition: inline
-In-Reply-To: <20200930220414.562527-4-kbusch@kernel.org>
-Received-SPF: pass client-ip=66.111.4.221; envelope-from=its@irrelevant.dk;
- helo=new1-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 04:01:34
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 01:13:31
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,85 +98,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Niklas Cassel <Niklas.Cassel@wdc.com>,
- qemu-block@nongnu.org, Klaus Jensen <k.jensen@samsung.com>,
- qemu-devel@nongnu.org,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Elena Afanasova <eafanasova@gmail.com>, qemu-trivial@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Thomas Huth <thuth@redhat.com> writes:
 
---LpQ9ahxlCli8rRTG
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 02/10/2020 07.05, Markus Armbruster wrote:
+>> Elena Afanasova <eafanasova@gmail.com> writes:
+>> 
+>>> Signed-off-by: Elena Afanasova <eafanasova@gmail.com>
+>>> ---
+>>>  bsd-user/elfload.c | 92 +++++++++++++++-------------------------------
+>>>  1 file changed, 30 insertions(+), 62 deletions(-)
+>>>
+>>> diff --git a/bsd-user/elfload.c b/bsd-user/elfload.c
+>>> index 32378af7b2..e10ca54eb7 100644
+>>> --- a/bsd-user/elfload.c
+>>> +++ b/bsd-user/elfload.c
+>>> @@ -867,18 +867,14 @@ static abi_ulong load_elf_interp(struct elfhdr * interp_elf_ex,
+>>>          if (sizeof(struct elf_phdr) * interp_elf_ex->e_phnum > TARGET_PAGE_SIZE)
+>>>              return ~(abi_ulong)0UL;
+>>>  
+>>> -        elf_phdata =  (struct elf_phdr *)
+>>> -                malloc(sizeof(struct elf_phdr) * interp_elf_ex->e_phnum);
+>>> -
+>>> -        if (!elf_phdata)
+>>> -          return ~((abi_ulong)0UL);
+>>> +        elf_phdata = g_new(struct elf_phdr, interp_elf_ex->e_phnum);
+>>>  
+>>>          /*
+>>>           * If the size of this structure has changed, then punt, since
+>>>           * we will be doing the wrong thing.
+>>>           */
+>>>          if (interp_elf_ex->e_phentsize != sizeof(struct elf_phdr)) {
+>>> -            free(elf_phdata);
+>>> +            g_free(elf_phdata);
+>>>              return ~((abi_ulong)0UL);
+>>>          }
+>>>  
+>>> @@ -890,9 +886,8 @@ static abi_ulong load_elf_interp(struct elfhdr * interp_elf_ex,
+>>>          }
+>>>          if (retval < 0) {
+>>>                  perror("load_elf_interp");
+>>> +                g_free(elf_phdata);
+>>>                  exit(-1);
+>>> -                free (elf_phdata);
+>>> -                return retval;
+>> 
+>> Deleting return looks wrong.
+>
+> Why? There is an exit(-1) right in front of it, so this is dead code...
+> well, maybe that should be done in a separate patch, or at least
+> mentioned in the patch description, though.
 
-On Sep 30 15:04, Keith Busch wrote:
-> Let the user specify a specific namespace if they want to get access
-> stats for a specific namespace.
->=20
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
-> ---
->  hw/block/nvme.c      | 66 +++++++++++++++++++++++++++-----------------
->  include/block/nvme.h |  1 +
->  2 files changed, 41 insertions(+), 26 deletions(-)
->=20
-> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index 8d2b5be567..41389b2b09 100644
-> --- a/hw/block/nvme.c
-> +++ b/hw/block/nvme.c
->  static uint16_t nvme_smart_info(NvmeCtrl *n, uint8_t rae, uint32_t buf_l=
-en,
->                                  uint64_t off, NvmeRequest *req)
->  {
->      uint32_t nsid =3D le32_to_cpu(req->cmd.nsid);
-> -
-> +    struct nvme_stats stats =3D { 0 };
-> +    NvmeSmartLog smart =3D { 0 };
->      uint32_t trans_len;
-> +    NvmeNamespace *ns;
->      time_t current_ms;
-> -    uint64_t units_read =3D 0, units_written =3D 0;
-> -    uint64_t read_commands =3D 0, write_commands =3D 0;
-> -    NvmeSmartLog smart;
-> -
-> -    if (nsid && nsid !=3D 0xffffffff) {
-> -        return NVME_INVALID_FIELD | NVME_DNR;
-> -    }
-> =20
->      if (off >=3D sizeof(smart)) {
->          return NVME_INVALID_FIELD | NVME_DNR;
->      }
-> =20
-> -    for (int i =3D 1; i <=3D n->num_namespaces; i++) {
-> -        NvmeNamespace *ns =3D nvme_ns(n, i);
-> -        if (!ns) {
-> -            continue;
-> -        }
-> -
-> -        BlockAcctStats *s =3D blk_get_stats(ns->blkconf.blk);
-> +    if (nsid !=3D 0xffffffff) {
-> +        ns =3D nvme_ns(n, nsid);
-> +        if (!ns)
-> +            return NVME_INVALID_NSID | NVME_DNR;
+You're right; I missed the exit(-1).
 
-Btw, this is failing style check (missing braces).
+Following the unpleasant odour spread by exit(-1)...  Aha, the
+function's behavior on error is inconsistent: sometimes it returns zero,
+sometimes it exits.
 
---LpQ9ahxlCli8rRTG
-Content-Type: application/pgp-signature; name="signature.asc"
+Since the problem is bigger than just one dead return, I recommend
+leaving it to a separate patch, and keeping this one focused on g_new().
 
------BEGIN PGP SIGNATURE-----
-
-iQEyBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl926UEACgkQTeGvMW1P
-DekAeAf1FVoybPx077ScM+ggh1f8lgbaSNLU29uLaswE2G18zqVDYMzjoZ+sqkAn
-aG4h+R6erXe1BDhMkZXcNk+VrrJb3SbBw9HPdFmDgRFLQHmSxtywm/KWqp/CN6+y
-3yLfMoPXJD7TU4L6KWaSitGMlEYhxK1j4zyHyeYshxIj4befmGS2aoc6jWmDsm44
-UrZ/1+XMVewLXNsYTfs/gqQBS3U1TDUK2gGGOpAlrV//5DoRMbvJhmygGPyfoPQr
-pZRNAvOkKvXRF0AErn/rs5Q2ouerv5qYNIMsxZhmcwtOt7q0y/HaHDZTXKw6YBXm
-B7zJWmpfLMI9v0ulIe90HCSDTq0s
-=5nmX
------END PGP SIGNATURE-----
-
---LpQ9ahxlCli8rRTG--
 
