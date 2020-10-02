@@ -2,91 +2,92 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66AB3C4363C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:36:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91D96C4363C
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:36:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB3AE20719
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:36:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1DC942074B
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:36:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bXVJCuLf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB3AE20719
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZLPhrbPn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DC942074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kON6i-00042w-RS
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 11:36:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45944)
+	id 1kON79-0004jX-SB
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 11:36:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44542)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kON4q-0002ZF-Ke
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 11:34:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29158)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kON4n-00032A-OA
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 11:34:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601652867;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=oLizrscbJER+6ujqFmmgQToC45HsaREUk4ujlNoOPVI=;
- b=bXVJCuLfrxibeqrp5Z2YMk10rMn54WGMsRaopuwS7pq7hoCgo5GareZyVCWrzY4UoLDOGe
- 5CpWZiKMBRX0oXd9TZSjPzyk4Nw38yquU3OTW0VibBdGyeYB5OTRcEXCGuuABH5chKBl98
- Ng/s+13DPOFvM3rmCdwv5A1Sw53ust4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-7-WukScEl8PNCEJTt7yuMvDg-1; Fri, 02 Oct 2020 11:34:19 -0400
-X-MC-Unique: WukScEl8PNCEJTt7yuMvDg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75DDD801ABF;
- Fri,  2 Oct 2020 15:34:13 +0000 (UTC)
-Received: from redhat.com (ovpn-114-9.ams2.redhat.com [10.36.114.9])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 544E81992F;
- Fri,  2 Oct 2020 15:34:11 +0000 (UTC)
-Date: Fri, 2 Oct 2020 16:34:08 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Yonggang Luo <luoyonggang@gmail.com>
-Subject: Re: [PATCH v6 1/4] configure: fixes indent of $meson setup
-Message-ID: <20201002153408.GI2338114@redhat.com>
-References: <20201001173230.829-1-luoyonggang@gmail.com>
- <20201001173230.829-2-luoyonggang@gmail.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kOMyr-0005Vb-I3
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 11:28:22 -0400
+Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:42033)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kOMyo-0002Iw-A0
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 11:28:21 -0400
+Received: by mail-ej1-x643.google.com with SMTP id q13so2544267ejo.9
+ for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 08:28:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=tFI5JzehN3mc6X+UphLIA1R02oShmt7XY3dUv+fWOGI=;
+ b=ZLPhrbPngyfAKUhEBb385G2Bp+gDk2Az8bKlx3Zx1s8FQ5ddfU2QbdmJdPrIBk7xJ/
+ RpH5zQ68Vp5HpZiYER3HxvEQkqa6asBvCK8zjBofGeyPdYKk5IGN3JRzEd4XuG3Z8Umy
+ 4mdaKKkJfxxsZePI9WVx9Y8Lrw8RlF1Rl0uxkCPj0Jv1L6lT//YadhLlu6F79jimO906
+ a0Kn8Kno41Isnjybbb/b0/K24O5LkVf3nB2PShcHMK6EMcuahKcdqa+A5xoPPrW72iXF
+ +eYVyEcEWwLNIKlWZVnMY+HNswUQL/WGhETNsl3ABdJ1xvOhCEMfxJ1pWfCPkYGpUNb7
+ nPAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=tFI5JzehN3mc6X+UphLIA1R02oShmt7XY3dUv+fWOGI=;
+ b=eEZOQHI53oeraSdJnPg07garTGbcF3O6NvpTuElhqa2pjXb98GQJuDlMZePBr3v5Uc
+ eXkcvOrhrZNTEVEgCxrXQdRotXBHciYRViHPrODf43v51VdptmtI3I3e1j8qYsNtB03F
+ jOC0+mHQPCRKvXyfy65liLILnzqBeiWvBwENXR0R5M70vpu74xskiWJ8Zk9EMqNEOETD
+ K40Q8Kn3gGafRTYum3l8nKXLMMTh8AdxxHUxyW1bQI9IntnxjinVuPeYPu18nA3Jt77k
+ Kn8rxyZYLbmjIBijYqjHWnTrOkrxxnmyOFd9Wwm2lLHO9Ckr02O96Y52soAyfYjFNZHv
+ 5mDQ==
+X-Gm-Message-State: AOAM5320NZZ6Zu8ZtrL9sL6ZCm8xLhZl8Iy5PdOw+LcS3cCTYaCk9oRk
+ GV856yDJjqjD0n2/raivLz+I3H0sJPpI0X0CSt4gFQ==
+X-Google-Smtp-Source: ABdhPJyPrL1R74Fpccbn70nezOJVMGdMiCjxHptgewq6iwWRcN8RwODNYlbLDEMGmGBygSKxUeO31ASCYPTiDiCB2P4=
+X-Received: by 2002:a17:907:20d9:: with SMTP id
+ qq25mr2738984ejb.382.1601652496399; 
+ Fri, 02 Oct 2020 08:28:16 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20201001173230.829-2-luoyonggang@gmail.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 01:13:31
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20201002105239.2444-1-peter.maydell@linaro.org>
+ <b1a6000a-c9a1-43fb-7646-b6ea87797b2e@redhat.com>
+ <CAFEAcA9PbBByROzJ3+pfxycAoP-C5JnmfxQEt5jm6+3A3n2fbw@mail.gmail.com>
+ <df5bd19c-da9d-d3b0-71a9-4deed67450bf@redhat.com>
+ <CAFEAcA9M_BP9mnZHCLM93aYvMxrRHYFELQZ3FvsyH3hNvXtHDA@mail.gmail.com>
+ <405d680b-d088-58ff-9364-fcfcea1345dc@redhat.com>
+ <CAFEAcA9vr+HKe3HnNECo8=pP7KcdjZXr1cJqg8HTbYKbaNDY3A@mail.gmail.com>
+ <a1ef11fc-7652-056e-bfcc-db0f8fcfc13f@redhat.com>
+In-Reply-To: <a1ef11fc-7652-056e-bfcc-db0f8fcfc13f@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 2 Oct 2020 16:28:05 +0100
+Message-ID: <CAFEAcA-MgZ9NcrGs6obbuZsc3xDtXjwB-_Xzk97+0kr+p=CxzQ@mail.gmail.com>
+Subject: Re: [PATCH] meson.build: Don't look for libudev for static builds
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::643;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x643.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,32 +100,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 02, 2020 at 01:32:27AM +0800, Yonggang Luo wrote:
-> convert these line from tab to space
-> 
-> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-> ---
->  configure | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+On Fri, 2 Oct 2020 at 16:15, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> Or is it loops vs. functions that you find ugly?
 
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Lack of functions. Being able to abstract out what you're
+doing into something with a comprehensible name is a
+pretty basic software engineering requirement. Yes, you
+*can* rearrange everything so that you ensure that
+all the code that wants to do something sets up
+some variables and then you loop over them, but
+then you're contorting things out of the most readable
+way to express them to work around limitations of the
+build tool.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+thanks
+-- PMM
 
