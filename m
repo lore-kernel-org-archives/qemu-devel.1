@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C69C6C4363C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 17:38:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3883C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 17:40:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49469206CA
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 17:38:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7083A206CA
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 17:40:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WOySHyzd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49469206CA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MUAL6xIf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7083A206CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOP0N-0002zq-7b
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 13:38:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45076)
+	id 1kOP38-0004X1-Bk
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 13:40:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45010)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kOOyY-0000Yr-Ki
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 13:36:11 -0400
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:40367)
+ id 1kOOyU-0000RO-Oj
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 13:36:06 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:35539)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kOOyW-0003KY-Qd
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 13:36:10 -0400
-Received: by mail-wr1-x42f.google.com with SMTP id j2so2679193wrx.7
- for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 10:36:08 -0700 (PDT)
+ id 1kOOyT-0003JO-6f
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 13:36:06 -0400
+Received: by mail-wm1-x342.google.com with SMTP id y15so2574391wmi.0
+ for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 10:36:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=CIHGBqIWtbWESa47zsQ9GTVFuyweiSkZ/Mu8fjQk2dY=;
- b=WOySHyzdBTPzAxMkdUinxkswZxWCvDA24tA1Pi0WqiH+vDyCXjHmhukNHMbCbauI3e
- sRc3y071UBrCadKjMWSh7j4mqmnIk9/0ETUSm0IJgPYRDmFuhhKtqdJNfnHggiEIPN+V
- VKGm/g3weLXDGjLaX0y5feC3IYwyE2Mch67tfImyJH0MvoEdU764Gv7YwbJvOs6hDhvS
- JbJL6fJcDFEzrvZCqFDNYlWT7wHoKhRk58jm2+9OV7RujI0KKGvEmFQgZUGOJdPH72tp
- IBz1IwrVu6Pw7ZZQ5PQ7RKAeEBU8MocqiTIzLc4xZ+PZzWH8Z4tSW0/fOOKbch//qmYh
- GZpw==
+ bh=xXdgD+CX1xaJz1RLqkztVK48fKpoJNRH36Jn29j2m3Q=;
+ b=MUAL6xIf8PviJhDBefAPrh7PcVnrrIOEO099O8FQoxcQFWYJP15tXvdIMXZ4IIPkMf
+ zg4dj+M4JzmME6yx0nmb/62DaPJhI8CM6EmxF6806IyZ6mg/vPhVbBqCRcO1gHGz6dKV
+ IbJ2/qUJ4dAXhiTz87R6NCtW1w6eibvsY+0hk2T8wxx83WrjznW16XBzq6zOdCtQ3FrT
+ sjBMTLCBlhkDj9fabM+tTniRITJk/FuNEXGLfFNV6ZGiQ9SMtejqyRpa2Ah2RAk7uG+O
+ U7mydm3W1I81+5gIpcPjeR4GIIt7iR6Dg7lElHCiD28l15dKtSL97qNCOEsfmDSnYwCX
+ pdZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=CIHGBqIWtbWESa47zsQ9GTVFuyweiSkZ/Mu8fjQk2dY=;
- b=Qec6KYjAGSlpvyhdNHX2I7U+uZbp3oF09XL1p1vqHvbkRV+m12CBVXwN/HyXm4Odbd
- atbFx2xW4aqPl61delQTcPmYfHwCgECS9ZMDshCybKDvhpkmERC5s1e5fPQdgayCONnh
- 77woCxDQbt2QR8OJMi/I9a3URObp4kLnlb6IRWnAUBhbQY8PzkNt+GHpnAq0ma53WAQ3
- Df/hP9yOYPoNrDyoJesvnBmTzI+DfNbQr6l/RULeZlvOC1KtJ7QVvikzqk05LBQt31FX
- vfMgk0mzLCztVZ85w1ky8clB23YDttsFNb0n1DVSt5vtWJRrWRfJeIB4Sa97tbYKSyru
- wneA==
-X-Gm-Message-State: AOAM532XFNuFwO12azL6aOe+bIWRNmYVrr9ws/ZvofmLdPPTafCgc7Iz
- yEfthRkR/OT3+xgYePElyrrd/6te+XU=
-X-Google-Smtp-Source: ABdhPJyebixF1wc6t8n3bjMcNqC12IhFcO1/iu4m+f7s+yxJl53leS7gW21hJz1Vl3YyFyKUm9/UUw==
-X-Received: by 2002:adf:f290:: with SMTP id k16mr4555422wro.124.1601660167266; 
- Fri, 02 Oct 2020 10:36:07 -0700 (PDT)
+ bh=xXdgD+CX1xaJz1RLqkztVK48fKpoJNRH36Jn29j2m3Q=;
+ b=SAeL9jAHG+v+wB4yRLIhofDnidCddBtZJzyQ13OByVpGaN8kOAoerpcH1TgO0UI3QX
+ HpgeTim9mINgHwQJtQVec0Gm4/4m1CvAAnqtSGrxJBr70PsGPpQ3uRoA4j62L8/L0RaM
+ JCTL+5LTjfuEbohVuvZcQjk0o9nQocNZtY7/WRwpYwgKb30glp6WTF87YxYoB/Wr8aHu
+ krYg/5Xy/vSkDVnQoo3P0yPF0jG8S+s7NGPt6DlC5jIWCgne090vm9ff2jfg63+EHJvH
+ XmCrQiAmWxeKGMioUwjbamADyP91TujrtbvcU+j1O1tpE8Ee9GubhmIwZp04Wq70SkSf
+ 87yg==
+X-Gm-Message-State: AOAM531cjQMP4gPLcwud2Euqr9h7BrgwhqSN0XlFUetoIGbaVfbU+Hqr
+ gD9vB270kkVn7vgxdnFXM7McJ8Ut6iQ=
+X-Google-Smtp-Source: ABdhPJwZIGQ7loiGEIqV6MjBkBBlJEQUsSH2w1n8BmoTx03WHcvUOW/SusLD/7zGLY/Qlox9/XKUnQ==
+X-Received: by 2002:a1c:bbc6:: with SMTP id l189mr4315191wmf.52.1601660163638; 
+ Fri, 02 Oct 2020 10:36:03 -0700 (PDT)
 Received: from donizetti.redhat.com ([2001:b07:6468:f312:47e0:e742:75ba:b84d])
  by smtp.gmail.com with ESMTPSA id
- l8sm2516454wrx.22.2020.10.02.10.36.06
+ l8sm2516454wrx.22.2020.10.02.10.36.02
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 02 Oct 2020 10:36:06 -0700 (PDT)
+ Fri, 02 Oct 2020 10:36:03 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 08/10] scsi/scsi_bus: Add scsi_device_get
-Date: Fri,  2 Oct 2020 19:35:56 +0200
-Message-Id: <20201002173558.232960-9-pbonzini@redhat.com>
+Subject: [PATCH v6 04/10] device_core: use drain_call_rcu in in qmp_device_add
+Date: Fri,  2 Oct 2020 19:35:52 +0200
+Message-Id: <20201002173558.232960-5-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201002173558.232960-1-pbonzini@redhat.com>
 References: <20201002173558.232960-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42f;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x42f.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -101,59 +101,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Maxim Levitsky <mlevitsk@redhat.com>
 
-Add scsi_device_get which finds the scsi device
-and takes a reference to it.
+Soon, a device removal might only happen on RCU callback execution.
+This is okay for device-del which provides a DEVICE_DELETED event,
+but not for the failure case of device-add.  To avoid changing
+monitor semantics, just drain all pending RCU callbacks on error.
 
-Suggested-by: Stefan Hajnoczi <stefanha@gmail.com>
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Message-Id: <20200913160259.32145-8-mlevitsk@redhat.com>
+Suggested-by: Stefan Hajnoczi <stefanha@gmail.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20200913160259.32145-4-mlevitsk@redhat.com>
+[Don't use it in qmp_device_del. - Paolo]
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/scsi-bus.c     | 11 +++++++++++
- include/hw/scsi/scsi.h |  1 +
- 2 files changed, 12 insertions(+)
+ qdev-monitor.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index 7599113efe..eda8cb7e70 100644
---- a/hw/scsi/scsi-bus.c
-+++ b/hw/scsi/scsi-bus.c
-@@ -73,6 +73,17 @@ SCSIDevice *scsi_device_find(SCSIBus *bus, int channel, int id, int lun)
-     return do_scsi_device_find(bus, channel, id, lun, false);
- }
- 
-+SCSIDevice *scsi_device_get(SCSIBus *bus, int channel, int id, int lun)
-+{
-+    SCSIDevice *d;
-+    RCU_READ_LOCK_GUARD();
-+    d = do_scsi_device_find(bus, channel, id, lun, false);
-+    if (d) {
-+        object_ref(d);
-+    }
-+    return d;
-+}
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index e9b7228480..bcfb90a08f 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -803,6 +803,18 @@ void qmp_device_add(QDict *qdict, QObject **ret_data, Error **errp)
+         return;
+     }
+     dev = qdev_device_add(opts, errp);
 +
- static void scsi_device_realize(SCSIDevice *s, Error **errp)
- {
-     SCSIDeviceClass *sc = SCSI_DEVICE_GET_CLASS(s);
-diff --git a/include/hw/scsi/scsi.h b/include/hw/scsi/scsi.h
-index 7a55cdbd74..09fa5c9d2a 100644
---- a/include/hw/scsi/scsi.h
-+++ b/include/hw/scsi/scsi.h
-@@ -190,6 +190,7 @@ int scsi_device_get_sense(SCSIDevice *dev, uint8_t *buf, int len, bool fixed);
- int scsi_SG_IO_FROM_DEV(BlockBackend *blk, uint8_t *cmd, uint8_t cmd_size,
-                         uint8_t *buf, uint8_t buf_size);
- SCSIDevice *scsi_device_find(SCSIBus *bus, int channel, int target, int lun);
-+SCSIDevice *scsi_device_get(SCSIBus *bus, int channel, int target, int lun);
- 
- /* scsi-generic.c. */
- extern const SCSIReqOps scsi_generic_req_ops;
++    /*
++     * Drain all pending RCU callbacks. This is done because
++     * some bus related operations can delay a device removal
++     * (in this case this can happen if device is added and then
++     * removed due to a configuration error)
++     * to a RCU callback, but user might expect that this interface
++     * will finish its job completely once qmp command returns result
++     * to the user
++     */
++    drain_call_rcu();
++
+     if (!dev) {
+         qemu_opts_del(opts);
+         return;
 -- 
 2.26.2
 
