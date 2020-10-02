@@ -2,110 +2,101 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56F3CC4727F
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 08:51:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46EE6C47423
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 08:51:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6B2A206C3
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 08:51:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J75B9eD7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6B2A206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E2F822064B
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 08:51:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2F822064B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50168 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOGmh-0001a1-TS
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 04:51:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43536)
+	id 1kOGmp-0000ts-8Q
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 04:51:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43190)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kOGlf-0000aa-Qb
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 04:50:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24109)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kOGld-0004mt-Fy
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 04:50:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601628616;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=0CIzjEYp18qgsiX7wwR7uxH0uREo1M9QGA/xyPD+Dgk=;
- b=J75B9eD72tKmTKhje8A7GQnS7TrohLSbuot9OxgmPAOHl7ONoRt75yGOHObif6s3EtcQ/J
- g2GAIus8pymGmuZFCIE8g6gvaQ94U86nxvfgaqdQkQ3fbLkP6xCkuNKPlohUShhFWrftpE
- LQLFy01taG1qJwfPP84IeEmrDHJqse4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-157-mwXpZb30OquK71P7lWjMSg-1; Fri, 02 Oct 2020 04:50:14 -0400
-X-MC-Unique: mwXpZb30OquK71P7lWjMSg-1
-Received: by mail-wm1-f71.google.com with SMTP id r10so370297wmh.0
- for <qemu-devel@nongnu.org>; Fri, 02 Oct 2020 01:50:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=0CIzjEYp18qgsiX7wwR7uxH0uREo1M9QGA/xyPD+Dgk=;
- b=N1DWNCRRWsLfy9N0qVE6Hryj7QYbwYxXq4zufNCaP6vhS+xE1WvwfF4GnpkxpwKc6M
- dtYXFjptPkMQE2+kLGfMFWqpIscuhPqVjIWpv53Y8+5ZmjyHSKiRhGkaGwN3XCcAotGE
- qwssVaSN4/EGxh8SBMNXn7zUus/q8uonH4NLwyZzbGEOXn7W4i9L90iCCPTALp6LF1qi
- hqVowoC0N9DbT78pQ6I1tXtQBYXtqJh2s4MC+nbBc6gIyE2P4DpC1xwU2btmvjh75J7t
- 8INSGmZpdvNctFNNslT+C/j3tIBE4cFa5hA1Uk8dVZktr6Nc/SQO9YYIc86c5mogtBNQ
- HshA==
-X-Gm-Message-State: AOAM532mE6WvOOSn2EwRQhqj6lNUbzOF5mCjWCtY4J48UqDgzZ5V0Lf6
- 92smMFA/sTUbf74vjYRjxnArbDARYZ810PKepjbXEO6PQGxm5cLapECYZ2HCEkAFjhcSxMnHdXU
- ZVk4zHeat2EkEmZs=
-X-Received: by 2002:a7b:c1c5:: with SMTP id a5mr1581964wmj.187.1601628613326; 
- Fri, 02 Oct 2020 01:50:13 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJybAXnAAaOnv3xgJ2kxjiXvzq1EJf6lnpHVsUvX6ndzfEnhFrHh5gq+AKYzzuSaJ5tIRCakAA==
-X-Received: by 2002:a7b:c1c5:: with SMTP id a5mr1581938wmj.187.1601628613114; 
- Fri, 02 Oct 2020 01:50:13 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:11eb:3314:c22:e3c7?
- ([2001:b07:6468:f312:11eb:3314:c22:e3c7])
- by smtp.gmail.com with ESMTPSA id r19sm960802wmh.7.2020.10.02.01.50.12
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 02 Oct 2020 01:50:12 -0700 (PDT)
-Subject: Re: [PATCH v4 1/1] qapi: Restrict code generated for user-mode
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20201002073621.1653924-1-philmd@redhat.com>
- <20201002073621.1653924-2-philmd@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <17772b79-07db-98ff-96c5-01a9ac1cbcca@redhat.com>
-Date: Fri, 2 Oct 2020 10:50:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kOGjd-0007uF-0N; Fri, 02 Oct 2020 04:48:14 -0400
+Received: from new1-smtp.messagingengine.com ([66.111.4.221]:37909)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kOGja-0004a3-Eu; Fri, 02 Oct 2020 04:48:12 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+ by mailnew.nyi.internal (Postfix) with ESMTP id 841725803F7;
+ Fri,  2 Oct 2020 04:48:07 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+ by compute4.internal (MEProxy); Fri, 02 Oct 2020 04:48:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-type:in-reply-to; s=fm1; bh=NleZoGEpq+9ky9YfmCELoSGaqjp
+ tlF4a2o9ZrgakjfA=; b=dz3k9TAoCOnPj/mipsCQZtxDcdD6QRdnTg66zVlRVEy
+ 9SED3/GEHXHVso7+ek4DBnd6bAt2tAztS/u8y8o6IOF5A/HVHTZRJdya7W1EZmIG
+ 9T7H2aPH6zBNpKit3krJq9p+oAfgMq3Qdk4tVsVk/2GDEAbdQmolCkyVE9uZGFue
+ nW3lN17l8TRDjWAX40uR6l+EIpi2UFUmXvBdWTPaYF/vWr/zGcQSrEJyVJbsFZxI
+ NDhzLXbVv8kfqvO/8pVLQcSxR4xcQcmcsCjkrY5zgf7hOtw2zGzmrERtIhHKt9C6
+ sMbx8+g6aIQjIM4ey6k25GBixIE17mK8kE+g6YuFRcA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-type:date:from:in-reply-to
+ :message-id:mime-version:references:subject:to:x-me-proxy
+ :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=NleZoG
+ Epq+9ky9YfmCELoSGaqjptlF4a2o9ZrgakjfA=; b=tghya2SJLRknvsEpaiKhj6
+ 75kyNrQVjDhU9XGyoY+GOPggOzL7cEqc1OsCUrqRXhVVJiT4lpzJ/S5gw5YUmn3L
+ Wo7zwAJK1Z/KEHUIjfsxYlR/qLQEyBD6BT9FWIHN2ozB1Tk8b70LS2PdigTQsmQm
+ 6jDKe0IEgKTf4MBM/RXJwvw6loHxWhAW+PKKSQnZsW0DC6zQrTLcBg2t6a47eM6F
+ 8BWUCrrDFe9LR0cw8AN5wcu2morNVQ/dBtGni9pOLVNPNRPYJ6SoR7XTnWLGoP2p
+ sJbRxoCMXxjpD7OYz/Kf0Jg4jb/kv6fX89FpQI2LKPoiix9lA4+mINRclZMqQSOw
+ ==
+X-ME-Sender: <xms:Rul2X8QfYCNZULF9J2kEC3KTNdC86kP5s2bGZXiGiSEND_Q1bdzWng>
+ <xme:Rul2X5y6HfV1jM1ikWLe9ZjltV_2UMTOx2b9FU7aAey5msEMGkfhawB_vRjJS3Zqy
+ rLLlvnPxyXI9NlI4JU>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrfeeigddtlecutefuodetggdotefrodftvf
+ curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+ uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+ fjughrpeffhffvuffkfhggtggujgesghdtreertddtjeenucfhrhhomhepmfhlrghushcu
+ lfgvnhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrdgukheqnecuggftrfgrthhtvg
+ hrnhepjeegudffueeiteekieelkedvueelteevjeduieeludfffeejgeffhfduvdduffek
+ necukfhppeektddrudeijedrleekrdduledtnecuvehluhhsthgvrhfuihiivgeptdenuc
+ frrghrrghmpehmrghilhhfrhhomhepihhtshesihhrrhgvlhgvvhgrnhhtrdgukh
+X-ME-Proxy: <xmx:Rul2X530gFrayj_z8XtCq_xWiQ7PsMcmYlyaBco2bfspU-E8RudOpQ>
+ <xmx:Rul2XwChTFA_mKu_ZjVX0qUJhwQnSpaisNtkV97SESzEyBg1paE4QA>
+ <xmx:Rul2X1hRirHyCPiKGhgAnvraoZkngf1-E9gk2Ir6lndpy3ZxeMfngw>
+ <xmx:R-l2XzZCEtMY2yukw-Bclq_-6m0PctkW-QWwpDOTCntidUKUaFLmFA>
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by mail.messagingengine.com (Postfix) with ESMTPA id 706EA306468B;
+ Fri,  2 Oct 2020 04:48:05 -0400 (EDT)
+Date: Fri, 2 Oct 2020 10:48:03 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH 3/9] hw/block/nvme: support per-namespace smart log
+Message-ID: <20201002084803.GB877411@apples.localdomain>
+References: <20200930220414.562527-1-kbusch@kernel.org>
+ <20200930220414.562527-4-kbusch@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20201002073621.1653924-2-philmd@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 01:13:31
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="LpQ9ahxlCli8rRTG"
+Content-Disposition: inline
+In-Reply-To: <20200930220414.562527-4-kbusch@kernel.org>
+Received-SPF: pass client-ip=66.111.4.221; envelope-from=its@irrelevant.dk;
+ helo=new1-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 04:01:34
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -23
-X-Spam_score: -2.4
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.26, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,110 +109,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>,
- Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Niklas Cassel <Niklas.Cassel@wdc.com>,
+ qemu-block@nongnu.org, Klaus Jensen <k.jensen@samsung.com>,
+ qemu-devel@nongnu.org,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/10/20 09:36, Philippe Mathieu-Daudé wrote:
-> A lot of QAPI generated code is never used by user-mode.
-> 
-> Split out qapi_system_modules and qapi_system_or_tools_modules
-> from the qapi_all_modules array. We now have 4 groups:
-> - always used
-> - only used by system-mode
-> - not used by user-mode
-> - not used by tools
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+--LpQ9ahxlCli8rRTG
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Sep 30 15:04, Keith Busch wrote:
+> Let the user specify a specific namespace if they want to get access
+> stats for a specific namespace.
+>=20
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
 > ---
->  qapi/meson.build | 51 ++++++++++++++++++++++++++++++++++--------------
->  1 file changed, 36 insertions(+), 15 deletions(-)
-> 
-> diff --git a/qapi/meson.build b/qapi/meson.build
-> index 7c4a89a882..10cf01ef65 100644
-> --- a/qapi/meson.build
-> +++ b/qapi/meson.build
-> @@ -14,39 +14,60 @@ util_ss.add(files(
->  ))
->  
->  qapi_all_modules = [
-> +  'common',
-> +  'introspect',
-> +  'misc',
-> +]
-> +
-> +qapi_system_modules = [
->    'acpi',
->    'audio',
-> +  'dump',
-> +  'machine-target',
-> +  'migration',
-> +  'misc-target',
-> +  'net',
-> +  'pci',
-> +  'rdma',
-> +  'rocker',
-> +  'tpm',
-> +  'trace',
-> +]
-> +
-> +qapi_system_or_user_modules = [
-> +  'machine', # X86CPUFeatureWordInfo
-> +  'qdev',
-> +]
-> +
-> +qapi_system_or_tools_modules = [
->    'authz',
->    'block-core',
->    'block',
->    'char',
-> -  'common',
->    'control',
->    'crypto',
-> -  'dump',
->    'error',
-> -  'introspect',
->    'job',
-> -  'machine',
-> -  'machine-target',
-> -  'migration',
-> -  'misc',
-> -  'misc-target',
-> -  'net',
->    'pragma',
-> -  'qdev',
-> -  'pci',
->    'qom',
-> -  'rdma',
-> -  'rocker',
->    'run-state',
->    'sockets',
-> -  'tpm',
-> -  'trace',
->    'transaction',
->    'ui',
->  ]
->  
-> +if have_system
-> +  qapi_all_modules += qapi_system_modules
-> +endif
-> +
-> +if have_system or have_user
-> +  qapi_all_modules += qapi_system_or_user_modules
-> +endif
-> +
-> +if have_system or have_tools
-> +  qapi_all_modules += qapi_system_or_tools_modules
-> +endif
-> +
->  qapi_storage_daemon_modules = [
->    'block-core',
->    'char',
-> 
+>  hw/block/nvme.c      | 66 +++++++++++++++++++++++++++-----------------
+>  include/block/nvme.h |  1 +
+>  2 files changed, 41 insertions(+), 26 deletions(-)
+>=20
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index 8d2b5be567..41389b2b09 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+>  static uint16_t nvme_smart_info(NvmeCtrl *n, uint8_t rae, uint32_t buf_l=
+en,
+>                                  uint64_t off, NvmeRequest *req)
+>  {
+>      uint32_t nsid =3D le32_to_cpu(req->cmd.nsid);
+> -
+> +    struct nvme_stats stats =3D { 0 };
+> +    NvmeSmartLog smart =3D { 0 };
+>      uint32_t trans_len;
+> +    NvmeNamespace *ns;
+>      time_t current_ms;
+> -    uint64_t units_read =3D 0, units_written =3D 0;
+> -    uint64_t read_commands =3D 0, write_commands =3D 0;
+> -    NvmeSmartLog smart;
+> -
+> -    if (nsid && nsid !=3D 0xffffffff) {
+> -        return NVME_INVALID_FIELD | NVME_DNR;
+> -    }
+> =20
+>      if (off >=3D sizeof(smart)) {
+>          return NVME_INVALID_FIELD | NVME_DNR;
+>      }
+> =20
+> -    for (int i =3D 1; i <=3D n->num_namespaces; i++) {
+> -        NvmeNamespace *ns =3D nvme_ns(n, i);
+> -        if (!ns) {
+> -            continue;
+> -        }
+> -
+> -        BlockAcctStats *s =3D blk_get_stats(ns->blkconf.blk);
+> +    if (nsid !=3D 0xffffffff) {
+> +        ns =3D nvme_ns(n, nsid);
+> +        if (!ns)
+> +            return NVME_INVALID_NSID | NVME_DNR;
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Btw, this is failing style check (missing braces).
 
+--LpQ9ahxlCli8rRTG
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEyBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl926UEACgkQTeGvMW1P
+DekAeAf1FVoybPx077ScM+ggh1f8lgbaSNLU29uLaswE2G18zqVDYMzjoZ+sqkAn
+aG4h+R6erXe1BDhMkZXcNk+VrrJb3SbBw9HPdFmDgRFLQHmSxtywm/KWqp/CN6+y
+3yLfMoPXJD7TU4L6KWaSitGMlEYhxK1j4zyHyeYshxIj4befmGS2aoc6jWmDsm44
+UrZ/1+XMVewLXNsYTfs/gqQBS3U1TDUK2gGGOpAlrV//5DoRMbvJhmygGPyfoPQr
+pZRNAvOkKvXRF0AErn/rs5Q2ouerv5qYNIMsxZhmcwtOt7q0y/HaHDZTXKw6YBXm
+B7zJWmpfLMI9v0ulIe90HCSDTq0s
+=5nmX
+-----END PGP SIGNATURE-----
+
+--LpQ9ahxlCli8rRTG--
 
