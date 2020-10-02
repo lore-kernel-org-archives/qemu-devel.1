@@ -2,66 +2,122 @@ Return-Path: <SRS0=fJPX=DJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D9C3C4363C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:33:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 033E1C4363C
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:33:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C95C0206DC
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:33:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C95C0206DC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 853822074B
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Oct 2020 15:33:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="T2Ry+FNX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 853822074B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kON3N-0000gh-ND
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 11:33:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45140)
+	id 1kON3r-0001AW-LC
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 11:33:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38016)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <steven.price@arm.com>)
- id 1kON1Z-0007pe-Nf
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 11:31:11 -0400
-Received: from foss.arm.com ([217.140.110.172]:60138)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <steven.price@arm.com>) id 1kON1U-0002mJ-E0
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 11:31:08 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9AEAE1396;
- Fri,  2 Oct 2020 08:31:01 -0700 (PDT)
-Received: from [192.168.1.179] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D9EF43F73B;
- Fri,  2 Oct 2020 08:30:58 -0700 (PDT)
-Subject: Re: [PATCH v3 2/2] arm64: kvm: Introduce MTE VCPU feature
-To: Andrew Jones <drjones@redhat.com>
-References: <20200925093607.3051-1-steven.price@arm.com>
- <20200925093607.3051-3-steven.price@arm.com>
- <20201002143050.zamkpmqysy6k5ngl@kamzik.brq.redhat.com>
-From: Steven Price <steven.price@arm.com>
-Message-ID: <8b617aef-2bff-8af0-df47-f9f863ab6fa0@arm.com>
-Date: Fri, 2 Oct 2020 16:30:47 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <20201002143050.zamkpmqysy6k5ngl@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
+ (Exim 4.90_1) (envelope-from <Wei.Huang2@amd.com>)
+ id 1kOMXB-0005JO-V7
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:59:46 -0400
+Received: from mail-mw2nam10on2051.outbound.protection.outlook.com
+ ([40.107.94.51]:54113 helo=NAM10-MW2-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <Wei.Huang2@amd.com>)
+ id 1kOMXA-0006BP-6B
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 10:59:45 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cdyUv/1fYR8CZbxcGqptRdTOJTwGOIkxKiw2tflzFk+WIQP+KxpQlvyd1ZyjvhUyHxTh58x0Ix+9ZViG9wDEj6cLaDtcGuomkyP26KOyCBuMkNKxGO2AX+nd1AidBqxAVdWYiBQCzmROtnndKrt+s27QN2UdUaERhcyXntzDXNqnhcUw2AG98AdXM9LPocosDg4sHuFxmslxa5Wpk1hecLaS+XW/++Xovnkk0yVUHf/aEMzpW0+X+sDtPAHkoyizjBzty3OIo09QqkxBgUZOaiuq5WH7OVZSiu56eXywZspx19QIO6gWgftF8FiPy1chKl8ipuEsV5XAoez5EEIr/Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5mTs2yVnrdf66KmKnSbYbmPCqj/NofZSC4A34MhcMGU=;
+ b=YTsNARVz/Hdc/MpUccbYgjYm0Pbl/WE7Gux6vuZiOMxhuybtb5SLhzc558wtEV2HS3+UvKl0sqIFeYDesUB9Y92Cl4hoAMFriIEfpU4hV1zBuzeODNpdbTjEAazWO1EVwFaGukU80+aRsm33VoS+ZkPAjh2IVGIhpIfnFHLTj4eCuhbI1Sz/zl256XiUBKrmgaeqzPRc7OUIHTqcJyJHh6CpF17ITLkxantb+EaNVOCzaFugh7Kq4xKujNbrjsKF8D7jvJnqq/+avWT9iNyY8ZAK+oO4bqXjrUglD66AK5333vi1noCi/bQzqj6XL//bEHb6LLkIyJYvEpqnDrxXgQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5mTs2yVnrdf66KmKnSbYbmPCqj/NofZSC4A34MhcMGU=;
+ b=T2Ry+FNXN9UPrjkVBzSy9xFKTj17GCg35a8QkFf6Txtvk4cAhaCPpsRhzupiAxxFfIHIPrIHn/D3MEJq7HIqHqKvlMPxA64BAa2rRl/ZkG8BktJJD9EYtX/KIhHj5HRR3lgbdgDBi0rRpGK2xOQSSh48cL779PMlVGwSqkakxzg=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
+Received: from CY4PR12MB1494.namprd12.prod.outlook.com (2603:10b6:910:f::22)
+ by CY4PR1201MB0149.namprd12.prod.outlook.com (2603:10b6:910:1c::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3433.39; Fri, 2 Oct
+ 2020 14:59:39 +0000
+Received: from CY4PR12MB1494.namprd12.prod.outlook.com
+ ([fe80::11f9:59c8:16c0:7718]) by CY4PR12MB1494.namprd12.prod.outlook.com
+ ([fe80::11f9:59c8:16c0:7718%8]) with mapi id 15.20.3433.038; Fri, 2 Oct 2020
+ 14:59:39 +0000
+From: Wei Huang <wei.huang2@amd.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH V2 2/3] amd-iommu: Sync IOVA-to-GPA translation during page
+ invalidation
+Date: Fri,  2 Oct 2020 09:59:06 -0500
+Message-Id: <20201002145907.1294353-3-wei.huang2@amd.com>
+X-Mailer: git-send-email 2.25.2
+In-Reply-To: <20201002145907.1294353-1-wei.huang2@amd.com>
+References: <20201002145907.1294353-1-wei.huang2@amd.com>
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=217.140.110.172;
- envelope-from=steven.price@arm.com; helo=foss.arm.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 11:31:01
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -44
-X-Spam_score: -4.5
-X-Spam_bar: ----
-X-Spam_report: (-4.5 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.256,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain
+X-Originating-IP: [165.204.78.2]
+X-ClientProxiedBy: DM3PR12CA0135.namprd12.prod.outlook.com
+ (2603:10b6:0:51::31) To CY4PR12MB1494.namprd12.prod.outlook.com
+ (2603:10b6:910:f::22)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from ethanolx56bbhost.amd.com (165.204.78.2) by
+ DM3PR12CA0135.namprd12.prod.outlook.com (2603:10b6:0:51::31) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3433.34 via Frontend Transport; Fri, 2 Oct 2020 14:59:38 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: eabcdb46-f602-47ec-74ba-08d866e3c8e9
+X-MS-TrafficTypeDiagnostic: CY4PR1201MB0149:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <CY4PR1201MB01492C901595C46B0B912EE9CF310@CY4PR1201MB0149.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2449;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: r1l8g0H7oVSEz/EJekNsUKIHpwUYIW6gqyI87CWyRwiX2wtAm+XRe3+CDTUZKLAoYbjjesq/Jn1z90As2lq24OwCAHjAfmBgxidh+qVeLML14WPd8okxbP+8e7JKupn9hD6FLhRUOxdygMGoCNFW+rhHzS5a20zFYo9YwOfPihwY1Q50ty05MyCoZyTAQNc9i6t/2hMAihDp3C9pkjwH3KEs/zkFudYFk2xvZm8symdf4IUAsRL7Iq6OxPot795FZRIo62bZQ7VO0e3hRjOApNhENSLN92AIbQ8HrdgWNYHfqwZCU7Re8MxbI8GzJAQjuw4Nq9D5WIC+fwffU/88MnyO2ULgz6o9AK5jvu9S0fghzq60UZIBozv8yLXA9FDwIRAeuzthwQAGsyGtHqAE+A==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:CY4PR12MB1494.namprd12.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(366004)(346002)(376002)(396003)(136003)(39860400002)(66476007)(8936002)(66556008)(66946007)(956004)(8676002)(2616005)(316002)(83380400001)(4326008)(26005)(86362001)(52116002)(6666004)(1076003)(478600001)(186003)(36756003)(6486002)(2906002)(16526019)(5660300002)(6916009)(7696005)(473944003)(414714003);
+ DIR:OUT; SFP:1101; 
+X-MS-Exchange-AntiSpam-MessageData: bWV7n8FzVGTiigQa12Nd8lc2F5kLwWqPLrc9b3sXU4kKk7Et7qW+jqUpOf9ah2F9nxI2LZ+9XXz5uq7B6u37gCluyyiiU1QDuk5BN9vW0WH9fe3aVFYqsE5Xd3ZsgoKhe2QKYpCrqrImvEukUeExKzHwyaqWEjMytC7/0z2Lk9VpLeLbsvMTLhzy/GmywR6ZYQJPSSsEIkGnS9KuYbasDx0wMIaTCjM2tJyn7ApSUW6PjPqd59A9F/H7IwaTbgn9LVB40LSxH/IZdFQD1e40Xa32gixGCWLZzs17qKiuldrf9uk/8hM2ELC0ec3FdTDr6IG3DrUzUjj2TPPTdcIKcb0Ii2bPAtszyJgvvxBCv0iFb3GzStA9rNPbWwjWEbtbhlKP/4/Df2fpt69IHz0GshZKafcnd/QWet7W+iyDeDZrrNxBHhNm2JLzBEsAx1Ce8IpeAk62exKF/iISzxBT2iTHS5O3p0CufNSL2WDT5YKMeistbaHo4f70RR8W5ZRnXDoOdRTj4djAkWZBpKYHQoeHZiVXr4o2XdZIO9UkMOYRYDYuvl+AtkHYqUA7IN2xakvHPGB2Z6BxULRn8KkBaj5ZFzQ8M1PIMlmr6rA87yiylyfKi1HJEj6xuKrHVLrqMmrvNbA/2FFtvsk5SfGzRQ==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: eabcdb46-f602-47ec-74ba-08d866e3c8e9
+X-MS-Exchange-CrossTenant-AuthSource: CY4PR12MB1494.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Oct 2020 14:59:38.9796 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: p45+LihcOZVP7dPLXryGwAmPRljcRxcVDK3XsGQJOu57n8ihxLD4GZTZk7inuLbV
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1201MB0149
+Received-SPF: none client-ip=40.107.94.51; envelope-from=Wei.Huang2@amd.com;
+ helo=NAM10-MW2-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 10:59:41
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -8
+X-Spam_score: -0.9
+X-Spam_bar: /
+X-Spam_report: (-0.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, FORGED_SPF_HELO=1, MSGID_FROM_MTA_HEADER=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_NONE=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -74,190 +130,277 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Rutland <mark.rutland@arm.com>,
- Peter Maydell <peter.maydell@linaro.org>, Haibo Xu <Haibo.Xu@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- James Morse <james.morse@arm.com>,
- Julien Thierry <julien.thierry.kdev@gmail.com>, kvmarm@lists.cs.columbia.edu,
- Marc Zyngier <maz@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Will Deacon <will@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: ehabkost@redhat.com, mst@redhat.com, wei.huang2@amd.com, peterx@redhat.com,
+ alex.williamson@redhat.com, pbonzini@redhat.com, Suravee.Suthikulpanit@amd.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/10/2020 15:30, Andrew Jones wrote:
-> On Fri, Sep 25, 2020 at 10:36:07AM +0100, Steven Price wrote:
->> Add a new VM feature 'KVM_ARM_CAP_MTE' which enables memory tagging
->> for a VM. This exposes the feature to the guest and automatically tags
->> memory pages touched by the VM as PG_mte_tagged (and clears the tags
->> storage) to ensure that the guest cannot see stale tags, and so that the
->> tags are correctly saved/restored across swap.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>   arch/arm64/include/asm/kvm_emulate.h |  3 +++
->>   arch/arm64/include/asm/kvm_host.h    |  3 +++
->>   arch/arm64/kvm/arm.c                 |  9 +++++++++
->>   arch/arm64/kvm/mmu.c                 | 15 +++++++++++++++
->>   arch/arm64/kvm/sys_regs.c            |  6 +++++-
->>   include/uapi/linux/kvm.h             |  1 +
->>   6 files changed, 36 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
->> index 49a55be2b9a2..4923a566ae6e 100644
->> --- a/arch/arm64/include/asm/kvm_emulate.h
->> +++ b/arch/arm64/include/asm/kvm_emulate.h
->> @@ -79,6 +79,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
->>   	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
->>   	    vcpu_el1_is_32bit(vcpu))
->>   		vcpu->arch.hcr_el2 |= HCR_TID2;
->> +
->> +	if (vcpu->kvm->arch.mte_enabled)
->> +		vcpu->arch.hcr_el2 |= HCR_ATA;
->>   }
->>   
->>   static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index 4f4360dd149e..1379300c1487 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -110,6 +110,9 @@ struct kvm_arch {
->>   	 * supported.
->>   	 */
->>   	bool return_nisv_io_abort_to_user;
->> +
->> +	/* Memory Tagging Extension enabled for the guest */
->> +	bool mte_enabled;
->>   };
->>   
->>   struct kvm_vcpu_fault_info {
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 46dc3d75cf13..624edca0a1fa 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -87,6 +87,12 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->>   		r = 0;
->>   		kvm->arch.return_nisv_io_abort_to_user = true;
->>   		break;
->> +	case KVM_CAP_ARM_MTE:
->> +		if (!system_supports_mte() || kvm->created_vcpus)
->> +			return -EINVAL;
->> +		r = 0;
->> +		kvm->arch.mte_enabled = true;
->> +		break;
->>   	default:
->>   		r = -EINVAL;
->>   		break;
->> @@ -206,6 +212,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->>   		 */
->>   		r = 1;
->>   		break;
->> +	case KVM_CAP_ARM_MTE:
->> +		r = system_supports_mte();
->> +		break;
->>   	default:
->>   		r = kvm_arch_vm_ioctl_check_extension(kvm, ext);
->>   		break;
->> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->> index ba00bcc0c884..befb9e1f0aa6 100644
->> --- a/arch/arm64/kvm/mmu.c
->> +++ b/arch/arm64/kvm/mmu.c
->> @@ -1949,6 +1949,21 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->>   	if (vma_pagesize == PAGE_SIZE && !force_pte)
->>   		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
->>   							   &pfn, &fault_ipa);
->> +	if (system_supports_mte() && kvm->arch.mte_enabled && pfn_valid(pfn)) {
-> 
-> 'system_supports_mte() && kvm->arch.mte_enabled' is redundant, but I
-> assume system_supports_mte() is there to improve the efficiency of the
-> branch, as it's using cpus_have_const_cap().
+Add support to sync the IOVA-to-GPA translation at the time of IOMMU
+page invalidation. This function is called when two IOMMU commands,
+AMDVI_CMD_INVAL_AMDVI_PAGES and AMDVI_CMD_INVAL_AMDVI_ALL, are
+intercepted. Address space notifiers are called accordingly.
 
-system_supports_mte() compiles to 0 when MTE support isn't built in, so 
-this code can be removed by the compiler, whereas with 
-kvm->arch.mte_enabled I doubt the compiler can deduce that it is never set.
+Co-developed-by: Wei Huang <wei.huang2@amd.com>
+Signed-off-by: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
+---
+ hw/i386/amd_iommu.c | 177 ++++++++++++++++++++++++++++++++++++++++++++
+ hw/i386/amd_iommu.h |  10 +++
+ 2 files changed, 187 insertions(+)
 
-> Maybe a helper like
-> 
->   static inline bool kvm_arm_mte_enabled(struct kvm *kvm)
->   {
->     return system_supports_mte() && kvm->arch.mte_enabled;
->   }
-> 
-> would allow both the more efficient branch and look less confusing
-> where it gets used.
-
-I wasn't sure it was worth having a helper since this was the only place 
-checking this condition. It's also a bit tricky putting this in a 
-logical header file, kvm_host.h doesn't work because struct kvm hasn't 
-been defined by then.
-
-Steve
-
->> +		/*
->> +		 * VM will be able to see the page's tags, so we must ensure
->> +		 * they have been initialised.
->> +		 */
->> +		struct page *page = pfn_to_page(pfn);
->> +		long i, nr_pages = compound_nr(page);
->> +
->> +		/* if PG_mte_tagged is set, tags have already been initialised */
->> +		for (i = 0; i < nr_pages; i++, page++) {
->> +			if (!test_and_set_bit(PG_mte_tagged, &page->flags))
->> +				mte_clear_page_tags(page_address(page));
->> +		}
->> +	}
->> +
->>   	if (writable)
->>   		kvm_set_pfn_dirty(pfn);
->>   
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index a655f172b5ad..5010a47152b4 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -1132,7 +1132,8 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
->>   			val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
->>   		val &= ~(0xfUL << ID_AA64PFR0_AMU_SHIFT);
->>   	} else if (id == SYS_ID_AA64PFR1_EL1) {
->> -		val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
->> +		if (!vcpu->kvm->arch.mte_enabled)
->> +			val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
->>   	} else if (id == SYS_ID_AA64ISAR1_EL1 && !vcpu_has_ptrauth(vcpu)) {
->>   		val &= ~((0xfUL << ID_AA64ISAR1_APA_SHIFT) |
->>   			 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
->> @@ -1394,6 +1395,9 @@ static bool access_mte_regs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->>   static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
->>   				   const struct sys_reg_desc *rd)
->>   {
->> +	if (vcpu->kvm->arch.mte_enabled)
->> +		return 0;
->> +
->>   	return REG_HIDDEN_USER | REG_HIDDEN_GUEST;
->>   }
->>   
->> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->> index f6d86033c4fa..87678ed82ab4 100644
->> --- a/include/uapi/linux/kvm.h
->> +++ b/include/uapi/linux/kvm.h
->> @@ -1035,6 +1035,7 @@ struct kvm_ppc_resize_hpt {
->>   #define KVM_CAP_LAST_CPU 184
->>   #define KVM_CAP_SMALLER_MAXPHYADDR 185
->>   #define KVM_CAP_S390_DIAG318 186
->> +#define KVM_CAP_ARM_MTE 188
->>   
->>   #ifdef KVM_CAP_IRQ_ROUTING
->>   
->> -- 
->> 2.20.1
->>
->>
-> 
-> Besides the helper suggestion nit
-> 
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
-> 
+diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
+index c7d24a05484d..7ce68289d20c 100644
+--- a/hw/i386/amd_iommu.c
++++ b/hw/i386/amd_iommu.c
+@@ -76,6 +76,12 @@ typedef struct AMDVIIOTLBEntry {
+     uint64_t page_mask;         /* physical page size  */
+ } AMDVIIOTLBEntry;
+ 
++static bool amdvi_get_dte(AMDVIState *s, int devid, uint64_t *entry);
++static void amdvi_sync_domain(AMDVIState *s, uint32_t domid,
++                              uint64_t addr, uint16_t flags);
++static void amdvi_walk_level(AMDVIAddressSpace *as, uint64_t pte,
++                             uint64_t iova, uint64_t partial);
++
+ /* configure MMIO registers at startup/reset */
+ static void amdvi_set_quad(AMDVIState *s, hwaddr addr, uint64_t val,
+                            uint64_t romask, uint64_t w1cmask)
+@@ -443,6 +449,78 @@ static void amdvi_address_space_unmap(AMDVIAddressSpace *as, IOMMUNotifier *n)
+     memory_region_notify_one(n, &entry);
+ }
+ 
++/*
++ * Sync the IOVA-to-GPA translation at the time of IOMMU page invalidation.
++ * This function is called when IOMMU commands, AMDVI_CMD_INVAL_AMDVI_PAGES
++ * and AMDVI_CMD_INVAL_AMDVI_ALL, are triggred.
++ *
++ * The range of addr invalidation is determined by addr and flags, using
++ * the following rules:
++ *   - All pages
++ *     In this case, we unmap the whole address space and then re-walk the
++ *     I/O page table to sync the mapping relationship.
++ *   - Single page
++ *     Re-walk the page based on the specified iova, and only sync the
++ *     newly mapped page.
++ */
++static void amdvi_sync_domain(AMDVIState *s, uint32_t domid,
++                              uint64_t addr, uint16_t flags)
++{
++    AMDVIAddressSpace *as;
++    bool sync_all_domains = false;
++    uint64_t mask, size = 0x1000;
++
++    if (domid == AMDVI_DOMAIN_ALL) {
++        sync_all_domains = true;
++    }
++
++     /* S=1 means the invalidation size is from addr field; otherwise 4KB */
++    if (flags & AMDVI_CMD_INVAL_IOMMU_PAGES_S_BIT) {
++        uint32_t zbit = cto64(addr | 0xFFF) + 1;
++
++        size = 1ULL << zbit;
++
++        if (size < 0x1000) {
++            addr = 0;
++            size = AMDVI_PGSZ_ENTIRE;
++        } else {
++            mask = ~(size - 1);
++            addr &= mask;
++        }
++    }
++
++    QLIST_FOREACH(as, &s->amdvi_as_with_notifiers, next) {
++        uint64_t dte[4];
++        IOMMUNotifier *n;
++
++        if (!amdvi_get_dte(s, as->devfn, dte)) {
++            continue;
++        }
++
++        if (!sync_all_domains && (domid != (dte[1] & 0xFFFULL))) {
++            continue;
++        }
++
++        /*
++         * In case of syncing more than a page, we invalidate the entire
++         * address range and re-walk the whole page table.
++         */
++        if (size == AMDVI_PGSZ_ENTIRE) {
++            IOMMU_NOTIFIER_FOREACH(n, &as->iommu) {
++                amdvi_address_space_unmap(as, n);
++            }
++        } else if (size > 0x1000) {
++            IOMMU_NOTIFIER_FOREACH(n, &as->iommu) {
++                if (n->start <= addr && addr + size < n->end) {
++                    amdvi_address_space_unmap(as, n);
++                }
++            }
++        }
++
++        amdvi_walk_level(as, dte[0], addr, 0);
++    }
++}
++
+ static gboolean amdvi_iotlb_remove_by_domid(gpointer key, gpointer value,
+                                             gpointer user_data)
+ {
+@@ -455,6 +533,8 @@ static gboolean amdvi_iotlb_remove_by_domid(gpointer key, gpointer value,
+ static void amdvi_inval_pages(AMDVIState *s, uint64_t *cmd)
+ {
+     uint16_t domid = cpu_to_le16((uint16_t)extract64(cmd[0], 32, 16));
++    uint64_t addr  = cpu_to_le64(extract64(cmd[1], 12, 52)) << 12;
++    uint16_t flags = cpu_to_le16((uint16_t)extract64(cmd[1], 0, 12));
+ 
+     if (extract64(cmd[0], 20, 12) || extract64(cmd[0], 48, 12) ||
+         extract64(cmd[1], 3, 9)) {
+@@ -465,6 +545,8 @@ static void amdvi_inval_pages(AMDVIState *s, uint64_t *cmd)
+     g_hash_table_foreach_remove(s->iotlb, amdvi_iotlb_remove_by_domid,
+                                 &domid);
+     trace_amdvi_pages_inval(domid);
++
++    amdvi_sync_domain(s, domid, addr, flags);
+ }
+ 
+ static void amdvi_prefetch_pages(AMDVIState *s, uint64_t *cmd)
+@@ -910,6 +992,101 @@ static inline uint64_t amdvi_get_pte_entry(AMDVIState *s, uint64_t pte_addr,
+     return pte;
+ }
+ 
++static inline uint64_t pte_get_page_size(uint64_t level)
++{
++    return 1UL << ((level * 9) + 3);
++}
++
++static void amdvi_sync_iova(AMDVIAddressSpace *as, uint64_t pte, uint64_t iova)
++{
++    IOMMUTLBEntry entry;
++    uint64_t addr = pte & AMDVI_DEV_PT_ROOT_MASK;
++    uint32_t level = get_pte_translation_mode(pte);
++    uint64_t size = pte_get_page_size(level + 1);
++    uint64_t perm = amdvi_get_perms(pte);
++
++    assert(level == 0 || level == 7);
++
++    entry.target_as = &address_space_memory;
++    entry.iova = iova ;
++    entry.perm = perm;
++    if (level == 0) {
++        entry.addr_mask = size - 1;
++        entry.translated_addr = addr;
++    } else if (level == 7) {
++        entry.addr_mask = (1 << (cto64(addr | 0xFFF) + 1)) - 1;
++        entry.translated_addr = addr & ~entry.addr_mask;
++    }
++
++    memory_region_notify_iommu(&as->iommu, 0, entry);
++}
++
++/*
++ * Walk the I/O page table and notify mapping change. Note that iova
++ * determines if this function's behavior:
++ *   - iova == 0: re-walk the whole page table
++ *   - iova != 0: re-walk the address defined in iova
++ */
++static void amdvi_walk_level(AMDVIAddressSpace *as, uint64_t pte,
++                             uint64_t iova, uint64_t partial)
++{
++    uint64_t index = 0;
++    uint8_t level = get_pte_translation_mode(pte);
++    uint64_t cur_addr = pte & AMDVI_DEV_PT_ROOT_MASK;
++    uint64_t end_addr = cur_addr + 4096;
++    uint64_t new_partial = 0;
++
++    if (!(pte & AMDVI_PTE_PRESENT)) {
++        return;
++    }
++
++    if (level == 7) {
++        amdvi_sync_iova(as, pte, iova);
++        return;
++    }
++
++    /* narrow the scope of table walk if iova != 0 */
++    if (iova) {
++        cur_addr += ((iova >> (3 + 9 * level)) & 0x1FF) << 3;
++        end_addr = cur_addr + 8;
++    }
++
++    while (cur_addr < end_addr) {
++        int cur_addr_inc = 8;
++        int index_inc = 1;
++
++        pte = amdvi_get_pte_entry(as->iommu_state, cur_addr, as->devfn);
++        /* validate the entry */
++        if (!(pte & AMDVI_PTE_PRESENT)) {
++            goto next;
++        }
++
++        if (level > 1) {
++            new_partial = (partial << 9) | index;
++            amdvi_walk_level(as, pte, iova, new_partial);
++        } else {
++            /* found a page, sync the mapping first */
++            if (iova) {
++                amdvi_sync_iova(as, pte, iova);
++            } else {
++                amdvi_sync_iova(as, pte, ((partial << 9) | index) << 12);
++            }
++
++            /* skip following entries when a large page is found */
++            if (get_pte_translation_mode(pte) == 7) {
++                int skipped = 1 << (cto64(pte >> 12) + 1);
++
++                cur_addr_inc = 8 * skipped;
++                index_inc = skipped;
++            }
++        }
++
++next:
++        cur_addr += cur_addr_inc;
++        index += index_inc;
++    }
++}
++
+ static void amdvi_page_walk(AMDVIAddressSpace *as, uint64_t *dte,
+                             IOMMUTLBEntry *ret, unsigned perms,
+                             hwaddr addr)
+diff --git a/hw/i386/amd_iommu.h b/hw/i386/amd_iommu.h
+index 29b7a35a51a5..6d80f4913984 100644
+--- a/hw/i386/amd_iommu.h
++++ b/hw/i386/amd_iommu.h
+@@ -123,6 +123,8 @@
+ #define AMDVI_CMD_COMPLETE_PPR_REQUEST    0x07
+ #define AMDVI_CMD_INVAL_AMDVI_ALL         0x08
+ 
++#define AMDVI_CMD_INVAL_IOMMU_PAGES_S_BIT (1ULL << 0)
++
+ #define AMDVI_DEVTAB_ENTRY_SIZE           32
+ 
+ /* Device table entry bits 0:63 */
+@@ -148,6 +150,9 @@
+ #define AMDVI_EVENT_ILLEGAL_COMMAND_ERROR (0x5U << 12)
+ #define AMDVI_EVENT_COMMAND_HW_ERROR      (0x6U << 12)
+ 
++/* PTE bits */
++#define AMDVI_PTE_PRESENT                 (1ULL << 0)
++
+ #define AMDVI_EVENT_LEN                  16
+ #define AMDVI_PERM_READ             (1 << 0)
+ #define AMDVI_PERM_WRITE            (1 << 1)
+@@ -198,6 +203,11 @@
+ #define AMDVI_MAX_PH_ADDR          (40UL << 8)
+ #define AMDVI_MAX_GVA_ADDR         (48UL << 15)
+ 
++#define AMDVI_PGSZ_ENTIRE          (0X0007FFFFFFFFF000ULL)
++
++/* The domain id is 16-bit, so use 32-bit all 1's to represent all domains */
++#define AMDVI_DOMAIN_ALL           (UINT32_MAX)
++
+ /* Completion Wait data size */
+ #define AMDVI_COMPLETION_DATA_SIZE    8
+ 
+-- 
+2.25.2
 
 
