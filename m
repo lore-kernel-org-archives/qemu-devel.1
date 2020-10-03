@@ -2,154 +2,109 @@ Return-Path: <SRS0=be0Y=DK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18B06C4363D
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 07:07:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B08E8C4363D
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 07:13:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65912206C9
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 07:07:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C05F206C9
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 07:13:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JANm7dkb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65912206C9
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zw0vk6Rd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C05F206C9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kObdW-0000GR-E9
-	for qemu-devel@archiver.kernel.org; Sat, 03 Oct 2020 03:07:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42852)
+	id 1kObjT-0001Uf-T0
+	for qemu-devel@archiver.kernel.org; Sat, 03 Oct 2020 03:13:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43362)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kObch-0008F6-Ba
- for qemu-devel@nongnu.org; Sat, 03 Oct 2020 03:06:27 -0400
-Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:35265)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kObcf-0000nq-Nr
- for qemu-devel@nongnu.org; Sat, 03 Oct 2020 03:06:27 -0400
-Received: by mail-wm1-x330.google.com with SMTP id y15so3873213wmi.0
- for <qemu-devel@nongnu.org>; Sat, 03 Oct 2020 00:06:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Z9JNWWV/Oj0iMagqWiZwgUj4RIW9lfYAhFuSozLdOeY=;
- b=JANm7dkbcW5ay569a/ex7qNE4bGZLpKUOEz2AKT7QedOT/MakeSc5szPVz+f4WN97a
- zNaU/feknhjocHd5xshtcwptZ0tvmfA58DxAIRF/xrYPFsQqJkQD6aFg/Go8ZJ/qUdnO
- I9f/qpiadO4nUlIQaiD/1cjChkYqIDnZHD/A0THVO5U6ukItpQJxKS6cdjgKvm8fVpQO
- cQMKnhl4obo1H3Nbi65sZCHsdw6KQVERpz2W57HyzyrN+FqkywStzvdw4dQ0WxmSavrl
- S/BMNPcHy9cAUN6nfJdUBhRoGzwU+Sqzl1Gzm+KQvY6Z3ZCSuUv2Ok9Cmzo+dx4jTKZk
- ZpcA==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kObiM-00013C-SJ
+ for qemu-devel@nongnu.org; Sat, 03 Oct 2020 03:12:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43021)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kObiJ-0001Fb-O6
+ for qemu-devel@nongnu.org; Sat, 03 Oct 2020 03:12:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601709134;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+fRZsKPEy5y6HK3qTRilR4ubF4SoNqZpU3aiClpoKcM=;
+ b=Zw0vk6RdZ6Uc7h8w0BzCdQdXgQxTXRCN12imKKaodHTezvUBBhSvQRFR2Bo4RkDKktF0D7
+ lx7bNy1w9do0vxPy+7vRJHqm0/Saq9j6JJh5ytY/NUPWcOp3KGSkyOzlnSRJHg6wf68BZP
+ +6WS/LW/DePSfsD5WsTctR0TIKVWIDQ=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-404-CrGT0ligOfS0nllqTcsxCw-1; Sat, 03 Oct 2020 03:12:12 -0400
+X-MC-Unique: CrGT0ligOfS0nllqTcsxCw-1
+Received: by mail-wr1-f69.google.com with SMTP id v5so1492026wrs.17
+ for <qemu-devel@nongnu.org>; Sat, 03 Oct 2020 00:12:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=Z9JNWWV/Oj0iMagqWiZwgUj4RIW9lfYAhFuSozLdOeY=;
- b=Bac57J/m3Z/DqPwdo93nbx5s17YjIq6A6arAzkBRsA0MjM8RY9bn5EIe5IQ0M+gfLV
- 3as/v34eevyuhX3R9/OIEYsJJ47XbKl+6J/Y+zfc1KNrvemdYdyIck5Ia8DSbKJTMX41
- WPc0AjJv7yurBRcbuXxoE+qfZaWBRv65zSTs9mFzY0BhG4zlatNZJVMEZX4FvgYEbGSg
- IuTDI/ES+j+gtSoqINsDvvBQQ95YJwaKThN/P+7Wc0hNyfixzNWaWJ4M5W4GUjGXCf2t
- m+LCbMVS5X73FIlMAkX+05ipPaB1iIMbYxriipAtc2xAL8QmZA0uzkmaIUkxveTwtDNf
- Kt5g==
-X-Gm-Message-State: AOAM532ny0iDBZqwQboBKLHhIuvNF4lkAmrjlncyOsjILMH8tbWGJ72N
- 0tn1kVfVqdrBA1mNXQl6nBS9MEBxfYk=
-X-Google-Smtp-Source: ABdhPJy5hWNn7QkEgh4enaitWdHmfGa5rD2pq85Tp2jxQsMi3skSL5HY+B+VVb8fB88rNyfAlnSIRA==
-X-Received: by 2002:a1c:9ec1:: with SMTP id h184mr6568434wme.180.1601708783498; 
- Sat, 03 Oct 2020 00:06:23 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=+fRZsKPEy5y6HK3qTRilR4ubF4SoNqZpU3aiClpoKcM=;
+ b=Wf+penjJppI+1LArsJG5i1IIN0mt2Kdoc+ZNfUmcboiYE9gJExl6Cc7K4jq3obmezK
+ zr87n1g+uKuWJ1G6k98VpYHygn6nfPwPvhqtXU3bUdCFEmrEVXg26WrkxKUFklhfrHLh
+ Zy7qm/cAbw8xsC1EL/kH+nQonr+oPbv+OcbSrXNTwXUTFuC6pDGeO5QvLJJ7aznBwsug
+ uJsOK1Y3z1RglRT2DwK4nW+zQTWEfzcrTgXdYP193k9eKSEcAwwyls1p2dtD+nx8AL6G
+ +pR8wYM8eR7VEquqLBz3rtx/7ihFVu7hJKl0iuGxnWUJMNg0y75V3WatdjBmwdum/ZNW
+ Hgtw==
+X-Gm-Message-State: AOAM531rvqyC8WudzfK1iIcS46QrrJh/js5lMxrIuJxYmDeA14FAAv/N
+ GjgQJOv1duTvTrw5J3CSGGJHvxSStJHpI2uzdZmMove86y5BU22NXsbWJDjbpjtONtLD1S8ebn6
+ eWndlkW8+/HVkEpc=
+X-Received: by 2002:a7b:c0d8:: with SMTP id s24mr1477353wmh.156.1601709130863; 
+ Sat, 03 Oct 2020 00:12:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzTR+fWzMPo0IRGWtsuzq11sJjLwdG9zmiBC60d+EtFFPH7nXqFaMha7vReqciITn4hU5vjBQ==
+X-Received: by 2002:a7b:c0d8:: with SMTP id s24mr1477339wmh.156.1601709130642; 
+ Sat, 03 Oct 2020 00:12:10 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:47e0:e742:75ba:b84d?
  ([2001:b07:6468:f312:47e0:e742:75ba:b84d])
- by smtp.googlemail.com with ESMTPSA id t6sm4843216wre.30.2020.10.03.00.06.22
+ by smtp.gmail.com with ESMTPSA id o6sm480909wrm.69.2020.10.03.00.12.08
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 03 Oct 2020 00:06:23 -0700 (PDT)
+ Sat, 03 Oct 2020 00:12:10 -0700 (PDT)
 Subject: Re: [PULL v2 00/11] capstone + disassembler patch queue
 To: Peter Maydell <peter.maydell@linaro.org>,
  Richard Henderson <richard.henderson@linaro.org>
 References: <20201002165127.130369-1-richard.henderson@linaro.org>
  <CAFEAcA_kr5M+TbLDiYVMZbSMgpZE8fN+ae27rgOVkpOj2b9-xQ@mail.gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
- uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <579da0f8-3b59-1cf6-9e0d-54c21905d683@redhat.com>
-Date: Sat, 3 Oct 2020 09:06:22 +0200
+Message-ID: <8156e2b2-241c-11b6-cf4b-0da4f59215db@redhat.com>
+Date: Sat, 3 Oct 2020 09:12:08 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
 In-Reply-To: <CAFEAcA_kr5M+TbLDiYVMZbSMgpZE8fN+ae27rgOVkpOj2b9-xQ@mail.gmail.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::330;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x330.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -19
-X-Spam_score: -2.0
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/03 02:43:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -23
+X-Spam_score: -2.4
 X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.256,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.256, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -169,16 +124,50 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 02/10/20 22:37, Peter Maydell wrote:
-> Found CMake: /usr/bin/cmake (2.8.12.2)
-> WARNING: The version of CMake /usr/bin/cmake is 2.8.12.2 but version
->> =3.4 is required
-> Run-time dependency capstone found: NO (tried pkgconfig and cmake)
-> Configuring capstone-defs.h using configuration
+> ../src/meson.build:753: WARNING: Trying to compare values of different
+> types (bool, str) using ==.
+> The result of this is undefined and will become a hard error in a
+> future Meson release.
 > Configuring config-host.h using configuration
-> 
-> We shouldn't be looking for or using cmake at all.
+> Program scripts/hxtool found: YES
+> Program scripts/shaderinclude.pl found: YES
+> Program scripts/qapi-gen.py found: YES
+> Program scripts/qemu-version.sh found: YES
+> Run-time dependency threads found: YES
+> Program keycodemapdb/tools/keymap-gen found: YES
+> Program scripts/decodetree.py found: YES
 
-This is a missing "method: 'pkg-config'".
+This can be rewritten like
+
+-if capstone_opt == 'disabled'
+-  capstone_opt = false
+-elif capstone_opt in ['enabled', 'auto', 'system']
++if capstone_opt in ['enabled', 'auto', 'system']
+   have_internal = fs.exists('capstone/Makefile')
+   capstone = dependency('capstone', static: enable_static,
+                         required: capstone_opt == 'system' or
+                                   capstone_opt == 'enabled' and not have_internal)
+   if capstone.found()
+     capstone_opt = 'system'
+   elif have_internal
+     capstone_opt = 'internal'
+   else
+-    capstone_opt = false
++    capstone_opt = 'disabled'
+   endif
+ endif
+ if capstone_opt == 'internal'
+
+...
+-summary_info += {'capstone':          capstone_opt}
++summary_info += {'capstone':          capstone_opt == 'disabled' ? false : capstone_opt}
+
+
+That said, this also showed a bug which can be fixed like this:
+
+-  have_internal = fs.exists('capstone/Makefile')
++  have_internal = fs.exists(meson.current_source_dir() / 'capstone/Makefile')
 
 Paolo
+
 
