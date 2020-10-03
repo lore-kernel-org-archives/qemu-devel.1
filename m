@@ -2,98 +2,69 @@ Return-Path: <SRS0=be0Y=DK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB2D0C4363D
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 09:54:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A5DEC4363D
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 10:02:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C910206C9
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 09:54:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e6AdNSF8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C910206C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7553F206CA
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 10:02:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7553F206CA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOeFB-00037I-ON
-	for qemu-devel@archiver.kernel.org; Sat, 03 Oct 2020 05:54:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39898)
+	id 1kOeNQ-00058W-G4
+	for qemu-devel@archiver.kernel.org; Sat, 03 Oct 2020 06:02:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40826)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kOeEU-0002Re-6q
- for qemu-devel@nongnu.org; Sat, 03 Oct 2020 05:53:38 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:38602)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kOeER-00025I-Gn
- for qemu-devel@nongnu.org; Sat, 03 Oct 2020 05:53:37 -0400
-Received: by mail-ot1-x341.google.com with SMTP id y5so3859696otg.5
- for <qemu-devel@nongnu.org>; Sat, 03 Oct 2020 02:53:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=obIunJMCwuIctwMB9KHyMjEcZAsycYX2a/PARzklzgo=;
- b=e6AdNSF8ykaX1FRPeb0Av9rzGcI6O/WKjwfucJ0YWkM2PWqm4XXzoO8A7B/wgLAjgJ
- jwmVw7iegXUiPIuumoqUV+pbHwz5LqTgso0qHLSoAkMhPrcHl/EtqNa538JQbvcmsIee
- mYPulDS/O9ZsiGUJPi5FlBDl/N+8joV6u1R1gb2g14QDvj52ENpUkRvRi5Ka67umkufO
- 8f/VJ5hNm8bl2RKyrR226RCuo5+kMTJ09UjHfrU26ZIIB+h/y311oK3EIPkKGRcD/yJW
- 0U1v4jHJ0ovP3h+//HxR5TBDApmGa4/blsu4aium9WyQjaOM2muWO3c5v2VlxCUUkKGV
- bOnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=obIunJMCwuIctwMB9KHyMjEcZAsycYX2a/PARzklzgo=;
- b=uKGpbWVts4+ECmCNu/pi4TVS+EKfSnQ44/tvGe5LvNkjqxJ27u+FVtzER9VQBzStmL
- kwKmMkx3NvXZfGnzenRKeLy6Os430OJmu5M+LvOj1L9vkmb8MlxoCiINsEm/ml1I88pi
- Vj61wJ04kr58ylVDpRZrpCHxLDjE3lDCp+RZ1ktCQmfAz/GxeOOhLycJR6E2j8cxmJBa
- 1nIctvk3+LL9WfUM30ttsgJ6tAr4L52B/uMmB6/FofY0Mw+8Mw1BR7gClpaCk3/ZQ3qe
- VxvTROfArlbr/C0XHiO8OgFu3ccjVdQTPCV5RHzaBOgrDEw2Hw5Trzv3tyCmRMedftwq
- XuaQ==
-X-Gm-Message-State: AOAM533wB3p5LvLH8QbnW6cGTS3bavfAKgBtgqIXDWZT+0pMyPKSpzva
- W/aO0xViplwA9jsaCZSu0JGoOg==
-X-Google-Smtp-Source: ABdhPJzortVGd43nIZrKjIRjdtZc+WQ0B+CpSCY952bMMF8IDrxjYl/ZrH209h+EJ6RbncHWhg6Nog==
-X-Received: by 2002:a9d:5509:: with SMTP id l9mr5179019oth.154.1601718814363; 
- Sat, 03 Oct 2020 02:53:34 -0700 (PDT)
-Received: from [10.10.73.179] (fixed-187-189-51-144.totalplay.net.
- [187.189.51.144])
- by smtp.gmail.com with ESMTPSA id c12sm1087623otm.61.2020.10.03.02.53.31
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 03 Oct 2020 02:53:32 -0700 (PDT)
-Subject: Re: [PATCH v4 11/12] target/arm: Reorder meson.build rules
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200929224355.1224017-1-philmd@redhat.com>
- <20200929224355.1224017-12-philmd@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <1328c0d8-be1d-1cbc-2c58-f17d078a1104@linaro.org>
-Date: Sat, 3 Oct 2020 04:53:29 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kOeMW-0004Mb-0E
+ for qemu-devel@nongnu.org; Sat, 03 Oct 2020 06:01:56 -0400
+Received: from us-smtp-delivery-44.mimecast.com ([205.139.111.44]:34447)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kOeMT-0002wX-UI
+ for qemu-devel@nongnu.org; Sat, 03 Oct 2020 06:01:55 -0400
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-582-uNrKKprfMHOGpQcR7fbb3Q-1; Sat, 03 Oct 2020 06:01:48 -0400
+X-MC-Unique: uNrKKprfMHOGpQcR7fbb3Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D849B801ADE;
+ Sat,  3 Oct 2020 10:01:46 +0000 (UTC)
+Received: from bahia.lan (ovpn-112-192.ams2.redhat.com [10.36.112.192])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3C6135D9D3;
+ Sat,  3 Oct 2020 10:01:41 +0000 (UTC)
+Subject: [PATCH v3 0/3] vhost: Skip access checks on GIOVAs
+From: Greg Kurz <groug@kaod.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
+Date: Sat, 03 Oct 2020 12:01:40 +0200
+Message-ID: <160171888144.284610.4628526949393013039.stgit@bahia.lan>
+User-Agent: StGit/0.21
 MIME-Version: 1.0
-In-Reply-To: <20200929224355.1224017-12-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=richard.henderson@linaro.org; helo=mail-ot1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -23
-X-Spam_score: -2.4
-X-Spam_bar: --
-X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.256,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: kaod.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: softfail client-ip=205.139.111.44; envelope-from=groug@kaod.org;
+ helo=us-smtp-delivery-44.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/03 06:01:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -11
+X-Spam_score: -1.2
+X-Spam_bar: -
+X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_SOFTFAIL=0.665 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,28 +77,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org, qemu-arm@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: kvm@vger.kernel.org, netdev@vger.kernel.org, qemu-devel@nongnu.org,
+ Laurent Vivier <laurent@vivier.eu>, virtualization@lists.linux-foundation.org,
+ linux-kernel@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/29/20 5:43 PM, Philippe Mathieu-Daudé wrote:
-> Reorder the rules to make this file easier to modify.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
-> I prefer to not squash that with the previous patch,
-> as it makes it harder to review.
-> ---
->  target/arm/meson.build | 22 ++++++++++------------
->  1 file changed, 10 insertions(+), 12 deletions(-)
+This series addresses some misuse around vring addresses provided by
+userspace when using an IOTLB device. The misuse cause failures of
+the VHOST_SET_VRING_ADDR ioctl on POWER, which in turn causes QEMU
+to crash at migration time.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Jason suggested that we should use vhost_get_used_size() during the
+review of v2. Fixed this in a preliminary patch (patch 2) and rebased
+the vq_log_used_access_ok() helper on top (patch 3).
 
-r~
+Note that I've also posted a patch for QEMU so that it skips the used
+structure GIOVA when allocating the log bitmap. Otherwise QEMU fails to
+allocate it because POWER puts GIOVAs very high in the address space (ie.
+over 0x800000000000000ULL).
+
+https://patchwork.ozlabs.org/project/qemu-devel/patch/160105498386.68108.21=
+45229309875282336.stgit@bahia.lan/
+
+v3:
+ - patch 1: added Jason's ack
+ - patch 2: new patch to use vhost_get_used_size()
+ - patch 3: rebased patch 2 from v2
+
+v2:
+ - patch 1: move the (vq->ioltb) check from vhost_vq_access_ok() to
+            vq_access_ok() as suggested by MST
+ - patch 2: new patch
+
+---
+
+Greg Kurz (3):
+      vhost: Don't call access_ok() when using IOTLB
+      vhost: Use vhost_get_used_size() in vhost_vring_set_addr()
+      vhost: Don't call log_access_ok() when using IOTLB
+
+
+ drivers/vhost/vhost.c |   33 +++++++++++++++++++++++----------
+ 1 file changed, 23 insertions(+), 10 deletions(-)
+
+--
+Greg
 
 
