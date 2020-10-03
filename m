@@ -2,93 +2,123 @@ Return-Path: <SRS0=Kewn=DL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76149C4363C
-	for <qemu-devel@archiver.kernel.org>; Sun,  4 Oct 2020 19:34:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21536C4363C
+	for <qemu-devel@archiver.kernel.org>; Sun,  4 Oct 2020 19:42:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7560F20637
-	for <qemu-devel@archiver.kernel.org>; Sun,  4 Oct 2020 19:34:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lmichel.fr header.i=@lmichel.fr header.b="ecC/QnAR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7560F20637
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=lmichel.fr
+	by mail.kernel.org (Postfix) with ESMTPS id 691E12067C
+	for <qemu-devel@archiver.kernel.org>; Sun,  4 Oct 2020 19:42:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 691E12067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=outlook.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kP9mY-0001iV-JB
-	for qemu-devel@archiver.kernel.org; Sun, 04 Oct 2020 15:34:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57348)
+	id 1kP9tk-0004Xg-Tw
+	for qemu-devel@archiver.kernel.org; Sun, 04 Oct 2020 15:42:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58164)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc@lmichel.fr>)
- id 1kP9lA-0000nz-Jv; Sun, 04 Oct 2020 15:33:28 -0400
-Received: from pharaoh.lmichel.fr ([149.202.28.74]:45442)
+ (Exim 4.90_1) (envelope-from <heecheol.yang@outlook.com>)
+ id 1kP9sB-00042z-TM
+ for qemu-devel@nongnu.org; Sun, 04 Oct 2020 15:40:43 -0400
+Received: from mail-mw2nam10olkn2087.outbound.protection.outlook.com
+ ([40.92.42.87]:49121 helo=NAM10-MW2-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc@lmichel.fr>)
- id 1kP9l6-0001M7-PA; Sun, 04 Oct 2020 15:33:28 -0400
-Received: from localhost (sekoia-pc.home.lmichel.fr [192.168.61.100])
- by pharaoh.lmichel.fr (Postfix) with ESMTPSA id 9CC3CC60F16;
- Sun,  4 Oct 2020 19:33:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr; s=pharaoh; 
- t=1601840001;
- h=from:from:sender:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QpDzQH6XYqbMIJg1Up4r9YOnvSEOUvKYMsEO4YSOvF8=;
- b=ecC/QnAR1gv+lHZqMDzSSihYXmBPTBebV7Q5FbCG4g5YOKXgZXTURcAnNCidZXkbniZXLz
- KwGvbY51rmWAL9W1kU7tQROVll6eSwLgFqm/L2lQ6nG1vnG18EtLSglhU3ssmV+17l7yyx
- af53w79/7BKzbgML2Vl0T0/wtbj2tPXyF3ZM2d0+E/5wp4l0Ry2HXCpG6hQ0a8HKoDdP28
- poUx3y4ES7dABVjxVtoqx3opmhSMpx3yYjs8OtVx9tig588lCMD33ins3/4ZvSB+fGkMbE
- iP3P/O1nouxbGl3bsTm1HbS53Fq72X0pP8qsyD5Z7wsWQ3eC7s92K20yhTb0xQ==
-Date: Sun, 4 Oct 2020 21:34:21 +0200
-From: Luc Michel <luc@lmichel.fr>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH 09/14] hw/misc/bcm2835_cprman: add a clock mux skeleton
- implementation
-Message-ID: <20201004193421.2a2znqtgwaoslvm3@sekoia-pc.home.lmichel.fr>
-References: <20200925101731.2159827-1-luc@lmichel.fr>
- <20200925101731.2159827-10-luc@lmichel.fr>
- <2a18bb94-1e6c-d853-3e6e-f6874b617a2b@amsat.org>
+ (Exim 4.90_1) (envelope-from <heecheol.yang@outlook.com>)
+ id 1kP9s8-0002Bd-Ni
+ for qemu-devel@nongnu.org; Sun, 04 Oct 2020 15:40:43 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Y4SBZUdGM3mhLz8rEcy/EJKAuuiHZEgB2oioXLOpRu4KPeLeWNOL4vh+38tDM759FkhmgXsMMYUoGoR5Ttd9/p/Mey7AgknZlfCs0fw6/PxKEiie2RyvIo6xqSFGegn6aFU/tW5G3KglajCzffGXbs93DH22w0pGKJwdtCwD3W5TtfNRGmsboF80y00mAPyFPJ1EOFc+1g5l8gLoGI1I/83se4Ao0sqP7t59cciOacQivrSzoKK20ie0hIfzmhRPwETfRQFt6dIrL3UyX3zE4a9bNclLDGG4My8FBWdcW0NSxfBAKYfpfDLtJkkg2Te5YjMpbWfWDU98fIveNG37eQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6tSfAHg3N4BP2/y2VHKhB+VguW7zHCZvKUH4nQJIRSg=;
+ b=AfrrSWn1OmWCtwxObXoLZ1ufgfCeBqLlSv6gpWdyxjmJ8Kho4hYdW0448ohzzSdg2rAjjAFUOIZoIQ+SnbY1aceRpFmy70/9GI9/AVHZyGgYfOHUN3i8VXSDoElVIAbUXlHE7wp6lb9hgBB5kIX0YE0J+8rKGh4Ythkiloip2Wu/k89mXpG2vVpewpeMjdFwrEjIzrKOtV8vu0L98T4zavvDF5IadTzpsdEbRFf1ecluyudaUR5krp/lSgIlQ1GdIBG56Vx9ANMFE4Ta48QNBG+5gsMuzia5dg00+eRK39xyDGRVgy0rWf85DwQ6LjzLuRdu2jH/x6vGqcQBXkamKg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6tSfAHg3N4BP2/y2VHKhB+VguW7zHCZvKUH4nQJIRSg=;
+ b=FRgNVnp8mjjD+xQjubArTOKZEWC7ITfoskug8YqKi4Vg9l9nU1ozcO4EZAWkyUC1gxyIseTFh3btfSOb0bwpq7G3b3EUmmm5XLZSmopEZf847SpAs62+9jKQrbuLrQlwh4tjmCNMqMEBIx9n7VqdnIgAfWsQjuBeSaCcZ1rHPUtQjT92pfH6WxfASR8kNPiki7pkp3h3SkbGpA9zXvNi8TpeQXIfRlqVECosoMw3UcKS76JxaNFpvP3hIb/4Uwi9p8GTLiNgt0d2OjMTka/wLdiLtmDeCwLSVlsj/h1QpXahbpRybn/HZiRIEWQhyw46GQYuaMBW4TIAw9Ag96/GSQ==
+Received: from DM6NAM10FT015.eop-nam10.prod.protection.outlook.com
+ (2a01:111:e400:7e86::50) by
+ DM6NAM10HT028.eop-nam10.prod.protection.outlook.com (2a01:111:e400:7e86::108)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3433.34; Sat, 3 Oct
+ 2020 22:02:02 +0000
+Received: from DM6PR16MB2473.namprd16.prod.outlook.com
+ (2a01:111:e400:7e86::53) by DM6NAM10FT015.mail.protection.outlook.com
+ (2a01:111:e400:7e86::100) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3433.34 via Frontend
+ Transport; Sat, 3 Oct 2020 22:02:02 +0000
+Received: from DM6PR16MB2473.namprd16.prod.outlook.com
+ ([fe80::ec2c:246a:b4d4:48b1]) by DM6PR16MB2473.namprd16.prod.outlook.com
+ ([fe80::ec2c:246a:b4d4:48b1%3]) with mapi id 15.20.3433.039; Sat, 3 Oct 2020
+ 22:02:02 +0000
+From: Hee-cheol Yang <heecheol.yang@outlook.com>
+To: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Hee-cheol Yang
+ <heecheol.yang@outlook.com>
+Subject: RE: [PATCH v2] hw/avr: Add limited support for avr gpio registers
+Thread-Topic: [PATCH v2] hw/avr: Add limited support for avr gpio registers
+Thread-Index: AQHWmYI5aN4/7/KuykiauBZvsOOin6mGK+gAgABCuAs=
+Date: Sat, 3 Oct 2020 22:02:02 +0000
+Message-ID: <DM6PR16MB24739B6BF93E480B6873A216E60E0@DM6PR16MB2473.namprd16.prod.outlook.com>
+References: <DM6PR16MB2473C5A77E009CA2FEF3D8ECE60E0@DM6PR16MB2473.namprd16.prod.outlook.com>,
+ <77f59e9a-861e-f580-57f4-72912ba2566a@amsat.org>
+In-Reply-To: <77f59e9a-861e-f580-57f4-72912ba2566a@amsat.org>
+Accept-Language: ko-KR, en-US
+Content-Language: ko-KR
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-incomingtopheadermarker: OriginalChecksum:D321509D9F057D3F408ED59A4793ADE3C13C9C2FE79BEB8C1F29E63019248244;
+ UpperCasedChecksum:4A5C3FD3F23913A8803E3CCD857286E0191B49B7DBCECA127B1C2F0517B48AAE;
+ SizeAsReceived:7138; Count:45
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tmn: [URA/jH/0m3WV7Rbf63u3b1gQLNk3vNVx]
+x-ms-publictraffictype: Email
+x-incomingheadercount: 45
+x-eopattributedmessage: 0
+x-ms-office365-filtering-correlation-id: 1890bc27-4e73-45bd-08ab-08d867e7f5a2
+x-ms-exchange-slblob-mailprops: ZK1LJjhzK/D0dphKRG3Uc6K54Ygkcp4hzJXdQT/ClpVR2n0WlZYv7C2fJs8TZIBay0SdAlDtaQU0yHg3CIvUqGeq17dvqiswo0yDaiDJ0V6kVoM5UV3PXgtbyFj6J7af3hsSKke4mvFV07Pvc3lxM0x9yV1U9xABmHkVmYH+iBnsLE1CE3spI4ArmnYD9reBd2401v1Gc6hzkW5qu+ysfYsIv/jLtBuj6+QiIkYf399Iw8UybPVKF6dss6Fwfjes46QSYjKSZAydxPGONlI/FThaU7/SFT/by5SNJHtHN1Qnz3bB+wB0MAPfzVhCIlNWJhXG05RD90uGHhVN6FcuZlyfWhK17pAfH7g/Dczl4vJvRnH9Iaa8wb2A8YjHTDYV/xYOL/TIZsWjzpa24NRJoUJab++zMrfI6tbkysNkyJC5eGvevYpBhE0yiUeY2XtRqHEn6lKqobhDC+oMf7oWZrv0SaNLBu2Hhyz1VFYvegnZxPhCIS5i4uSlzrhqIs2UCdCQ23IkYKC10ml4O87C9AG+M8zNBWMvJ5oYhL5MAKPunj8n1qE8p0XknDxm6bK1jWVRR5PzI4tKVbcw9rmGsu+Bjem1fdRcEELeFl6atX32rO8vEdpd8CFkLXSLNgl+ED40I48xa8spV9Qpnx8kOXDcgpbZAA41mIHMZRyQzVqhUrnQMuMUF2RJsaM1LL0kldHz7BysxFIRnVPA+wV5XrbevyPx8qjb5w15jCnGM9H5BIU+w5ukl4pDDHKPcTJ7676ytGC63nGd5pwfD5MWK+Y60c1Fkep62ujj+peMqjbBz/zzG1NElkGzRQmXvZgVJBSKlUehV+nCtPh9inlQa1iyRT2ybJXJP4+gie8g2InR47A418sUk7EfKIlJ3Nw69vRVDULiE2PgX/9BTazqatY4J/a18R8bnMjj/T/lIngVCk3KTdTng4rDxN1O080h
+x-ms-traffictypediagnostic: DM6NAM10HT028:
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ANUsHtpp7zhK74s72D9w1xF5p7c+Om86SBul/qrpjKoGx4zuDa2i7BSr/InrY6c+IwKa16y4YqGvlJpEly66HxUB1ZsbYH4fB0ECYBBWIVZaiAcARYnZB3mCtWgQrobUTGrgjhWcHjRYAHi+ZQmmcuOqj1ZbOr09Jj+CBhKYFkHijn8uOH25wLK2rivCXhi3vE1rLKU11PDnx5X/fZR7sH78hsMZi4J/PMwzRYcZFn0YRRloAtE1q3eWQN0r0U16
+x-ms-exchange-antispam-messagedata: zPB3VckpzXikYhxtUxpK4CE8giZe/o/gvQi5ohPkXTKlwCKxpNsOa/4596JFw04YlhFDHhAKHL1tJg/wq/arLF1HCnpcMBMSadPx+uHNfvsGyRwp6XsZ9J6XlY7poDfvTzJ3sSlm3JhmD2tU6JTm1g==
+x-ms-exchange-transport-forked: True
+Content-Type: multipart/alternative;
+ boundary="_000_DM6PR16MB24739B6BF93E480B6873A216E60E0DM6PR16MB2473namp_"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2a18bb94-1e6c-d853-3e6e-f6874b617a2b@amsat.org>
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr;
- s=pharaoh; t=1601840001;
- h=from:from:sender:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QpDzQH6XYqbMIJg1Up4r9YOnvSEOUvKYMsEO4YSOvF8=;
- b=KElNWU3GJGlUhj0rDlw/L+oIZUSYblbs7lWzo5udWSJlhI2On/44Kbk5iaIU/8y6OKdVEC
- QzF63uKJ8BkeOeHwdG7ZesI9l7ciNcXz4mqG2Ahdpjife5zioiq+QAaUTIpfcyTnrviLkp
- igxD6nYAno+6bVaj+VYOypF52GUaKshwQK7PzU0wNcrJH4DzAQgbTKLnHTxfqpw+ulMhW/
- s7h/7e7BQa36WgsOSKeylWDF502dYFXQtlDyo88TdXHJ5ev86ZutqQtCLvKyffv6Snq2EW
- YVE/1YD2NSFbHra2Qp2DDLcZ8etX0RLCHNyb/CUbXrAwnNA6pwSjaiwOuPggTg==
-ARC-Seal: i=1; s=pharaoh; d=lmichel.fr; t=1601840001; a=rsa-sha256; cv=none;
- b=J53569lg/L6OUXp87oCBg3qMJKS6RczRM3XlY3fh7s4qDJHEOrdeEbIPGD/jnz/N/zLXpIGwPvKW58h/GSDcymnU6lNmOcn8Dy4bfNM5bSr0x+/+R35KWvS2FHevUIEt7ABFPiWO/WrN/OvDxRJGySy4XhREHfEvht8tEZAmd/avdlzwXDF5d57yH/FQRoHmT0FkBCFRUoceLy3kOXg+mKYih9kR49ZZbLpZjX2UbFssNWu1u3JJ6HALOPX7YJImZo2FxxSRFr1ORR1Elopy4ebg7VhANV/QQ/9Zaxx6VCoBLh5TWw5a9D2VOzIjJpUbvwoV3lYxwRSehTGgb4s9SQ==
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=sekoia smtp.mailfrom=luc@lmichel.fr
-Received-SPF: pass client-ip=149.202.28.74; envelope-from=luc@lmichel.fr;
- helo=pharaoh.lmichel.fr
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/04 14:36:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM10FT015.eop-nam10.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1890bc27-4e73-45bd-08ab-08d867e7f5a2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Oct 2020 22:02:02.8358 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Internet
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6NAM10HT028
+X-OriginatorOrg: outlook.com
+Received-SPF: pass client-ip=40.92.42.87;
+ envelope-from=heecheol.yang@outlook.com;
+ helo=NAM10-MW2-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/04 15:40:38
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,916 +131,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org, Andrew Baumann <Andrew.Baumann@microsoft.com>
+Cc: Sarah Harris <S.E.Harris@kent.ac.uk>, Michael Rolnik <mrolnik@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 16:42 Fri 02 Oct     , Philippe Mathieu-Daudé wrote:
-> On 9/25/20 12:17 PM, Luc Michel wrote:
-> > The clock multiplexers are the last clock stage in the cprman. Each mux
-> > outputs one clock signal that goes out of the cprman to the SoC
-> > peripherals.
-> >
-> > Each mux has at most 10 sources. The sources 0 to 3 are common to all
-> > muxes. They are:
-> >    0. ground (no clock signal)
-> >    1. the main oscillator (xosc)
-> >    2. "test debug 0" clock
-> >    3. "test debug 1" clock
-> >
-> > Test debug 0 and 1 are actual clock muxes that can be used as sources to
-> > other muxes (for debug purpose).
-> >
-> > Sources 4 to 9 are mux specific and can be unpopulated (grounded). Those
-> > sources are fed by the PLL channels outputs.
-> >
-> > One corner case exists for DSI0E and DSI0P muxes. They have their source
-> > number 4 connected to an intermediate multiplexer that can select
-> > between PLLA-DSI0 and PLLD-DSI0 channel. This multiplexer is called
-> > DSI0HSCK and is not a clock mux as such. It is really a simple mux from
-> > the hardware point of view (see https://elinux.org/The_Undocumented_Pi).
-> > This mux is not implemented in this commit.
-> >
-> > Note that there is some muxes for which sources are unknown (because of
-> > a lack of documentation). For those cases all the sources are connected
-> > to ground in this implementation.
-> >
-> > Each clock mux output is exported by the cprman at the qdev level,
-> > adding the suffix '-out' to the mux name to form the output clock name.
-> > (E.g. the 'uart' mux sees its output exported as 'uart-out' at the
-> > cprman level.)
-> >
-> > Signed-off-by: Luc Michel <luc@lmichel.fr>
-> > ---
-> >  include/hw/misc/bcm2835_cprman.h           |  84 ++++
-> >  include/hw/misc/bcm2835_cprman_internals.h | 421 +++++++++++++++++++++
-> >  hw/misc/bcm2835_cprman.c                   | 151 ++++++++
-> >  3 files changed, 656 insertions(+)
-> >
-> > diff --git a/include/hw/misc/bcm2835_cprman.h b/include/hw/misc/bcm2835_cprman.h
-> > index aaf15fb20c..c2a89e8e90 100644
-> > --- a/include/hw/misc/bcm2835_cprman.h
-> > +++ b/include/hw/misc/bcm2835_cprman.h
-> > @@ -52,12 +52,73 @@ typedef enum CprmanPLLChannel {
-> >      CPRMAN_PLLH_CHANNEL_PIX,
-> >
-> >      CPRMAN_PLLB_CHANNEL_ARM,
-> >
-> >      CPRMAN_NUM_PLL_CHANNEL,
-> > +
-> > +    /* Special values used when connecting clock sources to clocks */
-> > +    CPRMAN_CLOCK_SRC_NORMAL = -1,
-> > +    CPRMAN_CLOCK_SRC_FORCE_GROUND = -2,
-> > +    CPRMAN_CLOCK_SRC_DSI0HSCK = -3,
->
-> Why not use CPRMAN_NORMAL_CHANNEL,
-> CPRMAN_FORCED_GROUND_CHANNEL and CPRMAN_DSI0HSCK_CHANNEL?
-Well, those are special values used when connecting the clock sources to
-the muxes in connect_mux_sources(). They are not channels hence the
-name. To keep the code simple, I reused the CprmanPLLChannel type for
-mux sources (it is used in bcm2835_cprman_internals.h to describe what
-source connects to what mux input).
+--_000_DM6PR16MB24739B6BF93E480B6873A216E60E0DM6PR16MB2473namp_
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 
-Ideally this type should be named something like ClockMuxSources (and
-CprmanPLLChannel should be a sub-set of this type). But doing so
-complicates the code quite a bit so I chose to simply have those three
-constants here instead.
+VGhhbmtzIGZvciB5b3VyIHJldmlldy4NCkFjdHVhbGx5LCB0aGUgdmVyeSByZWNlbnQgdjIgb25l
+IGlzIHY0LiBUaGVyZSB3YXMgYW4gdHlwbyB3aGlsZSBJIHdhcyB3cml0aW5nIG11bHRpcGxlIG1h
+aWxzIGZvciBzdWNjZXNzZnVsIHBhdGNoZXcgYnVpbGRzKHYyIGFuZCB2MyBoYXMgdGhlIHNhbWUg
+Y29udGVudHMpIC4uIFNvcnJ5Lg0KDQpJZiBuZWVkZWQsIGxldCBtZSBrbm93IHRvIHdyaXRlIHRo
+ZSBuZXcgdGl0bGVkIHZlcnNpb24gb2YgbWFpbCB3aGljaCBjb250YWlucyB0aGUgc2FtZSBjb250
+ZW50cy4NCg0KDQoNCi0tLS0tLS0tIOybkOuzuCDsnbTrqZTsnbwgLS0tLS0tLS0NCuuwnOyLoDog
+UGhpbGlwcGUgTWF0aGlldS1EYXVkw6kgPGY0YnVnQGFtc2F0Lm9yZz4NCuuCoOynnDogMjAvMTAv
+NCDsmKTsoIQgMzowMyAoR01UKzA5OjAwKQ0K67Cb7J2AIOyCrOuejDogSGVlY2hlb2wgWWFuZyA8
+aGVlY2hlb2wueWFuZ0BvdXRsb29rLmNvbT4sIHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0K7LC47KGw
+OiBTYXJhaCBIYXJyaXMgPFMuRS5IYXJyaXNAa2VudC5hYy51az4sIE1pY2hhZWwgUm9sbmlrIDxt
+cm9sbmlrQGdtYWlsLmNvbT4NCuygnOuqqTogUmU6IFtQQVRDSCB2Ml0gaHcvYXZyOiBBZGQgbGlt
+aXRlZCBzdXBwb3J0IGZvciBhdnIgZ3BpbyByZWdpc3RlcnMNCg0KT24gMTAvMy8yMCAyOjM4IFBN
+LCBIZWVjaGVvbCBZYW5nIHdyb3RlOg0KPiBBZGQgc29tZSBvZiB0aGVzZSBmZWF0dXJlcyBmb3Ig
+YXZyIGdwaW86DQo+DQo+ICAgLSBHUElPIEkvTyA6IFBPUlR4IHJlZ2lzdGVycw0KPiAgIC0gRGF0
+YSBEaXJlY3Rpb24gOiBERFJ4IHJlZ2lzdGVycw0KPg0KPiBGb2xsb3dpbmcgdGhpbmdzIGFyZSBu
+b3Qgc3VwcG9ydGVkIHlldDoNCj4gICAtIFBJTnggcmVnaXN0ZXJzDQo+ICAgLSBNQ1VSIHJlZ2lz
+dGVycw0KPiAgIC0gRXZlbiB0aG91Z2ggcmVhZC93cml0ZSBmb3IgRERSeCByZWdpc3RlcnMgYXJl
+DQo+ICAgICBpbXBsZW1lbnRlZCwgYWN0dWFsIGRpcmVjdGlvbiBjb250cm9scyBhcmUgbm90DQo+
+ICAgICBzdXBwb3J0ZWQgeWV0Lg0KPg0KPiBTaWduZWQtb2ZmLWJ5OiBIZWVjaGVvbCBZYW5nIDxo
+ZWVjaGVvbC55YW5nQG91dGxvb2suY29tPg0KPiAtLS0NCj4gIGh3L2F2ci9LY29uZmlnICAgICAg
+ICAgICAgIHwgICAxICsNCj4gIGh3L2F2ci9hdG1lZ2EuYyAgICAgICAgICAgIHwgICA3ICsrLQ0K
+PiAgaHcvYXZyL2F0bWVnYS5oICAgICAgICAgICAgfCAgIDIgKw0KPiAgaHcvZ3Bpby9LY29uZmln
+ICAgICAgICAgICAgfCAgIDMgKw0KPiAgaHcvZ3Bpby9hdnJfZ3Bpby5jICAgICAgICAgfCAxMTIg
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KPiAgaHcvZ3Bpby9tZXNvbi5i
+dWlsZCAgICAgICAgfCAgIDIgKw0KPiAgaW5jbHVkZS9ody9ncGlvL2F2cl9ncGlvLmggfCAgNDYg
+KysrKysrKysrKysrKysrDQo+ICA3IGZpbGVzIGNoYW5nZWQsIDE3MSBpbnNlcnRpb25zKCspLCAy
+IGRlbGV0aW9ucygtKQ0KPiAgY3JlYXRlIG1vZGUgMTAwNjQ0IGh3L2dwaW8vYXZyX2dwaW8uYw0K
+PiAgY3JlYXRlIG1vZGUgMTAwNjQ0IGluY2x1ZGUvaHcvZ3Bpby9hdnJfZ3Bpby5oDQoNCkZZSSB0
+aGlzIG9uZSBpcyBwb3N0ZWQgY29ycmVjdGx5LCBJIGNhbiByZWFkIGl0IGFuZCBwYXRjaGV3DQpz
+dWNjZXNzZnVsbHkgYXBwbGllZCBpdDoNCmh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9ETTZQUjE2
+TUIyNDczQzVBNzdFMDA5Q0EyRkVGM0Q4RUNFNjBFMEBETTZQUjE2TUIyNDczLm5hbXByZDE2LnBy
+b2Qub3V0bG9vay5jb20vDQoNCkJ1dCB2MyBpcyBicm9rZW4gYWdhaW4uLi4NCg==
 
->
-> >  } CprmanPLLChannel;
-> >
-> > +typedef enum CprmanClockMux {
-> > +    CPRMAN_CLOCK_GNRIC,
-> > +    CPRMAN_CLOCK_VPU,
-> > +    CPRMAN_CLOCK_SYS,
-> > +    CPRMAN_CLOCK_PERIA,
-> > +    CPRMAN_CLOCK_PERII,
-> > +    CPRMAN_CLOCK_H264,
-> > +    CPRMAN_CLOCK_ISP,
-> > +    CPRMAN_CLOCK_V3D,
-> > +    CPRMAN_CLOCK_CAM0,
-> > +    CPRMAN_CLOCK_CAM1,
-> > +    CPRMAN_CLOCK_CCP2,
-> > +    CPRMAN_CLOCK_DSI0E,
-> > +    CPRMAN_CLOCK_DSI0P,
-> > +    CPRMAN_CLOCK_DPI,
-> > +    CPRMAN_CLOCK_GP0,
-> > +    CPRMAN_CLOCK_GP1,
-> > +    CPRMAN_CLOCK_GP2,
-> > +    CPRMAN_CLOCK_HSM,
-> > +    CPRMAN_CLOCK_OTP,
-> > +    CPRMAN_CLOCK_PCM,
-> > +    CPRMAN_CLOCK_PWM,
-> > +    CPRMAN_CLOCK_SLIM,
-> > +    CPRMAN_CLOCK_SMI,
-> > +    CPRMAN_CLOCK_TEC,
-> > +    CPRMAN_CLOCK_TD0,
-> > +    CPRMAN_CLOCK_TD1,
-> > +    CPRMAN_CLOCK_TSENS,
-> > +    CPRMAN_CLOCK_TIMER,
-> > +    CPRMAN_CLOCK_UART,
-> > +    CPRMAN_CLOCK_VEC,
-> > +    CPRMAN_CLOCK_PULSE,
-> > +    CPRMAN_CLOCK_SDC,
-> > +    CPRMAN_CLOCK_ARM,
-> > +    CPRMAN_CLOCK_AVEO,
-> > +    CPRMAN_CLOCK_EMMC,
-> > +    CPRMAN_CLOCK_EMMC2,
-> > +
-> > +    CPRMAN_NUM_CLOCK_MUX
-> > +} CprmanClockMux;
-> > +
-> > +typedef enum CprmanClockMuxSource {
-> > +    CPRMAN_CLOCK_SRC_GND = 0,
-> > +    CPRMAN_CLOCK_SRC_XOSC,
-> > +    CPRMAN_CLOCK_SRC_TD0,
-> > +    CPRMAN_CLOCK_SRC_TD1,
-> > +    CPRMAN_CLOCK_SRC_PLLA,
-> > +    CPRMAN_CLOCK_SRC_PLLC,
-> > +    CPRMAN_CLOCK_SRC_PLLD,
-> > +    CPRMAN_CLOCK_SRC_PLLH,
-> > +    CPRMAN_CLOCK_SRC_PLLC_CORE1,
-> > +    CPRMAN_CLOCK_SRC_PLLC_CORE2,
-> > +
-> > +    CPRMAN_NUM_CLOCK_MUX_SRC
-> > +} CprmanClockMuxSource;
-> > +
-> >  typedef struct CprmanPLLState {
-> >      /*< private >*/
-> >      DeviceState parent_obj;
-> >
-> >      /*< public >*/
-> > @@ -89,22 +150,45 @@ typedef struct CprmanPLLChannelState {
-> >
-> >      Clock *pll_in;
-> >      Clock *out;
-> >  } CprmanPLLChannelState;
-> >
-> > +typedef struct CprmanClockMuxState {
-> > +    /*< private >*/
-> > +    DeviceState parent_obj;
-> > +
-> > +    /*< public >*/
-> > +    CprmanClockMux id;
-> > +
-> > +    uint32_t *reg_cm;
-> > +    int int_bits;
-> > +    int frac_bits;
-> > +
-> > +    Clock *srcs[CPRMAN_NUM_CLOCK_MUX_SRC];
-> > +    Clock *out;
-> > +
-> > +    /*
-> > +     * Used by clock srcs update callback to retrieve both the clock and the
-> > +     * source number.
-> > +     */
-> > +    struct CprmanClockMuxState *backref[CPRMAN_NUM_CLOCK_MUX_SRC];
-> > +} CprmanClockMuxState;
-> > +
-> >  struct BCM2835CprmanState {
-> >      /*< private >*/
-> >      SysBusDevice parent_obj;
-> >
-> >      /*< public >*/
-> >      MemoryRegion iomem;
-> >
-> >      CprmanPLLState plls[CPRMAN_NUM_PLL];
-> >      CprmanPLLChannelState channels[CPRMAN_NUM_PLL_CHANNEL];
-> > +    CprmanClockMuxState clock_muxes[CPRMAN_NUM_CLOCK_MUX];
-> >
-> >      uint32_t regs[CPRMAN_NUM_REGS];
-> >      uint32_t xosc_freq;
-> >
-> >      Clock *xosc;
-> > +    Clock *gnd;
->
-> This one seems to belong to MachineState in "hw/boards.h".
->
-> >  };
-> >
-> >  #endif
-> > diff --git a/include/hw/misc/bcm2835_cprman_internals.h b/include/hw/misc/bcm2835_cprman_internals.h
-> > index 8a5b9aae67..a2b5a1aa50 100644
-> > --- a/include/hw/misc/bcm2835_cprman_internals.h
-> > +++ b/include/hw/misc/bcm2835_cprman_internals.h
-> > @@ -12,15 +12,18 @@
-> >  #include "hw/registerfields.h"
-> >  #include "hw/misc/bcm2835_cprman.h"
-> >
-> >  #define TYPE_CPRMAN_PLL "bcm2835-cprman-pll"
-> >  #define TYPE_CPRMAN_PLL_CHANNEL "bcm2835-cprman-pll-channel"
-> > +#define TYPE_CPRMAN_CLOCK_MUX "bcm2835-cprman-clock-mux"
-> >
-> >  DECLARE_INSTANCE_CHECKER(CprmanPLLState, CPRMAN_PLL,
-> >                           TYPE_CPRMAN_PLL)
-> >  DECLARE_INSTANCE_CHECKER(CprmanPLLChannelState, CPRMAN_PLL_CHANNEL,
-> >                           TYPE_CPRMAN_PLL_CHANNEL)
-> > +DECLARE_INSTANCE_CHECKER(CprmanClockMuxState, CPRMAN_CLOCK_MUX,
-> > +                         TYPE_CPRMAN_CLOCK_MUX)
-> >
-> >  /* Register map */
-> >
-> >  /* PLLs */
-> >  REG32(CM_PLLA, 0x104)
-> > @@ -126,10 +129,94 @@ REG32(A2W_PLLH_RCAL, 0x1460)
-> >  REG32(A2W_PLLH_PIX, 0x1560)
-> >  REG32(A2W_PLLH_STS, 0x1660)
-> >
-> >  REG32(A2W_PLLB_ARM, 0x13e0)
-> >
-> > +/* Clock muxes */
-> > +REG32(CM_GNRICCTL, 0x000)
-> > +    FIELD(CM_CLOCKx_CTL, SRC, 0, 4)
-> > +    FIELD(CM_CLOCKx_CTL, ENABLE, 4, 1)
-> > +    FIELD(CM_CLOCKx_CTL, KILL, 5, 1)
-> > +    FIELD(CM_CLOCKx_CTL, GATE, 6, 1)
-> > +    FIELD(CM_CLOCKx_CTL, BUSY, 7, 1)
-> > +    FIELD(CM_CLOCKx_CTL, BUSYD, 8, 1)
-> > +    FIELD(CM_CLOCKx_CTL, MASH, 9, 2)
-> > +    FIELD(CM_CLOCKx_CTL, FLIP, 11, 1)
-> > +REG32(CM_GNRICDIV, 0x004)
-> > +    FIELD(CM_CLOCKx_DIV, FRAC, 0, 12)
-> > +REG32(CM_VPUCTL, 0x008)
-> > +REG32(CM_VPUDIV, 0x00c)
-> > +REG32(CM_SYSCTL, 0x010)
-> > +REG32(CM_SYSDIV, 0x014)
-> > +REG32(CM_PERIACTL, 0x018)
-> > +REG32(CM_PERIADIV, 0x01c)
-> > +REG32(CM_PERIICTL, 0x020)
-> > +REG32(CM_PERIIDIV, 0x024)
-> > +REG32(CM_H264CTL, 0x028)
-> > +REG32(CM_H264DIV, 0x02c)
-> > +REG32(CM_ISPCTL, 0x030)
-> > +REG32(CM_ISPDIV, 0x034)
-> > +REG32(CM_V3DCTL, 0x038)
-> > +REG32(CM_V3DDIV, 0x03c)
-> > +REG32(CM_CAM0CTL, 0x040)
-> > +REG32(CM_CAM0DIV, 0x044)
-> > +REG32(CM_CAM1CTL, 0x048)
-> > +REG32(CM_CAM1DIV, 0x04c)
-> > +REG32(CM_CCP2CTL, 0x050)
-> > +REG32(CM_CCP2DIV, 0x054)
-> > +REG32(CM_DSI0ECTL, 0x058)
-> > +REG32(CM_DSI0EDIV, 0x05c)
-> > +REG32(CM_DSI0PCTL, 0x060)
-> > +REG32(CM_DSI0PDIV, 0x064)
-> > +REG32(CM_DPICTL, 0x068)
-> > +REG32(CM_DPIDIV, 0x06c)
-> > +REG32(CM_GP0CTL, 0x070)
-> > +REG32(CM_GP0DIV, 0x074)
-> > +REG32(CM_GP1CTL, 0x078)
-> > +REG32(CM_GP1DIV, 0x07c)
-> > +REG32(CM_GP2CTL, 0x080)
-> > +REG32(CM_GP2DIV, 0x084)
-> > +REG32(CM_HSMCTL, 0x088)
-> > +REG32(CM_HSMDIV, 0x08c)
-> > +REG32(CM_OTPCTL, 0x090)
-> > +REG32(CM_OTPDIV, 0x094)
-> > +REG32(CM_PCMCTL, 0x098)
-> > +REG32(CM_PCMDIV, 0x09c)
-> > +REG32(CM_PWMCTL, 0x0a0)
-> > +REG32(CM_PWMDIV, 0x0a4)
-> > +REG32(CM_SLIMCTL, 0x0a8)
-> > +REG32(CM_SLIMDIV, 0x0ac)
-> > +REG32(CM_SMICTL, 0x0b0)
-> > +REG32(CM_SMIDIV, 0x0b4)
-> > +REG32(CM_TCNTCTL, 0x0c0)
-> > +REG32(CM_TCNTCNT, 0x0c4)
-> > +REG32(CM_TECCTL, 0x0c8)
-> > +REG32(CM_TECDIV, 0x0cc)
-> > +REG32(CM_TD0CTL, 0x0d0)
-> > +REG32(CM_TD0DIV, 0x0d4)
-> > +REG32(CM_TD1CTL, 0x0d8)
-> > +REG32(CM_TD1DIV, 0x0dc)
-> > +REG32(CM_TSENSCTL, 0x0e0)
-> > +REG32(CM_TSENSDIV, 0x0e4)
-> > +REG32(CM_TIMERCTL, 0x0e8)
-> > +REG32(CM_TIMERDIV, 0x0ec)
-> > +REG32(CM_UARTCTL, 0x0f0)
-> > +REG32(CM_UARTDIV, 0x0f4)
-> > +REG32(CM_VECCTL, 0x0f8)
-> > +REG32(CM_VECDIV, 0x0fc)
-> > +REG32(CM_PULSECTL, 0x190)
-> > +REG32(CM_PULSEDIV, 0x194)
-> > +REG32(CM_SDCCTL, 0x1a8)
-> > +REG32(CM_SDCDIV, 0x1ac)
-> > +REG32(CM_ARMCTL, 0x1b0)
-> > +REG32(CM_AVEOCTL, 0x1b8)
-> > +REG32(CM_AVEODIV, 0x1bc)
-> > +REG32(CM_EMMCCTL, 0x1c0)
-> > +REG32(CM_EMMCDIV, 0x1c4)
-> > +REG32(CM_EMMC2CTL, 0x1d0)
-> > +REG32(CM_EMMC2DIV, 0x1d4)
-> > +
-> >  /* misc registers */
-> >  REG32(CM_LOCK, 0x114)
-> >      FIELD(CM_LOCK, FLOCKH, 12, 1)
-> >      FIELD(CM_LOCK, FLOCKD, 11, 1)
-> >      FIELD(CM_LOCK, FLOCKC, 10, 1)
-> > @@ -317,6 +404,340 @@ static inline void set_pll_channel_init_info(BCM2835CprmanState *s,
-> >      channel->load_mask = PLL_CHANNEL_INIT_INFO[id].cm_load_mask;
-> >      channel->reg_a2w_ctrl = &s->regs[PLL_CHANNEL_INIT_INFO[id].a2w_ctrl_offset];
-> >      channel->fixed_divider = PLL_CHANNEL_INIT_INFO[id].fixed_divider;
-> >  }
-> >
-> > +/* Clock mux init info */
-> > +typedef struct ClockMuxInitInfo {
-> > +    const char *name;
-> > +    size_t cm_offset;
-> > +    int int_bits;
-> > +    int frac_bits;
-> > +
-> > +    CprmanPLLChannel src_mapping[CPRMAN_NUM_CLOCK_MUX_SRC];
-> > +} ClockMuxInitInfo;
-> > +
-> > +/*
-> > + * Each clock mux can have up to 10 sources. Sources 0 to 3 are always the
-> > + * same (ground, xosc, td0, td1). Sources 4 to 9 are mux specific, and are not
-> > + * always populated. The following macros catch all those cases.
-> > + */
-> > +
-> > +/* Unknown mapping. Connect everything to ground */
-> > +#define SRC_MAPPING_INFO_unknown                          \
-> > +    .src_mapping = {                                      \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, /* gnd */          \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, /* xosc */         \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, /* test debug 0 */ \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, /* test debug 1 */ \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, /* pll a */        \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, /* pll c */        \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, /* pll d */        \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, /* pll h */        \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, /* pll c, core1 */ \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, /* pll c, core2 */ \
-> > +    }
-> > +
-> > +/* Only the oscillator and the two test debug clocks */
-> > +#define SRC_MAPPING_INFO_xosc          \
-> > +    .src_mapping = {                   \
-> > +        CPRMAN_CLOCK_SRC_NORMAL,       \
-> > +        CPRMAN_CLOCK_SRC_NORMAL,       \
-> > +        CPRMAN_CLOCK_SRC_NORMAL,       \
-> > +        CPRMAN_CLOCK_SRC_NORMAL,       \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, \
-> > +    }
-> > +
-> > +/* All the PLL "core" channels */
-> > +#define SRC_MAPPING_INFO_core      \
-> > +    .src_mapping = {               \
-> > +        CPRMAN_CLOCK_SRC_NORMAL,   \
-> > +        CPRMAN_CLOCK_SRC_NORMAL,   \
-> > +        CPRMAN_CLOCK_SRC_NORMAL,   \
-> > +        CPRMAN_CLOCK_SRC_NORMAL,   \
-> > +        CPRMAN_PLLA_CHANNEL_CORE,  \
-> > +        CPRMAN_PLLC_CHANNEL_CORE0, \
-> > +        CPRMAN_PLLD_CHANNEL_CORE,  \
-> > +        CPRMAN_PLLH_CHANNEL_AUX,   \
-> > +        CPRMAN_PLLC_CHANNEL_CORE1, \
-> > +        CPRMAN_PLLC_CHANNEL_CORE2, \
-> > +    }
-> > +
-> > +/* All the PLL "per" channels */
-> > +#define SRC_MAPPING_INFO_periph        \
-> > +    .src_mapping = {                   \
-> > +        CPRMAN_CLOCK_SRC_NORMAL,       \
-> > +        CPRMAN_CLOCK_SRC_NORMAL,       \
-> > +        CPRMAN_CLOCK_SRC_NORMAL,       \
-> > +        CPRMAN_CLOCK_SRC_NORMAL,       \
-> > +        CPRMAN_PLLA_CHANNEL_PER,       \
-> > +        CPRMAN_PLLC_CHANNEL_PER,       \
-> > +        CPRMAN_PLLD_CHANNEL_PER,       \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, \
-> > +    }
-> > +
-> > +/*
-> > + * The DSI0 channels. This one got an intermediate mux between the PLL channels
-> > + * and the clock input.
-> > + */
-> > +#define SRC_MAPPING_INFO_dsi0          \
-> > +    .src_mapping = {                   \
-> > +        CPRMAN_CLOCK_SRC_NORMAL,       \
-> > +        CPRMAN_CLOCK_SRC_NORMAL,       \
-> > +        CPRMAN_CLOCK_SRC_NORMAL,       \
-> > +        CPRMAN_CLOCK_SRC_NORMAL,       \
-> > +        CPRMAN_CLOCK_SRC_DSI0HSCK,     \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, \
-> > +    }
-> > +
-> > +/* The DSI1 channel */
-> > +#define SRC_MAPPING_INFO_dsi1          \
-> > +    .src_mapping = {                   \
-> > +        CPRMAN_CLOCK_SRC_NORMAL,       \
-> > +        CPRMAN_CLOCK_SRC_NORMAL,       \
-> > +        CPRMAN_CLOCK_SRC_NORMAL,       \
-> > +        CPRMAN_CLOCK_SRC_NORMAL,       \
-> > +        CPRMAN_PLLD_CHANNEL_DSI1,      \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, \
-> > +        CPRMAN_CLOCK_SRC_FORCE_GROUND, \
-> > +    }
-> > +
-> > +#define FILL_CLOCK_MUX_SRC_MAPPING_INIT_INFO(kind_) \
-> > +    SRC_MAPPING_INFO_ ## kind_
-> > +
-> > +#define FILL_CLOCK_MUX_INIT_INFO(clock_, kind_) \
-> > +    .cm_offset = R_CM_ ## clock_ ## CTL,        \
-> > +    FILL_CLOCK_MUX_SRC_MAPPING_INIT_INFO(kind_)
-> > +
-> > +static ClockMuxInitInfo CLOCK_MUX_INIT_INFO[] = {
-> > +    [CPRMAN_CLOCK_GNRIC] = {
-> > +        .name = "gnric",
-> > +        FILL_CLOCK_MUX_INIT_INFO(GNRIC, unknown),
-> > +    },
-> > +    [CPRMAN_CLOCK_VPU] = {
-> > +        .name = "vpu",
-> > +        .int_bits = 12,
-> > +        .frac_bits = 8,
-> > +        FILL_CLOCK_MUX_INIT_INFO(VPU, core),
-> > +    },
-> > +    [CPRMAN_CLOCK_SYS] = {
-> > +        .name = "sys",
-> > +        FILL_CLOCK_MUX_INIT_INFO(SYS, unknown),
-> > +    },
-> > +    [CPRMAN_CLOCK_PERIA] = {
-> > +        .name = "peria",
-> > +        FILL_CLOCK_MUX_INIT_INFO(PERIA, unknown),
-> > +    },
-> > +    [CPRMAN_CLOCK_PERII] = {
-> > +        .name = "perii",
-> > +        FILL_CLOCK_MUX_INIT_INFO(PERII, unknown),
-> > +    },
-> > +    [CPRMAN_CLOCK_H264] = {
-> > +        .name = "h264",
-> > +        .int_bits = 4,
-> > +        .frac_bits = 8,
-> > +        FILL_CLOCK_MUX_INIT_INFO(H264, core),
-> > +    },
-> > +    [CPRMAN_CLOCK_ISP] = {
-> > +        .name = "isp",
-> > +        .int_bits = 4,
-> > +        .frac_bits = 8,
-> > +        FILL_CLOCK_MUX_INIT_INFO(ISP, core),
-> > +    },
-> > +    [CPRMAN_CLOCK_V3D] = {
-> > +        .name = "v3d",
-> > +        FILL_CLOCK_MUX_INIT_INFO(V3D, core),
-> > +    },
-> > +    [CPRMAN_CLOCK_CAM0] = {
-> > +        .name = "cam0",
-> > +        .int_bits = 4,
-> > +        .frac_bits = 8,
-> > +        FILL_CLOCK_MUX_INIT_INFO(CAM0, periph),
-> > +    },
-> > +    [CPRMAN_CLOCK_CAM1] = {
-> > +        .name = "cam1",
-> > +        .int_bits = 4,
-> > +        .frac_bits = 8,
-> > +        FILL_CLOCK_MUX_INIT_INFO(CAM1, periph),
-> > +    },
-> > +    [CPRMAN_CLOCK_CCP2] = {
-> > +        .name = "ccp2",
-> > +        FILL_CLOCK_MUX_INIT_INFO(CCP2, unknown),
-> > +    },
-> > +    [CPRMAN_CLOCK_DSI0E] = {
-> > +        .name = "dsi0e",
-> > +        .int_bits = 4,
-> > +        .frac_bits = 8,
-> > +        FILL_CLOCK_MUX_INIT_INFO(DSI0E, dsi0),
-> > +    },
-> > +    [CPRMAN_CLOCK_DSI0P] = {
-> > +        .name = "dsi0p",
-> > +        .int_bits = 0,
-> > +        .frac_bits = 0,
-> > +        FILL_CLOCK_MUX_INIT_INFO(DSI0P, dsi0),
-> > +    },
-> > +    [CPRMAN_CLOCK_DPI] = {
-> > +        .name = "dpi",
-> > +        .int_bits = 4,
-> > +        .frac_bits = 8,
-> > +        FILL_CLOCK_MUX_INIT_INFO(DPI, periph),
-> > +    },
-> > +    [CPRMAN_CLOCK_GP0] = {
-> > +        .name = "gp0",
-> > +        .int_bits = 12,
-> > +        .frac_bits = 12,
-> > +        FILL_CLOCK_MUX_INIT_INFO(GP0, periph),
-> > +    },
-> > +    [CPRMAN_CLOCK_GP1] = {
-> > +        .name = "gp1",
-> > +        .int_bits = 12,
-> > +        .frac_bits = 12,
-> > +        FILL_CLOCK_MUX_INIT_INFO(GP1, periph),
-> > +    },
-> > +    [CPRMAN_CLOCK_GP2] = {
-> > +        .name = "gp2",
-> > +        .int_bits = 12,
-> > +        .frac_bits = 12,
-> > +        FILL_CLOCK_MUX_INIT_INFO(GP2, periph),
-> > +    },
-> > +    [CPRMAN_CLOCK_HSM] = {
-> > +        .name = "hsm",
-> > +        .int_bits = 4,
-> > +        .frac_bits = 8,
-> > +        FILL_CLOCK_MUX_INIT_INFO(HSM, periph),
-> > +    },
-> > +    [CPRMAN_CLOCK_OTP] = {
-> > +        .name = "otp",
-> > +        .int_bits = 4,
-> > +        .frac_bits = 0,
-> > +        FILL_CLOCK_MUX_INIT_INFO(OTP, xosc),
-> > +    },
-> > +    [CPRMAN_CLOCK_PCM] = {
-> > +        .name = "pcm",
-> > +        .int_bits = 12,
-> > +        .frac_bits = 12,
-> > +        FILL_CLOCK_MUX_INIT_INFO(PCM, periph),
-> > +    },
-> > +    [CPRMAN_CLOCK_PWM] = {
-> > +        .name = "pwm",
-> > +        .int_bits = 12,
-> > +        .frac_bits = 12,
-> > +        FILL_CLOCK_MUX_INIT_INFO(PWM, periph),
-> > +    },
-> > +    [CPRMAN_CLOCK_SLIM] = {
-> > +        .name = "slim",
-> > +        .int_bits = 12,
-> > +        .frac_bits = 12,
-> > +        FILL_CLOCK_MUX_INIT_INFO(SLIM, periph),
-> > +    },
-> > +    [CPRMAN_CLOCK_SMI] = {
-> > +        .name = "smi",
-> > +        .int_bits = 4,
-> > +        .frac_bits = 8,
-> > +        FILL_CLOCK_MUX_INIT_INFO(SMI, periph),
-> > +    },
-> > +    [CPRMAN_CLOCK_TEC] = {
-> > +        .name = "tec",
-> > +        .int_bits = 6,
-> > +        .frac_bits = 0,
-> > +        FILL_CLOCK_MUX_INIT_INFO(TEC, xosc),
-> > +    },
-> > +    [CPRMAN_CLOCK_TD0] = {
-> > +        .name = "td0",
-> > +        FILL_CLOCK_MUX_INIT_INFO(TD0, unknown),
-> > +    },
-> > +    [CPRMAN_CLOCK_TD1] = {
-> > +        .name = "td1",
-> > +        FILL_CLOCK_MUX_INIT_INFO(TD1, unknown),
-> > +    },
-> > +    [CPRMAN_CLOCK_TSENS] = {
-> > +        .name = "tsens",
-> > +        .int_bits = 5,
-> > +        .frac_bits = 0,
-> > +        FILL_CLOCK_MUX_INIT_INFO(TSENS, xosc),
-> > +    },
-> > +    [CPRMAN_CLOCK_TIMER] = {
-> > +        .name = "timer",
-> > +        .int_bits = 6,
-> > +        .frac_bits = 12,
-> > +        FILL_CLOCK_MUX_INIT_INFO(TIMER, xosc),
-> > +    },
-> > +    [CPRMAN_CLOCK_UART] = {
-> > +        .name = "uart",
-> > +        .int_bits = 10,
-> > +        .frac_bits = 12,
-> > +        FILL_CLOCK_MUX_INIT_INFO(UART, periph),
-> > +    },
-> > +    [CPRMAN_CLOCK_VEC] = {
-> > +        .name = "vec",
-> > +        .int_bits = 4,
-> > +        .frac_bits = 0,
-> > +        FILL_CLOCK_MUX_INIT_INFO(VEC, periph),
-> > +    },
-> > +    [CPRMAN_CLOCK_PULSE] = {
-> > +        .name = "pulse",
-> > +        FILL_CLOCK_MUX_INIT_INFO(PULSE, xosc),
-> > +    },
-> > +    [CPRMAN_CLOCK_SDC] = {
-> > +        .name = "sdram",
-> > +        .int_bits = 6,
-> > +        .frac_bits = 0,
-> > +        FILL_CLOCK_MUX_INIT_INFO(SDC, core),
-> > +    },
-> > +    [CPRMAN_CLOCK_ARM] = {
-> > +        .name = "arm",
-> > +        FILL_CLOCK_MUX_INIT_INFO(ARM, unknown),
-> > +    },
-> > +    [CPRMAN_CLOCK_AVEO] = {
-> > +        .name = "aveo",
-> > +        .int_bits = 4,
-> > +        .frac_bits = 0,
-> > +        FILL_CLOCK_MUX_INIT_INFO(AVEO, periph),
-> > +    },
-> > +    [CPRMAN_CLOCK_EMMC] = {
-> > +        .name = "emmc",
-> > +        .int_bits = 4,
-> > +        .frac_bits = 8,
-> > +        FILL_CLOCK_MUX_INIT_INFO(EMMC, periph),
-> > +    },
-> > +    [CPRMAN_CLOCK_EMMC2] = {
-> > +        .name = "emmc2",
-> > +        .int_bits = 4,
-> > +        .frac_bits = 8,
-> > +        FILL_CLOCK_MUX_INIT_INFO(EMMC2, unknown),
-> > +    },
-> > +};
-> > +
-> > +#undef FILL_CLOCK_MUX_INIT_INFO
-> > +#undef FILL_CLOCK_MUX_SRC_MAPPING_INIT_INFO
-> > +#undef SRC_MAPPING_INFO_dsi1
-> > +#undef SRC_MAPPING_INFO_dsi0
-> > +#undef SRC_MAPPING_INFO_periph
-> > +#undef SRC_MAPPING_INFO_core
-> > +#undef SRC_MAPPING_INFO_xosc
-> > +#undef SRC_MAPPING_INFO_unknown
-> > +
-> > +static inline void set_clock_mux_init_info(BCM2835CprmanState *s,
-> > +                                           CprmanClockMuxState *mux,
-> > +                                           CprmanClockMux id)
-> > +{
-> > +    mux->id = id;
-> > +    mux->reg_cm = &s->regs[CLOCK_MUX_INIT_INFO[id].cm_offset];
-> > +    mux->int_bits = CLOCK_MUX_INIT_INFO[id].int_bits;
-> > +    mux->frac_bits = CLOCK_MUX_INIT_INFO[id].frac_bits;
-> > +}
-> > +
-> >  #endif
-> > diff --git a/hw/misc/bcm2835_cprman.c b/hw/misc/bcm2835_cprman.c
-> > index e644aeb2b5..8df2db0fd9 100644
-> > --- a/hw/misc/bcm2835_cprman.c
-> > +++ b/hw/misc/bcm2835_cprman.c
-> > @@ -36,10 +36,13 @@
-> >   *          |                                          [mux]
-> >   *          \-->[PLL]--->[PLL channel]                 [mux]
-> >   *
-> >   * The page at https://elinux.org/The_Undocumented_Pi gives the actual clock
-> >   * tree configuration.
-> > + *
-> > + * The CPRMAN exposes clock outputs with the name of the clock mux suffixed
-> > + * with "-out" (e.g. "uart-out", "h264-out", ...).
-> >   */
-> >
-> >  #include "qemu/osdep.h"
-> >  #include "qemu/log.h"
-> >  #include "migration/vmstate.h"
-> > @@ -224,10 +227,69 @@ static const TypeInfo cprman_pll_channel_info = {
-> >      .class_init = pll_channel_class_init,
-> >      .instance_init = pll_channel_init,
-> >  };
-> >
-> >
-> > +/* clock mux */
-> > +
-> > +static void clock_mux_update(CprmanClockMuxState *mux)
-> > +{
-> > +    clock_update(mux->out, 0);
-> > +}
-> > +
-> > +static void clock_mux_src_update(void *opaque)
-> > +{
-> > +    CprmanClockMuxState **backref = opaque;
-> > +    CprmanClockMuxState *s = *backref;
-> > +
-> > +    clock_mux_update(s);
-> > +}
-> > +
-> > +static void clock_mux_init(Object *obj)
-> > +{
-> > +    CprmanClockMuxState *s = CPRMAN_CLOCK_MUX(obj);
-> > +    size_t i;
-> > +
-> > +    for (i = 0; i < CPRMAN_NUM_CLOCK_MUX_SRC; i++) {
-> > +        char *name = g_strdup_printf("srcs[%zu]", i);
-> > +        s->backref[i] = s;
-> > +        s->srcs[i] = qdev_init_clock_in(DEVICE(s), name,
-> > +                                        clock_mux_src_update,
-> > +                                        &s->backref[i]);
-> > +        g_free(name);
-> > +    }
-> > +
-> > +    s->out = qdev_init_clock_out(DEVICE(s), "out");
-> > +}
-> > +
-> > +static const VMStateDescription clock_mux_vmstate = {
-> > +    .name = TYPE_CPRMAN_CLOCK_MUX,
-> > +    .version_id = 1,
-> > +    .minimum_version_id = 1,
-> > +    .fields = (VMStateField[]) {
-> > +        VMSTATE_ARRAY_CLOCK(srcs, CprmanClockMuxState,
-> > +                            CPRMAN_NUM_CLOCK_MUX_SRC),
-> > +        VMSTATE_END_OF_LIST()
-> > +    }
-> > +};
-> > +
-> > +static void clock_mux_class_init(ObjectClass *klass, void *data)
-> > +{
-> > +    DeviceClass *dc = DEVICE_CLASS(klass);
-> > +
-> > +    dc->vmsd = &clock_mux_vmstate;
-> > +}
-> > +
-> > +static const TypeInfo cprman_clock_mux_info = {
-> > +    .name = TYPE_CPRMAN_CLOCK_MUX,
-> > +    .parent = TYPE_DEVICE,
-> > +    .instance_size = sizeof(CprmanClockMuxState),
-> > +    .class_init = clock_mux_class_init,
-> > +    .instance_init = clock_mux_init,
-> > +};
-> > +
-> > +
-> >  /* CPRMAN "top level" model */
-> >
-> >  static uint32_t get_cm_lock(const BCM2835CprmanState *s)
-> >  {
-> >      static const int CM_LOCK_MAPPING[] = {
-> > @@ -291,10 +353,23 @@ static inline void update_channel_from_a2w(BCM2835CprmanState *s, size_t idx)
-> >              return;
-> >          }
-> >      }
-> >  }
-> >
-> > +static inline void update_mux_from_cm(BCM2835CprmanState *s, size_t idx)
-> > +{
-> > +    size_t i;
-> > +
-> > +    for (i = 0; i < CPRMAN_NUM_CLOCK_MUX; i++) {
-> > +        if ((CLOCK_MUX_INIT_INFO[i].cm_offset == idx)
-> > +           || (CLOCK_MUX_INIT_INFO[i].cm_offset == idx + 4)) {
->
-> Indent by one ;)
->
-> > +            clock_mux_update(&s->clock_muxes[i]);
-> > +            return;
-> > +        }
-> > +    }
-> > +}
-> > +
-> >  #define CASE_PLL_A2W_REGS(pll_) \
-> >      case R_A2W_ ## pll_ ## _CTRL: \
-> >      case R_A2W_ ## pll_ ## _ANA0: \
-> >      case R_A2W_ ## pll_ ## _ANA1: \
-> >      case R_A2W_ ## pll_ ## _ANA2: \
-> > @@ -363,10 +438,19 @@ static void cprman_write(void *opaque, hwaddr offset,
-> >      case R_A2W_PLLH_RCAL:
-> >      case R_A2W_PLLH_PIX:
-> >      case R_A2W_PLLB_ARM:
-> >          update_channel_from_a2w(s, idx);
-> >          break;
-> > +
-> > +    case R_CM_GNRICCTL ... R_CM_SMIDIV:
-> > +    case R_CM_TCNTCNT ... R_CM_VECDIV:
-> > +    case R_CM_PULSECTL ... R_CM_PULSEDIV:
-> > +    case R_CM_SDCCTL ... R_CM_ARMCTL:
-> > +    case R_CM_AVEOCTL ... R_CM_EMMCDIV:
-> > +    case R_CM_EMMC2CTL ... R_CM_EMMC2DIV:
-> > +        update_mux_from_cm(s, idx);
-> > +        break;
-> >      }
-> >  }
-> >
-> >  #undef CASE_PLL_A2W_REGS
-> >
-> > @@ -394,10 +478,14 @@ static void cprman_reset(DeviceState *dev)
-> >
-> >      for (i = 0; i < CPRMAN_NUM_PLL_CHANNEL; i++) {
-> >          device_cold_reset(DEVICE(&s->channels[i]));
-> >      }
-> >
-> > +    for (i = 0; i < CPRMAN_NUM_CLOCK_MUX; i++) {
-> > +        device_cold_reset(DEVICE(&s->clock_muxes[i]));
-> > +    }
-> > +
-> >      clock_update_hz(s->xosc, s->xosc_freq);
-> >  }
-> >
-> >  static Clock *init_internal_clock(BCM2835CprmanState *s,
-> >                                    const char *name)
-> > @@ -431,17 +519,69 @@ static void cprman_init(Object *obj)
-> >                                  &s->channels[i],
-> >                                  TYPE_CPRMAN_PLL_CHANNEL);
-> >          set_pll_channel_init_info(s, &s->channels[i], i);
-> >      }
-> >
-> > +    for (i = 0; i < CPRMAN_NUM_CLOCK_MUX; i++) {
-> > +        char *alias;
-> > +
-> > +        object_initialize_child(obj, CLOCK_MUX_INIT_INFO[i].name,
-> > +                                &s->clock_muxes[i],
-> > +                                TYPE_CPRMAN_CLOCK_MUX);
-> > +        set_clock_mux_init_info(s, &s->clock_muxes[i], i);
-> > +
-> > +        /* Expose muxes output as CPRMAN outputs */
-> > +        alias = g_strdup_printf("%s-out", CLOCK_MUX_INIT_INFO[i].name);
-> > +        qdev_alias_clock(DEVICE(&s->clock_muxes[i]), "out", DEVICE(obj), alias);
-> > +        g_free(alias);
-> > +
->
-> NL.
->
-> > +    }
-> > +
-> >      s->xosc = init_internal_clock(s, "xosc");
-> > +    s->gnd = init_internal_clock(s, "gnd");
-> > +
-> > +    clock_set(s->gnd, 0);
-> >
-> >      memory_region_init_io(&s->iomem, obj, &cprman_ops,
-> >                            s, "bcm2835-cprman", 0x2000);
-> >      sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
-> >  }
-> >
-> > +static void connect_mux_sources(BCM2835CprmanState *s,
-> > +                                CprmanClockMuxState *mux,
-> > +                                const CprmanPLLChannel *clk_mapping)
-> > +{
-> > +    size_t i;
-> > +    Clock *td0 = s->clock_muxes[CPRMAN_CLOCK_TD0].out;
-> > +    Clock *td1 = s->clock_muxes[CPRMAN_CLOCK_TD1].out;
-> > +
-> > +    /* For sources from 0 to 3. Source 4 to 9 are mux specific */
-> > +    Clock * const CLK_SRC_MAPPING[] = {
-> > +        [CPRMAN_CLOCK_SRC_GND] = s->gnd,
-> > +        [CPRMAN_CLOCK_SRC_XOSC] = s->xosc,
-> > +        [CPRMAN_CLOCK_SRC_TD0] = td0,
-> > +        [CPRMAN_CLOCK_SRC_TD1] = td1,
-> > +    };
-> > +
-> > +    for (i = 0; i < CPRMAN_NUM_CLOCK_MUX_SRC; i++) {
-> > +        CprmanPLLChannel mapping = clk_mapping[i];
-> > +        Clock *src;
-> > +
-> > +        if (mapping == CPRMAN_CLOCK_SRC_FORCE_GROUND) {
-> > +            src = s->gnd;
-> > +        } else if (mapping == CPRMAN_CLOCK_SRC_DSI0HSCK) {
-> > +            src = s->gnd; /* TODO */
-> > +        } else if (i < CPRMAN_CLOCK_SRC_PLLA) {
-> > +            src = CLK_SRC_MAPPING[i];
-> > +        } else {
-> > +            src = s->channels[mapping].out;
-> > +        }
-> > +
-> > +        clock_set_source(mux->srcs[i], src);
-> > +    }
-> > +}
-> > +
-> >  static void cprman_realize(DeviceState *dev, Error **errp)
-> >  {
-> >      BCM2835CprmanState *s = CPRMAN(dev);
-> >      size_t i;
-> >
-> > @@ -464,10 +604,20 @@ static void cprman_realize(DeviceState *dev, Error **errp)
-> >
-> >          if (!qdev_realize(DEVICE(channel), NULL, errp)) {
-> >              return;
-> >          }
-> >      }
-> > +
-> > +    for (i = 0; i < CPRMAN_NUM_CLOCK_MUX; i++) {
-> > +        CprmanClockMuxState *clock_mux = &s->clock_muxes[i];
-> > +
-> > +        connect_mux_sources(s, clock_mux, CLOCK_MUX_INIT_INFO[i].src_mapping);
-> > +
-> > +        if (!qdev_realize(DEVICE(clock_mux), NULL, errp)) {
-> > +            return;
-> > +        }
-> > +    }
-> >  }
-> >
-> >  static const VMStateDescription cprman_vmstate = {
-> >      .name = TYPE_BCM2835_CPRMAN,
-> >      .version_id = 1,
-> > @@ -504,8 +654,9 @@ static const TypeInfo cprman_info = {
-> >  static void cprman_register_types(void)
-> >  {
-> >      type_register_static(&cprman_info);
-> >      type_register_static(&cprman_pll_info);
-> >      type_register_static(&cprman_pll_channel_info);
-> > +    type_register_static(&cprman_clock_mux_info);
-> >  }
-> >
-> >  type_init(cprman_register_types);
-> >
->
-> Few comments, nice work!
->
-> Regards,
->
-> Phil.
+--_000_DM6PR16MB24739B6BF93E480B6873A216E60E0DM6PR16MB2473namp_
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: base64
 
---
+PGh0bWw+DQo8aGVhZD4NCjxtZXRhIGh0dHAtZXF1aXY9IkNvbnRlbnQtVHlwZSIgY29udGVudD0i
+dGV4dC9odG1sOyBjaGFyc2V0PXV0Zi04Ij4NCjxtZXRhIG5hbWU9IkdlbmVyYXRvciIgY29udGVu
+dD0iTWljcm9zb2Z0IEV4Y2hhbmdlIFNlcnZlciI+DQo8IS0tIGNvbnZlcnRlZCBmcm9tIHRleHQg
+LS0+PHN0eWxlPjwhLS0gLkVtYWlsUXVvdGUgeyBtYXJnaW4tbGVmdDogMXB0OyBwYWRkaW5nLWxl
+ZnQ6IDRwdDsgYm9yZGVyLWxlZnQ6ICM4MDAwMDAgMnB4IHNvbGlkOyB9IC0tPjwvc3R5bGU+DQo8
+L2hlYWQ+DQo8Ym9keT4NCjxkaXYgZGlyPSJhdXRvIj4NCjxkaXYgZGlyPSJhdXRvIj5UaGFua3Mg
+Zm9yIHlvdXIgcmV2aWV3LiZuYnNwOzwvZGl2Pg0KPGRpdiBkaXI9ImF1dG8iPkFjdHVhbGx5LCB0
+aGUgdmVyeSByZWNlbnQgdjIgb25lIGlzIHY0LiBUaGVyZSB3YXMgYW4gdHlwbyB3aGlsZSBJIHdh
+cyB3cml0aW5nIG11bHRpcGxlIG1haWxzIGZvciBzdWNjZXNzZnVsIHBhdGNoZXcgYnVpbGRzKHYy
+IGFuZCB2MyBoYXMgdGhlIHNhbWUgY29udGVudHMpIC4uIFNvcnJ5LiZuYnNwOzwvZGl2Pg0KPGRp
+diBkaXI9ImF1dG8iPjxicj4NCjwvZGl2Pg0KPGRpdiBkaXI9ImF1dG8iPklmIG5lZWRlZCwgbGV0
+IG1lIGtub3cgdG8gd3JpdGUgdGhlIG5ldyB0aXRsZWQgdmVyc2lvbiBvZiBtYWlsIHdoaWNoIGNv
+bnRhaW5zIHRoZSBzYW1lIGNvbnRlbnRzLjwvZGl2Pg0KPGRpdiBkaXI9ImF1dG8iPjxicj4NCjwv
+ZGl2Pg0KPGRpdj48YnI+DQo8L2Rpdj4NCjxkaXY+PGJyPg0KPC9kaXY+DQo8ZGl2Pi0tLS0tLS0t
+IOybkOuzuCDsnbTrqZTsnbwgLS0tLS0tLS08L2Rpdj4NCjxkaXY+67Cc7IugOiBQaGlsaXBwZSBN
+YXRoaWV1LURhdWTDqSAmbHQ7ZjRidWdAYW1zYXQub3JnJmd0OyA8L2Rpdj4NCjxkaXY+64Kg7Kec
+OiAyMC8xMC80IOyYpOyghCAzOjAzIChHTVQrMDk6MDApIDwvZGl2Pg0KPGRpdj7rsJvsnYAg7IKs
+656MOiBIZWVjaGVvbCBZYW5nICZsdDtoZWVjaGVvbC55YW5nQG91dGxvb2suY29tJmd0OywgcWVt
+dS1kZXZlbEBub25nbnUub3JnIDwvZGl2Pg0KPGRpdj7ssLjsobA6IFNhcmFoIEhhcnJpcyAmbHQ7
+Uy5FLkhhcnJpc0BrZW50LmFjLnVrJmd0OywgTWljaGFlbCBSb2xuaWsgJmx0O21yb2xuaWtAZ21h
+aWwuY29tJmd0Ow0KPC9kaXY+DQo8ZGl2PuygnOuqqTogUmU6IFtQQVRDSCB2Ml0gaHcvYXZyOiBB
+ZGQgbGltaXRlZCBzdXBwb3J0IGZvciBhdnIgZ3BpbyByZWdpc3RlcnMgPC9kaXY+DQo8ZGl2Pjxi
+cj4NCjwvZGl2Pg0KPC9kaXY+DQo8Zm9udCBzaXplPSIyIj48c3BhbiBzdHlsZT0iZm9udC1zaXpl
+OjExcHQ7Ij4NCjxkaXYgY2xhc3M9IlBsYWluVGV4dCI+T24gMTAvMy8yMCAyOjM4IFBNLCBIZWVj
+aGVvbCBZYW5nIHdyb3RlOjxicj4NCiZndDsgQWRkIHNvbWUgb2YgdGhlc2UgZmVhdHVyZXMgZm9y
+IGF2ciBncGlvOjxicj4NCiZndDsgPGJyPg0KJmd0OyZuYnNwOyZuYnNwOyAtIEdQSU8gSS9PIDog
+UE9SVHggcmVnaXN0ZXJzPGJyPg0KJmd0OyZuYnNwOyZuYnNwOyAtIERhdGEgRGlyZWN0aW9uIDog
+RERSeCByZWdpc3RlcnM8YnI+DQomZ3Q7IDxicj4NCiZndDsgRm9sbG93aW5nIHRoaW5ncyBhcmUg
+bm90IHN1cHBvcnRlZCB5ZXQ6PGJyPg0KJmd0OyZuYnNwOyZuYnNwOyAtIFBJTnggcmVnaXN0ZXJz
+PGJyPg0KJmd0OyZuYnNwOyZuYnNwOyAtIE1DVVIgcmVnaXN0ZXJzPGJyPg0KJmd0OyZuYnNwOyZu
+YnNwOyAtIEV2ZW4gdGhvdWdoIHJlYWQvd3JpdGUgZm9yIEREUnggcmVnaXN0ZXJzIGFyZTxicj4N
+CiZndDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgaW1wbGVtZW50ZWQsIGFjdHVhbCBkaXJlY3Rp
+b24gY29udHJvbHMgYXJlIG5vdDxicj4NCiZndDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgc3Vw
+cG9ydGVkIHlldC48YnI+DQomZ3Q7IDxicj4NCiZndDsgU2lnbmVkLW9mZi1ieTogSGVlY2hlb2wg
+WWFuZyAmbHQ7aGVlY2hlb2wueWFuZ0BvdXRsb29rLmNvbSZndDs8YnI+DQomZ3Q7IC0tLTxicj4N
+CiZndDsmbmJzcDsgaHcvYXZyL0tjb25maWcmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
+bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgfCZuYnNwOyZuYnNwOyAx
+ICs8YnI+DQomZ3Q7Jm5ic3A7IGh3L2F2ci9hdG1lZ2EuYyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
+OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyB8Jm5ic3A7Jm5ic3A7
+IDcgKystPGJyPg0KJmd0OyZuYnNwOyBody9hdnIvYXRtZWdhLmgmbmJzcDsmbmJzcDsmbmJzcDsm
+bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgfCZuYnNwOyZu
+YnNwOyAyICs8YnI+DQomZ3Q7Jm5ic3A7IGh3L2dwaW8vS2NvbmZpZyZuYnNwOyZuYnNwOyZuYnNw
+OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyB8Jm5ic3A7
+Jm5ic3A7IDMgKzxicj4NCiZndDsmbmJzcDsgaHcvZ3Bpby9hdnJfZ3Bpby5jJm5ic3A7Jm5ic3A7
+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IHwgMTEyICsrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKys8YnI+DQomZ3Q7Jm5ic3A7IGh3L2dwaW8vbWVzb24uYnVp
+bGQmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgfCZuYnNwOyZuYnNw
+OyAyICs8YnI+DQomZ3Q7Jm5ic3A7IGluY2x1ZGUvaHcvZ3Bpby9hdnJfZ3Bpby5oIHwmbmJzcDsg
+NDYgKysrKysrKysrKysrKysrPGJyPg0KJmd0OyZuYnNwOyA3IGZpbGVzIGNoYW5nZWQsIDE3MSBp
+bnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKTxicj4NCiZndDsmbmJzcDsgY3JlYXRlIG1vZGUg
+MTAwNjQ0IGh3L2dwaW8vYXZyX2dwaW8uYzxicj4NCiZndDsmbmJzcDsgY3JlYXRlIG1vZGUgMTAw
+NjQ0IGluY2x1ZGUvaHcvZ3Bpby9hdnJfZ3Bpby5oPGJyPg0KPGJyPg0KRllJIHRoaXMgb25lIGlz
+IHBvc3RlZCBjb3JyZWN0bHksIEkgY2FuIHJlYWQgaXQgYW5kIHBhdGNoZXc8YnI+DQpzdWNjZXNz
+ZnVsbHkgYXBwbGllZCBpdDo8YnI+DQo8YSBocmVmPSJodHRwczovL3BhdGNoZXcub3JnL1FFTVUv
+RE02UFIxNk1CMjQ3M0M1QTc3RTAwOUNBMkZFRjNEOEVDRTYwRTBARE02UFIxNk1CMjQ3My5uYW1w
+cmQxNi5wcm9kLm91dGxvb2suY29tLyI+aHR0cHM6Ly9wYXRjaGV3Lm9yZy9RRU1VL0RNNlBSMTZN
+QjI0NzNDNUE3N0UwMDlDQTJGRUYzRDhFQ0U2MEUwQERNNlBSMTZNQjI0NzMubmFtcHJkMTYucHJv
+ZC5vdXRsb29rLmNvbS88L2E+PGJyPg0KPGJyPg0KQnV0IHYzIGlzIGJyb2tlbiBhZ2Fpbi4uLjxi
+cj4NCjwvZGl2Pg0KPC9zcGFuPjwvZm9udD4NCjwvYm9keT4NCjwvaHRtbD4NCg==
+
+--_000_DM6PR16MB24739B6BF93E480B6873A216E60E0DM6PR16MB2473namp_--
 
