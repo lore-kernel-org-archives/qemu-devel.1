@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF9EAC4363D
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 08:46:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8105CC4363D
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 08:46:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E32E22067B
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 08:46:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E32E22067B
+	by mail.kernel.org (Postfix) with ESMTPS id F22B42067C
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 08:46:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F22B42067C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOdBn-00089A-3c
-	for qemu-devel@archiver.kernel.org; Sat, 03 Oct 2020 04:46:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57966)
+	id 1kOdBv-0008Bh-0f
+	for qemu-devel@archiver.kernel.org; Sat, 03 Oct 2020 04:46:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57968)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kOdAl-0007LQ-Ed
- for qemu-devel@nongnu.org; Sat, 03 Oct 2020 04:45:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50660)
+ id 1kOdAm-0007LX-N6
+ for qemu-devel@nongnu.org; Sat, 03 Oct 2020 04:45:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50676)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kOdAj-0003NN-DW
- for qemu-devel@nongnu.org; Sat, 03 Oct 2020 04:45:43 -0400
+ id 1kOdAj-0003NP-Mc
+ for qemu-devel@nongnu.org; Sat, 03 Oct 2020 04:45:44 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kOdAh-0007lv-Gc
- for <qemu-devel@nongnu.org>; Sat, 03 Oct 2020 08:45:39 +0000
+ id 1kOdAi-0007nB-6n
+ for <qemu-devel@nongnu.org>; Sat, 03 Oct 2020 08:45:40 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 7A3CB2E80DB
- for <qemu-devel@nongnu.org>; Sat,  3 Oct 2020 08:45:39 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 3026F2E8031
+ for <qemu-devel@nongnu.org>; Sat,  3 Oct 2020 08:45:40 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 03 Oct 2020 08:36:01 -0000
+Date: Sat, 03 Oct 2020 08:37:24 -0000
 From: Thomas Huth <1898084@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -54,7 +54,7 @@ X-Launchpad-Bug-Commenters: pere-jobs th-huth
 X-Launchpad-Bug-Reporter: Ophir LOJKINE (pere-jobs)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
 References: <160157283310.5327.3681752113841049978.malonedeb@soybean.canonical.com>
-Message-Id: <160171416109.9249.1662688515943745211.malone@wampee.canonical.com>
+Message-Id: <160171424441.13458.15444744732594583162.malone@gac.canonical.com>
 Subject: [Bug 1898084] Re: Assertion failed: (buf_len != 0), function soread, 
  file socket.c, line 183.
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -62,7 +62,7 @@ X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="d50d1e75c500726862802414f880ee3e3bb759bf"; Instance="production"
-X-Launchpad-Hash: ce2e0801c9fe66ba52792247524d6f5fccd44bae
+X-Launchpad-Hash: 44d9cc38d682cb5ba9d8f8c624ef10305a98a94f
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/03 03:55:45
@@ -90,18 +90,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-libslirp is a separate project now, and I see that you already reported
-it there (https://gitlab.freedesktop.org/slirp/libslirp/-/issues/29), so
-I'm closing this QEMU ticket now.
-
-** Bug watch added: gitlab.freedesktop.org/slirp/libslirp/-/issues #29
-   https://gitlab.freedesktop.org/slirp/libslirp/-/issues/29
-
-** Changed in: qemu
-       Status: New =3D> Invalid
-
-** Changed in: qemu
-       Status: Invalid =3D> Triaged
+Hmm, thinking about it twice, maybe let's rather keep this open, to make
+sure that we update to the right version of libslirp in QEMU once the
+fix is released there.
 
 -- =
 
