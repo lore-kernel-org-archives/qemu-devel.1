@@ -7,61 +7,60 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29A00C4363D
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 10:03:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D584C4363D
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 10:03:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABC63206CA
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 10:03:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABC63206CA
+	by mail.kernel.org (Postfix) with ESMTPS id E70F4206CA
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 10:03:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E70F4206CA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOeNo-0005dg-JP
-	for qemu-devel@archiver.kernel.org; Sat, 03 Oct 2020 06:03:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40860)
+	id 1kOeOH-00067E-UJ
+	for qemu-devel@archiver.kernel.org; Sat, 03 Oct 2020 06:03:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40884)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kOeMf-0004Ub-AO
- for qemu-devel@nongnu.org; Sat, 03 Oct 2020 06:02:05 -0400
-Received: from us-smtp-delivery-44.mimecast.com ([205.139.111.44]:38554)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kOeMq-0004mz-Pu
+ for qemu-devel@nongnu.org; Sat, 03 Oct 2020 06:02:16 -0400
+Received: from us-smtp-delivery-44.mimecast.com ([207.211.30.44]:30470)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kOeMd-0002x3-Ml
- for qemu-devel@nongnu.org; Sat, 03 Oct 2020 06:02:05 -0400
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kOeMp-0002xP-1v
+ for qemu-devel@nongnu.org; Sat, 03 Oct 2020 06:02:16 -0400
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-o1tP11ugOfO_vsKHpUl3HA-1; Sat, 03 Oct 2020 06:01:59 -0400
-X-MC-Unique: o1tP11ugOfO_vsKHpUl3HA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-203-fajacoYON_SSdHYDcB0WXA-1; Sat, 03 Oct 2020 06:02:10 -0400
+X-MC-Unique: fajacoYON_SSdHYDcB0WXA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BCE86802B75;
- Sat,  3 Oct 2020 10:01:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A6171005E5A;
+ Sat,  3 Oct 2020 10:02:08 +0000 (UTC)
 Received: from bahia.lan (ovpn-112-192.ams2.redhat.com [10.36.112.192])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 148CB60C15;
- Sat,  3 Oct 2020 10:01:52 +0000 (UTC)
-Subject: [PATCH v3 1/3] vhost: Don't call access_ok() when using IOTLB
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D1BBC10027AB;
+ Sat,  3 Oct 2020 10:02:03 +0000 (UTC)
+Subject: [PATCH v3 2/3] vhost: Use vhost_get_used_size() in
+ vhost_vring_set_addr()
 From: Greg Kurz <groug@kaod.org>
 To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
-Date: Sat, 03 Oct 2020 12:01:52 +0200
-Message-ID: <160171931213.284610.2052489816407219136.stgit@bahia.lan>
+Date: Sat, 03 Oct 2020 12:02:03 +0200
+Message-ID: <160171932300.284610.11846106312938909461.stgit@bahia.lan>
 In-Reply-To: <160171888144.284610.4628526949393013039.stgit@bahia.lan>
 References: <160171888144.284610.4628526949393013039.stgit@bahia.lan>
 User-Agent: StGit/0.21
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: kaod.org
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: softfail client-ip=205.139.111.44; envelope-from=groug@kaod.org;
+Received-SPF: softfail client-ip=207.211.30.44; envelope-from=groug@kaod.org;
  helo=us-smtp-delivery-44.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/03 06:01:51
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/03 06:02:14
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -11
 X-Spam_score: -1.2
@@ -87,54 +86,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When the IOTLB device is enabled, the vring addresses we get
-from userspace are GIOVAs. It is thus wrong to pass them down
-to access_ok() which only takes HVAs.
+The open-coded computation of the used size doesn't take the event
+into account when the VIRTIO_RING_F_EVENT_IDX feature is present.
+Fix that by using vhost_get_used_size().
 
-Access validation is done at prefetch time with IOTLB. Teach
-vq_access_ok() about that by moving the (vq->iotlb) check
-from vhost_vq_access_ok() to vq_access_ok(). This prevents
-vhost_vring_set_addr() to fail when verifying the accesses.
-No behavior change for vhost_vq_access_ok().
-
-BugLink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1883084
-Fixes: 6b1e6cc7855b ("vhost: new device IOTLB API")
-Cc: jasowang@redhat.com
-CC: stable@vger.kernel.org # 4.14+
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Acked-by: Jason Wang <jasowang@redhat.com>
 ---
- drivers/vhost/vhost.c |    9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ drivers/vhost/vhost.c |    3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index b45519ca66a7..c3b49975dc28 100644
+index c3b49975dc28..9d2c225fb518 100644
 --- a/drivers/vhost/vhost.c
 +++ b/drivers/vhost/vhost.c
-@@ -1290,6 +1290,11 @@ static bool vq_access_ok(struct vhost_virtqueue *vq,=
- unsigned int num,
- =09=09=09 vring_used_t __user *used)
+@@ -1519,8 +1519,7 @@ static long vhost_vring_set_addr(struct vhost_dev *d,
+ =09=09/* Also validate log access for used ring if enabled. */
+ =09=09if ((a.flags & (0x1 << VHOST_VRING_F_LOG)) &&
+ =09=09=09!log_access_ok(vq->log_base, a.log_guest_addr,
+-=09=09=09=09sizeof *vq->used +
+-=09=09=09=09vq->num * sizeof *vq->used->ring))
++=09=09=09=09       vhost_get_used_size(vq, vq->num)))
+ =09=09=09return -EINVAL;
+ =09}
 =20
- {
-+=09/* If an IOTLB device is present, the vring addresses are
-+=09 * GIOVAs. Access validation occurs at prefetch time. */
-+=09if (vq->iotlb)
-+=09=09return true;
-+
- =09return access_ok(desc, vhost_get_desc_size(vq, num)) &&
- =09       access_ok(avail, vhost_get_avail_size(vq, num)) &&
- =09       access_ok(used, vhost_get_used_size(vq, num));
-@@ -1383,10 +1388,6 @@ bool vhost_vq_access_ok(struct vhost_virtqueue *vq)
- =09if (!vq_log_access_ok(vq, vq->log_base))
- =09=09return false;
-=20
--=09/* Access validation occurs at prefetch time with IOTLB */
--=09if (vq->iotlb)
--=09=09return true;
--
- =09return vq_access_ok(vq, vq->num, vq->desc, vq->avail, vq->used);
- }
- EXPORT_SYMBOL_GPL(vhost_vq_access_ok);
 
 
 
