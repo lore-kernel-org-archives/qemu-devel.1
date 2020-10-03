@@ -7,82 +7,83 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 357BDC4363D
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 17:52:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04D0DC4363D
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 17:56:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86F3E206C1
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 17:52:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 82ADE206C1
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 17:56:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KvlpzcIT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86F3E206C1
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JQnqzRyA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82ADE206C1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOliK-0003ES-JP
-	for qemu-devel@archiver.kernel.org; Sat, 03 Oct 2020 13:52:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49606)
+	id 1kOllJ-0004Iu-FC
+	for qemu-devel@archiver.kernel.org; Sat, 03 Oct 2020 13:56:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50204)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kOlhE-0002HN-P1; Sat, 03 Oct 2020 13:51:48 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51475)
+ id 1kOlkO-0003mh-Ox
+ for qemu-devel@nongnu.org; Sat, 03 Oct 2020 13:55:04 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41126)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kOlhD-0004MG-5q; Sat, 03 Oct 2020 13:51:48 -0400
-Received: by mail-wm1-x343.google.com with SMTP id w2so4670950wmi.1;
- Sat, 03 Oct 2020 10:51:46 -0700 (PDT)
+ id 1kOlkN-0004dx-1S
+ for qemu-devel@nongnu.org; Sat, 03 Oct 2020 13:55:04 -0400
+Received: by mail-wr1-x443.google.com with SMTP id w5so5203696wrp.8
+ for <qemu-devel@nongnu.org>; Sat, 03 Oct 2020 10:55:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=bh3lXGz4KMFoW1Duf/q+SyxiwmL7JXHKrBkWEz9YXC0=;
- b=KvlpzcIToroDnQ4t7I6Ag4YmxDCkIQGJDhxaxtsucHe8cwFxaI0c+9V0pRN5G3/vrd
- d2yVl8ANbvm+Nr8RFyV35ZuwJGNqxL7Gtk2LME/tB20Io16aWsG09sr/8Qbb8hT0xYQD
- fCmEuUO3OxWmmIb3P7KcdeHA5SBXlt5a5NPH7OI6jLigRx0845BkQXOoIKBnohenutQK
- KVW8jsLT3tksr3mjZ5YN9fs0EG/mSyL0YmHDpQKYr+4TSmRH2yxsxQx/X/3Xya2Ad2xE
- B+tryErz9x74egIB+1ju412Hanxu/mhWfp1L/OeE55xoXZQHY8ZTtk8ESEEXXhiPr+4u
- 1gSQ==
+ bh=yQUOKdIlSVTudHSJHdqpZDQtd7oAf1RVItbdyqHPnSQ=;
+ b=JQnqzRyAHmIGGwbFhozNbRw4mHDQvIHFWlqitQsD4NZSy2cobGyaYnRP7onPlArxK9
+ jvSCXFfL6DNdpK7DewFIoRcCKwGVRQh+mRtINhR7f3FkOOyEr1ZiKOW+byYWQOAM1FYw
+ SNufm0Bs0Eg0DLcE5WBYBSVbL1tO/4tmpbGoJHnQ6vnHSrVyES3bYqz0LiXczssVng9S
+ v3EHXzXyMYZ6yAkiMbbB00RW+7gHgdwX6WbsAoYmx1eJI+UvIQqxOs/p7aCr9T+UvkLT
+ 8dN+BLFwtuo9Z1JWV0LlEGCWkuvZ71gF7ZfaIc79IxdVDZgvqNKHKc1lCeFVz0i62Uvu
+ SZSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=bh3lXGz4KMFoW1Duf/q+SyxiwmL7JXHKrBkWEz9YXC0=;
- b=FZLpHy+yewe++WlpHFw0DfWZHYLYvQ04IdyUpzDvFiIj3qzKj7+NJ56dg+16zZTPpH
- UNImVJDrQu7bVIzhktJOAvazAYFohZOK8fmBeVQPQ7iOvW8YD4bR+cjG1sxHK6KInx2j
- NcnZzaQ+fERGX3nvOmBm65Z9CJaP6LWc4Lj325oUcqel2AgOGF3NemE0VOQv9OcT4v7s
- TwNaixpTx25OzAcCrve4K/yiQ9vZRpbXTxFMTmlsS3gBOwSN3nuSQ1fThdeBp2QhMB8R
- 8g1jv6ad4yYuUi9HBTBAGZCtFxE/s++bsv89la3oZ1YA3XBvV23pMgUNCsrmvejlKgp3
- n0fw==
-X-Gm-Message-State: AOAM533ALognGuSLfBjbHZNdAAOrLtHCA7/gn7wckNhNxa/4cAC6crgD
- Eqc65/Nib9esuAXwcGluDK4=
-X-Google-Smtp-Source: ABdhPJzrGxOdGZ6iaX8RbLsJPkWe/QPwD2ad+HW6iAvYgps0mfMekGOqP2zUj3oZljofiTpebjO7NA==
-X-Received: by 2002:a05:600c:2256:: with SMTP id
- a22mr149657wmm.138.1601747505384; 
- Sat, 03 Oct 2020 10:51:45 -0700 (PDT)
+ bh=yQUOKdIlSVTudHSJHdqpZDQtd7oAf1RVItbdyqHPnSQ=;
+ b=j5IkaB3msWKxq73LlQ4ZYzGBhA4Xl64Cuhbw1SfbrAX+lLvDlKoTWPjiz/OoJ6xwam
+ wlmobMAiPwpNE4jb+dFPMb2jOFiY4mZtZ66H8VqWXpUi+8QohffmORBlmVyPy3w7CHlc
+ Gza5U5OtGT9FZVzMWmuRgQ3/PVieX/oFVHOBxlf8TrU/4Ty3nj/jFM+YwXcOpgvRA5nO
+ Lqd+jb6WWXPiDBVW4wmiII7omsjSMkFYSCSJJPMbItBhMIAgBO5vKoOkEv1urj5GA8ns
+ LQwh4HvxKpNmcWLPvFUIenRfU4/yHq/NtmMxqLQzTe1E9belKMqmMJwb5bs4Gd6bTja5
+ RJEA==
+X-Gm-Message-State: AOAM531RDLgqvuc7uOMDg3J9gkfU9lDtsBOv5qoCVOe6WbpBn9Kswv7p
+ sSHiS5/7mntvqJatcIowCvw=
+X-Google-Smtp-Source: ABdhPJzzn3d2fEFeYPqlxt2Ti97+NX1+Di1QJNy7177d9CQa9TBITNZgGcBfyAxcCFa1Gbk89jzDmw==
+X-Received: by 2002:a5d:4247:: with SMTP id s7mr8977735wrr.167.1601747701640; 
+ Sat, 03 Oct 2020 10:55:01 -0700 (PDT)
 Received: from [192.168.1.36] (74.red-83-53-161.dynamicip.rima-tde.net.
  [83.53.161.74])
- by smtp.gmail.com with ESMTPSA id f5sm5895820wmh.16.2020.10.03.10.51.44
+ by smtp.gmail.com with ESMTPSA id y14sm5738124wma.48.2020.10.03.10.55.00
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 03 Oct 2020 10:51:44 -0700 (PDT)
-Subject: Re: [PATCH v10 5/8] linux-user/elfload: Adjust iteration over phdr
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20201002215955.254866-1-richard.henderson@linaro.org>
- <20201002215955.254866-6-richard.henderson@linaro.org>
+ Sat, 03 Oct 2020 10:55:01 -0700 (PDT)
+Subject: Re: [PATCH 4/6] docs/devel/qom: Use *emphasis* for emphasis
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+References: <20201003025424.199291-1-ehabkost@redhat.com>
+ <20201003025424.199291-5-ehabkost@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5a3983a6-56a2-9803-1b3c-496af5cd01a8@amsat.org>
-Date: Sat, 3 Oct 2020 19:51:43 +0200
+Message-ID: <ad515585-a26e-8465-7270-67278e6ea26a@amsat.org>
+Date: Sat, 3 Oct 2020 19:55:00 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20201002215955.254866-6-richard.henderson@linaro.org>
+In-Reply-To: <20201003025424.199291-5-ehabkost@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -19
@@ -105,51 +106,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, laurent@vivier.eu
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/2/20 11:59 PM, Richard Henderson wrote:
-> The second loop uses a loop induction variable, and the first
-> does not.  Transform the first to match the second, to simplify
-> a following patch moving code between them.
+On 10/3/20 4:54 AM, Eduardo Habkost wrote:
+> <emphasis> is not valid reST syntax.
 > 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  linux-user/elfload.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
+>  docs/devel/qom.rst | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> index 7572a32a30..735ebfa190 100644
-> --- a/linux-user/elfload.c
-> +++ b/linux-user/elfload.c
-> @@ -2426,17 +2426,18 @@ static void load_elf_image(const char *image_name, int image_fd,
->      loaddr = -1, hiaddr = 0;
->      info->alignment = 0;
->      for (i = 0; i < ehdr->e_phnum; ++i) {
-> -        if (phdr[i].p_type == PT_LOAD) {
-> -            abi_ulong a = phdr[i].p_vaddr - phdr[i].p_offset;
-> +        struct elf_phdr *eppnt = phdr + i;
-> +        if (eppnt->p_type == PT_LOAD) {
-> +            abi_ulong a = eppnt->p_vaddr - eppnt->p_offset;
->              if (a < loaddr) {
->                  loaddr = a;
->              }
-> -            a = phdr[i].p_vaddr + phdr[i].p_memsz;
-> +            a = eppnt->p_vaddr + eppnt->p_memsz;
->              if (a > hiaddr) {
->                  hiaddr = a;
->              }
->              ++info->nsegs;
-> -            info->alignment |= phdr[i].p_align;
-> +            info->alignment |= eppnt->p_align;
->          }
->      }
+> diff --git a/docs/devel/qom.rst b/docs/devel/qom.rst
+> index a47e1b9a239..0c610e20d62 100644
+> --- a/docs/devel/qom.rst
+> +++ b/docs/devel/qom.rst
+> @@ -174,17 +174,17 @@ dynamically cast it to an object that implements the interface.
+>  Methods
+>  =======
 >  
+> -A <emphasis>method</emphasis> is a function within the namespace scope of
+> +A *method* is a function within the namespace scope of
+>  a class. It usually operates on the object instance by passing it as a
+>  strongly-typed first argument.
+>  If it does not operate on an object instance, it is dubbed
+> -<emphasis>class method</emphasis>.
+> +*class method*.
+>  
+>  Methods cannot be overloaded. That is, the #ObjectClass and method name
+>  uniquely identity the function to be called; the signature does not vary
+>  except for trailing varargs.
+>  
+> -Methods are always <emphasis>virtual</emphasis>. Overriding a method in
+> +Methods are always *virtual*. Overriding a method in
+>  #TypeInfo.class_init of a subclass leads to any user of the class obtained
+>  via OBJECT_GET_CLASS() accessing the overridden function.
+>  The original function is not automatically invoked. It is the responsibility
 > 
 
 
