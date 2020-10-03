@@ -7,39 +7,39 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8856FC41604
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 17:16:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7F25C41604
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 17:17:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 026362064C
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 17:16:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 026362064C
+	by mail.kernel.org (Postfix) with ESMTPS id 65D112064C
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 17:17:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65D112064C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOl9T-00062y-2J
-	for qemu-devel@archiver.kernel.org; Sat, 03 Oct 2020 13:16:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43322)
+	id 1kOl9f-0006Xu-Ha
+	for qemu-devel@archiver.kernel.org; Sat, 03 Oct 2020 13:17:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43064)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kOl6i-00034Z-N3
- for qemu-devel@nongnu.org; Sat, 03 Oct 2020 13:14:04 -0400
-Received: from mail.ispras.ru ([83.149.199.84]:36084)
+ id 1kOl5i-0001yu-BK
+ for qemu-devel@nongnu.org; Sat, 03 Oct 2020 13:13:02 -0400
+Received: from mail.ispras.ru ([83.149.199.84]:35954)
  by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kOl6g-0008Jy-Fb
- for qemu-devel@nongnu.org; Sat, 03 Oct 2020 13:14:04 -0400
+ id 1kOl5g-0008EJ-Lg
+ for qemu-devel@nongnu.org; Sat, 03 Oct 2020 13:13:02 -0400
 Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id 3C9D340A1DB0;
- Sat,  3 Oct 2020 17:13:56 +0000 (UTC)
-Subject: [PATCH v7 12/14] replay: describe reverse debugging in docs/replay.txt
+ by mail.ispras.ru (Postfix) with ESMTPSA id 3894340A1DAD;
+ Sat,  3 Oct 2020 17:12:58 +0000 (UTC)
+Subject: [PATCH v7 02/14] replay: provide an accessor for rr filename
 From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
 To: qemu-devel@nongnu.org
-Date: Sat, 03 Oct 2020 20:13:55 +0300
-Message-ID: <160174523509.12451.1409905901920738979.stgit@pasha-ThinkPad-X280>
+Date: Sat, 03 Oct 2020 20:12:57 +0300
+Message-ID: <160174517710.12451.17645787545733927488.stgit@pasha-ThinkPad-X280>
 In-Reply-To: <160174516520.12451.10785284392438702137.stgit@pasha-ThinkPad-X280>
 References: <160174516520.12451.10785284392438702137.stgit@pasha-ThinkPad-X280>
 User-Agent: StGit/0.17.1-dirty
@@ -77,84 +77,43 @@ Sender: "Qemu-devel"
 
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-This patch updates the documentation and describes usage of the reverse
-debugging in QEMU+GDB.
+This patch adds an accessor function for the name of the record/replay
+log file. Adding an accessor instead of making variable global,
+prevents accidental modification of this variable by other modules.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
---
-
-v4 changes:
- - added an example of the command line for reverse debugging of
-   the diskless machine
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- docs/replay.txt |   46 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+ include/sysemu/replay.h |    2 ++
+ replay/replay.c         |    5 +++++
+ 2 files changed, 7 insertions(+)
 
-diff --git a/docs/replay.txt b/docs/replay.txt
-index 70c27edb36..39fe5e9740 100644
---- a/docs/replay.txt
-+++ b/docs/replay.txt
-@@ -265,6 +265,16 @@ of the original disk image, use overlay files linked to the original images.
- Therefore all new snapshots (including the starting one) will be saved in
- overlays and the original image remains unchanged.
+diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
+index 5471bb514d..c9c896ae8d 100644
+--- a/include/sysemu/replay.h
++++ b/include/sysemu/replay.h
+@@ -72,6 +72,8 @@ void replay_start(void);
+ void replay_finish(void);
+ /*! Adds replay blocker with the specified error description */
+ void replay_add_blocker(Error *reason);
++/* Returns name of the replay log file */
++const char *replay_get_filename(void);
  
-+When you need to use snapshots with diskless virtual machine,
-+it must be started with 'orphan' qcow2 image. This image will be used
-+for storing VM snapshots. Here is the example of the command line for this:
-+
-+  qemu-system-i386 -icount shift=3,rr=replay,rrfile=record.bin,rrsnapshot=init \
-+    -net none -drive file=empty.qcow2,if=none,id=rr
-+
-+empty.qcow2 drive does not connected to any virtual block device and used
-+for VM snapshots only.
-+
- Network devices
- ---------------
+ /* Processing the instructions */
  
-@@ -294,6 +304,42 @@ for recording and replaying must contain identical number of ports in record
- and replay modes, but their backends may differ.
- E.g., '-serial stdio' in record mode, and '-serial null' in replay mode.
- 
-+Reverse debugging
-+-----------------
+diff --git a/replay/replay.c b/replay/replay.c
+index 83ed9e0e24..42e82f7bc7 100644
+--- a/replay/replay.c
++++ b/replay/replay.c
+@@ -399,3 +399,8 @@ void replay_add_blocker(Error *reason)
+ {
+     replay_blockers = g_slist_prepend(replay_blockers, reason);
+ }
 +
-+Reverse debugging allows "executing" the program in reverse direction.
-+GDB remote protocol supports "reverse step" and "reverse continue"
-+commands. The first one steps single instruction backwards in time,
-+and the second one finds the last breakpoint in the past.
-+
-+Recorded executions may be used to enable reverse debugging. QEMU can't
-+execute the code in backwards direction, but can load a snapshot and
-+replay forward to find the desired position or breakpoint.
-+
-+The following GDB commands are supported:
-+ - reverse-stepi (or rsi) - step one instruction backwards
-+ - reverse-continue (or rc) - find last breakpoint in the past
-+
-+Reverse step loads the nearest snapshot and replays the execution until
-+the required instruction is met.
-+
-+Reverse continue may include several passes of examining the execution
-+between the snapshots. Each of the passes include the following steps:
-+ 1. loading the snapshot
-+ 2. replaying to examine the breakpoints
-+ 3. if breakpoint or watchpoint was met
-+    - loading the snaphot again
-+    - replaying to the required breakpoint
-+ 4. else
-+    - proceeding to the p.1 with the earlier snapshot
-+
-+Therefore usage of the reverse debugging requires at least one snapshot
-+created in advance. This can be done by omitting 'snapshot' option
-+for the block drives and adding 'rrsnapshot' for both record and replay
-+command lines.
-+See the "Snapshotting" section to learn more about running record/replay
-+and creating the snapshot in these modes.
-+
- Replay log format
- -----------------
- 
++const char *replay_get_filename(void)
++{
++    return replay_filename;
++}
 
 
