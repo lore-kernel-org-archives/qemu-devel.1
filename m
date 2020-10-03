@@ -7,83 +7,83 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04D0DC4363D
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 17:56:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A24CC4363D
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 17:57:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82ADE206C1
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 17:56:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D8F9206C1
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 17:57:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JQnqzRyA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82ADE206C1
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lVU4lr2V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D8F9206C1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOllJ-0004Iu-FC
-	for qemu-devel@archiver.kernel.org; Sat, 03 Oct 2020 13:56:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50204)
+	id 1kOlma-0005Rv-AI
+	for qemu-devel@archiver.kernel.org; Sat, 03 Oct 2020 13:57:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50472)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kOlkO-0003mh-Ox
- for qemu-devel@nongnu.org; Sat, 03 Oct 2020 13:55:04 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41126)
+ id 1kOllQ-0004Zt-02
+ for qemu-devel@nongnu.org; Sat, 03 Oct 2020 13:56:08 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34091)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kOlkN-0004dx-1S
- for qemu-devel@nongnu.org; Sat, 03 Oct 2020 13:55:04 -0400
-Received: by mail-wr1-x443.google.com with SMTP id w5so5203696wrp.8
- for <qemu-devel@nongnu.org>; Sat, 03 Oct 2020 10:55:02 -0700 (PDT)
+ id 1kOllO-000523-8s
+ for qemu-devel@nongnu.org; Sat, 03 Oct 2020 13:56:07 -0400
+Received: by mail-wr1-x444.google.com with SMTP id t10so5232006wrv.1
+ for <qemu-devel@nongnu.org>; Sat, 03 Oct 2020 10:56:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=yQUOKdIlSVTudHSJHdqpZDQtd7oAf1RVItbdyqHPnSQ=;
- b=JQnqzRyAHmIGGwbFhozNbRw4mHDQvIHFWlqitQsD4NZSy2cobGyaYnRP7onPlArxK9
- jvSCXFfL6DNdpK7DewFIoRcCKwGVRQh+mRtINhR7f3FkOOyEr1ZiKOW+byYWQOAM1FYw
- SNufm0Bs0Eg0DLcE5WBYBSVbL1tO/4tmpbGoJHnQ6vnHSrVyES3bYqz0LiXczssVng9S
- v3EHXzXyMYZ6yAkiMbbB00RW+7gHgdwX6WbsAoYmx1eJI+UvIQqxOs/p7aCr9T+UvkLT
- 8dN+BLFwtuo9Z1JWV0LlEGCWkuvZ71gF7ZfaIc79IxdVDZgvqNKHKc1lCeFVz0i62Uvu
- SZSg==
+ bh=PVrMD5bSIZeKuBg0Tot7BN24PM8CfVzFwvMeC136QJY=;
+ b=lVU4lr2VH0sG2lfOzs20YHlD2sM3Z9gmAgoBi3lGpVCak1WsRRQNo2JlneNUacAoO4
+ U8Eb8DZMBhK0JY4klw2NEUvINrwJvSQ4/NrUyhQ+/6cB3WgdCef8iVgjF/k8TJ6G/a15
+ bHxTx329qk18Do9JTxjPSFiaYL8s1h/c6gH7nOmwhrv/N1d+cmLUFspmhCHha+dyDmp1
+ 1oe7HpgFQe5L20wxWFz4Cw5SjUlRnuRDwIkRVGWdMiVJlnrsGEq3xsudKBNhyQx/We77
+ WkWdcDc2t4Mee6gIHlW/gB9Rly7tG/Qrr9aaR9IZcTEYW8jA3ZTLOVfTFZIS9M8fvsHp
+ fxmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=yQUOKdIlSVTudHSJHdqpZDQtd7oAf1RVItbdyqHPnSQ=;
- b=j5IkaB3msWKxq73LlQ4ZYzGBhA4Xl64Cuhbw1SfbrAX+lLvDlKoTWPjiz/OoJ6xwam
- wlmobMAiPwpNE4jb+dFPMb2jOFiY4mZtZ66H8VqWXpUi+8QohffmORBlmVyPy3w7CHlc
- Gza5U5OtGT9FZVzMWmuRgQ3/PVieX/oFVHOBxlf8TrU/4Ty3nj/jFM+YwXcOpgvRA5nO
- Lqd+jb6WWXPiDBVW4wmiII7omsjSMkFYSCSJJPMbItBhMIAgBO5vKoOkEv1urj5GA8ns
- LQwh4HvxKpNmcWLPvFUIenRfU4/yHq/NtmMxqLQzTe1E9belKMqmMJwb5bs4Gd6bTja5
- RJEA==
-X-Gm-Message-State: AOAM531RDLgqvuc7uOMDg3J9gkfU9lDtsBOv5qoCVOe6WbpBn9Kswv7p
- sSHiS5/7mntvqJatcIowCvw=
-X-Google-Smtp-Source: ABdhPJzzn3d2fEFeYPqlxt2Ti97+NX1+Di1QJNy7177d9CQa9TBITNZgGcBfyAxcCFa1Gbk89jzDmw==
-X-Received: by 2002:a5d:4247:: with SMTP id s7mr8977735wrr.167.1601747701640; 
- Sat, 03 Oct 2020 10:55:01 -0700 (PDT)
+ bh=PVrMD5bSIZeKuBg0Tot7BN24PM8CfVzFwvMeC136QJY=;
+ b=Zk6aimxGnbdQiLuLLQQL9CzPl1ADxBr+bcnyUyY4xaklYfngQjEYndZKcZFuhNEnpk
+ nT9CFHe9S4mjZo0kBTZGabrorVQTaTfyuvvwqqSTGCOjTAxpIuwn+wf11lYgAeFjklxy
+ 5+fTKHlN5Hzlzg6JKEXj+BtvbpxlN5TVbX74RMsh61qpHIYtvLkos41ZF4m1cjTPY22t
+ MswTsWoLt91FUiVG23Qd/scuFD1yEJFZfvgOGuTc6EEezN5F5gMoDCiYTk1wRudd4p12
+ XUN0LHpWKtCyQBXfap9kDhXCzcIXT09L3astWLTFwo4ojzq7HC2BdaQsTezID477UhuR
+ 6YjA==
+X-Gm-Message-State: AOAM5304WvPltZcfQi/2lzYM5Hac+TjGQEJxDZTz5TIi96erVhH1+qYd
+ xNAs0zS2fWtx7ha9VSQNPvlYj4YfslY=
+X-Google-Smtp-Source: ABdhPJw7MYY0mDhxYxM1BGYAI6iqJ90cVgEkVK6N/XeT4QMx/5k8GRpUJFgYBHYN8KBNXB9TQ/OwjQ==
+X-Received: by 2002:a5d:6886:: with SMTP id h6mr9408689wru.374.1601747764871; 
+ Sat, 03 Oct 2020 10:56:04 -0700 (PDT)
 Received: from [192.168.1.36] (74.red-83-53-161.dynamicip.rima-tde.net.
  [83.53.161.74])
- by smtp.gmail.com with ESMTPSA id y14sm5738124wma.48.2020.10.03.10.55.00
+ by smtp.gmail.com with ESMTPSA id t5sm6319506wrb.21.2020.10.03.10.56.04
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 03 Oct 2020 10:55:01 -0700 (PDT)
-Subject: Re: [PATCH 4/6] docs/devel/qom: Use *emphasis* for emphasis
+ Sat, 03 Oct 2020 10:56:04 -0700 (PDT)
+Subject: Re: [PATCH 6/6] docs/devel/qom: Avoid long lines
 To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 References: <20201003025424.199291-1-ehabkost@redhat.com>
- <20201003025424.199291-5-ehabkost@redhat.com>
+ <20201003025424.199291-7-ehabkost@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ad515585-a26e-8465-7270-67278e6ea26a@amsat.org>
-Date: Sat, 3 Oct 2020 19:55:00 +0200
+Message-ID: <09310238-32b2-b570-56da-a9f8d550ab8d@amsat.org>
+Date: Sat, 3 Oct 2020 19:56:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20201003025424.199291-5-ehabkost@redhat.com>
+In-Reply-To: <20201003025424.199291-7-ehabkost@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -19
@@ -113,41 +113,51 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 10/3/20 4:54 AM, Eduardo Habkost wrote:
-> <emphasis> is not valid reST syntax.
+> Long code lines don't look good in the rendered documents, make
+> them shorter.
 > 
 > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  docs/devel/qom.rst | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  docs/devel/qom.rst | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
 > 
 > diff --git a/docs/devel/qom.rst b/docs/devel/qom.rst
-> index a47e1b9a239..0c610e20d62 100644
+> index 0c610e20d62..42d0dc4f4da 100644
 > --- a/docs/devel/qom.rst
 > +++ b/docs/devel/qom.rst
-> @@ -174,17 +174,17 @@ dynamically cast it to an object that implements the interface.
->  Methods
->  =======
+> @@ -284,7 +284,8 @@ in the header file:
+>  .. code-block:: c
+>     :caption: Declaring a simple type
 >  
-> -A <emphasis>method</emphasis> is a function within the namespace scope of
-> +A *method* is a function within the namespace scope of
->  a class. It usually operates on the object instance by passing it as a
->  strongly-typed first argument.
->  If it does not operate on an object instance, it is dubbed
-> -<emphasis>class method</emphasis>.
-> +*class method*.
+> -   OBJECT_DECLARE_SIMPLE_TYPE(MyDevice, my_device, MY_DEVICE, DEVICE)
+> +   OBJECT_DECLARE_SIMPLE_TYPE(MyDevice, my_device,
+> +                              MY_DEVICE, DEVICE)
 >  
->  Methods cannot be overloaded. That is, the #ObjectClass and method name
->  uniquely identity the function to be called; the signature does not vary
->  except for trailing varargs.
+>  This is equivalent to the following:
 >  
-> -Methods are always <emphasis>virtual</emphasis>. Overriding a method in
-> +Methods are always *virtual*. Overriding a method in
->  #TypeInfo.class_init of a subclass leads to any user of the class obtained
->  via OBJECT_GET_CLASS() accessing the overridden function.
->  The original function is not automatically invoked. It is the responsibility
+> @@ -360,7 +361,8 @@ This accepts an array of interface type names.
+>  
+>     OBJECT_DEFINE_TYPE_WITH_INTERFACES(MyDevice, my_device,
+>                                        MY_DEVICE, DEVICE,
+> -                                      { TYPE_USER_CREATABLE }, { NULL })
+> +                                      { TYPE_USER_CREATABLE },
+> +                                      { NULL })
+>  
+>  If the type is not intended to be instantiated, then then
+>  the OBJECT_DEFINE_ABSTRACT_TYPE() macro can be used instead:
+> @@ -368,7 +370,8 @@ the OBJECT_DEFINE_ABSTRACT_TYPE() macro can be used instead:
+>  .. code-block:: c
+>     :caption: Defining a simple abstract type
+>  
+> -   OBJECT_DEFINE_ABSTRACT_TYPE(MyDevice, my_device, MY_DEVICE, DEVICE)
+> +   OBJECT_DEFINE_ABSTRACT_TYPE(MyDevice, my_device,
+> +                               MY_DEVICE, DEVICE)
+>  
+>  
+>  
 > 
 
 
