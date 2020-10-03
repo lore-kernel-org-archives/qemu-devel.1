@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46D1CC46466
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 02:43:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFF26C4363C
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 02:43:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B96C3206FA
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 02:43:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 20685206DC
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 02:43:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eh3FcArw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B96C3206FA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fbsWAjnr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20685206DC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOXVs-0003xi-Ku
-	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 22:43:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41804)
+	id 1kOXVx-00049S-0u
+	for qemu-devel@archiver.kernel.org; Fri, 02 Oct 2020 22:43:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41850)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kOXUK-0002O6-3t
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 22:41:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42618)
+ id 1kOXUN-0002R9-JQ
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 22:41:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44867)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kOXUI-0002fE-27
- for qemu-devel@nongnu.org; Fri, 02 Oct 2020 22:41:31 -0400
+ id 1kOXUL-0002gP-Vu
+ for qemu-devel@nongnu.org; Fri, 02 Oct 2020 22:41:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601692889;
+ s=mimecast20190719; t=1601692893;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8qxe3ZVpSMpdE2wUQdy1oDx4GudQGhTY007X6Dg4W44=;
- b=Eh3FcArw0HDYjCy4UHX7so3JSbv1d+uMRGy1uRsDiT+GJcSX8LzcYYGCe32U+VV6aZ02Wg
- GSUB/ZgAmmx5nlb3LzyAZeK6q9SJmoQ7Ie8vLJWKNxXwBTitniU3ABpyTThOMN0HwFSLve
- qs5W5RcG0eUqhlsr690w3xJOiQlYG+c=
+ bh=3VXfXRoELIFszkw+f0Ls5+aw7iUG5vmbgXIN3bdgSt0=;
+ b=fbsWAjnrEm+Tpr6e6XyeoqOoeWz6bkXMR0picwRHks4iI7Eo0C6TYZFR79NPIsxcc8BrKX
+ Wsw0TfiTrq5LQJf+3fbHDvSebw3mbjQEbJQfwLvul7ZflNOaH9R/e8RJJ5oA6Pt54siIpF
+ 98B0d2P91fvFNXQsuy/fb1gm22s9k9o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-15-L72Th0L2Oo2oscCSTHqWHQ-1; Fri, 02 Oct 2020 22:41:27 -0400
-X-MC-Unique: L72Th0L2Oo2oscCSTHqWHQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-6-TWyXorWVNeyqRc23t3262g-1; Fri, 02 Oct 2020 22:41:31 -0400
+X-MC-Unique: TWyXorWVNeyqRc23t3262g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A468F1074648;
- Sat,  3 Oct 2020 02:41:26 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 124191853DA5;
+ Sat,  3 Oct 2020 02:41:30 +0000 (UTC)
 Received: from localhost (ovpn-119-102.rdu2.redhat.com [10.10.119.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5235A60BE2;
- Sat,  3 Oct 2020 02:41:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CCDD575261;
+ Sat,  3 Oct 2020 02:41:29 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/5] kernel-doc: Handle function typedefs that return pointers
-Date: Fri,  2 Oct 2020 22:41:19 -0400
-Message-Id: <20201003024123.193840-2-ehabkost@redhat.com>
+Subject: [PATCH 4/5] memory: Explicitly tag doc comments for structs
+Date: Fri,  2 Oct 2020 22:41:22 -0400
+Message-Id: <20201003024123.193840-5-ehabkost@redhat.com>
 In-Reply-To: <20201003024123.193840-1-ehabkost@redhat.com>
 References: <20201003024123.193840-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 21:59:12
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/02 21:51:44
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -103,32 +103,45 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-One example that was not being parsed correctly by kernel-doc is:
-
-  typedef Object *(ObjectPropertyResolve)(Object *obj,
-                                          void *opaque,
-                                          const char *part);
+This will allow us to remove the QEMU-specific
+$decl_type='type name' hack from the kernel-doc script.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- scripts/kernel-doc | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/exec/memory.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/kernel-doc b/scripts/kernel-doc
-index 40ad782e342..57a4a72970f 100755
---- a/scripts/kernel-doc
-+++ b/scripts/kernel-doc
-@@ -1318,8 +1318,8 @@ sub dump_typedef($$) {
-     $x =~ s@/\*.*?\*/@@gos;	# strip comments.
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index dee09851622..622207bde12 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -443,7 +443,7 @@ struct IOMMUMemoryRegion {
+     QLIST_FOREACH((n), &(mr)->iommu_notify, node)
  
-     # Parse function prototypes
--    if ($x =~ /typedef\s+(\w+)\s*\(\*\s*(\w\S+)\s*\)\s*\((.*)\);/ ||
--	$x =~ /typedef\s+(\w+)\s*(\w\S+)\s*\s*\((.*)\);/) {
-+    if ($x =~ /typedef\s+(\w+\s*\**)\s*\(\*\s*(\w\S+)\s*\)\s*\((.*)\);/ ||
-+	$x =~ /typedef\s+(\w+\s*\**)\s*(\w\S+)\s*\s*\((.*)\);/) {
+ /**
+- * MemoryListener: callbacks structure for updates to the physical memory map
++ * struct MemoryListener: callbacks structure for updates to the physical memory map
+  *
+  * Allows a component to adjust to changes in the guest-visible memory map.
+  * Use with memory_listener_register() and memory_listener_unregister().
+@@ -681,7 +681,7 @@ struct MemoryListener {
+ };
  
- 	# Function typedefs
- 	$return_type = $1;
+ /**
+- * AddressSpace: describes a mapping of addresses to #MemoryRegion objects
++ * struct AddressSpace: describes a mapping of addresses to #MemoryRegion objects
+  */
+ struct AddressSpace {
+     /* private: */
+@@ -721,7 +721,7 @@ static inline FlatView *address_space_to_flatview(AddressSpace *as)
+ 
+ 
+ /**
+- * MemoryRegionSection: describes a fragment of a #MemoryRegion
++ * struct MemoryRegionSection: describes a fragment of a #MemoryRegion
+  *
+  * @mr: the region, or %NULL if empty
+  * @fv: the flat view of the address space the region is mapped in
 -- 
 2.26.2
 
