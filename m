@@ -2,109 +2,89 @@ Return-Path: <SRS0=be0Y=DK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B08E8C4363D
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 07:13:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40CC1C4363D
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 07:25:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C05F206C9
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 07:13:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A8E37206CA
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 07:25:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zw0vk6Rd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C05F206C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LjwLIvr5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8E37206CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kObjT-0001Uf-T0
-	for qemu-devel@archiver.kernel.org; Sat, 03 Oct 2020 03:13:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43362)
+	id 1kObvD-0004PK-Ey
+	for qemu-devel@archiver.kernel.org; Sat, 03 Oct 2020 03:25:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45122)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kObiM-00013C-SJ
- for qemu-devel@nongnu.org; Sat, 03 Oct 2020 03:12:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43021)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kObiJ-0001Fb-O6
- for qemu-devel@nongnu.org; Sat, 03 Oct 2020 03:12:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601709134;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=+fRZsKPEy5y6HK3qTRilR4ubF4SoNqZpU3aiClpoKcM=;
- b=Zw0vk6RdZ6Uc7h8w0BzCdQdXgQxTXRCN12imKKaodHTezvUBBhSvQRFR2Bo4RkDKktF0D7
- lx7bNy1w9do0vxPy+7vRJHqm0/Saq9j6JJh5ytY/NUPWcOp3KGSkyOzlnSRJHg6wf68BZP
- +6WS/LW/DePSfsD5WsTctR0TIKVWIDQ=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-404-CrGT0ligOfS0nllqTcsxCw-1; Sat, 03 Oct 2020 03:12:12 -0400
-X-MC-Unique: CrGT0ligOfS0nllqTcsxCw-1
-Received: by mail-wr1-f69.google.com with SMTP id v5so1492026wrs.17
- for <qemu-devel@nongnu.org>; Sat, 03 Oct 2020 00:12:12 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kObuP-0003wR-3H
+ for qemu-devel@nongnu.org; Sat, 03 Oct 2020 03:24:45 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:44353)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kObuN-0002Qb-7V
+ for qemu-devel@nongnu.org; Sat, 03 Oct 2020 03:24:44 -0400
+Received: by mail-lj1-x243.google.com with SMTP id b19so2994941lji.11
+ for <qemu-devel@nongnu.org>; Sat, 03 Oct 2020 00:24:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=HqIvb9jVV7xjQVyWgl0XmEgW+zyP5ypZgsbvUAL+H8o=;
+ b=LjwLIvr5SRegNLgJJnmReDt6FEU253vOGMDx0xHamh5/CJMQKE0eWymrbPvww5RiVW
+ WwNOvc7v23jb7VrGHHbBPak2Au4yzjAM86mwcJT2CDv0KXOGdSv3N0lsxzCca2WqoTJj
+ zVuSDxSqp3yDmAOSGuoy97Uw0EGXKFofXPsmDnocmkNyeeCWG4izZ4QNu26w/p/zWWWX
+ dyezoEJQHY/zdJCtenQouMIkNulxvt6k/TTbG51q+i37LqNgMSwwLdo7GgkP3VX/9swb
+ ZRFprkDsWe6lpbSkU66gHsFm/oG6TtV8z44jocBBCiRLHcpwu9O1N39o9g/Pc9cbVxyp
+ 7v6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=+fRZsKPEy5y6HK3qTRilR4ubF4SoNqZpU3aiClpoKcM=;
- b=Wf+penjJppI+1LArsJG5i1IIN0mt2Kdoc+ZNfUmcboiYE9gJExl6Cc7K4jq3obmezK
- zr87n1g+uKuWJ1G6k98VpYHygn6nfPwPvhqtXU3bUdCFEmrEVXg26WrkxKUFklhfrHLh
- Zy7qm/cAbw8xsC1EL/kH+nQonr+oPbv+OcbSrXNTwXUTFuC6pDGeO5QvLJJ7aznBwsug
- uJsOK1Y3z1RglRT2DwK4nW+zQTWEfzcrTgXdYP193k9eKSEcAwwyls1p2dtD+nx8AL6G
- +pR8wYM8eR7VEquqLBz3rtx/7ihFVu7hJKl0iuGxnWUJMNg0y75V3WatdjBmwdum/ZNW
- Hgtw==
-X-Gm-Message-State: AOAM531rvqyC8WudzfK1iIcS46QrrJh/js5lMxrIuJxYmDeA14FAAv/N
- GjgQJOv1duTvTrw5J3CSGGJHvxSStJHpI2uzdZmMove86y5BU22NXsbWJDjbpjtONtLD1S8ebn6
- eWndlkW8+/HVkEpc=
-X-Received: by 2002:a7b:c0d8:: with SMTP id s24mr1477353wmh.156.1601709130863; 
- Sat, 03 Oct 2020 00:12:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzTR+fWzMPo0IRGWtsuzq11sJjLwdG9zmiBC60d+EtFFPH7nXqFaMha7vReqciITn4hU5vjBQ==
-X-Received: by 2002:a7b:c0d8:: with SMTP id s24mr1477339wmh.156.1601709130642; 
- Sat, 03 Oct 2020 00:12:10 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:47e0:e742:75ba:b84d?
- ([2001:b07:6468:f312:47e0:e742:75ba:b84d])
- by smtp.gmail.com with ESMTPSA id o6sm480909wrm.69.2020.10.03.00.12.08
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 03 Oct 2020 00:12:10 -0700 (PDT)
-Subject: Re: [PULL v2 00/11] capstone + disassembler patch queue
-To: Peter Maydell <peter.maydell@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>
-References: <20201002165127.130369-1-richard.henderson@linaro.org>
- <CAFEAcA_kr5M+TbLDiYVMZbSMgpZE8fN+ae27rgOVkpOj2b9-xQ@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8156e2b2-241c-11b6-cf4b-0da4f59215db@redhat.com>
-Date: Sat, 3 Oct 2020 09:12:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=HqIvb9jVV7xjQVyWgl0XmEgW+zyP5ypZgsbvUAL+H8o=;
+ b=PL0B7igmQyg4R5sJtP8Q02OglwtsZPbBA5Rz3eStO5GltC8wjOp17VAswzE8Jaz/Tz
+ zGuM+HMPo7KNHmYaEBIi6ThJHE4upD98h+3DF4UoZ3Lyjf/4/HQCLa3IEBC2ysgfvZhG
+ RWicoZKJpC+myNDw5bgPVvmGfhgsmoX8/eesYju89RN+HNbHadwYyLNXpGyp/0fnFQye
+ 0DS/B/lmvUaUYpy6qSkdqd0zHu2sK92o1NrlwcAh6KeJCXXsg+bLdHj6Pe6VGKxLDka2
+ NynCm0p/zWXHZA4acG2PAzOjM9I2ucsVc/o/XdVDQ5rpikjGmkcfBARmee6HIlmrg6Cb
+ pLEw==
+X-Gm-Message-State: AOAM532zJnl3wr5SUE0gGSqMzpaQZBSQNcZQclvjTrBH23Sf41s5uB6u
+ bx//oQE1wItXguvzjrCDc3oYZFxbZsuaxXYIxzI=
+X-Google-Smtp-Source: ABdhPJzDT1cikjcH/PunGyhQsdYNhIkPjPKSAgxxebGZSMiayvtUaUGe/oIHcLBwT8b9pryR8bLqHEH2JSoo5AsSus0=
+X-Received: by 2002:a2e:9dc7:: with SMTP id x7mr1822726ljj.447.1601709881468; 
+ Sat, 03 Oct 2020 00:24:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_kr5M+TbLDiYVMZbSMgpZE8fN+ae27rgOVkpOj2b9-xQ@mail.gmail.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/03 02:43:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -23
-X-Spam_score: -2.4
+References: <20201002105239.2444-1-peter.maydell@linaro.org>
+ <b1a6000a-c9a1-43fb-7646-b6ea87797b2e@redhat.com>
+ <CAFEAcA9PbBByROzJ3+pfxycAoP-C5JnmfxQEt5jm6+3A3n2fbw@mail.gmail.com>
+ <df5bd19c-da9d-d3b0-71a9-4deed67450bf@redhat.com>
+ <CAFEAcA9M_BP9mnZHCLM93aYvMxrRHYFELQZ3FvsyH3hNvXtHDA@mail.gmail.com>
+In-Reply-To: <CAFEAcA9M_BP9mnZHCLM93aYvMxrRHYFELQZ3FvsyH3hNvXtHDA@mail.gmail.com>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Sat, 3 Oct 2020 15:24:31 +0800
+Message-ID: <CAE2XoE-RnJ2j732JfxDA2A9O0Bp4KJ2rGG0LTjrDMKvRox-VBg@mail.gmail.com>
+Subject: Re: [PATCH] meson.build: Don't look for libudev for static builds
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: multipart/alternative; boundary="00000000000084adc505b0bf248b"
+Received-SPF: pass client-ip=2a00:1450:4864:20::243;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x243.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.256, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -118,56 +98,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: luoyonggang@gmail.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/10/20 22:37, Peter Maydell wrote:
-> ../src/meson.build:753: WARNING: Trying to compare values of different
-> types (bool, str) using ==.
-> The result of this is undefined and will become a hard error in a
-> future Meson release.
-> Configuring config-host.h using configuration
-> Program scripts/hxtool found: YES
-> Program scripts/shaderinclude.pl found: YES
-> Program scripts/qapi-gen.py found: YES
-> Program scripts/qemu-version.sh found: YES
-> Run-time dependency threads found: YES
-> Program keycodemapdb/tools/keymap-gen found: YES
-> Program scripts/decodetree.py found: YES
+--00000000000084adc505b0bf248b
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This can be rewritten like
+On Fri, Oct 2, 2020 at 9:11 PM Peter Maydell <peter.maydell@linaro.org>
+wrote:
+>
+> On Fri, 2 Oct 2020 at 14:05, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >
+> > On 02/10/20 14:35, Peter Maydell wrote:
+> > >
+> > > It would be better to do the "see if a static library is present"
+> > > test. This isn't too hard to do in configure (compare that
+> > > six line fix to the detection of libgio). Hopefully it is
+> > > not too hard to do in meson ?
+> >
+> > Yes, something like:
+> >
+> > if enable_static
+> >   skeleton =3D 'int main(void) { return 0; }'
+> >   if not cc.links(skeleton, dependencies: libudev)
+> >     if get_option('mpath').enabled()
+> >         error('Cannot link with libudev')
+> >       else
+> >         warning('Cannot link with libudev, disabling')
+> >         libudev =3D not_found
+> >       endif
+> >     endif
+> >   endif
+> > endif
+>
+> This duplicates the information that the thing that depends
+> on libudev is mpath. Can we put this in a wrapper around
+> dependency() so that we could just say something like
+>   libudev =3D compile_checked_dependency('libudev',
+>                        required: get_option('mpath').enabled(),
+>                        static: enable_static)
+>
+Hi Bonzini,
+This looks like a frequently used function, can we upstrem to meson?
 
--if capstone_opt == 'disabled'
--  capstone_opt = false
--elif capstone_opt in ['enabled', 'auto', 'system']
-+if capstone_opt in ['enabled', 'auto', 'system']
-   have_internal = fs.exists('capstone/Makefile')
-   capstone = dependency('capstone', static: enable_static,
-                         required: capstone_opt == 'system' or
-                                   capstone_opt == 'enabled' and not have_internal)
-   if capstone.found()
-     capstone_opt = 'system'
-   elif have_internal
-     capstone_opt = 'internal'
-   else
--    capstone_opt = false
-+    capstone_opt = 'disabled'
-   endif
- endif
- if capstone_opt == 'internal'
 
-...
--summary_info += {'capstone':          capstone_opt}
-+summary_info += {'capstone':          capstone_opt == 'disabled' ? false : capstone_opt}
+> for those dependencies that want to do the "does this compile"
+> check ?
+>
+> thanks
+> -- PMM
+>
 
 
-That said, this also showed a bug which can be fixed like this:
+--
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
 
--  have_internal = fs.exists('capstone/Makefile')
-+  have_internal = fs.exists(meson.current_source_dir() / 'capstone/Makefile')
+--00000000000084adc505b0bf248b
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Paolo
+<div dir=3D"ltr"><br><br>On Fri, Oct 2, 2020 at 9:11 PM Peter Maydell &lt;<=
+a href=3D"mailto:peter.maydell@linaro.org">peter.maydell@linaro.org</a>&gt;=
+ wrote:<br>&gt;<br>&gt; On Fri, 2 Oct 2020 at 14:05, Paolo Bonzini &lt;<a h=
+ref=3D"mailto:pbonzini@redhat.com">pbonzini@redhat.com</a>&gt; wrote:<br>&g=
+t; &gt;<br>&gt; &gt; On 02/10/20 14:35, Peter Maydell wrote:<br>&gt; &gt; &=
+gt;<br>&gt; &gt; &gt; It would be better to do the &quot;see if a static li=
+brary is present&quot;<br>&gt; &gt; &gt; test. This isn&#39;t too hard to d=
+o in configure (compare that<br>&gt; &gt; &gt; six line fix to the detectio=
+n of libgio). Hopefully it is<br>&gt; &gt; &gt; not too hard to do in meson=
+ ?<br>&gt; &gt;<br>&gt; &gt; Yes, something like:<br>&gt; &gt;<br>&gt; &gt;=
+ if enable_static<br>&gt; &gt; =C2=A0 skeleton =3D &#39;int main(void) { re=
+turn 0; }&#39;<br>&gt; &gt; =C2=A0 if not cc.links(skeleton, dependencies: =
+libudev)<br>&gt; &gt; =C2=A0 =C2=A0 if get_option(&#39;mpath&#39;).enabled(=
+)<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 error(&#39;Cannot link with libu=
+dev&#39;)<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 else<br>&gt; &gt; =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 warning(&#39;Cannot link with libudev, disabling&#39;)<br>&g=
+t; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 libudev =3D not_found<br>&gt; &gt; =C2=
+=A0 =C2=A0 =C2=A0 endif<br>&gt; &gt; =C2=A0 =C2=A0 endif<br>&gt; &gt; =C2=
+=A0 endif<br>&gt; &gt; endif<br>&gt;<br>&gt; This duplicates the informatio=
+n that the thing that depends<br>&gt; on libudev is mpath. Can we put this =
+in a wrapper around<br>&gt; dependency() so that we could just say somethin=
+g like<br>&gt; =C2=A0 libudev =3D compile_checked_dependency(&#39;libudev&#=
+39;,<br>&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0required: get_option(&#39;mpath&#39;).enabled(),<br>&g=
+t; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0static: enable_static)<br>&gt;<div>Hi Bonzini,<br><div>This lo=
+oks like a frequently used function, can we upstrem to meson?</div><div>=C2=
+=A0</div><div><br>&gt; for those dependencies that want to do the &quot;doe=
+s this compile&quot;<br>&gt; check ?<br>&gt;<br>&gt; thanks<br>&gt; -- PMM<=
+br>&gt;<br><br><br>--<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=
+=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 s=
+incerely,<br>Yonggang Luo</div></div></div>
 
+--00000000000084adc505b0bf248b--
 
