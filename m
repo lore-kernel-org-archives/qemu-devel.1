@@ -2,72 +2,98 @@ Return-Path: <SRS0=be0Y=DK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A726FC4363D
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 10:05:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D913C4363D
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 10:06:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E7D6206CA
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 10:05:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E7D6206CA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id D7001206CA
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 10:06:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HdJSC7mD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7001206CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOeQ4-0007gA-Fq
-	for qemu-devel@archiver.kernel.org; Sat, 03 Oct 2020 06:05:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40932)
+	id 1kOeQc-00006s-17
+	for qemu-devel@archiver.kernel.org; Sat, 03 Oct 2020 06:06:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41216)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kOeMy-00053z-Pm
- for qemu-devel@nongnu.org; Sat, 03 Oct 2020 06:02:24 -0400
-Received: from us-smtp-delivery-44.mimecast.com ([205.139.111.44]:48596)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kOeMx-0002xr-9s
- for qemu-devel@nongnu.org; Sat, 03 Oct 2020 06:02:24 -0400
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-378-tgmJOLFBPUuJiiTYcs74xg-1; Sat, 03 Oct 2020 06:02:18 -0400
-X-MC-Unique: tgmJOLFBPUuJiiTYcs74xg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5F43185A0C1;
- Sat,  3 Oct 2020 10:02:16 +0000 (UTC)
-Received: from bahia.lan (ovpn-112-192.ams2.redhat.com [10.36.112.192])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C57B110013C4;
- Sat,  3 Oct 2020 10:02:14 +0000 (UTC)
-Subject: [PATCH v3 3/3] vhost: Don't call log_access_ok() when using IOTLB
-From: Greg Kurz <groug@kaod.org>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
-Date: Sat, 03 Oct 2020 12:02:13 +0200
-Message-ID: <160171933385.284610.10189082586063280867.stgit@bahia.lan>
-In-Reply-To: <160171888144.284610.4628526949393013039.stgit@bahia.lan>
-References: <160171888144.284610.4628526949393013039.stgit@bahia.lan>
-User-Agent: StGit/0.21
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kOeOb-0006sh-0S
+ for qemu-devel@nongnu.org; Sat, 03 Oct 2020 06:04:05 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:44775)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kOeOY-00036J-IH
+ for qemu-devel@nongnu.org; Sat, 03 Oct 2020 06:04:04 -0400
+Received: by mail-oi1-x243.google.com with SMTP id y123so170256oie.11
+ for <qemu-devel@nongnu.org>; Sat, 03 Oct 2020 03:04:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=cG+rDiGufIRUZmngOUTf5V0P1gEN2vU/I0BKD4lYt1U=;
+ b=HdJSC7mDbiLifLA6qFPvkUWJX0Cfc+6dls/6n6VrDuxJqkAIlTuLnRTeeccAZCwVEq
+ WbRW1oCg1sZgeVV5YMgz5+gQR/KoLrI1UQvGKPwV5CEN2zoNmXM/Y8qqKPnnFkHjcBTN
+ A4TW+urnAoa+fse2BW7gDWhVtwgWazBcDb8ZCYZVYH9dLDcFbePe6vObYCwKtSNiSffo
+ ZVx77zc/+/D1RqLVe5T+pTqzja9KMwWUvT5fXgS3vmCV7lM2APa/mXGQxCyZhsewcmNV
+ nO80LcoiyKmAzMqM6uqV7upkTS4QCMgJV7xAjrn90AiPr4B0Z5ywj8Iwwl71vldE3Nny
+ owlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=cG+rDiGufIRUZmngOUTf5V0P1gEN2vU/I0BKD4lYt1U=;
+ b=j+/ylA49+CY9sO94ysn66Z0KwRCwmyVdY9wzTXi76MrJYVQ+/Ue8pbD4Mv6farzPhk
+ LWOqdDQdBHq5zLPL5tp8Jq6oba1HvjrVv3dzX24T+2M1H6kvLInyOTz0EKml+YHWTno6
+ nBzFGGE842DWeLPmg9KXNqpOnSPt6wUYVU51WYvSLpOMYGz2lLC5R+3yZtgLWIwjl8H4
+ 7FPNxgfzbHJ81X4JY90sasARxWShizMA+cPFKKVbNCzsIV3aTMy0wNM79mO1Yj9c1UAP
+ QRIG8NccPynn/CJDenvbx2PEuHQ6u+LQdJfrHqvGMfoAulJpZSfmfYnUbjzM8TTLfE9B
+ Tnow==
+X-Gm-Message-State: AOAM5302QUL+7/adZneBMzVe02Okc+wz35DoC58BgxH2nQrD5BVUpREh
+ yushorLcDWpIDkNo6X5CsTmDBQ==
+X-Google-Smtp-Source: ABdhPJwIeDtlbvhrW+UehIVEor+MVHY96lsLif2Knq/6uJbUXaH4H8RsDWtuRdpkBSxiFT5aLe+D9A==
+X-Received: by 2002:aca:ef03:: with SMTP id n3mr3457690oih.67.1601719441143;
+ Sat, 03 Oct 2020 03:04:01 -0700 (PDT)
+Received: from [10.10.73.179] (fixed-187-189-51-144.totalplay.net.
+ [187.189.51.144])
+ by smtp.gmail.com with ESMTPSA id j21sm1162131otq.18.2020.10.03.03.03.59
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 03 Oct 2020 03:04:00 -0700 (PDT)
+Subject: Re: [PATCH v4 12/12] .travis.yml: Add a KVM-only Aarch64 job
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200929224355.1224017-1-philmd@redhat.com>
+ <20200929224355.1224017-13-philmd@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <bd4c4587-de23-7612-48c7-afc8b94ab9fb@linaro.org>
+Date: Sat, 3 Oct 2020 05:03:57 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: kaod.org
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: softfail client-ip=205.139.111.44; envelope-from=groug@kaod.org;
- helo=us-smtp-delivery-44.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/03 06:01:51
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -11
-X-Spam_score: -1.2
-X-Spam_bar: -
-X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_SOFTFAIL=0.665 autolearn=no autolearn_force=no
+In-Reply-To: <20200929224355.1224017-13-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=richard.henderson@linaro.org; helo=mail-oi1-x243.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -23
+X-Spam_score: -2.4
+X-Spam_bar: --
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.256,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,79 +106,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kvm@vger.kernel.org, netdev@vger.kernel.org, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>, virtualization@lists.linux-foundation.org,
- linux-kernel@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org, qemu-arm@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When the IOTLB device is enabled, the log_guest_addr that is passed by
-userspace to the VHOST_SET_VRING_ADDR ioctl, and which is then written
-to vq->log_addr, is a GIOVA. All writes to this address are translated
-by log_user() to writes to an HVA, and then ultimately logged through
-the corresponding GPAs in log_write_hva(). No logging will ever occur
-with vq->log_addr in this case. It is thus wrong to pass vq->log_addr
-and log_guest_addr to log_access_vq() which assumes they are actual
-GPAs.
+On 9/29/20 5:43 PM, Philippe Mathieu-Daudé wrote:
+> Add a job to build QEMU on Aarch64 with TCG disabled, so
+> this configuration won't bitrot over time.
+> 
+> We explicitly modify default-configs/aarch64-softmmu.mak to
+> only select the 'virt' and 'SBSA-REF' machines.
 
-Introduce a new vq_log_used_access_ok() helper that only checks accesses
-to the log for the used structure when there isn't an IOTLB device around.
+I really wish we didn't have to do this.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- drivers/vhost/vhost.c |   23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+Can't we e.g. *not* list all of the arm boards explicitly in default-configs,
+but use the Kconfig "default y if ..."?
 
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index 9d2c225fb518..9ad45e1d27f0 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -1370,6 +1370,20 @@ bool vhost_log_access_ok(struct vhost_dev *dev)
- }
- EXPORT_SYMBOL_GPL(vhost_log_access_ok);
-=20
-+static bool vq_log_used_access_ok(struct vhost_virtqueue *vq,
-+=09=09=09=09  void __user *log_base,
-+=09=09=09=09  bool log_used,
-+=09=09=09=09  u64 log_addr)
-+{
-+=09/* If an IOTLB device is present, log_addr is a GIOVA that
-+=09 * will never be logged by log_used(). */
-+=09if (vq->iotlb)
-+=09=09return true;
-+
-+=09return !log_used || log_access_ok(log_base, log_addr,
-+=09=09=09=09=09  vhost_get_used_size(vq, vq->num));
-+}
-+
- /* Verify access for write logging. */
- /* Caller should have vq mutex and device mutex */
- static bool vq_log_access_ok(struct vhost_virtqueue *vq,
-@@ -1377,8 +1391,7 @@ static bool vq_log_access_ok(struct vhost_virtqueue *=
-vq,
- {
- =09return vq_memory_access_ok(log_base, vq->umem,
- =09=09=09=09   vhost_has_feature(vq, VHOST_F_LOG_ALL)) &&
--=09=09(!vq->log_used || log_access_ok(log_base, vq->log_addr,
--=09=09=09=09  vhost_get_used_size(vq, vq->num)));
-+=09=09vq_log_used_access_ok(vq, log_base, vq->log_used, vq->log_addr);
- }
-=20
- /* Can we start vq? */
-@@ -1517,9 +1530,9 @@ static long vhost_vring_set_addr(struct vhost_dev *d,
- =09=09=09return -EINVAL;
-=20
- =09=09/* Also validate log access for used ring if enabled. */
--=09=09if ((a.flags & (0x1 << VHOST_VRING_F_LOG)) &&
--=09=09=09!log_access_ok(vq->log_base, a.log_guest_addr,
--=09=09=09=09       vhost_get_used_size(vq, vq->num)))
-+=09=09if (!vq_log_used_access_ok(vq, vq->log_base,
-+=09=09=09=09a.flags & (0x1 << VHOST_VRING_F_LOG),
-+=09=09=09=09a.log_guest_addr))
- =09=09=09return -EINVAL;
- =09}
-=20
+Seems like that would let --disable-tcg work as expected.
+One should still be able to create custom configs with e.g.
+CONFIG_EXYNOS4=n or CONIFIG_ARM_V4=n, correct?
 
 
+r~
 
