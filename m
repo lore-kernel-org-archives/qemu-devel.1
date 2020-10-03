@@ -2,74 +2,113 @@ Return-Path: <SRS0=be0Y=DK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40A8CC4363D
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 08:39:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CC0DC4363D
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 08:43:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A17F0206DB
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 08:39:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A17F0206DB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id B8786206DB
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Oct 2020 08:43:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fwnfCZN2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8786206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kOd4z-0004rH-GQ
-	for qemu-devel@archiver.kernel.org; Sat, 03 Oct 2020 04:39:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57000)
+	id 1kOd8M-0005u3-KZ
+	for qemu-devel@archiver.kernel.org; Sat, 03 Oct 2020 04:43:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57494)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kOd4K-0004SY-3n
- for qemu-devel@nongnu.org; Sat, 03 Oct 2020 04:39:04 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:52575)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kOd4H-0002dK-GN
- for qemu-devel@nongnu.org; Sat, 03 Oct 2020 04:39:03 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.108.1.76])
- by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 4BA3C6197B53;
- Sat,  3 Oct 2020 10:38:50 +0200 (CEST)
-Received: from kaod.org (37.59.142.103) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Sat, 3 Oct 2020
- 10:38:49 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-103G005e6880fe4-ca63-4cea-b120-8e938ba0c296,
- 3345FDB4B62F999A850A9D5BF875A94D2EA020F3) smtp.auth=groug@kaod.org
-Date: Sat, 3 Oct 2020 10:38:48 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Jason Wang <jasowang@redhat.com>
-Subject: Re: [PATCH v2 2/2] vhost: Don't call log_access_ok() when using IOTLB
-Message-ID: <20201003103848.766c7442@bahia.lan>
-In-Reply-To: <d9dae1ed-49a4-909a-6840-ae46a4ffdffc@redhat.com>
-References: <160139701999.162128.2399875915342200263.stgit@bahia.lan>
- <160139704424.162128.7839027287942194310.stgit@bahia.lan>
- <d9dae1ed-49a4-909a-6840-ae46a4ffdffc@redhat.com>
-X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kOd7Y-0005TX-SX
+ for qemu-devel@nongnu.org; Sat, 03 Oct 2020 04:42:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58203)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kOd7W-00032J-CX
+ for qemu-devel@nongnu.org; Sat, 03 Oct 2020 04:42:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601714539;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=S0xpqNSz4nR6zaOIrWqbrOYhSZ4Jof6dJwL27Mhk994=;
+ b=fwnfCZN2uOfJhYDqENY61mrjnrmYmoUfjDLDr6HLP7sxqkRHMBSxRbWI1vj/3NHBX1HBC+
+ /22qE2T2xhstbVLZeKO321bi6m9o2j3jLpgoZwbbOwMQ11uYSggeMM8ABltDitYnnKiZE7
+ dzGL5Qy1ULsKJBjZCnPmuhZxbEXC/ec=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-102-GOziJyg8MGCxiYm0g0JY7Q-1; Sat, 03 Oct 2020 04:42:14 -0400
+X-MC-Unique: GOziJyg8MGCxiYm0g0JY7Q-1
+Received: by mail-wr1-f70.google.com with SMTP id s8so1577323wrb.15
+ for <qemu-devel@nongnu.org>; Sat, 03 Oct 2020 01:42:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=S0xpqNSz4nR6zaOIrWqbrOYhSZ4Jof6dJwL27Mhk994=;
+ b=FKBJQvfqLu/iqk3wEv9HWw95qroc72MTuFOW2fXfkGeWJ3jO3AbS6DKT+gZEiN+urT
+ XCcLh5nkYyX2uMOQGMjbaF/VMfwPVJWKQz7F5/lUd57jXDTcBa93xZ78EDhI3VPwLCa0
+ KE3ZyPehZzdi3wHvOmmhzHOsXxau1ymD/T/F1SwUGcGvwS6mzVcftbWmrnumy/0P4c1i
+ gtxREjO160YmKz9lxyuuq6vTHY1FUhiT4Bs5uv+02iahLhkW98R27HSZPZksmqHGISrs
+ OR0Zdu3fdFy7Trspd2hvfTGI9zI83028DTOia2dWpaxdOFNan0TV1U+2xGoj1UEuDbxU
+ gUcA==
+X-Gm-Message-State: AOAM533XPIKT0KevqDvncSQhV2ZyhDW31xmrWt74iqK7dcuiHWvh0OL2
+ dkdIlxzHDUObEeZSZAqLOCQAwKDH5M9q6ZPAFxxTcpE7ZnfbrCHxmSqmSlnLSyD+2C8Hvag2iSx
+ fDtAI52MdLkQlYPg=
+X-Received: by 2002:adf:93e5:: with SMTP id 92mr7013537wrp.31.1601714533490;
+ Sat, 03 Oct 2020 01:42:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxrRPU3hOX01ntmaQSZ5IbgEzb06+x487DnrYKVXRHnEmoNE4UilX7kIqwMqHiDZPlDphSp3Q==
+X-Received: by 2002:adf:93e5:: with SMTP id 92mr7013528wrp.31.1601714533291;
+ Sat, 03 Oct 2020 01:42:13 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.170.5])
+ by smtp.gmail.com with ESMTPSA id h17sm4861827wro.27.2020.10.03.01.42.12
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 03 Oct 2020 01:42:12 -0700 (PDT)
+Subject: Re: [PATCH] meson.build: Don't look for libudev for static builds
+To: luoyonggang@gmail.com
+References: <20201002105239.2444-1-peter.maydell@linaro.org>
+ <b1a6000a-c9a1-43fb-7646-b6ea87797b2e@redhat.com>
+ <CAFEAcA9PbBByROzJ3+pfxycAoP-C5JnmfxQEt5jm6+3A3n2fbw@mail.gmail.com>
+ <df5bd19c-da9d-d3b0-71a9-4deed67450bf@redhat.com>
+ <CAFEAcA9M_BP9mnZHCLM93aYvMxrRHYFELQZ3FvsyH3hNvXtHDA@mail.gmail.com>
+ <CAE2XoE-RnJ2j732JfxDA2A9O0Bp4KJ2rGG0LTjrDMKvRox-VBg@mail.gmail.com>
+ <d6417044-324c-0bec-a05c-1142dcdc6003@redhat.com>
+ <CAE2XoE-Z0E1TSn1pHfBK=7vcGL9qkxVwwxMOg3KhqaMMdJidiA@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3cf8a363-bdfa-2e31-995d-52a0fd1dfd42@redhat.com>
+Date: Sat, 3 Oct 2020 10:42:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [37.59.142.103]
-X-ClientProxiedBy: DAG1EX2.mxp5.local (172.16.2.2) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: 7085d870-f704-48ed-abc4-e9fdc74ba25a
-X-Ovh-Tracer-Id: 4078572412553632108
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrfeekgddthecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgihesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepveelhfdtudffhfeiveehhfelgeellefgteffteekudegheejfffghefhfeeuudffnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopegurghvihgusehgihgsshhonhdrughrohhpsggvrghrrdhiugdrrghu
-Received-SPF: pass client-ip=178.32.125.2; envelope-from=groug@kaod.org;
- helo=smtpout1.mo529.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/03 04:38:51
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+In-Reply-To: <CAE2XoE-Z0E1TSn1pHfBK=7vcGL9qkxVwwxMOg3KhqaMMdJidiA@mail.gmail.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/03 02:43:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -23
+X-Spam_score: -2.4
+X-Spam_bar: --
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.256, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -83,108 +122,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, netdev@vger.kernel.org,
- Laurent Vivier <laurent@vivier.eu>, virtualization@lists.linux-foundation.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 3 Oct 2020 09:58:59 +0800
-Jason Wang <jasowang@redhat.com> wrote:
+On 03/10/20 10:28, 罗勇刚(Yonggang Luo) wrote:
+>> Yes, I think adding a "links" argument to dependency (similar to
+>> find_library's has_headers argument) makes sense.  That would be written
+>>
+>>     dependency('libudev',
+>>                required: get_option('mpath').enabled(),
+>>                static: enable_static,
+>>                links: skeleton)
+> make sense, may also need extra cflags and link flags.
 
->=20
-> On 2020/9/30 =E4=B8=8A=E5=8D=8812:30, Greg Kurz wrote:
-> > When the IOTLB device is enabled, the log_guest_addr that is passed by
-> > userspace to the VHOST_SET_VRING_ADDR ioctl, and which is then written
-> > to vq->log_addr, is a GIOVA. All writes to this address are translated
-> > by log_user() to writes to an HVA, and then ultimately logged through
-> > the corresponding GPAs in log_write_hva(). No logging will ever occur
-> > with vq->log_addr in this case. It is thus wrong to pass vq->log_addr
-> > and log_guest_addr to log_access_vq() which assumes they are actual
-> > GPAs.
-> >
-> > Introduce a new vq_log_used_access_ok() helper that only checks accesses
-> > to the log for the used structure when there isn't an IOTLB device arou=
-nd.
-> >
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >   drivers/vhost/vhost.c |   23 +++++++++++++++++++----
-> >   1 file changed, 19 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > index c3b49975dc28..5996e32fa818 100644
-> > --- a/drivers/vhost/vhost.c
-> > +++ b/drivers/vhost/vhost.c
-> > @@ -1370,6 +1370,20 @@ bool vhost_log_access_ok(struct vhost_dev *dev)
-> >   }
-> >   EXPORT_SYMBOL_GPL(vhost_log_access_ok);
-> >  =20
-> > +static bool vq_log_used_access_ok(struct vhost_virtqueue *vq,
-> > +				  void __user *log_base,
-> > +				  bool log_used,
-> > +				  u64 log_addr,
-> > +				  size_t log_size)
-> > +{
-> > +	/* If an IOTLB device is present, log_addr is a GIOVA that
-> > +	 * will never be logged by log_used(). */
-> > +	if (vq->iotlb)
-> > +		return true;
-> > +
-> > +	return !log_used || log_access_ok(log_base, log_addr, log_size);
-> > +}
-> > +
-> >   /* Verify access for write logging. */
-> >   /* Caller should have vq mutex and device mutex */
-> >   static bool vq_log_access_ok(struct vhost_virtqueue *vq,
-> > @@ -1377,8 +1391,8 @@ static bool vq_log_access_ok(struct vhost_virtque=
-ue *vq,
-> >   {
-> >   	return vq_memory_access_ok(log_base, vq->umem,
-> >   				   vhost_has_feature(vq, VHOST_F_LOG_ALL)) &&
-> > -		(!vq->log_used || log_access_ok(log_base, vq->log_addr,
-> > -				  vhost_get_used_size(vq, vq->num)));
-> > +		vq_log_used_access_ok(vq, log_base, vq->log_used, vq->log_addr,
-> > +				      vhost_get_used_size(vq, vq->num));
-> >   }
-> >  =20
-> >   /* Can we start vq? */
-> > @@ -1517,8 +1531,9 @@ static long vhost_vring_set_addr(struct vhost_dev=
- *d,
-> >   			return -EINVAL;
-> >  =20
-> >   		/* Also validate log access for used ring if enabled. */
-> > -		if ((a.flags & (0x1 << VHOST_VRING_F_LOG)) &&
-> > -			!log_access_ok(vq->log_base, a.log_guest_addr,
-> > +		if (!vq_log_used_access_ok(vq, vq->log_base,
-> > +				a.flags & (0x1 << VHOST_VRING_F_LOG),
-> > +				a.log_guest_addr,
-> >   				sizeof *vq->used +
-> >   				vq->num * sizeof *vq->used->ring))
->=20
->=20
-> It looks to me that we should use vhost_get_used_size() which takes=20
-> event into account.
->=20
-> Any reason that we can't reuse vq_log_access_ok() here?
->=20
+They would be provided by the dependency, in general.
 
-No reason indeed but I'll fix this in a preliminary patch, and
-send a v2 shortly.
-
-Cheers,
-
---
-Greg
-
-> Thanks
->=20
->=20
-> >   			return -EINVAL;
-> >
-> >
->=20
+Paolo
 
 
