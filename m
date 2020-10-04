@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9349DC4363C
-	for <qemu-devel@archiver.kernel.org>; Sun,  4 Oct 2020 13:02:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E050C4363C
+	for <qemu-devel@archiver.kernel.org>; Sun,  4 Oct 2020 13:37:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1547206C1
-	for <qemu-devel@archiver.kernel.org>; Sun,  4 Oct 2020 13:02:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1547206C1
+	by mail.kernel.org (Postfix) with ESMTPS id 49C7520735
+	for <qemu-devel@archiver.kernel.org>; Sun,  4 Oct 2020 13:36:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49C7520735
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45846 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kP3eM-0002lw-U7
-	for qemu-devel@archiver.kernel.org; Sun, 04 Oct 2020 09:02:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33424)
+	id 1kP4CA-0007tK-Bz
+	for qemu-devel@archiver.kernel.org; Sun, 04 Oct 2020 09:36:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36986)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kP3dJ-0002IS-4q
- for qemu-devel@nongnu.org; Sun, 04 Oct 2020 09:00:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40490)
+ id 1kP4At-0007Is-Eu
+ for qemu-devel@nongnu.org; Sun, 04 Oct 2020 09:35:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42756)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kP3dG-0006o3-7B
- for qemu-devel@nongnu.org; Sun, 04 Oct 2020 09:00:56 -0400
+ id 1kP4Aq-0001V4-R0
+ for qemu-devel@nongnu.org; Sun, 04 Oct 2020 09:35:39 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kP3dD-00057F-7E
- for <qemu-devel@nongnu.org>; Sun, 04 Oct 2020 13:00:51 +0000
+ id 1kP4Ao-0007Iv-VN
+ for <qemu-devel@nongnu.org>; Sun, 04 Oct 2020 13:35:34 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 340EC2E80DB
- for <qemu-devel@nongnu.org>; Sun,  4 Oct 2020 13:00:51 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id EC1872E80DB
+ for <qemu-devel@nongnu.org>; Sun,  4 Oct 2020 13:35:34 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 04 Oct 2020 12:54:45 -0000
+Date: Sun, 04 Oct 2020 13:27:41 -0000
 From: Sergiy K <1897481@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -53,7 +53,7 @@ X-Launchpad-Bug-Commenters: alex-l-williamson sergey-kukunin
 X-Launchpad-Bug-Reporter: Sergiy K (sergey-kukunin)
 X-Launchpad-Bug-Modifier: Sergiy K (sergey-kukunin)
 References: <160123953126.1246.10707501292033522741.malonedeb@gac.canonical.com>
-Message-Id: <160181608539.25256.14439629467458347299.malone@chaenomeles.canonical.com>
+Message-Id: <160181806124.5178.5407820070805170576.malone@soybean.canonical.com>
 Subject: [Bug 1897481] Re: qemu crashes with VGA pass-through, e-GPU,
  nvidia 1060
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -61,7 +61,7 @@ X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="d50d1e75c500726862802414f880ee3e3bb759bf"; Instance="production"
-X-Launchpad-Hash: 01241e7f8dcab812adea349da236704eb172f163
+X-Launchpad-Hash: 7a6088697fe82128b956ed5cae2010304d885abb
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/04 09:00:51
@@ -89,40 +89,116 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Can confirm that it does not crash after applying that patch. I've added
-the `fprintf` statement there:
+I recorded both lspci -vvvv and lspci -xxxx for the following
+connections:
 
-        if (vdev->bars[i].size) {
-          vfio_bar_quirk_setup(vdev, i);
-        } else {
-            fprintf(stderr, "%04x:%04x bars for %d are empty\n", vdev->vend=
-or_id, vdev->device_id, i);
-        }
+  - hotplug: when GPU is connected after the host was loaded
+  - fresh: when GPU is connected before the host was started
 
-and the output is:
+The main difference is the following:
 
-    10de:1c03 bars for 0 are empty
-    10de:1c03 bars for 1 are empty
-    10de:1c03 bars for 2 are empty
-    10de:1c03 bars for 3 are empty
-    10de:1c03 bars for 4 are empty
-    10de:10f1 bars for 1 are empty
-    10de:10f1 bars for 2 are empty
-    10de:10f1 bars for 3 are empty
-    10de:10f1 bars for 4 are empty
-    10de:10f1 bars for 5 are empty
+1c1
+< # hotplug
+---
+> # fresh
+6c6
+< 	Control: I/O+ Mem- BusMaster- SpecCycle- MemWINV- VGASnoop- ParErr- Step=
+ping- SERR- FastB2B- DisINTx-
+---
+> 	Control: I/O- Mem+ BusMaster- SpecCycle- MemWINV- VGASnoop- ParErr- Step=
+ping- SERR- FastB2B- DisINTx-
+8c8
+< 	Interrupt: pin A routed to IRQ 18
+---
+> 	Interrupt: pin A routed to IRQ 255
+10,13c10,14
+< 	Region 1: Memory at <unassigned> (64-bit, prefetchable) [disabled]
+< 	Region 3: Memory at <unassigned> (64-bit, prefetchable) [disabled]
+< 	Region 5: I/O ports at 4000 [size=3D128]
+< 	Expansion ROM at f1400000 [virtual] [disabled] [size=3D512K]
+---
+> 	Region 0: Memory at f0000000 (32-bit, non-prefetchable) [size=3D16M]
+> 	Region 1: Memory at c0000000 (64-bit, prefetchable) [size=3D256M]
+> 	Region 3: Memory at d0000000 (64-bit, prefetchable) [size=3D32M]
+> 	Region 5: I/O ports at 4000 [disabled] [size=3D128]
+> 	Expansion ROM at f1080000 [disabled] [size=3D512K]
+30c31
+< 		LnkSta:	Speed 5GT/s (downgraded), Width x1 (downgraded)
+---
+> 		LnkSta:	Speed 2.5GT/s (downgraded), Width x1 (downgraded)
+35a37
+> 			 AtomicOpsCap: 32bit- 64bit- 128bitCAS-
+79c81
+< 	Interrupt: pin B routed to IRQ 19
+---
+> 	Interrupt: pin B routed to IRQ 255
+81c83
+< 	Region 0: Memory at f1480000 (32-bit, non-prefetchable) [size=3D16K]
+---
+> 	Region 0: Memory at f1000000 (32-bit, non-prefetchable) [size=3D16K]
+98c100
+< 		LnkSta:	Speed 5GT/s (downgraded), Width x1 (downgraded)
+---
+> 		LnkSta:	Speed 2.5GT/s (downgraded), Width x1 (downgraded)
+124,125c126,127
 
-What's interesting that 5 bar is available for VGA and 0 bar is
-available for the sound. Don't know if it gives some valuable
-information.
+I can tell, that hotplug connects as 5GT/s and fresh - 2.5GT/s. And
+there is an obvious difference between Regions.
 
-I understand that it's completely not a fault of QEMU, since the
-underlying layer gives wrong information. Any insight about potential
-problematic places? Is it completely a hardware issue (laptop's BIOS,
-nvidia) or something can be done in software? What's the next place to
-send a bugreport?
+The difference between lspci -xxxx but I don't know how to interpret the
+result:
 
-Thank you
+124,125c126,127
+< 00: de 10 03 1c 01 00 10 00 a1 00 00 03 00 00 80 00
+< 10: 00 00 00 00 0c 00 00 00 00 00 00 00 0c 00 00 00
+---
+> 00: de 10 03 1c 02 00 10 00 a1 00 00 03 10 00 80 00
+> 10: 00 00 00 f0 0c 00 00 c0 00 00 00 00 0c 00 00 d0
+127c129
+< 30: 00 00 00 00 60 00 00 00 00 00 00 00 00 01 00 00
+---
+> 30: 00 00 f8 ff 60 00 00 00 00 00 00 00 ff 01 00 00
+132c134
+< 80: 10 29 09 00 03 3d 45 00 43 01 12 10 00 00 00 00
+---
+> 80: 10 29 09 00 03 3d 45 00 43 01 11 10 00 00 00 00
+198c200
+< 4a0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 78
+---
+> 4a0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ff
+221c223
+< 610: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+---
+> 610: 01 10 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+257c259
+< 850: 00 00 00 00 78 00 00 00 ff 3f 00 00 00 00 00 00
+---
+> 850: 00 00 00 00 af 04 00 00 ff 3f 00 00 00 00 00 00
+382,383c384,385
+< 00: de 10 f1 10 02 00 10 00 a1 00 03 04 00 00 80 00
+< 10: 00 00 48 f1 00 00 00 00 00 00 00 00 00 00 00 00
+---
+> 00: de 10 f1 10 02 00 10 00 a1 00 03 04 10 00 80 00
+> 10: 00 00 00 f1 00 00 00 00 00 00 00 00 00 00 00 00
+385c387
+< 30: 00 00 00 00 60 00 00 00 00 00 00 00 00 02 00 00
+---
+> 30: 00 00 00 00 60 00 00 00 00 00 00 00 ff 02 00 00
+390c392
+< 80: 10 29 09 00 03 3d 45 00 43 01 12 10 00 00 00 00
+---
+> 80: 10 29 09 00 03 3d 45 00 43 01 11 10 00 00 00 00
+456,457c458,459
+< 4a0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 78
+< 4b0: 78 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+---
+> 4a0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ff
+> 4b0: af 04 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+
+
+** Attachment added: "lspci-hotplug"
+   https://bugs.launchpad.net/qemu/+bug/1897481/+attachment/5417476/+files/=
+lspci-hotplug
 
 -- =
 
