@@ -4,74 +4,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 311E9C4363C
-	for <qemu-devel@archiver.kernel.org>; Sun,  4 Oct 2020 18:14:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A73AC4363C
+	for <qemu-devel@archiver.kernel.org>; Sun,  4 Oct 2020 18:17:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B678920796
-	for <qemu-devel@archiver.kernel.org>; Sun,  4 Oct 2020 18:14:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 809D8205F4
+	for <qemu-devel@archiver.kernel.org>; Sun,  4 Oct 2020 18:17:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Eku+8e4t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B678920796
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qZfIU79y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 809D8205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kP8Wy-0006fO-SC
-	for qemu-devel@archiver.kernel.org; Sun, 04 Oct 2020 14:14:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46058)
+	id 1kP8ZD-0000VD-LQ
+	for qemu-devel@archiver.kernel.org; Sun, 04 Oct 2020 14:17:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45974)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kP8Nn-0002gI-FS
- for qemu-devel@nongnu.org; Sun, 04 Oct 2020 14:05:16 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36915)
+ id 1kP8Nf-0002TJ-GX
+ for qemu-devel@nongnu.org; Sun, 04 Oct 2020 14:05:07 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37407)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kP8Nl-0008LU-Vp
- for qemu-devel@nongnu.org; Sun, 04 Oct 2020 14:05:15 -0400
-Received: by mail-wr1-x441.google.com with SMTP id h7so3465206wre.4
- for <qemu-devel@nongnu.org>; Sun, 04 Oct 2020 11:05:13 -0700 (PDT)
+ id 1kP8Nd-0008K6-R9
+ for qemu-devel@nongnu.org; Sun, 04 Oct 2020 14:05:07 -0400
+Received: by mail-wm1-x342.google.com with SMTP id j136so6555593wmj.2
+ for <qemu-devel@nongnu.org>; Sun, 04 Oct 2020 11:05:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=lPkditD6hs2q2H3smeJcXzWyzKVAfF5M4jBe898tJg4=;
- b=Eku+8e4tq0+nytpbDBDQ9b7yEh3gkPpTDc+vr6kUqSrDv5xkapo5ayQauZfRUqXvPC
- hu4LN9+RbEU/C17k16rR36LdKyDEIEyl0OePTikLDx4M5m3E4g0NPfVQFO8rQkubh06+
- B19bLxuhY19VG5MXbtuBrbsgkTEFumGrHcqliODUm5s7N3C8WVEmK5MVHVrV/ifXmSEL
- Xk4heAMLo1idzfO3ZGLHTLaw81w76ShAUC9qn6rOZKld3AvkBvcdcmll1qs57Blbmmss
- T3/e3NVwc4BuotQyEvprOA/6rMg7Qp3DZJ8KDKGrcWrWGv1exs6E7TSL90D44BIm38Mo
- SiUw==
+ bh=eSsQ1tRNEnDrBinG2AD7nicmckt9bWMjE+UJknFeEd0=;
+ b=qZfIU79y4dRuXEvguEqm1mv2IYG/qUyusblGAAh6OJHY5G1KrpxTTNUNau3v+0mDA3
+ X0mafqerUWV9CdxX6M+Vo4SdG/6jZaniQkGgr2CYQLO4y0a4b/ee8CTdBd1OYrRwAq2B
+ Jfhdb6THQZjCF0CzhIhjF624lxNzdzP/nzJMmXj0AwPEHnyjbE3yeDZZ1ethp+ttjz+l
+ zl30EGl/htc27hzJsCPdIED8A2FDwxIGmNG5lBO18DYGldrbvL2DJsQibSpiOPkYpRY0
+ C+iE/QBO9D4tnez2N8oLy0swvvBarYDQIiOYAlEjNuof7ntDwZmNpX/kAk1c1x6e6XSt
+ wUTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=lPkditD6hs2q2H3smeJcXzWyzKVAfF5M4jBe898tJg4=;
- b=Sqb4t1rMubXSLI6BkjFp2T+fobk7z90H51EyYft9AY1VDAA04b5tCnDs+HKEIDHIjH
- XQjuDFhBFlh1dzRmXGl0H7FRlWI7/Frf9FLEmqByVbQVqhxpSPJr67ZA9jKxAxzXc/q0
- VAolV2G+WT0EHARFAYJHJ0tfmdIkliRe9Ja1ife29QM043c1xThYHOS1XmtzKgWTlZiq
- 19WHAwKhuByJRJznPOowVCWLEKiBgtbM4jCzGRrkGBflza4W6Jtfv8CBKqOwqKxjy8AJ
- fvfigVGmLYtV1JFyAriQ/B/jE+QxlzmHUoSmu6MoAsfC6BzTqMac7hPXRQ8oGeuO919x
- h5RQ==
-X-Gm-Message-State: AOAM5305FPbmwrHPZ7wqMJMri/i4yUQlW+y42RpNvacBievNvhQ3G6OY
- Ixohb+zjTBiAhbHbOQSFQS2qJO+1yoyjbg==
-X-Google-Smtp-Source: ABdhPJwdU4t1sWKY+IxJG/tbXeWFwBimgWQu2Wj1l+Y4OBwyr2IoltFf4wFBnoyFwqMJ8hyrw/dspg==
-X-Received: by 2002:adf:f2c1:: with SMTP id d1mr6913430wrp.179.1601834712588; 
- Sun, 04 Oct 2020 11:05:12 -0700 (PDT)
+ bh=eSsQ1tRNEnDrBinG2AD7nicmckt9bWMjE+UJknFeEd0=;
+ b=CP8ZgM14ImLxNOAVbtg7oWEx2tzrGPor3b4JBVzvtOcUVS/AGTGgPJwskKNYNlt7nX
+ iXKiYC86FkZ/QGLYtWupj2GvECnEaXL8fkybWK7lo4/gHzLNQlGKRVT2rgOqAIpxX7s7
+ YQIu80zlwxlFC/im4/DG9NQCSOETJG6VSpgRb9cV9doUoEwDi9RH9OMpr8krHJYfAvfw
+ 5LIAzgiKceNfQujpjnSoIz8x10BDl5fZuVq9Gr/VOPt6SHUGu4znNdJm1nO08oY5elR6
+ Q+w9EZfnKKFL9WSgjQbY4QzrOrHUvYreOyBLGEoSamzVugy7ix1sYSxCgTeaISvZMR6D
+ 5BEg==
+X-Gm-Message-State: AOAM531qE2QD3nmfzvb6FaoRQGayoPjooDAKivVx7uKZqjoLZea3gS4J
+ SkidAjUzqFO/j0AxChs2xeMl51wuBiVCew==
+X-Google-Smtp-Source: ABdhPJzLzYvKZs/Tx3ZPjbY8bcnfH+tZhLpOqhi9ICzuCYQSgNzD5MWis3CbSH1Rrtr8Nnn5ZEkbmw==
+X-Received: by 2002:a7b:c305:: with SMTP id k5mr13416670wmj.102.1601834704310; 
+ Sun, 04 Oct 2020 11:05:04 -0700 (PDT)
 Received: from localhost.localdomain
  (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id j10sm9593202wrn.2.2020.10.04.11.05.11
+ by smtp.gmail.com with ESMTPSA id j10sm9593202wrn.2.2020.10.04.11.05.03
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 04 Oct 2020 11:05:12 -0700 (PDT)
+ Sun, 04 Oct 2020 11:05:03 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH 19/21] contrib/gitdm: Add Yadro to the domain map
-Date: Sun,  4 Oct 2020 20:04:41 +0200
-Message-Id: <20201004180443.2035359-20-f4bug@amsat.org>
+Subject: [RFC PATCH 13/21] contrib/gitdm: Add more entries to the Red Hat
+ domain
+Date: Sun,  4 Oct 2020 20:04:35 +0200
+Message-Id: <20201004180443.2035359-14-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201004180443.2035359-1-f4bug@amsat.org>
 References: <20201004180443.2035359-1-f4bug@amsat.org>
@@ -79,8 +80,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -103,36 +104,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Kononenko <i.kononenko@yadro.com>,
- Roman Bolshakov <r.bolshakov@yadro.com>,
+Cc: Nir Soffer <nirsof@gmail.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Nir Soffer <nsoffer@redhat.com>, Frediano Ziglio <freddy77@gmail.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ Frediano Ziglio <fziglio@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There is a number of contributions from this domain,
-add its own entry to the gitdm domain map.
-
-Cc: Igor Kononenko <i.kononenko@yadro.com>
-Cc: Roman Bolshakov <r.bolshakov@yadro.com>
+Cc: Frediano Ziglio <freddy77@gmail.com>
+Cc: Frediano Ziglio <fziglio@redhat.com>
+Cc: Nir Soffer <nirsof@gmail.com>
+Cc: Nir Soffer <nsoffer@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
-One Reviewed-by/Ack-by from someone from this domain
-should be sufficient to get this patch merged.
+To the developers Cc'ed: If you agree with your entry, please
+reply with a Reviewed-by/Acked-by tag. If you disagree or doesn't
+care, please either reply with Nack-by or ignore this patch.
+I'll repost in 2 weeks as formal patch (not RFC) with only the
+entries acked by their author.
 ---
- contrib/gitdm/domain-map | 1 +
- 1 file changed, 1 insertion(+)
+ contrib/gitdm/group-map-redhat | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/contrib/gitdm/domain-map b/contrib/gitdm/domain-map
-index 6b3a2c3b4e..7170ddea7a 100644
---- a/contrib/gitdm/domain-map
-+++ b/contrib/gitdm/domain-map
-@@ -41,3 +41,4 @@ wavecomp.com    Wavecomp
- wdc.com         Western Digital
- windriver.com   Wind River
- xilinx.com      Xilinx
-+yadro.com       YADRO
+diff --git a/contrib/gitdm/group-map-redhat b/contrib/gitdm/group-map-redhat
+index d15db2d35e..0419e82795 100644
+--- a/contrib/gitdm/group-map-redhat
++++ b/contrib/gitdm/group-map-redhat
+@@ -6,3 +6,5 @@ david@gibson.dropbear.id.au
+ laurent@vivier.eu
+ pjp@fedoraproject.org
+ armbru@pond.sub.org
++freddy77@gmail.com
++nirsof@gmail.com
 -- 
 2.26.2
 
