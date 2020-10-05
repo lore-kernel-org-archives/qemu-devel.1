@@ -7,82 +7,83 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D4C9C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 10:18:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19F76C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 10:45:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B505B2078D
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 10:18:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F2552078E
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 10:45:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IdMiWVSE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B505B2078D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DGnhejbv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F2552078E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35020 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45766 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPNZS-000814-L5
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 06:18:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33242)
+	id 1kPNzs-0005jk-2E
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 06:45:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kPNYT-0007ai-Vo
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 06:17:18 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40757)
+ id 1kPNz2-0005IX-LA
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 06:44:44 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51622)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kPNYR-0005lN-Po
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 06:17:17 -0400
-Received: by mail-wr1-x442.google.com with SMTP id j2so8889602wrx.7
- for <qemu-devel@nongnu.org>; Mon, 05 Oct 2020 03:17:15 -0700 (PDT)
+ id 1kPNz0-0000iC-5d
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 06:44:44 -0400
+Received: by mail-wm1-x341.google.com with SMTP id d81so3046986wmc.1
+ for <qemu-devel@nongnu.org>; Mon, 05 Oct 2020 03:44:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
- bh=tvRXN5ZknoSqya6EqJrlT0TR7wJD8tO9Gl726VYBWjs=;
- b=IdMiWVSE+D5j74s+9GXxhWZ8I24kYEPqDnpoOg9kav4IUtaoxI3M4dkgtZb2O5a38m
- cCycbtCinls+mMHJqRRkuP0I9ua6gKGf3Z/Ezt9wrK7DlY63WIRVA3fkXydMB4QJVsx1
- I0ZQTkjSjVF49n2feowRk/Qwkp1v8Nk/OA9oFAoQ1x9iuygLnIaqGzaYC+WnNCD7afPj
- Sb3S230KomcZlJTu/B7+b+vW1XbjoGFgMf9gk57gTW2IJSO0bjvhVXQKYJeBXT8dLXQb
- JebiTtRqMR+Hwrm8Lv0OGPRMVsbP8225BLv/5BK7BCUomsG0LHPekSdCZmtbY2kFvUkp
- ZwJw==
+ bh=asFF4xuOqruWnJ465GAFmTJhIZEOYwLh2RHPcQCiDYA=;
+ b=DGnhejbvEvjpbq74Alp8iury6BvyINqoEud+Y/WsAXo2n717Qa9olPNR7HFq3xiJsm
+ m8U11CdQER0XgNaE1ae2cJwvuvqbQw23eBSX18amgoXABujkr1HhnqSFoKlF7FnV8xIl
+ 5ZavsqW6ZADOfJxFZXBXvlvsb4zjtw58dDWpkfOStytp5xms6uP7jRL8FUnCwIf0WLx4
+ dUrPDYI9M2cCdXWdLUGz6VaaZXADiV1bKiUSRZIjpoWv6Tqq0Tik2KzfJgxrIVC01Sfu
+ jyWTSZpPOeICujD0U6ZtitQyAMBqt323aGfR3u4iZ+g8vaEXaa1S90UhDMA8FAER2Tl0
+ 5ZBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=tvRXN5ZknoSqya6EqJrlT0TR7wJD8tO9Gl726VYBWjs=;
- b=DkJ2D/4KD7gB4vzFuJSk+RJaUW2qHfE45rfj9ECaGijaBsXcw0H+/1llAgH86gPlOh
- 76d7lId0LHCmyVUATwDQdOwQN6P8+GeDthLAky6VXvXSJmZyS6U0AvAYoTIpPer6AR4D
- a5GYa6PBLjoS/LUBWZPmq247M6cfxxNjlWGdmLfVBA/HBc3iZ760ODVOSG9UI8l57x7C
- fptv8LDtgSWn5CLS940YVAZNOhSgqDCkY32UPWQYK4oTZKF5ivuikctlkjShGZPUeFr1
- wflfl38q+umlweFgo2pvvgNH3Dmwh/d/lKRH4eiruThqMBp9BK3ROwGXqPbxqGdCVr/W
- HFLA==
-X-Gm-Message-State: AOAM5321X7Qerz1ZUS7n217rsf//IZur6MWpWXGYjvfbx5cllIn5JfAc
- UNEcmodD+2eqGDyUecpiWQLvQw==
-X-Google-Smtp-Source: ABdhPJzPhftKoijMSDnyEKTxGsm3A4tFSwJphEOi7zDY+JM7mGZ7LUqWd/fO2RmgOllV/7/WpOCgrA==
-X-Received: by 2002:adf:db4d:: with SMTP id f13mr17004086wrj.155.1601893033892; 
- Mon, 05 Oct 2020 03:17:13 -0700 (PDT)
+ bh=asFF4xuOqruWnJ465GAFmTJhIZEOYwLh2RHPcQCiDYA=;
+ b=CRoS1fhHsTyjCggp6iX/+gy3+cc0GMmk19VPp18RIyRDL22t11SOl9M0wuaw++d0w8
+ kOshRr2j4JQtV+7Q9A28g4qvjEVZBWfgtpFFKYfvVA0U/u146CSR79YteESrsDCJPEDv
+ cSaC9ZjW6NR6ZVAsBR5p0qNXBInEY0tOtN05C2aVA/DO9xRboQBmwwA840TSLF6Llni/
+ wLvrpDr+7hR+QpdCtEBfUkNnIMWl/+rzGMSwKrVIUtdmaOrCFcFuyPYlI+lYLehPr3Cp
+ THh3R0xi98J8jR6Z7HSd/1azClxYkOzhLjfJk1XpE8ZC7Ht3gvC2LN8R0wIpQpT0xQm6
+ mWGw==
+X-Gm-Message-State: AOAM532do6Aiyi8uR/biX+9UktfaVO9NR+uG7dPSvpimzKh7oWpfyKfa
+ tafYDp59CaBvSmUJai9Ox3wKcg==
+X-Google-Smtp-Source: ABdhPJy5nXQ1hu5BX2IiFz5zSUT3PiAPHprTtFhZUO2QHY/IinMcJmxQsNyRp2LAvU0VkD7/76ER6Q==
+X-Received: by 2002:a1c:9894:: with SMTP id
+ a142mr15772873wme.167.1601894680577; 
+ Mon, 05 Oct 2020 03:44:40 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a82sm1412008wmc.44.2020.10.05.03.17.12
+ by smtp.gmail.com with ESMTPSA id c1sm4314607wru.49.2020.10.05.03.44.39
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 05 Oct 2020 03:17:12 -0700 (PDT)
+ Mon, 05 Oct 2020 03:44:39 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 4C4471FF7E;
- Mon,  5 Oct 2020 11:17:12 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id C78831FF7E;
+ Mon,  5 Oct 2020 11:44:38 +0100 (BST)
 References: <20201001163429.1348-1-luoyonggang@gmail.com>
- <20201001163429.1348-4-luoyonggang@gmail.com>
+ <20201001163429.1348-5-luoyonggang@gmail.com>
 User-agent: mu4e 1.5.5; emacs 28.0.50
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: Yonggang Luo <luoyonggang@gmail.com>
-Subject: Re: [PATCH v3 3/6] cirrus: Enable plugin in cirrus for windows
-In-reply-to: <20201001163429.1348-4-luoyonggang@gmail.com>
-Date: Mon, 05 Oct 2020 11:17:12 +0100
-Message-ID: <87wo052d07.fsf@linaro.org>
+Subject: Re: [PATCH v3 4/6] plugin: define QEMU_PLUGIN_API_IMPLEMENTATION first
+In-reply-to: <20201001163429.1348-5-luoyonggang@gmail.com>
+Date: Mon, 05 Oct 2020 11:44:38 +0100
+Message-ID: <87sgat2bqh.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -113,33 +114,68 @@ Sender: "Qemu-devel"
 
 Yonggang Luo <luoyonggang@gmail.com> writes:
 
-> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-
-If the build doesn't work until your later fixes then this should be the
-last patch in the series.=20
-
-> ---
->  .cirrus.yml | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> This is used to distinguish from the qemu and plugin in
+> header qemu-plugin.h
 >
-> diff --git a/.cirrus.yml b/.cirrus.yml
-> index 86ea33926a..5363142373 100644
-> --- a/.cirrus.yml
-> +++ b/.cirrus.yml
-> @@ -104,7 +104,8 @@ windows_msys2_task:
->      - C:\tools\msys64\usr\bin\bash.exe -lc "mkdir build"
->      - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && ../configure
->        --python=3Dpython3 --ninja=3Dninja
-> -      --target-list-exclude=3Di386-softmmu,arm-softmmu,ppc-softmmu,mips-=
-softmmu"
-> +      --target-list-exclude=3Di386-softmmu,arm-softmmu,ppc-softmmu,mips-=
-softmmu
-> +      --enable-plugins"
->      - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && make -j$NUMBER_O=
-F_PROCESSORS"
->    test_script:
->      - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && make V=3D1 check"
+> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+> ---
+>  plugins/api.c  | 1 +
+>  plugins/core.c | 1 +
+>  2 files changed, 2 insertions(+)
+>
+> diff --git a/plugins/api.c b/plugins/api.c
+> index bbdc5a4eb4..f16922ca8b 100644
+> --- a/plugins/api.c
+> +++ b/plugins/api.c
+> @@ -35,6 +35,7 @@
+>   */
+>=20=20
+>  #include "qemu/osdep.h"
+> +#define QEMU_PLUGIN_API_IMPLEMENTATION
+>  #include "qemu/plugin.h"
 
+This doesn't do anything in this patch. You should split the special
+handling in the plugin header and combine it in this patch. Also I'm not
+quite sure of the logic you are trying to achieve later on:
+
+  #if !defined(QEMU_PLUGIN_API_IMPLEMENTATION)
+  #if defined(QEMU_PLUGIN_IMPLEMENTATION)
+  #define QEMU_PLUGIN_EXTERN
+  #else
+  #define QEMU_PLUGIN_EXTERN extern
+  #endif
+
+It seems to me you could get away with only one symbol - ideally just
+defined in plugins/api.c so you don't need to churn the plugins with
+changes, e.g.
+
+  #ifdef QEMU_PLUGIN_API_IMPLEMENTATION
+  #define QEMU_PLUGIN_EXTERN
+  #else
+  #define QEMU_PLUGIN_EXTERN extern
+  #endif
+
+But I'd still like to have a better answer as to why we need the extern?
+Is this a limitation of the mingw compiler or some windows special?
+
+>  #include "cpu.h"
+>  #include "sysemu/sysemu.h"
+> diff --git a/plugins/core.c b/plugins/core.c
+> index 51bfc94787..7a79ea4179 100644
+> --- a/plugins/core.c
+> +++ b/plugins/core.c
+> @@ -12,6 +12,7 @@
+>   * SPDX-License-Identifier: GPL-2.0-or-later
+>   */
+>  #include "qemu/osdep.h"
+> +#define QEMU_PLUGIN_API_IMPLEMENTATION
+>  #include "qemu/error-report.h"
+>  #include "qemu/config-file.h"
+>  #include "qapi/error.h"
+
+I don't think we include qemu/plugin.h from this file although it does
+raise the question of what happens when other parts of QEMU include the
+internal qemu/plugins.h header.
 
 --=20
 Alex Benn=C3=A9e
