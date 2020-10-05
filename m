@@ -4,76 +4,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3DACC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:16:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D428C47095
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:16:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D286A20756
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:16:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0FC0B2075A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:16:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OOI0Cp4V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D286A20756
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DbWYt1TS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FC0B2075A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPXqe-0008N1-Qn
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 17:16:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43274)
+	id 1kPXqf-0008Qs-T8
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 17:16:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43390)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kPXkX-0008HG-Uq
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44762)
+ id 1kPXko-0000CE-5c
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40556)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kPXkW-0007S4-3P
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:25 -0400
+ id 1kPXkm-0007Ul-2M
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601932222;
+ s=mimecast20190719; t=1601932239;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=7iQEv3zt3p82NBPGH5arb7e91tJI4oUtytLb1EkHJy4=;
- b=OOI0Cp4VFL/kRAYH3U+whtser6XXfufkIXvyZxj5SycY14AOmn+DaxJci1HpRlVKEdeCB1
- 7E4T8ECBYnDIA3wboHGTbdD2ShMru2EBodSFfX/L3cSKqF5ewSSxtyxfHoVrT1WIpAKtwY
- 4owowVXyhiEbofo07n226S09Xcs1elI=
+ bh=V/DIhyhvEtrkwNuf6rQ6jEyrj/vxKuw1OcuQxCV9B4o=;
+ b=DbWYt1TS4BYyXQHu5tFoZT6a7fYGJCysdj0rwhd/da/owFOuImpaFhGsMm7hK6ci2gAd4t
+ 0cBS1vvqIJJIaQ708HjSz2Ej7BALe2fquMV+Vj6YJCfOihxm5eyKTmflyKG+csLa1dPnte
+ rbqoccffoMLskSUOu4XHKTeToAkqUAI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-519-HHsBiQw6M_qaHk8d8fq6gA-1; Mon, 05 Oct 2020 17:10:20 -0400
-X-MC-Unique: HHsBiQw6M_qaHk8d8fq6gA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-423-K4gQbGmtPwa98O2of_imcA-1; Mon, 05 Oct 2020 17:10:37 -0400
+X-MC-Unique: K4gQbGmtPwa98O2of_imcA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C0CFB1015C9D;
- Mon,  5 Oct 2020 21:10:18 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 42270925C27;
+ Mon,  5 Oct 2020 21:10:36 +0000 (UTC)
 Received: from localhost (ovpn-119-102.rdu2.redhat.com [10.10.119.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7C8305C1BD;
- Mon,  5 Oct 2020 21:10:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D6D0578800;
+ Mon,  5 Oct 2020 21:10:35 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 10/21] qom: Improve error message displayed with missing object
- properties
-Date: Mon,  5 Oct 2020 17:09:49 -0400
-Message-Id: <20201005211000.710404-11-ehabkost@redhat.com>
+Subject: [PULL 18/21] kernel-doc: Handle function typedefs without asterisks
+Date: Mon,  5 Oct 2020 17:09:57 -0400
+Message-Id: <20201005211000.710404-19-ehabkost@redhat.com>
 In-Reply-To: <20201005211000.710404-1-ehabkost@redhat.com>
 References: <20201005211000.710404-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 02:11:31
@@ -97,44 +96,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Li Qiang <liq3ea@gmail.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Example of typedef that was not parsed by kernel-doc:
 
-Instead of only displaying the property missing, also display
-the object name. This help developer to quickly figure out the
-mistake without opening a debugger.
+  typedef void (ObjectUnparent)(Object *obj);
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20200920155340.401482-1-f4bug@amsat.org>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <20201003024123.193840-3-ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- qom/object.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ scripts/kernel-doc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/qom/object.c b/qom/object.c
-index c335dce7e4a..10653552334 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -1291,7 +1291,8 @@ ObjectProperty *object_property_find_err(Object *obj, const char *name,
- {
-     ObjectProperty *prop = object_property_find(obj, name);
-     if (!prop) {
--        error_setg(errp, "Property '.%s' not found", name);
-+        error_setg(errp, "Property '%s.%s' not found",
-+                   object_get_typename(obj), name);
-     }
-     return prop;
- }
+diff --git a/scripts/kernel-doc b/scripts/kernel-doc
+index 57a4a72970f..57b911ff174 100755
+--- a/scripts/kernel-doc
++++ b/scripts/kernel-doc
+@@ -1318,7 +1318,7 @@ sub dump_typedef($$) {
+     $x =~ s@/\*.*?\*/@@gos;	# strip comments.
+ 
+     # Parse function prototypes
+-    if ($x =~ /typedef\s+(\w+\s*\**)\s*\(\*\s*(\w\S+)\s*\)\s*\((.*)\);/ ||
++    if ($x =~ /typedef\s+(\w+\s*\**)\s*\(\*?\s*(\w\S+)\s*\)\s*\((.*)\);/ ||
+ 	$x =~ /typedef\s+(\w+\s*\**)\s*(\w\S+)\s*\s*\((.*)\);/) {
+ 
+ 	# Function typedefs
 -- 
 2.26.2
 
