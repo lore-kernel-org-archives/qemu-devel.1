@@ -2,89 +2,89 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 205B4C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 06:28:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AD02C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 06:28:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44B4B20674
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 06:28:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A64E020674
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 06:28:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="mTpG1qxS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44B4B20674
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Gftfeaw3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A64E020674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPJyw-00058Y-R4
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 02:28:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41416)
+	id 1kPJzA-0005IY-L5
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 02:28:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41422)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1kPJwj-0003gd-El; Mon, 05 Oct 2020 02:26:05 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51694)
+ id 1kPJwm-0003h5-0g; Mon, 05 Oct 2020 02:26:13 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37554)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1kPJwg-0001PN-6i; Mon, 05 Oct 2020 02:26:05 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+ id 1kPJwg-0001Ps-Jo; Mon, 05 Oct 2020 02:26:07 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 09562JZh105612; Mon, 5 Oct 2020 02:25:46 -0400
+ 09562fhc146133; Mon, 5 Oct 2020 02:25:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
  h=subject : to : cc :
- references : from : message-id : date : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=MLXHirc8IXVdPkDfx2nnfZ4Brynj+hsjVpkyEDJpwVA=;
- b=mTpG1qxSpWcneR0WZSF39s8sSB6UM1fnE+mHpZAx/4doUy0kOdT2Ygl4yhX6VYlyFO+G
- jyh9tywBshHbydXKJx+/gpa4euHfaCDoZt70P6//dereEUtRqc7u1AyRSAMC9V0lDMrB
- LsiTkUUAxEO0hW6Xv5exLs3y1xXH5p8kwbyHkg7vWdEo8D1XaUaKeWWbJc6+FBujoTdk
- tI01NnhsOhg2jbmQXHp/OqyBWobnl3QBGaeJnhUYKJmgTNKtVZHzjcKEFl05noU4cs+H
- MRk1KvV3AMQWVPToSFMt6LK71ULsUHJmtbgLuM3O7v8ArCdA1s6N2+dqLvSjyAhv6Zy4 Eg== 
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=KKgENuj99aDUaf4qyUcOrpFzt+zRHV1FIWm7BoCqbw0=;
+ b=Gftfeaw3oVbe2vAJRe+llKJgcetPpPMfQ6aKopJg5YALGFY9vMO01qhTnEVqqOclcT5r
+ 9rT8yWYiRTIq7aQ5xzcx6J3edt1dbWoJjwukUrHJMt9muE+9q0NIVM0rFx9nHnuOh34H
+ /qIM76jf8DCRApSl0fycvqdFlXkXcWVQYjH7Ry/J9IBCHxIR9tpUp8Tm28MKBVDb9Pgw
+ +5jv2//6ay2D/xiC1WcQi8SZanoi6E+Ql0+hjvg+LZhEEir1HtPkb4Mhin7wHPWyXRyX
+ OTQo5EiBbvy/R95F43cLnTHHgdAy8UNhcHWskHYyewobmV0zcKf4l2P2FVm3PIQ0unrb 1w== 
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33ywv0ggae-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33yu0p471v-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 05 Oct 2020 02:25:46 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0956JfVv155367;
- Mon, 5 Oct 2020 02:25:46 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com
- [149.81.74.108])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33ywv0gga2-1
+ Mon, 05 Oct 2020 02:25:54 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09563WDH150500;
+ Mon, 5 Oct 2020 02:25:53 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com
+ [149.81.74.107])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33yu0p4714-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 05 Oct 2020 02:25:46 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
- by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0956CK1l017151;
- Mon, 5 Oct 2020 06:25:44 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com
- (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
- by ppma05fra.de.ibm.com with ESMTP id 33xgx80xk6-1
+ Mon, 05 Oct 2020 02:25:53 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+ by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0956DDut005997;
+ Mon, 5 Oct 2020 06:25:51 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com
+ (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+ by ppma03fra.de.ibm.com with ESMTP id 33xgx7rxag-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 05 Oct 2020 06:25:44 +0000
+ Mon, 05 Oct 2020 06:25:51 +0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com
  (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 0956PgTX30867812
+ by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 0956PmeL21561676
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 5 Oct 2020 06:25:42 GMT
+ Mon, 5 Oct 2020 06:25:48 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0EEBFA405C;
- Mon,  5 Oct 2020 06:25:42 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 9D838A405F;
+ Mon,  5 Oct 2020 06:25:48 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A3874A4054;
- Mon,  5 Oct 2020 06:25:41 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 3697CA405C;
+ Mon,  5 Oct 2020 06:25:48 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.0.84])
  by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon,  5 Oct 2020 06:25:41 +0000 (GMT)
-Subject: Re: [PATCH 4/4] virtiofsd: avoid false positive compiler warning
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+ Mon,  5 Oct 2020 06:25:48 +0000 (GMT)
+Subject: Re: [PATCH 2/4] nbd: silence maybe-uninitialized warnings
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 References: <20200930155859.303148-1-borntraeger@de.ibm.com>
- <20200930155859.303148-5-borntraeger@de.ibm.com>
- <20200930162757.GD2783@work-vm>
+ <20200930155859.303148-3-borntraeger@de.ibm.com>
+ <a6cf1fcd-cf09-08ed-774c-30f716b73cfa@redhat.com>
 From: Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -129,29 +129,28 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Message-ID: <f342d7ea-4a4b-0943-3d49-d178bb34d513@de.ibm.com>
-Date: Mon, 5 Oct 2020 08:25:41 +0200
+Message-ID: <e1d1d60d-7df1-5152-a4a6-7f121b5f76f5@de.ibm.com>
+Date: Mon, 5 Oct 2020 08:25:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.12.0
-In-Reply-To: <20200930162757.GD2783@work-vm>
+MIME-Version: 1.0
+In-Reply-To: <a6cf1fcd-cf09-08ed-774c-30f716b73cfa@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-TM-AS-GCONF: 00
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
-MIME-Version: 1.0
+X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
  definitions=2020-10-05_04:2020-10-02,
  2020-10-05 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- impostorscore=0 phishscore=0 spamscore=0 adultscore=0 clxscore=1015
- mlxlogscore=999 suspectscore=0 mlxscore=0 bulkscore=0 malwarescore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ bulkscore=0 malwarescore=0
+ priorityscore=1501 lowpriorityscore=0 mlxscore=0 adultscore=0
+ mlxlogscore=999 suspectscore=0 phishscore=0 spamscore=0 clxscore=1011
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2006250000 definitions=main-2010050044
-Received-SPF: pass client-ip=148.163.158.5;
- envelope-from=borntraeger@de.ibm.com; helo=mx0b-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 02:25:58
+Received-SPF: pass client-ip=148.163.156.1;
+ envelope-from=borntraeger@de.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 02:25:59
 X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
 X-Spam_score_int: -26
 X-Spam_score: -2.7
@@ -173,37 +172,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ qemu-block@nongnu.org, qemu-trivial@nongnu.org,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
  Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 30.09.20 18:27, Dr. David Alan Gilbert wrote:
-> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
->> make: *** [Makefile:121: config-host.mak] Error 1
->> [cborntra@m83lp52 qemu]$ make -C build/
->> make: Entering directory '/home/cborntra/REPOS/qemu/build'
->> Generating qemu-version.h with a meson_exe.py custom command
->> Compiling C object tools/virtiofsd/virtiofsd.p/passthrough_ll.c.o
->> ../tools/virtiofsd/passthrough_ll.c: In function ‘lo_setattr’:
->> ../tools/virtiofsd/passthrough_ll.c:702:19: error: ‘fd’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
->>   702 |             res = futimens(fd, tv);
->>       |                   ^~~~~~~~~~~~~~~~
+On 30.09.20 19:19, Eric Blake wrote:
+> On 9/30/20 10:58 AM, Christian Borntraeger wrote:
+>> gcc 10 from Fedora 32 gives me:
+>>
+>> Compiling C object libblock.fa.p/nbd_server.c.o
+>> ../nbd/server.c: In function ‘nbd_co_client_start’:
+>> ../nbd/server.c:625:14: error: ‘namelen’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
+>>   625 |         rc = nbd_negotiate_send_info(client, NBD_INFO_NAME, namelen, name,
+>>       |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>   626 |                                      errp);
+>>       |                                      ~~~~~
+>> ../nbd/server.c:564:14: note: ‘namelen’ was declared here
+>>   564 |     uint32_t namelen;
+>>       |              ^~~~~~~
 >> cc1: all warnings being treated as errors
->> make: *** [Makefile.ninja:1438: tools/virtiofsd/virtiofsd.p/passthrough_ll.c.o] Error 1
->> make: Leaving directory '/home/cborntra/REPOS/
 >>
->> as far as I can see this can not happen. Let us silence the warning by
->> giving fd a default value.
->>
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> As I cannot see how this can happen, let uns silence the warning.
 > 
-> Yeh, I'd posted https://www.mail-archive.com/qemu-devel@nongnu.org/msg738783.html
-> but not yet merged it; only difference is I'd used -1 since it seemd
-> safer to use -1 even if it couldn't happen :-)
+> gcc is smart enough to see that nbd_opt_read_name(... &namelen), which
+> is the only use of namelen between declaration and use, does not always
+> initialize namelen; but fails to see we also exit this function early in
+> the same conditions when nbd_opt_read_name left namelen uninit.  The
+> workaround is fine.
+> 
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> 
+> I'm happy for this to go in through the trivial tree, but I'll also
+> queue it on my NBD tree if that is ready first.
 
-Agreed, lets go with your patch.
+Just in case cc qemu-trival. 
 
