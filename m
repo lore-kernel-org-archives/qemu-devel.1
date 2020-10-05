@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84C4CC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:20:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E5D5C4727D
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:20:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCB3F208C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:20:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A58F5208C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:20:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W4f7YBfO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCB3F208C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C7IQ4N43"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A58F5208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43510 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPXu4-0003VP-T3
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 17:20:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43304)
+	id 1kPXu5-0003X6-Fk
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 17:20:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43424)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kPXkb-0008OJ-E5
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30936)
+ id 1kPXkr-0000G9-7C
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51304)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kPXkZ-0007Sa-5S
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:28 -0400
+ id 1kPXkn-0007VB-Nx
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601932226;
+ s=mimecast20190719; t=1601932241;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=W+yWMzr7we7iUkfgz+kLkjKlVO4iF5CR5vCYlbGAjXM=;
- b=W4f7YBfOAkZL1pwBGmjK7kbbGB3e2q7oK5KA6Ye7TGMMbgSDn6P/Mx+JxstlS26FfBAh2S
- y2cwdcSR0jE5phLfw8Zlc1wUbgLqyyK9ECrGkLcXspZpviN5jfRmWYVf599o9rMRPs2VBy
- H7yccILMO6thfrxkJNl8WAaYG561Ick=
+ bh=g6mjwRssty9u8VVE9TYy5V6D+c+F3D0e09kwIT5voW4=;
+ b=C7IQ4N43+mmmEsZaRKPuXgH2DsrQkOlBNF5AjocGAWaN61k8No4SJFUWOE3WRZD7tmUfKO
+ 30y1q3F5i5k6Xm7CezzBZNouU3Xg1d8khaKGSPGDVg5xNwPH1zzbFw7OGdIys9KDkKY3aQ
+ x719QrSiENrcN4QcZad1tgPlTyajlDg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-60-6n565AwYO3mNHhBpxhkKoA-1; Mon, 05 Oct 2020 17:10:24 -0400
-X-MC-Unique: 6n565AwYO3mNHhBpxhkKoA-1
+ us-mta-498-rhZiGEXEPIKZWgkOsOKOWw-1; Mon, 05 Oct 2020 17:10:39 -0400
+X-MC-Unique: rhZiGEXEPIKZWgkOsOKOWw-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 625071DDED;
- Mon,  5 Oct 2020 21:10:23 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B244925C47;
+ Mon,  5 Oct 2020 21:10:38 +0000 (UTC)
 Received: from localhost (ovpn-119-102.rdu2.redhat.com [10.10.119.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ECE3160BFA;
- Mon,  5 Oct 2020 21:10:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CD77160C84;
+ Mon,  5 Oct 2020 21:10:37 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 13/21] docs/devel/qom: Fix indentation of code blocks
-Date: Mon,  5 Oct 2020 17:09:52 -0400
-Message-Id: <20201005211000.710404-14-ehabkost@redhat.com>
+Subject: [PULL 20/21] memory: Explicitly tag doc comments for structs
+Date: Mon,  5 Oct 2020 17:09:59 -0400
+Message-Id: <20201005211000.710404-21-ehabkost@redhat.com>
 In-Reply-To: <20201005211000.710404-1-ehabkost@redhat.com>
 References: <20201005211000.710404-1-ehabkost@redhat.com>
 MIME-Version: 1.0
@@ -103,139 +103,48 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some code blocks had one extra space, fix that.
+This will allow us to remove the QEMU-specific
+$decl_type='type name' hack from the kernel-doc script.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20201003025424.199291-4-ehabkost@redhat.com>
+Message-Id: <20201003024123.193840-5-ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- docs/devel/qom.rst | 76 +++++++++++++++++++++++-----------------------
- 1 file changed, 38 insertions(+), 38 deletions(-)
+ include/exec/memory.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/docs/devel/qom.rst b/docs/devel/qom.rst
-index c4857d95c8e..a47e1b9a239 100644
---- a/docs/devel/qom.rst
-+++ b/docs/devel/qom.rst
-@@ -284,28 +284,28 @@ in the header file:
- .. code-block:: c
-    :caption: Declaring a simple type
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index dee09851622..622207bde12 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -443,7 +443,7 @@ struct IOMMUMemoryRegion {
+     QLIST_FOREACH((n), &(mr)->iommu_notify, node)
  
--    OBJECT_DECLARE_SIMPLE_TYPE(MyDevice, my_device, MY_DEVICE, DEVICE)
-+   OBJECT_DECLARE_SIMPLE_TYPE(MyDevice, my_device, MY_DEVICE, DEVICE)
+ /**
+- * MemoryListener: callbacks structure for updates to the physical memory map
++ * struct MemoryListener: callbacks structure for updates to the physical memory map
+  *
+  * Allows a component to adjust to changes in the guest-visible memory map.
+  * Use with memory_listener_register() and memory_listener_unregister().
+@@ -681,7 +681,7 @@ struct MemoryListener {
+ };
  
- This is equivalent to the following:
- 
- .. code-block:: c
-    :caption: Expansion from declaring a simple type
- 
--    typedef struct MyDevice MyDevice;
--    typedef struct MyDeviceClass MyDeviceClass;
-+   typedef struct MyDevice MyDevice;
-+   typedef struct MyDeviceClass MyDeviceClass;
- 
--    G_DEFINE_AUTOPTR_CLEANUP_FUNC(MyDeviceClass, object_unref)
-+   G_DEFINE_AUTOPTR_CLEANUP_FUNC(MyDeviceClass, object_unref)
- 
--    #define MY_DEVICE_GET_CLASS(void *obj) \
--            OBJECT_GET_CLASS(MyDeviceClass, obj, TYPE_MY_DEVICE)
--    #define MY_DEVICE_CLASS(void *klass) \
--            OBJECT_CLASS_CHECK(MyDeviceClass, klass, TYPE_MY_DEVICE)
--    #define MY_DEVICE(void *obj)
--            OBJECT_CHECK(MyDevice, obj, TYPE_MY_DEVICE)
-+   #define MY_DEVICE_GET_CLASS(void *obj) \
-+           OBJECT_GET_CLASS(MyDeviceClass, obj, TYPE_MY_DEVICE)
-+   #define MY_DEVICE_CLASS(void *klass) \
-+           OBJECT_CLASS_CHECK(MyDeviceClass, klass, TYPE_MY_DEVICE)
-+   #define MY_DEVICE(void *obj)
-+           OBJECT_CHECK(MyDevice, obj, TYPE_MY_DEVICE)
- 
--    struct MyDeviceClass {
--        DeviceClass parent_class;
--    };
-+   struct MyDeviceClass {
-+       DeviceClass parent_class;
-+   };
- 
- The 'struct MyDevice' needs to be declared separately.
- If the type requires virtual functions to be declared in the class
-@@ -319,33 +319,33 @@ In the simple case the OBJECT_DEFINE_TYPE macro is suitable:
- .. code-block:: c
-    :caption: Defining a simple type
- 
--    OBJECT_DEFINE_TYPE(MyDevice, my_device, MY_DEVICE, DEVICE)
-+   OBJECT_DEFINE_TYPE(MyDevice, my_device, MY_DEVICE, DEVICE)
- 
- This is equivalent to the following:
- 
- .. code-block:: c
-    :caption: Expansion from defining a simple type
- 
--    static void my_device_finalize(Object *obj);
--    static void my_device_class_init(ObjectClass *oc, void *data);
--    static void my_device_init(Object *obj);
--
--    static const TypeInfo my_device_info = {
--        .parent = TYPE_DEVICE,
--        .name = TYPE_MY_DEVICE,
--        .instance_size = sizeof(MyDevice),
--        .instance_init = my_device_init,
--        .instance_finalize = my_device_finalize,
--        .class_size = sizeof(MyDeviceClass),
--        .class_init = my_device_class_init,
--    };
--
--    static void
--    my_device_register_types(void)
--    {
--        type_register_static(&my_device_info);
--    }
--    type_init(my_device_register_types);
-+   static void my_device_finalize(Object *obj);
-+   static void my_device_class_init(ObjectClass *oc, void *data);
-+   static void my_device_init(Object *obj);
-+
-+   static const TypeInfo my_device_info = {
-+       .parent = TYPE_DEVICE,
-+       .name = TYPE_MY_DEVICE,
-+       .instance_size = sizeof(MyDevice),
-+       .instance_init = my_device_init,
-+       .instance_finalize = my_device_finalize,
-+       .class_size = sizeof(MyDeviceClass),
-+       .class_init = my_device_class_init,
-+   };
-+
-+   static void
-+   my_device_register_types(void)
-+   {
-+       type_register_static(&my_device_info);
-+   }
-+   type_init(my_device_register_types);
- 
- This is sufficient to get the type registered with the type
- system, and the three standard methods now need to be implemented
-@@ -358,9 +358,9 @@ This accepts an array of interface type names.
- .. code-block:: c
-    :caption: Defining a simple type implementing interfaces
- 
--    OBJECT_DEFINE_TYPE_WITH_INTERFACES(MyDevice, my_device,
--                                       MY_DEVICE, DEVICE,
--                                       { TYPE_USER_CREATABLE }, { NULL })
-+   OBJECT_DEFINE_TYPE_WITH_INTERFACES(MyDevice, my_device,
-+                                      MY_DEVICE, DEVICE,
-+                                      { TYPE_USER_CREATABLE }, { NULL })
- 
- If the type is not intended to be instantiated, then then
- the OBJECT_DEFINE_ABSTRACT_TYPE() macro can be used instead:
-@@ -368,7 +368,7 @@ the OBJECT_DEFINE_ABSTRACT_TYPE() macro can be used instead:
- .. code-block:: c
-    :caption: Defining a simple abstract type
- 
--    OBJECT_DEFINE_ABSTRACT_TYPE(MyDevice, my_device, MY_DEVICE, DEVICE)
-+   OBJECT_DEFINE_ABSTRACT_TYPE(MyDevice, my_device, MY_DEVICE, DEVICE)
+ /**
+- * AddressSpace: describes a mapping of addresses to #MemoryRegion objects
++ * struct AddressSpace: describes a mapping of addresses to #MemoryRegion objects
+  */
+ struct AddressSpace {
+     /* private: */
+@@ -721,7 +721,7 @@ static inline FlatView *address_space_to_flatview(AddressSpace *as)
  
  
- 
+ /**
+- * MemoryRegionSection: describes a fragment of a #MemoryRegion
++ * struct MemoryRegionSection: describes a fragment of a #MemoryRegion
+  *
+  * @mr: the region, or %NULL if empty
+  * @fv: the flat view of the address space the region is mapped in
 -- 
 2.26.2
 
