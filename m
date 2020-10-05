@@ -2,90 +2,92 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1870CC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 15:36:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 080E9C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 15:43:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D417206DD
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 15:36:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 67BC220578
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 15:43:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IKEM1Emw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D417206DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ux0fscyI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67BC220578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPSXE-0000Ks-EJ
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 11:36:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52850)
+	id 1kPSdq-0004HK-DT
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 11:43:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55414)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kPSVp-0007M0-Qt
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 11:34:54 -0400
-Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:41313)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kPSVn-0006LW-HZ
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 11:34:53 -0400
-Received: by mail-lf1-x144.google.com with SMTP id d24so7430382lfa.8
- for <qemu-devel@nongnu.org>; Mon, 05 Oct 2020 08:34:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=p68fqP+9WSCreV6RpdsXdjr/pCjbIEjQTqsKHjz8klM=;
- b=IKEM1EmwYPwfx0BoKhCCnPn6QQ22zGR1rHqs2Nn58HhNZ2EU+SaZTfhl/ez0J1jiMx
- UiE8EdvKv9/DibJ4wbyb1h6JyStwQ0bYeCKrcJGZNFyrunaJYiEbebdQ2RSMSIvP3nuQ
- VXr+/cesQduuSdw6QUL4yXtIElxBdSoXFTr5cpFs6v7QsbqATs5gIITo+Jvyo96M3Cou
- CTX3JCChdEI7lalGR7IX2oRSOpG8C0132Yn+qy7XSecF53r+BQJ7bsnPBWK2tKWmkMqy
- lNet+XLmb4x869PD/QUxJOT19M+OGAjxLhG7ON7GVyM2YORYQBwVRp+6fKQ1Gdb7K4lK
- HGNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=p68fqP+9WSCreV6RpdsXdjr/pCjbIEjQTqsKHjz8klM=;
- b=CnuopbAvOzerB/vfesAjny+izbN9mdJTrj1hfcqHdzh4u94rAju365ZYaBG0Y2R6y8
- S2YK3UWuqdxGKW/l4ejt53yrgNYNn20NySz7O9p1hXmch2WqT+03SD+8ax1DLxXnUVQn
- 7z7ZlR0bpz4fO4iCSwvhzoeJNfwHqadqtT5KYfUngCz4ciguO9+AGD53NLUsIemzMBnw
- E2LUiZlANyi4B542Hca71vUQhcn5ZaZEmT963Jw5p5Xuz+t14F3oaC7C0txdef5nGgV1
- HmgDcWLFzlM38PwP2vWThhbrfTl2U32/qCya+m7pRo4uo+0WiqYVCF0zaMbd+X0V2v+3
- 0cqw==
-X-Gm-Message-State: AOAM531SlDERVV5Fss0bLQJ8vp7fMeepYbPOKNa3Fe8Em7APkMTj5xR3
- KLWWfYJf7IawzuSLI6PZJPvrzKIot14U7JUsmqc=
-X-Google-Smtp-Source: ABdhPJzPzydOUvyJe+UiOy7gyvcUtTsEtho+bSjhZRXPu+EjALoeYcksj5a0nfUdZygyBVfEl1bEG4mHL7MYqwVyWeI=
-X-Received: by 2002:a19:560a:: with SMTP id k10mr5487982lfb.599.1601912089123; 
- Mon, 05 Oct 2020 08:34:49 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kPSbb-0003DE-IM
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 11:40:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58733)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kPSbZ-0007fd-PF
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 11:40:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601912449;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=gVKFetoNc5U7j7QeRNTUMw4P3rarv9nDnrl96XJ7r+w=;
+ b=Ux0fscyIAe7y5yLTE/kNfGkPlzlh/c9hIW+5vRh8j12aEeCuIHfs7rqBQj4FLcOgsdDI8X
+ tSDWuzo1z2DwLmmX3Dm/vASZ68s065yuFCvJRJLfpXXhQ7oQaWeXQV0PBNhvfyI7cfgkrJ
+ APSxKxzUAY2GKCopghXNV537ysXDlUA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-559-gWrQAVBCNa-Q7CWQX9QPiQ-1; Mon, 05 Oct 2020 11:40:36 -0400
+X-MC-Unique: gWrQAVBCNa-Q7CWQX9QPiQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18C4080BCC1;
+ Mon,  5 Oct 2020 15:40:24 +0000 (UTC)
+Received: from redhat.com (ovpn-114-250.ams2.redhat.com [10.36.114.250])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BC65D60E1C;
+ Mon,  5 Oct 2020 15:40:21 +0000 (UTC)
+Date: Mon, 5 Oct 2020 16:40:19 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: =?utf-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Subject: Re: [PATCH v7 0/4] Fixes curses on msys2/mingw
+Message-ID: <20201005154019.GT2385272@redhat.com>
+References: <20201002180838.2047-1-luoyonggang@gmail.com>
+ <20201005082254.GE2385272@redhat.com>
+ <CAE2XoE9Ss7K0Q-sgQ268Ww7X1wmgmSRMk3-4byChn5_4GVYARA@mail.gmail.com>
 MIME-Version: 1.0
-References: <20201001163429.1348-1-luoyonggang@gmail.com>
- <20201001163429.1348-6-luoyonggang@gmail.com>
- <87pn5x2bjm.fsf@linaro.org>
-In-Reply-To: <87pn5x2bjm.fsf@linaro.org>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Mon, 5 Oct 2020 23:34:39 +0800
-Message-ID: <CAE2XoE8GQ3K0gp6Pr2eeq3R=X_1Mc9tPkmjVKx-TeS0G+WFJcw@mail.gmail.com>
-Subject: Re: [PATCH v3 5/6] plugin: getting qemu_plugin_get_hwaddr only expose
- one function prototype
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: multipart/alternative; boundary="00000000000008a5ab05b0ee39cb"
-Received-SPF: pass client-ip=2a00:1450:4864:20::144;
- envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x144.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <CAE2XoE9Ss7K0Q-sgQ268Ww7X1wmgmSRMk3-4byChn5_4GVYARA@mail.gmail.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 02:11:31
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,142 +100,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Richard Henderson <richard.henderson@linaro.org>,
- qemu-level <qemu-devel@nongnu.org>
+ qemu-level <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000008a5ab05b0ee39cb
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Mon, Oct 05, 2020 at 11:31:28PM +0800, 罗勇刚(Yonggang Luo) wrote:
+> On Mon, Oct 5, 2020 at 4:23 PM Daniel P. Berrangé <berrange@redhat.com>
+> wrote:
+> >
+> > Only one of the 4 patches in this series appears to have been sent.
+> All other are revied and preserve the same, I prefer not disturb by re
+> sending same patches as other contributor suggested
 
-On Mon, Oct 5, 2020 at 6:48 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
-ote:
->
->
-> Yonggang Luo <luoyonggang@gmail.com> writes:
->
-> > This is used for counting how much function are export to qemu plugin.
+I don't know where that is suggested, but I think that is very
+unhelpful.
+
+It breaks any kind of automation around fetching patch series.
+
+I don't want to have to fetch some patches from version 6 and
+some patches from version 7 to test the combined work.
+
+Every patch series posted should be complete, so contributors
+arent left wondering which are the correct versions for each
+patch.
+
 > >
-> > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-> > ---
-> >  plugins/api.c | 8 +++-----
-> >  1 file changed, 3 insertions(+), 5 deletions(-)
+> > On Sat, Oct 03, 2020 at 02:08:37AM +0800, Yonggang Luo wrote:
+> > > V6-V7
+> > > Update the configure script for
+> > > * curses: Fixes compiler error that complain don't have langinfo.h on
+> msys2/m=
+> > > ingw
+> > >
+> > > V5-V6
+> > > Dropping configure: Fixes ncursesw detection under msys2/mingw by
+> convert the=
+> > > m to meson first.
+> > > That need the meson 0.56 upstream to fixes the curses detection.
+> > > Add
+> > > * configure: fixes indent of $meson setup
+> > >
+> > > Yonggang Luo (4):
+> > >   configure: fixes indent of $meson setup
+> > >   curses: Fixes compiler error that complain don't have langinfo.h on
+> > >     msys2/mingw
+> > >   curses: Fixes curses compiling errors.
+> > >   win32: Simplify gmtime_r detection not depends on if  _POSIX_C_SOURCE
+> > >     are defined on msys2/mingw
+> > >
+> > >  configure                 | 47 +++++----------------------------------
+> > >  include/sysemu/os-win32.h |  4 ++--
+> > >  ui/curses.c               | 14 ++++++------
+> > >  util/oslib-win32.c        |  4 ++--
+> > >  4 files changed, 16 insertions(+), 53 deletions(-)
+> > >
+> > > --=20
+> > > 2.28.0.windows.1
+> > >
+> > >
 > >
-> > diff --git a/plugins/api.c b/plugins/api.c
-> > index f16922ca8b..d325084385 100644
-> > --- a/plugins/api.c
-> > +++ b/plugins/api.c
-> > @@ -252,10 +252,12 @@ bool
-qemu_plugin_mem_is_store(qemu_plugin_meminfo_t info)
+> > Regards,
+> > Daniel
+> > --
+> > |: https://berrange.com      -o-
+> https://www.flickr.com/photos/dberrange :|
+> > |: https://libvirt.org         -o-
+> https://fstop138.berrange.com :|
+> > |: https://entangle-photo.org    -o-
+> https://www.instagram.com/dberrange :|
 > >
-> >  #ifdef CONFIG_SOFTMMU
-> >  static __thread struct qemu_plugin_hwaddr hwaddr_info;
-> > +#endif
-> >
-> >  struct qemu_plugin_hwaddr
-*qemu_plugin_get_hwaddr(qemu_plugin_meminfo_t info,
-> >                                                    uint64_t vaddr)
-> >  {
-> > +#ifdef CONFIG_SOFTMMU
-> >      CPUState *cpu =3D current_cpu;
-> >      unsigned int mmu_idx =3D info >> TRACE_MEM_MMU_SHIFT;
-> >      hwaddr_info.is_store =3D info & TRACE_MEM_ST;
-> > @@ -267,14 +269,10 @@ struct qemu_plugin_hwaddr
-*qemu_plugin_get_hwaddr(qemu_plugin_meminfo_t info,
-> >      }
-> >
-> >      return &hwaddr_info;
-> > -}
-> >  #else
-> > -struct qemu_plugin_hwaddr
-*qemu_plugin_get_hwaddr(qemu_plugin_meminfo_t info,
-> > -                                                  uint64_t vaddr)
-> > -{
-> >      return NULL;
-> > -}
-> >  #endif
-> > +}
->
-> Hmm I'm not sure about this, surely you want the plugin system to
-> complain early if your plugin is going to use a function that is
-> incorrect for the mode you are running in?
-I merged these two function for couting how much function are exported, so
-getting the code easier to review, otherwise
- function qemu_plugin_get_hwaddr   would be exported twice.
->
-> Although we do currently unconditionally export the syscall functions
-> and arguably they should be CONFIG_USER only as well.
->
-> >
-> >  bool qemu_plugin_hwaddr_is_io(const struct qemu_plugin_hwaddr *haddr)
-> >  {
->
->
+> 
+> 
 > --
-> Alex Benn=C3=A9e
+>          此致
+> 礼
+> 罗勇刚
+> Yours
+>     sincerely,
+> Yonggang Luo
 
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
-
---
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
-
---00000000000008a5ab05b0ee39cb
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><br><br>On Mon, Oct 5, 2020 at 6:48 PM Alex Benn=C3=A9e &l=
-t;<a href=3D"mailto:alex.bennee@linaro.org">alex.bennee@linaro.org</a>&gt; =
-wrote:<br>&gt;<br>&gt;<br>&gt; Yonggang Luo &lt;<a href=3D"mailto:luoyongga=
-ng@gmail.com">luoyonggang@gmail.com</a>&gt; writes:<br>&gt;<br>&gt; &gt; Th=
-is is used for counting how much function are export to qemu plugin.<br>&gt=
-; &gt;<br>&gt; &gt; Signed-off-by: Yonggang Luo &lt;<a href=3D"mailto:luoyo=
-nggang@gmail.com">luoyonggang@gmail.com</a>&gt;<br>&gt; &gt; ---<br>&gt; &g=
-t; =C2=A0plugins/api.c | 8 +++-----<br>&gt; &gt; =C2=A01 file changed, 3 in=
-sertions(+), 5 deletions(-)<br>&gt; &gt;<br>&gt; &gt; diff --git a/plugins/=
-api.c b/plugins/api.c<br>&gt; &gt; index f16922ca8b..d325084385 100644<br>&=
-gt; &gt; --- a/plugins/api.c<br>&gt; &gt; +++ b/plugins/api.c<br>&gt; &gt; =
-@@ -252,10 +252,12 @@ bool qemu_plugin_mem_is_store(qemu_plugin_meminfo_t i=
-nfo)<br>&gt; &gt; <br>&gt; &gt; =C2=A0#ifdef CONFIG_SOFTMMU<br>&gt; &gt; =
-=C2=A0static __thread struct qemu_plugin_hwaddr hwaddr_info;<br>&gt; &gt; +=
-#endif<br>&gt; &gt; <br>&gt; &gt; =C2=A0struct qemu_plugin_hwaddr *qemu_plu=
-gin_get_hwaddr(qemu_plugin_meminfo_t info,<br>&gt; &gt; =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0uint64_t vaddr)<br>&gt; &gt; =C2=A0{<br>&gt; &gt; +#ifdef =
-CONFIG_SOFTMMU<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0CPUState *cpu =3D current_c=
-pu;<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0unsigned int mmu_idx =3D info &gt;&gt;=
- TRACE_MEM_MMU_SHIFT;<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0hwaddr_info.is_store=
- =3D info &amp; TRACE_MEM_ST;<br>&gt; &gt; @@ -267,14 +269,10 @@ struct qem=
-u_plugin_hwaddr *qemu_plugin_get_hwaddr(qemu_plugin_meminfo_t info,<br>&gt;=
- &gt; =C2=A0 =C2=A0 =C2=A0}<br>&gt; &gt; <br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0=
-return &amp;hwaddr_info;<br>&gt; &gt; -}<br>&gt; &gt; =C2=A0#else<br>&gt; &=
-gt; -struct qemu_plugin_hwaddr *qemu_plugin_get_hwaddr(qemu_plugin_meminfo_=
-t info,<br>&gt; &gt; - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0uint64_t vaddr)<br>&gt; &gt=
-; -{<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0return NULL;<br>&gt; &gt; -}<br>&gt; =
-&gt; =C2=A0#endif<br>&gt; &gt; +}<br>&gt;<br>&gt; Hmm I&#39;m not sure abou=
-t this, surely you want the plugin system to<br>&gt; complain early if your=
- plugin is going to use a function that is<br>&gt; incorrect for the mode y=
-ou are running in?<div>I merged these two function for couting how much fun=
-ction are exported, so getting the code easier to review, otherwise</div><d=
-iv>=C2=A0function qemu_plugin_get_hwaddr=C2=A0 =C2=A0would be exported twic=
-e.<br>&gt;<br>&gt; Although we do currently unconditionally export the sysc=
-all functions<br>&gt; and arguably they should be CONFIG_USER only as well.=
-<br>&gt;<br>&gt; &gt; <br>&gt; &gt; =C2=A0bool qemu_plugin_hwaddr_is_io(con=
-st struct qemu_plugin_hwaddr *haddr)<br>&gt; &gt; =C2=A0{<br>&gt;<br>&gt;<b=
-r>&gt; --<br>&gt; Alex Benn=C3=A9e<br><br><br><br>--<br>=C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=
-=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincerely,<br>Yonggang Luo</div></div>
-
---00000000000008a5ab05b0ee39cb--
 
