@@ -2,86 +2,100 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C322AC4363D
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 14:00:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DE4CC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 14:02:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C69820848
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 14:00:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ADF892085B
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 14:02:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AnvuJdNh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C69820848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aw/jiLU7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADF892085B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPR2e-0002lM-Av
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 10:00:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54646)
+	id 1kPR4V-0004ak-1V
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 10:02:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55236)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jfreimann@redhat.com>)
- id 1kPR0h-0001LK-4r
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 09:58:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:24509)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jfreimann@redhat.com>)
- id 1kPR0d-0000gI-Pv
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 09:58:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601906313;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=fCjqS97KrKdJlyRAjY1r3ymDq972TEKHfO5NaWWjPno=;
- b=AnvuJdNhjvEwlVZc/1WQ34nGyg5H3rffPZ4R7DPgN5q8kyLLCs1YVmt0E+NreHAnO5io6B
- VT60dygwjTfBblzJlAMrEwy1pcDgVB+NfDMxGmS81e+2EuddJ1d4Lx41XFLp9SwkvQ+Xun
- wGxOm2IqHQetH6NRkauSqbv/Viw5amo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-170-JzMHV3xINQGaJ68X0gUH-Q-1; Mon, 05 Oct 2020 09:58:31 -0400
-X-MC-Unique: JzMHV3xINQGaJ68X0gUH-Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5FCDC80365F
- for <qemu-devel@nongnu.org>; Mon,  5 Oct 2020 13:58:30 +0000 (UTC)
-Received: from localhost (ovpn-113-34.ams2.redhat.com [10.36.113.34])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1BFA15D9F3;
- Mon,  5 Oct 2020 13:58:23 +0000 (UTC)
-Date: Mon, 5 Oct 2020 15:58:22 +0200
-From: Jens Freimann <jfreimann@redhat.com>
-To: dgilbert@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
-Subject: Re: [RFC 0/1] tools/virtiofsd: don't create temporary directory in /
-Message-ID: <20201005135822.GE1625193@linux.fritz.box>
-References: <20201001061519.636959-1-jfreimann@redhat.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kPR29-0002zk-TG
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 10:00:09 -0400
+Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:39575)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kPR27-0000rK-2h
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 10:00:09 -0400
+Received: by mail-ot1-x32e.google.com with SMTP id f10so143752otb.6
+ for <qemu-devel@nongnu.org>; Mon, 05 Oct 2020 07:00:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=mp4z0rSmsXlN+OOt21MS8v4a21HEfCBoRgQTLy+F3jw=;
+ b=aw/jiLU7mCW1tuWfyenb5QIjqzegQrwyKBNaa/9PZSwTHfXIvrSTpFG5uT+KGoHBIK
+ wMV6mmu75LWOtcOqwbO20v0FAJjtrVI+1XIIll05ellCA9JWN0PlKytxgnPCPREF+snw
+ ppBo6Dy0TZJ2aftUVMJKLNSy6f5vhLSFmXtaoKRphOMqOybgZmn9+UekHY6nohmmj5Ke
+ haCxnKGioWUBz3DG6NiBUTC3wxMikI1iAR82F/Ko4GR2LcrgD11fM9mptq6/DHJVtfa6
+ E6EvGd25tBwZaFWoYlEQM1i4lGTkOd353NMrvz5GuZce1Har37ydJ0nhStI9DZ1HaUYH
+ ETmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=mp4z0rSmsXlN+OOt21MS8v4a21HEfCBoRgQTLy+F3jw=;
+ b=OBajXM54iFMiLUzfEdryeNh0+EWe1rk5Zp6qj75GIiJP5jvxRrs2XIMM50BTXzoz4N
+ 9TSriZr+fXxDGTpNaZMCHnGkzuDNTg88s96WxERAlr7od1Rrn/Fw0Xtq7Rl5CGcjQsaA
+ vISfpBqTVADF/CZr9xj5hUAS6ywLZL5ZtcQjADtkMo2mH+XZNpVBTV3JOGsDm3umCHjX
+ 6WNl8wJvzwJFF6qvNjhWwFtOcTCGtWcvJ+ZCg/GZ8yAnJWTTRY1wFe7X3xlvHU+co2ad
+ 3IFeMt52+1SRkyc8OLfhw7sCa4nuQAo5VPaTvPLXLZoMPjI5W+jG68QMtV70TKErUAyZ
+ dksQ==
+X-Gm-Message-State: AOAM530TSgjKlnRuz+qSwm42nUe5wVHXQVDLVT3HMJs8ImsDO6hd5fyd
+ N91ohl5HrRvfkhGllVVsFMC15Q==
+X-Google-Smtp-Source: ABdhPJzVlba0SQcC2gmuHyZFMcNcAPcfy7uxH1q1nx4vF3nl3RedUdhQN+M/rdNMsuI4hzpqRbFXJg==
+X-Received: by 2002:a9d:6c19:: with SMTP id f25mr12059193otq.25.1601906405482; 
+ Mon, 05 Oct 2020 07:00:05 -0700 (PDT)
+Received: from [10.10.73.179] (fixed-187-189-51-144.totalplay.net.
+ [187.189.51.144])
+ by smtp.gmail.com with ESMTPSA id p8sm8488oot.29.2020.10.05.07.00.03
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 05 Oct 2020 07:00:04 -0700 (PDT)
+Subject: Re: [RFC v5 06/68] target/riscv: rvv-1.0: add translation-time vector
+ context status
+To: Frank Chang <frank.chang@sifive.com>
+References: <20200929190448.31116-1-frank.chang@sifive.com>
+ <20200929190448.31116-7-frank.chang@sifive.com>
+ <ad28385b-3e36-e33a-03c2-dabaaaea80bc@linaro.org>
+ <CAE_xrPgK0ROiWo+Evan9uGFoBo8t0hV8vt0A2DxDb_Sws55-Ng@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <246985bc-98ff-0975-20d4-66c5864abc63@linaro.org>
+Date: Mon, 5 Oct 2020 09:00:01 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20201001061519.636959-1-jfreimann@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jfreimann@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jfreimann@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 01:25:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+In-Reply-To: <CAE_xrPgK0ROiWo+Evan9uGFoBo8t0hV8vt0A2DxDb_Sws55-Ng@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::32e;
+ envelope-from=richard.henderson@linaro.org; helo=mail-ot1-x32e.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,28 +108,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fidencio@redhat.com
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Oct 01, 2020 at 08:15:18AM +0200, Jens Freimann wrote:
->I'm sending this as an RFC because:
->Maybe just prepending "/tmp" is not generic enough and we should make it
->somehow configurable or use $TMPDIR. Also there might be security
->implications I'm not aware of.
->The process is running with container_kvm_t context which also needs
->a change to be allowed to create files in tmpfs to make it work.
+On 10/5/20 2:12 AM, Frank Chang wrote:
+>     I think you want to be sharing the code between vsetvl and vsetvli now.  Just
+>     pass in a TCGv value to a common helper.
+> 
+> 
+> The only difference now between vsetvl and vsetvli is the format of zimm and s2
+> fields.
+> But they have different formats and are queried by different functions,
+> i.e. s2 = tcg_const_tl(a->zimm); and gen_get_gpr(s2, a->rs2);
+> 
+> Is there any elegant way to retrieve the values of zimm and s2 by shared common
+> codes?
 
-Fabiano had the idea to use a glib function to create the
-temporary directory. It would be good because it uses the $TMPDIR env
-variable. 
+Yes, like I (too briefly) described:
 
-But before we decide about glib or not: the change is in the call
-chain of setup_sandbox() and there was a question what other implications
-that has. What do you think?
+static bool do_vsetvl(DisasContext *ctx,
+                      int rd, int rs1, TCGv s2)
+{
+    // existing contents of trans_vsetvl
+    // do continue to free s2.
+}
 
-regards,
-Jens  
+static bool trans_vsetvl(DisasContext *ctx, arg_vsetvl *a)
+{
+    TCGv s2 = tcg_temp_new();
+    gen_get_gpr(s2, a->rs2);
+    return do_vsetvl(ctx, a->rd, a->rs1, s2);
+}
 
+static bool trans_vsetvli(DisasContext *ctx, arg_vsetvli *a)
+{
+    TCGv s2 = tcg_const_tl(a->zimm);
+    return do_vsetvl(ctx, a->rd, a->rs1, s2);
+}
+
+
+r~
 
