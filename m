@@ -2,89 +2,89 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49C3AC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 12:09:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6226C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 12:23:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 824822075A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 12:09:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3306D2078D
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 12:23:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EajcBPgv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 824822075A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="d4Ayb/fG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3306D2078D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPPIn-0007b4-Go
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 08:09:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57532)
+	id 1kPPWx-00026g-Bd
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 08:23:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60058)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kPPHq-00072g-Ql
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 08:08:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25833)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kPPHn-00038o-KF
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 08:08:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601899690;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=XykrSJ0k2LgDUj4/I5lxDGEo9j/p+itcgjaxVD1IFnk=;
- b=EajcBPgv7vAhL47S+dx8lrBSvPRv3x8FMv51UGQN1qZ2dbaE8CKn6iZdJlcNpvD1Pq6N4b
- Q+6/K3IXwWzrFJX7bsCOuUCM2lb/ZD6J9OIw3RPYj0ti2L8tlnmKtPPdHdHySe9JAwuOba
- hovp0xPaRLI6S1NOOcaZyzQb6meAjdc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-180-RpA3Ll_3PlqNOVGzOZC2_w-1; Mon, 05 Oct 2020 08:08:08 -0400
-X-MC-Unique: RpA3Ll_3PlqNOVGzOZC2_w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1kPPVn-0001eh-Tf
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 08:22:39 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:57944 helo=mta-01.yadro.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1kPPVl-0004vW-Gh
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 08:22:39 -0400
+Received: from localhost (unknown [127.0.0.1])
+ by mta-01.yadro.com (Postfix) with ESMTP id 842594130A;
+ Mon,  5 Oct 2020 12:22:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+ in-reply-to:content-transfer-encoding:content-disposition
+ :content-type:content-type:mime-version:references:message-id
+ :subject:subject:from:from:date:date:received:received:received;
+ s=mta-01; t=1601900552; x=1603714953; bh=TIbiSW9NS9SxVDJ9QUU4uC
+ qMMpxAiPmDkUCxBlGPIT0=; b=d4Ayb/fGFagNNEIuN1tIfQwCdpVJsv2D1RyT3a
+ jyHa6pjhyvw2gKY8JbF+nuuFC4RmjgGNFztCZ3G1LXbbkzs3SI5CvToALwDeHUY7
+ rIoe9JMLCcSlP2GRlFmu742TB+ONB7c+4HJ8m95odZbH5In71cY9oPpBHkrQ30kF
+ kvbfc=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+ by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id OZdsAU_1v037; Mon,  5 Oct 2020 15:22:32 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
+ [172.17.10.102])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7068803F4A;
- Mon,  5 Oct 2020 12:08:07 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
- [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F9195C1BD;
- Mon,  5 Oct 2020 12:08:07 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C4FE511329C1; Mon,  5 Oct 2020 14:08:05 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH v2 1/4] keyval: Parse help options
-References: <20200930124557.51835-1-kwolf@redhat.com>
- <20200930124557.51835-2-kwolf@redhat.com>
- <87o8lmx837.fsf@dusky.pond.sub.org>
-Date: Mon, 05 Oct 2020 14:08:05 +0200
-In-Reply-To: <87o8lmx837.fsf@dusky.pond.sub.org> (Markus Armbruster's message
- of "Thu, 01 Oct 2020 17:46:20 +0200")
-Message-ID: <87mu10dgey.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ by mta-01.yadro.com (Postfix) with ESMTPS id 442B9412FB;
+ Mon,  5 Oct 2020 15:22:32 +0300 (MSK)
+Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
+ (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Mon, 5 Oct
+ 2020 15:22:32 +0300
+Date: Mon, 5 Oct 2020 15:22:31 +0300
+From: Roman Bolshakov <r.bolshakov@yadro.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [RFC PATCH 19/21] contrib/gitdm: Add Yadro to the domain map
+Message-ID: <20201005122231.GA37946@SPB-NB-133.local>
+References: <20201004180443.2035359-1-f4bug@amsat.org>
+ <20201004180443.2035359-20-f4bug@amsat.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 01:25:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20201004180443.2035359-20-f4bug@amsat.org>
+X-Originating-IP: [172.17.204.212]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-02.corp.yadro.com (172.17.10.102)
+Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
+ helo=mta-01.yadro.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 08:22:33
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,84 +97,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+Cc: Igor Kononenko <i.kononenko@yadro.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Markus Armbruster <armbru@redhat.com> writes:
+On Sun, Oct 04, 2020 at 08:04:41PM +0200, Philippe Mathieu-Daudé wrote:
+> There is a number of contributions from this domain,
+> add its own entry to the gitdm domain map.
+> 
+> Cc: Igor Kononenko <i.kononenko@yadro.com>
+> Cc: Roman Bolshakov <r.bolshakov@yadro.com>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+> One Reviewed-by/Ack-by from someone from this domain
+> should be sufficient to get this patch merged.
+> ---
+>  contrib/gitdm/domain-map | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/contrib/gitdm/domain-map b/contrib/gitdm/domain-map
+> index 6b3a2c3b4e..7170ddea7a 100644
+> --- a/contrib/gitdm/domain-map
+> +++ b/contrib/gitdm/domain-map
+> @@ -41,3 +41,4 @@ wavecomp.com    Wavecomp
+>  wdc.com         Western Digital
+>  windriver.com   Wind River
+>  xilinx.com      Xilinx
+> +yadro.com       YADRO
+> -- 
+> 2.26.2
+> 
 
-[...]
-> Making help support opt-in complicates things.  Is there a genuine use
-> for not supporting help?  Or is just to keep the users that don't
-> support help yet (but should) working without change?  Mind, I'm not
-> asking you to make them work, I'm only asking whether you can think of a
-> genuine case where help should not work.
->
-> What are the existing users that don't support help?  Let's see... many
-> in tests/test-keyval.c (ignore), and qobject_input_visitor_new_str().
-> That one's used for qemu-system-FOO -audiodev, -display, -blockdev, and
-> for qemu-storage-daemon --blockdev, --export, --monitor, --nbd-server.
->
-> Attempting to get help for them fails like this:
->
->     $ bld-x86/storage-daemon/qemu-storage-daemon --blockdev help
->     qemu-storage-daemon: Invalid parameter 'help'
->     $ bld-x86/storage-daemon/qemu-storage-daemon --blockdev file,help
->     qemu-storage-daemon: Expected '=' after parameter 'help'
->
-> I believe making them fail like
->
->     qemu-storage-daemon: no help available
->
-> would actually be an improvement.
+Reviewed-by: Roman Bolshakov <r.bolshakov@yadro.com>
 
-Potential issue: if an option's implied key may have the value "help",
-then option argument "help" can be either parsed as "give me help", or
-as "implied-key=help".
-
-None of the existing options have this issue:
-
-* audiodev: union Audiodev, implied key "driver" is enum AudiodevDriver,
-   "help" is not among its values
-
-* display: union DisplayOptions, implied key "type" is enum
-   DisplayType, "help" is not among its values
-
-* blockdev: union BlockdevOptions, implied key "driver is enum
-   BlockdevDriver, "help" is not among its values
-
-* export: union BlockExport, implied key "type" is enum BlockExportType,
-  "help" is not among its values
-
-* monitor: struct MonitorOptions, implied key "mode"is enum MonitorMode,
-  "help" is not among its values
-
-* nbd-server: struct NbdServerOptions, no implied key.
-
-We're good.
-
-What's the risk of not staying good?
-
-The implied keys above are all QAPI enums.
-
-The only existing QAPI enum with a value 'help' is QKeyCode.
-
-The only existing C enum with a name that ends in _HELP is the one
-defining Mac keycodes in hw/input/adb-keys.h.
-
-For completeness, I double-checked non of the existing occurences of
-string "help" are used as values of option parameters.
-
-We'll almost certainly stay good.
-
-What if we manage to mess this up against all odds?
-
-In my opinion, consistency in getting help is more important than
-consistency within a badly designed option: option argument "help"
-should give you help even when that means you can't omit the implied key
-when its value is "help".
-
-[...]
-
+Thanks,
+Roman
 
