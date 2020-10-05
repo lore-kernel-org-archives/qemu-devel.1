@@ -2,80 +2,84 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAB8BC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 16:01:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57EBFC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 16:02:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 586B7206DD
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 16:01:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 002F9206DD
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 16:02:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NzaH5cAp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 586B7206DD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uypJZ1tr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 002F9206DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPSvg-0002Fm-7i
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 12:01:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60718)
+	id 1kPSw4-0002Ug-TS
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 12:02:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60018)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kPStO-0008Ux-6O
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 11:59:14 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:45770)
+ id 1kPSqB-00046g-NF; Mon, 05 Oct 2020 11:55:56 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:39738)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kPStK-00027W-LK
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 11:59:13 -0400
-Received: by mail-lj1-x242.google.com with SMTP id a4so3351913lji.12
- for <qemu-devel@nongnu.org>; Mon, 05 Oct 2020 08:59:10 -0700 (PDT)
+ id 1kPSqA-0001WN-5C; Mon, 05 Oct 2020 11:55:55 -0400
+Received: by mail-pg1-x542.google.com with SMTP id 22so2311888pgv.6;
+ Mon, 05 Oct 2020 08:55:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=KZSr1+RWhjf73U8t/JBw3lLrcq3qCKPaCeufJWjWElk=;
- b=NzaH5cApY7pP8PbQGrKxnQlPEOEaaV8HAaDJ/9bPap0zDWMWhZmU+TRboiArX+YkCr
- At7cDGOJpvRDxv2ZI07NmJLZTMN2TjbZ50xptiCkXsyPwg4khd171HlJAn2wuL7wf+pv
- ZDfi9GqO3Vg/4GrKbrS3rLZGQQ/lIEreSNFPJ5+WMtaRD2tdvN5NnQRQDKJx7FgHvmmj
- ZwPnGuv0UBcy0IQyvc2olHSwag6VbvkZPhbCgGH47yGJ68tZ8gCjDBRVbaSQb7dAL2LE
- VasCDHbQUc9j2RmDyMWVv5Qf1CySVIUSpbivMcRGO7apxg1RgFNMzxlWIM5CtkHLu5Xt
- 4svg==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=fONA64XSdMINk4Pb3HJvl02BkTmqUfaoSQk6W/tx2aE=;
+ b=uypJZ1trGOSLsslGxqmD6P8w1q7GbCpafx/NUHxKpmX5uzLV0ysM2NDXXfFjFXneeY
+ 9DJwWImcSyiGPSFdhJZjkEoCyPFyWsUhcgmovGgE/DniX2hLQ9sHr4MRfoqVWG69Qjls
+ tQqP4NNWa9kZKMZ0uq4hYQ5ldIUX5O1miiaaxP5lx1kskE/gjcfsNnGZeIPo8V6lGbSJ
+ TT9eIi9yW5TzgZ5Oltgp4M1x11DkTnCTBgUXzZCeIkkEeaWarj+sXSDW4KnpI+Epu37Q
+ xmaLu83l41AefoZtRJXqw4XskdHOpqQ1FWPtYwomb+ij91+CDGhoABVTtO1TtpbmJbmR
+ l3zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=KZSr1+RWhjf73U8t/JBw3lLrcq3qCKPaCeufJWjWElk=;
- b=SYcmKenHnfsp8Jk+eimxSIFTACywI1Y5OYek2RFQ7e49ncFuoX47WUpFHLEhqyH8xz
- kTd1EhOf3GCWuL/Dr/NGVU/RKsXT0Ma+kMQnDC5eDFnjAdq9IB3ZDwDyWp7jlohIJjpQ
- EDxHYoErOZJa3mKnTfP8KqMEOJClSZpghHTXne+76nxGoqHikG7F8dB2HiGG26/3DgEB
- BBGMGN+V6EQ9kkVKWCtXTkdR9++0bcB4/rAxcHYRniLlXQEiO9SNl4ag5UBNYJlRM2ig
- UtTu9xrrQ7E99SE4CL7VkB/4If1bZQuvxgRaicc9K7MeCAi6BHNmpemRRL+2NqZmmdNx
- 8P9A==
-X-Gm-Message-State: AOAM533ZjeNVl6A44Y9EuaJmfDkW7mDs6AOMe1xOw9PPQZaKzLwtyM5k
- 3pZXdk59EIYcChWntvr1mCXta4O/yPKtu87N7a8=
-X-Google-Smtp-Source: ABdhPJzrILBFsenUhsRIY8/O6MFTiBFerhZtaYWEZNKMJoRwoAnSW2Xd3AO6fWIKsyiFsQJEkaYYpaaDMgAqVB0d6AE=
-X-Received: by 2002:a2e:9dc7:: with SMTP id x7mr130185ljj.447.1601913548860;
- Mon, 05 Oct 2020 08:59:08 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=fONA64XSdMINk4Pb3HJvl02BkTmqUfaoSQk6W/tx2aE=;
+ b=j8io3S2C4JrBsvT/fhWVA9dIPtTEa8mCfPQMDAMoTBhoMZefyMeB1Zyr7yJZyWIdAN
+ dSnsYrA53qK8J+LvXYVfN6iH9NL6rfBm4q2oSxKCDMR0xAFNUTgSXzRknWNvzWKil4K7
+ RvjKurFXUnwUSExMdrbKCC8zVie/vK2eRs+E3YofBdtmtAvZamLCf4VfXMbQFLWz0LJu
+ KN/KPZQftiekKx7K80mSP+AshRuyjJdJ/eWRYTidx50hzs9KLtCKxkLdfJs7gDK/cJW4
+ E68LX/yuoToQ97tiRohL7FCmOu8RJvjkQwtLFtPe+eiMkSMAx95HrpoNwZ2cBzPwOjFo
+ GgEg==
+X-Gm-Message-State: AOAM530hrTQ3wzHbYDsH4PQ8Ez9bXe/FxQKPaE+AEG6mObjYjJC/kLSf
+ ymvGe5rbLmXVYUT1culhLBb20g+myvPLHQ==
+X-Google-Smtp-Source: ABdhPJyIn0sYszzDjP87Ki3otLpJRbPhrTrjcdW6/CLfYEPKc03WVlt9iZwtq9qYMp7xNMmbRv2V1w==
+X-Received: by 2002:aa7:870c:0:b029:142:2501:34d1 with SMTP id
+ b12-20020aa7870c0000b0290142250134d1mr409803pfo.42.1601913351047; 
+ Mon, 05 Oct 2020 08:55:51 -0700 (PDT)
+Received: from localhost.localdomain ([103.94.185.75])
+ by smtp.googlemail.com with ESMTPSA id u22sm34803pgi.85.2020.10.05.08.55.48
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 05 Oct 2020 08:55:50 -0700 (PDT)
+From: Yonggang Luo <luoyonggang@gmail.com>
+To: qemu-devel@nongnu.org,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Subject: [PATCH v8 3/4] curses: Fixes curses compiling errors.
+Date: Mon,  5 Oct 2020 23:55:23 +0800
+Message-Id: <20201005155524.442-4-luoyonggang@gmail.com>
+X-Mailer: git-send-email 2.28.0.windows.1
+In-Reply-To: <20201005155524.442-1-luoyonggang@gmail.com>
+References: <20201005155524.442-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
-References: <20201001163429.1348-1-luoyonggang@gmail.com>
- <20201001163429.1348-5-luoyonggang@gmail.com>
- <87sgat2bqh.fsf@linaro.org>
-In-Reply-To: <87sgat2bqh.fsf@linaro.org>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Mon, 5 Oct 2020 23:58:59 +0800
-Message-ID: <CAE2XoE_UUUSyMaeEbZzci2t9GQ+1sgm=B5M7qOytr6JX+XPgJQ@mail.gmail.com>
-Subject: Re: [PATCH v3 4/6] plugin: define QEMU_PLUGIN_API_IMPLEMENTATION first
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: multipart/alternative; boundary="0000000000000a73da05b0ee902d"
-Received-SPF: pass client-ip=2a00:1450:4864:20::242;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x242.google.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x542.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -83,7 +87,7 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,154 +101,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Richard Henderson <richard.henderson@linaro.org>,
- qemu-level <qemu-devel@nongnu.org>
+ Laurent Vivier <laurent@vivier.eu>, Yonggang Luo <luoyonggang@gmail.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000000a73da05b0ee902d
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+This is the compiling error:
+../ui/curses.c: In function 'curses_refresh':
+../ui/curses.c:256:5: error: 'next_maybe_keycode' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+  256 |     curses2foo(_curses2keycode, _curseskey2keycode, chr, maybe_keycode)
+      |     ^~~~~~~~~~
+../ui/curses.c:302:32: note: 'next_maybe_keycode' was declared here
+  302 |             enum maybe_keycode next_maybe_keycode;
+      |                                ^~~~~~~~~~~~~~~~~~
+../ui/curses.c:256:5: error: 'maybe_keycode' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+  256 |     curses2foo(_curses2keycode, _curseskey2keycode, chr, maybe_keycode)
+      |     ^~~~~~~~~~
+../ui/curses.c:265:24: note: 'maybe_keycode' was declared here
+  265 |     enum maybe_keycode maybe_keycode;
+      |                        ^~~~~~~~~~~~~
+cc1.exe: all warnings being treated as errors
 
-Hi, I split this out just for easier review, so the lines changed in api.c
-and core.c
-equales to the number of function exported, anyway
+gcc version 10.2.0 (Rev1, Built by MSYS2 project)
 
-On Mon, Oct 5, 2020 at 6:44 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
-ote:
->
->
-> Yonggang Luo <luoyonggang@gmail.com> writes:
->
-> > This is used to distinguish from the qemu and plugin in
-> > header qemu-plugin.h
-> >
-> > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-> > ---
-> >  plugins/api.c  | 1 +
-> >  plugins/core.c | 1 +
-> >  2 files changed, 2 insertions(+)
-> >
-> > diff --git a/plugins/api.c b/plugins/api.c
-> > index bbdc5a4eb4..f16922ca8b 100644
-> > --- a/plugins/api.c
-> > +++ b/plugins/api.c
-> > @@ -35,6 +35,7 @@
-> >   */
-> >
-> >  #include "qemu/osdep.h"
-> > +#define QEMU_PLUGIN_API_IMPLEMENTATION
-> >  #include "qemu/plugin.h"
->
-> This doesn't do anything in this patch. You should split the special
-> handling in the plugin header and combine it in this patch. Also I'm not
-> quite sure of the logic you are trying to achieve later on:
->
->   #if !defined(QEMU_PLUGIN_API_IMPLEMENTATION)
->   #if defined(QEMU_PLUGIN_IMPLEMENTATION)
->   #define QEMU_PLUGIN_EXTERN
->   #else
->   #define QEMU_PLUGIN_EXTERN extern
->   #endif
->
-> It seems to me you could get away with only one symbol - ideally just
-> defined in plugins/api.c so you don't need to churn the plugins with
-> changes, e.g.
->
->   #ifdef QEMU_PLUGIN_API_IMPLEMENTATION
->   #define QEMU_PLUGIN_EXTERN
->   #else
->   #define QEMU_PLUGIN_EXTERN extern
->   #endif
->
-> But I'd still like to have a better answer as to why we need the extern?
-> Is this a limitation of the mingw compiler or some windows special?
->
-> >  #include "cpu.h"
-> >  #include "sysemu/sysemu.h"
-> > diff --git a/plugins/core.c b/plugins/core.c
-> > index 51bfc94787..7a79ea4179 100644
-> > --- a/plugins/core.c
-> > +++ b/plugins/core.c
-> > @@ -12,6 +12,7 @@
-> >   * SPDX-License-Identifier: GPL-2.0-or-later
-> >   */
-> >  #include "qemu/osdep.h"
-> > +#define QEMU_PLUGIN_API_IMPLEMENTATION
-> >  #include "qemu/error-report.h"
-> >  #include "qemu/config-file.h"
-> >  #include "qapi/error.h"
->
-> I don't think we include qemu/plugin.h from this file although it does
-> raise the question of what happens when other parts of QEMU include the
-> internal qemu/plugins.h header.
->
-> --
-> Alex Benn=C3=A9e
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ ui/curses.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/ui/curses.c b/ui/curses.c
+index 12bc682cf9..e4f9588c3e 100644
+--- a/ui/curses.c
++++ b/ui/curses.c
+@@ -262,7 +262,7 @@ static int curses2foo(const int _curses2foo[], const int _curseskey2foo[],
+ static void curses_refresh(DisplayChangeListener *dcl)
+ {
+     int chr, keysym, keycode, keycode_alt;
+-    enum maybe_keycode maybe_keycode;
++    enum maybe_keycode maybe_keycode = CURSES_KEYCODE;
+ 
+     curses_winch_check();
+ 
+@@ -299,7 +299,7 @@ static void curses_refresh(DisplayChangeListener *dcl)
+ 
+         /* alt or esc key */
+         if (keycode == 1) {
+-            enum maybe_keycode next_maybe_keycode;
++            enum maybe_keycode next_maybe_keycode = CURSES_KEYCODE;
+             int nextchr = console_getch(&next_maybe_keycode);
+ 
+             if (nextchr != -1) {
+-- 
+2.28.0.windows.1
 
-
---
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
-
---0000000000000a73da05b0ee902d
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">Hi, I split this out just for easier review, so the lines =
-changed in api.c and core.c<div>equales to the number of function exported,=
- anyway<br><br>On Mon, Oct 5, 2020 at 6:44 PM Alex Benn=C3=A9e &lt;<a href=
-=3D"mailto:alex.bennee@linaro.org">alex.bennee@linaro.org</a>&gt; wrote:<br=
->&gt;<br>&gt;<br>&gt; Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@gmail.=
-com">luoyonggang@gmail.com</a>&gt; writes:<br>&gt;<br>&gt; &gt; This is use=
-d to distinguish from the qemu and plugin in<br>&gt; &gt; header qemu-plugi=
-n.h<br>&gt; &gt;<br>&gt; &gt; Signed-off-by: Yonggang Luo &lt;<a href=3D"ma=
-ilto:luoyonggang@gmail.com">luoyonggang@gmail.com</a>&gt;<br>&gt; &gt; ---<=
-br>&gt; &gt; =C2=A0plugins/api.c =C2=A0| 1 +<br>&gt; &gt; =C2=A0plugins/cor=
-e.c | 1 +<br>&gt; &gt; =C2=A02 files changed, 2 insertions(+)<br>&gt; &gt;<=
-br>&gt; &gt; diff --git a/plugins/api.c b/plugins/api.c<br>&gt; &gt; index =
-bbdc5a4eb4..f16922ca8b 100644<br>&gt; &gt; --- a/plugins/api.c<br>&gt; &gt;=
- +++ b/plugins/api.c<br>&gt; &gt; @@ -35,6 +35,7 @@<br>&gt; &gt; =C2=A0 */<=
-br>&gt; &gt; <br>&gt; &gt; =C2=A0#include &quot;qemu/osdep.h&quot;<br>&gt; =
-&gt; +#define QEMU_PLUGIN_API_IMPLEMENTATION<br>&gt; &gt; =C2=A0#include &q=
-uot;qemu/plugin.h&quot;<br>&gt;<br>&gt; This doesn&#39;t do anything in thi=
-s patch. You should split the special<br>&gt; handling in the plugin header=
- and combine it in this patch. Also I&#39;m not<br>&gt; quite sure of the l=
-ogic you are trying to achieve later on:<br>&gt;<br>&gt; =C2=A0 #if !define=
-d(QEMU_PLUGIN_API_IMPLEMENTATION)<br>&gt; =C2=A0 #if defined(QEMU_PLUGIN_IM=
-PLEMENTATION)<br>&gt; =C2=A0 #define QEMU_PLUGIN_EXTERN<br>&gt; =C2=A0 #els=
-e<br>&gt; =C2=A0 #define QEMU_PLUGIN_EXTERN extern<br>&gt; =C2=A0 #endif<br=
->&gt;<br>&gt; It seems to me you could get away with only one symbol - idea=
-lly just<br>&gt; defined in plugins/api.c so you don&#39;t need to churn th=
-e plugins with<br>&gt; changes, e.g.<br>&gt;<br>&gt; =C2=A0 #ifdef QEMU_PLU=
-GIN_API_IMPLEMENTATION<br>&gt; =C2=A0 #define QEMU_PLUGIN_EXTERN<br>&gt; =
-=C2=A0 #else<br>&gt; =C2=A0 #define QEMU_PLUGIN_EXTERN extern<br>&gt; =C2=
-=A0 #endif<br>&gt;<br>&gt; But I&#39;d still like to have a better answer a=
-s to why we need the extern?<br>&gt; Is this a limitation of the mingw comp=
-iler or some windows special?<br>&gt;<br>&gt; &gt; =C2=A0#include &quot;cpu=
-.h&quot;<br>&gt; &gt; =C2=A0#include &quot;sysemu/sysemu.h&quot;<br>&gt; &g=
-t; diff --git a/plugins/core.c b/plugins/core.c<br>&gt; &gt; index 51bfc947=
-87..7a79ea4179 100644<br>&gt; &gt; --- a/plugins/core.c<br>&gt; &gt; +++ b/=
-plugins/core.c<br>&gt; &gt; @@ -12,6 +12,7 @@<br>&gt; &gt; =C2=A0 * SPDX-Li=
-cense-Identifier: GPL-2.0-or-later<br>&gt; &gt; =C2=A0 */<br>&gt; &gt; =C2=
-=A0#include &quot;qemu/osdep.h&quot;<br>&gt; &gt; +#define QEMU_PLUGIN_API_=
-IMPLEMENTATION<br>&gt; &gt; =C2=A0#include &quot;qemu/error-report.h&quot;<=
-br>&gt; &gt; =C2=A0#include &quot;qemu/config-file.h&quot;<br>&gt; &gt; =C2=
-=A0#include &quot;qapi/error.h&quot;<br>&gt;<br>&gt; I don&#39;t think we i=
-nclude qemu/plugin.h from this file although it does<br>&gt; raise the ques=
-tion of what happens when other parts of QEMU include the<br>&gt; internal =
-qemu/plugins.h header.<br>&gt;<br>&gt; --<br>&gt; Alex Benn=C3=A9e<br><br><=
-br><br>--<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=B4<br>=E7=A4=
-=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincerely,<br>=
-Yonggang Luo</div></div>
-
---0000000000000a73da05b0ee902d--
 
