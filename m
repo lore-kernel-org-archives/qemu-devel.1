@@ -2,93 +2,86 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57EBFC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 16:02:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C884C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 16:02:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 002F9206DD
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 16:02:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 835C9206DD
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 16:02:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uypJZ1tr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 002F9206DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PQ9aeIIH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 835C9206DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPSw4-0002Ug-TS
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 12:02:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60018)
+	id 1kPSwi-00036v-JV
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 12:02:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32896)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kPSqB-00046g-NF; Mon, 05 Oct 2020 11:55:56 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:39738)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kPSqA-0001WN-5C; Mon, 05 Oct 2020 11:55:55 -0400
-Received: by mail-pg1-x542.google.com with SMTP id 22so2311888pgv.6;
- Mon, 05 Oct 2020 08:55:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=fONA64XSdMINk4Pb3HJvl02BkTmqUfaoSQk6W/tx2aE=;
- b=uypJZ1trGOSLsslGxqmD6P8w1q7GbCpafx/NUHxKpmX5uzLV0ysM2NDXXfFjFXneeY
- 9DJwWImcSyiGPSFdhJZjkEoCyPFyWsUhcgmovGgE/DniX2hLQ9sHr4MRfoqVWG69Qjls
- tQqP4NNWa9kZKMZ0uq4hYQ5ldIUX5O1miiaaxP5lx1kskE/gjcfsNnGZeIPo8V6lGbSJ
- TT9eIi9yW5TzgZ5Oltgp4M1x11DkTnCTBgUXzZCeIkkEeaWarj+sXSDW4KnpI+Epu37Q
- xmaLu83l41AefoZtRJXqw4XskdHOpqQ1FWPtYwomb+ij91+CDGhoABVTtO1TtpbmJbmR
- l3zg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=fONA64XSdMINk4Pb3HJvl02BkTmqUfaoSQk6W/tx2aE=;
- b=j8io3S2C4JrBsvT/fhWVA9dIPtTEa8mCfPQMDAMoTBhoMZefyMeB1Zyr7yJZyWIdAN
- dSnsYrA53qK8J+LvXYVfN6iH9NL6rfBm4q2oSxKCDMR0xAFNUTgSXzRknWNvzWKil4K7
- RvjKurFXUnwUSExMdrbKCC8zVie/vK2eRs+E3YofBdtmtAvZamLCf4VfXMbQFLWz0LJu
- KN/KPZQftiekKx7K80mSP+AshRuyjJdJ/eWRYTidx50hzs9KLtCKxkLdfJs7gDK/cJW4
- E68LX/yuoToQ97tiRohL7FCmOu8RJvjkQwtLFtPe+eiMkSMAx95HrpoNwZ2cBzPwOjFo
- GgEg==
-X-Gm-Message-State: AOAM530hrTQ3wzHbYDsH4PQ8Ez9bXe/FxQKPaE+AEG6mObjYjJC/kLSf
- ymvGe5rbLmXVYUT1culhLBb20g+myvPLHQ==
-X-Google-Smtp-Source: ABdhPJyIn0sYszzDjP87Ki3otLpJRbPhrTrjcdW6/CLfYEPKc03WVlt9iZwtq9qYMp7xNMmbRv2V1w==
-X-Received: by 2002:aa7:870c:0:b029:142:2501:34d1 with SMTP id
- b12-20020aa7870c0000b0290142250134d1mr409803pfo.42.1601913351047; 
- Mon, 05 Oct 2020 08:55:51 -0700 (PDT)
-Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id u22sm34803pgi.85.2020.10.05.08.55.48
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 05 Oct 2020 08:55:50 -0700 (PDT)
-From: Yonggang Luo <luoyonggang@gmail.com>
-To: qemu-devel@nongnu.org,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Subject: [PATCH v8 3/4] curses: Fixes curses compiling errors.
-Date: Mon,  5 Oct 2020 23:55:23 +0800
-Message-Id: <20201005155524.442-4-luoyonggang@gmail.com>
-X-Mailer: git-send-email 2.28.0.windows.1
-In-Reply-To: <20201005155524.442-1-luoyonggang@gmail.com>
-References: <20201005155524.442-1-luoyonggang@gmail.com>
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kPSty-00015a-EQ
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 11:59:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26804)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kPStq-0002DG-9c
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 11:59:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601913579;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=UNF7vQhyvLveIcH0LkUirOla3WHTA58VFXcyLY7+IQw=;
+ b=PQ9aeIIH5mW182uI2DqdsRkrwQWD8RiVakBLsJFzjcfGALJMEemoEQ7VTmV30ki2Ndonws
+ OWGnBquc9rRL9pTI3CIXOy6BtMmEWl1sWXBIw88prGbVCMoez15lZZUVwL8n9caOVXedlc
+ s0CoJry9ah+JwioHSBAM79b7iZYlKcg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-504-9_KCP4w9OQWra_i7_fRDvg-1; Mon, 05 Oct 2020 11:59:37 -0400
+X-MC-Unique: 9_KCP4w9OQWra_i7_fRDvg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1322218C5218;
+ Mon,  5 Oct 2020 15:59:36 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-113-145.ams2.redhat.com
+ [10.36.113.145])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C59BC60C11;
+ Mon,  5 Oct 2020 15:59:34 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v8 12/14] block: Add bdrv_co_enter()/leave()
+Date: Mon,  5 Oct 2020 17:58:53 +0200
+Message-Id: <20201005155855.256490-13-kwolf@redhat.com>
+In-Reply-To: <20201005155855.256490-1-kwolf@redhat.com>
+References: <20201005155855.256490-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x542.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 01:25:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,64 +94,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>, Yonggang Luo <luoyonggang@gmail.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: kwolf@redhat.com, marcandre.lureau@gmail.com, armbru@redhat.com,
+ stefanha@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is the compiling error:
-../ui/curses.c: In function 'curses_refresh':
-../ui/curses.c:256:5: error: 'next_maybe_keycode' may be used uninitialized in this function [-Werror=maybe-uninitialized]
-  256 |     curses2foo(_curses2keycode, _curseskey2keycode, chr, maybe_keycode)
-      |     ^~~~~~~~~~
-../ui/curses.c:302:32: note: 'next_maybe_keycode' was declared here
-  302 |             enum maybe_keycode next_maybe_keycode;
-      |                                ^~~~~~~~~~~~~~~~~~
-../ui/curses.c:256:5: error: 'maybe_keycode' may be used uninitialized in this function [-Werror=maybe-uninitialized]
-  256 |     curses2foo(_curses2keycode, _curseskey2keycode, chr, maybe_keycode)
-      |     ^~~~~~~~~~
-../ui/curses.c:265:24: note: 'maybe_keycode' was declared here
-  265 |     enum maybe_keycode maybe_keycode;
-      |                        ^~~~~~~~~~~~~
-cc1.exe: all warnings being treated as errors
+Add a pair of functions to temporarily move the current coroutine to the
+AioContext of a given BlockDriverState.
 
-gcc version 10.2.0 (Rev1, Built by MSYS2 project)
-
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- ui/curses.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/block/block.h | 17 +++++++++++++++++
+ block.c               | 23 +++++++++++++++++++++++
+ 2 files changed, 40 insertions(+)
 
-diff --git a/ui/curses.c b/ui/curses.c
-index 12bc682cf9..e4f9588c3e 100644
---- a/ui/curses.c
-+++ b/ui/curses.c
-@@ -262,7 +262,7 @@ static int curses2foo(const int _curses2foo[], const int _curseskey2foo[],
- static void curses_refresh(DisplayChangeListener *dcl)
+diff --git a/include/block/block.h b/include/block/block.h
+index 981ab5b314..b5fa7b2229 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -626,6 +626,23 @@ bool bdrv_debug_is_suspended(BlockDriverState *bs, const char *tag);
+  */
+ AioContext *bdrv_get_aio_context(BlockDriverState *bs);
+ 
++/**
++ * Move the current coroutine to the AioContext of @bs and return the old
++ * AioContext of the coroutine. Increase bs->in_flight so that draining @bs
++ * will wait for the operation to proceed until the corresponding
++ * bdrv_co_leave().
++ *
++ * Consequently, you can't call drain inside a bdrv_co_enter/leave() section as
++ * this will deadlock.
++ */
++AioContext *coroutine_fn bdrv_co_enter(BlockDriverState *bs);
++
++/**
++ * Ends a section started by bdrv_co_enter(). Move the current coroutine back
++ * to old_ctx and decrease bs->in_flight again.
++ */
++void coroutine_fn bdrv_co_leave(BlockDriverState *bs, AioContext *old_ctx);
++
+ /**
+  * Transfer control to @co in the aio context of @bs
+  */
+diff --git a/block.c b/block.c
+index f4b6dd5d3d..5eac2683b2 100644
+--- a/block.c
++++ b/block.c
+@@ -6372,6 +6372,29 @@ AioContext *bdrv_get_aio_context(BlockDriverState *bs)
+     return bs ? bs->aio_context : qemu_get_aio_context();
+ }
+ 
++AioContext *coroutine_fn bdrv_co_enter(BlockDriverState *bs)
++{
++    Coroutine *self = qemu_coroutine_self();
++    AioContext *old_ctx = qemu_coroutine_get_aio_context(self);
++    AioContext *new_ctx;
++
++    /*
++     * Increase bs->in_flight to ensure that this operation is completed before
++     * moving the node to a different AioContext. Read new_ctx only afterwards.
++     */
++    bdrv_inc_in_flight(bs);
++
++    new_ctx = bdrv_get_aio_context(bs);
++    aio_co_reschedule_self(new_ctx);
++    return old_ctx;
++}
++
++void coroutine_fn bdrv_co_leave(BlockDriverState *bs, AioContext *old_ctx)
++{
++    aio_co_reschedule_self(old_ctx);
++    bdrv_dec_in_flight(bs);
++}
++
+ void bdrv_coroutine_enter(BlockDriverState *bs, Coroutine *co)
  {
-     int chr, keysym, keycode, keycode_alt;
--    enum maybe_keycode maybe_keycode;
-+    enum maybe_keycode maybe_keycode = CURSES_KEYCODE;
- 
-     curses_winch_check();
- 
-@@ -299,7 +299,7 @@ static void curses_refresh(DisplayChangeListener *dcl)
- 
-         /* alt or esc key */
-         if (keycode == 1) {
--            enum maybe_keycode next_maybe_keycode;
-+            enum maybe_keycode next_maybe_keycode = CURSES_KEYCODE;
-             int nextchr = console_getch(&next_maybe_keycode);
- 
-             if (nextchr != -1) {
+     aio_co_enter(bdrv_get_aio_context(bs), co);
 -- 
-2.28.0.windows.1
+2.25.4
 
 
