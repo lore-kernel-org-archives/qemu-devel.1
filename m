@@ -7,66 +7,67 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CD3FC47095
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75405C4363A
 	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:13:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0465C2078E
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:13:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 07758207EA
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:13:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ys7qpfnB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0465C2078E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ul2XZwSl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07758207EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPXny-0004r8-5o
+	id 1kPXny-0004sD-63
 	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 17:13:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43162)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43144)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kPXkQ-0008A5-A8
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37539)
+ id 1kPXkO-00089X-Ul
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57940)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kPXkO-0007NS-I2
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:18 -0400
+ id 1kPXkL-0007LM-AK
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601932215;
+ s=mimecast20190719; t=1601932212;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=387ny3+sRKBHYTy13TXt40bJDATXI6sqbRKvGbTh/FE=;
- b=Ys7qpfnBlfXR5AZlNtgPBek8jFdSTD4vNnw7zw5eSwUWoqxsokjbnpe2lurNifQPU/2jzX
- xKeRgvT0uW+anh1VR31P2HGdztOF/7XbxisTagFYzU0ALplN+MkdBDf9xWwN9yeeXopmad
- gDdatW4tYr+yBbAxHlXxgq/nzuMs6H4=
+ bh=VKVHOfnczXhyBWhAP6cPmuP/ZmSpUD+aWjzBUKL3yS8=;
+ b=Ul2XZwSlt7jRXLaLkcmmpdklUrtoFSx7y+jqzB0XkQoPtD1Xt1zKNfo52Rb7SKgmQdO05X
+ g0RRjhTKDX33binorFAhslaE0tpZW2wOtPcMvfQzgyegUIehQeynMoDvTPNqtKm6UqMoUl
+ b2q8nSBEh57a+u6PE3QWVG0B5tcRNFI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-246-ddJml-cNMFW0wQ_puOAW3w-1; Mon, 05 Oct 2020 17:10:11 -0400
-X-MC-Unique: ddJml-cNMFW0wQ_puOAW3w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-402-NL9VSY6vN5uKq8jytm-I5A-1; Mon, 05 Oct 2020 17:10:10 -0400
+X-MC-Unique: NL9VSY6vN5uKq8jytm-I5A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88C051015C9D;
- Mon,  5 Oct 2020 21:10:10 +0000 (UTC)
-Received: from localhost (ovpn-119-102.rdu2.redhat.com [10.10.119.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1788F61177;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44D3E107ACF9;
  Mon,  5 Oct 2020 21:10:08 +0000 (UTC)
+Received: from localhost (ovpn-119-102.rdu2.redhat.com [10.10.119.102])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0D06E5D9CD;
+ Mon,  5 Oct 2020 21:10:07 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 04/21] hw/core/qdev-properties: Fix code style
-Date: Mon,  5 Oct 2020 17:09:43 -0400
-Message-Id: <20201005211000.710404-5-ehabkost@redhat.com>
+Subject: [PULL 03/21] hw/core/qdev-properties: Use qemu_strtoul() in
+ set_pci_host_devaddr()
+Date: Mon,  5 Oct 2020 17:09:42 -0400
+Message-Id: <20201005211000.710404-4-ehabkost@redhat.com>
 In-Reply-To: <20201005211000.710404-1-ehabkost@redhat.com>
 References: <20201005211000.710404-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -107,49 +108,78 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-We will soon move this code, fix its style to avoid checkpatch.pl
-to complain.
+Replace strtoul() by qemu_strtoul() so checkpatch.pl won't complain
+if we move this code later.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200930164949.1425294-5-philmd@redhat.com>
+Message-Id: <20200930164949.1425294-4-philmd@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/core/qdev-properties.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ hw/core/qdev-properties.c | 25 ++++++++++++-------------
+ 1 file changed, 12 insertions(+), 13 deletions(-)
 
 diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index a1190a5db9e..071fd5864ae 100644
+index 080ba319a1f..a1190a5db9e 100644
 --- a/hw/core/qdev-properties.c
 +++ b/hw/core/qdev-properties.c
-@@ -543,15 +543,15 @@ static void set_mac(Object *obj, Visitor *v, const char *name, void *opaque,
-         if (!qemu_isxdigit(str[pos])) {
+@@ -951,7 +951,7 @@ static void set_pci_host_devaddr(Object *obj, Visitor *v, const char *name,
+     Property *prop = opaque;
+     PCIHostDeviceAddress *addr = qdev_get_prop_ptr(dev, prop);
+     char *str, *p;
+-    char *e;
++    const char *e;
+     unsigned long val;
+     unsigned long dom = 0, bus = 0;
+     unsigned int slot = 0, func = 0;
+@@ -966,23 +966,23 @@ static void set_pci_host_devaddr(Object *obj, Visitor *v, const char *name,
+     }
+ 
+     p = str;
+-    val = strtoul(p, &e, 16);
+-    if (e == p || *e != ':') {
++    if (qemu_strtoul(p, &e, 16, &val) < 0 || val > 0xffff || e == p) {
++        goto inval;
++    }
++    if (*e != ':') {
+         goto inval;
+     }
+     bus = val;
+ 
+-    p = e + 1;
+-    val = strtoul(p, &e, 16);
+-    if (e == p) {
++    p = (char *)e + 1;
++    if (qemu_strtoul(p, &e, 16, &val) < 0 || val > 0x1f || e == p) {
+         goto inval;
+     }
+     if (*e == ':') {
+         dom = bus;
+         bus = val;
+-        p = e + 1;
+-        val = strtoul(p, &e, 16);
+-        if (e == p) {
++        p = (char *)e + 1;
++        if (qemu_strtoul(p, &e, 16, &val) < 0 || val > 0x1f || e == p) {
              goto inval;
          }
--        if (!qemu_isxdigit(str[pos+1])) {
-+        if (!qemu_isxdigit(str[pos + 1])) {
-             goto inval;
-         }
-         if (i == 5) {
--            if (str[pos+2] != '\0') {
-+            if (str[pos + 2] != '\0') {
-                 goto inval;
-             }
-         } else {
--            if (str[pos+2] != ':' && str[pos+2] != '-') {
-+            if (str[pos + 2] != ':' && str[pos + 2] != '-') {
-                 goto inval;
-             }
-         }
-@@ -898,8 +898,8 @@ static void set_blocksize(Object *obj, Visitor *v, const char *name,
-     /* We rely on power-of-2 blocksizes for bitmasks */
-     if ((value & (value - 1)) != 0) {
-         error_setg(errp,
--                  "Property %s.%s doesn't take value '%" PRId64 "', it's not a power of 2",
--                  dev->id ?: "", name, (int64_t)value);
-+                  "Property %s.%s doesn't take value '%" PRId64 "', "
-+                  "it's not a power of 2", dev->id ?: "", name, (int64_t)value);
-         return;
+     }
+@@ -991,14 +991,13 @@ static void set_pci_host_devaddr(Object *obj, Visitor *v, const char *name,
+     if (*e != '.') {
+         goto inval;
+     }
+-    p = e + 1;
+-    val = strtoul(p, &e, 10);
+-    if (e == p) {
++    p = (char *)e + 1;
++    if (qemu_strtoul(p, &e, 10, &val) < 0 || val > 7 || e == p) {
+         goto inval;
+     }
+     func = val;
+ 
+-    if (dom > 0xffff || bus > 0xff || slot > 0x1f || func > 7) {
++    if (bus > 0xff) {
+         goto inval;
      }
  
 -- 
