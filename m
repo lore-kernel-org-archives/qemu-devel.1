@@ -4,85 +4,85 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D428C47095
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:16:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C27C4C4727E
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:16:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FC0B2075A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:16:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4614F2078E
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:16:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DbWYt1TS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FC0B2075A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y4JmzGGD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4614F2078E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPXqf-0008Qs-T8
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 17:16:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43390)
+	id 1kPXqh-0008RZ-0d
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 17:16:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43186)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kPXko-0000CE-5c
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40556)
+ id 1kPXkS-0008Al-55
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38856)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kPXkm-0007Ul-2M
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:41 -0400
+ id 1kPXkQ-0007O6-2B
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601932239;
+ s=mimecast20190719; t=1601932217;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=V/DIhyhvEtrkwNuf6rQ6jEyrj/vxKuw1OcuQxCV9B4o=;
- b=DbWYt1TS4BYyXQHu5tFoZT6a7fYGJCysdj0rwhd/da/owFOuImpaFhGsMm7hK6ci2gAd4t
- 0cBS1vvqIJJIaQ708HjSz2Ej7BALe2fquMV+Vj6YJCfOihxm5eyKTmflyKG+csLa1dPnte
- rbqoccffoMLskSUOu4XHKTeToAkqUAI=
+ bh=/pSRTyw/I2c45NOIrr18mZNAWjiTUlL2Mrsv2hSjPbw=;
+ b=Y4JmzGGDf1PBGlzI9oIs5klS9lCq92c7Svr6RGgLBJ/LlKgldC7Aj6qFXHEm5HRFrnWh7l
+ bbNSTq1uWm+ROOZsrx+dp+m/jqR83p7GG3O/VpW9udAh/ztZwDF/pDm89h3krkOKIyOkY6
+ 2b1mGrcNfdJ46fX5cnFkbNSWp90tAVc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-423-K4gQbGmtPwa98O2of_imcA-1; Mon, 05 Oct 2020 17:10:37 -0400
-X-MC-Unique: K4gQbGmtPwa98O2of_imcA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-82-sUNiBgfVMTCJef8HuQ_xyg-1; Mon, 05 Oct 2020 17:10:15 -0400
+X-MC-Unique: sUNiBgfVMTCJef8HuQ_xyg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 42270925C27;
- Mon,  5 Oct 2020 21:10:36 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 23AB787308D;
+ Mon,  5 Oct 2020 21:10:13 +0000 (UTC)
 Received: from localhost (ovpn-119-102.rdu2.redhat.com [10.10.119.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D6D0578800;
- Mon,  5 Oct 2020 21:10:35 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id ABC6655770;
+ Mon,  5 Oct 2020 21:10:12 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 18/21] kernel-doc: Handle function typedefs without asterisks
-Date: Mon,  5 Oct 2020 17:09:57 -0400
-Message-Id: <20201005211000.710404-19-ehabkost@redhat.com>
+Subject: [PULL 06/21] hw/core/qdev-properties: Export qdev_prop_enum
+Date: Mon,  5 Oct 2020 17:09:45 -0400
+Message-Id: <20201005211000.710404-7-ehabkost@redhat.com>
 In-Reply-To: <20201005211000.710404-1-ehabkost@redhat.com>
 References: <20201005211000.710404-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 02:11:31
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 01:25:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
 X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,38 +96,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Example of typedef that was not parsed by kernel-doc:
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-  typedef void (ObjectUnparent)(Object *obj);
-
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20201003024123.193840-3-ehabkost@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200930164949.1425294-7-philmd@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- scripts/kernel-doc | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/hw/qdev-properties.h | 1 +
+ hw/core/qdev-properties.c    | 7 +++++++
+ 2 files changed, 8 insertions(+)
 
-diff --git a/scripts/kernel-doc b/scripts/kernel-doc
-index 57a4a72970f..57b911ff174 100755
---- a/scripts/kernel-doc
-+++ b/scripts/kernel-doc
-@@ -1318,7 +1318,7 @@ sub dump_typedef($$) {
-     $x =~ s@/\*.*?\*/@@gos;	# strip comments.
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index 528310bb22f..44374500659 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -8,6 +8,7 @@
+ extern const PropertyInfo qdev_prop_bit;
+ extern const PropertyInfo qdev_prop_bit64;
+ extern const PropertyInfo qdev_prop_bool;
++extern const PropertyInfo qdev_prop_enum;
+ extern const PropertyInfo qdev_prop_uint8;
+ extern const PropertyInfo qdev_prop_uint16;
+ extern const PropertyInfo qdev_prop_uint32;
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index 76417d09365..31dfe441e2e 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -86,6 +86,13 @@ void qdev_propinfo_set_default_value_enum(ObjectProperty *op,
+         qapi_enum_lookup(prop->info->enum_table, prop->defval.i));
+ }
  
-     # Parse function prototypes
--    if ($x =~ /typedef\s+(\w+\s*\**)\s*\(\*\s*(\w\S+)\s*\)\s*\((.*)\);/ ||
-+    if ($x =~ /typedef\s+(\w+\s*\**)\s*\(\*?\s*(\w\S+)\s*\)\s*\((.*)\);/ ||
- 	$x =~ /typedef\s+(\w+\s*\**)\s*(\w\S+)\s*\s*\((.*)\);/) {
++const PropertyInfo qdev_prop_enum = {
++    .name  = "enum",
++    .get   = qdev_propinfo_get_enum,
++    .set   = qdev_propinfo_set_enum,
++    .set_default_value = qdev_propinfo_set_default_value_enum,
++};
++
+ /* Bit */
  
- 	# Function typedefs
+ static uint32_t qdev_get_prop_mask(Property *prop)
 -- 
 2.26.2
 
