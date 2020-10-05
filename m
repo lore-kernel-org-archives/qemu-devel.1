@@ -2,70 +2,85 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18A8EC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 11:02:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87E7BC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 11:05:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DABF20774
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 11:02:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DABF20774
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0D658206CB
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 11:05:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="U7/F2Wi5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D658206CB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPOG1-0002OU-Lc
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 07:02:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42394)
+	id 1kPOJ4-0004Pc-5X
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 07:05:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42864)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kPOEc-0001Sl-RT; Mon, 05 Oct 2020 07:00:50 -0400
-Resent-Date: Mon, 05 Oct 2020 07:00:50 -0400
-Resent-Message-Id: <E1kPOEc-0001Sl-RT@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21738)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kPOEa-0002xI-Ai; Mon, 05 Oct 2020 07:00:50 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1601895637; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=V5YP+QhqO8EW0v4q129WKeT+DcgzqXHToYUTLxi9GRWG6X499b0mRY27PkHe/U28cOnbnY8PIcJiUwzqc71KflAEf7ukrbeDcr/kYKQtpV/shAEH3ut2XJWro2mRN/q0mnlyTCfLIdkeDiQoxRW+8+oDmeCXvUBu5/qtUFUh1Iw=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1601895637;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=DILhuDN8k6itDBtA3v0cn5ouxqe/RKKHvjzh0n7zuuw=; 
- b=kN6aY0Wj2M0SacYryx72DR1tBA6SpH/Kk73yjUO5QFtptvgXusCYhaAgaq36rxjpOe3khwaKJDKXjdaZty/Jj3tgA1gBJ1RlcORxAzyOOq8/vfm2XhhRmNnm38ao5K84n8PF0AVEQTeVqJkRlC+BphxTGHfybkRNDxcDJ/LNhCQ=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1601895636658231.5983456335009;
- Mon, 5 Oct 2020 04:00:36 -0700 (PDT)
-Subject: Re: [RFC PATCH 0/3] qom: Fix missing interface in qemu-storage-daemon
-Message-ID: <160189563492.31697.9823140619252759195@66eaa9a8a123>
-In-Reply-To: <20201005105442.2093105-1-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1kPOGE-0002mg-89
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 07:02:33 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:38170)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1kPOG8-00037t-6o
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 07:02:29 -0400
+Received: by mail-pg1-x544.google.com with SMTP id g18so3641067pgd.5
+ for <qemu-devel@nongnu.org>; Mon, 05 Oct 2020 04:02:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=daynix-com.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=08vZY+3bcErz95M3JZ2GrS8+wbjWer11x6dH+Wo3MyI=;
+ b=U7/F2Wi5EDYgMyJUT70w1CqyKYUzU3OR8vTxKF/VQ5ucI1x5uA1VoXqXRXArLsVXv5
+ NTkBu10ESZPio1zmwah5J/+iPaM89WzfDMS7f0T9Vqebo4ICcM+Zj3+8RWjT4KUKJSyJ
+ NdnVysZ6fXxpEvAtRk5hklSKGOn0SvLr4Qxa+2ugMK2JAgFwIRg9rWEpC3EtA6K8Ur0l
+ o+VQzDdTguGzHUsHxKqY0AmTsSlH08NT5JIxMep6tmca86ksSXhNDYBMtfDkAfQk9Wta
+ 1gLDZmRNuIL+b9S8RVPunUGGbh02D5LcNBezwf1dBZrHOJEq7SYihhu83JusruiqbcbY
+ Ejpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=08vZY+3bcErz95M3JZ2GrS8+wbjWer11x6dH+Wo3MyI=;
+ b=Guq1/nACfWIs02VOLpsb/jfx1qXcD3iMm5/XR5dANpys7+9SRpo4qnEyye+H2sNIGD
+ PC1J5FyAHucPCxseiOozpRfLkab1I2J+nJk7OzbXfpC7s/3Fdl7waW3SkmTUNRDttYFM
+ 91/zyIUyV4uUlPM2moxHTc5KpuWfzkf9ecLIDoMuoMIQBdg5f1086UNoVLk6umYm3aR3
+ UzFJWR6PsFiR32PsgdlhSyAA5yrON2RSz+Dt5lY28AsKNQgWpJxZQaY2Zc9P/QzaL+QK
+ ZORJExxeg0VXPmOALQsQx4C9EeQwi5vxmmlmMZvhjhs+HsDThfohsftNIkOMZFdYCYgf
+ 0rlQ==
+X-Gm-Message-State: AOAM532aO6COjNwFALsMJaKze4uc6BSQEhC5iHB7IHh5ZXH2Yq/j2J+1
+ WhOgB5iJWauJ+d0VCvozISxnDkwXrp5gy9sEBPz3jsRdGZV5yA==
+X-Google-Smtp-Source: ABdhPJzZSkFlOM0KTo8Bx/m8A3Lx4YhpoOirz5Ekc1MNTopR49ObJPEjj3mKYA7em+aBwhfFH5nV2c24Vi/sUyDu5/Q=
+X-Received: by 2002:a63:fe03:: with SMTP id p3mr14026134pgh.100.1601895742371; 
+ Mon, 05 Oct 2020 04:02:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: philmd@redhat.com
-Date: Mon, 5 Oct 2020 04:00:36 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 07:00:43
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+References: <20201005090140.90461-1-andrew@daynix.com>
+ <20201005090140.90461-3-andrew@daynix.com>
+ <20201005060809-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20201005060809-mutt-send-email-mst@kernel.org>
+From: Andrew Melnichenko <andrew@daynix.com>
+Date: Mon, 5 Oct 2020 14:33:18 +0300
+Message-ID: <CABcq3pEx_vqgtMbhBwsw52cOhGQuyh7YjAnVnHni3-31iz5-zw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] hw/virtio-pci Added AER capability.
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000b1143405b0ea6abb"
+Received-SPF: none client-ip=2607:f8b0:4864:20::544;
+ envelope-from=andrew@daynix.com; helo=mail-pg1-x544.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,27 +93,234 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
- qemu-block@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org,
- kraxel@redhat.com, pbonzini@redhat.com, lersek@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMTAwNTEwNTQ0Mi4yMDkz
-MTA1LTEtcGhpbG1kQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIGJ1aWxk
-IHRlc3Qgb24gRnJlZUJTRCBob3N0LiBQbGVhc2UgZmluZCB0aGUgZGV0YWlscyBiZWxvdy4KCj09
-PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKIyBUZXN0aW5nIHNjcmlwdCB3aWxs
-IGJlIGludm9rZWQgdW5kZXIgdGhlIGdpdCBjaGVja291dCB3aXRoCiMgSEVBRCBwb2ludGluZyB0
-byBhIGNvbW1pdCB0aGF0IGhhcyB0aGUgcGF0Y2hlcyBhcHBsaWVkIG9uIHRvcCBvZiAiYmFzZSIK
-IyBicmFuY2gKaWYgcWVtdS1zeXN0ZW0teDg2XzY0IC0taGVscCA+L2Rldi9udWxsIDI+JjE7IHRo
-ZW4KICBRRU1VPXFlbXUtc3lzdGVtLXg4Nl82NAplbGlmIC91c3IvbGliZXhlYy9xZW11LWt2bSAt
-LWhlbHAgPi9kZXYvbnVsbCAyPiYxOyB0aGVuCiAgUUVNVT0vdXNyL2xpYmV4ZWMvcWVtdS1rdm0K
-ZWxzZQogIGV4aXQgMQpmaQptYWtlIHZtLWJ1aWxkLWZyZWVic2QgSj0yMSBRRU1VPSRRRU1VCmV4
-aXQgMAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJs
-ZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMTAwNTEwNTQ0Mi4yMDkzMTA1LTEtcGhp
-bG1kQHJlZGhhdC5jb20vdGVzdGluZy5GcmVlQlNELz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBn
-ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10u
-ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+--000000000000b1143405b0ea6abb
+Content-Type: text/plain; charset="UTF-8"
+
+yes
+
+>     DEFINE_PROP_BIT("aer", VirtIOPCIProxy, flags,
+>                     VIRTIO_PCI_FLAG_AER_BIT, *false*),
+>
+
+On Mon, Oct 5, 2020 at 1:08 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+
+> On Mon, Oct 05, 2020 at 12:01:40PM +0300, andrew@daynix.com wrote:
+> > From: Andrew <andrew@daynix.com>
+> >
+> > Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1857668
+> > Added AER capability for virtio-pci devices.
+> > Also added property for devices, by default AER is enabled.
+>
+>
+> Looking at code it's disabled by default, isn't it?
+>
+> >
+> > Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
+> > ---
+> >  hw/virtio/virtio-pci.c | 16 ++++++++++++++++
+> >  hw/virtio/virtio-pci.h |  4 ++++
+> >  2 files changed, 20 insertions(+)
+> >
+> > diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> > index ae60c1e249..e0a7936f9c 100644
+> > --- a/hw/virtio/virtio-pci.c
+> > +++ b/hw/virtio/virtio-pci.c
+> > @@ -1807,6 +1807,12 @@ static void virtio_pci_realize(PCIDevice
+> *pci_dev, Error **errp)
+> >           */
+> >          pci_set_word(pci_dev->config + pos + PCI_PM_PMC, 0x3);
+> >
+> > +        if (proxy->flags & VIRTIO_PCI_FLAG_AER) {
+> > +            pcie_aer_init(pci_dev, PCI_ERR_VER, last_pcie_cap_offset,
+> > +                          PCI_ERR_SIZEOF, NULL);
+> > +            last_pcie_cap_offset += PCI_ERR_SIZEOF;
+> > +        }
+> > +
+> >          if (proxy->flags & VIRTIO_PCI_FLAG_INIT_DEVERR) {
+> >              /* Init error enabling flags */
+> >              pcie_cap_deverr_init(pci_dev);
+> > @@ -1848,7 +1854,15 @@ static void virtio_pci_realize(PCIDevice
+> *pci_dev, Error **errp)
+> >
+> >  static void virtio_pci_exit(PCIDevice *pci_dev)
+> >  {
+> > +    VirtIOPCIProxy *proxy = VIRTIO_PCI(pci_dev);
+> > +    bool pcie_port = pci_bus_is_express(pci_get_bus(pci_dev)) &&
+> > +                     !pci_bus_is_root(pci_get_bus(pci_dev));
+> > +
+> >      msix_uninit_exclusive_bar(pci_dev);
+> > +    if (proxy->flags & VIRTIO_PCI_FLAG_AER && pcie_port &&
+> > +        pci_is_express(pci_dev)) {
+> > +        pcie_aer_exit(pci_dev);
+> > +    }
+> >  }
+> >
+> >  static void virtio_pci_reset(DeviceState *qdev)
+> > @@ -1901,6 +1915,8 @@ static Property virtio_pci_properties[] = {
+> >                      VIRTIO_PCI_FLAG_INIT_PM_BIT, true),
+> >      DEFINE_PROP_BIT("x-pcie-flr-init", VirtIOPCIProxy, flags,
+> >                      VIRTIO_PCI_FLAG_INIT_FLR_BIT, true),
+> > +    DEFINE_PROP_BIT("aer", VirtIOPCIProxy, flags,
+> > +                    VIRTIO_PCI_FLAG_AER_BIT, false),
+> >      DEFINE_PROP_END_OF_LIST(),
+> >  };
+> >
+> > diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+> > index 91096f0291..3986b4f0e3 100644
+> > --- a/hw/virtio/virtio-pci.h
+> > +++ b/hw/virtio/virtio-pci.h
+> > @@ -45,6 +45,7 @@ enum {
+> >      VIRTIO_PCI_FLAG_INIT_LNKCTL_BIT,
+> >      VIRTIO_PCI_FLAG_INIT_PM_BIT,
+> >      VIRTIO_PCI_FLAG_INIT_FLR_BIT,
+> > +    VIRTIO_PCI_FLAG_AER_BIT,
+> >  };
+> >
+> >  /* Need to activate work-arounds for buggy guests at vmstate load. */
+> > @@ -84,6 +85,9 @@ enum {
+> >  /* Init Function Level Reset capability */
+> >  #define VIRTIO_PCI_FLAG_INIT_FLR (1 << VIRTIO_PCI_FLAG_INIT_FLR_BIT)
+> >
+> > +/* Advanced Error Reporting capability */
+> > +#define VIRTIO_PCI_FLAG_AER (1 << VIRTIO_PCI_FLAG_AER_BIT)
+> > +
+> >  typedef struct {
+> >      MSIMessage msg;
+> >      int virq;
+> > --
+> > 2.28.0
+>
+>
+
+--000000000000b1143405b0ea6abb
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>yes</div><blockquote class=3D"gmail_quote" style=3D"m=
+argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
+:1ex"><div>=C2=A0 =C2=A0 DEFINE_PROP_BIT(&quot;aer&quot;, VirtIOPCIProxy, f=
+lags,<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 VIRTIO_PCI_FLAG_AER_BIT, <b>false</b>),</div></blockquote></div><br><di=
+v class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Mon, Oct 5=
+, 2020 at 1:08 PM Michael S. Tsirkin &lt;<a href=3D"mailto:mst@redhat.com">=
+mst@redhat.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" st=
+yle=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padd=
+ing-left:1ex">On Mon, Oct 05, 2020 at 12:01:40PM +0300, <a href=3D"mailto:a=
+ndrew@daynix.com" target=3D"_blank">andrew@daynix.com</a> wrote:<br>
+&gt; From: Andrew &lt;<a href=3D"mailto:andrew@daynix.com" target=3D"_blank=
+">andrew@daynix.com</a>&gt;<br>
+&gt; <br>
+&gt; Buglink: <a href=3D"https://bugzilla.redhat.com/show_bug.cgi?id=3D1857=
+668" rel=3D"noreferrer" target=3D"_blank">https://bugzilla.redhat.com/show_=
+bug.cgi?id=3D1857668</a><br>
+&gt; Added AER capability for virtio-pci devices.<br>
+&gt; Also added property for devices, by default AER is enabled.<br>
+<br>
+<br>
+Looking at code it&#39;s disabled by default, isn&#39;t it?<br>
+<br>
+&gt; <br>
+&gt; Signed-off-by: Andrew Melnychenko &lt;<a href=3D"mailto:andrew@daynix.=
+com" target=3D"_blank">andrew@daynix.com</a>&gt;<br>
+&gt; ---<br>
+&gt;=C2=A0 hw/virtio/virtio-pci.c | 16 ++++++++++++++++<br>
+&gt;=C2=A0 hw/virtio/virtio-pci.h |=C2=A0 4 ++++<br>
+&gt;=C2=A0 2 files changed, 20 insertions(+)<br>
+&gt; <br>
+&gt; diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c<br>
+&gt; index ae60c1e249..e0a7936f9c 100644<br>
+&gt; --- a/hw/virtio/virtio-pci.c<br>
+&gt; +++ b/hw/virtio/virtio-pci.c<br>
+&gt; @@ -1807,6 +1807,12 @@ static void virtio_pci_realize(PCIDevice *pci_d=
+ev, Error **errp)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 pci_set_word(pci_dev-&gt;config + po=
+s + PCI_PM_PMC, 0x3);<br>
+&gt;=C2=A0 <br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (proxy-&gt;flags &amp; VIRTIO_PCI_FLAG=
+_AER) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 pcie_aer_init(pci_dev, PCI_=
+ERR_VER, last_pcie_cap_offset,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 PCI_ERR_SIZEOF, NULL);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 last_pcie_cap_offset +=3D P=
+CI_ERR_SIZEOF;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (proxy-&gt;flags &amp; VIRTIO_PCI=
+_FLAG_INIT_DEVERR) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* Init error enabling=
+ flags */<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 pcie_cap_deverr_init(p=
+ci_dev);<br>
+&gt; @@ -1848,7 +1854,15 @@ static void virtio_pci_realize(PCIDevice *pci_d=
+ev, Error **errp)<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 static void virtio_pci_exit(PCIDevice *pci_dev)<br>
+&gt;=C2=A0 {<br>
+&gt; +=C2=A0 =C2=A0 VirtIOPCIProxy *proxy =3D VIRTIO_PCI(pci_dev);<br>
+&gt; +=C2=A0 =C2=A0 bool pcie_port =3D pci_bus_is_express(pci_get_bus(pci_d=
+ev)) &amp;&amp;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0!pci_bus_is_root(pci_get_bus(pci_dev));<br>
+&gt; +<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 msix_uninit_exclusive_bar(pci_dev);<br>
+&gt; +=C2=A0 =C2=A0 if (proxy-&gt;flags &amp; VIRTIO_PCI_FLAG_AER &amp;&amp=
+; pcie_port &amp;&amp;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 pci_is_express(pci_dev)) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 pcie_aer_exit(pci_dev);<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt;=C2=A0 }<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 static void virtio_pci_reset(DeviceState *qdev)<br>
+&gt; @@ -1901,6 +1915,8 @@ static Property virtio_pci_properties[] =3D {<br=
+>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 VIRTIO_PCI_FLAG_INIT_PM_BIT, true),<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 DEFINE_PROP_BIT(&quot;x-pcie-flr-init&quot;, VirtI=
+OPCIProxy, flags,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 VIRTIO_PCI_FLAG_INIT_FLR_BIT, true),<br>
+&gt; +=C2=A0 =C2=A0 DEFINE_PROP_BIT(&quot;aer&quot;, VirtIOPCIProxy, flags,=
+<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ VIRTIO_PCI_FLAG_AER_BIT, false),<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 DEFINE_PROP_END_OF_LIST(),<br>
+&gt;=C2=A0 };<br>
+&gt;=C2=A0 <br>
+&gt; diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h<br>
+&gt; index 91096f0291..3986b4f0e3 100644<br>
+&gt; --- a/hw/virtio/virtio-pci.h<br>
+&gt; +++ b/hw/virtio/virtio-pci.h<br>
+&gt; @@ -45,6 +45,7 @@ enum {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 VIRTIO_PCI_FLAG_INIT_LNKCTL_BIT,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 VIRTIO_PCI_FLAG_INIT_PM_BIT,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 VIRTIO_PCI_FLAG_INIT_FLR_BIT,<br>
+&gt; +=C2=A0 =C2=A0 VIRTIO_PCI_FLAG_AER_BIT,<br>
+&gt;=C2=A0 };<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 /* Need to activate work-arounds for buggy guests at vmstate loa=
+d. */<br>
+&gt; @@ -84,6 +85,9 @@ enum {<br>
+&gt;=C2=A0 /* Init Function Level Reset capability */<br>
+&gt;=C2=A0 #define VIRTIO_PCI_FLAG_INIT_FLR (1 &lt;&lt; VIRTIO_PCI_FLAG_INI=
+T_FLR_BIT)<br>
+&gt;=C2=A0 <br>
+&gt; +/* Advanced Error Reporting capability */<br>
+&gt; +#define VIRTIO_PCI_FLAG_AER (1 &lt;&lt; VIRTIO_PCI_FLAG_AER_BIT)<br>
+&gt; +<br>
+&gt;=C2=A0 typedef struct {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 MSIMessage msg;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 int virq;<br>
+&gt; -- <br>
+&gt; 2.28.0<br>
+<br>
+</blockquote></div>
+
+--000000000000b1143405b0ea6abb--
 
