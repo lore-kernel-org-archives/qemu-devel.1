@@ -7,68 +7,69 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D6FDC46466
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 18:56:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A54A6C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 18:57:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B21B620756
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 18:56:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2362F20853
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 18:57:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="IXGgpl/6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B21B620756
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="A91B3kwo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2362F20853
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPVf8-0003fZ-Qk
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 14:56:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44436)
+	id 1kPVfY-0004aZ-7z
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 14:57:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44362)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1kPVaM-0006qH-PR
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 14:51:46 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:56572)
+ id 1kPVaE-0006gZ-M0
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 14:51:38 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:56408)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1kPVaK-00085G-6Y
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 14:51:46 -0400
+ id 1kPVaB-000847-62
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 14:51:38 -0400
 Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 095InPQK184577;
- Mon, 5 Oct 2020 18:51:36 GMT
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 095InRwO184669;
+ Mon, 5 Oct 2020 18:51:27 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=+gUipXBt1XgHJhNX5iQGgCzDEU/jXvwBoewdf5qPP+0=;
- b=IXGgpl/6IxtR7/ej5h6S4f0pp5JVpPQuALznavTmm302pcVQfcW4BG+u5gAvJL3+lbpC
- GmdTSzdKsho0tQ1wfUVhPPzcAbi/xVJZV5VbeFprqTrs1Ri6pxGMocQdc9a1ESFoKLc1
- bX2YSpCiFpfm9crox8l7Rq8jBC9BYsnaYDxwemO5Q1V7HkExz/sBFYJzmNMeDiO28BW+
- LkJ94OFilkpo1qe3AhLjEpXTbBpWOCZbdpQuEk9AI3PRjb3vi4ACtYx4sGPelCoQnn1/
- X4RQxSglhmiFaXSc9umFjYgZZiYUfCCPwkxHpJ3a/bg1hWbVtsBAiovZeOWcCkWQ4Hjb tw== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by userp2120.oracle.com with ESMTP id 33xhxmq55s-1
+ bh=TxbYluq6P+wdVO3WejpM0UCI4Gev1IIpPMAx0KMXa60=;
+ b=A91B3kwoQ5IJQB0Oy4UrOmc3KLqlPcOcfqQxIK5l4rz1/StGZgPIT2WrpBaZgiMJXZMu
+ AvKO5OE0pHUtfGlH3tAm9obms9SdONpv7xKPsQqftUhQ50FIHhfe4jDNyh15aBMR45OT
+ +Z705DzJyRaxdqWLXpUf70TBjgJQhQaDUSdAxUfnWJhAOpIqudXhRYbw6bIjQteJLW5Z
+ ubGqa7z0cY0Q3P7dhqmK7Z38TFaexqL2tEZoxY8owql44nnILQm7XYH4EaN5xIyol4SE
+ KBQn4EBAk9KYRnpRtQkwrQlZPsI1GebbarWYlryijIkGR4YiTw+IFFODZvgxQf53QS+s ww== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by userp2120.oracle.com with ESMTP id 33xhxmq551-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Mon, 05 Oct 2020 18:51:36 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 095Ip7H4026350;
- Mon, 5 Oct 2020 18:51:36 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by userp3020.oracle.com with ESMTP id 33yyje8phe-1
+ Mon, 05 Oct 2020 18:51:27 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 095IpDqn182601;
+ Mon, 5 Oct 2020 18:51:26 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by aserp3030.oracle.com with ESMTP id 33y2vkvf8j-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 05 Oct 2020 18:51:35 +0000
+ Mon, 05 Oct 2020 18:51:26 +0000
 Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 095IpYr6014561;
- Mon, 5 Oct 2020 18:51:34 GMT
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 095IpPnl001930;
+ Mon, 5 Oct 2020 18:51:26 GMT
 Received: from flaka.hsd1.ca.comcast.net (/67.180.143.163)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 05 Oct 2020 11:51:33 -0700
+ with ESMTP ; Mon, 05 Oct 2020 11:51:25 -0700
 From: elena.ufimtseva@oracle.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH v10 14/19] multi-process: Synchronize remote memory
-Date: Mon,  5 Oct 2020 11:51:02 -0700
-Message-Id: <36d29152d22987013503c911efad9e6648752445.1601923020.git.elena.ufimtseva@oracle.com>
+Subject: [PATCH v10 09/19] multi-process: setup memory manager for remote
+ device
+Date: Mon,  5 Oct 2020 11:50:57 -0700
+Message-Id: <206d07ba1eeedcd42bdfff8d828a086c7dc8fe93.1601923020.git.elena.ufimtseva@oracle.com>
 X-Mailer: git-send-email 2.25.GIT
 In-Reply-To: <cover.1601923020.git.elena.ufimtseva@oracle.com>
 References: <cover.1601923020.git.elena.ufimtseva@oracle.com>
@@ -77,11 +78,11 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9765
  signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=4
- adultscore=0 bulkscore=0
- phishscore=0 mlxlogscore=999 mlxscore=0 spamscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2010050136
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ mlxlogscore=999
+ malwarescore=0 suspectscore=4 spamscore=0 phishscore=0 bulkscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2010050136
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9765
  signatures=668680
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
@@ -127,72 +128,61 @@ Sender: "Qemu-devel"
 
 From: Jagannathan Raman <jag.raman@oracle.com>
 
-Add memory-listener object which is used to keep the view of the RAM
-in sync between QEMU and remote process.
-A MemoryListener is registered for system-memory AddressSpace. The
-listener sends SYNC_SYSMEM message to the remote process when memory
-listener commits the changes to memory, the remote process receives
-the message and processes it in the handler for SYNC_SYSMEM message.
+SyncSysMemMsg message format is defined. It is used to send
+file descriptors of the RAM regions to remote device.
+RAM on the remote device is configured with a set of file descriptors.
+Old RAM regions are deleted and new regions, each with an fd, is
+added to the RAM.
 
 Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- MAINTAINERS                  |   2 +
- hw/i386/remote-msg.c         |   5 +
- hw/pci/memory-sync.c         | 210 +++++++++++++++++++++++++++++++++++
- hw/pci/meson.build           |   2 +
- hw/pci/proxy.c               |   6 +
- include/hw/pci/memory-sync.h |  27 +++++
- include/hw/pci/proxy.h       |   2 +
- 7 files changed, 254 insertions(+)
- create mode 100644 hw/pci/memory-sync.c
- create mode 100644 include/hw/pci/memory-sync.h
+ MAINTAINERS                     |  2 ++
+ hw/i386/meson.build             |  1 +
+ hw/i386/remote-memory.c         | 58 +++++++++++++++++++++++++++++++++
+ include/hw/i386/remote-memory.h | 19 +++++++++++
+ include/io/mpqemu-link.h        | 13 ++++++++
+ io/mpqemu-link.c                | 11 +++++++
+ 6 files changed, 104 insertions(+)
+ create mode 100644 hw/i386/remote-memory.c
+ create mode 100644 include/hw/i386/remote-memory.h
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 7b2096b300..aa18f4fe86 100644
+index ac8eefaa3f..14b8c005fc 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -3054,6 +3054,8 @@ F: include/hw/i386/remote-memory.h
- F: hw/i386/remote-memory.c
- F: hw/pci/proxy.c
- F: include/hw/pci/proxy.h
-+F: hw/pci/memory-sync.c
-+F: include/hw/pci/memory-sync.h
+@@ -3050,6 +3050,8 @@ F: include/io/mpqemu-link.h
+ F: hw/i386/remote-msg.c
+ F: include/hw/i386/remote-obj.h
+ F: hw/i386/remote-obj.c
++F: include/hw/i386/remote-memory.h
++F: hw/i386/remote-memory.c
  
  Build and test automation
  -------------------------
-diff --git a/hw/i386/remote-msg.c b/hw/i386/remote-msg.c
-index 9b9ca7ea53..3465a9ddd6 100644
---- a/hw/i386/remote-msg.c
-+++ b/hw/i386/remote-msg.c
-@@ -17,6 +17,7 @@
- #include "sysemu/runstate.h"
- #include "hw/pci/pci.h"
- #include "exec/memattrs.h"
-+#include "hw/i386/remote-memory.h"
+diff --git a/hw/i386/meson.build b/hw/i386/meson.build
+index 7b35f35d86..36e151c80a 100644
+--- a/hw/i386/meson.build
++++ b/hw/i386/meson.build
+@@ -26,6 +26,7 @@ i386_ss.add(when: 'CONFIG_PC', if_true: files(
+ i386_ss.add(when: 'CONFIG_MPQEMU', if_true: files('remote.c'))
+ i386_ss.add(when: 'CONFIG_MPQEMU', if_true: files('remote-msg.c'))
+ i386_ss.add(when: 'CONFIG_MPQEMU', if_true: files('remote-obj.c'))
++i386_ss.add(when: 'CONFIG_MPQEMU', if_true: files('remote-memory.c'))
  
- static void process_config_write(QIOChannel *ioc, PCIDevice *dev,
-                                  MPQemuMsg *msg);
-@@ -64,6 +65,10 @@ void coroutine_fn mpqemu_remote_msg_loop_co(void *data)
-         case BAR_READ:
-             process_bar_read(com->ioc, &msg, &local_err);
-             break;
-+        case SYNC_SYSMEM:
-+            remote_sysmem_reconfig(&msg, &local_err);
-+            break;
-+
-         default:
-             error_setg(&local_err,
-                        "Unknown command (%d) received for device %s (pid=%d)",
-diff --git a/hw/pci/memory-sync.c b/hw/pci/memory-sync.c
+ subdir('kvm')
+ subdir('xen')
+diff --git a/hw/i386/remote-memory.c b/hw/i386/remote-memory.c
 new file mode 100644
-index 0000000000..26a8784af0
+index 0000000000..27bc8a7674
 --- /dev/null
-+++ b/hw/pci/memory-sync.c
-@@ -0,0 +1,210 @@
++++ b/hw/i386/remote-memory.c
+@@ -0,0 +1,58 @@
 +/*
++ * Memory manager for remote device
++ *
 + * Copyright © 2018, 2020 Oracle and/or its affiliates.
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or later.
@@ -203,253 +193,60 @@ index 0000000000..26a8784af0
 +#include "qemu/osdep.h"
 +#include "qemu-common.h"
 +
-+#include "qemu/compiler.h"
-+#include "qemu/int128.h"
-+#include "qemu/range.h"
-+#include "exec/memory.h"
-+#include "exec/cpu-common.h"
-+#include "cpu.h"
-+#include "exec/ram_addr.h"
++#include "hw/i386/remote-memory.h"
 +#include "exec/address-spaces.h"
-+#include "io/mpqemu-link.h"
-+#include "hw/pci/memory-sync.h"
++#include "exec/ram_addr.h"
++#include "qapi/error.h"
 +
-+static void proxy_ml_begin(MemoryListener *listener)
++void remote_sysmem_reconfig(MPQemuMsg *msg, Error **errp)
 +{
-+    RemoteMemSync *sync = container_of(listener, RemoteMemSync, listener);
-+    int mrs;
++    SyncSysmemMsg *sysmem_info = &msg->data.sync_sysmem;
++    MemoryRegion *sysmem, *subregion, *next;
++    static unsigned int suffix;
++    Error *local_err = NULL;
++    char *name;
++    int region;
 +
-+    for (mrs = 0; mrs < sync->n_mr_sections; mrs++) {
-+        memory_region_unref(sync->mr_sections[mrs].mr);
-+    }
++    sysmem = get_system_memory();
 +
-+    g_free(sync->mr_sections);
-+    sync->mr_sections = NULL;
-+    sync->n_mr_sections = 0;
-+}
++    memory_region_transaction_begin();
 +
-+static int get_fd_from_hostaddr(uint64_t host, ram_addr_t *offset)
-+{
-+    MemoryRegion *mr;
-+    ram_addr_t off;
-+
-+    /**
-+     * Assumes that the host address is a valid address as it's
-+     * coming from the MemoryListener system. In the case host
-+     * address is not valid, the following call would return
-+     * the default subregion of "system_memory" region, and
-+     * not NULL. So it's not possible to check for NULL here.
-+     */
-+    mr = memory_region_from_host((void *)(uintptr_t)host, &off);
-+
-+    if (offset) {
-+        *offset = off;
-+    }
-+
-+    return memory_region_get_fd(mr);
-+}
-+
-+static bool proxy_mrs_can_merge(uint64_t host, uint64_t prev_host, size_t size)
-+{
-+    bool merge;
-+    int fd1, fd2;
-+
-+    fd1 = get_fd_from_hostaddr(host, NULL);
-+
-+    fd2 = get_fd_from_hostaddr(prev_host, NULL);
-+
-+    merge = (fd1 == fd2);
-+
-+    merge &= ((prev_host + size) == host);
-+
-+    return merge;
-+}
-+
-+static bool try_merge(RemoteMemSync *sync, MemoryRegionSection *section)
-+{
-+    uint64_t mrs_size, mrs_gpa, mrs_page;
-+    MemoryRegionSection *prev_sec;
-+    bool merged = false;
-+    uintptr_t mrs_host;
-+    RAMBlock *mrs_rb;
-+
-+    if (!sync->n_mr_sections) {
-+        return false;
-+    }
-+
-+    mrs_rb = section->mr->ram_block;
-+    mrs_page = (uint64_t)qemu_ram_pagesize(mrs_rb);
-+    mrs_size = int128_get64(section->size);
-+    mrs_gpa = section->offset_within_address_space;
-+    mrs_host = (uintptr_t)memory_region_get_ram_ptr(section->mr) +
-+               section->offset_within_region;
-+
-+    if (get_fd_from_hostaddr(mrs_host, NULL) < 0) {
-+        return true;
-+    }
-+
-+    mrs_host = mrs_host & ~(mrs_page - 1);
-+    mrs_gpa = mrs_gpa & ~(mrs_page - 1);
-+    mrs_size = ROUND_UP(mrs_size, mrs_page);
-+
-+    prev_sec = sync->mr_sections + (sync->n_mr_sections - 1);
-+    uint64_t prev_gpa_start = prev_sec->offset_within_address_space;
-+    uint64_t prev_size = int128_get64(prev_sec->size);
-+    uint64_t prev_gpa_end   = range_get_last(prev_gpa_start, prev_size);
-+    uint64_t prev_host_start =
-+        (uintptr_t)memory_region_get_ram_ptr(prev_sec->mr) +
-+        prev_sec->offset_within_region;
-+    uint64_t prev_host_end = range_get_last(prev_host_start, prev_size);
-+
-+    if (mrs_gpa <= (prev_gpa_end + 1)) {
-+        g_assert(mrs_gpa > prev_gpa_start);
-+
-+        if ((section->mr == prev_sec->mr) &&
-+            proxy_mrs_can_merge(mrs_host, prev_host_start,
-+                                (mrs_gpa - prev_gpa_start))) {
-+            uint64_t max_end = MAX(prev_host_end, mrs_host + mrs_size);
-+            merged = true;
-+            prev_sec->offset_within_address_space =
-+                MIN(prev_gpa_start, mrs_gpa);
-+            prev_sec->offset_within_region =
-+                MIN(prev_host_start, mrs_host) -
-+                (uintptr_t)memory_region_get_ram_ptr(prev_sec->mr);
-+            prev_sec->size = int128_make64(max_end - MIN(prev_host_start,
-+                                                         mrs_host));
++    QTAILQ_FOREACH_SAFE(subregion, &sysmem->subregions, subregions_link, next) {
++        if (subregion->ram) {
++            memory_region_del_subregion(sysmem, subregion);
++            object_unparent(OBJECT(subregion));
 +        }
 +    }
 +
-+    return merged;
-+}
++    for (region = 0; region < msg->num_fds; region++) {
++        subregion = g_new(MemoryRegion, 1);
++        name = g_strdup_printf("remote-mem-%u", suffix++);
++        memory_region_init_ram_from_fd(subregion, NULL,
++                                       name, sysmem_info->sizes[region],
++                                       RAM_SHARED, msg->fds[region],
++                                       sysmem_info->offsets[region],
++                                       &local_err);
++        g_free(name);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            break;
++        }
 +
-+static void proxy_ml_region_addnop(MemoryListener *listener,
-+                                   MemoryRegionSection *section)
-+{
-+    RemoteMemSync *sync = container_of(listener, RemoteMemSync, listener);
-+
-+    if (!(memory_region_is_ram(section->mr) &&
-+          !memory_region_is_rom(section->mr))) {
-+        return;
++        memory_region_add_subregion(sysmem, sysmem_info->gpas[region],
++                                    subregion);
 +    }
 +
-+    if (try_merge(sync, section)) {
-+        return;
-+    }
-+
-+    ++sync->n_mr_sections;
-+    sync->mr_sections = g_renew(MemoryRegionSection, sync->mr_sections,
-+                                sync->n_mr_sections);
-+    sync->mr_sections[sync->n_mr_sections - 1] = *section;
-+    sync->mr_sections[sync->n_mr_sections - 1].fv = NULL;
-+    memory_region_ref(section->mr);
++    memory_region_transaction_commit();
 +}
-+
-+static void proxy_ml_commit(MemoryListener *listener)
-+{
-+    RemoteMemSync *sync = container_of(listener, RemoteMemSync, listener);
-+    MPQemuMsg msg;
-+    MemoryRegionSection *section;
-+    ram_addr_t offset;
-+    uintptr_t host_addr;
-+    int region;
-+    Error *local_err = NULL;
-+
-+    memset(&msg, 0, sizeof(MPQemuMsg));
-+
-+    msg.cmd = SYNC_SYSMEM;
-+    msg.num_fds = sync->n_mr_sections;
-+    msg.size = sizeof(SyncSysmemMsg);
-+    if (msg.num_fds > REMOTE_MAX_FDS) {
-+        error_report("Number of fds is more than %d", REMOTE_MAX_FDS);
-+        return;
-+    }
-+
-+    for (region = 0; region < sync->n_mr_sections; region++) {
-+        section = &sync->mr_sections[region];
-+        msg.data.sync_sysmem.gpas[region] =
-+            section->offset_within_address_space;
-+        msg.data.sync_sysmem.sizes[region] = int128_get64(section->size);
-+        host_addr = (uintptr_t)memory_region_get_ram_ptr(section->mr) +
-+                    section->offset_within_region;
-+        msg.fds[region] = get_fd_from_hostaddr(host_addr, &offset);
-+        msg.data.sync_sysmem.offsets[region] = offset;
-+    }
-+    mpqemu_msg_send(&msg, sync->ioc, &local_err);
-+    if (local_err) {
-+        error_report("Error in sending command %d", msg.cmd);
-+    }
-+}
-+
-+void deconfigure_memory_sync(RemoteMemSync *sync)
-+{
-+    memory_listener_unregister(&sync->listener);
-+
-+    proxy_ml_begin(&sync->listener);
-+}
-+
-+void configure_memory_sync(RemoteMemSync *sync, QIOChannel *ioc)
-+{
-+    sync->n_mr_sections = 0;
-+    sync->mr_sections = NULL;
-+
-+    sync->ioc = ioc;
-+
-+    sync->listener.begin = proxy_ml_begin;
-+    sync->listener.commit = proxy_ml_commit;
-+    sync->listener.region_add = proxy_ml_region_addnop;
-+    sync->listener.region_nop = proxy_ml_region_addnop;
-+    sync->listener.priority = 10;
-+
-+    memory_listener_register(&sync->listener, &address_space_memory);
-+}
-diff --git a/hw/pci/meson.build b/hw/pci/meson.build
-index 0df30172b5..7947a6235e 100644
---- a/hw/pci/meson.build
-+++ b/hw/pci/meson.build
-@@ -18,3 +18,5 @@ softmmu_ss.add_all(when: 'CONFIG_PCI', if_true: pci_ss)
- 
- softmmu_ss.add(when: 'CONFIG_PCI', if_false: files('pci-stub.c'))
- softmmu_ss.add(when: 'CONFIG_ALL', if_true: files('pci-stub.c'))
-+
-+specific_ss.add(when: 'CONFIG_MPQEMU', if_true: files('memory-sync.c'))
-diff --git a/hw/pci/proxy.c b/hw/pci/proxy.c
-index 4e23c752cc..008af7e8f5 100644
---- a/hw/pci/proxy.c
-+++ b/hw/pci/proxy.c
-@@ -18,6 +18,8 @@
- #include "migration/blocker.h"
- #include "io/mpqemu-link.h"
- #include "qemu/error-report.h"
-+#include "hw/pci/memory-sync.h"
-+#include "qom/object.h"
- 
- static void proxy_set_socket(PCIProxyDev *pdev, int fd, Error **errp)
- {
-@@ -58,6 +60,8 @@ static void pci_proxy_dev_realize(PCIDevice *device, Error **errp)
- 
-     qemu_mutex_init(&dev->io_mutex);
-     qio_channel_set_blocking(dev->ioc, true, NULL);
-+
-+    configure_memory_sync(&dev->sync, dev->ioc);
- }
- 
- static void pci_proxy_dev_exit(PCIDevice *pdev)
-@@ -65,6 +69,8 @@ static void pci_proxy_dev_exit(PCIDevice *pdev)
-     PCIProxyDev *dev = PCI_PROXY_DEV(pdev);
- 
-     qio_channel_close(dev->ioc, NULL);
-+
-+    deconfigure_memory_sync(&dev->sync);
- }
- 
- static int config_op_send(PCIProxyDev *pdev, uint32_t addr, uint32_t *val,
-diff --git a/include/hw/pci/memory-sync.h b/include/hw/pci/memory-sync.h
+diff --git a/include/hw/i386/remote-memory.h b/include/hw/i386/remote-memory.h
 new file mode 100644
-index 0000000000..785f76a14c
+index 0000000000..aab3e4d85d
 --- /dev/null
-+++ b/include/hw/pci/memory-sync.h
-@@ -0,0 +1,27 @@
++++ b/include/hw/i386/remote-memory.h
+@@ -0,0 +1,19 @@
 +/*
++ * Memory manager for remote device
++ *
 + * Copyright © 2018, 2020 Oracle and/or its affiliates.
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or later.
@@ -457,45 +254,86 @@ index 0000000000..785f76a14c
 + *
 + */
 +
-+#ifndef MEMORY_SYNC_H
-+#define MEMORY_SYNC_H
++#ifndef REMOTE_MEMORY_H
++#define REMOTE_MEMORY_H
 +
-+#include "exec/memory.h"
-+#include "io/channel.h"
++#include "exec/hwaddr.h"
++#include "io/mpqemu-link.h"
 +
-+typedef struct RemoteMemSync {
-+    MemoryListener listener;
-+
-+    int n_mr_sections;
-+    MemoryRegionSection *mr_sections;
-+
-+    QIOChannel *ioc;
-+} RemoteMemSync;
-+
-+void configure_memory_sync(RemoteMemSync *sync, QIOChannel *ioc);
-+void deconfigure_memory_sync(RemoteMemSync *sync);
++void remote_sysmem_reconfig(MPQemuMsg *msg, Error **errp);
 +
 +#endif
-diff --git a/include/hw/pci/proxy.h b/include/hw/pci/proxy.h
-index cc2a3b937e..d52e2cad8a 100644
---- a/include/hw/pci/proxy.h
-+++ b/include/hw/pci/proxy.h
-@@ -11,6 +11,7 @@
- 
- #include "hw/pci/pci.h"
+diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
+index 3505e062dd..e33181ad80 100644
+--- a/include/io/mpqemu-link.h
++++ b/include/io/mpqemu-link.h
+@@ -14,6 +14,7 @@
+ #include "qom/object.h"
+ #include "qemu/thread.h"
  #include "io/channel.h"
-+#include "hw/pci/memory-sync.h"
++#include "exec/hwaddr.h"
  
- #define TYPE_PCI_PROXY_DEV "pci-proxy-dev"
+ #define REMOTE_MAX_FDS 8
  
-@@ -40,6 +41,7 @@ struct PCIProxyDev {
-     QemuMutex io_mutex;
-     QIOChannel *ioc;
-     Error *migration_blocker;
-+    RemoteMemSync sync;
-     ProxyMemoryRegion region[PCI_NUM_REGIONS];
- };
+@@ -24,12 +25,22 @@
+  *
+  * MPQemuCmd enum type to specify the command to be executed on the remote
+  * device.
++ *
++ * SYNC_SYSMEM      Shares QEMU's RAM with remote device's RAM
+  */
+ typedef enum {
+     MPQEMU_CMD_INIT,
++    SYNC_SYSMEM,
++    RET_MSG,
+     MPQEMU_CMD_MAX,
+ } MPQemuCmd;
  
++typedef struct {
++    hwaddr gpas[REMOTE_MAX_FDS];
++    uint64_t sizes[REMOTE_MAX_FDS];
++    off_t offsets[REMOTE_MAX_FDS];
++} SyncSysmemMsg;
++
+ /**
+  * MPQemuMsg:
+  * @cmd: The remote command
+@@ -40,12 +51,14 @@ typedef enum {
+  * MPQemuMsg Format of the message sent to the remote device from QEMU.
+  *
+  */
++
+ typedef struct {
+     int cmd;
+     size_t size;
+ 
+     union {
+         uint64_t u64;
++        SyncSysmemMsg sync_sysmem;
+     } data;
+ 
+     int fds[REMOTE_MAX_FDS];
+diff --git a/io/mpqemu-link.c b/io/mpqemu-link.c
+index 42df2af229..8d966820a0 100644
+--- a/io/mpqemu-link.c
++++ b/io/mpqemu-link.c
+@@ -226,5 +226,16 @@ bool mpqemu_msg_valid(MPQemuMsg *msg)
+         }
+     }
+ 
++     /* Verify message specific fields. */
++    switch (msg->cmd) {
++    case SYNC_SYSMEM:
++        if (msg->num_fds == 0 || msg->size != sizeof(SyncSysmemMsg)) {
++            return false;
++        }
++        break;
++    default:
++        break;
++    }
++
+     return true;
+ }
 -- 
 2.25.GIT
 
