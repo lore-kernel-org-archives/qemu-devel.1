@@ -2,86 +2,82 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B265C4363D
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 22:24:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24DE8C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 22:59:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1A10206CB
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 22:24:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0EE1B2074F
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 22:59:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vGU50ibO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1A10206CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="h9s98Ogb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EE1B2074F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPYu4-0006YK-Td
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 18:24:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54046)
+	id 1kPZSC-0008UN-Mc
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 18:59:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33206)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kPYry-00055Z-Vs; Mon, 05 Oct 2020 18:22:10 -0400
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:38795)
+ (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
+ id 1kPZOj-0007k0-An; Mon, 05 Oct 2020 18:56:01 -0400
+Received: from mail-qv1-xf42.google.com ([2607:f8b0:4864:20::f42]:33645)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kPYrw-0006dC-Sj; Mon, 05 Oct 2020 18:22:10 -0400
-Received: by mail-io1-xd42.google.com with SMTP id y20so10865052iod.5;
- Mon, 05 Oct 2020 15:22:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
+ id 1kPZOh-0002md-9p; Mon, 05 Oct 2020 18:56:01 -0400
+Received: by mail-qv1-xf42.google.com with SMTP id cy2so6990929qvb.0;
+ Mon, 05 Oct 2020 15:55:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=tglCH8RgEdJDRiweRrrdMYIPM+WqqQQ5+MPTE43ZHJ0=;
- b=vGU50ibOPj8poQZsoQYRUIk0uS67zuRPNbwkNfM6RlGLrRimIAj7pvXBZRbHlgM0QZ
- y3vLBjN7y7GdsHWwoACyESlEzyF4Zja9zE+F7h/trJmQeGruQ6MVySCCLmeAgMIY0tnV
- SX7v2yJkAxf8L/QOpSnm4g3QZwn8jlo/6IETByy5vVyL4ijKPPNtj5zGC1m0vgX7MnJx
- jURzguz6lChBY3/w5fVnJCxuQ9dUrFzADR0b1BeACWva2LkuKY+NzXqHKvpSoiwAHQjy
- zqQ2qhjzKwGXCVz5eEFYdK1YcL/5L3cjtyvxgXJPpIBnhC9xxMgJ8YwDy8vC3eeLDkR4
- 2eIQ==
+ :cc; bh=gPKf2w9mX4wYAK4imtSS4zpT61Op7JZnKhqQzehCEVM=;
+ b=h9s98OgbpV+4KhUR5qQMSsvBs7Dc+A1VSABFVLr9p3w77LoDE0MDK58TVGy6fqkRSE
+ rvznW1OL1zuShPpeisGoKyOtdY9oUlxPGGh3zfoBW5iw/SXXYc39imBh68GF/HTObjnS
+ v+yZLWDFcAwjNIhGOTZ5mSamRRcH/CSSkNjWY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=tglCH8RgEdJDRiweRrrdMYIPM+WqqQQ5+MPTE43ZHJ0=;
- b=ZWj7OtJPPwzE1HtTCX7YVCeY0AiuhGqIWaIKwjB0nr2MYia3J/HLkDeC6m6F4VkPuX
- 9YZ9PBAtTSDmEqk9zG6j+xNjQmSed3+E28uZK4YDX9wr1LBf3GsAfU7kfimBHh+EO0h6
- AsEmQcAMvvt1vaTd2R2YugBHMcyZJ11ZauZRejQcoedo+FWB7cBlmR0+qoqeNKrL1XAa
- HZrFS47OlHI0VPjB1vA+oub7nXD6Ko4WYF5TY6TRm49uwBd0J1ieRnA2ORQm884ZFdMX
- tuQIAa3Msb10p3bJnaWAlVNcdygdWKhyJ2TSp0tG/AAiiYrvncqyRpDTmxEMMQA/JxLm
- fEbA==
-X-Gm-Message-State: AOAM533/OjM5yyGhiRnw6RiCn835LCPYBYvrsDrJwLn1c4SZ8gQYAu9T
- VBO5a2TIe8m98g8aihtVXBCz7eW9Nmj5JLnqTOo=
-X-Google-Smtp-Source: ABdhPJxofBpqaJ7ftKfQNvFcXJI2udnz9n/T3dOHw+fd3y7w80zMjOp+C09aL5vFTVmWCceeJ3IJzaEAwU7L5l5JNbI=
-X-Received: by 2002:a5e:9b11:: with SMTP id j17mr731287iok.176.1601936527273; 
- Mon, 05 Oct 2020 15:22:07 -0700 (PDT)
+ bh=gPKf2w9mX4wYAK4imtSS4zpT61Op7JZnKhqQzehCEVM=;
+ b=JLjPSA+FGjJ6qpUnSNN1gBqGeiVoaK6rDBXAYVbT6y6rwVziTjktdw0SrA3AiB8IF3
+ BYRN9PuMmvAgX9MZBhoENmFuaVZZy1P4V5AUA6Sr20qWEdIFE/lOg5rgpATeEvLtWjlR
+ Ln40y4Q319xRn6+zhKwDI/88jQ1DOR1kmWFRk4BDghpihbEPLL9cXpch+S0KeFE49abe
+ Z3NbW4JGt2tL4XUuh4XIY7BwRgQUvUT9kQgl1FwhFGX2d9dFmaNVIhbS90C9ll7gsLyz
+ UYlrHCfI4C8Jttw1ADrn8Q8d1MTO9tL0VaNrTcLzi3ZnwJmYw0HxKFYWzxii45q4QvDP
+ dRaA==
+X-Gm-Message-State: AOAM533uZ5xwmRCYNlPdC9r1xfgQUtaQz549jyBJXAAzmOFdpNW4O5mq
+ bq/1VZC1Fra9xI5XR+05GBX0dt6ZQbfSDIaj27A=
+X-Google-Smtp-Source: ABdhPJygRqoK1E0/bHhR9oF1YXlo8Euh0h4PbYaonH+x2seg+cF1QKANa8x1CV2r1orOS1QsaBnTOai31+96XTwbmWQ=
+X-Received: by 2002:a0c:f984:: with SMTP id t4mr2029982qvn.18.1601938557454;
+ Mon, 05 Oct 2020 15:55:57 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200929020337.1559-1-jiangyifei@huawei.com>
- <20200929020337.1559-3-jiangyifei@huawei.com>
-In-Reply-To: <20200929020337.1559-3-jiangyifei@huawei.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 5 Oct 2020 15:10:40 -0700
-Message-ID: <CAKmqyKMXdiTJYoNbATTfGTO-FT1+Ke9bHk_kGwpT0mH26xsSVg@mail.gmail.com>
-Subject: Re: [PATCH 2/5] target/riscv: Add PMP state description
-To: Yifei Jiang <jiangyifei@huawei.com>
+References: <20200929055309.509-1-wangzhiqiang.bj@bytedance.com>
+ <20200929055309.509-2-wangzhiqiang.bj@bytedance.com>
+In-Reply-To: <20200929055309.509-2-wangzhiqiang.bj@bytedance.com>
+From: Joel Stanley <joel@jms.id.au>
+Date: Mon, 5 Oct 2020 22:55:45 +0000
+Message-ID: <CACPK8Xf-R=1UrEVxF92Y4HGXadWfdvHjmjyDnH5K3GSJTkq7YA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] aspeed: Add support for the g220a-bmc board
+To: John Wang <wangzhiqiang.bj@bytedance.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d42;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd42.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::f42;
+ envelope-from=joel.stan@gmail.com; helo=mail-qv1-xf42.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
+X-Spam_score_int: -14
+X-Spam_score: -1.5
 X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.248,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,103 +90,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Zhanghailiang <zhang.zhanghailiang@huawei.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "Zhangxiaofeng \(F\)" <victor.zhangxiaofeng@huawei.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>, yinyipeng <yinyipeng1@huawei.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, "Wubin \(H\)" <wu.wubin@huawei.com>,
- "dengkai \(A\)" <dengkai1@huawei.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ =?UTF-8?B?6YOB6Zu3?= <yulei.sh@bytedance.com>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ "open list:ASPEED BMCs" <qemu-arm@nongnu.org>, clkg@kaod.org,
+ xuxiaohan@bytedance.com, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 28, 2020 at 7:05 PM Yifei Jiang <jiangyifei@huawei.com> wrote:
+On Tue, 29 Sep 2020 at 05:53, John Wang <wangzhiqiang.bj@bytedance.com> wrote:
 >
-> In the case of supporting PMP feature, add PMP state description
-> to vmstate_riscv_cpu.
+> G220A is a 2 socket x86 motherboard supported by OpenBMC.
+> Strapping configuration was obtained from hardware.
 >
-> Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
-> Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
+> Signed-off-by: John Wang <wangzhiqiang.bj@bytedance.com>
+
+Reviewed-by: Joel Stanley <joel@jms.id.au>
+
 > ---
->  target/riscv/machine.c | 49 ++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 49 insertions(+)
+>  hw/arm/aspeed.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 60 insertions(+)
 >
-> diff --git a/target/riscv/machine.c b/target/riscv/machine.c
-> index 3451b888b1..b1fc839b43 100644
-> --- a/target/riscv/machine.c
-> +++ b/target/riscv/machine.c
-> @@ -4,6 +4,51 @@
->  #include "sysemu/kvm.h"
->  #include "migration/cpu.h"
+> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+> index bdb981d2f8..04c8ad2bcd 100644
+> --- a/hw/arm/aspeed.c
+> +++ b/hw/arm/aspeed.c
+> @@ -120,6 +120,20 @@ struct AspeedMachineState {
+>          SCU_AST2500_HW_STRAP_ACPI_ENABLE |                              \
+>          SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER))
 >
-> +static bool pmp_needed(void *opaque)
-> +{
-> +    RISCVCPU *cpu = opaque;
-> +    CPURISCVState *env = &cpu->env;
+> +#define G220A_BMC_HW_STRAP1 (                                      \
+> +        SCU_AST2500_HW_STRAP_SPI_AUTOFETCH_ENABLE |                     \
+> +        SCU_AST2500_HW_STRAP_GPIO_STRAP_ENABLE |                        \
+> +        SCU_AST2500_HW_STRAP_UART_DEBUG |                               \
+> +        SCU_AST2500_HW_STRAP_RESERVED28 |                               \
+> +        SCU_AST2500_HW_STRAP_DDR4_ENABLE |                              \
+> +        SCU_HW_STRAP_2ND_BOOT_WDT |                                     \
+> +        SCU_HW_STRAP_VGA_CLASS_CODE |                                   \
+> +        SCU_HW_STRAP_LPC_RESET_PIN |                                    \
+> +        SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER) |                \
+> +        SCU_AST2500_HW_STRAP_SET_AXI_AHB_RATIO(AXI_AHB_RATIO_2_1) |     \
+> +        SCU_HW_STRAP_VGA_SIZE_SET(VGA_64M_DRAM) |                       \
+> +        SCU_AST2500_HW_STRAP_RESERVED1)
 > +
-> +    return riscv_feature(env, RISCV_FEATURE_PMP);
+>  /* Witherspoon hardware value: 0xF10AD216 (but use romulus definition) */
+>  #define WITHERSPOON_BMC_HW_STRAP1 ROMULUS_BMC_HW_STRAP1
+>
+> @@ -559,6 +573,30 @@ static void witherspoon_bmc_i2c_init(AspeedMachineState *bmc)
+>      /* Bus 11: TODO ucd90160@64 */
+>  }
+>
+> +static void g220a_bmc_i2c_init(AspeedMachineState *bmc)
+> +{
+> +    AspeedSoCState *soc = &bmc->soc;
+> +    DeviceState *dev;
+> +
+> +    dev = DEVICE(i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 3),
+> +                                         "emc1413", 0x4c));
+> +    object_property_set_int(OBJECT(dev), "temperature0", 31000, &error_abort);
+> +    object_property_set_int(OBJECT(dev), "temperature1", 28000, &error_abort);
+> +    object_property_set_int(OBJECT(dev), "temperature2", 20000, &error_abort);
+> +
+> +    dev = DEVICE(i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 12),
+> +                                         "emc1413", 0x4c));
+> +    object_property_set_int(OBJECT(dev), "temperature0", 31000, &error_abort);
+> +    object_property_set_int(OBJECT(dev), "temperature1", 28000, &error_abort);
+> +    object_property_set_int(OBJECT(dev), "temperature2", 20000, &error_abort);
+> +
+> +    dev = DEVICE(i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 13),
+> +                                         "emc1413", 0x4c));
+> +    object_property_set_int(OBJECT(dev), "temperature0", 31000, &error_abort);
+> +    object_property_set_int(OBJECT(dev), "temperature1", 28000, &error_abort);
+> +    object_property_set_int(OBJECT(dev), "temperature2", 20000, &error_abort);
 > +}
 > +
-> +static const VMStateDescription vmstate_pmp_entry = {
-> +    .name = "cpu/pmp/entry",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINTTL(addr_reg, pmp_entry_t),
-> +        VMSTATE_UINT8(cfg_reg, pmp_entry_t),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static const VMStateDescription vmstate_pmp_addr = {
-> +    .name = "cpu/pmp/addr",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINTTL(sa, pmp_addr_t),
-> +        VMSTATE_UINTTL(ea, pmp_addr_t),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static const VMStateDescription vmstate_pmp = {
-> +    .name = "cpu/pmp",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .needed = pmp_needed,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_STRUCT_ARRAY(env.pmp_state.pmp, RISCVCPU, MAX_RISCV_PMPS,
-> +                             0, vmstate_pmp_entry, pmp_entry_t),
-> +        VMSTATE_STRUCT_ARRAY(env.pmp_state.addr, RISCVCPU, MAX_RISCV_PMPS,
-> +                             0, vmstate_pmp_addr, pmp_addr_t),
-> +        VMSTATE_UINT32(env.pmp_state.num_rules, RISCVCPU),
-
-I would prefer to re-generate these from the PMP CSRs post load.
-
-Alistair
-
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
->  const VMStateDescription vmstate_riscv_cpu = {
->      .name = "cpu",
->      .version_id = 1,
-> @@ -55,5 +100,9 @@ const VMStateDescription vmstate_riscv_cpu = {
->          VMSTATE_UINTTL(env.mstatush, RISCVCPU),
->  #endif
->          VMSTATE_END_OF_LIST()
-> +    },
-> +    .subsections = (const VMStateDescription * []) {
-> +        &vmstate_pmp,
-> +        NULL
->      }
+>  static bool aspeed_get_mmio_exec(Object *obj, Error **errp)
+>  {
+>      return ASPEED_MACHINE(obj)->mmio_exec;
+> @@ -798,6 +836,24 @@ static void aspeed_machine_tacoma_class_init(ObjectClass *oc, void *data)
+>          aspeed_soc_num_cpus(amc->soc_name);
 >  };
-> --
-> 2.19.1
 >
+> +static void aspeed_machine_g220a_class_init(ObjectClass *oc, void *data)
+> +{
+> +    MachineClass *mc = MACHINE_CLASS(oc);
+> +    AspeedMachineClass *amc = ASPEED_MACHINE_CLASS(oc);
+> +
+> +    mc->desc       = "Bytedance G220A BMC (ARM1176)";
+> +    amc->soc_name  = "ast2500-a1";
+> +    amc->hw_strap1 = G220A_BMC_HW_STRAP1;
+> +    amc->fmc_model = "n25q512a";
+> +    amc->spi_model = "mx25l25635e";
+> +    amc->num_cs    = 2;
+> +    amc->macs_mask  = ASPEED_MAC1_ON | ASPEED_MAC2_ON;
+> +    amc->i2c_init  = g220a_bmc_i2c_init;
+> +    mc->default_ram_size = 1024 * MiB;
+> +    mc->default_cpus = mc->min_cpus = mc->max_cpus =
+> +        aspeed_soc_num_cpus(amc->soc_name);
+> +};
+> +
+>  static const TypeInfo aspeed_machine_types[] = {
+>      {
+>          .name          = MACHINE_TYPE_NAME("palmetto-bmc"),
+> @@ -835,6 +891,10 @@ static const TypeInfo aspeed_machine_types[] = {
+>          .name          = MACHINE_TYPE_NAME("tacoma-bmc"),
+>          .parent        = TYPE_ASPEED_MACHINE,
+>          .class_init    = aspeed_machine_tacoma_class_init,
+> +    }, {
+> +        .name          = MACHINE_TYPE_NAME("g220a-bmc"),
+> +        .parent        = TYPE_ASPEED_MACHINE,
+> +        .class_init    = aspeed_machine_g220a_class_init,
+>      }, {
+>          .name          = TYPE_ASPEED_MACHINE,
+>          .parent        = TYPE_MACHINE,
+> --
+> 2.25.1
 >
 
