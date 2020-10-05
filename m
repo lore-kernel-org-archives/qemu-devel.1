@@ -2,99 +2,85 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBF06C46466
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 15:28:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF58AC4363D
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 15:33:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1DF5520874
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 15:28:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6386F208C7
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 15:33:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GsuFAH5F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DF5520874
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B8csTdgP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6386F208C7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPSPZ-0003fs-Uv
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 11:28:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50426)
+	id 1kPSUS-0005k4-A9
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 11:33:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51982)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kPSOk-00037j-SJ
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 11:27:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31175)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kPSOi-0005Jk-Av
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 11:27:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601911650;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=ThhMUjjLg+/D2yAGmDv83K8pC0Dc18gDxERoM4qHJ1g=;
- b=GsuFAH5FrufAMnaW/qtY062BlDKPLHuE1CwCtT88V/c866gbOsx/h4yFnRSgSkR0Z+xrjg
- YTGex+a0sgE6HiMp2ML1vnr3QY+Sfgvb1l5fkTMhRoGL3dK68zbPSLxaelK99uXvPj98eJ
- 8ASC8STNBsD+GCOA2VjgPrvj4ZdUm6E=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-45-mBhHYuRNMzmVOiYCUS95lQ-1; Mon, 05 Oct 2020 11:27:29 -0400
-X-MC-Unique: mBhHYuRNMzmVOiYCUS95lQ-1
-Received: by mail-wm1-f69.google.com with SMTP id d76so1360854wmd.8
- for <qemu-devel@nongnu.org>; Mon, 05 Oct 2020 08:27:29 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kPSSq-0004jP-3t
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 11:31:53 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:41531)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kPSSl-00060O-U9
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 11:31:47 -0400
+Received: by mail-ed1-x542.google.com with SMTP id l24so9833637edj.8
+ for <qemu-devel@nongnu.org>; Mon, 05 Oct 2020 08:31:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=wrumF7t0BWyBWmcw42tF3Amm71V4fc4xYAQ8HJ06CIg=;
+ b=B8csTdgPDqO7OQQKNvb2bnuARmbG/AV39r6aUSBW/qU+PNOFRk0d5zGVphx2E0IT0o
+ b2efpvgcHOYStUNjm22VcByP0NtaKoL0mnsGCrjxAqSKhfuf0SrcyvLtiSj7t28j5w0L
+ vC6E650QhMXooQ17EYYB/jRxtsPCV2d1aTrn7v+sh3OYNAJlMUO1uOKjOAy4uC/yFGE/
+ ky6WHdiBZ9hdxTis/LS2eVZOrV0nZ8Y9QNEw83gd0CkLGmvav6N8ZMm2zkO7nEjYYC1n
+ cUAQVgh1MiAdp55vNNHlJRCHCYQXlYtRQ9esSNkHV+WtOm7m+uPpT9bUwiGk+8p2GASg
+ 4JQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=ThhMUjjLg+/D2yAGmDv83K8pC0Dc18gDxERoM4qHJ1g=;
- b=UsHRbyLe4hXVL1+M/751JsbMNVs6bavSSMUhvOElHqTcxb0byzZDVdzmhsAUVo66hR
- eXBjUyYS262+ZgFbUA558qSaRaBHFCdLL/CEYItzjDZwpcFnRL4NrgQA5crXMswdGUjR
- fpYgJyAO7mfPisV4qbB7lvi4cIQMLXkUf+NqlKV3ItIZy+m2itlATjYO0Ng5KRPNOytY
- uLtFkCylTpxy7vIno5isL9329aACOVeasZvI90B9akWl3CGMKMdTgksr8l9dlHly9E4e
- +tGFc8vaeDeKi6iyR2lDLNbhFf8FiQnHxTOHaaDzDT4OVLXE7O0iYlgNYSaCmq9NxfUm
- IH1A==
-X-Gm-Message-State: AOAM533mpcqc2jPhqrg90Bj6XqmuKwy9OCL+lcZfbnCA6jXcxxEPGWQ2
- qF+ukVJMimxr0fNoCb57UlZLNQwj4RvJgOkgaNUI3QTAi/8cnLGua5kqpkp/ld+WYDGWd4w6sW+
- 2q7yaAEicNaHZKmQ=
-X-Received: by 2002:a5d:630a:: with SMTP id i10mr17956446wru.137.1601911647827; 
- Mon, 05 Oct 2020 08:27:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzoEDbNmaVqtq4LuuFziMdkP4O4nZd4TYjoG7erWESeywLb1BGqqQcWLru2VufEjnloXdmeNA==
-X-Received: by 2002:a5d:630a:: with SMTP id i10mr17956419wru.137.1601911647578; 
- Mon, 05 Oct 2020 08:27:27 -0700 (PDT)
-Received: from x1w.redhat.com (106.red-83-59-162.dynamicip.rima-tde.net.
- [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id c4sm84612wme.27.2020.10.05.08.27.26
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 05 Oct 2020 08:27:26 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] softmmu/memory: Log invalid memory accesses
-Date: Mon,  5 Oct 2020 17:27:25 +0200
-Message-Id: <20201005152725.2143444-1-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.2
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=wrumF7t0BWyBWmcw42tF3Amm71V4fc4xYAQ8HJ06CIg=;
+ b=qh83r24YSR+kPeXYqDmWw3+arqOgPrDNRi3ukp4s6E7zJ3YlttfPadVHvr4iC3w3WE
+ Vv+ZoCUnx/HThTEf98zxFtCBjFaQ5Styl6+fzuRWB4NwIq+x2qZB6c9R8B7kGXfjnlJ1
+ DEkMbFmB4+wF6bBzAYd3fcVCpQa4Ch0Bfb8m7vQtaF1EFqLktDE1vgrz97Jz1drptmf4
+ ON/ak3IWor/M1kbt2XrmQUY+Ds1wyLq7cIMdJZQ1JEJ472tkaqF7AstG8UZa/Q5egq6Z
+ z2dkbaY7mT92yuh190SHVTQrvaf6rqQDcmzThZ5sLK1mmiE2IIsZRoONSEKUkV1CitdK
+ w7og==
+X-Gm-Message-State: AOAM531mcCv6Dur4xa1+ClRKVm24RkMXSglSKFNFObZytce02Hf3v4G2
+ dusWkHckneYAci+XGzxa7AivDk9Y/Q7yKcAwxg3Yit5M/EeC8A==
+X-Google-Smtp-Source: ABdhPJzQii/niDwO0ZkSfHlucDogXbwygxqfzwfkhLQDnvd7dMDnIUuNuzIa1ld/NStNE8yeFz1DmtPXkc8l4Ebs3D4=
+X-Received: by 2002:a50:9ea6:: with SMTP id a35mr233361edf.52.1601911899983;
+ Mon, 05 Oct 2020 08:31:39 -0700 (PDT)
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 02:11:31
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+References: <20201005150122.446472-1-pbonzini@redhat.com>
+In-Reply-To: <20201005150122.446472-1-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 5 Oct 2020 16:31:28 +0100
+Message-ID: <CAFEAcA-bWoya2pkqw1f4v_s2M2T6byfFgZSkgve-xE9uS5vxkw@mail.gmail.com>
+Subject: Re: [PATCH] readthedocs: build with Python 3.6
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::542;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x542.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,70 +93,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Log invalid memory accesses with as GUEST_ERROR.
+On Mon, 5 Oct 2020 at 16:01, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> The readthedocs build is failing because we do not support Python 3.5 anymore.
+> Bump the Python version in the configuration.
+>
+> Fixes: 1b11f28d05 ("configure: Bump the minimum required Python version to 3.6", 2020-10-02)
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  .readthedocs.yml | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/.readthedocs.yml b/.readthedocs.yml
+> index 8355dbc634..7fb7b8dd61 100644
+> --- a/.readthedocs.yml
+> +++ b/.readthedocs.yml
+> @@ -17,4 +17,4 @@ formats: all
+>  # we require for other Python in our codebase (our conf.py
+>  # enforces this, and some code needs it.)
+>  python:
+> -  version: 3.5
+> +  version: 3.6
 
-This is particularly useful since commit 5d971f9e67 which reverted
-("memory: accept mismatching sizes in memory_region_access_valid").
+Applied to master, thanks.
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- softmmu/memory.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
-
-diff --git a/softmmu/memory.c b/softmmu/memory.c
-index fa280a19f7..403ff3abc9 100644
---- a/softmmu/memory.c
-+++ b/softmmu/memory.c
-@@ -14,6 +14,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/log.h"
- #include "qapi/error.h"
- #include "cpu.h"
- #include "exec/memory.h"
-@@ -1353,10 +1354,18 @@ bool memory_region_access_valid(MemoryRegion *mr,
- {
-     if (mr->ops->valid.accepts
-         && !mr->ops->valid.accepts(mr->opaque, addr, size, is_write, attrs)) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "Invalid access at addr "
-+                                       "0x%" HWADDR_PRIX ", size %u, "
-+                                       "region '%s', reason: rejected\n",
-+                      addr, size, memory_region_name(mr));
-         return false;
-     }
- 
-     if (!mr->ops->valid.unaligned && (addr & (size - 1))) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "Invalid access at addr "
-+                                       "0x%" HWADDR_PRIX ", size %u, "
-+                                       "region '%s', reason: unaligned\n",
-+                      addr, size, memory_region_name(mr));
-         return false;
-     }
- 
-@@ -1367,6 +1376,13 @@ bool memory_region_access_valid(MemoryRegion *mr,
- 
-     if (size > mr->ops->valid.max_access_size
-         || size < mr->ops->valid.min_access_size) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "Invalid access at addr "
-+                                       "0x%" HWADDR_PRIX ", size %u, "
-+                                       "region '%s', reason: invalid size "
-+                                       "(min:%u max:%u)\n",
-+                      addr, size, memory_region_name(mr),
-+                      mr->ops->valid.min_access_size,
-+                      mr->ops->valid.max_access_size);
-         return false;
-     }
-     return true;
--- 
-2.26.2
-
+-- PMM
 
