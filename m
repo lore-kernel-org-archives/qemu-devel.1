@@ -2,79 +2,82 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC4ACC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 11:26:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A21ACC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 11:28:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B54620795
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 11:26:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E9452064C
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 11:28:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="CMufNrVj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B54620795
+	dkim=pass (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="ThsQKSYT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E9452064C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPOdL-0001yk-0l
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 07:26:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47798)
+	id 1kPOfM-0003xX-87
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 07:28:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47810)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1kPOc6-00010n-7z
+ (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1kPOc6-00011W-TP
  for qemu-devel@nongnu.org; Mon, 05 Oct 2020 07:25:06 -0400
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:33851)
+Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:33852)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1kPOc4-0005kQ-5q
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 07:25:05 -0400
-Received: by mail-lf1-x143.google.com with SMTP id u8so10402054lff.1
- for <qemu-devel@nongnu.org>; Mon, 05 Oct 2020 04:25:03 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1kPOc4-0005kh-M2
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 07:25:06 -0400
+Received: by mail-lf1-x144.google.com with SMTP id u8so10402101lff.1
+ for <qemu-devel@nongnu.org>; Mon, 05 Oct 2020 04:25:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=daynix-com.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=VwG+XNrhoeeF5cRnLMedD+7G946kK8EA6TQLCd3Qk68=;
- b=CMufNrVjvjJMA1o2UzuKlnx5qJsFXv1rtGVVTL/q48uxOYima/h46z11in6KFQnJKh
- 4+VpzGcgCL3xKlhQLXApXUyr3sg6/991eGWsFs+a2IrcX5ESDhrJf/BMOLQStz/OSRY3
- U60VQLSDbaUp4urikgmEG+FBqX3KbMSl087EIeWSLctNkXGTmR9w/2iK3Gc4QJfZiDjQ
- Pb+auz353iBnaFep32Hqd2nLxju1egYnL+UBDO3Cv3wXfSqtmkG1gaQsxV8qIhAzRPoW
- r7tHWrTYh2Mkq4BuXFd/1Rp8qFctCgUvI5f8w1zTnbQqcwQ/TR8N6wLUTGktBlEj6kju
- bEGw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=081ribZzsJC9K8QhvxDETxbGA4OIAPk4ZwZgtVwhNbg=;
+ b=ThsQKSYTHsveiEA+yUjdEPkDgsMyNIgc2dqJKl1jIwaFBdTy4K171itWmPNr1iUkHc
+ A7kkzGtkXFWZ3BA26UG3iPbkp/AYfkiNwLHfT/37/+0aXpvo+u+ah1wuvSf1p3pOglOH
+ BAYoVPQ37asR/ujwz775ygzTcFiB5Fmk5OKOfkCpTQnYozqCGusR/ao9WDpWF9pagOZl
+ CWbnIA9OB7TqTD59dz+ZVItEXTh+gT56E7PgCPX0ZYpEV2Pet4Av+Y8NiM3jCQJ9W8IT
+ bTKxPvN1GWuZgYly565AHgIer1mazg8xXPeW1ARmVkMZVD2rTlRzrddiLPLTmWQ0PJBx
+ R+xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=VwG+XNrhoeeF5cRnLMedD+7G946kK8EA6TQLCd3Qk68=;
- b=k72LEr4ccexyVL1hT9uC/WZ7jFesc4vOxmZdh8CP87Wn3GQUw/EyKpITXxA5onY9Em
- ReHiXqtmUl481x+aZfnlQpgyFbnYQdU1aI/Vs1cF0aQWOP8y6JDtT8P96yPiDsnHc7sk
- D7Kkta+e7DJD3baPlJsC7XDf7NDsEfg6BJ5Wez8vIYqQh1b23paOIOrXx325DYRWxdHk
- PD0ITG7xuKiqTIxn0WWUdB2Y3oCdDcxXQd353GjLYG2XRxrRx8Nr1cg3HPhrXLMmDYgi
- Owgpf4hVN/Qus93KrKUPxizVuRqQtQePJMnPrIbAWL6Hn4NhuSbamgS0aUMfH1UU5aEt
- 2xEA==
-X-Gm-Message-State: AOAM533HjfizAq9pIQgt0ePPkoEKRfubjIvE9igzrEgUQhEWWh9a3Y1X
- /GTaDv6vxLkxoVQClKI1l1DF9wY5tFQ0MQ==
-X-Google-Smtp-Source: ABdhPJzxeM9exvRuWkdfD3r5lbIcq5KW//gsF8ktavjFPHjvfN4B8Th0TQHP4qOd/kPwkicxMctWog==
-X-Received: by 2002:a19:c1d7:: with SMTP id r206mr3138014lff.87.1601897101721; 
- Mon, 05 Oct 2020 04:25:01 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=081ribZzsJC9K8QhvxDETxbGA4OIAPk4ZwZgtVwhNbg=;
+ b=pgo3SFTSdw+rHtFCaC2zEvhSsrc0cutghiqdm2gkllxSsci1R5Zf6sZ90Zclmqc/VH
+ DS/INJucEAPL73nGrgDeB1L57Ipc+4wCdFXfI0ZqnQmtKVHIxuRA8GZQ6BXiZCC19gPJ
+ WRcH3DpBfLMSEjsJNRjrNLoMiJfQTM9pKJcByFBJLJbBD+A8ibB8yBUjGCdE3h0iNJtU
+ MPy6iI2L/yS6EzK//ResuSpdTikcmqNSGUv4rlUlFabIoKtCt+bg6BBBhdZC5aR8L0VG
+ oqXBPuPBjpiq4Zb97/7auetpgbNWLBuIvMsKb3RvdPhrvQmeLmSxAbbIYYlbAeiDenzu
+ bxhw==
+X-Gm-Message-State: AOAM5310xqNc63VSDKv/Hxjx0KP4SEMn+cHl1EZ2gYBgcVzVtR++3oHv
+ os97SLO4Rk3XH9x9GFrc6Kl8vSZAjXjKaQ==
+X-Google-Smtp-Source: ABdhPJzZUMDBMHkUJtFCIbukDcQPIkP4oLrFoOOQbkmyuyeKqlvn3cT/YRwQoaaS6VU+5TqO9/KdHQ==
+X-Received: by 2002:a19:c02:: with SMTP id 2mr91226lfm.482.1601897102782;
+ Mon, 05 Oct 2020 04:25:02 -0700 (PDT)
 Received: from navi.cosmonova.net.ua ([95.67.24.131])
- by smtp.gmail.com with ESMTPSA id f10sm1546514ljn.87.2020.10.05.04.25.00
+ by smtp.gmail.com with ESMTPSA id f10sm1546514ljn.87.2020.10.05.04.25.01
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 05 Oct 2020 04:25:00 -0700 (PDT)
+ Mon, 05 Oct 2020 04:25:02 -0700 (PDT)
 From: andrew@daynix.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 0/2] hw/virtio-pci: AER capability
-Date: Mon,  5 Oct 2020 14:55:59 +0300
-Message-Id: <20201005115601.103791-1-andrew@daynix.com>
+Subject: [PATCH v3 1/2] hw/virtio-pci Added counter for pcie capabilities
+ offsets.
+Date: Mon,  5 Oct 2020 14:56:00 +0300
+Message-Id: <20201005115601.103791-2-andrew@daynix.com>
 X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201005115601.103791-1-andrew@daynix.com>
+References: <20201005115601.103791-1-andrew@daynix.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=2a00:1450:4864:20::143;
- envelope-from=andrew@daynix.com; helo=mail-lf1-x143.google.com
+Received-SPF: none client-ip=2a00:1450:4864:20::144;
+ envelope-from=andrew@daynix.com; helo=mail-lf1-x144.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -18
@@ -100,22 +103,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Andrew Melnychenko <andrew@daynix.com>
+From: Andrew <andrew@daynix.com>
 
-Now, AER capability for virtio-pci is disabled by default.
-AER capability is only for PCI with PCIe interface on PCIe bus.
-During migration - device "realize" should initialize AER
-if requested by device properties.
-Also fixed commit message and added proper link to bugzilla.
+Removed hardcoded offset for ats. Added cap offset counter
+for future capabilities like AER.
 
-Andrew (2):
-  hw/virtio-pci Added counter for pcie capabilities offsets.
-  hw/virtio-pci Added AER capability.
+Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
+---
+ hw/virtio/virtio-pci.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
- hw/virtio/virtio-pci.c | 20 +++++++++++++++++++-
- hw/virtio/virtio-pci.h |  4 ++++
- 2 files changed, 23 insertions(+), 1 deletion(-)
-
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 5bc769f685..ae60c1e249 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -1788,6 +1788,7 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
+ 
+     if (pcie_port && pci_is_express(pci_dev)) {
+         int pos;
++        uint16_t last_pcie_cap_offset = PCI_CONFIG_SPACE_SIZE;
+ 
+         pos = pcie_endpoint_cap_init(pci_dev, 0);
+         assert(pos > 0);
+@@ -1823,7 +1824,8 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
+         }
+ 
+         if (proxy->flags & VIRTIO_PCI_FLAG_ATS) {
+-            pcie_ats_init(pci_dev, 256);
++            pcie_ats_init(pci_dev, last_pcie_cap_offset);
++            last_pcie_cap_offset += PCI_EXT_CAP_ATS_SIZEOF;
+         }
+ 
+         if (proxy->flags & VIRTIO_PCI_FLAG_INIT_FLR) {
 -- 
 2.28.0
 
