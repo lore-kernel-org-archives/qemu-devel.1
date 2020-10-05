@@ -4,76 +4,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FF28C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:20:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0B38C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:20:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB51A208C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:20:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61E9A208C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:20:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LZuF9NhC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB51A208C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZPFUtSoH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61E9A208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPXu7-0003bP-UR
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 17:20:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43244)
+	id 1kPXuG-0003vH-D7
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 17:20:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43388)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kPXkW-0008Dp-FA
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29176)
+ id 1kPXko-0000CC-11
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22097)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kPXkS-0007PJ-Gr
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:24 -0400
+ id 1kPXkl-0007Ue-0N
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601932219;
+ s=mimecast20190719; t=1601932237;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=vSZU8LutC2AZ+Vt0lQlqAk6xxkGLLoRLLfQshp5cRs4=;
- b=LZuF9NhCrwXBJqztUZdcafTLZ5Uo/sumhbomEp8LRmPLv1cUq5e/IevHOvrm/mRzds+gx5
- KSWzJRheJJ0q51kEL8vTrY2VZcfuvHhldTl0T13YHqotTCSAL1+yshKtdhYIk3mIk+2rVM
- lREOJrjKUXvO0FoMWA6a9FkBQgj+fJI=
+ bh=367k11b3zf85sB9S3cGnMHOkTfp1Umm4WdkTED0mfWc=;
+ b=ZPFUtSoHVbTrvSNDHJ04cqzYFZAigxzntZhox74R1RZboqoyJoWUZdKGo+lf1bcVtkx/Yz
+ 5y+JNO43sknl2hwivzICdkEYvbeMoKQ/9SHXyWAtH64BMkBsbSpDFufUHQf0ExBmztSjhm
+ ki495v39GY6oKDF3jeNCZn+QC1p2rlk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-245-0YRpkEqHN2mRYMPZBP57fg-1; Mon, 05 Oct 2020 17:10:15 -0400
-X-MC-Unique: 0YRpkEqHN2mRYMPZBP57fg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-221-ZYv6mUTpNmGawxD6y1PG-g-1; Mon, 05 Oct 2020 17:10:35 -0400
+X-MC-Unique: ZYv6mUTpNmGawxD6y1PG-g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 64DA918A8222;
- Mon,  5 Oct 2020 21:10:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 554701015C9D;
+ Mon,  5 Oct 2020 21:10:34 +0000 (UTC)
 Received: from localhost (ovpn-119-102.rdu2.redhat.com [10.10.119.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2DB445C1BD;
- Mon,  5 Oct 2020 21:10:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EE40F55764;
+ Mon,  5 Oct 2020 21:10:33 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 07/21] hw/core/qdev-properties: Export some integer-related
- functions
-Date: Mon,  5 Oct 2020 17:09:46 -0400
-Message-Id: <20201005211000.710404-8-ehabkost@redhat.com>
+Subject: [PULL 17/21] kernel-doc: Handle function typedefs that return pointers
+Date: Mon,  5 Oct 2020 17:09:56 -0400
+Message-Id: <20201005211000.710404-18-ehabkost@redhat.com>
 In-Reply-To: <20201005211000.710404-1-ehabkost@redhat.com>
 References: <20201005211000.710404-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 02:11:31
@@ -97,199 +96,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+One example that was not being parsed correctly by kernel-doc is:
 
-We are going to split this file and reuse these static functions.
-Declare them in the local "qdev-prop-internal.h" header.
+  typedef Object *(ObjectPropertyResolve)(Object *obj,
+                                          void *opaque,
+                                          const char *part);
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200930164949.1425294-8-philmd@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <20201003024123.193840-2-ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/core/qdev-prop-internal.h | 11 +++++++++
- hw/core/qdev-properties.c    | 46 +++++++++++++++++++-----------------
- 2 files changed, 35 insertions(+), 22 deletions(-)
+ scripts/kernel-doc | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/core/qdev-prop-internal.h b/hw/core/qdev-prop-internal.h
-index 2a8c9a306a5..9cf5cc1d519 100644
---- a/hw/core/qdev-prop-internal.h
-+++ b/hw/core/qdev-prop-internal.h
-@@ -15,5 +15,16 @@ void qdev_propinfo_set_enum(Object *obj, Visitor *v, const char *name,
+diff --git a/scripts/kernel-doc b/scripts/kernel-doc
+index 40ad782e342..57a4a72970f 100755
+--- a/scripts/kernel-doc
++++ b/scripts/kernel-doc
+@@ -1318,8 +1318,8 @@ sub dump_typedef($$) {
+     $x =~ s@/\*.*?\*/@@gos;	# strip comments.
  
- void qdev_propinfo_set_default_value_enum(ObjectProperty *op,
-                                           const Property *prop);
-+void qdev_propinfo_set_default_value_int(ObjectProperty *op,
-+                                         const Property *prop);
-+void qdev_propinfo_set_default_value_uint(ObjectProperty *op,
-+                                          const Property *prop);
-+
-+void qdev_propinfo_get_uint16(Object *obj, Visitor *v, const char *name,
-+                              void *opaque, Error **errp);
-+void qdev_propinfo_get_int32(Object *obj, Visitor *v, const char *name,
-+                             void *opaque, Error **errp);
-+void qdev_propinfo_get_size32(Object *obj, Visitor *v, const char *name,
-+                              void *opaque, Error **errp);
+     # Parse function prototypes
+-    if ($x =~ /typedef\s+(\w+)\s*\(\*\s*(\w\S+)\s*\)\s*\((.*)\);/ ||
+-	$x =~ /typedef\s+(\w+)\s*(\w\S+)\s*\s*\((.*)\);/) {
++    if ($x =~ /typedef\s+(\w+\s*\**)\s*\(\*\s*(\w\S+)\s*\)\s*\((.*)\);/ ||
++	$x =~ /typedef\s+(\w+\s*\**)\s*(\w\S+)\s*\s*\((.*)\);/) {
  
- #endif
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index 31dfe441e2e..37e309077a1 100644
---- a/hw/core/qdev-properties.c
-+++ b/hw/core/qdev-properties.c
-@@ -271,12 +271,14 @@ static void set_uint8(Object *obj, Visitor *v, const char *name, void *opaque,
-     visit_type_uint8(v, name, ptr, errp);
- }
- 
--static void set_default_value_int(ObjectProperty *op, const Property *prop)
-+void qdev_propinfo_set_default_value_int(ObjectProperty *op,
-+                                         const Property *prop)
- {
-     object_property_set_default_int(op, prop->defval.i);
- }
- 
--static void set_default_value_uint(ObjectProperty *op, const Property *prop)
-+void qdev_propinfo_set_default_value_uint(ObjectProperty *op,
-+                                          const Property *prop)
- {
-     object_property_set_default_uint(op, prop->defval.u);
- }
-@@ -285,13 +287,13 @@ const PropertyInfo qdev_prop_uint8 = {
-     .name  = "uint8",
-     .get   = get_uint8,
-     .set   = set_uint8,
--    .set_default_value = set_default_value_uint,
-+    .set_default_value = qdev_propinfo_set_default_value_uint,
- };
- 
- /* --- 16bit integer --- */
- 
--static void get_uint16(Object *obj, Visitor *v, const char *name,
--                       void *opaque, Error **errp)
-+void qdev_propinfo_get_uint16(Object *obj, Visitor *v, const char *name,
-+                              void *opaque, Error **errp)
- {
-     DeviceState *dev = DEVICE(obj);
-     Property *prop = opaque;
-@@ -317,9 +319,9 @@ static void set_uint16(Object *obj, Visitor *v, const char *name,
- 
- const PropertyInfo qdev_prop_uint16 = {
-     .name  = "uint16",
--    .get   = get_uint16,
-+    .get   = qdev_propinfo_get_uint16,
-     .set   = set_uint16,
--    .set_default_value = set_default_value_uint,
-+    .set_default_value = qdev_propinfo_set_default_value_uint,
- };
- 
- /* --- 32bit integer --- */
-@@ -349,8 +351,8 @@ static void set_uint32(Object *obj, Visitor *v, const char *name,
-     visit_type_uint32(v, name, ptr, errp);
- }
- 
--static void get_int32(Object *obj, Visitor *v, const char *name, void *opaque,
--                      Error **errp)
-+void qdev_propinfo_get_int32(Object *obj, Visitor *v, const char *name,
-+                             void *opaque, Error **errp)
- {
-     DeviceState *dev = DEVICE(obj);
-     Property *prop = opaque;
-@@ -378,14 +380,14 @@ const PropertyInfo qdev_prop_uint32 = {
-     .name  = "uint32",
-     .get   = get_uint32,
-     .set   = set_uint32,
--    .set_default_value = set_default_value_uint,
-+    .set_default_value = qdev_propinfo_set_default_value_uint,
- };
- 
- const PropertyInfo qdev_prop_int32 = {
-     .name  = "int32",
--    .get   = get_int32,
-+    .get   = qdev_propinfo_get_int32,
-     .set   = set_int32,
--    .set_default_value = set_default_value_int,
-+    .set_default_value = qdev_propinfo_set_default_value_int,
- };
- 
- /* --- 64bit integer --- */
-@@ -444,14 +446,14 @@ const PropertyInfo qdev_prop_uint64 = {
-     .name  = "uint64",
-     .get   = get_uint64,
-     .set   = set_uint64,
--    .set_default_value = set_default_value_uint,
-+    .set_default_value = qdev_propinfo_set_default_value_uint,
- };
- 
- const PropertyInfo qdev_prop_int64 = {
-     .name  = "int64",
-     .get   = get_int64,
-     .set   = set_int64,
--    .set_default_value = set_default_value_int,
-+    .set_default_value = qdev_propinfo_set_default_value_int,
- };
- 
- /* --- string --- */
-@@ -820,8 +822,8 @@ const PropertyInfo qdev_prop_pci_devfn = {
- 
- /* --- 32bit unsigned int 'size' type --- */
- 
--static void get_size32(Object *obj, Visitor *v, const char *name, void *opaque,
--                       Error **errp)
-+void qdev_propinfo_get_size32(Object *obj, Visitor *v, const char *name,
-+                              void *opaque, Error **errp)
- {
-     DeviceState *dev = DEVICE(obj);
-     Property *prop = opaque;
-@@ -861,9 +863,9 @@ static void set_size32(Object *obj, Visitor *v, const char *name, void *opaque,
- 
- const PropertyInfo qdev_prop_size32 = {
-     .name  = "size",
--    .get = get_size32,
-+    .get = qdev_propinfo_get_size32,
-     .set = set_size32,
--    .set_default_value = set_default_value_uint,
-+    .set_default_value = qdev_propinfo_set_default_value_uint,
- };
- 
- /* --- blocksize --- */
-@@ -919,9 +921,9 @@ const PropertyInfo qdev_prop_blocksize = {
-     .name  = "size",
-     .description = "A power of two between " MIN_BLOCK_SIZE_STR
-                    " and " MAX_BLOCK_SIZE_STR,
--    .get   = get_size32,
-+    .get   = qdev_propinfo_get_size32,
-     .set   = set_blocksize,
--    .set_default_value = set_default_value_uint,
-+    .set_default_value = qdev_propinfo_set_default_value_uint,
- };
- 
- /* --- pci host address --- */
-@@ -1190,7 +1192,7 @@ const PropertyInfo qdev_prop_arraylen = {
-     .name = "uint32",
-     .get = get_uint32,
-     .set = set_prop_arraylen,
--    .set_default_value = set_default_value_uint,
-+    .set_default_value = qdev_propinfo_set_default_value_uint,
- };
- 
- /* --- public helpers --- */
-@@ -1401,7 +1403,7 @@ const PropertyInfo qdev_prop_size = {
-     .name  = "size",
-     .get = get_size,
-     .set = set_size,
--    .set_default_value = set_default_value_uint,
-+    .set_default_value = qdev_propinfo_set_default_value_uint,
- };
- 
- /* --- object link property --- */
+ 	# Function typedefs
+ 	$return_type = $1;
 -- 
 2.26.2
 
