@@ -2,84 +2,88 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7B17C4363D
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 15:33:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AFA4C4741F
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 15:35:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 061C7208C7
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 15:33:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A8770206DD
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 15:35:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nghIAoav"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 061C7208C7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="McTpYj2Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8770206DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPSUd-0005oN-W6
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 11:33:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52056)
+	id 1kPSWo-0007mf-PV
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 11:35:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52686)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kPSSw-0004jp-2O; Mon, 05 Oct 2020 11:31:54 -0400
-Received: from mail-lf1-x129.google.com ([2a00:1450:4864:20::129]:45354)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kPSSm-00060F-QV; Mon, 05 Oct 2020 11:31:53 -0400
-Received: by mail-lf1-x129.google.com with SMTP id r127so6849573lff.12;
- Mon, 05 Oct 2020 08:31:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=/kd3h6Lk0txhbpOzzK0wE+D/MA9izizv8l3Jkb17SBw=;
- b=nghIAoavzaIFJmtH9PQ9hMLzAx9AqmwiMUPuJa6VHO9UEV6N56cUchBtqbjdXhxg+h
- PMOBFc1Dii5PAHA838nLsWxk5kAjBmSlcfwTrx7KiX76Lhw+rdl725VMkFkBuH/Ix9d2
- 8JK33T5Ft3UnYhPrfvwWSlynuEaSR4ZIo0eXwD/tPJFHCMc5viIi9qiYWM3+2Q0/KujE
- 1DRWQoXusmR09aI8k08TSRV5mXe+KKfot7fDdRAs2ZfjJPZl1+qp5cas/Vc5wvtd4O2j
- reiBfqr2dgPfy5xj0dw4kvYld9O0VLgzu8MSzal7gLpOVsH8YJhBKE8Iy4wi2LMALX7W
- Xmog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=/kd3h6Lk0txhbpOzzK0wE+D/MA9izizv8l3Jkb17SBw=;
- b=oCB1QZRsVLIbU9IwlWDHyLrCz5YJHao/TMmhzBNgEaXoa4uE9U1qpsCgKfdwqCWtY/
- BziZV+JMonDT0eKQDrKVR80EWt+qBTuEf+uNk1rWXNZjopRyRlNKeVuuDT/rayZvHNwb
- 6L4QeAATKnAYxHUzcGjx+Giy8Prz7OWmWcqIwWENn2DkO4bkh+IadR/qJZanLvZjZXai
- 6W7o6zh0meXe+xOxnMpkijw4EfpIZ+hEOcgkBjLdshKydkwpcHYkdbo6bgnEeXlXmqM2
- WlHBb6jj0aA1slTRLxS8KtDcLqgrdeq/svqwoHNyE1tPLeXa/HUIYUkiFk8vwzsB5Bm2
- 9J2Q==
-X-Gm-Message-State: AOAM5310aNflq/G5OzIRrqHx4KU9rwdLb8XpO6YWwvZD/5t7VGGys+pu
- qgP8UdYT0LFs0WfEp5Bjiy7S7Zqz23gtsGDfdiE=
-X-Google-Smtp-Source: ABdhPJwMtauOd3cIruCKrazEbadOkkD7ZHj/scRsBUQ38KUDOWBYsv3QzHm2FLHwTwxsCY9noekAOzmft4f+j3TNm1s=
-X-Received: by 2002:a19:9141:: with SMTP id y1mr6647lfj.554.1601911898126;
- Mon, 05 Oct 2020 08:31:38 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kPSVE-0006hw-Q9
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 11:34:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41628)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kPSVB-0006HB-Ac
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 11:34:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601912051;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=cHeJaB6QRqc1yecKc5f45y2ODhEYjb9V9KmFqXOeV28=;
+ b=McTpYj2Z2c1kzfcHK3jU/sN40dkDceMwC0uORqxF/0aWYtsZaj7d22gZpML5UIIyj0M35H
+ 31GT6idg7zSxuVX6BAsQSDbLi2SIopVF20/tUvcvF9FCvJT0mRJkYwrTijLK6hMrAvncNM
+ 94CKNvmzHxs2ex4pfwOxJHRRWC2Ly7k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-522-E6jTIEIlPWqR_tNRRLpQ-g-1; Mon, 05 Oct 2020 11:34:05 -0400
+X-MC-Unique: E6jTIEIlPWqR_tNRRLpQ-g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 69C268B4C73;
+ Mon,  5 Oct 2020 15:33:54 +0000 (UTC)
+Received: from [10.10.120.38] (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 93C3460C11;
+ Mon,  5 Oct 2020 15:33:52 +0000 (UTC)
+Subject: Re: QEMU API cleanup initiative - Let's chat during the KVM call
+From: John Snow <jsnow@redhat.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
+References: <1f0b0576-eb07-bf5a-a4d8-c6a2d18d1a94@redhat.com>
+Message-ID: <62147dfc-ef6a-238c-d26c-0907fcb7d6ba@redhat.com>
+Date: Mon, 5 Oct 2020 11:33:52 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20201002180838.2047-1-luoyonggang@gmail.com>
- <20201005082254.GE2385272@redhat.com>
-In-Reply-To: <20201005082254.GE2385272@redhat.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Mon, 5 Oct 2020 23:31:28 +0800
-Message-ID: <CAE2XoE9Ss7K0Q-sgQ268Ww7X1wmgmSRMk3-4byChn5_4GVYARA@mail.gmail.com>
-Subject: Re: [PATCH v7 0/4] Fixes curses on msys2/mingw
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000a63e0005b0ee2dc0"
-Received-SPF: pass client-ip=2a00:1450:4864:20::129;
- envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x129.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <1f0b0576-eb07-bf5a-a4d8-c6a2d18d1a94@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 01:25:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -93,126 +97,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- qemu-level <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Andrea Bolognani <abologna@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000a63e0005b0ee2dc0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 10/3/20 8:14 PM, John Snow wrote:
+> Hi, everyone! I'd like to discuss some of this in the upstream KVM call.
+> 
+> TLDR: I would like to begin an organized effort to consolidate our CLI 
+> parsing, moving it onto QAPI. I'd like to talk about how we should 
+> proceed on the KVM call, prior to KVM Forum, where we should continue 
+> these discussions.
+> 
 
-On Mon, Oct 5, 2020 at 4:23 PM Daniel P. Berrang=C3=A9 <berrange@redhat.com=
->
-wrote:
->
-> Only one of the 4 patches in this series appears to have been sent.
-All other are revied and preserve the same, I prefer not disturb by re
-sending same patches
-as other contributor suggested
->
-> On Sat, Oct 03, 2020 at 02:08:37AM +0800, Yonggang Luo wrote:
-> > V6-V7
-> > Update the configure script for
-> > * curses: Fixes compiler error that complain don't have langinfo.h on
-msys2/m=3D
-> > ingw
-> >
-> > V5-V6
-> > Dropping configure: Fixes ncursesw detection under msys2/mingw by
-convert the=3D
-> > m to meson first.
-> > That need the meson 0.56 upstream to fixes the curses detection.
-> > Add
-> > * configure: fixes indent of $meson setup
-> >
-> > Yonggang Luo (4):
-> >   configure: fixes indent of $meson setup
-> >   curses: Fixes compiler error that complain don't have langinfo.h on
-> >     msys2/mingw
-> >   curses: Fixes curses compiling errors.
-> >   win32: Simplify gmtime_r detection not depends on if  _POSIX_C_SOURCE
-> >     are defined on msys2/mingw
-> >
-> >  configure                 | 47 +++++----------------------------------
-> >  include/sysemu/os-win32.h |  4 ++--
-> >  ui/curses.c               | 14 ++++++------
-> >  util/oslib-win32.c        |  4 ++--
-> >  4 files changed, 16 insertions(+), 53 deletions(-)
-> >
-> > --=3D20
-> > 2.28.0.windows.1
-> >
-> >
->
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com      -o-
-https://www.flickr.com/photos/dberrange :|
-> |: https://libvirt.org         -o-
-https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-
-https://www.instagram.com/dberrange :|
->
+Call details:
+
+( https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg00997.html )
+
+ > You can join the call from your web browser here:
+ > https://bluejeans.com/497377100
+ >
+ > Meeting ID: 497377100
+ > Phone numbers: https://www.redhat.com/en/conference-numbers
+
+The call is at 13:00 UTC:
+
+- 09:00 EDT
+- 15:00 CEST
 
 
---
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
+Intended area of focus:
 
---000000000000a63e0005b0ee2dc0
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+- What work needs to be done to move the CLI onto QAPI
+- How do we measure/document this conversion progress?
+- What are the criteria for a complete conversion?
+- How do we distribute this work?
 
-<div dir=3D"ltr"><br><br>On Mon, Oct 5, 2020 at 4:23 PM Daniel P. Berrang=
-=C3=A9 &lt;<a href=3D"mailto:berrange@redhat.com">berrange@redhat.com</a>&g=
-t; wrote:<br>&gt;<br>&gt; Only one of the 4 patches in this series appears =
-to have been sent.<div>All other are revied and preserve the same, I prefer=
- not disturb=C2=A0by re sending same patches</div><div>as other contributor=
- suggested<br>&gt;<br>&gt; On Sat, Oct 03, 2020 at 02:08:37AM +0800, Yongga=
-ng Luo wrote:<br>&gt; &gt; V6-V7<br>&gt; &gt; Update the configure script f=
-or<br>&gt; &gt; * curses: Fixes compiler error that complain don&#39;t have=
- langinfo.h on msys2/m=3D<br>&gt; &gt; ingw<br>&gt; &gt;<br>&gt; &gt; V5-V6=
-<br>&gt; &gt; Dropping configure: Fixes ncursesw detection under msys2/ming=
-w by convert the=3D<br>&gt; &gt; m to meson first.<br>&gt; &gt; That need t=
-he meson 0.56 upstream to fixes the curses detection.<br>&gt; &gt; Add<br>&=
-gt; &gt; * configure: fixes indent of $meson setup<br>&gt; &gt;<br>&gt; &gt=
-; Yonggang Luo (4):<br>&gt; &gt; =C2=A0 configure: fixes indent of $meson s=
-etup<br>&gt; &gt; =C2=A0 curses: Fixes compiler error that complain don&#39=
-;t have langinfo.h on<br>&gt; &gt; =C2=A0 =C2=A0 msys2/mingw<br>&gt; &gt; =
-=C2=A0 curses: Fixes curses compiling errors.<br>&gt; &gt; =C2=A0 win32: Si=
-mplify gmtime_r detection not depends on if =C2=A0_POSIX_C_SOURCE<br>&gt; &=
-gt; =C2=A0 =C2=A0 are defined on msys2/mingw<br>&gt; &gt;<br>&gt; &gt; =C2=
-=A0configure =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 47 +=
-++++----------------------------------<br>&gt; &gt; =C2=A0include/sysemu/os=
--win32.h | =C2=A04 ++--<br>&gt; &gt; =C2=A0ui/curses.c =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 14 ++++++------<br>&gt; &gt; =C2=A0util/osli=
-b-win32.c =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A04 ++--<br>&gt; &gt; =C2=A04 fi=
-les changed, 16 insertions(+), 53 deletions(-)<br>&gt; &gt;<br>&gt; &gt; --=
-=3D20<br>&gt; &gt; 2.28.0.windows.1<br>&gt; &gt;<br>&gt; &gt;<br>&gt;<br>&g=
-t; Regards,<br>&gt; Daniel<br>&gt; --<br>&gt; |: <a href=3D"https://berrang=
-e.com">https://berrange.com</a> =C2=A0 =C2=A0 =C2=A0-o- =C2=A0 =C2=A0<a hre=
-f=3D"https://www.flickr.com/photos/dberrange">https://www.flickr.com/photos=
-/dberrange</a> :|<br>&gt; |: <a href=3D"https://libvirt.org">https://libvir=
-t.org</a> =C2=A0 =C2=A0 =C2=A0 =C2=A0 -o- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0<a href=3D"https://fstop138.berrange.com">https://fstop138.berran=
-ge.com</a> :|<br>&gt; |: <a href=3D"https://entangle-photo.org">https://ent=
-angle-photo.org</a> =C2=A0 =C2=A0-o- =C2=A0 =C2=A0<a href=3D"https://www.in=
-stagram.com/dberrange">https://www.instagram.com/dberrange</a> :|<br>&gt;<b=
-r><br><br>--<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=B4<br>=E7=
-=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincerely,<=
-br>Yonggang Luo</div></div>
 
---000000000000a63e0005b0ee2dc0--
+(See quoted below for context/detail)
+
+
+> 
+> Background
+> ----------
+> 
+> You may recall late last December that Stefan started a big discussion 
+> thread about Modernizing the QEMU API:
+> "Making QEMU easier for management tools and applications" [1]
+> 
+> There were lots of opinions and directions proposed for this, with many 
+> competing visions for where QEMU should go, or what it ought endeavor to 
+> be.
+> 
+> Though many of these visions conflict in terms of the implementations 
+> for their end goal, many shared a similar logical end-goal and shared 
+> some concrete intermediate steps. One of those concrete intermediate 
+> steps is the consolidation of our configuration and startup mechanisms 
+> into a unified API.
+> 
+> 
+> The QEMU API, Today
+> ------------------
+> 
+> At the moment, QAPI is our most formal system for declaring types, 
+> structures and interfaces. I believe QAPI is not going anywhere, and so 
+> I am doubling down and committing to improving and expanding the QAPI 
+> subsystem.
+> 
+> I wanted to understand what QEMU's existing interface even *was*. We can 
+> understand QEMU's interface to be four components presently:
+> 
+> 1. The QEMU Monitor Protocol (QMP)
+> 
+> QMP is based explicitly on top of QAPI, which we do indeed have formal 
+> specifications for in ./qapi. They are not standards-compliant, but they 
+> are at least unified.
+> 
+> 2. The GTK UI
+> 
+> The GTK UI offers very minimal interface, and does not offer any feature 
+> that is not available through one of the other interfaces or standard 
+> operating system UI. Good!
+> 
+> 3. The Human Monitor Protocol (HMP)
+> 
+> HMP is increasingly based on QMP, though the conversion is not complete 
+> and it is not clear if it will be "complete". This was a major sub-topic 
+> of the thread last December with no clear consensus. Some work continues 
+> to bring major HMP features over to QMP; notably Daniel Berrange has 
+> been trying to port savevm/loadvm over to QMP [2]. For now, it seems 
+> like HMP will be with us at least as a debugging and development 
+> interface. There is work to be done to audit and inventory any remaining 
+> features that must be ported to QMP, which are reundant with QMP, and 
+> which are uniquely useful as debugging interfaces.
+> 
+> 4. The QEMU command-line
+> 
+> Last, we have the QEMU CLI. This interface was grown organically over 
+> time and features many different parser subsystems and loosely federated 
+> components with no unified specification document that explains the 
+> entire shape of the CLI.
+> 
+> 
+> Auditing the CLI interface
+> --------------------------
+> 
+> I wanted to know what our CLI really looked like. Not trusting any of 
+> our existing documentation to be complete/authoritative, I used the QEMU 
+> 5.1 release as a basis and audited the entirety of that interface. [3]
+> 
+> Here's what I found:
+> 
+> - QEMU 5.1 has 131 command line flags
+>    - 93 of these take an argument
+>    - 38 of them do not.
+> 
+> If we want to unify the parsing into a single formal declaration, it 
+> would be helpful to know what we're dealing with. Of those flags that 
+> take arguments:
+> 
+> - 3 use QAPI to parse their argument directly
+> - 51 use QemuOpts in some way:
+>    - 36 use qemu_opts_parse[_noisily] directly
+>    - 10 desugar to `qemu_opts_parse_noisily` (-fdc, -hda, et al)
+>    - 5 add a single option using `qemu_opt_set`.
+> - 1 is parsed rather directly by QOM (-tb-size)
+> - 14 are stored directly as (const char *)
+> - 3 are parsed into numerical types with atoi/strtol/etc.
+> - 21 are parsed by custom parsing mechanisms.
+> 
+> For full, gory details, please see the document referenced at [3]. It's 
+> about 4000 lines of markdown detailing the QAPI/C structures that define 
+> each command line argument, as well as some fairly detailed analyses of 
+> the custom parsers and exactly which values they accept.
+> 
+> 
+> I'm not reading a 4,000+ line markdown document
+> -----------------------------------------------
+> 
+> Good news! I made a summary spreadsheet to summarize what I found. [4]
+> 
+> This spreadsheet summarizes the types of arguments we have and what 
+> parsers they utilize and their support status. The spreadsheet follows 
+> the order of flags as defined in qemu-options.hx, category-by-category.
+> 
+> I also tried to broadly assign "topics" to each flag for the purposes of 
+> laying out a better manual in the future, but I wasn't fully confident 
+> in many flags that affect things like boot, firmware, chipset, etc, so 
+> this is a work in progress.
+> 
+> https://docs.google.com/spreadsheets/d/1OJvzDwLpo2XsGytNp9Pr-vYIrb0pWrFKBNPtOyH80ew/edit?usp=sharing 
+> 
+> 
+> If you don't have google, I have an ODS exported version of this 
+> spreadsheet too -- feel free to relay your feedback back to me here. [5]
+> 
+> Paolo Bonzini helped re-organize my initial draft and used it to 
+> identify flags perhaps most in need of attention to bring onto a new 
+> standard, annotated in yellow.
+> 
+> (Those items are: -k, -uuid, -no-hpet, -no-reboot, -no-shutdown, 
+> -incoming-, and -enable-fips.)
+> 
+> Of the remainder, quite a few are either already deprecated, are 
+> aliases, or are simple sugar for another command that could be expressed 
+> more compactly. Quite a few are already using *at least* QemuOpts such 
+> that porting them to QAPI should not be extremely mechanically difficult.
+> 
+> I would like to use the KVM call to discuss a roadmap for converting the 
+> remaining options to QAPI, what that would take, and who will take 
+> ownership for which subsystems/flags. I would like to bring these 
+> discussions to KVM Forum and lend serious, dedicated effort to finishing 
+> this task.
+> 
+> 
+> Related work and ongoing efforts
+> --------------------------------
+> 
+> Mentioned above, Daniel Berrange is porting HMP features to QMP [2].
+> 
+> I am adding python static typing to our QAPI generator in the belief 
+> that QAPI will continue to grow in importance for us, and inviting more 
+> developers to participate in writing QAPI generator backends by 
+> formalizing that interface. [6].
+> 
+> I am prototyping a new QAPI generator backend that produces Json-Schema, 
+> attempting to target various SDK generators that are compatible with 
+> e.g. OpenAPI (which uses a modified version Json-Schema as a 
+> sub-specification.)
+> 
+> Eduardo Habkost is working on making all QOM type definitions fully data 
+> driven, in the hopes that we might eventually be able to integrate these 
+> types with QAPI to eliminate stub types from the API. [7]
+> 
+> Marc-André is adding a Rust backend to the QAPI generator, along with a 
+> new API frontend that can communicate with dbus. [8]
+> 
+> 
+> -- 
+> 
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg04840.html
+> [2] https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg00587.html
+> [3] https://gitlab.com/jsnow/qemu/-/blob/cli_audit/docs/cli_audit.md
+> [4] 
+> https://docs.google.com/spreadsheets/d/1OJvzDwLpo2XsGytNp9Pr-vYIrb0pWrFKBNPtOyH80ew/edit?usp=sharing 
+> 
+> [5] http://people.redhat.com/~jsnow/qemu-5_1-audit.ods
+> [6] https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg10723.html
+> [7] https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg08304.html 
+> (And more to come)
+> [8] https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg03971.html
+
 
