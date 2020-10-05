@@ -7,83 +7,82 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75405C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:13:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D63C4727E
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:14:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07758207EA
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:13:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 41936207EA
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:14:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ul2XZwSl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07758207EA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T3UufQF5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41936207EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPXny-0004sD-63
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 17:13:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43144)
+	id 1kPXnz-0004v4-DD
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 17:13:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43168)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kPXkO-00089X-Ul
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57940)
+ id 1kPXkQ-0008AC-Lt
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54765)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kPXkL-0007LM-AK
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:16 -0400
+ id 1kPXkO-0007N9-Hb
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601932212;
+ s=mimecast20190719; t=1601932215;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=VKVHOfnczXhyBWhAP6cPmuP/ZmSpUD+aWjzBUKL3yS8=;
- b=Ul2XZwSlt7jRXLaLkcmmpdklUrtoFSx7y+jqzB0XkQoPtD1Xt1zKNfo52Rb7SKgmQdO05X
- g0RRjhTKDX33binorFAhslaE0tpZW2wOtPcMvfQzgyegUIehQeynMoDvTPNqtKm6UqMoUl
- b2q8nSBEh57a+u6PE3QWVG0B5tcRNFI=
+ bh=XEoq9EbX6/fzzvW2lNcxW2NPkT5KG2SSUNmANtD/K24=;
+ b=T3UufQF5eVZCyoNW8fg37cYF2dQEx3WoNmqDvYget0j/Gg9HAT6++xttw/sf2/lv1mfXro
+ fhRxlmxt9PERaUghPDA8n5DmVv55G1M3K6hU21nOHrzxbLOjnOeQV/LUumkBtFvCrMJKtk
+ 37RIdf6sArfN8mF5t7Gg6CRuvGYIX3M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-402-NL9VSY6vN5uKq8jytm-I5A-1; Mon, 05 Oct 2020 17:10:10 -0400
-X-MC-Unique: NL9VSY6vN5uKq8jytm-I5A-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-409-lszAYZKkM9SAbNvZZ7bJVQ-1; Mon, 05 Oct 2020 17:10:12 -0400
+X-MC-Unique: lszAYZKkM9SAbNvZZ7bJVQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44D3E107ACF9;
- Mon,  5 Oct 2020 21:10:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9227E1DDED;
+ Mon,  5 Oct 2020 21:10:11 +0000 (UTC)
 Received: from localhost (ovpn-119-102.rdu2.redhat.com [10.10.119.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0D06E5D9CD;
- Mon,  5 Oct 2020 21:10:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 56C8173674;
+ Mon,  5 Oct 2020 21:10:11 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 03/21] hw/core/qdev-properties: Use qemu_strtoul() in
- set_pci_host_devaddr()
-Date: Mon,  5 Oct 2020 17:09:42 -0400
-Message-Id: <20201005211000.710404-4-ehabkost@redhat.com>
+Subject: [PULL 05/21] hw/core/qdev-properties: Export enum-related functions
+Date: Mon,  5 Oct 2020 17:09:44 -0400
+Message-Id: <20201005211000.710404-6-ehabkost@redhat.com>
 In-Reply-To: <20201005211000.710404-1-ehabkost@redhat.com>
 References: <20201005211000.710404-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 01:25:11
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 02:11:31
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
 X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -108,80 +107,195 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Replace strtoul() by qemu_strtoul() so checkpatch.pl won't complain
-if we move this code later.
+We are going to split this file and reuse these static functions.
+Add the local "qdev-prop-internal.h" header declaring them.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200930164949.1425294-4-philmd@redhat.com>
+Message-Id: <20200930164949.1425294-6-philmd@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/core/qdev-properties.c | 25 ++++++++++++-------------
- 1 file changed, 12 insertions(+), 13 deletions(-)
+ hw/core/qdev-prop-internal.h | 19 ++++++++++++
+ hw/core/qdev-properties.c    | 58 +++++++++++++++++++-----------------
+ 2 files changed, 49 insertions(+), 28 deletions(-)
+ create mode 100644 hw/core/qdev-prop-internal.h
 
+diff --git a/hw/core/qdev-prop-internal.h b/hw/core/qdev-prop-internal.h
+new file mode 100644
+index 00000000000..2a8c9a306a5
+--- /dev/null
++++ b/hw/core/qdev-prop-internal.h
+@@ -0,0 +1,19 @@
++/*
++ * qdev property parsing
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef HW_CORE_QDEV_PROP_INTERNAL_H
++#define HW_CORE_QDEV_PROP_INTERNAL_H
++
++void qdev_propinfo_get_enum(Object *obj, Visitor *v, const char *name,
++                            void *opaque, Error **errp);
++void qdev_propinfo_set_enum(Object *obj, Visitor *v, const char *name,
++                            void *opaque, Error **errp);
++
++void qdev_propinfo_set_default_value_enum(ObjectProperty *op,
++                                          const Property *prop);
++
++#endif
 diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index 080ba319a1f..a1190a5db9e 100644
+index 071fd5864ae..76417d09365 100644
 --- a/hw/core/qdev-properties.c
 +++ b/hw/core/qdev-properties.c
-@@ -951,7 +951,7 @@ static void set_pci_host_devaddr(Object *obj, Visitor *v, const char *name,
+@@ -18,6 +18,7 @@
+ #include "qemu/uuid.h"
+ #include "qemu/units.h"
+ #include "qemu/cutils.h"
++#include "qdev-prop-internal.h"
+ 
+ void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
+                                   Error **errp)
+@@ -53,8 +54,8 @@ void *qdev_get_prop_ptr(DeviceState *dev, Property *prop)
+     return ptr;
+ }
+ 
+-static void get_enum(Object *obj, Visitor *v, const char *name, void *opaque,
+-                     Error **errp)
++void qdev_propinfo_get_enum(Object *obj, Visitor *v, const char *name,
++                            void *opaque, Error **errp)
+ {
+     DeviceState *dev = DEVICE(obj);
      Property *prop = opaque;
-     PCIHostDeviceAddress *addr = qdev_get_prop_ptr(dev, prop);
-     char *str, *p;
--    char *e;
-+    const char *e;
-     unsigned long val;
-     unsigned long dom = 0, bus = 0;
-     unsigned int slot = 0, func = 0;
-@@ -966,23 +966,23 @@ static void set_pci_host_devaddr(Object *obj, Visitor *v, const char *name,
-     }
+@@ -63,8 +64,8 @@ static void get_enum(Object *obj, Visitor *v, const char *name, void *opaque,
+     visit_type_enum(v, prop->name, ptr, prop->info->enum_table, errp);
+ }
  
-     p = str;
--    val = strtoul(p, &e, 16);
--    if (e == p || *e != ':') {
-+    if (qemu_strtoul(p, &e, 16, &val) < 0 || val > 0xffff || e == p) {
-+        goto inval;
-+    }
-+    if (*e != ':') {
-         goto inval;
-     }
-     bus = val;
+-static void set_enum(Object *obj, Visitor *v, const char *name, void *opaque,
+-                     Error **errp)
++void qdev_propinfo_set_enum(Object *obj, Visitor *v, const char *name,
++                            void *opaque, Error **errp)
+ {
+     DeviceState *dev = DEVICE(obj);
+     Property *prop = opaque;
+@@ -78,7 +79,8 @@ static void set_enum(Object *obj, Visitor *v, const char *name, void *opaque,
+     visit_type_enum(v, prop->name, ptr, prop->info->enum_table, errp);
+ }
  
--    p = e + 1;
--    val = strtoul(p, &e, 16);
--    if (e == p) {
-+    p = (char *)e + 1;
-+    if (qemu_strtoul(p, &e, 16, &val) < 0 || val > 0x1f || e == p) {
-         goto inval;
-     }
-     if (*e == ':') {
-         dom = bus;
-         bus = val;
--        p = e + 1;
--        val = strtoul(p, &e, 16);
--        if (e == p) {
-+        p = (char *)e + 1;
-+        if (qemu_strtoul(p, &e, 16, &val) < 0 || val > 0x1f || e == p) {
-             goto inval;
-         }
-     }
-@@ -991,14 +991,13 @@ static void set_pci_host_devaddr(Object *obj, Visitor *v, const char *name,
-     if (*e != '.') {
-         goto inval;
-     }
--    p = e + 1;
--    val = strtoul(p, &e, 10);
--    if (e == p) {
-+    p = (char *)e + 1;
-+    if (qemu_strtoul(p, &e, 10, &val) < 0 || val > 7 || e == p) {
-         goto inval;
-     }
-     func = val;
+-static void set_default_value_enum(ObjectProperty *op, const Property *prop)
++void qdev_propinfo_set_default_value_enum(ObjectProperty *op,
++                                          const Property *prop)
+ {
+     object_property_set_default_str(op,
+         qapi_enum_lookup(prop->info->enum_table, prop->defval.i));
+@@ -669,9 +671,9 @@ const PropertyInfo qdev_prop_on_off_auto = {
+     .name = "OnOffAuto",
+     .description = "on/off/auto",
+     .enum_table = &OnOffAuto_lookup,
+-    .get = get_enum,
+-    .set = set_enum,
+-    .set_default_value = set_default_value_enum,
++    .get = qdev_propinfo_get_enum,
++    .set = qdev_propinfo_set_enum,
++    .set_default_value = qdev_propinfo_set_default_value_enum,
+ };
  
--    if (dom > 0xffff || bus > 0xff || slot > 0x1f || func > 7) {
-+    if (bus > 0xff) {
-         goto inval;
-     }
+ /* --- lost tick policy --- */
+@@ -681,9 +683,9 @@ QEMU_BUILD_BUG_ON(sizeof(LostTickPolicy) != sizeof(int));
+ const PropertyInfo qdev_prop_losttickpolicy = {
+     .name  = "LostTickPolicy",
+     .enum_table  = &LostTickPolicy_lookup,
+-    .get   = get_enum,
+-    .set   = set_enum,
+-    .set_default_value = set_default_value_enum,
++    .get   = qdev_propinfo_get_enum,
++    .set   = qdev_propinfo_set_enum,
++    .set_default_value = qdev_propinfo_set_default_value_enum,
+ };
  
+ /* --- Block device error handling policy --- */
+@@ -695,9 +697,9 @@ const PropertyInfo qdev_prop_blockdev_on_error = {
+     .description = "Error handling policy, "
+                    "report/ignore/enospc/stop/auto",
+     .enum_table = &BlockdevOnError_lookup,
+-    .get = get_enum,
+-    .set = set_enum,
+-    .set_default_value = set_default_value_enum,
++    .get = qdev_propinfo_get_enum,
++    .set = qdev_propinfo_set_enum,
++    .set_default_value = qdev_propinfo_set_default_value_enum,
+ };
+ 
+ /* --- BIOS CHS translation */
+@@ -709,9 +711,9 @@ const PropertyInfo qdev_prop_bios_chs_trans = {
+     .description = "Logical CHS translation algorithm, "
+                    "auto/none/lba/large/rechs",
+     .enum_table = &BiosAtaTranslation_lookup,
+-    .get = get_enum,
+-    .set = set_enum,
+-    .set_default_value = set_default_value_enum,
++    .get = qdev_propinfo_get_enum,
++    .set = qdev_propinfo_set_enum,
++    .set_default_value = qdev_propinfo_set_default_value_enum,
+ };
+ 
+ /* --- FDC default drive types */
+@@ -721,9 +723,9 @@ const PropertyInfo qdev_prop_fdc_drive_type = {
+     .description = "FDC drive type, "
+                    "144/288/120/none/auto",
+     .enum_table = &FloppyDriveType_lookup,
+-    .get = get_enum,
+-    .set = set_enum,
+-    .set_default_value = set_default_value_enum,
++    .get = qdev_propinfo_get_enum,
++    .set = qdev_propinfo_set_enum,
++    .set_default_value = qdev_propinfo_set_default_value_enum,
+ };
+ 
+ /* --- MultiFDCompression --- */
+@@ -733,9 +735,9 @@ const PropertyInfo qdev_prop_multifd_compression = {
+     .description = "multifd_compression values, "
+                    "none/zlib/zstd",
+     .enum_table = &MultiFDCompression_lookup,
+-    .get = get_enum,
+-    .set = set_enum,
+-    .set_default_value = set_default_value_enum,
++    .get = qdev_propinfo_get_enum,
++    .set = qdev_propinfo_set_enum,
++    .set_default_value = qdev_propinfo_set_default_value_enum,
+ };
+ 
+ /* --- pci address --- */
+@@ -1416,9 +1418,9 @@ const PropertyInfo qdev_prop_off_auto_pcibar = {
+     .name = "OffAutoPCIBAR",
+     .description = "off/auto/bar0/bar1/bar2/bar3/bar4/bar5",
+     .enum_table = &OffAutoPCIBAR_lookup,
+-    .get = get_enum,
+-    .set = set_enum,
+-    .set_default_value = set_default_value_enum,
++    .get = qdev_propinfo_get_enum,
++    .set = qdev_propinfo_set_enum,
++    .set_default_value = qdev_propinfo_set_default_value_enum,
+ };
+ 
+ /* --- PCIELinkSpeed 2_5/5/8/16 -- */
+@@ -1495,7 +1497,7 @@ const PropertyInfo qdev_prop_pcie_link_speed = {
+     .enum_table = &PCIELinkSpeed_lookup,
+     .get = get_prop_pcielinkspeed,
+     .set = set_prop_pcielinkspeed,
+-    .set_default_value = set_default_value_enum,
++    .set_default_value = qdev_propinfo_set_default_value_enum,
+ };
+ 
+ /* --- PCIELinkWidth 1/2/4/8/12/16/32 -- */
+@@ -1590,5 +1592,5 @@ const PropertyInfo qdev_prop_pcie_link_width = {
+     .enum_table = &PCIELinkWidth_lookup,
+     .get = get_prop_pcielinkwidth,
+     .set = set_prop_pcielinkwidth,
+-    .set_default_value = set_default_value_enum,
++    .set_default_value = qdev_propinfo_set_default_value_enum,
+ };
 -- 
 2.26.2
 
