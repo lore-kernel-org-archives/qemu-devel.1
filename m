@@ -2,93 +2,86 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NORMAL_HTTP_TO_IP,NUMERIC_HTTP_ADDR,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D7FCC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 13:59:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C322AC4363D
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 14:00:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E02F4207BC
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 13:59:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3C69820848
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 14:00:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VxCR0l9r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E02F4207BC
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AnvuJdNh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C69820848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPR1d-0001kc-2o
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 09:59:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53986)
+	id 1kPR2e-0002lM-Av
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 10:00:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54646)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kPQyR-000787-79
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 09:56:19 -0400
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:33178)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kPQyO-0000NN-Kp
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 09:56:18 -0400
-Received: by mail-wr1-x42f.google.com with SMTP id m6so9725765wrn.0
- for <qemu-devel@nongnu.org>; Mon, 05 Oct 2020 06:56:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=33jc4GvxhINu+DGd3c2tDcuxZvRf6s057BT97g14Zqk=;
- b=VxCR0l9rKKAXmjy5tIC+pdCGSffUiBrTm3xY6tYNPjQQnsGxyVbkeqbPn+3M+l6Dq8
- 3lCo6GaYD+Kh1h9NsMKY6VEdA3cOf/hSgZBiWuHwwLfUzwiXSSDrD/u4S1sKpV6Wx1Cg
- soRDfP+njjHY92/rDPZ8I2S/QhzD8pQEu8A4htnBLLG75pqUsskwc42/tMykjc7BpZzQ
- s6srQfipCpEktn4Tw1E1tQnXp16FEibdCLLAYc+fLw9jHJt8F1N5m5TEKmDEhwcZvTw4
- ft591bVpudPqXSBGw5/BxbwqMbZnXiM7D3RV1Kte7Qjlc0w9WXffnUfa/dkcNY2Gdo0y
- yfrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=33jc4GvxhINu+DGd3c2tDcuxZvRf6s057BT97g14Zqk=;
- b=sVCXDXKjJu4/Wzc2I2LKSJfLHzl10ULXkn/HaGihQTeToa7+G97Liv6IpzqREp9+JS
- ONMcBQgy52dCBZ9z2o4DI//VGXqcGICq5Iq/noKsj/XYx0on/BzcwzF1x4/cennr6/jJ
- sv0D/ipaWl9T7cAbpOqURn7KGRuP++Cm/HB5cOkno0jT2vE7fqpIBdf3926MHGwu8XxD
- GrHZsGYLGb4EcBBgnMO73zF828SIgtVeSlZtlnXzwUbTUp751tGFzzFTmUdk+P4kl8PX
- lsOUBX8kvvG+DeE28DV9wcO2T8IKwH6EQ/SXnh5/1t984cETj1BBRcQY6fdlNnombu5y
- ncdQ==
-X-Gm-Message-State: AOAM531LxJm2TMF/eCeD5lJF+8ebZR9xsemqwN4h4eFwwShM3+89yu9h
- QJSjiSMjQ5RG9N0me7ZkuV/8CTUseSs=
-X-Google-Smtp-Source: ABdhPJwtcNw1DjTLVIgQMAew8oEvAMd/2C7OCveuLzor2V6vlzAyU/FDlaPt14pQWREolYhygJw15g==
-X-Received: by 2002:adf:db52:: with SMTP id f18mr17857460wrj.397.1601906173601; 
- Mon, 05 Oct 2020 06:56:13 -0700 (PDT)
-Received: from localhost.localdomain ([2001:b07:6468:f312:2e86:3d8b:8b70:920c])
- by smtp.gmail.com with ESMTPSA id c8sm13406559wmd.18.2020.10.05.06.56.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 05 Oct 2020 06:56:13 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 1/4] slirp: Convert Makefile bits to meson bits
-Date: Mon,  5 Oct 2020 15:56:10 +0200
-Message-Id: <20201005135613.435932-2-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201005135613.435932-1-pbonzini@redhat.com>
-References: <20201005135613.435932-1-pbonzini@redhat.com>
+ (Exim 4.90_1) (envelope-from <jfreimann@redhat.com>)
+ id 1kPR0h-0001LK-4r
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 09:58:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:24509)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jfreimann@redhat.com>)
+ id 1kPR0d-0000gI-Pv
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 09:58:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601906313;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=fCjqS97KrKdJlyRAjY1r3ymDq972TEKHfO5NaWWjPno=;
+ b=AnvuJdNhjvEwlVZc/1WQ34nGyg5H3rffPZ4R7DPgN5q8kyLLCs1YVmt0E+NreHAnO5io6B
+ VT60dygwjTfBblzJlAMrEwy1pcDgVB+NfDMxGmS81e+2EuddJ1d4Lx41XFLp9SwkvQ+Xun
+ wGxOm2IqHQetH6NRkauSqbv/Viw5amo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-170-JzMHV3xINQGaJ68X0gUH-Q-1; Mon, 05 Oct 2020 09:58:31 -0400
+X-MC-Unique: JzMHV3xINQGaJ68X0gUH-Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5FCDC80365F
+ for <qemu-devel@nongnu.org>; Mon,  5 Oct 2020 13:58:30 +0000 (UTC)
+Received: from localhost (ovpn-113-34.ams2.redhat.com [10.36.113.34])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1BFA15D9F3;
+ Mon,  5 Oct 2020 13:58:23 +0000 (UTC)
+Date: Mon, 5 Oct 2020 15:58:22 +0200
+From: Jens Freimann <jfreimann@redhat.com>
+To: dgilbert@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
+Subject: Re: [RFC 0/1] tools/virtiofsd: don't create temporary directory in /
+Message-ID: <20201005135822.GE1625193@linux.fritz.box>
+References: <20201001061519.636959-1-jfreimann@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42f;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x42f.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.248,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+In-Reply-To: <20201001061519.636959-1-jfreimann@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jfreimann@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jfreimann@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 01:25:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,335 +94,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, richard.henderson@linaro.org
+Cc: fidencio@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SLIRP uses Meson so it could become a subproject in the future,
-but our choice of configure options is not yet supported in Meson
-(https://github.com/mesonbuild/meson/pull/7740).
+On Thu, Oct 01, 2020 at 08:15:18AM +0200, Jens Freimann wrote:
+>I'm sending this as an RFC because:
+>Maybe just prepending "/tmp" is not generic enough and we should make it
+>somehow configurable or use $TMPDIR. Also there might be security
+>implications I'm not aware of.
+>The process is running with container_kvm_t context which also needs
+>a change to be allowed to create files in tmpfs to make it work.
 
-For now, build the library via the main meson.build just like for
-capstone.
+Fabiano had the idea to use a glib function to create the
+temporary directory. It would be good because it uses the $TMPDIR env
+variable. 
 
-This improves the current state of affairs in that we will re-link
-the qemu executables against a changed libslirp.a, which we wouldn't
-do before-hand.
+But before we decide about glib or not: the change is in the call
+chain of setup_sandbox() and there was a question what other implications
+that has. What do you think?
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- Makefile                |  7 +---
- configure               | 68 ++++---------------------------
- meson.build             | 90 +++++++++++++++++++++++++++++++++++++----
- meson_options.txt       |  3 ++
- net/meson.build         |  2 +-
- tests/qtest/meson.build |  6 +--
- 6 files changed, 99 insertions(+), 77 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index f27bd4b2eb..9d6b7fc8c0 100644
---- a/Makefile
-+++ b/Makefile
-@@ -163,12 +163,7 @@ dtc/%: .git-submodule-status
- capstone/all:
- 
- .PHONY: slirp/all
--slirp/all: .git-submodule-status
--	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/slirp		\
--		BUILD_DIR="$(BUILD_DIR)/slirp" 			\
--		PKG_CONFIG="$(PKG_CONFIG)" 				\
--		CC="$(CC)" AR="$(AR)" 	LD="$(LD)" RANLIB="$(RANLIB)"	\
--		CFLAGS="$(QEMU_CFLAGS) $(CFLAGS)" LDFLAGS="$(QEMU_LDFLAGS)")
-+slirp/all:
- 
- ROM_DIRS = $(addprefix pc-bios/, $(ROMS))
- ROM_DIRS_RULES=$(foreach t, all clean, $(addsuffix /$(t), $(ROM_DIRS)))
-diff --git a/configure b/configure
-index 66641099fc..51f4e978be 100755
---- a/configure
-+++ b/configure
-@@ -349,7 +349,7 @@ modules="no"
- module_upgrades="no"
- prefix="/usr/local"
- qemu_suffix="qemu"
--slirp=""
-+slirp="auto"
- oss_lib=""
- bsd="no"
- linux="no"
-@@ -1058,9 +1058,9 @@ for opt do
-   ;;
-   --enable-vnc-png) vnc_png="enabled"
-   ;;
--  --disable-slirp) slirp="no"
-+  --disable-slirp) slirp="disabled"
-   ;;
--  --enable-slirp=git) slirp="git"
-+  --enable-slirp=git) slirp="internal"
-   ;;
-   --enable-slirp=system) slirp="system"
-   ;;
-@@ -5806,56 +5806,12 @@ fi
- ##########################################
- # check for slirp
- 
--# slirp is only required when building softmmu targets
--if test -z "$slirp" -a "$softmmu" != "yes" ; then
--    slirp="no"
--fi
--
- case "$slirp" in
--  "" | yes)
--    if $pkg_config slirp; then
--      slirp=system
--    elif test -e "${source_path}/.git" && test $git_update = 'yes' ; then
--      slirp=git
--    elif test -e "${source_path}/slirp/Makefile" ; then
--      slirp=internal
--    elif test -z "$slirp" ; then
--      slirp=no
--    else
--      feature_not_found "slirp" "Install slirp devel or git submodule"
--    fi
--    ;;
--
--  system)
--    if ! $pkg_config slirp; then
--      feature_not_found "slirp" "Install slirp devel"
--    fi
--    ;;
--esac
--
--case "$slirp" in
--  git | internal)
--    if test "$slirp" = git; then
-+  auto | enabled | internal)
-+    # Simpler to always update submodule, even if not needed.
-+    if test -e "${source_path}/.git" && test $git_update = 'yes' ; then
-       git_submodules="${git_submodules} slirp"
-     fi
--    mkdir -p slirp
--    slirp_cflags="-I${source_path}/slirp/src -Islirp/src"
--    slirp_libs="-Lslirp -lslirp"
--    if test "$mingw32" = "yes" ; then
--      slirp_libs="$slirp_libs -lws2_32 -liphlpapi"
--    fi
--    ;;
--
--  system)
--    slirp_version=$($pkg_config --modversion slirp 2>/dev/null)
--    slirp_cflags=$($pkg_config --cflags slirp 2>/dev/null)
--    slirp_libs=$($pkg_config --libs slirp 2>/dev/null)
--    ;;
--
--  no)
--    ;;
--  *)
--    error_exit "Unknown state for slirp: $slirp"
-     ;;
- esac
- 
-@@ -6256,16 +6212,8 @@ fi
- if test "$guest_agent" = "yes" ; then
-   echo "CONFIG_GUEST_AGENT=y" >> $config_host_mak
- fi
--if test "$slirp" != "no"; then
--  echo "CONFIG_SLIRP=y" >> $config_host_mak
--  echo "CONFIG_SMBD_COMMAND=\"$smbd\"" >> $config_host_mak
--  echo "SLIRP_CFLAGS=$slirp_cflags" >> $config_host_mak
--  echo "SLIRP_LIBS=$slirp_libs" >> $config_host_mak
--fi
-+echo "CONFIG_SMBD_COMMAND=\"$smbd\"" >> $config_host_mak
- subdirs=
--if [ "$slirp" = "git" -o "$slirp" = "internal" ]; then
--  subdirs="$subdirs slirp"
--fi
- if test "$vde" = "yes" ; then
-   echo "CONFIG_VDE=y" >> $config_host_mak
-   echo "VDE_LIBS=$vde_libs" >> $config_host_mak
-@@ -7321,7 +7269,7 @@ NINJA=${ninja:-$PWD/ninjatool} $meson setup \
- 	-Dcocoa=$cocoa -Dmpath=$mpath -Dsdl=$sdl -Dsdl_image=$sdl_image \
- 	-Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
- 	-Dgettext=$gettext -Dxkbcommon=$xkbcommon -Du2f=$u2f \
--	-Dcapstone=$capstone \
-+	-Dcapstone=$capstone -Dslirp=$slirp \
-         $cross_arg \
-         "$PWD" "$source_path"
- 
-diff --git a/meson.build b/meson.build
-index 64c5c5a33c..6ee8c3265c 100644
---- a/meson.build
-+++ b/meson.build
-@@ -300,11 +300,6 @@ else
-   xkbcommon = dependency('xkbcommon', required: get_option('xkbcommon'),
-                          method: 'pkg-config', static: enable_static)
- endif
--slirp = not_found
--if config_host.has_key('CONFIG_SLIRP')
--  slirp = declare_dependency(compile_args: config_host['SLIRP_CFLAGS'].split(),
--                             link_args: config_host['SLIRP_LIBS'].split())
--endif
- vde = not_found
- if config_host.has_key('CONFIG_VDE')
-   vde = declare_dependency(link_args: config_host['VDE_LIBS'].split())
-@@ -966,7 +961,88 @@ if capstone_opt == 'internal'
-   capstone = declare_dependency(link_with: libcapstone,
-                                 include_directories: 'capstone/include')
- endif
-+
-+slirp = not_found
-+slirp_opt = 'disabled'
-+if have_system
-+  slirp_opt = get_option('slirp')
-+  if slirp_opt in ['enabled', 'auto', 'system']
-+    have_internal = fs.exists(meson.current_source_dir() / 'slirp/meson.build')
-+    slirp = dependency('slirp', static: enable_static,
-+                       method: 'pkg-config',
-+                       required: slirp_opt == 'system' or
-+                                 slirp_opt == 'enabled' and not have_internal)
-+    if slirp.found()
-+      slirp_opt = 'system'
-+    elif have_internal
-+      slirp_opt = 'internal'
-+    else
-+      slirp_opt = 'disabled'
-+    endif
-+  endif
-+  if slirp_opt == 'internal'
-+    slirp_deps = []
-+    if targetos == 'windows'
-+      slirp_deps = cc.find_library('iphlpapi')
-+    endif
-+    slirp_conf = configuration_data()
-+    slirp_conf.set('SLIRP_MAJOR_VERSION', meson.project_version().split('.')[0])
-+    slirp_conf.set('SLIRP_MINOR_VERSION', meson.project_version().split('.')[1])
-+    slirp_conf.set('SLIRP_MICRO_VERSION', meson.project_version().split('.')[2])
-+    slirp_conf.set_quoted('SLIRP_VERSION_STRING', meson.project_version())
-+    slirp_cargs = ['-DG_LOG_DOMAIN="Slirp"']
-+    slirp_files = [
-+      'slirp/src/arp_table.c',
-+      'slirp/src/bootp.c',
-+      'slirp/src/cksum.c',
-+      'slirp/src/dhcpv6.c',
-+      'slirp/src/dnssearch.c',
-+      'slirp/src/if.c',
-+      'slirp/src/ip6_icmp.c',
-+      'slirp/src/ip6_input.c',
-+      'slirp/src/ip6_output.c',
-+      'slirp/src/ip_icmp.c',
-+      'slirp/src/ip_input.c',
-+      'slirp/src/ip_output.c',
-+      'slirp/src/mbuf.c',
-+      'slirp/src/misc.c',
-+      'slirp/src/ncsi.c',
-+      'slirp/src/ndp_table.c',
-+      'slirp/src/sbuf.c',
-+      'slirp/src/slirp.c',
-+      'slirp/src/socket.c',
-+      'slirp/src/state.c',
-+      'slirp/src/stream.c',
-+      'slirp/src/tcp_input.c',
-+      'slirp/src/tcp_output.c',
-+      'slirp/src/tcp_subr.c',
-+      'slirp/src/tcp_timer.c',
-+      'slirp/src/tftp.c',
-+      'slirp/src/udp.c',
-+      'slirp/src/udp6.c',
-+      'slirp/src/util.c',
-+      'slirp/src/version.c',
-+      'slirp/src/vmstate.c',
-+    ]
-+
-+    configure_file(
-+      input : 'slirp/src/libslirp-version.h.in',
-+      output : 'libslirp-version.h',
-+      configuration: slirp_conf)
-+
-+    slirp_inc = include_directories('slirp', 'slirp/src')
-+    libslirp = static_library('slirp',
-+                              sources: slirp_files,
-+                              c_args: slirp_cargs,
-+                              include_directories: slirp_inc)
-+    slirp = declare_dependency(link_with: libslirp,
-+                               dependencies: slirp_deps,
-+                               include_directories: slirp_inc)
-+  endif
-+endif
-+
- config_host_data.set('CONFIG_CAPSTONE', capstone.found())
-+config_host_data.set('CONFIG_SLIRP', slirp.found())
- 
- genh += configure_file(output: 'config-host.h', configuration: config_host_data)
- 
-@@ -1643,8 +1719,8 @@ summary_info += {'python':            '@0@ (version: @1@)'.format(python.full_pa
- summary_info += {'sphinx-build':      config_host['SPHINX_BUILD']}
- summary_info += {'genisoimage':       config_host['GENISOIMAGE']}
- # TODO: add back version
--summary_info += {'slirp support':     config_host.has_key('CONFIG_SLIRP')}
--if config_host.has_key('CONFIG_SLIRP')
-+summary_info += {'slirp support':     slirp_opt == 'disabled' ? false : slirp_opt}
-+if slirp_opt != 'disabled'
-   summary_info += {'smbd':            config_host['CONFIG_SMBD_COMMAND']}
- endif
- summary_info += {'module support':    config_host.has_key('CONFIG_MODULES')}
-diff --git a/meson_options.txt b/meson_options.txt
-index a0455d8a95..8a362fb08d 100644
---- a/meson_options.txt
-+++ b/meson_options.txt
-@@ -52,3 +52,6 @@ option('xkbcommon', type : 'feature', value : 'auto',
- option('capstone', type: 'combo', value: 'auto',
-        choices: ['disabled', 'enabled', 'auto', 'system', 'internal'],
-        description: 'Whether and how to find the capstone library')
-+option('slirp', type: 'combo', value: 'auto',
-+       choices: ['disabled', 'enabled', 'auto', 'system', 'internal'],
-+       description: 'Whether and how to find the slirp library')
-diff --git a/net/meson.build b/net/meson.build
-index 6c2ec47dd5..1c7e3a3cb9 100644
---- a/net/meson.build
-+++ b/net/meson.build
-@@ -18,7 +18,7 @@ softmmu_ss.add(files(
- ))
- 
- softmmu_ss.add(when: 'CONFIG_L2TPV3', if_true: files('l2tpv3.c'))
--softmmu_ss.add(when: ['CONFIG_SLIRP', slirp], if_true: files('slirp.c'))
-+softmmu_ss.add(when: slirp, if_true: files('slirp.c'))
- softmmu_ss.add(when: ['CONFIG_VDE', vde], if_true: files('vde.c'))
- softmmu_ss.add(when: 'CONFIG_NETMAP', if_true: files('netmap.c'))
- vhost_user_ss = ss.source_set()
-diff --git a/tests/qtest/meson.build b/tests/qtest/meson.build
-index 4f7757ee93..ad33ac311d 100644
---- a/tests/qtest/meson.build
-+++ b/tests/qtest/meson.build
-@@ -23,7 +23,7 @@ qtests_pci = \
-   (config_all_devices.has_key('CONFIG_IVSHMEM_DEVICE') ? ['ivshmem-test'] : [])
- 
- qtests_i386 = \
--  (config_host.has_key('CONFIG_SLIRP') ? ['pxe-test', 'test-netfilter'] : []) +             \
-+  (slirp.found() ? ['pxe-test', 'test-netfilter'] : []) +             \
-   (config_host.has_key('CONFIG_POSIX') ? ['test-filter-mirror'] : []) +                     \
-   (have_tools ? ['ahci-test'] : []) +                                                       \
-   (config_all_devices.has_key('CONFIG_ISA_TESTDEV') ? ['endianness-test'] : []) +           \
-@@ -117,7 +117,7 @@ qtests_ppc64 = \
-   (config_all_devices.has_key('CONFIG_PSERIES') ? ['device-plug-test'] : []) +               \
-   (config_all_devices.has_key('CONFIG_POWERNV') ? ['pnv-xscom-test'] : []) +                 \
-   (config_all_devices.has_key('CONFIG_PSERIES') ? ['rtas-test'] : []) +                      \
--  (config_host.has_key('CONFIG_SLIRP') ? ['pxe-test', 'test-netfilter'] : []) +              \
-+  (slirp.found() ? ['pxe-test', 'test-netfilter'] : []) +              \
-   (config_all_devices.has_key('CONFIG_USB_UHCI') ? ['usb-hcd-uhci-test'] : []) +             \
-   (config_all_devices.has_key('CONFIG_USB_XHCI_NEC') ? ['usb-hcd-xhci-test'] : []) +         \
-   (config_host.has_key('CONFIG_POSIX') ? ['test-filter-mirror'] : []) +                      \
-@@ -151,7 +151,7 @@ qtests_aarch64 = \
-    'migration-test']
- 
- qtests_s390x = \
--  (config_host.has_key('CONFIG_SLIRP') ? ['pxe-test', 'test-netfilter'] : []) +                 \
-+  (slirp.found() ? ['pxe-test', 'test-netfilter'] : []) +                 \
-   (config_host.has_key('CONFIG_POSIX') ? ['test-filter-mirror'] : []) +                         \
-   (config_host.has_key('CONFIG_POSIX') ? ['test-filter-redirector'] : []) +                     \
-   ['boot-serial-test',
--- 
-2.26.2
-
+regards,
+Jens  
 
 
