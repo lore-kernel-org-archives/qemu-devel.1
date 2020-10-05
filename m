@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79065C4363A
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEE3EC4727D
 	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 12:56:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AAFF1205F4
+	by mail.kernel.org (Postfix) with ESMTPS id 2E9C520756
 	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 12:56:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="grZkoh9v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAFF1205F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k1c6wb3Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E9C520756
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPQ2z-0001A8-Iw
+	id 1kPQ2z-0001A6-O5
 	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 08:56:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39656)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39512)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kPQ1c-0000Go-C9; Mon, 05 Oct 2020 08:55:32 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51088)
+ id 1kPQ13-0008AB-R6; Mon, 05 Oct 2020 08:54:57 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45373)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kPQ1a-0000q8-Cx; Mon, 05 Oct 2020 08:55:32 -0400
-Received: by mail-wm1-x344.google.com with SMTP id 13so8506397wmf.0;
- Mon, 05 Oct 2020 05:55:28 -0700 (PDT)
+ id 1kPQ11-0000jC-Hk; Mon, 05 Oct 2020 08:54:57 -0400
+Received: by mail-wr1-x443.google.com with SMTP id e17so743312wru.12;
+ Mon, 05 Oct 2020 05:54:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=wlWVSOO/aREpLlLadE6mtcQSK8dWwT8nqz07OWfYY0c=;
- b=grZkoh9vK0eDXQ/x75t891GfLow7DrtdbDy1tL4nb473KomrtawONgf3UV58zqppmk
- Cgtk6ybVhP3UcbTTFMf2z7O4eCb9xV8yA9huBPhjsbC0Ec6dYG1CdliFh9V5UwoFmPMp
- +7eVgLg9lwVCEOEvShm5lRRv3Ud59NsDN9BpIWSt1JeY1KRlMuCF5HK1snWwqFxDMXy9
- wHpOU88lIJ2/V5D0ohzRQMaRJfrEz3/zlOuRfFgiDSg8e0CYS2S2k7aoRjA2FFHDr1EG
- KJV0/emuDg+fkhVkBCSCipX+fP7lSPU0OLdMEEQtqTVNwLT7t7TWp7EEuBHDxpbU3o+B
- 9lcg==
+ bh=KBOv/CvOxxFmYdUajDkUeedXPOjqN/XNZCSE+Jws89M=;
+ b=k1c6wb3QWq7RFeVEUXkSljHcigYjq+HOuyLSN1GoogwYDEafY7fbDkpBJ27tVUp5X4
+ KpzlcTLww50TZPJXw4u1xbwhbJmxwk37YexAnGO3qO1lW3FcB9gJkgb//Eti9BZIUfp0
+ Zbe5bsfLBdEC6kxDPIvMpzR5Y+NdRUoM+1gWLVT0QiJG/+KL8xN941BL3KvuuoqGvEMs
+ dZS/vymH2hwqhpi6AkNBsSpkyf8aGCZbKWCGwoWsUsgNm4vFrgJZk/b3hEHyrunUh8rI
+ fwi9l0+KwbCW6bZl8D1LPElNBaVnETgE575laLkenFp8VyNSI0f5Q48JuHO5Gj5ipvEB
+ BJNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :mime-version:content-transfer-encoding;
- bh=wlWVSOO/aREpLlLadE6mtcQSK8dWwT8nqz07OWfYY0c=;
- b=lDjl/Dfaoa9ySf5Ua8JD32onR84iJxH4Yt5D/HzD0i8x3ngulU80dGlHyaDhWrVJTa
- xQ/OjupOkVpQQMCI6Y0CzrA4ldmlqIFif12jetHjZT7gaJ4o2ALmn5AZpMfImNXP3R8D
- 1Aq0WAHDsFwBwyOM+hMTNa4taHKNoXiM8DzuG9XzvxnZm9r1oBm/Kc5iGGhr2vXHyTTa
- t0JZJkxewt6Sxo82Vwx63Fgdl3xd5aev//NjGyUElwoWQDJDGxlmZGZ12PVUdmWsefje
- 05pwnAuIpCjvuWEB4DOdIt9q0XIWKSYM+0swKV8kCqj7mkNkQx3HkA+mLzJnDAlQ3Z7L
- f78w==
-X-Gm-Message-State: AOAM532XGDSJ0ELw0RNxj7jHsIsQMkTtz3GFgIpVY8sJynSSSPxIDHxW
- c5u3Sn0h06hXetq2p5hF3NdJ+r6RoQs=
-X-Google-Smtp-Source: ABdhPJxr4vYzwP1moB3VcZGzdhFLXFmbfLxYenm70Ah5UcIXbshdeVtFGOrzHknF31YIUlc9Y2IZQQ==
-X-Received: by 2002:a1c:7c12:: with SMTP id x18mr3109972wmc.107.1601902527029; 
- Mon, 05 Oct 2020 05:55:27 -0700 (PDT)
+ bh=KBOv/CvOxxFmYdUajDkUeedXPOjqN/XNZCSE+Jws89M=;
+ b=WfeqrKmiacSYozHo3tvEYY31tWt+EMi0D9Dj5pgdrzpu3i2NO0cixGrmxveRavwvET
+ j6P5lybm4NgYNh/1+b1N9WKasb/lDdua3bvmqlUhTE2Rmi7AYDq5X42BE3vGtsWXrip+
+ Qw+/4290Vp+CxAJCmolF95l0CaWqodWKM7dF76lzXSQkMF1IokZznsZVWtrvijP8keWx
+ zDACo0QkgDlakbc5BKN5KBdI5IHwt/fKauTd4lCoN028K+8KW6Zyxp6fwVffgpxsPTjT
+ 13yfrMAK1U2bJX7gLn2Jvf7xT7yjIxjaWRNY0mZhcSW9BPzPItslJDBS/HnsMuba7eWk
+ Z7jA==
+X-Gm-Message-State: AOAM533jERegYsRu79toQuDwZ5kCbVTzx4WaZKeZvoD7gMblFIssn/MT
+ 7oFEl3VSWU3g0mWArILVJ21HZl0oiPo=
+X-Google-Smtp-Source: ABdhPJzKuyYm6rTCVJ1935tNQvilGIRMI8F6JgYgbBoEuR1rIpvjYZQ7LElPQC4UCG/yPZpS6hRVeQ==
+X-Received: by 2002:adf:ed12:: with SMTP id a18mr12222374wro.178.1601902493054; 
+ Mon, 05 Oct 2020 05:54:53 -0700 (PDT)
 Received: from localhost.localdomain ([2001:b07:6468:f312:2e86:3d8b:8b70:920c])
- by smtp.gmail.com with ESMTPSA id m14sm4499528wrx.62.2020.10.05.05.55.26
+ by smtp.gmail.com with ESMTPSA id h1sm13432501wrx.33.2020.10.05.05.54.52
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 05 Oct 2020 05:55:26 -0700 (PDT)
+ Mon, 05 Oct 2020 05:54:52 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] ide: clean up ahci_populate_sglist
-Date: Mon,  5 Oct 2020 14:55:27 +0200
-Message-Id: <20201005125527.429187-1-pbonzini@redhat.com>
+Subject: [PATCH] migration: block-dirty-bitmap: rewrite
+ dirty_bitmap_load_header
+Date: Mon,  5 Oct 2020 14:54:54 +0200
+Message-Id: <20201005125454.429077-1-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x344.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -96,86 +97,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jsnow@redhat.com, qemu-block@nongnu.org
+Cc: vsementsov@redhat.com, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Alex reported an uninitialized variable warning in ahci_populate_sglist.
-Even though the warning is bogus and happens only because of -Og, the
-code in the function leaves something to be desired; the condition that
-triggers the warning is easily shown to be entirely redundant.
+Alex reported an uninitialized variable warning in dirty_bitmap_load_header,
+where the compiler cannot understand that the !s->cancelled check must be
+true for the following one to pass.
 
-In particular, the loop's "if" condition can be rewritten from
-"offset < sum + tbl_entry_size" to "offset - sum < tbl_entry_size";
-this is safe since the LHS cannot underflow.  Because off_pos is
-exactly "offset - sum" it is clear that it can never be less than
-zero or greater than tbl_entry_size.  We can therefore keep the off_idx
-check only and, for documentation purposes, reduce off_pos to an unsigned
-32-bit integer.
-
-The tracepoint also is not particularly useful at this point, since
-we know that (if it ever triggers) off_idx will be -1 and off_pos
-uninitialized.  Instead, include the requested offset and the total PRDT
-length, which will be smaller than the offset.
+Even though the issue happened only because of -Og, the function is very
+convoluted.  Just rewrite it to first look up s->bs and then s->bitmap,
+and to avoid long sequences of "else if"s.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/ide/ahci.c       | 12 +++++-------
- hw/ide/trace-events |  2 +-
- 2 files changed, 6 insertions(+), 8 deletions(-)
+ migration/block-dirty-bitmap.c | 138 ++++++++++++++++-----------------
+ 1 file changed, 68 insertions(+), 70 deletions(-)
 
-diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-index 680304a24c..997b67a6fc 100644
---- a/hw/ide/ahci.c
-+++ b/hw/ide/ahci.c
-@@ -924,8 +924,7 @@ static int ahci_populate_sglist(AHCIDevice *ad, QEMUSGList *sglist,
-     int r = 0;
-     uint64_t sum = 0;
-     int off_idx = -1;
--    int64_t off_pos = -1;
--    int tbl_entry_size;
-+    uint32_t off_pos = 0;
-     IDEBus *bus = &ad->port;
-     BusState *qbus = BUS(bus);
+diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
+index 5bef793ac0..24d749e35e 100644
+--- a/migration/block-dirty-bitmap.c
++++ b/migration/block-dirty-bitmap.c
+@@ -1010,102 +1010,100 @@ static int dirty_bitmap_load_bits(QEMUFile *f, DBMLoadState *s)
+ static int dirty_bitmap_load_header(QEMUFile *f, DBMLoadState *s,
+                                     GHashTable *alias_map)
+ {
+-    GHashTable *bitmap_alias_map = NULL;
+-    Error *local_err = NULL;
+-    bool nothing;
+     s->flags = qemu_get_bitmap_flags(f);
+     trace_dirty_bitmap_load_header(s->flags);
  
-@@ -952,19 +951,18 @@ static int ahci_populate_sglist(AHCIDevice *ad, QEMUSGList *sglist,
-     /* Get entries in the PRDT, init a qemu sglist accordingly */
-     if (prdtl > 0) {
-         AHCI_SG *tbl = (AHCI_SG *)prdt;
--        sum = 0;
-         for (i = 0; i < prdtl; i++) {
--            tbl_entry_size = prdt_tbl_entry_size(&tbl[i]);
--            if (offset < (sum + tbl_entry_size)) {
-+            uint32_t tbl_entry_size = prdt_tbl_entry_size(&tbl[i]);
-+            if (offset - sum < tbl_entry_size) {
-                 off_idx = i;
-                 off_pos = offset - sum;
-                 break;
+-    nothing = s->flags == (s->flags & DIRTY_BITMAP_MIG_FLAG_EOS);
+-
++    /* Read the whole header early so we can easily cancel in case of errors.  */
+     if (s->flags & DIRTY_BITMAP_MIG_FLAG_DEVICE_NAME) {
+         if (!qemu_get_counted_string(f, s->node_alias)) {
+             error_report("Unable to read node alias string");
+             return -EINVAL;
+         }
+-
+-        if (!s->cancelled) {
+-            if (alias_map) {
+-                const AliasMapInnerNode *amin;
+-
+-                amin = g_hash_table_lookup(alias_map, s->node_alias);
+-                if (!amin) {
+-                    error_setg(&local_err, "Error: Unknown node alias '%s'",
+-                               s->node_alias);
+-                    s->bs = NULL;
+-                } else {
+-                    bitmap_alias_map = amin->subtree;
+-                    s->bs = bdrv_lookup_bs(NULL, amin->string, &local_err);
+-                }
+-            } else {
+-                s->bs = bdrv_lookup_bs(s->node_alias, s->node_alias,
+-                                       &local_err);
+-            }
+-            if (!s->bs) {
+-                error_report_err(local_err);
+-                cancel_incoming_locked(s);
+-            }
++    }
++    if (s->flags & DIRTY_BITMAP_MIG_FLAG_BITMAP_NAME) {
++        if (!qemu_get_counted_string(f, s->bitmap_alias)) {
++            error_report("Unable to read bitmap alias string");
++            return -EINVAL;
+         }
+-    } else if (s->bs) {
++    }
++
++    if ((s->flags & ~DIRTY_BITMAP_MIG_FLAG_EOS) == 0 || s->cancelled) {
++        return 0;
++    }
++
++    if (s->flags & DIRTY_BITMAP_MIG_FLAG_DEVICE_NAME) {
++        Error *local_err = NULL;
+         if (alias_map) {
+             const AliasMapInnerNode *amin;
+ 
+-            /* Must be present in the map, or s->bs would not be set */
+             amin = g_hash_table_lookup(alias_map, s->node_alias);
+-            assert(amin != NULL);
+-
+-            bitmap_alias_map = amin->subtree;
++            if (!amin) {
++                error_report("Error: Unknown node alias '%s'", s->node_alias);
++                s->bs = NULL;
++                goto cancel;
++            }
++            s->bs = bdrv_lookup_bs(NULL, amin->string, &local_err);
++        } else {
++            s->bs = bdrv_lookup_bs(s->node_alias, s->node_alias, &local_err);
+         }
+-    } else if (!nothing && !s->cancelled) {
++        if (!s->bs) {
++            error_report_err(local_err);
++            goto cancel;
++        }
++        s->bitmap_name[0] = 0;
++    }
++    if (!s->bs) {
+         error_report("Error: block device name is not set");
+-        cancel_incoming_locked(s);
++        goto cancel;
+     }
+ 
+-    assert(nothing || s->cancelled || !!alias_map == !!bitmap_alias_map);
+-
+     if (s->flags & DIRTY_BITMAP_MIG_FLAG_BITMAP_NAME) {
+         const char *bitmap_name;
+ 
+-        if (!qemu_get_counted_string(f, s->bitmap_alias)) {
+-            error_report("Unable to read bitmap alias string");
+-            return -EINVAL;
+-        }
++        if (alias_map) {
++            const AliasMapInnerNode *amin;
++            GHashTable *bitmap_alias_map;
+ 
+-        if (!s->cancelled) {
+-            if (bitmap_alias_map) {
+-                bitmap_name = g_hash_table_lookup(bitmap_alias_map,
+-                                                  s->bitmap_alias);
+-                if (!bitmap_name) {
+-                    error_report("Error: Unknown bitmap alias '%s' on node "
+-                                 "'%s' (alias '%s')", s->bitmap_alias,
+-                                 s->bs->node_name, s->node_alias);
+-                    cancel_incoming_locked(s);
+-                }
+-            } else {
+-                bitmap_name = s->bitmap_alias;
+-            }
+-        }
++            amin = g_hash_table_lookup(alias_map, s->node_alias);
++            bitmap_alias_map = amin->subtree;
+ 
+-        if (!s->cancelled) {
+-            g_strlcpy(s->bitmap_name, bitmap_name, sizeof(s->bitmap_name));
+-            s->bitmap = bdrv_find_dirty_bitmap(s->bs, s->bitmap_name);
+-
+-            /*
+-             * bitmap may be NULL here, it wouldn't be an error if it is the
+-             * first occurrence of the bitmap
+-             */
+-            if (!s->bitmap && !(s->flags & DIRTY_BITMAP_MIG_FLAG_START)) {
+-                error_report("Error: unknown dirty bitmap "
+-                             "'%s' for block device '%s'",
+-                             s->bitmap_name, s->bs->node_name);
+-                cancel_incoming_locked(s);
++            /* Must be present in the map, or s->bs would not be set */
++            assert(bitmap_alias_map);
++            bitmap_name = g_hash_table_lookup(bitmap_alias_map,
++                                              s->bitmap_alias);
++            if (!bitmap_name) {
++                error_report("Error: Unknown bitmap alias '%s' on node "
++                             "'%s' (alias '%s')", s->bitmap_alias,
++                             s->bs->node_name, s->node_alias);
++                goto cancel;
              }
-             sum += tbl_entry_size;
++        } else {
++            bitmap_name = s->bitmap_alias;
          }
--        if ((off_idx == -1) || (off_pos < 0) || (off_pos > tbl_entry_size)) {
-+        if (off_idx == -1) {
-             trace_ahci_populate_sglist_bad_offset(ad->hba, ad->port_no,
--                                                  off_idx, off_pos);
-+                                                  sum, offset);
-             r = -1;
-             goto out;
-         }
-diff --git a/hw/ide/trace-events b/hw/ide/trace-events
-index 6e357685f9..81706efe80 100644
---- a/hw/ide/trace-events
-+++ b/hw/ide/trace-events
-@@ -88,7 +88,7 @@ ahci_populate_sglist(void *s, int port) "ahci(%p)[%d]"
- ahci_populate_sglist_no_prdtl(void *s, int port, uint16_t opts) "ahci(%p)[%d]: no sg list given by guest: 0x%04x"
- ahci_populate_sglist_no_map(void *s, int port) "ahci(%p)[%d]: DMA mapping failed"
- ahci_populate_sglist_short_map(void *s, int port) "ahci(%p)[%d]: mapped less than expected"
--ahci_populate_sglist_bad_offset(void *s, int port, int off_idx, int64_t off_pos) "ahci(%p)[%d]: Incorrect offset! off_idx: %d, off_pos: %"PRId64
-+ahci_populate_sglist_bad_offset(void *s, int port, uint64_t sum, uint64_t offset) "ahci(%p)[%d]: Incorrect offset! total PRDT length %"PRIu64", offset: %"PRIu64
- ncq_finish(void *s, int port, uint8_t tag) "ahci(%p)[%d][tag:%d]: NCQ transfer finished"
- execute_ncq_command_read(void *s, int port, uint8_t tag, int count, int64_t lba) "ahci(%p)[%d][tag:%d]: NCQ reading %d sectors from LBA %"PRId64
- execute_ncq_command_unsup(void *s, int port, uint8_t tag, uint8_t cmd) "ahci(%p)[%d][tag:%d]: error: unsupported NCQ command (0x%02x) received"
+-    } else if (!s->bitmap && !nothing && !s->cancelled) {
+-        error_report("Error: block device name is not set");
+-        cancel_incoming_locked(s);
++
++        g_strlcpy(s->bitmap_name, bitmap_name, sizeof(s->bitmap_name));
++    }
++
++    if (!s->bitmap_name[0]) {
++        error_report("Error: dirty bitmap name is not set");
++        goto cancel;
+     }
+ 
++    /*
++     * bitmap may be NULL here, it wouldn't be an error if it is the
++     * first occurrence of the bitmap
++     */
++    s->bitmap = bdrv_find_dirty_bitmap(s->bs, s->bitmap_name);
++    if (!s->bitmap && !(s->flags & DIRTY_BITMAP_MIG_FLAG_START)) {
++        error_report("Error: unknown dirty bitmap "
++                     "'%s' for block device '%s'",
++                     s->bitmap_name, s->bs->node_name);
++        goto cancel;
++    }
++    return 0;
++
++cancel:
++    cancel_incoming_locked(s);
+     return 0;
+ }
+ 
 -- 
 2.26.2
 
