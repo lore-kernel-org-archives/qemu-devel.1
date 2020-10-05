@@ -2,94 +2,87 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8A0AC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 19:50:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72F28C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 19:52:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B65AA208C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 19:50:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0AD3204EC
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 19:52:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lmichel.fr header.i=@lmichel.fr header.b="E8CFNSkA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B65AA208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=lmichel.fr
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qzpPnrsV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0AD3204EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPWVZ-0006sA-Nz
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 15:50:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56032)
+	id 1kPWXZ-0000pG-UV
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 15:52:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56562)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc@lmichel.fr>)
- id 1kPWUf-0006C7-W8; Mon, 05 Oct 2020 15:49:58 -0400
-Received: from pharaoh.lmichel.fr ([149.202.28.74]:35548)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc@lmichel.fr>)
- id 1kPWUd-0006jD-D5; Mon, 05 Oct 2020 15:49:57 -0400
-Received: from localhost (sekoia-pc.home.lmichel.fr [192.168.61.100])
- by pharaoh.lmichel.fr (Postfix) with ESMTPSA id 561A6C60F16;
- Mon,  5 Oct 2020 19:49:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr; s=pharaoh; 
- t=1601927389;
- h=from:from:sender:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pJFENdhqupghajawulvBj40O7T5YCNemlhz/pELAp4Y=;
- b=E8CFNSkA4aIr/tQyu2u+OjyiMuGkz5Yc2tSJPSo3pBJMzRf5+tC4fF2O2D/cs28HIC+dJW
- qY5m4cVTT1ivyghfNP8n76nrDv7E6MeKJROYCeWPW/9mWmtB3YdDIkfSx3bYo41H7tt5wa
- /0aIh9fYzCUwJ9UXqDMcfZ9x/9iuCpy5KA9WSXS0Iwv+Ql73KHy/Koz6sZOYkyqTHUrVbG
- 2jZUAgTpzDfNIh6yeC1PJTE3WsABrz474dp20XbEGarmb8GwH3F+RWZ3q8/4slhUHgdmJg
- 9uPfU++3Zr2bNfWRbBj+hEeihTIqO1lYtOjGyfwoNONoqng/+BDX1QWieJ27gg==
-Date: Mon, 5 Oct 2020 21:50:49 +0200
-From: Luc Michel <luc@lmichel.fr>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH 10/14] hw/misc/bcm2835_cprman: implement clock mux
- behaviour
-Message-ID: <20201005195049.333vsqwfgh72suhq@sekoia-pc.home.lmichel.fr>
-References: <20200925101731.2159827-1-luc@lmichel.fr>
- <20200925101731.2159827-11-luc@lmichel.fr>
- <76aae8af-dff0-b76f-cf04-0e3231eaf2bb@amsat.org>
- <2ca8802e-3295-bd22-e705-931ae8dbbd1d@amsat.org>
- <20201004183719.m3tsetxcgvc5ea2m@sekoia-pc.home.lmichel.fr>
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kPWWW-0007lp-8J; Mon, 05 Oct 2020 15:51:52 -0400
+Received: from mail-pf1-x436.google.com ([2607:f8b0:4864:20::436]:44899)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kPWWS-00074Z-Fx; Mon, 05 Oct 2020 15:51:51 -0400
+Received: by mail-pf1-x436.google.com with SMTP id n136so1682615pfd.11;
+ Mon, 05 Oct 2020 12:51:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=YL8KLigaBn/LrPDDLKeSFNKEGwXVc6l1Oo2NoRSVZgU=;
+ b=qzpPnrsVnLMEP2XCoAPAv5lX/si084AqqjUN8VfQCrmRbgLtN8dNuQ//ZnlcuXnuER
+ qwRrtJM0YVYlQbRiIW/ZJ6wef7gG5ogNftrGP670ZQz17aKIsTcLybcquUZvIysoz8uY
+ VVsKzK3zuWbx1rxFrK6n92N49W2Hct3DN5O2ywX8BoYNVkMLOKMkmmh7A+11tJ/6DtlF
+ XrBwo7XIojsDi5jZgSmwriYQg4wa3DZ8VtqiibzCXtkfNuwdOlUFaRzQBFdik2hEgAeU
+ 4G43vj1CksDTnwTWCfwoC8mnA/Mh6Bso4HRvj8NBuOTR0ekpPoRVmgFrd1em+t9DTgg9
+ RVSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=YL8KLigaBn/LrPDDLKeSFNKEGwXVc6l1Oo2NoRSVZgU=;
+ b=kAx/aVP9sOyu8TrMZ1r8jH4N+6F5ThHYijPsYl1aO+aAufVr9/S6lx4gbA42jPu2DW
+ c8IawO4K5jfsT+kL1iWq/abZf6LVgnjR13hawmHXGgaThmHyE38lYNDZWvPQyi4LLp8o
+ OFuld/hpbf0rEln3+l5rLAsAsLH3fiSVtm+uCMj47veGhW8W/1d+64bfDbvHBOD2OvxZ
+ DYK5Q8pJSGiy1WOFqOE3pZ9pL+q6Cc4YL3fMQcmWjMXy2EE9uNK0vv4eM6s+dCRjhWP/
+ pd0XosBh3Oz+xW6PBFfqg4P3GsdRG4HiDuDV2sY5qTETlF340pX6Ml1Cd9rQRoyj5C0U
+ t/zQ==
+X-Gm-Message-State: AOAM531nhmcstpDrWHfj3lBofc7TOIoLyUxTFQxVOiHFv/KzHbBY1Fb3
+ 6HaXWz2axFjdMDZWeBYWv5k1MbxiAEE0WQ==
+X-Google-Smtp-Source: ABdhPJxSoHrGrcAUz0m7Jsu8LxGMaei0kZiVQwb5yKZHdMpcAvq7pztqP/R8ECm/SsZCxK2q/qoYvg==
+X-Received: by 2002:a63:705c:: with SMTP id a28mr1065165pgn.266.1601927506163; 
+ Mon, 05 Oct 2020 12:51:46 -0700 (PDT)
+Received: from localhost.localdomain ([103.94.185.75])
+ by smtp.googlemail.com with ESMTPSA id ep11sm358985pjb.55.2020.10.05.12.51.43
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 05 Oct 2020 12:51:45 -0700 (PDT)
+From: Yonggang Luo <luoyonggang@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3] scripts: Convert qemu-version.sh to qemu-version.py
+Date: Tue,  6 Oct 2020 03:51:29 +0800
+Message-Id: <20201005195129.1507-1-luoyonggang@gmail.com>
+X-Mailer: git-send-email 2.28.0.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20201004183719.m3tsetxcgvc5ea2m@sekoia-pc.home.lmichel.fr>
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr;
- s=pharaoh; t=1601927389;
- h=from:from:sender:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pJFENdhqupghajawulvBj40O7T5YCNemlhz/pELAp4Y=;
- b=AOg9d39DbYYLE9/qRhIRXtArC9SCQexD4sTFKuBdNAI/zzzVnjHA3AYycaOJeDdNM4NOWr
- r8+cvZ96jLLssNdVVp4+VyjuhdTY2cEldp1lIFAegqv3CVdwEi/EswZcR3fXNqOmoLGUS3
- fhmJpdDXXGfuHolctaMEuZohEtvJdNEaYszeoHLpc+LwvydNFbB6mOwYoPaH52m+jD7sU8
- JRe1dM/eABSG8/4VNe5Dd7et6gad6yovx4cgABF+y5Rj7Y2sh5xiqZzdEXk2/klf9MXkVG
- YJ+NaCzXhUxt4t7VdHhYneaGfTO3qOWM+NgDZyMwqbUJYOqHYABBSR+GTkuDAA==
-ARC-Seal: i=1; s=pharaoh; d=lmichel.fr; t=1601927389; a=rsa-sha256; cv=none;
- b=FBM5QMuIW8qsvQ/QevHP6Eiuk1C+PV6sKxDxayn3A8alYGOvceYZxosZ6unSWvITLf730TZ4VYplyUoAUswdx65nloj2PBbcX2Kz9DhMq/UsSfq+Go75awWzwx3qB8ou5OgGVMEkyeC49QZBySMRVtF51UejGQlaXjH2X1XyAjnbtL700ajkrvuyCwgkh7dylQA+bHgBkwbIJYpePq7Jm6t3WrSsPat4t99nz0bcpm1jz3nWFPFdFu3gE4Hm02TpJ9v1NbEUOrIfj9wA9jXKbACkCt8MyItbxuhIcddA+utRrazitoBmsjBioea28o/gArZp9z6zPR2rvHu+UP2gEA==
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=sekoia smtp.mailfrom=luc@lmichel.fr
-Received-SPF: pass client-ip=149.202.28.74; envelope-from=luc@lmichel.fr;
- helo=pharaoh.lmichel.fr
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 15:49:50
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Received-SPF: pass client-ip=2607:f8b0:4864:20::436;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x436.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,141 +96,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org, Andrew Baumann <Andrew.Baumann@microsoft.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ QEMU Trivial <qemu-trivial@nongnu.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Yonggang Luo <luoyonggang@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20:37 Sun 04 Oct     , Luc Michel wrote:
-> On 16:51 Fri 02 Oct     , Philippe Mathieu-Daudé wrote:
-> > On 9/26/20 11:40 PM, Philippe Mathieu-Daudé wrote:
-> > > On 9/25/20 12:17 PM, Luc Michel wrote:
-> > >> A clock mux can be configured to select one of its 10 sources through
-> > >> the cm_ctl register. It also embeds yet another clock divider, composed
-> > >> of an integer part and a fractionnal part. The number of bits of each
-> > > 
-> > > Typo "fractional".
-> > > 
-> > >> part is mux dependant.
-> > > 
-> > > Typo "dependent"?
-> > > 
-> > >>
-> > >> Signed-off-by: Luc Michel <luc@lmichel.fr>
-> > >> ---
-> > >>  hw/misc/bcm2835_cprman.c | 43 +++++++++++++++++++++++++++++++++++++++-
-> > >>  1 file changed, 42 insertions(+), 1 deletion(-)
-> > >>
-> > >> diff --git a/hw/misc/bcm2835_cprman.c b/hw/misc/bcm2835_cprman.c
-> > >> index 8df2db0fd9..75bc11939b 100644
-> > >> --- a/hw/misc/bcm2835_cprman.c
-> > >> +++ b/hw/misc/bcm2835_cprman.c
-> > >> @@ -229,19 +229,60 @@ static const TypeInfo cprman_pll_channel_info = {
-> > >>  };
-> > >>  
-> > >>  
-> > >>  /* clock mux */
-> > >>  
-> > >> +static bool clock_mux_is_enabled(CprmanClockMuxState *mux)
-> > >> +{
-> > >> +    return FIELD_EX32(*mux->reg_cm, CM_CLOCKx_CTL, ENABLE);
-> > >> +}
-> > >> +
-> > >>  static void clock_mux_update(CprmanClockMuxState *mux)
-> > >>  {
-> > >> -    clock_update(mux->out, 0);
-> > >> +    uint64_t freq, div;
-> > >> +    uint32_t src = FIELD_EX32(*mux->reg_cm, CM_CLOCKx_CTL, SRC);
-> > >> +    bool enabled = clock_mux_is_enabled(mux);
-> > >> +
-> > >> +    *mux->reg_cm = FIELD_DP32(*mux->reg_cm, CM_CLOCKx_CTL, BUSY, enabled);
-> > >> +
-> > >> +    if (!enabled) {
-> > >> +        clock_update(mux->out, 0);
-> > >> +        return;
-> > >> +    }
-> > >> +
-> > >> +    freq = clock_get_hz(mux->srcs[src]);
-> > >> +
-> > >> +    if (mux->int_bits == 0 && mux->frac_bits == 0) {
-> > >> +        clock_update_hz(mux->out, freq);
-> > >> +        return;
-> > >> +    }
-> > >> +
-> > >> +    /*
-> > >> +     * The divider has an integer and a fractional part. The size of each part
-> > >> +     * varies with the muxes (int_bits and frac_bits). Both parts are
-> > >> +     * concatenated, with the integer part always starting at bit 12.
-> > >> +     */
-> > >> +    div = mux->reg_cm[1] >> (R_CM_CLOCKx_DIV_FRAC_LENGTH - mux->frac_bits);
-> > >> +    div &= (1 << (mux->int_bits + mux->frac_bits)) - 1;
-> > 
-> > Eventually:
-> > 
-> >     div &= MAKE_64BIT_MASK(mux->int_bits + mux->frac_bits, 64);
-> I think this is MAKE_64BIT_MASK(0, mux->int_bits + mux->frac_bits)
-> (The shift macro parameter is 0 to have the ones positioned at the
-> mask's LSBs.
-> I'll use this macro in my next re-roll.
-Actually, I won't, because switching to muldiv64 implied some
-modifications. The muldiv64 divisor parameter is uint32_t. Since there
-is no MAKE_32BIT_MASK, and I don't use all the "features" of this macro
-anyway (shift = 0 in my case), I'll keep this form (but I'll switch to
-uin32_t for div).
+The sh script are harder to maintain for compatible different
+xsh environment so convert it to python script
+Also incorporate the fixes in
+https://patchew.org/QEMU/20200929143654.518157-1-marcandre.lureau@redhat.com/
 
+Testing args length and if not enough, setting pkgversion and version to ''
+
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+---
+ meson.build             |  2 +-
+ scripts/qemu-version.py | 37 +++++++++++++++++++++++++++++++++++++
+ scripts/qemu-version.sh | 25 -------------------------
+ 3 files changed, 38 insertions(+), 26 deletions(-)
+ create mode 100644 scripts/qemu-version.py
+ delete mode 100755 scripts/qemu-version.sh
+
+diff --git a/meson.build b/meson.build
+index 95a532bd29..20f653b6eb 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1072,7 +1072,7 @@ tracetool = [
+    '--backend=' + config_host['TRACE_BACKENDS']
+ ]
+ 
+-qemu_version_cmd = [find_program('scripts/qemu-version.sh'),
++qemu_version_cmd = [find_program('scripts/qemu-version.py'),
+                     meson.current_source_dir(),
+                     config_host['PKGVERSION'], meson.project_version()]
+ qemu_version = custom_target('qemu-version.h',
+diff --git a/scripts/qemu-version.py b/scripts/qemu-version.py
+new file mode 100644
+index 0000000000..fc1531ef2b
+--- /dev/null
++++ b/scripts/qemu-version.py
+@@ -0,0 +1,37 @@
++#!/usr/bin/env python3
++
++#
++# Script for retrieve qemu git version information
++#
++# Author: Yonggang Luo <luoyonggang@gmail.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2.  See
++# the COPYING file in the top-level directory.
++#
++
++import sys
++import subprocess
++
++def main(args):
++    pkgversion = ''
++    version = ''
++    if len(args) > 3:
++        dir = args[1]
++        pkgversion = args[2]
++        version = args[3]
++        if len(pkgversion) == 0:
++            pc = subprocess.run(['git', 'describe', '--match', "'v*'", '--dirty', '--always'],
++                                stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, cwd=dir)
++            if pc.returncode == 0:
++                pkgversion = pc.stdout.decode('utf8').strip()
++
++    fullversion = version
++    if len(pkgversion) > 0:
++        fullversion = "{} ({})".format(version, pkgversion)
++
++    version_header = '''#define QEMU_PKGVERSION "{}"
++#define QEMU_FULL_VERSION "{}"'''.format(pkgversion, fullversion)
++    sys.stdout.buffer.write(version_header.encode('utf8'))
++
++if __name__ == "__main__":
++    main(sys.argv)
+diff --git a/scripts/qemu-version.sh b/scripts/qemu-version.sh
+deleted file mode 100755
+index 03128c56a2..0000000000
+--- a/scripts/qemu-version.sh
++++ /dev/null
+@@ -1,25 +0,0 @@
+-#!/bin/sh
+-
+-set -eu
+-
+-dir="$1"
+-pkgversion="$2"
+-version="$3"
+-
+-if [ -z "$pkgversion" ]; then
+-    cd "$dir"
+-    if [ -e .git ]; then
+-        pkgversion=$(git describe --match 'v*' --dirty | echo "")
+-    fi
+-fi
+-
+-if [ -n "$pkgversion" ]; then
+-    fullversion="$version ($pkgversion)"
+-else
+-    fullversion="$version"
+-fi
+-
+-cat <<EOF
+-#define QEMU_PKGVERSION "$pkgversion"
+-#define QEMU_FULL_VERSION "$fullversion"
+-EOF
 -- 
-Luc
+2.28.0.windows.1
 
-> 
-> > 
-> > >> +
-> > >> +    freq = (freq << mux->frac_bits) / div;
-> > 
-> > Maybe:
-> > 
-> >     freq = muldiv64(freq, 1 << mux->frac_bits, div);
-> OK
-> 
-> > 
-> > >> +
-> > >> +    clock_update_hz(mux->out, freq);
-> > >>  }
-> > >>  
-> > >>  static void clock_mux_src_update(void *opaque)
-> > >>  {
-> > >>      CprmanClockMuxState **backref = opaque;
-> > >>      CprmanClockMuxState *s = *backref;
-> > >> +    CprmanClockMuxSource src = backref - s->backref;
-> > >> +    uint32_t current_src;
-> > 
-> > Maybe avoid current_src and use in place.
-> OK
-> 
-> > 
-> > Otherwise:
-> > Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Thanks !
-> 
-> -- 
-> Luc
-> 
-> > 
-> > >> +
-> > >> +    current_src = FIELD_EX32(*s->reg_cm, CM_CLOCKx_CTL, SRC);
-> > >> +
-> > >> +    if (current_src != src) {
-> > >> +        return;
-> > >> +    }
-> > >>  
-> > >>      clock_mux_update(s);
-> > >>  }
-> > >>  
-> > >>  static void clock_mux_init(Object *obj)
-> > >>
-> > > 
-> 
-> -- 
-
--- 
 
