@@ -2,82 +2,90 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 979FAC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 17:47:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D198C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 17:48:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 068D5207BC
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 17:47:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F8FA207BC
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 17:48:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="STl5HC1J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 068D5207BC
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Booiqkit"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F8FA207BC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPUZy-0006ny-Op
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 13:47:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57550)
+	id 1kPUau-0007Ru-Kf
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 13:48:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57892)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kPUXt-0005mP-Ik
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 13:45:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49590)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kPUZE-0006XH-9C
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 13:46:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35454)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kPUXp-0007xb-EW
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 13:45:09 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kPUZC-0008FE-HV
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 13:46:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601919903;
+ s=mimecast20190719; t=1601919984;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=IMS0tT+uC34xvjrfmB1l3KKnX9Yr/I22OmmZi1CfL40=;
- b=STl5HC1J8bEJ3n8X85qWSF9M/1qedZgbzgVdKO1fgJuBi0VbWio3OSMXCEYci4Dgp4jcdM
- 8m5/+dOzEoGhXulHgESZQMqTpyujTK7lvNMzK5BT62tQwhzGtqbq92agSU7KCu5V8K9WLq
- Sue92QTCvN4AoWFCy1NniIue+Ng8LhQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-506-tsN0mtWoNzKD5t9oGNnBFg-1; Mon, 05 Oct 2020 13:45:02 -0400
-X-MC-Unique: tsN0mtWoNzKD5t9oGNnBFg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A46A107ACF5;
- Mon,  5 Oct 2020 17:44:59 +0000 (UTC)
-Received: from localhost (ovpn-119-102.rdu2.redhat.com [10.10.119.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6194B78800;
- Mon,  5 Oct 2020 17:44:55 +0000 (UTC)
-Date: Mon, 5 Oct 2020 13:44:54 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH 01/16] hw/core/cpu: Let CPU object have a clock source
-Message-ID: <20201005174454.GM7303@habkost.net>
-References: <20200928171539.788309-1-f4bug@amsat.org>
- <20200928171539.788309-2-f4bug@amsat.org>
- <20200930094313.1120a040@redhat.com>
- <da7248f7-5098-188b-d274-e122c87bb498@amsat.org>
- <20201005184009.493629b0@redhat.com>
+ bh=+XDtR+OKLQAN7ugBi70cy/vM31LYMF2UsJCBIN8N2Qo=;
+ b=BooiqkitO9HJB4K1pr0aG1b6eLXut7w4Cr6YK6TIn66fH0DPGWsdkv9/mR9D5VA94guu2H
+ eutTLLfAQL8Pra/j1E52b21T68OrhVs3wHT0n+ny0+uza6Md0Ka/ZCk3n8AjP1bVPtUGoD
+ XZtIxtNiybPbYT70Gmh87GEnXJO8RiI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-562-UhDf6FtQMSiCvzCYqgF_Ew-1; Mon, 05 Oct 2020 13:46:23 -0400
+X-MC-Unique: UhDf6FtQMSiCvzCYqgF_Ew-1
+Received: by mail-wr1-f72.google.com with SMTP id u15so4329354wrn.4
+ for <qemu-devel@nongnu.org>; Mon, 05 Oct 2020 10:46:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=+XDtR+OKLQAN7ugBi70cy/vM31LYMF2UsJCBIN8N2Qo=;
+ b=rnkYBW8zxmhkViz9de4HQMkKETy1eVM7P+U3fw2li9WlYY05tqPTaeBz6NO3VjxCMc
+ 7m7hU0bOht95WaBMdqmTqLYn91coh/YhTj4lkI4y8UW2EcTfogu/y6MyWHm4GJFIBrVn
+ 9wNx2CXti2/pjFjNKUAhU56lOEmSSDLIjlqAByYxj5Go+aLESdZVdh33e4Qj3DPGtdmQ
+ 12XucZyP9UsOOsxoDcNan5SHJ1IBjBxCtCsGTxsKuM6yZnajd9HJ6Hu15sBeDMocbS8+
+ lSjV2yzKEpFIzIObBsgXD7Ravnn6iWKhB1uYqSrNI/FSCMI4s6EVBodQ6pVPzpwZXhLl
+ S/iA==
+X-Gm-Message-State: AOAM5328owaWvy1MpUM2dS4n4OGr/seYqTm17UeMzjLU2v/Kw6TBSnqV
+ lhphViaRrHCDlUzk2o8LYG/aSFU2G+QLRzx12hXHrir0s4hicmSdxPfJWbWM6imIXVEkdad6lVB
+ mXpwHuBClU017s2A=
+X-Received: by 2002:a5d:52ca:: with SMTP id r10mr488768wrv.195.1601919981824; 
+ Mon, 05 Oct 2020 10:46:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzcsxTKs/J+E6Im447sT7qWOXp2OZTHs/WTZLAOV9lDSRyYhFv3J9AkJ3OmW+ec0O8rsZwekw==
+X-Received: by 2002:a5d:52ca:: with SMTP id r10mr488754wrv.195.1601919981618; 
+ Mon, 05 Oct 2020 10:46:21 -0700 (PDT)
+Received: from redhat.com (bzq-79-179-71-128.red.bezeqint.net. [79.179.71.128])
+ by smtp.gmail.com with ESMTPSA id i1sm818343wrx.44.2020.10.05.10.46.20
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 05 Oct 2020 10:46:20 -0700 (PDT)
+Date: Mon, 5 Oct 2020 13:46:18 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: andrew@daynix.com
+Subject: Re: [PATCH v3 2/2] hw/virtio-pci Added AER capability.
+Message-ID: <20201005134406-mutt-send-email-mst@kernel.org>
+References: <20201005115601.103791-1-andrew@daynix.com>
+ <20201005115601.103791-3-andrew@daynix.com>
 MIME-Version: 1.0
-In-Reply-To: <20201005184009.493629b0@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20201005115601.103791-3-andrew@daynix.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 01:25:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -87,7 +95,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,177 +108,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>,
- Huacai Chen <zltjiangshi@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
- Paul Burton <paulburton@kernel.org>,
- "Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- qemu-arm <qemu-arm@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>,
- Cleber Rosa <crosa@redhat.com>, Huacai Chen <chenhc@lemote.com>,
- =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 05, 2020 at 06:40:09PM +0200, Igor Mammedov wrote:
-> On Wed, 30 Sep 2020 12:16:53 +0200
-> Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+On Mon, Oct 05, 2020 at 02:56:01PM +0300, andrew@daynix.com wrote:
+> From: Andrew <andrew@daynix.com>
 > 
-> > +arm/ppc/riscv folks
-> > 
-> > On 9/30/20 9:43 AM, Igor Mammedov wrote:
-> > > On Mon, 28 Sep 2020 19:15:24 +0200
-> > > Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
-> > >   
-> > >> Let CPUState have a clock source (named 'clk') and CPUClass
+> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1878465
 
-The language here confuses me: is this a clock source inside the
-CPU, or just a clock input that can be connected to a clock
-source somewhere?
+That's a private bug - what information can you share about
+the motivation for the patch?
 
-See also comment below[1].
-
-> > >> have a clock_update() callback. The clock can be optionally
-> > >> set Using qdev_connect_clock_in() from the Clock API.
-> > >> If the clock changes, the optional clock_update() will be
-> > >> called.  
-
-What does "clock change" means?  Is this just about the
-frequency, or something else?
-
-(By reading the Clock API documentation, it looks like it only
-represents the clock frequency, but I'm not sure)
-
-> > > 
-> > > the sole user of it is mips cpu, so question is why
-> > > you are making it part of generic CPUm instead of
-> > > MIPSCPUClass/MIPSCPU?  
-> > 
-> > This is a feature of the CPU, regardless its architecture.
-> > 
-> > I expect the other archs to start using it soon.
+> Added AER capability for virtio-pci devices.
+> Also added property for devices, by default AER is disabled.
 > 
-> if there aren't any plans to actually to do that,
-> I'd keep it to MIPS class and generalize later when there is demand.
-
-I normally don't mind if a feature is generic from the beginning.
-But in this case I'm inclined to agree with Igor.  Unless we
-expect to see arch-independent code to use CPUState.clock soon
-(do we?), having CPUState.clock existing but unused by most
-architectures would be misleading.
-
-Also, at least on x86 there are so many different clock sources,
-that I'm not sure it would be a desirable to have a generic clock
-input named "clk".
-
+> Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
+> ---
+>  hw/virtio/virtio-pci.c | 16 ++++++++++++++++
+>  hw/virtio/virtio-pci.h |  4 ++++
+>  2 files changed, 20 insertions(+)
+> 
+> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> index ae60c1e249..e0a7936f9c 100644
+> --- a/hw/virtio/virtio-pci.c
+> +++ b/hw/virtio/virtio-pci.c
+> @@ -1807,6 +1807,12 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
+>           */
+>          pci_set_word(pci_dev->config + pos + PCI_PM_PMC, 0x3);
 >  
-> > 
-> > >   
-> > >>
-> > >> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> > >> ---
-> > >>  include/hw/core/cpu.h |  5 +++++
-> > >>  hw/core/cpu.c         | 12 ++++++++++++
-> > >>  2 files changed, 17 insertions(+)
-> > >>
-> > >> diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-> > >> index 6c34798c8b3..6989d90c193 100644
-> > >> --- a/include/hw/core/cpu.h
-> > >> +++ b/include/hw/core/cpu.h
-> > >> @@ -31,6 +31,7 @@
-> > >>  #include "qemu/thread.h"
-> > >>  #include "qemu/plugin.h"
-> > >>  #include "qom/object.h"
-> > >> +#include "hw/clock.h"
-> > >>  
-> > >>  typedef int (*WriteCoreDumpFunction)(const void *buf, size_t size,
-> > >>                                       void *opaque);
-> > >> @@ -155,6 +156,7 @@ struct TranslationBlock;
-> > >>   * @disas_set_info: Setup architecture specific components of disassembly info
-> > >>   * @adjust_watchpoint_address: Perform a target-specific adjustment to an
-> > >>   * address before attempting to match it against watchpoints.
-> > >> + * @clock_update: Callback for input clock changes
-> > >>   *
-> > >>   * Represents a CPU family or model.
-> > >>   */
-> > >> @@ -176,6 +178,7 @@ struct CPUClass {
-> > >>                                    unsigned size, MMUAccessType access_type,
-> > >>                                    int mmu_idx, MemTxAttrs attrs,
-> > >>                                    MemTxResult response, uintptr_t retaddr);
-> > >> +    void (*clock_update)(CPUState *cpu);
-> > >>      bool (*virtio_is_big_endian)(CPUState *cpu);
-> > >>      int (*memory_rw_debug)(CPUState *cpu, vaddr addr,
-> > >>                             uint8_t *buf, int len, bool is_write);
-> > >> @@ -316,6 +319,7 @@ struct qemu_work_item;
-> > >>   *   QOM parent.
-> > >>   * @nr_cores: Number of cores within this CPU package.
-> > >>   * @nr_threads: Number of threads within this CPU.
-> > >> + * @clock: this CPU source clock (an output clock of another device)
-
-[1]
-
-What does "source clock" means?  Is this the same as "clock input"?
-
-
-> > >>   * @running: #true if CPU is currently running (lockless).
-> > >>   * @has_waiter: #true if a CPU is currently waiting for the cpu_exec_end;
-> > >>   * valid under cpu_list_lock.
-> > >> @@ -400,6 +404,7 @@ struct CPUState {
-> > >>      int num_ases;
-> > >>      AddressSpace *as;
-> > >>      MemoryRegion *memory;
-> > >> +    Clock *clock;
-> > >>  
-> > >>      void *env_ptr; /* CPUArchState */
-> > >>      IcountDecr *icount_decr_ptr;
-> > >> diff --git a/hw/core/cpu.c b/hw/core/cpu.c
-> > >> index c55c09f734c..37fcff3ec64 100644
-> > >> --- a/hw/core/cpu.c
-> > >> +++ b/hw/core/cpu.c
-> > >> @@ -30,6 +30,7 @@
-> > >>  #include "qemu/qemu-print.h"
-> > >>  #include "sysemu/tcg.h"
-> > >>  #include "hw/boards.h"
-> > >> +#include "hw/qdev-clock.h"
-> > >>  #include "hw/qdev-properties.h"
-> > >>  #include "trace/trace-root.h"
-> > >>  #include "qemu/plugin.h"
-> > >> @@ -247,6 +248,16 @@ void cpu_reset(CPUState *cpu)
-> > >>      trace_guest_cpu_reset(cpu);
-> > >>  }
-> > >>  
-> > >> +static void cpu_clk_update(void *opaque)
-> > >> +{
-> > >> +    CPUState *cpu = opaque;
-> > >> +    CPUClass *cc = CPU_GET_CLASS(cpu);
-> > >> +
-> > >> +    if (cc->clock_update) {
-> > >> +        cc->clock_update(cpu);
-> > >> +    }
-> > >> +}
-> > >> +
-> > >>  static void cpu_common_reset(DeviceState *dev)
-> > >>  {
-> > >>      CPUState *cpu = CPU(dev);
-> > >> @@ -367,6 +378,7 @@ static void cpu_common_initfn(Object *obj)
-> > >>      /* the default value is changed by qemu_init_vcpu() for softmmu */
-> > >>      cpu->nr_cores = 1;
-> > >>      cpu->nr_threads = 1;
-> > >> +    cpu->clock = qdev_init_clock_in(DEVICE(obj), "clk", cpu_clk_update, cpu);
-> > >>  
-> > >>      qemu_mutex_init(&cpu->work_mutex);
-> > >>      QSIMPLEQ_INIT(&cpu->work_list);  
-> > >   
-> > 
+> +        if (proxy->flags & VIRTIO_PCI_FLAG_AER) {
+> +            pcie_aer_init(pci_dev, PCI_ERR_VER, last_pcie_cap_offset,
+> +                          PCI_ERR_SIZEOF, NULL);
+> +            last_pcie_cap_offset += PCI_ERR_SIZEOF;
+> +        }
+> +
+>          if (proxy->flags & VIRTIO_PCI_FLAG_INIT_DEVERR) {
+>              /* Init error enabling flags */
+>              pcie_cap_deverr_init(pci_dev);
+> @@ -1848,7 +1854,15 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
+>  
+>  static void virtio_pci_exit(PCIDevice *pci_dev)
+>  {
+> +    VirtIOPCIProxy *proxy = VIRTIO_PCI(pci_dev);
+> +    bool pcie_port = pci_bus_is_express(pci_get_bus(pci_dev)) &&
+> +                     !pci_bus_is_root(pci_get_bus(pci_dev));
+> +
+>      msix_uninit_exclusive_bar(pci_dev);
+> +    if (proxy->flags & VIRTIO_PCI_FLAG_AER && pcie_port &&
+> +        pci_is_express(pci_dev)) {
+> +        pcie_aer_exit(pci_dev);
+> +    }
+>  }
+>  
+>  static void virtio_pci_reset(DeviceState *qdev)
+> @@ -1901,6 +1915,8 @@ static Property virtio_pci_properties[] = {
+>                      VIRTIO_PCI_FLAG_INIT_PM_BIT, true),
+>      DEFINE_PROP_BIT("x-pcie-flr-init", VirtIOPCIProxy, flags,
+>                      VIRTIO_PCI_FLAG_INIT_FLR_BIT, true),
+> +    DEFINE_PROP_BIT("aer", VirtIOPCIProxy, flags,
+> +                    VIRTIO_PCI_FLAG_AER_BIT, false),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
 > 
 
--- 
-Eduardo
+Does management need ability to enable this capability?
+If yes let's cc them. If no let's rename to x-aer so we don't
+commit to a stable interface ...
+
+ 
+> diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+> index 91096f0291..3986b4f0e3 100644
+> --- a/hw/virtio/virtio-pci.h
+> +++ b/hw/virtio/virtio-pci.h
+> @@ -45,6 +45,7 @@ enum {
+>      VIRTIO_PCI_FLAG_INIT_LNKCTL_BIT,
+>      VIRTIO_PCI_FLAG_INIT_PM_BIT,
+>      VIRTIO_PCI_FLAG_INIT_FLR_BIT,
+> +    VIRTIO_PCI_FLAG_AER_BIT,
+>  };
+>  
+>  /* Need to activate work-arounds for buggy guests at vmstate load. */
+> @@ -84,6 +85,9 @@ enum {
+>  /* Init Function Level Reset capability */
+>  #define VIRTIO_PCI_FLAG_INIT_FLR (1 << VIRTIO_PCI_FLAG_INIT_FLR_BIT)
+>  
+> +/* Advanced Error Reporting capability */
+> +#define VIRTIO_PCI_FLAG_AER (1 << VIRTIO_PCI_FLAG_AER_BIT)
+> +
+>  typedef struct {
+>      MSIMessage msg;
+>      int virq;
+> -- 
+> 2.28.0
 
 
