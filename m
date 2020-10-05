@@ -2,87 +2,91 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4839BC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 16:28:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E922C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 16:29:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACE9C20756
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 16:28:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC42A20756
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 16:29:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WD7kcIve"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACE9C20756
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RL0UDXRu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC42A20756
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPTLi-0007Mk-RZ
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 12:28:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60934)
+	id 1kPTMp-0000FA-KB
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 12:29:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40570)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kPStZ-0000dm-UP
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 11:59:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33202)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kPStX-0002A6-5A
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 11:59:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601913562;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=KOAkHdpteTM/75ZBBWzAK2DQW7fqPdAc3IHnSx/whg8=;
- b=WD7kcIveTAuvJ9k9E+g7xv8DrhAtV/fNv7Q/8/i6cwXfei0VWrK4Xi6ykIHSpT0oCrblmw
- LPrRVSLpUZ8xGFxC6EUHEsMaXzPncB+2EovN2Vopc7hkheubHDbsyCwtMFYyP4cJs6k6Cl
- 8EzdAFIICnUQlfsg4KJh//5Dwbnt7Tw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-275-lqyKYqGONCqGr9nthRn-4w-1; Mon, 05 Oct 2020 11:59:20 -0400
-X-MC-Unique: lqyKYqGONCqGr9nthRn-4w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71D2D1085954;
- Mon,  5 Oct 2020 15:59:19 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-113-145.ams2.redhat.com
- [10.36.113.145])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E7F2560C11;
- Mon,  5 Oct 2020 15:59:17 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v8 07/14] monitor: Make current monitor a per-coroutine
- property
-Date: Mon,  5 Oct 2020 17:58:48 +0200
-Message-Id: <20201005155855.256490-8-kwolf@redhat.com>
-In-Reply-To: <20201005155855.256490-1-kwolf@redhat.com>
-References: <20201005155855.256490-1-kwolf@redhat.com>
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kPTLd-0007S8-8a
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 12:28:25 -0400
+Received: from mail-pj1-x102c.google.com ([2607:f8b0:4864:20::102c]:37136)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kPTLb-0006o4-MP
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 12:28:24 -0400
+Received: by mail-pj1-x102c.google.com with SMTP id kk9so77221pjb.2
+ for <qemu-devel@nongnu.org>; Mon, 05 Oct 2020 09:28:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=uqucitEH4/4+GS3KmukO0nlTVwKYBiH1PWiLYzxk3YM=;
+ b=RL0UDXRuizz+aWjp1ng2Y1riRG1furOoFYce5B8k1088jongDp6tfLBvREwV3WkaB0
+ IhcM0p9C2VE4tXcfIGE31zLZeIuIutm8ieW5ZABAoBB6mkDL92FXmccnhTihb7WDOwOz
+ Zu7BO4qtZAtfNc777YmHDXyjHjaxUosGaueK1yT9jwq9nMHJ2EjzYmwWJ/rNPMOfVbjn
+ NTbEDHDaAc/yrKk1Kg3pXlf8DEdN8wFphWNrwbuDhjzXyTNxOSRsbgIszhVmpUt7IOPO
+ Mlfxd5lyOKvVtkO4/YnyR4O1PP/DgXMMOE32qC5I+RP8WEO46xIgT/y3c3MerGbfY9bj
+ cQtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=uqucitEH4/4+GS3KmukO0nlTVwKYBiH1PWiLYzxk3YM=;
+ b=VsPzXRQdjK0uFO8FpgswqcxN6IMgRG4s+Hv91IheUEqZYrjByNUb/0JJ44PJmjaXr0
+ Ukv+bXFFng2JMFPbyfJA5690HjDpZhR1wWtlWl81QC3NeOw/sGLO758AppBuULYxiISP
+ gXY6EzIM9sxyXESvbY7L8u2pvxpVekjQYcBAbWzPTzmp4HuvyfBw8Axs8muAgbT1Noww
+ ApxXCrcRVMah68qMH3nF7RCnJEFOcb/ossZ6mhJ6JSKofV9BLaCp9N6wyt/0IacdpuUT
+ q/OiZA2bzinmQz8FYFPmeXlzh4BJc81yjXdvskhGHUXSDM/8c//rjspr9UGzm8x3rI7F
+ AY7Q==
+X-Gm-Message-State: AOAM531cGAlald5Q02TdTh4IB3p6R8iRp63t4d1b9R0V3+OHp9C4IU1y
+ ozgfOWydKVFPGNDdZys48p4EIpa/x+W2Lw==
+X-Google-Smtp-Source: ABdhPJywz6sdmuk5Cx+GUrs5uFJbvruPte2mQ9hxexBKp4XQaLOY7gObpG3zRorfuVuGQgMVLObcnw==
+X-Received: by 2002:a17:90a:e697:: with SMTP id
+ s23mr228554pjy.16.1601915301419; 
+ Mon, 05 Oct 2020 09:28:21 -0700 (PDT)
+Received: from localhost.localdomain ([103.94.185.75])
+ by smtp.googlemail.com with ESMTPSA id x13sm374725pfj.199.2020.10.05.09.28.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 05 Oct 2020 09:28:20 -0700 (PDT)
+From: Yonggang Luo <luoyonggang@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 0/6] Enable plugin support on msys2/mingw
+Date: Tue,  6 Oct 2020 00:28:00 +0800
+Message-Id: <20201005162806.1350-1-luoyonggang@gmail.com>
+X-Mailer: git-send-email 2.28.0.windows.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 02:11:31
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::102c;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x102c.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,167 +99,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, marcandre.lureau@gmail.com, armbru@redhat.com,
- stefanha@redhat.com, qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Yonggang Luo <luoyonggang@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This way, a monitor command handler will still be able to access the
-current monitor, but when it yields, all other code code will correctly
-get NULL from monitor_cur().
-
-This uses a hash table to map the coroutine pointer to the current
-monitor of that coroutine.  Outside of coroutine context, we associate
-the current monitor with the leader coroutine of the current thread.
-
-Approaches to implement some form of coroutine local storage directly in
-the coroutine core code have been considered and discarded because they
-didn't end up being much more generic than the hash table and their
-performance impact on coroutines not using coroutine local storage was
-unclear. As the block layer uses a coroutine per I/O request, this is a
-fast path and we have to be careful. It's safest to just stay out of
-this path with code only used by the monitor.
-
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- include/monitor/monitor.h |  2 +-
- monitor/hmp.c             |  4 ++--
- monitor/monitor.c         | 34 +++++++++++++++++++++++++++-------
- qapi/qmp-dispatch.c       |  4 ++--
- stubs/monitor-core.c      |  2 +-
- 5 files changed, 33 insertions(+), 13 deletions(-)
-
-diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
-index 543eafcb76..348bfad3d5 100644
---- a/include/monitor/monitor.h
-+++ b/include/monitor/monitor.h
-@@ -13,7 +13,7 @@ typedef struct MonitorOptions MonitorOptions;
- extern QemuOptsList qemu_mon_opts;
- 
- Monitor *monitor_cur(void);
--Monitor *monitor_set_cur(Monitor *mon);
-+Monitor *monitor_set_cur(Coroutine *co, Monitor *mon);
- bool monitor_cur_is_qmp(void);
- 
- void monitor_init_globals(void);
-diff --git a/monitor/hmp.c b/monitor/hmp.c
-index 560ec98e7b..abaf939b2d 100644
---- a/monitor/hmp.c
-+++ b/monitor/hmp.c
-@@ -1081,9 +1081,9 @@ void handle_hmp_command(MonitorHMP *mon, const char *cmdline)
-     }
- 
-     /* old_mon is non-NULL when called from qmp_human_monitor_command() */
--    old_mon = monitor_set_cur(&mon->common);
-+    old_mon = monitor_set_cur(qemu_coroutine_self(), &mon->common);
-     cmd->cmd(&mon->common, qdict);
--    monitor_set_cur(old_mon);
-+    monitor_set_cur(qemu_coroutine_self(), old_mon);
- 
-     qobject_unref(qdict);
- }
-diff --git a/monitor/monitor.c b/monitor/monitor.c
-index 099c164c6d..ef68ca9d21 100644
---- a/monitor/monitor.c
-+++ b/monitor/monitor.c
-@@ -58,29 +58,48 @@ IOThread *mon_iothread;
- /* Bottom half to dispatch the requests received from I/O thread */
- QEMUBH *qmp_dispatcher_bh;
- 
--/* Protects mon_list, monitor_qapi_event_state, monitor_destroyed.  */
-+/*
-+ * Protects mon_list, monitor_qapi_event_state, coroutine_mon,
-+ * monitor_destroyed.
-+ */
- QemuMutex monitor_lock;
- static GHashTable *monitor_qapi_event_state;
-+static GHashTable *coroutine_mon; /* Maps Coroutine* to Monitor* */
- 
- MonitorList mon_list;
- int mon_refcount;
- static bool monitor_destroyed;
- 
--static __thread Monitor *cur_monitor;
--
- Monitor *monitor_cur(void)
- {
--    return cur_monitor;
-+    Monitor *mon;
-+
-+    qemu_mutex_lock(&monitor_lock);
-+    mon = g_hash_table_lookup(coroutine_mon, qemu_coroutine_self());
-+    qemu_mutex_unlock(&monitor_lock);
-+
-+    return mon;
- }
- 
- /**
-  * Sets a new current monitor and returns the old one.
-+ *
-+ * If a non-NULL monitor is set for a coroutine, another call
-+ * resetting it to NULL is required before the coroutine terminates,
-+ * otherwise a stale entry would remain in the hash table.
-  */
--Monitor *monitor_set_cur(Monitor *mon)
-+Monitor *monitor_set_cur(Coroutine *co, Monitor *mon)
- {
--    Monitor *old_monitor = cur_monitor;
-+    Monitor *old_monitor = monitor_cur();
-+
-+    qemu_mutex_lock(&monitor_lock);
-+    if (mon) {
-+        g_hash_table_replace(coroutine_mon, co, mon);
-+    } else {
-+        g_hash_table_remove(coroutine_mon, co);
-+    }
-+    qemu_mutex_unlock(&monitor_lock);
- 
--    cur_monitor = mon;
-     return old_monitor;
- }
- 
-@@ -623,6 +642,7 @@ void monitor_init_globals_core(void)
- {
-     monitor_qapi_event_init();
-     qemu_mutex_init(&monitor_lock);
-+    coroutine_mon = g_hash_table_new(NULL, NULL);
- 
-     /*
-      * The dispatcher BH must run in the main loop thread, since we
-diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index 2fdbc0fba4..5677ba92ca 100644
---- a/qapi/qmp-dispatch.c
-+++ b/qapi/qmp-dispatch.c
-@@ -154,11 +154,11 @@ QDict *qmp_dispatch(const QmpCommandList *cmds, QObject *request,
-     }
- 
-     assert(monitor_cur() == NULL);
--    monitor_set_cur(cur_mon);
-+    monitor_set_cur(qemu_coroutine_self(), cur_mon);
- 
-     cmd->fn(args, &ret, &err);
- 
--    monitor_set_cur(NULL);
-+    monitor_set_cur(qemu_coroutine_self(), NULL);
-     qobject_unref(args);
-     if (err) {
-         /* or assert(!ret) after reviewing all handlers: */
-diff --git a/stubs/monitor-core.c b/stubs/monitor-core.c
-index dc1748bf13..d058a2a00d 100644
---- a/stubs/monitor-core.c
-+++ b/stubs/monitor-core.c
-@@ -8,7 +8,7 @@ Monitor *monitor_cur(void)
-     return NULL;
- }
- 
--Monitor *monitor_set_cur(Monitor *mon)
-+Monitor *monitor_set_cur(Coroutine *co, Monitor *mon)
- {
-     return NULL;
- }
--- 
-2.25.4
-
+V3-V4=0D
+Split  plugin: Fixes typo in qemu-plugin.h out=0D
+Trying to explain the design of=0D
+plugin: Getting qemu-plugin works under win32.=0D
+=0D
+V1-V2=0D
+1. Fixes review comments=0D
+2. Increase QEMU_PLUGIN_VERSION to 1 for compat  QEMU_PLUGIN_VERSION 0=0D
+3. Revise the loader to support for version 0 and 1=0D
+4. By export function qemu_plugin_initialize in plugin, and call it in load=
+er=3D=0D
+, so=0D
+  we have no need call it in every plugin. And also provide a standard impl=
+em=3D=0D
+entation,=0D
+  anyway, use can also override it.=0D
+=0D
+Add this feature on msys2/mingw by using glib provided cross-platform dlsym=
+ f=3D=0D
+unctional.=0D
+=0D
+Yonggang Luo (6):=0D
+  plugins: Fixes a issue when dlsym failed, the handle not closed=0D
+  plugin: Fixes compiling errors on msys2/mingw=0D
+  plugin: getting qemu_plugin_get_hwaddr only expose one function=0D
+    prototype=0D
+  plugin: Fixes typo in qemu-plugin.h=0D
+  plugin: Getting qemu-plugin works under win32.=0D
+  cirrus: Enable plugin in cirrus for windows=0D
+=0D
+ .cirrus.yml                  |   3 +-=0D
+ Makefile                     |   1 -=0D
+ configure                    |  71 -------------=0D
+ contrib/plugins/hotblocks.c  |   3 +-=0D
+ contrib/plugins/hotpages.c   |   1 +=0D
+ contrib/plugins/howvec.c     |   1 +=0D
+ contrib/plugins/lockstep.c   |   1 +=0D
+ include/qemu/qemu-plugin.h   | 197 +++++++++++++++++++++++++++--------=0D
+ meson.build                  |   6 +-=0D
+ plugins/api.c                |  76 +++++++-------=0D
+ plugins/core.c               |  16 ++-=0D
+ plugins/loader.c             |  51 ++++++++-=0D
+ plugins/meson.build          |  10 +-=0D
+ plugins/plugin.h             |   1 +=0D
+ plugins/qemu-plugins.symbols |  40 -------=0D
+ tests/plugin/bb.c            |   5 +-=0D
+ tests/plugin/empty.c         |   1 +=0D
+ tests/plugin/insn.c          |   1 +=0D
+ tests/plugin/mem.c           |   1 +=0D
+ 19 files changed, 272 insertions(+), 214 deletions(-)=0D
+ delete mode 100644 plugins/qemu-plugins.symbols=0D
+=0D
+--=3D20=0D
+2.28.0.windows.1=0D
+=0D
 
