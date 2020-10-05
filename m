@@ -2,86 +2,96 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BCA0C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 17:03:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0E2BC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 17:16:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E41B2078E
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 17:03:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DA729206CB
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 17:16:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MC+qSSJm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E41B2078E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nztLmPU3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA729206CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPTt8-0004a4-7i
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 13:03:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48388)
+	id 1kPU64-0000Ip-7C
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 13:16:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51428)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kPTro-0003fF-AX
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 13:01:40 -0400
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:38501)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kPU51-0008G4-9f
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 13:15:19 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:35767)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kPTrl-0002qa-04
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 13:01:39 -0400
-Received: by mail-lf1-x142.google.com with SMTP id y11so11747059lfl.5
- for <qemu-devel@nongnu.org>; Mon, 05 Oct 2020 10:01:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=uvRi+Y4NeCjV04cTu/q9zjCV/Sk1wwoGGuQsrbu5n2U=;
- b=MC+qSSJm58HCyacVrFaLso64wP1SbPJAX+uewOndMsw6doumuwDN2g7hUnD2euJ3EU
- zGa9L4P2P2jmFLGk4L03GB5TNITCV0xDHymGhpYFDCdJQjKMygblq3IiRpsBw0JNl+Nm
- GiPS0CNp2yAaKTJn1xKB9+mFMsPxoc/5VgbFTdkMBzFcVWzCrqSbFznDifOAb1VPgalR
- x8KWo9he3iW28kXFHAro5PTyPWye0HlKO0eSE9ygR71gYFEAArXXOY32I0d04VpRqkw1
- GwmiqHubaw7ZshahhsCRjmAq3x8YajZFXg0bOTxElBifGMDCSCNMBFdv3c2Ucnr9p9mz
- GiMQ==
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kPU4z-0004T0-Km
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 13:15:18 -0400
+Received: by mail-ot1-x344.google.com with SMTP id s66so9356283otb.2
+ for <qemu-devel@nongnu.org>; Mon, 05 Oct 2020 10:15:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=nVJIyap9/XZr9vJyTLMl0cL4j8xu1l5/Yffka7gkt8w=;
+ b=nztLmPU3zfRbhQ8O43Wh79p7RnjsHlUsXzENttECuH+SmKoLmI2Zu9Fr6vI6oTq7MM
+ 7X+R1dTOFMrrjL2pCUHWj7jaYDeGjwyXbXjUaZGpRBAb9hVgbM+mwlm+9mlhpmYDJssP
+ lLfd3tw+bg0gfTgMtI8pZAo+4ypJBa8neMXbFJ7JHuCuZiwbP6olrtx3Ul2QJZeLiRRK
+ /lZi8/uTNwtDpxRHN8GGqgQB9N8sDH/gRay7mXKnUREN+3DuLRQ/xX+dMuHD9mCSBDaT
+ WR7Waue1R00g1BJ24BiR4XINQtHclgERRGWQvqdzJrwoLbcRSeZ2nHTVjZ8yniRWlZYy
+ fYvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=uvRi+Y4NeCjV04cTu/q9zjCV/Sk1wwoGGuQsrbu5n2U=;
- b=BDEnIzQsKDRfBfmbESNgBz5Z4LKjfZk/wscheJ83GwnX7kRhIrMw/SK6AJYBG6zbLl
- hpvP/aVN88o3JfYOAGzamWR18IrFjSiqH8FyJC4ssUfHiNi8VX80w7udO/Hp9r86cmT1
- r5EqFnjfpQKphGwIMJ+Nng077mM8ODUMyMv/ug6MwKzr/34Ze1IqfQVJ5F/ThXmY3V3Q
- G6XKGTQJi9Qd52pMq+ZIrSQ+9KPjZN+F3C8yztF3NzLJS7bO+TVh2p2T9hNyhXsHmh1L
- +DN2ypcn6XXRmdFa8Tg8SpJ7NacNFg2ivsToPOva65U55C/9C5I0JwUVjpJdy/8bpfJB
- U1gQ==
-X-Gm-Message-State: AOAM53292PqJbqNSjKbPbR2BOdLWM2fpY+ktVYTMm9N49CalsT4X/lph
- ExkXSBf7E/FSg8TUJ6fNlKBOMq0ZsRLzoYWF0cw=
-X-Google-Smtp-Source: ABdhPJy0JXb6WTKTZu0qeMDqLv5EGdJewprTiYdqc09g0EgwJHmwfXoa0TxLqqPiiEZFbH6eqH7cIhzB+yzcbC7xLb0=
-X-Received: by 2002:a19:a407:: with SMTP id q7mr124916lfc.377.1601917294953;
- Mon, 05 Oct 2020 10:01:34 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=nVJIyap9/XZr9vJyTLMl0cL4j8xu1l5/Yffka7gkt8w=;
+ b=UnE/yE1Jh1vNkF3qOAIsOBs5VLhjGCcJ1/iVcf0FI4WdLBvkCqe4HUQ3tR/cdAryny
+ v3qep/oo10jtWvV8UR5ELsUuN4w+3np3f4UoVB60MY59tZgoOIdt80VT5vnh5UnxLqx5
+ p6pvbz9ooIAXW7wNbVUF9MRvIlFFfID7xJo3RwlOUdS7XZX2+VYJJa85QA5M4dWdlvBf
+ lprorq+DmM8etY9HoGe0j4AOZAGrht+EXnobz9AbB4tGZSMJY5zCloosQxYkLC6jt7LZ
+ 2BnbQ56pfXMreBMYilJiRZMS68LpcwQVwxYdXOPGSRgR5NEiDI8NgdLxcJKPXJOaQiXf
+ hEgw==
+X-Gm-Message-State: AOAM531fQPw7s4Xl72imJKz5QIWcMG0Hq3AEoTGefw458s5IsHwcm1hI
+ 90K3wmZWFlnjK76ZF5hhElMaTA==
+X-Google-Smtp-Source: ABdhPJw0IgQlySyTZZe0IC9sRE2bTTQamklspsxMkH7PD+QjFib9mOp8UwzdYqK8HPFBBs6toMD4wg==
+X-Received: by 2002:a9d:929:: with SMTP id 38mr247144otp.324.1601918116108;
+ Mon, 05 Oct 2020 10:15:16 -0700 (PDT)
+Received: from [10.10.73.179] (fixed-187-189-51-144.totalplay.net.
+ [187.189.51.144])
+ by smtp.gmail.com with ESMTPSA id n23sm158995oon.14.2020.10.05.10.15.13
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 05 Oct 2020 10:15:15 -0700 (PDT)
+Subject: Re: [PATCH 0/4] Convert remaining submodules to meson, cleanup env
+ var handling
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20201005135613.435932-1-pbonzini@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <148b5429-5668-2ae1-6506-53bc47160408@linaro.org>
+Date: Mon, 5 Oct 2020 12:15:11 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20200924163509.142565-1-f4bug@amsat.org>
-In-Reply-To: <20200924163509.142565-1-f4bug@amsat.org>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Tue, 6 Oct 2020 01:01:25 +0800
-Message-ID: <CAE2XoE8WULp8zuXjCuB8eaJQKEWhenKpBOV9crCTK_hLJ5awjg@mail.gmail.com>
-Subject: Re: [RFC PATCH] scripts/qemu-version.sh: Always describe tag version
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: multipart/alternative; boundary="000000000000534cca05b0ef6f49"
-Received-SPF: pass client-ip=2a00:1450:4864:20::142;
- envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x142.google.com
+In-Reply-To: <20201005135613.435932-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=richard.henderson@linaro.org; helo=mail-ot1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,131 +105,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-level <qemu-devel@nongnu.org>
+Cc: marcandre.lureau@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000534cca05b0ef6f49
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 10/5/20 8:56 AM, Paolo Bonzini wrote:
+> The main purpose of this series is to have a correct and consistent
+> handling of CFLAGS/CXXFLAGS/LDFLAGS environment variables:
+> 
+> - correct: avoid that the -pie flag, used for the compiler checks in
+> the configure script, ends up being passed to Meson if an LDFLAGS
+> environment variable exists (patch 3)
+> 
+> - consistent: ensure that CFLAGS that are set in the configure
+> script are persistent even if Meson is restarted; to do so,
+> make the configure script store them in the cross file it generates.
+> 
+> In order to avoid having to deal with recursive make, patches 1
+> and 2 integrate the Meson-based build system with the build of
+> embedded slirp and libfdt.  This follows the lead of Richard's
+> patches to do the same with Capstone.
+> 
+> Based-on: <20201003093851.324923-1-richard.henderson@linaro.org>
+> Supersedes: <20200923092617.1593722-1-pbonzini@redhat.com>
+> 
+> Paolo Bonzini (4):
+>   slirp: Convert Makefile bits to meson bits
+>   dtc: Convert Makefile bits to meson bits
+>   configure: do not clobber environment CFLAGS/CXXFLAGS/LDFLAGS
+>   configure: consistently pass CFLAGS/CXXFLAGS/LDFLAGS to meson
 
-On windows executing
-"pkgversion=3D$(git describe --match 'v*' --dirty --always | echo "")"
-$ bash ./scripts/qemu-version.sh . '' ''
-#define QEMU_PKGVERSION ""
-#define QEMU_FULL_VERSION ""
+Tested-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-The result are empty.
-
-By removing echo ""
-        pkgversion=3D$(git describe --match 'v*' --dirty --always)
-the result are
-```
-$ bash ./scripts/qemu-version.sh . '' ''
-#define QEMU_PKGVERSION "v5.1.0-1922-g94f35f943a-dirty"
-#define QEMU_FULL_VERSION " (v5.1.0-1922-g94f35f943a-dirty)"
-```
-
-What are expected?
-
-
-On Fri, Sep 25, 2020 at 12:50 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg>
-wrote:
->
-> I'm not sure why sometime I get this error:
->
->   $ make
->   Generating qemu-version.h with a meson_exe.py custom command
->   fatal: No tags can describe 'dc9f825f99eb5dc82f127e6c95fbe3a503e11346'.
->   Try --always, or create some tags.
->
-> While to --always option is not clear in GIT-DESCRIBE(1):
->
->    --always
->        Show uniquely abbreviated commit object as fallback.
->
-> using it works and fix my builds:
->
->   $ git describe --match 'v*' --dirty --always
->   dc9f825f99e-dirty
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  scripts/qemu-version.sh | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/scripts/qemu-version.sh b/scripts/qemu-version.sh
-> index 03128c56a2c..a7135511588 100755
-> --- a/scripts/qemu-version.sh
-> +++ b/scripts/qemu-version.sh
-> @@ -9,7 +9,7 @@ version=3D"$3"
->  if [ -z "$pkgversion" ]; then
->      cd "$dir"
->      if [ -e .git ]; then
-> -        pkgversion=3D$(git describe --match 'v*' --dirty | echo "")
-> +        pkgversion=3D$(git describe --match 'v*' --dirty --always | echo
-"")
->      fi
->  fi
->
-> --
-> 2.26.2
->
->
-
-
---
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
-
---000000000000534cca05b0ef6f49
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">On windows executing<div>&quot;pkgversion=3D$(git describe=
- --match &#39;v*&#39; --dirty --always | echo &quot;&quot;)&quot;</div><div=
->$ bash ./scripts/qemu-version.sh . &#39;&#39; &#39;&#39;<br>#define QEMU_P=
-KGVERSION &quot;&quot;<br>#define QEMU_FULL_VERSION &quot;&quot;<br><br>The=
- result are empty.<br><br>By removing echo &quot;&quot;<br>=C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 pkgversion=3D$(git describe --match &#39;v*&#39; --dirty --al=
-ways)<br>the result are<br>```</div><div>$ bash ./scripts/qemu-version.sh .=
- &#39;&#39; &#39;&#39;<br>#define QEMU_PKGVERSION &quot;v5.1.0-1922-g94f35f=
-943a-dirty&quot;<br>#define QEMU_FULL_VERSION &quot; (v5.1.0-1922-g94f35f94=
-3a-dirty)&quot;<br></div><div>```</div><div><br></div><div>What are expecte=
-d?<br><br><br>On Fri, Sep 25, 2020 at 12:50 AM Philippe Mathieu-Daud=C3=A9 =
-&lt;<a href=3D"mailto:f4bug@amsat.org">f4bug@amsat.org</a>&gt; wrote:<br>&g=
-t;<br>&gt; I&#39;m not sure why sometime I get this error:<br>&gt;<br>&gt; =
-=C2=A0 $ make<br>&gt; =C2=A0 Generating qemu-version.h with a meson_exe.py =
-custom command<br>&gt; =C2=A0 fatal: No tags can describe &#39;dc9f825f99eb=
-5dc82f127e6c95fbe3a503e11346&#39;.<br>&gt; =C2=A0 Try --always, or create s=
-ome tags.<br>&gt;<br>&gt; While to --always option is not clear in GIT-DESC=
-RIBE(1):<br>&gt;<br>&gt; =C2=A0 =C2=A0--always<br>&gt; =C2=A0 =C2=A0 =C2=A0=
- =C2=A0Show uniquely abbreviated commit object as fallback.<br>&gt;<br>&gt;=
- using it works and fix my builds:<br>&gt;<br>&gt; =C2=A0 $ git describe --=
-match &#39;v*&#39; --dirty --always<br>&gt; =C2=A0 dc9f825f99e-dirty<br>&gt=
-;<br>&gt; Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:=
-f4bug@amsat.org">f4bug@amsat.org</a>&gt;<br>&gt; ---<br>&gt; =C2=A0scripts/=
-qemu-version.sh | 2 +-<br>&gt; =C2=A01 file changed, 1 insertion(+), 1 dele=
-tion(-)<br>&gt;<br>&gt; diff --git a/scripts/qemu-version.sh b/scripts/qemu=
--version.sh<br>&gt; index 03128c56a2c..a7135511588 100755<br>&gt; --- a/scr=
-ipts/qemu-version.sh<br>&gt; +++ b/scripts/qemu-version.sh<br>&gt; @@ -9,7 =
-+9,7 @@ version=3D&quot;$3&quot;<br>&gt; =C2=A0if [ -z &quot;$pkgversion&qu=
-ot; ]; then<br>&gt; =C2=A0 =C2=A0 =C2=A0cd &quot;$dir&quot;<br>&gt; =C2=A0 =
-=C2=A0 =C2=A0if [ -e .git ]; then<br>&gt; - =C2=A0 =C2=A0 =C2=A0 =C2=A0pkgv=
-ersion=3D$(git describe --match &#39;v*&#39; --dirty | echo &quot;&quot;)<b=
-r>&gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0pkgversion=3D$(git describe --match &#3=
-9;v*&#39; --dirty --always | echo &quot;&quot;)<br>&gt; =C2=A0 =C2=A0 =C2=
-=A0fi<br>&gt; =C2=A0fi<br>&gt;<br>&gt; --<br>&gt; 2.26.2<br>&gt;<br>&gt;<br=
-><br><br>--<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=B4<br>=E7=
-=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincerely,<=
-br>Yonggang Luo<br></div></div>
-
---000000000000534cca05b0ef6f49--
+r~
 
