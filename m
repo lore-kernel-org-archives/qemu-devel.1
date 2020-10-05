@@ -2,87 +2,163 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30B92C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 05:29:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 205B4C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 06:28:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7927F2078A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 05:29:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 44B4B20674
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 06:28:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pE/Bcypx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7927F2078A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="mTpG1qxS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44B4B20674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPJ49-0005C5-H6
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 01:29:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59154)
+	id 1kPJyw-00058Y-R4
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 02:28:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41416)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pauldzim@gmail.com>)
- id 1kPJ3L-0004ly-OH
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 01:28:51 -0400
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:40480)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <pauldzim@gmail.com>)
- id 1kPJ3J-0002zY-OL
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 01:28:51 -0400
-Received: by mail-io1-xd41.google.com with SMTP id k25so7827108ioh.7
- for <qemu-devel@nongnu.org>; Sun, 04 Oct 2020 22:28:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=s/Nw0kA9/z5JP90sTcU0pJZv/MDggn2Cz7N0QXIVke8=;
- b=pE/BcypxBfJ8I1EvcJl2TOyMHoNu7NhidM5IRHLD2AMCW1Gdh22N/SsFmS4woxjQYy
- f/USAKfArjkTxup2W2+rA9cLf/14chRotMHkmGtkuEFmlY4iM8cnVD5ylQsZGQBdy9Gz
- yqdyWtNKRMygNc+RGDLsB2kxSkIJNSddEQpTThgvqNI74i4rosg6XrGm4MKrksnsN+8Y
- GM46BSoBd/U9sxTH47qddyx4bkIAA/GS40ivq1+IEB8gvHJ/kWbD7A/HT07l97KFjji8
- Rnq2WjBqOz2LhO0WYDsitCKXnGqeFu3rwQQApttnLJ2fG/mkdU0Msg6zcLEcaXCAgcdS
- r0xg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=s/Nw0kA9/z5JP90sTcU0pJZv/MDggn2Cz7N0QXIVke8=;
- b=KsvH7Jv1IJYbMZL/fQnzo/7CdZpiDyrCVQ9cEgqhWu1xqz8uDz43EGFVGjV0W3b9a+
- 1QXcwIKRoVxluq6aDx45wO45VnJ8bIKKTzrszKykDdhIGYgg6nMDf1koh5trXk2tx+MC
- Mru8dUX18nwk2k3ggUZ+glYrr2SC/BGb39kuvvBg5znI4XWQunJenAhUJRhBNMW5Ulcd
- H2TMQdBPmmOphrnI6KiS3EAwjyRU5T6qNgoq5lUYxqa34ZkZrjlrQeyFSQO4TLGZ9fNO
- K7fQDXo+YrLPUgUnKGHHGF1B5H7eQ3gwTOb8ttMj0HlvcVj3uwVTHnOBLSQyz/zC5TZ5
- 8Qfg==
-X-Gm-Message-State: AOAM530jgQIMeF/5MeaL8Z4e24kntIy5JbELqLaw/805LW37e2TiHXRT
- hLkzcYVEkzoJ3MjuTrSW/M/xliLj93yumWTPIXc=
-X-Google-Smtp-Source: ABdhPJxHI3/i2X7EPzZA6ceSf31a8wqZEugv0JzZcaXjsaPIuiUH99joMVN5wjHm6JElBTuM1ruozBkkikmbA6ewLtQ=
-X-Received: by 2002:a5e:8206:: with SMTP id l6mr9614916iom.127.1601875728252; 
- Sun, 04 Oct 2020 22:28:48 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
+ id 1kPJwj-0003gd-El; Mon, 05 Oct 2020 02:26:05 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51694)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
+ id 1kPJwg-0001PN-6i; Mon, 05 Oct 2020 02:26:05 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 09562JZh105612; Mon, 5 Oct 2020 02:25:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=subject : to : cc :
+ references : from : message-id : date : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=MLXHirc8IXVdPkDfx2nnfZ4Brynj+hsjVpkyEDJpwVA=;
+ b=mTpG1qxSpWcneR0WZSF39s8sSB6UM1fnE+mHpZAx/4doUy0kOdT2Ygl4yhX6VYlyFO+G
+ jyh9tywBshHbydXKJx+/gpa4euHfaCDoZt70P6//dereEUtRqc7u1AyRSAMC9V0lDMrB
+ LsiTkUUAxEO0hW6Xv5exLs3y1xXH5p8kwbyHkg7vWdEo8D1XaUaKeWWbJc6+FBujoTdk
+ tI01NnhsOhg2jbmQXHp/OqyBWobnl3QBGaeJnhUYKJmgTNKtVZHzjcKEFl05noU4cs+H
+ MRk1KvV3AMQWVPToSFMt6LK71ULsUHJmtbgLuM3O7v8ArCdA1s6N2+dqLvSjyAhv6Zy4 Eg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33ywv0ggae-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 05 Oct 2020 02:25:46 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0956JfVv155367;
+ Mon, 5 Oct 2020 02:25:46 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com
+ [149.81.74.108])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33ywv0gga2-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 05 Oct 2020 02:25:46 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+ by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0956CK1l017151;
+ Mon, 5 Oct 2020 06:25:44 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com
+ (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+ by ppma05fra.de.ibm.com with ESMTP id 33xgx80xk6-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 05 Oct 2020 06:25:44 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 0956PgTX30867812
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 5 Oct 2020 06:25:42 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 0EEBFA405C;
+ Mon,  5 Oct 2020 06:25:42 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A3874A4054;
+ Mon,  5 Oct 2020 06:25:41 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.0.84])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Mon,  5 Oct 2020 06:25:41 +0000 (GMT)
+Subject: Re: [PATCH 4/4] virtiofsd: avoid false positive compiler warning
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <20200930155859.303148-1-borntraeger@de.ibm.com>
+ <20200930155859.303148-5-borntraeger@de.ibm.com>
+ <20200930162757.GD2783@work-vm>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Message-ID: <f342d7ea-4a4b-0943-3d49-d178bb34d513@de.ibm.com>
+Date: Mon, 5 Oct 2020 08:25:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
+In-Reply-To: <20200930162757.GD2783@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-References: <20201004182506.2038515-1-f4bug@amsat.org>
-In-Reply-To: <20201004182506.2038515-1-f4bug@amsat.org>
-From: Paul Zimmerman <pauldzim@gmail.com>
-Date: Sun, 4 Oct 2020 22:28:21 -0700
-Message-ID: <CADBGO7_bewUoNRGYHjm9ATrZL3a7fo=O9xapUdzmqvceOKOsKg@mail.gmail.com>
-Subject: Re: [RFC PATCH] contrib/gitdm: Add more individual contributors
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d41;
- envelope-from=pauldzim@gmail.com; helo=mail-io1-xd41.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-10-05_04:2020-10-02,
+ 2020-10-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ impostorscore=0 phishscore=0 spamscore=0 adultscore=0 clxscore=1015
+ mlxlogscore=999 suspectscore=0 mlxscore=0 bulkscore=0 malwarescore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2010050044
+Received-SPF: pass client-ip=148.163.158.5;
+ envelope-from=borntraeger@de.ibm.com; helo=mx0b-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 02:25:58
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,113 +172,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: James Hogan <jhogan@kernel.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Subbaraya Sundeep <sundeep.lkml@gmail.com>,
- Sven Schnelle <svens@stackframe.org>, Paul Burton <paulburton@kernel.org>,
- Helge Deller <deller@gmx.de>,
- =?UTF-8?Q?Volker_R=C3=BCmelin?= <vr_qemu@t-online.de>,
- Finn Thain <fthain@telegraphics.com.au>,
- Ahmed Karaman <ahmedkhaledkaraman@gmail.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- =?UTF-8?B?S8WRdsOhZ8OzIFpvbHTDoW4=?= <dirty.ice.hu@gmail.com>,
- Guenter Roeck <linux@roeck-us.net>, Stefan Weil <sw@weilnetz.de>,
- Alistair Francis <alistair@alistair23.me>,
- Niek Linnenbank <nieklinnenbank@gmail.com>, Michael Rolnik <mrolnik@gmail.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>,
- Jean-Christophe Dubois <jcd@tribudubois.net>,
- David Carlier <devnexen@gmail.com>, Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Oct 4, 2020 at 11:25 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
->
-> These individual contributors have a number of contributions,
-> add them to the 'individual' group map.
->
-> Cc: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-> Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-> Cc: Alistair Francis <alistair@alistair23.me>
-> Cc: Artyom Tarasenko <atar4qemu@gmail.com>
-> Cc: David Carlier <devnexen@gmail.com>
-> Cc: Finn Thain <fthain@telegraphics.com.au>
-> Cc: Guenter Roeck <linux@roeck-us.net>
-> Cc: Helge Deller <deller@gmx.de>
-> Cc: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
-> Cc: James Hogan <jhogan@kernel.org>
-> Cc: Jean-Christophe Dubois <jcd@tribudubois.net>
-> Cc: K=C5=91v=C3=A1g=C3=B3 Zolt=C3=A1n <dirty.ice.hu@gmail.com>
-> Cc: Laurent Vivier <laurent@vivier.eu>
-> Cc: Michael Rolnik <mrolnik@gmail.com>
-> Cc: Niek Linnenbank <nieklinnenbank@gmail.com>
-> Cc: Paul Burton <paulburton@kernel.org>
-> Cc: Paul Zimmerman <pauldzim@gmail.com>
-> Cc: Stefan Weil <sw@weilnetz.de>
-> Cc: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> Cc: Sven Schnelle <svens@stackframe.org>
-> Cc: Thomas Huth <huth@tuxfamily.org>
-> Cc: Volker R=C3=BCmelin <vr_qemu@t-online.de>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
-> To the developers Cc'ed: If you agree with your entry, please
-> reply with a Reviewed-by/Acked-by tag. If you disagree or doesn't
-> care, please either reply with Nack-by or ignore this patch.
-> I'll repost in 2 weeks as formal patch (not RFC) with only the
-> entries acked by their author.
-> ---
->  contrib/gitdm/group-map-individuals | 22 ++++++++++++++++++++++
->  contrib/gitdm/group-map-redhat      |  1 -
->  2 files changed, 22 insertions(+), 1 deletion(-)
->
-> diff --git a/contrib/gitdm/group-map-individuals b/contrib/gitdm/group-ma=
-p-individuals
-> index cf8a2ce367..b478fd4576 100644
-> --- a/contrib/gitdm/group-map-individuals
-> +++ b/contrib/gitdm/group-map-individuals
-> @@ -16,3 +16,25 @@ aurelien@aurel32.net
->  balaton@eik.bme.hu
->  e.emanuelegiuseppe@gmail.com
->  andrew.smirnov@gmail.com
-> +sw@weilnetz.de
-> +huth@tuxfamily.org
-> +laurent@vivier.eu
-> +atar4qemu@gmail.com
-> +hpoussin@reactos.org
-> +deller@gmx.de
-> +alistair@alistair23.me
-> +fthain@telegraphics.com.au
-> +svens@stackframe.org
-> +aleksandar.qemu.devel@gmail.com
-> +jhogan@kernel.org
-> +paulburton@kernel.org
-> +vr_qemu@t-online.de
-> +nieklinnenbank@gmail.com
-> +devnexen@gmail.com
-> +jcd@tribudubois.net
-> +dirty.ice.hu@gmail.com
-> +mrolnik@gmail.com
-> +pauldzim@gmail.com
-> +linux@roeck-us.net
-> +sundeep.lkml@gmail.com
-> +ahmedkhaledkaraman@gmail.com
-> diff --git a/contrib/gitdm/group-map-redhat b/contrib/gitdm/group-map-red=
-hat
-> index d15db2d35e..4a8ca84b36 100644
-> --- a/contrib/gitdm/group-map-redhat
-> +++ b/contrib/gitdm/group-map-redhat
-> @@ -3,6 +3,5 @@
->  #
->
->  david@gibson.dropbear.id.au
-> -laurent@vivier.eu
->  pjp@fedoraproject.org
->  armbru@pond.sub.org
-> --
-> 2.26.2
->
 
-Acked-by: Paul Zimmerman <pauldzim@gmail.com>
+
+On 30.09.20 18:27, Dr. David Alan Gilbert wrote:
+> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
+>> make: *** [Makefile:121: config-host.mak] Error 1
+>> [cborntra@m83lp52 qemu]$ make -C build/
+>> make: Entering directory '/home/cborntra/REPOS/qemu/build'
+>> Generating qemu-version.h with a meson_exe.py custom command
+>> Compiling C object tools/virtiofsd/virtiofsd.p/passthrough_ll.c.o
+>> ../tools/virtiofsd/passthrough_ll.c: In function ‘lo_setattr’:
+>> ../tools/virtiofsd/passthrough_ll.c:702:19: error: ‘fd’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
+>>   702 |             res = futimens(fd, tv);
+>>       |                   ^~~~~~~~~~~~~~~~
+>> cc1: all warnings being treated as errors
+>> make: *** [Makefile.ninja:1438: tools/virtiofsd/virtiofsd.p/passthrough_ll.c.o] Error 1
+>> make: Leaving directory '/home/cborntra/REPOS/
+>>
+>> as far as I can see this can not happen. Let us silence the warning by
+>> giving fd a default value.
+>>
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> 
+> Yeh, I'd posted https://www.mail-archive.com/qemu-devel@nongnu.org/msg738783.html
+> but not yet merged it; only difference is I'd used -1 since it seemd
+> safer to use -1 even if it couldn't happen :-)
+
+Agreed, lets go with your patch.
 
