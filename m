@@ -2,89 +2,89 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AD02C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 06:28:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25CFBC46466
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 06:28:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A64E020674
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 06:28:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A43CD20674
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 06:28:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Gftfeaw3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A64E020674
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Taq3ujzs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A43CD20674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPJzA-0005IY-L5
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 02:28:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41422)
+	id 1kPJzB-0005L3-La
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 02:28:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41556)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1kPJwm-0003h5-0g; Mon, 05 Oct 2020 02:26:13 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37554)
+ id 1kPJxJ-00042S-LY; Mon, 05 Oct 2020 02:26:41 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51656)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1kPJwg-0001Ps-Jo; Mon, 05 Oct 2020 02:26:07 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ id 1kPJxH-0001YG-AJ; Mon, 05 Oct 2020 02:26:41 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 09562fhc146133; Mon, 5 Oct 2020 02:25:54 -0400
+ 0956EdgS120724; Mon, 5 Oct 2020 02:26:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
  h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=KKgENuj99aDUaf4qyUcOrpFzt+zRHV1FIWm7BoCqbw0=;
- b=Gftfeaw3oVbe2vAJRe+llKJgcetPpPMfQ6aKopJg5YALGFY9vMO01qhTnEVqqOclcT5r
- 9rT8yWYiRTIq7aQ5xzcx6J3edt1dbWoJjwukUrHJMt9muE+9q0NIVM0rFx9nHnuOh34H
- /qIM76jf8DCRApSl0fycvqdFlXkXcWVQYjH7Ry/J9IBCHxIR9tpUp8Tm28MKBVDb9Pgw
- +5jv2//6ay2D/xiC1WcQi8SZanoi6E+Ql0+hjvg+LZhEEir1HtPkb4Mhin7wHPWyXRyX
- OTQo5EiBbvy/R95F43cLnTHHgdAy8UNhcHWskHYyewobmV0zcKf4l2P2FVm3PIQ0unrb 1w== 
+ bh=JLQJqg06Iuq4nuZuwS3YJBaCnR0XxEFiPWdMo4akQtU=;
+ b=Taq3ujzssseUebPoQ1nm9ldXq40TBakRAPBRaV15PVEvXAMPYj4PaK1YQUpwHKxtbD79
+ 83pZLbIAC2VtH85SJGfmx+Zeh0gwhahtlOtGoTX9G4Dpw7jXPcDGEj1HML+5scYILH2P
+ lhbzZI3EnggRmMsbyAeUD3qqAnaQQoLrAi0Jzx/wHuGayQv6baDv4ypCKrYv5Z5FtHma
+ vguzosAz9KmFRwjQDJgYHZtqnxHLEwOsgjXa6LHmPUBKIcQMqAcVneetiJ0Xu46zeV7W
+ 7c2O9NL6CTaEgWBPoukXto/hy0NvxvfkPAlm/MhNLl6AqvtiBz8ugTJ47kXyNltDBUxj cw== 
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33yu0p471v-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33yx1vr882-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 05 Oct 2020 02:25:54 -0400
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09563WDH150500;
- Mon, 5 Oct 2020 02:25:53 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com
- [149.81.74.107])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33yu0p4714-1
+ Mon, 05 Oct 2020 02:26:31 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0956I3H9144890;
+ Mon, 5 Oct 2020 02:26:31 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com
+ [169.51.49.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33yx1vr874-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 05 Oct 2020 02:25:53 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
- by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0956DDut005997;
- Mon, 5 Oct 2020 06:25:51 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com
- (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
- by ppma03fra.de.ibm.com with ESMTP id 33xgx7rxag-1
+ Mon, 05 Oct 2020 02:26:31 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+ by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0956BgJA008382;
+ Mon, 5 Oct 2020 06:26:29 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com
+ (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+ by ppma03ams.nl.ibm.com with ESMTP id 33xgx89ujk-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 05 Oct 2020 06:25:51 +0000
+ Mon, 05 Oct 2020 06:26:29 +0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com
  (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 0956PmeL21561676
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 0956QRJn21954940
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 5 Oct 2020 06:25:48 GMT
+ Mon, 5 Oct 2020 06:26:27 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 9D838A405F;
- Mon,  5 Oct 2020 06:25:48 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id EF7B0A4054;
+ Mon,  5 Oct 2020 06:26:26 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 3697CA405C;
- Mon,  5 Oct 2020 06:25:48 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 88F9BA4066;
+ Mon,  5 Oct 2020 06:26:26 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.0.84])
  by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon,  5 Oct 2020 06:25:48 +0000 (GMT)
-Subject: Re: [PATCH 2/4] nbd: silence maybe-uninitialized warnings
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+ Mon,  5 Oct 2020 06:26:26 +0000 (GMT)
+Subject: Re: [PATCH 1/4] vmdk: fix maybe uninitialized warnings
+To: Fam Zheng <fam@euphon.net>, qemu-devel@nongnu.org
 References: <20200930155859.303148-1-borntraeger@de.ibm.com>
- <20200930155859.303148-3-borntraeger@de.ibm.com>
- <a6cf1fcd-cf09-08ed-774c-30f716b73cfa@redhat.com>
+ <20200930155859.303148-2-borntraeger@de.ibm.com>
+ <f78c368c7a61c2386deec50cd3386253588e64dc.camel@euphon.net>
 From: Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -129,12 +129,12 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Message-ID: <e1d1d60d-7df1-5152-a4a6-7f121b5f76f5@de.ibm.com>
-Date: Mon, 5 Oct 2020 08:25:47 +0200
+Message-ID: <062fe426-3f05-eb02-0871-3c798e0885e4@de.ibm.com>
+Date: Mon, 5 Oct 2020 08:26:26 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <a6cf1fcd-cf09-08ed-774c-30f716b73cfa@redhat.com>
+In-Reply-To: <f78c368c7a61c2386deec50cd3386253588e64dc.camel@euphon.net>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -143,11 +143,11 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
  definitions=2020-10-05_04:2020-10-02,
  2020-10-05 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 malwarescore=0
- priorityscore=1501 lowpriorityscore=0 mlxscore=0 adultscore=0
- mlxlogscore=999 suspectscore=0 phishscore=0 spamscore=0 clxscore=1011
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2010050044
+ spamscore=0 phishscore=0
+ priorityscore=1501 lowpriorityscore=0 mlxscore=0 mlxlogscore=999
+ suspectscore=2 malwarescore=0 bulkscore=0 adultscore=0 impostorscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2010050048
 Received-SPF: pass client-ip=148.163.156.1;
  envelope-from=borntraeger@de.ibm.com; helo=mx0a-001b2d01.pphosted.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 02:25:59
@@ -171,42 +171,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, qemu-trivial@nongnu.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ qemu-trivial@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 30.09.20 19:19, Eric Blake wrote:
-> On 9/30/20 10:58 AM, Christian Borntraeger wrote:
->> gcc 10 from Fedora 32 gives me:
+On 30.09.20 18:36, Fam Zheng wrote:
+> On Wed, 2020-09-30 at 17:58 +0200, Christian Borntraeger wrote:
+>> Fedora 32 gcc 10 seems to give false positives:
 >>
->> Compiling C object libblock.fa.p/nbd_server.c.o
->> ../nbd/server.c: In function ‘nbd_co_client_start’:
->> ../nbd/server.c:625:14: error: ‘namelen’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
->>   625 |         rc = nbd_negotiate_send_info(client, NBD_INFO_NAME, namelen, name,
->>       |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->>   626 |                                      errp);
->>       |                                      ~~~~~
->> ../nbd/server.c:564:14: note: ‘namelen’ was declared here
->>   564 |     uint32_t namelen;
->>       |              ^~~~~~~
+>> Compiling C object libblock.fa.p/block_vmdk.c.o
+>> ../block/vmdk.c: In function ‘vmdk_parse_extents’:
+>> ../block/vmdk.c:587:5: error: ‘extent’ may be used uninitialized in
+>> this function [-Werror=maybe-uninitialized]
+>>   587 |     g_free(extent->l1_table);
+>>       |     ^~~~~~~~~~~~~~~~~~~~~~~~
+>> ../block/vmdk.c:754:17: note: ‘extent’ was declared here
+>>   754 |     VmdkExtent *extent;
+>>       |                 ^~~~~~
+>> ../block/vmdk.c:620:11: error: ‘extent’ may be used uninitialized in
+>> this function [-Werror=maybe-uninitialized]
+>>   620 |     ret = vmdk_init_tables(bs, extent, errp);
+>>       |           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> ../block/vmdk.c:598:17: note: ‘extent’ was declared here
+>>   598 |     VmdkExtent *extent;
+>>       |                 ^~~~~~
+>> ../block/vmdk.c:1178:39: error: ‘extent’ may be used uninitialized in
+>> this function [-Werror=maybe-uninitialized]
+>>  1178 |             extent->flat_start_offset = flat_offset << 9;
+>>       |             ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~
+>> ../block/vmdk.c: In function ‘vmdk_open_vmdk4’:
+>> ../block/vmdk.c:581:22: error: ‘extent’ may be used uninitialized in
+>> this function [-Werror=maybe-uninitialized]
+>>   581 |     extent->l2_cache =
+>>       |     ~~~~~~~~~~~~~~~~~^
+>>   582 |         g_malloc(extent->entry_size * extent->l2_size *
+>> L2_CACHE_SIZE);
+>>       |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> ~~~~~~~~~
+>> ../block/vmdk.c:872:17: note: ‘extent’ was declared here
+>>   872 |     VmdkExtent *extent;
+>>       |                 ^~~~~~
+>> ../block/vmdk.c: In function ‘vmdk_open’:
+>> ../block/vmdk.c:620:11: error: ‘extent’ may be used uninitialized in
+>> this function [-Werror=maybe-uninitialized]
+>>   620 |     ret = vmdk_init_tables(bs, extent, errp);
+>>       |           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> ../block/vmdk.c:598:17: note: ‘extent’ was declared here
+>>   598 |     VmdkExtent *extent;
+>>       |                 ^~~~~~
 >> cc1: all warnings being treated as errors
+>> make: *** [Makefile.ninja:884: libblock.fa.p/block_vmdk.c.o] Error 1
 >>
->> As I cannot see how this can happen, let uns silence the warning.
+>> fix them by assigning a default value.
+>>
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> ---
+>>  block/vmdk.c | 8 ++++----
+>>  1 file changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/block/vmdk.c b/block/vmdk.c
+>> index 8ec62c7ab798..a00dc00eb47a 100644
+>> --- a/block/vmdk.c
+>> +++ b/block/vmdk.c
+>> @@ -595,7 +595,7 @@ static int vmdk_open_vmfs_sparse(BlockDriverState
+>> *bs,
+>>      int ret;
+>>      uint32_t magic;
+>>      VMDK3Header header;
+>> -    VmdkExtent *extent;
+>> +    VmdkExtent *extent = NULL;
+>>  
+>>      ret = bdrv_pread(file, sizeof(magic), &header, sizeof(header));
+>>      if (ret < 0) {
+>> @@ -751,7 +751,7 @@ static int vmdk_open_se_sparse(BlockDriverState
+>> *bs,
+>>      int ret;
+>>      VMDKSESparseConstHeader const_header;
+>>      VMDKSESparseVolatileHeader volatile_header;
+>> -    VmdkExtent *extent;
+>> +    VmdkExtent *extent = NULL;
+>>  
+>>      ret = bdrv_apply_auto_read_only(bs,
+>>              "No write support for seSparse images available", errp);
+>> @@ -869,7 +869,7 @@ static int vmdk_open_vmdk4(BlockDriverState *bs,
+>>      uint32_t magic;
+>>      uint32_t l1_size, l1_entry_sectors;
+>>      VMDK4Header header;
+>> -    VmdkExtent *extent;
+>> +    VmdkExtent *extent = NULL;
+>>      BDRVVmdkState *s = bs->opaque;
+>>      int64_t l1_backup_offset = 0;
+>>      bool compressed;
+>> @@ -1088,7 +1088,7 @@ static int vmdk_parse_extents(const char *desc,
+>> BlockDriverState *bs,
+>>      BdrvChild *extent_file;
+>>      BdrvChildRole extent_role;
+>>      BDRVVmdkState *s = bs->opaque;
+>> -    VmdkExtent *extent;
+>> +    VmdkExtent *extent = NULL;
+>>      char extent_opt_prefix[32];
+>>      Error *local_err = NULL;
+>>  
 > 
-> gcc is smart enough to see that nbd_opt_read_name(... &namelen), which
-> is the only use of namelen between declaration and use, does not always
-> initialize namelen; but fails to see we also exit this function early in
-> the same conditions when nbd_opt_read_name left namelen uninit.  The
-> workaround is fine.
+> Looks trivial, and correct.
 > 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> 
-> I'm happy for this to go in through the trivial tree, but I'll also
-> queue it on my NBD tree if that is ready first.
+> Reviewed-by: Fam Zheng <fam@euphon.net>
 
-Just in case cc qemu-trival. 
+
+Will this go via the block or trivial tree (cced). 
 
