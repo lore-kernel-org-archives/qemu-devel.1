@@ -2,95 +2,88 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91C7BC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 12:47:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79065C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 12:56:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5816206A1
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 12:47:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AAFF1205F4
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 12:56:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZlSC6p/l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5816206A1
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="grZkoh9v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAFF1205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPPtp-0005Cr-IF
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 08:47:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37220)
+	id 1kPQ2z-0001A8-Iw
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 08:56:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39656)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kPPs8-0004Xf-4Q
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 08:45:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41617)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kPPs5-0008A7-CT
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 08:45:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601901939;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=2CfXhWywyX+EzQ0gjH3UTRq4gSMoGGT7Gfer9Ko3xVg=;
- b=ZlSC6p/lih18SQcTICBG8wK+2/jRDpCUOFpex7yOS90lTKws2xgrvcFVQy6rKL+jcq/rSr
- J8cdl0XD/n+Y11HwszbZKpSUj8m1yVg80pi1sSYqHwX51lzo688ltDVDoXYJbkeYzh0QoO
- UzmLx2tXazF46qNYIpEBUN5rs40DR4g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-165-Zd-gE5MwNiSK52kmWfEsLw-1; Mon, 05 Oct 2020 08:45:34 -0400
-X-MC-Unique: Zd-gE5MwNiSK52kmWfEsLw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6A65680BCC7;
- Mon,  5 Oct 2020 12:45:31 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
- [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DA52B1002EE4;
- Mon,  5 Oct 2020 12:45:30 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 5619A11329C1; Mon,  5 Oct 2020 14:45:29 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
-Subject: Re: [PATCH v5 10/10] migration: introduce snapshot-{save, load,
- delete} QMP commands
-References: <20201002162747.3123597-1-berrange@redhat.com>
- <20201002162747.3123597-11-berrange@redhat.com>
- <ef01ef63-7b95-88c2-5d31-103d29f9f64f@redhat.com>
- <87a6x1cev5.fsf@dusky.pond.sub.org>
- <20201005113612.GH2385272@redhat.com>
-Date: Mon, 05 Oct 2020 14:45:29 +0200
-In-Reply-To: <20201005113612.GH2385272@redhat.com> ("Daniel P. =?utf-8?Q?B?=
- =?utf-8?Q?errang=C3=A9=22's?=
- message of "Mon, 5 Oct 2020 12:36:12 +0100")
-Message-ID: <87imboc046.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1kPQ1c-0000Go-C9; Mon, 05 Oct 2020 08:55:32 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51088)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1kPQ1a-0000q8-Cx; Mon, 05 Oct 2020 08:55:32 -0400
+Received: by mail-wm1-x344.google.com with SMTP id 13so8506397wmf.0;
+ Mon, 05 Oct 2020 05:55:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=wlWVSOO/aREpLlLadE6mtcQSK8dWwT8nqz07OWfYY0c=;
+ b=grZkoh9vK0eDXQ/x75t891GfLow7DrtdbDy1tL4nb473KomrtawONgf3UV58zqppmk
+ Cgtk6ybVhP3UcbTTFMf2z7O4eCb9xV8yA9huBPhjsbC0Ec6dYG1CdliFh9V5UwoFmPMp
+ +7eVgLg9lwVCEOEvShm5lRRv3Ud59NsDN9BpIWSt1JeY1KRlMuCF5HK1snWwqFxDMXy9
+ wHpOU88lIJ2/V5D0ohzRQMaRJfrEz3/zlOuRfFgiDSg8e0CYS2S2k7aoRjA2FFHDr1EG
+ KJV0/emuDg+fkhVkBCSCipX+fP7lSPU0OLdMEEQtqTVNwLT7t7TWp7EEuBHDxpbU3o+B
+ 9lcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=wlWVSOO/aREpLlLadE6mtcQSK8dWwT8nqz07OWfYY0c=;
+ b=lDjl/Dfaoa9ySf5Ua8JD32onR84iJxH4Yt5D/HzD0i8x3ngulU80dGlHyaDhWrVJTa
+ xQ/OjupOkVpQQMCI6Y0CzrA4ldmlqIFif12jetHjZT7gaJ4o2ALmn5AZpMfImNXP3R8D
+ 1Aq0WAHDsFwBwyOM+hMTNa4taHKNoXiM8DzuG9XzvxnZm9r1oBm/Kc5iGGhr2vXHyTTa
+ t0JZJkxewt6Sxo82Vwx63Fgdl3xd5aev//NjGyUElwoWQDJDGxlmZGZ12PVUdmWsefje
+ 05pwnAuIpCjvuWEB4DOdIt9q0XIWKSYM+0swKV8kCqj7mkNkQx3HkA+mLzJnDAlQ3Z7L
+ f78w==
+X-Gm-Message-State: AOAM532XGDSJ0ELw0RNxj7jHsIsQMkTtz3GFgIpVY8sJynSSSPxIDHxW
+ c5u3Sn0h06hXetq2p5hF3NdJ+r6RoQs=
+X-Google-Smtp-Source: ABdhPJxr4vYzwP1moB3VcZGzdhFLXFmbfLxYenm70Ah5UcIXbshdeVtFGOrzHknF31YIUlc9Y2IZQQ==
+X-Received: by 2002:a1c:7c12:: with SMTP id x18mr3109972wmc.107.1601902527029; 
+ Mon, 05 Oct 2020 05:55:27 -0700 (PDT)
+Received: from localhost.localdomain ([2001:b07:6468:f312:2e86:3d8b:8b70:920c])
+ by smtp.gmail.com with ESMTPSA id m14sm4499528wrx.62.2020.10.05.05.55.26
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 05 Oct 2020 05:55:26 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] ide: clean up ahci_populate_sglist
+Date: Mon,  5 Oct 2020 14:55:27 +0200
+Message-Id: <20201005125527.429187-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 02:11:31
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.248,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,35 +96,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>, "Dr.
- David Alan Gilbert" <dgilbert@redhat.com>
+Cc: jsnow@redhat.com, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+Alex reported an uninitialized variable warning in ahci_populate_sglist.
+Even though the warning is bogus and happens only because of -Og, the
+code in the function leaves something to be desired; the condition that
+triggers the warning is easily shown to be entirely redundant.
 
-> On Mon, Oct 05, 2020 at 09:26:54AM +0200, Markus Armbruster wrote:
->> Eric Blake <eblake@redhat.com> writes:
->>=20
->> > On 10/2/20 11:27 AM, Daniel P. Berrang=C3=A9 wrote:
->> >
->> > Do we have a query- command handy to easily learn which snapshot names
->> > are even available to attempt deletion on?  If not, that's worth a
->> > separate patch.
->>=20
->> Oh, I missed that one.  It's the QMP equivalent to "info snapshots", and
->> it is required to finish the job.  Since we're at v5, I'd be okay with a
->> follow-up patch, as long as it is done for 5.2.
->
-> "query-named-block-nodes" returns BlockDeviceInfo struct, which
-> contains ImageInfo which contains an array of SnapshotInfo. So
-> we don't need any new query command.
+In particular, the loop's "if" condition can be rewritten from
+"offset < sum + tbl_entry_size" to "offset - sum < tbl_entry_size";
+this is safe since the LHS cannot underflow.  Because off_pos is
+exactly "offset - sum" it is clear that it can never be less than
+zero or greater than tbl_entry_size.  We can therefore keep the off_idx
+check only and, for documentation purposes, reduce off_pos to an unsigned
+32-bit integer.
 
-My Acked-by stands without a new query then.
+The tracepoint also is not particularly useful at this point, since
+we know that (if it ever triggers) off_idx will be -1 and off_pos
+uninitialized.  Instead, include the requested offset and the total PRDT
+length, which will be smaller than the offset.
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/ide/ahci.c       | 12 +++++-------
+ hw/ide/trace-events |  2 +-
+ 2 files changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+index 680304a24c..997b67a6fc 100644
+--- a/hw/ide/ahci.c
++++ b/hw/ide/ahci.c
+@@ -924,8 +924,7 @@ static int ahci_populate_sglist(AHCIDevice *ad, QEMUSGList *sglist,
+     int r = 0;
+     uint64_t sum = 0;
+     int off_idx = -1;
+-    int64_t off_pos = -1;
+-    int tbl_entry_size;
++    uint32_t off_pos = 0;
+     IDEBus *bus = &ad->port;
+     BusState *qbus = BUS(bus);
+ 
+@@ -952,19 +951,18 @@ static int ahci_populate_sglist(AHCIDevice *ad, QEMUSGList *sglist,
+     /* Get entries in the PRDT, init a qemu sglist accordingly */
+     if (prdtl > 0) {
+         AHCI_SG *tbl = (AHCI_SG *)prdt;
+-        sum = 0;
+         for (i = 0; i < prdtl; i++) {
+-            tbl_entry_size = prdt_tbl_entry_size(&tbl[i]);
+-            if (offset < (sum + tbl_entry_size)) {
++            uint32_t tbl_entry_size = prdt_tbl_entry_size(&tbl[i]);
++            if (offset - sum < tbl_entry_size) {
+                 off_idx = i;
+                 off_pos = offset - sum;
+                 break;
+             }
+             sum += tbl_entry_size;
+         }
+-        if ((off_idx == -1) || (off_pos < 0) || (off_pos > tbl_entry_size)) {
++        if (off_idx == -1) {
+             trace_ahci_populate_sglist_bad_offset(ad->hba, ad->port_no,
+-                                                  off_idx, off_pos);
++                                                  sum, offset);
+             r = -1;
+             goto out;
+         }
+diff --git a/hw/ide/trace-events b/hw/ide/trace-events
+index 6e357685f9..81706efe80 100644
+--- a/hw/ide/trace-events
++++ b/hw/ide/trace-events
+@@ -88,7 +88,7 @@ ahci_populate_sglist(void *s, int port) "ahci(%p)[%d]"
+ ahci_populate_sglist_no_prdtl(void *s, int port, uint16_t opts) "ahci(%p)[%d]: no sg list given by guest: 0x%04x"
+ ahci_populate_sglist_no_map(void *s, int port) "ahci(%p)[%d]: DMA mapping failed"
+ ahci_populate_sglist_short_map(void *s, int port) "ahci(%p)[%d]: mapped less than expected"
+-ahci_populate_sglist_bad_offset(void *s, int port, int off_idx, int64_t off_pos) "ahci(%p)[%d]: Incorrect offset! off_idx: %d, off_pos: %"PRId64
++ahci_populate_sglist_bad_offset(void *s, int port, uint64_t sum, uint64_t offset) "ahci(%p)[%d]: Incorrect offset! total PRDT length %"PRIu64", offset: %"PRIu64
+ ncq_finish(void *s, int port, uint8_t tag) "ahci(%p)[%d][tag:%d]: NCQ transfer finished"
+ execute_ncq_command_read(void *s, int port, uint8_t tag, int count, int64_t lba) "ahci(%p)[%d][tag:%d]: NCQ reading %d sectors from LBA %"PRId64
+ execute_ncq_command_unsup(void *s, int port, uint8_t tag, uint8_t cmd) "ahci(%p)[%d][tag:%d]: error: unsupported NCQ command (0x%02x) received"
+-- 
+2.26.2
 
 
