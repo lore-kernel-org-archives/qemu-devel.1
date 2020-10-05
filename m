@@ -2,94 +2,105 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1571AC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 18:44:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C8CCC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 18:54:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6676520853
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 18:44:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8436D20853
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 18:53:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DuSipUKQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6676520853
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ZbhurtQI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8436D20853
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPVTJ-0004YL-AF
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 14:44:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42302)
+	id 1kPVcU-0008IZ-F3
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 14:53:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44264)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kPVSG-0003ol-OM
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 14:43:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57817)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kPVSD-00072P-MT
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 14:43:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601923400;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=F9lR6ujFIVOdjNVkFUZgEJdLNwqUowq8neB0dnHsSNI=;
- b=DuSipUKQ8a78t1tf8Cj6k2VpzwPYXtmhgkV8jqpmeXr/bL/q2k9Vrg3GGcVwUrhcaTQsrJ
- mnTGMrD4Oo3gvIMURtiLpgW+NHBSnsE6t99yh/+sxASoTvDSvyrt7zEXbAruxt91+cn9mp
- HZMYSxmGF4f1tCju9FA4jznCmem09PE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-391-cDnzevw6Ph2D-eLV3uzOlw-1; Mon, 05 Oct 2020 14:43:19 -0400
-X-MC-Unique: cDnzevw6Ph2D-eLV3uzOlw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD673107ACF5;
- Mon,  5 Oct 2020 18:43:16 +0000 (UTC)
-Received: from localhost (ovpn-119-102.rdu2.redhat.com [10.10.119.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 15A7255767;
- Mon,  5 Oct 2020 18:43:10 +0000 (UTC)
-Date: Mon, 5 Oct 2020 14:43:10 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH 01/16] hw/core/cpu: Let CPU object have a clock source
-Message-ID: <20201005184310.GN7303@habkost.net>
-References: <20200928171539.788309-1-f4bug@amsat.org>
- <20200928171539.788309-2-f4bug@amsat.org>
- <20200930094313.1120a040@redhat.com>
- <da7248f7-5098-188b-d274-e122c87bb498@amsat.org>
- <20201005184009.493629b0@redhat.com>
- <20201005174454.GM7303@habkost.net>
- <8c337ca9-4f03-e6df-0e67-f8ca2b3248e7@amsat.org>
+ (Exim 4.90_1) (envelope-from <elena.ufimtseva@oracle.com>)
+ id 1kPVaA-0006di-0p
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 14:51:34 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:52522)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <elena.ufimtseva@oracle.com>)
+ id 1kPVa7-00083O-OL
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 14:51:33 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 095InpTb076374;
+ Mon, 5 Oct 2020 18:51:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=corp-2020-01-29;
+ bh=lZUjqm79YJbOnq61vlhu8qeTHIIkKtGmbfzDyCCSYWk=;
+ b=ZbhurtQI5V4gksTPLK9P1h9FWgANR0dAfeL45oRdVKWvjpgOQxS9jVH2uikTK/hX02Er
+ i4DXFz94GG+3O9cwCnVbTkBtxlfRP6N47XNvkZJDz+GvIv9MCubpr7r2y7mSPS64U8IQ
+ 0x63/pTxwy8MhFUYj6jX4Lkpx9QD+mjiPCajehE2Ij3i+Xn3TG5+5BfXUlXAfZS21NpC
+ 15t6k3lrX2nad5t7J9IghRbWQcn84+HwoZIbOVbCY8U+EdsyIz+Ce9d6otEQEWvD5Gq1
+ YmOnxXM25tL5fj7YsJQxI5HoKQyujKJ+gGKDbeWQXduqpVS3X4EH1pE/d7sBTCCGMg4w gA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by aserp2120.oracle.com with ESMTP id 33ym34c9rd-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+ Mon, 05 Oct 2020 18:51:17 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 095Ip6Kg026259;
+ Mon, 5 Oct 2020 18:51:16 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by userp3020.oracle.com with ESMTP id 33yyje8nwu-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 05 Oct 2020 18:51:16 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 095IpE8U001770;
+ Mon, 5 Oct 2020 18:51:14 GMT
+Received: from flaka.hsd1.ca.comcast.net (/67.180.143.163)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Mon, 05 Oct 2020 11:51:14 -0700
+From: elena.ufimtseva@oracle.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH v10 02/19] multi-process: Add config option for multi-process
+ QEMU
+Date: Mon,  5 Oct 2020 11:50:50 -0700
+Message-Id: <c509052f414e8556691f359bda3b526a8eb85565.1601923020.git.elena.ufimtseva@oracle.com>
+X-Mailer: git-send-email 2.25.GIT
+In-Reply-To: <cover.1601923020.git.elena.ufimtseva@oracle.com>
+References: <cover.1601923020.git.elena.ufimtseva@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <8c337ca9-4f03-e6df-0e67-f8ca2b3248e7@amsat.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 02:11:31
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9765
+ signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
+ adultscore=0 bulkscore=0
+ phishscore=0 mlxlogscore=999 mlxscore=0 spamscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2010050136
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9765
+ signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0
+ priorityscore=1501
+ mlxscore=0 mlxlogscore=999 clxscore=1015 bulkscore=0 spamscore=0
+ malwarescore=0 phishscore=0 suspectscore=1 adultscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2010050136
+Received-SPF: pass client-ip=141.146.126.78;
+ envelope-from=elena.ufimtseva@oracle.com; helo=aserp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 14:51:29
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,172 +113,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>,
- Huacai Chen <zltjiangshi@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
- Paul Burton <paulburton@kernel.org>,
- "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- qemu-arm <qemu-arm@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>,
- Cleber Rosa <crosa@redhat.com>, Huacai Chen <chenhc@lemote.com>,
- Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>,
- =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
+ john.g.johnson@oracle.com, kraxel@redhat.com, jag.raman@oracle.com,
+ quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
+ kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
+ stefanha@redhat.com, thanos.makatos@nutanix.com, rth@twiddle.net,
+ kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 05, 2020 at 08:09:31PM +0200, Philippe Mathieu-Daudé wrote:
-> On 10/5/20 7:44 PM, Eduardo Habkost wrote:
-> > On Mon, Oct 05, 2020 at 06:40:09PM +0200, Igor Mammedov wrote:
-> >> On Wed, 30 Sep 2020 12:16:53 +0200
-> >> Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
-> >>
-> >>> +arm/ppc/riscv folks
-> >>>
-> >>> On 9/30/20 9:43 AM, Igor Mammedov wrote:
-> >>>> On Mon, 28 Sep 2020 19:15:24 +0200
-> >>>> Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
-> >>>>   
-> >>>>> Let CPUState have a clock source (named 'clk') and CPUClass
-> > 
-> > The language here confuses me: is this a clock source inside the
-> > CPU, or just a clock input that can be connected to a clock
-> > source somewhere?
-> 
-> 2nd description, "somewhere". I'll reword.
-> 
-> > 
-> > See also comment below[1].
-> > 
-> >>>>> have a clock_update() callback. The clock can be optionally
-> >>>>> set Using qdev_connect_clock_in() from the Clock API.
-> >>>>> If the clock changes, the optional clock_update() will be
-> >>>>> called.  
-> > 
-> > What does "clock change" means?  Is this just about the
-> > frequency, or something else?
-> 
-> A frequency changes -- which can be because a parent (in the
-> clock tree) changed its source using a MUX.
-> 
-> > 
-> > (By reading the Clock API documentation, it looks like it only
-> > represents the clock frequency, but I'm not sure)
-> > 
-> >>>>
-> >>>> the sole user of it is mips cpu, so question is why
-> >>>> you are making it part of generic CPUm instead of
-> >>>> MIPSCPUClass/MIPSCPU?  
-> >>>
-> >>> This is a feature of the CPU, regardless its architecture.
-> >>>
-> >>> I expect the other archs to start using it soon.
-> >>
-> >> if there aren't any plans to actually to do that,
-> >> I'd keep it to MIPS class and generalize later when there is demand.
-> 
-> No problem.
-> 
-> > 
-> > I normally don't mind if a feature is generic from the beginning.
-> > But in this case I'm inclined to agree with Igor.  Unless we
-> > expect to see arch-independent code to use CPUState.clock soon
-> > (do we?), having CPUState.clock existing but unused by most
-> > architectures would be misleading.
-> > 
-> > Also, at least on x86 there are so many different clock sources,
-> > that I'm not sure it would be a desirable to have a generic clock
-> > input named "clk".
-> 
-> Well X86 is the arch I'm less confident with. Anyhow if it has
-> multiple clock sources, I'd expect a Clock MUX block to select
-> an unique clock to feed the CPU.
+From: Jagannathan Raman <jag.raman@oracle.com>
 
-I don't mean there are different clocks that can feed the CPU,
-but that there are multiple software interfaces that report a
-clock frequency to the guest OS, and they can disagree with each
-other.  The phrase "the actual frequency of the CPU clock" is
-going to be ambiguous.
+Add a configuration option to separate multi-process code
 
-> 
-[...]
-> >>>>>   *   QOM parent.
-> >>>>>   * @nr_cores: Number of cores within this CPU package.
-> >>>>>   * @nr_threads: Number of threads within this CPU.
-> >>>>> + * @clock: this CPU source clock (an output clock of another device)
-> > 
-> > [1]
-> > 
-> > What does "source clock" means?  Is this the same as "clock input"?
-> 
-> Yes, for clocks it is common to use source/sink instead of input/output.
-> I'll try to reword.
+Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ configure   | 10 ++++++++++
+ meson.build |  1 +
+ 2 files changed, 11 insertions(+)
 
-If we use source/sink terminology, wouldn't CPUState.clock be a
-sink, which can be connected to a source somewhere else?
-
-> 
-> > 
-> > 
-> >>>>>   * @running: #true if CPU is currently running (lockless).
-> >>>>>   * @has_waiter: #true if a CPU is currently waiting for the cpu_exec_end;
-> >>>>>   * valid under cpu_list_lock.
-> >>>>> @@ -400,6 +404,7 @@ struct CPUState {
-> >>>>>      int num_ases;
-> >>>>>      AddressSpace *as;
-> >>>>>      MemoryRegion *memory;
-> >>>>> +    Clock *clock;
-> >>>>>  
-> >>>>>      void *env_ptr; /* CPUArchState */
-> >>>>>      IcountDecr *icount_decr_ptr;
-> >>>>> diff --git a/hw/core/cpu.c b/hw/core/cpu.c
-> >>>>> index c55c09f734c..37fcff3ec64 100644
-> >>>>> --- a/hw/core/cpu.c
-> >>>>> +++ b/hw/core/cpu.c
-> >>>>> @@ -30,6 +30,7 @@
-> >>>>>  #include "qemu/qemu-print.h"
-> >>>>>  #include "sysemu/tcg.h"
-> >>>>>  #include "hw/boards.h"
-> >>>>> +#include "hw/qdev-clock.h"
-> >>>>>  #include "hw/qdev-properties.h"
-> >>>>>  #include "trace/trace-root.h"
-> >>>>>  #include "qemu/plugin.h"
-> >>>>> @@ -247,6 +248,16 @@ void cpu_reset(CPUState *cpu)
-> >>>>>      trace_guest_cpu_reset(cpu);
-> >>>>>  }
-> >>>>>  
-> >>>>> +static void cpu_clk_update(void *opaque)
-> >>>>> +{
-> >>>>> +    CPUState *cpu = opaque;
-> >>>>> +    CPUClass *cc = CPU_GET_CLASS(cpu);
-> >>>>> +
-> >>>>> +    if (cc->clock_update) {
-> >>>>> +        cc->clock_update(cpu);
-> >>>>> +    }
-> >>>>> +}
-> >>>>> +
-> >>>>>  static void cpu_common_reset(DeviceState *dev)
-> >>>>>  {
-> >>>>>      CPUState *cpu = CPU(dev);
-> >>>>> @@ -367,6 +378,7 @@ static void cpu_common_initfn(Object *obj)
-> >>>>>      /* the default value is changed by qemu_init_vcpu() for softmmu */
-> >>>>>      cpu->nr_cores = 1;
-> >>>>>      cpu->nr_threads = 1;
-> >>>>> +    cpu->clock = qdev_init_clock_in(DEVICE(obj), "clk", cpu_clk_update, cpu);
-> >>>>>  
-> >>>>>      qemu_mutex_init(&cpu->work_mutex);
-> >>>>>      QSIMPLEQ_INIT(&cpu->work_list);  
-> >>>>   
-> >>>
-> >>
-> > 
-> 
-
+diff --git a/configure b/configure
+index b1e11397a8..a602f34f87 100755
+--- a/configure
++++ b/configure
+@@ -570,6 +570,7 @@ libdaxctl=""
+ meson=""
+ skip_meson=no
+ gettext=""
++mpqemu="no"
+ 
+ bogus_os="no"
+ malloc_trim=""
+@@ -1661,6 +1662,10 @@ for opt do
+   ;;
+   --disable-libdaxctl) libdaxctl=no
+   ;;
++  --enable-mpqemu) mpqemu=yes
++  ;;
++  --disable-mpqemu) mpqemu=no
++  ;;
+   *)
+       echo "ERROR: unknown option $opt"
+       echo "Try '$0 --help' for more information"
+@@ -1984,6 +1989,8 @@ disabled with --disable-FEATURE, default is enabled if available:
+   xkbcommon       xkbcommon support
+   rng-none        dummy RNG, avoid using /dev/(u)random and getrandom()
+   libdaxctl       libdaxctl support
++  mpqemu          multi-process QEMU support
++
+ 
+ NOTE: The object files are built at the place where configure is launched
+ EOF
+@@ -7502,6 +7509,9 @@ fi
+ if test "$have_mlockall" = "yes" ; then
+   echo "HAVE_MLOCKALL=y" >> $config_host_mak
+ fi
++if test "$mpqemu" = "yes" ; then
++  echo "CONFIG_MPQEMU=y" >> $config_host_mak
++fi
+ if test "$fuzzing" = "yes" ; then
+   QEMU_CFLAGS="$QEMU_CFLAGS -fsanitize=fuzzer-no-link"
+ fi
+diff --git a/meson.build b/meson.build
+index f0fe5f8799..9f2092d80d 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1426,6 +1426,7 @@ endif
+ summary_info += {'thread sanitizer':  config_host.has_key('CONFIG_TSAN')}
+ summary_info += {'rng-none':          config_host.has_key('CONFIG_RNG_NONE')}
+ summary_info += {'Linux keyring':     config_host.has_key('CONFIG_SECRET_KEYRING')}
++summary_info += {'Multi-Process QEMU': config_host.has_key('CONFIG_MPQEMU')}
+ summary(summary_info, bool_yn: true)
+ 
+ if not supported_cpus.contains(cpu)
 -- 
-Eduardo
+2.25.GIT
 
 
