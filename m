@@ -2,85 +2,91 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20C78C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 20:26:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF112C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 20:26:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86C4520853
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 20:26:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 32E722074F
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 20:26:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B9rVGwK9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86C4520853
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lmichel.fr header.i=@lmichel.fr header.b="NrbuVxeL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32E722074F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=lmichel.fr
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56266 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPX3m-0002qg-FZ
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 16:26:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57956)
+	id 1kPX4F-0003kX-QT
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 16:26:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57764)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kPWaV-0005Jt-82; Mon, 05 Oct 2020 15:55:59 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:44004)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kPWaS-0007jC-RI; Mon, 05 Oct 2020 15:55:58 -0400
-Received: by mail-lj1-x243.google.com with SMTP id l13so5532067ljg.10;
- Mon, 05 Oct 2020 12:55:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=kIgkJgwRnlXzAi/N6bYPqXdd1GzIP0MwV+Ya7hdUJwQ=;
- b=B9rVGwK9fKwiTKAgXV/CsVM8pQF2hNecLvB+Yc0Bl2EneFnDuP73GuOe7yMPCS0Jkj
- EZbAdErtkKTFjb4iC73yvzezX4EoOg2J6x68BmDk+CyjE13RCF8uwGUMSpnT5fiZXoNj
- fbIg7BwQQJaniSK5GOP7hkR4fCfSU/AERAIYeYsOUR3dmddfcO9j+E7uQcAV5ezwozTc
- j9OLqsKJE0H2ugYSlf6cMXFCHGT+6ONUJk0gmrehz/Gu3GlKFHDjAkEnh68ubOJTYrxH
- ocNnJTbrYGYnn2PJbXsnTDLH/D+14k4W6qX44ZVQMzjFIRraRC6kwSI63kBWToDiuvZB
- Y2jA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=kIgkJgwRnlXzAi/N6bYPqXdd1GzIP0MwV+Ya7hdUJwQ=;
- b=rl6yyfyYavo3yu0YUtdLX47XSp8wzrEYpiLghsLQEp3no9u37kM9s4QJz58qfVHgMN
- xkPKWIoXF5RnaewhZUlTUdo6MEhoFAVM37llkVAzS02XsEuHRur/SusTerJXVmIGvojg
- Q7OVzbbfQTLtQFMllIAMGvEvnbTzERD1sU3C6TU0CnAm8ensex+Fx2Y2b/u8SM2N1KnP
- SR8moNxUBaHSh6bavh74TzUiMctewMUWXiP+z4fa/bDRmohUfUCe8eGnoaa/7OvM6/Hz
- guvAxYqSxIHjB1Zt/Vpp5IWlZcsjzsToMOV4GXQmZP6zK94z4T+uQKECW1vEVPpCF6jn
- 8fqg==
-X-Gm-Message-State: AOAM531MIT/SddJPJ1gUZSf1eXPEKuedzW3vLOsSFRgmTuX+Z5bu4QNh
- KgTBYsQeTD0wFgQlSCOzHamSrHxLrAv0fo6sH5M=
-X-Google-Smtp-Source: ABdhPJwWlkqiA9FlZf6P1ZMOc8WE8FinwWK7yB6bSp9DtZtpzmeeUl7QW49Wb7wpgbqtYcqZPnrM4zjxl2IJUMKSDUg=
-X-Received: by 2002:a2e:978f:: with SMTP id y15mr412200lji.300.1601927753868; 
- Mon, 05 Oct 2020 12:55:53 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <luc@lmichel.fr>)
+ id 1kPWZy-0004Ca-B8; Mon, 05 Oct 2020 15:55:26 -0400
+Received: from pharaoh.lmichel.fr ([149.202.28.74]:35898)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <luc@lmichel.fr>)
+ id 1kPWZs-0007WU-Rs; Mon, 05 Oct 2020 15:55:25 -0400
+Received: from sekoia-pc.home.lmichel.fr (sekoia-pc.home.lmichel.fr
+ [192.168.61.100])
+ by pharaoh.lmichel.fr (Postfix) with ESMTPS id D0177C60F1D;
+ Mon,  5 Oct 2020 19:55:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr; s=pharaoh; 
+ t=1601927714;
+ h=from:from:sender:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=HZVj10AFujvPZeDEOYBlWPdrZCZDe5HuOmVNdOSGfsA=;
+ b=NrbuVxeLnCbqxyPWVqLaBognD8NYFU9H/P3T/J2mHMWl4uXjIRawGQsBecrUoUPvC+gGOf
+ WnM4W5ttJsq3jdk7IJ3wwc1r+Gz1uvSlIkLIEz0gLMfsRg8KOqIN8uHAdY1HAt8loQIICA
+ TCYDWMFjOoHSiIdk+weYecKbb0dwggWYUOVYQLjshpdBEpZQu0AVkw5QRf+S628Msa98Gh
+ MbJR+F8KyP87BcnhtoWB1I8T1xapp7VO+cEGat/L4v3aBQLn4yd+ZPFsS2cMV14RY9Wm6z
+ eZv+jJNFaWJR+FJGzlKoNf6DdRe4isz1QvzxXtAAhKeU2uGqKvWClIz8RuyakA==
+From: Luc Michel <luc@lmichel.fr>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 05/15] hw/arm/raspi: add a skeleton implementation of the
+ CPRMAN
+Date: Mon,  5 Oct 2020 21:56:02 +0200
+Message-Id: <20201005195612.1999165-6-luc@lmichel.fr>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201005195612.1999165-1-luc@lmichel.fr>
+References: <20201005195612.1999165-1-luc@lmichel.fr>
 MIME-Version: 1.0
-References: <20201005172109.416-1-luoyonggang@gmail.com>
- <CAFEAcA95r2FZibphrO0N_rckWOKigM_d80Qi0grtpWWzN3d19A@mail.gmail.com>
-In-Reply-To: <CAFEAcA95r2FZibphrO0N_rckWOKigM_d80Qi0grtpWWzN3d19A@mail.gmail.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Tue, 6 Oct 2020 03:55:42 +0800
-Message-ID: <CAE2XoE_a4Q++HAbe2_MgbOgAqTqCtEDGOegQL+mJ5CKCp5HtAA@mail.gmail.com>
-Subject: Re: [PATCH v2] scripts: Convert qemu-version.sh to qemu-version.py
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000b9a95705b0f1de34"
-Received-SPF: pass client-ip=2a00:1450:4864:20::243;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x243.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr;
+ s=pharaoh; t=1601927715;
+ h=from:from:sender:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=HZVj10AFujvPZeDEOYBlWPdrZCZDe5HuOmVNdOSGfsA=;
+ b=Rd8nDMLHfohlt3TbELAtMsdVHRtPXXyJ3W/uA1yAmCLec9fgSuViL2CsKUrsJInRhzzE1F
+ lpzRja6VmOPeZU832GhV5jYb2jN014sfe1mRqYw6U3L5Wi3VowKypfo6bE50/RFY1xjWVA
+ iB++ivwphLGeFfRvxNk4VAWo08jW9/p/HLgrIUKqN/upX0+5ld6O8QVq/dEejNFjXvgO10
+ j8KtLCvHKJam5OQeXnA3le6rYVSyhxKfQG23AgJsa4KfjReC8s9oS6jhkUvZdKfw8o8hN0
+ 2/9rR72oheykCJ4f6XKpD+E8MS20nXJd4ehtEDwAgRAXsPkYtTVFu48zptbfxA==
+ARC-Seal: i=1; s=pharaoh; d=lmichel.fr; t=1601927715; a=rsa-sha256; cv=none;
+ b=PNXc3AhKt9mKpVhKcBseZGHdhVRqRSg9k30X6pgUErHb48mZ8ytceH089ROWMmUJg4xVfQM/SYqVSjVyv5CQfxO/yjN8Pbv5SoAZx+2ZjhWVj9F9E7FkcPzg/aLlbT8FAwsbyF/bUgYYbHCWWO0RRIqFdxIdl3pQnhNyP08HIsUK3ZhCgsJr0vZtBt0gnj+cxnL3bLkR6WlgcW+bGQ3LfEcwmQQaDo51j42AmJzGibLUwP6Bq8JbaVmDc9juVZiRTX6C5d3aXguf/E0bOgo5ySBmHSuV3k9xZQZSx2PvhY37V/fi1PJJjczq0PFbmP4TulTvt+a0vgzqaOi918beOw==
+ARC-Authentication-Results: i=1;
+	pharaoh.lmichel.fr
+Received-SPF: pass client-ip=149.202.28.74; envelope-from=luc@lmichel.fr;
+ helo=pharaoh.lmichel.fr
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 15:49:50
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,246 +100,391 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Luc Michel <luc@lmichel.fr>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Paul Zimmerman <pauldzim@gmail.com>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org,
+ Havard Skinnemoen <hskinnemoen@google.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000b9a95705b0f1de34
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+The BCM2835 CPRMAN is the clock manager of the SoC. It is composed of a
+main oscillator, and several sub-components (PLLs, multiplexers, ...) to
+generate the BCM2835 clock tree.
 
-On Tue, Oct 6, 2020 at 3:23 AM Peter Maydell <peter.maydell@linaro.org>
-wrote:
->
-> On Mon, 5 Oct 2020 at 18:24, Yonggang Luo <luoyonggang@gmail.com> wrote:
-> >
-> > The sh script are harder to maintain for compatible different
-> > xsh environment
-> >
-> > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-> > ---
-> >  meson.build             |  2 +-
-> >  scripts/qemu-version.py | 30 ++++++++++++++++++++++++++++++
-> >  scripts/qemu-version.sh | 25 -------------------------
-> >  3 files changed, 31 insertions(+), 26 deletions(-)
-> >  create mode 100644 scripts/qemu-version.py
-> >  delete mode 100755 scripts/qemu-version.sh
-> >
-> > diff --git a/meson.build b/meson.build
-> > index 95a532bd29..20f653b6eb 100644
-> > --- a/meson.build
-> > +++ b/meson.build
-> > @@ -1072,7 +1072,7 @@ tracetool =3D [
-> >     '--backend=3D' + config_host['TRACE_BACKENDS']
-> >  ]
-> >
-> > -qemu_version_cmd =3D [find_program('scripts/qemu-version.sh'),
-> > +qemu_version_cmd =3D [find_program('scripts/qemu-version.py'),
-> >                      meson.current_source_dir(),
-> >                      config_host['PKGVERSION'], meson.project_version()=
-]
-> >  qemu_version =3D custom_target('qemu-version.h',
-> > diff --git a/scripts/qemu-version.py b/scripts/qemu-version.py
-> > new file mode 100644
-> > index 0000000000..384c54027d
-> > --- /dev/null
-> > +++ b/scripts/qemu-version.py
-> > @@ -0,0 +1,30 @@
-> > +#!/usr/bin/env python3
-> > +
-> > +# Script for retrieve qemu git version information
-> > +# and output to stdout as QEMU_PKGVERSION and QEMU_FULL_VERSION header
-> > +# Author: Yonggang Luo <luoyonggang@gmail.com>
->
-> Can we have a license statement in all new files, please?
->
-> > +
-> > +import sys
-> > +import subprocess
-> > +
-> > +def main(args):
-> > +    if len(args) <=3D 3:
-> > +        sys.exit(0)
-> > +
-> > +    dir =3D args[1]
-> > +    pkgversion =3D args[2]
-> > +    version =3D args[3]
-> > +    pc =3D subprocess.run(['git', 'describe', '--match', "'v*'",
-'--dirty', '--always'],
-> > +        stdout=3Dsubprocess.PIPE, stderr=3Dsubprocess.DEVNULL, cwd=3Dd=
-ir)
-> > +    if pc.returncode =3D=3D 0:
-> > +        pkgversion =3D pc.stdout.decode('utf8').strip()
-> > +    fullversion =3D version
-> > +    if len(pkgversion) > 0:
-> > +        fullversion =3D "{} ({})".format(version, pkgversion)
-> > +
-> > +    version_header =3D '''#define QEMU_PKGVERSION "{}"
-> > +#define QEMU_FULL_VERSION "{}"'''.format(pkgversion, fullversion)
-> > +    sys.stdout.buffer.write(version_header.encode('utf8'))
-> > +
-> > +if __name__ =3D=3D "__main__":
-> > +    main(sys.argv)
->
-> Wow, python really makes this kind of task clunky compared to shell...
-That's right, the size are bloated, but for me, easier to understand
->
-> This doesn't seem to be the same logic as the original shell.
-> I'm not too familiar with python, but:
->  * the shell script doesn't run git if pkgversion is not the empty string
->  * the shell script doesn't run git unless the .git directory exists
-> If these are intentional behaviour changes you should mention
-> them in the commit message.
->
-> Also worth mentioning that you're fixing the bug in the shell
-> script where we ignore the output from git (the intention was
-> to ignore a failure from git but otherwise to keep its output;
-> this patch:
->
-https://patchew.org/QEMU/20200929143654.518157-1-marcandre.lureau@redhat.co=
-m/
-> is the fix for that in the existing shell script).
->
-> > diff --git a/scripts/qemu-version.sh b/scripts/qemu-version.sh
-> > deleted file mode 100755
-> > index 03128c56a2..0000000000
-> > --- a/scripts/qemu-version.sh
-> > +++ /dev/null
-> > @@ -1,25 +0,0 @@
-> > -#!/bin/sh
-> > -
-> > -set -eu
-> > -
-> > -dir=3D"$1"
-> > -pkgversion=3D"$2"
-> > -version=3D"$3"
-> > -
-> > -if [ -z "$pkgversion" ]; then
-> > -    cd "$dir"
-> > -    if [ -e .git ]; then
-> > -        pkgversion=3D$(git describe --match 'v*' --dirty | echo "")
-> > -    fi
-> > -fi
-> > -
-> > -if [ -n "$pkgversion" ]; then
-> > -    fullversion=3D"$version ($pkgversion)"
-> > -else
-> > -    fullversion=3D"$version"
-> > -fi
-> > -
-> > -cat <<EOF
-> > -#define QEMU_PKGVERSION "$pkgversion"
-> > -#define QEMU_FULL_VERSION "$fullversion"
-> > -EOF
->
-> thanks
-> -- PMM
+This commit adds a skeleton of the CPRMAN, with a dummy register
+read/write implementation. It embeds the main oscillator (xosc) from
+which all the clocks will be derived.
 
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Luc Michel <luc@lmichel.fr>
+---
+ include/hw/arm/bcm2835_peripherals.h       |   3 +-
+ include/hw/misc/bcm2835_cprman.h           |  37 +++++
+ include/hw/misc/bcm2835_cprman_internals.h |  24 +++
+ hw/arm/bcm2835_peripherals.c               |  11 +-
+ hw/misc/bcm2835_cprman.c                   | 163 +++++++++++++++++++++
+ hw/misc/meson.build                        |   1 +
+ hw/misc/trace-events                       |   5 +
+ 7 files changed, 242 insertions(+), 2 deletions(-)
+ create mode 100644 include/hw/misc/bcm2835_cprman.h
+ create mode 100644 include/hw/misc/bcm2835_cprman_internals.h
+ create mode 100644 hw/misc/bcm2835_cprman.c
 
+diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
+index 6aa94184eb..479e2346e8 100644
+--- a/include/hw/arm/bcm2835_peripherals.h
++++ b/include/hw/arm/bcm2835_peripherals.h
+@@ -21,10 +21,11 @@
+ #include "hw/misc/bcm2835_property.h"
+ #include "hw/misc/bcm2835_rng.h"
+ #include "hw/misc/bcm2835_mbox.h"
+ #include "hw/misc/bcm2835_mphi.h"
+ #include "hw/misc/bcm2835_thermal.h"
++#include "hw/misc/bcm2835_cprman.h"
+ #include "hw/sd/sdhci.h"
+ #include "hw/sd/bcm2835_sdhost.h"
+ #include "hw/gpio/bcm2835_gpio.h"
+ #include "hw/timer/bcm2835_systmr.h"
+ #include "hw/usb/hcd-dwc2.h"
+@@ -46,11 +47,11 @@ struct BCM2835PeripheralState {
+     BCM2835SystemTimerState systmr;
+     BCM2835MphiState mphi;
+     UnimplementedDeviceState txp;
+     UnimplementedDeviceState armtmr;
+     UnimplementedDeviceState powermgt;
+-    UnimplementedDeviceState cprman;
++    BCM2835CprmanState cprman;
+     PL011State uart0;
+     BCM2835AuxState aux;
+     BCM2835FBState fb;
+     BCM2835DMAState dma;
+     BCM2835ICState ic;
+diff --git a/include/hw/misc/bcm2835_cprman.h b/include/hw/misc/bcm2835_cprman.h
+new file mode 100644
+index 0000000000..8ae2d4d17c
+--- /dev/null
++++ b/include/hw/misc/bcm2835_cprman.h
+@@ -0,0 +1,37 @@
++/*
++ * BCM2835 CPRMAN clock manager
++ *
++ * Copyright (c) 2020 Luc Michel <luc@lmichel.fr>
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
++#ifndef HW_MISC_CPRMAN_H
++#define HW_MISC_CPRMAN_H
++
++#include "hw/sysbus.h"
++#include "hw/qdev-clock.h"
++
++#define TYPE_BCM2835_CPRMAN "bcm2835-cprman"
++
++typedef struct BCM2835CprmanState BCM2835CprmanState;
++
++DECLARE_INSTANCE_CHECKER(BCM2835CprmanState, CPRMAN,
++                         TYPE_BCM2835_CPRMAN)
++
++#define CPRMAN_NUM_REGS (0x2000 / sizeof(uint32_t))
++
++struct BCM2835CprmanState {
++    /*< private >*/
++    SysBusDevice parent_obj;
++
++    /*< public >*/
++    MemoryRegion iomem;
++
++    uint32_t regs[CPRMAN_NUM_REGS];
++    uint32_t xosc_freq;
++
++    Clock *xosc;
++};
++
++#endif
+diff --git a/include/hw/misc/bcm2835_cprman_internals.h b/include/hw/misc/bcm2835_cprman_internals.h
+new file mode 100644
+index 0000000000..8fcc6d1d09
+--- /dev/null
++++ b/include/hw/misc/bcm2835_cprman_internals.h
+@@ -0,0 +1,24 @@
++/*
++ * BCM2835 CPRMAN clock manager
++ *
++ * Copyright (c) 2020 Luc Michel <luc@lmichel.fr>
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
++#ifndef HW_MISC_CPRMAN_INTERNALS_H
++#define HW_MISC_CPRMAN_INTERNALS_H
++
++#include "hw/registerfields.h"
++#include "hw/misc/bcm2835_cprman.h"
++
++/* Register map */
++
++/*
++ * This field is common to all registers. Each register write value must match
++ * the CPRMAN_PASSWORD magic value in its 8 MSB.
++ */
++FIELD(CPRMAN, PASSWORD, 24, 8)
++#define CPRMAN_PASSWORD 0x5a
++
++#endif
+diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
+index 10e9f501d2..9d6190042d 100644
+--- a/hw/arm/bcm2835_peripherals.c
++++ b/hw/arm/bcm2835_peripherals.c
+@@ -119,10 +119,13 @@ static void bcm2835_peripherals_init(Object *obj)
+     object_initialize_child(obj, "mphi", &s->mphi, TYPE_BCM2835_MPHI);
+ 
+     /* DWC2 */
+     object_initialize_child(obj, "dwc2", &s->dwc2, TYPE_DWC2_USB);
+ 
++    /* CPRMAN clock manager */
++    object_initialize_child(obj, "cprman", &s->cprman, TYPE_BCM2835_CPRMAN);
++
+     object_property_add_const_link(OBJECT(&s->dwc2), "dma-mr",
+                                    OBJECT(&s->gpu_bus_mr));
+ }
+ 
+ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+@@ -158,10 +161,17 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+     /* Interrupt Controller */
+     if (!sysbus_realize(SYS_BUS_DEVICE(&s->ic), errp)) {
+         return;
+     }
+ 
++    /* CPRMAN clock manager */
++    if (!sysbus_realize(SYS_BUS_DEVICE(&s->cprman), errp)) {
++        return;
++    }
++    memory_region_add_subregion(&s->peri_mr, CPRMAN_OFFSET,
++                sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->cprman), 0));
++
+     memory_region_add_subregion(&s->peri_mr, ARMCTRL_IC_OFFSET,
+                 sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->ic), 0));
+     sysbus_pass_irq(SYS_BUS_DEVICE(s), SYS_BUS_DEVICE(&s->ic));
+ 
+     /* Sys Timer */
+@@ -344,11 +354,10 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+                                INTERRUPT_USB));
+ 
+     create_unimp(s, &s->txp, "bcm2835-txp", TXP_OFFSET, 0x1000);
+     create_unimp(s, &s->armtmr, "bcm2835-sp804", ARMCTRL_TIMER0_1_OFFSET, 0x40);
+     create_unimp(s, &s->powermgt, "bcm2835-powermgt", PM_OFFSET, 0x114);
+-    create_unimp(s, &s->cprman, "bcm2835-cprman", CPRMAN_OFFSET, 0x2000);
+     create_unimp(s, &s->i2s, "bcm2835-i2s", I2S_OFFSET, 0x100);
+     create_unimp(s, &s->smi, "bcm2835-smi", SMI_OFFSET, 0x100);
+     create_unimp(s, &s->spi[0], "bcm2835-spi0", SPI0_OFFSET, 0x20);
+     create_unimp(s, &s->bscsl, "bcm2835-spis", BSC_SL_OFFSET, 0x100);
+     create_unimp(s, &s->i2c[0], "bcm2835-i2c0", BSC0_OFFSET, 0x20);
+diff --git a/hw/misc/bcm2835_cprman.c b/hw/misc/bcm2835_cprman.c
+new file mode 100644
+index 0000000000..57ab9910b5
+--- /dev/null
++++ b/hw/misc/bcm2835_cprman.c
+@@ -0,0 +1,163 @@
++/*
++ * BCM2835 CPRMAN clock manager
++ *
++ * Copyright (c) 2020 Luc Michel <luc@lmichel.fr>
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
++/*
++ * This peripheral is roughly divided into 3 main parts:
++ *   - the PLLs
++ *   - the PLL channels
++ *   - the clock muxes
++ *
++ * A main oscillator (xosc) feeds all the PLLs. Each PLLs has one or more
++ * channels. Those channel are then connected to the clock muxes. Each mux has
++ * multiples sources (usually the xosc, some of the PLL channels and some "test
++ * debug" clocks). A mux is configured to select a given source through its
++ * control register. Each mux has one output clock that also goes out of the
++ * CPRMAN. This output clock usually connects to another peripheral in the SoC
++ * (so a given mux is dedicated to a peripheral).
++ *
++ * At each level (PLL, channel and mux), the clock can be altered through
++ * dividers (and multipliers in case of the PLLs), and can be disabled (in this
++ * case, the next levels see no clock).
++ *
++ * This can be sum-up as follows (this is an example and not the actual BCM2835
++ * clock tree):
++ *
++ *          /-->[PLL]-|->[PLL channel]--...            [mux]--> to peripherals
++ *          |         |->[PLL channel]  muxes takes    [mux]
++ *          |         \->[PLL channel]  inputs from    [mux]
++ *          |                           some channels  [mux]
++ * [xosc]---|-->[PLL]-|->[PLL channel]  and other srcs [mux]
++ *          |         \->[PLL channel]           ...-->[mux]
++ *          |                                          [mux]
++ *          \-->[PLL]--->[PLL channel]                 [mux]
++ *
++ * The page at https://elinux.org/The_Undocumented_Pi gives the actual clock
++ * tree configuration.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "migration/vmstate.h"
++#include "hw/qdev-properties.h"
++#include "hw/misc/bcm2835_cprman.h"
++#include "hw/misc/bcm2835_cprman_internals.h"
++#include "trace.h"
++
++/* CPRMAN "top level" model */
++
++static uint64_t cprman_read(void *opaque, hwaddr offset,
++                            unsigned size)
++{
++    BCM2835CprmanState *s = CPRMAN(opaque);
++    uint64_t r = 0;
++    size_t idx = offset / sizeof(uint32_t);
++
++    switch (idx) {
++    default:
++        r = s->regs[idx];
++    }
++
++    trace_bcm2835_cprman_read(offset, r);
++    return r;
++}
++
++static void cprman_write(void *opaque, hwaddr offset,
++                         uint64_t value, unsigned size)
++{
++    BCM2835CprmanState *s = CPRMAN(opaque);
++    size_t idx = offset / sizeof(uint32_t);
++
++    if (FIELD_EX32(value, CPRMAN, PASSWORD) != CPRMAN_PASSWORD) {
++        trace_bcm2835_cprman_write_invalid_magic(offset, value);
++        return;
++    }
++
++    value &= ~R_CPRMAN_PASSWORD_MASK;
++
++    trace_bcm2835_cprman_write(offset, value);
++    s->regs[idx] = value;
++
++}
++
++static const MemoryRegionOps cprman_ops = {
++    .read = cprman_read,
++    .write = cprman_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .valid = {
++        /*
++         * Although this hasn't been checked against real hardware, nor the
++         * information can be found in a datasheet, it seems reasonable because
++         * of the "PASSWORD" magic value found in every registers.
++         */
++        .min_access_size        = 4,
++        .max_access_size        = 4,
++        .unaligned              = false,
++    },
++    .impl = {
++        .max_access_size = 4,
++    },
++};
++
++static void cprman_reset(DeviceState *dev)
++{
++    BCM2835CprmanState *s = CPRMAN(dev);
++
++    memset(s->regs, 0, sizeof(s->regs));
++
++    clock_update_hz(s->xosc, s->xosc_freq);
++}
++
++static void cprman_init(Object *obj)
++{
++    BCM2835CprmanState *s = CPRMAN(obj);
++
++    s->xosc = clock_new(obj, "xosc");
++
++    memory_region_init_io(&s->iomem, obj, &cprman_ops,
++                          s, "bcm2835-cprman", 0x2000);
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
++}
++
++static const VMStateDescription cprman_vmstate = {
++    .name = TYPE_BCM2835_CPRMAN,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32_ARRAY(regs, BCM2835CprmanState, CPRMAN_NUM_REGS),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static Property cprman_properties[] = {
++    DEFINE_PROP_UINT32("xosc-freq-hz", BCM2835CprmanState, xosc_freq, 19200000),
++    DEFINE_PROP_END_OF_LIST()
++};
++
++static void cprman_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->reset = cprman_reset;
++    dc->vmsd = &cprman_vmstate;
++    device_class_set_props(dc, cprman_properties);
++}
++
++static const TypeInfo cprman_info = {
++    .name = TYPE_BCM2835_CPRMAN,
++    .parent = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(BCM2835CprmanState),
++    .class_init = cprman_class_init,
++    .instance_init = cprman_init,
++};
++
++static void cprman_register_types(void)
++{
++    type_register_static(&cprman_info);
++}
++
++type_init(cprman_register_types);
+diff --git a/hw/misc/meson.build b/hw/misc/meson.build
+index 793d45b1dc..c94cf70e82 100644
+--- a/hw/misc/meson.build
++++ b/hw/misc/meson.build
+@@ -71,10 +71,11 @@ softmmu_ss.add(when: 'CONFIG_RASPI', if_true: files(
+   'bcm2835_mbox.c',
+   'bcm2835_mphi.c',
+   'bcm2835_property.c',
+   'bcm2835_rng.c',
+   'bcm2835_thermal.c',
++  'bcm2835_cprman.c',
+ ))
+ softmmu_ss.add(when: 'CONFIG_SLAVIO', if_true: files('slavio_misc.c'))
+ softmmu_ss.add(when: 'CONFIG_ZYNQ', if_true: files('zynq_slcr.c', 'zynq-xadc.c'))
+ softmmu_ss.add(when: 'CONFIG_STM32F2XX_SYSCFG', if_true: files('stm32f2xx_syscfg.c'))
+ softmmu_ss.add(when: 'CONFIG_STM32F4XX_SYSCFG', if_true: files('stm32f4xx_syscfg.c'))
+diff --git a/hw/misc/trace-events b/hw/misc/trace-events
+index 6054f9adf3..d718a2b177 100644
+--- a/hw/misc/trace-events
++++ b/hw/misc/trace-events
+@@ -224,5 +224,10 @@ grlib_ahb_pnp_read(uint64_t addr, uint32_t value) "AHB PnP read addr:0x%03"PRIx6
+ grlib_apb_pnp_read(uint64_t addr, uint32_t value) "APB PnP read addr:0x%03"PRIx64" data:0x%08x"
+ 
+ # pca9552.c
+ pca955x_gpio_status(const char *description, const char *buf) "%s GPIOs 0-15 [%s]"
+ pca955x_gpio_change(const char *description, unsigned id, unsigned prev_state, unsigned current_state) "%s GPIO id:%u status: %u -> %u"
++
++# bcm2835_cprman.c
++bcm2835_cprman_read(uint64_t offset, uint64_t value) "offset:0x%" PRIx64 " value:0x%" PRIx64
++bcm2835_cprman_write(uint64_t offset, uint64_t value) "offset:0x%" PRIx64 " value:0x%" PRIx64
++bcm2835_cprman_write_invalid_magic(uint64_t offset, uint64_t value) "offset:0x%" PRIx64 " value:0x%" PRIx64
+-- 
+2.28.0
 
---
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
-
---000000000000b9a95705b0f1de34
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><br><br>On Tue, Oct 6, 2020 at 3:23 AM Peter Maydell &lt;<=
-a href=3D"mailto:peter.maydell@linaro.org">peter.maydell@linaro.org</a>&gt;=
- wrote:<br>&gt;<br>&gt; On Mon, 5 Oct 2020 at 18:24, Yonggang Luo &lt;<a hr=
-ef=3D"mailto:luoyonggang@gmail.com">luoyonggang@gmail.com</a>&gt; wrote:<br=
->&gt; &gt;<br>&gt; &gt; The sh script are harder to maintain for compatible=
- different<br>&gt; &gt; xsh environment<br>&gt; &gt;<br>&gt; &gt; Signed-of=
-f-by: Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@gmail.com">luoyonggang=
-@gmail.com</a>&gt;<br>&gt; &gt; ---<br>&gt; &gt; =C2=A0meson.build =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | =C2=A02 +-<br>&gt; &gt; =C2=A0scripts/=
-qemu-version.py | 30 ++++++++++++++++++++++++++++++<br>&gt; &gt; =C2=A0scri=
-pts/qemu-version.sh | 25 -------------------------<br>&gt; &gt; =C2=A03 fil=
-es changed, 31 insertions(+), 26 deletions(-)<br>&gt; &gt; =C2=A0create mod=
-e 100644 scripts/qemu-version.py<br>&gt; &gt; =C2=A0delete mode 100755 scri=
-pts/qemu-version.sh<br>&gt; &gt;<br>&gt; &gt; diff --git a/meson.build b/me=
-son.build<br>&gt; &gt; index 95a532bd29..20f653b6eb 100644<br>&gt; &gt; ---=
- a/meson.build<br>&gt; &gt; +++ b/meson.build<br>&gt; &gt; @@ -1072,7 +1072=
-,7 @@ tracetool =3D [<br>&gt; &gt; =C2=A0 =C2=A0 &#39;--backend=3D&#39; + c=
-onfig_host[&#39;TRACE_BACKENDS&#39;]<br>&gt; &gt; =C2=A0]<br>&gt; &gt;<br>&=
-gt; &gt; -qemu_version_cmd =3D [find_program(&#39;scripts/qemu-version.sh&#=
-39;),<br>&gt; &gt; +qemu_version_cmd =3D [find_program(&#39;scripts/qemu-ve=
-rsion.py&#39;),<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0meson.current_source_dir(),<br>&gt; &gt; =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0co=
-nfig_host[&#39;PKGVERSION&#39;], meson.project_version()]<br>&gt; &gt; =C2=
-=A0qemu_version =3D custom_target(&#39;qemu-version.h&#39;,<br>&gt; &gt; di=
-ff --git a/scripts/qemu-version.py b/scripts/qemu-version.py<br>&gt; &gt; n=
-ew file mode 100644<br>&gt; &gt; index 0000000000..384c54027d<br>&gt; &gt; =
---- /dev/null<br>&gt; &gt; +++ b/scripts/qemu-version.py<br>&gt; &gt; @@ -0=
-,0 +1,30 @@<br>&gt; &gt; +#!/usr/bin/env python3<br>&gt; &gt; +<br>&gt; &gt=
-; +# Script for retrieve qemu git version information<br>&gt; &gt; +# and o=
-utput to stdout as QEMU_PKGVERSION and QEMU_FULL_VERSION header<br>&gt; &gt=
-; +# Author: Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@gmail.com">luoy=
-onggang@gmail.com</a>&gt;<br>&gt;<br>&gt; Can we have a license statement i=
-n all new files, please?<br>&gt;<br>&gt; &gt; +<br>&gt; &gt; +import sys<br=
->&gt; &gt; +import subprocess<br>&gt; &gt; +<br>&gt; &gt; +def main(args):<=
-br>&gt; &gt; + =C2=A0 =C2=A0if len(args) &lt;=3D 3:<br>&gt; &gt; + =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0sys.exit(0)<br>&gt; &gt; +<br>&gt; &gt; + =C2=A0 =C2=A0=
-dir =3D args[1]<br>&gt; &gt; + =C2=A0 =C2=A0pkgversion =3D args[2]<br>&gt; =
-&gt; + =C2=A0 =C2=A0version =3D args[3]<br>&gt; &gt; + =C2=A0 =C2=A0pc =3D =
-subprocess.run([&#39;git&#39;, &#39;describe&#39;, &#39;--match&#39;, &quot=
-;&#39;v*&#39;&quot;, &#39;--dirty&#39;, &#39;--always&#39;],<br>&gt; &gt; +=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0stdout=3Dsubprocess.PIPE, stderr=3Dsubprocess.D=
-EVNULL, cwd=3Ddir)<br>&gt; &gt; + =C2=A0 =C2=A0if pc.returncode =3D=3D 0:<b=
-r>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0pkgversion =3D pc.stdout.decode(&#=
-39;utf8&#39;).strip()<br>&gt; &gt; + =C2=A0 =C2=A0fullversion =3D version<b=
-r>&gt; &gt; + =C2=A0 =C2=A0if len(pkgversion) &gt; 0:<br>&gt; &gt; + =C2=A0=
- =C2=A0 =C2=A0 =C2=A0fullversion =3D &quot;{} ({})&quot;.format(version, pk=
-gversion)<br>&gt; &gt; +<br>&gt; &gt; + =C2=A0 =C2=A0version_header =3D &#3=
-9;&#39;&#39;#define QEMU_PKGVERSION &quot;{}&quot;<br>&gt; &gt; +#define QE=
-MU_FULL_VERSION &quot;{}&quot;&#39;&#39;&#39;.format(pkgversion, fullversio=
-n)<br>&gt; &gt; + =C2=A0 =C2=A0sys.stdout.buffer.write(version_header.encod=
-e(&#39;utf8&#39;))<br>&gt; &gt; +<br>&gt; &gt; +if __name__ =3D=3D &quot;__=
-main__&quot;:<br>&gt; &gt; + =C2=A0 =C2=A0main(sys.argv)<br>&gt;<br>&gt; Wo=
-w, python really makes this kind of task clunky compared to shell...<div>Th=
-at&#39;s right, the size are bloated, but for me, easier to understand<br>&=
-gt;<br>&gt; This doesn&#39;t seem to be the same logic as the original shel=
-l.<br>&gt; I&#39;m not too familiar with python, but:<br>&gt; =C2=A0* the s=
-hell script doesn&#39;t run git if pkgversion is not the empty string<br>&g=
-t; =C2=A0* the shell script doesn&#39;t run git unless the .git directory e=
-xists<br>&gt; If these are intentional behaviour changes you should mention=
-<br>&gt; them in the commit message.<br>&gt;<br>&gt; Also worth mentioning =
-that you&#39;re fixing the bug in the shell<br>&gt; script where we ignore =
-the output from git (the intention was<br>&gt; to ignore a failure from git=
- but otherwise to keep its output;<br>&gt; this patch:<br>&gt; <a href=3D"h=
-ttps://patchew.org/QEMU/20200929143654.518157-1-marcandre.lureau@redhat.com=
-/">https://patchew.org/QEMU/20200929143654.518157-1-marcandre.lureau@redhat=
-.com/</a><br>&gt; is the fix for that in the existing shell script).<br>&gt=
-;<br>&gt; &gt; diff --git a/scripts/qemu-version.sh b/scripts/qemu-version.=
-sh<br>&gt; &gt; deleted file mode 100755<br>&gt; &gt; index 03128c56a2..000=
-0000000<br>&gt; &gt; --- a/scripts/qemu-version.sh<br>&gt; &gt; +++ /dev/nu=
-ll<br>&gt; &gt; @@ -1,25 +0,0 @@<br>&gt; &gt; -#!/bin/sh<br>&gt; &gt; -<br>=
-&gt; &gt; -set -eu<br>&gt; &gt; -<br>&gt; &gt; -dir=3D&quot;$1&quot;<br>&gt=
-; &gt; -pkgversion=3D&quot;$2&quot;<br>&gt; &gt; -version=3D&quot;$3&quot;<=
-br>&gt; &gt; -<br>&gt; &gt; -if [ -z &quot;$pkgversion&quot; ]; then<br>&gt=
-; &gt; - =C2=A0 =C2=A0cd &quot;$dir&quot;<br>&gt; &gt; - =C2=A0 =C2=A0if [ =
--e .git ]; then<br>&gt; &gt; - =C2=A0 =C2=A0 =C2=A0 =C2=A0pkgversion=3D$(gi=
-t describe --match &#39;v*&#39; --dirty | echo &quot;&quot;)<br>&gt; &gt; -=
- =C2=A0 =C2=A0fi<br>&gt; &gt; -fi<br>&gt; &gt; -<br>&gt; &gt; -if [ -n &quo=
-t;$pkgversion&quot; ]; then<br>&gt; &gt; - =C2=A0 =C2=A0fullversion=3D&quot=
-;$version ($pkgversion)&quot;<br>&gt; &gt; -else<br>&gt; &gt; - =C2=A0 =C2=
-=A0fullversion=3D&quot;$version&quot;<br>&gt; &gt; -fi<br>&gt; &gt; -<br>&g=
-t; &gt; -cat &lt;&lt;EOF<br>&gt; &gt; -#define QEMU_PKGVERSION &quot;$pkgve=
-rsion&quot;<br>&gt; &gt; -#define QEMU_FULL_VERSION &quot;$fullversion&quot=
-;<br>&gt; &gt; -EOF<br>&gt;<br>&gt; thanks<br>&gt; -- PMM<br><br><br><br>--=
-<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=
-=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincerely,<br>Yonggan=
-g Luo</div></div>
-
---000000000000b9a95705b0f1de34--
 
