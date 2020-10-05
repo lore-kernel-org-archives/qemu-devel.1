@@ -2,92 +2,100 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABFF7C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 20:27:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEC23C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 20:28:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E313A2100A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 20:27:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 55A3221527
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 20:28:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lmichel.fr header.i=@lmichel.fr header.b="ZnxIR76W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E313A2100A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=lmichel.fr
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UyCpxWoP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55A3221527
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPX5M-0005n5-Is
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 16:27:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57750)
+	id 1kPX6D-0006yL-CI
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 16:28:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59786)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc@lmichel.fr>)
- id 1kPWZw-000498-Vb; Mon, 05 Oct 2020 15:55:25 -0400
-Received: from pharaoh.lmichel.fr ([149.202.28.74]:35896)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc@lmichel.fr>)
- id 1kPWZs-0007WV-S5; Mon, 05 Oct 2020 15:55:24 -0400
-Received: from sekoia-pc.home.lmichel.fr (sekoia-pc.home.lmichel.fr
- [192.168.61.100])
- by pharaoh.lmichel.fr (Postfix) with ESMTPS id 69776C60F1E;
- Mon,  5 Oct 2020 19:55:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr; s=pharaoh; 
- t=1601927715;
- h=from:from:sender:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ (Exim 4.90_1) (envelope-from <mlureau@redhat.com>)
+ id 1kPWkv-0002mm-SJ
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 16:06:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40593)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mlureau@redhat.com>)
+ id 1kPWkt-0000L2-Il
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 16:06:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601928400;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2sb2I3zIfSX59xE1Wo6FrLpt7JM2pGoY/y2K8ajtnBA=;
- b=ZnxIR76WlwS5q/aQIyFRjuyybwi6nXhbIHZVEKgo5BAjzmUUhrC1kQrHt+iIR8JtUy5Obd
- sjGsCi2DNqINbQzJuBullVeAxxnGqcZ2Zx8mOFOSYQFUGjXG1xW/yk+2Mlocevk4uIXRDE
- i6n+0p+iZLp4VjV39VnEkbs7f2qPnkhr7G8mHYRBcDptbL9u0UPvWsAxwHnPSu/+1x8gSj
- pFkgXmSuUy2rLN3szpB3+YEhzRjx7t+VEUpxwQ71kPiISC/t+LxlnvACO/3NxjQu9MNcDd
- sZyL8LRwYSItLgr9Lnlou7nYiUj3Qmkh7peRizU8fFnLmWxIkeIFHRpo6ZhJIg==
-From: Luc Michel <luc@lmichel.fr>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 06/15] hw/misc/bcm2835_cprman: add a PLL skeleton
- implementation
-Date: Mon,  5 Oct 2020 21:56:03 +0200
-Message-Id: <20201005195612.1999165-7-luc@lmichel.fr>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201005195612.1999165-1-luc@lmichel.fr>
-References: <20201005195612.1999165-1-luc@lmichel.fr>
+ bh=WTPbRsoAdIdaieEFBEjZBBCyhx5pQwTJSbQV3jAJ6SU=;
+ b=UyCpxWoP0es+zgGXwRYhbZIK+NaZrzBJ6hphcukRp5J3z6MPr4sCr0WC8OjeqiGFF4EpNX
+ w/ma4CCfTYNjnZnXZWk2gleCn4L/jevjQO8Hciq2vgrQt9NVYOdCraWC/m/sl6yOF5wdRt
+ RWSMXXnq+8ww8/z+MKlcaDjux4pxnDc=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-520-FvJboAegOGyCx8Ji-aWsSA-1; Mon, 05 Oct 2020 16:06:38 -0400
+X-MC-Unique: FvJboAegOGyCx8Ji-aWsSA-1
+Received: by mail-il1-f199.google.com with SMTP id 9so7700391ile.22
+ for <qemu-devel@nongnu.org>; Mon, 05 Oct 2020 13:06:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=WTPbRsoAdIdaieEFBEjZBBCyhx5pQwTJSbQV3jAJ6SU=;
+ b=lx0czp+TnsKmbLO3IxIRp5ks3+ErAbNOUvA1et3t9cOwLjtQSnYDpicwYJ+bUXnten
+ tGWURvmb3RNGHWItmJhGKegiPfaXEaIH/NBhdlnucS73FSbOrXlFDitNi/7OUBPf2nBI
+ tKcWgn/lwxfPZAIOTJZ1BR+pnP2RYJPatevP/l0betTBf5GHf6rL3WFC/d9WGgv8SAWi
+ M1zdk3XCrRlWbt2JjZk4Yq75zHc06lnpn3NUtyytSicY57hZkImEswZCH4SGIvN3C+Ry
+ y01+SjJ4xhDqAAw00Ew8rpohKFZeHLYlrFumr1NHF6ji2TvRUBjAe1Cn+d7vzkIu2BgM
+ tzcw==
+X-Gm-Message-State: AOAM533yn01M9AyqpJH/DmfQvkWDcq5oGPWFUw/ErvAVIFGmZT7cVRgw
+ j+FO82p1OJplwPsAGCYvCQoSIF+1/kXbPqv2+nu9iJwE3+sBKv+GtjGjycbazwBUaMC5kgjgmWB
+ JXKCkS1b7xilxFWaKcF5tWbqWb+zXDBs=
+X-Received: by 2002:a05:6638:f03:: with SMTP id
+ h3mr1475952jas.36.1601928397926; 
+ Mon, 05 Oct 2020 13:06:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyHeq++59ug/FUJZEuILeI66AoE0E9EjsPWMsMSyjda7KgIWHEu8lzgCZAeVCL2ael7rB2747RXED0HzC5gRSI=
+X-Received: by 2002:a05:6638:f03:: with SMTP id
+ h3mr1475938jas.36.1601928397723; 
+ Mon, 05 Oct 2020 13:06:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr;
- s=pharaoh; t=1601927715;
- h=from:from:sender:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=2sb2I3zIfSX59xE1Wo6FrLpt7JM2pGoY/y2K8ajtnBA=;
- b=GeJgvsZTCvVetk+JFnH734EMLi0iVcZghJutysM7AJsmfcoF9ghOtCek8bB16AaZW9YAgh
- dCnbVbK9OzvVWuXtbdZ98uAZvt7qEIOp82Icq1MC20LWgoREEP7vLA7W2LAS58f7n2z5zJ
- WGg1KdVSENehCuksBDVJ8BtG5kNS9xj7D2MCzXKmog3dz3KbcUNpGZLMriY44xQAH13YGX
- qJJtYrxoN8dAlFB+QYxVQ8OUBd5y95F9rj16qaQgrFBojhoke1cmXGhcOCOaj0RRbuHXG3
- CQjGRjkq0RA6PeNge6wcJbCAWJBmrxQfp6itvWDgNK+W7tG75kWsf3iXoPHK7Q==
-ARC-Seal: i=1; s=pharaoh; d=lmichel.fr; t=1601927715; a=rsa-sha256; cv=none;
- b=XqFLvhUfUDKPpw62Da55hXxFCMBCc4hF7Hg9cd/WA31nt3EoJ9RCDSGdrhp9TkQqLYmL6bc/dmZUmdDjmxEwr96OE65kjerb6A5xNhDIR7VbyMmeQsLlAt9EPW7qbAHBoiIPj2aa3BN/FQpVY3NzeRh7TkRVX3vYqDoJIbskIuiuhl1aGlTXuPFX/KsDebw9PhxKUh+sHno4D5vpm957he4fm82vSN0ZOWc7HYPOf7/mPd0mYEPdqBEQTkVNatSsGn+KxLTa1C/WVXsQn+QUkzr4XhkLdRL+91xCV84EODrMtBeVs58nPOCbvXerLM6NqOSKKY/Xs833vOeB8CzsaQ==
-ARC-Authentication-Results: i=1;
-	pharaoh.lmichel.fr
-Received-SPF: pass client-ip=149.202.28.74; envelope-from=luc@lmichel.fr;
- helo=pharaoh.lmichel.fr
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 15:49:50
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+References: <CAHOaf96qxm6_qigD+DuoJ5GpS9rOqXe4Gv=2UnujiiwcfN0HHQ@mail.gmail.com>
+In-Reply-To: <CAHOaf96qxm6_qigD+DuoJ5GpS9rOqXe4Gv=2UnujiiwcfN0HHQ@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Tue, 6 Oct 2020 00:06:26 +0400
+Message-ID: <CAMxuvazRhrB8baHp3p=NmzCX5hQBDF6mYDDaQ5Ow1TZu96T2Uw@mail.gmail.com>
+Subject: Re: [PATCH] qom: fix objects with improper parent type
+To: Sergey Nizovtsev <snizovtsev@gmail.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mlureau@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mlureau@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 01:25:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,449 +108,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Luc Michel <luc@lmichel.fr>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Paul Zimmerman <pauldzim@gmail.com>,
- Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org,
- Havard Skinnemoen <hskinnemoen@google.com>
+Cc: Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-trivial <qemu-trivial@nongnu.org>, Jason Wang <jasowang@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There are 5 PLLs in the CPRMAN, namely PLL A, C, D, H and B. All of them
-take the xosc clock as input and produce a new clock.
+On Wed, Sep 30, 2020 at 3:47 AM Sergey Nizovtsev <snizovtsev@gmail.com> wro=
+te:
+>
+> Some objects accidentally inherit ObjectClass instead of Object.
+> They compile silently but may crash after downcasting.
+>
+> In this patch, we introduce a coccinelle script to find broken
+> declarations and fix them manually with proper base type.
+>
+> Signed-off-by: Sergey Nizovtsev <snizovtsev@gmail.com>
 
-This commit adds a skeleton implementation for the PLLs as sub-devices
-of the CPRMAN. The PLLs are instantiated and connected internally to the
-main oscillator.
+thanks!!
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Each PLL has 6 registers : CM, A2W_CTRL, A2W_ANA[0,1,2,3], A2W_FRAC. A
-write to any of them triggers a call to the (not yet implemented)
-pll_update function.
-
-If the main oscillator changes frequency, an update is also triggered.
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Luc Michel <luc@lmichel.fr>
----
- include/hw/misc/bcm2835_cprman.h           |  29 +++++
- include/hw/misc/bcm2835_cprman_internals.h | 144 +++++++++++++++++++++
- hw/misc/bcm2835_cprman.c                   | 108 ++++++++++++++++
- 3 files changed, 281 insertions(+)
-
-diff --git a/include/hw/misc/bcm2835_cprman.h b/include/hw/misc/bcm2835_cprman.h
-index 8ae2d4d17c..ddbb3e0237 100644
---- a/include/hw/misc/bcm2835_cprman.h
-+++ b/include/hw/misc/bcm2835_cprman.h
-@@ -19,17 +19,46 @@ typedef struct BCM2835CprmanState BCM2835CprmanState;
- DECLARE_INSTANCE_CHECKER(BCM2835CprmanState, CPRMAN,
-                          TYPE_BCM2835_CPRMAN)
- 
- #define CPRMAN_NUM_REGS (0x2000 / sizeof(uint32_t))
- 
-+typedef enum CprmanPll {
-+    CPRMAN_PLLA = 0,
-+    CPRMAN_PLLC,
-+    CPRMAN_PLLD,
-+    CPRMAN_PLLH,
-+    CPRMAN_PLLB,
-+
-+    CPRMAN_NUM_PLL
-+} CprmanPll;
-+
-+typedef struct CprmanPllState {
-+    /*< private >*/
-+    DeviceState parent_obj;
-+
-+    /*< public >*/
-+    CprmanPll id;
-+
-+    uint32_t *reg_cm;
-+    uint32_t *reg_a2w_ctrl;
-+    uint32_t *reg_a2w_ana;
-+    uint32_t prediv_mask; /* prediv bit in ana[1] */
-+    uint32_t *reg_a2w_frac;
-+
-+    Clock *xosc_in;
-+    Clock *out;
-+} CprmanPllState;
-+
- struct BCM2835CprmanState {
-     /*< private >*/
-     SysBusDevice parent_obj;
- 
-     /*< public >*/
-     MemoryRegion iomem;
- 
-+    CprmanPllState plls[CPRMAN_NUM_PLL];
-+
-     uint32_t regs[CPRMAN_NUM_REGS];
-     uint32_t xosc_freq;
- 
-     Clock *xosc;
- };
-diff --git a/include/hw/misc/bcm2835_cprman_internals.h b/include/hw/misc/bcm2835_cprman_internals.h
-index 8fcc6d1d09..340ad623bb 100644
---- a/include/hw/misc/bcm2835_cprman_internals.h
-+++ b/include/hw/misc/bcm2835_cprman_internals.h
-@@ -10,15 +10,159 @@
- #define HW_MISC_CPRMAN_INTERNALS_H
- 
- #include "hw/registerfields.h"
- #include "hw/misc/bcm2835_cprman.h"
- 
-+#define TYPE_CPRMAN_PLL "bcm2835-cprman-pll"
-+
-+DECLARE_INSTANCE_CHECKER(CprmanPllState, CPRMAN_PLL,
-+                         TYPE_CPRMAN_PLL)
-+
- /* Register map */
- 
-+/* PLLs */
-+REG32(CM_PLLA, 0x104)
-+    FIELD(CM_PLLA, LOADDSI0, 0, 1)
-+    FIELD(CM_PLLA, HOLDDSI0, 1, 1)
-+    FIELD(CM_PLLA, LOADCCP2, 2, 1)
-+    FIELD(CM_PLLA, HOLDCCP2, 3, 1)
-+    FIELD(CM_PLLA, LOADCORE, 4, 1)
-+    FIELD(CM_PLLA, HOLDCORE, 5, 1)
-+    FIELD(CM_PLLA, LOADPER, 6, 1)
-+    FIELD(CM_PLLA, HOLDPER, 7, 1)
-+    FIELD(CM_PLLx, ANARST, 8, 1)
-+REG32(CM_PLLC, 0x108)
-+    FIELD(CM_PLLC, LOADCORE0, 0, 1)
-+    FIELD(CM_PLLC, HOLDCORE0, 1, 1)
-+    FIELD(CM_PLLC, LOADCORE1, 2, 1)
-+    FIELD(CM_PLLC, HOLDCORE1, 3, 1)
-+    FIELD(CM_PLLC, LOADCORE2, 4, 1)
-+    FIELD(CM_PLLC, HOLDCORE2, 5, 1)
-+    FIELD(CM_PLLC, LOADPER, 6, 1)
-+    FIELD(CM_PLLC, HOLDPER, 7, 1)
-+REG32(CM_PLLD, 0x10c)
-+    FIELD(CM_PLLD, LOADDSI0, 0, 1)
-+    FIELD(CM_PLLD, HOLDDSI0, 1, 1)
-+    FIELD(CM_PLLD, LOADDSI1, 2, 1)
-+    FIELD(CM_PLLD, HOLDDSI1, 3, 1)
-+    FIELD(CM_PLLD, LOADCORE, 4, 1)
-+    FIELD(CM_PLLD, HOLDCORE, 5, 1)
-+    FIELD(CM_PLLD, LOADPER, 6, 1)
-+    FIELD(CM_PLLD, HOLDPER, 7, 1)
-+REG32(CM_PLLH, 0x110)
-+    FIELD(CM_PLLH, LOADPIX, 0, 1)
-+    FIELD(CM_PLLH, LOADAUX, 1, 1)
-+    FIELD(CM_PLLH, LOADRCAL, 2, 1)
-+REG32(CM_PLLB, 0x170)
-+    FIELD(CM_PLLB, LOADARM, 0, 1)
-+    FIELD(CM_PLLB, HOLDARM, 1, 1)
-+
-+REG32(A2W_PLLA_CTRL, 0x1100)
-+    FIELD(A2W_PLLx_CTRL, NDIV, 0, 10)
-+    FIELD(A2W_PLLx_CTRL, PDIV, 12, 3)
-+    FIELD(A2W_PLLx_CTRL, PWRDN, 16, 1)
-+    FIELD(A2W_PLLx_CTRL, PRST_DISABLE, 17, 1)
-+REG32(A2W_PLLC_CTRL, 0x1120)
-+REG32(A2W_PLLD_CTRL, 0x1140)
-+REG32(A2W_PLLH_CTRL, 0x1160)
-+REG32(A2W_PLLB_CTRL, 0x11e0)
-+
-+REG32(A2W_PLLA_ANA0, 0x1010)
-+REG32(A2W_PLLA_ANA1, 0x1014)
-+    FIELD(A2W_PLLx_ANA1, FB_PREDIV, 14, 1)
-+REG32(A2W_PLLA_ANA2, 0x1018)
-+REG32(A2W_PLLA_ANA3, 0x101c)
-+
-+REG32(A2W_PLLC_ANA0, 0x1030)
-+REG32(A2W_PLLC_ANA1, 0x1034)
-+REG32(A2W_PLLC_ANA2, 0x1038)
-+REG32(A2W_PLLC_ANA3, 0x103c)
-+
-+REG32(A2W_PLLD_ANA0, 0x1050)
-+REG32(A2W_PLLD_ANA1, 0x1054)
-+REG32(A2W_PLLD_ANA2, 0x1058)
-+REG32(A2W_PLLD_ANA3, 0x105c)
-+
-+REG32(A2W_PLLH_ANA0, 0x1070)
-+REG32(A2W_PLLH_ANA1, 0x1074)
-+    FIELD(A2W_PLLH_ANA1, FB_PREDIV, 11, 1)
-+REG32(A2W_PLLH_ANA2, 0x1078)
-+REG32(A2W_PLLH_ANA3, 0x107c)
-+
-+REG32(A2W_PLLB_ANA0, 0x10f0)
-+REG32(A2W_PLLB_ANA1, 0x10f4)
-+REG32(A2W_PLLB_ANA2, 0x10f8)
-+REG32(A2W_PLLB_ANA3, 0x10fc)
-+
-+REG32(A2W_PLLA_FRAC, 0x1200)
-+    FIELD(A2W_PLLx_FRAC, FRAC, 0, 20)
-+REG32(A2W_PLLC_FRAC, 0x1220)
-+REG32(A2W_PLLD_FRAC, 0x1240)
-+REG32(A2W_PLLH_FRAC, 0x1260)
-+REG32(A2W_PLLB_FRAC, 0x12e0)
-+
- /*
-  * This field is common to all registers. Each register write value must match
-  * the CPRMAN_PASSWORD magic value in its 8 MSB.
-  */
- FIELD(CPRMAN, PASSWORD, 24, 8)
- #define CPRMAN_PASSWORD 0x5a
- 
-+/* PLL init info */
-+typedef struct PLLInitInfo {
-+    const char *name;
-+    size_t cm_offset;
-+    size_t a2w_ctrl_offset;
-+    size_t a2w_ana_offset;
-+    uint32_t prediv_mask; /* Prediv bit in ana[1] */
-+    size_t a2w_frac_offset;
-+} PLLInitInfo;
-+
-+#define FILL_PLL_INIT_INFO(pll_)                \
-+    .cm_offset = R_CM_ ## pll_,                 \
-+    .a2w_ctrl_offset = R_A2W_ ## pll_ ## _CTRL, \
-+    .a2w_ana_offset = R_A2W_ ## pll_ ## _ANA0,  \
-+    .a2w_frac_offset = R_A2W_ ## pll_ ## _FRAC
-+
-+static const PLLInitInfo PLL_INIT_INFO[] = {
-+    [CPRMAN_PLLA] = {
-+        .name = "plla",
-+        .prediv_mask = R_A2W_PLLx_ANA1_FB_PREDIV_MASK,
-+        FILL_PLL_INIT_INFO(PLLA),
-+    },
-+    [CPRMAN_PLLC] = {
-+        .name = "pllc",
-+        .prediv_mask = R_A2W_PLLx_ANA1_FB_PREDIV_MASK,
-+        FILL_PLL_INIT_INFO(PLLC),
-+    },
-+    [CPRMAN_PLLD] = {
-+        .name = "plld",
-+        .prediv_mask = R_A2W_PLLx_ANA1_FB_PREDIV_MASK,
-+        FILL_PLL_INIT_INFO(PLLD),
-+    },
-+    [CPRMAN_PLLH] = {
-+        .name = "pllh",
-+        .prediv_mask = R_A2W_PLLH_ANA1_FB_PREDIV_MASK,
-+        FILL_PLL_INIT_INFO(PLLH),
-+    },
-+    [CPRMAN_PLLB] = {
-+        .name = "pllb",
-+        .prediv_mask = R_A2W_PLLx_ANA1_FB_PREDIV_MASK,
-+        FILL_PLL_INIT_INFO(PLLB),
-+    },
-+};
-+
-+#undef FILL_PLL_CHANNEL_INIT_INFO
-+
-+static inline void set_pll_init_info(BCM2835CprmanState *s,
-+                                     CprmanPllState *pll,
-+                                     CprmanPll id)
-+{
-+    pll->id = id;
-+    pll->reg_cm = &s->regs[PLL_INIT_INFO[id].cm_offset];
-+    pll->reg_a2w_ctrl = &s->regs[PLL_INIT_INFO[id].a2w_ctrl_offset];
-+    pll->reg_a2w_ana = &s->regs[PLL_INIT_INFO[id].a2w_ana_offset];
-+    pll->prediv_mask = PLL_INIT_INFO[id].prediv_mask;
-+    pll->reg_a2w_frac = &s->regs[PLL_INIT_INFO[id].a2w_frac_offset];
-+}
-+
- #endif
-diff --git a/hw/misc/bcm2835_cprman.c b/hw/misc/bcm2835_cprman.c
-index 57ab9910b5..b86f5901b8 100644
---- a/hw/misc/bcm2835_cprman.c
-+++ b/hw/misc/bcm2835_cprman.c
-@@ -46,10 +46,56 @@
- #include "hw/qdev-properties.h"
- #include "hw/misc/bcm2835_cprman.h"
- #include "hw/misc/bcm2835_cprman_internals.h"
- #include "trace.h"
- 
-+/* PLL */
-+
-+static void pll_update(CprmanPllState *pll)
-+{
-+    clock_update(pll->out, 0);
-+}
-+
-+static void pll_xosc_update(void *opaque)
-+{
-+    pll_update(CPRMAN_PLL(opaque));
-+}
-+
-+static void pll_init(Object *obj)
-+{
-+    CprmanPllState *s = CPRMAN_PLL(obj);
-+
-+    s->xosc_in = qdev_init_clock_in(DEVICE(s), "xosc-in", pll_xosc_update, s);
-+    s->out = qdev_init_clock_out(DEVICE(s), "out");
-+}
-+
-+static const VMStateDescription pll_vmstate = {
-+    .name = TYPE_CPRMAN_PLL,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_CLOCK(xosc_in, CprmanPllState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void pll_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->vmsd = &pll_vmstate;
-+}
-+
-+static const TypeInfo cprman_pll_info = {
-+    .name = TYPE_CPRMAN_PLL,
-+    .parent = TYPE_DEVICE,
-+    .instance_size = sizeof(CprmanPllState),
-+    .class_init = pll_class_init,
-+    .instance_init = pll_init,
-+};
-+
-+
- /* CPRMAN "top level" model */
- 
- static uint64_t cprman_read(void *opaque, hwaddr offset,
-                             unsigned size)
- {
-@@ -64,10 +110,19 @@ static uint64_t cprman_read(void *opaque, hwaddr offset,
- 
-     trace_bcm2835_cprman_read(offset, r);
-     return r;
- }
- 
-+#define CASE_PLL_REGS(pll_)       \
-+    case R_CM_ ## pll_:           \
-+    case R_A2W_ ## pll_ ## _CTRL: \
-+    case R_A2W_ ## pll_ ## _ANA0: \
-+    case R_A2W_ ## pll_ ## _ANA1: \
-+    case R_A2W_ ## pll_ ## _ANA2: \
-+    case R_A2W_ ## pll_ ## _ANA3: \
-+    case R_A2W_ ## pll_ ## _FRAC
-+
- static void cprman_write(void *opaque, hwaddr offset,
-                          uint64_t value, unsigned size)
- {
-     BCM2835CprmanState *s = CPRMAN(opaque);
-     size_t idx = offset / sizeof(uint32_t);
-@@ -80,12 +135,35 @@ static void cprman_write(void *opaque, hwaddr offset,
-     value &= ~R_CPRMAN_PASSWORD_MASK;
- 
-     trace_bcm2835_cprman_write(offset, value);
-     s->regs[idx] = value;
- 
-+    switch (idx) {
-+    CASE_PLL_REGS(PLLA) :
-+        pll_update(&s->plls[CPRMAN_PLLA]);
-+        break;
-+
-+    CASE_PLL_REGS(PLLC) :
-+        pll_update(&s->plls[CPRMAN_PLLC]);
-+        break;
-+
-+    CASE_PLL_REGS(PLLD) :
-+        pll_update(&s->plls[CPRMAN_PLLD]);
-+        break;
-+
-+    CASE_PLL_REGS(PLLH) :
-+        pll_update(&s->plls[CPRMAN_PLLH]);
-+        break;
-+
-+    CASE_PLL_REGS(PLLB) :
-+        pll_update(&s->plls[CPRMAN_PLLB]);
-+        break;
-+    }
- }
- 
-+#undef CASE_PLL_REGS
-+
- static const MemoryRegionOps cprman_ops = {
-     .read = cprman_read,
-     .write = cprman_write,
-     .endianness = DEVICE_LITTLE_ENDIAN,
-     .valid = {
-@@ -104,27 +182,55 @@ static const MemoryRegionOps cprman_ops = {
- };
- 
- static void cprman_reset(DeviceState *dev)
- {
-     BCM2835CprmanState *s = CPRMAN(dev);
-+    size_t i;
- 
-     memset(s->regs, 0, sizeof(s->regs));
- 
-+    for (i = 0; i < CPRMAN_NUM_PLL; i++) {
-+        device_cold_reset(DEVICE(&s->plls[i]));
-+    }
-+
-     clock_update_hz(s->xosc, s->xosc_freq);
- }
- 
- static void cprman_init(Object *obj)
- {
-     BCM2835CprmanState *s = CPRMAN(obj);
-+    size_t i;
-+
-+    for (i = 0; i < CPRMAN_NUM_PLL; i++) {
-+        object_initialize_child(obj, PLL_INIT_INFO[i].name,
-+                                &s->plls[i], TYPE_CPRMAN_PLL);
-+        set_pll_init_info(s, &s->plls[i], i);
-+    }
- 
-     s->xosc = clock_new(obj, "xosc");
- 
-     memory_region_init_io(&s->iomem, obj, &cprman_ops,
-                           s, "bcm2835-cprman", 0x2000);
-     sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
- }
- 
-+static void cprman_realize(DeviceState *dev, Error **errp)
-+{
-+    BCM2835CprmanState *s = CPRMAN(dev);
-+    size_t i;
-+
-+    for (i = 0; i < CPRMAN_NUM_PLL; i++) {
-+        CprmanPllState *pll = &s->plls[i];
-+
-+        clock_set_source(pll->xosc_in, s->xosc);
-+
-+        if (!qdev_realize(DEVICE(pll), NULL, errp)) {
-+            return;
-+        }
-+    }
-+}
-+
- static const VMStateDescription cprman_vmstate = {
-     .name = TYPE_BCM2835_CPRMAN,
-     .version_id = 1,
-     .minimum_version_id = 1,
-     .fields = (VMStateField[]) {
-@@ -140,10 +246,11 @@ static Property cprman_properties[] = {
- 
- static void cprman_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
-+    dc->realize = cprman_realize;
-     dc->reset = cprman_reset;
-     dc->vmsd = &cprman_vmstate;
-     device_class_set_props(dc, cprman_properties);
- }
- 
-@@ -156,8 +263,9 @@ static const TypeInfo cprman_info = {
- };
- 
- static void cprman_register_types(void)
- {
-     type_register_static(&cprman_info);
-+    type_register_static(&cprman_pll_info);
- }
- 
- type_init(cprman_register_types);
--- 
-2.28.0
+> ---
+>  scripts/coccinelle/qobject-parent-type.cocci | 26 ++++++++++++++++++++
+>  include/hw/acpi/vmgenid.h                    |  2 +-
+>  include/hw/misc/vmcoreinfo.h                 |  2 +-
+>  include/net/can_host.h                       |  2 +-
+>  MAINTAINERS                                  |  1 +
+>  5 files changed, 30 insertions(+), 3 deletions(-)
+>  create mode 100644 scripts/coccinelle/qobject-parent-type.cocci
+>
+> diff --git a/scripts/coccinelle/qobject-parent-type.cocci
+> b/scripts/coccinelle/qobject-parent-type.cocci
+> new file mode 100644
+> index 0000000000..9afb3edd97
+> --- /dev/null
+> +++ b/scripts/coccinelle/qobject-parent-type.cocci
+> @@ -0,0 +1,26 @@
+> +// Highlight object declarations that don't look like object class but
+> +// accidentally inherit from it.
+> +
+> +@match@
+> +identifier obj_t, fld;
+> +type parent_t =3D~ ".*Class$";
+> +@@
+> +struct obj_t {
+> +    parent_t fld;
+> +    ...
+> +};
+> +
+> +@script:python filter depends on match@
+> +obj_t << match.obj_t;
+> +@@
+> +is_class_obj =3D obj_t.endswith('Class')
+> +cocci.include_match(not is_class_obj)
+> +
+> +@replacement depends on filter@
+> +identifier match.obj_t, match.fld;
+> +type match.parent_t;
+> +@@
+> +struct obj_t {
+> +*   parent_t fld;
+> +    ...
+> +};
+> diff --git a/include/hw/acpi/vmgenid.h b/include/hw/acpi/vmgenid.h
+> index d50fbacb8e..cb4ad37fc5 100644
+> --- a/include/hw/acpi/vmgenid.h
+> +++ b/include/hw/acpi/vmgenid.h
+> @@ -19,7 +19,7 @@
+>  OBJECT_DECLARE_SIMPLE_TYPE(VmGenIdState, VMGENID)
+>
+>  struct VmGenIdState {
+> -    DeviceClass parent_obj;
+> +    DeviceState parent_obj;
+>      QemuUUID guid;                /* The 128-bit GUID seen by the guest =
+*/
+>      uint8_t vmgenid_addr_le[8];   /* Address of the GUID (little-endian)=
+ */
+>  };
+> diff --git a/include/hw/misc/vmcoreinfo.h b/include/hw/misc/vmcoreinfo.h
+> index ebada6617a..0b7b55d400 100644
+> --- a/include/hw/misc/vmcoreinfo.h
+> +++ b/include/hw/misc/vmcoreinfo.h
+> @@ -24,7 +24,7 @@ DECLARE_INSTANCE_CHECKER(VMCoreInfoState, VMCOREINFO,
+>  typedef struct fw_cfg_vmcoreinfo FWCfgVMCoreInfo;
+>
+>  struct VMCoreInfoState {
+> -    DeviceClass parent_obj;
+> +    DeviceState parent_obj;
+>
+>      bool has_vmcoreinfo;
+>      FWCfgVMCoreInfo vmcoreinfo;
+> diff --git a/include/net/can_host.h b/include/net/can_host.h
+> index 4e3ce3f954..caab71bdda 100644
+> --- a/include/net/can_host.h
+> +++ b/include/net/can_host.h
+> @@ -35,7 +35,7 @@
+>  OBJECT_DECLARE_TYPE(CanHostState, CanHostClass, CAN_HOST)
+>
+>  struct CanHostState {
+> -    ObjectClass oc;
+> +    Object oc;
+>
+>      CanBusState *bus;
+>      CanBusClientState bus_client;
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 5eed1e692b..2160b8196a 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -2402,6 +2402,7 @@ F: qobject/
+>  F: include/qapi/qmp/
+>  X: include/qapi/qmp/dispatch.h
+>  F: scripts/coccinelle/qobject.cocci
+> +F: scripts/coccinelle/qobject-parent-type.cocci
+>  F: tests/check-qdict.c
+>  F: tests/check-qjson.c
+>  F: tests/check-qlist.c
+> --
+> 2.28.0
+>
 
 
