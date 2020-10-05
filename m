@@ -2,83 +2,88 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA377C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 20:38:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01642C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 20:54:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A5E2204EA
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 20:38:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A5E2204EA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 8781C2078E
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 20:54:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aJmijmEb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8781C2078E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPXFE-0006yw-DZ
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 16:38:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34202)
+	id 1kPXV5-00034Z-G7
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 16:54:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40582)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kPWyV-0006Fo-Ir
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 16:20:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35720)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kPWyT-00024S-8z
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 16:20:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kPWyQ-0005rJ-WB
- for <qemu-devel@nongnu.org>; Mon, 05 Oct 2020 20:20:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id EE6692E80E9
- for <qemu-devel@nongnu.org>; Mon,  5 Oct 2020 20:20:42 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kPXTK-0001Uq-Cf
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 16:52:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25413)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kPXTI-0005pH-Ay
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 16:52:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601931154;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=Dot6P37PxoTmgZTJ7G7tqku4LzWsKUy9rRcBtdXcADw=;
+ b=aJmijmEb4of7BO0xPLrPr42pA2eXv2l7ZsdFOdk4weC5FXfN7MwF/BHPY3jI6fXQ1NRjwu
+ JA+D8muh8juLcB+2mWdWJuknqnOO8Qfx8yPiCxFKk6luzAZlpNwHk2DSLp0o9yc4GJQiSN
+ icgd1yBMsLis15fRZ25z+rz/rpHqdpc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-510-g5AXRIj8O5mmlu_GpEFXwg-1; Mon, 05 Oct 2020 16:52:30 -0400
+X-MC-Unique: g5AXRIj8O5mmlu_GpEFXwg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 320C018A072C
+ for <qemu-devel@nongnu.org>; Mon,  5 Oct 2020 20:52:29 +0000 (UTC)
+Received: from localhost (ovpn-119-102.rdu2.redhat.com [10.10.119.102])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E483F18E3C;
+ Mon,  5 Oct 2020 20:52:28 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/3] docs: Include QTest protocol and libqtest API on
+ documentation
+Date: Mon,  5 Oct 2020 16:52:25 -0400
+Message-Id: <20201005205228.697463-1-ehabkost@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 05 Oct 2020 20:11:08 -0000
-From: mcandre <1772165@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Wishlist;
- assignee=None; 
-X-Launchpad-Bug-Tags: arm usb
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: aditya-govardhan andrew-pennebaker clemd davbac
- dims dougrabson kraxel-redhat pauldzim pmaydell vortelf weberkai
-X-Launchpad-Bug-Reporter: George (vortelf)
-X-Launchpad-Bug-Modifier: mcandre (andrew-pennebaker)
-References: <152673688616.9061.7617411809661975686.malonedeb@chaenomeles.canonical.com>
- <160191065927.25016.14450333329909988777.malone@chaenomeles.canonical.com>
-Message-Id: <CAHXt_SXZpzjYqW1uDUXwWsu0CYRMM=NN_r_avCcHYCz=xZkoHQ@mail.gmail.com>
-Subject: Re: [Bug 1772165] Re: arm raspi2/raspi3 emulation has no USB support
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="d50d1e75c500726862802414f880ee3e3bb759bf"; Instance="production"
-X-Launchpad-Hash: 052535223ff2138a455e8d664c34eb81ea6ae83b
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 16:20:43
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 01:25:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,118 +92,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1772165 <1772165@bugs.launchpad.net>
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Which Beagle boards, Jetson Nano, other devices have rich support from
-qemu? ARM is critical going forward.
+This moves the QTest section of testing.rst to a separate=0D
+document, and include the QTest Protocol specification and=0D
+libqtest API reference in the document.=0D
+=0D
+Eduardo Habkost (3):=0D
+  docs: Move QTest documentation to its own document=0D
+  docs/devel/qtest: Include protocol spec in document=0D
+  docs/devel/qtest: Include libqtest API reference=0D
+=0D
+ docs/devel/index.rst          |  1 +=0D
+ docs/devel/qtest.rst          | 72 ++++++++++++++++++++++++++++++++++=0D
+ docs/devel/testing.rst        | 47 +---------------------=0D
+ tests/qtest/libqos/libqtest.h | 20 +++++-----=0D
+ softmmu/qtest.c               | 73 +++++++++++++++++++++++++++++++----=0D
+ 5 files changed, 150 insertions(+), 63 deletions(-)=0D
+ create mode 100644 docs/devel/qtest.rst=0D
+=0D
+--=20=0D
+2.26.2=0D
+=0D
 
-On Mon, Oct 5, 2020, 10:20 AM Dims <1772165@bugs.launchpad.net> wrote:
-
-> So, is it still true, that QEMU doesn't support USB on Raspberry Pi?
->
-> In other words I can't emulate Raspberry Pi actually?
->
-> What about documentation and QEMU helps? They reports usb for raspi2,
-> for example:
->
-> $qemu-system-arm -machine raspi2 -device help | grep usb-host
-> name "usb-host", bus usb-bus
->
-> Is this incorrect information?
->
-> Also, when I was truing to configure USB passthrough, I was getting
-> permission errors on /dev/usb/* probably indicating it was doing
-> something.
->
-> If it doesn't support usb, then why isn't it write error message?
->
-> --
-> You received this bug notification because you are subscribed to the bug
-> report.
-> https://bugs.launchpad.net/bugs/1772165
->
-> Title:
->   arm raspi2/raspi3 emulation has no USB support
->
-> Status in QEMU:
->   Confirmed
->
-> Bug description:
->   Using Qemu 2.12.0 on ArchLinux.
->
->   Trying to emulate arm device with `qemu-system-arm` and attach usb
->   device for unput using
->
->   ` -usb -device usb-host,bus=3D001,vendorid=3D0x1d6b,productid=3D0x0002 `
->
->   # lsusb returns
->
->   Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
->   Bus 001 Device 014: ID 13d3:3487 IMC Networks
->   Bus 001 Device 004: ID 0457:11af Silicon Integrated Systems Corp.
->   Bus 001 Device 003: ID 0bda:57e6 Realtek Semiconductor Corp.
->   Bus 001 Device 002: ID 0bda:0129 Realtek Semiconductor Corp. RTS5129
-> Card Reader Controller
->   Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
->
->   # qemu returns
->   qemu-system-arm: -device
-> usb-host,bus=3D001,vendorid=3D0x1d6b,productid=3D0x0002: Bus '001' not fo=
-und
->
->
->   Tried with connecting external usb keyboard but that didn't seem to work
-> either.
->
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1772165/+subscriptions
->
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1772165
-
-Title:
-  arm raspi2/raspi3 emulation has no USB support
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  Using Qemu 2.12.0 on ArchLinux.
-
-  Trying to emulate arm device with `qemu-system-arm` and attach usb
-  device for unput using
-
-  ` -usb -device usb-host,bus=3D001,vendorid=3D0x1d6b,productid=3D0x0002 `
-
-  # lsusb returns
-
-  Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
-  Bus 001 Device 014: ID 13d3:3487 IMC Networks =
-
-  Bus 001 Device 004: ID 0457:11af Silicon Integrated Systems Corp. =
-
-  Bus 001 Device 003: ID 0bda:57e6 Realtek Semiconductor Corp. =
-
-  Bus 001 Device 002: ID 0bda:0129 Realtek Semiconductor Corp. RTS5129 Card=
- Reader Controller
-  Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-
-  # qemu returns
-  qemu-system-arm: -device usb-host,bus=3D001,vendorid=3D0x1d6b,productid=
-=3D0x0002: Bus '001' not found
-
-  =
-
-  Tried with connecting external usb keyboard but that didn't seem to work =
-either.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1772165/+subscriptions
 
