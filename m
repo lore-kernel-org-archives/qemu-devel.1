@@ -2,93 +2,102 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 767E7C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 07:28:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A15DBC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 07:41:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAEFB205F4
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 07:28:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA2F820665
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 07:41:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HoXqPLgX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAEFB205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LIsHYoIZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA2F820665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPKuk-0001hv-Vh
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 03:28:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51916)
+	id 1kPL7I-00077p-SN
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 03:41:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54772)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kPKtl-0001CG-1a
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 03:27:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43380)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kPKti-0008GI-PS
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 03:27:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601882821;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=7XBux1vVKLRxoX59ByWau/wYMcf6fvz6wWBxGRdovDs=;
- b=HoXqPLgXrhVh6UEGCaQxGkQ8XHAfwtDEUgWs1vDUaBu3fUKq5uij/5TAgjUwYydbtsWjl3
- DY5sRrsWnz+tBgzuhSJzO1k7vMsueGTtNGlKRVyOd3NqGFbS5vYoAaLFH1R1NN2LvPuz6e
- Jh4s1aGPOc8eWL1jakGsl6RbMC3r588=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-198-v5bmZgLQNNe7aRqW2FLkmg-1; Mon, 05 Oct 2020 03:26:58 -0400
-X-MC-Unique: v5bmZgLQNNe7aRqW2FLkmg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DCD5EE75F;
- Mon,  5 Oct 2020 07:26:56 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-101.ams2.redhat.com
- [10.36.112.101])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 51BAA5D9CD;
- Mon,  5 Oct 2020 07:26:56 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id A91AB10C7796; Mon,  5 Oct 2020 09:26:54 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH v5 10/10] migration: introduce snapshot-{save, load,
- delete} QMP commands
-References: <20201002162747.3123597-1-berrange@redhat.com>
- <20201002162747.3123597-11-berrange@redhat.com>
- <ef01ef63-7b95-88c2-5d31-103d29f9f64f@redhat.com>
-Date: Mon, 05 Oct 2020 09:26:54 +0200
-In-Reply-To: <ef01ef63-7b95-88c2-5d31-103d29f9f64f@redhat.com> (Eric Blake's
- message of "Fri, 2 Oct 2020 14:46:07 -0500")
-Message-ID: <87a6x1cev5.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kPL5r-0006NY-RP
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 03:39:36 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44850)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kPL5o-0001VW-Ir
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 03:39:33 -0400
+Received: by mail-wr1-x443.google.com with SMTP id s12so8313281wrw.11
+ for <qemu-devel@nongnu.org>; Mon, 05 Oct 2020 00:39:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=u7/3ZYjrDiSTRtpD01Uuzh1ZkBI1UjOidLmRUtfaw80=;
+ b=LIsHYoIZ31Veu/PYYzQDg41ddXcMQx4bvbLAM/W8uL0l8NKTEd2sEtQ1Vqh1zQU+L9
+ TL4VUz2hCRFys8KVphRZoiW1WTrbz/ip85E30hx0EVTSDSCyphIFiqZEdWGbuwXbftIU
+ S7DuugyZukSb14J5sHFam/8Gy+XL+0JZUGnFVpwc41xIEortK3ToOISCjyS9Rq/M29Fy
+ PLZdkpOz70LowbBroXBCZdjIEngTWCX1y0+HE0dnJ8IomfDIaJElNM1R3orQL+rgo/l7
+ ilMwfXBM+y7AsnuYmMtTwBnpt21pJMbu8o5b4zWRLddrHe0VETdwOTjZz7EiaRaJUXSb
+ i5Gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=u7/3ZYjrDiSTRtpD01Uuzh1ZkBI1UjOidLmRUtfaw80=;
+ b=A1NjBkiSYt/SZkh5Epp+eypAwxMebDyJeO3HuoQCJrUSTCuLIS+8xIw8T3EUWqS4vI
+ DWVt3caWE3cb3m3jf7/zSIM25HeMYW5IgoIaP2V7Zl5b8r/Z7Qg5LF2vsaHDqLugdRn/
+ DJ66k74crLBTu6J4LDxSxhGEFEhcJ0eRl+3Bk0bCmnEcXoDoP6Y8UuI6WrB/8jJ0+2yt
+ FMHrjAitn4qXzxI6SgOBOCL+ZsOEYAcEqk/3bv7iWGQa2X1NWyZ1uwflCC50DG7IiTpq
+ Z3WVBb1nRUgKs6rNipV/EZPxle+EURGmOjXgu2RxgRSiBorH3ar2JNNdfZNhn/FN/ayp
+ r1sw==
+X-Gm-Message-State: AOAM530YrNn5oHpRG0KGPFyvaD75AmlMmdHZd0ydsSaOM2QV8vYdOFhC
+ E7n9m8P39ACX6cxMSYpPTTQ=
+X-Google-Smtp-Source: ABdhPJx6SryB5GScwhnf1zbT/cfoWJbjvzjtqi5cQx1fXsLdaWqSz9wBnK3dQj5HbuFWYHTxNIsPsw==
+X-Received: by 2002:a5d:4c52:: with SMTP id n18mr15668574wrt.267.1601883570873; 
+ Mon, 05 Oct 2020 00:39:30 -0700 (PDT)
+Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id 18sm11471532wmj.28.2020.10.05.00.39.28
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 05 Oct 2020 00:39:30 -0700 (PDT)
+Subject: Re: [PATCH 15/16] target/mips/cpu: Do not allow system-mode use
+ without input clock
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Igor Mammedov <imammedo@redhat.com>, Thomas Huth <thuth@redhat.com>
+References: <20200928171539.788309-1-f4bug@amsat.org>
+ <20200928171539.788309-16-f4bug@amsat.org>
+ <20200929150154.04f77949@redhat.com>
+ <35db3210-8165-6fe8-c835-22970fb31c93@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <2e1ef61c-688d-0a1d-ae0a-1cc11d555cd4@amsat.org>
+Date: Mon, 5 Oct 2020 09:39:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <35db3210-8165-6fe8-c835-22970fb31c93@amsat.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 01:25:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -38
-X-Spam_score: -3.9
-X-Spam_bar: ---
-X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.745,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.248, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,266 +110,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>, "Denis V.
- Lunev" <den@virtuozzo.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Damien Hedde <damien.hedde@greensocs.com>,
+ Huacai Chen <zltjiangshi@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Paul Burton <paulburton@kernel.org>,
+ "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>, Cleber Rosa <crosa@redhat.com>,
+ Huacai Chen <chenhc@lemote.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
++Thomas for qtest
 
-> On 10/2/20 11:27 AM, Daniel P. Berrang=C3=A9 wrote:
->> savevm, loadvm and delvm are some of the few HMP commands that have neve=
-r
->> been converted to use QMP. The reasons for the lack of conversion are
->> that they blocked execution of the event thread, and the semantics
->> around choice of disks were ill-defined.
->>=20
->> Despite this downside, however, libvirt and applications using libvirt
->> have used these commands for as long as QMP has existed, via the
->> "human-monitor-command" passthrough command. IOW, while it is clearly
->> desirable to be able to fix the problems, they are not a blocker to
->> all real world usage.
->>=20
->> Meanwhile there is a need for other features which involve adding new
->> parameters to the commands. This is possible with HMP passthrough, but
->> it provides no reliable way for apps to introspect features, so using
->> QAPI modelling is highly desirable.
->>=20
->> This patch thus introduces new snapshot-{load,save,delete} commands to
->> QMP that are intended to replace the old HMP counterparts. The new
->> commands are given different names, because they will be using the new
->> QEMU job framework and thus will have diverging behaviour from the HMP
->> originals. It would thus be misleading to keep the same name.
->>=20
->> While this design uses the generic job framework, the current impl is
->> still blocking. The intention that the blocking problem is fixed later.
->> None the less applications using these new commands should assume that
->> they are asynchronous and thus wait for the job status change event to
->> indicate completion.
->>=20
->> In addition to using the job framework, the new commands require the
->> caller to be explicit about all the block device nodes used in the
->> snapshot operations, with no built-in default heuristics in use.
->>=20
->> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->> ---
->
->> +++ b/qapi/job.json
->> @@ -22,10 +22,17 @@
->>  #
->>  # @amend: image options amend job type, see "x-blockdev-amend" (since 5=
-.1)
->>  #
->> +# @snapshot-load: snapshot load job type, see "snapshot-load" (since 5.=
-2)
->> +#
->> +# @snapshot-save: snapshot save job type, see "snapshot-save" (since 5.=
-2)
->> +#
->> +# @snapshot-delete: snapshot delete job type, see "snapshot-delete" (si=
-nce 5.2)
->> +#
->>  # Since: 1.7
->>  ##
->>  { 'enum': 'JobType',
->> -  'data': ['commit', 'stream', 'mirror', 'backup', 'create', 'amend'] }
->> +  'data': ['commit', 'stream', 'mirror', 'backup', 'create', 'amend',
->> +           'snapshot-load', 'snapshot-save', 'snapshot-delete'] }
->> =20
->>  ##
->>  # @JobStatus:
->> diff --git a/qapi/migration.json b/qapi/migration.json
->> index 7f5e6fd681..d2bd551ad9 100644
->> --- a/qapi/migration.json
->> +++ b/qapi/migration.json
->> @@ -1787,3 +1787,123 @@
->>  # Since: 5.2
->>  ##
->>  { 'command': 'query-dirty-rate', 'returns': 'DirtyRateInfo' }
->> +
->> +##
->> +# @snapshot-save:
->> +#
->> +# Save a VM snapshot
->> +#
->> +# @job-id: identifier for the newly created job
->> +# @tag: name of the snapshot to create
->> +# @devices: list of block device node names to save a snapshot to
->> +# @vmstate: block device node name to save vmstate to
->
-> Here, you document vmstate last,...
->
->> +#
->> +# Applications should not assume that the snapshot save is complete
->> +# when this command returns. The job commands / events must be used
->> +# to determine completion and to fetch details of any errors that arise=
-.
->> +#
->> +# Note that the VM CPUs will be paused during the time it takes to
->> +# save the snapshot
-
-End the sentence with a period, please.
-
-> "will be", or "may be"?  As you stated above, we may be able to lift the
-> synchronous limitations down the road, while still maintaining the
-> present interface of using this command to start the job and waiting on
-> the job id until it is finished, at which point the CPUs might not need
-> to be paused as much.
-
-Could also add a sentence like "This may change in the future".
-
->> +#
->> +# It is strongly recommended that @devices contain all writable
->> +# block device nodes if a consistent snapshot is required.
->> +#
->> +# If @tag already exists, an error will be reported
->> +#
->> +# Returns: nothing
->> +#
->> +# Example:
->> +#
->> +# -> { "execute": "snapshot-save",
->> +#      "data": {
->> +#         "job-id": "snapsave0",
->> +#         "tag": "my-snap",
->> +#         "vmstate": "disk0",
->> +#         "devices": ["disk0", "disk1"]
->
-> ...here vmstate occurs before devices.  I don't know if our doc
-> generator cares about inconsistent ordering.
-
-It does not.  It's questionable style, though.  Easy enough to tidy up.
-
->> +#      }
->> +#    }
->> +# <- { "return": { } }
->> +#
->> +# Since: 5.2
->> +##
->> +{ 'command': 'snapshot-save',
->> +  'data': { 'job-id': 'str',
->> +            'tag': 'str',
->> +            'vmstate': 'str',
->> +            'devices': ['str'] } }
->> +
->> +##
->> +# @snapshot-load:
->> +#
->> +# Load a VM snapshot
->> +#
->> +# @job-id: identifier for the newly created job
->> +# @tag: name of the snapshot to load.
->> +# @devices: list of block device node names to load a snapshot from
->> +# @vmstate: block device node name to load vmstate from
->> +#
->> +# Applications should not assume that the snapshot save is complete
->> +# when this command returns. The job commands / events must be used
->> +# to determine completion and to fetch details of any errors that arise=
-.
->
-> s/save/load/
->
->> +#
->> +# Note that the VM CPUs will be paused during the time it takes to
->> +# save the snapshot
-
-End the sentence with a period, please.
-
-> s/save/load/
->
-> But while pausing CPUs during save is annoying, pausing CPUs during
-> restore makes sense (after all, executing on stale data that will still
-> be updated during the restore is just wasted execution).
->
->
->> +#
->> +# It is strongly recommended that @devices contain all writable
->> +# block device nodes that can have changed since the original
->> +# @snapshot-save command execution.
->> +#
->> +# Returns: nothing
->> +#
->> +# Example:
->> +#
->> +# -> { "execute": "snapshot-load",
->> +#      "data": {
->> +#         "job-id": "snapload0",
->> +#         "tag": "my-snap",
->> +#         "vmstate": "disk0",
->> +#         "devices": ["disk0", "disk1"]
->> +#      }
->> +#    }
->> +# <- { "return": { } }
->> +#
->> +# Since: 5.2
->> +##
->> +{ 'command': 'snapshot-load',
->> +  'data': { 'job-id': 'str',
->> +            'tag': 'str',
->> +            'vmstate': 'str',
->> +            'devices': ['str'] } }
->> +
->> +##
->> +# @snapshot-delete:
->> +#
->> +# Delete a VM snapshot
->> +#
->> +# @job-id: identifier for the newly created job
->> +# @tag: name of the snapshot to delete.
->> +# @devices: list of block device node names to delete a snapshot from
->> +#
->> +# Applications should not assume that the snapshot save is complete
->> +# when this command returns. The job commands / events must be used
->> +# to determine completion and to fetch details of any errors that arise=
-.
->
-> Do we have a query- command handy to easily learn which snapshot names
-> are even available to attempt deletion on?  If not, that's worth a
-> separate patch.
-
-Oh, I missed that one.  It's the QMP equivalent to "info snapshots", and
-it is required to finish the job.  Since we're at v5, I'd be okay with a
-follow-up patch, as long as it is done for 5.2.
-
->> +#
->> +# Returns: nothing
->> +#
->> +# Example:
->> +#
->> +# -> { "execute": "snapshot-delete",
->> +#      "data": {
->> +#         "job-id": "snapdelete0",
->> +#         "tag": "my-snap",
->> +#         "devices": ["disk0", "disk1"]
->> +#      }
->> +#    }
->> +# <- { "return": { } }
->> +#
->> +# Since: 5.2
->> +##
-
-With the doc comment nits addressed, and with new command
-query-snapshots either included or promised for later in 5.2:
-Acked-by: Markus Armbruster <armbru@redhat.com>
-
->
->> +++ b/tests/qemu-iotests/group
->> @@ -291,6 +291,7 @@
->>  277 rw quick
->>  279 rw backing quick
->>  280 rw migration quick
->> +310 rw quick
->>  281 rw quick
->>  282 rw img quick
->>  283 auto quick
->
-> What's wrong with sorted order? I get the renumbering to appease a merge
-> conflict, but it also requires rearrangement ;)
+On 9/29/20 4:40 PM, Philippe Mathieu-Daudé wrote:
+> On 9/29/20 3:01 PM, Igor Mammedov wrote:
+>> On Mon, 28 Sep 2020 19:15:38 +0200
+>> Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>
+>>> Now than all QOM users provides the input clock, do not allow
+>>> using a CPU core without its input clock connected on system-mode
+>>> emulation. For user-mode, keep providing a fixed 200 MHz clock,
+>>> as it used by the RDHWR instruction (see commit cdfcad788394).
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>> ---
+>>> Cc: Igor Mammedov <imammedo@redhat.com>
+>>>
+>>> We need the qtest check for tests/qtest/machine-none-test.c
+>>> which instanciate a CPU with the none machine. Igor, is it
+>>> better to remove the MIPS targets from the test cpus_map[]?
+>>
+>> I don't get idea, could you rephrase/elaborate?
+> 
+> cpu_class_init sets:
+> 
+>     /*
+>      * Reason: CPUs still need special care by board code: wiring up
+>      * IRQs, adding reset handlers, halting non-first CPUs, ...
+>      */
+>     dc->user_creatable = false;
+> 
+> but the CPUs are created via another path in vl.c:
+> 
+>         current_machine->cpu_type = parse_cpu_option(cpu_option);
+> 
+> The machine-none-test assumes CPU objects are user-creatable.
+> 
+> With this patch I enforce MIPS CPU to have an input clock
+> connected, so they are not user-creatable anymore.
+> 
+> I tried this code ...:
+> 
+> --- a/target/mips/cpu.c
+> +++ b/target/mips/cpu.c
+> @@ -229,7 +229,11 @@ static const TypeInfo mips_cpu_type_info = {
+>  static void mips_cpu_cpudef_class_init(ObjectClass *oc, void *data)
+>  {
+>      MIPSCPUClass *mcc = MIPS_CPU_CLASS(oc);
+> +    DeviceClass *dc = DEVICE_CLASS(oc);
+> +
+>      mcc->cpu_def = data;
+> +    /* Reason: clock need to be wired up */
+> +    dc->user_creatable = false;
+>  }
+> 
+> ... but it is ignored, the CPU can still be created.
+> 
+> Not sure how to handle this.
+> 
+>>
+>>> ---
+>>>  target/mips/cpu.c | 8 ++++++++
+>>>  1 file changed, 8 insertions(+)
+>>>
+>>> diff --git a/target/mips/cpu.c b/target/mips/cpu.c
+>>> index 2f75216c324..cc4ee75af30 100644
+>>> --- a/target/mips/cpu.c
+>>> +++ b/target/mips/cpu.c
+>>> @@ -25,6 +25,7 @@
+>>>  #include "kvm_mips.h"
+>>>  #include "qemu/module.h"
+>>>  #include "sysemu/kvm.h"
+>>> +#include "sysemu/qtest.h"
+>>>  #include "exec/exec-all.h"
+>>>  #include "hw/qdev-clock.h"
+>>>  #include "hw/qdev-properties.h"
+>>> @@ -159,11 +160,18 @@ static void mips_cpu_realizefn(DeviceState *dev, Error **errp)
+>>>      Error *local_err = NULL;
+>>>  
+>>>      if (!clock_get(cs->clock)) {
+>>> +#ifdef CONFIG_USER_ONLY
+>>>          /*
+>>>           * Initialize the frequency to 200MHz in case
+>>>           * the clock remains unconnected.
+>>>           */
+>>>          clock_set_hz(cs->clock, 200000000);
+>>> +#else
+>>> +        if (!qtest_enabled()) {
+>>> +            error_setg(errp, "CPU clock must be connected to a clock source");
+>>> +            return;
+>>> +        }
+>>> +#endif
+>>>      }
+>>>      mips_cpu_clk_update(cs);
+>>>  
+>>
+> 
 
 
