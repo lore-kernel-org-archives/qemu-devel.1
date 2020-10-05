@@ -2,96 +2,96 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08314C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 10:50:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45FB3C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 10:52:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7843E2083B
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 10:50:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B5A552075A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 10:52:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="E2KNUjxm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7843E2083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BLI0v3WD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5A552075A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPO49-00085E-Cp
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 06:50:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39002)
+	id 1kPO6I-0000lt-Ry
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 06:52:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39488)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kPO32-0007em-20
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 06:48:52 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43757)
+ (Exim 4.90_1) (envelope-from <74cmonty@gmail.com>)
+ id 1kPO5Z-0000EG-Pj; Mon, 05 Oct 2020 06:51:29 -0400
+Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:36077)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kPO2z-0001D4-NE
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 06:48:51 -0400
-Received: by mail-wr1-x443.google.com with SMTP id g12so3560851wrp.10
- for <qemu-devel@nongnu.org>; Mon, 05 Oct 2020 03:48:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=P9gU8ZNa/Cy3R6kc7LXLMx5orvGKQrA7KN2BHyDXrAQ=;
- b=E2KNUjxmJO0akFlCS5EZgFIT4MIGkNzTqTwAWZyhSy5StRSQFpcwo2/hYuXbdmd3YB
- no77fOwTko8pOC+tyFgINEhKoa4IE8A36zgETH9t3W2DxD6V+Hne0v3t/DRGBSv0iA/b
- iSTWwcCVH4cJ0NmoQoFKbOq5wyNdcbUkxjKbCV0gskoL/egbRo7YY9MFAvSJbxNy/Eqv
- TdNYj5bOJupeQ5E2aoIUqaVrFh1qEzjTpN6KY+Cr1QsDdmqJ4En/a1G/3GGgaSUX7+Fy
- tG1BENzRcbUwMPpvOzFuzOCQnChYDvS+fRaSGuFtJ2N7TLanLT91573FjOaouoOlcycy
- IV7A==
+ (Exim 4.90_1) (envelope-from <74cmonty@gmail.com>)
+ id 1kPO5X-0001XG-50; Mon, 05 Oct 2020 06:51:29 -0400
+Received: by mail-ej1-x641.google.com with SMTP id qp15so11225519ejb.3;
+ Mon, 05 Oct 2020 03:51:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-transfer-encoding;
+ bh=zlomqrOhtPoc70L+vuBIPNvjCF/pYjLzg+HplJ0eKC0=;
+ b=BLI0v3WDQskJrV4IrM0ybWiJfV3gQtMGNnVV1D9T2Bz6nSKIRXriLr9WF7J/DS6ViG
+ zkYqkNc78eD8OYKMU5zfk1nQX0JLjBw4thPvkN2KgYtUQMCDZ2k6PlozPYz8Ebu7UR/1
+ yVMihR0RvFfr21kocl7zoS4jkGS50fPAoV/Fs2HSsV6QkNKBxMMKtwticWCNY2miResK
+ MX7h12VkUQ2DWRPwUMCCoFXnVjoOhTRba76kPiE5KX7sWwtLCifCb6lKIs8O5G0hFzL3
+ XgdyvwKZ0hX0IPI3BN0kh+6WAcUMyfxerqcjB3EHeCnn2vQOSgmr1Wi7msC6Q0J/11II
+ f4XQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=P9gU8ZNa/Cy3R6kc7LXLMx5orvGKQrA7KN2BHyDXrAQ=;
- b=STMAAVGdZGfs5ID6ChELBIdELIIyEVIzx9qsqEoN3gEXBW3favaSvscieFAlFNM6/8
- d7iDr6j2s1rNtFz7IezGXw9MqZRSg5ZtfNY1VKh4ewjZYQJTeajC8F51oKfIANs/Q+ck
- euhNIGisC5j1PachqrmMHFbLmWuKRLu99cNDR8UMVTYmNXwAty2qqeA+0QnRL0xO8iit
- vtRxOWLNBsqluKbSmMY24B7yranOwwblvKb7AxCFrd1m0//BA2T18etlOjyu9zQaRg13
- rLKUt+VbvkWwLoCr6vxnbIZLXUUzf3k1PmCWZYjed3WFxdwRXBXiLIdhZFSvveC46E/P
- zT8g==
-X-Gm-Message-State: AOAM531BlrhV1YGwawU1dDwYw+LZWTFW/VF++W+d5ePQXKSfCWQQQTm5
- uUiP1xg0vPiOKSyymjsm5U7lBg==
-X-Google-Smtp-Source: ABdhPJycgP8sYTVERJBOsHCP+GB6qkCwYHMneuOQSeUhI2OtTWUjVTLpa5LixLyHyE10QOQprWf2aA==
-X-Received: by 2002:a5d:61c7:: with SMTP id q7mr17198303wrv.343.1601894927472; 
- Mon, 05 Oct 2020 03:48:47 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a5sm12625312wrp.37.2020.10.05.03.48.46
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 05 Oct 2020 03:48:46 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id AF6181FF7E;
- Mon,  5 Oct 2020 11:48:45 +0100 (BST)
-References: <20201001163429.1348-1-luoyonggang@gmail.com>
- <20201001163429.1348-6-luoyonggang@gmail.com>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Yonggang Luo <luoyonggang@gmail.com>
-Subject: Re: [PATCH v3 5/6] plugin: getting qemu_plugin_get_hwaddr only
- expose one function prototype
-In-reply-to: <20201001163429.1348-6-luoyonggang@gmail.com>
-Date: Mon, 05 Oct 2020 11:48:45 +0100
-Message-ID: <87pn5x2bjm.fsf@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-transfer-encoding;
+ bh=zlomqrOhtPoc70L+vuBIPNvjCF/pYjLzg+HplJ0eKC0=;
+ b=VyfRP6NAhWqIRoD9SY26NZjGMSJQPK+Hfd2XPynyj4Wa9MRKF3JnXy2+L5ZfnUfBvE
+ 6e6+OWBJSvy8qqk1LuJEX0j3UgwmsUO9SN9SduQVDlUaiwWb4dZbSAO+EIbIe9JuonvL
+ Qpa5+eqMezddqD6ctjMmPtQZIZVwIRJM9WRXX2aRrAdSxTEgqnPgjQX8zgiVBRV8T28k
+ 5vrvfWU393b5BQ1Vcv4ucBS4VoRf36oAkWZpKGhipwNUz37g+fcnG8N/I9qVZSjmQ1og
+ KpDxJk/H4WF4hskdsPW9ITzeqvqdNP1JBdjWWepb7HvRADcUuedYAci35YEhBoUyxX4H
+ KixA==
+X-Gm-Message-State: AOAM532flAkpIL7rQvcYPHK9Wp/p/6ZUQsy/da6zwt5VJSeX0HlGID/S
+ 4xLr0Qchv3IU1q9vwp+l/uA=
+X-Google-Smtp-Source: ABdhPJwj9d/4ggZf13j2Iv+gSgLTGnY5Gjk5oF2jPz6ugiIQNa1CFlBC83g/Ubap//vkQc5eFxhAlg==
+X-Received: by 2002:a17:906:f14b:: with SMTP id
+ gw11mr14663475ejb.41.1601895083880; 
+ Mon, 05 Oct 2020 03:51:23 -0700 (PDT)
+Received: from [10.16.55.97] ([193.16.224.1])
+ by smtp.gmail.com with ESMTPSA id d25sm8344254edq.52.2020.10.05.03.51.22
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 05 Oct 2020 03:51:23 -0700 (PDT)
+Subject: Re: Emulate Rpi with QEMU fails
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <47dbcad4-3121-b1c3-06fa-abec7c353fb6@gmail.com>
+ <87sgatanti.fsf@linaro.org>
+ <CAFEAcA_ZMLV3DZ_R_SHvPLdEf=i-xpspD5itBmfYeqyMhgtLWQ@mail.gmail.com>
+ <875z7p3t9e.fsf@linaro.org>
+From: Thomas Schneider <74cmonty@gmail.com>
+Message-ID: <e43be86d-1847-199f-4cbd-2e3bd124d70a@gmail.com>
+Date: Mon, 5 Oct 2020 12:51:21 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
+In-Reply-To: <875z7p3t9e.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::641;
+ envelope-from=74cmonty@gmail.com; helo=mail-ej1-x641.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,69 +105,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hello,
 
-Yonggang Luo <luoyonggang@gmail.com> writes:
+thanks for your replies.
 
-> This is used for counting how much function are export to qemu plugin.
+I must admit that I don't fully understand your analysis.
+However you made some conclusions that are correct.
+
+In fact I have found a Github repo 
+<https://github.com/dhruvvyas90/qemu-rpi-kernel> where a specific kernel 
+and versatile-pb are provided + instructions for lauching the emulation 
+with the original RPi image file:
+$ qemu-system-arm \
+   -M versatilepb \
+   -cpu arm1176 \
+   -m 256 \
+   -drive 
+"file=/.../2020-05-27-raspios-buster-lite-armhf.img,if=none,index=0,media=disk,format=raw,id=disk0" 
+\
+   -device 
+"virtio-blk-pci,drive=disk0,disable-modern=on,disable-legacy=off" \
+   -net "user,hostfwd=tcp::5022-:22" \
+   -dtb /.../versatile-pb-buster-5.4.51.dtb \
+   -kernel /.../kernel-qemu-5.4.51-buster \
+   -append 'root=/dev/vda2 panic=1' \
+   -no-reboot
+
+This means it is more recent than the Raspberry Pi Geek article, and the 
+emulation works.
+But I'm not sure if this usable considering the added models -M raspi2 
+and -M raspi3.
+
+Can you please advise how to proceed?
+
+In addition I would like to know if there's a memory limitation using 
+models -M raspi2 and -M raspi3?
+To my understanding there's a limitation to 256MB using -M versatilepb.
+If yes, I consider to another raw image located on host's temporary 
+filesystem and use this a swap in the client.
+
+And how can I make use of a client network device that is based on 
+host's tap device connected to a network bridge?
+
+THX
+
+
+Am 05.10.2020 um 11:40 schrieb Alex Bennée:
+> Peter Maydell <peter.maydell@linaro.org> writes:
 >
-> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-> ---
->  plugins/api.c | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
+>> On Sun, 4 Oct 2020 at 18:44, Alex Bennée <alex.bennee@linaro.org> wrote:
+>>> Thomas <74cmonty@gmail.com> writes:
+>>>> I'm trying to emulate Rpi with QEMU.
+>>>> I found
+>>>> [url=1]this[/url]
+>>>> arcticle in Raspberry Pi Geek documenting the steps including persistent
+>>>> storage on host.
+>>>>
+>>>> However when starting the emulation with command
+>>>> qemu-system-arm -M versatilepb -cpu arm1176 -m 256 -serial stdio -hda
+>>>> 2020-08-20-raspios-buster-armhf-lite.img -net
+>>>> "user,hostfwd=tcp::5022-:22" -dtb versatile-pb-buster.dtb -kernel
+>>>> kernel-qemu-5.4.51-buster -append "root=/dev/sda2 rootfstype=ext4 rw
+>>>> panic=1" -no-reboot
+>>> Let's start with the fact you are using a versatilepb machine type with
+>>> a versatilepb dtb and not the rasppi model.
+>> Given the name of the kernel image, this probably actually *is*
+>> built for versatilepb, or it wouldn't have got as far as failing
+>> to mount the root partition. There seems to be a lot of confusion
+>> in the raspberry pi community about the difference between
+>> running the raspi userspace plus a for-versatilepb kernel
+>> versus running a full raspi setup.
+> Ahh your German is considerably better than mine ;-) Looking more
+> closely at the blog it seems to be predicated on extracting a Raspbian
+> kernel which at least stands a fighting chance of being a multi_config
+> kernel - like the buster above.
 >
-> diff --git a/plugins/api.c b/plugins/api.c
-> index f16922ca8b..d325084385 100644
-> --- a/plugins/api.c
-> +++ b/plugins/api.c
-> @@ -252,10 +252,12 @@ bool qemu_plugin_mem_is_store(qemu_plugin_meminfo_t=
- info)
->=20=20
->  #ifdef CONFIG_SOFTMMU
->  static __thread struct qemu_plugin_hwaddr hwaddr_info;
-> +#endif
->=20=20
->  struct qemu_plugin_hwaddr *qemu_plugin_get_hwaddr(qemu_plugin_meminfo_t =
-info,
->                                                    uint64_t vaddr)
->  {
-> +#ifdef CONFIG_SOFTMMU
->      CPUState *cpu =3D current_cpu;
->      unsigned int mmu_idx =3D info >> TRACE_MEM_MMU_SHIFT;
->      hwaddr_info.is_store =3D info & TRACE_MEM_ST;
-> @@ -267,14 +269,10 @@ struct qemu_plugin_hwaddr *qemu_plugin_get_hwaddr(q=
-emu_plugin_meminfo_t info,
->      }
->=20=20
->      return &hwaddr_info;
-> -}
->  #else
-> -struct qemu_plugin_hwaddr *qemu_plugin_get_hwaddr(qemu_plugin_meminfo_t =
-info,
-> -                                                  uint64_t vaddr)
-> -{
->      return NULL;
-> -}
->  #endif
-> +}
+> I can see why these sorts of shenanigans used to be pulled when there
+> where no RaspPi models although if all you want to do is run an ARM user
+> space what's wrong with using linux-user for this sort of thing?
+>
+>> Anyway, failing to mount the rootfs and not listing any
+>> sda devices is not a problem with the fstab, because the system
+>> hasn't got as far as being able to mount the filesystem with a
+>> fstab on it yet. One possibility is that the kernel is
+>> missing the device drivers for either PCI or for the SCSI
+>> controller that gets plugged in to versatilepb by default.
+>>
+>> My guess at the cause is that you're trying to boot a Linux 5.something
+>> kernel and you've run into the issue described in this thread:
+>> https://lists.gnu.org/archive/html/qemu-discuss/2020-09/msg00023.html
+>> where the Linux 5.x sym53c8xx scsi driver is not compatible with QEMU's
+>> emulation of that device. If that's the case then you should see
+>> earlier in the kernel boot log error messages similar to the ones
+>> that Roger reported. The fix would be either to use an older
+>> kernel, or to change the QEMU commandline to use a different
+>> SCSI controller (or to use a virtio block device).
+> Do we have any documentation for the RaspPi models? The acceptance tests
+> look like they support the inbuilt MMC/SD controller device:
+>
+>          kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
+>                                 serial_kernel_cmdline[uart_id] +
+>                                 ' root=/dev/mmcblk0p2 rootwait ' +
+>                                 'dwc_otg.fiq_fsm_enable=0')
+>
+> It would be useful to fill the hole in the documentation so gently steer
+> people away from these hybrid franken-machine approaches.
+>
+>> thanks
+>> -- PMM
+>
 
-Hmm I'm not sure about this, surely you want the plugin system to
-complain early if your plugin is going to use a function that is
-incorrect for the mode you are running in?
-
-Although we do currently unconditionally export the syscall functions
-and arguably they should be CONFIG_USER only as well.
-
->=20=20
->  bool qemu_plugin_hwaddr_is_io(const struct qemu_plugin_hwaddr *haddr)
->  {
-
-
---=20
-Alex Benn=C3=A9e
 
