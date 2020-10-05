@@ -2,93 +2,82 @@ Return-Path: <SRS0=FSHi=DM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C342AC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 16:21:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 343BDC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 16:23:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A184206DD
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 16:21:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 97A22206DD
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 16:22:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X/D7KW/f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A184206DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hfB7Bnx6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97A22206DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPTEt-0001Cm-Gq
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 12:21:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60046)
+	id 1kPTGM-00029o-IG
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 12:22:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60778)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kPSqF-0004Ao-TB; Mon, 05 Oct 2020 11:56:00 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:40729)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kPSqC-0001YE-QB; Mon, 05 Oct 2020 11:55:59 -0400
-Received: by mail-pf1-x443.google.com with SMTP id w21so7193576pfc.7;
- Mon, 05 Oct 2020 08:55:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=SrkVSypShhYA6dpxFUnwCp8qnWAZDmqFXRpgTELiGHU=;
- b=X/D7KW/fx9ziudkt+fjyondUMfrOwwCHJGW7d5mK9eFLxudVgDXO6FvIusjNQqBII+
- Zggwzy91ynhVaTKrffjQBFNDyos3RqSDWSrMoAjl0BigI0fnI+cIYHayzlz+K/gNZuBb
- cj6/BtYu+luSVzyoEw3ubYT3OrhPP9CTzxWSCa8I0nn4qf9oPOWw+0yjOZMxGpezG/tt
- rlrve6svPHzTVQ5YJt30q5qj4PBgCM6KY2d3uSDTs2akmW5bbSPbikQG0pqy/oKxj0ql
- NVokl8tloXJZCBAfvioOdNERC4g2/YZ9IPGVb7yGYCdOeUZBMLB/Cx09DZ1ddigb/Shm
- StTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=SrkVSypShhYA6dpxFUnwCp8qnWAZDmqFXRpgTELiGHU=;
- b=WmEcUCj2g/CCdByMtEsZXp2Ocxiz4IQCQYP3lTIrICP+JEQZ9xZzWhwbrGW5lTmYCV
- xsyyKV6HFP0AS66Gg5AHUF8BiKEM//h/ZXKUb6rxodLrUOET77TZsxG1XXkpl6je+19A
- SktesSSESC6Dtn17ZBHbSJLbqU7PtqKsTzizQOPaodRBMjhxxYr54/ibz0SeCMM8/wlQ
- DtUkUZnydoqxgUf2xKdFMmsxWh5E+MZMfVuKzhSi8fqWlReIjgI3PVmuHELG7qAZu2pU
- zylz8UiDMYQpZ4Dr0SJymVIN3rKn1Ro6d8nC4uIYrsK3EL0PHriI8PrxKyUJicLDBqKd
- IAOw==
-X-Gm-Message-State: AOAM533A86ZWOlucS8dBITOQ6O6RvbgG6foeMy6gn5O6Lo+ZpgbMNbcR
- xhPyBvgIX8SqnFbyIQUipphpB3sr9Om6mA==
-X-Google-Smtp-Source: ABdhPJw3QTCnBM8mvRSSTiDYjcLUk5jjNSrKrfbqCtuIfK5GTtVHJslbAU/vwfINBGyy7vQhWBxwKQ==
-X-Received: by 2002:a63:f04c:: with SMTP id s12mr80653pgj.425.1601913354325;
- Mon, 05 Oct 2020 08:55:54 -0700 (PDT)
-Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id u22sm34803pgi.85.2020.10.05.08.55.51
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 05 Oct 2020 08:55:53 -0700 (PDT)
-From: Yonggang Luo <luoyonggang@gmail.com>
-To: qemu-devel@nongnu.org,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Subject: [PATCH v8 4/4] win32: Simplify gmtime_r detection not depends on if
- _POSIX_C_SOURCE are defined on msys2/mingw
-Date: Mon,  5 Oct 2020 23:55:24 +0800
-Message-Id: <20201005155524.442-5-luoyonggang@gmail.com>
-X-Mailer: git-send-email 2.28.0.windows.1
-In-Reply-To: <20201005155524.442-1-luoyonggang@gmail.com>
-References: <20201005155524.442-1-luoyonggang@gmail.com>
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kPStQ-00007v-7m
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 11:59:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42634)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kPStN-00027s-2k
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 11:59:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601913552;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=AzKXRraM8rTXpWRCrk1V7BEMEZH80NPGZBPBria2B+s=;
+ b=hfB7Bnx6xd8BqYQKgu6KpynHYaAUhFyJxIkMgOmPIjqCgnycFwAr8w2ynxqIblDaT9kp6f
+ mBUWurbeTKLEE6nCmCx3Qg8qUNHWrhPlt0HYW/rVFE516vmmKRxnYkGf7I/t6HyTcX3wwQ
+ cUBXLECY6X4LEkmjDSVKo11s8TqnoKo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-379-vkxrSfUbPh6PCJhIjxXQzg-1; Mon, 05 Oct 2020 11:59:08 -0400
+X-MC-Unique: vkxrSfUbPh6PCJhIjxXQzg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97A3D101FFA6;
+ Mon,  5 Oct 2020 15:59:07 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-113-145.ams2.redhat.com
+ [10.36.113.145])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7DC366715F;
+ Mon,  5 Oct 2020 15:59:00 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v8 00/14] monitor: Optionally run handlers in coroutines
+Date: Mon,  5 Oct 2020 17:58:41 +0200
+Message-Id: <20201005155855.256490-1-kwolf@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
- envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 02:11:31
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,196 +90,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>, Yonggang Luo <luoyonggang@gmail.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: kwolf@redhat.com, marcandre.lureau@gmail.com, armbru@redhat.com,
+ stefanha@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We remove the CONFIG_LOCALTIME_R detection option in configure, and move the check
-existence of gmtime_r from configure into C header and source directly by using macro
-`_POSIX_THREAD_SAFE_FUNCTIONS`.
-Before this patch, the configure script are always assume the compiler doesn't define
-_POSIX_C_SOURCE macro at all, but that's not true, because thirdparty library such
-as ncursesw may define -D_POSIX_C_SOURCE in it's pkg-config file. And that C Flags will
-added -D_POSIX_C_SOURCE into each QEMU_CFLAGS. And that's causing the following compiling error:
-n file included from C:/work/xemu/qemu/include/qemu/osdep.h:119,
-                 from ../softmmu/main.c:25:
-C:/work/xemu/qemu/include/sysemu/os-win32.h:53:12: error: redundant redeclaration of 'gmtime_r' [-Werror=redundant-decls]
-   53 | struct tm *gmtime_r(const time_t *timep, struct tm *result);
-      |            ^~~~~~~~
-In file included from C:/work/xemu/qemu/include/qemu/osdep.h:94,
-                 from ../softmmu/main.c:25:
-C:/CI-Tools/msys64/mingw64/x86_64-w64-mingw32/include/time.h:284:36: note: previous definition of 'gmtime_r' was here
-  284 | __forceinline struct tm *__CRTDECL gmtime_r(const time_t *_Time, struct tm *_Tm) {
-      |                                    ^~~~~~~~
-In file included from C:/work/xemu/qemu/include/qemu/osdep.h:119,
-                 from ../softmmu/main.c:25:
-C:/work/xemu/qemu/include/sysemu/os-win32.h:55:12: error: redundant redeclaration of 'localtime_r' [-Werror=redundant-decls]
-   55 | struct tm *localtime_r(const time_t *timep, struct tm *result);
-      |            ^~~~~~~~~~~
-In file included from C:/work/xemu/qemu/include/qemu/osdep.h:94,
-                 from ../softmmu/main.c:25:
-C:/CI-Tools/msys64/mingw64/x86_64-w64-mingw32/include/time.h:281:36: note: previous definition of 'localtime_r' was here
-  281 | __forceinline struct tm *__CRTDECL localtime_r(const time_t *_Time, struct tm *_Tm) {
-      |                                    ^~~~~~~~~~~
-Compiling C object libcommon.fa.p/hw_gpio_zaurus.c.obj
-In file included from C:/work/xemu/qemu/include/qemu/osdep.h:119,
-                 from ../hw/i2c/smbus_slave.c:16:
-C:/work/xemu/qemu/include/sysemu/os-win32.h:53:12: error: redundant redeclaration of 'gmtime_r' [-Werror=redundant-decls]
-   53 | struct tm *gmtime_r(const time_t *timep, struct tm *result);
-      |            ^~~~~~~~
-In file included from C:/work/xemu/qemu/include/qemu/osdep.h:94,
-                 from ../hw/i2c/smbus_slave.c:16:
-C:/CI-Tools/msys64/mingw64/x86_64-w64-mingw32/include/time.h:284:36: note: previous definition of 'gmtime_r' was here
-  284 | __forceinline struct tm *__CRTDECL gmtime_r(const time_t *_Time, struct tm *_Tm) {
-      |                                    ^~~~~~~~
-In file included from C:/work/xemu/qemu/include/qemu/osdep.h:119,
-                 from ../hw/i2c/smbus_slave.c:16:
-C:/work/xemu/qemu/include/sysemu/os-win32.h:55:12: error: redundant redeclaration of 'localtime_r' [-Werror=redundant-decls]
-   55 | struct tm *localtime_r(const time_t *timep, struct tm *result);
-      |            ^~~~~~~~~~~
-In file included from C:/work/xemu/qemu/include/qemu/osdep.h:94,
-                 from ../hw/i2c/smbus_slave.c:16:
-C:/CI-Tools/msys64/mingw64/x86_64-w64-mingw32/include/time.h:281:36: note: previous definition of 'localtime_r' was here
-  281 | __forceinline struct tm *__CRTDECL localtime_r(const time_t *_Time, struct tm *_Tm) {
-      |                                    ^~~~~~~~~~~
-Compiling C object libcommon.fa.p/hw_dma_xilinx_axidma.c.obj
+Some QMP command handlers can block the main loop for a relatively long
+time, for example because they perform some I/O. This is quite nasty.
+Allowing such handlers to run in a coroutine where they can yield (and
+therefore release the BQL) while waiting for an event such as I/O
+completion solves the problem.
 
-After this patch, whenever ncursesw or other thirdparty libraries tried to define or not
-define  _POSIX_C_SOURCE, the source will building properly. Because now, we don't make any
-assumption if _POSIX_C_SOURCE are defined. We solely relied on if the macro `_POSIX_THREAD_SAFE_FUNCTIONS`
-are defined in msys2/mingw header.
+This series adds the infrastructure to allow this and switches
+block_resize to run in a coroutine as a first example.
 
-The _POSIX_THREAD_SAFE_FUNCTIONS are defined in mingw header like this:
+This is an alternative solution to Marc-André's "monitor: add
+asynchronous command type" series.
 
-```
-#if defined(_POSIX_C_SOURCE) && !defined(_POSIX_THREAD_SAFE_FUNCTIONS)
-#define _POSIX_THREAD_SAFE_FUNCTIONS 200112L
-#endif
+v8:
+- Replaced bdrv_co_move_to_aio_context() with bdrv_co_enter()/leave(),
+  added bdrv_co_lock()/unlock() and fixed the iothread support in
+  qmp_block_resize() with the new functions [Stefan]
+- More detailed documentation of 'coroutine' flag for commands [Markus]
+- Improved comment for dropping out of coroutine context in
+  qmp_dispatch() [Markus]
+- Coding style changes [Markus]
+- Resolve some more merge conflicts on rebase
 
-#ifdef _POSIX_THREAD_SAFE_FUNCTIONS
-__forceinline struct tm *__CRTDECL localtime_r(const time_t *_Time, struct tm *_Tm) {
-  return localtime_s(_Tm, _Time) ? NULL : _Tm;
-}
-__forceinline struct tm *__CRTDECL gmtime_r(const time_t *_Time, struct tm *_Tm) {
-  return gmtime_s(_Tm, _Time) ? NULL : _Tm;
-}
-__forceinline char *__CRTDECL ctime_r(const time_t *_Time, char *_Str) {
-  return ctime_s(_Str, 0x7fffffff, _Time) ? NULL : _Str;
-}
-__forceinline char *__CRTDECL asctime_r(const struct tm *_Tm, char * _Str) {
-  return asctime_s(_Str, 0x7fffffff, _Tm) ? NULL : _Str;
-}
-#endif
-```
+v7:
+- Added patch 2 to add a Monitor parameter to monitor_get_cpu_index(),
+  too [Markus]
+- Let monitor_set_cur() return the old monitor [Markus]
+- Fixed comment about linking stub objects in test-util-sockets [Markus]
+- More detailed commit message for per-coroutine current monitor and
+  document that monitor_set_cur(NULL) must be called eventually [Markus]
+- Resolve some merge conflicts on rebase
 
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
----
- configure                 | 34 ----------------------------------
- include/sysemu/os-win32.h |  4 ++--
- util/oslib-win32.c        |  4 ++--
- 3 files changed, 4 insertions(+), 38 deletions(-)
+v6:
+- Fixed cur_mon behaviour: It should always point to the Monitor while
+  we're in the handler coroutine, but be NULL while the handler
+  coroutines has yielded. [Markus]
+- Give HMP handlers the coroutine option, too, because they will call
+  QMP handlers, and life is easier when we know whether we are in
+  coroutine context or not.
+- Fixed block_resize for block devices in iothreads and for HMP
+- Resolved some merge conflict with QAPI generator and monitor
+  refactorings that were merged in the meantime
 
-diff --git a/configure b/configure
-index 6acdd6fa88..19813935b3 100755
---- a/configure
-+++ b/configure
-@@ -2378,37 +2378,6 @@ if test "$vhost_net" = ""; then
-   test "$vhost_kernel" = "yes" && vhost_net=yes
- fi
- 
--##########################################
--# MinGW / Mingw-w64 localtime_r/gmtime_r check
--
--if test "$mingw32" = "yes"; then
--    # Some versions of MinGW / Mingw-w64 lack localtime_r
--    # and gmtime_r entirely.
--    #
--    # Some versions of Mingw-w64 define a macro for
--    # localtime_r/gmtime_r.
--    #
--    # Some versions of Mingw-w64 will define functions
--    # for localtime_r/gmtime_r, but only if you have
--    # _POSIX_THREAD_SAFE_FUNCTIONS defined. For fun
--    # though, unistd.h and pthread.h both define
--    # that for you.
--    #
--    # So this #undef localtime_r and #include <unistd.h>
--    # are not in fact redundant.
--cat > $TMPC << EOF
--#include <unistd.h>
--#include <time.h>
--#undef localtime_r
--int main(void) { localtime_r(NULL, NULL); return 0; }
--EOF
--    if compile_prog "" "" ; then
--        localtime_r="yes"
--    else
--        localtime_r="no"
--    fi
--fi
--
- ##########################################
- # pkg-config probe
- 
-@@ -6715,9 +6684,6 @@ if [ "$bsd" = "yes" ] ; then
-   echo "CONFIG_BSD=y" >> $config_host_mak
- fi
- 
--if test "$localtime_r" = "yes" ; then
--  echo "CONFIG_LOCALTIME_R=y" >> $config_host_mak
--fi
- if test "$qom_cast_debug" = "yes" ; then
-   echo "CONFIG_QOM_CAST_DEBUG=y" >> $config_host_mak
- fi
-diff --git a/include/sysemu/os-win32.h b/include/sysemu/os-win32.h
-index d8978e28c0..5346d51e89 100644
---- a/include/sysemu/os-win32.h
-+++ b/include/sysemu/os-win32.h
-@@ -48,12 +48,12 @@
- #define siglongjmp(env, val) longjmp(env, val)
- 
- /* Missing POSIX functions. Don't use MinGW-w64 macros. */
--#ifndef CONFIG_LOCALTIME_R
-+#ifndef _POSIX_THREAD_SAFE_FUNCTIONS
- #undef gmtime_r
- struct tm *gmtime_r(const time_t *timep, struct tm *result);
- #undef localtime_r
- struct tm *localtime_r(const time_t *timep, struct tm *result);
--#endif /* CONFIG_LOCALTIME_R */
-+#endif /* _POSIX_THREAD_SAFE_FUNCTIONS */
- 
- static inline void os_setup_signal_handling(void) {}
- static inline void os_daemonize(void) {}
-diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-index 051afb217b..e99debfb8d 100644
---- a/util/oslib-win32.c
-+++ b/util/oslib-win32.c
-@@ -106,7 +106,7 @@ void qemu_anon_ram_free(void *ptr, size_t size)
-     }
- }
- 
--#ifndef CONFIG_LOCALTIME_R
-+#ifndef _POSIX_THREAD_SAFE_FUNCTIONS
- /* FIXME: add proper locking */
- struct tm *gmtime_r(const time_t *timep, struct tm *result)
- {
-@@ -130,7 +130,7 @@ struct tm *localtime_r(const time_t *timep, struct tm *result)
-     }
-     return p;
- }
--#endif /* CONFIG_LOCALTIME_R */
-+#endif /* _POSIX_THREAD_SAFE_FUNCTIONS */
- 
- static int socket_error(void)
- {
+v5:
+- Improved comments and documentation [Markus]
+
+v4:
+- Forbid 'oob': true, 'coroutine': true [Markus]
+- Removed Python type hints [Markus]
+- Introduced separate bool qmp_dispatcher_co_shutdown to make it clearer
+  how a shutdown request is signalled to the dispatcher [Markus]
+- Allow using aio_poll() with iohandler_ctx and use that instead of
+  aio_bh_poll() [Markus]
+- Removed coroutine_fn from qmp_block_resize() again because at least
+  one caller (HMP) calls it outside of coroutine context [Markus]
+- Tried to make the synchronisation between dispatcher and the monitor
+  thread clearer, and fixed a race condition
+- Improved documentation and comments
+
+v3:
+- Fix race between monitor thread and dispatcher that could schedule the
+  dispatcher coroutine twice if a second requests comes in before the
+  dispatcher can wake up [Patchew]
+
+v2:
+- Fix typo in a commit message [Eric]
+- Use hyphen instead of underscore for the test command [Eric]
+- Mark qmp_block_resize() as coroutine_fn [Stefan]
+
+
+Kevin Wolf (14):
+  monitor: Add Monitor parameter to monitor_set_cpu()
+  monitor: Add Monitor parameter to monitor_get_cpu_index()
+  monitor: Use getter/setter functions for cur_mon
+  hmp: Update current monitor only in handle_hmp_command()
+  qmp: Assert that no other monitor is active
+  qmp: Call monitor_set_cur() only in qmp_dispatch()
+  monitor: Make current monitor a per-coroutine property
+  qapi: Add a 'coroutine' flag for commands
+  qmp: Move dispatcher to a coroutine
+  hmp: Add support for coroutine command handlers
+  util/async: Add aio_co_reschedule_self()
+  block: Add bdrv_co_enter()/leave()
+  block: Add bdrv_lock()/unlock()
+  block: Convert 'block_resize' to coroutine
+
+ qapi/block-core.json                    |   3 +-
+ docs/devel/qapi-code-gen.txt            |  29 ++++++
+ docs/sphinx/qapidoc.py                  |   2 +-
+ include/block/aio.h                     |  10 ++
+ include/block/block.h                   |  31 ++++++
+ include/monitor/monitor.h               |   7 +-
+ include/qapi/qmp/dispatch.h             |   5 +-
+ monitor/monitor-internal.h              |   7 +-
+ audio/wavcapture.c                      |   8 +-
+ block.c                                 |  50 +++++++++
+ blockdev.c                              |  16 +--
+ dump/dump.c                             |   2 +-
+ hw/core/machine-hmp-cmds.c              |   2 +-
+ hw/scsi/vhost-scsi.c                    |   2 +-
+ hw/virtio/vhost-vsock.c                 |   2 +-
+ migration/fd.c                          |   4 +-
+ monitor/hmp-cmds.c                      |   4 +-
+ monitor/hmp.c                           |  44 ++++++--
+ monitor/misc.c                          |  38 +++----
+ monitor/monitor.c                       | 101 ++++++++++++++++--
+ monitor/qmp-cmds-control.c              |   2 +
+ monitor/qmp-cmds.c                      |   2 +-
+ monitor/qmp.c                           | 131 +++++++++++++++++-------
+ net/socket.c                            |   2 +-
+ net/tap.c                               |   6 +-
+ qapi/qmp-dispatch.c                     |  65 +++++++++++-
+ qapi/qmp-registry.c                     |   3 +
+ qga/main.c                              |   2 +-
+ softmmu/cpus.c                          |   2 +-
+ stubs/monitor-core.c                    |  10 +-
+ tests/test-qmp-cmds.c                   |  10 +-
+ tests/test-util-sockets.c               |  12 +--
+ trace/control.c                         |   2 +-
+ util/aio-posix.c                        |   8 +-
+ util/async.c                            |  30 ++++++
+ util/qemu-error.c                       |   6 +-
+ util/qemu-print.c                       |   3 +-
+ util/qemu-sockets.c                     |   1 +
+ scripts/qapi/commands.py                |  10 +-
+ scripts/qapi/expr.py                    |  11 +-
+ scripts/qapi/introspect.py              |   2 +-
+ scripts/qapi/schema.py                  |  13 ++-
+ tests/qapi-schema/test-qapi.py          |   7 +-
+ hmp-commands.hx                         |   1 +
+ tests/qapi-schema/meson.build           |   1 +
+ tests/qapi-schema/oob-coroutine.err     |   2 +
+ tests/qapi-schema/oob-coroutine.json    |   2 +
+ tests/qapi-schema/oob-coroutine.out     |   0
+ tests/qapi-schema/qapi-schema-test.json |   1 +
+ tests/qapi-schema/qapi-schema-test.out  |   2 +
+ 50 files changed, 573 insertions(+), 143 deletions(-)
+ create mode 100644 tests/qapi-schema/oob-coroutine.err
+ create mode 100644 tests/qapi-schema/oob-coroutine.json
+ create mode 100644 tests/qapi-schema/oob-coroutine.out
+
 -- 
-2.28.0.windows.1
+2.25.4
 
 
