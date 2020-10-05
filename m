@@ -3,86 +3,91 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BBC1C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 13:56:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33E9CC4363D
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 13:57:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B45D2068D
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 13:56:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A0D99207BC
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 13:57:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RfwukXrH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B45D2068D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KXJDlJ9S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0D99207BC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPQyc-000713-Hn
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 09:56:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53558)
+	id 1kPQzn-0008Oz-LD
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 09:57:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53962)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kPQwo-00061I-My
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 09:54:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37529)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kPQwm-0008Ti-UD
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 09:54:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601906076;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=1d0NRCoLzx8k7ULihqSWEZcOlNupW5zoqeBQ0+ZjudQ=;
- b=RfwukXrH6qJw+crc4jpprQNqIj3xM+TLHPmkh5san5+bjMD0oRyHlvY8tgpEbvM2AH9J54
- NP6ZOrp+KZci52Go/A5xMcgbaR/RQyQlajx5Gre3K1Dw+kjrUTo3MJQesFjDlvXkhzb9Lk
- LzD5tQ8JnaAClIR1JBPVq/GholfMRz4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-395-uIiuCgKyODaBfPCh8g7Ocg-1; Mon, 05 Oct 2020 09:54:33 -0400
-X-MC-Unique: uIiuCgKyODaBfPCh8g7Ocg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BDE5C107ACF7;
- Mon,  5 Oct 2020 13:54:32 +0000 (UTC)
-Received: from localhost (ovpn-112-117.ams2.redhat.com [10.36.112.117])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 650337366A;
- Mon,  5 Oct 2020 13:54:32 +0000 (UTC)
-Date: Mon, 5 Oct 2020 14:54:31 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Subject: Re: [PATCH] virtiofsd: Call qemu_init_exec_dir
-Message-ID: <20201005135431.GD5029@stefanha-x1.localdomain>
-References: <20201002124015.44820-1-dgilbert@redhat.com>
+ (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1kPQyQ-000784-1N
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 09:56:19 -0400
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:53391)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1kPQyO-0000NI-KJ
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 09:56:17 -0400
+Received: by mail-wm1-x32e.google.com with SMTP id f21so3465589wml.3
+ for <qemu-devel@nongnu.org>; Mon, 05 Oct 2020 06:56:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=2o8pQnaV6jx+33KumWBlrHoy1B3kkbh0WO/pEaQSKfQ=;
+ b=KXJDlJ9Sm7JV5Co5Fwo6ZBd5lWJUzXqj2pbX/WCOznO72/gDAuNh1l5vVM348GG2no
+ R+m4FmvsT1K+PASnhjoMhkQzEABSwI4y0+urvmFC4iClkn4/M68hhgwk/pOz/k0zam2Q
+ o8IJv9bkSTY2VNrKiS0W3KE5qpWt6t1406L2/MkYx36EmmllZbxlhK27tiJisO7s/Pkm
+ Hy/RxJDHMBMmGzopQc8LC6X0gyIm0HHrh0gajRV6rIKuZIH10Ql7jj3rdhE5H2bmKlrC
+ +Hsxqelj7Ka7DWn+6xNgEIg5a9+nStAl192zvW4BQ6Mkq4FaNhynVigFUfRrRE9qA6ZT
+ 2ghw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=2o8pQnaV6jx+33KumWBlrHoy1B3kkbh0WO/pEaQSKfQ=;
+ b=NZ9tJPT44xISt+AVdbC4AdNDoisyOSgFWe3wqPEyOUY0Fz4aPN1YpsohirpF4A6r9Q
+ V4wxSeW3gzCrzSxjtpm+MB+1vhz66QNDYmOf9gljIG8QRMNCOMs0Cgyp3mjLRHHK6pEr
+ J0AwjIFhEngQNWmo2Ph/QI/Vkq6PukuOgH2k4wusceIokgcJO8P4ZOG7pUwqP0vM4WiZ
+ 6d5F44b2MSSii3qfpAqzRdxZojK5pObsV15euSL/+5sm4ce+KX3PaTffkgPwe7ObYvvW
+ LugoQPmHDwzhKl86/o70zp9e8S/kzlTynqK9wrXIOHD5gueV8ZVSkVowxPCT0gvw27Dl
+ 1PiQ==
+X-Gm-Message-State: AOAM532+32CSviMAvVz9ovchCkheqJu9mNgXoh1IHKaQVrIhFEKcvVEV
+ vugsaWr0GLQumMpKvc1GiK9ZBxjTEzE=
+X-Google-Smtp-Source: ABdhPJyE1l+lxjvx3RJEwLXJpG0CE3NLAkHR5GwQAe8Z5J/7CAxOCdsITGcW1fbMU7iL/Xfwf1Amlw==
+X-Received: by 2002:a1c:1bd1:: with SMTP id
+ b200mr17882877wmb.171.1601906172888; 
+ Mon, 05 Oct 2020 06:56:12 -0700 (PDT)
+Received: from localhost.localdomain ([2001:b07:6468:f312:2e86:3d8b:8b70:920c])
+ by smtp.gmail.com with ESMTPSA id c8sm13406559wmd.18.2020.10.05.06.56.12
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 05 Oct 2020 06:56:12 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/4] Convert remaining submodules to meson,
+ cleanup env var handling
+Date: Mon,  5 Oct 2020 15:56:09 +0200
+Message-Id: <20201005135613.435932-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <20201002124015.44820-1-dgilbert@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="11Y7aswkeuHtSBEs"
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 02:11:31
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::32e;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x32e.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.248,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,47 +100,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, alex.bennee@linaro.org, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, richard.henderson@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---11Y7aswkeuHtSBEs
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The main purpose of this series is to have a correct and consistent
+handling of CFLAGS/CXXFLAGS/LDFLAGS environment variables:
 
-On Fri, Oct 02, 2020 at 01:40:15PM +0100, Dr. David Alan Gilbert (git) wrot=
-e:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->=20
-> Since fcb4f59c879 qemu_get_local_state_pathname relies on the
-> init_exec_dir, and virtiofsd asserts because we never set it.
-> Set it.
->=20
-> Reported-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  tools/virtiofsd/passthrough_ll.c | 2 ++
->  1 file changed, 2 insertions(+)
+- correct: avoid that the -pie flag, used for the compiler checks in
+the configure script, ends up being passed to Meson if an LDFLAGS
+environment variable exists (patch 3)
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+- consistent: ensure that CFLAGS that are set in the configure
+script are persistent even if Meson is restarted; to do so,
+make the configure script store them in the cross file it generates.
 
---11Y7aswkeuHtSBEs
-Content-Type: application/pgp-signature; name="signature.asc"
+In order to avoid having to deal with recursive make, patches 1
+and 2 integrate the Meson-based build system with the build of
+embedded slirp and libfdt.  This follows the lead of Richard's
+patches to do the same with Capstone.
 
------BEGIN PGP SIGNATURE-----
+Based-on: <20201003093851.324923-1-richard.henderson@linaro.org>
+Supersedes: <20200923092617.1593722-1-pbonzini@redhat.com>
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl97JZcACgkQnKSrs4Gr
-c8hwyAf/S8GpiKwKuPzbSum7ajBUC1cDeTDkNOa/Dy6oVW4em0fVXB1DhSz+kAT/
-GMEcu52Q3+XCDZZ4XKnpdg5MgvKk7aMbsAjPG0zIpAcOy0G9T/x5BxjoKFv9nCtX
-SJVdSZUgGSLUi9ssjw+sBFctxPPAaZpdUpWJw6n04ZHIlrUxvjkkgZYpOsFz2B14
-2+l+6lbVkh9wjHocxD+KyyLUy7HqfXj5GskOWIhoAQo/hQvGYu3Cj8yDer9pVqda
-Y4L2UrxFPRl9kJ7ElSPvuHC6srK1+R02t7gbAB8YHIaZMsG9JPgM7jKFYHBz+7GT
-a/0K7+ZHG+Rj/jehBwGSxsn5HUSs7g==
-=DpIA
------END PGP SIGNATURE-----
+Paolo Bonzini (4):
+  slirp: Convert Makefile bits to meson bits
+  dtc: Convert Makefile bits to meson bits
+  configure: do not clobber environment CFLAGS/CXXFLAGS/LDFLAGS
+  configure: consistently pass CFLAGS/CXXFLAGS/LDFLAGS to meson
 
---11Y7aswkeuHtSBEs--
+ Makefile                                      |  28 +--
+ configure                                     | 222 +++++-------------
+ default-configs/targets/aarch64-softmmu.mak   |   1 +
+ default-configs/targets/arm-softmmu.mak       |   1 +
+ .../targets/microblaze-softmmu.mak            |   1 +
+ .../targets/microblazeel-softmmu.mak          |   1 +
+ default-configs/targets/mips64el-softmmu.mak  |   1 +
+ default-configs/targets/ppc-softmmu.mak       |   1 +
+ default-configs/targets/ppc64-softmmu.mak     |   1 +
+ default-configs/targets/riscv32-softmmu.mak   |   1 +
+ default-configs/targets/riscv64-softmmu.mak   |   1 +
+ default-configs/targets/rx-softmmu.mak        |   1 +
+ meson.build                                   | 164 +++++++++++--
+ meson_options.txt                             |   6 +
+ net/meson.build                               |   2 +-
+ tests/qtest/meson.build                       |   6 +-
+ 16 files changed, 225 insertions(+), 213 deletions(-)
+
+-- 
+2.26.2
 
 
