@@ -4,75 +4,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0B38C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:20:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58AA9C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:22:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61E9A208C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:20:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DFD8E208C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Oct 2020 21:22:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZPFUtSoH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61E9A208C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FIYEtLdp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFD8E208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPXuG-0003vH-D7
-	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 17:20:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43388)
+	id 1kPXvw-0006fs-QN
+	for qemu-devel@archiver.kernel.org; Mon, 05 Oct 2020 17:22:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43382)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kPXko-0000CC-11
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22097)
+ id 1kPXkn-0000Bz-G2
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52419)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kPXkl-0007Ue-0N
- for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:41 -0400
+ id 1kPXkj-0007US-8V
+ for qemu-devel@nongnu.org; Mon, 05 Oct 2020 17:10:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601932237;
+ s=mimecast20190719; t=1601932235;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=367k11b3zf85sB9S3cGnMHOkTfp1Umm4WdkTED0mfWc=;
- b=ZPFUtSoHVbTrvSNDHJ04cqzYFZAigxzntZhox74R1RZboqoyJoWUZdKGo+lf1bcVtkx/Yz
- 5y+JNO43sknl2hwivzICdkEYvbeMoKQ/9SHXyWAtH64BMkBsbSpDFufUHQf0ExBmztSjhm
- ki495v39GY6oKDF3jeNCZn+QC1p2rlk=
+ bh=uEyhLN+7XslyBoI0Db6s1CZEYZyW8MgA6FMtj5f7PIE=;
+ b=FIYEtLdpcJtrL/Yv8z3FgTGfDXmStCogiF6p/LIpCLGwG6dlsVCZ78RZtsh8OW72O5sAQA
+ /Tn2IJ9PVSZT/hIdoA2L1YfL50EMAZ6qUR2NJI98u70Nogn53vpvKi+oBmhDJA5rUXiPuZ
+ 84ozNjRphD2r8eQujpTseAZ/aNM+qoc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-221-ZYv6mUTpNmGawxD6y1PG-g-1; Mon, 05 Oct 2020 17:10:35 -0400
-X-MC-Unique: ZYv6mUTpNmGawxD6y1PG-g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-65-ON17W0wNOPO7TeyY14uwJg-1; Mon, 05 Oct 2020 17:10:31 -0400
+X-MC-Unique: ON17W0wNOPO7TeyY14uwJg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 554701015C9D;
- Mon,  5 Oct 2020 21:10:34 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0E7EF18A8220;
+ Mon,  5 Oct 2020 21:10:30 +0000 (UTC)
 Received: from localhost (ovpn-119-102.rdu2.redhat.com [10.10.119.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EE40F55764;
- Mon,  5 Oct 2020 21:10:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C123660BFA;
+ Mon,  5 Oct 2020 21:10:29 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 17/21] kernel-doc: Handle function typedefs that return pointers
-Date: Mon,  5 Oct 2020 17:09:56 -0400
-Message-Id: <20201005211000.710404-18-ehabkost@redhat.com>
+Subject: [PULL 14/21] docs/devel/qom: Use *emphasis* for emphasis
+Date: Mon,  5 Oct 2020 17:09:53 -0400
+Message-Id: <20201005211000.710404-15-ehabkost@redhat.com>
 In-Reply-To: <20201005211000.710404-1-ehabkost@redhat.com>
 References: <20201005211000.710404-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/05 02:11:31
@@ -98,40 +98,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+ Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-One example that was not being parsed correctly by kernel-doc is:
-
-  typedef Object *(ObjectPropertyResolve)(Object *obj,
-                                          void *opaque,
-                                          const char *part);
+<emphasis> is not valid reST syntax.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20201003024123.193840-2-ehabkost@redhat.com>
+Message-Id: <20201003025424.199291-5-ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- scripts/kernel-doc | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ docs/devel/qom.rst | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/kernel-doc b/scripts/kernel-doc
-index 40ad782e342..57a4a72970f 100755
---- a/scripts/kernel-doc
-+++ b/scripts/kernel-doc
-@@ -1318,8 +1318,8 @@ sub dump_typedef($$) {
-     $x =~ s@/\*.*?\*/@@gos;	# strip comments.
+diff --git a/docs/devel/qom.rst b/docs/devel/qom.rst
+index a47e1b9a239..0c610e20d62 100644
+--- a/docs/devel/qom.rst
++++ b/docs/devel/qom.rst
+@@ -174,17 +174,17 @@ dynamically cast it to an object that implements the interface.
+ Methods
+ =======
  
-     # Parse function prototypes
--    if ($x =~ /typedef\s+(\w+)\s*\(\*\s*(\w\S+)\s*\)\s*\((.*)\);/ ||
--	$x =~ /typedef\s+(\w+)\s*(\w\S+)\s*\s*\((.*)\);/) {
-+    if ($x =~ /typedef\s+(\w+\s*\**)\s*\(\*\s*(\w\S+)\s*\)\s*\((.*)\);/ ||
-+	$x =~ /typedef\s+(\w+\s*\**)\s*(\w\S+)\s*\s*\((.*)\);/) {
+-A <emphasis>method</emphasis> is a function within the namespace scope of
++A *method* is a function within the namespace scope of
+ a class. It usually operates on the object instance by passing it as a
+ strongly-typed first argument.
+ If it does not operate on an object instance, it is dubbed
+-<emphasis>class method</emphasis>.
++*class method*.
  
- 	# Function typedefs
- 	$return_type = $1;
+ Methods cannot be overloaded. That is, the #ObjectClass and method name
+ uniquely identity the function to be called; the signature does not vary
+ except for trailing varargs.
+ 
+-Methods are always <emphasis>virtual</emphasis>. Overriding a method in
++Methods are always *virtual*. Overriding a method in
+ #TypeInfo.class_init of a subclass leads to any user of the class obtained
+ via OBJECT_GET_CLASS() accessing the overridden function.
+ The original function is not automatically invoked. It is the responsibility
 -- 
 2.26.2
 
