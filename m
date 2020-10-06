@@ -2,91 +2,97 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60D0FC41604
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 16:10:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21A62C41604
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 16:10:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9F662075A
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 16:10:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ABB83206D4
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 16:10:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dw9zGohI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9F662075A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a9CgGqvK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABB83206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPpXM-0000eG-Oq
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 12:10:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52978)
+	id 1kPpY9-0001pc-Md
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 12:10:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53420)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kPpSf-0001zl-PQ
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 12:05:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56579)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kPpSb-0003IF-SB
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 12:05:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602000304;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=W+NoW7DZBasMMsaeaD+Z2NTOOoD+XkkainhXfZ1dKjQ=;
- b=dw9zGohIsN7y3YmXTWAQeLGoiaWlmOLom4ZVHq9aHDDZYxV6z3ax7SvaD/jvhWJ5m0b4oz
- nRGDvplQvu17qC6b2ZaeK9ZzfKEQ2Mt7PGJgS0tQaMef3eqO7RBCO7rbA6O2aUbqRinlNw
- /o/gY2dLs43LzJKdJ3DiyrnifeLhvEc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-490-Fi0mBXGdNWuE3JzAlqoKqw-1; Tue, 06 Oct 2020 12:05:02 -0400
-X-MC-Unique: Fi0mBXGdNWuE3JzAlqoKqw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C8C7318C5203;
- Tue,  6 Oct 2020 16:05:01 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-113-197.ams2.redhat.com
- [10.36.113.197])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CE6E178482;
- Tue,  6 Oct 2020 16:04:55 +0000 (UTC)
-Subject: Re: [PATCH v3 1/1] hw/nvram: Always register
- FW_CFG_DATA_GENERATOR_INTERFACE
-To: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kPpUW-0005jT-Ch
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 12:07:05 -0400
+Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:50953)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kPpUT-000402-Sn
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 12:07:04 -0400
+Received: by mail-wm1-x32f.google.com with SMTP id 13so3506162wmf.0
+ for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 09:07:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=RW2H8oOxjZLyAyqn7EI7Rl9/hR5wbT5g58TjqEuFX28=;
+ b=a9CgGqvKUbFo56Ittlchy0f++wNEtM2khS+JodrFtyz00pI+lxJO7cZ+8YhBvW/GC/
+ Wt2ghKZebErQSXj6ke8Y57LYtUNmvW3G2g0A0zSMNF2yjvxxLQ99Eepd+T92Dq/iU/0r
+ QSyTAxd2FPVdoxfz4YSWHuFY77qg6VQdUSGuGWTRVePtdAukZRgCqsi0//lDuSg/QeRF
+ ftFEcipkxMh7N/nIepO+VoNG2AoGYGFGL4oKeLIl8PJblFzAVXXxVUfAtPzU2SXr76q+
+ qWwAmk7F5/OqI8YiysEXE7ASd6TOLhyrdpSRLLY0LGI3vXRiM4WF/nZEsOG8JoL4Oxs7
+ y3YA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=RW2H8oOxjZLyAyqn7EI7Rl9/hR5wbT5g58TjqEuFX28=;
+ b=tu7xw97tU0sQ/LhIYgVTeETSC18F7K+xeIWQBFWg/OManzty1nzuujjlORXhzpgsd9
+ n46NDV1qrgDp9B22I/X2R3N83iLUsnIgu1ic3XkuIm3WYtSKQlK2qXxF65q8l3H0SdfR
+ Mtcg1e5llaEHXdjU/wAThOSbyFdY5jjAhGdkrnOvvqvl74sJdoqCzkSwuy/zd3febXmv
+ IfmKsHhooqyn0UnSpHFLTPsZDJ+u8JJKkA/Ow3Bq5kuRn2XyqoYF5tA4A125zIycwXTb
+ JysRMxbhdjw16VBBEH/QeBZeh3phlYPCGeEslPQ4rmUVYittT4IG6VkXdxFsu5P60s+w
+ W4ng==
+X-Gm-Message-State: AOAM531h3j5VL3nKiUN24mC6mvPvFVKBhAU1IS+4DOwk/agZWvvlzfgC
+ n6/hWBD1IkFos7kVnzlyqKQ=
+X-Google-Smtp-Source: ABdhPJyL6Jr1TRMDFgyA0HY5UW735Ah9QXS9DasRyjrPLfLkYyW3YQPpXAtOzkqOOyzvVemNshpFSA==
+X-Received: by 2002:a05:600c:230a:: with SMTP id
+ 10mr5800026wmo.151.1602000420469; 
+ Tue, 06 Oct 2020 09:07:00 -0700 (PDT)
+Received: from x1w.redhat.com (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id j17sm5204629wrw.68.2020.10.06.09.06.59
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 06 Oct 2020 09:06:59 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  qemu-devel@nongnu.org
-References: <20201006153636.2383248-1-philmd@redhat.com>
- <20201006153636.2383248-2-philmd@redhat.com>
- <134bbd15-c53c-7686-a36d-f02a81b56e0d@linaro.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <e7348766-7210-23f8-ab4e-b5985c279909@redhat.com>
-Date: Tue, 6 Oct 2020 18:04:54 +0200
+Subject: [PATCH 04/12] contrib/gitdm: Add ByteDance to the domain map
+Date: Tue,  6 Oct 2020 18:06:45 +0200
+Message-Id: <20201006160653.2391972-5-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201006160653.2391972-1-f4bug@amsat.org>
+References: <20201006160653.2391972-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <134bbd15-c53c-7686-a36d-f02a81b56e0d@linaro.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lersek@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=lersek@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 01:55:55
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::32f;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32f.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.248,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,27 +105,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, qemu-block@nongnu.org
+Cc: Jiachen Zhang <zhangjiachen.jaycee@bytedance.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/06/20 17:51, Richard Henderson wrote:
-> On 10/6/20 10:36 AM, Philippe Mathieu-Daudé wrote:
->> +++ b/hw/nvram/fw_cfg-interface.c
->> @@ -0,0 +1,15 @@
->> +#include "qemu/osdep.h"
->> +#include "hw/nvram/fw_cfg.h"
-> 
-> License boilerplate missing.
-> 
-> r~
-> 
+There is a number of contributors from this domain,
+add its own entry to the gitdm domain map.
 
-Hrmpf, so easy to forget about that, especially in review :/ Thanks for
-catching it.
+Acked-by: Jiachen Zhang <zhangjiachen.jaycee@bytedance.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ contrib/gitdm/domain-map | 1 +
+ 1 file changed, 1 insertion(+)
 
-Laszlo
+diff --git a/contrib/gitdm/domain-map b/contrib/gitdm/domain-map
+index a4102154b6..ae5d149434 100644
+--- a/contrib/gitdm/domain-map
++++ b/contrib/gitdm/domain-map
+@@ -6,6 +6,7 @@
+ 
+ amd.com         AMD
+ baidu.com       Baidu
++bytedance.com   ByteDance
+ cmss.chinamobile.com China Mobile
+ citrix.com      Citrix
+ greensocs.com   GreenSocs
+-- 
+2.26.2
 
 
