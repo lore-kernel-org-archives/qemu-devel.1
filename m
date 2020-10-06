@@ -7,78 +7,77 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E9E7C41604
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:41:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D62F4C46466
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:43:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 081A420760
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:41:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6BB1620760
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:43:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qmh/8Cr+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 081A420760
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PGNlu6zx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BB1620760
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPhbN-0001XP-Oy
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 03:41:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39934)
+	id 1kPhct-0004Oy-DK
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 03:43:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39856)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kPhQS-0003NE-Nv
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:20 -0400
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:55005)
+ id 1kPhQP-0003EL-F1
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:17 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37488)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kPhQQ-0001Wu-M0
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:20 -0400
-Received: by mail-wm1-x333.google.com with SMTP id p15so1815678wmi.4
- for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 00:30:18 -0700 (PDT)
+ id 1kPhQN-0001Ub-87
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:17 -0400
+Received: by mail-wr1-x443.google.com with SMTP id h7so8607896wre.4
+ for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 00:30:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=wM70NITwc42Whej4N3YEEzYrn9T/JQZRJIsTDSZHZoE=;
- b=Qmh/8Cr+8nRP6Wc4PiP/9tv05Ms5AnFm8ufjCDwjLAi/Q9oyFbgbV6hG1MQKpLPBEF
- jtDCTiO8vRipGlA3eecoTjg0bfmnqXFnQY4s2G8sW8skBo0dazWQFLXxN2I62CRdGplu
- f+I4ygXh074fNeaxIe+RSlH0eAlxGCSfsmCd9kGmhCYfN0JR/nVClwYqdCZ9gHwzyfeL
- 3Hvapk66wv3jkV5l053nK7HWI3dfkknF5Jhro9trTOPuUQ1CGAmfXsxoU7GvHPIwWEcw
- N6Xu5Pm6v+7LjsXiDS/6gVshWW9RtXBhkMW7Wyjr8m7WPE78FHfAYqgHDOBnjPBvQrSP
- p9SQ==
+ bh=Lx7aepaU4oeb9uUi81d1ARWCm8iq4HU6ykoV7TnaemU=;
+ b=PGNlu6zxpVH14oq6A36NwLzFob6q8ObPwMOZKYwfy657B/3WxmKcl4OOgnkm4HU0vo
+ ci8hNFDElMIGDzjI8hicitGOF4TKsm/HPB7ufH6KkxpZkl4GautPNiIoIezXf3cXT1Uy
+ 7sqX/q2p9dUk9b9DW94C/pL1FEb6AuxLj3f1/hiD62OJ8sGMY0s+MA3pZaF1f0V0EU1s
+ P7wQVBYFhpfCSEZfvqEmGhc2Bjy586Ay9BU6vk8T8FLN+XrGtWu5F4KDqDBCoCFazbGR
+ EJpbvDPOz7TfRAEjHdtgMxBHfuNRHQuvod5gv1WRA7CAgfO4Wu7bfb14vJjUscR7f78n
+ cMDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=wM70NITwc42Whej4N3YEEzYrn9T/JQZRJIsTDSZHZoE=;
- b=s7Rk7ocu1Xnn0WTfufiEjirQpFfHCMi5b2MfQiui4D515Z42bzbgOFtJPO+vGqxaFh
- jzddsI09xVWr3hkD2BFnp4Ui6h4Z/IVI7sNYp6Vc92yejP7G5OVLwuGgtBTFQtH++sjx
- 50g0sAyzqw2q5eWSXMrtgTz7vGFdbkGfN7zoop9UYKVKAmpBvPNtEM1AcaC4Ytj5QpbT
- 78AWY/1e0/jAG4aEJgIApp46lw1ue9LlhLSy5/2JhRfARa21WRGNZkfNc0SBR26ajvCQ
- vFZ6M/+iwNwL/F1wYx0yHQoz5bpWPzy150HTQJlzzEQMIzcheIMMeOh0ZRb7pIr7r9zI
- bVZA==
-X-Gm-Message-State: AOAM53295l8gp1SqkMmlIS0jTal8ufZ+8wBypi+87Gy7KDm9vQTltrU4
- tTPJ7hj6LNKv5GgrvLlbqukQJsyMDYk=
-X-Google-Smtp-Source: ABdhPJywduqkFWtWNaOviBmnC1TdQqDDJoYRV9+dPXUcL3Yf+KTiksg2RGHcgQgqC0W7CT+7ZsJtYg==
-X-Received: by 2002:a05:600c:214c:: with SMTP id
- v12mr1505271wml.23.1601969416925; 
- Tue, 06 Oct 2020 00:30:16 -0700 (PDT)
+ bh=Lx7aepaU4oeb9uUi81d1ARWCm8iq4HU6ykoV7TnaemU=;
+ b=MIQf7RJhmo6i4aTq2zs9m2QcRaI3KU4TfrIyPiCtWymHRbckaaDv9dFdmqLPwrwnFn
+ SjWANEpsijhLV46etJ+Pyts/bU+eHzDMb4TuFG/5UUp443VL0T0XcSmqUixd7cxVlSsB
+ SZN5RyD/lt84WBI5NJCjtpXfQWEsojq66QgqNVaANqVXax579I1I2IP6fev/mT/T2CZA
+ ccEeMwqUNo9DyWSPqUJhJuGV9j96vnIBcbckxyJvGk/Pf6JhsNYvt2Af426adMeijQ46
+ 5YiKBPmOYWzoNxgvV5TWmNUo4xpj0ywIg9znJJg+1Ov/9u6ie7uD/Ul3KdOKY/gyqNMQ
+ RpCg==
+X-Gm-Message-State: AOAM531kH4dF3+gdtpN6OB+JU8ylxhq8ljqbfLTScvvB3juqYDwqbu25
+ FLlElU4qFpKF9tISSg4tjnH+SU3BSqk=
+X-Google-Smtp-Source: ABdhPJy+Sbx6KKFR+eYAA3jYg/j5sbjECPkJcQa5kwUdxXkckbqvC/4hVAh8IqUc133BAYQ9aeNChg==
+X-Received: by 2002:adf:ecc1:: with SMTP id s1mr3289616wro.120.1601969413371; 
+ Tue, 06 Oct 2020 00:30:13 -0700 (PDT)
 Received: from localhost.localdomain ([2001:b07:6468:f312:5aca:cd0b:c4a1:9c2e])
- by smtp.gmail.com with ESMTPSA id i9sm2576329wma.47.2020.10.06.00.30.16
+ by smtp.gmail.com with ESMTPSA id i9sm2576329wma.47.2020.10.06.00.30.12
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 06 Oct 2020 00:30:16 -0700 (PDT)
+ Tue, 06 Oct 2020 00:30:12 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 34/37] gdbstub: add reverse continue support in replay mode
-Date: Tue,  6 Oct 2020 09:29:44 +0200
-Message-Id: <20201006072947.487729-35-pbonzini@redhat.com>
+Subject: [PULL 30/37] replay: introduce breakpoint at the specified step
+Date: Tue,  6 Oct 2020 09:29:40 +0200
+Message-Id: <20201006072947.487729-31-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201006072947.487729-1-pbonzini@redhat.com>
 References: <20201006072947.487729-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::333;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x333.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -102,6 +101,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>,
+ Markus Armbruster <armbru@redhat.com>,
  Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -109,208 +109,293 @@ Sender: "Qemu-devel"
 
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-This patch adds support of the reverse continue operation for gdbstub.
-Reverse continue finds the last breakpoint that would happen in normal
-execution from the beginning to the current moment.
-Implementation of the reverse continue replays the execution twice:
-to find the breakpoints that were hit and to seek to the last breakpoint.
-Reverse continue loads the previous snapshot and tries to find the breakpoint
-since that moment. If there are no such breakpoints, it proceeds to
-the earlier snapshot, and so on. When no breakpoints or watchpoints were
-hit at all, execution stops at the beginning of the replay log.
+This patch introduces replay_break, replay_delete_break
+qmp and hmp commands.
+These commands allow stopping at the specified instruction.
+It may be useful for debugging when there are some known
+events that should be investigated.
+replay_break command has one argument - number of instructions
+executed since the start of the replay.
+replay_delete_break removes previously set breakpoint.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
-Message-Id: <160174522930.12451.6994758004725016836.stgit@pasha-ThinkPad-X280>
+Acked-by: Markus Armbruster <armbru@redhat.com>
+
+--
+
+v4 changes:
+ - removed useless error_free call
+Message-Id: <160174520606.12451.7056879546045599378.stgit@pasha-ThinkPad-X280>
+
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- exec.c                    |  1 +
- gdbstub.c                 | 10 +++++-
- include/sysemu/replay.h   |  8 +++++
- replay/replay-debugging.c | 72 +++++++++++++++++++++++++++++++++++++++
- softmmu/cpus.c            |  5 +++
- stubs/replay.c            |  5 +++
- 6 files changed, 100 insertions(+), 1 deletion(-)
+ hmp-commands.hx           | 32 +++++++++++++++
+ include/monitor/hmp.h     |  2 +
+ qapi/replay.json          | 36 +++++++++++++++++
+ replay/replay-debugging.c | 84 +++++++++++++++++++++++++++++++++++++++
+ replay/replay-internal.h  |  4 ++
+ replay/replay.c           | 17 ++++++++
+ 6 files changed, 175 insertions(+)
 
-diff --git a/exec.c b/exec.c
-index d8072668ea..ec68f4a9ca 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2753,6 +2753,7 @@ void cpu_check_watchpoint(CPUState *cpu, vaddr addr, vaddr len,
-                  * Don't process the watchpoints when we are
-                  * in a reverse debugging operation.
-                  */
-+                replay_breakpoint();
-                 return;
-             }
-             if (flags == BP_MEM_READ) {
-diff --git a/gdbstub.c b/gdbstub.c
-index 79e8ccc050..ac92273018 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1907,6 +1907,13 @@ static void handle_backward(GdbCmdContext *gdb_ctx, void *user_ctx)
-                 put_packet("E14");
-             }
-             return;
-+        case 'c':
-+            if (replay_reverse_continue()) {
-+                gdb_continue();
-+            } else {
-+                put_packet("E14");
-+            }
-+            return;
-         }
-     }
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 1088d64503..7680d0b380 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1804,6 +1804,38 @@ SRST
+   Set QOM property *property* of object at location *path* to value *value*
+ ERST
  
-@@ -2161,7 +2168,8 @@ static void handle_query_supported(GdbCmdContext *gdb_ctx, void *user_ctx)
-     }
++    {
++        .name       = "replay_break",
++        .args_type  = "icount:i",
++        .params     = "icount",
++        .help       = "set breakpoint at the specified instruction count",
++        .cmd        = hmp_replay_break,
++    },
++
++SRST
++``replay_break`` *icount*
++  Set replay breakpoint at instruction count *icount*.
++  Execution stops when the specified instruction is reached.
++  There can be at most one breakpoint. When breakpoint is set, any prior
++  one is removed.  The breakpoint may be set only in replay mode and only
++  "in the future", i.e. at instruction counts greater than the current one.
++  The current instruction count can be observed with ``info replay``.
++ERST
++
++    {
++        .name       = "replay_delete_break",
++        .args_type  = "",
++        .params     = "",
++        .help       = "remove replay breakpoint",
++        .cmd        = hmp_replay_delete_break,
++    },
++
++SRST
++``replay_delete_break``
++  Remove replay breakpoint which was previously set with ``replay_break``.
++  The command is ignored when there are no replay breakpoints.
++ERST
++
+     {
+         .name       = "info",
+         .args_type  = "item:s?",
+diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
+index f297fccce8..809ad638bb 100644
+--- a/include/monitor/hmp.h
++++ b/include/monitor/hmp.h
+@@ -130,5 +130,7 @@ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+ void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
+ void hmp_info_sev(Monitor *mon, const QDict *qdict);
+ void hmp_info_replay(Monitor *mon, const QDict *qdict);
++void hmp_replay_break(Monitor *mon, const QDict *qdict);
++void hmp_replay_delete_break(Monitor *mon, const QDict *qdict);
  
-     if (replay_mode == REPLAY_MODE_PLAY) {
--        g_string_append(gdbserver_state.str_buf, ";ReverseStep+");
-+        g_string_append(gdbserver_state.str_buf,
-+            ";ReverseStep+;ReverseContinue+");
-     }
- 
-     if (gdb_ctx->num_params &&
-diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-index 90bbb5d825..172b20c60c 100644
---- a/include/sysemu/replay.h
-+++ b/include/sysemu/replay.h
-@@ -81,11 +81,19 @@ const char *replay_get_filename(void);
-  * Returns true on success.
-  */
- bool replay_reverse_step(void);
-+/*
-+ * Start searching the last breakpoint/watchpoint.
-+ * Used by gdbstub for backwards debugging.
-+ * Returns true if the process successfully started.
-+ */
-+bool replay_reverse_continue(void);
- /*
-  * Returns true if replay module is processing
-  * reverse_continue or reverse_step request
-  */
- bool replay_running_debug(void);
-+/* Called in reverse debugging mode to collect breakpoint information */
-+void replay_breakpoint(void);
- 
- /* Processing the instructions */
- 
+ #endif
+diff --git a/qapi/replay.json b/qapi/replay.json
+index e6b3f6001d..173ba76107 100644
+--- a/qapi/replay.json
++++ b/qapi/replay.json
+@@ -63,3 +63,39 @@
+ ##
+ { 'command': 'query-replay',
+   'returns': 'ReplayInfo' }
++
++##
++# @replay-break:
++#
++# Set replay breakpoint at instruction count @icount.
++# Execution stops when the specified instruction is reached.
++# There can be at most one breakpoint. When breakpoint is set, any prior
++# one is removed.  The breakpoint may be set only in replay mode and only
++# "in the future", i.e. at instruction counts greater than the current one.
++# The current instruction count can be observed with @query-replay.
++#
++# @icount: instruction count to stop at
++#
++# Since: 5.2
++#
++# Example:
++#
++# -> { "execute": "replay-break", "data": { "icount": 220414 } }
++#
++##
++{ 'command': 'replay-break', 'data': { 'icount': 'int' } }
++
++##
++# @replay-delete-break:
++#
++# Remove replay breakpoint which was set with @replay-break.
++# The command is ignored when there are no replay breakpoints.
++#
++# Since: 5.2
++#
++# Example:
++#
++# -> { "execute": "replay-delete-break" }
++#
++##
++{ 'command': 'replay-delete-break' }
 diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
-index 1e1dec0295..30ca38e5dd 100644
+index 51a6de4e81..3dc23b84fc 100644
 --- a/replay/replay-debugging.c
 +++ b/replay/replay-debugging.c
-@@ -23,6 +23,8 @@
- #include "migration/snapshot.h"
+@@ -12,10 +12,13 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "sysemu/replay.h"
++#include "sysemu/runstate.h"
+ #include "replay-internal.h"
+ #include "monitor/hmp.h"
+ #include "monitor/monitor.h"
+ #include "qapi/qapi-commands-replay.h"
++#include "qapi/qmp/qdict.h"
++#include "qemu/timer.h"
  
- static bool replay_is_debugging;
-+static int64_t replay_last_breakpoint;
-+static int64_t replay_last_snapshot;
- 
- bool replay_running_debug(void)
+ void hmp_info_replay(Monitor *mon, const QDict *qdict)
  {
-@@ -246,3 +248,73 @@ bool replay_reverse_step(void)
- 
-     return false;
+@@ -41,3 +44,84 @@ ReplayInfo *qmp_query_replay(Error **errp)
+     retval->icount = replay_get_current_icount();
+     return retval;
  }
 +
-+static void replay_continue_end(void)
++static void replay_break(uint64_t icount, QEMUTimerCB callback, void *opaque)
 +{
-+    replay_is_debugging = false;
-+    vm_stop(RUN_STATE_DEBUG);
++    assert(replay_mode == REPLAY_MODE_PLAY);
++    assert(replay_mutex_locked());
++    assert(replay_break_icount >= replay_get_current_icount());
++    assert(callback);
++
++    replay_break_icount = icount;
++
++    if (replay_break_timer) {
++        timer_del(replay_break_timer);
++    }
++    replay_break_timer = timer_new_ns(QEMU_CLOCK_REALTIME,
++                                      callback, opaque);
++}
++
++static void replay_delete_break(void)
++{
++    assert(replay_mode == REPLAY_MODE_PLAY);
++    assert(replay_mutex_locked());
++
++    if (replay_break_timer) {
++        timer_del(replay_break_timer);
++        timer_free(replay_break_timer);
++        replay_break_timer = NULL;
++    }
++    replay_break_icount = -1ULL;
++}
++
++static void replay_stop_vm(void *opaque)
++{
++    vm_stop(RUN_STATE_PAUSED);
 +    replay_delete_break();
 +}
 +
-+static void replay_continue_stop(void *opaque)
++void qmp_replay_break(int64_t icount, Error **errp)
 +{
-+    Error *err = NULL;
-+    if (replay_last_breakpoint != -1LL) {
-+        replay_seek(replay_last_breakpoint, replay_stop_vm_debug, &err);
-+        if (err) {
-+            error_free(err);
-+            replay_continue_end();
++    if (replay_mode == REPLAY_MODE_PLAY) {
++        if (icount >= replay_get_current_icount()) {
++            replay_break(icount, replay_stop_vm, NULL);
++        } else {
++            error_setg(errp,
++                "cannot set breakpoint at the instruction in the past");
 +        }
-+        return;
-+    }
-+    /*
-+     * No breakpoints since the last snapshot.
-+     * Find previous snapshot and try again.
-+     */
-+    if (replay_last_snapshot != 0) {
-+        replay_seek(replay_last_snapshot - 1, replay_continue_stop, &err);
-+        if (err) {
-+            error_free(err);
-+            replay_continue_end();
-+        }
-+        replay_last_snapshot = replay_get_current_icount();
-+        return;
 +    } else {
-+        /* Seek to the very first step */
-+        replay_seek(0, replay_stop_vm_debug, &err);
-+        if (err) {
-+            error_free(err);
-+            replay_continue_end();
-+        }
-+        return;
++        error_setg(errp, "setting the breakpoint is allowed only in play mode");
 +    }
-+    replay_continue_end();
 +}
 +
-+bool replay_reverse_continue(void)
++void hmp_replay_break(Monitor *mon, const QDict *qdict)
++{
++    int64_t icount = qdict_get_try_int(qdict, "icount", -1LL);
++    Error *err = NULL;
++
++    qmp_replay_break(icount, &err);
++    if (err) {
++        error_report_err(err);
++        return;
++    }
++}
++
++void qmp_replay_delete_break(Error **errp)
++{
++    if (replay_mode == REPLAY_MODE_PLAY) {
++        replay_delete_break();
++    } else {
++        error_setg(errp, "replay breakpoints are allowed only in play mode");
++    }
++}
++
++void hmp_replay_delete_break(Monitor *mon, const QDict *qdict)
 +{
 +    Error *err = NULL;
 +
-+    assert(replay_mode == REPLAY_MODE_PLAY);
-+
-+    if (replay_get_current_icount() != 0) {
-+        replay_seek(replay_get_current_icount() - 1,
-+                    replay_continue_stop, &err);
-+        if (err) {
-+            error_free(err);
-+            return false;
-+        }
-+        replay_last_breakpoint = -1LL;
-+        replay_is_debugging = true;
-+        replay_last_snapshot = replay_get_current_icount();
-+        return true;
++    qmp_replay_delete_break(&err);
++    if (err) {
++        error_report_err(err);
++        return;
 +    }
-+
-+    return false;
 +}
+diff --git a/replay/replay-internal.h b/replay/replay-internal.h
+index 33ac551e78..2f6145ec7c 100644
+--- a/replay/replay-internal.h
++++ b/replay/replay-internal.h
+@@ -94,6 +94,10 @@ extern ReplayState replay_state;
+ 
+ /* File for replay writing */
+ extern FILE *replay_file;
++/* Instruction count of the replay breakpoint */
++extern uint64_t replay_break_icount;
++/* Timer for the replay breakpoint callback */
++extern QEMUTimer *replay_break_timer;
+ 
+ void replay_put_byte(uint8_t byte);
+ void replay_put_event(uint8_t event);
+diff --git a/replay/replay.c b/replay/replay.c
+index 797b6a5b15..d4c228ab28 100644
+--- a/replay/replay.c
++++ b/replay/replay.c
+@@ -34,6 +34,10 @@ static char *replay_filename;
+ ReplayState replay_state;
+ static GSList *replay_blockers;
+ 
++/* Replay breakpoints */
++uint64_t replay_break_icount = -1ULL;
++QEMUTimer *replay_break_timer;
 +
-+void replay_breakpoint(void)
-+{
-+    assert(replay_mode == REPLAY_MODE_PLAY);
-+    replay_last_breakpoint = replay_get_current_icount();
-+}
-diff --git a/softmmu/cpus.c b/softmmu/cpus.c
-index 95c557fac5..9e33416b4d 100644
---- a/softmmu/cpus.c
-+++ b/softmmu/cpus.c
-@@ -286,6 +286,11 @@ void cpu_handle_guest_debug(CPUState *cpu)
+ bool replay_next_event_is(int event)
  {
-     if (replay_running_debug()) {
-         if (!cpu->singlestep_enabled) {
-+            /*
-+             * Report about the breakpoint and
-+             * make a single step to skip it
-+             */
-+            replay_breakpoint();
-             cpu_single_step(cpu, SSTEP_ENABLE);
-         } else {
-             cpu_single_step(cpu, 0);
-diff --git a/stubs/replay.c b/stubs/replay.c
-index d5b52302e9..45ebe77fb9 100644
---- a/stubs/replay.c
-+++ b/stubs/replay.c
-@@ -98,3 +98,8 @@ bool replay_reverse_step(void)
- {
-     return false;
+     bool res = false;
+@@ -73,6 +77,13 @@ int replay_get_instructions(void)
+     replay_mutex_lock();
+     if (replay_next_event_is(EVENT_INSTRUCTION)) {
+         res = replay_state.instruction_count;
++        if (replay_break_icount != -1LL) {
++            uint64_t current = replay_get_current_icount();
++            assert(replay_break_icount >= current);
++            if (current + res > replay_break_icount) {
++                res = replay_break_icount - current;
++            }
++        }
+     }
+     replay_mutex_unlock();
+     return res;
+@@ -99,6 +110,12 @@ void replay_account_executed_instructions(void)
+                    will be read from the log. */
+                 qemu_notify_event();
+             }
++            /* Execution reached the break step */
++            if (replay_break_icount == replay_state.current_icount) {
++                /* Cannot make callback directly from the vCPU thread */
++                timer_mod_ns(replay_break_timer,
++                    qemu_clock_get_ns(QEMU_CLOCK_REALTIME));
++            }
+         }
+     }
  }
-+
-+bool replay_reverse_continue(void)
-+{
-+    return false;
-+}
 -- 
 2.26.2
 
