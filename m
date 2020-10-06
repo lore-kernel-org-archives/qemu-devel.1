@@ -2,79 +2,78 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42EB2C4363D
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 12:41:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19BB6C4363D
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 12:41:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED2B7206F7
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 12:40:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 70C3A2075A
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 12:41:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bx+AZBOz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED2B7206F7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d7VkbW5X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70C3A2075A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPmH5-000269-1x
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 08:40:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55740)
+	id 1kPmHm-0002uU-8g
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 08:41:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55938)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kPmFJ-0000pC-Mp
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 08:39:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51922)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1kPmFY-00010H-PI
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 08:39:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43730)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kPmFG-0007ra-Ur
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 08:39:08 -0400
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1kPmFV-0007tA-PB
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 08:39:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601987945;
+ s=mimecast20190719; t=1601987960;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=woztGtAskR3puGICZfwx/ALjF4rhIDaBW07z+oIFN1w=;
- b=Bx+AZBOz5WHpq2OT56Xj2c4plosbOwD+Zsl1CuVnr3oMKjQhOQTYBsn+nBrwAhdLBtb4UE
- GdYU74GC2wOtpwdgsVpQJW5wBDf2tmEGGdLLvPphUl5fqIhkGDMTugu0LZ7c7+be+JiX8a
- wX/CKScGxv4SnTO/Fygqhj9DUBtWo1E=
+ bh=VZyovmSD3wM6Yph0aMecaSDZGzrK5iKEahnakJcmqbg=;
+ b=d7VkbW5Xi4iKamO81Af721SzPqbSofU47eCTUsILUFKyLR1kii5u3ol463pKyP+N3/dPD8
+ 7/DhE1BzSJXLsVxl/dCL/bYVikKOX+fLej2Lv13mGW84R326EsmZK44x3aR1TGHRq72FBf
+ l5nItJ2DrEtFrVji5uMT0Ezy/yMzn50=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-579-72xewIt-NjKnQfIeVS61iw-1; Tue, 06 Oct 2020 08:39:03 -0400
-X-MC-Unique: 72xewIt-NjKnQfIeVS61iw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-65--7Aum98wOV6UwVoEIfk9zg-1; Tue, 06 Oct 2020 08:39:19 -0400
+X-MC-Unique: -7Aum98wOV6UwVoEIfk9zg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65384802B45;
- Tue,  6 Oct 2020 12:39:02 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-113-147.ams2.redhat.com [10.36.113.147])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8C1B95D9EF;
- Tue,  6 Oct 2020 12:38:55 +0000 (UTC)
-Date: Tue, 6 Oct 2020 14:38:54 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 1/1] hw/nvram: Always register
- FW_CFG_DATA_GENERATOR_INTERFACE
-Message-ID: <20201006123854.GF4202@linux.fritz.box>
-References: <20201006111909.2302081-1-philmd@redhat.com>
- <20201006111909.2302081-2-philmd@redhat.com>
- <20201006121507.GE4202@linux.fritz.box>
- <c36178f9-67f1-2d22-6537-15c73516cbbe@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9AD21084D60;
+ Tue,  6 Oct 2020 12:39:17 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.35.206.84])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 143A155760;
+ Tue,  6 Oct 2020 12:39:12 +0000 (UTC)
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v7 01/13] qtest: rename qtest_qmp_receive to
+ qtest_qmp_receive_dict
+Date: Tue,  6 Oct 2020 15:38:52 +0300
+Message-Id: <20201006123904.610658-2-mlevitsk@redhat.com>
+In-Reply-To: <20201006123904.610658-1-mlevitsk@redhat.com>
+References: <20201006123904.610658-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <c36178f9-67f1-2d22-6537-15c73516cbbe@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mlevitsk@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mlevitsk@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 00:55:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -97,56 +96,269 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P . Berrange" <berrange@redhat.com>, qemu-block@nongnu.org,
- Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ John Snow <jsnow@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 06.10.2020 um 14:20 hat Paolo Bonzini geschrieben:
-> On 06/10/20 14:15, Kevin Wolf wrote:
-> > Am 06.10.2020 um 13:19 hat Philippe Mathieu-DaudÃ© geschrieben:
-> >> While the FW_CFG_DATA_GENERATOR_INTERFACE is only consumed
-> >> by a device only available using system-mode (fw_cfg), it is
-> >> implemented by a crypto component (tls-cipher-suites) which
-> >> is always available when crypto is used.
-> >>
-> >> Commit 69699f3055 introduced the following error in the
-> >> qemu-storage-daemon binary:
-> >>
-> >>   $ echo -e \
-> >>     '{"execute": "qmp_capabilities"}\r\n{"execute": "qom-list-types"}\r\n{"execute": "quit"}\r\n' \
-> >>     | storage-daemon/qemu-storage-daemon --chardev stdio,id=qmp0  --monitor qmp0
-> >>   {"QMP": {"version": {"qemu": {"micro": 50, "minor": 1, "major": 5}, "package": ""}, "capabilities": ["oob"]}}
-> >>   {"return": {}}
-> >>   missing interface 'fw_cfg-data-generator' for object 'tls-creds'
-> >>   Aborted (core dumped)
-> >>
-> >> Since QOM dependencies are resolved at runtime, this issue
-> >> could not be triggered at linktime, and we don't have test
-> >> running the qemu-storage-daemon binary.
-> >>
-> >> Fix by always registering the QOM interface.
-> >>
-> >> Reported-by: Kevin Wolf <kwolf@redhat.com>
-> >> Fixes: 69699f3055 ("crypto/tls-cipher-suites: Produce fw_cfg consumable blob")
-> >> Signed-off-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
-> > 
-> > This fails to build for me:
-> > 
-> > ../hw/nvram/meson.build:2:7: ERROR: Unknown method "add" in object.
-> 
-> It's
-> 
->   Based-on: <20201006111219.2300921-1-philmd@redhat.com>
-> 
-> (which won't be applied in exactly that shape, but more or less it will
-> be the same).
+In the next patch a new version of qtest_qmp_receive will be
+reintroduced that will buffer received qmp events for later
+consumption in qtest_qmp_eventwait_ref
 
-Oh, I see. Then I guess it's not supposed to be merged through my tree.
+No functional change intended.
 
-Kevin
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+---
+ tests/qtest/ahci-test.c        |  4 ++--
+ tests/qtest/device-plug-test.c |  2 +-
+ tests/qtest/drive_del-test.c   |  2 +-
+ tests/qtest/libqos/libqtest.h  |  4 ++--
+ tests/qtest/libqtest.c         | 16 ++++++++--------
+ tests/qtest/pvpanic-test.c     |  2 +-
+ tests/qtest/qmp-test.c         | 18 +++++++++---------
+ 7 files changed, 24 insertions(+), 24 deletions(-)
+
+diff --git a/tests/qtest/ahci-test.c b/tests/qtest/ahci-test.c
+index 5e1954852e..d42ebaeb4c 100644
+--- a/tests/qtest/ahci-test.c
++++ b/tests/qtest/ahci-test.c
+@@ -1590,7 +1590,7 @@ static void test_atapi_tray(void)
+     qtest_qmp_send(ahci->parent->qts, "{'execute': 'blockdev-open-tray', "
+                     "'arguments': {'id': 'cd0'}}");
+     atapi_wait_tray(ahci, true);
+-    rsp = qtest_qmp_receive(ahci->parent->qts);
++    rsp = qtest_qmp_receive_dict(ahci->parent->qts);
+     qobject_unref(rsp);
+ 
+     qmp_discard_response(ahci->parent->qts,
+@@ -1620,7 +1620,7 @@ static void test_atapi_tray(void)
+     qtest_qmp_send(ahci->parent->qts, "{'execute': 'blockdev-close-tray', "
+                    "'arguments': {'id': 'cd0'}}");
+     atapi_wait_tray(ahci, false);
+-    rsp = qtest_qmp_receive(ahci->parent->qts);
++    rsp = qtest_qmp_receive_dict(ahci->parent->qts);
+     qobject_unref(rsp);
+ 
+     /* Now, to convince ATAPI we understand the media has changed... */
+diff --git a/tests/qtest/device-plug-test.c b/tests/qtest/device-plug-test.c
+index 9214892741..a2247856be 100644
+--- a/tests/qtest/device-plug-test.c
++++ b/tests/qtest/device-plug-test.c
+@@ -23,7 +23,7 @@ static void device_del_start(QTestState *qtest, const char *id)
+ 
+ static void device_del_finish(QTestState *qtest)
+ {
+-    QDict *resp = qtest_qmp_receive(qtest);
++    QDict *resp = qtest_qmp_receive_dict(qtest);
+ 
+     g_assert(qdict_haskey(resp, "return"));
+     qobject_unref(resp);
+diff --git a/tests/qtest/drive_del-test.c b/tests/qtest/drive_del-test.c
+index 2d765865ce..ba0cd77445 100644
+--- a/tests/qtest/drive_del-test.c
++++ b/tests/qtest/drive_del-test.c
+@@ -41,7 +41,7 @@ static void device_del(QTestState *qts)
+     /* Complication: ignore DEVICE_DELETED event */
+     qmp_discard_response(qts, "{'execute': 'device_del',"
+                          " 'arguments': { 'id': 'dev0' } }");
+-    response = qtest_qmp_receive(qts);
++    response = qtest_qmp_receive_dict(qts);
+     g_assert(response);
+     g_assert(qdict_haskey(response, "return"));
+     qobject_unref(response);
+diff --git a/tests/qtest/libqos/libqtest.h b/tests/qtest/libqos/libqtest.h
+index a6ee1654f2..a41135fc92 100644
+--- a/tests/qtest/libqos/libqtest.h
++++ b/tests/qtest/libqos/libqtest.h
+@@ -191,12 +191,12 @@ void qtest_qmp_vsend(QTestState *s, const char *fmt, va_list ap)
+     GCC_FMT_ATTR(2, 0);
+ 
+ /**
+- * qtest_receive:
++ * qtest_qmp_receive_dict:
+  * @s: #QTestState instance to operate on.
+  *
+  * Reads a QMP message from QEMU and returns the response.
+  */
+-QDict *qtest_qmp_receive(QTestState *s);
++QDict *qtest_qmp_receive_dict(QTestState *s);
+ 
+ /**
+  * qtest_qmp_eventwait:
+diff --git a/tests/qtest/libqtest.c b/tests/qtest/libqtest.c
+index 58f58e1ece..dadc465825 100644
+--- a/tests/qtest/libqtest.c
++++ b/tests/qtest/libqtest.c
+@@ -322,7 +322,7 @@ QTestState *qtest_init(const char *extra_args)
+     QDict *greeting;
+ 
+     /* Read the QMP greeting and then do the handshake */
+-    greeting = qtest_qmp_receive(s);
++    greeting = qtest_qmp_receive_dict(s);
+     qobject_unref(greeting);
+     qobject_unref(qtest_qmp(s, "{ 'execute': 'qmp_capabilities' }"));
+ 
+@@ -603,7 +603,7 @@ QDict *qmp_fd_receive(int fd)
+     return qmp.response;
+ }
+ 
+-QDict *qtest_qmp_receive(QTestState *s)
++QDict *qtest_qmp_receive_dict(QTestState *s)
+ {
+     return qmp_fd_receive(s->qmp_fd);
+ }
+@@ -678,7 +678,7 @@ QDict *qtest_vqmp_fds(QTestState *s, int *fds, size_t fds_num,
+     qtest_qmp_vsend_fds(s, fds, fds_num, fmt, ap);
+ 
+     /* Receive reply */
+-    return qtest_qmp_receive(s);
++    return qtest_qmp_receive_dict(s);
+ }
+ 
+ QDict *qtest_vqmp(QTestState *s, const char *fmt, va_list ap)
+@@ -686,7 +686,7 @@ QDict *qtest_vqmp(QTestState *s, const char *fmt, va_list ap)
+     qtest_qmp_vsend(s, fmt, ap);
+ 
+     /* Receive reply */
+-    return qtest_qmp_receive(s);
++    return qtest_qmp_receive_dict(s);
+ }
+ 
+ QDict *qmp_fd(int fd, const char *fmt, ...)
+@@ -776,7 +776,7 @@ QDict *qtest_qmp_eventwait_ref(QTestState *s, const char *event)
+     QDict *response;
+ 
+     for (;;) {
+-        response = qtest_qmp_receive(s);
++        response = qtest_qmp_receive_dict(s);
+         if ((qdict_haskey(response, "event")) &&
+             (strcmp(qdict_get_str(response, "event"), event) == 0)) {
+             return response;
+@@ -807,7 +807,7 @@ char *qtest_vhmp(QTestState *s, const char *fmt, va_list ap)
+     while (ret == NULL && qdict_get_try_str(resp, "event")) {
+         /* Ignore asynchronous QMP events */
+         qobject_unref(resp);
+-        resp = qtest_qmp_receive(s);
++        resp = qtest_qmp_receive_dict(s);
+         ret = g_strdup(qdict_get_try_str(resp, "return"));
+     }
+     g_assert(ret);
+@@ -1255,7 +1255,7 @@ QDict *qtest_qmp_receive_success(QTestState *s,
+     const char *event;
+ 
+     for (;;) {
+-        response = qtest_qmp_receive(s);
++        response = qtest_qmp_receive_dict(s);
+         g_assert(!qdict_haskey(response, "error"));
+         ret = qdict_get_qdict(response, "return");
+         if (ret) {
+@@ -1345,7 +1345,7 @@ void qtest_qmp_device_del(QTestState *qts, const char *id)
+     rsp = qtest_qmp_receive_success(qts, device_deleted_cb, &got_event);
+     qobject_unref(rsp);
+     if (!got_event) {
+-        rsp = qtest_qmp_receive(qts);
++        rsp = qtest_qmp_receive_dict(qts);
+         g_assert_cmpstr(qdict_get_try_str(rsp, "event"),
+                         ==, "DEVICE_DELETED");
+         qobject_unref(rsp);
+diff --git a/tests/qtest/pvpanic-test.c b/tests/qtest/pvpanic-test.c
+index e57639481e..b0b20ad340 100644
+--- a/tests/qtest/pvpanic-test.c
++++ b/tests/qtest/pvpanic-test.c
+@@ -24,7 +24,7 @@ static void test_panic(void)
+ 
+     qtest_outb(qts, 0x505, 0x1);
+ 
+-    response = qtest_qmp_receive(qts);
++    response = qtest_qmp_receive_dict(qts);
+     g_assert(qdict_haskey(response, "event"));
+     g_assert_cmpstr(qdict_get_str(response, "event"), ==, "GUEST_PANICKED");
+     g_assert(qdict_haskey(response, "data"));
+diff --git a/tests/qtest/qmp-test.c b/tests/qtest/qmp-test.c
+index e1032c5a21..eb1cd8abb8 100644
+--- a/tests/qtest/qmp-test.c
++++ b/tests/qtest/qmp-test.c
+@@ -47,37 +47,37 @@ static void test_malformed(QTestState *qts)
+ 
+     /* syntax error */
+     qtest_qmp_send_raw(qts, "{]\n");
+-    resp = qtest_qmp_receive(qts);
++    resp = qtest_qmp_receive_dict(qts);
+     qmp_expect_error_and_unref(resp, "GenericError");
+     assert_recovered(qts);
+ 
+     /* lexical error: impossible byte outside string */
+     qtest_qmp_send_raw(qts, "{\xFF");
+-    resp = qtest_qmp_receive(qts);
++    resp = qtest_qmp_receive_dict(qts);
+     qmp_expect_error_and_unref(resp, "GenericError");
+     assert_recovered(qts);
+ 
+     /* lexical error: funny control character outside string */
+     qtest_qmp_send_raw(qts, "{\x01");
+-    resp = qtest_qmp_receive(qts);
++    resp = qtest_qmp_receive_dict(qts);
+     qmp_expect_error_and_unref(resp, "GenericError");
+     assert_recovered(qts);
+ 
+     /* lexical error: impossible byte in string */
+     qtest_qmp_send_raw(qts, "{'bad \xFF");
+-    resp = qtest_qmp_receive(qts);
++    resp = qtest_qmp_receive_dict(qts);
+     qmp_expect_error_and_unref(resp, "GenericError");
+     assert_recovered(qts);
+ 
+     /* lexical error: control character in string */
+     qtest_qmp_send_raw(qts, "{'execute': 'nonexistent', 'id':'\n");
+-    resp = qtest_qmp_receive(qts);
++    resp = qtest_qmp_receive_dict(qts);
+     qmp_expect_error_and_unref(resp, "GenericError");
+     assert_recovered(qts);
+ 
+     /* lexical error: interpolation */
+     qtest_qmp_send_raw(qts, "%%p");
+-    resp = qtest_qmp_receive(qts);
++    resp = qtest_qmp_receive_dict(qts);
+     qmp_expect_error_and_unref(resp, "GenericError");
+     assert_recovered(qts);
+ 
+@@ -111,7 +111,7 @@ static void test_qmp_protocol(void)
+     qts = qtest_init_without_qmp_handshake(common_args);
+ 
+     /* Test greeting */
+-    resp = qtest_qmp_receive(qts);
++    resp = qtest_qmp_receive_dict(qts);
+     q = qdict_get_qdict(resp, "QMP");
+     g_assert(q);
+     test_version(qdict_get(q, "version"));
+@@ -205,7 +205,7 @@ static void send_oob_cmd_that_fails(QTestState *s, const char *id)
+ 
+ static void recv_cmd_id(QTestState *s, const char *id)
+ {
+-    QDict *resp = qtest_qmp_receive(s);
++    QDict *resp = qtest_qmp_receive_dict(s);
+ 
+     g_assert_cmpstr(qdict_get_try_str(resp, "id"), ==, id);
+     qobject_unref(resp);
+@@ -222,7 +222,7 @@ static void test_qmp_oob(void)
+     qts = qtest_init_without_qmp_handshake(common_args);
+ 
+     /* Check the greeting message. */
+-    resp = qtest_qmp_receive(qts);
++    resp = qtest_qmp_receive_dict(qts);
+     q = qdict_get_qdict(resp, "QMP");
+     g_assert(q);
+     capabilities = qdict_get_qlist(q, "capabilities");
+-- 
+2.26.2
 
 
