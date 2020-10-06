@@ -2,88 +2,87 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47091C4363D
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 22:29:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26A02C4363D
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 23:08:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CCDF206FC
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 22:29:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 48649208C7
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 23:08:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cl8jtulw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CCDF206FC
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XS2d8ZjX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48649208C7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPvSd-0001NQ-C1
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 18:29:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45484)
+	id 1kPw40-0007tE-2s
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 19:08:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56294)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kPv9z-00077y-IG
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 18:10:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50793)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kPw3Q-0007Te-SO
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 19:07:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56716)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kPv9v-0006Qv-SD
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 18:10:15 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kPw3N-0004jP-Qz
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 19:07:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602022202;
+ s=mimecast20190719; t=1602025648;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=h4ogneDYBvVq18dZ2y7hPL4IVvfOmaXh9FYWhRrlJag=;
- b=Cl8jtulw2AHaYJrm7fzEDj7+//SC0OFCJQmCbwZnrNH+MfFaCHAmej45AmozH/HPbOskIQ
- VRHzNjKjhlO1GLBrOp1jlyuMewR2kVIZYvrECJjkdlR5VqLzbfSifgyWbx4GjuF7tWNKtv
- F7Cm8g+iVZpBzHnNduYrb/tV3NOIVLI=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=jAJuIgJh2u7qaRB0dGPFsWKSjKqE/VNRfHE+BqH1DtA=;
+ b=XS2d8ZjXOOf7iRhuqeiEuMVucEphtnA+IaMZm7bYx9AEjXZFLhsxKYn0kZj0mzb5JdUhES
+ I2zKgtyhATR3r/JbZLyIAX9e7BOsSUzaOl/LPDy3/ZFl8KHbPgtn60FrULFwegvqlDzQKi
+ kZk/7hlD1lQz73LJ0+C3bqvdJdU/tf8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-486-z43qWC_RPwi3-kC542yyXg-1; Tue, 06 Oct 2020 18:10:00 -0400
-X-MC-Unique: z43qWC_RPwi3-kC542yyXg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-521-hxLScgUtPtWJHiflFmWyFA-1; Tue, 06 Oct 2020 19:07:26 -0400
+X-MC-Unique: hxLScgUtPtWJHiflFmWyFA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BAF4C1091060;
- Tue,  6 Oct 2020 22:09:59 +0000 (UTC)
-Received: from localhost (ovpn-119-102.rdu2.redhat.com [10.10.119.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7EE5010013BD;
- Tue,  6 Oct 2020 22:09:59 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-devel@nongnu.org
-Subject: [PULL 19/21] memory: Explicitly tag doc comments for structs
-Date: Tue,  6 Oct 2020 18:09:28 -0400
-Message-Id: <20201006220930.908275-20-ehabkost@redhat.com>
-In-Reply-To: <20201006220930.908275-1-ehabkost@redhat.com>
-References: <20201006220930.908275-1-ehabkost@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5EED3805EF7;
+ Tue,  6 Oct 2020 23:07:25 +0000 (UTC)
+Received: from [10.10.120.38] (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EAD4B1A886;
+ Tue,  6 Oct 2020 23:07:24 +0000 (UTC)
+To: Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>
+From: John Snow <jsnow@redhat.com>
+Subject: acceptance-system-fedora failures
+Message-ID: <f9e09f0b-3915-382c-d670-8d33d164ad7b@redhat.com>
+Date: Tue, 6 Oct 2020 19:07:24 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 01:55:55
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 00:55:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
 X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ WEIRD_PORT=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,56 +95,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This will allow us to remove the QEMU-specific
-$decl_type='type name' hack from the kernel-doc script.
+I'm seeing this gitlab test fail quite often in my Python work; I don't 
+*think* this has anything to do with my patches, but maybe I need to try 
+and bisect this more aggressively.
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20201003024123.193840-5-ehabkost@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- include/exec/memory.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+The very first hint of an error I see is on line 154:
 
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index dee0985162..622207bde1 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -443,7 +443,7 @@ struct IOMMUMemoryRegion {
-     QLIST_FOREACH((n), &(mr)->iommu_notify, node)
- 
- /**
-- * MemoryListener: callbacks structure for updates to the physical memory map
-+ * struct MemoryListener: callbacks structure for updates to the physical memory map
-  *
-  * Allows a component to adjust to changes in the guest-visible memory map.
-  * Use with memory_listener_register() and memory_listener_unregister().
-@@ -681,7 +681,7 @@ struct MemoryListener {
- };
- 
- /**
-- * AddressSpace: describes a mapping of addresses to #MemoryRegion objects
-+ * struct AddressSpace: describes a mapping of addresses to #MemoryRegion objects
-  */
- struct AddressSpace {
-     /* private: */
-@@ -721,7 +721,7 @@ static inline FlatView *address_space_to_flatview(AddressSpace *as)
- 
- 
- /**
-- * MemoryRegionSection: describes a fragment of a #MemoryRegion
-+ * struct MemoryRegionSection: describes a fragment of a #MemoryRegion
-  *
-  * @mr: the region, or %NULL if empty
-  * @fv: the flat view of the address space the region is mapped in
--- 
-2.26.2
+https://gitlab.com/jsnow/qemu/-/jobs/776334918#L154
+
+22:05:36 ERROR|
+22:05:36 ERROR| Reproduced traceback from: 
+/builds/jsnow/qemu/build/tests/venv/lib64/python3.8/site-packages/avocado/core/test.py:753
+22:05:36 ERROR| Traceback (most recent call last):
+22:05:36 ERROR|   File 
+"/builds/jsnow/qemu/build/tests/acceptance/avocado_qemu/__init__.py", 
+line 171, in setUp
+22:05:36 ERROR|     self.cancel("No QEMU binary defined or found in the 
+build tree")
+
+Is this a known problem?
+
+--js
 
 
