@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2F61C41604
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:45:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BDDDC41604
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:46:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33E2F20760
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:45:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BF07920760
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:46:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EA6UNSqw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33E2F20760
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="erWuw/tT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF07920760
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPhfZ-0007xV-7a
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 03:45:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39892)
+	id 1kPhfu-00087L-RY
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 03:46:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39618)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kPhQQ-0003HU-Oz
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:18 -0400
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:52303)
+ id 1kPhQ9-0002a5-A7
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:01 -0400
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:34803)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kPhQO-0001Uz-2M
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:18 -0400
-Received: by mail-wm1-x32c.google.com with SMTP id l11so1833553wmh.2
- for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 00:30:15 -0700 (PDT)
+ id 1kPhQ7-0001PF-Ix
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:00 -0400
+Received: by mail-wr1-x42e.google.com with SMTP id t10so12238520wrv.1
+ for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 00:29:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=N+wPUKHp0dEGNvIdECz+pBa71rOenQ+nUmpc905Z6ig=;
- b=EA6UNSqwqzdZ8XAXQJtPXgUU8Y8culRpeF90oxEyZUAg0LvemWl7MaMJyntVEo8Yig
- bMJWDfvpoV0I7/7boN2FpYMiFuEmlin2WOl8ULLjhqkc9gKj/iXJEc/ICTsTyypxtu0o
- 424dtWXBxbvp6ltBBJtTWutG/KJzNwtTbds2rbV/EvPmE0V2VQJSWJ3ZLC7ElwtrtNuv
- JKB+S51wtG7tRdEa/+8mrQFjEv+yC8KVCc3S88LM4vXmTdLlaO6eC1KktZLlSmKBSjIQ
- Sh09s55Xr6iA9amgXaVU9hEqOr2qzpfOzfnSQijwpv+S5q3iLEEvGPQ5gd4HyojHi3Re
- Wa8Q==
+ bh=9PshzEAxmiySI9dhZtBtR355rxrVnXQvCn9xhLCKJkQ=;
+ b=erWuw/tTrQOciYA3Lcrl2WoB16Tdz86cx/DocAcFkleWpI+PCVV8L0BdrCjfWmyb4V
+ oeVB1ez7OrxeZ86SoojM75st1Z3FllW7RKSH7VEiz6AzkB/2j2w3Wqh8ROGukkfsxFiR
+ bvO5k1vcvKsIizySpuysRnaDn7n3aGRB/wuDrOIrUUFGPyMRNOSOiaNK2yrnv2AQQIP/
+ QKfHN8TFituJvDGZqJHooivdKGH2fSlV5MI2Opbuklz44pT90bCDgxaT0AVXPijfAbVj
+ b8YpBm0me4am0WmszDxf4Nx30e7UE30Hc4JvhwuF+5tje1OJKm/jaXwKBCe6bwQINiWY
+ 7Y3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=N+wPUKHp0dEGNvIdECz+pBa71rOenQ+nUmpc905Z6ig=;
- b=JeE/YIXUBXAP2owrG08K/QAF+Qji/r3/79ELcyDcw7oI/vEwYgfZ8T3aupCA3jjbO/
- TV7912LW3cOuIHvXQxyohTgwbrcMWa+AuS/hVu8G74CbSgomxbHNc91vrWyDwfzUgwlf
- gUVrCkHSP+Lsg6YNrS6KT4Xi+89t5c+vzZ/2AkFS4uSv1KU5s3ZDCT9kbWJF9giFMhFp
- 8mczG1WLq5bflEmUDMQnuDHvFGa5LFyzveqIepVaYlBQnzinmgQ4PT/qk29CrcJgHAbk
- t1Wat874cB8YBSlCh1E54QlNpIPucIHgaWI/NVoOD0C+x0KJESm3/AwC9L9he0kGwHuN
- ulSQ==
-X-Gm-Message-State: AOAM530lCPR5UATpdO1uy1dQQ0tTo1GF0JsOARVjjSeB9C0fm3xycClq
- 86SJDz73INxMAoE62uhJmcrNB62TK8Q=
-X-Google-Smtp-Source: ABdhPJysV8kKnHiG6dxYbw8Bj+YFw/UWSwRGZZBsld5YbpsU6GjrzCersYrSoFXV+hs5gSoVfa+cpQ==
-X-Received: by 2002:a1c:23c2:: with SMTP id j185mr3107499wmj.136.1601969414316; 
- Tue, 06 Oct 2020 00:30:14 -0700 (PDT)
+ bh=9PshzEAxmiySI9dhZtBtR355rxrVnXQvCn9xhLCKJkQ=;
+ b=qiV39+n6AvNvyYqBPR4UMvge3IX4q+jQij4/wwQE3fWqBUUJehQ3uF3VlW/b1BQ/IR
+ L0jE5yVvm4JR6VgrTat8HUuyp5SLn/wERivIh/7JNqD3HyWFdKaRVeRGW28+BLelkQ/+
+ Y7ODxbdUIkiTdGrXiok+vIPJyjOC9PS7R/OzD5J3k7M2lHSXq99G5VkZoNkKZ0RTqM1N
+ VjXaJJxNKo9gBCnw3kyK4W8zD2NOhN1DJUdl6DjPnQOvmPPafIxcptwaoX+BacRiN8Pm
+ IBXQpt/B4HwrWFTHs0ih8dbrXZa6lvEukm7yySv+2EyKJYyRVkpoTmIGrsh0m7kW3eCV
+ JpRA==
+X-Gm-Message-State: AOAM531/AhH3RgRLUKFyAnBA/LX3NPW2bYH4NdLjCIlbnTvzmdh6CR6V
+ WBweSzk+aM2Y6qtdoDLHdklxUgrgIvc=
+X-Google-Smtp-Source: ABdhPJwgTEK6MiFUpJIMB6EYM26uvEshkTm8TD9FUxDEIPCwWitk55xdKMrd6c/u4itL4GgGglaZgg==
+X-Received: by 2002:adf:dd51:: with SMTP id u17mr3241648wrm.355.1601969398048; 
+ Tue, 06 Oct 2020 00:29:58 -0700 (PDT)
 Received: from localhost.localdomain ([2001:b07:6468:f312:5aca:cd0b:c4a1:9c2e])
- by smtp.gmail.com with ESMTPSA id i9sm2576329wma.47.2020.10.06.00.30.13
+ by smtp.gmail.com with ESMTPSA id i9sm2576329wma.47.2020.10.06.00.29.57
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 06 Oct 2020 00:30:13 -0700 (PDT)
+ Tue, 06 Oct 2020 00:29:57 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 31/37] replay: implement replay-seek command
-Date: Tue,  6 Oct 2020 09:29:41 +0200
-Message-Id: <20201006072947.487729-32-pbonzini@redhat.com>
+Subject: [PULL 13/37] hvf: remove hvf specific functions from global includes
+Date: Tue,  6 Oct 2020 09:29:23 +0200
+Message-Id: <20201006072947.487729-14-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201006072947.487729-1-pbonzini@redhat.com>
 References: <20201006072947.487729-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32c;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x32c.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42e;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x42e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -100,208 +100,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>,
- Markus Armbruster <armbru@redhat.com>,
- Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Cc: Roman Bolshakov <r.bolshakov@yadro.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Claudio Fontana <cfontana@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+From: Claudio Fontana <cfontana@suse.de>
 
-This patch adds hmp/qmp commands replay_seek/replay-seek that proceed
-the execution to the specified instruction count.
-The command automatically loads nearest snapshot and replays the execution
-to find the desired instruction count.
-
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
-Acked-by: Markus Armbruster <armbru@redhat.com>
-
---
-
-v4 changes:
- - fixed HMP command description indent
- - removed useless error_free call
-Message-Id: <160174521180.12451.14033112911009278753.stgit@pasha-ThinkPad-X280>
-
+Signed-off-by: Claudio Fontana <cfontana@suse.de>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Roman Bolshakov <r.bolshakov@yadro.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hmp-commands.hx           | 18 ++++++++
- include/monitor/hmp.h     |  1 +
- qapi/replay.json          | 20 +++++++++
- replay/replay-debugging.c | 87 +++++++++++++++++++++++++++++++++++++++
- 4 files changed, 126 insertions(+)
+ accel/stubs/hvf-stub.c     | 30 ------------------------------
+ accel/stubs/meson.build    |  1 -
+ include/sysemu/hvf.h       |  8 --------
+ target/i386/hvf/hvf-cpus.h |  8 ++++++++
+ target/i386/hvf/x86hvf.c   |  2 ++
+ target/i386/hvf/x86hvf.h   |  1 -
+ 6 files changed, 10 insertions(+), 40 deletions(-)
+ delete mode 100644 accel/stubs/hvf-stub.c
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 7680d0b380..e43ce600b8 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1836,6 +1836,24 @@ SRST
-   The command is ignored when there are no replay breakpoints.
- ERST
+diff --git a/accel/stubs/hvf-stub.c b/accel/stubs/hvf-stub.c
+deleted file mode 100644
+index e81dfe888c..0000000000
+--- a/accel/stubs/hvf-stub.c
++++ /dev/null
+@@ -1,30 +0,0 @@
+-/*
+- * QEMU HVF support
+- *
+- * Copyright 2017 Red Hat, Inc.
+- *
+- * This software is licensed under the terms of the GNU General Public
+- * License version 2 or later, as published by the Free Software Foundation,
+- * and may be copied, distributed, and modified under those terms.
+- *
+- * See the COPYING file in the top-level directory.
+- *
+- */
+-
+-#include "qemu/osdep.h"
+-#include "cpu.h"
+-#include "sysemu/hvf.h"
+-
+-int hvf_init_vcpu(CPUState *cpu)
+-{
+-    return -ENOSYS;
+-}
+-
+-int hvf_vcpu_exec(CPUState *cpu)
+-{
+-    return -ENOSYS;
+-}
+-
+-void hvf_vcpu_destroy(CPUState *cpu)
+-{
+-}
+diff --git a/accel/stubs/meson.build b/accel/stubs/meson.build
+index 314e3cfff4..3fbe34e5bb 100644
+--- a/accel/stubs/meson.build
++++ b/accel/stubs/meson.build
+@@ -1,6 +1,5 @@
+ specific_ss.add(when: 'CONFIG_HAX', if_false: files('hax-stub.c'))
+ specific_ss.add(when: 'CONFIG_XEN', if_false: files('xen-stub.c'))
+-specific_ss.add(when: 'CONFIG_HVF', if_false: files('hvf-stub.c'))
+ specific_ss.add(when: 'CONFIG_KVM', if_false: files('kvm-stub.c'))
+ specific_ss.add(when: 'CONFIG_TCG', if_false: files('tcg-stub.c'))
+ specific_ss.add(when: 'CONFIG_WHPX', if_false: files('whpx-stub.c'))
+diff --git a/include/sysemu/hvf.h b/include/sysemu/hvf.h
+index 1398679458..f893768df9 100644
+--- a/include/sysemu/hvf.h
++++ b/include/sysemu/hvf.h
+@@ -26,14 +26,6 @@ extern bool hvf_allowed;
+ #define hvf_get_supported_cpuid(func, idx, reg) 0
+ #endif /* !CONFIG_HVF */
  
-+    {
-+        .name       = "replay_seek",
-+        .args_type  = "icount:i",
-+        .params     = "icount",
-+        .help       = "replay execution to the specified instruction count",
-+        .cmd        = hmp_replay_seek,
-+    },
-+
-+SRST
-+``replay_seek`` *icount*
-+  Automatically proceed to the instruction count *icount*, when
-+  replaying the execution. The command automatically loads nearest
-+  snapshot and replays the execution to find the desired instruction.
-+  When there is no preceding snapshot or the execution is not replayed,
-+  then the command fails.
-+  *icount* for the reference may be observed with ``info replay`` command.
-+ERST
-+
-     {
-         .name       = "info",
-         .args_type  = "item:s?",
-diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
-index 809ad638bb..ed2913fd18 100644
---- a/include/monitor/hmp.h
-+++ b/include/monitor/hmp.h
-@@ -132,5 +132,6 @@ void hmp_info_sev(Monitor *mon, const QDict *qdict);
- void hmp_info_replay(Monitor *mon, const QDict *qdict);
- void hmp_replay_break(Monitor *mon, const QDict *qdict);
- void hmp_replay_delete_break(Monitor *mon, const QDict *qdict);
-+void hmp_replay_seek(Monitor *mon, const QDict *qdict);
+-int hvf_init_vcpu(CPUState *);
+-int hvf_vcpu_exec(CPUState *);
+-void hvf_cpu_synchronize_state(CPUState *);
+-void hvf_cpu_synchronize_post_reset(CPUState *);
+-void hvf_cpu_synchronize_post_init(CPUState *);
+-void hvf_cpu_synchronize_pre_loadvm(CPUState *);
+-void hvf_vcpu_destroy(CPUState *);
+-
+ #define TYPE_HVF_ACCEL ACCEL_CLASS_NAME("hvf")
  
- #endif
-diff --git a/qapi/replay.json b/qapi/replay.json
-index 173ba76107..bfd83d7591 100644
---- a/qapi/replay.json
-+++ b/qapi/replay.json
-@@ -99,3 +99,23 @@
- #
- ##
- { 'command': 'replay-delete-break' }
-+
-+##
-+# @replay-seek:
-+#
-+# Automatically proceed to the instruction count @icount, when
-+# replaying the execution. The command automatically loads nearest
-+# snapshot and replays the execution to find the desired instruction.
-+# When there is no preceding snapshot or the execution is not replayed,
-+# then the command fails.
-+# icount for the reference may be obtained with @query-replay command.
-+#
-+# @icount: target instruction count
-+#
-+# Since: 5.2
-+#
-+# Example:
-+#
-+# -> { "execute": "replay-seek", "data": { "icount": 220414 } }
-+##
-+{ 'command': 'replay-seek', 'data': { 'icount': 'int' } }
-diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
-index 3dc23b84fc..e1fe6b8661 100644
---- a/replay/replay-debugging.c
-+++ b/replay/replay-debugging.c
-@@ -19,6 +19,8 @@
- #include "qapi/qapi-commands-replay.h"
- #include "qapi/qmp/qdict.h"
- #include "qemu/timer.h"
-+#include "block/snapshot.h"
-+#include "migration/snapshot.h"
+ typedef struct HVFState HVFState;
+diff --git a/target/i386/hvf/hvf-cpus.h b/target/i386/hvf/hvf-cpus.h
+index 262e449fd6..ced31b82c0 100644
+--- a/target/i386/hvf/hvf-cpus.h
++++ b/target/i386/hvf/hvf-cpus.h
+@@ -14,4 +14,12 @@
  
- void hmp_info_replay(Monitor *mon, const QDict *qdict)
+ extern const CpusAccel hvf_cpus;
+ 
++int hvf_init_vcpu(CPUState *);
++int hvf_vcpu_exec(CPUState *);
++void hvf_cpu_synchronize_state(CPUState *);
++void hvf_cpu_synchronize_post_reset(CPUState *);
++void hvf_cpu_synchronize_post_init(CPUState *);
++void hvf_cpu_synchronize_pre_loadvm(CPUState *);
++void hvf_vcpu_destroy(CPUState *);
++
+ #endif /* HVF_CPUS_H */
+diff --git a/target/i386/hvf/x86hvf.c b/target/i386/hvf/x86hvf.c
+index 5cbcb32ab6..b986213c0f 100644
+--- a/target/i386/hvf/x86hvf.c
++++ b/target/i386/hvf/x86hvf.c
+@@ -32,6 +32,8 @@
+ #include <Hypervisor/hv.h>
+ #include <Hypervisor/hv_vmx.h>
+ 
++#include "hvf-cpus.h"
++
+ void hvf_set_segment(struct CPUState *cpu, struct vmx_segment *vmx_seg,
+                      SegmentCache *qseg, bool is_tr)
  {
-@@ -125,3 +127,88 @@ void hmp_replay_delete_break(Monitor *mon, const QDict *qdict)
-         return;
-     }
- }
-+
-+static char *replay_find_nearest_snapshot(int64_t icount,
-+                                          int64_t *snapshot_icount)
-+{
-+    BlockDriverState *bs;
-+    QEMUSnapshotInfo *sn_tab;
-+    QEMUSnapshotInfo *nearest = NULL;
-+    char *ret = NULL;
-+    int nb_sns, i;
-+    AioContext *aio_context;
-+
-+    *snapshot_icount = -1;
-+
-+    bs = bdrv_all_find_vmstate_bs();
-+    if (!bs) {
-+        goto fail;
-+    }
-+    aio_context = bdrv_get_aio_context(bs);
-+
-+    aio_context_acquire(aio_context);
-+    nb_sns = bdrv_snapshot_list(bs, &sn_tab);
-+    aio_context_release(aio_context);
-+
-+    for (i = 0; i < nb_sns; i++) {
-+        if (bdrv_all_find_snapshot(sn_tab[i].name, &bs) == 0) {
-+            if (sn_tab[i].icount != -1ULL
-+                && sn_tab[i].icount <= icount
-+                && (!nearest || nearest->icount < sn_tab[i].icount)) {
-+                nearest = &sn_tab[i];
-+            }
-+        }
-+    }
-+    if (nearest) {
-+        ret = g_strdup(nearest->name);
-+        *snapshot_icount = nearest->icount;
-+    }
-+    g_free(sn_tab);
-+
-+fail:
-+    return ret;
-+}
-+
-+static void replay_seek(int64_t icount, QEMUTimerCB callback, Error **errp)
-+{
-+    char *snapshot = NULL;
-+    int64_t snapshot_icount;
-+
-+    if (replay_mode != REPLAY_MODE_PLAY) {
-+        error_setg(errp, "replay must be enabled to seek");
-+        return;
-+    }
-+
-+    snapshot = replay_find_nearest_snapshot(icount, &snapshot_icount);
-+    if (snapshot) {
-+        if (icount < replay_get_current_icount()
-+            || replay_get_current_icount() < snapshot_icount) {
-+            vm_stop(RUN_STATE_RESTORE_VM);
-+            load_snapshot(snapshot, errp);
-+        }
-+        g_free(snapshot);
-+    }
-+    if (replay_get_current_icount() <= icount) {
-+        replay_break(icount, callback, NULL);
-+        vm_start();
-+    } else {
-+        error_setg(errp, "cannot seek to the specified instruction count");
-+    }
-+}
-+
-+void qmp_replay_seek(int64_t icount, Error **errp)
-+{
-+    replay_seek(icount, replay_stop_vm, errp);
-+}
-+
-+void hmp_replay_seek(Monitor *mon, const QDict *qdict)
-+{
-+    int64_t icount = qdict_get_try_int(qdict, "icount", -1LL);
-+    Error *err = NULL;
-+
-+    qmp_replay_seek(icount, &err);
-+    if (err) {
-+        error_report_err(err);
-+        return;
-+    }
-+}
+diff --git a/target/i386/hvf/x86hvf.h b/target/i386/hvf/x86hvf.h
+index 79539f7282..4fabc6d582 100644
+--- a/target/i386/hvf/x86hvf.h
++++ b/target/i386/hvf/x86hvf.h
+@@ -35,5 +35,4 @@ void hvf_get_msrs(CPUState *cpu_state);
+ void vmx_clear_int_window_exiting(CPUState *cpu);
+ void hvf_get_segments(CPUState *cpu_state);
+ void vmx_update_tpr(CPUState *cpu);
+-void hvf_cpu_synchronize_state(CPUState *cpu_state);
+ #endif
 -- 
 2.26.2
 
