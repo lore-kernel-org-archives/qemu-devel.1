@@ -2,86 +2,95 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 117DDC41604
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 09:11:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B991C47095
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 09:20:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 637272078E
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 09:11:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6170F20866
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 09:20:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PTi8ML5I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 637272078E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="We7z8HtK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6170F20866
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPizr-0003ej-0H
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 05:10:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34006)
+	id 1kPj90-0005xu-4x
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 05:20:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35352)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kPizE-00034j-6A; Tue, 06 Oct 2020 05:10:20 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37529)
+ id 1kPj7H-0004zM-9R
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 05:18:39 -0400
+Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:38687)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kPizC-0006Zt-DY; Tue, 06 Oct 2020 05:10:19 -0400
-Received: by mail-wr1-x444.google.com with SMTP id h7so8943645wre.4;
- Tue, 06 Oct 2020 02:10:17 -0700 (PDT)
+ id 1kPj7F-0007Xu-FP
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 05:18:38 -0400
+Received: by mail-wm1-x329.google.com with SMTP id v12so2284211wmh.3
+ for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 02:18:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=rMV/CuyCUzetR86gKWAzorahfaIMTIJGPrcF4mDgVu0=;
- b=PTi8ML5IfVISD21TgbF+jdMiYB4iGoLnjyF905KT6OPm/FUIFPGW8M2AljLQmwQVdN
- GikXhgaMemn2BPjBRt4N40jfq5o81lbZoxh7jJ5yGdPRhKEiLsxTCYMR8LlQc2VQLwRj
- 0XMVsa+FYoUA0Ydco5Seijlip7SZdN8wzYjdpjaP+IlH+ZopP4ORomxmWwF3G9I7wFX7
- vjiwbyR+a8nr0n9qQb9WmihSXRne+5zrKJQkfsFtfvj+LCh3E+wiLytge2V/d5Qgzi9M
- 1rrVlb+bYZuJfWb7vtLuADDU3SuPSO+26LbNs7H7gePBbDQGIA7MJJZ5KHUULEPEw3z8
- hL6g==
+ bh=C6qeUVxqlSpoRZn2lKUM6MZrZQfpAs8K/6HDbYrTQms=;
+ b=We7z8HtKTUiS/6n51Vk0UV5QJbprJTdt7I9u+TwLTbprj0AOQZQETLOM7cH3KpFBTr
+ QMYwZHnYKUm5wlmkckqbgXSOw7A+ucl/ETvdptWwpyyxSw0Ev5T5oOsJA+nMktd60932
+ 5iJllqQJTkjVMjmTZtiqtZEv3bkXB35x0sAk/sEG6wD2R0FpMUQpL8HOBD+6H5in+HCQ
+ OetWc0iVTH8zZa7Ob+9xBf3KO1HqaDjW4SuOoGI9eNvriaqLFN8XaJ7y7lakNhg1mu8Q
+ oug9BFAk8kuS8Qe2M08euYM46c/VIwwcg7Eo/m8Hsi4U/obA/+loh+Hb6UWUFrGymjVr
+ qjfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=rMV/CuyCUzetR86gKWAzorahfaIMTIJGPrcF4mDgVu0=;
- b=SU4OBEZ1+WfVRHjryskWFEs1i2oBLGsovGPDNJApnR5TTJRDH5Jol62D9rHq853RWW
- 3CjRkvO5bY4b58rHxPg31RILhr2h3oS+WrmsMlh2YKYPZmgRqoPRBtIJR8taPys0Hm75
- wxyTowBfQli5PwyFF8830QmwDGbpa22G92FZKTXCIfzBfDk8HAPii59zYNIRzupBMnUs
- 7wjPTgsB/qtf9PSCGf8gFYt2UEwIULTnn/7IIPd4RksvMkzm9X/Jfhv/FAeE57IF2+cq
- EtvGa63rc4vbzENX1q1122N0r9RJBywbSDE1J5UyYPcRFAi7JBYMgOE+2aMiTo8o69VM
- i/1w==
-X-Gm-Message-State: AOAM533Dn3YgSGPgp8jM7JxXBpHLKm9Ig/7xn7CUO/iCDYInfBzQbH5W
- KCgpJ/Gto2eAJtDh55vD9LM=
-X-Google-Smtp-Source: ABdhPJzRoT/W6zjHx2smJTfLTnr9TVVOdbdu6CX8ctyUQGz19sb+aMCu084jSk+pGewatWE88brr2g==
-X-Received: by 2002:adf:e552:: with SMTP id z18mr3577630wrm.50.1601975416570; 
- Tue, 06 Oct 2020 02:10:16 -0700 (PDT)
+ bh=C6qeUVxqlSpoRZn2lKUM6MZrZQfpAs8K/6HDbYrTQms=;
+ b=hMc5rOSriFDdmSBV1FTcAIg8vdkOnjEM1jecanjc1aiblBs7DBLpiPTrB+kMo4Ed5V
+ ATBHW4zP5fC9lXJyodw9u5jXOIngYp0OQN8Wy0vv6n46lyGykJszLiyPy9DJ8N/Dr+o/
+ V912I9fG2QcBBKABCpNBtCIFxa81BIUIBzqPUQ6TbzECtxvotoHGpDs2Ehh9h0VG3n0z
+ k+QOqfBWzSXFc5S+tfB4UUiSne05+8vbXesyzgu9mJtP2Lid3XfFuqWXBv8o4afUFXed
+ 7qMIerQsrZCLP0T0lwnWmHb+bgg5eqokT006ZdCOPMEfUx/2cZHqT1QHK17L0lvtqMX9
+ 8RZA==
+X-Gm-Message-State: AOAM531FLR3g0o+UjsnDPJ0xOCacH/zHQxwFeTHOQk1aEPYr+Xs6q/H4
+ Ca0Zn4J5WEo7eja0QE4n+hc=
+X-Google-Smtp-Source: ABdhPJxU08Fy/jOxfG2YfNcC2TvFMM1XeX6lsaY0OCoPMqk/F8Rg+vGBzxFDyidkVFEY6WfstAquKQ==
+X-Received: by 2002:a1c:f208:: with SMTP id s8mr3848113wmc.85.1601975915606;
+ Tue, 06 Oct 2020 02:18:35 -0700 (PDT)
 Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
  [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id 1sm3722051wre.61.2020.10.06.02.10.15
+ by smtp.gmail.com with ESMTPSA id e18sm3457149wrx.50.2020.10.06.02.18.34
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 06 Oct 2020 02:10:15 -0700 (PDT)
-Subject: Re: [PATCH v2 03/15] hw/core/clock: add the clock_new helper function
-To: Luc Michel <luc@lmichel.fr>, qemu-devel@nongnu.org
-References: <20201005195612.1999165-1-luc@lmichel.fr>
- <20201005195612.1999165-4-luc@lmichel.fr>
+ Tue, 06 Oct 2020 02:18:34 -0700 (PDT)
+Subject: Re: [RFC PATCH 08/21] contrib/gitdm: Add Mentor Graphics to the
+ domain map
+To: Jan Kiszka <jan.kiszka@siemens.com>,
+ Joseph Myers <joseph@codesourcery.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>
+References: <20201004180443.2035359-1-f4bug@amsat.org>
+ <20201004180443.2035359-9-f4bug@amsat.org>
+ <alpine.DEB.2.21.2010051327090.312@digraph.polyomino.org.uk>
+ <87eemc3b1q.fsf@linaro.org>
+ <alpine.DEB.2.21.2010052047250.11145@digraph.polyomino.org.uk>
+ <e1818fb3-4c63-6b2a-17cc-f3b7bc7d393b@siemens.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <21c16fba-085c-98cc-a313-b790850c6813@amsat.org>
-Date: Tue, 6 Oct 2020 11:10:14 +0200
+Message-ID: <17920b87-8156-9a59-3fdd-6910f8e68f1b@amsat.org>
+Date: Tue, 6 Oct 2020 11:18:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20201005195612.1999165-4-luc@lmichel.fr>
+In-Reply-To: <e1818fb3-4c63-6b2a-17cc-f3b7bc7d393b@siemens.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::329;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x329.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -104,74 +113,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Havard Skinnemoen <hskinnemoen@google.com>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Paul Zimmerman <pauldzim@gmail.com>,
- Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org
+Cc: Kwok Cheung Yeung <kcy@codesourcery.com>,
+ Taimoor Mirza <tmirza@codesourcery.com>, qemu-devel@nongnu.org,
+ Julian Brown <julian@codesourcery.com>,
+ Sandra Loosemore <sandra@codesourcery.com>,
+ Andrew Jenner <andrew@codesourcery.com>,
+ Thomas Schwinge <thomas@codesourcery.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/5/20 9:56 PM, Luc Michel wrote:
-> This function creates a clock a parent it to another object with a given
-> name. It calls clock_setup_canonical_path before returning the new
-> clock.
+On 10/6/20 6:01 AM, Jan Kiszka wrote:
+> On 05.10.20 22:52, Joseph Myers wrote:
+>> On Mon, 5 Oct 2020, Alex Bennée wrote:
+>>
+>>> Joseph Myers <joseph@codesourcery.com> writes:
+>>>
+>>>> On Sun, 4 Oct 2020, Philippe Mathieu-Daudé wrote:
+>>>>
+>>>>> There is a number of contributors from this domain,
+>>>>> add its own entry to the gitdm domain map.
+>>>>
+>>>> At some point the main branding will be Siemens; not sure how you want to 
+>>>> handle that.
+>>>
+>>> We've already done something similar with WaveComp who have rolled up
+>>> the various mips and imgtec contributions into
+>>> contrib/gitdm/group-map-wavecomp.
+>>>
+>>> It's really up to you and which corporate entity would like internet
+>>> bragging points. The only Siemens contributor I could find is Jan Kiszka
+>>> but he has contributed a fair amount ;-)
+>>
+>> Given that the Mentor branding is going away (and the "Mentor Graphics" 
+>> version largely has gone away, "Mentor, a Siemens Business" is what's 
+>> currently used as a Mentor brand), probably it makes sense to use Siemens 
+>> for both codesourcery.com and mentor.com addresses.
+>>
 > 
-> This function is useful to create clocks in devices when one doesn't
-> want to expose it at the qdev level (as an input or an output).
-> 
-> Suggested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Signed-off-by: Luc Michel <luc@lmichel.fr>
-> ---
->  include/hw/clock.h | 26 ++++++++++++++++++++++++++
->  1 file changed, 26 insertions(+)
-> 
-> diff --git a/include/hw/clock.h b/include/hw/clock.h
-> index c93e6113cd..a67c4c008b 100644
-> --- a/include/hw/clock.h
-> +++ b/include/hw/clock.h
-> @@ -93,10 +93,36 @@ extern const VMStateDescription vmstate_clock;
->   *
->   * compute the canonical path of the clock (used by log messages)
->   */
->  void clock_setup_canonical_path(Clock *clk);
->  
-> +/**
-> + * clock_new:
-> + * @parent: the clock parent
-> + * @name: the clock object name
-> + *
-> + * Helper function to create a new clock and parent it to @parent. There is no
-> + * need to call clock_setup_canonical_path on the returned clock as it is done
-> + * by this function.
-> + *
-> + * @return the newly created clock
-> + */
-> +static inline Clock *clock_new(Object *parent, const char *name)
-> +{
-> +    Object *obj;
-> +    Clock *clk;
-> +
-> +    obj = object_new(TYPE_CLOCK);
-> +    object_property_add_child(parent, name, obj);
-> +    object_unref(obj);
-> +
-> +    clk = CLOCK(obj);
-> +    clock_setup_canonical_path(clk);
+> I think the key question is what this map is used for: Is it supposed to
+> document the historic status, who was who at the time of contribution?
+> Or is its purpose to help identifying the copyright holder of a
+> contribution today?
 
-Thanks for adding this function. It doesn't seem justified
-to have it inlined. Can you move it to hw/core/clock.c?
+My understanding is it is useful to document the historic status
+(who was who at the time of contribution). The tool support such
+granularity [*]:
 
-> +
-> +    return clk;
-> +}
-> +
->  /**
->   * clock_set_callback:
->   * @clk: the clock to register the callback into
->   * @cb: the callback function
->   * @opaque: the argument to the callback
-> 
+EmailMap file
+
+    Map email addresses onto employers.  These files contain lines
+    like:
+
+            [user@]domain  employer  [< yyyy-mm-dd]
+
+    If the "user@" portion is missing, all email from the given domain
+    will be treated as being associated with the given employer.  If a
+    date is provided, the entry is only valid up to that date;
+    otherwise it is considered valid into the indefinite future.  This
+    feature can be useful for properly tracking developers' work when
+    they change employers but do not change email addresses.
+
+[*] https://repo.or.cz/git-dm.git/blob/098408bc4d:/README#l122
+
+Regards,
+
+Phil.
 
