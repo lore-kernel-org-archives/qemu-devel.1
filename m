@@ -2,92 +2,90 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7925AC41604
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 08:43:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 553FFC41604
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 08:44:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1F7B2080A
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 08:43:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 85B662080A
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 08:44:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ho0/h1yq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1F7B2080A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GuV686ar"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85B662080A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPiZY-0007uM-UN
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 04:43:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55502)
+	id 1kPiaZ-0008Sq-Cg
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 04:44:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55364)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kPiXi-0006cd-D8
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 04:41:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34394)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kPiXf-00033g-RT
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 04:41:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601973710;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=0LPnSZi6f+vgSA5T9Ql1rvwGN0jDOW+YK/Csyla+Yig=;
- b=ho0/h1yq0CI16eD+Wfrj9asW9IJLZwee7qY8RVX6Gl2Jyb+S5JgvB1jj4e29ECDEVuJZ9s
- JRaMUE5yFVQsZa9fgRzkVkRq3F6ihpNeD4wLjliZwWjiQr73GpKSAIkqxACbjyarAB7YNY
- Qwtw24yc2/ZzQ43cB3J52eEyqpgaCc4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-509-WgaG_RQsNpi4yS7EsEolAQ-1; Tue, 06 Oct 2020 04:41:49 -0400
-X-MC-Unique: WgaG_RQsNpi4yS7EsEolAQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38FCD18A0720;
- Tue,  6 Oct 2020 08:41:48 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-112-235.ams2.redhat.com
- [10.36.112.235])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 676FD73666;
- Tue,  6 Oct 2020 08:41:43 +0000 (UTC)
-Subject: Re: [PULL 5/5] crypto/tls-cipher-suites: Produce fw_cfg consumable
- blob
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>
-References: <20200704163927.28188-1-philmd@redhat.com>
- <20200704163927.28188-6-philmd@redhat.com>
- <20200929154651.GC4398@linux.fritz.box>
- <d454d4ae-3c8b-72fb-698d-938e11d18d3a@redhat.com>
- <b47fe2e3-6867-20ec-70b5-c2dd52c6d698@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <23aed98b-6844-d027-14dd-26298698160d@redhat.com>
-Date: Tue, 6 Oct 2020 10:41:39 +0200
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kPiX4-00066o-43
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 04:41:14 -0400
+Received: from mail-ej1-x631.google.com ([2a00:1450:4864:20::631]:33710)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kPiX2-00030l-Ad
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 04:41:13 -0400
+Received: by mail-ej1-x631.google.com with SMTP id c22so15072832ejx.0
+ for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 01:41:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=o6FOmTAhVyYGMcAf1PB6hbfQknro5cZ7zds/7nsigrw=;
+ b=GuV686arF/8B9HX2NRTFatnmw3p3SUXPhsC8DCGejlP/z159IFhIipMghl4l8V9tc0
+ w/UXfgs+mM32JoP5AJwulbEJlgHHADFyQf60yR0ZUrrWcC5ZlIQ1sG4W4NQnbZhp2HhR
+ /wGgrEeOdK+puzMlDf2J7Lvd+5SAwVkZk2w92vY1Yiy3EpA/2soTg9cA3Dr99z37XQBr
+ l9aC3pq53uvMmQEpTmL7xOnP0cm5dAlKhnhgQ1bwknqZY8NSyWIxmUduPXk+H+Ov7fFH
+ W1F9QiamKNMtmMQ+8G2gM+WVOXiULwkljJN5BO7dY3zEuw7F1ERJEdHT+57ALdbQXxDY
+ uHQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=o6FOmTAhVyYGMcAf1PB6hbfQknro5cZ7zds/7nsigrw=;
+ b=AOw1n7pA8VV8nJi7XGX927A8ndqwRuxy/u8WKuHWj2AoGR6NhMYC8dt7weEx/H+Jvq
+ NjkRInF0ZQLyZ+Vm8PEU1bk7BCSXX4hte2zunNdU4EekDDpEmQ4OsqR+/iLMzs+Nn/Er
+ H7GAKwfZiLWRwWMaWPOn6O2Qe80kWtXk6fWoyuZBdedLTd2WmPMSKSfktZf+EPrXoOE0
+ cAHgOKS04CA85J9A4AKxbeuELA//UP4taJ+Plgvr40YVi5nhW/MR96lCFeAHGO43BLli
+ HRQJ7t8vwWr228BC/vuU5HpX+HUpKvky1lDJGXfRX+6V9XiPJGe11uVYfSe6jx4fZSfP
+ 1EFg==
+X-Gm-Message-State: AOAM531rqVVeml0FNYMCaDkgplDZNhyxZ+q3Dod3GEg2u6Gi9doZOeSZ
+ m156smRgpLqnXTJf0i/nomBDp4EPqB1njTEj3so=
+X-Google-Smtp-Source: ABdhPJwqMh2+nuyaZ4b3meaqE7PmZtYpc1cUjmdLbsBfTGh4OwlnyBjGdvo230R2id3KS40hefbd9j8FrVAhoSMv5j8=
+X-Received: by 2002:a17:906:e949:: with SMTP id
+ jw9mr3980449ejb.109.1601973670981; 
+ Tue, 06 Oct 2020 01:41:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <b47fe2e3-6867-20ec-70b5-c2dd52c6d698@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lersek@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=lersek@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 00:55:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+References: <cover.1599470071.git.tgolembi@redhat.com>
+ <1bf9ede3b9273613319ff8ff99b40c385439cfa8.1599470071.git.tgolembi@redhat.com>
+ <CAJ+F1C+FPkg-fznQdfqnioJ9CD3fi7apW34ad=cQMgzRsphqCQ@mail.gmail.com>
+ <20201006083141.m4xmo2pzlte72pzp@auriga.localdomain>
+In-Reply-To: <20201006083141.m4xmo2pzlte72pzp@auriga.localdomain>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 6 Oct 2020 12:40:58 +0400
+Message-ID: <CAJ+F1CK0hnmYT=fxvuePHyt3je5KYn4KZva-jFoRM4ZTqsNTPQ@mail.gmail.com>
+Subject: Re: [PATCH v2 2/3] qga: add implementation of guest-get-disks for
+ Linux
+To: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
+Content-Type: multipart/alternative; boundary="00000000000099357f05b0fc8fef"
+Received-SPF: pass client-ip=2a00:1450:4864:20::631;
+ envelope-from=marcandre.lureau@gmail.com; helo=mail-ej1-x631.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,125 +98,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/05/20 11:16, Philippe Mathieu-Daudé wrote:
-> Hi Laszlo,
-> 
-> On 10/1/20 9:18 AM, Laszlo Ersek wrote:
->> On 09/29/20 17:46, Kevin Wolf wrote:
->>> Am 04.07.2020 um 18:39 hat Philippe Mathieu-Daudé geschrieben:
->>>> Since our format is consumable by the fw_cfg device,
->>>> we can implement the FW_CFG_DATA_GENERATOR interface.
->>>>
->>>> Example of use to dump the cipher suites (if tracing enabled):
->>>>
->>>>   $ qemu-system-x86_64 -S \
->>>>     -object tls-cipher-suites,id=mysuite1,priority=@SYSTEM \
->>>>     -fw_cfg name=etc/path/to/ciphers,gen_id=mysuite1 \
->>>>     -trace qcrypto\*
->>>>   1590664444.197123:qcrypto_tls_cipher_suite_priority priority: @SYSTEM
->>>>   1590664444.197219:qcrypto_tls_cipher_suite_info data=[0x13,0x02] version=TLS1.3 name=TLS_AES_256_GCM_SHA384
->>>>   1590664444.197228:qcrypto_tls_cipher_suite_info data=[0x13,0x03] version=TLS1.3 name=TLS_CHACHA20_POLY1305_SHA256
->>>>   1590664444.197233:qcrypto_tls_cipher_suite_info data=[0x13,0x01] version=TLS1.3 name=TLS_AES_128_GCM_SHA256
->>>>   1590664444.197236:qcrypto_tls_cipher_suite_info data=[0x13,0x04] version=TLS1.3 name=TLS_AES_128_CCM_SHA256
->>>>   1590664444.197240:qcrypto_tls_cipher_suite_info data=[0xc0,0x30] version=TLS1.2 name=TLS_ECDHE_RSA_AES_256_GCM_SHA384
->>>>   1590664444.197245:qcrypto_tls_cipher_suite_info data=[0xcc,0xa8] version=TLS1.2 name=TLS_ECDHE_RSA_CHACHA20_POLY1305
->>>>   1590664444.197250:qcrypto_tls_cipher_suite_info data=[0xc0,0x14] version=TLS1.0 name=TLS_ECDHE_RSA_AES_256_CBC_SHA1
->>>>   1590664444.197254:qcrypto_tls_cipher_suite_info data=[0xc0,0x2f] version=TLS1.2 name=TLS_ECDHE_RSA_AES_128_GCM_SHA256
->>>>   1590664444.197258:qcrypto_tls_cipher_suite_info data=[0xc0,0x13] version=TLS1.0 name=TLS_ECDHE_RSA_AES_128_CBC_SHA1
->>>>   1590664444.197261:qcrypto_tls_cipher_suite_info data=[0xc0,0x2c] version=TLS1.2 name=TLS_ECDHE_ECDSA_AES_256_GCM_SHA384
->>>>   1590664444.197266:qcrypto_tls_cipher_suite_info data=[0xcc,0xa9] version=TLS1.2 name=TLS_ECDHE_ECDSA_CHACHA20_POLY1305
->>>>   1590664444.197270:qcrypto_tls_cipher_suite_info data=[0xc0,0xad] version=TLS1.2 name=TLS_ECDHE_ECDSA_AES_256_CCM
->>>>   1590664444.197274:qcrypto_tls_cipher_suite_info data=[0xc0,0x0a] version=TLS1.0 name=TLS_ECDHE_ECDSA_AES_256_CBC_SHA1
->>>>   1590664444.197278:qcrypto_tls_cipher_suite_info data=[0xc0,0x2b] version=TLS1.2 name=TLS_ECDHE_ECDSA_AES_128_GCM_SHA256
->>>>   1590664444.197283:qcrypto_tls_cipher_suite_info data=[0xc0,0xac] version=TLS1.2 name=TLS_ECDHE_ECDSA_AES_128_CCM
->>>>   1590664444.197287:qcrypto_tls_cipher_suite_info data=[0xc0,0x09] version=TLS1.0 name=TLS_ECDHE_ECDSA_AES_128_CBC_SHA1
->>>>   1590664444.197291:qcrypto_tls_cipher_suite_info data=[0x00,0x9d] version=TLS1.2 name=TLS_RSA_AES_256_GCM_SHA384
->>>>   1590664444.197296:qcrypto_tls_cipher_suite_info data=[0xc0,0x9d] version=TLS1.2 name=TLS_RSA_AES_256_CCM
->>>>   1590664444.197300:qcrypto_tls_cipher_suite_info data=[0x00,0x35] version=TLS1.0 name=TLS_RSA_AES_256_CBC_SHA1
->>>>   1590664444.197304:qcrypto_tls_cipher_suite_info data=[0x00,0x9c] version=TLS1.2 name=TLS_RSA_AES_128_GCM_SHA256
->>>>   1590664444.197308:qcrypto_tls_cipher_suite_info data=[0xc0,0x9c] version=TLS1.2 name=TLS_RSA_AES_128_CCM
->>>>   1590664444.197312:qcrypto_tls_cipher_suite_info data=[0x00,0x2f] version=TLS1.0 name=TLS_RSA_AES_128_CBC_SHA1
->>>>   1590664444.197316:qcrypto_tls_cipher_suite_info data=[0x00,0x9f] version=TLS1.2 name=TLS_DHE_RSA_AES_256_GCM_SHA384
->>>>   1590664444.197320:qcrypto_tls_cipher_suite_info data=[0xcc,0xaa] version=TLS1.2 name=TLS_DHE_RSA_CHACHA20_POLY1305
->>>>   1590664444.197325:qcrypto_tls_cipher_suite_info data=[0xc0,0x9f] version=TLS1.2 name=TLS_DHE_RSA_AES_256_CCM
->>>>   1590664444.197329:qcrypto_tls_cipher_suite_info data=[0x00,0x39] version=TLS1.0 name=TLS_DHE_RSA_AES_256_CBC_SHA1
->>>>   1590664444.197333:qcrypto_tls_cipher_suite_info data=[0x00,0x9e] version=TLS1.2 name=TLS_DHE_RSA_AES_128_GCM_SHA256
->>>>   1590664444.197337:qcrypto_tls_cipher_suite_info data=[0xc0,0x9e] version=TLS1.2 name=TLS_DHE_RSA_AES_128_CCM
->>>>   1590664444.197341:qcrypto_tls_cipher_suite_info data=[0x00,0x33] version=TLS1.0 name=TLS_DHE_RSA_AES_128_CBC_SHA1
->>>>   1590664444.197345:qcrypto_tls_cipher_suite_count count: 29
->>>>
->>>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>>> Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
->>>> Acked-by: Laszlo Ersek <lersek@redhat.com>
->>>> Message-Id: <20200623172726.21040-6-philmd@redhat.com>
->>>
->>> I noticed only now that this breaks '--object help' in
->>> qemu-storage-daemon:
->>>
->>> $ qemu-storage-daemon --object help
->>> List of user creatable objects:
->>> qemu-storage-daemon: missing interface 'fw_cfg-data-generator' for object 'tls-creds'
->>> Aborted (core dumped)
->>>
->>> The reason is that we don't (and can't) link hw/nvram/fw_cfg.c into the
->>> storage daemon because it requires other system emulator stuff.
->>
->> Ouch. I've been completely oblivious to "--object help" and how it
->> affects qemu-storage-daemon. Sorry about that.
->>
->> Could you please include a backtrace about the abort()?
->>
->> Grepping for the error message, I can find type_initialize() in
->> "qom/object.c", but my knowledge about QOM internals is practically nil.
->>
->> The error message seems bogus FWIW -- why would
->> TYPE_FW_CFG_DATA_GENERATOR_INTERFACE be *required* from "tls-creds"?
->>
->> TYPE_FW_CFG_DATA_GENERATOR_INTERFACE is implemented by
->> "tls-cipher-suites", and required by "-fw_cfg name=...,gen_id=...". If
->> that -fw_cfg switch is not used, then why would anything look for the
->> TYPE_FW_CFG_DATA_GENERATOR_INTERFACE interface? Especially under the
->> tls-creds object?
-> 
-> Sorry for not updating Kevin's post in time (we have been discussing
-> over IRC).
-> 
-> What happens here is a QOM design flow, first triggered by fw_cfg as
-> we are now trying to have QEMU split into more components.
-> 
-> QOM interface/object type names are simple strings, so we don't get
-> any link failure in case of missing dependency (which are resolved at
-> runtime using strcmp).
-> 
-> "tls-cipher-suites" is a generic crypto object, it happens to implement
-> the fw_cfg-data-generator interface. The fw_cfg-data-generator interface
-> is registered as QOM type in hw/nvram/fw_cfg.c which is only built when
-> SOFTMMU is selected. qemu-storage-daemon doesn't select SOFTMMU.
-> We don't want to restrict "tls-cipher-suites" to SOFTMMU.
-> 
-> The simplest fix we discuss is to have a single C file to register the
-> fw_cfg-data-generator interface in QOM, and link with it if any of
-> CRYPTO / NVRAM kconfig is selected.
-> 
-> I'll send a patch.
+--00000000000099357f05b0fc8fef
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Thank you for the explanation!
+Hi
 
-(I suggest keeping such discussions *originally* on the list. IRC is
-practically indistinguishable from the bit bucket, and you'll have to
-write up a summary for others on the mailing list anyway. (In some cases
-it could even require filing a ticket in some tracker, in the end.) Best
-to have the discussion at once on the list. Just my suggestion of course.)
+On Tue, Oct 6, 2020 at 12:31 PM Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi=
+@redhat.com>
+wrote:
 
-Thanks!
-Laszlo
+> On Tue, Sep 29, 2020 at 07:22:00PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+>
+> > > +        if (getline(&line, &n, fp) =3D=3D -1) {
+> > > +            g_debug("  failed to read disk size");
+> > >
+> >
+> > line: getline(3) "This buffer should be freed by the user program even =
+if
+> > getline() failed."
+>
+> That is handled by the g_autofree, or am I missing something? `line`
+> will get out of scope after every interation (even with continue). Or do
+>
+>
+Ah right, I got confused.
 
+thanks
+
+--=20
+Marc-Andr=C3=A9 Lureau
+
+--00000000000099357f05b0fc8fef
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>Hi<br></div><br><div class=3D"gmail_quote"><div dir=
+=3D"ltr" class=3D"gmail_attr">On Tue, Oct 6, 2020 at 12:31 PM Tom=C3=A1=C5=
+=A1 Golembiovsk=C3=BD &lt;<a href=3D"mailto:tgolembi@redhat.com">tgolembi@r=
+edhat.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=
+=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding=
+-left:1ex">On Tue, Sep 29, 2020 at 07:22:00PM +0400, Marc-Andr=C3=A9 Lureau=
+ wrote:<br><br>
+&gt; &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (getline(&amp;line, &amp;n, fp) =
+=3D=3D -1) {<br>
+&gt; &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 g_debug(&quot;=C2=A0 f=
+ailed to read disk size&quot;);<br>
+&gt; &gt;<br>
+&gt; <br>
+&gt; line: getline(3) &quot;This buffer should be freed by the user program=
+ even if<br>
+&gt; getline() failed.&quot;<br>
+<br>
+That is handled by the g_autofree, or am I missing something? `line`<br>
+will get out of scope after every interation (even with continue). Or do<br=
+><br></blockquote><div>=C2=A0</div><div>Ah right, I got confused.<br></div>=
+<div><br></div>thanks<br clear=3D"all"></div><br>-- <br><div dir=3D"ltr" cl=
+ass=3D"gmail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
+
+--00000000000099357f05b0fc8fef--
 
