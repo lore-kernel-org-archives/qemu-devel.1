@@ -7,76 +7,79 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42018C4363D
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 11:14:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B344C4363D
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 11:14:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97DA1206F7
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 11:14:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 04660206F7
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 11:14:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X1/zp4y3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97DA1206F7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h1zOXEv8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04660206F7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPkvA-0003Nr-Hc
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 07:14:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34504)
+	id 1kPkvE-0003WU-1b
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 07:14:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34680)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kPktZ-0001gM-CL
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 07:12:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33073)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kPku3-0001rF-Tk
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 07:13:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45995)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kPktX-0005JC-Cs
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 07:12:37 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kPktw-0005LY-CC
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 07:13:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601982754;
+ s=mimecast20190719; t=1601982779;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XHSMU3H8MAqIi6xWpwYEGX/4wsnCDrIc6FNRKW4vl4w=;
- b=X1/zp4y3z9qqCq9MqVy8BW1quzuihsENAySas69OaIaDYDPndx5PbCNT6bTSA93EEHd1kj
- NtsK9HGcAwN4pfssp/3ZN3QPq1MIm7s46AVwF9IgHTbfTqmC4hmIUUfawF+LOJm5mVkfvr
- PJnFZAKwNBfYcFPyfX5y+zi98XvDqwk=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-21-EJRalVpgP_-AV8dzRrBVOA-1; Tue, 06 Oct 2020 07:12:33 -0400
-X-MC-Unique: EJRalVpgP_-AV8dzRrBVOA-1
-Received: by mail-wm1-f70.google.com with SMTP id p17so577437wmi.7
- for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 04:12:32 -0700 (PDT)
+ bh=kZn95L6kUsLR6YDfNvagiwYZibhPsdA0FOVQExAddoU=;
+ b=h1zOXEv8l1/XHgPm7JLRj6xCnn5dZIOBJ4ZPDOAMA7uxZiOaHcuRitjyUTErumA7VYfluC
+ 9yKKrSVId8uJ9AbuCgOetABEU3j4StlvSv8neJU2lHeyqiEO2d1AbXQqM1UtuRo/kTVyzW
+ x9GDBNfe+dTTNgIjUB5qC6id4LeBe4c=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-55-Mqka_BOkOaGpLUWfWFpfIg-1; Tue, 06 Oct 2020 07:12:57 -0400
+X-MC-Unique: Mqka_BOkOaGpLUWfWFpfIg-1
+Received: by mail-wr1-f70.google.com with SMTP id g7so412547wrm.2
+ for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 04:12:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=XHSMU3H8MAqIi6xWpwYEGX/4wsnCDrIc6FNRKW4vl4w=;
- b=j+9RWLKaimh7rFn4pKswpo69WV1Q4YZFq0KycNbk8HNjzGjncFtDVmdP0L7rCjNIDO
- VRdzbdrUzqFMD0w1dwL8XBUGmd6yTyBiPp/CXohAJE+ms499+v63FPp5bYBCPOcGM82n
- 4Ley3iUrJ14jXSZ+naey867lzwRoXmwojUnbGt7Mfc5NKbK084SLF5alE8Z2qofJpypc
- +wwU44kvceYohdOUU9Y1rgn+ykckjLTc9n+nTU8UJJNZPFlLgcNr5q3zEIUmQHBBvhds
- 4XbOUvZ92eJBBSY9qOaXBcy9crPOUirO4RTfEmZuSjO/NtJpreER3FDex1uaxvcnLYMr
- OqPg==
-X-Gm-Message-State: AOAM530w5rB7Xe1OnIKIQ2fmfveSUig3I1tmrfDooVxm1ZFcjapjmV4y
- MtBRWa2MRe/zN5ccATxTH86C+h0HvE5DFfKY96N6k9WTnFBKHcITwrRx471Ni+Kz42E+X9Sd/Qh
- 0JBDK+WuTMNMv3lc=
-X-Received: by 2002:a5d:4f82:: with SMTP id d2mr4242753wru.65.1601982751757;
- Tue, 06 Oct 2020 04:12:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJztuI5MQgQsEFig4ahjsGUeWII8UCfOclJz6/4FmneUnD62NeONMVNzTjOwf7MmT8Zph3Ageg==
-X-Received: by 2002:a5d:4f82:: with SMTP id d2mr4242730wru.65.1601982751552;
- Tue, 06 Oct 2020 04:12:31 -0700 (PDT)
+ bh=kZn95L6kUsLR6YDfNvagiwYZibhPsdA0FOVQExAddoU=;
+ b=Q03ck9OIDgNpWfiEiankjpIUGa8MZEE3BseEc53yEWqyORD9igfjDg6d+S783oDo+H
+ 7TWaVo6WEkKWK298D7aZkBZt8id9ti0gwUPHlHpEkism9tbgKW0eP+lSGk8L89MrY4bY
+ LnLQsDnojyaCD/Ts/D7tlPqUfcM5go94L0R9BQhV20HQL340ShS+/tpnG9dMXoC3Wber
+ UBhQYqwaKr2fxRZcIDHuSpOz9pTYCJLU6XjZK76FDP2S9uJSAsWmmY8nekE+R3twfH71
+ 3IPm23INyLPvXcPJQLiC6Yet0xJA1Cn8EbPwzt3UhmWMDqQ4SVEGtQYsF7RoDPufFwQV
+ 34LA==
+X-Gm-Message-State: AOAM532G8jDoxpkK/xMDLTvOQhZxuTX7p97iWCVWoDjJLRxgbPBUjoIq
+ DdvyxrAhVh3+lHHaZWflY8FozCt4KwLSeh4cJQ3w+7EPnb0ENWJNrjlsGrAzOhbCCVKhTrxDQhs
+ m3nSlmk5krG9WJa8=
+X-Received: by 2002:a05:600c:2159:: with SMTP id
+ v25mr4507354wml.180.1601982776502; 
+ Tue, 06 Oct 2020 04:12:56 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzCqSBFskFiADjiN4Pc7xQWdQivth2NlmZ5Ob4Em3X1XDJJqOZhhZo1aViSo2LgL+HMbfGBLA==
+X-Received: by 2002:a05:600c:2159:: with SMTP id
+ v25mr4507335wml.180.1601982776271; 
+ Tue, 06 Oct 2020 04:12:56 -0700 (PDT)
 Received: from x1w.redhat.com (106.red-83-59-162.dynamicip.rima-tde.net.
  [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id g144sm1302861wmg.30.2020.10.06.04.12.30
+ by smtp.gmail.com with ESMTPSA id a17sm4063654wra.29.2020.10.06.04.12.55
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 06 Oct 2020 04:12:30 -0700 (PDT)
+ Tue, 06 Oct 2020 04:12:55 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 02/10] meson.build: Add comments to clarify code organization
-Date: Tue,  6 Oct 2020 13:12:11 +0200
-Message-Id: <20201006111219.2300921-3-philmd@redhat.com>
+Subject: [PATCH 07/10] io: Move the creation of the library to the main
+ meson.build
+Date: Tue,  6 Oct 2020 13:12:16 +0200
+Message-Id: <20201006111219.2300921-8-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201006111219.2300921-1-philmd@redhat.com>
 References: <20201006111219.2300921-1-philmd@redhat.com>
@@ -120,37 +123,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Be consistent creating all the libraries in the main meson.build file.
+
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- meson.build | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ meson.build    | 10 ++++++++++
+ io/meson.build | 10 ----------
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index a02c743794..eaff16d482 100644
+index 55966c3b60..70545efd74 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -1323,6 +1323,10 @@ qemu_syms = custom_target('qemu.syms', output: 'qemu.syms',
-                              capture: true,
-                              command: [undefsym, nm, '@INPUT@'])
+@@ -1064,6 +1064,7 @@ block_ss = ss.source_set()
+ bsd_user_ss = ss.source_set()
+ chardev_ss = ss.source_set()
+ common_ss = ss.source_set()
++io_ss = ss.source_set()
+ linux_user_ss = ss.source_set()
+ qmp_ss = ss.source_set()
+ softmmu_ss = ss.source_set()
+@@ -1328,6 +1329,15 @@ qemu_syms = custom_target('qemu.syms', output: 'qemu.syms',
+ # Library dependencies #
+ ########################
  
-+########################
-+# Library dependencies #
-+########################
++io_ss = io_ss.apply(config_host, strict: false)
++libio = static_library('io', io_ss.sources() + genh,
++                       dependencies: [io_ss.dependencies()],
++                       link_with: libqemuutil,
++                       name_suffix: 'fa',
++                       build_by_default: false)
 +
- block_ss = block_ss.apply(config_host, strict: false)
- libblock = static_library('block', block_ss.sources() + genh,
-                           dependencies: block_ss.dependencies(),
-@@ -1363,6 +1367,10 @@ common_all = static_library('common',
-                             dependencies: common_all.dependencies(),
-                             name_suffix: 'fa')
- 
-+###########
-+# Targets #
-+###########
++io = declare_dependency(link_whole: libio, dependencies: [crypto, qom])
 +
- feature_to_c = find_program('scripts/feature_to_c.sh')
- 
- emulators = {}
+ libmigration = static_library('migration', sources: migration_files + genh,
+                               name_suffix: 'fa',
+                               build_by_default: false)
+diff --git a/io/meson.build b/io/meson.build
+index 768c1b5ec3..bcd8b1e737 100644
+--- a/io/meson.build
++++ b/io/meson.build
+@@ -1,4 +1,3 @@
+-io_ss = ss.source_set()
+ io_ss.add(genh)
+ io_ss.add(files(
+   'channel-buffer.c',
+@@ -14,12 +13,3 @@ io_ss.add(files(
+   'net-listener.c',
+   'task.c',
+ ))
+-
+-io_ss = io_ss.apply(config_host, strict: false)
+-libio = static_library('io', io_ss.sources() + genh,
+-                       dependencies: [io_ss.dependencies()],
+-                       link_with: libqemuutil,
+-                       name_suffix: 'fa',
+-                       build_by_default: false)
+-
+-io = declare_dependency(link_whole: libio, dependencies: [crypto, qom])
 -- 
 2.26.2
 
