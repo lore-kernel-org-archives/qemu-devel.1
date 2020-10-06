@@ -2,92 +2,121 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F1F2C47095
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 17:37:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7996C41604
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 17:41:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC708206CB
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 17:37:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4280A206CB
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 17:41:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aXrMqH7t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC708206CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="V3JdMzjC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4280A206CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPqu2-0006xc-N2
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 13:37:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45628)
+	id 1kPqxP-0000NR-UZ
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 13:40:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46106)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kPqtG-0006RX-UZ
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 13:36:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34396)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kPqtD-0007oB-TZ
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 13:36:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602005798;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=OlEEnCD6GnrpXbExAOuTk8EzKnrxj8eyF7rYwrvg/rg=;
- b=aXrMqH7tuDn6BC5GvRdE/RuRjMOBQa5AEeqFFU9JrfxTnfp3uJRDC1CiXMaiAIn56a1Dzp
- CkkOOX+6Vy6M3EEqKZlxy5DMssRd2vlnMZiyvtp+dr5SaaI66jMsA5LsrrtrKKidC8AQJE
- j04waFzSFrHNBkzpyY9fjIcDviBGyKo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-259-X9AxjDB7PjGpArI7e2F3-A-1; Tue, 06 Oct 2020 13:36:37 -0400
-X-MC-Unique: X9AxjDB7PjGpArI7e2F3-A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7FE45835B8E;
- Tue,  6 Oct 2020 17:36:35 +0000 (UTC)
-Received: from work-vm (ovpn-114-216.ams2.redhat.com [10.36.114.216])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AF6E81002C26;
- Tue,  6 Oct 2020 17:36:32 +0000 (UTC)
-Date: Tue, 6 Oct 2020 18:36:30 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH v5 10/10] migration: introduce
- snapshot-{save,load,delete} QMP commands
-Message-ID: <20201006173630.GJ3000@work-vm>
-References: <20201002162747.3123597-1-berrange@redhat.com>
- <20201002162747.3123597-11-berrange@redhat.com>
- <ef01ef63-7b95-88c2-5d31-103d29f9f64f@redhat.com>
+ (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
+ id 1kPqv7-0007TR-Ba; Tue, 06 Oct 2020 13:38:37 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51462)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
+ id 1kPqv5-0007xj-Ee; Tue, 06 Oct 2020 13:38:37 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 096HWTnA102630; Tue, 6 Oct 2020 13:38:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=yetm3O9T97JOXDDqZxQ5H5pUsa4oUP9tp3Y6sM5yu1Q=;
+ b=V3JdMzjC2w4t6EZo2zWnvhPebekmW1DovAp0bXSZJFH1GxTWi2nBrUKnTIaHNu5byHFX
+ FAkTMArO5U4nrHdxtxuLlGlh1cJ1Li3d76atWTa/1WEy762fAy3vLSB036ApOTi4hK52
+ aFg2BdzHE7R57AKJRFBim+YlZaOsAB49OGyObWUSaF4dPs2QuyADlyKP0oHr3/8mymwM
+ etEh1r4XczQ9PO/JT0DxS2nPuM1x7Lbdlc5UqlOm2PvOenQtZwN/X0RVnfPEI1TDBefM
+ VFTGvO8Yd00XgygBmj9Gv4uN3tG7EcFyxD2nV42Jf2MQaUD4K8Dz9q6W0ml9EUUFIhzm UA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 340uwfacn6-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 06 Oct 2020 13:38:33 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 096HZWTc127389;
+ Tue, 6 Oct 2020 13:38:32 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.10])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 340uwfacmh-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 06 Oct 2020 13:38:32 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+ by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 096HbXbS004717;
+ Tue, 6 Oct 2020 17:38:31 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
+ [9.57.198.26]) by ppma02dal.us.ibm.com with ESMTP id 33xgx9fegc-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 06 Oct 2020 17:38:31 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
+ [9.57.199.109])
+ by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 096HcU9T41812412
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 6 Oct 2020 17:38:30 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id D9B34112069;
+ Tue,  6 Oct 2020 17:38:30 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 93C64112062;
+ Tue,  6 Oct 2020 17:38:28 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.211.60.106])
+ by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+ Tue,  6 Oct 2020 17:38:28 +0000 (GMT)
+Subject: Re: [PATCH v2 1/9] s390x/pci: Move header files to include/hw/s390x
+To: Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>
+References: <1601669191-6731-1-git-send-email-mjrosato@linux.ibm.com>
+ <1601669191-6731-2-git-send-email-mjrosato@linux.ibm.com>
+ <20201006173259.1ec36597.cohuck@redhat.com>
+ <e9f6c3e1-9341-b0d0-9fb2-b34ebd19bcba@linux.ibm.com>
+ <1c118c1d-8c9b-9b7b-d1ec-2080aaa1c1a3@twiddle.net>
+From: Matthew Rosato <mjrosato@linux.ibm.com>
+Message-ID: <b715826d-dcfb-8ed3-7050-d09904d6ed40@linux.ibm.com>
+Date: Tue, 6 Oct 2020 13:38:27 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <ef01ef63-7b95-88c2-5d31-103d29f9f64f@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 00:55:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+In-Reply-To: <1c118c1d-8c9b-9b7b-d1ec-2080aaa1c1a3@twiddle.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-10-06_09:2020-10-06,
+ 2020-10-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 spamscore=0
+ clxscore=1015 bulkscore=0 phishscore=0 mlxlogscore=999 lowpriorityscore=0
+ mlxscore=0 malwarescore=0 suspectscore=0 priorityscore=1501
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2010060108
+Received-SPF: pass client-ip=148.163.156.1;
+ envelope-from=mjrosato@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 11:46:42
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,257 +129,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: thuth@redhat.com, kvm@vger.kernel.org, pmorel@linux.ibm.com,
+ david@redhat.com, schnelle@linux.ibm.com, qemu-s390x@nongnu.org,
+ qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+ alex.williamson@redhat.com, mst@redhat.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Eric Blake (eblake@redhat.com) wrote:
-> On 10/2/20 11:27 AM, Daniel P. Berrangé wrote:
-> > savevm, loadvm and delvm are some of the few HMP commands that have never
-> > been converted to use QMP. The reasons for the lack of conversion are
-> > that they blocked execution of the event thread, and the semantics
-> > around choice of disks were ill-defined.
-> > 
-> > Despite this downside, however, libvirt and applications using libvirt
-> > have used these commands for as long as QMP has existed, via the
-> > "human-monitor-command" passthrough command. IOW, while it is clearly
-> > desirable to be able to fix the problems, they are not a blocker to
-> > all real world usage.
-> > 
-> > Meanwhile there is a need for other features which involve adding new
-> > parameters to the commands. This is possible with HMP passthrough, but
-> > it provides no reliable way for apps to introspect features, so using
-> > QAPI modelling is highly desirable.
-> > 
-> > This patch thus introduces new snapshot-{load,save,delete} commands to
-> > QMP that are intended to replace the old HMP counterparts. The new
-> > commands are given different names, because they will be using the new
-> > QEMU job framework and thus will have diverging behaviour from the HMP
-> > originals. It would thus be misleading to keep the same name.
-> > 
-> > While this design uses the generic job framework, the current impl is
-> > still blocking. The intention that the blocking problem is fixed later.
-> > None the less applications using these new commands should assume that
-> > they are asynchronous and thus wait for the job status change event to
-> > indicate completion.
-> > 
-> > In addition to using the job framework, the new commands require the
-> > caller to be explicit about all the block device nodes used in the
-> > snapshot operations, with no built-in default heuristics in use.
-> > 
-> > Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-> > ---
+On 10/6/20 1:33 PM, Richard Henderson wrote:
+> On 10/6/20 11:43 AM, Matthew Rosato wrote:
+>>> Looks good, but...
+>>>
+>>> <meta>Is there any way to coax out a more reviewable version of this
+>>> via git mv?</meta>
+>>>
+>>
+>> I tried git mv, but a diff between the old patch and the new patch looks the
+>> same (other than the fact that I squashed the MAINTAINERS hit in)
 > 
-> > +++ b/qapi/job.json
-> > @@ -22,10 +22,17 @@
-> >  #
-> >  # @amend: image options amend job type, see "x-blockdev-amend" (since 5.1)
-> >  #
-> > +# @snapshot-load: snapshot load job type, see "snapshot-load" (since 5.2)
-> > +#
-> > +# @snapshot-save: snapshot save job type, see "snapshot-save" (since 5.2)
-> > +#
-> > +# @snapshot-delete: snapshot delete job type, see "snapshot-delete" (since 5.2)
-> > +#
-> >  # Since: 1.7
-> >  ##
-> >  { 'enum': 'JobType',
-> > -  'data': ['commit', 'stream', 'mirror', 'backup', 'create', 'amend'] }
-> > +  'data': ['commit', 'stream', 'mirror', 'backup', 'create', 'amend',
-> > +           'snapshot-load', 'snapshot-save', 'snapshot-delete'] }
-> >  
-> >  ##
-> >  # @JobStatus:
-> > diff --git a/qapi/migration.json b/qapi/migration.json
-> > index 7f5e6fd681..d2bd551ad9 100644
-> > --- a/qapi/migration.json
-> > +++ b/qapi/migration.json
-> > @@ -1787,3 +1787,123 @@
-> >  # Since: 5.2
-> >  ##
-> >  { 'command': 'query-dirty-rate', 'returns': 'DirtyRateInfo' }
-> > +
-> > +##
-> > +# @snapshot-save:
-> > +#
-> > +# Save a VM snapshot
-> > +#
-> > +# @job-id: identifier for the newly created job
-> > +# @tag: name of the snapshot to create
-> > +# @devices: list of block device node names to save a snapshot to
-> > +# @vmstate: block device node name to save vmstate to
+> git format-patch --find-renames[=<pct>]
 > 
-> Here, you document vmstate last,...
+> Though I'm surprised it's not doing that by default.
 > 
-> > +#
-> > +# Applications should not assume that the snapshot save is complete
-> > +# when this command returns. The job commands / events must be used
-> > +# to determine completion and to fetch details of any errors that arise.
-> > +#
-> > +# Note that the VM CPUs will be paused during the time it takes to
-> > +# save the snapshot
-> 
-> "will be", or "may be"?  As you stated above, we may be able to lift the
-> synchronous limitations down the road, while still maintaining the
-> present interface of using this command to start the job and waiting on
-> the job id until it is finished, at which point the CPUs might not need
-> to be paused as much.
-> 
-> > +#
-> > +# It is strongly recommended that @devices contain all writable
-> > +# block device nodes if a consistent snapshot is required.
-> > +#
-> > +# If @tag already exists, an error will be reported
-> > +#
-> > +# Returns: nothing
-> > +#
-> > +# Example:
-> > +#
-> > +# -> { "execute": "snapshot-save",
-> > +#      "data": {
-> > +#         "job-id": "snapsave0",
-> > +#         "tag": "my-snap",
-> > +#         "vmstate": "disk0",
-> > +#         "devices": ["disk0", "disk1"]
-> 
-> ...here vmstate occurs before devices.  I don't know if our doc
-> generator cares about inconsistent ordering.
-> 
-> > +#      }
-> > +#    }
-> > +# <- { "return": { } }
-> > +#
-> > +# Since: 5.2
-> > +##
-> > +{ 'command': 'snapshot-save',
-> > +  'data': { 'job-id': 'str',
-> > +            'tag': 'str',
-> > +            'vmstate': 'str',
-> > +            'devices': ['str'] } }
-> > +
-> > +##
-> > +# @snapshot-load:
-> > +#
-> > +# Load a VM snapshot
-> > +#
-> > +# @job-id: identifier for the newly created job
-> > +# @tag: name of the snapshot to load.
-> > +# @devices: list of block device node names to load a snapshot from
-> > +# @vmstate: block device node name to load vmstate from
-> > +#
-> > +# Applications should not assume that the snapshot save is complete
-> > +# when this command returns. The job commands / events must be used
-> > +# to determine completion and to fetch details of any errors that arise.
-> 
-> s/save/load/
-> 
-> > +#
-> > +# Note that the VM CPUs will be paused during the time it takes to
-> > +# save the snapshot
-> 
-> s/save/load/
-> 
-> But while pausing CPUs during save is annoying, pausing CPUs during
-> restore makes sense (after all, executing on stale data that will still
-> be updated during the restore is just wasted execution).
-
-Note that there are other snapshotting schemes that can do this more
-dynamically and page/load the state on demand - a rapid resume from
-snapshot like that is quite attractive.
-
-Dave
-
-> 
-> > +#
-> > +# It is strongly recommended that @devices contain all writable
-> > +# block device nodes that can have changed since the original
-> > +# @snapshot-save command execution.
-> > +#
-> > +# Returns: nothing
-> > +#
-> > +# Example:
-> > +#
-> > +# -> { "execute": "snapshot-load",
-> > +#      "data": {
-> > +#         "job-id": "snapload0",
-> > +#         "tag": "my-snap",
-> > +#         "vmstate": "disk0",
-> > +#         "devices": ["disk0", "disk1"]
-> > +#      }
-> > +#    }
-> > +# <- { "return": { } }
-> > +#
-> > +# Since: 5.2
-> > +##
-> > +{ 'command': 'snapshot-load',
-> > +  'data': { 'job-id': 'str',
-> > +            'tag': 'str',
-> > +            'vmstate': 'str',
-> > +            'devices': ['str'] } }
-> > +
-> > +##
-> > +# @snapshot-delete:
-> > +#
-> > +# Delete a VM snapshot
-> > +#
-> > +# @job-id: identifier for the newly created job
-> > +# @tag: name of the snapshot to delete.
-> > +# @devices: list of block device node names to delete a snapshot from
-> > +#
-> > +# Applications should not assume that the snapshot save is complete
-> > +# when this command returns. The job commands / events must be used
-> > +# to determine completion and to fetch details of any errors that arise.
-> 
-> Do we have a query- command handy to easily learn which snapshot names
-> are even available to attempt deletion on?  If not, that's worth a
-> separate patch.
-> 
-> > +#
-> > +# Returns: nothing
-> > +#
-> > +# Example:
-> > +#
-> > +# -> { "execute": "snapshot-delete",
-> > +#      "data": {
-> > +#         "job-id": "snapdelete0",
-> > +#         "tag": "my-snap",
-> > +#         "devices": ["disk0", "disk1"]
-> > +#      }
-> > +#    }
-> > +# <- { "return": { } }
-> > +#
-> > +# Since: 5.2
-> > +##
-> 
-> > +++ b/tests/qemu-iotests/group
-> > @@ -291,6 +291,7 @@
-> >  277 rw quick
-> >  279 rw backing quick
-> >  280 rw migration quick
-> > +310 rw quick
-> >  281 rw quick
-> >  282 rw img quick
-> >  283 auto quick
-> 
-> What's wrong with sorted order? I get the renumbering to appease a merge
-> conflict, but it also requires rearrangement ;)
-> 
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3226
-> Virtualization:  qemu.org | libvirt.org
+> r~
 > 
 
+Huh, neat.  That looks alot better, gives something that looks like:
 
+diff --git a/hw/s390x/s390-pci-bus.h b/include/hw/s390x/s390-pci-bus.h
+similarity index 100%
+rename from hw/s390x/s390-pci-bus.h
+rename to include/hw/s390x/s390-pci-bus.h
+diff --git a/hw/s390x/s390-pci-inst.h b/include/hw/s390x/s390-pci-inst.h
+similarity index 100%
+rename from hw/s390x/s390-pci-inst.h
+rename to include/hw/s390x/s390-pci-inst.h
 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Thanks!
 
 
