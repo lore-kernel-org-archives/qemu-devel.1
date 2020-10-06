@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4104BC3279D
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B03D2C46466
 	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 00:00:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98AC1212CC
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 00:00:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4573221481
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 00:00:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f9QO+1qP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98AC1212CC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FS0bTPfG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4573221481
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPwt1-0001Dr-Fz
+	id 1kPwt1-0001Fm-SZ
 	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 20:00:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38268)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38226)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kPwqm-0007mj-5p
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 19:58:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53357)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kPwqi-0007mQ-Iw
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 19:58:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34878)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kPwqg-0002IB-CQ
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 19:58:30 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kPwqd-0002HY-VW
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 19:58:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602028705;
+ s=mimecast20190719; t=1602028703;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=13f7ZcwyL2HoUTVislrZE9zDCzpag0gsSKlPXvDs438=;
- b=f9QO+1qPp1ig6ZdFGg2PdQ6YHZbyeC/6mTdR38Ju8EENkS+smLv8D4aajT8STEq8E2WULb
- KEDLzt8C9TZN31WNglQtDoQphHRyOnXg8KaJ/nLONcP8VtoC1A2m4Kov3mWg4wRJF/r9oc
- oeT0MUm6Z21+aCMdHHqDQNa7ya70huE=
+ bh=dm3LrLUdePuq3us66UcV7FCBRQCAmijB+fVoXut0lAo=;
+ b=FS0bTPfG+vPY3myWq+JnqyLeWJbegrqQ1Qk1cf40IdbGwnBVngO3qkyxheiE7by0+pWFlE
+ Cs6nHam/EsNBqUUVBtg7Gxpuzf/HWtU+MU7Gp/bwd2qEvIb9pH1QYfYb/ZfoH4OsDz9Yds
+ A1RpVf/aoZ59TDk+AHKA4GPl4Ft5SCU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-27-sNm8QWVuMRasK3lIABCKYw-1; Tue, 06 Oct 2020 19:58:23 -0400
-X-MC-Unique: sNm8QWVuMRasK3lIABCKYw-1
+ us-mta-317-9dHhBEtPN9e0crfJEbfeeg-1; Tue, 06 Oct 2020 19:58:21 -0400
+X-MC-Unique: 9dHhBEtPN9e0crfJEbfeeg-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A4C11084D64;
- Tue,  6 Oct 2020 23:58:22 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3CC9987950D;
+ Tue,  6 Oct 2020 23:58:20 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5D80160BFA;
- Tue,  6 Oct 2020 23:58:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3416265F5E;
+ Tue,  6 Oct 2020 23:58:19 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 03/20] python/machine.py: reorder __init__
-Date: Tue,  6 Oct 2020 19:58:00 -0400
-Message-Id: <20201006235817.3280413-4-jsnow@redhat.com>
+Subject: [PATCH 01/20] python/qemu: use isort to lay out imports
+Date: Tue,  6 Oct 2020 19:57:58 -0400
+Message-Id: <20201006235817.3280413-2-jsnow@redhat.com>
 In-Reply-To: <20201006235817.3280413-1-jsnow@redhat.com>
 References: <20201006235817.3280413-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -80,7 +80,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,100 +100,130 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Put the init arg handling all at the top, and mostly in order (deviating
-when one is dependent on another), and put what is effectively runtime
-state declaration at the bottom.
+Borrowed from the QAPI cleanup series, use the same configuration to
+standardize the way we write and sort imports.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- python/qemu/machine.py | 44 ++++++++++++++++++++++++------------------
- 1 file changed, 25 insertions(+), 19 deletions(-)
+ python/qemu/.isort.cfg        |  7 +++++++
+ python/qemu/accel.py          |  1 +
+ python/qemu/console_socket.py |  2 +-
+ python/qemu/machine.py        |  8 ++++----
+ python/qemu/qmp.py            | 10 +++++-----
+ python/qemu/qtest.py          |  2 +-
+ 6 files changed, 19 insertions(+), 11 deletions(-)
+ create mode 100644 python/qemu/.isort.cfg
 
+diff --git a/python/qemu/.isort.cfg b/python/qemu/.isort.cfg
+new file mode 100644
+index 00000000000..6d0fd6cc0d3
+--- /dev/null
++++ b/python/qemu/.isort.cfg
+@@ -0,0 +1,7 @@
++[settings]
++force_grid_wrap=4
++force_sort_within_sections=True
++include_trailing_comma=True
++line_length=72
++lines_after_imports=2
++multi_line_output=3
+\ No newline at end of file
+diff --git a/python/qemu/accel.py b/python/qemu/accel.py
+index 7fabe629208..3ec6bdcfdb5 100644
+--- a/python/qemu/accel.py
++++ b/python/qemu/accel.py
+@@ -18,6 +18,7 @@
+ import os
+ import subprocess
+ 
++
+ LOG = logging.getLogger(__name__)
+ 
+ # Mapping host architecture to any additional architectures it can
+diff --git a/python/qemu/console_socket.py b/python/qemu/console_socket.py
+index 70869fbbdc4..69f604c77fe 100644
+--- a/python/qemu/console_socket.py
++++ b/python/qemu/console_socket.py
+@@ -13,9 +13,9 @@
+ # the COPYING file in the top-level directory.
+ #
+ 
++from collections import deque
+ import socket
+ import threading
+-from collections import deque
+ import time
+ 
+ 
 diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-index 3017ec072df..71fe58be050 100644
+index 82f3731fc3f..bc83f399c1b 100644
 --- a/python/qemu/machine.py
 +++ b/python/qemu/machine.py
-@@ -84,42 +84,54 @@ def __init__(self, binary, args=None, wrapper=None, name=None,
-         @param monitor_address: address for QMP monitor
-         @param socket_scm_helper: helper program, required for send_fd_scm()
-         @param sock_dir: where to create socket (overrides test_dir for sock)
--        @param console_log: (optional) path to console log file
-         @param drain_console: (optional) True to drain console socket to buffer
-+        @param console_log: (optional) path to console log file
-         @note: Qemu process is not started until launch() is used.
-         '''
-+        # Direct user configuration
+@@ -20,15 +20,15 @@
+ import errno
+ import logging
+ import os
+-import subprocess
+ import shutil
+ import signal
++import subprocess
+ import tempfile
+-from typing import Optional, Type
+ from types import TracebackType
+-from . import console_socket
++from typing import Optional, Type
 +
-+        self._binary = binary
-+
-         if args is None:
-             args = []
-+        # Copy mutable input: we will be modifying our copy
-+        self._args = list(args)
-+
-         if wrapper is None:
-             wrapper = []
--        if name is None:
--            name = "qemu-%d" % os.getpid()
--        if sock_dir is None:
--            sock_dir = test_dir
--        self._name = name
-+        self._wrapper = wrapper
-+
-+        self._name = name or "qemu-%d" % os.getpid()
-+        self._test_dir = test_dir
-+        self._sock_dir = sock_dir or self._test_dir
-+        self._socket_scm_helper = socket_scm_helper
-+
-         if monitor_address is not None:
-             self._monitor_address = monitor_address
-             self._remove_monitor_sockfile = False
-         else:
-             self._monitor_address = os.path.join(
--                sock_dir, f"{name}-monitor.sock"
-+                self._sock_dir, f"{self._name}-monitor.sock"
-             )
-             self._remove_monitor_sockfile = True
-+
-+        self._console_log_path = console_log
-+        if self._console_log_path:
-+            # In order to log the console, buffering needs to be enabled.
-+            self._drain_console = True
-+        else:
-+            self._drain_console = drain_console
-+
-+        # Runstate
-         self._qemu_log_path = None
-         self._qemu_log_file = None
-         self._popen = None
--        self._binary = binary
--        self._args = list(args)     # Force copy args in case we modify them
--        self._wrapper = wrapper
-         self._events = []
-         self._iolog = None
--        self._socket_scm_helper = socket_scm_helper
-         self._qmp_set = True   # Enable QMP monitor by default.
-         self._qmp = None
-         self._qemu_full_args = None
--        self._test_dir = test_dir
-         self._temp_dir = None
--        self._sock_dir = sock_dir
-         self._launched = False
-         self._machine = None
-         self._console_index = 0
-@@ -129,12 +141,6 @@ def __init__(self, binary, args=None, wrapper=None, name=None,
-         self._console_socket = None
-         self._remove_files = []
-         self._user_killed = False
--        self._console_log_path = console_log
--        if self._console_log_path:
--            # In order to log the console, buffering needs to be enabled.
--            self._drain_console = True
--        else:
--            self._drain_console = drain_console
++from . import console_socket, qmp
  
-     def __enter__(self):
-         return self
+-from . import qmp
+ 
+ LOG = logging.getLogger(__name__)
+ 
+diff --git a/python/qemu/qmp.py b/python/qemu/qmp.py
+index 7935dababbf..ddf8347ac12 100644
+--- a/python/qemu/qmp.py
++++ b/python/qemu/qmp.py
+@@ -7,21 +7,21 @@
+ # This work is licensed under the terms of the GNU GPL, version 2.  See
+ # the COPYING file in the top-level directory.
+ 
+-import json
+ import errno
+-import socket
++import json
+ import logging
++import socket
++from types import TracebackType
+ from typing import (
+     Any,
+-    cast,
+     Dict,
+     Optional,
+     TextIO,
+-    Type,
+     Tuple,
++    Type,
+     Union,
++    cast,
+ )
+-from types import TracebackType
+ 
+ 
+ # QMPMessage is a QMP Message of any kind.
+diff --git a/python/qemu/qtest.py b/python/qemu/qtest.py
+index 888c8bd2f60..7700c0b09b6 100644
+--- a/python/qemu/qtest.py
++++ b/python/qemu/qtest.py
+@@ -17,8 +17,8 @@
+ # Based on qmp.py.
+ #
+ 
+-import socket
+ import os
++import socket
+ from typing import Optional, TextIO
+ 
+ from .machine import QEMUMachine
 -- 
 2.26.2
 
