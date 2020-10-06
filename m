@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D62F4C46466
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:43:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34BBDC41604
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:43:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BB1620760
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:43:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8BEF620760
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:43:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PGNlu6zx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BB1620760
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b6gz9/ay"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BEF620760
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPhct-0004Oy-DK
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 03:43:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39856)
+	id 1kPhcy-0004av-Ej
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 03:43:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39814)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kPhQP-0003EL-F1
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:17 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37488)
+ id 1kPhQM-00038M-QZ
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:14 -0400
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:38421)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kPhQN-0001Ub-87
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:17 -0400
-Received: by mail-wr1-x443.google.com with SMTP id h7so8607896wre.4
- for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 00:30:14 -0700 (PDT)
+ id 1kPhQK-0001Ta-Ez
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:14 -0400
+Received: by mail-wr1-x434.google.com with SMTP id n18so4415784wrs.5
+ for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 00:30:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Lx7aepaU4oeb9uUi81d1ARWCm8iq4HU6ykoV7TnaemU=;
- b=PGNlu6zxpVH14oq6A36NwLzFob6q8ObPwMOZKYwfy657B/3WxmKcl4OOgnkm4HU0vo
- ci8hNFDElMIGDzjI8hicitGOF4TKsm/HPB7ufH6KkxpZkl4GautPNiIoIezXf3cXT1Uy
- 7sqX/q2p9dUk9b9DW94C/pL1FEb6AuxLj3f1/hiD62OJ8sGMY0s+MA3pZaF1f0V0EU1s
- P7wQVBYFhpfCSEZfvqEmGhc2Bjy586Ay9BU6vk8T8FLN+XrGtWu5F4KDqDBCoCFazbGR
- EJpbvDPOz7TfRAEjHdtgMxBHfuNRHQuvod5gv1WRA7CAgfO4Wu7bfb14vJjUscR7f78n
- cMDA==
+ bh=vqm6/4FMvwrI7h0blvL6bknr7fh+GWarVad7IzR7GgY=;
+ b=b6gz9/aykmhl5qKu60HMo4KR9iFUxOoeYE8B0MrBS2lSDn05UTwU2D30m4UAPpBcf1
+ uGp6+5PVAlaBr/yI2JwXdSM4yJa5bumRu1A6I49OiVPgEKBEwOctnrTSZmOzcPEhnDGF
+ oLEU08WJOtPcd6Ph4lFgRXBBsXqzcVqWl4nYDSuhpkEM+iQWe/YkdzDLDmOJsTMRl6oD
+ 5jlF8be2lmf0MdedPrSztPpC9+7HFLMjfyUmujjOosVqmsr1tLZuRNwQyTE9NNe3/1+Q
+ 9WVHvZzoz+M+ijfSEAS/frj9aTqqqD5fsAOgWEtru4ikR+zuDgvG5ggG2aUbFKxubMl7
+ ooXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=Lx7aepaU4oeb9uUi81d1ARWCm8iq4HU6ykoV7TnaemU=;
- b=MIQf7RJhmo6i4aTq2zs9m2QcRaI3KU4TfrIyPiCtWymHRbckaaDv9dFdmqLPwrwnFn
- SjWANEpsijhLV46etJ+Pyts/bU+eHzDMb4TuFG/5UUp443VL0T0XcSmqUixd7cxVlSsB
- SZN5RyD/lt84WBI5NJCjtpXfQWEsojq66QgqNVaANqVXax579I1I2IP6fev/mT/T2CZA
- ccEeMwqUNo9DyWSPqUJhJuGV9j96vnIBcbckxyJvGk/Pf6JhsNYvt2Af426adMeijQ46
- 5YiKBPmOYWzoNxgvV5TWmNUo4xpj0ywIg9znJJg+1Ov/9u6ie7uD/Ul3KdOKY/gyqNMQ
- RpCg==
-X-Gm-Message-State: AOAM531kH4dF3+gdtpN6OB+JU8ylxhq8ljqbfLTScvvB3juqYDwqbu25
- FLlElU4qFpKF9tISSg4tjnH+SU3BSqk=
-X-Google-Smtp-Source: ABdhPJy+Sbx6KKFR+eYAA3jYg/j5sbjECPkJcQa5kwUdxXkckbqvC/4hVAh8IqUc133BAYQ9aeNChg==
-X-Received: by 2002:adf:ecc1:: with SMTP id s1mr3289616wro.120.1601969413371; 
- Tue, 06 Oct 2020 00:30:13 -0700 (PDT)
+ bh=vqm6/4FMvwrI7h0blvL6bknr7fh+GWarVad7IzR7GgY=;
+ b=FN8YP4EBrjQcKY0fzMpwrX/9Cg6ERsC3cFBINGp6OIbCfNAUJLqzkptQ0CXeCqx380
+ 1bIzIY6PggwuMUDMhjUilfZ88+X5TRZYggCcS/H7t18Ntq0uHLstFxJDFuPFA2wEVf3U
+ v+LyuKTqKGCotHDmmlJfcFwZi5unexi52yDkJLS6mjTRhcn6VwRDZeYRokjQHD38CwnO
+ /f/kj5kbW6DpXiKJIbL+9K18G98pDkH4K6itRYpgIpnp0sNLJbKNXJscpLcuuYwwz1NI
+ JIt/3572WrA8ilk5t9Ug7GsUWZnhColWmmgkb+a9G3Li6M9w4TiVu684ipzGpnUBqGbv
+ hFAg==
+X-Gm-Message-State: AOAM532eE6VbVXvWnuZBu+cqlMZHu9WYp4CkqHXHIuQX06rANjhhjh9x
+ 8AbahKVuSOqZRqKLGFbP4HCRa8bwvp0=
+X-Google-Smtp-Source: ABdhPJyzJ8Z8DQrny924FudeajllNsT7I66BeWLFSGSsQTT3oCqalUCzfsxzN6aoA96HLwWbgrFfVQ==
+X-Received: by 2002:adf:e4c9:: with SMTP id v9mr3185026wrm.375.1601969410615; 
+ Tue, 06 Oct 2020 00:30:10 -0700 (PDT)
 Received: from localhost.localdomain ([2001:b07:6468:f312:5aca:cd0b:c4a1:9c2e])
- by smtp.gmail.com with ESMTPSA id i9sm2576329wma.47.2020.10.06.00.30.12
+ by smtp.gmail.com with ESMTPSA id i9sm2576329wma.47.2020.10.06.00.30.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 06 Oct 2020 00:30:12 -0700 (PDT)
+ Tue, 06 Oct 2020 00:30:10 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 30/37] replay: introduce breakpoint at the specified step
-Date: Tue,  6 Oct 2020 09:29:40 +0200
-Message-Id: <20201006072947.487729-31-pbonzini@redhat.com>
+Subject: [PULL 27/37] migration: introduce icount field for snapshots
+Date: Tue,  6 Oct 2020 09:29:37 +0200
+Message-Id: <20201006072947.487729-28-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201006072947.487729-1-pbonzini@redhat.com>
 References: <20201006072947.487729-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x443.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::434;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x434.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -100,302 +100,385 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>,
- Markus Armbruster <armbru@redhat.com>,
- Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Cc: Kevin Wolf <kwolf@redhat.com>, Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
 
-This patch introduces replay_break, replay_delete_break
-qmp and hmp commands.
-These commands allow stopping at the specified instruction.
-It may be useful for debugging when there are some known
-events that should be investigated.
-replay_break command has one argument - number of instructions
-executed since the start of the replay.
-replay_delete_break removes previously set breakpoint.
+Saving icount as a parameters of the snapshot allows navigation between
+them in the execution replay scenario.
+This information can be used for finding a specific snapshot for proceeding
+the recorded execution to the specific moment of the time.
+E.g., 'reverse step' action (introduced in one of the following patches)
+needs to load the nearest snapshot which is prior to the current moment
+of time.
+This patch also updates snapshot test which verifies qemu monitor output.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
 Acked-by: Markus Armbruster <armbru@redhat.com>
+Acked-by: Kevin Wolf <kwolf@redhat.com>
 
 --
 
 v4 changes:
- - removed useless error_free call
-Message-Id: <160174520606.12451.7056879546045599378.stgit@pasha-ThinkPad-X280>
+ - squashed format update with test output update
+v7 changes:
+ - introduced the spaces between the fields in snapshot info output
+ - updated the test to match new field widths
+Message-Id: <160174518865.12451.14327573383978752463.stgit@pasha-ThinkPad-X280>
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hmp-commands.hx           | 32 +++++++++++++++
- include/monitor/hmp.h     |  2 +
- qapi/replay.json          | 36 +++++++++++++++++
- replay/replay-debugging.c | 84 +++++++++++++++++++++++++++++++++++++++
- replay/replay-internal.h  |  4 ++
- replay/replay.c           | 17 ++++++++
- 6 files changed, 175 insertions(+)
+ block/qapi.c               | 18 ++++++++++----
+ block/qcow2-snapshot.c     |  2 ++
+ blockdev.c                 | 10 ++++++++
+ include/block/snapshot.h   |  1 +
+ migration/savevm.c         |  5 ++++
+ qapi/block-core.json       | 10 ++++++--
+ stubs/replay.c             |  5 ++++
+ tests/qemu-iotests/261     |  4 ++--
+ tests/qemu-iotests/267.out | 48 +++++++++++++++++++-------------------
+ 9 files changed, 71 insertions(+), 32 deletions(-)
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 1088d64503..7680d0b380 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1804,6 +1804,38 @@ SRST
-   Set QOM property *property* of object at location *path* to value *value*
- ERST
+diff --git a/block/qapi.c b/block/qapi.c
+index f423ece98c..036da085ee 100644
+--- a/block/qapi.c
++++ b/block/qapi.c
+@@ -230,6 +230,8 @@ int bdrv_query_snapshot_info_list(BlockDriverState *bs,
+         info->date_nsec     = sn_tab[i].date_nsec;
+         info->vm_clock_sec  = sn_tab[i].vm_clock_nsec / 1000000000;
+         info->vm_clock_nsec = sn_tab[i].vm_clock_nsec % 1000000000;
++        info->icount        = sn_tab[i].icount;
++        info->has_icount    = sn_tab[i].icount != -1ULL;
  
-+    {
-+        .name       = "replay_break",
-+        .args_type  = "icount:i",
-+        .params     = "icount",
-+        .help       = "set breakpoint at the specified instruction count",
-+        .cmd        = hmp_replay_break,
-+    },
-+
-+SRST
-+``replay_break`` *icount*
-+  Set replay breakpoint at instruction count *icount*.
-+  Execution stops when the specified instruction is reached.
-+  There can be at most one breakpoint. When breakpoint is set, any prior
-+  one is removed.  The breakpoint may be set only in replay mode and only
-+  "in the future", i.e. at instruction counts greater than the current one.
-+  The current instruction count can be observed with ``info replay``.
-+ERST
-+
-+    {
-+        .name       = "replay_delete_break",
-+        .args_type  = "",
-+        .params     = "",
-+        .help       = "remove replay breakpoint",
-+        .cmd        = hmp_replay_delete_break,
-+    },
-+
-+SRST
-+``replay_delete_break``
-+  Remove replay breakpoint which was previously set with ``replay_break``.
-+  The command is ignored when there are no replay breakpoints.
-+ERST
-+
-     {
-         .name       = "info",
-         .args_type  = "item:s?",
-diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
-index f297fccce8..809ad638bb 100644
---- a/include/monitor/hmp.h
-+++ b/include/monitor/hmp.h
-@@ -130,5 +130,7 @@ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
- void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
- void hmp_info_sev(Monitor *mon, const QDict *qdict);
- void hmp_info_replay(Monitor *mon, const QDict *qdict);
-+void hmp_replay_break(Monitor *mon, const QDict *qdict);
-+void hmp_replay_delete_break(Monitor *mon, const QDict *qdict);
+         info_list = g_new0(SnapshotInfoList, 1);
+         info_list->value = info;
+@@ -694,14 +696,15 @@ BlockStatsList *qmp_query_blockstats(bool has_query_nodes,
+ void bdrv_snapshot_dump(QEMUSnapshotInfo *sn)
+ {
+     char date_buf[128], clock_buf[128];
++    char icount_buf[128] = {0};
+     struct tm tm;
+     time_t ti;
+     int64_t secs;
+     char *sizing = NULL;
  
- #endif
-diff --git a/qapi/replay.json b/qapi/replay.json
-index e6b3f6001d..173ba76107 100644
---- a/qapi/replay.json
-+++ b/qapi/replay.json
-@@ -63,3 +63,39 @@
+     if (!sn) {
+-        qemu_printf("%-10s%-20s%11s%20s%15s",
+-                    "ID", "TAG", "VM SIZE", "DATE", "VM CLOCK");
++        qemu_printf("%-10s%-18s%7s%20s%13s%11s",
++                    "ID", "TAG", "VM SIZE", "DATE", "VM CLOCK", "ICOUNT");
+     } else {
+         ti = sn->date_sec;
+         localtime_r(&ti, &tm);
+@@ -715,11 +718,16 @@ void bdrv_snapshot_dump(QEMUSnapshotInfo *sn)
+                  (int)(secs % 60),
+                  (int)((sn->vm_clock_nsec / 1000000) % 1000));
+         sizing = size_to_str(sn->vm_state_size);
+-        qemu_printf("%-10s%-20s%11s%20s%15s",
++        if (sn->icount != -1ULL) {
++            snprintf(icount_buf, sizeof(icount_buf),
++                "%"PRId64, sn->icount);
++        }
++        qemu_printf("%-9s %-17s %7s%20s%13s%11s",
+                     sn->id_str, sn->name,
+                     sizing,
+                     date_buf,
+-                    clock_buf);
++                    clock_buf,
++                    icount_buf);
+     }
+     g_free(sizing);
+ }
+@@ -881,6 +889,8 @@ void bdrv_image_info_dump(ImageInfo *info)
+                 .date_nsec = elem->value->date_nsec,
+                 .vm_clock_nsec = elem->value->vm_clock_sec * 1000000000ULL +
+                                  elem->value->vm_clock_nsec,
++                .icount = elem->value->has_icount ?
++                          elem->value->icount : -1ULL,
+             };
+ 
+             pstrcpy(sn.id_str, sizeof(sn.id_str), elem->value->id);
+diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
+index d68b25e0c5..2e98c7f4b6 100644
+--- a/block/qcow2-snapshot.c
++++ b/block/qcow2-snapshot.c
+@@ -663,6 +663,7 @@ int qcow2_snapshot_create(BlockDriverState *bs, QEMUSnapshotInfo *sn_info)
+     sn->date_sec = sn_info->date_sec;
+     sn->date_nsec = sn_info->date_nsec;
+     sn->vm_clock_nsec = sn_info->vm_clock_nsec;
++    sn->icount = sn_info->icount;
+     sn->extra_data_size = sizeof(QCowSnapshotExtraData);
+ 
+     /* Allocate the L1 table of the snapshot and copy the current one there. */
+@@ -1007,6 +1008,7 @@ int qcow2_snapshot_list(BlockDriverState *bs, QEMUSnapshotInfo **psn_tab)
+         sn_info->date_sec = sn->date_sec;
+         sn_info->date_nsec = sn->date_nsec;
+         sn_info->vm_clock_nsec = sn->vm_clock_nsec;
++        sn_info->icount = sn->icount;
+     }
+     *psn_tab = sn_tab;
+     return s->nb_snapshots;
+diff --git a/blockdev.c b/blockdev.c
+index bebd3ba1c3..a6ae475dac 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -59,6 +59,7 @@
+ #include "sysemu/arch_init.h"
+ #include "sysemu/qtest.h"
+ #include "sysemu/runstate.h"
++#include "sysemu/replay.h"
+ #include "qemu/cutils.h"
+ #include "qemu/help_option.h"
+ #include "qemu/main-loop.h"
+@@ -1190,6 +1191,10 @@ SnapshotInfo *qmp_blockdev_snapshot_delete_internal_sync(const char *device,
+     info->vm_state_size = sn.vm_state_size;
+     info->vm_clock_nsec = sn.vm_clock_nsec % 1000000000;
+     info->vm_clock_sec = sn.vm_clock_nsec / 1000000000;
++    if (sn.icount != -1ULL) {
++        info->icount = sn.icount;
++        info->has_icount = true;
++    }
+ 
+     return info;
+ 
+@@ -1350,6 +1355,11 @@ static void internal_snapshot_prepare(BlkActionState *common,
+     sn->date_sec = tv.tv_sec;
+     sn->date_nsec = tv.tv_usec * 1000;
+     sn->vm_clock_nsec = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    if (replay_mode != REPLAY_MODE_NONE) {
++        sn->icount = replay_get_current_icount();
++    } else {
++        sn->icount = -1ULL;
++    }
+ 
+     ret1 = bdrv_snapshot_create(bs, sn);
+     if (ret1 < 0) {
+diff --git a/include/block/snapshot.h b/include/block/snapshot.h
+index 2bfcd57578..b0fe42993d 100644
+--- a/include/block/snapshot.h
++++ b/include/block/snapshot.h
+@@ -42,6 +42,7 @@ typedef struct QEMUSnapshotInfo {
+     uint32_t date_sec; /* UTC date of the snapshot */
+     uint32_t date_nsec;
+     uint64_t vm_clock_nsec; /* VM clock relative to boot */
++    uint64_t icount; /* record/replay step */
+ } QEMUSnapshotInfo;
+ 
+ int bdrv_snapshot_find(BlockDriverState *bs, QEMUSnapshotInfo *sn_info,
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 34e4b71052..0e8dc78684 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2723,6 +2723,11 @@ int save_snapshot(const char *name, Error **errp)
+     sn->date_sec = tv.tv_sec;
+     sn->date_nsec = tv.tv_usec * 1000;
+     sn->vm_clock_nsec = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    if (replay_mode != REPLAY_MODE_NONE) {
++        sn->icount = replay_get_current_icount();
++    } else {
++        sn->icount = -1ULL;
++    }
+ 
+     if (name) {
+         ret = bdrv_snapshot_find(bs, old_sn, name);
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 12a24772b5..fdc2e5cb28 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -27,13 +27,18 @@
+ #
+ # @vm-clock-nsec: fractional part in nano seconds to be used with vm-clock-sec
+ #
++# @icount: Current instruction count. Appears when execution record/replay
++#          is enabled. Used for "time-traveling" to match the moment
++#          in the recorded execution with the snapshots. (since 5.2)
++#
+ # Since: 1.3
+ #
  ##
- { 'command': 'query-replay',
-   'returns': 'ReplayInfo' }
-+
-+##
-+# @replay-break:
-+#
-+# Set replay breakpoint at instruction count @icount.
-+# Execution stops when the specified instruction is reached.
-+# There can be at most one breakpoint. When breakpoint is set, any prior
-+# one is removed.  The breakpoint may be set only in replay mode and only
-+# "in the future", i.e. at instruction counts greater than the current one.
-+# The current instruction count can be observed with @query-replay.
-+#
-+# @icount: instruction count to stop at
-+#
-+# Since: 5.2
-+#
-+# Example:
-+#
-+# -> { "execute": "replay-break", "data": { "icount": 220414 } }
-+#
-+##
-+{ 'command': 'replay-break', 'data': { 'icount': 'int' } }
-+
-+##
-+# @replay-delete-break:
-+#
-+# Remove replay breakpoint which was set with @replay-break.
-+# The command is ignored when there are no replay breakpoints.
-+#
-+# Since: 5.2
-+#
-+# Example:
-+#
-+# -> { "execute": "replay-delete-break" }
-+#
-+##
-+{ 'command': 'replay-delete-break' }
-diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
-index 51a6de4e81..3dc23b84fc 100644
---- a/replay/replay-debugging.c
-+++ b/replay/replay-debugging.c
-@@ -12,10 +12,13 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "sysemu/replay.h"
-+#include "sysemu/runstate.h"
- #include "replay-internal.h"
- #include "monitor/hmp.h"
- #include "monitor/monitor.h"
- #include "qapi/qapi-commands-replay.h"
-+#include "qapi/qmp/qdict.h"
-+#include "qemu/timer.h"
+ { 'struct': 'SnapshotInfo',
+   'data': { 'id': 'str', 'name': 'str', 'vm-state-size': 'int',
+             'date-sec': 'int', 'date-nsec': 'int',
+-            'vm-clock-sec': 'int', 'vm-clock-nsec': 'int' } }
++            'vm-clock-sec': 'int', 'vm-clock-nsec': 'int',
++            '*icount': 'int' } }
  
- void hmp_info_replay(Monitor *mon, const QDict *qdict)
+ ##
+ # @ImageInfoSpecificQCow2EncryptionBase:
+@@ -5363,7 +5368,8 @@
+ #                    "date-sec": 1000012,
+ #                    "date-nsec": 10,
+ #                    "vm-clock-sec": 100,
+-#                    "vm-clock-nsec": 20
++#                    "vm-clock-nsec": 20,
++#                    "icount": 220414
+ #      }
+ #    }
+ #
+diff --git a/stubs/replay.c b/stubs/replay.c
+index 5974ec1f50..eacb366aa8 100644
+--- a/stubs/replay.c
++++ b/stubs/replay.c
+@@ -88,3 +88,8 @@ int replay_read_random(void *buf, size_t len)
  {
-@@ -41,3 +44,84 @@ ReplayInfo *qmp_query_replay(Error **errp)
-     retval->icount = replay_get_current_icount();
-     return retval;
+     return 0;
  }
 +
-+static void replay_break(uint64_t icount, QEMUTimerCB callback, void *opaque)
++uint64_t replay_get_current_icount(void)
 +{
-+    assert(replay_mode == REPLAY_MODE_PLAY);
-+    assert(replay_mutex_locked());
-+    assert(replay_break_icount >= replay_get_current_icount());
-+    assert(callback);
-+
-+    replay_break_icount = icount;
-+
-+    if (replay_break_timer) {
-+        timer_del(replay_break_timer);
-+    }
-+    replay_break_timer = timer_new_ns(QEMU_CLOCK_REALTIME,
-+                                      callback, opaque);
++    return 0;
 +}
-+
-+static void replay_delete_break(void)
-+{
-+    assert(replay_mode == REPLAY_MODE_PLAY);
-+    assert(replay_mutex_locked());
-+
-+    if (replay_break_timer) {
-+        timer_del(replay_break_timer);
-+        timer_free(replay_break_timer);
-+        replay_break_timer = NULL;
-+    }
-+    replay_break_icount = -1ULL;
-+}
-+
-+static void replay_stop_vm(void *opaque)
-+{
-+    vm_stop(RUN_STATE_PAUSED);
-+    replay_delete_break();
-+}
-+
-+void qmp_replay_break(int64_t icount, Error **errp)
-+{
-+    if (replay_mode == REPLAY_MODE_PLAY) {
-+        if (icount >= replay_get_current_icount()) {
-+            replay_break(icount, replay_stop_vm, NULL);
-+        } else {
-+            error_setg(errp,
-+                "cannot set breakpoint at the instruction in the past");
-+        }
-+    } else {
-+        error_setg(errp, "setting the breakpoint is allowed only in play mode");
-+    }
-+}
-+
-+void hmp_replay_break(Monitor *mon, const QDict *qdict)
-+{
-+    int64_t icount = qdict_get_try_int(qdict, "icount", -1LL);
-+    Error *err = NULL;
-+
-+    qmp_replay_break(icount, &err);
-+    if (err) {
-+        error_report_err(err);
-+        return;
-+    }
-+}
-+
-+void qmp_replay_delete_break(Error **errp)
-+{
-+    if (replay_mode == REPLAY_MODE_PLAY) {
-+        replay_delete_break();
-+    } else {
-+        error_setg(errp, "replay breakpoints are allowed only in play mode");
-+    }
-+}
-+
-+void hmp_replay_delete_break(Monitor *mon, const QDict *qdict)
-+{
-+    Error *err = NULL;
-+
-+    qmp_replay_delete_break(&err);
-+    if (err) {
-+        error_report_err(err);
-+        return;
-+    }
-+}
-diff --git a/replay/replay-internal.h b/replay/replay-internal.h
-index 33ac551e78..2f6145ec7c 100644
---- a/replay/replay-internal.h
-+++ b/replay/replay-internal.h
-@@ -94,6 +94,10 @@ extern ReplayState replay_state;
+diff --git a/tests/qemu-iotests/261 b/tests/qemu-iotests/261
+index 848ffa760d..847b4c6a37 100755
+--- a/tests/qemu-iotests/261
++++ b/tests/qemu-iotests/261
+@@ -392,7 +392,7 @@ _check_test_img -r all
  
- /* File for replay writing */
- extern FILE *replay_file;
-+/* Instruction count of the replay breakpoint */
-+extern uint64_t replay_break_icount;
-+/* Timer for the replay breakpoint callback */
-+extern QEMUTimer *replay_break_timer;
+ echo
+ echo "$((sn_count - 1)) snapshots should remain:"
+-echo "  qemu-img info reports $(_img_info | grep -c '^ \{34\}') snapshots"
++echo "  qemu-img info reports $(_img_info | grep -c '^ \{32\}') snapshots"
+ echo "  Image header reports $(peek_file_be "$TEST_IMG" 60 4) snapshots"
  
- void replay_put_byte(uint8_t byte);
- void replay_put_event(uint8_t event);
-diff --git a/replay/replay.c b/replay/replay.c
-index 797b6a5b15..d4c228ab28 100644
---- a/replay/replay.c
-+++ b/replay/replay.c
-@@ -34,6 +34,10 @@ static char *replay_filename;
- ReplayState replay_state;
- static GSList *replay_blockers;
+ echo
+@@ -519,7 +519,7 @@ _check_test_img -r all
  
-+/* Replay breakpoints */
-+uint64_t replay_break_icount = -1ULL;
-+QEMUTimer *replay_break_timer;
-+
- bool replay_next_event_is(int event)
- {
-     bool res = false;
-@@ -73,6 +77,13 @@ int replay_get_instructions(void)
-     replay_mutex_lock();
-     if (replay_next_event_is(EVENT_INSTRUCTION)) {
-         res = replay_state.instruction_count;
-+        if (replay_break_icount != -1LL) {
-+            uint64_t current = replay_get_current_icount();
-+            assert(replay_break_icount >= current);
-+            if (current + res > replay_break_icount) {
-+                res = replay_break_icount - current;
-+            }
-+        }
-     }
-     replay_mutex_unlock();
-     return res;
-@@ -99,6 +110,12 @@ void replay_account_executed_instructions(void)
-                    will be read from the log. */
-                 qemu_notify_event();
-             }
-+            /* Execution reached the break step */
-+            if (replay_break_icount == replay_state.current_icount) {
-+                /* Cannot make callback directly from the vCPU thread */
-+                timer_mod_ns(replay_break_timer,
-+                    qemu_clock_get_ns(QEMU_CLOCK_REALTIME));
-+            }
-         }
-     }
- }
+ echo
+ echo '65536 snapshots should remain:'
+-echo "  qemu-img info reports $(_img_info | grep -c '^ \{34\}') snapshots"
++echo "  qemu-img info reports $(_img_info | grep -c '^ \{32\}') snapshots"
+ echo "  Image header reports $(peek_file_be "$TEST_IMG" 60 4) snapshots"
+ 
+ # success, all done
+diff --git a/tests/qemu-iotests/267.out b/tests/qemu-iotests/267.out
+index 215902b3ad..27471ffae8 100644
+--- a/tests/qemu-iotests/267.out
++++ b/tests/qemu-iotests/267.out
+@@ -33,8 +33,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+@@ -44,8 +44,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+@@ -69,8 +69,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+@@ -94,8 +94,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+@@ -105,8 +105,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+@@ -119,8 +119,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+@@ -134,8 +134,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+@@ -145,15 +145,15 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+ Internal snapshots on overlay:
+ Snapshot list:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+-1         snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++1         snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ Internal snapshots on backing file:
+ 
+ === -blockdev with NBD server on the backing file ===
+@@ -166,17 +166,17 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+ Internal snapshots on overlay:
+ Snapshot list:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+-1         snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++1         snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ Internal snapshots on backing file:
+ Snapshot list:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+-1         snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++1         snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ *** done
 -- 
 2.26.2
 
