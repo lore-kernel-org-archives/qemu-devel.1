@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11497C4363D
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 11:16:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BAD5C41604
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 11:16:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EA5D20760
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 11:16:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A162D20760
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 11:16:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BHJ4RDmM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EA5D20760
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X/w3cQ1H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A162D20760
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPkxM-0006xv-FJ
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 07:16:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34730)
+	id 1kPkxO-00072w-Mw
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 07:16:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34698)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kPkuD-0001sz-Be
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 07:13:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44970)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kPku5-0001s4-SO
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 07:13:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:24841)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kPku7-0005MN-Af
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 07:13:15 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kPku1-0005M0-8R
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 07:13:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601982789;
+ s=mimecast20190719; t=1601982784;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UGlTQyPHetsqq0zL2iZVU9NGjFB1rfxPXu9fGi39RP8=;
- b=BHJ4RDmMT+zU25dlzg3XAc2AWiyWW5T60ESV38bkag0g1bxkBvI0x2779gGWKPkNA5wXZM
- TehDgxzIUfU41hW3NhmfLzX1q8giHvLqx++Xzksj8Pl2mg+9/iQeceCmFmECPhijdm8IRM
- bMOgSnV5q7LWJY8T2ejS/XneVKRgy4A=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-182-LbRAOvYaOrykqiW2mYURQw-1; Tue, 06 Oct 2020 07:13:07 -0400
-X-MC-Unique: LbRAOvYaOrykqiW2mYURQw-1
-Received: by mail-wr1-f69.google.com with SMTP id t17so1899238wrm.13
- for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 04:13:07 -0700 (PDT)
+ bh=y654+qjr2XVjaJo/qs42m3q3chS6kyMAnJkYOWqEyzg=;
+ b=X/w3cQ1HqWemS782GKMwdBX/Fkeh3g48SAKkf1rUrPajXKgNGsz0GwuvCawwg2d1IEitJl
+ 0ljULRvUG9Duud5k642IHfzkq7CEFoqbKJnWLW1/j98zRbA2gOYA7QKRgOyhb+pOLRaiR/
+ zb9Zc9IXOe6Z4NofQvuiqzosWrTJv8E=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-246-6zCPwmbAPreGwVHNkZgl_Q-1; Tue, 06 Oct 2020 07:13:02 -0400
+X-MC-Unique: 6zCPwmbAPreGwVHNkZgl_Q-1
+Received: by mail-wr1-f72.google.com with SMTP id c6so4252409wrt.6
+ for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 04:13:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=UGlTQyPHetsqq0zL2iZVU9NGjFB1rfxPXu9fGi39RP8=;
- b=D12T6z2VD3+2ofm63WSATo7sqTXCdYlLk+bHEqxSWGaGORLA5+70W1St2mlbzn6CO+
- S5m9HKNbCnWhDN+wNjKf7xjCeo5ozBXmwM33GY17KquLzCqQmY05G1xPN7QZtONwQwDw
- fWbyMxHzcsimsS2CtEApvvdP3ksi15mYRn5aukpbgMaTdo2wCEIpNOb7lSaSHCr2BnzO
- WQm/S2KOCAiwPPPasLiD8UqwO7iL0wG9hUlCMylOOCHnNuXjAQaTVKoRk8x0Ji9hINH0
- soaj3/gzK0d/yJLmCMlIRsKGGAXv/6wKBQP/6h+0x/CNgmRzaQohmO6IPtcMdxFbINVb
- bhvg==
-X-Gm-Message-State: AOAM532U02AtD8znJiPOBXGLyl2YmCUVusEggEPVGxX1kHA8kwkp93Xz
- d5VMtXUaSkggERlzjFSV79YTgfg/4kuggoQMlg89DJlwCfsJqN2zjcVU9JD5zW8jCa3X5di/w3V
- XaF5Ar5aEqxVdrcs=
-X-Received: by 2002:a5d:6409:: with SMTP id z9mr897087wru.391.1601982786278;
- Tue, 06 Oct 2020 04:13:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwxBXJAHlzAcMw3p8z9DJfZ2ANL9j5lqmE9paWPuCrC/DN1XW1f1o7e48W0ybuPeRSt9Ku6zQ==
-X-Received: by 2002:a5d:6409:: with SMTP id z9mr897068wru.391.1601982786103;
- Tue, 06 Oct 2020 04:13:06 -0700 (PDT)
+ bh=y654+qjr2XVjaJo/qs42m3q3chS6kyMAnJkYOWqEyzg=;
+ b=W7ymvXzCLY4giHp471dpL97C30F1zGnGjK+Vq2lYjqacYnzi9+fNX4tpu7Bkkel+XH
+ NJ3fjkh8CUxRYl+nau3fIVqD6iEZgeP80b+u9HsNRd+qs58Io/Y4+xa9ll71nxJo5SWV
+ 1NyHwDwjxZ+x76p5hL3OnP9YOtm279YlIeNAWlJ6VsSkjJmKRn2/iGqvnyCPJ5Y7P8On
+ drbIl+SVXRDi94Mr/bCgx2b1dZbORIAZLnbufXtefdoHe2tI5He8+0+GkpO5G1oaSYjM
+ d5RKUibVBYDp8vAKeqqfs8JiMh6KqCmEk6ROceVj/V2U56fQC1hx+S77CPYwX9gjolCl
+ RdJA==
+X-Gm-Message-State: AOAM532nB1x4dIUu5DoymS3OOV175V80a+DqTAOCKGQKGGaJzUSzXB8/
+ iO/7+WJUdpMy/JSU+SZsK2a81oEp5PryWeRm28ltd3EPPL3WsEaIK2cWmE5ixyJpvGUzdiIGV4v
+ msUh8pqAIR6sYD9Y=
+X-Received: by 2002:a1c:7f14:: with SMTP id a20mr4298712wmd.95.1601982781453; 
+ Tue, 06 Oct 2020 04:13:01 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy+OHvtXrF4Cdv6W1e4q+LU5p8CBAVEgIZFh+mebr1bYRGoqWf7HScC+Fo6CvAOizEo66Y1Yg==
+X-Received: by 2002:a1c:7f14:: with SMTP id a20mr4298690wmd.95.1601982781233; 
+ Tue, 06 Oct 2020 04:13:01 -0700 (PDT)
 Received: from x1w.redhat.com (106.red-83-59-162.dynamicip.rima-tde.net.
  [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id f189sm3631986wmf.16.2020.10.06.04.13.05
+ by smtp.gmail.com with ESMTPSA id a5sm4028173wrp.37.2020.10.06.04.13.00
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 06 Oct 2020 04:13:05 -0700 (PDT)
+ Tue, 06 Oct 2020 04:13:00 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 09/10] authz: Move the creation of the library to the main
+Subject: [PATCH 08/10] crypto: Move the creation of the library to the main
  meson.build
-Date: Tue,  6 Oct 2020 13:12:18 +0200
-Message-Id: <20201006111219.2300921-10-philmd@redhat.com>
+Date: Tue,  6 Oct 2020 13:12:17 +0200
+Message-Id: <20201006111219.2300921-9-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201006111219.2300921-1-philmd@redhat.com>
 References: <20201006111219.2300921-1-philmd@redhat.com>
@@ -126,60 +126,63 @@ Be consistent creating all the libraries in the main meson.build file.
 Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- meson.build       | 10 ++++++++++
- authz/meson.build | 10 ----------
+ meson.build        | 10 ++++++++++
+ crypto/meson.build | 10 ----------
  2 files changed, 10 insertions(+), 10 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index 5ded67cb76..9ecfe93503 100644
+index 70545efd74..5ded67cb76 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -1059,6 +1059,7 @@ sphinx_extn_depends = [ meson.source_root() / 'docs/sphinx/depfile.py',
- 
- # Collect sourcesets.
- 
-+authz_ss = ss.source_set()
- blockdev_ss = ss.source_set()
- block_ss = ss.source_set()
+@@ -1064,6 +1064,7 @@ block_ss = ss.source_set()
  bsd_user_ss = ss.source_set()
-@@ -1330,6 +1331,15 @@ qemu_syms = custom_target('qemu.syms', output: 'qemu.syms',
+ chardev_ss = ss.source_set()
+ common_ss = ss.source_set()
++crypto_ss = ss.source_set()
+ io_ss = ss.source_set()
+ linux_user_ss = ss.source_set()
+ qmp_ss = ss.source_set()
+@@ -1329,6 +1330,15 @@ qemu_syms = custom_target('qemu.syms', output: 'qemu.syms',
  # Library dependencies #
  ########################
  
-+authz_ss = authz_ss.apply(config_host, strict: false)
-+libauthz = static_library('authz', authz_ss.sources() + genh,
-+                          dependencies: [authz_ss.dependencies()],
-+                          name_suffix: 'fa',
-+                          build_by_default: false)
++crypto_ss = crypto_ss.apply(config_host, strict: false)
++libcrypto = static_library('crypto', crypto_ss.sources() + genh,
++                           dependencies: [crypto_ss.dependencies()],
++                           name_suffix: 'fa',
++                           build_by_default: false)
 +
-+authz = declare_dependency(link_whole: libauthz,
-+                           dependencies: qom)
++crypto = declare_dependency(link_whole: libcrypto,
++                            dependencies: [authz, qom])
 +
- crypto_ss = crypto_ss.apply(config_host, strict: false)
- libcrypto = static_library('crypto', crypto_ss.sources() + genh,
-                            dependencies: [crypto_ss.dependencies()],
-diff --git a/authz/meson.build b/authz/meson.build
-index 516d71f2e2..88fa7769cb 100644
---- a/authz/meson.build
-+++ b/authz/meson.build
+ io_ss = io_ss.apply(config_host, strict: false)
+ libio = static_library('io', io_ss.sources() + genh,
+                        dependencies: [io_ss.dependencies()],
+diff --git a/crypto/meson.build b/crypto/meson.build
+index f6f5ce1ecd..7f37b5d335 100644
+--- a/crypto/meson.build
++++ b/crypto/meson.build
 @@ -1,4 +1,3 @@
--authz_ss = ss.source_set()
- authz_ss.add(genh)
- authz_ss.add(files(
-   'base.c',
-@@ -8,12 +7,3 @@ authz_ss.add(files(
- ))
+-crypto_ss = ss.source_set()
+ crypto_ss.add(genh)
+ crypto_ss.add(files(
+   'afsplit.c',
+@@ -52,15 +51,6 @@ if 'CONFIG_GNUTLS' in config_host
+ endif
  
- authz_ss.add(when: ['CONFIG_AUTH_PAM', pam], if_true: files('pamacct.c'))
+ 
+-crypto_ss = crypto_ss.apply(config_host, strict: false)
+-libcrypto = static_library('crypto', crypto_ss.sources() + genh,
+-                           dependencies: [crypto_ss.dependencies()],
+-                           name_suffix: 'fa',
+-                           build_by_default: false)
 -
--authz_ss = authz_ss.apply(config_host, strict: false)
--libauthz = static_library('authz', authz_ss.sources() + genh,
--                          dependencies: [authz_ss.dependencies()],
--                          name_suffix: 'fa',
--                          build_by_default: false)
+-crypto = declare_dependency(link_whole: libcrypto,
+-                            dependencies: [authz, qom])
 -
--authz = declare_dependency(link_whole: libauthz,
--                           dependencies: qom)
+ util_ss.add(files('aes.c'))
+ util_ss.add(files('init.c'))
+ 
 -- 
 2.26.2
 
