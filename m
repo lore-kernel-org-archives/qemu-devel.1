@@ -2,76 +2,80 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1F02C41604
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 17:42:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2657DC47095
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 17:44:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68EA12075A
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 17:42:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68EA12075A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7952220782
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 17:44:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jbi1JT3M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7952220782
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPqzH-0002JM-G6
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 13:42:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46644)
+	id 1kPr11-0003bb-I2
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 13:44:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47060)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1kPqxy-0001Id-LW; Tue, 06 Oct 2020 13:41:34 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:50009)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1kPqxw-000054-0m; Tue, 06 Oct 2020 13:41:34 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.108.20.195])
- by mo529.mail-out.ovh.net (Postfix) with ESMTPS id BF27C62AF608;
- Tue,  6 Oct 2020 19:41:29 +0200 (CEST)
-Received: from kaod.org (37.59.142.105) by DAG4EX1.mxp5.local (172.16.2.31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Tue, 6 Oct 2020
- 19:41:29 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-105G006c50df8bd-90c5-41e0-8d5b-fe6b1de2db55,
- 2331A23DC679A54E7C1604B88AF6A34BAE14B46D) smtp.auth=clg@kaod.org
-Subject: Re: [PATCH v2 5/6] spapr/xive: Activate StoreEOI at the source level
-To: Greg Kurz <groug@kaod.org>
-References: <20201005165147.526426-1-clg@kaod.org>
- <20201005165147.526426-6-clg@kaod.org> <20201006190645.33a05694@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <66bb5bdf-fe88-33a8-85ea-dde8aa78379e@kaod.org>
-Date: Tue, 6 Oct 2020 19:41:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-MIME-Version: 1.0
-In-Reply-To: <20201006190645.33a05694@bahia.lan>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [37.59.142.105]
-X-ClientProxiedBy: DAG8EX1.mxp5.local (172.16.2.71) To DAG4EX1.mxp5.local
- (172.16.2.31)
-X-Ovh-Tracer-GUID: 98547d32-1a78-4b58-9492-35b8ba7d9753
-X-Ovh-Tracer-Id: 12414453850723355555
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrgeeggdduudegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfhisehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepjeekudeuudevleegudeugeekleffveeludejteffiedvledvgfekueefudehheefnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehgrhhouhhgsehkrghougdrohhrgh
-Received-SPF: pass client-ip=178.32.125.2; envelope-from=clg@kaod.org;
- helo=smtpout1.mo529.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 12:58:29
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kPr0H-0002ya-2m
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 13:43:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57001)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kPr0F-0000FM-4f
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 13:43:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602006234;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type;
+ bh=dhKcb9zC8Pzia6sElJokg8/PX0MuqUhMvbxWy4B99w0=;
+ b=Jbi1JT3MKLkeBJD7t3Xl8xA83KRPNB5cV83zyxgZq+6lx+t+mvlvUGo6qB1ZYUTYCjLCxs
+ C8WS2NttNN4eaS2oETJOSXZP7gSo7w6nb41AHLZL9Hi3qUEXPuRnX5nIUtXEn5MdXIQdWU
+ v/6BdZO1kMzuz2bM3nV+/8W7AE/RO8A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-62-nLOm34C9OOmkVkaeuhQYzg-1; Tue, 06 Oct 2020 13:43:52 -0400
+X-MC-Unique: nLOm34C9OOmkVkaeuhQYzg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7C5BA805EF7;
+ Tue,  6 Oct 2020 17:43:51 +0000 (UTC)
+Received: from thuth.com (ovpn-113-60.ams2.redhat.com [10.36.113.60])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D2E2419936;
+ Tue,  6 Oct 2020 17:43:49 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [PATCH] tests/docker: Add genisoimage to the docker file
+Date: Tue,  6 Oct 2020 19:43:47 +0200
+Message-Id: <20201006174347.152040-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 01:55:55
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -84,80 +88,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gustavo Romero <gromero@linux.ibm.com>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-trivial@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9=20?= <philmd@redhat.com>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/6/20 7:06 PM, Greg Kurz wrote:
-> On Mon, 5 Oct 2020 18:51:46 +0200
-> Cédric Le Goater <clg@kaod.org> wrote:
-> 
->> When the StoreEOI capability is "on", the H_INT_GET_SOURCE_INFO will
->> set the StoreEOI flag for all sources. This could be an issue if
->> StoreEOI is not supported on a specific source, of a passthrough
->> device for instance. In that case, we could either introduce a new KVM
->> ioctl to query the characteristics of the source at the HW level or
->> deactivate StoreEOI on the machine.
->>
->> This is theoretically unsafe on a POWER9 host but it still runs.
->>
-> 
-> Patch looks good but as said before, what is the likeliness of something
-> really painful to happen on a POWER9 host ?
+genisoimage is needed for running the tests/qtest/cdrom-test qtest.
 
-Nothing will happen because POWER9 systems deactivate StoreEOI. You need
-a custom skiboot to add it back.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ tests/docker/dockerfiles/centos8.docker      | 1 +
+ tests/docker/dockerfiles/debian-amd64.docker | 1 +
+ tests/docker/dockerfiles/fedora.docker       | 1 +
+ tests/docker/dockerfiles/ubuntu2004.docker   | 1 +
+ 4 files changed, 4 insertions(+)
 
-C.
-
-
->> Signed-off-by: Cédric Le Goater <clg@kaod.org>
->> ---
->>  hw/intc/spapr_xive.c | 1 +
->>  hw/ppc/spapr_irq.c   | 6 ++++++
->>  2 files changed, 7 insertions(+)
->>
->> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
->> index 1fa09f287ac0..41f2719ff93a 100644
->> --- a/hw/intc/spapr_xive.c
->> +++ b/hw/intc/spapr_xive.c
->> @@ -280,6 +280,7 @@ static void spapr_xive_instance_init(Object *obj)
->>      SpaprXive *xive = SPAPR_XIVE(obj);
->>  
->>      object_initialize_child(obj, "source", &xive->source, TYPE_XIVE_SOURCE);
->> +    object_property_add_alias(obj, "flags", OBJECT(&xive->source), "flags");
->>  
->>      object_initialize_child(obj, "end_source", &xive->end_source,
->>                              TYPE_XIVE_END_SOURCE);
->> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
->> index f59960339ec3..cdf9f9df4173 100644
->> --- a/hw/ppc/spapr_irq.c
->> +++ b/hw/ppc/spapr_irq.c
->> @@ -325,9 +325,14 @@ void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
->>  
->>      if (spapr->irq->xive) {
->>          uint32_t nr_servers = spapr_max_server_number(spapr);
->> +        uint64_t flags = 0;
->>          DeviceState *dev;
->>          int i;
->>  
->> +        if (spapr_get_cap(spapr, SPAPR_CAP_STOREEOI) == SPAPR_CAP_ON) {
->> +            flags |= XIVE_SRC_STORE_EOI;
->> +        }
->> +
->>          dev = qdev_new(TYPE_SPAPR_XIVE);
->>          qdev_prop_set_uint32(dev, "nr-irqs", smc->nr_xirqs + SPAPR_XIRQ_BASE);
->>          /*
->> @@ -337,6 +342,7 @@ void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
->>          qdev_prop_set_uint32(dev, "nr-ends", nr_servers << 3);
->>          object_property_set_link(OBJECT(dev), "xive-fabric", OBJECT(spapr),
->>                                   &error_abort);
->> +        object_property_set_int(OBJECT(dev), "flags", flags, &error_abort);
->>          sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
->>  
->>          spapr->xive = SPAPR_XIVE(dev);
-> 
+diff --git a/tests/docker/dockerfiles/centos8.docker b/tests/docker/dockerfiles/centos8.docker
+index f435616d6a..0fc2697491 100644
+--- a/tests/docker/dockerfiles/centos8.docker
++++ b/tests/docker/dockerfiles/centos8.docker
+@@ -8,6 +8,7 @@ ENV PACKAGES \
+     dbus-daemon \
+     gcc \
+     gcc-c++ \
++    genisoimage \
+     gettext \
+     git \
+     glib2-devel \
+diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/dockerfiles/debian-amd64.docker
+index d2500dcff1..314c6bae83 100644
+--- a/tests/docker/dockerfiles/debian-amd64.docker
++++ b/tests/docker/dockerfiles/debian-amd64.docker
+@@ -14,6 +14,7 @@ RUN apt update && \
+ RUN apt update && \
+     DEBIAN_FRONTEND=noninteractive eatmydata \
+     apt install -y --no-install-recommends \
++        genisoimage \
+         libbz2-dev \
+         liblzo2-dev \
+         libgcrypt20-dev \
+diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
+index ec783418c8..85c975543d 100644
+--- a/tests/docker/dockerfiles/fedora.docker
++++ b/tests/docker/dockerfiles/fedora.docker
+@@ -15,6 +15,7 @@ ENV PACKAGES \
+     findutils \
+     gcc \
+     gcc-c++ \
++    genisoimage \
+     gettext \
+     git \
+     glib2-devel \
+diff --git a/tests/docker/dockerfiles/ubuntu2004.docker b/tests/docker/dockerfiles/ubuntu2004.docker
+index cafe8443fb..f4b9556b9e 100644
+--- a/tests/docker/dockerfiles/ubuntu2004.docker
++++ b/tests/docker/dockerfiles/ubuntu2004.docker
+@@ -3,6 +3,7 @@ ENV PACKAGES flex bison \
+     ccache \
+     clang-10\
+     gcc \
++    genisoimage \
+     gettext \
+     git \
+     glusterfs-common \
+-- 
+2.18.2
 
 
