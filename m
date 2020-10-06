@@ -2,90 +2,78 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0956C41604
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 15:26:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A501DC41604
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 15:31:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F5A0206DD
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 15:26:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H82F0FNl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F5A0206DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D8FDD206A1
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 15:31:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8FDD206A1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPoqz-0008GN-4a
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 11:26:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42432)
+	id 1kPow0-0002Fd-Kn
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 11:31:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44590)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kPooF-0006da-G3
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 11:23:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50401)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kPoo9-00056v-Km
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 11:23:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601997796;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=A1ZlOEodKJ8XSBImIcVvCdJrzG2X2vEC8CvDTsnL34c=;
- b=H82F0FNlnh38igzj+cJ7UJH1Ahm5xahnbIYSjw3DcnDSXTN+OWvfaHk3015xS6Q7qjeE9L
- XRNp6lqLw1q5BVF504tWbA58sqGcpufQM3RZhG6C8WQ7ZTlJpnQo+iI09dCI1q/SxvokU8
- IgdTMMK8R9Cm/PKPcEJuoPhH0XG+GEU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-375-pbVza8dUP5WcO0DfPgzfuQ-1; Tue, 06 Oct 2020 11:23:13 -0400
-X-MC-Unique: pbVza8dUP5WcO0DfPgzfuQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6B602104D3E5;
- Tue,  6 Oct 2020 15:23:12 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.74])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DDEDB10013BD;
- Tue,  6 Oct 2020 15:23:10 +0000 (UTC)
-Date: Tue, 6 Oct 2020 17:23:09 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [PULL 00/21] machine + QOM queue, 2020-10-05
-Message-ID: <20201006172309.36585fe1@redhat.com>
-In-Reply-To: <20201006170418.67bc8ce6@redhat.com>
-References: <20201005211000.710404-1-ehabkost@redhat.com>
- <CAFEAcA_+4b4HHP_8BBqqy+QmoyF6Lx1jmuFvcsbW5THZQDrXww@mail.gmail.com>
- <20201006143637.GP7303@habkost.net>
- <20201006170418.67bc8ce6@redhat.com>
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kPoux-0001eJ-F2
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 11:30:19 -0400
+Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:36765)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kPouq-00064N-MP
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 11:30:19 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.108.4.83])
+ by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 72A8D694E63D;
+ Tue,  6 Oct 2020 17:30:08 +0200 (CEST)
+Received: from kaod.org (37.59.142.105) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Tue, 6 Oct 2020
+ 17:30:07 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-105G006dabbadbd-8993-4728-83e9-39cdeee8a678,
+ ABBA5CC1B3A583228A496F54FDB0659883642288) smtp.auth=groug@kaod.org
+Date: Tue, 6 Oct 2020 17:30:00 +0200
+From: Greg Kurz <groug@kaod.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH] vhost: Ignore vrings in dirty log when using a vIOMMU
+Message-ID: <20201006173000.319dc038@bahia.lan>
+In-Reply-To: <20201006064659-mutt-send-email-mst@kernel.org>
+References: <160105498386.68108.2145229309875282336.stgit@bahia.lan>
+ <20200928062343.GA501872@yekko.fritz.box>
+ <20200928093718.334774b2@bahia.lan>
+ <20201005101414-mutt-send-email-mst@kernel.org>
+ <20201006115850.11f06b8e@bahia.lan>
+ <20201006064659-mutt-send-email-mst@kernel.org>
+X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=imammedo@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 00:55:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [37.59.142.105]
+X-ClientProxiedBy: DAG1EX2.mxp5.local (172.16.2.2) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: b2477cd1-6fcb-4f1a-9072-6471369c0666
+X-Ovh-Tracer-Id: 10196149559198325155
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrgeeggdekkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgihesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepvdefgfdtgeeluddujeejleffgffhhedtieeggffguddvgfekvefgfeettdejheevnecuffhomhgrihhnpehrvgguhhgrthdrtghomhenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepjhgrshhofigrnhhgsehrvgguhhgrthdrtghomh
+Received-SPF: pass client-ip=79.137.123.220; envelope-from=groug@kaod.org;
+ helo=smtpout1.mo804.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 11:30:09
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,73 +86,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. =?UTF-8?B?QmVy?=
- =?UTF-8?B?cmFuZ8Op?=" <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Laurent Vivier <laurent@vivier.eu>, Jason Wang <jasowang@redhat.com>,
+ qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 6 Oct 2020 17:04:18 +0200
-Igor Mammedov <imammedo@redhat.com> wrote:
+On Tue, 6 Oct 2020 06:49:28 -0400
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-> On Tue, 6 Oct 2020 10:36:37 -0400
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
->=20
-> > On Tue, Oct 06, 2020 at 03:03:57PM +0100, Peter Maydell wrote: =20
-> > > On Mon, 5 Oct 2020 at 22:10, Eduardo Habkost <ehabkost@redhat.com> wr=
-ote:   =20
-> > > >
-> > > > The following changes since commit 36d9c2883e55c863b622b99f0ebb5143=
-f0001401:
-> > > >
-> > > >   readthedocs: build with Python 3.6 (2020-10-05 16:30:45 +0100)
-> > > >
-> > > > are available in the Git repository at:
-> > > >
-> > > >   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
-> > > >
-> > > > for you to fetch changes up to fec5c4b6d3b7f3ffcfcbe1714e0405df6de2=
-a222:
-> > > >
-> > > >   kernel-doc: Remove $decl_type=3D'type name' hack (2020-10-05 12:4=
-8:11 -0400)
-> > > >
-> > > > ----------------------------------------------------------------
-> > > > machine + QOM queue, 2020-10-05
-> > > >
-> > > > * QOM documentation fixes and cleanups (Eduardo Habkost)
-> > > > * user-mode: Prune build dependencies (Philippe Mathieu-Daud=C3=A9)
-> > > > * qom: Improve error message (Philippe Mathieu-Daud=C3=A9)
-> > > > * numa: hmat: require parent cache description before the next
-> > > >   level one (Igor Mammedov)
-> > > >
-> > > > ----------------------------------------------------------------   =
-=20
-> > >=20
-> > > Compile failure on OSX:
-> > >=20
-> > > ../../hw/core/numa.c:429:20: error: format specifies type 'unsigned
-> > > char' but the argument has type 'int' [-Werror,-Wformat]
-> > >                    node->level - 1);
-> > >                    ^~~~~~~~~~~~~~~~
-> > > /Users/pm215/src/qemu-for-merges/include/qapi/error.h:319:35: note:
-> > > expanded from macro 'error_setg'
-> > >                         (fmt), ## __VA_ARGS__)
-> > >                          ~~~      ^~~~~~~~~~~
-> > > 1 error generated.   =20
-> >=20
-> > Is there a CI system where this is tested?  I'd like to be able
-> > to detect this kind of failure before sending pull requests. =20
-> I usually use travis-ci, but for this patch I didn't run it via CI for so=
-me reason.
-> Just posted fixed v2.
->=20
-> (it looks like pushing to github doesn't trigger travis build anymore)
-Looks like travis-ci lost previous authorizations to my github repo,
-but giving a new one didn't help.
+> On Tue, Oct 06, 2020 at 11:58:50AM +0200, Greg Kurz wrote:
+> > On Mon, 5 Oct 2020 10:18:03 -0400
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > 
+> > > On Mon, Sep 28, 2020 at 09:37:18AM +0200, Greg Kurz wrote:
+> > > > On Mon, 28 Sep 2020 16:23:43 +1000
+> > > > David Gibson <david@gibson.dropbear.id.au> wrote:
+> > > > 
+> > > > > On Fri, Sep 25, 2020 at 07:29:43PM +0200, Greg Kurz wrote:
+> > > > > > When a vIOMMU is present, any address comming from the guest is an IO
+> > > > > > virtual address, including those of the vrings. The backend's accesses
+> > > > > > to the vrings happen through vIOMMU translation : the backend hence
+> > > > > > only logs the final guest physical address, not the IO virtual one.
+> > > > > > It thus doesn't make sense to make room for the vring addresses in the
+> > > > > > dirty log in this case.
+> > > > > > 
+> > > > > > This fixes a crash of the source when migrating a guest using in-kernel
+> > > > > > vhost-net and iommu_platform=on on POWER, because DMA regions are put
+> > > > > > at very high addresses and the resulting log size is likely to cause
+> > > > > > g_malloc0() to abort.
+> > > > > > 
+> > > > > > BugLink: https://bugzilla.redhat.com/show_bug.cgi?id=1879349
+> > > > > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > > > 
+> > > > > I'm a little confused as to what's going on here.  Obviously
+> > > > > allocating dirty bitmaps in IOVA space doesn't make much sense.
+> > > > > But.. in all cases isn't the ring ending up in guest memory, whether
+> > > > > translated or not.  So why do specific addresses of the ring make a
+> > > > > difference in *any* case.
+> > > > > 
+> > > > 
+> > > > I admit I'm a bit surprised as well... I can't think of a scenario
+> > > > where the address of the used ring would be higher than the guest
+> > > > memory... Maybe MST can shed some light here ?
+> > > 
+> > > So the original idea was that vring itself is specified in
+> > > terms of HVA as opposed to rest of stuff which is specified
+> > > in terms of GPA.
+> > 
+> > The vring itself is indeed described in term of HVA (vq->used) but
+> > when it comes to the dirty log, QEMU passes the GPA of the used
+> > structure to the vhost backend:
+> > 
+> > >From vhost_virtqueue_set_addr():
+> > 
+> >     addr.log_guest_addr = vq->used_phys;
+> >                               ^^ GPA ^^
+> >     addr.flags = enable_log ? (1 << VHOST_VRING_F_LOG) : 0;
+> >     r = dev->vhost_ops->vhost_set_vring_addr(dev, &addr);
+> 
+> Right. The point being we either use the log bitmap or the ring aliasing
 
-Something wrong with current QEMU master, travis-ci doesn't recognize QEMU =
-repo a valid anymore.
+Not sure what the "ring aliasing trick" is referring too...
+
+> trick to track memory changes, not both. If we used the ring aliasing
+> trick then presumably VHOST_VRING_F_LOG would be clear and then
+> log_guest_addr is unused.
+> 
+
+Ok, so IIUC this means that vhost_get_log_size() never needs to
+special case vq->used_phys (ie. log_guest_addr) since it is a
+GPA (ie. <= guest RAM size and thus already covered by the first
+loop), right ?
+
+> > And the sizing of the bitmap computed in vhost_get_log_size() is
+> > also based on this GPA:
+> > 
+> >     for (i = 0; i < dev->nvqs; ++i) {
+> >         struct vhost_virtqueue *vq = dev->vqs + i;
+> > 
+> >         if (!vq->used_phys && !vq->used_size) {
+> >             continue;
+> >         }
+> > 
+> >         uint64_t last = vq->used_phys + vq->used_size - 1;
+> >                             ^^ GPA ^^
+> >         log_size = MAX(log_size, last / VHOST_LOG_CHUNK + 1);
+> >     }
+> >
+> > With platform_iommu=off, I couldn't find a case where this second
+> > loop in vhost_get_log_size() increases the log size actually... and
+> > when platform_iommu=on, vq->used_phys is a GIOVA that my other patches
+> > you've already merged in the kernel explicitly ignore when it comes to
+> > the dirty log... So it really seems that this loop is useless for the
+> > general case. If it is there to address some corner case, I guess it
+> > deserves a comment at the very least.
+> > 
+> > Cheers,
+> > 
+> > --
+> > Greg
+> > 
+> > > This way we wanted to support e.g. migration by vhost writing into
+> > > qemu address space, qemu copying data to guest memory.
+> > > 
+> > > 
+> > > 
+> > > 
+> > > > > > ---
+> > > > > >  hw/virtio/vhost.c |   38 ++++++++++++++++++++++++--------------
+> > > > > >  1 file changed, 24 insertions(+), 14 deletions(-)
+> > > > > > 
+> > > > > > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> > > > > > index 1a1384e7a642..0b83d6b8e65e 100644
+> > > > > > --- a/hw/virtio/vhost.c
+> > > > > > +++ b/hw/virtio/vhost.c
+> > > > > > @@ -106,6 +106,20 @@ static void vhost_dev_sync_region(struct vhost_dev *dev,
+> > > > > >      }
+> > > > > >  }
+> > > > > >  
+> > > > > > +static int vhost_dev_has_iommu(struct vhost_dev *dev)
+> > > > > > +{
+> > > > > > +    VirtIODevice *vdev = dev->vdev;
+> > > > > > +
+> > > > > > +    /*
+> > > > > > +     * For vhost, VIRTIO_F_IOMMU_PLATFORM means the backend support
+> > > > > > +     * incremental memory mapping API via IOTLB API. For platform that
+> > > > > > +     * does not have IOMMU, there's no need to enable this feature
+> > > > > > +     * which may cause unnecessary IOTLB miss/update trnasactions.
+> > > > > > +     */
+> > > > > > +    return vdev->dma_as != &address_space_memory &&
+> > > > > > +           virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_PLATFORM);
+> > > > > > +}
+> > > > > > +
+> > > > > >  static int vhost_sync_dirty_bitmap(struct vhost_dev *dev,
+> > > > > >                                     MemoryRegionSection *section,
+> > > > > >                                     hwaddr first,
+> > > > > > @@ -130,6 +144,11 @@ static int vhost_sync_dirty_bitmap(struct vhost_dev *dev,
+> > > > > >                                range_get_last(reg->guest_phys_addr,
+> > > > > >                                               reg->memory_size));
+> > > > > >      }
+> > > > > > +
+> > > > > > +    if (vhost_dev_has_iommu(dev)) {
+> > > > > > +        return 0;
+> > > > > > +    }
+> > > > > > +
+> > > > > >      for (i = 0; i < dev->nvqs; ++i) {
+> > > > > >          struct vhost_virtqueue *vq = dev->vqs + i;
+> > > > > >  
+> > > > > > @@ -172,6 +191,11 @@ static uint64_t vhost_get_log_size(struct vhost_dev *dev)
+> > > > > >                                         reg->memory_size);
+> > > > > >          log_size = MAX(log_size, last / VHOST_LOG_CHUNK + 1);
+> > > > > >      }
+> > > > > > +
+> > > > > > +    if (vhost_dev_has_iommu(dev)) {
+> > > > > > +        return log_size;
+> > > > > > +    }
+> > > > > > +
+> > > > > >      for (i = 0; i < dev->nvqs; ++i) {
+> > > > > >          struct vhost_virtqueue *vq = dev->vqs + i;
+> > > > > >  
+> > > > > > @@ -287,20 +311,6 @@ static inline void vhost_dev_log_resize(struct vhost_dev *dev, uint64_t size)
+> > > > > >      dev->log_size = size;
+> > > > > >  }
+> > > > > >  
+> > > > > > -static int vhost_dev_has_iommu(struct vhost_dev *dev)
+> > > > > > -{
+> > > > > > -    VirtIODevice *vdev = dev->vdev;
+> > > > > > -
+> > > > > > -    /*
+> > > > > > -     * For vhost, VIRTIO_F_IOMMU_PLATFORM means the backend support
+> > > > > > -     * incremental memory mapping API via IOTLB API. For platform that
+> > > > > > -     * does not have IOMMU, there's no need to enable this feature
+> > > > > > -     * which may cause unnecessary IOTLB miss/update trnasactions.
+> > > > > > -     */
+> > > > > > -    return vdev->dma_as != &address_space_memory &&
+> > > > > > -           virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_PLATFORM);
+> > > > > > -}
+> > > > > > -
+> > > > > >  static void *vhost_memory_map(struct vhost_dev *dev, hwaddr addr,
+> > > > > >                                hwaddr *plen, bool is_write)
+> > > > > >  {
+> > > > > > 
+> > > > > > 
+> > > > > 
+> > > > 
+> > > 
+> > > 
+> 
 
 
