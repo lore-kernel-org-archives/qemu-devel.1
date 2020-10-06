@@ -2,121 +2,78 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E6C7C41604
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 16:06:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2B09C46466
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 16:08:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53F0C206D4
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 16:06:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7716B206D4
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 16:08:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ysv6OcnA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53F0C206D4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="el/eeF1+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7716B206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPpUO-0005AJ-RW
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 12:06:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52494)
+	id 1kPpWH-0007CD-Br
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 12:08:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52764)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kPpQU-0008GV-KW
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 12:02:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21151)
+ (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
+ id 1kPpRV-00015H-Dt
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 12:03:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60229)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kPpQQ-0002v0-Ps
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 12:02:54 -0400
+ (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
+ id 1kPpRQ-000342-37
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 12:03:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602000169;
+ s=mimecast20190719; t=1602000231;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=YkTqV7mCtJTwopqDesrLbeZiBOdhCXWVJx2dTnISz+s=;
- b=Ysv6OcnA8VKagw8byYhD2i3RBBScL7pvm7kO0IUww109y/UB7QYDbbxuzjXnFwEKiy9FK/
- 1UrggorOYsrXl9LXY461CoEHpZrDTSIDK7503QUWX0aA+g+Svb6dXwmeCbnAB+AMmjOLji
- BG6vZ8HXJBm5rAlj4WaUDJkjwlDtdVY=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-577-1sRAZrAjMgaA8eirUj311g-1; Tue, 06 Oct 2020 12:02:47 -0400
-X-MC-Unique: 1sRAZrAjMgaA8eirUj311g-1
-Received: by mail-wm1-f70.google.com with SMTP id l15so848784wmh.9
- for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 09:02:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=YkTqV7mCtJTwopqDesrLbeZiBOdhCXWVJx2dTnISz+s=;
- b=dFJ/miKJQD7kz3dv2jtK3NsTSjJTp7Nq5/zIL3KPSHWYWb7fWHSBcwTyxT7++p2fOB
- zjz21casDWyE1aVWOjC/RpJYhMos/jqgAYICkmA7mGmhXMGWTpbDOT+2bI72YG/D2mzo
- Cg3hYXbW+i7X+Q3yRYhVY9mqm1YVj5BzumThujtF2QtVGSet0p7bzZdTn3mgpbnFIUw9
- ScdZxqrh5OLXF8Cqan0bceTmVaVSDft5909AY6aOHIpGPLLMnwSK6qILVc4pxgQs1J9R
- NWPYSttSBhB7nisuz4R7OYCj66brsSgWzJ0om8CLinefRABRy1SJbXgTD/r2QGVtJtJM
- 7apQ==
-X-Gm-Message-State: AOAM532nT/r4US1EECIZOCsQrmRqpMBuB8bMe3lB47zHjQhl2MSvx08q
- tDDAFyF5E+eiR9tZq26zBm5qrBgOnBmWfGXnIZUxBzWuY7+ghGtqtBsrjrix7uIj0qNlMNniR4C
- 8FFusaLrPa+jrZWc=
-X-Received: by 2002:adf:9504:: with SMTP id 4mr5980074wrs.27.1602000166776;
- Tue, 06 Oct 2020 09:02:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw772MTTpsDqpIe08ADno/fyD/gpFLoQQBmKvkoKvhpqzMwc4uBYexYZBuV5c2VBWnFzVGcuw==
-X-Received: by 2002:adf:9504:: with SMTP id 4mr5980026wrs.27.1602000166424;
- Tue, 06 Oct 2020 09:02:46 -0700 (PDT)
-Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
- [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id s185sm4187373wmf.3.2020.10.06.09.02.45
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 06 Oct 2020 09:02:45 -0700 (PDT)
-Subject: Re: [PATCH v3 1/1] hw/nvram: Always register
- FW_CFG_DATA_GENERATOR_INTERFACE
-To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-References: <20201006153636.2383248-1-philmd@redhat.com>
- <20201006153636.2383248-2-philmd@redhat.com>
- <134bbd15-c53c-7686-a36d-f02a81b56e0d@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <700d357f-e214-8ba6-910f-78b857757d32@redhat.com>
-Date: Tue, 6 Oct 2020 18:02:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ in-reply-to:in-reply-to:references:references;
+ bh=BaUe4isU0tR/NmluVZPPbsP7hFB454Cm7HO/r2z15k4=;
+ b=el/eeF1+ch5rnWBR5Q1CnEHldnyuGax99Jtrnv/gz+QNCH41QuJ/Kpc43BpAINYg8qqVtp
+ G0PV4eXnGKQWN757hX/HHhbpUPt/N/3qt9ftTNUZZ6VpEPTShV2LYqTWyKEG/5etck8NbE
+ LNtmYnmBga/To0BCRwWHLSL8vXRDNRE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-117-cdUy2kTJMbqsboPM2tzrhw-1; Tue, 06 Oct 2020 12:03:49 -0400
+X-MC-Unique: cdUy2kTJMbqsboPM2tzrhw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 12B4A18C5207
+ for <qemu-devel@nongnu.org>; Tue,  6 Oct 2020 16:03:49 +0000 (UTC)
+Received: from titinator (ovpn-115-5.ams2.redhat.com [10.36.115.5])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AEEA360E1C;
+ Tue,  6 Oct 2020 16:03:41 +0000 (UTC)
+References: <20200827153657.111098-1-dgilbert@redhat.com>
+ <20200827153657.111098-6-dgilbert@redhat.com>
+User-agent: mu4e 1.5.2; emacs 26.3
+From: Christophe de Dinechin <dinechin@redhat.com>
+To: "Dr. David Alan Gilbert \(git\)" <dgilbert@redhat.com>
+Subject: Re: [PATCH v2 5/6] tools/virtiofsd: xattr name mappings: Map server
+ xattr names
+In-reply-to: <20200827153657.111098-6-dgilbert@redhat.com>
+Date: Tue, 06 Oct 2020 18:03:38 +0200
+Message-ID: <lyft6rl4th.fsf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <134bbd15-c53c-7686-a36d-f02a81b56e0d@linaro.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dinechin@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+Content-Type: text/plain
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=dinechin@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 00:55:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -125,9 +82,8 @@ X-Spam_score: -2.8
 X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -140,22 +96,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Gerd Hoffmann <kraxel@redhat.com>, qemu-block@nongnu.org
+Cc: virtio-fs@redhat.com, stefanha@redhat.com, vgoyal@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/6/20 5:51 PM, Richard Henderson wrote:
-> On 10/6/20 10:36 AM, Philippe Mathieu-Daudé wrote:
->> +++ b/hw/nvram/fw_cfg-interface.c
->> @@ -0,0 +1,15 @@
->> +#include "qemu/osdep.h"
->> +#include "hw/nvram/fw_cfg.h"
-> 
-> License boilerplate missing.
 
-Grr. Paolo since you queued this, do you mind fixing directly?
+On 2020-08-27 at 17:36 CEST, Dr. David Alan Gilbert (git) wrote...
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> Map xattr names coming from the server, i.e. the host filesystem;
+> currently this is only from listxattr.
+>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  tools/virtiofsd/passthrough_ll.c | 88 ++++++++++++++++++++++++++++++++
+>  1 file changed, 88 insertions(+)
+>
+> diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+> index 9b9c8f3ab1..7cd99186f7 100644
+> --- a/tools/virtiofsd/passthrough_ll.c
+> +++ b/tools/virtiofsd/passthrough_ll.c
+> @@ -2188,6 +2188,42 @@ static int xattr_map_client(const char *client_name, char **out_name)
+>      abort();
+>  }
+>
+> +/*
+> + * For use with listxattr where the server fs gives us a name and we may need
+> + * to sanitize this for the client.
+> + * Returns a pointer to the result in *out_name
+> + *   This is always the original string or the current string with some prefix
+> + *   removed; no reallocation is done.
+> + * Returns 0 on success
+> + * Can return -ENODATA to indicate the name should be dropped from the list.
+> + */
+> +static int xattr_map_server(const char *server_name, const char **out_name)
+
+> +{
+> +    const XattrMapEntry *cur_entry;
+> +    for (cur_entry = xattr_map_list; ; cur_entry++) {
+> +        if ((cur_entry->flags & XATTR_MAP_FLAG_SERVER) &&
+> +            (!strncmp(cur_entry->prepend,
+> +                      server_name,
+> +                      strlen(cur_entry->prepend)))) {
+
+Might be slightly clearer (and possibly faster) as
+
+    strstart(cur_entry->prepend, server_name, &end)
+
+> +            if (cur_entry->flags & XATTR_MAP_FLAG_END_BAD) {
+> +                return -ENODATA;
+> +            }
+> +            if (cur_entry->flags & XATTR_MAP_FLAG_END_OK) {
+> +                *out_name = server_name;
+> +                return 0;
+> +            }
+> +            if (cur_entry->flags & XATTR_MAP_FLAG_PREFIX) {
+> +                /* Remove prefix */
+> +                *out_name = server_name + strlen(cur_entry->prepend);
+
+With the above, that would be
+
+    *out_name = end;
+
+
+> +                return 0;
+> +            }
+> +        }
+> +    }
+> +
+> +    /* Shouldn't get here - rules should have an END_* */
+
+You probably want to point the finger back to parse_xattrmap() in the comment?
+
+> +    abort();
+
+> +}
+> +
+>  static void lo_getxattr(fuse_req_t req, fuse_ino_t ino, const char *in_name,
+>                          size_t size)
+>  {
+> @@ -2342,8 +2378,60 @@ static void lo_listxattr(fuse_req_t req, fuse_ino_t ino, size_t size)
+>          if (ret == 0) {
+>              goto out;
+>          }
+> +
+> +        if (lo->xattrmap) {
+
+If you put the "XattrMapEntry" pointer in lo, then you would probably test that.
+
+> +            /*
+> +             * Map the names back, some attributes might be dropped,
+> +             * some shortened, but not increased, so we shouldn't
+> +             * run out of room.
+> +             */
+> +            size_t out_index, in_index;
+> +            out_index = 0;
+> +            in_index = 0;
+> +            while (in_index < ret) {
+> +                const char *map_out;
+> +                char *in_ptr = value + in_index;
+> +                /* Length of current attribute name */
+> +                size_t in_len = strlen(value + in_index) + 1;
+> +
+> +                int mapret = xattr_map_server(in_ptr, &map_out);
+> +                if (mapret != -ENODATA && mapret != 0) {
+> +                    /* Shouldn't happen */
+> +                    saverr = -mapret;
+> +                    goto out;
+> +                }
+> +                if (mapret == 0) {
+> +                    /* Either unchanged, or truncated */
+> +                    size_t out_len;
+> +                    if (map_out != in_ptr) {
+> +                        /* +1 copies the NIL */
+> +                        out_len = strlen(map_out) + 1;
+> +                    } else {
+> +                        /* No change */
+> +                        out_len = in_len;
+> +                    }
+> +                    /*
+> +                     * Move result along, may still be needed for an unchanged
+> +                     * entry if a previous entry was changed.
+> +                     */
+> +                    memmove(value + out_index, map_out, out_len);
+> +
+> +                    out_index += out_len;
+> +                }
+> +                in_index += in_len;
+> +            }
+> +            ret = out_index;
+> +            if (ret == 0) {
+> +                goto out;
+> +            }
+> +        }
+>          fuse_reply_buf(req, value, ret);
+>      } else {
+> +        /*
+> +         * xattrmap only ever shortens the result,
+> +         * so we don't need to do anything clever with the
+> +         * allocation length here.
+> +         */
+
+I don't understand the comment above. We are in the !lo->xattrmap) case, no?
+
+>          fuse_reply_xattr(req, ret);
+>      }
+>  out_free:
+
+
+--
+Cheers,
+Christophe de Dinechin (IRC c3d)
 
 
