@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA40BC4363D
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 11:46:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC4E7C4363D
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 11:48:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2143420789
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 11:46:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 26ECA2080A
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 11:48:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bt2Y4xw5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2143420789
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GdyEpqsZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26ECA2080A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPlQM-00005U-5y
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 07:46:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42262)
+	id 1kPlRq-0000vy-7Q
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 07:48:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39688)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kPlOl-0007as-HX
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 07:44:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47883)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kPlEl-0001Vi-GV
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 07:34:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22581)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kPlOj-0000s2-RY
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 07:44:51 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kPlEd-00084p-I3
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 07:34:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601984685;
+ s=mimecast20190719; t=1601984062;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=UC4H0OfOfjg4XblicGApEAW+vcZez+hhYIQ/C2ZEHz4=;
- b=bt2Y4xw51cwWkrO+lOj+U/VjX9eVwKRBRQ7a0Bdcw1pk8xq1VQKB5r4eP560YfLIbMAPrB
- aimcW6+G6p4aRSEoFAk4opa6v9bjrdwB79js0iVhVEEU9Nc8SlpYztXqBG5pRWSbnZ2tTM
- eNLhOGLsqk7WDiYdN8nOHXmtjXd6wpU=
+ bh=ws4y57LYTQhJujk70GhLINLpG+W6hU1+yPj3Bb2JciI=;
+ b=GdyEpqsZ9OvJHfcobN50XfpRAuinWbgZYYphfRsqIFc6M/n1UdM+jz0YbchgrSngpTfF6E
+ 5AB+5FbWhAlm8ySAEt249s8jbzH/OkvD8L6s9HcA8oyhfU7ak6QISRfB0A5mzJ9qH92f4f
+ HGLL6hyr9RAx989npPzy7orU9q1+OVg=
 Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
  [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-313-2IQ25qSsNgOlWpJpBkzByw-1; Tue, 06 Oct 2020 07:44:43 -0400
-X-MC-Unique: 2IQ25qSsNgOlWpJpBkzByw-1
-Received: by mail-wr1-f72.google.com with SMTP id r16so5220879wrm.18
- for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 04:44:43 -0700 (PDT)
+ us-mta-19-AjBMyp63MKW5Q8q5AMLP5A-1; Tue, 06 Oct 2020 07:34:20 -0400
+X-MC-Unique: AjBMyp63MKW5Q8q5AMLP5A-1
+Received: by mail-wr1-f72.google.com with SMTP id u15so5265708wrn.4
+ for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 04:34:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=UC4H0OfOfjg4XblicGApEAW+vcZez+hhYIQ/C2ZEHz4=;
- b=fpKiGLJYP6IYz6Fobpm61gcfCG//u9yvzFrOfB2lWkac4bCU3+LJq/SsuRsX3JIqMf
- DIU04ER9Jp1vedJk0n7ma93gDoxBiYof/S1PCr1+nXE+lBO+ILu+FN1ihdjnp3vrpDTa
- oslCKVNE6XQ5IljCuWmwwuRRPTO573GRSQYwenCa0D6/cSsPJU6QUIxfsNtcFVfHkd/E
- lz/ChW5mnY2loTYcbBR8qZ/AMB1w2nIhHTy3A3AOuPvsdORspexoEQR1uMoWbTPE65lk
- 71NDmPQHCQfNzzqOE07QzUNEMF/1lhH5Fmfl8NVyf5L4tmC9/O7FZSU5HxXbAjYw2m0x
- d99g==
-X-Gm-Message-State: AOAM530q/JArGLX6QMt5KemshDyv6c2c/oQk2QdLLoSjhwz1HSLLy2cP
- DIFrRwRpB2BjiUstFyXlfubaMGY4/M/DgyuUWrac6XAW92MHiiFi5sM6F1WPbFlm0/9P2K8CBKl
- wNdWnktbOMYnh3oM=
-X-Received: by 2002:a1c:9695:: with SMTP id y143mr4147739wmd.146.1601984682490; 
- Tue, 06 Oct 2020 04:44:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxBhvXBK1pe7I/ps1aw0xi3m0EqBjtWgX6ANiSsNVA1b/iKtCtMf0pv20u4JJ5FeocVy+OjHQ==
-X-Received: by 2002:a1c:9695:: with SMTP id y143mr4147719wmd.146.1601984682321; 
- Tue, 06 Oct 2020 04:44:42 -0700 (PDT)
+ bh=ws4y57LYTQhJujk70GhLINLpG+W6hU1+yPj3Bb2JciI=;
+ b=IdacpqVpamGewz4uuNRIcrODuUbTj1nUbJcG6M1YuMz6AvcvWnOOmnh/T6l6DU32ws
+ kmj+c5/CveakNI2KMW3+9vLlXVj2QCh23IP5a6SeTQT7sdl8estGg+qY8SACSql4ryRU
+ mfOLKhmUH1M9TAv82sd4y03QbRBzYb5W0sBOIexpb5qhoCicfBSaBLeBEOyY0NOTOIdj
+ v6Frl3kw2t1P3nyItIFKjptNUO7q4Ve4SvKmW4Fmfc4yX3chlQ4liezztR9Mrum1XVe/
+ WSYU+7K/jdlIIlTyZ3Y42Ejyo2Pq/pImo71dboi4Gy1rsMXFtf6ogOQPByBTTl9aLQOU
+ sooQ==
+X-Gm-Message-State: AOAM530arz7QERLDLEYja7CWwQhheJ0dDu/Oj6W3Xjfr2HYiGrTxtyJk
+ kURhOW4vkmB9aqca8D9Ix0H9HMXvK181+BXCd4fNJrDWwJiNNo3xe9zFZ76sIxf+gdoyHPdPOzr
+ lGYAbDIsCrrxiyto=
+X-Received: by 2002:a1c:c28a:: with SMTP id s132mr4238440wmf.67.1601984059780; 
+ Tue, 06 Oct 2020 04:34:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwLbB6lM50a26/Wd4U38bz4sN3pSlxKzqkvDauk0hl0/uaDyrIQ62sj6YIYwXeoen0aGDR/Rw==
+X-Received: by 2002:a1c:c28a:: with SMTP id s132mr4238421wmf.67.1601984059614; 
+ Tue, 06 Oct 2020 04:34:19 -0700 (PDT)
 Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
  [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id 63sm4190564wrh.71.2020.10.06.04.44.40
+ by smtp.gmail.com with ESMTPSA id g2sm3619315wmg.38.2020.10.06.04.34.18
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 06 Oct 2020 04:44:41 -0700 (PDT)
-Subject: Re: [PATCH v5 26/36] qapi/gen.py: Fix edge-case of _is_user_module
+ Tue, 06 Oct 2020 04:34:19 -0700 (PDT)
+Subject: Re: [PATCH v5 06/36] qapi: Remove wildcard includes
 To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
 References: <20201005195158.2348217-1-jsnow@redhat.com>
- <20201005195158.2348217-27-jsnow@redhat.com>
+ <20201005195158.2348217-7-jsnow@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -101,12 +101,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <a391f167-6ace-53d7-ce33-10d488bf6e7d@redhat.com>
-Date: Tue, 6 Oct 2020 13:44:40 +0200
+Message-ID: <5de0c658-abd8-e0b4-f9a5-c368150addba@redhat.com>
+Date: Tue, 6 Oct 2020 13:34:18 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20201005195158.2348217-27-jsnow@redhat.com>
+In-Reply-To: <20201005195158.2348217-7-jsnow@redhat.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -145,15 +145,25 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 10/5/20 9:51 PM, John Snow wrote:
-> The edge case is that if the name is '', this expression returns a
-> string instead of a bool, which violates our declared type.
+> Wildcard includes become hard to manage when refactoring and dealing
+> with circular dependencies with strictly typed mypy.
+> 
+> flake8 also flags each one as a warning, as it is not smart enough to
+> know which names exist in the imported file.
+> 
+> Remove them and include things explicitly by name instead.
 > 
 > Signed-off-by: John Snow <jsnow@redhat.com>
-> Reviewed-by: Cleber Rosa <crosa@redhat.com>
 > Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> Reviewed-by: Cleber Rosa <crosa@redhat.com>
 > ---
->  scripts/qapi/gen.py | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  scripts/qapi/commands.py   |  2 +-
+>  scripts/qapi/events.py     |  7 ++++++-
+>  scripts/qapi/gen.py        | 12 +++++++++---
+>  scripts/qapi/introspect.py |  7 ++++++-
+>  scripts/qapi/types.py      |  8 +++++++-
+>  scripts/qapi/visit.py      | 10 +++++++++-
+>  6 files changed, 38 insertions(+), 8 deletions(-)
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
