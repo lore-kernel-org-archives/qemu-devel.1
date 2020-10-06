@@ -7,78 +7,77 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEEBBC41604
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:45:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2F61C41604
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:45:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54E2320760
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:45:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33E2F20760
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:45:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R0sn1ef5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54E2320760
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EA6UNSqw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33E2F20760
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPhfL-0007lj-Bh
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 03:45:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39946)
+	id 1kPhfZ-0007xV-7a
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 03:45:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39892)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kPhQT-0003OZ-Bp
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:21 -0400
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:38718)
+ id 1kPhQQ-0003HU-Oz
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:18 -0400
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:52303)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kPhQR-0001XJ-CC
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:20 -0400
-Received: by mail-wm1-x333.google.com with SMTP id v12so1934195wmh.3
- for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 00:30:18 -0700 (PDT)
+ id 1kPhQO-0001Uz-2M
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:18 -0400
+Received: by mail-wm1-x32c.google.com with SMTP id l11so1833553wmh.2
+ for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 00:30:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=6WD9Ks2QvGXimCjR6xfwgm6lrYby8X5mCiKe4m027WE=;
- b=R0sn1ef50AyVUmtCZIuzV/uNjf7h55rB0BfPToTyp2qCxgA8H7dbyFDOqLl6gSMS3Y
- SaAS2CzMgFSI2sSFGLnrJeeBfdKtiJinLt+Pg7o62Y53Ji2vuralqIeVtK9bUuz4mwTV
- d4idtc/sr33biXhpWdaRWzUpT1okxKsPo6AWcegTQt0qKsfpF7YJcEIM58MT9F0FafZp
- 3CkRuhlG6DrlvUSjgvXvy8B6K0SYzGKC/c2Av6jm6WrdqBgHCiEqaeAiioVbUHJz2uxc
- 2VPAsE9sGLrQ6Qd6n3oprWZebnsVhYNIPGL18B6BVOyo22RLFRa7AhFNh03hf5JJyS5G
- s1+w==
+ bh=N+wPUKHp0dEGNvIdECz+pBa71rOenQ+nUmpc905Z6ig=;
+ b=EA6UNSqwqzdZ8XAXQJtPXgUU8Y8culRpeF90oxEyZUAg0LvemWl7MaMJyntVEo8Yig
+ bMJWDfvpoV0I7/7boN2FpYMiFuEmlin2WOl8ULLjhqkc9gKj/iXJEc/ICTsTyypxtu0o
+ 424dtWXBxbvp6ltBBJtTWutG/KJzNwtTbds2rbV/EvPmE0V2VQJSWJ3ZLC7ElwtrtNuv
+ JKB+S51wtG7tRdEa/+8mrQFjEv+yC8KVCc3S88LM4vXmTdLlaO6eC1KktZLlSmKBSjIQ
+ Sh09s55Xr6iA9amgXaVU9hEqOr2qzpfOzfnSQijwpv+S5q3iLEEvGPQ5gd4HyojHi3Re
+ Wa8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=6WD9Ks2QvGXimCjR6xfwgm6lrYby8X5mCiKe4m027WE=;
- b=ENmU+jcZTy16X7iRxU7jTKRonTGkmCZVsnmzO7Ee2GH0zQDjuZl0pS85NOi+LW5MGs
- orjUVgMbJ7zuUlMOmIP90KgF9qkt6srTzQEJmlI2k+92sL01A0i0dAOlCtcf+vDuBzft
- mvPH9jIj5hyBAh7CZ6doOChfaYcqiMpwVgcGKrZ+tsnwr56JmZG3BU4FS0wa/KmOXule
- GdkESJagGISNWI9v/tfEz2wdRU4HkOkyNot+JnVexBD4DxQe2V6j7aZdD3FWhVV12sX9
- LN8eQ420yF+0UxcPf+Ta6hg5rLmRuo5AZ1iaYFeE9CRy2eEtfuMRgEMXlspol2zlhBjr
- T8TA==
-X-Gm-Message-State: AOAM5331/eppFZZ9x6cNO4XbDc8+MePzJN4lOqB7k60B+9BOH3AIa52U
- /SSegEnz1Im4G8Md8hGmBD6rlWWUPAA=
-X-Google-Smtp-Source: ABdhPJztGnKN3vKINbbFKytqlgzKRP8Q6EFVNGUGjqw8SI/VUpdx1ckBO/IB8Uvo6vca0SKtaOSogQ==
-X-Received: by 2002:a1c:6a0a:: with SMTP id f10mr3302175wmc.86.1601969417737; 
- Tue, 06 Oct 2020 00:30:17 -0700 (PDT)
+ bh=N+wPUKHp0dEGNvIdECz+pBa71rOenQ+nUmpc905Z6ig=;
+ b=JeE/YIXUBXAP2owrG08K/QAF+Qji/r3/79ELcyDcw7oI/vEwYgfZ8T3aupCA3jjbO/
+ TV7912LW3cOuIHvXQxyohTgwbrcMWa+AuS/hVu8G74CbSgomxbHNc91vrWyDwfzUgwlf
+ gUVrCkHSP+Lsg6YNrS6KT4Xi+89t5c+vzZ/2AkFS4uSv1KU5s3ZDCT9kbWJF9giFMhFp
+ 8mczG1WLq5bflEmUDMQnuDHvFGa5LFyzveqIepVaYlBQnzinmgQ4PT/qk29CrcJgHAbk
+ t1Wat874cB8YBSlCh1E54QlNpIPucIHgaWI/NVoOD0C+x0KJESm3/AwC9L9he0kGwHuN
+ ulSQ==
+X-Gm-Message-State: AOAM530lCPR5UATpdO1uy1dQQ0tTo1GF0JsOARVjjSeB9C0fm3xycClq
+ 86SJDz73INxMAoE62uhJmcrNB62TK8Q=
+X-Google-Smtp-Source: ABdhPJysV8kKnHiG6dxYbw8Bj+YFw/UWSwRGZZBsld5YbpsU6GjrzCersYrSoFXV+hs5gSoVfa+cpQ==
+X-Received: by 2002:a1c:23c2:: with SMTP id j185mr3107499wmj.136.1601969414316; 
+ Tue, 06 Oct 2020 00:30:14 -0700 (PDT)
 Received: from localhost.localdomain ([2001:b07:6468:f312:5aca:cd0b:c4a1:9c2e])
- by smtp.gmail.com with ESMTPSA id i9sm2576329wma.47.2020.10.06.00.30.16
+ by smtp.gmail.com with ESMTPSA id i9sm2576329wma.47.2020.10.06.00.30.13
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 06 Oct 2020 00:30:17 -0700 (PDT)
+ Tue, 06 Oct 2020 00:30:13 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 35/37] replay: describe reverse debugging in docs/replay.txt
-Date: Tue,  6 Oct 2020 09:29:45 +0200
-Message-Id: <20201006072947.487729-36-pbonzini@redhat.com>
+Subject: [PULL 31/37] replay: implement replay-seek command
+Date: Tue,  6 Oct 2020 09:29:41 +0200
+Message-Id: <20201006072947.487729-32-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201006072947.487729-1-pbonzini@redhat.com>
 References: <20201006072947.487729-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::333;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x333.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32c;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x32c.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -101,8 +100,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>,
+Cc: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>,
+ Markus Armbruster <armbru@redhat.com>,
  Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -110,88 +109,199 @@ Sender: "Qemu-devel"
 
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-This patch updates the documentation and describes usage of the reverse
-debugging in QEMU+GDB.
+This patch adds hmp/qmp commands replay_seek/replay-seek that proceed
+the execution to the specified instruction count.
+The command automatically loads nearest snapshot and replays the execution
+to find the desired instruction count.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Acked-by: Markus Armbruster <armbru@redhat.com>
 
 --
 
 v4 changes:
- - added an example of the command line for reverse debugging of
-   the diskless machine
-Message-Id: <160174523509.12451.1409905901920738979.stgit@pasha-ThinkPad-X280>
+ - fixed HMP command description indent
+ - removed useless error_free call
+Message-Id: <160174521180.12451.14033112911009278753.stgit@pasha-ThinkPad-X280>
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- docs/replay.txt | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+ hmp-commands.hx           | 18 ++++++++
+ include/monitor/hmp.h     |  1 +
+ qapi/replay.json          | 20 +++++++++
+ replay/replay-debugging.c | 87 +++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 126 insertions(+)
 
-diff --git a/docs/replay.txt b/docs/replay.txt
-index 8952e6d852..87a64ae068 100644
---- a/docs/replay.txt
-+++ b/docs/replay.txt
-@@ -265,6 +265,16 @@ of the original disk image, use overlay files linked to the original images.
- Therefore all new snapshots (including the starting one) will be saved in
- overlays and the original image remains unchanged.
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 7680d0b380..e43ce600b8 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1836,6 +1836,24 @@ SRST
+   The command is ignored when there are no replay breakpoints.
+ ERST
  
-+When you need to use snapshots with diskless virtual machine,
-+it must be started with 'orphan' qcow2 image. This image will be used
-+for storing VM snapshots. Here is the example of the command line for this:
++    {
++        .name       = "replay_seek",
++        .args_type  = "icount:i",
++        .params     = "icount",
++        .help       = "replay execution to the specified instruction count",
++        .cmd        = hmp_replay_seek,
++    },
 +
-+  qemu-system-i386 -icount shift=3,rr=replay,rrfile=record.bin,rrsnapshot=init \
-+    -net none -drive file=empty.qcow2,if=none,id=rr
++SRST
++``replay_seek`` *icount*
++  Automatically proceed to the instruction count *icount*, when
++  replaying the execution. The command automatically loads nearest
++  snapshot and replays the execution to find the desired instruction.
++  When there is no preceding snapshot or the execution is not replayed,
++  then the command fails.
++  *icount* for the reference may be observed with ``info replay`` command.
++ERST
 +
-+empty.qcow2 drive does not connected to any virtual block device and used
-+for VM snapshots only.
-+
- Network devices
- ---------------
+     {
+         .name       = "info",
+         .args_type  = "item:s?",
+diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
+index 809ad638bb..ed2913fd18 100644
+--- a/include/monitor/hmp.h
++++ b/include/monitor/hmp.h
+@@ -132,5 +132,6 @@ void hmp_info_sev(Monitor *mon, const QDict *qdict);
+ void hmp_info_replay(Monitor *mon, const QDict *qdict);
+ void hmp_replay_break(Monitor *mon, const QDict *qdict);
+ void hmp_replay_delete_break(Monitor *mon, const QDict *qdict);
++void hmp_replay_seek(Monitor *mon, const QDict *qdict);
  
-@@ -294,6 +304,42 @@ for recording and replaying must contain identical number of ports in record
- and replay modes, but their backends may differ.
- E.g., '-serial stdio' in record mode, and '-serial null' in replay mode.
+ #endif
+diff --git a/qapi/replay.json b/qapi/replay.json
+index 173ba76107..bfd83d7591 100644
+--- a/qapi/replay.json
++++ b/qapi/replay.json
+@@ -99,3 +99,23 @@
+ #
+ ##
+ { 'command': 'replay-delete-break' }
++
++##
++# @replay-seek:
++#
++# Automatically proceed to the instruction count @icount, when
++# replaying the execution. The command automatically loads nearest
++# snapshot and replays the execution to find the desired instruction.
++# When there is no preceding snapshot or the execution is not replayed,
++# then the command fails.
++# icount for the reference may be obtained with @query-replay command.
++#
++# @icount: target instruction count
++#
++# Since: 5.2
++#
++# Example:
++#
++# -> { "execute": "replay-seek", "data": { "icount": 220414 } }
++##
++{ 'command': 'replay-seek', 'data': { 'icount': 'int' } }
+diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
+index 3dc23b84fc..e1fe6b8661 100644
+--- a/replay/replay-debugging.c
++++ b/replay/replay-debugging.c
+@@ -19,6 +19,8 @@
+ #include "qapi/qapi-commands-replay.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qemu/timer.h"
++#include "block/snapshot.h"
++#include "migration/snapshot.h"
  
-+Reverse debugging
-+-----------------
+ void hmp_info_replay(Monitor *mon, const QDict *qdict)
+ {
+@@ -125,3 +127,88 @@ void hmp_replay_delete_break(Monitor *mon, const QDict *qdict)
+         return;
+     }
+ }
 +
-+Reverse debugging allows "executing" the program in reverse direction.
-+GDB remote protocol supports "reverse step" and "reverse continue"
-+commands. The first one steps single instruction backwards in time,
-+and the second one finds the last breakpoint in the past.
++static char *replay_find_nearest_snapshot(int64_t icount,
++                                          int64_t *snapshot_icount)
++{
++    BlockDriverState *bs;
++    QEMUSnapshotInfo *sn_tab;
++    QEMUSnapshotInfo *nearest = NULL;
++    char *ret = NULL;
++    int nb_sns, i;
++    AioContext *aio_context;
 +
-+Recorded executions may be used to enable reverse debugging. QEMU can't
-+execute the code in backwards direction, but can load a snapshot and
-+replay forward to find the desired position or breakpoint.
++    *snapshot_icount = -1;
 +
-+The following GDB commands are supported:
-+ - reverse-stepi (or rsi) - step one instruction backwards
-+ - reverse-continue (or rc) - find last breakpoint in the past
++    bs = bdrv_all_find_vmstate_bs();
++    if (!bs) {
++        goto fail;
++    }
++    aio_context = bdrv_get_aio_context(bs);
 +
-+Reverse step loads the nearest snapshot and replays the execution until
-+the required instruction is met.
++    aio_context_acquire(aio_context);
++    nb_sns = bdrv_snapshot_list(bs, &sn_tab);
++    aio_context_release(aio_context);
 +
-+Reverse continue may include several passes of examining the execution
-+between the snapshots. Each of the passes include the following steps:
-+ 1. loading the snapshot
-+ 2. replaying to examine the breakpoints
-+ 3. if breakpoint or watchpoint was met
-+    - loading the snaphot again
-+    - replaying to the required breakpoint
-+ 4. else
-+    - proceeding to the p.1 with the earlier snapshot
++    for (i = 0; i < nb_sns; i++) {
++        if (bdrv_all_find_snapshot(sn_tab[i].name, &bs) == 0) {
++            if (sn_tab[i].icount != -1ULL
++                && sn_tab[i].icount <= icount
++                && (!nearest || nearest->icount < sn_tab[i].icount)) {
++                nearest = &sn_tab[i];
++            }
++        }
++    }
++    if (nearest) {
++        ret = g_strdup(nearest->name);
++        *snapshot_icount = nearest->icount;
++    }
++    g_free(sn_tab);
 +
-+Therefore usage of the reverse debugging requires at least one snapshot
-+created in advance. This can be done by omitting 'snapshot' option
-+for the block drives and adding 'rrsnapshot' for both record and replay
-+command lines.
-+See the "Snapshotting" section to learn more about running record/replay
-+and creating the snapshot in these modes.
++fail:
++    return ret;
++}
 +
- Replay log format
- -----------------
- 
++static void replay_seek(int64_t icount, QEMUTimerCB callback, Error **errp)
++{
++    char *snapshot = NULL;
++    int64_t snapshot_icount;
++
++    if (replay_mode != REPLAY_MODE_PLAY) {
++        error_setg(errp, "replay must be enabled to seek");
++        return;
++    }
++
++    snapshot = replay_find_nearest_snapshot(icount, &snapshot_icount);
++    if (snapshot) {
++        if (icount < replay_get_current_icount()
++            || replay_get_current_icount() < snapshot_icount) {
++            vm_stop(RUN_STATE_RESTORE_VM);
++            load_snapshot(snapshot, errp);
++        }
++        g_free(snapshot);
++    }
++    if (replay_get_current_icount() <= icount) {
++        replay_break(icount, callback, NULL);
++        vm_start();
++    } else {
++        error_setg(errp, "cannot seek to the specified instruction count");
++    }
++}
++
++void qmp_replay_seek(int64_t icount, Error **errp)
++{
++    replay_seek(icount, replay_stop_vm, errp);
++}
++
++void hmp_replay_seek(Monitor *mon, const QDict *qdict)
++{
++    int64_t icount = qdict_get_try_int(qdict, "icount", -1LL);
++    Error *err = NULL;
++
++    qmp_replay_seek(icount, &err);
++    if (err) {
++        error_report_err(err);
++        return;
++    }
++}
 -- 
 2.26.2
 
