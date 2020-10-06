@@ -2,73 +2,93 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77523C41604
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 15:42:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E37FBC46466
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 15:42:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D63CF206F7
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 15:42:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7DEF020760
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 15:42:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ExyPyCi5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D63CF206F7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZjzEZBBz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DEF020760
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPp6f-0002GA-0b
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 11:42:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47158)
+	id 1kPp6r-0002gN-Kc
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 11:42:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46454)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kPp4R-0000mS-U2
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 11:40:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43929)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kPp1I-0005oY-Fz
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 11:36:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34026)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kPp4Q-0007kh-7d
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 11:40:07 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kPp1E-0007GH-TK
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 11:36:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601998805;
+ s=mimecast20190719; t=1601998606;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=iVKzhPnNWnTR0T+C26GTxek83BgSeJCF9XBuHyTo+SM=;
- b=ExyPyCi5I54ShSFWy0D0A2/6oHjE7qjEETRHsUkUtzOd55V6MLqj63fMm57FiSVd2zNL2c
- oAslmBW24faTT/HTf0zJjygdNgD++zyN17jyEBJcqNEUUyfidbB69i/F96q7XNt2mCzZQE
- x1IooYlGSms3xHUQ6YFpWRvj8pV3WQs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-337-ud2z3xMLP46eJ3pD_4YUxQ-1; Tue, 06 Oct 2020 11:40:01 -0400
-X-MC-Unique: ud2z3xMLP46eJ3pD_4YUxQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 10D2D1868412;
- Tue,  6 Oct 2020 15:40:00 +0000 (UTC)
-Received: from gondolin (ovpn-112-156.ams2.redhat.com [10.36.112.156])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 503EA55767;
- Tue,  6 Oct 2020 15:39:47 +0000 (UTC)
-Date: Tue, 6 Oct 2020 17:39:44 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Matthew Rosato <mjrosato@linux.ibm.com>
-Subject: Re: [PATCH v2 4/9] linux-headers: update against 5.9-rc7
-Message-ID: <20201006173944.611048c5.cohuck@redhat.com>
-In-Reply-To: <1601669191-6731-5-git-send-email-mjrosato@linux.ibm.com>
-References: <1601669191-6731-1-git-send-email-mjrosato@linux.ibm.com>
- <1601669191-6731-5-git-send-email-mjrosato@linux.ibm.com>
-Organization: Red Hat GmbH
+ bh=A2NhhHmyKoCsBTvmZ7fN8i5on5WUvhiptL/RbfJsOjA=;
+ b=ZjzEZBBze5ZrNoq3yk4K7I5bRSqkrisYjbUcq1BZkBX4BE27S0K+NYdqkH7zUitDj5N3rH
+ OKC7Joq8hJ7KP7/P8pUauAzEierM2FZ5KvR+2P7xiQpMEvXmH+0BRIaKWNGtEeIXQ/AnRy
+ hm36Kd1/aP1z6/ikQTQf6PCK6TPpPsg=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-199-ZY_nWeD8P7anzSoDDGsqjQ-1; Tue, 06 Oct 2020 11:36:45 -0400
+X-MC-Unique: ZY_nWeD8P7anzSoDDGsqjQ-1
+Received: by mail-wr1-f70.google.com with SMTP id r16so5476665wrm.18
+ for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 08:36:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=A2NhhHmyKoCsBTvmZ7fN8i5on5WUvhiptL/RbfJsOjA=;
+ b=nJJdFWSCz+h0Bqxz/w1IfdrwLAQvKTddkJ+QdEXUqOVFq3B7stgHp9WIvUXRydHdgM
+ uiw6ZdAMeAxapqXTvMiPqS4UuyoBhN2unNeT7DkwA2pbIX0PupReCY9pjmMCiOvB32UM
+ IqP3NwMTohCPKGl5VVebfrTYVDE6m1x90y/UPh7FgnbFOufBvK5oacfruE+SX6NHwTen
+ nSc44wIK10TX9jn9H5onQscBGikxx6Sqc5yCm+tBmr7s6vk2NfDII3K2BiQEPl1WWwej
+ fqM/8J69N+pourTyBhbBidwuHH5Z7gGUi7R7JcL8miNJx+6tIuMvuacs6N7XCJL02qv9
+ HRIg==
+X-Gm-Message-State: AOAM532YAHiTV5JO1l50lN/52I3uCIf3tskph7iWSssWvyae6pjVUiaN
+ lvtKHhcdl9UzSfNa4NDVxlIbnEg8AIHuo466Xvj74TCz9j/MJkxuLyTQstKALxudNTTbs6wmYCC
+ juqj5IzRrZDAF8rU=
+X-Received: by 2002:a1c:a444:: with SMTP id n65mr5411397wme.122.1601998603931; 
+ Tue, 06 Oct 2020 08:36:43 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzE1afOkEaLvCyOXRNcmsc2zAsFDK9aCgvWyWFJrqIZKeaSKDJHTn6WL9oI+4kBM3+FLAvbKw==
+X-Received: by 2002:a1c:a444:: with SMTP id n65mr5411379wme.122.1601998603674; 
+ Tue, 06 Oct 2020 08:36:43 -0700 (PDT)
+Received: from x1w.redhat.com (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id x64sm4599526wmg.33.2020.10.06.08.36.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 06 Oct 2020 08:36:43 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 1/1] hw/nvram: Always register
+ FW_CFG_DATA_GENERATOR_INTERFACE
+Date: Tue,  6 Oct 2020 17:36:36 +0200
+Message-Id: <20201006153636.2383248-2-philmd@redhat.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201006153636.2383248-1-philmd@redhat.com>
+References: <20201006153636.2383248-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=cohuck@redhat.com;
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 00:55:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -91,45 +111,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, kvm@vger.kernel.org, pmorel@linux.ibm.com,
- david@redhat.com, schnelle@linux.ibm.com, qemu-s390x@nongnu.org,
- qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
- alex.williamson@redhat.com, mst@redhat.com, pbonzini@redhat.com,
- rth@twiddle.net
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri,  2 Oct 2020 16:06:26 -0400
-Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+While the FW_CFG_DATA_GENERATOR_INTERFACE is only consumed
+by a device only available using system-mode (fw_cfg), it is
+implemented by a crypto component (tls-cipher-suites) which
+is always available when crypto is used.
 
-> PLACEHOLDER as the kernel patch driving the need for this ("vfio-pci/zdev:
-> define the vfio_zdev header") isn't merged yet.
-> 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> ---
->  .../drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h         | 14 +++++++-------
->  linux-headers/linux/kvm.h                                  |  6 ++++--
->  linux-headers/linux/vfio.h                                 |  5 +++++
->  3 files changed, 16 insertions(+), 9 deletions(-)
-> 
-> diff --git a/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h b/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h
-> index 7b4062a..acd4c83 100644
-> --- a/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h
-> +++ b/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h
-> @@ -68,7 +68,7 @@ static inline int pvrdma_idx_valid(uint32_t idx, uint32_t max_elems)
->  
->  static inline int32_t pvrdma_idx(int *var, uint32_t max_elems)
->  {
-> -	const unsigned int idx = qatomic_read(var);
-> +	const unsigned int idx = atomic_read(var);
+Commit 69699f3055 introduced the following error in the
+qemu-storage-daemon binary:
 
-Hm... either this shouldn't have been renamed to qatomic_read() in the
-first place, or we need to add some post-processing to the update
-script.
+  $ echo -e \
+    '{"execute": "qmp_capabilities"}\r\n{"execute": "qom-list-types"}\r\n{"execute": "quit"}\r\n' \
+    | storage-daemon/qemu-storage-daemon --chardev stdio,id=qmp0  --monitor qmp0
+  {"QMP": {"version": {"qemu": {"micro": 50, "minor": 1, "major": 5}, "package": ""}, "capabilities": ["oob"]}}
+  {"return": {}}
+  missing interface 'fw_cfg-data-generator' for object 'tls-creds'
+  Aborted (core dumped)
 
->  
->  	if (pvrdma_idx_valid(idx, max_elems))
->  		return idx & (max_elems - 1);
+Since QOM dependencies are resolved at runtime, this issue
+could not be triggered at linktime, and we don't have test
+running the qemu-storage-daemon binary.
+
+Fix by always registering the QOM interface.
+
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Fixes: 69699f3055 ("crypto/tls-cipher-suites: Produce fw_cfg consumable blob")
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ hw/nvram/fw_cfg-interface.c | 15 +++++++++++++++
+ hw/nvram/fw_cfg.c           |  7 -------
+ MAINTAINERS                 |  2 +-
+ hw/nvram/meson.build        |  3 +++
+ 4 files changed, 19 insertions(+), 8 deletions(-)
+ create mode 100644 hw/nvram/fw_cfg-interface.c
+
+diff --git a/hw/nvram/fw_cfg-interface.c b/hw/nvram/fw_cfg-interface.c
+new file mode 100644
+index 0000000000..bcc7b1edbc
+--- /dev/null
++++ b/hw/nvram/fw_cfg-interface.c
+@@ -0,0 +1,15 @@
++#include "qemu/osdep.h"
++#include "hw/nvram/fw_cfg.h"
++
++static const TypeInfo fw_cfg_data_generator_interface_info = {
++    .parent = TYPE_INTERFACE,
++    .name = TYPE_FW_CFG_DATA_GENERATOR_INTERFACE,
++    .class_size = sizeof(FWCfgDataGeneratorClass),
++};
++
++static void fw_cfg_register_interfaces(void)
++{
++    type_register_static(&fw_cfg_data_generator_interface_info);
++}
++
++type_init(fw_cfg_register_interfaces)
+diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+index 0e95d057fd..08539a1aab 100644
+--- a/hw/nvram/fw_cfg.c
++++ b/hw/nvram/fw_cfg.c
+@@ -1360,18 +1360,11 @@ static const TypeInfo fw_cfg_mem_info = {
+     .class_init    = fw_cfg_mem_class_init,
+ };
+ 
+-static const TypeInfo fw_cfg_data_generator_interface_info = {
+-    .parent = TYPE_INTERFACE,
+-    .name = TYPE_FW_CFG_DATA_GENERATOR_INTERFACE,
+-    .class_size = sizeof(FWCfgDataGeneratorClass),
+-};
+-
+ static void fw_cfg_register_types(void)
+ {
+     type_register_static(&fw_cfg_info);
+     type_register_static(&fw_cfg_io_info);
+     type_register_static(&fw_cfg_mem_info);
+-    type_register_static(&fw_cfg_data_generator_interface_info);
+ }
+ 
+ type_init(fw_cfg_register_types)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index b76fb31861..a45d908ebd 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2054,7 +2054,7 @@ R: Laszlo Ersek <lersek@redhat.com>
+ R: Gerd Hoffmann <kraxel@redhat.com>
+ S: Supported
+ F: docs/specs/fw_cfg.txt
+-F: hw/nvram/fw_cfg.c
++F: hw/nvram/fw_cfg*.c
+ F: stubs/fw_cfg.c
+ F: include/hw/nvram/fw_cfg.h
+ F: include/standard-headers/linux/qemu_fw_cfg.h
+diff --git a/hw/nvram/meson.build b/hw/nvram/meson.build
+index 1f2ed013b2..fd2951a860 100644
+--- a/hw/nvram/meson.build
++++ b/hw/nvram/meson.build
+@@ -1,3 +1,6 @@
++# QOM interfaces must be available anytime QOM is used.
++qom_ss.add(files('fw_cfg-interface.c'))
++
+ softmmu_ss.add(files('fw_cfg.c'))
+ softmmu_ss.add(when: 'CONFIG_CHRP_NVRAM', if_true: files('chrp_nvram.c'))
+ softmmu_ss.add(when: 'CONFIG_DS1225Y', if_true: files('ds1225y.c'))
+-- 
+2.26.2
 
 
