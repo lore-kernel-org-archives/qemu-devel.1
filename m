@@ -2,75 +2,84 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 681FCC41604
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 10:01:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26048C41604
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 10:01:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9FFBB20674
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 10:01:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FFBB20674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4F80E20674
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 10:01:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bINGIaTX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F80E20674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPjmJ-0005jX-B9
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 06:01:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45218)
+	id 1kPjmN-0005pN-1R
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 06:01:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45248)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kPjkR-0004KY-At
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 05:59:08 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:41733)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kPjkN-0004Hr-9T
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 05:59:05 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.108.16.121])
- by mo529.mail-out.ovh.net (Postfix) with ESMTPS id DAD966280112;
- Tue,  6 Oct 2020 11:58:52 +0200 (CEST)
-Received: from kaod.org (37.59.142.101) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Tue, 6 Oct 2020
- 11:58:52 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-101G0048afa39c4-ddd5-4508-9255-030d4fa49dfa,
- ABBA5CC1B3A583228A496F54FDB0659883642288) smtp.auth=groug@kaod.org
-Date: Tue, 6 Oct 2020 11:58:50 +0200
-From: Greg Kurz <groug@kaod.org>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH] vhost: Ignore vrings in dirty log when using a vIOMMU
-Message-ID: <20201006115850.11f06b8e@bahia.lan>
-In-Reply-To: <20201005101414-mutt-send-email-mst@kernel.org>
-References: <160105498386.68108.2145229309875282336.stgit@bahia.lan>
- <20200928062343.GA501872@yekko.fritz.box>
- <20200928093718.334774b2@bahia.lan>
- <20201005101414-mutt-send-email-mst@kernel.org>
-X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kPjkU-0004LX-2g
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 05:59:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48987)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kPjkR-0004Ik-FS
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 05:59:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601978346;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=ef4nEw92T7XryGjdWU85hpW8vouiPoI2HxKv7tDMlcM=;
+ b=bINGIaTXGzr3dpWFul89zLPClE89pl2bH5Nbat/ZtQ8tlSr5VzU+H9AFLYORmrHtJmDsWi
+ l8cV3tswa3yZrbtg0XgVNnXqSBLtIYqjC22udrggscHzCDyaru/oDh41uTmgO5UtToG54I
+ 6n+m49lMQ19sdxle8uTTDSjMYaBMZgk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-326-uUA4l7IRPwGxYYRMrc-cxQ-1; Tue, 06 Oct 2020 05:59:04 -0400
+X-MC-Unique: uUA4l7IRPwGxYYRMrc-cxQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED72864080
+ for <qemu-devel@nongnu.org>; Tue,  6 Oct 2020 09:59:03 +0000 (UTC)
+Received: from localhost (ovpn-112-180.ams2.redhat.com [10.36.112.180])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DA0473A40;
+ Tue,  6 Oct 2020 09:58:51 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] virtiofsd: avoid /proc/self/fd tempdir
+Date: Tue,  6 Oct 2020 10:58:26 +0100
+Message-Id: <20201006095826.59813-1-stefanha@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: base64
 Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [37.59.142.101]
-X-ClientProxiedBy: DAG1EX2.mxp5.local (172.16.2.2) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: 2d8bc93f-5f35-48c5-80be-f1cba419e46b
-X-Ovh-Tracer-Id: 4601552920851880355
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrgeeggddvvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgihesthhqredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepfeelteetkeevhfelgfevkefgudfffeekgfehgeefheelleejudeugfffieekleegnecuffhomhgrihhnpehrvgguhhgrthdrtghomhenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepjhgrshhofigrnhhgsehrvgguhhgrthdrtghomh
-Received-SPF: pass client-ip=178.32.125.2; envelope-from=groug@kaod.org;
- helo=smtpout1.mo529.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 05:58:53
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 01:55:55
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -10
+X-Spam_score: -1.1
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MIME_BASE64_TEXT=1.741, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -84,185 +93,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <laurent@vivier.eu>, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: virtio-fs@redhat.com, Miklos Szeredi <mszeredi@redhat.com>,
+ Jens Freimann <jfreimann@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 5 Oct 2020 10:18:03 -0400
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
-
-> On Mon, Sep 28, 2020 at 09:37:18AM +0200, Greg Kurz wrote:
-> > On Mon, 28 Sep 2020 16:23:43 +1000
-> > David Gibson <david@gibson.dropbear.id.au> wrote:
-> >=20
-> > > On Fri, Sep 25, 2020 at 07:29:43PM +0200, Greg Kurz wrote:
-> > > > When a vIOMMU is present, any address comming from the guest is an =
-IO
-> > > > virtual address, including those of the vrings. The backend's acces=
-ses
-> > > > to the vrings happen through vIOMMU translation : the backend hence
-> > > > only logs the final guest physical address, not the IO virtual one.
-> > > > It thus doesn't make sense to make room for the vring addresses in =
-the
-> > > > dirty log in this case.
-> > > >=20
-> > > > This fixes a crash of the source when migrating a guest using in-ke=
-rnel
-> > > > vhost-net and iommu_platform=3Don on POWER, because DMA regions are=
- put
-> > > > at very high addresses and the resulting log size is likely to cause
-> > > > g_malloc0() to abort.
-> > > >=20
-> > > > BugLink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1879349
-> > > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > >=20
-> > > I'm a little confused as to what's going on here.  Obviously
-> > > allocating dirty bitmaps in IOVA space doesn't make much sense.
-> > > But.. in all cases isn't the ring ending up in guest memory, whether
-> > > translated or not.  So why do specific addresses of the ring make a
-> > > difference in *any* case.
-> > >=20
-> >=20
-> > I admit I'm a bit surprised as well... I can't think of a scenario
-> > where the address of the used ring would be higher than the guest
-> > memory... Maybe MST can shed some light here ?
->=20
-> So the original idea was that vring itself is specified in
-> terms of HVA as opposed to rest of stuff which is specified
-> in terms of GPA.
-
-The vring itself is indeed described in term of HVA (vq->used) but
-when it comes to the dirty log, QEMU passes the GPA of the used
-structure to the vhost backend:
-
-=46rom vhost_virtqueue_set_addr():
-
-    addr.log_guest_addr =3D vq->used_phys;
-                              ^^ GPA ^^
-    addr.flags =3D enable_log ? (1 << VHOST_VRING_F_LOG) : 0;
-    r =3D dev->vhost_ops->vhost_set_vring_addr(dev, &addr);
-
-And the sizing of the bitmap computed in vhost_get_log_size() is
-also based on this GPA:
-
-    for (i =3D 0; i < dev->nvqs; ++i) {
-        struct vhost_virtqueue *vq =3D dev->vqs + i;
-
-        if (!vq->used_phys && !vq->used_size) {
-            continue;
-        }
-
-        uint64_t last =3D vq->used_phys + vq->used_size - 1;
-                            ^^ GPA ^^
-        log_size =3D MAX(log_size, last / VHOST_LOG_CHUNK + 1);
-    }
-
-With platform_iommu=3Doff, I couldn't find a case where this second
-loop in vhost_get_log_size() increases the log size actually... and
-when platform_iommu=3Don, vq->used_phys is a GIOVA that my other patches
-you've already merged in the kernel explicitly ignore when it comes to
-the dirty log... So it really seems that this loop is useless for the
-general case. If it is there to address some corner case, I guess it
-deserves a comment at the very least.
-
-Cheers,
-
---
-Greg
-
-> This way we wanted to support e.g. migration by vhost writing into
-> qemu address space, qemu copying data to guest memory.
->=20
->=20
->=20
->=20
-> > > > ---
-> > > >  hw/virtio/vhost.c |   38 ++++++++++++++++++++++++--------------
-> > > >  1 file changed, 24 insertions(+), 14 deletions(-)
-> > > >=20
-> > > > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> > > > index 1a1384e7a642..0b83d6b8e65e 100644
-> > > > --- a/hw/virtio/vhost.c
-> > > > +++ b/hw/virtio/vhost.c
-> > > > @@ -106,6 +106,20 @@ static void vhost_dev_sync_region(struct vhost=
-_dev *dev,
-> > > >      }
-> > > >  }
-> > > > =20
-> > > > +static int vhost_dev_has_iommu(struct vhost_dev *dev)
-> > > > +{
-> > > > +    VirtIODevice *vdev =3D dev->vdev;
-> > > > +
-> > > > +    /*
-> > > > +     * For vhost, VIRTIO_F_IOMMU_PLATFORM means the backend support
-> > > > +     * incremental memory mapping API via IOTLB API. For platform =
-that
-> > > > +     * does not have IOMMU, there's no need to enable this feature
-> > > > +     * which may cause unnecessary IOTLB miss/update trnasactions.
-> > > > +     */
-> > > > +    return vdev->dma_as !=3D &address_space_memory &&
-> > > > +           virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_PLATFORM);
-> > > > +}
-> > > > +
-> > > >  static int vhost_sync_dirty_bitmap(struct vhost_dev *dev,
-> > > >                                     MemoryRegionSection *section,
-> > > >                                     hwaddr first,
-> > > > @@ -130,6 +144,11 @@ static int vhost_sync_dirty_bitmap(struct vhos=
-t_dev *dev,
-> > > >                                range_get_last(reg->guest_phys_addr,
-> > > >                                               reg->memory_size));
-> > > >      }
-> > > > +
-> > > > +    if (vhost_dev_has_iommu(dev)) {
-> > > > +        return 0;
-> > > > +    }
-> > > > +
-> > > >      for (i =3D 0; i < dev->nvqs; ++i) {
-> > > >          struct vhost_virtqueue *vq =3D dev->vqs + i;
-> > > > =20
-> > > > @@ -172,6 +191,11 @@ static uint64_t vhost_get_log_size(struct vhos=
-t_dev *dev)
-> > > >                                         reg->memory_size);
-> > > >          log_size =3D MAX(log_size, last / VHOST_LOG_CHUNK + 1);
-> > > >      }
-> > > > +
-> > > > +    if (vhost_dev_has_iommu(dev)) {
-> > > > +        return log_size;
-> > > > +    }
-> > > > +
-> > > >      for (i =3D 0; i < dev->nvqs; ++i) {
-> > > >          struct vhost_virtqueue *vq =3D dev->vqs + i;
-> > > > =20
-> > > > @@ -287,20 +311,6 @@ static inline void vhost_dev_log_resize(struct=
- vhost_dev *dev, uint64_t size)
-> > > >      dev->log_size =3D size;
-> > > >  }
-> > > > =20
-> > > > -static int vhost_dev_has_iommu(struct vhost_dev *dev)
-> > > > -{
-> > > > -    VirtIODevice *vdev =3D dev->vdev;
-> > > > -
-> > > > -    /*
-> > > > -     * For vhost, VIRTIO_F_IOMMU_PLATFORM means the backend support
-> > > > -     * incremental memory mapping API via IOTLB API. For platform =
-that
-> > > > -     * does not have IOMMU, there's no need to enable this feature
-> > > > -     * which may cause unnecessary IOTLB miss/update trnasactions.
-> > > > -     */
-> > > > -    return vdev->dma_as !=3D &address_space_memory &&
-> > > > -           virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_PLATFORM);
-> > > > -}
-> > > > -
-> > > >  static void *vhost_memory_map(struct vhost_dev *dev, hwaddr addr,
-> > > >                                hwaddr *plen, bool is_write)
-> > > >  {
-> > > >=20
-> > > >=20
-> > >=20
-> >=20
->=20
->=20
+SW4gb3JkZXIgdG8gcHJldmVudCAvcHJvYy9zZWxmL2ZkIGVzY2FwZXMgYSB0ZW1wb3JhcnkgZGly
+ZWN0b3J5IGlzCmNyZWF0ZWQgd2hlcmUgL3Byb2Mvc2VsZi9mZCBpcyBiaW5kLW1vdW50ZWQuIFRo
+aXMgZG9lc24ndCB3b3JrIG9uCnJlYWQtb25seSBmaWxlIHN5c3RlbXMuCgpBdm9pZCB0aGUgdGVt
+cG9yYXJ5IGRpcmVjdG9yeSBieSBiaW5kLW1vdW50aW5nIC9wcm9jL3NlbGYvZmQgb3ZlciAvcHJv
+Yy4KVGhpcyBkb2VzIG5vdCBhZmZlY3Qgb3RoZXIgcHJvY2Vzc2VzIHNpbmNlIHdlIHJlbW91bnRl
+ZCAvIHdpdGggTVNfUkVDIHwKTVNfU0xBVkUuIC9wcm9jIG11c3QgZXhpc3QgYW5kIHZpcnRpb2Zz
+ZCBkb2VzIG5vdCB1c2UgaXQgc28gaXQncyBzYWZlIHRvCmRvIHRoaXMuCgpQYXRoIHRyYXZlcnNh
+bCBjYW4gYmUgdGVzdGVkIHdpdGggdGhlIGZvbGxvd2luZyBmdW5jdGlvbjoKCiAgc3RhdGljIHZv
+aWQgdGVzdF9wcm9jX2ZkX2VzY2FwZShzdHJ1Y3QgbG9fZGF0YSAqbG8pCiAgewogICAgICBpbnQg
+ZmQ7CiAgICAgIGludCBsZXZlbCA9IDA7CiAgICAgIGlub190IGxhc3RfaW5vID0gMDsKCiAgICAg
+IGZkID0gbG8tPnByb2Nfc2VsZl9mZDsKICAgICAgZm9yICg7OykgewogICAgICAgICAgc3RydWN0
+IHN0YXQgc3Q7CgogICAgICAgICAgaWYgKGZzdGF0KGZkLCAmc3QpICE9IDApIHsKICAgICAgICAg
+ICAgICBwZXJyb3IoImZzdGF0Iik7CiAgICAgICAgICAgICAgcmV0dXJuOwogICAgICAgICAgfQog
+ICAgICAgICAgaWYgKGxhc3RfaW5vICYmIHN0LnN0X2lubyA9PSBsYXN0X2lubykgewogICAgICAg
+ICAgICAgIGZwcmludGYoc3RkZXJyLCAiaW5vZGUgbnVtYmVyIHVuY2hhbmdlZCwgc3RvcHBpbmdc
+biIpOwogICAgICAgICAgICAgIHJldHVybjsKICAgICAgICAgIH0KICAgICAgICAgIGxhc3RfaW5v
+ID0gc3Quc3RfaW5vOwoKICAgICAgICAgIGZwcmludGYoc3RkZXJyLCAiTGV2ZWwgJWQgZGV2ICVs
+dSBpbm8gJWx1XG4iLCBsZXZlbCwKICAgICAgICAgICAgICAgICAgKHVuc2lnbmVkIGxvbmcpc3Qu
+c3RfZGV2LAogICAgICAgICAgICAgICAgICAodW5zaWduZWQgbG9uZylsYXN0X2lubyk7CiAgICAg
+ICAgICBmZCA9IG9wZW5hdChmZCwgIi4uIiwgT19QQVRIIHwgT19ESVJFQ1RPUlkgfCBPX05PRk9M
+TE9XKTsKICAgICAgICAgIGxldmVsKys7CiAgICAgIH0KICB9CgpCZWZvcmUgYW5kIGFmdGVyIHRo
+aXMgcGF0Y2ggb25seSBMZXZlbCAwIGlzIGRpc3BsYXllZC4gV2l0aG91dAovcHJvYy9zZWxmL2Zk
+IGJpbmQtbW91bnQgcHJvdGVjdGlvbiBpdCBpcyBwb3NzaWJsZSB0byB0cmF2ZXJzZSBwYXJlbnQK
+ZGlyZWN0b3JpZXMuCgpGaXhlczogMzk3YWU5ODJmNGRmNCAoInZpcnRpb2ZzZDogamFpbCBsby0+
+cHJvY19zZWxmX2ZkIikKQ2M6IE1pa2xvcyBTemVyZWRpIDxtc3plcmVkaUByZWRoYXQuY29tPgpD
+YzogSmVucyBGcmVpbWFubiA8amZyZWltYW5uQHJlZGhhdC5jb20+ClNpZ25lZC1vZmYtYnk6IFN0
+ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFAcmVkaGF0LmNvbT4KLS0tCiB0b29scy92aXJ0aW9mc2Qv
+cGFzc3Rocm91Z2hfbGwuYyB8IDM0ICsrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0tLS0tCiAx
+IGZpbGUgY2hhbmdlZCwgMTEgaW5zZXJ0aW9ucygrKSwgMjMgZGVsZXRpb25zKC0pCgpkaWZmIC0t
+Z2l0IGEvdG9vbHMvdmlydGlvZnNkL3Bhc3N0aHJvdWdoX2xsLmMgYi90b29scy92aXJ0aW9mc2Qv
+cGFzc3Rocm91Z2hfbGwuYwppbmRleCAwYjIyOWViZDU3Li42YWU3ZmZjZGQ3IDEwMDY0NAotLS0g
+YS90b29scy92aXJ0aW9mc2QvcGFzc3Rocm91Z2hfbGwuYworKysgYi90b29scy92aXJ0aW9mc2Qv
+cGFzc3Rocm91Z2hfbGwuYwpAQCAtMjM5Myw4ICsyMzkzLDYgQEAgc3RhdGljIHZvaWQgc2V0dXBf
+d2FpdF9wYXJlbnRfY2FwYWJpbGl0aWVzKHZvaWQpCiBzdGF0aWMgdm9pZCBzZXR1cF9uYW1lc3Bh
+Y2VzKHN0cnVjdCBsb19kYXRhICpsbywgc3RydWN0IGZ1c2Vfc2Vzc2lvbiAqc2UpCiB7CiAgICAg
+cGlkX3QgY2hpbGQ7Ci0gICAgY2hhciB0ZW1wbGF0ZVtdID0gInZpcnRpb2ZzZC1YWFhYWFgiOwot
+ICAgIGNoYXIgKnRtcGRpcjsKIAogICAgIC8qCiAgICAgICogQ3JlYXRlIGEgbmV3IHBpZCBuYW1l
+c3BhY2UgZm9yICpjaGlsZCogcHJvY2Vzc2VzLiAgV2UnbGwgaGF2ZSB0bwpAQCAtMjQ1OCwzMyAr
+MjQ1NiwyMyBAQCBzdGF0aWMgdm9pZCBzZXR1cF9uYW1lc3BhY2VzKHN0cnVjdCBsb19kYXRhICps
+bywgc3RydWN0IGZ1c2Vfc2Vzc2lvbiAqc2UpCiAgICAgICAgIGV4aXQoMSk7CiAgICAgfQogCi0g
+ICAgdG1wZGlyID0gbWtkdGVtcCh0ZW1wbGF0ZSk7Ci0gICAgaWYgKCF0bXBkaXIpIHsKLSAgICAg
+ICAgZnVzZV9sb2coRlVTRV9MT0dfRVJSLCAidG1wZGlyKCVzKTogJW1cbiIsIHRlbXBsYXRlKTsK
+KyAgICAvKgorICAgICAqIFdlIG9ubHkgbmVlZCAvcHJvYy9zZWxmL2ZkLiBQcmV2ZW50ICIuLiIg
+ZnJvbSBhY2Nlc3NpbmcgcGFyZW50CisgICAgICogZGlyZWN0b3JpZXMgb2YgL3Byb2Mvc2VsZi9m
+ZCBieSBiaW5kLW1vdW50aW5nIGl0IG92ZXIgL3Byb2MuIFNpbmNlIC8gd2FzCisgICAgICogcHJl
+dmlvdXNseSByZW1vdW50ZWQgd2l0aCBNU19SRUMgfCBNU19TTEFWRSB0aGlzIG1vdW50IGNoYW5n
+ZSBvbmx5CisgICAgICogYWZmZWN0cyBvdXIgcHJvY2Vzcy4KKyAgICAgKi8KKyAgICBpZiAobW91
+bnQoIi9wcm9jL3NlbGYvZmQiLCAiL3Byb2MiLCBOVUxMLCBNU19CSU5ELCBOVUxMKSA8IDApIHsK
+KyAgICAgICAgZnVzZV9sb2coRlVTRV9MT0dfRVJSLCAibW91bnQoL3Byb2Mvc2VsZi9mZCwgTVNf
+QklORCk6ICVtXG4iKTsKICAgICAgICAgZXhpdCgxKTsKICAgICB9CiAKLSAgICBpZiAobW91bnQo
+Ii9wcm9jL3NlbGYvZmQiLCB0bXBkaXIsIE5VTEwsIE1TX0JJTkQsIE5VTEwpIDwgMCkgewotICAg
+ICAgICBmdXNlX2xvZyhGVVNFX0xPR19FUlIsICJtb3VudCgvcHJvYy9zZWxmL2ZkLCAlcywgTVNf
+QklORCk6ICVtXG4iLAotICAgICAgICAgICAgICAgICB0bXBkaXIpOwotICAgICAgICBleGl0KDEp
+OwotICAgIH0KLQotICAgIC8qIE5vdyB3ZSBjYW4gZ2V0IG91ciAvcHJvYy9zZWxmL2ZkIGRpcmVj
+dG9yeSBmaWxlIGRlc2NyaXB0b3IgKi8KLSAgICBsby0+cHJvY19zZWxmX2ZkID0gb3Blbih0bXBk
+aXIsIE9fUEFUSCk7CisgICAgLyogR2V0IHRoZSAvcHJvYyAoYWN0dWFsbHkgL3Byb2Mvc2VsZi9m
+ZCwgc2VlIGFib3ZlKSBmaWxlIGRlc2NyaXB0b3IgKi8KKyAgICBsby0+cHJvY19zZWxmX2ZkID0g
+b3BlbigiL3Byb2MiLCBPX1BBVEgpOwogICAgIGlmIChsby0+cHJvY19zZWxmX2ZkID09IC0xKSB7
+Ci0gICAgICAgIGZ1c2VfbG9nKEZVU0VfTE9HX0VSUiwgIm9wZW4oJXMsIE9fUEFUSCk6ICVtXG4i
+LCB0bXBkaXIpOworICAgICAgICBmdXNlX2xvZyhGVVNFX0xPR19FUlIsICJvcGVuKC9wcm9jLCBP
+X1BBVEgpOiAlbVxuIik7CiAgICAgICAgIGV4aXQoMSk7CiAgICAgfQotCi0gICAgaWYgKHVtb3Vu
+dDIodG1wZGlyLCBNTlRfREVUQUNIKSA8IDApIHsKLSAgICAgICAgZnVzZV9sb2coRlVTRV9MT0df
+RVJSLCAidW1vdW50MiglcywgTU5UX0RFVEFDSCk6ICVtXG4iLCB0bXBkaXIpOwotICAgICAgICBl
+eGl0KDEpOwotICAgIH0KLQotICAgIGlmIChybWRpcih0bXBkaXIpIDwgMCkgewotICAgICAgICBm
+dXNlX2xvZyhGVVNFX0xPR19FUlIsICJybWRpciglcyk6ICVtXG4iLCB0bXBkaXIpOwotICAgIH0K
+IH0KIAogLyoKLS0gCjIuMjYuMgoK
 
 
