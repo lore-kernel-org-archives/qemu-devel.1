@@ -2,71 +2,74 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08493C4363D
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 22:08:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1FCBC4363D
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 22:11:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3ED87208B6
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 22:08:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3E46C206F4
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 22:11:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D6nOfBl4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ED87208B6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nl3q+ADB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E46C206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40504 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPv8O-0005kG-2A
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 18:08:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44778)
+	id 1kPvBF-0007t6-4p
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 18:11:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45158)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kPv6l-0004z6-95
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 18:06:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42312)
+ id 1kPv9M-0006LS-Vc
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 18:09:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34810)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kPv6i-0006Ao-O0
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 18:06:54 -0400
+ id 1kPv9L-0006Mn-8S
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 18:09:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602022011;
+ s=mimecast20190719; t=1602022174;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type;
- bh=ils0BP+cNaOMg3GKRSynEad9TgRvNzhouxtHidMz3tU=;
- b=D6nOfBl4radBOL4DZWVzcNNKDDD2e8DzlzP4P3Xs7h1nAJOQ6ElJdTOarmQjL4z0/GZLAD
- G9RTMRrVkWL8QFGd5Wa+5zNuifnyegzBB2BCQ1ErC+Ljt2XbpGCA/4KjA6Ulwlo82vtCpq
- c8lQ/W8Jso9EQH0EQ/fP2+CwUOO2hLU=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=C999aiagk6KOyK+M3BSZ4sSc3YbI839m6idgoRIdXvM=;
+ b=Nl3q+ADB/pRl3d0opZ94ghEaMNa+pnQCiVckp+qa6DRAe+MfwqXY4/4HCF3c7KTPZdel6I
+ fMk+bNZ+27sGiXoOLU4ukTPDlRQmYHJZ3bwTZEVP617C4UnMBnxiboAujyrfVha2Zt37uW
+ VftVPMWvY/6gO06ENLFjxofBH1jh0bs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-406-8-4HMb4qOeK2eQbEzfTxIw-1; Tue, 06 Oct 2020 18:06:49 -0400
-X-MC-Unique: 8-4HMb4qOeK2eQbEzfTxIw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-480-1nACHwCPP3i2uwqSH9Walw-1; Tue, 06 Oct 2020 18:09:32 -0400
+X-MC-Unique: 1nACHwCPP3i2uwqSH9Walw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6A7DA1018F7A;
- Tue,  6 Oct 2020 22:06:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B5B380365F;
+ Tue,  6 Oct 2020 22:09:31 +0000 (UTC)
 Received: from localhost (ovpn-119-102.rdu2.redhat.com [10.10.119.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F20495D9CD;
- Tue,  6 Oct 2020 22:06:47 +0000 (UTC)
-Date: Tue, 6 Oct 2020 18:06:47 -0400
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0263B619C4;
+ Tue,  6 Oct 2020 22:09:30 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: Purpose of QOM properties registered at realize time?
-Message-ID: <20201006220647.GR7303@habkost.net>
+To: Peter Maydell <peter.maydell@linaro.org>,
+	qemu-devel@nongnu.org
+Subject: [PULL 00/21] machine + QOM queue, 2020-10-06
+Date: Tue,  6 Oct 2020 18:09:09 -0400
+Message-Id: <20201006220930.908275-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 01:55:55
@@ -90,65 +93,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-riscv@nongnu.org,
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
-
-While trying to understand how QOM properties are used in QEMU, I
-stumbled upon multiple cases where alias properties are added at
-realize time.
-
-Now, I don't understand why those properties exist.  As the
-properties are added at realize time, I assume they aren't
-supposed to be touched by the user at all.  If they are not
-supposed to be touched by the user, what exactly is the purpose
-of those QOM properties?
-
-For reference, these are the cases I've found:
-
-$ git grep -nwpE 'object_property_add_alias|qdev_pass_gpios|qdev_alias_all_properties' | grep -A1 realize
-hw/arm/allwinner-a10.c=71=static void aw_a10_realize(DeviceState *dev, Error **errp)
-hw/arm/allwinner-a10.c:89:    qdev_pass_gpios(DEVICE(&s->intc), dev, NULL);
---
-hw/arm/allwinner-h3.c=232=static void allwinner_h3_realize(DeviceState *dev, Error **errp)
-hw/arm/allwinner-h3.c:359:    object_property_add_alias(OBJECT(s), "sd-bus", OBJECT(&s->mmc0),
---
-hw/arm/armsse.c=429=static void armsse_realize(DeviceState *dev, Error **errp)
-hw/arm/armsse.c:1092:    qdev_pass_gpios(dev_secctl, dev, "mscexp_status");
---
-hw/arm/armv7m.c=149=static void armv7m_realize(DeviceState *dev, Error **errp)
-hw/arm/armv7m.c:219:    qdev_pass_gpios(DEVICE(&s->nvic), dev, NULL);
---
-hw/arm/bcm2835_peripherals.c=128=static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-hw/arm/bcm2835_peripherals.c:322:    object_property_add_alias(OBJECT(s), "sd-bus", OBJECT(&s->gpio), "sd-bus");
---
-hw/arm/bcm2836.c=69=static void bcm2836_realize(DeviceState *dev, Error **errp)
-hw/arm/bcm2836.c:87:    object_property_add_alias(OBJECT(s), "sd-bus", OBJECT(&s->peripherals),
-hw/arm/msf2-soc.c=79=static void m2sxxx_soc_realize(DeviceState *dev_soc, Error **errp)
-hw/arm/msf2-soc.c:170:        object_property_add_alias(OBJECT(s), bus_name,
---
-hw/arm/nrf51_soc.c=58=static void nrf51_soc_realize(DeviceState *dev_soc, Error **errp)
-hw/arm/nrf51_soc.c:138:    qdev_pass_gpios(DEVICE(&s->gpio), dev_soc, NULL);
---
-hw/arm/xlnx-zynqmp.c=276=static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-hw/arm/xlnx-zynqmp.c:522:        object_property_add_alias(OBJECT(s), bus_name, sdhci, "sd-bus");
---
-hw/misc/mac_via.c=1011=static void mac_via_realize(DeviceState *dev, Error **errp)
-hw/misc/mac_via.c:1028:    object_property_add_alias(OBJECT(dev), "irq[0]", OBJECT(ms),
---
-hw/ppc/spapr_drc.c=511=static void realize(DeviceState *d, Error **errp)
-hw/ppc/spapr_drc.c:530:    object_property_add_alias(root_container, link_name,
-hw/riscv/sifive_e.c=186=static void sifive_e_soc_realize(DeviceState *dev, Error **errp)
-hw/riscv/sifive_e.c:233:    qdev_pass_gpios(DEVICE(&s->gpio), dev, NULL);
-hw/riscv/sifive_u.c=651=static void sifive_u_soc_realize(DeviceState *dev, Error **errp)
-hw/riscv/sifive_u.c:743:    qdev_pass_gpios(DEVICE(&s->gpio), dev, NULL);
-
--- 
-Eduardo
+The following changes since commit d7c5b788295426c1ef48a9ffc3432c51220f69ba=
+:=0D
+=0D
+  Merge remote-tracking branch 'remotes/stefanha-gitlab/tags/block-pull-req=
+uest' into staging (2020-10-06 12:15:59 +0100)=0D
+=0D
+are available in the Git repository at:=0D
+=0D
+  git://github.com/ehabkost/qemu.git tags/machine-next-pull-request=0D
+=0D
+for you to fetch changes up to 1b5e843ab68c4afa611da22f303a5b0daa979ad8:=0D
+=0D
+  numa: hmat: require parent cache description before the next level one (2=
+020-10-06 11:09:41 -0400)=0D
+=0D
+----------------------------------------------------------------=0D
+machine + QOM queue, 2020-10-06=0D
+=0D
+* QOM documentation fixes and cleanups (Eduardo Habkost)=0D
+* user-mode: Prune build dependencies (Philippe Mathieu-Daud=C3=A9)=0D
+* qom: Improve error message (Philippe Mathieu-Daud=C3=A9)=0D
+* numa: hmat: require parent cache description before the next=0D
+  level one (Igor Mammedov)=0D
+=0D
+----------------------------------------------------------------=0D
+=0D
+Eduardo Habkost (11):=0D
+  qom: Fix DECLARE_*CHECKER documentation=0D
+  docs/devel/qom: Fix indentation of bulleted list=0D
+  docs/devel/qom: Fix indentation of code blocks=0D
+  docs/devel/qom: Use *emphasis* for emphasis=0D
+  docs/devel/qom: Remove usage of <code>=0D
+  docs/devel/qom: Avoid long lines=0D
+  kernel-doc: Handle function typedefs that return pointers=0D
+  kernel-doc: Handle function typedefs without asterisks=0D
+  qom: Explicitly tag doc comments for typedefs and structs=0D
+  memory: Explicitly tag doc comments for structs=0D
+  kernel-doc: Remove $decl_type=3D'type name' hack=0D
+=0D
+Igor Mammedov (1):=0D
+  numa: hmat: require parent cache description before the next level one=0D
+=0D
+Philippe Mathieu-Daud=C3=A9 (9):=0D
+  hw/core/qdev-properties: Use qemu_strtol() in set_mac() handler=0D
+  hw/core/qdev-properties: Use qemu_strtoul() in set_pci_host_devaddr()=0D
+  hw/core/qdev-properties: Fix code style=0D
+  hw/core/qdev-properties: Export enum-related functions=0D
+  hw/core/qdev-properties: Export qdev_prop_enum=0D
+  hw/core/qdev-properties: Export some integer-related functions=0D
+  hw/core/qdev-properties: Extract system-mode specific properties=0D
+  hw/core/cpu: Add missing 'exec/cpu-common.h' include=0D
+  qom: Improve error message displayed with missing object properties=0D
+=0D
+ docs/devel/qom.rst               |  91 ++--=0D
+ hw/core/qdev-prop-internal.h     |  30 ++=0D
+ include/exec/memory.h            |   6 +-=0D
+ include/hw/qdev-properties.h     |   1 +=0D
+ include/qom/object.h             |  38 +-=0D
+ hw/core/cpu.c                    |   1 +=0D
+ hw/core/numa.c                   |   8 +-=0D
+ hw/core/qdev-properties-system.c | 687 ++++++++++++++++++++++++++++-=0D
+ hw/core/qdev-properties.c        | 735 ++-----------------------------=0D
+ qom/object.c                     |   3 +-=0D
+ scripts/kernel-doc               |  16 +-=0D
+ 11 files changed, 831 insertions(+), 785 deletions(-)=0D
+ create mode 100644 hw/core/qdev-prop-internal.h=0D
+=0D
+--=20=0D
+2.26.2=0D
+=0D
 
 
