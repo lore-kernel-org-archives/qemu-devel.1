@@ -2,77 +2,90 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78568C4363D
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 12:58:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C98BDC4363D
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 12:59:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E35942075A
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 12:58:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 333C32075A
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 12:59:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RDQ3nuKK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E35942075A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CIXx17sR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 333C32075A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPmXp-0005Mm-P3
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 08:58:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56366)
+	id 1kPmYo-00077y-2q
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 08:59:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60090)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1kPmGd-0002EQ-J9
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 08:40:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30750)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kPmVn-0002gb-D8
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 08:56:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56243)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1kPmGb-00080w-55
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 08:40:31 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kPmVl-0001sA-Jc
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 08:56:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601988028;
+ s=mimecast20190719; t=1601988968;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5LCE8BFoYRDbMZRp/QGyqUoACL7bTwS92nRXSyf7F1o=;
- b=RDQ3nuKKnO7NZnDGZkXx1RdI1LHejrmAqn/UH350yXfu7CM8AlTXYp+yeuF2ngD3St525R
- GWcZuwH87WWtwq64EHHVwir3FatPUKElwerk+vUnBJOa+3IpVjksrcsP6RtTZsVqWZuUWL
- +2B1S2TpMIs3ggU5/eOoW2vQvcJf250=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-265-Yw9QaetrM2SJuJUpbrUXMw-1; Tue, 06 Oct 2020 08:40:25 -0400
-X-MC-Unique: Yw9QaetrM2SJuJUpbrUXMw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70A881084D8B;
- Tue,  6 Oct 2020 12:40:24 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.35.206.84])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 54E0955760;
- Tue,  6 Oct 2020 12:40:17 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
+ content-transfer-encoding:content-transfer-encoding;
+ bh=/s6R5f8ZjpImJ1yDPXJ7mTGHg0FFOi4BEA6zhtvc/j0=;
+ b=CIXx17sRWB0bmqPi14atH2JGZ6Q/cwpmewd7xAC36MjycVRmHdLCGP61XZrwN6PDXDt97s
+ E08JyKrp+HwDGQ8MfzIij63KlrIPnzu7FeJ1WH15fSJ+aJ4X8GkLEM4I9jx76yEUz2m4RQ
+ h1zekc7DQ4vUTrU92cE+YUlRYZAC7eo=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-517-SA0yC9cuOoSaF4sx9ILPtA-1; Tue, 06 Oct 2020 08:56:06 -0400
+X-MC-Unique: SA0yC9cuOoSaF4sx9ILPtA-1
+Received: by mail-wr1-f72.google.com with SMTP id o6so5303933wrp.1
+ for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 05:56:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=/s6R5f8ZjpImJ1yDPXJ7mTGHg0FFOi4BEA6zhtvc/j0=;
+ b=lsHobUQ9ZIqTucxrNSXajNED13VwLtN16xXG6nqjIu7XjVqN8Ir1QKKClfL+/Mc5Dz
+ NcxxGHur0Up6lnDzCfgdEYreMLhl0kck4Xvr2WtJQUZJJjo3smIVwy2b2IXDN8ZIZDWP
+ K9ZCrJe8DJ6lQTipWUhp6dUr11amF0yMw2qNdbm2UBopgnRf25NJORWXbquT6e1nd2iR
+ u8HslXgOE11OHcRb2Ie1+kYL+CI4boFx3Q7H7+XAAL8RFRp8iECbXuEkgLbu1M6X6b7B
+ MssO7z1Mdlb484FwvAcT+1w5QEW4pkJeBQqrFeSsJ8Qn3vn8Jis3Xvfh9Jzr7X0Ac6W5
+ dmhQ==
+X-Gm-Message-State: AOAM531T2H9GUAX0ITz7sq8NvXUQB2wxJqjdj8jfXc8EB6ZunAAGh1Qx
+ cGusf8NcBE2ipSxIlMF7pbZIodvRHDPL1j7z7WMIQhbtAzKBvjnfh18UQgCn870usFgtWOzmRMa
+ pDut9SpnRNDMkZrk=
+X-Received: by 2002:a1c:38c7:: with SMTP id f190mr4234571wma.47.1601988964724; 
+ Tue, 06 Oct 2020 05:56:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzP8d2JR0A4V85oQydg12onvbAYdepu4CL6MsDQYSmhgRH5lia8XxZbejhDoiTmvAx6qYwoCg==
+X-Received: by 2002:a1c:38c7:: with SMTP id f190mr4234545wma.47.1601988964527; 
+ Tue, 06 Oct 2020 05:56:04 -0700 (PDT)
+Received: from x1w.redhat.com (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id s12sm3662933wmd.20.2020.10.06.05.56.03
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 06 Oct 2020 05:56:03 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 12/13] virtio-scsi: use scsi_device_get
-Date: Tue,  6 Oct 2020 15:39:03 +0300
-Message-Id: <20201006123904.610658-13-mlevitsk@redhat.com>
-In-Reply-To: <20201006123904.610658-1-mlevitsk@redhat.com>
-References: <20201006123904.610658-1-mlevitsk@redhat.com>
+Subject: [PATCH v2 0/9] meson: Move the creation of the library to the main
+ meson.build
+Date: Tue,  6 Oct 2020 14:55:53 +0200
+Message-Id: <20201006125602.2311423-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mlevitsk@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mlevitsk@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 00:55:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -95,121 +108,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, John Snow <jsnow@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This will help us to avoid the scsi device disappearing
-after we took a reference to it.
+Make Meson machinery more consistent, as requested by Paolo.
 
-It doesn't by itself forbid case when we try to access
-an unrealized device
+Since v1: addressed Paolo's review comments
+- Drop migration RFC patch
+- Move comment block
 
-Suggested-by: Stefan Hajnoczi <stefanha@gmail.com>
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20200913160259.32145-9-mlevitsk@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/scsi/virtio-scsi.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
+Series coded while listening to Brass Against songs:
 
-diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-index 971afbb217..3db9a8aae9 100644
---- a/hw/scsi/virtio-scsi.c
-+++ b/hw/scsi/virtio-scsi.c
-@@ -33,7 +33,7 @@ static inline int virtio_scsi_get_lun(uint8_t *lun)
-     return ((lun[2] << 8) | lun[3]) & 0x3FFF;
- }
- 
--static inline SCSIDevice *virtio_scsi_device_find(VirtIOSCSI *s, uint8_t *lun)
-+static inline SCSIDevice *virtio_scsi_device_get(VirtIOSCSI *s, uint8_t *lun)
- {
-     if (lun[0] != 1) {
-         return NULL;
-@@ -41,7 +41,7 @@ static inline SCSIDevice *virtio_scsi_device_find(VirtIOSCSI *s, uint8_t *lun)
-     if (lun[2] != 0 && !(lun[2] >= 0x40 && lun[2] < 0x80)) {
-         return NULL;
-     }
--    return scsi_device_find(&s->bus, 0, lun[1], virtio_scsi_get_lun(lun));
-+    return scsi_device_get(&s->bus, 0, lun[1], virtio_scsi_get_lun(lun));
- }
- 
- void virtio_scsi_init_req(VirtIOSCSI *s, VirtQueue *vq, VirtIOSCSIReq *req)
-@@ -256,7 +256,7 @@ static inline void virtio_scsi_ctx_check(VirtIOSCSI *s, SCSIDevice *d)
-  *  case of async cancellation. */
- static int virtio_scsi_do_tmf(VirtIOSCSI *s, VirtIOSCSIReq *req)
- {
--    SCSIDevice *d = virtio_scsi_device_find(s, req->req.tmf.lun);
-+    SCSIDevice *d = virtio_scsi_device_get(s, req->req.tmf.lun);
-     SCSIRequest *r, *next;
-     BusChild *kid;
-     int target;
-@@ -370,10 +370,10 @@ static int virtio_scsi_do_tmf(VirtIOSCSI *s, VirtIOSCSIReq *req)
- 
-         rcu_read_lock();
-         QTAILQ_FOREACH_RCU(kid, &s->bus.qbus.children, sibling) {
--             d = SCSI_DEVICE(kid->child);
--             if (d->channel == 0 && d->id == target) {
--                qdev_reset_all(&d->qdev);
--             }
-+            SCSIDevice *d1 = SCSI_DEVICE(kid->child);
-+            if (d1->channel == 0 && d1->id == target) {
-+                qdev_reset_all(&d1->qdev);
-+            }
-         }
-         rcu_read_unlock();
- 
-@@ -386,14 +386,17 @@ static int virtio_scsi_do_tmf(VirtIOSCSI *s, VirtIOSCSIReq *req)
-         break;
-     }
- 
-+    object_unref(OBJECT(d));
-     return ret;
- 
- incorrect_lun:
-     req->resp.tmf.response = VIRTIO_SCSI_S_INCORRECT_LUN;
-+    object_unref(OBJECT(d));
-     return ret;
- 
- fail:
-     req->resp.tmf.response = VIRTIO_SCSI_S_BAD_TARGET;
-+    object_unref(OBJECT(d));
-     return ret;
- }
- 
-@@ -564,7 +567,7 @@ static int virtio_scsi_handle_cmd_req_prepare(VirtIOSCSI *s, VirtIOSCSIReq *req)
-         }
-     }
- 
--    d = virtio_scsi_device_find(s, req->req.cmd.lun);
-+    d = virtio_scsi_device_get(s, req->req.cmd.lun);
-     if (!d) {
-         req->resp.cmd.response = VIRTIO_SCSI_S_BAD_TARGET;
-         virtio_scsi_complete_cmd_req(req);
-@@ -580,10 +583,12 @@ static int virtio_scsi_handle_cmd_req_prepare(VirtIOSCSI *s, VirtIOSCSIReq *req)
-             req->sreq->cmd.xfer > req->qsgl.size)) {
-         req->resp.cmd.response = VIRTIO_SCSI_S_OVERRUN;
-         virtio_scsi_complete_cmd_req(req);
-+        object_unref(OBJECT(d));
-         return -ENOBUFS;
-     }
-     scsi_req_ref(req->sreq);
-     blk_io_plug(d->conf.blk);
-+    object_unref(OBJECT(d));
-     return 0;
- }
- 
+  https://www.youtube.com/channel/UClJMqrWQJ8OYWJ4ZdfqZdeQ
+
+and available in the Git repository at:
+
+  https://gitlab.com/philmd/qemu.git branches/meson_libraries_consistency
+
+Philippe Mathieu-Daudé (9):
+  meson.build: Add comments to clarify code organization
+  meson.build: Sort sourcesets alphabetically
+  hw/core: Move the creation of the library to the main meson.build
+  chardev: Move the creation of the library to the main meson.build
+  migration: Move the creation of the library to the main meson.build
+  io: Move the creation of the library to the main meson.build
+  crypto: Move the creation of the library to the main meson.build
+  authz: Move the creation of the library to the main meson.build
+  qom: Move the creation of the library to the main meson.build
+
+ meson.build           | 86 ++++++++++++++++++++++++++++++++++++++-----
+ authz/meson.build     | 10 -----
+ chardev/meson.build   |  6 ---
+ crypto/meson.build    | 10 -----
+ hw/core/meson.build   |  6 ---
+ io/meson.build        | 10 -----
+ migration/meson.build |  8 +---
+ qom/meson.build       |  8 ----
+ 8 files changed, 77 insertions(+), 67 deletions(-)
+
 -- 
 2.26.2
 
