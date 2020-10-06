@@ -2,101 +2,82 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 267AFC41604
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 08:41:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70C58C41604
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 08:42:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69D692080A
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 08:41:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mumAl4PD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69D692080A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id EFB6B2080A
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 08:42:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFB6B2080A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPiXS-0006A9-RI
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 04:41:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55226)
+	id 1kPiXz-0006fQ-Uy
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 04:42:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55270)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kPiWF-0005ML-Ot; Tue, 06 Oct 2020 04:40:23 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43054)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kPiWi-0005p3-Nu
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 04:40:52 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59550)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kPiWE-0002qa-2t; Tue, 06 Oct 2020 04:40:23 -0400
-Received: by mail-wr1-x443.google.com with SMTP id g12so7022559wrp.10;
- Tue, 06 Oct 2020 01:40:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=5R99MHvHog38JUAHK+cJI9tw/G0v91gWyeejkWSp+EU=;
- b=mumAl4PDKinRUSCHhFvuoegv1u3awm7PtIkoSeWq/8OJiSBpJRZT6OPXGcmMLZPv74
- L0/myKESO/F8sFqjicfWL1vXeDuEOIPXByY9BggyI0ujZptA3tnHMxQTQaJZk7/fW2+x
- TdTM1odXEunbNYzdmTbbg9abotLNhZWWiov9AW96Ac3bx8CqlRJfhXwJ53ElBKhlTyhi
- LtB47TnU0WfKYdft0UT+bdW+2l/4DiQzCzAB8KPlq5ZL6mvgd0wwZ90GDGGEC8yOafnS
- h0lbyLW8ALTYt+xmjsC7b/yKDe1Fr3LCsrCNf+/4bgI8ETApBlqMUZ9FgOWHvy2RnL7v
- JqmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=5R99MHvHog38JUAHK+cJI9tw/G0v91gWyeejkWSp+EU=;
- b=CdH0CjAZHEs8WgdiuUfSRIEyytSDTJ3mi7IkMk3V+2YiRq+AuWBONYip/9BgtpPI3v
- 6Kdc6DICleBnNp9Z5eVj4cPBCJ46ytkbetMTDQn3XlVvQmj6FplyoSEGoYqIF4/eAGX5
- NO2LvtDE5MWSoL8UGBKIuXYunXDkElE44d4OE6vF3UiX5a+A7QKi1zWJ0z2ZwK4At+9C
- L1zZT5HqAXxCe3k+n12zZD+5xypQJQV/wBAAvc55M6uGU+fnrCYjszc6o3wI9F6/GuPr
- buDptjhUZczQGOpPqiadEbuuJi1lJTU0932B6Ys/QwlO3swDCEGimFYQpUr0nA4GoADh
- pHDA==
-X-Gm-Message-State: AOAM530sifPeM4PswODanGJubF7CDAc0Kjdi064xZotIlZIgj7bRpYh7
- n/ywlKeSAo4R9XXAnGL8tE0=
-X-Google-Smtp-Source: ABdhPJxpWudWmIVEbeyLa46pKtCPc0wheP7hhFWDzyiFju7tW8I0LepgNeP1EUuxfAvzRQ3bWUbgAw==
-X-Received: by 2002:a5d:6551:: with SMTP id z17mr3623507wrv.200.1601973619585; 
- Tue, 06 Oct 2020 01:40:19 -0700 (PDT)
-Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
- [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id s6sm3358640wrg.92.2020.10.06.01.40.18
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 06 Oct 2020 01:40:18 -0700 (PDT)
-Subject: Re: [PATCH v2 10/15] hw/misc/bcm2835_cprman: add a clock mux skeleton
- implementation
-To: Luc Michel <luc@lmichel.fr>, qemu-devel@nongnu.org
-References: <20201005195612.1999165-1-luc@lmichel.fr>
- <20201005195612.1999165-11-luc@lmichel.fr>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ea432580-114b-3f85-b4f1-0012bfb008c0@amsat.org>
-Date: Tue, 6 Oct 2020 10:40:17 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kPiWg-0002zO-CV
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 04:40:52 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kPiWe-0008Eo-Kq
+ for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 08:40:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 990D12E80DC
+ for <qemu-devel@nongnu.org>; Tue,  6 Oct 2020 08:40:48 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20201005195612.1999165-11-luc@lmichel.fr>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.248,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 06 Oct 2020 08:34:22 -0000
+From: Paul Zimmerman <1772165@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Wishlist;
+ assignee=None; 
+X-Launchpad-Bug-Tags: arm usb
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: aditya-govardhan andrew-pennebaker clemd davbac
+ dims dougrabson kraxel-redhat pauldzim pmaydell vortelf weberkai
+X-Launchpad-Bug-Reporter: George (vortelf)
+X-Launchpad-Bug-Modifier: Paul Zimmerman (pauldzim)
+References: <152673688616.9061.7617411809661975686.malonedeb@chaenomeles.canonical.com>
+Message-Id: <160197326267.4941.13705063040074762126.malone@soybean.canonical.com>
+Subject: [Bug 1772165] Re: arm raspi2/raspi3 emulation has no USB support
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="d50d1e75c500726862802414f880ee3e3bb759bf"; Instance="production"
+X-Launchpad-Hash: c8b30f0ea8b0fa36025d7bdeea90165bd8204300
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 03:50:54
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -105,111 +86,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Havard Skinnemoen <hskinnemoen@google.com>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Paul Zimmerman <pauldzim@gmail.com>,
- Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org
+Reply-To: Bug 1772165 <1772165@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/5/20 9:56 PM, Luc Michel wrote:
-> The clock multiplexers are the last clock stage in the CPRMAN. Each mux
-> outputs one clock signal that goes out of the CPRMAN to the SoC
-> peripherals.
-> 
-> Each mux has at most 10 sources. The sources 0 to 3 are common to all
-> muxes. They are:
->    0. ground (no clock signal)
->    1. the main oscillator (xosc)
->    2. "test debug 0" clock
->    3. "test debug 1" clock
-> 
-> Test debug 0 and 1 are actual clock muxes that can be used as sources to
-> other muxes (for debug purpose).
-> 
-> Sources 4 to 9 are mux specific and can be unpopulated (grounded). Those
-> sources are fed by the PLL channels outputs.
-> 
-> One corner case exists for DSI0E and DSI0P muxes. They have their source
-> number 4 connected to an intermediate multiplexer that can select
-> between PLLA-DSI0 and PLLD-DSI0 channel. This multiplexer is called
-> DSI0HSCK and is not a clock mux as such. It is really a simple mux from
-> the hardware point of view (see https://elinux.org/The_Undocumented_Pi).
-> This mux is not implemented in this commit.
-> 
-> Note that there is some muxes for which sources are unknown (because of
-> a lack of documentation). For those cases all the sources are connected
-> to ground in this implementation.
-> 
-> Each clock mux output is exported by the CPRMAN at the qdev level,
-> adding the suffix '-out' to the mux name to form the output clock name.
-> (E.g. the 'uart' mux sees its output exported as 'uart-out' at the
-> CPRMAN level.)
-> 
-> Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Signed-off-by: Luc Michel <luc@lmichel.fr>
-> ---
->  include/hw/misc/bcm2835_cprman.h           |  84 ++++
->  include/hw/misc/bcm2835_cprman_internals.h | 421 +++++++++++++++++++++
->  hw/misc/bcm2835_cprman.c                   | 150 ++++++++
->  3 files changed, 655 insertions(+)
-[...]
+Here is that command line again, hopefully readable this time:
 
-> +#define FILL_CLOCK_MUX_INIT_INFO(clock_, kind_) \
-> +    .cm_offset = R_CM_ ## clock_ ## CTL,        \
-> +    FILL_CLOCK_MUX_SRC_MAPPING_INIT_INFO(kind_)
-> +
-> +static ClockMuxInitInfo CLOCK_MUX_INIT_INFO[] = {
-> +    [CPRMAN_CLOCK_GNRIC] = {
-> +        .name = "gnric",
-> +        FILL_CLOCK_MUX_INIT_INFO(GNRIC, unknown),
-> +    },
-[...]
+qemu-system-arm -M raspi2 \
+    -drive file=3D2019-09-26-raspbian-buster.img,format=3Draw,if=3Dsd \
+    -dtb bcm2709-rpi-2-b.dtb \
+    -kernel kernel7.img \
+    -append 'rw earlycon=3Dpl011,0x3f201000 console=3DttyAMA0 \
+        loglevel=3D8 root=3D/dev/mmcblk0p2 fsck.repair=3Dyes \
+        net.ifnames=3D0 rootwait memtest=3D1 \
+        dwc_otg.fiq_fsm_enable=3D0' \
+    -serial stdio -no-reboot \
+    -netdev user,id=3Dnet0 \
+    -usb -device usb-kbd -device usb-tablet \
+    -device usb-net,netdev=3Dnet0
 
-> +static inline void update_mux_from_cm(BCM2835CprmanState *s, size_t idx)
-> +{
-> +    size_t i;
-> +
-> +    for (i = 0; i < CPRMAN_NUM_CLOCK_MUX; i++) {
-> +        if ((CLOCK_MUX_INIT_INFO[i].cm_offset == idx) ||
-> +            (CLOCK_MUX_INIT_INFO[i].cm_offset == idx + 4)) {
+-- =
 
-Maybe add a /* Matches DIV or CTL */ comment. Anyway
-FILL_CLOCK_MUX_INIT_INFO() only uses CTL, not DIV, so
-+4 check is not necessary.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1772165
 
-Otherwise:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Title:
+  arm raspi2/raspi3 emulation has no USB support
 
-> +            clock_mux_update(&s->clock_muxes[i]);
-> +            return;
-> +        }
-> +    }
-> +}
-> +
->  #define CASE_PLL_A2W_REGS(pll_) \
->      case R_A2W_ ## pll_ ## _CTRL: \
->      case R_A2W_ ## pll_ ## _ANA0: \
->      case R_A2W_ ## pll_ ## _ANA1: \
->      case R_A2W_ ## pll_ ## _ANA2: \
-> @@ -363,10 +438,19 @@ static void cprman_write(void *opaque, hwaddr offset,
->      case R_A2W_PLLH_RCAL:
->      case R_A2W_PLLH_PIX:
->      case R_A2W_PLLB_ARM:
->          update_channel_from_a2w(s, idx);
->          break;
-> +
-> +    case R_CM_GNRICCTL ... R_CM_SMIDIV:
-> +    case R_CM_TCNTCNT ... R_CM_VECDIV:
-> +    case R_CM_PULSECTL ... R_CM_PULSEDIV:
-> +    case R_CM_SDCCTL ... R_CM_ARMCTL:
-> +    case R_CM_AVEOCTL ... R_CM_EMMCDIV:
-> +    case R_CM_EMMC2CTL ... R_CM_EMMC2DIV:
-> +        update_mux_from_cm(s, idx);
-> +        break;
->      }
->  }
-[...]
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  Using Qemu 2.12.0 on ArchLinux.
+
+  Trying to emulate arm device with `qemu-system-arm` and attach usb
+  device for unput using
+
+  ` -usb -device usb-host,bus=3D001,vendorid=3D0x1d6b,productid=3D0x0002 `
+
+  # lsusb returns
+
+  Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+  Bus 001 Device 014: ID 13d3:3487 IMC Networks =
+
+  Bus 001 Device 004: ID 0457:11af Silicon Integrated Systems Corp. =
+
+  Bus 001 Device 003: ID 0bda:57e6 Realtek Semiconductor Corp. =
+
+  Bus 001 Device 002: ID 0bda:0129 Realtek Semiconductor Corp. RTS5129 Card=
+ Reader Controller
+  Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+
+  # qemu returns
+  qemu-system-arm: -device usb-host,bus=3D001,vendorid=3D0x1d6b,productid=
+=3D0x0002: Bus '001' not found
+
+  =
+
+  Tried with connecting external usb keyboard but that didn't seem to work =
+either.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1772165/+subscriptions
 
