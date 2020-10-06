@@ -2,118 +2,90 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11BC3C41604
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 16:45:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30E60C41604
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 16:47:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74A31206F7
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 16:45:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AA662206DD
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 16:47:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="c/bH43Mc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74A31206F7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L5UUnye0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA662206DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPq5I-0003Ps-Gu
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 12:45:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34492)
+	id 1kPq7F-0004VT-PB
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 12:47:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34994)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
- id 1kPq44-0002By-Hs; Tue, 06 Oct 2020 12:43:48 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64606)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
- id 1kPq42-0001UQ-GH; Tue, 06 Oct 2020 12:43:48 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 096GY1Hx130363; Tue, 6 Oct 2020 12:43:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=6fBu163/RX6BbYHQSuxFl5MRtXVdZH8OGOOYZn+xBB8=;
- b=c/bH43McqehtycNkOvLnT/7qk2TslqufeS873QwMJDMVath1w5NIYZ2VW7lR8QEsurYo
- lPTVfQue0X2rY4+P7vp9JOYcPWuaYo4Q9LWR3XWnxG/TeRcpHE0K9VHmu+a5pLhpIht0
- AjlXZqhc+mM8zWDCxua/ZliM2MFG+QySaQzdwgsox/w1/8akb3f/cdWiifStgq4zReZd
- FGlHoehjo8JRhLZbpAuBGAEpcQr2Qsrs4ZsELKHG7xmGYvQ2lfUjbgxPMpi+3rJ5PLU1
- XuSE9cxAuabpEMyaIPUZCio1H4IorLcVv2MvdA935jytJIW4cD0RrzsMlGjcstHJcuTc 7A== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 340v5v0a98-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 06 Oct 2020 12:43:44 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 096GY5tS130837;
- Tue, 6 Oct 2020 12:43:44 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0a-001b2d01.pphosted.com with ESMTP id 340v5v0a8y-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 06 Oct 2020 12:43:44 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 096GfRZM027954;
- Tue, 6 Oct 2020 16:43:43 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com
- [9.57.198.28]) by ppma03dal.us.ibm.com with ESMTP id 33xgx9f31f-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 06 Oct 2020 16:43:43 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
- [9.57.199.109])
- by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 096Ghgdo52560238
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 6 Oct 2020 16:43:42 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8B1B4112062;
- Tue,  6 Oct 2020 16:43:42 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2919D112061;
- Tue,  6 Oct 2020 16:43:40 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.211.60.106])
- by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
- Tue,  6 Oct 2020 16:43:39 +0000 (GMT)
-Subject: Re: [PATCH v2 1/9] s390x/pci: Move header files to include/hw/s390x
-To: Cornelia Huck <cohuck@redhat.com>
-References: <1601669191-6731-1-git-send-email-mjrosato@linux.ibm.com>
- <1601669191-6731-2-git-send-email-mjrosato@linux.ibm.com>
- <20201006173259.1ec36597.cohuck@redhat.com>
-From: Matthew Rosato <mjrosato@linux.ibm.com>
-Message-ID: <e9f6c3e1-9341-b0d0-9fb2-b34ebd19bcba@linux.ibm.com>
-Date: Tue, 6 Oct 2020 12:43:39 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kPq6d-000455-Et
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 12:46:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52479)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kPq6a-0001qu-Hr
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 12:46:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602002782;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=VMufXsKnKCqttKvixuu/HlvstKfkrcUd4TsDYAg1nAM=;
+ b=L5UUnye0DHEDWNoTbI34YY7zt7B0MnoMjVvys5VZmbcx+Lj9R+2vLgwDQeIyPfS5VbcRb1
+ SnKgiu+N+RYciGrjS+tiP4EuBJETBYJn6I2lzUsxYHmGaTEwXYWKXm+eTqKEtW7ZACj7D7
+ to6ErzVhozABxjqvzFe1bAj7IWvdFrg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-162-5lt3L6e1OuKebeGM8MPozQ-1; Tue, 06 Oct 2020 12:46:19 -0400
+X-MC-Unique: 5lt3L6e1OuKebeGM8MPozQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DCFF344F3
+ for <qemu-devel@nongnu.org>; Tue,  6 Oct 2020 16:46:18 +0000 (UTC)
+Received: from [10.10.120.38] (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E4A445C1C4;
+ Tue,  6 Oct 2020 16:46:17 +0000 (UTC)
+Subject: Re: [PATCH v5 03/36] qapi-gen: Separate arg-parsing from generation
+To: Markus Armbruster <armbru@redhat.com>
+References: <20201005195158.2348217-1-jsnow@redhat.com>
+ <20201005195158.2348217-4-jsnow@redhat.com>
+ <87imbntvw9.fsf@dusky.pond.sub.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <4419bbce-c0d8-865d-bed6-08d27809ba6b@redhat.com>
+Date: Tue, 6 Oct 2020 12:46:17 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20201006173259.1ec36597.cohuck@redhat.com>
+In-Reply-To: <87imbntvw9.fsf@dusky.pond.sub.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-10-06_09:2020-10-06,
- 2020-10-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 phishscore=0
- adultscore=0 lowpriorityscore=0 mlxlogscore=999 impostorscore=0
- suspectscore=0 bulkscore=0 spamscore=0 mlxscore=0 clxscore=1015
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2010060102
-Received-SPF: pass client-ip=148.163.158.5;
- envelope-from=mjrosato@linux.ibm.com; helo=mx0b-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 12:43:44
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 01:55:55
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -127,43 +99,245 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, kvm@vger.kernel.org, pmorel@linux.ibm.com,
- david@redhat.com, schnelle@linux.ibm.com, qemu-s390x@nongnu.org,
- qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
- alex.williamson@redhat.com, mst@redhat.com, pbonzini@redhat.com,
- rth@twiddle.net
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/6/20 11:32 AM, Cornelia Huck wrote:
-> On Fri,  2 Oct 2020 16:06:23 -0400
-> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+On 10/6/20 7:51 AM, Markus Armbruster wrote:
+> John Snow <jsnow@redhat.com> writes:
 > 
->> Seems a more appropriate location for them.
+>> This is a minor re-work of the entrypoint script. It isolates a
+>> generate() method from the actual command-line mechanism.
 >>
->> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>> Reviewed-by: Cleber Rosa <crosa@redhat.com>
+>> Tested-by: Cleber Rosa <crosa@redhat.com>
 >> ---
->>   hw/s390x/s390-pci-bus.c          |   4 +-
->>   hw/s390x/s390-pci-bus.h          | 372 ---------------------------------------
->>   hw/s390x/s390-pci-inst.c         |   4 +-
->>   hw/s390x/s390-pci-inst.h         | 312 --------------------------------
->>   hw/s390x/s390-virtio-ccw.c       |   2 +-
->>   include/hw/s390x/s390-pci-bus.h  | 372 +++++++++++++++++++++++++++++++++++++++
->>   include/hw/s390x/s390-pci-inst.h | 312 ++++++++++++++++++++++++++++++++
->>   7 files changed, 689 insertions(+), 689 deletions(-)
->>   delete mode 100644 hw/s390x/s390-pci-bus.h
->>   delete mode 100644 hw/s390x/s390-pci-inst.h
->>   create mode 100644 include/hw/s390x/s390-pci-bus.h
->>   create mode 100644 include/hw/s390x/s390-pci-inst.h
+>>   scripts/qapi-gen.py | 85 +++++++++++++++++++++++++++++++++------------
+>>   1 file changed, 62 insertions(+), 23 deletions(-)
+>>
+>> diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
+>> index 541e8c1f55d..117b396a595 100644
+>> --- a/scripts/qapi-gen.py
+>> +++ b/scripts/qapi-gen.py
+>> @@ -1,30 +1,77 @@
+>>   #!/usr/bin/env python3
+>> -# QAPI generator
+>> -#
+>> +
+>>   # This work is licensed under the terms of the GNU GPL, version 2 or later.
+>>   # See the COPYING file in the top-level directory.
+>>   
+>> +"""
+>> +QAPI Generator
+>> +
+>> +This script is the main entry point for generating C code from the QAPI schema.
+>> +"""
+>>   
+>>   import argparse
+>>   import re
+>>   import sys
+>>   
+>>   from qapi.commands import gen_commands
+>> +from qapi.error import QAPIError
+>>   from qapi.events import gen_events
+>>   from qapi.introspect import gen_introspect
+>> -from qapi.schema import QAPIError, QAPISchema
+>> +from qapi.schema import QAPISchema
+>>   from qapi.types import gen_types
+>>   from qapi.visit import gen_visit
 > 
-> Looks good, but...
+> Unrelated cleanup.  Okay.
 > 
-> <meta>Is there any way to coax out a more reviewable version of this
-> via git mv?</meta>
+>>   
+>>   
+>> -def main(argv):
+>> +DEFAULT_OUTPUT_DIR = ''
+>> +DEFAULT_PREFIX = ''
+>> +
+>> +
+>> +def generate(schema_file: str,
+>> +             output_dir: str,
+>> +             prefix: str,
+>> +             unmask: bool = False,
+>> +             builtins: bool = False) -> None:
+>> +    """
+>> +    generate uses a given schema to produce C code in the target directory.
+>> +
+>> +    :param schema_file: The primary QAPI schema file.
+>> +    :param output_dir: The output directory to store generated code.
+>> +    :param prefix: Optional C-code prefix for symbol names.
+>> +    :param unmask: Expose non-ABI names through introspection?
+>> +    :param builtins: Generate code for built-in types?
+>> +
+>> +    :raise QAPIError: On failures.
+>> +    """
+>> +    match = re.match(r'([A-Za-z_.-][A-Za-z0-9_.-]*)?', prefix)
+>> +    if match.end() != len(prefix):
+>> +        msg = "funny character '{:s}' in prefix '{:s}'".format(
+>> +            prefix[match.end()], prefix)
+>> +        raise QAPIError('', None, msg)
 > 
+> Uh...
+> 
+>      $ python3 scripts/qapi-gen.py --prefix=@ x
+>      scripts/qapi-gen.py: : funny character '@' in prefix '@'
+> 
+> Unwanted " :".
+> 
+> This is due to a hack: you pass '' for info (*quack*).  Everything else
+> passes QAPISourceInfo (I believe).
+> 
+> Is it really a good idea to do this in generate?  It's not about
+> generating code, it's about validating a CLI option.
+> 
+>> +
+>> +    schema = QAPISchema(schema_file)
+>> +    gen_types(schema, output_dir, prefix, builtins)
+>> +    gen_visit(schema, output_dir, prefix, builtins)
+>> +    gen_commands(schema, output_dir, prefix)
+>> +    gen_events(schema, output_dir, prefix)
+>> +    gen_introspect(schema, output_dir, prefix, unmask)
+>> +
+>> +
+>> +def main() -> int:
+>> +    """
+>> +    gapi-gen shell script entrypoint.
+>> +    Expects arguments via sys.argv, see --help for details.
+>> +
+>> +    :return: int, 0 on success, 1 on failure.
+>> +    """
+>>       parser = argparse.ArgumentParser(
+>>           description='Generate code from a QAPI schema')
+>>       parser.add_argument('-b', '--builtins', action='store_true',
+>>                           help="generate code for built-in types")
+>> -    parser.add_argument('-o', '--output-dir', action='store', default='',
+>> +    parser.add_argument('-o', '--output-dir', action='store',
+>> +                        default=DEFAULT_OUTPUT_DIR,
+>>                           help="write output to directory OUTPUT_DIR")
+>> -    parser.add_argument('-p', '--prefix', action='store', default='',
+>> +    parser.add_argument('-p', '--prefix', action='store',
+>> +                        default=DEFAULT_PREFIX,
+>>                           help="prefix for symbols")
+> 
+> I don't like the changes to default=, because:
+> 
+> 1. They are only losely related to the patch's purpose.
+> 
+> 2. They split the definition of the CLI: most of it is here, except for
+> defaults, which are defined elsewhere.
+> 
+> 3. The defaults will not change, and nothing else uses the constants.
+> 
+>>       parser.add_argument('-u', '--unmask-non-abi-names', action='store_true',
+>>                           dest='unmask',
+>> @@ -32,25 +79,17 @@ def main(argv):
+>>       parser.add_argument('schema', action='store')
+>>       args = parser.parse_args()
+>>   
+>> -    match = re.match(r'([A-Za-z_.-][A-Za-z0-9_.-]*)?', args.prefix)
+>> -    if match.end() != len(args.prefix):
+>> -        print("%s: 'funny character '%s' in argument of --prefix"
+>> -              % (sys.argv[0], args.prefix[match.end()]),
+>> -              file=sys.stderr)
+>> -        sys.exit(1)
+>> -
+>>       try:
+>> -        schema = QAPISchema(args.schema)
+>> +        generate(args.schema,
+>> +                 output_dir=args.output_dir,
+>> +                 prefix=args.prefix,
+>> +                 unmask=args.unmask,
+>> +                 builtins=args.builtins)
+>>       except QAPIError as err:
+>> -        print(err, file=sys.stderr)
+>> -        exit(1)
+>> -
+>> -    gen_types(schema, args.output_dir, args.prefix, args.builtins)
+>> -    gen_visit(schema, args.output_dir, args.prefix, args.builtins)
+>> -    gen_commands(schema, args.output_dir, args.prefix)
+>> -    gen_events(schema, args.output_dir, args.prefix)
+>> -    gen_introspect(schema, args.output_dir, args.prefix, args.unmask)
+>> +        print(f"{sys.argv[0]}: {str(err)}", file=sys.stderr)
+>> +        return 1
+>> +    return 0
+> 
+> Subtle change: you move the gen_FOO() into the try ... except.  Okay;
+> they don't raise QAPIError, but perhaps worth a mention in the commit
+> message.
+> 
+>>   
+>>   
+>>   if __name__ == '__main__':
+>> -    main(sys.argv)
+>> +    sys.exit(main())
+> 
+> "Python was designed to be easy to understand and fun to use."
+> Ha ha ha.
+> 
+Here's a Fixup that requires more (but obvious) Fixups to later patches 
+in this series. (The next patch needs the same changes re-applied to the 
+now-moved file.)
 
-I tried git mv, but a diff between the old patch and the new patch looks 
-the same (other than the fact that I squashed the MAINTAINERS hit in)
+A note: I add a FIXME, but when I respin my error series, it will take 
+care of this piece. This is just the quickest, dumbest way to victory in 
+the interim. It is not worth engineering a better solution, because 
+there is one waiting in part 4 already.
+
+(Future knowledge: I add a QAPIError that does not define its arguments 
+that inherits Exception and is used as the basis for all error classes 
+in QAPI; and the contextual error that requires "info" is changed to 
+inherit from QAPIError. This is useful as a "package-level" error, one 
+in which that *all* errors in this package inherit from. We already 
+achieve that, but we needed a more general form to serve as the root of 
+that inheritance tree.)
+
+
+diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
+index 117b396a595..c62c4e93323 100644
+--- a/scripts/qapi-gen.py
++++ b/scripts/qapi-gen.py
+@@ -22,10 +22,6 @@
+  from qapi.visit import gen_visit
+
+
+-DEFAULT_OUTPUT_DIR = ''
+-DEFAULT_PREFIX = ''
+-
+-
+  def generate(schema_file: str,
+               output_dir: str,
+               prefix: str,
+@@ -68,10 +64,10 @@ def main() -> int:
+      parser.add_argument('-b', '--builtins', action='store_true',
+                          help="generate code for built-in types")
+      parser.add_argument('-o', '--output-dir', action='store',
+-                        default=DEFAULT_OUTPUT_DIR,
++                        default='',
+                          help="write output to directory OUTPUT_DIR")
+      parser.add_argument('-p', '--prefix', action='store',
+-                        default=DEFAULT_PREFIX,
++                        default='',
+                          help="prefix for symbols")
+      parser.add_argument('-u', '--unmask-non-abi-names', 
+action='store_true',
+                          dest='unmask',
+diff --git a/scripts/qapi/error.py b/scripts/qapi/error.py
+index ae60d9e2fe8..f5a818ae35f 100644
+--- a/scripts/qapi/error.py
++++ b/scripts/qapi/error.py
+@@ -21,6 +21,9 @@ def __init__(self, info, col, msg):
+
+      def __str__(self):
++        # FIXME: We need a general-purpose no-context error class.
++        if not self.info:
++            return self.msg
+          loc = str(self.info)
+          if self.col is not None:
+              assert self.info.line is not None
+              loc += ':%s' % self.col
 
 
