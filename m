@@ -4,95 +4,86 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53DACC4363D
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 11:22:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA43EC4363D
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 11:25:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4D0A20760
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 11:22:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6524620760
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 11:25:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iLWwqRDE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4D0A20760
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QTsvjrHL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6524620760
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPl3N-0005i4-Qq
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 07:22:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34910)
+	id 1kPl5j-0008Mi-Ff
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 07:25:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36466)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kPkuW-0002an-Sx
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 07:13:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38829)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kPl26-0004Gr-2u
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 07:21:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44820)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kPkuT-0005QK-UQ
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 07:13:36 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kPl23-0006RU-WC
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 07:21:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601982813;
+ s=mimecast20190719; t=1601983283;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=mPf2uclSCMKvJzabCYV++5DDS/lhd3Wt8bVfXYSncVs=;
- b=iLWwqRDE89WXjOpXtJla2KiumkBENjF00uQPHzrfqTACkd743MFr6WnzARxe3tcH2a2zzP
- X/oNgoM0MqSYdAqfgxaDxnMz+tfufjR/qFc9S66d3SHkyVQNel39SMxgoVw8MIF13FbkFh
- Er8o9xsWWQACQn7g04oC8oYmmTZqN34=
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
- [209.85.167.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-485-Y5j80eVuMfWTI7iGf3eMhg-1; Tue, 06 Oct 2020 07:13:31 -0400
-X-MC-Unique: Y5j80eVuMfWTI7iGf3eMhg-1
-Received: by mail-oi1-f200.google.com with SMTP id w200so591139oiw.5
- for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 04:13:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=mPf2uclSCMKvJzabCYV++5DDS/lhd3Wt8bVfXYSncVs=;
- b=IImBRSwjnOVUXJi1vcMxO5P3cYW8NHzV1iYOlrFWU8cjUeTtqUObNYxUa4wT28de1Y
- yEwDgKS92vBrXoLiQW5U5Txzje39t8IkcuECdvWUlVKuJhb7lkJ8C9UY2R8WMRuGyqCD
- DwrMw+7cbaOTrIKGpc2HXxYY9lPq2p/9jhg+/lea3iDb+2XVfDxDHlo8kEWhzd+/hyjF
- hBxblz0Gw1h160i8aSdtvM7baJjyHOWhCjYRImzChy3AhnDTdoIsN7WXP2PslhrTvXz9
- 3JzcT5sBtJ2YOu4CdGkOuFFWEMPHG5sXsAgOm7NQ8RO8TmPsx8HD74UUU3r94cD92XND
- 4BWA==
-X-Gm-Message-State: AOAM532ntlwalJBnllQ5lmEaELrTJC3R/N5lFbwR9cKM2XGlWlDpRhEz
- j/PzpdRVbXBwiDzhx8iakukHZAYbIa2Gsw5mJ/pZQOuXA9qPbsPKXxYWFx3KcEj75Qm/ftvJ1SF
- FCh2lhKFbU86+FfKqWB17Kz7k4Bw103g=
-X-Received: by 2002:a4a:4845:: with SMTP id p66mr2769637ooa.68.1601982810659; 
- Tue, 06 Oct 2020 04:13:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJweWdMTOot6+4QSOkHNTaOp4nx85jA1is0Zk6YP8pavj5ViFB8A26mmPJJ2DAzUrimJ7Ru2sv9glvYPuvvue0o=
-X-Received: by 2002:a4a:4845:: with SMTP id p66mr2769625ooa.68.1601982810459; 
- Tue, 06 Oct 2020 04:13:30 -0700 (PDT)
+ bh=swrIDlQslW1TY3XEz6OoCoLjRo344H/Ib8ic+QdfZLg=;
+ b=QTsvjrHLO3ATxc3fUPLm3f+m5gl+oXAhjZt1rWXXkrT0HhB3M7yfDZh+PO6Hnb/GGxsaOw
+ ebwd7HDDsQKCt+ZUYWTVzQI5Vj7WBq3UFnzq3us8ta7pG7l1cPDugWDrdtcmU2JskVTRSO
+ Mcx3sBb0896iY8zDKMFCZpW9q/jW/js=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-8-rxY39N0SOzyzxANHJD8QYQ-1; Tue, 06 Oct 2020 07:21:20 -0400
+X-MC-Unique: rxY39N0SOzyzxANHJD8QYQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 21DE19CC0E
+ for <qemu-devel@nongnu.org>; Tue,  6 Oct 2020 11:21:08 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
+ [10.36.112.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E6D1210013D7;
+ Tue,  6 Oct 2020 11:21:07 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 78F5711329C1; Tue,  6 Oct 2020 13:21:06 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: [PATCH v5 02/36] qapi: modify docstrings to be sphinx-compatible
+References: <20201005195158.2348217-1-jsnow@redhat.com>
+ <20201005195158.2348217-3-jsnow@redhat.com>
+Date: Tue, 06 Oct 2020 13:21:06 +0200
+In-Reply-To: <20201005195158.2348217-3-jsnow@redhat.com> (John Snow's message
+ of "Mon, 5 Oct 2020 15:51:24 -0400")
+Message-ID: <87r1qbtxb1.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-References: <20201006111219.2300921-1-philmd@redhat.com>
- <20201006111219.2300921-2-philmd@redhat.com>
-In-Reply-To: <20201006111219.2300921-2-philmd@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Date: Tue, 6 Oct 2020 13:13:19 +0200
-Message-ID: <CAP+75-WhgxvQpmH7VS6hN9t0trHNA6fW5f8zYnvZu3X-23wF+g@mail.gmail.com>
-Subject: Re: [RFC PATCH 01/10] migration: Only add migration files to the
- Meson sourceset
-To: QEMU Developers <qemu-devel@nongnu.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+Content-Type: text/plain
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 00:55:20
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 01:55:55
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
 X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -106,46 +97,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Oct 6, 2020 at 1:12 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
-om> wrote:
->
-> I'm not sure how that works, but keep the use of Meson
-> sourcesets consistent, only add source files.
->
+John Snow <jsnow@redhat.com> writes:
 
-Eventually:
-Fixes: 5516623020 ("meson: convert migration directory to Meson")
+> A precise style guide and a package-wide overhaul is forthcoming pending
+> further discussion and consensus. At present, we are avoiding obvious
+> errors that cause sphinx documentation build problems.
+>
+> A preliminary style guide is loosely based on PEP 257 and Sphinx
+> Autodoc. It is chosen for interoperability with our existing Sphinx
+> framework, and because it has loose recognition in the Pycharm IDE.
+>
+> - Use Triple-double quotes (""").
+> - Opening and closing quotes appear on their own lines for multi-line docs.
+> - A single-sentence summary should be the first line of the docstring.
+> - A blank line follows.
+> - Further prose, if needed, is written next and can be multiple paragraphs,
+>   contain RST markup, etc.
+> - The :param x: desc, :returns: desc, and :raises z: desc info fields follow.
 
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Mandatory when they apply?
+
+> - Additional examples, diagrams, or other metadata follows below.
+>
+> See also:
+>
+> https://www.python.org/dev/peps/pep-0257/
+> https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#info-field-lists
+> Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  migration/meson.build | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  scripts/qapi/gen.py    | 6 ++++--
+>  scripts/qapi/parser.py | 1 +
+>  2 files changed, 5 insertions(+), 2 deletions(-)
 >
-> diff --git a/migration/meson.build b/migration/meson.build
-> index b5b71c8060..55c9e1329f 100644
-> --- a/migration/meson.build
-> +++ b/migration/meson.build
-> @@ -14,7 +14,7 @@ libmigration =3D static_library('migration', sources: m=
-igration_files + genh,
->                                build_by_default: false)
->  migration =3D declare_dependency(link_with: libmigration,
->                                 dependencies: [zlib, qom, io])
-> -softmmu_ss.add(migration)
-> +softmmu_ss.add(migration_files)
->
->  softmmu_ss.add(files(
->    'block-dirty-bitmap.c',
-> --
-> 2.26.2
->
+> diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
+> index ca66c82b5b8..dc7b94aa115 100644
+> --- a/scripts/qapi/gen.py
+> +++ b/scripts/qapi/gen.py
+> @@ -154,9 +154,11 @@ def _bottom(self):
+>  
+>  @contextmanager
+>  def ifcontext(ifcond, *args):
+> -    """A 'with' statement context manager to wrap with start_if()/end_if()
+> +    """
+> +    A with-statement context manager that wraps with `start_if()` / `end_if()`.
+>  
+> -    *args: any number of QAPIGenCCode
+> +    :param ifcond: A list of conditionals, passed to `start_if()`.
+> +    :param args: any number of `QAPIGenCCode`.
+>  
+>      Example::
+>  
+> diff --git a/scripts/qapi/parser.py b/scripts/qapi/parser.py
+> index 9d1a3e2eea9..31bc2e6dca9 100644
+> --- a/scripts/qapi/parser.py
+> +++ b/scripts/qapi/parser.py
+> @@ -381,6 +381,7 @@ def append(self, line):
+>  
+>          The way that the line is dealt with depends on which part of
+>          the documentation we're parsing right now:
+> +
+>          * The body section: ._append_line is ._append_body_line
+>          * An argument section: ._append_line is ._append_args_line
+>          * A features section: ._append_line is ._append_features_line
+
+I'm asking because you're not adding :param line: here.
+
+Same for several other functions in this file.
+
+In schema.py:
+
+    class QAPISchemaMember:
+        """ Represents object members, enum members and features """
+
+Are the spaces next to """ okay?
 
 
