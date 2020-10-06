@@ -2,70 +2,70 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FE4AC41604
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 17:13:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BFC9C41604
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 17:13:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E99D206DD
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 17:13:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D279206DD
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 17:13:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LwzWw3Ix"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E99D206DD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FevOmft+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D279206DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32784 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPqWf-0006Jv-DB
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 13:13:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40500)
+	id 1kPqX3-0006yz-92
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 13:13:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40574)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kPqVo-0005nL-2d
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 13:12:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39346)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kPqWM-00067i-Co
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 13:13:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32894)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kPqVl-000524-6X
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 13:12:27 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kPqWK-00053N-Rv
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 13:13:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602004343;
+ s=mimecast20190719; t=1602004380;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=d+7XqSJItk+i6N1Z50T272rWJmUgTCZofcmcIEuoGZ8=;
- b=LwzWw3IxN7P4IS8RlzJXKENIG9PV8yfMxPGlU4d43mkdqQXfAW/tXO0ZFWWgVxXJEmYE3o
- uxiC15WQh1UHqRoLw7krx81CfzlnYGec2pwrGz5+z6kAb/yoF8fNc5ZC4NswQV1cstV0z5
- uu5IAavMeaZVVXHdZ1pygKUq0ttTiik=
+ bh=Ecw/oDaOz6r43dlJaHQO7jUdOZeTkTda+ilLu1x8ENE=;
+ b=FevOmft+Rx66BXyvvLqsTTXesWTUTVFeNt19Xgfnj7ZB3tyostW0w1OZf2lT5K5JMKfGOl
+ zkMeHDqLphm5tsS1+I8s4wy95wQ66kqGzyPcGciOCvcoaVJSj88aXuKymvkFEtxbGvIWsT
+ jUJaJ/4uonPPbwYc9knx/F1pjoPrf5A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-319-GD-Mxxo9NbKDLUGbyGuqqQ-1; Tue, 06 Oct 2020 13:12:22 -0400
-X-MC-Unique: GD-Mxxo9NbKDLUGbyGuqqQ-1
+ us-mta-189-cAG4-EWpN3W3wp6ZgI1zXA-1; Tue, 06 Oct 2020 13:12:58 -0400
+X-MC-Unique: cAG4-EWpN3W3wp6ZgI1zXA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A81B8031F8
- for <qemu-devel@nongnu.org>; Tue,  6 Oct 2020 17:12:20 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9EFC0835B4F
+ for <qemu-devel@nongnu.org>; Tue,  6 Oct 2020 17:12:57 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-113-60.ams2.redhat.com [10.36.113.60])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1EB8A55760;
- Tue,  6 Oct 2020 17:12:18 +0000 (UTC)
-Subject: Re: [PATCH 3/3] docs/devel/qtest: Include libqtest API reference
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 222DB55770;
+ Tue,  6 Oct 2020 17:12:53 +0000 (UTC)
+Subject: Re: [PATCH 0/3] docs: Include QTest protocol and libqtest API on
+ documentation
 To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 References: <20201005205228.697463-1-ehabkost@redhat.com>
- <20201005205228.697463-4-ehabkost@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <62336b4c-79b7-287b-8d9d-c269ce213c61@redhat.com>
-Date: Tue, 6 Oct 2020 19:12:17 +0200
+Message-ID: <64fc2c1a-0751-6b6a-1499-9dae8c7ea100@redhat.com>
+Date: Tue, 6 Oct 2020 19:12:53 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20201005205228.697463-4-ehabkost@redhat.com>
+In-Reply-To: <20201005205228.697463-1-ehabkost@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
@@ -104,58 +104,25 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 05/10/2020 22.52, Eduardo Habkost wrote:
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->   docs/devel/qtest.rst          |  6 ++++++
->   tests/qtest/libqos/libqtest.h | 20 ++++++++++----------
->   2 files changed, 16 insertions(+), 10 deletions(-)
+> This moves the QTest section of testing.rst to a separate
+> document, and include the QTest Protocol specification and
+> libqtest API reference in the document.
 > 
-> diff --git a/docs/devel/qtest.rst b/docs/devel/qtest.rst
-> index 3bf9ebee7f0..075fe5f7d53 100644
-> --- a/docs/devel/qtest.rst
-> +++ b/docs/devel/qtest.rst
-> @@ -64,3 +64,9 @@ QTest Protocol
->   
->   .. kernel-doc:: softmmu/qtest.c
->      :doc: QTest Protocol
-> +
-> +
-> +libqtest API reference
-> +----------------------
-> +
-> +.. kernel-doc:: tests/qtest/libqos/libqtest.h
-> diff --git a/tests/qtest/libqos/libqtest.h b/tests/qtest/libqos/libqtest.h
-> index a6ee1654f20..209fcf69737 100644
-> --- a/tests/qtest/libqos/libqtest.h
-> +++ b/tests/qtest/libqos/libqtest.h
-> @@ -24,7 +24,7 @@ typedef struct QTestState QTestState;
->   
->   /**
->    * qtest_initf:
-> - * @fmt...: Format for creating other arguments to pass to QEMU, formatted
-> + * @fmt: Format for creating other arguments to pass to QEMU, formatted
->    * like sprintf().
->    *
->    * Convenience wrapper around qtest_init().
-> @@ -87,7 +87,7 @@ void qtest_quit(QTestState *s);
->    * @s: #QTestState instance to operate on.
->    * @fds: array of file descriptors
->    * @fds_num: number of elements in @fds
-> - * @fmt...: QMP message to send to qemu, formatted like
-> + * @fmt: QMP message to send to qemu, formatted like
->    * qobject_from_jsonf_nofail().  See parse_escape() for what's
->    * supported after '%'.
->    *
-> @@ -100,7 +100,7 @@ QDict *qtest_qmp_fds(QTestState *s, int *fds, size_t fds_num,
->   /**
->    * qtest_qmp:
->    * @s: #QTestState instance to operate on.
-> - * @fmt...: QMP message to send to qemu, formatted like
-> + * @fmt: QMP message to send to qemu, formatted like
+> Eduardo Habkost (3):
+>    docs: Move QTest documentation to its own document
+>    docs/devel/qtest: Include protocol spec in document
+>    docs/devel/qtest: Include libqtest API reference
+> 
+>   docs/devel/index.rst          |  1 +
+>   docs/devel/qtest.rst          | 72 ++++++++++++++++++++++++++++++++++
+>   docs/devel/testing.rst        | 47 +---------------------
+>   tests/qtest/libqos/libqtest.h | 20 +++++-----
+>   softmmu/qtest.c               | 73 +++++++++++++++++++++++++++++++----
+>   5 files changed, 150 insertions(+), 63 deletions(-)
+>   create mode 100644 docs/devel/qtest.rst
 
-I think you should mention those changes to all those "fmt..." in the commit 
-message?
+FWIW:
 
-  Thomas
+Acked-by: Thomas Huth <thuth@redhat.com>
 
 
