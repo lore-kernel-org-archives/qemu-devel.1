@@ -2,111 +2,93 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75578C41604
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 15:45:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5075AC41604
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 15:46:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8B4C206F7
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 15:45:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0464206F7
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 15:46:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XpJVxB/u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8B4C206F7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qthoGYAK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0464206F7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPpA4-0005BG-0B
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 11:45:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47814)
+	id 1kPpAg-0005XF-Sv
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 11:46:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47972)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kPp6q-00034b-KD
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 11:42:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40665)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kPp6p-0008RV-0n
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 11:42:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601998954;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=HhiFqcRFVCUz3bgcxsIPZcQZmWGvxr1JUfWyirfIeAs=;
- b=XpJVxB/uZySlUv5unraUWceSdyzGst9xlx4DSP2noAN99LuCY9CYPEHxjw0gPdQRdDoMiW
- sfCxPBubPK99vkJTylytgr+kab7M6WOKeUDTYsHMUCxXNh4mKE+gwnFI6ae35tpC81YY53
- q9XZHSnRD8EZj3dTWJrFtaV4P6EhsqI=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-137-3IBwmHYtNv6riH_qK4pg_g-1; Tue, 06 Oct 2020 11:42:33 -0400
-X-MC-Unique: 3IBwmHYtNv6riH_qK4pg_g-1
-Received: by mail-wr1-f70.google.com with SMTP id b2so5464414wrs.7
- for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 08:42:32 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kPp7M-0003hS-RU
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 11:43:09 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37066)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kPp7J-000056-Np
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 11:43:08 -0400
+Received: by mail-wm1-x342.google.com with SMTP id j136so3609843wmj.2
+ for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 08:43:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=jwTWURE/eDrPEvo24EEaW5PvQHWcRQAeKjfZiY++ilU=;
+ b=qthoGYAKTo0dQJAG1T3Kx2lmANdfA1BWauNjM9bWd0PxaIwVXV3pIABkX60KLACr+q
+ V5NpQtXMxVgpYHFM6/W5gX+OPrvq3QPiw4CqcaJBGjDIJUwPV5GUcnei6/1ogZVdDzrv
+ awDVUHBHs2zzTU4K3TjglRnYEOF/i/tVAROWdcbq1qe8v8cxdW9vXN/QTIAktxb3Pfus
+ dQqxbu6dQZTCxuvSVKZDqD2G0XDJ24k6ijG883oo4eB5Y7cefGaWsss7szhDvYY9zhKF
+ XrIJxd+lfOjCRUT9ehzyITI2WgsfhBTiXTfT/8NoADG6kSPuVeY0X0GMQ6F6c+fk6AhV
+ C3xQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=HhiFqcRFVCUz3bgcxsIPZcQZmWGvxr1JUfWyirfIeAs=;
- b=cnDFoLNJ4HsoA8vlynGxBAaqtwm7GAa0k4M9VA2+gwoksZsp4+BKj4/vAkXQY6J372
- esLSFsIJHX0dWnxcYA/Sl6BdDVkTLSSL3uvQCb7qDtuQIMuuiqZnPbWbm+xfJVqOd4pP
- /cmrPN1uiBQaZe5nK/UQfTvTGlsVpfLpc+zJ26wi4tnCll4HtzGW7oNyGp/DgoLqw3F/
- GPoxbp0Yz8+Ft/a/vammrn9OOPYZ9f5BG4K2tm7N6G9LEAVKr8P275qy4grUbYbhD9uv
- pve+o5rUqkw2FvIRBr4iEJwu4IEdS+MigT+oEKYys2lpc71+3+Hqd85dWWw/peAWtu/w
- OY/g==
-X-Gm-Message-State: AOAM533WcZAFwnJOd7HTuHxT2LnTaCANdiN9vL01TLnw2KdfOiXl9TMV
- k0r0Bkbe8Fp7kP1AUuaFXvMR2RtkO5DJy7FsDfQ94OnMnjJKEEzSS0U8ZoH0xfJIXKH4bCfaYJl
- MNWEZR+4AQThI0LA=
-X-Received: by 2002:a7b:cb04:: with SMTP id u4mr5481915wmj.130.1601998951696; 
- Tue, 06 Oct 2020 08:42:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzZvmEq35dPYerZ2Pw2gdQuMRhBw1+Lp7g8Xq7rxGzoCPfpbtN/E4fB2a07EHPbz3zWANDRTg==
-X-Received: by 2002:a7b:cb04:: with SMTP id u4mr5481899wmj.130.1601998951479; 
- Tue, 06 Oct 2020 08:42:31 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5aca:cd0b:c4a1:9c2e?
- ([2001:b07:6468:f312:5aca:cd0b:c4a1:9c2e])
- by smtp.gmail.com with ESMTPSA id u63sm4857963wmb.13.2020.10.06.08.42.30
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 06 Oct 2020 08:42:30 -0700 (PDT)
-Subject: Re: [PULL 00/21] machine + QOM queue, 2020-10-05
-To: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-References: <20201005211000.710404-1-ehabkost@redhat.com>
- <CAFEAcA_+4b4HHP_8BBqqy+QmoyF6Lx1jmuFvcsbW5THZQDrXww@mail.gmail.com>
- <20201006143637.GP7303@habkost.net> <20201006170418.67bc8ce6@redhat.com>
- <20201006172309.36585fe1@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <42392f2d-c8b6-6a79-022b-ba8ca5e3ff46@redhat.com>
-Date: Tue, 6 Oct 2020 17:42:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ bh=jwTWURE/eDrPEvo24EEaW5PvQHWcRQAeKjfZiY++ilU=;
+ b=jTn17OFCokJHxV9pfwIds5rvGDFqJY58ma5Gjcy5qeiBzGA8mcoh+3TXbp6RozpVsJ
+ WbTKpt7Fx9/+ETWpzDdoQOwEp50RaoYcBtEMh5jjktHFfdp3yynvAqLw5UZB1wcuMOi/
+ uuM/tqeyXQMxlVzdHmaNUzCCPFsibM85L/ErTxp1lkk3kOUJlq8/F6jYg1wkHrmtmAJU
+ j0CEBdKzB/E7I4jujRG775MJ2ANZCLZ/yvWkWq6qdB7DEy3sxXdx96db9UKUwt65o6an
+ 9bzfSTVER/xl/nWknmc2GHPs+T4kfs+021ehremptz/bhqvIndU73oicdc277GwfX/Pp
+ DgwA==
+X-Gm-Message-State: AOAM533QlHx+QGyyDFGMAcsQPgD1302dEZFcB+tkP0IfFgkvJwHcHg8h
+ efjAl8QbpM6dwdLX91/6RjfxhA==
+X-Google-Smtp-Source: ABdhPJw/65NWn+8ikmIW8naqbci9Bow00qqGqtDo9mROFRXt8baDx1dpT2W3kXg7+tvrYrYrZq+Uyg==
+X-Received: by 2002:a1c:e48b:: with SMTP id b133mr5382275wmh.0.1601998981960; 
+ Tue, 06 Oct 2020 08:43:01 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id v9sm5601133wrv.35.2020.10.06.08.43.00
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 06 Oct 2020 08:43:00 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 267C11FF7E;
+ Tue,  6 Oct 2020 16:43:00 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] hw/ide/ahci: silence a compiler warning
+Date: Tue,  6 Oct 2020 16:42:56 +0100
+Message-Id: <20201006154256.17392-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20201006172309.36585fe1@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 00:55:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -119,24 +101,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: John Snow <jsnow@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ "open list:IDE" <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/10/20 17:23, Igor Mammedov wrote:
-> Looks like travis-ci lost previous authorizations to my github repo,
-> but giving a new one didn't help.
-> 
-> Something wrong with current QEMU master, travis-ci doesn't recognize QEMU repo a valid anymore.
-> 
+When built with -Og -ggdb with gcc 8.3 the compiler gets confused
+reporting:
 
-Interesting, I use Travis->Gitlab integration and even though builds are
-still triggered, they don't appear in the Gitlab CI page.  So the
-configuration is okay, but something seems to be wrong on the Travis side.
+  ../../hw/ide/ahci.c: In function ‘ahci_populate_sglist’:
+  ../../hw/ide/ahci.c:965:58: error: ‘tbl_entry_size’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
 
-Paolo
+As prdtl being > 0 is a prerequisite for running the code which
+guarantees we execute the loop at least once although not necessarily
+resetting off_pos/off_idx which should short-circuit the test anyway.
+
+To save grey hair initialise the value to zero and move the variable
+to the local block so future changes can't accidentally use it.
+
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ hw/ide/ahci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+index 680304a24c..f5c20c7d55 100644
+--- a/hw/ide/ahci.c
++++ b/hw/ide/ahci.c
+@@ -925,7 +925,6 @@ static int ahci_populate_sglist(AHCIDevice *ad, QEMUSGList *sglist,
+     uint64_t sum = 0;
+     int off_idx = -1;
+     int64_t off_pos = -1;
+-    int tbl_entry_size;
+     IDEBus *bus = &ad->port;
+     BusState *qbus = BUS(bus);
+ 
+@@ -952,6 +951,7 @@ static int ahci_populate_sglist(AHCIDevice *ad, QEMUSGList *sglist,
+     /* Get entries in the PRDT, init a qemu sglist accordingly */
+     if (prdtl > 0) {
+         AHCI_SG *tbl = (AHCI_SG *)prdt;
++        int tbl_entry_size = 0;
+         sum = 0;
+         for (i = 0; i < prdtl; i++) {
+             tbl_entry_size = prdt_tbl_entry_size(&tbl[i]);
+-- 
+2.20.1
 
 
