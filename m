@@ -7,78 +7,77 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEE83C41604
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:36:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4640EC41604
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:36:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A67020760
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:36:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8CF6320760
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:36:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OJ7EvcrZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A67020760
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CiG+Ndfb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CF6320760
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPhWF-00020y-CU
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 03:36:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39744)
+	id 1kPhWU-0002ZT-ID
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 03:36:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39648)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kPhQI-0002w4-BE
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:10 -0400
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:46267)
+ id 1kPhQB-0002gX-TN
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:03 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:46270)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kPhQG-0001Su-NB
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:09 -0400
-Received: by mail-wr1-x42c.google.com with SMTP id o5so12222378wrn.13
- for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 00:30:08 -0700 (PDT)
+ id 1kPhQ9-0001PU-Av
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:03 -0400
+Received: by mail-wr1-x431.google.com with SMTP id o5so12221901wrn.13
+ for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 00:30:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=rX/2cdjF+IuOQnPp1vgFSyENqGKo+72G+GCVvdtD8j4=;
- b=OJ7EvcrZsBtrqbmDuOZlKzZwGCzCSBYc2kJZcrl1IlOcG5jjYSogfxeXAXwaOTT1Eg
- 4s/5AX9PkqWdgybN8O0RVEhmCzbhz7J0u8iB2Xf8ag13WzkLNoU/jEqsmh0ifshqcul2
- VDj3RZIkvqcrdxtnS4dxZ3rnB3QQteDc+JK5zp9SaYlzA0up/wpSvZSXuVxOw5/JtX3X
- cYMxKveYswS7zvGfOjJOCxAfVVXt+BFHICE6ovFN1qLbZXm/+dJaqNbDX1RrTcUMiNsS
- P3oGMCgbks2MViCbbf3jBs9/N1wegFXx7V0SDfaiXeYsUzNdtwmGhAWpmp7UwJCfP8FH
- +uSQ==
+ bh=1wBDqPu0Mh/k8EUaxsOa5LE93l3x7HmJK/nuzfwKfPY=;
+ b=CiG+Ndfb7Yi+VakfHFYwq2ofJZZMpJX9NyRJhEuz00uucRfDIZ72jMnGwSHzzz3I+D
+ mDXoLXNey7xtU1bBFO/lP/M7wJOkTbSdIJCRutlbNdO53zBbU0BDPbbj+LkDul20e86o
+ MfuHwXqQCu79GsnPGTy9DiV1NA2Xq800pLBXYW30mFo8/SjnDTTKPmzRqr2xI13Ewapp
+ MRTyjPPIWDWpAcq/Qlsqn6psdhroYKZukjs+KaXybmivhEVTDza3tsoBkNJzhe8p0Sge
+ 7OtsSiflsaXi2fHIMVhoC1Rf9eaQVINjrG4xuBqrejfWRKxlUnZDakGpWkTZsBml+F+E
+ Y5KQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=rX/2cdjF+IuOQnPp1vgFSyENqGKo+72G+GCVvdtD8j4=;
- b=bj+Au3SjebL2D9o58n2T8EiwDYyCQRJyhUq6lNDHCmRM2lm/A5l1i6Nv6bfACkWRXu
- SC0+FI5p3BWT0VFdefAo/atMtvAOTOBlpIxFN/goxo5fHlVoOzaEHJ5sJFhW6KeNi8Lg
- G9wxJVDp6SiyRKb8ggroYHd+QxScTNC8VNW9kITno57MzE03oPs1TNaSQv5LF+izyX/U
- BXQPU+/ipt0GOY6DpGUB0bv9MpXrpk3Ae+x4Ha7qhjj/i4K46j2JUiqizrtZ+ebU1FJn
- ojruXJt7c2VrcDjwWx4Dh4C9KR+jA1hUDNxl7L40CLhaHvF4ElbYJ30OEUT3BYau5LJB
- Na4A==
-X-Gm-Message-State: AOAM533CHeIcQQ8+1/mMKXMA1ykjk3Eg8k9jZTczgR6LEXQueBX8x+L1
- EEAU1gIPPMcUaS3b+g++hGMYCT2uGhw=
-X-Google-Smtp-Source: ABdhPJxgp8MbFnQ8Po0YZis6YYKlhiSbdxBD9e8P7vo8sZsb7qKn+kbeL4lwgwCPulYDD6mocoz9iA==
-X-Received: by 2002:adf:90a2:: with SMTP id i31mr3606709wri.276.1601969407103; 
- Tue, 06 Oct 2020 00:30:07 -0700 (PDT)
+ bh=1wBDqPu0Mh/k8EUaxsOa5LE93l3x7HmJK/nuzfwKfPY=;
+ b=MJH3TX4mC2zkG8RNuGJaUZ1OOKQgjF107TurOiS5Mmo8GC+sxaoGW+6QMQQcXR/9LC
+ UW5n3ZRcDILlzTfg0GdlVf0Vy3vV6CXUZ/lNLy+woiMWygRce49W+ZowvNAhaGxEcs2a
+ LQraoX8gk0yjrBLugxH8zDylVOwOgw+KwRZd2TU1TiLrLtwIYyKGRKUhjj0qVdB0yfGs
+ 5ZF7MqleRPNXlcQakiDRYB9TTYExCe4U9iwEyUu03/Qrcgpnm9yxaEMG+owLGJFCAljW
+ uFp6dYftqhk51AZEg1jpE7k3lmnoVbgwIA8qLcb87lGV8+BNzPMmJdHXC3WXZxa1mBvG
+ c5Ww==
+X-Gm-Message-State: AOAM532rLaAfYuXJsSzKFyazyBiLOYWa6cDDkb4myTwACIRCiNX8DCGC
+ 3cDKPWncFb4FW6UqJJsJZh1FDKMnPJU=
+X-Google-Smtp-Source: ABdhPJy7KQfpbD1gvvSG0FyhBXW9pm3+j0ZoKdNJSlwXm/f4uoRi8qTvpCQ697TUyGdDtfs+23ysZw==
+X-Received: by 2002:adf:f504:: with SMTP id q4mr3217147wro.353.1601969399730; 
+ Tue, 06 Oct 2020 00:29:59 -0700 (PDT)
 Received: from localhost.localdomain ([2001:b07:6468:f312:5aca:cd0b:c4a1:9c2e])
- by smtp.gmail.com with ESMTPSA id i9sm2576329wma.47.2020.10.06.00.30.06
+ by smtp.gmail.com with ESMTPSA id i9sm2576329wma.47.2020.10.06.00.29.58
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 06 Oct 2020 00:30:06 -0700 (PDT)
+ Tue, 06 Oct 2020 00:29:59 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 23/37] configure: don't enable ASLR for --enable-debug Windows
- builds
-Date: Tue,  6 Oct 2020 09:29:33 +0200
-Message-Id: <20201006072947.487729-24-pbonzini@redhat.com>
+Subject: [PULL 15/37] hax: remove hax specific functions from global includes
+Date: Tue,  6 Oct 2020 09:29:25 +0200
+Message-Id: <20201006072947.487729-16-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201006072947.487729-1-pbonzini@redhat.com>
 References: <20201006072947.487729-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x42c.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::431;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x431.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -101,48 +100,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ Claudio Fontana <cfontana@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+From: Claudio Fontana <cfontana@suse.de>
 
-Unlike other OSs it is not possible for gdb to temporarily disable ASLR when
-debugging executables on Windows which causes gdb to fail with memory access
-errors when trying to debug QEMU.
-
-Keep ASLR enabled by default on Windows via the --dynamicbase compiler flag
-except for --enable-debug builds when there is a clear expectation that a
-functioning gdb is expected at the cost of slightly less security.
-
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-Id: <20201005133434.12614-1-mark.cave-ayland@ilande.co.uk>
+Signed-off-by: Claudio Fontana <cfontana@suse.de>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ accel/stubs/hax-stub.c    | 10 ----------
+ include/sysemu/hax.h      | 17 -----------------
+ target/i386/hax-all.c     |  1 -
+ target/i386/hax-cpus.c    |  1 -
+ target/i386/hax-cpus.h    | 16 ++++++++++++++++
+ target/i386/hax-mem.c     |  2 +-
+ target/i386/hax-posix.c   |  3 +--
+ target/i386/hax-windows.c |  2 +-
+ target/i386/hax-windows.h |  2 ++
+ 9 files changed, 21 insertions(+), 33 deletions(-)
 
-diff --git a/configure b/configure
-index 04c8cc017c..28df227db5 100755
---- a/configure
-+++ b/configure
-@@ -5882,7 +5882,14 @@ fi
+diff --git a/accel/stubs/hax-stub.c b/accel/stubs/hax-stub.c
+index 7ad190cae2..1a9da83185 100644
+--- a/accel/stubs/hax-stub.c
++++ b/accel/stubs/hax-stub.c
+@@ -21,13 +21,3 @@ int hax_sync_vcpus(void)
+ {
+     return 0;
+ }
+-
+-int hax_init_vcpu(CPUState *cpu)
+-{
+-    return -ENOSYS;
+-}
+-
+-int hax_smp_cpu_exec(CPUState *cpu)
+-{
+-    return -ENOSYS;
+-}
+diff --git a/include/sysemu/hax.h b/include/sysemu/hax.h
+index 9b27e65cc7..12fb54f990 100644
+--- a/include/sysemu/hax.h
++++ b/include/sysemu/hax.h
+@@ -22,29 +22,12 @@
+ #ifndef QEMU_HAX_H
+ #define QEMU_HAX_H
  
- # Use ASLR, no-SEH and DEP if available
- if test "$mingw32" = "yes" ; then
--    for flag in --dynamicbase --no-seh --nxcompat; do
-+    flags="--no-seh --nxcompat"
+-
+ int hax_sync_vcpus(void);
+-int hax_init_vcpu(CPUState *cpu);
+-int hax_smp_cpu_exec(CPUState *cpu);
+-int hax_populate_ram(uint64_t va, uint64_t size);
+-
+-void hax_cpu_synchronize_state(CPUState *cpu);
+-void hax_cpu_synchronize_post_reset(CPUState *cpu);
+-void hax_cpu_synchronize_post_init(CPUState *cpu);
+-void hax_cpu_synchronize_pre_loadvm(CPUState *cpu);
+ 
+ #ifdef CONFIG_HAX
+ 
+ int hax_enabled(void);
+ 
+-#include "qemu/bitops.h"
+-#include "exec/memory.h"
+-int hax_vcpu_destroy(CPUState *cpu);
+-void hax_raise_event(CPUState *cpu);
+-void hax_reset_vcpu_state(void *opaque);
+-#include "target/i386/hax-interface.h"
+-#include "target/i386/hax-i386.h"
+-
+ #else /* CONFIG_HAX */
+ 
+ #define hax_enabled() (0)
+diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
+index fd1ab673d7..fecfe8cd6e 100644
+--- a/target/i386/hax-all.c
++++ b/target/i386/hax-all.c
+@@ -28,7 +28,6 @@
+ #include "exec/address-spaces.h"
+ 
+ #include "qemu-common.h"
+-#include "hax-i386.h"
+ #include "sysemu/accel.h"
+ #include "sysemu/reset.h"
+ #include "sysemu/runstate.h"
+diff --git a/target/i386/hax-cpus.c b/target/i386/hax-cpus.c
+index 9aad98bc7a..99770e590c 100644
+--- a/target/i386/hax-cpus.c
++++ b/target/i386/hax-cpus.c
+@@ -22,7 +22,6 @@
+ #include "qemu/osdep.h"
+ #include "qemu/error-report.h"
+ #include "qemu/main-loop.h"
+-#include "hax-i386.h"
+ #include "sysemu/runstate.h"
+ #include "sysemu/cpus.h"
+ #include "qemu/guest-random.h"
+diff --git a/target/i386/hax-cpus.h b/target/i386/hax-cpus.h
+index a64417fe2d..ee8ab7a631 100644
+--- a/target/i386/hax-cpus.h
++++ b/target/i386/hax-cpus.h
+@@ -14,4 +14,20 @@
+ 
+ extern const CpusAccel hax_cpus;
+ 
++#include "hax-interface.h"
++#include "hax-i386.h"
 +
-+    # Disable ASLR for debug builds to allow debugging with gdb
-+    if test "$debug" = "no" ; then
-+        flags="--dynamicbase $flags"
-+    fi
++int hax_init_vcpu(CPUState *cpu);
++int hax_smp_cpu_exec(CPUState *cpu);
++int hax_populate_ram(uint64_t va, uint64_t size);
 +
-+    for flag in $flags; do
-         if ld_has $flag ; then
-             QEMU_LDFLAGS="-Wl,$flag $QEMU_LDFLAGS"
-         fi
++void hax_cpu_synchronize_state(CPUState *cpu);
++void hax_cpu_synchronize_post_reset(CPUState *cpu);
++void hax_cpu_synchronize_post_init(CPUState *cpu);
++void hax_cpu_synchronize_pre_loadvm(CPUState *cpu);
++
++int hax_vcpu_destroy(CPUState *cpu);
++void hax_raise_event(CPUState *cpu);
++void hax_reset_vcpu_state(void *opaque);
++
+ #endif /* HAX_CPUS_H */
+diff --git a/target/i386/hax-mem.c b/target/i386/hax-mem.c
+index 6bb5a24917..71e637cf16 100644
+--- a/target/i386/hax-mem.c
++++ b/target/i386/hax-mem.c
+@@ -13,7 +13,7 @@
+ #include "exec/address-spaces.h"
+ #include "qemu/error-report.h"
+ 
+-#include "target/i386/hax-i386.h"
++#include "hax-cpus.h"
+ #include "qemu/queue.h"
+ 
+ #define DEBUG_HAX_MEM 0
+diff --git a/target/i386/hax-posix.c b/target/i386/hax-posix.c
+index 6fb7867d11..735a749d4b 100644
+--- a/target/i386/hax-posix.c
++++ b/target/i386/hax-posix.c
+@@ -14,9 +14,8 @@
+ #include "qemu/osdep.h"
+ #include <sys/ioctl.h>
+ 
+-#include "target/i386/hax-i386.h"
+-
+ #include "sysemu/cpus.h"
++#include "hax-cpus.h"
+ 
+ hax_fd hax_mod_open(void)
+ {
+diff --git a/target/i386/hax-windows.c b/target/i386/hax-windows.c
+index 469b48e608..6c82dfb54f 100644
+--- a/target/i386/hax-windows.c
++++ b/target/i386/hax-windows.c
+@@ -12,7 +12,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "cpu.h"
+-#include "hax-i386.h"
++#include "hax-cpus.h"
+ 
+ /*
+  * return 0 when success, -1 when driver not loaded,
+diff --git a/target/i386/hax-windows.h b/target/i386/hax-windows.h
+index 12cbd813dc..a5ce12d663 100644
+--- a/target/i386/hax-windows.h
++++ b/target/i386/hax-windows.h
+@@ -23,6 +23,8 @@
+ #include <winioctl.h>
+ #include <windef.h>
+ 
++#include "hax-cpus.h"
++
+ #define HAX_INVALID_FD INVALID_HANDLE_VALUE
+ 
+ static inline void hax_mod_close(struct hax_state *hax)
 -- 
 2.26.2
 
