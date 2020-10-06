@@ -2,124 +2,92 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BCA1C41604
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 17:34:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F1F2C47095
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 17:37:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90D52206B5
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 17:34:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC708206CB
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 17:37:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lt1bkpc+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90D52206B5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aXrMqH7t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC708206CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPqrS-0005n1-Ab
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 13:34:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45092)
+	id 1kPqu2-0006xc-N2
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 13:37:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45628)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <rth7680@gmail.com>)
- id 1kPqqX-0005Ko-No; Tue, 06 Oct 2020 13:33:53 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:41491)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <rth7680@gmail.com>)
- id 1kPqqW-0007TL-1S; Tue, 06 Oct 2020 13:33:53 -0400
-Received: by mail-ed1-x541.google.com with SMTP id l24so14443540edj.8;
- Tue, 06 Oct 2020 10:33:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Uei1rIJa7Or3V2E+URLP6jV3aRThIaXwhLFaZDG2lGw=;
- b=Lt1bkpc+rhGHysBVwec0VVK133WquFpCa/3cfTsATF7AGpCGUPg5cPrKJEDCpWR+5V
- jC5zwzf0wlyZV3d9bhBAwNx6Ok5ZhrjmF//CpWlAbsoXU8Xxw9ELR4IDivrLaO43WlNx
- lzOr/MSM2ZuBAPqxSQlJH9lC4XuNykOlCpNBR+C4dIf5wWiEUaPVdv6u2aQ/+MaGYBlh
- 9oj0KO6DifXKjoosFirKO+qTex+x5hrmhU7dH4rooqkdBuFpdtL5KyQZCIpqvw6Ts81D
- KzQC0cWt8i81Nup5f5P4UsmOJZVmROpSLuhGiYyJwZLCHOOLPuphYTRnQ+ohtx9CL0O2
- FU5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=Uei1rIJa7Or3V2E+URLP6jV3aRThIaXwhLFaZDG2lGw=;
- b=F5WmW8mD7/kkjJQydTih1QHoG35wl4mfDm9ZMtdgp2yPvkRG9J2WUXmW7sx/ZqJnEG
- FV9OJXcM61+vaXapX7MJXr7YRwdrNlC+SkrtZhgJPtb57inJ0CikIE4pMsKbIWn5nw6N
- Dl4S3rEaMiPzgW6ftiL4IwDLDiq7Um8f7OuHlMT4yJhT7GW4oMwJif4CAxjT53LToaYi
- GYndxuWSElPaIwYEsf87/Od0vU9qrE/CwLA93fdyqEeJoBnv7XO72wzhOZ9a2bsoZzDt
- MLYYDBpqQmq9u1wcPSSHBg9550G5o8DHmmwyVS/ah5oHeesCFAhRVyGqhCCHDCkQamoU
- Z3yA==
-X-Gm-Message-State: AOAM5327UBEgMj7ueu4raGIJg4emwR3hzN3EDNyzH/s8Wj1xUpHKRFBw
- sRkCs17eGIvqFWVvPV61IB8=
-X-Google-Smtp-Source: ABdhPJwTOWAuR0525siZkYZB0oOxC76JU9cysVbx8fXbyXU2utNtSuuxhFQvhIkqNuVjF+CvDrD0xA==
-X-Received: by 2002:a50:ccc6:: with SMTP id b6mr6612392edj.329.1602005628753; 
- Tue, 06 Oct 2020 10:33:48 -0700 (PDT)
-Received: from [192.168.175.34] ([185.81.136.21])
- by smtp.googlemail.com with ESMTPSA id k18sm2626367ejk.42.2020.10.06.10.33.40
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 06 Oct 2020 10:33:47 -0700 (PDT)
-Subject: Re: [PATCH v2 1/9] s390x/pci: Move header files to include/hw/s390x
-To: Matthew Rosato <mjrosato@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-References: <1601669191-6731-1-git-send-email-mjrosato@linux.ibm.com>
- <1601669191-6731-2-git-send-email-mjrosato@linux.ibm.com>
- <20201006173259.1ec36597.cohuck@redhat.com>
- <e9f6c3e1-9341-b0d0-9fb2-b34ebd19bcba@linux.ibm.com>
-From: Richard Henderson <rth@twiddle.net>
-Autocrypt: addr=rth@twiddle.net; prefer-encrypt=mutual; keydata=
- mQENBFGuLC8BCADcAoWcnW9lTsDMzbO3MBU+KbiGaj5JPatEUscRDkQYM2fyNjJp2tIWDK5a
- n4yngeXB3eX61WbYR3QraRK8mlYLGxyAdHMEQfPipbqf3TmN043fssT2bc82ApJcs1zvLYgI
- rhMht7Dck7A0wNC1jo+ZjVVFig5gDTN7gOzaAdBtV8tVNUddwkLzzaGpfihhSD6U46NdqKOG
- Wlnn6TrkMy0QGdQ5NaXHkRlUjnnUTSW/nKfoxD+EI+A9V4sYOd8mc/TL4aJh/i/AiU57eLbo
- n17uQI6/VTWDUWl8USiz4x9c8vmqlywLx00tAFxxoRWqk4KVJlj+Sh0up/D/sJ+vPpgBABEB
- AAG0I1JpY2hhcmQgSGVuZGVyc29uIDxydGhAdHdpZGRsZS5uZXQ+iQFYBBMBAgBCAhsDBgsJ
- CAcDAgYVCAIJCgsEFgIDAQIeAQIXgAIZARYhBJyxjdr46EmtKvwWpK0ScMxN0CebBQJdweUY
- BQkP1h/pAAoJEK0ScMxN0CebqDsH/0YyfnXk+Dc++H37VCEKgRet2i1ATFzxRnifkvmdxha0
- V+PVptQ2fwSe+w3KxoFecD8W75nysmUjrU/FicW9yU5YRlGONPZjruG02/KzmhA5PzWJdYO3
- i/t0qRayvWIcX2qA/flsXEbmb/BbAFM05LQIdcOu74eiBFe5CBCOWBDJeneE1urIE0hSYxoh
- nCcG60ULrNj13ohZ4zAEluoY32qIo7/OPWmtR88cPrEbZT8k+RqgZbsotzaPT1/RlL74fL8k
- ofYfTgKAFH7eEy6fF2nzDp2GThVn+3sA62xtpSXUf/X1m75B40KOcq1EQbHypNTmBc1wt13e
- ibhPNEVX2am5AQ0EUa4sLwEIALITHfH3gciRNfQIe7awDTDvn6H3C6gDyCAnv5LiuLTLZiyK
- NZp3lNO3rPowyKrGT2RIDlumlqPgdeHzqEEX91YK0yk2vdFvwU04rJ4D+qRgdUPoeICLD1zo
- PwOv2FaY6Tf8dKYas1RHF5QU5yQNey8j7IYYoE2yGPn2PtBmvtmK4iLataUEvx0U385Zr+jf
- HscqwTiToryeDC8Io/9BsMvAssE5Yf5URS2nJ7LFOvc4njsQJPF1i9egBXaIloqv7p2hVCKJ
- Hl5UWIxitQ9QQIl6iU4LCpz8mVYTXwv48IAVpbUf7+ak9V9Kk3jCeQnlxCJBUHjUhoIzinbS
- JHPHtkkAEQEAAYkBPAQYAQIAJgIbDBYhBJyxjdr46EmtKvwWpK0ScMxN0CebBQJdweVIBQkP
- 1iAZAAoJEK0ScMxN0CebGHUH/RtouOlWl6To97tQsTJUq/2YwmRpFOsvV0/zCX4fKBGAbeZi
- VaELSt2+3UEErA+n8HwbQmjJ6IrdhA9GustOpOyCcbLVSMwql/OlAwBtDzCcC8dTU4zcuY2a
- rGG2A8i5krU85G9r1wowVcWZBsdmW7/dKiNoadLQiig4bHNiSaV4ograas5efyEjqTxiY+yG
- hzPw5DK2kbp2co8iDF1vW0LWPeLFBinCgItcI9LvgHWaB3rwjOfvNpMn5m64SoQYHB8wbnid
- erAjOzkBzmqnfS1tAUr8mtESStEwrEmNv0ZoA6S0Wt+c9pyTr+BpG4OFlhj7ZI+Eh7zOrr33
- q9OBIdA=
-Message-ID: <1c118c1d-8c9b-9b7b-d1ec-2080aaa1c1a3@twiddle.net>
-Date: Tue, 6 Oct 2020 12:33:34 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kPqtG-0006RX-UZ
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 13:36:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34396)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kPqtD-0007oB-TZ
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 13:36:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602005798;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=OlEEnCD6GnrpXbExAOuTk8EzKnrxj8eyF7rYwrvg/rg=;
+ b=aXrMqH7tuDn6BC5GvRdE/RuRjMOBQa5AEeqFFU9JrfxTnfp3uJRDC1CiXMaiAIn56a1Dzp
+ CkkOOX+6Vy6M3EEqKZlxy5DMssRd2vlnMZiyvtp+dr5SaaI66jMsA5LsrrtrKKidC8AQJE
+ j04waFzSFrHNBkzpyY9fjIcDviBGyKo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-259-X9AxjDB7PjGpArI7e2F3-A-1; Tue, 06 Oct 2020 13:36:37 -0400
+X-MC-Unique: X9AxjDB7PjGpArI7e2F3-A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7FE45835B8E;
+ Tue,  6 Oct 2020 17:36:35 +0000 (UTC)
+Received: from work-vm (ovpn-114-216.ams2.redhat.com [10.36.114.216])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AF6E81002C26;
+ Tue,  6 Oct 2020 17:36:32 +0000 (UTC)
+Date: Tue, 6 Oct 2020 18:36:30 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH v5 10/10] migration: introduce
+ snapshot-{save,load,delete} QMP commands
+Message-ID: <20201006173630.GJ3000@work-vm>
+References: <20201002162747.3123597-1-berrange@redhat.com>
+ <20201002162747.3123597-11-berrange@redhat.com>
+ <ef01ef63-7b95-88c2-5d31-103d29f9f64f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <e9f6c3e1-9341-b0d0-9fb2-b34ebd19bcba@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::541;
- envelope-from=rth7680@gmail.com; helo=mail-ed1-x541.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -12
-X-Spam_score: -1.3
-X-Spam_bar: -
-X-Spam_report: (-1.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_ENVFROM_END_DIGIT=0.25,
- FREEMAIL_FORGED_FROMDOMAIN=0.248, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+In-Reply-To: <ef01ef63-7b95-88c2-5d31-103d29f9f64f@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 00:55:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -132,27 +100,257 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, kvm@vger.kernel.org, pmorel@linux.ibm.com,
- david@redhat.com, schnelle@linux.ibm.com, qemu-s390x@nongnu.org,
- qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
- alex.williamson@redhat.com, mst@redhat.com, pbonzini@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/6/20 11:43 AM, Matthew Rosato wrote:
->> Looks good, but...
->>
->> <meta>Is there any way to coax out a more reviewable version of this
->> via git mv?</meta>
->>
+* Eric Blake (eblake@redhat.com) wrote:
+> On 10/2/20 11:27 AM, Daniel P. Berrangé wrote:
+> > savevm, loadvm and delvm are some of the few HMP commands that have never
+> > been converted to use QMP. The reasons for the lack of conversion are
+> > that they blocked execution of the event thread, and the semantics
+> > around choice of disks were ill-defined.
+> > 
+> > Despite this downside, however, libvirt and applications using libvirt
+> > have used these commands for as long as QMP has existed, via the
+> > "human-monitor-command" passthrough command. IOW, while it is clearly
+> > desirable to be able to fix the problems, they are not a blocker to
+> > all real world usage.
+> > 
+> > Meanwhile there is a need for other features which involve adding new
+> > parameters to the commands. This is possible with HMP passthrough, but
+> > it provides no reliable way for apps to introspect features, so using
+> > QAPI modelling is highly desirable.
+> > 
+> > This patch thus introduces new snapshot-{load,save,delete} commands to
+> > QMP that are intended to replace the old HMP counterparts. The new
+> > commands are given different names, because they will be using the new
+> > QEMU job framework and thus will have diverging behaviour from the HMP
+> > originals. It would thus be misleading to keep the same name.
+> > 
+> > While this design uses the generic job framework, the current impl is
+> > still blocking. The intention that the blocking problem is fixed later.
+> > None the less applications using these new commands should assume that
+> > they are asynchronous and thus wait for the job status change event to
+> > indicate completion.
+> > 
+> > In addition to using the job framework, the new commands require the
+> > caller to be explicit about all the block device nodes used in the
+> > snapshot operations, with no built-in default heuristics in use.
+> > 
+> > Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+> > ---
 > 
-> I tried git mv, but a diff between the old patch and the new patch looks the
-> same (other than the fact that I squashed the MAINTAINERS hit in)
+> > +++ b/qapi/job.json
+> > @@ -22,10 +22,17 @@
+> >  #
+> >  # @amend: image options amend job type, see "x-blockdev-amend" (since 5.1)
+> >  #
+> > +# @snapshot-load: snapshot load job type, see "snapshot-load" (since 5.2)
+> > +#
+> > +# @snapshot-save: snapshot save job type, see "snapshot-save" (since 5.2)
+> > +#
+> > +# @snapshot-delete: snapshot delete job type, see "snapshot-delete" (since 5.2)
+> > +#
+> >  # Since: 1.7
+> >  ##
+> >  { 'enum': 'JobType',
+> > -  'data': ['commit', 'stream', 'mirror', 'backup', 'create', 'amend'] }
+> > +  'data': ['commit', 'stream', 'mirror', 'backup', 'create', 'amend',
+> > +           'snapshot-load', 'snapshot-save', 'snapshot-delete'] }
+> >  
+> >  ##
+> >  # @JobStatus:
+> > diff --git a/qapi/migration.json b/qapi/migration.json
+> > index 7f5e6fd681..d2bd551ad9 100644
+> > --- a/qapi/migration.json
+> > +++ b/qapi/migration.json
+> > @@ -1787,3 +1787,123 @@
+> >  # Since: 5.2
+> >  ##
+> >  { 'command': 'query-dirty-rate', 'returns': 'DirtyRateInfo' }
+> > +
+> > +##
+> > +# @snapshot-save:
+> > +#
+> > +# Save a VM snapshot
+> > +#
+> > +# @job-id: identifier for the newly created job
+> > +# @tag: name of the snapshot to create
+> > +# @devices: list of block device node names to save a snapshot to
+> > +# @vmstate: block device node name to save vmstate to
+> 
+> Here, you document vmstate last,...
+> 
+> > +#
+> > +# Applications should not assume that the snapshot save is complete
+> > +# when this command returns. The job commands / events must be used
+> > +# to determine completion and to fetch details of any errors that arise.
+> > +#
+> > +# Note that the VM CPUs will be paused during the time it takes to
+> > +# save the snapshot
+> 
+> "will be", or "may be"?  As you stated above, we may be able to lift the
+> synchronous limitations down the road, while still maintaining the
+> present interface of using this command to start the job and waiting on
+> the job id until it is finished, at which point the CPUs might not need
+> to be paused as much.
+> 
+> > +#
+> > +# It is strongly recommended that @devices contain all writable
+> > +# block device nodes if a consistent snapshot is required.
+> > +#
+> > +# If @tag already exists, an error will be reported
+> > +#
+> > +# Returns: nothing
+> > +#
+> > +# Example:
+> > +#
+> > +# -> { "execute": "snapshot-save",
+> > +#      "data": {
+> > +#         "job-id": "snapsave0",
+> > +#         "tag": "my-snap",
+> > +#         "vmstate": "disk0",
+> > +#         "devices": ["disk0", "disk1"]
+> 
+> ...here vmstate occurs before devices.  I don't know if our doc
+> generator cares about inconsistent ordering.
+> 
+> > +#      }
+> > +#    }
+> > +# <- { "return": { } }
+> > +#
+> > +# Since: 5.2
+> > +##
+> > +{ 'command': 'snapshot-save',
+> > +  'data': { 'job-id': 'str',
+> > +            'tag': 'str',
+> > +            'vmstate': 'str',
+> > +            'devices': ['str'] } }
+> > +
+> > +##
+> > +# @snapshot-load:
+> > +#
+> > +# Load a VM snapshot
+> > +#
+> > +# @job-id: identifier for the newly created job
+> > +# @tag: name of the snapshot to load.
+> > +# @devices: list of block device node names to load a snapshot from
+> > +# @vmstate: block device node name to load vmstate from
+> > +#
+> > +# Applications should not assume that the snapshot save is complete
+> > +# when this command returns. The job commands / events must be used
+> > +# to determine completion and to fetch details of any errors that arise.
+> 
+> s/save/load/
+> 
+> > +#
+> > +# Note that the VM CPUs will be paused during the time it takes to
+> > +# save the snapshot
+> 
+> s/save/load/
+> 
+> But while pausing CPUs during save is annoying, pausing CPUs during
+> restore makes sense (after all, executing on stale data that will still
+> be updated during the restore is just wasted execution).
 
-git format-patch --find-renames[=<pct>]
+Note that there are other snapshotting schemes that can do this more
+dynamically and page/load the state on demand - a rapid resume from
+snapshot like that is quite attractive.
 
-Though I'm surprised it's not doing that by default.
+Dave
 
-r~
+> 
+> > +#
+> > +# It is strongly recommended that @devices contain all writable
+> > +# block device nodes that can have changed since the original
+> > +# @snapshot-save command execution.
+> > +#
+> > +# Returns: nothing
+> > +#
+> > +# Example:
+> > +#
+> > +# -> { "execute": "snapshot-load",
+> > +#      "data": {
+> > +#         "job-id": "snapload0",
+> > +#         "tag": "my-snap",
+> > +#         "vmstate": "disk0",
+> > +#         "devices": ["disk0", "disk1"]
+> > +#      }
+> > +#    }
+> > +# <- { "return": { } }
+> > +#
+> > +# Since: 5.2
+> > +##
+> > +{ 'command': 'snapshot-load',
+> > +  'data': { 'job-id': 'str',
+> > +            'tag': 'str',
+> > +            'vmstate': 'str',
+> > +            'devices': ['str'] } }
+> > +
+> > +##
+> > +# @snapshot-delete:
+> > +#
+> > +# Delete a VM snapshot
+> > +#
+> > +# @job-id: identifier for the newly created job
+> > +# @tag: name of the snapshot to delete.
+> > +# @devices: list of block device node names to delete a snapshot from
+> > +#
+> > +# Applications should not assume that the snapshot save is complete
+> > +# when this command returns. The job commands / events must be used
+> > +# to determine completion and to fetch details of any errors that arise.
+> 
+> Do we have a query- command handy to easily learn which snapshot names
+> are even available to attempt deletion on?  If not, that's worth a
+> separate patch.
+> 
+> > +#
+> > +# Returns: nothing
+> > +#
+> > +# Example:
+> > +#
+> > +# -> { "execute": "snapshot-delete",
+> > +#      "data": {
+> > +#         "job-id": "snapdelete0",
+> > +#         "tag": "my-snap",
+> > +#         "devices": ["disk0", "disk1"]
+> > +#      }
+> > +#    }
+> > +# <- { "return": { } }
+> > +#
+> > +# Since: 5.2
+> > +##
+> 
+> > +++ b/tests/qemu-iotests/group
+> > @@ -291,6 +291,7 @@
+> >  277 rw quick
+> >  279 rw backing quick
+> >  280 rw migration quick
+> > +310 rw quick
+> >  281 rw quick
+> >  282 rw img quick
+> >  283 auto quick
+> 
+> What's wrong with sorted order? I get the renumbering to appease a merge
+> conflict, but it also requires rearrangement ;)
+> 
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3226
+> Virtualization:  qemu.org | libvirt.org
+> 
+
+
+
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
