@@ -2,74 +2,75 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D76EC41604
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 17:41:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1F02C41604
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 17:42:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E86BF206CB
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 17:41:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E86BF206CB
+	by mail.kernel.org (Postfix) with ESMTPS id 68EA12075A
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 17:42:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68EA12075A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPqxX-0000aX-Os
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 13:41:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46224)
+	id 1kPqzH-0002JM-G6
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 13:42:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46644)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1kPqvo-0007iT-LJ; Tue, 06 Oct 2020 13:39:22 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:54749)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1kPqxy-0001Id-LW; Tue, 06 Oct 2020 13:41:34 -0400
+Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:50009)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1kPqvj-0007zj-Lo; Tue, 06 Oct 2020 13:39:20 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.109.146.15])
- by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 87D9E62AF2D3;
- Tue,  6 Oct 2020 19:39:11 +0200 (CEST)
-Received: from kaod.org (37.59.142.105) by DAG8EX1.mxp5.local (172.16.2.71)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1kPqxw-000054-0m; Tue, 06 Oct 2020 13:41:34 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.108.20.195])
+ by mo529.mail-out.ovh.net (Postfix) with ESMTPS id BF27C62AF608;
+ Tue,  6 Oct 2020 19:41:29 +0200 (CEST)
+Received: from kaod.org (37.59.142.105) by DAG4EX1.mxp5.local (172.16.2.31)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Tue, 6 Oct 2020
- 19:39:11 +0200
+ 19:41:29 +0200
 Authentication-Results: garm.ovh; auth=pass
- (GARM-105G00633475554-bec9-4257-85df-59c8e5f31d11,
- ABBA5CC1B3A583228A496F54FDB0659883642288) smtp.auth=groug@kaod.org
-Date: Tue, 6 Oct 2020 19:39:09 +0200
-From: Greg Kurz <groug@kaod.org>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH v2 6/6] spapr/xive: Introduce a new CAS value for the
- StoreEOI capability
-Message-ID: <20201006193909.617cc487@bahia.lan>
-In-Reply-To: <20201005165147.526426-7-clg@kaod.org>
+ (GARM-105G006c50df8bd-90c5-41e0-8d5b-fe6b1de2db55,
+ 2331A23DC679A54E7C1604B88AF6A34BAE14B46D) smtp.auth=clg@kaod.org
+Subject: Re: [PATCH v2 5/6] spapr/xive: Activate StoreEOI at the source level
+To: Greg Kurz <groug@kaod.org>
 References: <20201005165147.526426-1-clg@kaod.org>
- <20201005165147.526426-7-clg@kaod.org>
-X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ <20201005165147.526426-6-clg@kaod.org> <20201006190645.33a05694@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <66bb5bdf-fe88-33a8-85ea-dde8aa78379e@kaod.org>
+Date: Tue, 6 Oct 2020 19:41:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20201006190645.33a05694@bahia.lan>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-Originating-IP: [37.59.142.105]
-X-ClientProxiedBy: DAG3EX2.mxp5.local (172.16.2.22) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: a6dc60b9-7d44-45d5-be8a-48f9ea55a24c
-X-Ovh-Tracer-Id: 12375610301591493027
+X-ClientProxiedBy: DAG8EX1.mxp5.local (172.16.2.71) To DAG4EX1.mxp5.local
+ (172.16.2.31)
+X-Ovh-Tracer-GUID: 98547d32-1a78-4b58-9492-35b8ba7d9753
+X-Ovh-Tracer-Id: 12414453850723355555
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrgeeggdduudegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfhisehtqhertdertdejnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeevlefhtddufffhieevhefhleegleelgfetffetkedugeehjeffgfehhfefueduffenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtoheptghlgheskhgrohgurdhorhhg
-Received-SPF: pass client-ip=178.32.125.2; envelope-from=groug@kaod.org;
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrgeeggdduudegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfhisehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepjeekudeuudevleegudeugeekleffveeludejteffiedvledvgfekueefudehheefnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehgrhhouhhgsehkrghougdrohhrgh
+Received-SPF: pass client-ip=178.32.125.2; envelope-from=clg@kaod.org;
  helo=smtpout1.mo529.mail-out.ovh.net
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 12:58:29
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -89,155 +90,74 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 5 Oct 2020 18:51:47 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+On 10/6/20 7:06 PM, Greg Kurz wrote:
+> On Mon, 5 Oct 2020 18:51:46 +0200
+> Cédric Le Goater <clg@kaod.org> wrote:
+> 
+>> When the StoreEOI capability is "on", the H_INT_GET_SOURCE_INFO will
+>> set the StoreEOI flag for all sources. This could be an issue if
+>> StoreEOI is not supported on a specific source, of a passthrough
+>> device for instance. In that case, we could either introduce a new KVM
+>> ioctl to query the characteristics of the source at the HW level or
+>> deactivate StoreEOI on the machine.
+>>
+>> This is theoretically unsafe on a POWER9 host but it still runs.
+>>
+> 
+> Patch looks good but as said before, what is the likeliness of something
+> really painful to happen on a POWER9 host ?
 
-> When the StoreEOI capability is set to "cas", let CAS decide when
-> StoreEOI should be advertised. StoreEOI is safe to use with a P10
-> compat machine because the OS enforces load-after-store ordering but
-> not with P9 compat.
->=20
-> The question now is : should we make "cas" the default at the machine
-> level ?
->=20
+Nothing will happen because POWER9 systems deactivate StoreEOI. You need
+a custom skiboot to add it back.
 
-Hmm, spapr capabilities are knobs for the end user to provide a specific
-and consistent behavior to the guest... so the "let CAS decide depending
-on what the guest asked for" thing looks awkward... I mean that making
-"cas" the default at the machine level looks like you don't really want
-this to be a capability at all.
+C.
 
-If the user asked for StoreEOI but the guest chose a compat mode that
-can't support it, QEMU should simply exit IMHO.
 
-Or alternatively I guess you can just forget about the spapr capability
-and do all the checks (XIVE interrupt controller, KVM support, guest
-asked for P10) at CAS.
-
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
->  include/hw/ppc/spapr.h      |  1 +
->  include/hw/ppc/spapr_xive.h |  1 +
->  hw/intc/spapr_xive.c        |  9 +++++++++
->  hw/ppc/spapr_caps.c         | 21 +++++++++++++++++----
->  hw/ppc/spapr_hcall.c        |  7 +++++++
->  5 files changed, 35 insertions(+), 4 deletions(-)
->=20
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index b701c14b4e09..17e7d873e8dc 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -87,6 +87,7 @@ typedef enum {
->  #define SPAPR_CAP_ON                    0x01
-> =20
->  /* Custom Caps */
-> +#define SPAPR_CAP_CAS                   0x02
-> =20
->  /* Generic */
->  #define SPAPR_CAP_BROKEN                0x00
-> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> index 26c8d90d7196..8b8aa586e44f 100644
-> --- a/include/hw/ppc/spapr_xive.h
-> +++ b/include/hw/ppc/spapr_xive.h
-> @@ -75,6 +75,7 @@ void spapr_xive_map_mmio(SpaprXive *xive);
-> =20
->  int spapr_xive_end_to_target(uint8_t end_blk, uint32_t end_idx,
->                               uint32_t *out_server, uint8_t *out_prio);
-> +void spapr_xive_enable_store_eoi(SpaprXive *xive, bool enable);
-> =20
->  /*
->   * KVM XIVE device helpers
-> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> index 41f2719ff93a..f57a2681dd91 100644
-> --- a/hw/intc/spapr_xive.c
-> +++ b/hw/intc/spapr_xive.c
-> @@ -1802,3 +1802,12 @@ void spapr_xive_hcall_init(SpaprMachineState *spap=
-r)
->      spapr_register_hypercall(H_INT_SYNC, h_int_sync);
->      spapr_register_hypercall(H_INT_RESET, h_int_reset);
->  }
-> +
-> +void spapr_xive_enable_store_eoi(SpaprXive *xive, bool enable)
-> +{
-> +    if (enable) {
-> +        xive->source.esb_flags |=3D XIVE_SRC_STORE_EOI;
-> +    } else {
-> +        xive->source.esb_flags &=3D ~XIVE_SRC_STORE_EOI;
-> +    }
-> +}
-> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> index 9251badbdc27..c55e1fccb9bc 100644
-> --- a/hw/ppc/spapr_caps.c
-> +++ b/hw/ppc/spapr_caps.c
-> @@ -524,6 +524,13 @@ static void cap_fwnmi_apply(SpaprMachineState *spapr=
-, uint8_t val,
->      }
->  }
-> =20
-> +SpaprCapPossible cap_storeeoi_possible =3D {
-> +    .num =3D 3,
-> +    .vals =3D { "off", "on", "cas" },
-> +    .help =3D "off - no StoreEOI, on - StoreEOI, "
-> +            "cas - negotiated at CAS (POWER10 compat only)",
-> +};
-> +
->  static void cap_storeeoi_apply(SpaprMachineState *spapr, uint8_t val,
->                                 Error **errp)
->  {
-> @@ -550,6 +557,11 @@ static void cap_storeeoi_apply(SpaprMachineState *sp=
-apr, uint8_t val,
->              return;
->          }
-> =20
-> +        /* CAS will decide to advertise StoreEOI (P10 compat kernels onl=
-y) */
-> +        if (val =3D=3D SPAPR_CAP_CAS) {
-> +            return;
-> +        }
-> +
->          /*
->           * load-after-store ordering is not enforced on POWER9 CPUs
->           * and StoreEOI can be racy.
-> @@ -671,11 +683,12 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM]=
- =3D {
->      },
->      [SPAPR_CAP_STOREEOI] =3D {
->          .name =3D "storeeoi",
-> -        .description =3D "Implements XIVE StoreEOI feature",
-> +        .description =3D "Implements XIVE StoreEOI feature (off, on, cas=
-)",
->          .index =3D SPAPR_CAP_STOREEOI,
-> -        .get =3D spapr_cap_get_bool,
-> -        .set =3D spapr_cap_set_bool,
-> -        .type =3D "bool",
-> +        .get =3D spapr_cap_get_string,
-> +        .set =3D spapr_cap_set_string,
-> +        .type =3D "string",
-> +        .possible =3D &cap_storeeoi_possible,
->          .apply =3D cap_storeeoi_apply,
->      },
->  };
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 607740150fa2..158b122b9192 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1804,6 +1804,13 @@ target_ulong do_client_architecture_support(PowerP=
-CCPU *cpu,
->  "Guest requested unavailable interrupt mode (XIVE), try the ic-mode=3Dxi=
-ve or ic-mode=3Ddual machine property");
->              exit(EXIT_FAILURE);
->          }
-> +
-> +        /* Advertise StoreEOI for a P10 compat guest. */
-> +        if (spapr_get_cap(spapr, SPAPR_CAP_STOREEOI) =3D=3D SPAPR_CAP_CA=
-S) {
-> +            bool enable =3D ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_3_=
-10, 0,
-> +                                           cpu->compat_pvr);
-> +            spapr_xive_enable_store_eoi(spapr->xive, enable);
-> +        }
->      } else {
->          if (!spapr->irq->xics) {
->              error_report(
+>> Signed-off-by: Cédric Le Goater <clg@kaod.org>
+>> ---
+>>  hw/intc/spapr_xive.c | 1 +
+>>  hw/ppc/spapr_irq.c   | 6 ++++++
+>>  2 files changed, 7 insertions(+)
+>>
+>> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+>> index 1fa09f287ac0..41f2719ff93a 100644
+>> --- a/hw/intc/spapr_xive.c
+>> +++ b/hw/intc/spapr_xive.c
+>> @@ -280,6 +280,7 @@ static void spapr_xive_instance_init(Object *obj)
+>>      SpaprXive *xive = SPAPR_XIVE(obj);
+>>  
+>>      object_initialize_child(obj, "source", &xive->source, TYPE_XIVE_SOURCE);
+>> +    object_property_add_alias(obj, "flags", OBJECT(&xive->source), "flags");
+>>  
+>>      object_initialize_child(obj, "end_source", &xive->end_source,
+>>                              TYPE_XIVE_END_SOURCE);
+>> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+>> index f59960339ec3..cdf9f9df4173 100644
+>> --- a/hw/ppc/spapr_irq.c
+>> +++ b/hw/ppc/spapr_irq.c
+>> @@ -325,9 +325,14 @@ void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
+>>  
+>>      if (spapr->irq->xive) {
+>>          uint32_t nr_servers = spapr_max_server_number(spapr);
+>> +        uint64_t flags = 0;
+>>          DeviceState *dev;
+>>          int i;
+>>  
+>> +        if (spapr_get_cap(spapr, SPAPR_CAP_STOREEOI) == SPAPR_CAP_ON) {
+>> +            flags |= XIVE_SRC_STORE_EOI;
+>> +        }
+>> +
+>>          dev = qdev_new(TYPE_SPAPR_XIVE);
+>>          qdev_prop_set_uint32(dev, "nr-irqs", smc->nr_xirqs + SPAPR_XIRQ_BASE);
+>>          /*
+>> @@ -337,6 +342,7 @@ void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
+>>          qdev_prop_set_uint32(dev, "nr-ends", nr_servers << 3);
+>>          object_property_set_link(OBJECT(dev), "xive-fabric", OBJECT(spapr),
+>>                                   &error_abort);
+>> +        object_property_set_int(OBJECT(dev), "flags", flags, &error_abort);
+>>          sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
+>>  
+>>          spapr->xive = SPAPR_XIVE(dev);
+> 
 
 
