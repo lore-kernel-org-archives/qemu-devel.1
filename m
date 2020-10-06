@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A62CC47095
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:41:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD8EDC41604
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:41:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F5F12078E
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:41:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 600AE20760
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:41:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vG67bz7e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F5F12078E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ob51tosD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 600AE20760
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPhb4-0001Bf-NA
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 03:41:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39766)
+	id 1kPhbE-0001QL-Cl
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 03:41:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39558)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kPhQK-00030G-5f
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:12 -0400
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:50457)
+ id 1kPhQ6-0002S9-AJ
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:29:58 -0400
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:36541)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kPhQI-0001TB-Ew
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:11 -0400
-Received: by mail-wm1-x331.google.com with SMTP id 13so1845667wmf.0
- for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 00:30:10 -0700 (PDT)
+ id 1kPhQ4-0001Od-RT
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:29:58 -0400
+Received: by mail-wr1-x42c.google.com with SMTP id z1so12223703wrt.3
+ for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 00:29:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=cpyQLJv0wdPNrXTFIzMBIsZDapctBMjUV4cbdzJBuo8=;
- b=vG67bz7ebTOVQJz9RT/YmTd7evzbpRD3qQJl3fsAohvrZX4eQpbbGBPe6VgEEx7ONv
- W1zMLyRAPjQhLgKmnyKFOflPD9PzgL6lPhrNyG3p+j6x/6xjvftVJjePBksiMbJwTaXI
- YStHhPZ+y88HcpkFvrDpFHDaavpMvNFBSK5jroDTS+qy1PvpHTsAEucpYGGd0ncqbG49
- vm6qnQZn1Wf9KFIm1RsyiM6t8VhfNmDAUFW9BYqCrPLl4qMckK/S4rJGhVbunf6rnMZL
- Y15qmfA+I44kmbyqZ5C0MEB+9eNg1yHNCSPIRaeLTI4izu887mEy/nebHAALTfi+qYKZ
- b+8A==
+ bh=XxU4JUy0D8PVTLSMbq2V+3PgAaQreqZ5rvwSi2NUvwk=;
+ b=Ob51tosDyW2KApUJTZUWjhiBmWvKH4VpcNnK9j6A+zQrWhTnE/lqCn7Ai/Tlw3M+ZW
+ 0KALosaH8ZxMro6bv4Rguwc+WyUai6h2ebtzAdpSj2bDqAzHLiBJp1p3ciTF85FgwmtN
+ 4iKa8pjkuPopMM7jtz9NPFL7uiqrQTipbwKtMdB/Ru6XVwHYH1PlB70WmE0oTsllDEIQ
+ coIAzU7CFjt4H2k1OXZLwjoohPxCr2RDfqTas0owc+zDgJ1NGHXC8eJ7F/iVegmHI6ni
+ PUZWLyk8ZChQ2Urp0WB1i0VgWG48tvTcxNPxgEB3bI+lpK/+l2XLaPkxwTJv72iLuwXQ
+ O6tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=cpyQLJv0wdPNrXTFIzMBIsZDapctBMjUV4cbdzJBuo8=;
- b=DS9dbGN6RMR4ViM9EBOnCNFHIebtBTFQz/AM84/gtsWYlf3R8ST4cvp/Hh0CWRDOBK
- owvbupzZ8T/2zdCYfDd1VlDxdtKZ9K3hucRPOr0ok4wIgz2Z8vFEczxVBheGS1X79ZJC
- qra33kzmkjYa2LZM6UcTVZnLZ7IEIWW9rwy/iR3s5QTsBUGdoaqyMxVXqJbB1ZYgj0LN
- F9M4szsTJcJt7sngemmCf9g2Z9DJWUBP0ReJ6OFT3mSoC42lJf1b+08EmtL44citbABD
- 26Q8QJx6ki8TylZtPYTcwWlvt0UIgbdAjJDpuT6s/jhiQcX/NwMpjXdyVkPyObi3tjNv
- cyHg==
-X-Gm-Message-State: AOAM5339mqe3LT65qfN7p085wVx2AVref/m3C/tBwylmexjViFDCYCsC
- fT0Qz4StUK1FE7+92pdxFcOkLfg0Yfo=
-X-Google-Smtp-Source: ABdhPJyleGGaJRe8grVKKfHjm09vYC/FDyF56I2nW7N/1xd7te3g9UIR8VIm9pWMuVo1okKF7ggRMQ==
-X-Received: by 2002:a7b:c081:: with SMTP id r1mr3219414wmh.158.1601969408843; 
- Tue, 06 Oct 2020 00:30:08 -0700 (PDT)
+ bh=XxU4JUy0D8PVTLSMbq2V+3PgAaQreqZ5rvwSi2NUvwk=;
+ b=JLy3LdL9CWeXyYu6EVZSIoyT0SlWWzXCB8qvClS4XQd6SCpRB6PMf/EqZhSzhWUyiB
+ LquO7NRY3GzTFfcB+n3K8i7lDkgxi/AlfCxVFgw63dEalsMpIaQ7PLoOS0+TkIYx6Iib
+ F7JtSjIHKczMm5OW18X5qsYjLq9L3FTEi1dKsJi3s5/7D8Qb/NMeQdH4tUyL0giITTdh
+ oprbBADlPFA3dytxSaylxS/aXFhzbbfIi7UK3Wwz8RYYlzgxD/d26r2DPz9Lo4rQDZ+q
+ yeaTItO/qVqYh/6ZR491aZfpeJa7Q8S7ZycHWXlldk/i+poA0cWOXBAsWE6kjFcOePZ6
+ o5YQ==
+X-Gm-Message-State: AOAM531F8UqnW0KqHXsF5LVIue6de9EWVTvWbn7GrlTOuN+AG20ZOpfz
+ gvjCFqiBVyfJ4yYYNpkNtW18rTyqfQ8=
+X-Google-Smtp-Source: ABdhPJzaxJ9eQ6RMMm1H6MLLJwHvmI1z9xvwMN7+Xo1+uQDn1Xa2ZvZiC+qQF2Am+tO2BtPX2kVcLg==
+X-Received: by 2002:adf:f552:: with SMTP id j18mr3536256wrp.128.1601969395331; 
+ Tue, 06 Oct 2020 00:29:55 -0700 (PDT)
 Received: from localhost.localdomain ([2001:b07:6468:f312:5aca:cd0b:c4a1:9c2e])
- by smtp.gmail.com with ESMTPSA id i9sm2576329wma.47.2020.10.06.00.30.08
+ by smtp.gmail.com with ESMTPSA id i9sm2576329wma.47.2020.10.06.00.29.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 06 Oct 2020 00:30:08 -0700 (PDT)
+ Tue, 06 Oct 2020 00:29:54 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 25/37] replay: provide an accessor for rr filename
-Date: Tue,  6 Oct 2020 09:29:35 +0200
-Message-Id: <20201006072947.487729-26-pbonzini@redhat.com>
+Subject: [PULL 10/37] cpus: cleanup now unneeded includes
+Date: Tue,  6 Oct 2020 09:29:20 +0200
+Message-Id: <20201006072947.487729-11-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201006072947.487729-1-pbonzini@redhat.com>
 References: <20201006072947.487729-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::331;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x331.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x42c.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -102,55 +102,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>,
- Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ Richard Henderson <richard.henderson@linaro.org>,
+ Claudio Fontana <cfontana@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+From: Claudio Fontana <cfontana@suse.de>
 
-This patch adds an accessor function for the name of the record/replay
-log file. Adding an accessor instead of making variable global,
-prevents accidental modification of this variable by other modules.
-
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
+Signed-off-by: Claudio Fontana <cfontana@suse.de>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <160174517710.12451.17645787545733927488.stgit@pasha-ThinkPad-X280>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/sysemu/replay.h | 2 ++
- replay/replay.c         | 5 +++++
- 2 files changed, 7 insertions(+)
+ softmmu/cpus.c | 7 -------
+ 1 file changed, 7 deletions(-)
 
-diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-index a140d69a73..7d963139e5 100644
---- a/include/sysemu/replay.h
-+++ b/include/sysemu/replay.h
-@@ -72,6 +72,8 @@ void replay_start(void);
- void replay_finish(void);
- /*! Adds replay blocker with the specified error description */
- void replay_add_blocker(Error *reason);
-+/* Returns name of the replay log file */
-+const char *replay_get_filename(void);
- 
- /* Processing the instructions */
- 
-diff --git a/replay/replay.c b/replay/replay.c
-index 4c1457b07e..797b6a5b15 100644
---- a/replay/replay.c
-+++ b/replay/replay.c
-@@ -399,3 +399,8 @@ void replay_add_blocker(Error *reason)
- {
-     replay_blockers = g_slist_prepend(replay_blockers, reason);
- }
-+
-+const char *replay_get_filename(void)
-+{
-+    return replay_filename;
-+}
+diff --git a/softmmu/cpus.c b/softmmu/cpus.c
+index adc20eb3de..1180103ede 100644
+--- a/softmmu/cpus.c
++++ b/softmmu/cpus.c
+@@ -29,20 +29,13 @@
+ #include "qapi/qapi-commands-misc.h"
+ #include "qapi/qapi-events-run-state.h"
+ #include "qapi/qmp/qerror.h"
+-#include "sysemu/tcg.h"
+ #include "exec/gdbstub.h"
+ #include "sysemu/hw_accel.h"
+-#include "sysemu/kvm.h"
+ #include "exec/exec-all.h"
+ #include "qemu/thread.h"
+ #include "qemu/plugin.h"
+ #include "sysemu/cpus.h"
+-#include "qemu/main-loop.h"
+-#include "qemu/option.h"
+-#include "qemu/bitmap.h"
+-#include "qemu/seqlock.h"
+ #include "qemu/guest-random.h"
+-#include "tcg/tcg.h"
+ #include "hw/nmi.h"
+ #include "sysemu/replay.h"
+ #include "sysemu/runstate.h"
 -- 
 2.26.2
 
