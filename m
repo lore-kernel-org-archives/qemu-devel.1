@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34BBDC41604
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:43:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9CFFC41604
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:43:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BEF620760
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:43:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 41D2F20760
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 07:43:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b6gz9/ay"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BEF620760
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L1FAcjUM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41D2F20760
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPhcy-0004av-Ej
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 03:43:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39814)
+	id 1kPhdE-0004oD-4t
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 03:43:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39612)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kPhQM-00038M-QZ
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:14 -0400
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:38421)
+ id 1kPhQ8-0002YL-Lg
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:00 -0400
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:35322)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kPhQK-0001Ta-Ez
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:14 -0400
-Received: by mail-wr1-x434.google.com with SMTP id n18so4415784wrs.5
- for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 00:30:12 -0700 (PDT)
+ id 1kPhQ6-0001P2-O2
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 03:30:00 -0400
+Received: by mail-wr1-x42d.google.com with SMTP id n15so6471692wrq.2
+ for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 00:29:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=vqm6/4FMvwrI7h0blvL6bknr7fh+GWarVad7IzR7GgY=;
- b=b6gz9/aykmhl5qKu60HMo4KR9iFUxOoeYE8B0MrBS2lSDn05UTwU2D30m4UAPpBcf1
- uGp6+5PVAlaBr/yI2JwXdSM4yJa5bumRu1A6I49OiVPgEKBEwOctnrTSZmOzcPEhnDGF
- oLEU08WJOtPcd6Ph4lFgRXBBsXqzcVqWl4nYDSuhpkEM+iQWe/YkdzDLDmOJsTMRl6oD
- 5jlF8be2lmf0MdedPrSztPpC9+7HFLMjfyUmujjOosVqmsr1tLZuRNwQyTE9NNe3/1+Q
- 9WVHvZzoz+M+ijfSEAS/frj9aTqqqD5fsAOgWEtru4ikR+zuDgvG5ggG2aUbFKxubMl7
- ooXg==
+ bh=tRws1uvIR8Dz3INqgE4H34M7MpVxrffO/G7ZokVze8I=;
+ b=L1FAcjUMlpcIFb/Kk2sdWXvlPST3jkAV7iM8DAil5+XLFcC/Z0ppi+HhLtWFDZ0S6b
+ up8zp1f58+z9+nB7Vazg9UtSPKAPU6eWDEegX1d2hphj31cRo/WYy4k7ENVMrU31eg9l
+ Ou46+lAcKxdCMIUr+OA0YT13uLNYLygZosQib4EpMP1j6b6jqnfgjnn3LSXQQd7+jCDa
+ kwrlbDgxUZ81rpqt5sgIGxu/ImS8rDOhNStLvcN24tVoa1/VNXsyTwVRWeG8BnkaQ2fE
+ ryVU57LfYvZDvgk/fOGeyWYKLtSEAiSAfSj/+sPbti63EFeNb2ItcoZXxyfnj+Lf6QV8
+ JGeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=vqm6/4FMvwrI7h0blvL6bknr7fh+GWarVad7IzR7GgY=;
- b=FN8YP4EBrjQcKY0fzMpwrX/9Cg6ERsC3cFBINGp6OIbCfNAUJLqzkptQ0CXeCqx380
- 1bIzIY6PggwuMUDMhjUilfZ88+X5TRZYggCcS/H7t18Ntq0uHLstFxJDFuPFA2wEVf3U
- v+LyuKTqKGCotHDmmlJfcFwZi5unexi52yDkJLS6mjTRhcn6VwRDZeYRokjQHD38CwnO
- /f/kj5kbW6DpXiKJIbL+9K18G98pDkH4K6itRYpgIpnp0sNLJbKNXJscpLcuuYwwz1NI
- JIt/3572WrA8ilk5t9Ug7GsUWZnhColWmmgkb+a9G3Li6M9w4TiVu684ipzGpnUBqGbv
- hFAg==
-X-Gm-Message-State: AOAM532eE6VbVXvWnuZBu+cqlMZHu9WYp4CkqHXHIuQX06rANjhhjh9x
- 8AbahKVuSOqZRqKLGFbP4HCRa8bwvp0=
-X-Google-Smtp-Source: ABdhPJyzJ8Z8DQrny924FudeajllNsT7I66BeWLFSGSsQTT3oCqalUCzfsxzN6aoA96HLwWbgrFfVQ==
-X-Received: by 2002:adf:e4c9:: with SMTP id v9mr3185026wrm.375.1601969410615; 
- Tue, 06 Oct 2020 00:30:10 -0700 (PDT)
+ bh=tRws1uvIR8Dz3INqgE4H34M7MpVxrffO/G7ZokVze8I=;
+ b=nk7mFhCvDOfMLyYowQCF9fgRjXAEJgmny9LlXpsGKPh7k50fl3z+7Src5Wt8MoQG44
+ lgpocXekAroutDOoq4yIElR9Kwot9d94vv586L+jGbr2tzlWFO8sto+m+eHUJbNBSXJm
+ DmNth/1JhQKpA0BNzrRmujJrLhbirD3fTyCdyeA7ZqZulXBHkNtOW1hakNJaHq9j1XMn
+ p7cQNmwhOwyWIdICTPCXZQWbX9kXXyqLGmZ0cUppYKQaBIISquB2ZNptZrCs4DI9UcUZ
+ eMX8GVSywvKVjL/AHYQEZCglKcVy+RkACv08rmAKvB1Ke1Kgb49tiyJqo5d7JK7CX/Wf
+ EIwg==
+X-Gm-Message-State: AOAM530Dwl87kK48Vc+IJtWY+zuu/3L0R4zsV0/jSTVbs4UjCkJjyGfZ
+ r4dJU1JRUSCVyJuxth7y7DG9hm9N7/w=
+X-Google-Smtp-Source: ABdhPJy27qF6i1D8bTgsJwrG/kcbU7+RUjK4jy3UdjFEKK8GriZ1YTNizl5gfT7CTgxvhSaksNUonw==
+X-Received: by 2002:adf:f3d2:: with SMTP id g18mr3199826wrp.367.1601969397024; 
+ Tue, 06 Oct 2020 00:29:57 -0700 (PDT)
 Received: from localhost.localdomain ([2001:b07:6468:f312:5aca:cd0b:c4a1:9c2e])
- by smtp.gmail.com with ESMTPSA id i9sm2576329wma.47.2020.10.06.00.30.09
+ by smtp.gmail.com with ESMTPSA id i9sm2576329wma.47.2020.10.06.00.29.56
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 06 Oct 2020 00:30:10 -0700 (PDT)
+ Tue, 06 Oct 2020 00:29:56 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 27/37] migration: introduce icount field for snapshots
-Date: Tue,  6 Oct 2020 09:29:37 +0200
-Message-Id: <20201006072947.487729-28-pbonzini@redhat.com>
+Subject: [PULL 12/37] cpus: add handle_interrupt to the CpusAccel interface
+Date: Tue,  6 Oct 2020 09:29:22 +0200
+Message-Id: <20201006072947.487729-13-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201006072947.487729-1-pbonzini@redhat.com>
 References: <20201006072947.487729-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::434;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x434.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42d;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x42d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -100,385 +100,313 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>,
- Markus Armbruster <armbru@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ Claudio Fontana <cfontana@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
+From: Claudio Fontana <cfontana@suse.de>
 
-Saving icount as a parameters of the snapshot allows navigation between
-them in the execution replay scenario.
-This information can be used for finding a specific snapshot for proceeding
-the recorded execution to the specific moment of the time.
-E.g., 'reverse step' action (introduced in one of the following patches)
-needs to load the nearest snapshot which is prior to the current moment
-of time.
-This patch also updates snapshot test which verifies qemu monitor output.
+kvm: uses the generic handler
+qtest: uses the generic handler
+whpx: changed to use the generic handler (identical implementation)
+hax: changed to use the generic handler (identical implementation)
+hvf: changed to use the generic handler (identical implementation)
+tcg: adapt tcg-cpus to point to the tcg-specific handler
 
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
-Acked-by: Markus Armbruster <armbru@redhat.com>
-Acked-by: Kevin Wolf <kwolf@redhat.com>
-
---
-
-v4 changes:
- - squashed format update with test output update
-v7 changes:
- - introduced the spaces between the fields in snapshot info output
- - updated the test to match new field widths
-Message-Id: <160174518865.12451.14327573383978752463.stgit@pasha-ThinkPad-X280>
-
+Signed-off-by: Claudio Fontana <cfontana@suse.de>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/qapi.c               | 18 ++++++++++----
- block/qcow2-snapshot.c     |  2 ++
- blockdev.c                 | 10 ++++++++
- include/block/snapshot.h   |  1 +
- migration/savevm.c         |  5 ++++
- qapi/block-core.json       | 10 ++++++--
- stubs/replay.c             |  5 ++++
- tests/qemu-iotests/261     |  4 ++--
- tests/qemu-iotests/267.out | 48 +++++++++++++++++++-------------------
- 9 files changed, 71 insertions(+), 32 deletions(-)
+ accel/tcg/tcg-all.c    | 26 --------------------------
+ accel/tcg/tcg-cpus.c   | 28 ++++++++++++++++++++++++++++
+ hw/core/cpu.c          | 13 -------------
+ include/hw/core/cpu.h  | 14 --------------
+ include/sysemu/cpus.h  |  2 ++
+ softmmu/cpus.c         | 18 ++++++++++++++++++
+ target/i386/hax-all.c  | 10 ----------
+ target/i386/hvf/hvf.c  |  9 ---------
+ target/i386/whpx-all.c | 10 ----------
+ 9 files changed, 48 insertions(+), 82 deletions(-)
 
-diff --git a/block/qapi.c b/block/qapi.c
-index f423ece98c..036da085ee 100644
---- a/block/qapi.c
-+++ b/block/qapi.c
-@@ -230,6 +230,8 @@ int bdrv_query_snapshot_info_list(BlockDriverState *bs,
-         info->date_nsec     = sn_tab[i].date_nsec;
-         info->vm_clock_sec  = sn_tab[i].vm_clock_nsec / 1000000000;
-         info->vm_clock_nsec = sn_tab[i].vm_clock_nsec % 1000000000;
-+        info->icount        = sn_tab[i].icount;
-+        info->has_icount    = sn_tab[i].icount != -1ULL;
+diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
+index 000fe4dbd9..fa1208158f 100644
+--- a/accel/tcg/tcg-all.c
++++ b/accel/tcg/tcg-all.c
+@@ -47,31 +47,6 @@ typedef struct TCGState TCGState;
+ DECLARE_INSTANCE_CHECKER(TCGState, TCG_STATE,
+                          TYPE_TCG_ACCEL)
  
-         info_list = g_new0(SnapshotInfoList, 1);
-         info_list->value = info;
-@@ -694,14 +696,15 @@ BlockStatsList *qmp_query_blockstats(bool has_query_nodes,
- void bdrv_snapshot_dump(QEMUSnapshotInfo *sn)
- {
-     char date_buf[128], clock_buf[128];
-+    char icount_buf[128] = {0};
-     struct tm tm;
-     time_t ti;
-     int64_t secs;
-     char *sizing = NULL;
+-/* mask must never be zero, except for A20 change call */
+-static void tcg_handle_interrupt(CPUState *cpu, int mask)
+-{
+-    int old_mask;
+-    g_assert(qemu_mutex_iothread_locked());
+-
+-    old_mask = cpu->interrupt_request;
+-    cpu->interrupt_request |= mask;
+-
+-    /*
+-     * If called from iothread context, wake the target cpu in
+-     * case its halted.
+-     */
+-    if (!qemu_cpu_is_self(cpu)) {
+-        qemu_cpu_kick(cpu);
+-    } else {
+-        qatomic_set(&cpu_neg(cpu)->icount_decr.u16.high, -1);
+-        if (icount_enabled() &&
+-            !cpu->can_do_io
+-            && (mask & ~old_mask) != 0) {
+-            cpu_abort(cpu, "Raised interrupt while not in I/O function");
+-        }
+-    }
+-}
+-
+ /*
+  * We default to false if we know other options have been enabled
+  * which are currently incompatible with MTTCG. Otherwise when each
+@@ -128,7 +103,6 @@ static int tcg_init(MachineState *ms)
+     TCGState *s = TCG_STATE(current_accel());
  
-     if (!sn) {
--        qemu_printf("%-10s%-20s%11s%20s%15s",
--                    "ID", "TAG", "VM SIZE", "DATE", "VM CLOCK");
-+        qemu_printf("%-10s%-18s%7s%20s%13s%11s",
-+                    "ID", "TAG", "VM SIZE", "DATE", "VM CLOCK", "ICOUNT");
-     } else {
-         ti = sn->date_sec;
-         localtime_r(&ti, &tm);
-@@ -715,11 +718,16 @@ void bdrv_snapshot_dump(QEMUSnapshotInfo *sn)
-                  (int)(secs % 60),
-                  (int)((sn->vm_clock_nsec / 1000000) % 1000));
-         sizing = size_to_str(sn->vm_state_size);
--        qemu_printf("%-10s%-20s%11s%20s%15s",
-+        if (sn->icount != -1ULL) {
-+            snprintf(icount_buf, sizeof(icount_buf),
-+                "%"PRId64, sn->icount);
-+        }
-+        qemu_printf("%-9s %-17s %7s%20s%13s%11s",
-                     sn->id_str, sn->name,
-                     sizing,
-                     date_buf,
--                    clock_buf);
-+                    clock_buf,
-+                    icount_buf);
-     }
-     g_free(sizing);
+     tcg_exec_init(s->tb_size * 1024 * 1024);
+-    cpu_interrupt_handler = tcg_handle_interrupt;
+     mttcg_enabled = s->mttcg_enabled;
+     cpus_register_accel(&tcg_cpus);
+ 
+diff --git a/accel/tcg/tcg-cpus.c b/accel/tcg/tcg-cpus.c
+index 4f15c7f0de..cedd1e6c4f 100644
+--- a/accel/tcg/tcg-cpus.c
++++ b/accel/tcg/tcg-cpus.c
+@@ -543,9 +543,37 @@ static int64_t tcg_get_elapsed_ticks(void)
+     return cpu_get_ticks();
  }
-@@ -881,6 +889,8 @@ void bdrv_image_info_dump(ImageInfo *info)
-                 .date_nsec = elem->value->date_nsec,
-                 .vm_clock_nsec = elem->value->vm_clock_sec * 1000000000ULL +
-                                  elem->value->vm_clock_nsec,
-+                .icount = elem->value->has_icount ?
-+                          elem->value->icount : -1ULL,
-             };
  
-             pstrcpy(sn.id_str, sizeof(sn.id_str), elem->value->id);
-diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
-index d68b25e0c5..2e98c7f4b6 100644
---- a/block/qcow2-snapshot.c
-+++ b/block/qcow2-snapshot.c
-@@ -663,6 +663,7 @@ int qcow2_snapshot_create(BlockDriverState *bs, QEMUSnapshotInfo *sn_info)
-     sn->date_sec = sn_info->date_sec;
-     sn->date_nsec = sn_info->date_nsec;
-     sn->vm_clock_nsec = sn_info->vm_clock_nsec;
-+    sn->icount = sn_info->icount;
-     sn->extra_data_size = sizeof(QCowSnapshotExtraData);
- 
-     /* Allocate the L1 table of the snapshot and copy the current one there. */
-@@ -1007,6 +1008,7 @@ int qcow2_snapshot_list(BlockDriverState *bs, QEMUSnapshotInfo **psn_tab)
-         sn_info->date_sec = sn->date_sec;
-         sn_info->date_nsec = sn->date_nsec;
-         sn_info->vm_clock_nsec = sn->vm_clock_nsec;
-+        sn_info->icount = sn->icount;
-     }
-     *psn_tab = sn_tab;
-     return s->nb_snapshots;
-diff --git a/blockdev.c b/blockdev.c
-index bebd3ba1c3..a6ae475dac 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -59,6 +59,7 @@
- #include "sysemu/arch_init.h"
- #include "sysemu/qtest.h"
- #include "sysemu/runstate.h"
-+#include "sysemu/replay.h"
- #include "qemu/cutils.h"
- #include "qemu/help_option.h"
- #include "qemu/main-loop.h"
-@@ -1190,6 +1191,10 @@ SnapshotInfo *qmp_blockdev_snapshot_delete_internal_sync(const char *device,
-     info->vm_state_size = sn.vm_state_size;
-     info->vm_clock_nsec = sn.vm_clock_nsec % 1000000000;
-     info->vm_clock_sec = sn.vm_clock_nsec / 1000000000;
-+    if (sn.icount != -1ULL) {
-+        info->icount = sn.icount;
-+        info->has_icount = true;
-+    }
- 
-     return info;
- 
-@@ -1350,6 +1355,11 @@ static void internal_snapshot_prepare(BlkActionState *common,
-     sn->date_sec = tv.tv_sec;
-     sn->date_nsec = tv.tv_usec * 1000;
-     sn->vm_clock_nsec = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    if (replay_mode != REPLAY_MODE_NONE) {
-+        sn->icount = replay_get_current_icount();
++/* mask must never be zero, except for A20 change call */
++static void tcg_handle_interrupt(CPUState *cpu, int mask)
++{
++    int old_mask;
++    g_assert(qemu_mutex_iothread_locked());
++
++    old_mask = cpu->interrupt_request;
++    cpu->interrupt_request |= mask;
++
++    /*
++     * If called from iothread context, wake the target cpu in
++     * case its halted.
++     */
++    if (!qemu_cpu_is_self(cpu)) {
++        qemu_cpu_kick(cpu);
 +    } else {
-+        sn->icount = -1ULL;
++        qatomic_set(&cpu_neg(cpu)->icount_decr.u16.high, -1);
++        if (icount_enabled() &&
++            !cpu->can_do_io
++            && (mask & ~old_mask) != 0) {
++            cpu_abort(cpu, "Raised interrupt while not in I/O function");
++        }
 +    }
++}
++
+ const CpusAccel tcg_cpus = {
+     .create_vcpu_thread = tcg_start_vcpu_thread,
+     .kick_vcpu_thread = tcg_kick_vcpu_thread,
++
++    .handle_interrupt = tcg_handle_interrupt,
++
+     .get_virtual_clock = tcg_get_virtual_clock,
+     .get_elapsed_ticks = tcg_get_elapsed_ticks,
+ };
+diff --git a/hw/core/cpu.c b/hw/core/cpu.c
+index d596182621..8654550d39 100644
+--- a/hw/core/cpu.c
++++ b/hw/core/cpu.c
+@@ -35,8 +35,6 @@
+ #include "qemu/plugin.h"
+ #include "sysemu/hw_accel.h"
  
-     ret1 = bdrv_snapshot_create(bs, sn);
-     if (ret1 < 0) {
-diff --git a/include/block/snapshot.h b/include/block/snapshot.h
-index 2bfcd57578..b0fe42993d 100644
---- a/include/block/snapshot.h
-+++ b/include/block/snapshot.h
-@@ -42,6 +42,7 @@ typedef struct QEMUSnapshotInfo {
-     uint32_t date_sec; /* UTC date of the snapshot */
-     uint32_t date_nsec;
-     uint64_t vm_clock_nsec; /* VM clock relative to boot */
-+    uint64_t icount; /* record/replay step */
- } QEMUSnapshotInfo;
- 
- int bdrv_snapshot_find(BlockDriverState *bs, QEMUSnapshotInfo *sn_info,
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 34e4b71052..0e8dc78684 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -2723,6 +2723,11 @@ int save_snapshot(const char *name, Error **errp)
-     sn->date_sec = tv.tv_sec;
-     sn->date_nsec = tv.tv_usec * 1000;
-     sn->vm_clock_nsec = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    if (replay_mode != REPLAY_MODE_NONE) {
-+        sn->icount = replay_get_current_icount();
-+    } else {
-+        sn->icount = -1ULL;
-+    }
- 
-     if (name) {
-         ret = bdrv_snapshot_find(bs, old_sn, name);
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 12a24772b5..fdc2e5cb28 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -27,13 +27,18 @@
- #
- # @vm-clock-nsec: fractional part in nano seconds to be used with vm-clock-sec
- #
-+# @icount: Current instruction count. Appears when execution record/replay
-+#          is enabled. Used for "time-traveling" to match the moment
-+#          in the recorded execution with the snapshots. (since 5.2)
-+#
- # Since: 1.3
- #
- ##
- { 'struct': 'SnapshotInfo',
-   'data': { 'id': 'str', 'name': 'str', 'vm-state-size': 'int',
-             'date-sec': 'int', 'date-nsec': 'int',
--            'vm-clock-sec': 'int', 'vm-clock-nsec': 'int' } }
-+            'vm-clock-sec': 'int', 'vm-clock-nsec': 'int',
-+            '*icount': 'int' } }
- 
- ##
- # @ImageInfoSpecificQCow2EncryptionBase:
-@@ -5363,7 +5368,8 @@
- #                    "date-sec": 1000012,
- #                    "date-nsec": 10,
- #                    "vm-clock-sec": 100,
--#                    "vm-clock-nsec": 20
-+#                    "vm-clock-nsec": 20,
-+#                    "icount": 220414
- #      }
- #    }
- #
-diff --git a/stubs/replay.c b/stubs/replay.c
-index 5974ec1f50..eacb366aa8 100644
---- a/stubs/replay.c
-+++ b/stubs/replay.c
-@@ -88,3 +88,8 @@ int replay_read_random(void *buf, size_t len)
+-CPUInterruptHandler cpu_interrupt_handler;
+-
+ CPUState *cpu_by_arch_id(int64_t id)
  {
+     CPUState *cpu;
+@@ -394,17 +392,6 @@ static vaddr cpu_adjust_watchpoint_address(CPUState *cpu, vaddr addr, int len)
+     return addr;
+ }
+ 
+-static void generic_handle_interrupt(CPUState *cpu, int mask)
+-{
+-    cpu->interrupt_request |= mask;
+-
+-    if (!qemu_cpu_is_self(cpu)) {
+-        qemu_cpu_kick(cpu);
+-    }
+-}
+-
+-CPUInterruptHandler cpu_interrupt_handler = generic_handle_interrupt;
+-
+ static void cpu_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+index 6c34798c8b..4879f25026 100644
+--- a/include/hw/core/cpu.h
++++ b/include/hw/core/cpu.h
+@@ -844,12 +844,6 @@ bool cpu_exists(int64_t id);
+  */
+ CPUState *cpu_by_arch_id(int64_t id);
+ 
+-#ifndef CONFIG_USER_ONLY
+-
+-typedef void (*CPUInterruptHandler)(CPUState *, int);
+-
+-extern CPUInterruptHandler cpu_interrupt_handler;
+-
+ /**
+  * cpu_interrupt:
+  * @cpu: The CPU to set an interrupt on.
+@@ -857,17 +851,9 @@ extern CPUInterruptHandler cpu_interrupt_handler;
+  *
+  * Invokes the interrupt handler.
+  */
+-static inline void cpu_interrupt(CPUState *cpu, int mask)
+-{
+-    cpu_interrupt_handler(cpu, mask);
+-}
+-
+-#else /* USER_ONLY */
+ 
+ void cpu_interrupt(CPUState *cpu, int mask);
+ 
+-#endif /* USER_ONLY */
+-
+ #ifdef NEED_CPU_H
+ 
+ #ifdef CONFIG_SOFTMMU
+diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
+index 26171697f5..231685955d 100644
+--- a/include/sysemu/cpus.h
++++ b/include/sysemu/cpus.h
+@@ -16,6 +16,8 @@ typedef struct CpusAccel {
+     void (*synchronize_state)(CPUState *cpu);
+     void (*synchronize_pre_loadvm)(CPUState *cpu);
+ 
++    void (*handle_interrupt)(CPUState *cpu, int mask);
++
+     int64_t (*get_virtual_clock)(void);
+     int64_t (*get_elapsed_ticks)(void);
+ } CpusAccel;
+diff --git a/softmmu/cpus.c b/softmmu/cpus.c
+index 99f418437b..f3d0c59f78 100644
+--- a/softmmu/cpus.c
++++ b/softmmu/cpus.c
+@@ -225,6 +225,24 @@ int64_t cpus_get_elapsed_ticks(void)
+     return cpu_get_ticks();
+ }
+ 
++static void generic_handle_interrupt(CPUState *cpu, int mask)
++{
++    cpu->interrupt_request |= mask;
++
++    if (!qemu_cpu_is_self(cpu)) {
++        qemu_cpu_kick(cpu);
++    }
++}
++
++void cpu_interrupt(CPUState *cpu, int mask)
++{
++    if (cpus_accel->handle_interrupt) {
++        cpus_accel->handle_interrupt(cpu, mask);
++    } else {
++        generic_handle_interrupt(cpu, mask);
++    }
++}
++
+ static int do_vm_stop(RunState state, bool send_stop)
+ {
+     int ret = 0;
+diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
+index b66ddeb8bf..fd1ab673d7 100644
+--- a/target/i386/hax-all.c
++++ b/target/i386/hax-all.c
+@@ -297,15 +297,6 @@ int hax_vm_destroy(struct hax_vm *vm)
      return 0;
  }
-+
-+uint64_t replay_get_current_icount(void)
-+{
-+    return 0;
-+}
-diff --git a/tests/qemu-iotests/261 b/tests/qemu-iotests/261
-index 848ffa760d..847b4c6a37 100755
---- a/tests/qemu-iotests/261
-+++ b/tests/qemu-iotests/261
-@@ -392,7 +392,7 @@ _check_test_img -r all
  
- echo
- echo "$((sn_count - 1)) snapshots should remain:"
--echo "  qemu-img info reports $(_img_info | grep -c '^ \{34\}') snapshots"
-+echo "  qemu-img info reports $(_img_info | grep -c '^ \{32\}') snapshots"
- echo "  Image header reports $(peek_file_be "$TEST_IMG" 60 4) snapshots"
+-static void hax_handle_interrupt(CPUState *cpu, int mask)
+-{
+-    cpu->interrupt_request |= mask;
+-
+-    if (!qemu_cpu_is_self(cpu)) {
+-        qemu_cpu_kick(cpu);
+-    }
+-}
+-
+ static int hax_init(ram_addr_t ram_size, int max_cpus)
+ {
+     struct hax_state *hax = NULL;
+@@ -350,7 +341,6 @@ static int hax_init(ram_addr_t ram_size, int max_cpus)
+     qversion.cur_version = hax_cur_version;
+     qversion.min_version = hax_min_version;
+     hax_notify_qemu_version(hax->vm->fd, &qversion);
+-    cpu_interrupt_handler = hax_handle_interrupt;
  
- echo
-@@ -519,7 +519,7 @@ _check_test_img -r all
+     return ret;
+   error:
+diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
+index 7ac6987c1b..ed9356565c 100644
+--- a/target/i386/hvf/hvf.c
++++ b/target/i386/hvf/hvf.c
+@@ -262,14 +262,6 @@ static void update_apic_tpr(CPUState *cpu)
  
- echo
- echo '65536 snapshots should remain:'
--echo "  qemu-img info reports $(_img_info | grep -c '^ \{34\}') snapshots"
-+echo "  qemu-img info reports $(_img_info | grep -c '^ \{32\}') snapshots"
- echo "  Image header reports $(peek_file_be "$TEST_IMG" 60 4) snapshots"
+ #define VECTORING_INFO_VECTOR_MASK     0xff
  
- # success, all done
-diff --git a/tests/qemu-iotests/267.out b/tests/qemu-iotests/267.out
-index 215902b3ad..27471ffae8 100644
---- a/tests/qemu-iotests/267.out
-+++ b/tests/qemu-iotests/267.out
-@@ -33,8 +33,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) savevm snap0
- (qemu) info snapshots
- List of snapshots present on all disks:
--ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-+ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
-+--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
- (qemu) loadvm snap0
- (qemu) quit
+-static void hvf_handle_interrupt(CPUState * cpu, int mask)
+-{
+-    cpu->interrupt_request |= mask;
+-    if (!qemu_cpu_is_self(cpu)) {
+-        qemu_cpu_kick(cpu);
+-    }
+-}
+-
+ void hvf_handle_io(CPUArchState *env, uint16_t port, void *buffer,
+                   int direction, int size, int count)
+ {
+@@ -894,7 +886,6 @@ static int hvf_accel_init(MachineState *ms)
+     }
+   
+     hvf_state = s;
+-    cpu_interrupt_handler = hvf_handle_interrupt;
+     memory_listener_register(&hvf_memory_listener, &address_space_memory);
+     cpus_register_accel(&hvf_cpus);
+     return 0;
+diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
+index 91ee2e59f9..f4f3e33eac 100644
+--- a/target/i386/whpx-all.c
++++ b/target/i386/whpx-all.c
+@@ -1488,15 +1488,6 @@ static void whpx_memory_init(void)
+     memory_listener_register(&whpx_memory_listener, &address_space_memory);
+ }
  
-@@ -44,8 +44,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) savevm snap0
- (qemu) info snapshots
- List of snapshots present on all disks:
--ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-+ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
-+--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
- (qemu) loadvm snap0
- (qemu) quit
+-static void whpx_handle_interrupt(CPUState *cpu, int mask)
+-{
+-    cpu->interrupt_request |= mask;
+-
+-    if (!qemu_cpu_is_self(cpu)) {
+-        qemu_cpu_kick(cpu);
+-    }
+-}
+-
+ /*
+  * Load the functions from the given library, using the given handle. If a
+  * handle is provided, it is used, otherwise the library is opened. The
+@@ -1651,7 +1642,6 @@ static int whpx_accel_init(MachineState *ms)
  
-@@ -69,8 +69,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) savevm snap0
- (qemu) info snapshots
- List of snapshots present on all disks:
--ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-+ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
-+--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
- (qemu) loadvm snap0
- (qemu) quit
+     whpx_memory_init();
  
-@@ -94,8 +94,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) savevm snap0
- (qemu) info snapshots
- List of snapshots present on all disks:
--ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-+ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
-+--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
- (qemu) loadvm snap0
- (qemu) quit
+-    cpu_interrupt_handler = whpx_handle_interrupt;
+     cpus_register_accel(&whpx_cpus);
  
-@@ -105,8 +105,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) savevm snap0
- (qemu) info snapshots
- List of snapshots present on all disks:
--ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-+ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
-+--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
- (qemu) loadvm snap0
- (qemu) quit
- 
-@@ -119,8 +119,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) savevm snap0
- (qemu) info snapshots
- List of snapshots present on all disks:
--ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-+ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
-+--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
- (qemu) loadvm snap0
- (qemu) quit
- 
-@@ -134,8 +134,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) savevm snap0
- (qemu) info snapshots
- List of snapshots present on all disks:
--ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-+ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
-+--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
- (qemu) loadvm snap0
- (qemu) quit
- 
-@@ -145,15 +145,15 @@ QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) savevm snap0
- (qemu) info snapshots
- List of snapshots present on all disks:
--ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-+ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
-+--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
- (qemu) loadvm snap0
- (qemu) quit
- 
- Internal snapshots on overlay:
- Snapshot list:
--ID        TAG                 VM SIZE                DATE       VM CLOCK
--1         snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-+ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
-+1         snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
- Internal snapshots on backing file:
- 
- === -blockdev with NBD server on the backing file ===
-@@ -166,17 +166,17 @@ QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) savevm snap0
- (qemu) info snapshots
- List of snapshots present on all disks:
--ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-+ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
-+--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
- (qemu) loadvm snap0
- (qemu) quit
- 
- Internal snapshots on overlay:
- Snapshot list:
--ID        TAG                 VM SIZE                DATE       VM CLOCK
--1         snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-+ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
-+1         snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
- Internal snapshots on backing file:
- Snapshot list:
--ID        TAG                 VM SIZE                DATE       VM CLOCK
--1         snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-+ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
-+1         snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
- *** done
+     printf("Windows Hypervisor Platform accelerator is operational\n");
 -- 
 2.26.2
 
