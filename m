@@ -2,80 +2,76 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2B00C46466
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 14:44:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31E10C41604
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 15:03:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63894208B8
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 14:44:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 468DA206B5
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 15:03:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bkO9GTr2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63894208B8
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CkiPw4pe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 468DA206B5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPoCL-0007Qz-E7
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 10:44:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60216)
+	id 1kPoUU-0004ZY-UN
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 11:02:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35988)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kPoAg-0006Db-O0
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 10:42:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47070)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kPoRr-0003ZQ-Kd
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 11:00:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38956)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kPoAe-0007FN-Uy
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 10:42:30 -0400
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kPoRp-0000sL-1G
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 11:00:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601995347;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=be7LIixgisk9/eC5nBFQ8KB6zY1zNbj5ofDamAVEMY8=;
- b=bkO9GTr2Y6wDXuCDhB3ukZRPtwPJI7oecr9oenFuBy92+suy/YVaihyQYZ8m0/mJG8GafF
- XXWy+xulk2fGvzmvZsEFl7ltGzgPJ9rrP+hMej9n2FvqBryR32bKgVoNRyHBgF1aRwGJoy
- yhsQDCRF1rWyKehnMdNHX3fOADVtqMc=
+ s=mimecast20190719; t=1601996411;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=79+oOtukN7BJNm4ZPWytnhn/M8p+27pbo1hwyhAgMJk=;
+ b=CkiPw4peNgRQhq8cavX6Wka/bJQijnUFlpJWOH6RA3zRy9z8bx2gCTaqp1igGL+Ba1OS4L
+ 05M10NocpmQCCmk/kWxlJupbnr6Mftfz7iTb8wrNYbKlGLS7no7WneMm8rXyjx/OJUlbIp
+ rSMYMmvlSQ4bVz99G8xv1VnRvy4iwq0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-442-LEjOFWr5PCmKDE1jIvu9ZQ-1; Tue, 06 Oct 2020 10:42:21 -0400
-X-MC-Unique: LEjOFWr5PCmKDE1jIvu9ZQ-1
+ us-mta-548-hIlmfTewPz6lRM8y_pXgVQ-1; Tue, 06 Oct 2020 11:00:09 -0400
+X-MC-Unique: hIlmfTewPz6lRM8y_pXgVQ-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6E44E8018A1;
- Tue,  6 Oct 2020 14:42:20 +0000 (UTC)
-Received: from redhat.com (ovpn-114-125.ams2.redhat.com [10.36.114.125])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CA80973676;
- Tue,  6 Oct 2020 14:42:18 +0000 (UTC)
-Date: Tue, 6 Oct 2020 15:42:15 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PULL 00/21] machine + QOM queue, 2020-10-05
-Message-ID: <20201006144215.GK2482221@redhat.com>
-References: <20201005211000.710404-1-ehabkost@redhat.com>
- <CAFEAcA_+4b4HHP_8BBqqy+QmoyF6Lx1jmuFvcsbW5THZQDrXww@mail.gmail.com>
- <20201006143637.GP7303@habkost.net>
- <CAFEAcA97upqUtasSsg+wxLFvak5rz+t3DBD7zMu4dnwvpw73AQ@mail.gmail.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C3C5F10BBEC1;
+ Tue,  6 Oct 2020 15:00:07 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EF2CB7366B;
+ Tue,  6 Oct 2020 15:00:06 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] numa: hmat: require parent cache description before the
+ next level one
+Date: Tue,  6 Oct 2020 11:00:02 -0400
+Message-Id: <20201006150002.1601845-1-imammedo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA97upqUtasSsg+wxLFvak5rz+t3DBD7zMu4dnwvpw73AQ@mail.gmail.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=imammedo@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 01:55:55
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -98,51 +94,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: jingqi.liu@intel.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Oct 06, 2020 at 03:38:56PM +0100, Peter Maydell wrote:
-> On Tue, 6 Oct 2020 at 15:36, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >
-> > On Tue, Oct 06, 2020 at 03:03:57PM +0100, Peter Maydell wrote:
-> > > Compile failure on OSX:
-> > >
-> > > ../../hw/core/numa.c:429:20: error: format specifies type 'unsigned
-> > > char' but the argument has type 'int' [-Werror,-Wformat]
-> > >                    node->level - 1);
-> > >                    ^~~~~~~~~~~~~~~~
-> > > /Users/pm215/src/qemu-for-merges/include/qapi/error.h:319:35: note:
-> > > expanded from macro 'error_setg'
-> > >                         (fmt), ## __VA_ARGS__)
-> > >                          ~~~      ^~~~~~~~~~~
-> > > 1 error generated.
-> >
-> > Is there a CI system where this is tested?  I'd like to be able
-> > to detect this kind of failure before sending pull requests.
-> 
-> Currently this is still my ad-hoc setup. I think there is
-> some CI that tests OSX compiles, though I have no idea how
-> individual maintainers set up to use it.
+Spec[1] defines 0 - 3 level memory side cache, however QEMU
+CLI allows to specify an intermediate cache level without
+specifying previous level. Such option(s) silently ignored
+when building HMAT table, which leads to incomplete cache
+information.
+Make sure that previous level exists and error out
+if it hasn't been provided.
 
-Cirrus CI will cover macOS builds.  You just need to register with
-Cirrus CI via your GitLab login, then pushing a branch to gitlab
-should trigger both GitLab CI and Cirrus CI, which covers a vast
-majority of combinations.
+1) ACPI 6.2A 5.2.27.5 Memory Side Cache Information Structure
 
-If you register with Travis and push to GitHub too, you'll get
-some non-x86 coverage too. Alternatively setup mirroring from
-GitLab to GitHub, so you don't have to separately push to GitHub,
-just use GitLab to trigger all three CI systems.
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1842877
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+v2:
+  - fix build inssue on MacOS
+---
+ hw/core/numa.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-Regards,
-Daniel
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index 7d5d413001..7c4dd4e68e 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -424,7 +424,13 @@ void parse_numa_hmat_cache(MachineState *ms, NumaHmatCacheOptions *node,
+     }
+ 
+     if ((node->level > 1) &&
+-        ms->numa_state->hmat_cache[node->node_id][node->level - 1] &&
++        ms->numa_state->hmat_cache[node->node_id][node->level - 1] == NULL) {
++        error_setg(errp, "Cache level=%u shall be defined first",
++                   node->level - 1);
++        return;
++    }
++
++    if ((node->level > 1) &&
+         (node->size <=
+             ms->numa_state->hmat_cache[node->node_id][node->level - 1]->size)) {
+         error_setg(errp, "Invalid size=%" PRIu64 ", the size of level=%" PRIu8
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.27.0
 
 
