@@ -2,93 +2,120 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5075AC41604
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 15:46:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13FBAC41604
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 15:50:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0464206F7
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 15:46:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3829A206F7
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 15:50:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qthoGYAK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0464206F7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="imfH03GN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3829A206F7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPpAg-0005XF-Sv
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 11:46:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47972)
+	id 1kPpE4-0007vX-0r
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 11:50:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48816)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kPp7M-0003hS-RU
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 11:43:09 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37066)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kPp7J-000056-Np
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 11:43:08 -0400
-Received: by mail-wm1-x342.google.com with SMTP id j136so3609843wmj.2
- for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 08:43:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=jwTWURE/eDrPEvo24EEaW5PvQHWcRQAeKjfZiY++ilU=;
- b=qthoGYAKTo0dQJAG1T3Kx2lmANdfA1BWauNjM9bWd0PxaIwVXV3pIABkX60KLACr+q
- V5NpQtXMxVgpYHFM6/W5gX+OPrvq3QPiw4CqcaJBGjDIJUwPV5GUcnei6/1ogZVdDzrv
- awDVUHBHs2zzTU4K3TjglRnYEOF/i/tVAROWdcbq1qe8v8cxdW9vXN/QTIAktxb3Pfus
- dQqxbu6dQZTCxuvSVKZDqD2G0XDJ24k6ijG883oo4eB5Y7cefGaWsss7szhDvYY9zhKF
- XrIJxd+lfOjCRUT9ehzyITI2WgsfhBTiXTfT/8NoADG6kSPuVeY0X0GMQ6F6c+fk6AhV
- C3xQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=jwTWURE/eDrPEvo24EEaW5PvQHWcRQAeKjfZiY++ilU=;
- b=jTn17OFCokJHxV9pfwIds5rvGDFqJY58ma5Gjcy5qeiBzGA8mcoh+3TXbp6RozpVsJ
- WbTKpt7Fx9/+ETWpzDdoQOwEp50RaoYcBtEMh5jjktHFfdp3yynvAqLw5UZB1wcuMOi/
- uuM/tqeyXQMxlVzdHmaNUzCCPFsibM85L/ErTxp1lkk3kOUJlq8/F6jYg1wkHrmtmAJU
- j0CEBdKzB/E7I4jujRG775MJ2ANZCLZ/yvWkWq6qdB7DEy3sxXdx96db9UKUwt65o6an
- 9bzfSTVER/xl/nWknmc2GHPs+T4kfs+021ehremptz/bhqvIndU73oicdc277GwfX/Pp
- DgwA==
-X-Gm-Message-State: AOAM533QlHx+QGyyDFGMAcsQPgD1302dEZFcB+tkP0IfFgkvJwHcHg8h
- efjAl8QbpM6dwdLX91/6RjfxhA==
-X-Google-Smtp-Source: ABdhPJw/65NWn+8ikmIW8naqbci9Bow00qqGqtDo9mROFRXt8baDx1dpT2W3kXg7+tvrYrYrZq+Uyg==
-X-Received: by 2002:a1c:e48b:: with SMTP id b133mr5382275wmh.0.1601998981960; 
- Tue, 06 Oct 2020 08:43:01 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id v9sm5601133wrv.35.2020.10.06.08.43.00
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 06 Oct 2020 08:43:00 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 267C11FF7E;
- Tue,  6 Oct 2020 16:43:00 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] hw/ide/ahci: silence a compiler warning
-Date: Tue,  6 Oct 2020 16:42:56 +0100
-Message-Id: <20201006154256.17392-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
+ id 1kPpAu-0006ER-1b; Tue, 06 Oct 2020 11:46:49 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:6484)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
+ id 1kPpAr-0000cE-FR; Tue, 06 Oct 2020 11:46:47 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 096FWWot094821; Tue, 6 Oct 2020 11:46:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=WKkpOGzuPGflvpRZ5ZiIIFCyVBjtTme5ACD7olhZ8yU=;
+ b=imfH03GNTpWn6o4Fj2j8a66edfWijibJGKgyQCd5Qj6O4wFJsGZSFtSjyKRmMEmJTLe7
+ s8mKl3mkhAUzC96avtuqIcFJUEwwDiEpB/2D6RE+u/uvHbsmcigRx75AjZ3RHz9l64gs
+ D8mD9rbERTx16QFfwZ2pvHxg03Q3sl7+lsVfrvwu3cCHF9JEHSsIExFpTOj5N/jAri1g
+ W2PDiXy0C1thfzCAjbSy8WVLPrwiZGO8ltjIGTwHc+euhTSXJQ2ddNN+x+kOOfdes26T
+ O8gKT8oNQbjzOcdzvwF11wITlJl+xfUqYHIhly0BFr2I715pnu71sHFIglWm5sCE36XD 2g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 340tqfhy2a-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 06 Oct 2020 11:46:41 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 096FWwae097633;
+ Tue, 6 Oct 2020 11:46:40 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.10])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 340tqfhy11-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 06 Oct 2020 11:46:40 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+ by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 096FVWom009210;
+ Tue, 6 Oct 2020 15:46:39 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com
+ [9.57.198.27]) by ppma02dal.us.ibm.com with ESMTP id 33xgx9ek98-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 06 Oct 2020 15:46:39 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
+ [9.57.199.109])
+ by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 096FkcFM48496972
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 6 Oct 2020 15:46:38 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C3821112065;
+ Tue,  6 Oct 2020 15:46:38 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 7F646112063;
+ Tue,  6 Oct 2020 15:46:36 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.211.60.106])
+ by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+ Tue,  6 Oct 2020 15:46:36 +0000 (GMT)
+Subject: Re: [PATCH v2 4/9] linux-headers: update against 5.9-rc7
+To: Cornelia Huck <cohuck@redhat.com>, yuval.shaia.ml@gmail.com,
+ marcel.apfelbaum@gmail.com
+References: <1601669191-6731-1-git-send-email-mjrosato@linux.ibm.com>
+ <1601669191-6731-5-git-send-email-mjrosato@linux.ibm.com>
+ <20201006173944.611048c5.cohuck@redhat.com>
+From: Matthew Rosato <mjrosato@linux.ibm.com>
+Message-ID: <ff130c5d-558b-1c16-1f7b-34324126b473@linux.ibm.com>
+Date: Tue, 6 Oct 2020 11:46:35 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <20201006173944.611048c5.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-10-06_06:2020-10-06,
+ 2020-10-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 impostorscore=0
+ suspectscore=0 adultscore=0 malwarescore=0 priorityscore=1501 spamscore=0
+ bulkscore=0 phishscore=0 mlxscore=0 lowpriorityscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2010060101
+Received-SPF: pass client-ip=148.163.156.1;
+ envelope-from=mjrosato@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 11:46:42
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,52 +128,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- "open list:IDE" <qemu-block@nongnu.org>
+Cc: thuth@redhat.com, kvm@vger.kernel.org, pmorel@linux.ibm.com,
+ david@redhat.com, schnelle@linux.ibm.com, qemu-s390x@nongnu.org,
+ qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+ alex.williamson@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When built with -Og -ggdb with gcc 8.3 the compiler gets confused
-reporting:
+On 10/6/20 11:39 AM, Cornelia Huck wrote:
+> On Fri,  2 Oct 2020 16:06:26 -0400
+> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+> 
+>> PLACEHOLDER as the kernel patch driving the need for this ("vfio-pci/zdev:
+>> define the vfio_zdev header") isn't merged yet.
+>>
+>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>> ---
+>>   .../drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h         | 14 +++++++-------
+>>   linux-headers/linux/kvm.h                                  |  6 ++++--
+>>   linux-headers/linux/vfio.h                                 |  5 +++++
+>>   3 files changed, 16 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h b/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h
+>> index 7b4062a..acd4c83 100644
+>> --- a/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h
+>> +++ b/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h
+>> @@ -68,7 +68,7 @@ static inline int pvrdma_idx_valid(uint32_t idx, uint32_t max_elems)
+>>   
+>>   static inline int32_t pvrdma_idx(int *var, uint32_t max_elems)
+>>   {
+>> -	const unsigned int idx = qatomic_read(var);
+>> +	const unsigned int idx = atomic_read(var);
+> 
+> Hm... either this shouldn't have been renamed to qatomic_read() in the
+> first place, or we need to add some post-processing to the update
+> script.
+> 
+Before I posted this set, I mentioned this in a reply to Stefan's 
+atomic->qatomic patchset that introduced the change...  Paolo replied 
+and said the code shouldn't be getting imported during header updates at 
+all:
 
-  ../../hw/ide/ahci.c: In function ‘ahci_populate_sglist’:
-  ../../hw/ide/ahci.c:965:58: error: ‘tbl_entry_size’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
+https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg00734.html
 
-As prdtl being > 0 is a prerequisite for running the code which
-guarantees we execute the loop at least once although not necessarily
-resetting off_pos/off_idx which should short-circuit the test anyway.
+Copying the maintainers of the pvrdma stuff for their awareness in case 
+they missed the first exchange.
 
-To save grey hair initialise the value to zero and move the variable
-to the local block so future changes can't accidentally use it.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- hw/ide/ahci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-index 680304a24c..f5c20c7d55 100644
---- a/hw/ide/ahci.c
-+++ b/hw/ide/ahci.c
-@@ -925,7 +925,6 @@ static int ahci_populate_sglist(AHCIDevice *ad, QEMUSGList *sglist,
-     uint64_t sum = 0;
-     int off_idx = -1;
-     int64_t off_pos = -1;
--    int tbl_entry_size;
-     IDEBus *bus = &ad->port;
-     BusState *qbus = BUS(bus);
- 
-@@ -952,6 +951,7 @@ static int ahci_populate_sglist(AHCIDevice *ad, QEMUSGList *sglist,
-     /* Get entries in the PRDT, init a qemu sglist accordingly */
-     if (prdtl > 0) {
-         AHCI_SG *tbl = (AHCI_SG *)prdt;
-+        int tbl_entry_size = 0;
-         sum = 0;
-         for (i = 0; i < prdtl; i++) {
-             tbl_entry_size = prdt_tbl_entry_size(&tbl[i]);
--- 
-2.20.1
 
 
