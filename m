@@ -2,74 +2,88 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8716C41604
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 14:15:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E79B8C41604
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 14:37:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A17920760
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 14:15:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A17920760
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=siemens.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1E1AF2065C
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 14:37:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jTbZS9BF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E1AF2065C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPnkn-00073q-0d
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 10:15:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53496)
+	id 1kPo5v-00039T-L2
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 10:37:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58882)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jan.kiszka@siemens.com>)
- id 1kPnjp-0006da-Mq
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 10:14:45 -0400
-Received: from gecko.sbs.de ([194.138.37.40]:48893)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jan.kiszka@siemens.com>)
- id 1kPnjn-0003Wf-4J
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 10:14:44 -0400
-Received: from mail2.sbs.de (mail2.sbs.de [192.129.41.66])
- by gecko.sbs.de (8.15.2/8.15.2) with ESMTPS id 096EEVk4006324
- (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 6 Oct 2020 16:14:31 +0200
-Received: from [167.87.130.37] ([167.87.130.37])
- by mail2.sbs.de (8.15.2/8.15.2) with ESMTP id 096EE4w7026867;
- Tue, 6 Oct 2020 16:14:06 +0200
-Subject: Re: [RFC PATCH 08/21] contrib/gitdm: Add Mentor Graphics to the
- domain map
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Joseph Myers <joseph@codesourcery.com>
-References: <20201004180443.2035359-1-f4bug@amsat.org>
- <20201004180443.2035359-9-f4bug@amsat.org>
- <alpine.DEB.2.21.2010051327090.312@digraph.polyomino.org.uk>
- <87eemc3b1q.fsf@linaro.org>
- <alpine.DEB.2.21.2010052047250.11145@digraph.polyomino.org.uk>
- <e1818fb3-4c63-6b2a-17cc-f3b7bc7d393b@siemens.com>
- <878scj3cyv.fsf@linaro.org> <bbe2408e-75bd-1a72-7d5e-acde1a5d5e21@amsat.org>
-From: Jan Kiszka <jan.kiszka@siemens.com>
-Message-ID: <d09a6b2f-b7a3-f111-1aa8-9a573b94e2fd@siemens.com>
-Date: Tue, 6 Oct 2020 16:14:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kPo5B-0002j2-UZ
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 10:36:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36232)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kPo58-0006Vh-Tg
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 10:36:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601995005;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=8hS0GcNJuMdQyTJcY0u+ssfVW5IOHF6IzAXMdmeOCng=;
+ b=jTbZS9BFJKx48qtWuLqHbJFxHXlVAOwkyt0zIDD/RvBWoIjA8QUAp9uivM/or9YsxGyx+F
+ NDy/ejWMyovaiy4OeeqC/24+d+RRWGPZJCVTSvBlyegu1seQF+Z/vId6F2K0fBPlRGl0+x
+ 2ocHrtFRAW+VC2KfH53m09O8b0Fx3Ss=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-205-Xo3QjFTnMq2Pvf2-X-OA3Q-1; Tue, 06 Oct 2020 10:36:40 -0400
+X-MC-Unique: Xo3QjFTnMq2Pvf2-X-OA3Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 72DEE6408A;
+ Tue,  6 Oct 2020 14:36:39 +0000 (UTC)
+Received: from localhost (ovpn-119-102.rdu2.redhat.com [10.10.119.102])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E8F5176642;
+ Tue,  6 Oct 2020 14:36:38 +0000 (UTC)
+Date: Tue, 6 Oct 2020 10:36:37 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PULL 00/21] machine + QOM queue, 2020-10-05
+Message-ID: <20201006143637.GP7303@habkost.net>
+References: <20201005211000.710404-1-ehabkost@redhat.com>
+ <CAFEAcA_+4b4HHP_8BBqqy+QmoyF6Lx1jmuFvcsbW5THZQDrXww@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <bbe2408e-75bd-1a72-7d5e-acde1a5d5e21@amsat.org>
+In-Reply-To: <CAFEAcA_+4b4HHP_8BBqqy+QmoyF6Lx1jmuFvcsbW5THZQDrXww@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=194.138.37.40;
- envelope-from=jan.kiszka@siemens.com; helo=gecko.sbs.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 10:14:38
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 00:55:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -83,89 +97,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kwok Cheung Yeung <kcy@codesourcery.com>,
- Taimoor Mirza <tmirza@codesourcery.com>, qemu-devel@nongnu.org,
- Julian Brown <julian@codesourcery.com>,
- Sandra Loosemore <sandra@codesourcery.com>,
- Andrew Jenner <andrew@codesourcery.com>,
- Thomas Schwinge <thomas@codesourcery.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06.10.20 14:41, Philippe Mathieu-Daudé wrote:
-> On 10/6/20 11:44 AM, Alex Bennée wrote:
->>
->> Jan Kiszka <jan.kiszka@siemens.com> writes:
->>
->>> On 05.10.20 22:52, Joseph Myers wrote:
->>>> On Mon, 5 Oct 2020, Alex Bennée wrote:
->>>>
->>>>> Joseph Myers <joseph@codesourcery.com> writes:
->>>>>
->>>>>> On Sun, 4 Oct 2020, Philippe Mathieu-Daudé wrote:
->>>>>>
->>>>>>> There is a number of contributors from this domain,
->>>>>>> add its own entry to the gitdm domain map.
->>>>>>
->>>>>> At some point the main branding will be Siemens; not sure how you want to 
->>>>>> handle that.
->>>>>
->>>>> We've already done something similar with WaveComp who have rolled up
->>>>> the various mips and imgtec contributions into
->>>>> contrib/gitdm/group-map-wavecomp.
->>>>>
->>>>> It's really up to you and which corporate entity would like internet
->>>>> bragging points. The only Siemens contributor I could find is Jan Kiszka
->>>>> but he has contributed a fair amount ;-)
->>>>
->>>> Given that the Mentor branding is going away (and the "Mentor Graphics" 
->>>> version largely has gone away, "Mentor, a Siemens Business" is what's 
->>>> currently used as a Mentor brand), probably it makes sense to use Siemens 
->>>> for both codesourcery.com and mentor.com addresses.
->>>>
->>>
->>> I think the key question is what this map is used for: Is it supposed to
->>> document the historic status, who was who at the time of contribution?
->>> Or is its purpose to help identifying the copyright holder of a
->>> contribution today?
->>
->> I don't know what others use them for but for me it was just an easy way
->> to get a survey of the companies and individuals involved over the last
->> year (2y, 3y, 5y... etc) of development.
+On Tue, Oct 06, 2020 at 03:03:57PM +0100, Peter Maydell wrote:
+> On Mon, 5 Oct 2020 at 22:10, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> >
+> > The following changes since commit 36d9c2883e55c863b622b99f0ebb5143f0001401:
+> >
+> >   readthedocs: build with Python 3.6 (2020-10-05 16:30:45 +0100)
+> >
+> > are available in the Git repository at:
+> >
+> >   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
+> >
+> > for you to fetch changes up to fec5c4b6d3b7f3ffcfcbe1714e0405df6de2a222:
+> >
+> >   kernel-doc: Remove $decl_type='type name' hack (2020-10-05 12:48:11 -0400)
+> >
+> > ----------------------------------------------------------------
+> > machine + QOM queue, 2020-10-05
+> >
+> > * QOM documentation fixes and cleanups (Eduardo Habkost)
+> > * user-mode: Prune build dependencies (Philippe Mathieu-Daudé)
+> > * qom: Improve error message (Philippe Mathieu-Daudé)
+> > * numa: hmat: require parent cache description before the next
+> >   level one (Igor Mammedov)
+> >
+> > ----------------------------------------------------------------
 > 
-> My personal interest is seeing how the corporate/academic/hobbyist
-> contributions are split, and how this evolves over time.
+> Compile failure on OSX:
 > 
-> Since there were entries for some companies, I added more,
-> but this is not a requisite and we can drop the patches if
-> considered not useful or giving headaches to the contributors.
-> 
->> The consolidation of
->> contributions isn't overly distorting IMO. The biggest user is probably
->> the end of year state of the nation surveys wanting to see what impact
->> various organisations are having on a project and consolidation just
->> helps push you up the table a little more.
->>
->> The biggest counter example we have at the moment is RedHat/IBM which
->> AFAICT is because the RedHat guys are treated as a separate business
->> unit with their own unique identity.
->>
->> Either way I don't think it's a major issue - hence it is up to the
->> hackers to make the choice.
-> 
-> Totally. In this particular case, we could even keep "Codesourcery"
-> group separate, similarly to RH/IBM.
-> 
+> ../../hw/core/numa.c:429:20: error: format specifies type 'unsigned
+> char' but the argument has type 'int' [-Werror,-Wformat]
+>                    node->level - 1);
+>                    ^~~~~~~~~~~~~~~~
+> /Users/pm215/src/qemu-for-merges/include/qapi/error.h:319:35: note:
+> expanded from macro 'error_setg'
+>                         (fmt), ## __VA_ARGS__)
+>                          ~~~      ^~~~~~~~~~~
+> 1 error generated.
 
-If there is a way to express also timeline, then I would keep the
-historic contributions separate and account those since the merger
-(April 2017) to Siemens. You may even consider adding also the phase
-when Codesourcery was owned by Mentor.
-
-Jan
+Is there a CI system where this is tested?  I'd like to be able
+to detect this kind of failure before sending pull requests.
 
 -- 
-Siemens AG, T RDA IOT
-Corporate Competence Center Embedded Linux
+Eduardo
+
 
