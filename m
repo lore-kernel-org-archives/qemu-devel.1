@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B03D2C46466
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 00:00:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B9D2C4363D
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 00:00:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4573221481
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 00:00:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E3700212CC
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 00:00:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FS0bTPfG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4573221481
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ONIZVTmR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3700212CC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58192 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPwt1-0001Fm-SZ
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 20:00:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38226)
+	id 1kPwt7-0001Ti-UP
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 20:00:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38278)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kPwqi-0007mQ-Iw
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 19:58:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34878)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kPwqm-0007nU-RU
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 19:58:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58112)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kPwqd-0002HY-VW
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 19:58:26 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kPwqf-0002Hy-Ba
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 19:58:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602028703;
+ s=mimecast20190719; t=1602028704;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=dm3LrLUdePuq3us66UcV7FCBRQCAmijB+fVoXut0lAo=;
- b=FS0bTPfG+vPY3myWq+JnqyLeWJbegrqQ1Qk1cf40IdbGwnBVngO3qkyxheiE7by0+pWFlE
- Cs6nHam/EsNBqUUVBtg7Gxpuzf/HWtU+MU7Gp/bwd2qEvIb9pH1QYfYb/ZfoH4OsDz9Yds
- A1RpVf/aoZ59TDk+AHKA4GPl4Ft5SCU=
+ bh=kn888XOGJoWD2QFt78fuRBExMTFaJ1fF2Lgz5K7oy8E=;
+ b=ONIZVTmRewiUZG8d0m8dXF1nGkhQhrgFexYmkuhePEL+WdfgBFB230Ytd+gQPiqiKyuw5y
+ gSl4nzhF8FmKE3SfPg48yPF2MkCeJV+tcPD+kLutEsJI0ecTVP+LsL6s970lvnesi7Fg5b
+ SmqNyXt7Ify5EQqzKsTsISZMNzura38=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-317-9dHhBEtPN9e0crfJEbfeeg-1; Tue, 06 Oct 2020 19:58:21 -0400
-X-MC-Unique: 9dHhBEtPN9e0crfJEbfeeg-1
+ us-mta-505-fQcLtrLzMeiv_MgJxhk0ZA-1; Tue, 06 Oct 2020 19:58:22 -0400
+X-MC-Unique: fQcLtrLzMeiv_MgJxhk0ZA-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3CC9987950D;
- Tue,  6 Oct 2020 23:58:20 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 225AF64097;
+ Tue,  6 Oct 2020 23:58:21 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3416265F5E;
- Tue,  6 Oct 2020 23:58:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 63602610F3;
+ Tue,  6 Oct 2020 23:58:20 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 01/20] python/qemu: use isort to lay out imports
-Date: Tue,  6 Oct 2020 19:57:58 -0400
-Message-Id: <20201006235817.3280413-2-jsnow@redhat.com>
+Subject: [PATCH 02/20] python/machine.py: Fix monitor address typing
+Date: Tue,  6 Oct 2020 19:57:59 -0400
+Message-Id: <20201006235817.3280413-3-jsnow@redhat.com>
 In-Reply-To: <20201006235817.3280413-1-jsnow@redhat.com>
 References: <20201006235817.3280413-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -80,7 +80,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,130 +100,106 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Borrowed from the QAPI cleanup series, use the same configuration to
-standardize the way we write and sort imports.
+Prior to this, it's difficult for mypy to intuit what the concrete type
+of the monitor address is; it has difficulty inferring the type across
+two variables.
+
+Create _monitor_address as a property that always returns a valid
+address to simplify static type analysis.
+
+To preserve our ability to clean up, use a simple boolean to indicate
+whether or not we should try to clean up the sock file after execution.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 ---
- python/qemu/.isort.cfg        |  7 +++++++
- python/qemu/accel.py          |  1 +
- python/qemu/console_socket.py |  2 +-
- python/qemu/machine.py        |  8 ++++----
- python/qemu/qmp.py            | 10 +++++-----
- python/qemu/qtest.py          |  2 +-
- 6 files changed, 19 insertions(+), 11 deletions(-)
- create mode 100644 python/qemu/.isort.cfg
+ python/qemu/machine.py | 40 +++++++++++++++++++++++++---------------
+ 1 file changed, 25 insertions(+), 15 deletions(-)
 
-diff --git a/python/qemu/.isort.cfg b/python/qemu/.isort.cfg
-new file mode 100644
-index 00000000000..6d0fd6cc0d3
---- /dev/null
-+++ b/python/qemu/.isort.cfg
-@@ -0,0 +1,7 @@
-+[settings]
-+force_grid_wrap=4
-+force_sort_within_sections=True
-+include_trailing_comma=True
-+line_length=72
-+lines_after_imports=2
-+multi_line_output=3
-\ No newline at end of file
-diff --git a/python/qemu/accel.py b/python/qemu/accel.py
-index 7fabe629208..3ec6bdcfdb5 100644
---- a/python/qemu/accel.py
-+++ b/python/qemu/accel.py
-@@ -18,6 +18,7 @@
- import os
- import subprocess
- 
-+
- LOG = logging.getLogger(__name__)
- 
- # Mapping host architecture to any additional architectures it can
-diff --git a/python/qemu/console_socket.py b/python/qemu/console_socket.py
-index 70869fbbdc4..69f604c77fe 100644
---- a/python/qemu/console_socket.py
-+++ b/python/qemu/console_socket.py
-@@ -13,9 +13,9 @@
- # the COPYING file in the top-level directory.
- #
- 
-+from collections import deque
- import socket
- import threading
--from collections import deque
- import time
- 
- 
 diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-index 82f3731fc3f..bc83f399c1b 100644
+index bc83f399c1b..3017ec072df 100644
 --- a/python/qemu/machine.py
 +++ b/python/qemu/machine.py
-@@ -20,15 +20,15 @@
- import errno
- import logging
- import os
--import subprocess
- import shutil
- import signal
-+import subprocess
- import tempfile
--from typing import Optional, Type
- from types import TracebackType
--from . import console_socket
-+from typing import Optional, Type
-+
-+from . import console_socket, qmp
+@@ -28,6 +28,7 @@
+ from typing import Optional, Type
  
--from . import qmp
+ from . import console_socket, qmp
++from .qmp import SocketAddrT
+ 
  
  LOG = logging.getLogger(__name__)
+@@ -68,7 +69,8 @@ class QEMUMachine:
+     """
  
-diff --git a/python/qemu/qmp.py b/python/qemu/qmp.py
-index 7935dababbf..ddf8347ac12 100644
---- a/python/qemu/qmp.py
-+++ b/python/qemu/qmp.py
-@@ -7,21 +7,21 @@
- # This work is licensed under the terms of the GNU GPL, version 2.  See
- # the COPYING file in the top-level directory.
+     def __init__(self, binary, args=None, wrapper=None, name=None,
+-                 test_dir="/var/tmp", monitor_address=None,
++                 test_dir="/var/tmp",
++                 monitor_address: Optional[SocketAddrT] = None,
+                  socket_scm_helper=None, sock_dir=None,
+                  drain_console=False, console_log=None):
+         '''
+@@ -95,8 +97,14 @@ def __init__(self, binary, args=None, wrapper=None, name=None,
+         if sock_dir is None:
+             sock_dir = test_dir
+         self._name = name
+-        self._monitor_address = monitor_address
+-        self._vm_monitor = None
++        if monitor_address is not None:
++            self._monitor_address = monitor_address
++            self._remove_monitor_sockfile = False
++        else:
++            self._monitor_address = os.path.join(
++                sock_dir, f"{name}-monitor.sock"
++            )
++            self._remove_monitor_sockfile = True
+         self._qemu_log_path = None
+         self._qemu_log_file = None
+         self._popen = None
+@@ -241,15 +249,17 @@ def _load_io_log(self):
  
--import json
- import errno
--import socket
-+import json
- import logging
-+import socket
-+from types import TracebackType
- from typing import (
-     Any,
--    cast,
-     Dict,
-     Optional,
-     TextIO,
--    Type,
-     Tuple,
-+    Type,
-     Union,
-+    cast,
- )
--from types import TracebackType
+     def _base_args(self):
+         args = ['-display', 'none', '-vga', 'none']
++
+         if self._qmp_set:
+             if isinstance(self._monitor_address, tuple):
+-                moncdev = "socket,id=mon,host=%s,port=%s" % (
+-                    self._monitor_address[0],
+-                    self._monitor_address[1])
++                moncdev = "socket,id=mon,host={},port={}".format(
++                    *self._monitor_address
++                )
+             else:
+-                moncdev = 'socket,id=mon,path=%s' % self._vm_monitor
++                moncdev = f"socket,id=mon,path={self._monitor_address}"
+             args.extend(['-chardev', moncdev, '-mon',
+                          'chardev=mon,mode=control'])
++
+         if self._machine is not None:
+             args.extend(['-machine', self._machine])
+         for _ in range(self._console_index):
+@@ -274,14 +284,14 @@ def _pre_launch(self):
+         self._qemu_log_file = open(self._qemu_log_path, 'wb')
  
+         if self._qmp_set:
+-            if self._monitor_address is not None:
+-                self._vm_monitor = self._monitor_address
+-            else:
+-                self._vm_monitor = os.path.join(self._sock_dir,
+-                                                self._name + "-monitor.sock")
+-                self._remove_files.append(self._vm_monitor)
+-            self._qmp = qmp.QEMUMonitorProtocol(self._vm_monitor, server=True,
+-                                                nickname=self._name)
++            if self._remove_monitor_sockfile:
++                assert isinstance(self._monitor_address, str)
++                self._remove_files.append(self._monitor_address)
++            self._qmp = qmp.QEMUMonitorProtocol(
++                self._monitor_address,
++                server=True,
++                nickname=self._name
++            )
  
- # QMPMessage is a QMP Message of any kind.
-diff --git a/python/qemu/qtest.py b/python/qemu/qtest.py
-index 888c8bd2f60..7700c0b09b6 100644
---- a/python/qemu/qtest.py
-+++ b/python/qemu/qtest.py
-@@ -17,8 +17,8 @@
- # Based on qmp.py.
- #
- 
--import socket
- import os
-+import socket
- from typing import Optional, TextIO
- 
- from .machine import QEMUMachine
+     def _post_launch(self):
+         if self._qmp:
 -- 
 2.26.2
 
