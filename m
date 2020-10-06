@@ -2,110 +2,100 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF72DC41604
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 09:55:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8D3DC4727D
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 10:00:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2007A20674
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 09:55:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1095E20674
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 10:00:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MwkVmJgg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2007A20674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ROOOEp7p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1095E20674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPjgv-0003IU-5g
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 05:55:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44220)
+	id 1kPjm4-0005Ah-SQ
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 06:00:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45146)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kPjfv-0002qM-Ge
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 05:54:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23813)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kPjft-0003hP-RB
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 05:54:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601978064;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pX9m99dwdoz0rkc+rPW1wPTim3vD1BUP0V/jLp3duy4=;
- b=MwkVmJggnlZw8KveO5i/7JA/+91HNmh61sRi4+Jl3fnuYQGNHJkjnwImUTy5WuyhHSox6s
- WaBv8Qm77+gmpf+wosSPjfD2frV4bTvbZlZadxB46iPaejGydKxLdHCB4qB+ESpjtWHljN
- AH2CnC+zaoM90hJjV6dDdH90YJaljIg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-40-mLehZftSPuCpsRcg8jeo_g-1; Tue, 06 Oct 2020 05:54:22 -0400
-X-MC-Unique: mLehZftSPuCpsRcg8jeo_g-1
-Received: by mail-wr1-f71.google.com with SMTP id 47so2869456wrc.19
- for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 02:54:22 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kPjkC-000443-Uz
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 05:58:52 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45105)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kPjkA-0004HQ-EH
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 05:58:52 -0400
+Received: by mail-wr1-x444.google.com with SMTP id e17so4025548wru.12
+ for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 02:58:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=3376gvfx72qTvLrPkueMPO8jMQTkKeQ7SFEjXQOmKdM=;
+ b=ROOOEp7p44lZSISCPCTRsTTcciS5tBP4oj4WGwonLb+YF88TZnOD49QGAS7PLQ5aAC
+ yS7tcI8DeXGqOUiRnuzVao4cRdx8zsJ1iO46Ma8FlgnIPHZ4dpev2xEwK2bHrGwGkP3R
+ 2BfYkKRtZn7sjDNpcJnbl7PdLor4RN7t9jgN3UrBbDFcEpxH75rIzr1AyQg/Gqx26YZQ
+ sWVxDZEI20N6inC5li1XYaIizGd3qAyVSadacaAhLgf6Sk8Y6W7rXuLrUgOwoF+Q6kWY
+ /MmRFjyLUU8ofyF4+q2zzSaQvmaZx5j0T6HfijZZ5usc2a884g+YvJP+SJtUQSvoJja3
+ /plw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=pX9m99dwdoz0rkc+rPW1wPTim3vD1BUP0V/jLp3duy4=;
- b=NxBNdStrLoQayzo4RvYwup12y2d55t0cEsseSC+6xxNBRR5vM1zQRNJ0b5G5e/mSFK
- Db4SD6TwnAnN8ZThnOJnXoNx0+OjW3ePcqTPHebibHzRAKCMX7hUru4fP8gpidqcDQ63
- DiFUUOck8hqP6sLoIpaJXF0h+Y68Wr9Y+/Iq/xiJ35ve0M2u9L2vVCCmAHmFh5rcPyOD
- wExNdR2QLbmqQ6HjhZ2/gOjKuOXy/rfUr3/yQ2K9qDq/d84vCxqKMXsC32+WAlIWQXTB
- bZ+tYu9jVsRVGhtIPj/yPhMve9VckFMNg9+6H/UrJtI0+PYwKk47urhEfK0clvBk0FSI
- gUTA==
-X-Gm-Message-State: AOAM5328gMjDwUtaYH5fuSpJEKiE6GzuvkIP5ne+tgkbgnybhiESPwET
- iSmjkhv31Uhg1djeOBZ86U2Jxf4D9TEW1AyDKdo86kvGrw2aoE4DZnd94XVCRK/C3q2w5yv+R9R
- ykO38S35if76jv7M=
-X-Received: by 2002:adf:e704:: with SMTP id c4mr2046819wrm.24.1601978061436;
- Tue, 06 Oct 2020 02:54:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwZDeWY7Ssm5/TedVxjBih09duMWJxbiPOUDG5+0YrCDEhoInU6vrb+gYSSrxUkgWxV445dcw==
-X-Received: by 2002:adf:e704:: with SMTP id c4mr2046798wrm.24.1601978061229;
- Tue, 06 Oct 2020 02:54:21 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5aca:cd0b:c4a1:9c2e?
- ([2001:b07:6468:f312:5aca:cd0b:c4a1:9c2e])
- by smtp.gmail.com with ESMTPSA id f12sm3050265wmf.26.2020.10.06.02.54.19
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 06 Oct 2020 02:54:20 -0700 (PDT)
-Subject: Re: [PATCH 1/2] softmmu: move more files to softmmu/
-To: BALATON Zoltan <balaton@eik.bme.hu>
-References: <20201006091922.331832-1-pbonzini@redhat.com>
- <20201006091922.331832-2-pbonzini@redhat.com>
- <27899e4f-a1a0-919b-f0b2-26c73adaa6e@eik.bme.hu>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <679db184-662c-9175-b0f3-e22d26328f59@redhat.com>
-Date: Tue, 6 Oct 2020 11:54:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=3376gvfx72qTvLrPkueMPO8jMQTkKeQ7SFEjXQOmKdM=;
+ b=huNfJZ0IPbbN6xCcbbnmpOztk6gjxA5KzfhvzGDfNZVuATWfGBf/fYmdX1XHIQW1uU
+ 4ElpJ0p54ezkbncdARoI7eWzpOFpvs0Q6M+IB9E+ZoAQYQZkpvwZmMwIlM1Oux/CMCNh
+ VGUEq5sY3IQbQY1kouNUeLv2MMQsgwikojBQigCsPIXpd5pOjze9W/QaaccjHuKJXXuu
+ 8xKpbAN+FKoFufGyDJYq/nuQ3NjWIVRM0tJrBkw5aTsmAxj9y8x9/N59da+wGx6M2vsH
+ U6obuF+l/3nTyD9E969VdQhSG3qh50q28h+L7+ObuS2P7UR2CEQ1Ry0yVcQWLw2Y+Rwv
+ sUAw==
+X-Gm-Message-State: AOAM532eE+2FEejUflHXWYljz68r4NugKbgJDgrlICLEcRENoPk7urfT
+ +LIsU6r22s8WTBqMgcerZqNSBA==
+X-Google-Smtp-Source: ABdhPJwJp0lUfXt1SKxdUNX0pk0doP0Q8Fwa+hn0ka+mijuoClu0vfi6hdAVWT7UjJvpyeTw1VvQ4g==
+X-Received: by 2002:adf:ee07:: with SMTP id y7mr4244651wrn.229.1601978328733; 
+ Tue, 06 Oct 2020 02:58:48 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id n66sm3254254wmb.35.2020.10.06.02.58.47
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 06 Oct 2020 02:58:47 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 9FCFB1FF7E;
+ Tue,  6 Oct 2020 10:58:46 +0100 (BST)
+References: <47dbcad4-3121-b1c3-06fa-abec7c353fb6@gmail.com>
+ <87sgatanti.fsf@linaro.org>
+ <CAFEAcA_ZMLV3DZ_R_SHvPLdEf=i-xpspD5itBmfYeqyMhgtLWQ@mail.gmail.com>
+ <875z7p3t9e.fsf@linaro.org>
+ <e43be86d-1847-199f-4cbd-2e3bd124d70a@gmail.com>
+ <CADBGO794+ZPD=B=dFuA7SC96g3GDJXF1A8j=VP6MeiSw1Sf4oQ@mail.gmail.com>
+ <d8d79b4c-aeb4-4f07-7110-91d8d1afd701@gmail.com>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Thomas Schneider <74cmonty@gmail.com>
+Subject: Re: Emulate Rpi with QEMU fails
+In-reply-to: <d8d79b4c-aeb4-4f07-7110-91d8d1afd701@gmail.com>
+Date: Tue, 06 Oct 2020 10:58:46 +0100
+Message-ID: <87362r3cbt.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <27899e4f-a1a0-919b-f0b2-26c73adaa6e@eik.bme.hu>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 01:55:55
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,28 +108,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Paul Zimmerman <pauldzim@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/10/20 11:43, BALATON Zoltan wrote:
-> 
-> The name of this dir may be misleading. I think it originally stood
-> for the actual MMU emulation but now it seems everything related to
-> system emulation is dumped here. Is it better to keep MMU emulation
-> separate and put other files in a "sysemu" dir or rename this dir if
-> it keeps mixing MMU emulation and system emulation parts? (I think
-> the MMU emulation is a weak part of QEMU regarding performance so it
-> would be better to keep that cleanly separated so that it's easier to
-> analyse and optimise it in the future, which is more difficult if
-> it's mixed with other parts where it's not even clear what
-> constitutes the actual MMU emulation. So I vote for keeping it
-> separate.)
 
-I agree that softmmu/ should have been called sysemu/.  But I think it's
-unnecessary churn to do that now.
+Thomas Schneider <74cmonty@gmail.com> writes:
 
-Paolo
+> Hello Paul,
+>
+> many thanks for sharing this info.
+>
+> Can you confirm that the emulated RPi with your command will use=20
+> "internal QEMU" network, means the client cannot be accessed from any=20
+> other device in LAN?
 
+The support for user-mode and TAP networking is orthogonal to the
+emulated device. However if you only want a few ports it's quite easy to
+use port forwarding, e.g:
+
+  -netdev user,id=3Dunet,hostfwd=3Dtcp::2222-:22
+
+which forwards 2222 to port 22 on the device. I have an alias in
+.ssh/config for accessing my QEMU devices.
+
+> If yes, what is required to setup a TAP connected to host's network
+> bridge?
+
+I'll defer to others for this but generally when I want proper bridged
+networking for a VM I use virt-manager/libvirt to configure it because
+it can be quite fiddly to do by hand.
+
+--=20
+Alex Benn=C3=A9e
 
