@@ -2,87 +2,77 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	NUMERIC_HTTP_ADDR,SPF_HELO_NONE,SPF_PASS,WEIRD_PORT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BD99C47095
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 17:57:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89B77C41604
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 17:57:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31D24206D4
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 17:57:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ElLesKrx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31D24206D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 15607206D4
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 17:57:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15607206D4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPrDN-00082R-Uy
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 13:57:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49530)
+	id 1kPrDP-000853-TI
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 13:57:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49542)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <prasadalok77@gmail.com>)
- id 1kPrCK-0007Fm-I2
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 13:56:24 -0400
-Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:39734)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <prasadalok77@gmail.com>)
- id 1kPrCH-0001ib-76
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 13:56:24 -0400
-Received: by mail-io1-xd43.google.com with SMTP id q9so548575iow.6
- for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 10:56:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
- bh=ZBth6tHOmiZ5t58IWd4Hvgj3sFlZ+bmlbYTR/T0jx4E=;
- b=ElLesKrxyhs/zBrg7jKMNx/Xy5WcNyjEdUIrQJMiXSctlN+GKkNHB5tTKegA2+6gIO
- AnM786XNAxQDwsf3NHXOjXNGG0mOUeempwLJzVP54ZjHgzt+vOIW62uRcxih2O+gbnm9
- 2aJ3DsMT2nHeOSm396D3PTGSxOTCBs1m7Ars9u2iqEK+tVUlEwAqUerfpjGhLT4Eua2w
- fjhfX0ml8tNZwZL88Nk6nOhXbTIWn6J9aSaMqmjNq6IuwqLlVs0FrBl8GxZJ0F5E9do/
- glJyuq8zjZBaregKADFm5Wb1Tyqafw3uJghg9VOnIeVlMeY98yNItGjCTCB3Dm3OVJCn
- LVzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to;
- bh=ZBth6tHOmiZ5t58IWd4Hvgj3sFlZ+bmlbYTR/T0jx4E=;
- b=DDfvSYl2LmuEQRINSvvy/N911/ije/7q0kV9qVA/3lFM5mUSr9pAoE3tY+TP7tHZHG
- uo0S5QNVr0GG33DEEqLn+D00DBMApZ6XqTPMYn+5kcpJMPZqmMZYg794m2xsFxcbWGqd
- zviHApvpJEfKBB6tcQRe80Uv/QqUmW6gIC9q8sOCsKMDvrQ7dRHbqjd/VJkKZg2uNmA+
- igoT2qWhKeiLz/bIX0FodwJK6wReEewNhMkrRWrQLH7XF9Ye1UonCpDmgP72J6Ok+Ikf
- 938YhL6eWPeajcwc1lYgljnpsXG7K3mVhws78inCMu3DYor51tT2MxmHuluf+9EC1yNO
- M5Iw==
-X-Gm-Message-State: AOAM531VJEFe70XjMLgAnnw4RINNgeSJj176BvJrKKQBoTOia6N/XIU2
- jTB0m4xtPuoHxs+XmOvlucUim5RVGkoAy8750HqdPmf70mPelg==
-X-Google-Smtp-Source: ABdhPJzz5kqHdv44PkH2wrWp4kBnXor8SZ+QJChP7Nzw1bNI5caq8eyX/PsvcsmnrrjBAAGvg0Ihx3R0EdzsMQUTN9k=
-X-Received: by 2002:a02:b187:: with SMTP id t7mr2465186jah.18.1602006979486;
- Tue, 06 Oct 2020 10:56:19 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1kPrCO-0007HS-A8; Tue, 06 Oct 2020 13:56:28 -0400
+Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:58715)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1kPrCK-0001if-Gc; Tue, 06 Oct 2020 13:56:28 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.108.20.55])
+ by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 58C7162B03AC;
+ Tue,  6 Oct 2020 19:56:21 +0200 (CEST)
+Received: from kaod.org (37.59.142.103) by DAG4EX1.mxp5.local (172.16.2.31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Tue, 6 Oct 2020
+ 19:56:20 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-103G005baa1ad17-2893-46bd-b75c-f88912534356,
+ 2331A23DC679A54E7C1604B88AF6A34BAE14B46D) smtp.auth=clg@kaod.org
+Subject: Re: [PATCH v2 6/6] spapr/xive: Introduce a new CAS value for the
+ StoreEOI capability
+To: Greg Kurz <groug@kaod.org>
+References: <20201005165147.526426-1-clg@kaod.org>
+ <20201005165147.526426-7-clg@kaod.org> <20201006193909.617cc487@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <75092c78-6a20-4870-8c06-76aa93365418@kaod.org>
+Date: Tue, 6 Oct 2020 19:56:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <CAJPzGv1Vd1V2a_7n2GW4RBUDgpsdyAH-8NMvW+368gigtYWd0g@mail.gmail.com>
-In-Reply-To: <CAJPzGv1Vd1V2a_7n2GW4RBUDgpsdyAH-8NMvW+368gigtYWd0g@mail.gmail.com>
-From: Alok Prasad <prasadalok77@gmail.com>
-Date: Tue, 6 Oct 2020 23:26:08 +0530
-Message-ID: <CAJPzGv0bFatmLJ_dy83KgZbyMS5zM0_pAqTynkSAHXNUST_JHg@mail.gmail.com>
-Subject: Fwd: Enable IOMMU Inside QEMU
-To: qemu-devel@nongnu.org
-Content-Type: multipart/alternative; boundary="000000000000f0a7bd05b10450fb"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
- envelope-from=prasadalok77@gmail.com; helo=mail-io1-xd43.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -5
-X-Spam_score: -0.6
-X-Spam_bar: /
-X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, HTML_MESSAGE=0.001,
- NUMERIC_HTTP_ADDR=1.242, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, WEIRD_PORT=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20201006193909.617cc487@bahia.lan>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [37.59.142.103]
+X-ClientProxiedBy: DAG2EX2.mxp5.local (172.16.2.12) To DAG4EX1.mxp5.local
+ (172.16.2.31)
+X-Ovh-Tracer-GUID: 0814dd7e-0652-4ad7-871f-6230e157a46d
+X-Ovh-Tracer-Id: 12665529530668977059
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrgeeggdduudejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfhisehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepjeekudeuudevleegudeugeekleffveeludejteffiedvledvgfekueefudehheefnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehgrhhouhhgsehkrghougdrohhrgh
+Received-SPF: pass client-ip=178.32.125.2; envelope-from=clg@kaod.org;
+ helo=smtpout1.mo529.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 12:58:29
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,211 +85,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Gustavo Romero <gromero@linux.ibm.com>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000f0a7bd05b10450fb
-Content-Type: text/plain; charset="UTF-8"
+On 10/6/20 7:39 PM, Greg Kurz wrote:
+> On Mon, 5 Oct 2020 18:51:47 +0200
+> Cédric Le Goater <clg@kaod.org> wrote:
+> 
+>> When the StoreEOI capability is set to "cas", let CAS decide when
+>> StoreEOI should be advertised. StoreEOI is safe to use with a P10
+>> compat machine because the OS enforces load-after-store ordering but
+>> not with P9 compat.
+>>
+>> The question now is : should we make "cas" the default at the machine
+>> level ?
+>>
+> 
+> Hmm, spapr capabilities are knobs for the end user to provide a specific
+> and consistent behavior to the guest... so the "let CAS decide depending
+> on what the guest asked for" thing looks awkward... 
 
-How Can i i enable vIOMMU inside QEMU
-Have run the qemu with below parameters.
+The guest doesn't ask for StoreEOI. The hypervisor will return StoreEOI
+if the kernel is P10 compat and will not if it's P9 to make sure that
+it can be migrated to a P9 host.  
 
-root@beta-hp-p70:/home/fastlinq/alok/KVM-VM# ps -ef | grep qemu
-root     20347     1  2 06:06 ?        00:00:36 /usr/bin/qemu-system-x86_64
--name guest=centos7_8_vm,debug-threads=on -S -object
-secret,id=masterKey0,format=raw,file=/var/lib/libvirt/qemu/domain-15-centos7_8_vm/master-key.aes
--machine
-pc-q35-4.2,accel=kvm,usb=off,dump-guest-core=off,kernel_irqchip=split -cpu
-SandyBridge,vmx=on -m 4096 -realtime mlock=off -smp
-1,sockets=1,cores=1,threads=1 -uuid f8ee6a5e-6253-453c-8304-7eca50fa7b94
--no-user-config -nodefaults -chardev
-socket,id=charmonitor,path=/var/lib/libvirt/qemu/domain-15-centos7_8_vm/monitor.sock,server,nowait
--mon chardev=charmonitor,id=monitor,mode=control -rtc base=utc -no-shutdown
--no-acpi -boot strict=on -device intel-iommu,intremap=on,caching-mode=on
--device
-pcie-root-port,port=0x10,chassis=1,id=pci.1,bus=pcie.0,multifunction=on,addr=0x2
--device pcie-root-port,port=0x11,chassis=2,id=pci.2,bus=pcie.0,addr=0x2.0x1
--device pcie-root-port,port=0x12,chassis=3,id=pci.3,bus=pcie.0,addr=0x2.0x2
--device pcie-root-port,port=0x13,chassis=4,id=pci.4,bus=pcie.0,addr=0x2.0x3
--device pcie-root-port,port=0x14,chassis=5,id=pci.5,bus=pcie.0,addr=0x2.0x4
--device pcie-root-port,port=0x15,chassis=6,id=pci.6,bus=pcie.0,addr=0x2.0x5
--device pcie-root-port,port=0x16,chassis=7,id=pci.7,bus=pcie.0,addr=0x2.0x6
--device pcie-root-port,port=0x17,chassis=8,id=pci.8,bus=pcie.0,addr=0x2.0x7
--device qemu-xhci,id=usb,bus=pci.5,addr=0x0 -device
-virtio-serial-pci,id=virtio-serial0,bus=pci.3,addr=0x0 -drive
-file=/home/fastlinq/centos-7.8.qcow2,format=qcow2,if=none,id=drive-virtio-disk0
--device
-virtio-blk-pci,scsi=off,bus=pci.4,addr=0x0,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1
--drive
-file=/home/fastlinq/dev.img,format=raw,if=none,id=drive-virtio-disk2,cache=none,aio=native
--device
-virtio-blk-pci,scsi=off,bus=pci.8,addr=0x0,drive=drive-virtio-disk2,id=virtio-disk2
--netdev tap,fd=26,id=hostnet0 -device
-rtl8139,netdev=hostnet0,id=net0,mac=52:54:00:b8:d3:f8,bus=pci.2,addr=0x0
--chardev pty,id=charserial0 -device
-isa-serial,chardev=charserial0,id=serial0 -vnc 127.0.0.1:0 -device
-cirrus-vga,id=video0,bus=pcie.0,addr=0x1 -device
-virtio-balloon-pci,id=balloon0,bus=pci.6,addr=0x0 -msg timestamp=on
+> I mean that making
+> "cas" the default at the machine level looks like you don't really want
+> this to be a capability at all.
 
-XML of the same ( ony relevant part)
-  <resource>
-    <partition>/machine</partition>
-  </resource>
-  <os>
-    <type arch='x86_64' machine='pc-q35-4.2'>hvm</type>
-    <boot dev='hd'/>
-  </os>
-  <features>
-    <kvm>
-      <hidden state='off'/>
-    </kvm>
-    <ioapic driver='qemu'/>
-  </features>
-  <cpu mode='custom' match='exact' check='partial'>
-    <model fallback='allow'>SandyBridge</model>
-    <feature policy='require' name='vmx'/>
-  </cpu>
-...
-....
- <iommu model='intel'>
-      <driver intremap='on' caching_mode='on'/>
-    </iommu>
+It means that you are not forcing a behaviour "off" or "on". It depends
+on the guest support, P10 or P9, which is what we want as a default 
+behavior to be in sync with pHyp.
 
-and in Guest VM
+> If the user asked for StoreEOI but the guest chose a compat mode that
+> can't support it, QEMU should simply exit IMHO
+It's not like XICS. A P8 compat can not run on XIVE. A P9 compat can use 
+StoreEOI. So it should be considered more like a mitigation. But anyhow, 
+the P9 systems currenly shipped never activate StoreEOI. So you will get 
+the error.
+ 
+> Or alternatively I guess you can just forget about the spapr capability
+> and do all the checks (XIVE interrupt controller, KVM support, guest
+> asked for P10) at CAS.
 
-[root@centos-8 ~]# dmesg | grep DMAR
-[    0.000000] DMAR: IOMMU enabled
-
-[root@centos-8 ~]# cat /proc/cmdline
-BOOT_IMAGE=(hd0,gpt2)/vmlinuz-4.18.0-193.6.3.el8_2.x86_64
-root=UUID=4fd120e4-1f6d-46b3-a404-5569ef6af1f9 ro console=tty0
-rd_NO_PLYMOUTH crashkernel=auto
-resume=UUID=40f14688-2619-4046-a9eb-b7333fff1b84 console=ttyS0,115200
-intel_iommu=on
-
-I don't see other Prints related to IOMMU which seems that its not present
-in guest VM. " DMAR: IOMMU enabled " just means its enabled in kernel
-paramter.
-
-ideally i should see some other prints e.g below
-
-dmesg | grep -e DMAR -e IOMMU
-[ 0.000000] ACPI: DMAR 0x000000003E86C000 000048 (v01 BOCHS BXPCDMAR
-00000001
-BXPC 00000001)
-[ 0.000000] DMAR: IOMMU enabled ---> only shows that its enabled in OS/GRUB
-[ 0.145746] DMAR: Host address width 39
-[ 0.145747] DMAR: DRHD base: 0x000000fed90000 flags: 0x1
-[ 0.145769] DMAR: dmar0: reg_base_addr fed90000 ver 1:0 cap 12008c22260286
-ecap
-f00f5a
-[ 0.145776] DMAR: No RMRR found
-[ 0.145776] DMAR: No ATSR found
-[ 0.145825] DMAR: dmar0: Using Queued invalidation
-[ 0.218192] DMAR: Setting RMRR:
-[ 0.218193] DMAR: Prepare 0-16MiB unity mapping for LPC
-[ 0.219038] DMAR: Setting identity map for device 0000:00:1f.0 [0x0 -
-0xffffff]
-[ 0.257194] DMAR: Intel(R) Virtualization Technology for Directed I/O
-
-root@beta-hp-p70:/home/fastlinq/alok/KVM-VM# /usr/bin/qemu-system-x86_64
---version
-QEMU emulator version 4.2.1
-Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
-
-
-
-I am missing here something,? Is there seperate Branch for the same in qemu.
+That's how I did in the fisrt patches but then you loose the ability to 
+switch it off on P10 and switch on on P9. Which is good to have for tests 
+and performance and for possible issues if we ever have to handle a source 
+which has different charateristics. In that case, we would switch it off. 
 
 Thanks,
-Alok
 
---000000000000f0a7bd05b10450fb
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+C.
 
-<div dir=3D"ltr"><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=
-=3D"gmail_attr">How Can i i enable vIOMMU inside QEMU<br></div><div dir=3D"=
-ltr"><div>Have run the qemu with below parameters.</div><div><br><div>root@=
-beta-hp-p70:/home/fastlinq/alok/KVM-VM# ps -ef | grep qemu<br>root =C2=A0 =
-=C2=A0 20347 =C2=A0 =C2=A0 1 =C2=A02 06:06 ? =C2=A0 =C2=A0 =C2=A0 =C2=A000:=
-00:36 /usr/bin/qemu-system-x86_64 -name guest=3Dcentos7_8_vm,debug-threads=
-=3Don -S -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvir=
-t/qemu/domain-15-centos7_8_vm/master-key.aes -machine pc-q35-4.2,accel=3Dkv=
-m,usb=3Doff,dump-guest-core=3Doff,kernel_irqchip=3Dsplit -cpu SandyBridge,v=
-mx=3Don -m 4096 -realtime mlock=3Doff -smp 1,sockets=3D1,cores=3D1,threads=
-=3D1 -uuid f8ee6a5e-6253-453c-8304-7eca50fa7b94 -no-user-config -nodefaults=
- -chardev socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-15-ce=
-ntos7_8_vm/monitor.sock,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonit=
-or,mode=3Dcontrol -rtc base=3Dutc -no-shutdown -no-acpi -boot strict=3Don -=
-device intel-iommu,intremap=3Don,caching-mode=3Don -device pcie-root-port,p=
-ort=3D0x10,chassis=3D1,id=3Dpci.1,bus=3Dpcie.0,multifunction=3Don,addr=3D0x=
-2 -device pcie-root-port,port=3D0x11,chassis=3D2,id=3Dpci.2,bus=3Dpcie.0,ad=
-dr=3D0x2.0x1 -device pcie-root-port,port=3D0x12,chassis=3D3,id=3Dpci.3,bus=
-=3Dpcie.0,addr=3D0x2.0x2 -device pcie-root-port,port=3D0x13,chassis=3D4,id=
-=3Dpci.4,bus=3Dpcie.0,addr=3D0x2.0x3 -device pcie-root-port,port=3D0x14,cha=
-ssis=3D5,id=3Dpci.5,bus=3Dpcie.0,addr=3D0x2.0x4 -device pcie-root-port,port=
-=3D0x15,chassis=3D6,id=3Dpci.6,bus=3Dpcie.0,addr=3D0x2.0x5 -device pcie-roo=
-t-port,port=3D0x16,chassis=3D7,id=3Dpci.7,bus=3Dpcie.0,addr=3D0x2.0x6 -devi=
-ce pcie-root-port,port=3D0x17,chassis=3D8,id=3Dpci.8,bus=3Dpcie.0,addr=3D0x=
-2.0x7 -device qemu-xhci,id=3Dusb,bus=3Dpci.5,addr=3D0x0 -device virtio-seri=
-al-pci,id=3Dvirtio-serial0,bus=3Dpci.3,addr=3D0x0 -drive file=3D/home/fastl=
-inq/centos-7.8.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0 -devi=
-ce virtio-blk-pci,scsi=3Doff,bus=3Dpci.4,addr=3D0x0,drive=3Ddrive-virtio-di=
-sk0,id=3Dvirtio-disk0,bootindex=3D1 -drive file=3D/home/fastlinq/dev.img,fo=
-rmat=3Draw,if=3Dnone,id=3Ddrive-virtio-disk2,cache=3Dnone,aio=3Dnative -dev=
-ice virtio-blk-pci,scsi=3Doff,bus=3Dpci.8,addr=3D0x0,drive=3Ddrive-virtio-d=
-isk2,id=3Dvirtio-disk2 -netdev tap,fd=3D26,id=3Dhostnet0 -device rtl8139,ne=
-tdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:b8:d3:f8,bus=3Dpci.2,addr=3D0x0 -c=
-hardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharserial0,id=3Ds=
-erial0 -vnc <a href=3D"http://127.0.0.1:0" target=3D"_blank">127.0.0.1:0</a=
-> -device cirrus-vga,id=3Dvideo0,bus=3Dpcie.0,addr=3D0x1 -device virtio-bal=
-loon-pci,id=3Dballoon0,bus=3Dpci.6,addr=3D0x0 -msg timestamp=3Don<br></div>=
-</div><div><br></div><div>XML of the same ( ony relevant part)</div><div>=
-=C2=A0 &lt;resource&gt;<br>=C2=A0 =C2=A0 &lt;partition&gt;/machine&lt;/part=
-ition&gt;<br>=C2=A0 &lt;/resource&gt;<br>=C2=A0 &lt;os&gt;<br>=C2=A0 =C2=A0=
- &lt;type arch=3D&#39;x86_64&#39; machine=3D&#39;pc-q35-4.2&#39;&gt;hvm&lt;=
-/type&gt;<br>=C2=A0 =C2=A0 &lt;boot dev=3D&#39;hd&#39;/&gt;<br>=C2=A0 &lt;/=
-os&gt;<br>=C2=A0 &lt;features&gt;<br>=C2=A0 =C2=A0 &lt;kvm&gt;<br>=C2=A0 =
-=C2=A0 =C2=A0 &lt;hidden state=3D&#39;off&#39;/&gt;<br>=C2=A0 =C2=A0 &lt;/k=
-vm&gt;<br>=C2=A0 =C2=A0 &lt;ioapic driver=3D&#39;qemu&#39;/&gt;<br>=C2=A0 &=
-lt;/features&gt;<br>=C2=A0 &lt;cpu mode=3D&#39;custom&#39; match=3D&#39;exa=
-ct&#39; check=3D&#39;partial&#39;&gt;<br>=C2=A0 =C2=A0 &lt;model fallback=
-=3D&#39;allow&#39;&gt;SandyBridge&lt;/model&gt;<br>=C2=A0 =C2=A0 &lt;featur=
-e policy=3D&#39;require&#39; name=3D&#39;vmx&#39;/&gt;<br>=C2=A0 &lt;/cpu&g=
-t;<br></div><div>...</div><div>....</div><div>=C2=A0&lt;iommu model=3D&#39;=
-intel&#39;&gt;<br>=C2=A0 =C2=A0 =C2=A0 &lt;driver intremap=3D&#39;on&#39; c=
-aching_mode=3D&#39;on&#39;/&gt;<br>=C2=A0 =C2=A0 &lt;/iommu&gt;<br></div><d=
-iv><br></div><div>and in Guest VM=C2=A0</div><div><br></div><div>[root@cent=
-os-8 ~]# dmesg | grep DMAR<br>[ =C2=A0 =C2=A00.000000] DMAR: IOMMU enabled<=
-br><br></div><div>[root@centos-8 ~]# cat /proc/cmdline<br>BOOT_IMAGE=3D(hd0=
-,gpt2)/vmlinuz-4.18.0-193.6.3.el8_2.x86_64 root=3DUUID=3D4fd120e4-1f6d-46b3=
--a404-5569ef6af1f9 ro console=3Dtty0 rd_NO_PLYMOUTH crashkernel=3Dauto resu=
-me=3DUUID=3D40f14688-2619-4046-a9eb-b7333fff1b84 console=3DttyS0,115200 int=
-el_iommu=3Don<br></div><div><br></div><div>I don&#39;t see other Prints rel=
-ated to IOMMU which seems that its not present in guest VM. &quot;
 
-DMAR: IOMMU enabled &quot; just means its enabled in kernel paramter.<br></=
-div><div><br></div><div>ideally i should see some other prints e.g below=C2=
-=A0</div><div><br></div><div>dmesg | grep -e DMAR -e IOMMU<br>[ 0.000000] A=
-CPI: DMAR 0x000000003E86C000 000048 (v01 BOCHS BXPCDMAR 00000001<br>BXPC 00=
-000001)<br>[ 0.000000] DMAR: IOMMU enabled ---&gt; only shows that its enab=
-led in OS/GRUB<br>[ 0.145746] DMAR: Host address width 39<br>[ 0.145747] DM=
-AR: DRHD base: 0x000000fed90000 flags: 0x1<br>[ 0.145769] DMAR: dmar0: reg_=
-base_addr fed90000 ver 1:0 cap 12008c22260286 ecap<br>f00f5a<br>[ 0.145776]=
- DMAR: No RMRR found<br>[ 0.145776] DMAR: No ATSR found<br>[ 0.145825] DMAR=
-: dmar0: Using Queued invalidation<br>[ 0.218192] DMAR: Setting RMRR:<br>[ =
-0.218193] DMAR: Prepare 0-16MiB unity mapping for LPC<br>[ 0.219038] DMAR: =
-Setting identity map for device 0000:00:1f.0 [0x0 - 0xffffff]<br>[ 0.257194=
-] DMAR: Intel(R) Virtualization Technology for Directed I/O<br></div><div><=
-br></div><div>root@beta-hp-p70:/home/fastlinq/alok/KVM-VM# /usr/bin/qemu-sy=
-stem-x86_64 --version<br>QEMU emulator version 4.2.1<br>Copyright (c) 2003-=
-2019 Fabrice Bellard and the QEMU Project developers<br></div><div><br></di=
-v><div><br></div><div><div><br></div><div>I am missing here something,? Is =
-there seperate Branch for the same in qemu.</div></div><div><br></div><div>=
-Thanks,</div><div>Alok</div><div><br></div></div>
-</div></div>
+ 
+>> Signed-off-by: Cédric Le Goater <clg@kaod.org>
+>> ---
+>>  include/hw/ppc/spapr.h      |  1 +
+>>  include/hw/ppc/spapr_xive.h |  1 +
+>>  hw/intc/spapr_xive.c        |  9 +++++++++
+>>  hw/ppc/spapr_caps.c         | 21 +++++++++++++++++----
+>>  hw/ppc/spapr_hcall.c        |  7 +++++++
+>>  5 files changed, 35 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+>> index b701c14b4e09..17e7d873e8dc 100644
+>> --- a/include/hw/ppc/spapr.h
+>> +++ b/include/hw/ppc/spapr.h
+>> @@ -87,6 +87,7 @@ typedef enum {
+>>  #define SPAPR_CAP_ON                    0x01
+>>  
+>>  /* Custom Caps */
+>> +#define SPAPR_CAP_CAS                   0x02
+>>  
+>>  /* Generic */
+>>  #define SPAPR_CAP_BROKEN                0x00
+>> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+>> index 26c8d90d7196..8b8aa586e44f 100644
+>> --- a/include/hw/ppc/spapr_xive.h
+>> +++ b/include/hw/ppc/spapr_xive.h
+>> @@ -75,6 +75,7 @@ void spapr_xive_map_mmio(SpaprXive *xive);
+>>  
+>>  int spapr_xive_end_to_target(uint8_t end_blk, uint32_t end_idx,
+>>                               uint32_t *out_server, uint8_t *out_prio);
+>> +void spapr_xive_enable_store_eoi(SpaprXive *xive, bool enable);
+>>  
+>>  /*
+>>   * KVM XIVE device helpers
+>> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+>> index 41f2719ff93a..f57a2681dd91 100644
+>> --- a/hw/intc/spapr_xive.c
+>> +++ b/hw/intc/spapr_xive.c
+>> @@ -1802,3 +1802,12 @@ void spapr_xive_hcall_init(SpaprMachineState *spapr)
+>>      spapr_register_hypercall(H_INT_SYNC, h_int_sync);
+>>      spapr_register_hypercall(H_INT_RESET, h_int_reset);
+>>  }
+>> +
+>> +void spapr_xive_enable_store_eoi(SpaprXive *xive, bool enable)
+>> +{
+>> +    if (enable) {
+>> +        xive->source.esb_flags |= XIVE_SRC_STORE_EOI;
+>> +    } else {
+>> +        xive->source.esb_flags &= ~XIVE_SRC_STORE_EOI;
+>> +    }
+>> +}
+>> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+>> index 9251badbdc27..c55e1fccb9bc 100644
+>> --- a/hw/ppc/spapr_caps.c
+>> +++ b/hw/ppc/spapr_caps.c
+>> @@ -524,6 +524,13 @@ static void cap_fwnmi_apply(SpaprMachineState *spapr, uint8_t val,
+>>      }
+>>  }
+>>  
+>> +SpaprCapPossible cap_storeeoi_possible = {
+>> +    .num = 3,
+>> +    .vals = { "off", "on", "cas" },
+>> +    .help = "off - no StoreEOI, on - StoreEOI, "
+>> +            "cas - negotiated at CAS (POWER10 compat only)",
+>> +};
+>> +
+>>  static void cap_storeeoi_apply(SpaprMachineState *spapr, uint8_t val,
+>>                                 Error **errp)
+>>  {
+>> @@ -550,6 +557,11 @@ static void cap_storeeoi_apply(SpaprMachineState *spapr, uint8_t val,
+>>              return;
+>>          }
+>>  
+>> +        /* CAS will decide to advertise StoreEOI (P10 compat kernels only) */
+>> +        if (val == SPAPR_CAP_CAS) {
+>> +            return;
+>> +        }
+>> +
+>>          /*
+>>           * load-after-store ordering is not enforced on POWER9 CPUs
+>>           * and StoreEOI can be racy.
+>> @@ -671,11 +683,12 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+>>      },
+>>      [SPAPR_CAP_STOREEOI] = {
+>>          .name = "storeeoi",
+>> -        .description = "Implements XIVE StoreEOI feature",
+>> +        .description = "Implements XIVE StoreEOI feature (off, on, cas)",
+>>          .index = SPAPR_CAP_STOREEOI,
+>> -        .get = spapr_cap_get_bool,
+>> -        .set = spapr_cap_set_bool,
+>> -        .type = "bool",
+>> +        .get = spapr_cap_get_string,
+>> +        .set = spapr_cap_set_string,
+>> +        .type = "string",
+>> +        .possible = &cap_storeeoi_possible,
+>>          .apply = cap_storeeoi_apply,
+>>      },
+>>  };
+>> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+>> index 607740150fa2..158b122b9192 100644
+>> --- a/hw/ppc/spapr_hcall.c
+>> +++ b/hw/ppc/spapr_hcall.c
+>> @@ -1804,6 +1804,13 @@ target_ulong do_client_architecture_support(PowerPCCPU *cpu,
+>>  "Guest requested unavailable interrupt mode (XIVE), try the ic-mode=xive or ic-mode=dual machine property");
+>>              exit(EXIT_FAILURE);
+>>          }
+>> +
+>> +        /* Advertise StoreEOI for a P10 compat guest. */
+>> +        if (spapr_get_cap(spapr, SPAPR_CAP_STOREEOI) == SPAPR_CAP_CAS) {
+>> +            bool enable = ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_3_10, 0,
+>> +                                           cpu->compat_pvr);
+>> +            spapr_xive_enable_store_eoi(spapr->xive, enable);
+>> +        }
+>>      } else {
+>>          if (!spapr->irq->xics) {
+>>              error_report(
+> 
 
---000000000000f0a7bd05b10450fb--
 
