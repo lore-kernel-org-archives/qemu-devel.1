@@ -2,87 +2,113 @@ Return-Path: <SRS0=+uBF=DN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8E20C4363D
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 12:52:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82BE0C4363D
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 12:53:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 554AD206F7
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 12:52:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 15D3F206F7
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Oct 2020 12:53:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e9xOKIvT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 554AD206F7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f7H1x3F1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15D3F206F7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51186 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kPmRw-0006Uq-6Q
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 08:52:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56248)
+	id 1kPmTA-0007xQ-Bb
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 08:53:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59352)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1kPmGJ-0001zl-GN
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 08:40:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36554)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kPmRk-0006gh-I7
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 08:52:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33090)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1kPmGH-0007zQ-B0
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 08:40:11 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kPmRh-0001GS-PQ
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 08:52:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601988008;
+ s=mimecast20190719; t=1601988717;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Nnuyc6vGg0YQTTko9ZFG8pQ6V7jgI3e2I4rg00G88H8=;
- b=e9xOKIvTbyagvseNKNvvH32fsqDZ0ybXi/YCKhrmWM13Em9dQe/7wExq7UBlb0w8sgLRg3
- //fjn87awYLljEMpoLgOpfI9k9G/Rf4olqsn7b9H76iOTiHhcGkKnciS2W2agaHGNZIYRr
- ijXaH6ZbSkgZNe2d/Bi79BUKipP1JHQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-492-KeDsAdMBMOKiRS1eMl-9AA-1; Tue, 06 Oct 2020 08:40:06 -0400
-X-MC-Unique: KeDsAdMBMOKiRS1eMl-9AA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E2245802B45;
- Tue,  6 Oct 2020 12:40:04 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.35.206.84])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C80C855760;
- Tue,  6 Oct 2020 12:39:57 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v7 09/13] device-core: use atomic_set on .realized property
-Date: Tue,  6 Oct 2020 15:39:00 +0300
-Message-Id: <20201006123904.610658-10-mlevitsk@redhat.com>
-In-Reply-To: <20201006123904.610658-1-mlevitsk@redhat.com>
-References: <20201006123904.610658-1-mlevitsk@redhat.com>
+ bh=2GyxQa03IhAv5hgAOKqlP02mxq3ZBfl4/njdmgh/It0=;
+ b=f7H1x3F1HTtDTYLJyh4uAbbwia5BZ3OSGc8piHni8yGlctg1ZKUvQH9NAEMDH5WGXdFYoJ
+ jJd6C7qB5wnWrDbtHgtgcBqPkEgioEv1gFlButDRt68KFvpNw7vHY21HzV1qTG4+9uuIm6
+ f6xyzO/D9vy5IYNhBctHsEin0i4iFUQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-365-YWtJuPpmM--vocKvJ_H0tQ-1; Tue, 06 Oct 2020 08:51:55 -0400
+X-MC-Unique: YWtJuPpmM--vocKvJ_H0tQ-1
+Received: by mail-wm1-f71.google.com with SMTP id 13so1088469wmf.0
+ for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 05:51:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=2GyxQa03IhAv5hgAOKqlP02mxq3ZBfl4/njdmgh/It0=;
+ b=p6UD4TsTcIxri0SCQGjRnBZLK9XdnqL0vNbaeGRNiOvCL3VDcyncMg83wV/HC/yUcp
+ iuxqTuAJwMHsFcKT+y/oyPYm/wVWtvQPLYbXZm4DvG5B6ybcSHZXQGssSBHarutrqpLc
+ 5EyAUThYb39FKv9JGtVsK+dlgxDaFhb2BpaRi/zosrkfF8Zph/YU9h7i+AYYe/ssj4Zq
+ hlCNFwlyYKzTfKFP9LDW30MIRE3xCHXF55uKxKbNI1grCUQ3L0Xy2u0pZa5tKD28tGFJ
+ 53w/QmlaotPMD07NQB5qPXaraeJIM38oJvz+3HgmlX9t98e98xmiS5FcQazocBfacve1
+ jStg==
+X-Gm-Message-State: AOAM531/FzSsfvL8eBMhtiKqxY0qbcZSbR5TI+FDmcN7R1dS17YbnR3Q
+ +NF8RnjsiOK6lDs6wh/72jbq1SKkVfwVMVpxFr7Yo+KP17U4Vf4rw1ZogzDFdkNX9pd6UVs7geF
+ /w6wfZez7nKen1Xo=
+X-Received: by 2002:adf:f207:: with SMTP id p7mr5196818wro.152.1601988714478; 
+ Tue, 06 Oct 2020 05:51:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxX060biAYE10YhUSdyRXXm5syrQGIE+ycF/1slmhbF+TTibNs8kYbCZsCXTcltbw8bLYdZpw==
+X-Received: by 2002:adf:f207:: with SMTP id p7mr5196793wro.152.1601988714221; 
+ Tue, 06 Oct 2020 05:51:54 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5aca:cd0b:c4a1:9c2e?
+ ([2001:b07:6468:f312:5aca:cd0b:c4a1:9c2e])
+ by smtp.gmail.com with ESMTPSA id c68sm3940098wmd.34.2020.10.06.05.51.52
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 06 Oct 2020 05:51:53 -0700 (PDT)
+Subject: Re: [PATCH v2 1/1] hw/nvram: Always register
+ FW_CFG_DATA_GENERATOR_INTERFACE
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20201006111909.2302081-1-philmd@redhat.com>
+ <20201006111909.2302081-2-philmd@redhat.com>
+ <20201006121507.GE4202@linux.fritz.box>
+ <c36178f9-67f1-2d22-6537-15c73516cbbe@redhat.com>
+ <20201006123854.GF4202@linux.fritz.box>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <40b7c403-1ead-f320-c221-d2b4641112a6@redhat.com>
+Date: Tue, 6 Oct 2020 14:51:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20201006123854.GF4202@linux.fritz.box>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mlevitsk@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mlevitsk@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 01:55:55
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 00:55:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
 X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,94 +121,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, John Snow <jsnow@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: "Daniel P . Berrange" <berrange@redhat.com>, qemu-block@nongnu.org,
+ Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some code might race with placement of new devices on a bus.
-We currently first place a (unrealized) device on the bus
-and then realize it.
+On 06/10/20 14:38, Kevin Wolf wrote:
+> Am 06.10.2020 um 14:20 hat Paolo Bonzini geschrieben:
+>> It's
+>>
+>>   Based-on: <20201006111219.2300921-1-philmd@redhat.com>
+>>
+>> (which won't be applied in exactly that shape, but more or less it will
+>> be the same).
+> 
+> Oh, I see. Then I guess it's not supposed to be merged through my tree.
 
-As a workaround, users that scan the child device list, can
-check the realized property to see if it is safe to access such a device.
-Use an atomic write here too to aid with this.
+As you prefer; feel free to take that one when Phil sends the final version.
 
-A separate discussion is what to do with devices that are unrealized:
-It looks like for this case we only call the hotplug handler's unplug
-callback and its up to it to unrealize the device.
-An atomic operation doesn't cause harm for this code path though.
-
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20200913160259.32145-6-mlevitsk@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/core/qdev.c         | 19 ++++++++++++++++++-
- include/hw/qdev-core.h |  2 ++
- 2 files changed, 20 insertions(+), 1 deletion(-)
-
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 59e5e710b7..fc4daa36fa 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -946,7 +946,25 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
-             }
-        }
- 
-+       qatomic_store_release(&dev->realized, value);
-+
-     } else if (!value && dev->realized) {
-+
-+        /*
-+         * Change the value so that any concurrent users are aware
-+         * that the device is going to be unrealized
-+         *
-+         * TODO: change .realized property to enum that states
-+         * each phase of the device realization/unrealization
-+         */
-+
-+        qatomic_set(&dev->realized, value);
-+        /*
-+         * Ensure that concurrent users see this update prior to
-+         * any other changes done by unrealize.
-+         */
-+        smp_wmb();
-+
-         QLIST_FOREACH(bus, &dev->child_bus, sibling) {
-             qbus_unrealize(bus);
-         }
-@@ -961,7 +979,6 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
-     }
- 
-     assert(local_err == NULL);
--    dev->realized = value;
-     return;
- 
- child_realize_fail:
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 2c6307e3ed..868973319e 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -163,6 +163,8 @@ struct NamedClockList {
- /**
-  * DeviceState:
-  * @realized: Indicates whether the device has been fully constructed.
-+ *            When accessed outsize big qemu lock, must be accessed with
-+ *            atomic_load_acquire()
-  * @reset: ResettableState for the device; handled by Resettable interface.
-  *
-  * This structure should not be accessed directly.  We declare it here
--- 
-2.26.2
+Paolo
 
 
