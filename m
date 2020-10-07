@@ -2,76 +2,90 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 597CDC4363C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 06:35:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8DAEC4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 06:44:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 916EF206F0
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 06:35:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 916EF206F0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id D691A20797
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 06:44:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SY7yr+Ar"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D691A20797
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ32R-00071N-8Z
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 02:34:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51970)
+	id 1kQ3Bd-0002AH-MT
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 02:44:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53072)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1kQ31U-0006ZK-8W; Wed, 07 Oct 2020 02:34:00 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:56807)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1kQ31R-0004Fz-KQ; Wed, 07 Oct 2020 02:33:59 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.108.16.121])
- by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 13BD062CDFF9;
- Wed,  7 Oct 2020 08:33:53 +0200 (CEST)
-Received: from kaod.org (37.59.142.97) by DAG4EX1.mxp5.local (172.16.2.31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Wed, 7 Oct 2020
- 08:33:52 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-97G00283e6032c-6ce9-4096-a9f9-397f3eefb726,
- A1FB6DEFD4FFF4B2E39ADAD8D1A9CF0B60FA0B96) smtp.auth=clg@kaod.org
-Subject: Re: [PATCH v2 0/9] 5p80: Add SFDP support
-To: Joel Stanley <joel@jms.id.au>
-References: <20200902093107.608000-1-clg@kaod.org>
- <CACPK8XdsX1hfNTw+Eb-=u2AXc8Ww5wVwU0mRnRo=p=d_VBTA0A@mail.gmail.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <f01f9079-aa22-b84d-1b6d-681bbf410408@kaod.org>
-Date: Wed, 7 Oct 2020 08:33:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-MIME-Version: 1.0
-In-Reply-To: <CACPK8XdsX1hfNTw+Eb-=u2AXc8Ww5wVwU0mRnRo=p=d_VBTA0A@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [37.59.142.97]
-X-ClientProxiedBy: DAG7EX2.mxp5.local (172.16.2.62) To DAG4EX1.mxp5.local
- (172.16.2.31)
-X-Ovh-Tracer-GUID: 357e581e-74ce-410d-912f-7b8db6d31a87
-X-Ovh-Tracer-Id: 7012104623920614249
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrgeehgddutdelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfhisehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheeutdehgefhvdehtdeuleetgedvfeeukedtfeeihfffffeiuddutdduhffgvedtnecuffhomhgrihhnpehgihhthhhusgdrtghomhenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehjohgvlhesjhhmshdrihgurdgruh
-Received-SPF: pass client-ip=178.32.125.2; envelope-from=clg@kaod.org;
- helo=smtpout1.mo529.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 01:59:29
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <yvugenfi@redhat.com>)
+ id 1kQ3AI-0001E0-VN
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 02:43:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42603)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <yvugenfi@redhat.com>)
+ id 1kQ3AG-00054A-AB
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 02:43:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602052983;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7KsoqAOVZT04n5tExLGbwtsPQe6gPuAyzkA+hQQR5CU=;
+ b=SY7yr+Arhx5toRp1n0olBPb3H92S2+jO3Oj5CcM+2++rcxv0R3hxS+ClO24PpnwvHga+YB
+ zMb0rtQpDTZirSpsmBLEAVha3U+R2vIgQOYjIMf1/xrdq4Q0ym3J3vB8QnkBel3DurOoWD
+ 12TRsbpmvcqNnyCN8XiM0Izb8m5qHs0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-90-l6jfaZSMNGGWwHvQpcVSYA-1; Wed, 07 Oct 2020 02:41:26 -0400
+X-MC-Unique: l6jfaZSMNGGWwHvQpcVSYA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 276822FD05;
+ Wed,  7 Oct 2020 06:41:25 +0000 (UTC)
+Received: from [10.35.206.149] (unknown [10.35.206.149])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E47C860BEC;
+ Wed,  7 Oct 2020 06:41:20 +0000 (UTC)
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.4\))
+Subject: Re: [PATCH v3 2/2] hw/virtio-pci Added AER capability.
+From: Yan Vugenfirer <yvugenfi@redhat.com>
+In-Reply-To: <20201005134406-mutt-send-email-mst@kernel.org>
+Date: Wed, 7 Oct 2020 09:41:16 +0300
+Message-Id: <F7D5DD54-2FD7-46E0-BD1D-6FAAF6D7B6F1@redhat.com>
+References: <20201005115601.103791-1-andrew@daynix.com>
+ <20201005115601.103791-3-andrew@daynix.com>
+ <20201005134406-mutt-send-email-mst@kernel.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=yvugenfi@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain;
+	charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=yvugenfi@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:54:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -84,107 +98,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
- Francisco Iglesias <frasse.iglesias@gmail.com>,
- Alistair Francis <alistair@alistair23.me>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+Cc: Andrew Melnichenko <andrew@daynix.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/7/20 3:43 AM, Joel Stanley wrote:
-> On Wed, 2 Sep 2020 at 09:31, Cédric Le Goater <clg@kaod.org> wrote:
->>
->> Hello,
->>
->> JEDEC STANDARD JESD216 for Serial Flash Discovery Parameters (SFDP)
->> provides a mean to describe the features of a serial flash device
->> using a set of internal parameter tables. Support in Linux has been
->> added some time ago and the spi-nor driver is using it more often
->> to detect the flash settings and even flash models.
->>
->> This is the initial framework for the RDSFDP command giving access to
->> a private SFDP area under the flash.
->>
->> The patches available here :
->>
->>   https://github.com/legoater/qemu/commits/aspeed-5.2
-> 
-> Reviewed-by: Joel Stanley <joel@jms.id.au>
-> Tested-by: Joel Stanley <joel@jms.id.au>
-> 
-> Note that these need to be rebased on master; there are some minor conflicts.
-> 
-> These patches have proved essential in debugging a recent kernel
-> regression. Thanks for adding this support Cédric.
-
-We have been discussing offline with Francisco of a more subtle approach 
-to reduce the size of the definitions of the SFDP tables. I agree that 
-the current approach is brutal (and efficient :) but I haven't had time 
-to take a close look at his proposal. See below.
-
-    typedef struct SFDPSection {
-        const uint32_t addr;
-        const uint32_t size;
-        const uint32_t wrap_sz;
-        const uint8_t *data;
-    } SFDPSection;
-    
-    #define SFDP_RAW(start_addr, vals...) \
-    {                                     \
-      .addr = start_addr,                 \
-      .size = sizeof((uint8_t[]){vals}),  \
-      .data = (const uint8_t[]){vals}     \
-    }
-    
-    #define SFDP_RAW_WRAP(start_addr, _wrap_sz, vals...) \
-    {                                     \
-      .addr = start_addr,                 \
-      .size = sizeof((uint8_t[]){vals}),  \
-      .wrap_sz = _wrap_sz,                \
-      .data = (const uint8_t[]){vals}     \
-    }
-    
-    #define SFDP_TABLE_END() { 0 }
-    #define IS_SFDP_END(x) (x.size == 0)
-    
-    #define M35T4545_WRAP_SZ 0x100
-    
-    static const SFDPTable m35t4545 = {
-        SFDP_RAW_WRAP(0, M35T4545_WRAP_SZ,
-                      0x53, 0x46, 0x44, 0x50, 0x00, 0x01, 0x00, 0xff,
-                      0x00, 0x00, 0x01, 0x09, 0x30, 0x00, 0x00, 0xff),
-    
-        SFDP_RAW(0x38,
-                 0xe5, 0x20, 0xfb, 0xff, 0xff, 0xff, 0xff, 0x0f,
-                 0x29, 0xeb, 0x27, 0x6b, 0x08, 0x3b, 0x27, 0xbb,
-                 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x27, 0xbb,
-                 0xff, 0xff, 0x29, 0xeb, 0x0c, 0x20, 0x10, 0xd8,
-                 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff),
-    
-        SFDP_TABLE_END()
-    };
-    
-    uint8_t m25p80_sfdp_read(SFDPTable t, uint32_t addr)
-    {
-        if (t[0].wrap_sz) {
-            addr &= (t.wrap_sz-1);
-        }
-    
-        for (int i = 0; !IS_SFDP_END(t[i]); i++) {
-            if (addr >= t[i].addr && addr < (t[i].addr + t[i].size)) {
-                return t[i].data[addr];
-            }
-        }
-        return 0xFF;
-    }
+Hi Michael,
 
 
-The SFDP header (SFDP_RAW_WRAP) contains the list of the SFDP tables, 
-the first being the BFPT at offset 0x30. It would be nice to be able 
-to build the list in the header from the different table definitions.
 
-C.
+> On 5 Oct 2020, at 8:46 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
+>=20
+> On Mon, Oct 05, 2020 at 02:56:01PM +0300, andrew@daynix.com wrote:
+>> From: Andrew <andrew@daynix.com>
+>>=20
+>> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1878465
+>=20
+> That's a private bug - what information can you share about
+> the motivation for the patch?
 
+We need AER feature in order to pass MS WHQL tests for the future Windows S=
+erver versions.
+According to Microsoft driver\device certification requirements for next ve=
+rsion of Window Server, PCIe devices must support AER.
+The exact quote from Microsoft certification requirements:
+"Windows Server PCI Express devices are required to support Advanced Error =
+Reporting [AER] as defined in PCI Express Base Specification version 2.1.=
+=E2=80=9D
+
+
+>=20
+>> Added AER capability for virtio-pci devices.
+>> Also added property for devices, by default AER is disabled.
+>>=20
+>> Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
+>> ---
+>> hw/virtio/virtio-pci.c | 16 ++++++++++++++++
+>> hw/virtio/virtio-pci.h |  4 ++++
+>> 2 files changed, 20 insertions(+)
+>>=20
+>> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+>> index ae60c1e249..e0a7936f9c 100644
+>> --- a/hw/virtio/virtio-pci.c
+>> +++ b/hw/virtio/virtio-pci.c
+>> @@ -1807,6 +1807,12 @@ static void virtio_pci_realize(PCIDevice *pci_dev=
+, Error **errp)
+>>          */
+>>         pci_set_word(pci_dev->config + pos + PCI_PM_PMC, 0x3);
+>>=20
+>> +        if (proxy->flags & VIRTIO_PCI_FLAG_AER) {
+>> +            pcie_aer_init(pci_dev, PCI_ERR_VER, last_pcie_cap_offset,
+>> +                          PCI_ERR_SIZEOF, NULL);
+>> +            last_pcie_cap_offset +=3D PCI_ERR_SIZEOF;
+>> +        }
+>> +
+>>         if (proxy->flags & VIRTIO_PCI_FLAG_INIT_DEVERR) {
+>>             /* Init error enabling flags */
+>>             pcie_cap_deverr_init(pci_dev);
+>> @@ -1848,7 +1854,15 @@ static void virtio_pci_realize(PCIDevice *pci_dev=
+, Error **errp)
+>>=20
+>> static void virtio_pci_exit(PCIDevice *pci_dev)
+>> {
+>> +    VirtIOPCIProxy *proxy =3D VIRTIO_PCI(pci_dev);
+>> +    bool pcie_port =3D pci_bus_is_express(pci_get_bus(pci_dev)) &&
+>> +                     !pci_bus_is_root(pci_get_bus(pci_dev));
+>> +
+>>     msix_uninit_exclusive_bar(pci_dev);
+>> +    if (proxy->flags & VIRTIO_PCI_FLAG_AER && pcie_port &&
+>> +        pci_is_express(pci_dev)) {
+>> +        pcie_aer_exit(pci_dev);
+>> +    }
+>> }
+>>=20
+>> static void virtio_pci_reset(DeviceState *qdev)
+>> @@ -1901,6 +1915,8 @@ static Property virtio_pci_properties[] =3D {
+>>                     VIRTIO_PCI_FLAG_INIT_PM_BIT, true),
+>>     DEFINE_PROP_BIT("x-pcie-flr-init", VirtIOPCIProxy, flags,
+>>                     VIRTIO_PCI_FLAG_INIT_FLR_BIT, true),
+>> +    DEFINE_PROP_BIT("aer", VirtIOPCIProxy, flags,
+>> +                    VIRTIO_PCI_FLAG_AER_BIT, false),
+>>     DEFINE_PROP_END_OF_LIST(),
+>> };
+>>=20
+>=20
+> Does management need ability to enable this capability?
+> If yes let's cc them. If no let's rename to x-aer so we don't
+> commit to a stable interface ...
+
+QE is using libvirt in order to spawn test setups. So I think it should be =
+used by management as well.
+Whom should Andrew CC?
+
+Best regards,
+Yan.
+>=20
+>=20
+>> diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+>> index 91096f0291..3986b4f0e3 100644
+>> --- a/hw/virtio/virtio-pci.h
+>> +++ b/hw/virtio/virtio-pci.h
+>> @@ -45,6 +45,7 @@ enum {
+>>     VIRTIO_PCI_FLAG_INIT_LNKCTL_BIT,
+>>     VIRTIO_PCI_FLAG_INIT_PM_BIT,
+>>     VIRTIO_PCI_FLAG_INIT_FLR_BIT,
+>> +    VIRTIO_PCI_FLAG_AER_BIT,
+>> };
+>>=20
+>> /* Need to activate work-arounds for buggy guests at vmstate load. */
+>> @@ -84,6 +85,9 @@ enum {
+>> /* Init Function Level Reset capability */
+>> #define VIRTIO_PCI_FLAG_INIT_FLR (1 << VIRTIO_PCI_FLAG_INIT_FLR_BIT)
+>>=20
+>> +/* Advanced Error Reporting capability */
+>> +#define VIRTIO_PCI_FLAG_AER (1 << VIRTIO_PCI_FLAG_AER_BIT)
+>> +
+>> typedef struct {
+>>     MSIMessage msg;
+>>     int virq;
+>> --=20
+>> 2.28.0
 
 
