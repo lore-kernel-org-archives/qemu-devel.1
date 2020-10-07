@@ -7,67 +7,69 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09386C4727E
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 17:01:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E3A4C41604
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 17:01:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EA6B2168B
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 17:01:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6C0C820782
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 17:01:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jHv5faCW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EA6B2168B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZZUhWbFl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C0C820782
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQCoU-0006qO-6p
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 13:01:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48844)
+	id 1kQCp6-00073X-8W
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 13:01:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52454)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQCeH-0002rB-8U
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 12:50:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60756)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQCna-0005mv-89
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 13:00:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56569)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQCeF-0002Zo-8k
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 12:50:40 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQCnV-0004Rt-GT
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 13:00:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602089438;
+ s=mimecast20190719; t=1602090011;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=cjbxwAj8es/iOIXQjh38jn3KvAWBxBALopqL4AhHNtI=;
- b=jHv5faCW+2YRwBMwCgkY0M8TR1hde+X+/cgKUyZiKWmKkLkxn0Ih+V24oWWhOBAdlCaNC1
- JpTY3tqoe0ROu0/igVLwAF2pJIut41D0ZMsuqZVZgVCnXNPU6HFAtAb2hT0hAaNPpsn4aF
- 0wFAXuX0U8fKbqq3i08kOg7scUxbL6Q=
+ bh=QjiWhhHOtwy1inldJrJrD0hsUmW3Y8av1dHxqw9Mtr8=;
+ b=ZZUhWbFlD4jMszN4eFNki1orubw3I9hNuF4/j3YBfd2qB+IfYfqg6s05IeebiFXLm1Hnrg
+ /+K+Ti89IkzPoVsUg++cFyuAp2FBzYkWzohHL2M/Le4p+pAfh69VKVkA58wXUS35iO3OhP
+ eNv0BgKXahJn4mssW0R4tOhKgvRJegQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-365-ekqSX0wgOrSgnrK_ZakfqQ-1; Wed, 07 Oct 2020 12:50:35 -0400
-X-MC-Unique: ekqSX0wgOrSgnrK_ZakfqQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-535-vAXRNw3EMTGxpGdeA028Ig-1; Wed, 07 Oct 2020 13:00:07 -0400
+X-MC-Unique: vAXRNw3EMTGxpGdeA028Ig-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C580810BBECE
- for <qemu-devel@nongnu.org>; Wed,  7 Oct 2020 16:50:34 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E44BF1921FA7
+ for <qemu-devel@nongnu.org>; Wed,  7 Oct 2020 17:00:06 +0000 (UTC)
 Received: from [10.10.120.38] (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 50C0160BFA;
- Wed,  7 Oct 2020 16:50:34 +0000 (UTC)
-Subject: Re: [PATCH v5 27/36] qapi/gen.py: add type hint annotations
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5BEEF100164C;
+ Wed,  7 Oct 2020 17:00:06 +0000 (UTC)
+Subject: Re: [PATCH v5 02/36] qapi: modify docstrings to be sphinx-compatible
 To: Markus Armbruster <armbru@redhat.com>
 References: <20201005195158.2348217-1-jsnow@redhat.com>
- <20201005195158.2348217-28-jsnow@redhat.com>
- <87tuv68952.fsf@dusky.pond.sub.org>
+ <20201005195158.2348217-3-jsnow@redhat.com>
+ <87r1qbtxb1.fsf@dusky.pond.sub.org>
+ <5f95ee89-78be-424b-906e-56b4f9bf76a5@redhat.com>
+ <87sgaqjy65.fsf@dusky.pond.sub.org>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <5979141d-1d54-94fe-1afb-a976739f0956@redhat.com>
-Date: Wed, 7 Oct 2020 12:50:33 -0400
+Message-ID: <7b75a029-e505-5a1e-ea8e-cc3b92c8b87f@redhat.com>
+Date: Wed, 7 Oct 2020 13:00:05 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <87tuv68952.fsf@dusky.pond.sub.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <87sgaqjy65.fsf@dusky.pond.sub.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -99,62 +101,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/7/20 9:20 AM, Markus Armbruster wrote:
+On 10/7/20 3:24 AM, Markus Armbruster wrote:
 > John Snow <jsnow@redhat.com> writes:
 > 
->> Annotations do not change runtime behavior.
->> This commit *only* adds annotations.
+>> On 10/6/20 7:21 AM, Markus Armbruster wrote:
+>>> John Snow <jsnow@redhat.com> writes:
+>>>
+>>>> A precise style guide and a package-wide overhaul is forthcoming pending
+>>>> further discussion and consensus. At present, we are avoiding obvious
+>>>> errors that cause sphinx documentation build problems.
+>>>>
+>>>> A preliminary style guide is loosely based on PEP 257 and Sphinx
+>>>> Autodoc. It is chosen for interoperability with our existing Sphinx
+>>>> framework, and because it has loose recognition in the Pycharm IDE.
+>>>>
+>>>> - Use Triple-double quotes (""").
+>>>> - Opening and closing quotes appear on their own lines for multi-line docs.
+>>>> - A single-sentence summary should be the first line of the docstring.
+>>>> - A blank line follows.
+>>>> - Further prose, if needed, is written next and can be multiple paragraphs,
+>>>>     contain RST markup, etc.
+>>>> - The :param x: desc, :returns: desc, and :raises z: desc info fields follow.
+>>> Mandatory when they apply?
+>>>
 >>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
->> Reviewed-by: Cleber Rosa <crosa@redhat.com>
->> ---
->>   scripts/qapi/gen.py | 104 ++++++++++++++++++++++++--------------------
->>   1 file changed, 57 insertions(+), 47 deletions(-)
+>> Subject of debate...
 >>
->> diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
->> index 1bad37fc06b..d0391cd8718 100644
->> --- a/scripts/qapi/gen.py
->> +++ b/scripts/qapi/gen.py
->> @@ -17,7 +17,13 @@
->>   import errno
->>   import os
->>   import re
->> -from typing import Optional
->> +from typing import (
->> +    Dict,
->> +    Iterator,
->> +    List,
->> +    Optional,
->> +    Tuple,
->> +)
->>   
->>   from .common import (
->>       c_fname,
->> @@ -29,31 +35,31 @@
->>       mcgen,
->>   )
->>   from .schema import QAPISchemaObjectType, QAPISchemaVisitor
->> +from .source import QAPISourceInfo
+>> - Some people really hate obvious docstring comments.
+>> - Some people really like the consistency.
+>>
+>> Which type of developer am I? Guess it depends on when you ask.
+>>
+>> Figured we'd hash that out when I go to write a style guide document.
 > 
-> PATCH 03 has a similar cleanup.  Are there more?  Perhaps a separate
-> patch doing just this kind of cleanup would make sense.  Up to you.
+> Fair enough.
 > 
-> [...]
+> If I stop reading after the first paragraph, the patch matches
+> expectations built by the commit message.
 > 
 
-This isn't a cleanup, I am just importing QAPISourceInfo to use for an 
-annotation. It's relevant and required for this patch, and doesn't make 
-sense on its own.
+(:
 
-Patch 03 ... Oh, you mean identifying the correct location of QAPIError. 
-Uh... nah? I think that was the only case of that one changing. Not 
-worth pulling out or naming, I think.
+> If I speed-read, the first paragraph barely registers, but the second
+> makes me slow down, giving me the mistaken idea that this patch is about
+> converting to a preliminary style guide.  It's not, it's about getting
+> Sphinx errors out of the way.
+> 
+> I figure you didn't stop after the first paragraph because you felt a
+> need to explain why you resolve the "obvious errors" the way you do.
+> 
+> Perhaps:
+> 
+>      qapi: modify docstrings to be sphinx-compatible
+> 
+>      A precise style guide and a package-wide overhaul is forthcoming
+>      pending further discussion and consensus. For now, merely avoid
+>      obvious errors that cause Sphinx documentation build problems, using a
+>      style loosely based on PEP 257 and Sphinx Autodoc. It is chosen for
+>      interoperability with our existing Sphinx framework, and because it
+>      has loose recognition in the Pycharm IDE.
+> 
+>      [...]
+>     
+> 
+>>>> - Additional examples, diagrams, or other metadata follows below.
+>>>>
+>>>> See also:
+>>>>
+>>>> https://www.python.org/dev/peps/pep-0257/
+>>>> https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#info-field-lists
+> 
+> Blank line here, by convention.
+> 
+
+Wonder why my script didn't do that. Eh.
+
+>>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>>> ---
+>>>>    scripts/qapi/gen.py    | 6 ++++--
+>>>>    scripts/qapi/parser.py | 1 +
+>>>>    2 files changed, 5 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
+>>>> index ca66c82b5b8..dc7b94aa115 100644
+>>>> --- a/scripts/qapi/gen.py
+>>>> +++ b/scripts/qapi/gen.py
+>>>> @@ -154,9 +154,11 @@ def _bottom(self):
+>>>>      @contextmanager
+>>>>    def ifcontext(ifcond, *args):
+>>>> -    """A 'with' statement context manager to wrap with start_if()/end_if()
+>>>> +    """
+>>>> +    A with-statement context manager that wraps with `start_if()` / `end_if()`.
+>>>>    -    *args: any number of QAPIGenCCode
+>>>> +    :param ifcond: A list of conditionals, passed to `start_if()`.
+>>>> +    :param args: any number of `QAPIGenCCode`.
+>>>>          Example::
+>>>>    diff --git a/scripts/qapi/parser.py b/scripts/qapi/parser.py
+>>>> index 9d1a3e2eea9..31bc2e6dca9 100644
+>>>> --- a/scripts/qapi/parser.py
+>>>> +++ b/scripts/qapi/parser.py
+>>>> @@ -381,6 +381,7 @@ def append(self, line):
+>>>>              The way that the line is dealt with depends on which
+>>>> part of
+>>>>            the documentation we're parsing right now:
+>>>> +
+>>>>            * The body section: ._append_line is ._append_body_line
+>>>>            * An argument section: ._append_line is ._append_args_line
+>>>>            * A features section: ._append_line is ._append_features_line
+>>> I'm asking because you're not adding :param line: here.
+>>>
+>>
+>> Yeah, it's not necessary to test the syntax of what else I've written
+>> with sphinx, so I didn't add it. VERY TECHNICALLY this blurb isn't
+>> required at all and could be deleted. You can do so if you'd like; it
+>> will just show up later in some other patch or series more designed to
+>> fix formatting.
+> 
+> I recommend (but do not demand) to strictly limit this commit to
+> "avoiding obvious errors that cause sphinx documentation build
+> problems."
+> 
+
+OK, I'll drop this bit for now, but I will keep the new annotations for 
+ifcontext, because... well. Why do it twice.
+
+>>> Same for several other functions in this file.
+>>> In schema.py:
+>>>       class QAPISchemaMember:
+>>>           """ Represents object members, enum members and features """
+>>> Are the spaces next to """ okay?
+>>>
+>>
+>> Ideally cleaned up, but that's not a goal of this patch or series.
+> 
+> Got it.
+> 
 
 
