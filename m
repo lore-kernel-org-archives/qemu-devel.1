@@ -7,67 +7,66 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9A83C4363D
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 12:07:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 434C2C4363D
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 12:08:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51BFF20789
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 12:07:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE1FA206A1
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 12:08:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I3S2anLG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51BFF20789
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dHT4fNrW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE1FA206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ8Dy-0005QZ-Ax
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 08:07:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35778)
+	id 1kQ8FF-0007Au-HC
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 08:08:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36024)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kQ84J-0001VU-9b
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 07:57:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51495)
+ id 1kQ84S-0001eI-MV
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 07:57:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28797)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kQ84F-0001hH-6u
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 07:57:14 -0400
+ id 1kQ84P-0001lO-FU
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 07:57:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602071830;
+ s=mimecast20190719; t=1602071840;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=22Qsmi4XFKCBVOTxJQOM0XpcwaYo5VRpQRb9bg3qLkc=;
- b=I3S2anLGI+GKUSzh/3wqtfIiQ2GTqZXXtR7UQpsJbF5qj5gl6jL85z0c0vO6UgAeKc0+Z0
- 2Tt0YZdrDUVzvVNoKfMJohSSH3oXKycZvbSUznKIShB+mVEhGuOjBxTIfd7/6eF3mc6tqO
- /jSEEr8uq8DfrNwgDitEI/xGYaYsO4Q=
+ bh=d3v5cQxcIySqlSBjEcok3n/xI8fAKEf5zkOQbUOR8KU=;
+ b=dHT4fNrWvltr07apPJP7aMcVzIRxQFDV8uOKitN09DjJ7xjws7jQ049gkkbbpjI4lEPP0m
+ 0dsCMQBAYCqvIS0wJtsi1zPPdppd0lxruw1Ffdq5gmnOe+mbIYaCnj/80aNAgrCg+2X+Y7
+ NsOAb321d1CGotQWDNObCpE/57YYcy0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-18-TUaxWs6NNtOMpnagtnSLtw-1; Wed, 07 Oct 2020 07:57:08 -0400
-X-MC-Unique: TUaxWs6NNtOMpnagtnSLtw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-136-t8KxaerFMW-HFFoM52je7w-1; Wed, 07 Oct 2020 07:57:18 -0400
+X-MC-Unique: t8KxaerFMW-HFFoM52je7w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82D441007469;
- Wed,  7 Oct 2020 11:57:07 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2422E1007470;
+ Wed,  7 Oct 2020 11:57:17 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2503555760;
- Wed,  7 Oct 2020 11:57:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B6E6E60BEC;
+ Wed,  7 Oct 2020 11:57:16 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 06/17] qtest: check that drives are really appearing and
- disappearing
-Date: Wed,  7 Oct 2020 07:56:49 -0400
-Message-Id: <20201007115700.707938-7-pbonzini@redhat.com>
+Subject: [PATCH v8 12/17] scsi: switch to bus->check_address
+Date: Wed,  7 Oct 2020 07:56:55 -0400
+Message-Id: <20201007115700.707938-13-pbonzini@redhat.com>
 In-Reply-To: <20201007115700.707938-1-pbonzini@redhat.com>
 References: <20201007115700.707938-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -84,7 +83,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,77 +101,197 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Do not just trust the HMP commands to create and delete the drive, use
-query-block to check that this is actually the case.
-
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <20201006123904.610658-6-mlevitsk@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/qtest/drive_del-test.c | 32 +++++++++++++++++++++++++++++++-
- 1 file changed, 31 insertions(+), 1 deletion(-)
+ hw/scsi/scsi-bus.c | 122 ++++++++++++++++++++++++++++-----------------
+ 1 file changed, 75 insertions(+), 47 deletions(-)
 
-diff --git a/tests/qtest/drive_del-test.c b/tests/qtest/drive_del-test.c
-index 9d20a1ed8b..ff772b3671 100644
---- a/tests/qtest/drive_del-test.c
-+++ b/tests/qtest/drive_del-test.c
-@@ -14,20 +14,49 @@
- #include "libqos/libqtest.h"
- #include "libqos/virtio.h"
- #include "qapi/qmp/qdict.h"
-+#include "qapi/qmp/qlist.h"
-+
-+static bool has_drive(QTestState *qts)
+diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+index 4cf1f404b4..4ab9811cd8 100644
+--- a/hw/scsi/scsi-bus.c
++++ b/hw/scsi/scsi-bus.c
+@@ -22,33 +22,6 @@ static void scsi_req_dequeue(SCSIRequest *req);
+ static uint8_t *scsi_target_alloc_buf(SCSIRequest *req, size_t len);
+ static void scsi_target_free_buf(SCSIRequest *req);
+ 
+-static Property scsi_props[] = {
+-    DEFINE_PROP_UINT32("channel", SCSIDevice, channel, 0),
+-    DEFINE_PROP_UINT32("scsi-id", SCSIDevice, id, -1),
+-    DEFINE_PROP_UINT32("lun", SCSIDevice, lun, -1),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+-static void scsi_bus_class_init(ObjectClass *klass, void *data)
+-{
+-    BusClass *k = BUS_CLASS(klass);
+-    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
+-
+-    k->get_dev_path = scsibus_get_dev_path;
+-    k->get_fw_dev_path = scsibus_get_fw_dev_path;
+-    hc->unplug = qdev_simple_device_unplug_cb;
+-}
+-
+-static const TypeInfo scsi_bus_info = {
+-    .name = TYPE_SCSI_BUS,
+-    .parent = TYPE_BUS,
+-    .instance_size = sizeof(SCSIBus),
+-    .class_init = scsi_bus_class_init,
+-    .interfaces = (InterfaceInfo[]) {
+-        { TYPE_HOTPLUG_HANDLER },
+-        { }
+-    }
+-};
+ static int next_scsi_bus;
+ 
+ static void scsi_device_realize(SCSIDevice *s, Error **errp)
+@@ -160,35 +133,68 @@ static void scsi_dma_restart_cb(void *opaque, int running, RunState state)
+     }
+ }
+ 
+-static void scsi_qdev_realize(DeviceState *qdev, Error **errp)
++static bool scsi_bus_is_address_free(SCSIBus *bus,
++				     int channel, int target, int lun,
++				     SCSIDevice **p_dev)
 +{
-+    QDict *response;
-+    QList *ret;
-+    QListEntry *entry;
-+    bool found;
-+
-+    response = qtest_qmp(qts, "{'execute': 'query-block'}");
-+    g_assert(response && qdict_haskey(response, "return"));
-+    ret = qdict_get_qlist(response, "return");
-+
-+    found = false;
-+    QLIST_FOREACH_ENTRY(ret, entry) {
-+        QDict *entry_dict = qobject_to(QDict, entry->value);
-+        if (!strcmp(qdict_get_str(entry_dict, "device"), "drive0")) {
-+            found = true;
-+            break;
++    SCSIDevice *d = scsi_device_find(bus, channel, target, lun);
++    if (d && d->lun == lun) {
++        if (p_dev) {
++            *p_dev = d;
 +        }
++        return false;
++    }
++    if (p_dev) {
++        *p_dev = NULL;
++    }
++    return true;
++}
++
++static bool scsi_bus_check_address(BusState *qbus, DeviceState *qdev, Error **errp)
+ {
+     SCSIDevice *dev = SCSI_DEVICE(qdev);
+-    SCSIBus *bus = DO_UPCAST(SCSIBus, qbus, dev->qdev.parent_bus);
+-    SCSIDevice *d;
+-    Error *local_err = NULL;
++    SCSIBus *bus = SCSI_BUS(qbus);
+ 
+     if (dev->channel > bus->info->max_channel) {
+         error_setg(errp, "bad scsi channel id: %d", dev->channel);
+-        return;
++        return false;
+     }
+     if (dev->id != -1 && dev->id > bus->info->max_target) {
+         error_setg(errp, "bad scsi device id: %d", dev->id);
+-        return;
++        return false;
+     }
+     if (dev->lun != -1 && dev->lun > bus->info->max_lun) {
+         error_setg(errp, "bad scsi device lun: %d", dev->lun);
+-        return;
++        return false;
 +    }
 +
-+    qobject_unref(response);
-+    return found;
++    if (dev->id != -1 && dev->lun != -1) {
++        SCSIDevice *d;
++        if (!scsi_bus_is_address_free(bus, dev->channel, dev->id, dev->lun, &d)) {
++            error_setg(errp, "lun already used by '%s'", d->qdev.id);
++            return false;
++        }
+     }
+ 
++    return true;
 +}
++
++static void scsi_qdev_realize(DeviceState *qdev, Error **errp)
++{
++    SCSIDevice *dev = SCSI_DEVICE(qdev);
++    SCSIBus *bus = DO_UPCAST(SCSIBus, qbus, dev->qdev.parent_bus);
++    bool is_free;
++    Error *local_err = NULL;
++
+     if (dev->id == -1) {
+         int id = -1;
+         if (dev->lun == -1) {
+             dev->lun = 0;
+         }
+         do {
+-            d = scsi_device_find(bus, dev->channel, ++id, dev->lun);
+-        } while (d && d->lun == dev->lun && id < bus->info->max_target);
+-        if (d && d->lun == dev->lun) {
++            is_free = scsi_bus_is_address_free(bus, dev->channel, ++id, dev->lun, NULL);
++        } while (!is_free && id < bus->info->max_target);
++        if (!is_free) {
+             error_setg(errp, "no free target");
+             return;
+         }
+@@ -196,20 +202,13 @@ static void scsi_qdev_realize(DeviceState *qdev, Error **errp)
+     } else if (dev->lun == -1) {
+         int lun = -1;
+         do {
+-            d = scsi_device_find(bus, dev->channel, dev->id, ++lun);
+-        } while (d && d->lun == lun && lun < bus->info->max_lun);
+-        if (d && d->lun == lun) {
++            is_free = scsi_bus_is_address_free(bus, dev->channel, dev->id, ++lun, NULL);
++        } while (!is_free && lun < bus->info->max_lun);
++        if (!is_free) {
+             error_setg(errp, "no free lun");
+             return;
+         }
+         dev->lun = lun;
+-    } else {
+-        d = scsi_device_find(bus, dev->channel, dev->id, dev->lun);
+-        assert(d);
+-        if (d->lun == dev->lun && dev != d) {
+-            error_setg(errp, "lun already used by '%s'", d->qdev.id);
+-            return;
+-        }
+     }
  
- static void drive_add(QTestState *qts)
+     QTAILQ_INIT(&dev->requests);
+@@ -1723,6 +1722,13 @@ const VMStateDescription vmstate_scsi_device = {
+     }
+ };
+ 
++static Property scsi_props[] = {
++    DEFINE_PROP_UINT32("channel", SCSIDevice, channel, 0),
++    DEFINE_PROP_UINT32("scsi-id", SCSIDevice, id, -1),
++    DEFINE_PROP_UINT32("lun", SCSIDevice, lun, -1),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void scsi_device_class_init(ObjectClass *klass, void *data)
  {
-     char *resp = qtest_hmp(qts, "drive_add 0 if=none,id=drive0");
+     DeviceClass *k = DEVICE_CLASS(klass);
+@@ -1753,6 +1759,28 @@ static const TypeInfo scsi_device_type_info = {
+     .instance_init = scsi_dev_instance_init,
+ };
  
-     g_assert_cmpstr(resp, ==, "OK\r\n");
-+    g_assert(has_drive(qts));
-     g_free(resp);
- }
- 
- static void drive_del(QTestState *qts)
++static void scsi_bus_class_init(ObjectClass *klass, void *data)
++{
++    BusClass *k = BUS_CLASS(klass);
++    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
++
++    k->get_dev_path = scsibus_get_dev_path;
++    k->get_fw_dev_path = scsibus_get_fw_dev_path;
++    k->check_address = scsi_bus_check_address;
++    hc->unplug = qdev_simple_device_unplug_cb;
++}
++
++static const TypeInfo scsi_bus_info = {
++    .name = TYPE_SCSI_BUS,
++    .parent = TYPE_BUS,
++    .instance_size = sizeof(SCSIBus),
++    .class_init = scsi_bus_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_HOTPLUG_HANDLER },
++        { }
++    }
++};
++
+ static void scsi_register_types(void)
  {
--    char *resp = qtest_hmp(qts, "drive_del drive0");
-+    char *resp;
- 
-+    g_assert(has_drive(qts));
-+    resp = qtest_hmp(qts, "drive_del drive0");
-     g_assert_cmpstr(resp, ==, "");
-+    g_assert(!has_drive(qts));
-     g_free(resp);
- }
- 
-@@ -130,6 +159,7 @@ static void test_drive_del_device_del(void)
-      */
-     drive_del(qts);
-     device_del(qts);
-+    g_assert(!has_drive(qts));
- 
-     qtest_quit(qts);
- }
+     type_register_static(&scsi_bus_info);
 -- 
 2.26.2
 
