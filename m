@@ -2,73 +2,66 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DC43C4363D
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 12:24:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91315C4363D
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 12:27:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3CE22080A
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 12:24:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3CE22080A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 08FDF206D9
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 12:27:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08FDF206D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ8UY-0002m5-Ur
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 08:24:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40250)
+	id 1kQ8XG-0005Nt-0X
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 08:27:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40686)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kQ8PQ-0007Wf-K0; Wed, 07 Oct 2020 08:19:04 -0400
-Resent-Date: Wed, 07 Oct 2020 08:19:04 -0400
-Resent-Message-Id: <E1kQ8PQ-0007Wf-K0@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21382)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kQ8PL-00045t-Ug; Wed, 07 Oct 2020 08:19:04 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1602073127; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=gWARqivE3zmRniDiOaWPXrxpAVbCc/5IvX7ZM+2hGguboGAV/cwsSaX4Fcl3ThlLLVW55JbgZS5ofxcYAHpoJh48y/OGdoB7ArpEWtxddg6SCOzM0hmbmlWJMdrWpGpiDVx36L9hyIVkYpO3daRQJb1A7NgDRHKuIEmjjO69oXw=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1602073127;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=juQJeNb0Eor/TetcFC/6eNcGa55BSzQIfnwtwEDTOwg=; 
- b=P1sKzNLJsiYzpIKeARrjA8cGdye8f6RACjkNEj+9P47dLr33bxma2EzYHSzYqeaV755mqClJQc+rvsd8HuES3Wmaku7eQHJbtZQWo7a7RhCqwwFP4yxOMh6n9yJHTPhhYP44F6AVhyxwMx4wlimmCNJUgVGnDzZtnOtSLl3vKUI=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1602073125182448.03826224330453;
- Wed, 7 Oct 2020 05:18:45 -0700 (PDT)
-Subject: Re: [PATCH v8 00/17] Fix scsi devices plug/unplug races w.r.t
- virtio-scsi iothread
-Message-ID: <160207312370.3664.15369244078339212252@66eaa9a8a123>
-In-Reply-To: <20201007115700.707938-1-pbonzini@redhat.com>
+ (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
+ id 1kQ8RE-0000HE-WA
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 08:20:58 -0400
+Received: from mail.ispras.ru ([83.149.199.84]:56514)
+ by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
+ id 1kQ8RC-0004PH-Sy
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 08:20:56 -0400
+Received: from [10.12.39.188] (unknown [85.142.117.224])
+ by mail.ispras.ru (Postfix) with ESMTPSA id 0A3BA40D3BFF;
+ Wed,  7 Oct 2020 12:20:48 +0000 (UTC)
+Subject: Re: acceptance-system-fedora failures
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+References: <f9e09f0b-3915-382c-d670-8d33d164ad7b@redhat.com>
+ <4e191372-c332-8f69-85e2-1ff6ead0f40d@redhat.com>
+ <59d2a787-bcd4-7283-693b-09ea04c16dc6@redhat.com>
+ <6068346f-b034-9321-0eea-29233c23a300@redhat.com>
+ <78ce9ac1-d2a1-9dc0-bf38-f9ac34b2f203@ispras.ru>
+ <14ee7cc6-42ca-fd86-241b-ed85e26693f7@redhat.com> <878sci1dt0.fsf@linaro.org>
+From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
+Message-ID: <d86c9425-dcb2-7fa7-1f6f-bd7b8dab53c1@ispras.ru>
+Date: Wed, 7 Oct 2020 15:20:47 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: pbonzini@redhat.com
-Date: Wed, 7 Oct 2020 05:18:45 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 08:18:53
+In-Reply-To: <878sci1dt0.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=83.149.199.84;
+ envelope-from=pavel.dovgalyuk@ispras.ru; helo=mail.ispras.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 08:18:04
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,108 +74,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- mreitz@redhat.com
+Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Cleber Rosa <crosa@redhat.com>,
+ John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMTAwNzExNTcwMC43MDc5
-MzgtMS1wYm9uemluaUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
-dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
-aW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMDEwMDcxMTU3MDAuNzA3
-OTM4LTEtcGJvbnppbmlAcmVkaGF0LmNvbQpTdWJqZWN0OiBbUEFUQ0ggdjggMDAvMTddIEZpeCBz
-Y3NpIGRldmljZXMgcGx1Zy91bnBsdWcgcmFjZXMgdy5yLnQgdmlydGlvLXNjc2kgaW90aHJlYWQK
-Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNl
-ID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
-bGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
-MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3Bh
-dGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAyMDEwMDcx
-MTU3MDAuNzA3OTM4LTEtcGJvbnppbmlAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMjAxMDA3MTE1
-NzAwLjcwNzkzOC0xLXBib256aW5pQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNo
-ICd0ZXN0Jwo3ZTUxYTM1IHNjc2kvc2NzaV9idXM6IGZpeCByYWNlcyBpbiBSRVBPUlQgTFVOUwoz
-YmE1NTRjIHZpcnRpby1zY3NpOiB1c2Ugc2NzaV9kZXZpY2VfZ2V0CmNhYTI4OTQgc2NzaS9zY3Np
-X2J1czogQWRkIHNjc2lfZGV2aWNlX2dldAo4ZDc0ODNiIHNjc2kvc2NzaS1idXM6IHNjc2lfZGV2
-aWNlX2ZpbmQ6IGRvbid0IHJldHVybiB1bnJlYWxpemVkIGRldmljZXMKODAwMjczNyBkZXZpY2Ut
-Y29yZTogdXNlIGF0b21pY19zZXQgb24gLnJlYWxpemVkIHByb3BlcnR5CmQ5MTkzN2Ygc2NzaTog
-c3dpdGNoIHRvIGJ1cy0+Y2hlY2tfYWRkcmVzcwo1NjJhMTIzIGRldmljZS1jb3JlOiB1c2UgUkNV
-IGZvciBsaXN0IG9mIGNoaWxkcmVuIG9mIGEgYnVzCjZiYzQ2MTcgZGV2aWNlX2NvcmU6IHVzZSBk
-cmFpbl9jYWxsX3JjdSBpbiBpbiBxbXBfZGV2aWNlX2FkZAo5N2ZiZjg1IHNjc2kvc2NzaV9idXM6
-IHN3aXRjaCBzZWFyY2ggZGlyZWN0aW9uIGluIHNjc2lfZGV2aWNlX2ZpbmQKYmIzYjY4ZSBxZGV2
-OiBhZGQgImNoZWNrIGlmIGFkZHJlc3MgZnJlZSIgY2FsbGJhY2sgZm9yIGJ1c2VzCmFkZjllM2Ug
-cWVtdS1pb3Rlc3RzLCBxdGVzdDogcmV3cml0ZSB0ZXN0IDA2NyBhcyBhIHF0ZXN0CjA5MzYyN2Qg
-cXRlc3Q6IGNoZWNrIHRoYXQgZHJpdmVzIGFyZSByZWFsbHkgYXBwZWFyaW5nIGFuZCBkaXNhcHBl
-YXJpbmcKODA4NTZkZSBxdGVzdDogc3dpdGNoIHVzZXJzIGJhY2sgdG8gcXRlc3RfcW1wX3JlY2Vp
-dmUKYzk2ZDVmMCBkZXZpY2UtcGx1Zy10ZXN0OiB1c2UgcXRlc3RfcW1wIHRvIHNlbmQgdGhlIGRl
-dmljZV9kZWwgY29tbWFuZApmMWYwNGQ5IHF0ZXN0OiByZW1vdmUgcXRlc3RfcW1wX3JlY2VpdmVf
-c3VjY2VzcwoxMTQ4ZWM0IHF0ZXN0OiBSZWludHJvZHVjZSBxdGVzdF9xbXBfcmVjZWl2ZQoyMGUz
-MTgzIHF0ZXN0OiByZW5hbWUgcXRlc3RfcW1wX3JlY2VpdmUgdG8gcXRlc3RfcW1wX3JlY2VpdmVf
-ZGljdAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xNyBDaGVja2luZyBjb21taXQgMjBlMzE4M2Vj
-YmQ4IChxdGVzdDogcmVuYW1lIHF0ZXN0X3FtcF9yZWNlaXZlIHRvIHF0ZXN0X3FtcF9yZWNlaXZl
-X2RpY3QpCjIvMTcgQ2hlY2tpbmcgY29tbWl0IDExNDhlYzQ5MDBhNiAocXRlc3Q6IFJlaW50cm9k
-dWNlIHF0ZXN0X3FtcF9yZWNlaXZlKQozLzE3IENoZWNraW5nIGNvbW1pdCBmMWYwNGQ5YzIzMjAg
-KHF0ZXN0OiByZW1vdmUgcXRlc3RfcW1wX3JlY2VpdmVfc3VjY2VzcykKNC8xNyBDaGVja2luZyBj
-b21taXQgYzk2ZDVmMGFhMzJiIChkZXZpY2UtcGx1Zy10ZXN0OiB1c2UgcXRlc3RfcW1wIHRvIHNl
-bmQgdGhlIGRldmljZV9kZWwgY29tbWFuZCkKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3Rl
-cnMKIzMzOiBGSUxFOiB0ZXN0cy9xdGVzdC9kZXZpY2UtcGx1Zy10ZXN0LmM6MjM6CisgICAgICAg
-ICAgICAgICAgICAgICAieydleGVjdXRlJzogJ2RldmljZV9kZWwnLCAnYXJndW1lbnRzJzogeyAn
-aWQnOiAlcyB9IH0iLCBpZCk7Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDc2IGxpbmVz
-IGNoZWNrZWQKClBhdGNoIDQvMTcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
-SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNS8xNyBDaGVj
-a2luZyBjb21taXQgODA4NTZkZWI1NDhkIChxdGVzdDogc3dpdGNoIHVzZXJzIGJhY2sgdG8gcXRl
-c3RfcW1wX3JlY2VpdmUpCjYvMTcgQ2hlY2tpbmcgY29tbWl0IDA5MzYyN2QyMTIwMyAocXRlc3Q6
-IGNoZWNrIHRoYXQgZHJpdmVzIGFyZSByZWFsbHkgYXBwZWFyaW5nIGFuZCBkaXNhcHBlYXJpbmcp
-CjcvMTcgQ2hlY2tpbmcgY29tbWl0IGFkZjllM2VhMmIwYyAocWVtdS1pb3Rlc3RzLCBxdGVzdDog
-cmV3cml0ZSB0ZXN0IDA2NyBhcyBhIHF0ZXN0KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVs
-ZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM0MzogCmRlbGV0
-ZWQgZmlsZSBtb2RlIDEwMDc1NQoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzY0
-NjogRklMRTogdGVzdHMvcXRlc3QvZHJpdmVfZGVsLXRlc3QuYzoxOToKK3N0YXRpYyBib29sIGxv
-b2tfZm9yX2RyaXZlMChRVGVzdFN0YXRlICpxdHMsIGNvbnN0IGNoYXIgKmNvbW1hbmQsIGNvbnN0
-IGNoYXIgKmtleSkKCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgMzA4IGxpbmVzIGNoZWNr
-ZWQKClBhdGNoIDcvMTcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOC8xNyBDaGVja2luZyBj
-b21taXQgYmIzYjY4ZTM1MDdlIChxZGV2OiBhZGQgImNoZWNrIGlmIGFkZHJlc3MgZnJlZSIgY2Fs
-bGJhY2sgZm9yIGJ1c2VzKQo5LzE3IENoZWNraW5nIGNvbW1pdCA5N2ZiZjg1N2FjYWUgKHNjc2kv
-c2NzaV9idXM6IHN3aXRjaCBzZWFyY2ggZGlyZWN0aW9uIGluIHNjc2lfZGV2aWNlX2ZpbmQpCjEw
-LzE3IENoZWNraW5nIGNvbW1pdCA2YmM0NjE3NzlkMzQgKGRldmljZV9jb3JlOiB1c2UgZHJhaW5f
-Y2FsbF9yY3UgaW4gaW4gcW1wX2RldmljZV9hZGQpCjExLzE3IENoZWNraW5nIGNvbW1pdCA1NjJh
-MTIzOTA5MDMgKGRldmljZS1jb3JlOiB1c2UgUkNVIGZvciBsaXN0IG9mIGNoaWxkcmVuIG9mIGEg
-YnVzKQoxMi8xNyBDaGVja2luZyBjb21taXQgZDkxOTM3ZmZjYjJmIChzY3NpOiBzd2l0Y2ggdG8g
-YnVzLT5jaGVja19hZGRyZXNzKQpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0
-YWJzCiM1NTogRklMRTogaHcvc2NzaS9zY3NpLWJ1cy5jOjEzNzoKK15JXkleSV5JICAgICBpbnQg
-Y2hhbm5lbCwgaW50IHRhcmdldCwgaW50IGx1biwkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxk
-IG5ldmVyIHVzZSB0YWJzCiM1NjogRklMRTogaHcvc2NzaS9zY3NpLWJ1cy5jOjEzODoKK15JXkle
-SV5JICAgICBTQ1NJRGV2aWNlICoqcF9kZXYpJAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJh
-Y3RlcnMKIzcxOiBGSUxFOiBody9zY3NpL3Njc2ktYnVzLmM6MTUzOgorc3RhdGljIGJvb2wgc2Nz
-aV9idXNfY2hlY2tfYWRkcmVzcyhCdXNTdGF0ZSAqcWJ1cywgRGV2aWNlU3RhdGUgKnFkZXYsIEVy
-cm9yICoqZXJycCkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM5MTogRklMRTog
-aHcvc2NzaS9zY3NpLWJ1cy5jOjE3MzoKKyAgICAgICAgaWYgKCFzY3NpX2J1c19pc19hZGRyZXNz
-X2ZyZWUoYnVzLCBkZXYtPmNoYW5uZWwsIGRldi0+aWQsIGRldi0+bHVuLCAmZCkpIHsKCldBUk5J
-Tkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMzA6IEZJTEU6IGh3L3Njc2kvc2NzaS1idXMu
-YzoxOTU6CisgICAgICAgICAgICBpc19mcmVlID0gc2NzaV9idXNfaXNfYWRkcmVzc19mcmVlKGJ1
-cywgZGV2LT5jaGFubmVsLCArK2lkLCBkZXYtPmx1biwgTlVMTCk7CgpXQVJOSU5HOiBsaW5lIG92
-ZXIgODAgY2hhcmFjdGVycwojMTQzOiBGSUxFOiBody9zY3NpL3Njc2ktYnVzLmM6MjA1OgorICAg
-ICAgICAgICAgaXNfZnJlZSA9IHNjc2lfYnVzX2lzX2FkZHJlc3NfZnJlZShidXMsIGRldi0+Y2hh
-bm5lbCwgZGV2LT5pZCwgKytsdW4sIE5VTEwpOwoKdG90YWw6IDIgZXJyb3JzLCA0IHdhcm5pbmdz
-LCAxODIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTIvMTcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KCjEzLzE3IENoZWNraW5nIGNvbW1pdCA4MDAyNzM3MzAzYzkgKGRldmljZS1jb3JlOiB1c2Ug
-YXRvbWljX3NldCBvbiAucmVhbGl6ZWQgcHJvcGVydHkpCjE0LzE3IENoZWNraW5nIGNvbW1pdCA4
-ZDc0ODNiZTBmZDkgKHNjc2kvc2NzaS1idXM6IHNjc2lfZGV2aWNlX2ZpbmQ6IGRvbid0IHJldHVy
-biB1bnJlYWxpemVkIGRldmljZXMpCjE1LzE3IENoZWNraW5nIGNvbW1pdCBjYWEyODk0NjBiZTYg
-KHNjc2kvc2NzaV9idXM6IEFkZCBzY3NpX2RldmljZV9nZXQpCjE2LzE3IENoZWNraW5nIGNvbW1p
-dCAzYmE1NTRjZDRmNDggKHZpcnRpby1zY3NpOiB1c2Ugc2NzaV9kZXZpY2VfZ2V0KQoxNy8xNyBD
-aGVja2luZyBjb21taXQgN2U1MWEzNTYzYWJlIChzY3NpL3Njc2lfYnVzOiBmaXggcmFjZXMgaW4g
-UkVQT1JUIExVTlMpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRo
-IGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9y
-Zy9sb2dzLzIwMjAxMDA3MTE1NzAwLjcwNzkzOC0xLXBib256aW5pQHJlZGhhdC5jb20vdGVzdGlu
-Zy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
-YWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
-ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 07.10.2020 14:22, Alex Bennée wrote:
+> 
+> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
+> 
+>> On 10/7/20 10:51 AM, Pavel Dovgalyuk wrote:
+>>> On 07.10.2020 11:23, Thomas Huth wrote:
+>>>> On 07/10/2020 09.13, Philippe Mathieu-Daudé wrote:
+>>>> Thanks, that was helpful. ... and the winner is:
+>>>>
+>>>>       commit   55adb3c45620c31f29978f209e2a44a08d34e2da
+>>>>       Author:  John Snow <jsnow@redhat.com>
+>>>>       Date:    Fri Jul 24 01:23:00 2020 -0400
+>>>>       Subject: ide: cancel pending callbacks on SRST
+>>>>
+>>>> ... starting with this commit, the tests starts failing. John, any
+>>>> idea what
+>>>> might be causing this?
+>>>
+>>> This patch includes the following lines:
+>>>
+>>> +        aio_bh_schedule_oneshot(qemu_get_aio_context(),
+>>> +                                ide_bus_perform_srst, bus);
+>>>
+>>> replay_bh_schedule_oneshot_event should be used instead of this
+>>> function, because it synchronizes non-deterministic BHs.
+>>
+>> Why do we have 2 different functions? BH are already complex
+>> enough, and we need to also think about the replay API...
+>>
+>> What about the other cases such vhost-user (blk/net), virtio-blk?
+> 
+> This does seem like something that should be wrapped up inside
+> aio_bh_schedule_oneshot itself or maybe we need a
+> aio_bh_schedule_transaction_oneshot to distinguish it from the other
+> uses the function has.
+> 
+
+Maybe there should be two functions:
+- one for the guest modification
+- one for internal qemu things
+
+The first one may be implemented though the rr+second one.
+Maybe replay_ prefix is confusing and the whole BH interface should look 
+like that?
+
+
+Pavel Dovgalyuk
 
