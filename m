@@ -2,111 +2,91 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41AD6C4363C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 19:16:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACCA2C4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 19:18:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DCA6206FC
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 19:16:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3CE522076B
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 19:18:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="onEl4cDe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DCA6206FC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ep2C/GpC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CE522076B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQEvO-0003pj-9T
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 15:16:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50038)
+	id 1kQExE-0005Uo-7i
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 15:18:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52422)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
- id 1kQEk8-0008E3-2x; Wed, 07 Oct 2020 15:04:52 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8756
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
- id 1kQEk5-0004de-N8; Wed, 07 Oct 2020 15:04:51 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 097J0w62011590; Wed, 7 Oct 2020 15:04:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=from : to : cc : subject
- : date : message-id : in-reply-to : references; s=pp1;
- bh=rxJHrrGwAH95cY5t0BsFMeQVPmQ3iOx4VAt7Ysr6bQo=;
- b=onEl4cDen+szUHy0V0JgOmCMufnVfAxptQnsnPDh4CnUcqHls+0Pxx11OvI1QgWNqwAr
- 41antznkrEZJ23QO357EeCoX1kbGMZLSMzsOfw0rm/TpGSHB7kZrmrf9CIXRdktM5sl6
- hnDqZ3TBfm4jBsmfzT2jsFGbgPHyiT80LcNxShX99yXRr58JIVhLaQnLUOhAESZiG/nU
- Xbzqt8blKeuFjyU8TAUhnIdHKyBQcL0NwYeqK4YO/OvkO2HitAXSAhX4gUQ2K+3o8czl
- OE4L0aHkGUzsds5IiM2zqbMks7xXd3EvKwNz3c6Ha42hF2zms/UuzPY7G7DHTI09SRpX aA== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 341jehswua-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 07 Oct 2020 15:04:48 -0400
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 097J11xi011814;
- Wed, 7 Oct 2020 15:04:48 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0b-001b2d01.pphosted.com with ESMTP id 341jehswu0-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 07 Oct 2020 15:04:48 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 097IlXgV003114;
- Wed, 7 Oct 2020 19:04:47 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com
- [9.57.198.29]) by ppma03dal.us.ibm.com with ESMTP id 33xgx9spcc-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 07 Oct 2020 19:04:47 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
- [9.57.199.111])
- by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 097J4kQr40894830
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 7 Oct 2020 19:04:46 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 83634AC05B;
- Wed,  7 Oct 2020 19:04:46 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 25D47AC05E;
- Wed,  7 Oct 2020 19:04:44 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.211.60.106])
- by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
- Wed,  7 Oct 2020 19:04:43 +0000 (GMT)
-From: Matthew Rosato <mjrosato@linux.ibm.com>
-To: cohuck@redhat.com, thuth@redhat.com
-Subject: [PATCH v3 10/10] s390x/pci: get zPCI function info from host
-Date: Wed,  7 Oct 2020 15:04:15 -0400
-Message-Id: <1602097455-15658-11-git-send-email-mjrosato@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1602097455-15658-1-git-send-email-mjrosato@linux.ibm.com>
-References: <1602097455-15658-1-git-send-email-mjrosato@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-10-07_10:2020-10-07,
- 2020-10-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 malwarescore=0
- mlxlogscore=999 impostorscore=0 spamscore=0 mlxscore=0 priorityscore=1501
- lowpriorityscore=0 suspectscore=2 adultscore=0 phishscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2010070118
-Received-SPF: pass client-ip=148.163.158.5;
- envelope-from=mjrosato@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 15:04:22
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQEwA-0004ay-EY
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 15:17:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53294)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQEw7-0006Qk-VQ
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 15:17:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602098234;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=mum544dG8yZ2KjV6+g4J2EnHu/A69+Eox0a//bwLX1E=;
+ b=ep2C/GpCfBnaFBDFOodnJ9/NKQuCgzYplJcvKYMxnm9iteZG3Z95Do03xtDlHsr0PTRULD
+ cSwM4xV0Vz2zDUnaXH0bh+dxbR2Xr/22udPO2Ne79sxxnDqzyf+5oiMQb7z/iHLumGyvQI
+ +RPwMlsjRlC/KdsqKvrLr6o4HI4adMk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-99-CKLkoO4RPKmy_4qsCjNRpQ-1; Wed, 07 Oct 2020 15:17:13 -0400
+X-MC-Unique: CKLkoO4RPKmy_4qsCjNRpQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AD38186DD32;
+ Wed,  7 Oct 2020 19:17:12 +0000 (UTC)
+Received: from [10.10.120.38] (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4D26A100164C;
+ Wed,  7 Oct 2020 19:17:11 +0000 (UTC)
+Subject: Re: [PATCH 18/20] python/qemu/qmp.py: re-raise OSError when
+ encountered
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20201006235817.3280413-1-jsnow@redhat.com>
+ <20201006235817.3280413-19-jsnow@redhat.com>
+ <20201007113043.GL7212@linux.fritz.box>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <c0ab4401-3c13-47ab-8b07-b1046e488a61@redhat.com>
+Date: Wed, 7 Oct 2020 15:17:10 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
+MIME-Version: 1.0
+In-Reply-To: <20201007113043.GL7212@linux.fritz.box>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:54:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -120,373 +100,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kvm@vger.kernel.org, pmorel@linux.ibm.com, david@redhat.com,
- schnelle@linux.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
- pasic@linux.ibm.com, borntraeger@de.ibm.com, alex.williamson@redhat.com,
- mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net
+Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We use the capability chains of the VFIO_DEVICE_GET_INFO ioctl to retrieve
-the CLP information that the kernel exports.
+On 10/7/20 7:30 AM, Kevin Wolf wrote:
+> Am 07.10.2020 um 01:58 hat John Snow geschrieben:
+>> Nested if conditions don't change when the exception block fires; we
+>> need to explicitly re-raise the error if we didn't intend to capture and
+>> suppress it.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>   python/qemu/qmp.py | 6 +++---
+>>   1 file changed, 3 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/python/qemu/qmp.py b/python/qemu/qmp.py
+>> index d911999da1f..bdbd1e9bdbb 100644
+>> --- a/python/qemu/qmp.py
+>> +++ b/python/qemu/qmp.py
+>> @@ -169,9 +169,9 @@ def __get_events(self, wait: Union[bool, float] = False) -> None:
+>>           try:
+>>               self.__json_read()
+>>           except OSError as err:
+>> -            if err.errno == errno.EAGAIN:
+>> -                # No data available
+>> -                pass
+>> +            # EAGAIN: No data available; not critical
+>> +            if err.errno != errno.EAGAIN:
+>> +                raise
+> 
+> Hm, if we re-raise the exception here, the socket remains non-blocking.
+> I think we intended to have it like that only temporarily.
+> 
 
-To be compatible with previous kernel versions we fall back on previous
-predefined values, same as the emulation values, when the ioctl is found
-to not support capability chains. If individual CLP capabilities are not
-found, we fall back on default values for only those capabilities missing
-from the chain.
+Whoops. Yep, no good to go from one kind of broken to a different kind 
+of broken.
 
-This patch is based on work previously done by Pierre Morel.
+> The same kind of exception would raise QMPConnectError below instead of
+> directly OSError. Should we try to make this consistent?
+> 
 
-Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
----
- hw/s390x/meson.build             |   1 +
- hw/s390x/s390-pci-bus.c          |  10 +-
- hw/s390x/s390-pci-vfio.c         | 197 +++++++++++++++++++++++++++++++++++++++
- include/hw/s390x/s390-pci-bus.h  |   1 +
- include/hw/s390x/s390-pci-clp.h  |  12 ++-
- include/hw/s390x/s390-pci-vfio.h |  19 ++++
- 6 files changed, 233 insertions(+), 7 deletions(-)
- create mode 100644 hw/s390x/s390-pci-vfio.c
- create mode 100644 include/hw/s390x/s390-pci-vfio.h
+Yeah, honestly I'm a bit confused about the error plumbing myself. We 
+like to return "None" a lot, and I have been trying to remove that 
+whenever possible, because the nature of what None can mean semantically 
+is ambiguous.
 
-diff --git a/hw/s390x/meson.build b/hw/s390x/meson.build
-index 948ceae..3ee4594 100644
---- a/hw/s390x/meson.build
-+++ b/hw/s390x/meson.build
-@@ -10,6 +10,7 @@ s390x_ss.add(files(
-   's390-ccw.c',
-   's390-pci-bus.c',
-   's390-pci-inst.c',
-+  's390-pci-vfio.c',
-   's390-skeys.c',
-   's390-stattrib.c',
-   's390-virtio-hcall.c',
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 3dc8a10..182e76e 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -17,6 +17,7 @@
- #include "cpu.h"
- #include "hw/s390x/s390-pci-bus.h"
- #include "hw/s390x/s390-pci-inst.h"
-+#include "hw/s390x/s390-pci-vfio.h"
- #include "hw/pci/pci_bus.h"
- #include "hw/qdev-properties.h"
- #include "hw/pci/pci_bridge.h"
-@@ -737,7 +738,7 @@ static void s390_pci_iommu_free(S390pciState *s, PCIBus *bus, int32_t devfn)
-     object_unref(OBJECT(iommu));
- }
- 
--static S390PCIGroup *s390_group_create(int id)
-+S390PCIGroup *s390_group_create(int id)
- {
-     S390PCIGroup *group;
-     S390pciState *s = s390_get_phb();
-@@ -782,7 +783,7 @@ static void set_pbdev_info(S390PCIBusDevice *pbdev)
-     pbdev->zpci_fn.sdma = ZPCI_SDMA_ADDR;
-     pbdev->zpci_fn.edma = ZPCI_EDMA_ADDR;
-     pbdev->zpci_fn.pchid = 0;
--    pbdev->zpci_fn.ug = ZPCI_DEFAULT_FN_GRP;
-+    pbdev->zpci_fn.pfgid = ZPCI_DEFAULT_FN_GRP;
-     pbdev->zpci_fn.fid = pbdev->fid;
-     pbdev->zpci_fn.uid = pbdev->uid;
-     pbdev->pci_group = s390_group_find(ZPCI_DEFAULT_FN_GRP);
-@@ -861,7 +862,8 @@ static int s390_pci_msix_init(S390PCIBusDevice *pbdev)
-     name = g_strdup_printf("msix-s390-%04x", pbdev->uid);
-     memory_region_init_io(&pbdev->msix_notify_mr, OBJECT(pbdev),
-                           &s390_msi_ctrl_ops, pbdev, name, PAGE_SIZE);
--    memory_region_add_subregion(&pbdev->iommu->mr, ZPCI_MSI_ADDR,
-+    memory_region_add_subregion(&pbdev->iommu->mr,
-+                                pbdev->pci_group->zpci_group.msia,
-                                 &pbdev->msix_notify_mr);
-     g_free(name);
- 
-@@ -1013,6 +1015,8 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
- 
-         if (object_dynamic_cast(OBJECT(dev), "vfio-pci")) {
-             pbdev->fh |= FH_SHM_VFIO;
-+            /* Fill in CLP information passed via the vfio region */
-+            s390_pci_get_clp_info(pbdev);
-         } else {
-             pbdev->fh |= FH_SHM_EMUL;
-         }
-diff --git a/hw/s390x/s390-pci-vfio.c b/hw/s390x/s390-pci-vfio.c
-new file mode 100644
-index 0000000..43684c6
---- /dev/null
-+++ b/hw/s390x/s390-pci-vfio.c
-@@ -0,0 +1,197 @@
-+/*
-+ * s390 vfio-pci interfaces
-+ *
-+ * Copyright 2020 IBM Corp.
-+ * Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
-+
-+#include <sys/ioctl.h>
-+#include <linux/vfio.h>
-+#include <linux/vfio_zdev.h>
-+
-+#include "qemu/osdep.h"
-+#include "hw/s390x/s390-pci-bus.h"
-+#include "hw/s390x/s390-pci-clp.h"
-+#include "hw/s390x/s390-pci-vfio.h"
-+#include "hw/vfio/pci.h"
-+
-+#ifndef DEBUG_S390PCI_VFIO
-+#define DEBUG_S390PCI_VFIO  0
-+#endif
-+
-+#define DPRINTF(fmt, ...)                                          \
-+    do {                                                           \
-+        if (DEBUG_S390PCI_VFIO) {                                  \
-+            fprintf(stderr, "S390pci-vfio: " fmt, ## __VA_ARGS__); \
-+        }                                                          \
-+    } while (0)
-+
-+static void s390_pci_read_base(S390PCIBusDevice *pbdev,
-+                               struct vfio_device_info *info)
-+{
-+    struct vfio_info_cap_header *hdr;
-+    struct vfio_device_info_cap_zpci_base *cap;
-+
-+    hdr = vfio_get_device_info_cap(info, VFIO_DEVICE_INFO_CAP_ZPCI_BASE);
-+
-+    /* If capability not provided, just leave the defaults in place */
-+    if (hdr == NULL) {
-+        DPRINTF("Base PCI clp capability not found\n");
-+        return;
-+    }
-+    cap = (void *) hdr;
-+
-+    pbdev->zpci_fn.sdma = cap->start_dma;
-+    pbdev->zpci_fn.edma = cap->end_dma;
-+    pbdev->zpci_fn.pchid = cap->pchid;
-+    pbdev->zpci_fn.vfn = cap->vfn;
-+    pbdev->zpci_fn.pfgid = cap->gid;
-+    /* The following values remain 0 until we support other FMB formats */
-+    pbdev->zpci_fn.fmbl = 0;
-+    pbdev->zpci_fn.pft = 0;
-+}
-+
-+static void s390_pci_read_group(S390PCIBusDevice *pbdev,
-+                                struct vfio_device_info *info)
-+{
-+    struct vfio_info_cap_header *hdr;
-+    struct vfio_device_info_cap_zpci_group *cap;
-+    ClpRspQueryPciGrp *resgrp;
-+
-+    hdr = vfio_get_device_info_cap(info, VFIO_DEVICE_INFO_CAP_ZPCI_GROUP);
-+
-+    /* If capability not provided, just use the default group */
-+    if (hdr == NULL) {
-+        DPRINTF("Base PCI Group clp capability not found\n");
-+        pbdev->zpci_fn.pfgid = ZPCI_DEFAULT_FN_GRP;
-+        pbdev->pci_group = s390_group_find(ZPCI_DEFAULT_FN_GRP);
-+        return;
-+    }
-+    cap = (void *) hdr;
-+
-+    /* See if the PCI group is already defined, create if not */
-+    pbdev->pci_group = s390_group_find(pbdev->zpci_fn.pfgid);
-+
-+    if (!pbdev->pci_group) {
-+        pbdev->pci_group = s390_group_create(pbdev->zpci_fn.pfgid);
-+
-+        resgrp = &pbdev->pci_group->zpci_group;
-+        if (cap->flags & VFIO_DEVICE_INFO_ZPCI_FLAG_REFRESH) {
-+            resgrp->fr = 1;
-+        }
-+        stq_p(&resgrp->dasm, cap->dasm);
-+        stq_p(&resgrp->msia, cap->msi_addr);
-+        stw_p(&resgrp->mui, cap->mui);
-+        stw_p(&resgrp->i, cap->noi);
-+        stw_p(&resgrp->maxstbl, cap->maxstbl);
-+        stb_p(&resgrp->version, cap->version);
-+    }
-+}
-+
-+static void s390_pci_read_util(S390PCIBusDevice *pbdev,
-+                               struct vfio_device_info *info)
-+{
-+    struct vfio_info_cap_header *hdr;
-+    struct vfio_device_info_cap_zpci_util *cap;
-+
-+    hdr = vfio_get_device_info_cap(info, VFIO_DEVICE_INFO_CAP_ZPCI_UTIL);
-+
-+    /* If capability not provided, just leave the defaults in place */
-+    if (hdr == NULL) {
-+        DPRINTF("Util clp capability not found\n");
-+        return;
-+    }
-+    cap = (void *) hdr;
-+
-+    if (cap->size > CLP_UTIL_STR_LEN) {
-+        DPRINTF("UTIL clp capability unexpected size\n");
-+        return;
-+    }
-+
-+    pbdev->zpci_fn.flags |= CLP_RSP_QPCI_MASK_UTIL;
-+    memcpy(pbdev->zpci_fn.util_str, cap->util_str, CLP_UTIL_STR_LEN);
-+}
-+
-+static void s390_pci_read_pfip(S390PCIBusDevice *pbdev,
-+                               struct vfio_device_info *info)
-+{
-+    struct vfio_info_cap_header *hdr;
-+    struct vfio_device_info_cap_zpci_pfip *cap;
-+
-+    hdr = vfio_get_device_info_cap(info, VFIO_DEVICE_INFO_CAP_ZPCI_PFIP);
-+
-+    /* If capability not provided, just leave the defaults in place */
-+    if (hdr == NULL) {
-+        DPRINTF("PFIP clp capability not found\n");
-+        return;
-+    }
-+    cap = (void *) hdr;
-+
-+    if (cap->size > CLP_PFIP_NR_SEGMENTS) {
-+        DPRINTF("PFIP clp capability unexpected size\n");
-+        return;
-+    }
-+
-+    memcpy(pbdev->zpci_fn.pfip, cap->pfip, CLP_PFIP_NR_SEGMENTS);
-+}
-+
-+/*
-+ * This function will issue the VFIO_DEVICE_GET_INFO ioctl and look for
-+ * capabilities that contain information about CLP features provided by the
-+ * underlying host.
-+ * On entry, defaults have already been placed into the guest CLP response
-+ * buffers.  On exit, defaults will have been overwritten for any CLP features
-+ * found in the capability chain; defaults will remain for any CLP features not
-+ * found in the chain.
-+ */
-+void s390_pci_get_clp_info(S390PCIBusDevice *pbdev)
-+{
-+    g_autofree struct vfio_device_info *info;
-+    VFIOPCIDevice *vfio_pci;
-+    uint32_t argsz;
-+    int fd;
-+
-+    argsz = sizeof(*info);
-+    info = g_malloc0(argsz);
-+
-+    vfio_pci = container_of(pbdev->pdev, VFIOPCIDevice, pdev);
-+    fd = vfio_pci->vbasedev.fd;
-+
-+    /*
-+     * If the specified argsz is not large enough to contain all capabilities
-+     * it will be updated upon return from the ioctl.  Retry until we have
-+     * a big enough buffer to hold the entire capability chain.  On error,
-+     * just exit and rely on CLP defaults.
-+     */
-+retry:
-+    info->argsz = argsz;
-+
-+    if (ioctl(fd, VFIO_DEVICE_GET_INFO, info)) {
-+        DPRINTF("zPCI could not read vfio device info\n");
-+        return;
-+    }
-+
-+    if (info->argsz > argsz) {
-+        argsz = info->argsz;
-+        info = g_realloc(info, argsz);
-+        goto retry;
-+    }
-+
-+    /*
-+     * Find the CLP features provided and fill in the guest CLP responses.
-+     * Always call s390_pci_read_base first as information from this could
-+     * determine which function group is used in s390_pci_read_group.
-+     * For any feature not found, the default values will remain in the CLP
-+     * response.
-+     */
-+    s390_pci_read_base(pbdev, info);
-+    s390_pci_read_group(pbdev, info);
-+    s390_pci_read_util(pbdev, info);
-+    s390_pci_read_pfip(pbdev, info);
-+
-+    return;
-+}
-diff --git a/include/hw/s390x/s390-pci-bus.h b/include/hw/s390x/s390-pci-bus.h
-index 79206be..945d5c1 100644
---- a/include/hw/s390x/s390-pci-bus.h
-+++ b/include/hw/s390x/s390-pci-bus.h
-@@ -314,6 +314,7 @@ typedef struct S390PCIGroup {
-     int id;
-     QTAILQ_ENTRY(S390PCIGroup) link;
- } S390PCIGroup;
-+S390PCIGroup *s390_group_create(int id);
- S390PCIGroup *s390_group_find(int id);
- 
- struct S390PCIBusDevice {
-diff --git a/include/hw/s390x/s390-pci-clp.h b/include/hw/s390x/s390-pci-clp.h
-index 3708acd..ea2b137 100644
---- a/include/hw/s390x/s390-pci-clp.h
-+++ b/include/hw/s390x/s390-pci-clp.h
-@@ -79,6 +79,7 @@ typedef struct ClpFhListEntry {
- #define CLP_SET_DISABLE_PCI_FN 1 /* Yes, 1 disables it */
- 
- #define CLP_UTIL_STR_LEN 64
-+#define CLP_PFIP_NR_SEGMENTS 4
- 
- #define CLP_MASK_FMT 0xf0000000
- 
-@@ -120,14 +121,17 @@ typedef struct ClpRspQueryPci {
-     uint32_t fmt;
-     uint64_t reserved1;
-     uint16_t vfn; /* virtual fn number */
--#define CLP_RSP_QPCI_MASK_UTIL  0x100
--#define CLP_RSP_QPCI_MASK_PFGID 0xff
--    uint16_t ug;
-+#define CLP_RSP_QPCI_MASK_UTIL  0x01
-+    uint8_t flags;
-+    uint8_t pfgid;
-     uint32_t fid; /* pci function id */
-     uint8_t bar_size[PCI_BAR_COUNT];
-     uint16_t pchid;
-     uint32_t bar[PCI_BAR_COUNT];
--    uint64_t reserved2;
-+    uint8_t pfip[CLP_PFIP_NR_SEGMENTS];
-+    uint16_t reserved2;
-+    uint8_t fmbl;
-+    uint8_t pft;
-     uint64_t sdma; /* start dma as */
-     uint64_t edma; /* end dma as */
-     uint32_t reserved3[11];
-diff --git a/include/hw/s390x/s390-pci-vfio.h b/include/hw/s390x/s390-pci-vfio.h
-new file mode 100644
-index 0000000..f690dae
---- /dev/null
-+++ b/include/hw/s390x/s390-pci-vfio.h
-@@ -0,0 +1,19 @@
-+/*
-+ * s390 vfio-pci interfaces
-+ *
-+ * Copyright 2020 IBM Corp.
-+ * Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
-+
-+#ifndef HW_S390_PCI_VFIO_H
-+#define HW_S390_PCI_VFIO_H
-+
-+#include "hw/s390x/s390-pci-bus.h"
-+
-+void s390_pci_get_clp_info(S390PCIBusDevice *pbdev);
-+
-+#endif
--- 
-1.8.3.1
+I need to sit down with this code and learn all of the different ways it 
+can actually and genuinely fail, and what each failure actually 
+semantically means.
+
+I suspect it would probably be best to always catch socket errors and 
+wrap them in QMPConnectError just to be consistent about that.
+
+I also need to revise the docstrings to be clear about what errors get 
+raised where, when, and why. I almost included that for this series, but 
+decided against it because I need to also adjust the docstring 
+formatting and so on -- and pending discussion in the qapi series -- 
+felt it would be best to tackle that just a little bit later.
+
+Here's a docstring convention question:
+
+I think that any method that directly raises an exception should always 
+mention that with :raise X:. How far up the call chain, however, should 
+anticipated exceptions be documented with :raise:?
+
+My gut feeling is that it should stop at the first public call boundary, 
+so accept() should repeat any :raise: comments that appear in private 
+helpers.
+
+>>           self.__sock.setblocking(True)
+>>   
+>>           # Wait for new events, if needed.
+> 
+> Kevin
+> 
+
+Thanks for the review! Things seem like they're looking good.
+
+--js
 
 
