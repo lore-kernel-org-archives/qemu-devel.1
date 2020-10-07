@@ -2,84 +2,88 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2F33C4363C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 11:12:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CFCDC4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 11:21:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05E882075A
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 11:12:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3B5D9206F0
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 11:21:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fxf4kYfT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05E882075A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DOIwYOI3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B5D9206F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ7Mf-00025d-Jp
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 07:12:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52886)
+	id 1kQ7Vq-0005Qh-7I
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 07:21:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55184)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kQ7Le-0001GM-7Q
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 07:11:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40242)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kQ7Lc-0004I9-Gk
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 07:11:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602069063;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=uy5X5OoqKbGe3636UJqjpIqptFCYbuWrYhzrt6z9j7w=;
- b=Fxf4kYfT6ip6/tyIZMuBxThgiZla9IBu9KyQseYGfCoV9yQNOAmA8VWOPOMFUUQIx+Fw6K
- HVqkp0uuhtgXd7LDiDIOBDCQQlsGVqbwjne/CcAZUDYvjlopcIdbemHvrdgbT+wSKY7RAB
- v/X9qTFUQz54UYJd8bSkRko587QiH6E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-321-a9SicE5GNLukIc34P8lddQ-1; Wed, 07 Oct 2020 07:11:01 -0400
-X-MC-Unique: a9SicE5GNLukIc34P8lddQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B2FEA107AFC6;
- Wed,  7 Oct 2020 11:11:00 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-113-169.ams2.redhat.com [10.36.113.169])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 653F75D9DD;
- Wed,  7 Oct 2020 11:10:58 +0000 (UTC)
-Date: Wed, 7 Oct 2020 13:10:56 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH 16/20] python/console_socket: avoid encoding to/from string
-Message-ID: <20201007111056.GJ7212@linux.fritz.box>
-References: <20201006235817.3280413-1-jsnow@redhat.com>
- <20201006235817.3280413-17-jsnow@redhat.com>
+ (Exim 4.90_1) (envelope-from <prasadalok77@gmail.com>)
+ id 1kQ7V3-0004cy-Vd
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 07:20:49 -0400
+Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:40199)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <prasadalok77@gmail.com>)
+ id 1kQ7V1-0005MT-WD
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 07:20:49 -0400
+Received: by mail-il1-x142.google.com with SMTP id u9so1894074ilj.7
+ for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 04:20:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=w9vP+baIbynxJ3cglaOxcq+DgxTxh5YrQZYtfrZpoCg=;
+ b=DOIwYOI3RPOykUtCTzNtLWbaFeX+psvK+UCEyLloSb2tUwmJN+pDMhE0rcSOll1JIy
+ q/MiWjXs9+7f4kuuEN07ATfznGXXoChTwXehELpcAVGrSabdNOGwufgBCwAm6opP7Rnj
+ jz0O4UE+FF0G3DzYoJABiT8GpfedXzBO7epAi/AHJKwLHgV6fFmjHiErKauGY52jwFux
+ bZdnPDqw6/IXvk4YCIo6FGUltAdjdOfea+k9TX5IcI3aJ3NGZWgkQv2XB31C6DGDAXT2
+ cKIApse5sPVCPtxCNQuU3ICKKssyIRUQdijtb5zq2VNDV2LfXyni6RNc4H0gKmqpfLL9
+ b7eQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=w9vP+baIbynxJ3cglaOxcq+DgxTxh5YrQZYtfrZpoCg=;
+ b=YAbG4CT3oImPlWaCI7oVyItrKCqOQ0jw3VAhL79eKm7qRKiYrZlBbaIj4QpGOqAsyu
+ FolTecYma0YphHV0ZeFIy46M7noSAs05rwEkNqrxWMIhAFiUVNOsN2Aa8t9LerWDislr
+ P4rDW2982UWE+F6+0sk+FI7SBtHHbN/sVXcvoscNwidFlx2s9tDysXzNRTKBiqVwPQM0
+ 9cD+UIXhpt6+OqcPCTFQJSSIR8GYZLNEZoJ7Xyixwd9gfhkSEJjl+1JAJyMWOvUkLngp
+ iDP+OIUSBchuThZw4dGFMQcKIqWTRTOIMPn6J7AMuJO4C3gbsbv5PqT2qH2QmuwUtROn
+ 2n1g==
+X-Gm-Message-State: AOAM533VDrRTsgg1QRf/0Z4bbw5UR+N0knqXJqsv+/ZznUhqT0l2I9kX
+ /uManf0mQTiAcfRDLVHCiLtTN4NtiIFrY/zAenM=
+X-Google-Smtp-Source: ABdhPJwegqRpCL9X386Fsc5cN4vm2S8zWiadSCdM5gs1WykD0x/2ap4HsWVGqJQ3D4H2PxvWm7vWgacoJtPxpHPNyks=
+X-Received: by 2002:a92:aa01:: with SMTP id j1mr2417103ili.301.1602069646526; 
+ Wed, 07 Oct 2020 04:20:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20201006235817.3280413-17-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:54:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <CAJPzGv1Vd1V2a_7n2GW4RBUDgpsdyAH-8NMvW+368gigtYWd0g@mail.gmail.com>
+ <CAJPzGv0bFatmLJ_dy83KgZbyMS5zM0_pAqTynkSAHXNUST_JHg@mail.gmail.com>
+ <20201006202325.GB6026@xz-x1>
+In-Reply-To: <20201006202325.GB6026@xz-x1>
+From: Alok Prasad <prasadalok77@gmail.com>
+Date: Wed, 7 Oct 2020 16:50:35 +0530
+Message-ID: <CAJPzGv3biYdPe=sd9_WYjCsoSdSNyfTZq=pLucAvzYvq_SHvXw@mail.gmail.com>
+Subject: Re: Fwd: Enable IOMMU Inside QEMU
+To: Peter Xu <peterx@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000002fcc7505b112e803"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::142;
+ envelope-from=prasadalok77@gmail.com; helo=mail-il1-x142.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,18 +96,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 07.10.2020 um 01:58 hat John Snow geschrieben:
-> We can work directly in bytes instead of translating back and forth to
-> string, which removes the question of which encodings to use.
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
+--0000000000002fcc7505b112e803
+Content-Type: text/plain; charset="UTF-8"
 
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Thanks, Peter!
+That worked for me, Not sure if Virsh XML has some issue.
+for sake of other, this is the complete command I use.
 
+/usr/bin/qemu-system-x86_64  -machine q35,kernel-irqchip=split,accel=kvm
+-smp 4 -m 2G   -device intel-iommu,intremap=on,caching-mode=on -nographic
+os_image.qcow2
+
+dmesg inside VM now shows
+
+[root@centos-8 ~]# dmesg | grep -e DMAR
+[    0.013047] ACPI: DMAR 0x000000007FFE221F 000048 (v01 BOCHS  BXPCDMAR
+00000001 BXPC 00000001)
+[    0.100861] DMAR: IOMMU enabled
+[    0.258287] DMAR: Host address width 39
+[    0.259213] DMAR: DRHD base: 0x000000fed90000 flags: 0x1
+[    0.260470] DMAR: dmar0: reg_base_addr fed90000 ver 1:0 cap
+d2008c22260286 ecap f00f5a
+[    0.262321] DMAR-IR: IOAPIC id 0 under DRHD base  0xfed90000 IOMMU 0
+[    0.263755] DMAR-IR: Queued invalidation will be enabled to support
+x2apic and Intr-remapping.
+[    0.267498] DMAR-IR: Enabled IRQ remapping in x2apic mode
+[    2.205498] DMAR: No RMRR found
+[    2.207406] DMAR: No ATSR found
+[    2.209495] DMAR: dmar0: Using Queued invalidation
+[    2.212938] DMAR: Hardware identity mapping for device 0000:00:00.0
+[    2.216531] DMAR: Hardware identity mapping for device 0000:00:01.0
+[    2.219430] DMAR: Hardware identity mapping for device 0000:00:02.0
+[    2.222314] DMAR: Hardware identity mapping for device 0000:00:03.0
+[    2.224804] DMAR: Hardware identity mapping for device 0000:00:1f.0
+[    2.227289] DMAR: Hardware identity mapping for device 0000:00:1f.2
+[    2.229850] DMAR: Hardware identity mapping for device 0000:00:1f.3
+[    2.232185] DMAR: Setting RMRR:
+[    2.233469] DMAR: Prepare 0-16MiB unity mapping for LPC
+[    2.235443] DMAR: Ignoring identity map for HW passthrough device
+0000:00:1f.0 [0x0 - 0xffffff]
+[    2.238732] DMAR: Intel(R) Virtualization Technology for Directed I/O
+
+
+Thanks,
+Alok
+
+On Wed, Oct 7, 2020 at 1:53 AM Peter Xu <peterx@redhat.com> wrote:
+
+> On Tue, Oct 06, 2020 at 11:26:08PM +0530, Alok Prasad wrote:
+> > root@beta-hp-p70:/home/fastlinq/alok/KVM-VM# /usr/bin/qemu-system-x86_64
+> > --version
+> > QEMU emulator version 4.2.1
+> > Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+> >
+> > I am missing here something,? Is there seperate Branch for the same in
+> qemu.
+>
+> No, it should always be in mainline.
+>
+> I didn't see anything obviously wrong in your setup.  A simplest QEMU
+> cmdline
+> to boot a guest with vIOMMU should be:
+>
+> $QEMU -machine q35,kernel-irqchip=split,accel=kvm -smp 4 -m 2G \
+>       -device intel-iommu ~/images/default.qcow2
+>
+> May worth try this directly.  Also feel free to compile the latest QEMU.
+> The
+> default configuration should work.
+>
+> --
+> Peter Xu
+>
+>
+
+--0000000000002fcc7505b112e803
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">Thanks, Peter!<div>That worked for me, Not sure if Virsh X=
+ML has some issue.</div><div><div>for sake of other, this is the complete c=
+ommand=C2=A0I use.<br></div><div><br></div><div>/usr/bin/qemu-system-x86_64=
+ =C2=A0-machine q35,kernel-irqchip=3Dsplit,accel=3Dkvm -smp 4 -m 2G =C2=A0 =
+-device intel-iommu,intremap=3Don,caching-mode=3Don -nographic=C2=A0 os_ima=
+ge.qcow2<br></div><div><br></div><div>dmesg inside VM now shows</div><div><=
+br></div><div>[root@centos-8 ~]# dmesg | grep -e DMAR<br>[ =C2=A0 =C2=A00.0=
+13047] ACPI: DMAR 0x000000007FFE221F 000048 (v01 BOCHS =C2=A0BXPCDMAR 00000=
+001 BXPC 00000001)<br>[ =C2=A0 =C2=A00.100861] DMAR: IOMMU enabled<br>[ =C2=
+=A0 =C2=A00.258287] DMAR: Host address width 39<br>[ =C2=A0 =C2=A00.259213]=
+ DMAR: DRHD base: 0x000000fed90000 flags: 0x1<br>[ =C2=A0 =C2=A00.260470] D=
+MAR: dmar0: reg_base_addr fed90000 ver 1:0 cap d2008c22260286 ecap f00f5a<b=
+r>[ =C2=A0 =C2=A00.262321] DMAR-IR: IOAPIC id 0 under DRHD base =C2=A00xfed=
+90000 IOMMU 0<br>[ =C2=A0 =C2=A00.263755] DMAR-IR: Queued invalidation will=
+ be enabled to support x2apic and Intr-remapping.<br>[ =C2=A0 =C2=A00.26749=
+8] DMAR-IR: Enabled IRQ remapping in x2apic mode<br>[ =C2=A0 =C2=A02.205498=
+] DMAR: No RMRR found<br>[ =C2=A0 =C2=A02.207406] DMAR: No ATSR found<br>[ =
+=C2=A0 =C2=A02.209495] DMAR: dmar0: Using Queued invalidation<br>[ =C2=A0 =
+=C2=A02.212938] DMAR: Hardware identity mapping for device 0000:00:00.0<br>=
+[ =C2=A0 =C2=A02.216531] DMAR: Hardware identity mapping for device 0000:00=
+:01.0<br>[ =C2=A0 =C2=A02.219430] DMAR: Hardware identity mapping for devic=
+e 0000:00:02.0<br>[ =C2=A0 =C2=A02.222314] DMAR: Hardware identity mapping =
+for device 0000:00:03.0<br>[ =C2=A0 =C2=A02.224804] DMAR: Hardware identity=
+ mapping for device 0000:00:1f.0<br>[ =C2=A0 =C2=A02.227289] DMAR: Hardware=
+ identity mapping for device 0000:00:1f.2<br>[ =C2=A0 =C2=A02.229850] DMAR:=
+ Hardware identity mapping for device 0000:00:1f.3<br>[ =C2=A0 =C2=A02.2321=
+85] DMAR: Setting RMRR:<br>[ =C2=A0 =C2=A02.233469] DMAR: Prepare 0-16MiB u=
+nity mapping for LPC<br>[ =C2=A0 =C2=A02.235443] DMAR: Ignoring identity ma=
+p for HW passthrough device 0000:00:1f.0 [0x0 - 0xffffff]<br>[ =C2=A0 =C2=
+=A02.238732] DMAR: Intel(R) Virtualization Technology for Directed I/O<br><=
+/div><div><br></div><div><br></div><div>Thanks,</div><div>Alok</div></div><=
+/div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">O=
+n Wed, Oct 7, 2020 at 1:53 AM Peter Xu &lt;<a href=3D"mailto:peterx@redhat.=
+com">peterx@redhat.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_q=
+uote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,2=
+04);padding-left:1ex">On Tue, Oct 06, 2020 at 11:26:08PM +0530, Alok Prasad=
+ wrote:<br>
+&gt; root@beta-hp-p70:/home/fastlinq/alok/KVM-VM# /usr/bin/qemu-system-x86_=
+64<br>
+&gt; --version<br>
+&gt; QEMU emulator version 4.2.1<br>
+&gt; Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developer=
+s<br>
+&gt; <br>
+&gt; I am missing here something,? Is there seperate Branch for the same in=
+ qemu.<br>
+<br>
+No, it should always be in mainline.<br>
+<br>
+I didn&#39;t see anything obviously wrong in your setup.=C2=A0 A simplest Q=
+EMU cmdline<br>
+to boot a guest with vIOMMU should be:<br>
+<br>
+$QEMU -machine q35,kernel-irqchip=3Dsplit,accel=3Dkvm -smp 4 -m 2G \<br>
+=C2=A0 =C2=A0 =C2=A0 -device intel-iommu ~/images/default.qcow2<br>
+<br>
+May worth try this directly.=C2=A0 Also feel free to compile the latest QEM=
+U.=C2=A0 The<br>
+default configuration should work.<br>
+<br>
+-- <br>
+Peter Xu<br>
+<br>
+</blockquote></div>
+
+--0000000000002fcc7505b112e803--
 
