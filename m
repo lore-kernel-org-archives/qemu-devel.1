@@ -2,91 +2,135 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DD69C41604
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 17:34:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 281B4C41604
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 17:36:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 814FF2168B
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 17:34:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 404132168B
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 17:36:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kc9BYMHv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 814FF2168B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SKX10M25"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 404132168B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36144 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQDL3-0003Qv-2k
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 13:34:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59264)
+	id 1kQDN1-00055R-9k
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 13:36:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59472)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kQDFZ-0006Bp-FB; Wed, 07 Oct 2020 13:29:13 -0400
-Received: from mail-qt1-x82f.google.com ([2607:f8b0:4864:20::82f]:37736)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kQDFX-00008U-3O; Wed, 07 Oct 2020 13:29:13 -0400
-Received: by mail-qt1-x82f.google.com with SMTP id s47so2619020qth.4;
- Wed, 07 Oct 2020 10:29:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=mX8en2ZnBA7wWFUbbt4tWBoKqKjQ0RCgoRKeKF6SAp0=;
- b=kc9BYMHv2unyLqhz1c6kdifxDybNK1O+tLAhig9joUcPZvsGomP6j1coWVzIvert69
- w/7KJjI7+G3ssIG3OLbki9wt7XgzFIgEsYo33ls/V1DbkPGDTmhbWLAlcAY5ngd9YPA3
- +GhSEZlR2uDaDCEGbKrgdx+VOo/3+ArFCNLOu7WeA5CdwGI5p+8I6kykan90RardSn71
- Y7oW+FJr9vqTzvbYMozV1GNZsKtJz1Aw3jW+PVqOO0Icz8YxHJZAng47CbDg40U540QR
- l+gDDZDSVRTR8e+GG/YswZZfKkjcG7VMHYfdRgeH2Gn6KrTsV3ChJu+rGgP8ksqcxzL0
- GL3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=mX8en2ZnBA7wWFUbbt4tWBoKqKjQ0RCgoRKeKF6SAp0=;
- b=CmRzwpU9i6+8E3C1BcBr/wHVUp4LjhbJMRCt4tvIfI1SLw/PsMnT43EVWbfURWZf7p
- 5/749m9FMDYWtKdm9j4wm0GaVexrpTHgcT/1j3hOHxaSN2Dh7OEz7QnKXbLBXorUF3RK
- PWMsxuFeCIijuorcHMuZGl6A2XxrvBji3t7q5AFICLmzueFUPEwF+NAEpjnf12p1Ut/U
- j21sObyzDzE4evnswvIhnY3Otl3Sbu1vi29tyHNx2vHg8namkhuTv34c9OtDqr6r5eAK
- QOekj46jo0E4iT4f1GCXMh6jJ4VzDk2d/fy5nUKivFCd0cNbTESzb0QrlYwoCCyBEbtu
- Yh2A==
-X-Gm-Message-State: AOAM531A4Io6VzaitGDyfhsciCjHNg2Lktohsr7uGjAapi2ADDbqMJBj
- rEpu3L5LdJ0NJ1FAxCjZ4lGheywN4Wxjcg==
-X-Google-Smtp-Source: ABdhPJyPBtO3sdMT3g4E7E575Be7ZOtF2bUlOVpoxU3v2dXQn9uVmm3EaMkDVZG6UWXtXnHGb2vazA==
-X-Received: by 2002:ac8:3984:: with SMTP id v4mr4395631qte.240.1602091746685; 
- Wed, 07 Oct 2020 10:29:06 -0700 (PDT)
-Received: from rekt.ibmuc.com ([2804:431:c7c6:5a9b:54fc:df2a:8a5e:989b])
- by smtp.gmail.com with ESMTPSA id e39sm2080117qtk.32.2020.10.07.10.29.05
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 07 Oct 2020 10:29:06 -0700 (PDT)
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 5/5] specs/ppc-spapr-numa: update with new NUMA support
-Date: Wed,  7 Oct 2020 14:28:49 -0300
-Message-Id: <20201007172849.302240-6-danielhb413@gmail.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201007172849.302240-1-danielhb413@gmail.com>
-References: <20201007172849.302240-1-danielhb413@gmail.com>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kQDGH-0007I0-8X
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 13:29:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51581)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kQDG9-0000DT-Cq
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 13:29:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602091788;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=/uqYLS1LbopoDC7KHGQFupjQLbU0LuRB3iE7nDesYug=;
+ b=SKX10M258WXSyLkh3sKiOgEBA9dJ7G/rVPsFwsVFrI0qs9GTagQX4A0tQjL2gEuID17vLK
+ l/tQSInR8r/VS7rxFORpBd3xk/KWAOc2G8W+OJzP8WzcDk20sD+CGYHXlGKpGLzLbqWqfH
+ 6JA5JgzfgGzfzKTWnZz+t2PX7wYBv14=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-232-UCjDbaqCNJaTw-Zy1ZSJdQ-1; Wed, 07 Oct 2020 13:29:43 -0400
+X-MC-Unique: UCjDbaqCNJaTw-Zy1ZSJdQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BFE6E804013;
+ Wed,  7 Oct 2020 17:29:41 +0000 (UTC)
+Received: from [10.3.113.66] (ovpn-113-66.phx2.redhat.com [10.3.113.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 509F31002382;
+ Wed,  7 Oct 2020 17:29:41 +0000 (UTC)
+Subject: Re: [PATCH v3 1/4] keyval: Parse help options
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20201007164903.282198-1-kwolf@redhat.com>
+ <20201007164903.282198-2-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Autocrypt: addr=eblake@redhat.com; keydata=
+ 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
+Organization: Red Hat, Inc.
+Message-ID: <609ce08c-35d5-ca85-ac15-bdbc56c28465@redhat.com>
+Date: Wed, 7 Oct 2020 12:29:40 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::82f;
- envelope-from=danielhb413@gmail.com; helo=mail-qt1-x82f.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20201007164903.282198-2-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="mOnHv6AIaNSAyKPLsDD2PcEhZB0sdEpeR"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:44:56
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,276 +143,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-ppc@nongnu.org,
- david@gibson.dropbear.id.au
+Cc: armbru@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This update provides more in depth information about the
-choices and drawbacks of the new NUMA support for the
-spapr machine.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--mOnHv6AIaNSAyKPLsDD2PcEhZB0sdEpeR
+Content-Type: multipart/mixed; boundary="LSvaU345wtI4cfSCaJs3nEj4cgElx57gP";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: armbru@redhat.com, qemu-devel@nongnu.org
+Message-ID: <609ce08c-35d5-ca85-ac15-bdbc56c28465@redhat.com>
+Subject: Re: [PATCH v3 1/4] keyval: Parse help options
+References: <20201007164903.282198-1-kwolf@redhat.com>
+ <20201007164903.282198-2-kwolf@redhat.com>
+In-Reply-To: <20201007164903.282198-2-kwolf@redhat.com>
 
-Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
----
- docs/specs/ppc-spapr-numa.rst | 235 ++++++++++++++++++++++++++++++++--
- 1 file changed, 227 insertions(+), 8 deletions(-)
+--LSvaU345wtI4cfSCaJs3nEj4cgElx57gP
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/docs/specs/ppc-spapr-numa.rst b/docs/specs/ppc-spapr-numa.rst
-index e762038022..5fca2bdd8e 100644
---- a/docs/specs/ppc-spapr-numa.rst
-+++ b/docs/specs/ppc-spapr-numa.rst
-@@ -158,9 +158,235 @@ kernel tree). This results in the following distances:
- * resources four NUMA levels apart: 160
- 
- 
--Consequences for QEMU NUMA tuning
-+pseries NUMA mechanics
-+======================
-+
-+Starting in QEMU 5.2, the pseries machine considers user input when setting NUMA
-+topology of the guest. The overall design is:
-+
-+* ibm,associativity-reference-points is set to {0x4, 0x3, 0x2, 0x1}, allowing
-+  for 4 distinct NUMA distance values based on the NUMA levels
-+
-+* ibm,max-associativity-domains supports multiple associativity domains in all
-+  NUMA levels, granting user flexibility
-+
-+* ibm,associativity for all resources varies with user input
-+
-+These changes are only effective for pseries-5.2 and newer machines that are
-+created with more than one NUMA node (disconsidering NUMA nodes created by
-+the machine itself, e.g. NVLink 2 GPUs). The now legacy support has been
-+around for such a long time, with users seeing NUMA distances 10 and 40
-+(and 80 if using NVLink2 GPUs), and there is no need to disrupt the
-+existing experience of those guests.
-+
-+To bring the user experience x86 users have when tuning up NUMA, we had
-+to operate under the current pseries Linux kernel logic described in
-+`How the pseries Linux guest calculates NUMA distances`_. The result
-+is that we needed to translate NUMA distance user input to pseries
-+Linux kernel input.
-+
-+Translating user distance to kernel distance
-+--------------------------------------------
-+
-+User input for NUMA distance can vary from 10 to 254. We need to translate
-+that to the values that the Linux kernel operates on (10, 20, 40, 80, 160).
-+This is how it is being done:
-+
-+* user distance 11 to 30 will be interpreted as 20
-+* user distance 31 to 60 will be interpreted as 40
-+* user distance 61 to 120 will be interpreted as 80
-+* user distance 121 and beyond will be interpreted as 160
-+* user distance 10 stays 10
-+
-+The reasoning behind this aproximation is to avoid any round up to the local
-+distance (10), keeping it exclusive to the 4th NUMA level (which is still
-+exclusive to the node_id). All other ranges were chosen under the developer
-+discretion of what would be (somewhat) sensible considering the user input.
-+Any other strategy can be used here, but in the end the reality is that we'll
-+have to accept that a large array of values will be translated to the same
-+NUMA topology in the guest, e.g. this user input:
-+
-+::
-+
-+      0   1   2
-+  0  10  31 120
-+  1  31  10  30
-+  2 120  30  10
-+
-+And this other user input:
-+
-+::
-+
-+      0   1   2
-+  0  10  60  61
-+  1  60  10  11
-+  2  61  11  10
-+
-+Will both be translated to the same values internally:
-+
-+::
-+
-+      0   1   2
-+  0  10  40  80
-+  1  40  10  20
-+  2  80  20  10
-+
-+Users are encouraged to use only the kernel values in the NUMA definition to
-+avoid being taken by surprise with that the guest is actually seeing in the
-+topology. There are enough potential surprises that are inherent to the
-+associativity domain assignment process, discussed below.
-+
-+
-+How associativity domains are assigned
-+--------------------------------------
-+
-+LOPAPR allows more than one associativity array (or 'string') per allocated
-+resource. This would be used to represent that the resource has multiple
-+connections with the board, and then the operational system, when deciding
-+NUMA distancing, should consider the associativity information that provides
-+the shortest distance.
-+
-+The spapr implementation does not support multiple associativity arrays per
-+resource, neither does the pseries Linux kernel. We'll have to represent the
-+NUMA topology using one associativity per resource, which means that choices
-+and compromises are going to be made.
-+
-+Consider the following NUMA topology entered by user input:
-+
-+::
-+
-+      0   1   2   3
-+  0  10  40  20  40
-+  1  40  10  80  40
-+  2  20  80  10  20
-+  3  40  40  20  10
-+
-+All the associativity arrays are initialized with NUMA id in all associativity
-+domains:
-+
-+* node 0: 0 0 0 0
-+* node 1: 1 1 1 1
-+* node 2: 2 2 2 2
-+* node 3: 3 3 3 3
-+
-+
-+Honoring just the relative distances of node 0 to every other node, we find the
-+NUMA level matches (considering the reference points {0x4, 0x3, 0x2, 0x1}) for
-+each distance:
-+
-+* distance from 0 to 1 is 40 (no match at 0x4 and 0x3, will match
-+  at 0x2)
-+* distance from 0 to 2 is 20 (no match at 0x4, will match at 0x3)
-+* distance from 0 to 3 is 40 (no match at 0x4 and 0x3, will match
-+  at 0x2)
-+
-+We'll copy the associativity domains of node 0 to all other nodes, based on
-+the NUMA level matches. Between 0 and 1, a match in 0x2, we'll also copy
-+the domains 0x2 and 0x1 from 0 to 1 as well. This will give us:
-+
-+* node 0: 0 0 0 0
-+* node 1: 0 0 1 1
-+
-+Doing the same to node 2 and node 3, these are the associativity arrays
-+after considering all matches with node 0:
-+
-+* node 0: 0 0 0 0
-+* node 1: 0 0 1 1
-+* node 2: 0 0 0 2
-+* node 3: 0 0 3 3
-+
-+The distances related to node 0 are accounted for. For node 1, and keeping
-+in mind that we don't need to revisit node 0 again, the distance from
-+node 1 to 2 is 80, matching at 0x1, and distance from 1 to 3 is 40,
-+match in 0x2. Repeating the same logic of copying all domains up to
-+the NUMA level match:
-+
-+* node 0: 0 0 0 0
-+* node 1: 1 0 1 1
-+* node 2: 1 0 0 2
-+* node 3: 1 0 3 3
-+
-+In the last step we will analyze just nodes 2 and 3. The desired distance
-+between 2 and 3 is 20, i.e. a match in 0x3:
-+
-+* node 0: 0 0 0 0
-+* node 1: 1 0 1 1
-+* node 2: 1 0 0 2
-+* node 3: 1 0 0 3
-+
-+
-+The kernel will read these arrays and will calculate the following NUMA topology for
-+the guest:
-+
-+::
-+
-+      0   1   2   3
-+  0  10  40  20  20
-+  1  40  10  40  40
-+  2  20  40  10  20
-+  3  20  40  20  10
-+
-+Note that this is not what the user wanted - the desired distance between
-+0 and 3 is 40, we calculated it as 20. This is what the current logic and
-+implementation constraints of the kernel and QEMU will provide inside the
-+LOPAPR specification.
-+
-+Users are welcome to use this knowledge and experiment with the input to get
-+the NUMA topology they want, or as closer as they want. The important thing
-+is to keep expectations up to par with what we are capable of provide at this
-+moment: an approximation.
-+
-+Limitations of the implementation
- ---------------------------------
- 
-+As mentioned above, the pSeries NUMA distance logic is, in fact, a way to approximate
-+user choice. The Linux kernel, and PAPR itself, does not provide QEMU with the ways
-+to fully map user input to actual NUMA distance the guest will use. These limitations
-+creates two notable limitations in our support:
-+
-+* Asymmetrical topologies aren't supported. We only support NUMA topologies where
-+  the distance from node A to B is always the same as B to A. We do not support
-+  any A-B pair where the distance back and forth is asymmetric. For example, the
-+  following topology isn't supported and the pSeries guest will not boot with this
-+  user input:
-+
-+::
-+
-+      0   1
-+  0  10  40
-+  1  20  10
-+
-+
-+* 'non-transitive' topologies will be poorly translated to the guest. This is the
-+  kind of topology where the distance from a node A to B is X, B to C is X, but
-+  the distance A to C is not X. E.g.:
-+
-+::
-+
-+      0   1   2   3
-+  0  10  20  20  40
-+  1  20  10  80  40
-+  2  20  80  10  20
-+  3  40  40  20  10
-+
-+  In the example above, distance 0 to 2 is 20, 2 to 3 is 20, but 0 to 3 is 40.
-+  The kernel will always match with the shortest associativity domain possible,
-+  and we're attempting to retain the previous established relations between the
-+  nodes. This means that a distance equal to 20 between nodes 0 and 2 and the
-+  same distance 20 between nodes 2 and 3 will cause the distance between 0 and 3
-+  to also be 20.
-+
-+
-+Legacy (5.1 and older) pseries NUMA mechanics
-+=============================================
-+
-+In short, we can summarize the NUMA distances seem in pseries Linux guests, using
-+QEMU up to 5.1, as follows:
-+
-+* local distance, i.e. the distance of the resource to its own NUMA node: 10
-+* if it's a NVLink GPU device, distance: 80
-+* every other resource, distance: 40
-+
- The way the pseries Linux guest calculates NUMA distances has a direct effect
- on what QEMU users can expect when doing NUMA tuning. As of QEMU 5.1, this is
- the default ibm,associativity-reference-points being used in the pseries
-@@ -180,12 +406,5 @@ as far as NUMA distance goes:
-   to the same third NUMA level, having distance = 40
- * for NVLink GPUs, distance = 80 from everything else
- 
--In short, we can summarize the NUMA distances seem in pseries Linux guests, using
--QEMU up to 5.1, as follows:
--
--* local distance, i.e. the distance of the resource to its own NUMA node: 10
--* if it's a NVLink GPU device, distance: 80
--* every other resource, distance: 40
--
- This also means that user input in QEMU command line does not change the
- NUMA distancing inside the guest for the pseries machine.
--- 
-2.26.2
+On 10/7/20 11:49 AM, Kevin Wolf wrote:
+> This adds a special meaning for 'help' and '?' as options to the keyval
+> parser. Instead of being an error (because of a missing value) or a
+> value for an implied key, they now request help, which is a new boolean
+> ouput of the parser in addition to the QDict.
+
+output
+
+>=20
+> A new parameter 'p_help' is added to keyval_parse() that contains on
+> return whether help was requested. If NULL is passed, requesting help
+> results in an error and all other cases work like before.
+>=20
+> Turning previous error cases into help is a compatible extension. The
+> behaviour potentially changes for implied keys: They could previously
+> get 'help' as their value, which is now interpreted as requesting help.
+>=20
+> This is not a problem in practice because 'help' and '?' are not a valid
+> values for the implied key of any option parsed with keyval_parse():
+>=20
+> * audiodev: union Audiodev, implied key "driver" is enum AudiodevDriver,
+>   "help" and "?" are not among its values
+>=20
+> * display: union DisplayOptions, implied key "type" is enum
+>   DisplayType, "help" and "?" are not among its values
+>=20
+> * blockdev: union BlockdevOptions, implied key "driver is enum
+>   BlockdevDriver, "help" and "?" are not among its values
+>=20
+> * export: union BlockExport, implied key "type" is enum BlockExportType,
+>   "help" and "?" are not among its values
+>=20
+> * monitor: struct MonitorOptions, implied key "mode"is enum MonitorMode,
+
+missing space
+
+>   "help" and "?" are not among its values
+>=20
+> * nbd-server: struct NbdServerOptions, no implied key.
+
+Including the audit is nice (and thanks to Markus for helping derive the
+list).
+
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+
+> +++ b/util/keyval.c
+> @@ -14,7 +14,7 @@
+>   * KEY=3DVALUE,... syntax:
+>   *
+>   *   key-vals     =3D [ key-val { ',' key-val } [ ',' ] ]
+> - *   key-val      =3D key '=3D' val
+> + *   key-val      =3D 'help' | key '=3D' val
+
+Maybe: =3D 'help' | '?' | key =3D '=3D' val
+
+>   *   key          =3D key-fragment { '.' key-fragment }
+>   *   key-fragment =3D / [^=3D,.]* /
+>   *   val          =3D { / [^,]* / | ',,' }
+> @@ -73,10 +73,14 @@
+>   *
+>   * Additional syntax for use with an implied key:
+>   *
+> - *   key-vals-ik  =3D val-no-key [ ',' key-vals ]
+> + *   key-vals-ik  =3D 'help' | val-no-key [ ',' key-vals ]
+
+and again for '?' here.  Actually, this should probably be:
+
+key-vals-ik  =3D 'help' [ ',' key-vals ]
+             | '?' [ ',' key-vals ]
+             | val-no-key [ ',' key-vals ]
+
+>   *   val-no-key   =3D / [^=3D,]* /
+
+This is now slightly inaccurate, but I don't know how to concisely
+express the regex [^=3D,]* but not '?' or 'help', and the prose covers the
+ambiguity.
+
+
+> @@ -410,6 +442,14 @@ QDict *keyval_parse(const char *params, const char *=
+implied_key,
+>          implied_key =3D NULL;
+>      }
+> =20
+> +    if (p_help) {
+> +        *p_help =3D help;
+> +    } else if (help) {
+> +        error_setg(errp, "Help is not available for this option");
+> +        qobject_unref(qdict);
+> +        return NULL;
+> +    }
+
+This part is a definite improvement over v2.
+
+I'm assuming Markus can help touch up the comments and spelling errors, so:
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--LSvaU345wtI4cfSCaJs3nEj4cgElx57gP--
+
+--mOnHv6AIaNSAyKPLsDD2PcEhZB0sdEpeR
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl99+wQACgkQp6FrSiUn
+Q2oqdgf8Dsr7Y/c2sRMnoww9t32pROcG5NEqQJ/Khv6NliOXxsvp/ySmHzloRqEv
+MCBpidrAfDfkiJOjvhxM3iGJdFPkrziB83nLnpvwohyWhC3aV1B1VPgKBYZHK0+h
+ZCPQsFzO8ZMpN75SFrzstORekztSC6d/Pc9ZkzdJX/rwFbVt2xbcNiUiC4sr2haU
+VhoMttPQHBAXox44MlGvuG3QlPWqepPwlfhr6OC0W0Q89hcjRzDsYMu4ddFgte7h
+1FMZQoagLM52wQJHypuGl9hboWBgtFTkYpM2OQ0ZQ6x1BlklV+etDxktombl/CSt
+k9d9th/eegvF11Rijw1O7yCs/LerqQ==
+=My2a
+-----END PGP SIGNATURE-----
+
+--mOnHv6AIaNSAyKPLsDD2PcEhZB0sdEpeR--
 
 
