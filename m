@@ -7,63 +7,62 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFAE8C4363D
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 12:02:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1C3FC4363D
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 12:02:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50A8D20789
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 12:02:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1304320782
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 12:02:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DLkgxbhP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50A8D20789
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QlfrsBHG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1304320782
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ89T-0007tP-9H
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 08:02:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35908)
+	id 1kQ89g-0008OA-0P
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 08:02:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35752)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kQ84O-0001YJ-Fh
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 07:57:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30080)
+ id 1kQ84H-0001Tg-Ip
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 07:57:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29449)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kQ84L-0001k0-2C
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 07:57:20 -0400
+ id 1kQ84D-0001gw-Nh
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 07:57:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602071836;
+ s=mimecast20190719; t=1602071829;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=CrmoymnzAgikECEklmSg1XDyOEymdcxw7MwzoWGtGiE=;
- b=DLkgxbhPcWFVQRy6uEze9XKSmoTsiOzeMgMzJCdb916QekZoZSyCmGF+h0Rv4EGS7FZE6h
- AJSra2xPg0K43QvrJNZWpdVdYgaOXRcDV6fQcuXxNSHKRuz6vcVA7kdXgUlk/q2nINUuF8
- 8MKsEFyRNo+lslVvjwQQx8pJ3Q4RvOk=
+ bh=uAJ2cD9EbDnle3AkY/6ltfJ3Qb/+qcsUaD8BFkIZXuc=;
+ b=QlfrsBHGoXSuNdTrwhSqXTGJ1zBC13PEUrzxmvg0jCOkFwqVKAGKz4Giw+OQ1/oiHggsl0
+ VZelUhf5nIbTz0RlFNi38DFg3Dw0mMyKEPBqVxEpcBLpgLASarJ0G3z9jOvslhtt79WsWL
+ V3PVtwt2r6ln6dDVQkHp606OIPssAmk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-550-zT8-JcTDM4eeWXsS17Ovow-1; Wed, 07 Oct 2020 07:57:14 -0400
-X-MC-Unique: zT8-JcTDM4eeWXsS17Ovow-1
+ us-mta-509-Sz4BSwIoNIGAm6eVqY0NnA-1; Wed, 07 Oct 2020 07:57:06 -0400
+X-MC-Unique: Sz4BSwIoNIGAm6eVqY0NnA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 098651007468;
- Wed,  7 Oct 2020 11:57:12 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F1B4510BBEC7;
+ Wed,  7 Oct 2020 11:57:05 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9BEF555785;
- Wed,  7 Oct 2020 11:57:08 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 84E995577B;
+ Wed,  7 Oct 2020 11:57:05 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 09/17] scsi/scsi_bus: switch search direction in
- scsi_device_find
-Date: Wed,  7 Oct 2020 07:56:52 -0400
-Message-Id: <20201007115700.707938-10-pbonzini@redhat.com>
+Subject: [PATCH v8 03/17] qtest: remove qtest_qmp_receive_success
+Date: Wed,  7 Oct 2020 07:56:46 -0400
+Message-Id: <20201007115700.707938-4-pbonzini@redhat.com>
 In-Reply-To: <20201007115700.707938-1-pbonzini@redhat.com>
 References: <20201007115700.707938-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -74,17 +73,17 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:44:56
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:54:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
 X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,55 +97,200 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: kwolf@redhat.com, Maxim Levitsky <mlevitsk@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org,
- mreitz@redhat.com
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Maxim Levitsky <mlevitsk@redhat.com>
 
-This change will allow us to convert the bus children list to RCU,
-while not changing the logic of this function
+The purpose of qtest_qmp_receive_success was mostly to process events
+that arrived between the issueing of a command and the "return"
+line from QMP.  This is now handled by the buffering of events
+that libqtest performs automatically.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20200913160259.32145-2-mlevitsk@redhat.com>
+[Extracted from Maxim's patch to a separate commit. - Paolo]
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/scsi-bus.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ tests/qtest/libqos/libqtest.h   | 17 -----------
+ tests/qtest/libqtest.c          | 53 ++++-----------------------------
+ tests/qtest/migration-helpers.c | 25 ++++++++++++----
+ 3 files changed, 25 insertions(+), 70 deletions(-)
 
-diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index 3284a5d1fb..6b1ed7ae9a 100644
---- a/hw/scsi/scsi-bus.c
-+++ b/hw/scsi/scsi-bus.c
-@@ -1572,7 +1572,7 @@ SCSIDevice *scsi_device_find(SCSIBus *bus, int channel, int id, int lun)
-     BusChild *kid;
-     SCSIDevice *target_dev = NULL;
+diff --git a/tests/qtest/libqos/libqtest.h b/tests/qtest/libqos/libqtest.h
+index a2e3961792..64bb1cd9eb 100644
+--- a/tests/qtest/libqos/libqtest.h
++++ b/tests/qtest/libqos/libqtest.h
+@@ -240,23 +240,6 @@ QDict *qtest_qmp_eventwait_ref(QTestState *s, const char *event);
+  */
+ QDict *qtest_qmp_event_ref(QTestState *s, const char *event);
  
--    QTAILQ_FOREACH_REVERSE(kid, &bus->qbus.children, sibling) {
-+    QTAILQ_FOREACH(kid, &bus->qbus.children, sibling) {
-         DeviceState *qdev = kid->child;
-         SCSIDevice *dev = SCSI_DEVICE(qdev);
+-/**
+- * qtest_qmp_receive_success:
+- * @s: #QTestState instance to operate on
+- * @event_cb: Event callback
+- * @opaque: Argument for @event_cb
+- *
+- * Poll QMP messages until a command success response is received.
+- * If @event_cb, call it for each event received, passing @opaque,
+- * the event's name and data.
+- * Return the success response's "return" member.
+- */
+-QDict *qtest_qmp_receive_success(QTestState *s,
+-                                 void (*event_cb)(void *opaque,
+-                                                  const char *name,
+-                                                  QDict *data),
+-                                 void *opaque);
+-
+ /**
+  * qtest_hmp:
+  * @s: #QTestState instance to operate on.
+diff --git a/tests/qtest/libqtest.c b/tests/qtest/libqtest.c
+index d4c49a52ff..baac667b8d 100644
+--- a/tests/qtest/libqtest.c
++++ b/tests/qtest/libqtest.c
+@@ -1291,35 +1291,6 @@ void qtest_cb_for_every_machine(void (*cb)(const char *machine),
+     qobject_unref(response);
+ }
  
-@@ -1580,7 +1580,15 @@ SCSIDevice *scsi_device_find(SCSIBus *bus, int channel, int id, int lun)
-             if (dev->lun == lun) {
-                 return dev;
-             }
--            target_dev = dev;
+-QDict *qtest_qmp_receive_success(QTestState *s,
+-                                 void (*event_cb)(void *opaque,
+-                                                  const char *event,
+-                                                  QDict *data),
+-                                 void *opaque)
+-{
+-    QDict *response, *ret, *data;
+-    const char *event;
+-
+-    for (;;) {
+-        response = qtest_qmp_receive_dict(s);
+-        g_assert(!qdict_haskey(response, "error"));
+-        ret = qdict_get_qdict(response, "return");
+-        if (ret) {
+-            break;
+-        }
+-        event = qdict_get_str(response, "event");
+-        data = qdict_get_qdict(response, "data");
+-        if (event_cb) {
+-            event_cb(opaque, event, data);
+-        }
+-        qobject_unref(response);
+-    }
+-
+-    qobject_ref(ret);
+-    qobject_unref(response);
+-    return ret;
+-}
+-
+ /*
+  * Generic hot-plugging test via the device_add QMP commands.
+  */
+@@ -1355,13 +1326,6 @@ void qtest_qmp_device_add(QTestState *qts, const char *driver, const char *id,
+     qobject_unref(args);
+ }
+ 
+-static void device_deleted_cb(void *opaque, const char *name, QDict *data)
+-{
+-    bool *got_event = opaque;
+-
+-    g_assert_cmpstr(name, ==, "DEVICE_DELETED");
+-    *got_event = true;
+-}
+ 
+ /*
+  * Generic hot-unplugging test via the device_del QMP command.
+@@ -1378,24 +1342,17 @@ static void device_deleted_cb(void *opaque, const char *name, QDict *data)
+  * and this one:
+  *
+  * {"return": {}}
+- *
+- * But the order of arrival may vary - so we've got to detect both.
+  */
+ void qtest_qmp_device_del(QTestState *qts, const char *id)
+ {
+-    bool got_event = false;
+     QDict *rsp;
+ 
+-    qtest_qmp_send(qts, "{'execute': 'device_del', 'arguments': {'id': %s}}",
+-                   id);
+-    rsp = qtest_qmp_receive_success(qts, device_deleted_cb, &got_event);
++    rsp = qtest_qmp(qts, "{'execute': 'device_del', 'arguments': {'id': %s}}",
++                    id);
 +
-+            /*
-+             * If we don't find exact match (channel/bus/lun),
-+             * we will return the first device which matches channel/bus
-+             */
-+
-+            if (!target_dev) {
-+                target_dev = dev;
-+            }
-         }
++    g_assert(qdict_haskey(rsp, "return"));
+     qobject_unref(rsp);
+-    if (!got_event) {
+-        rsp = qtest_qmp_receive_dict(qts);
+-        g_assert_cmpstr(qdict_get_try_str(rsp, "event"),
+-                        ==, "DEVICE_DELETED");
+-        qobject_unref(rsp);
+-    }
++    qtest_qmp_eventwait(qts, "DEVICE_DELETED");
+ }
+ 
+ bool qmp_rsp_is_err(QDict *rsp)
+diff --git a/tests/qtest/migration-helpers.c b/tests/qtest/migration-helpers.c
+index 516093b39a..b799dbafb7 100644
+--- a/tests/qtest/migration-helpers.c
++++ b/tests/qtest/migration-helpers.c
+@@ -17,10 +17,12 @@
+ 
+ bool got_stop;
+ 
+-static void stop_cb(void *opaque, const char *name, QDict *data)
++static void check_stop_event(QTestState *who)
+ {
+-    if (!strcmp(name, "STOP")) {
++    QDict *event = qtest_qmp_event_ref(who, "STOP");
++    if (event) {
+         got_stop = true;
++        qobject_unref(event);
      }
-     return target_dev;
+ }
+ 
+@@ -30,12 +32,19 @@ static void stop_cb(void *opaque, const char *name, QDict *data)
+ QDict *wait_command_fd(QTestState *who, int fd, const char *command, ...)
+ {
+     va_list ap;
++    QDict *resp;
+ 
+     va_start(ap, command);
+     qtest_qmp_vsend_fds(who, &fd, 1, command, ap);
+     va_end(ap);
+ 
+-    return qtest_qmp_receive_success(who, stop_cb, NULL);
++    resp = qtest_qmp_receive(who);
++    check_stop_event(who);
++
++    g_assert(!qdict_haskey(resp, "error"));
++    g_assert(qdict_haskey(resp, "return"));
++
++    return qdict_get_qdict(resp, "return");
+ }
+ 
+ /*
+@@ -44,12 +53,18 @@ QDict *wait_command_fd(QTestState *who, int fd, const char *command, ...)
+ QDict *wait_command(QTestState *who, const char *command, ...)
+ {
+     va_list ap;
++    QDict *resp;
+ 
+     va_start(ap, command);
+-    qtest_qmp_vsend(who, command, ap);
++    resp = qtest_vqmp(who, command, ap);
+     va_end(ap);
+ 
+-    return qtest_qmp_receive_success(who, stop_cb, NULL);
++    check_stop_event(who);
++
++    g_assert(!qdict_haskey(resp, "error"));
++    g_assert(qdict_haskey(resp, "return"));
++
++    return qdict_get_qdict(resp, "return");
+ }
+ 
+ /*
 -- 
 2.26.2
 
