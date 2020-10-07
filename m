@@ -2,86 +2,76 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 795C3C4363C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 08:57:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C6C8C4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 08:58:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF63920797
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 08:56:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bw8N41GT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF63920797
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4921B20797
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 08:58:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4921B20797
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ5Fq-0004ku-O2
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 04:56:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52978)
+	id 1kQ5Gx-0005fk-5f
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 04:58:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53418)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kQ5Dh-0002pr-EC; Wed, 07 Oct 2020 04:54:45 -0400
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:33618)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kQ5Df-00041D-II; Wed, 07 Oct 2020 04:54:45 -0400
-Received: by mail-lj1-x244.google.com with SMTP id 133so1193823ljj.0;
- Wed, 07 Oct 2020 01:54:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=WUm6kk3l/nP+LeFH6oczXVPLfb8g8NLzOSbVsoR97Mg=;
- b=Bw8N41GTGskphmMDpgLviUkZF2xcZrjlak4j4YqTspUucjGY722goymH4tvC3jYOCL
- 76yoryZTGgsDjcJaGV2zzhVp/Uwa/IbxTIyT7buyF5htBgENHIZkxzPEeOy2O7ZE6zKa
- gXHc5TV2+Smwt2f3kqllWsejfWk5zavd5dT80TS9ImbDSVi1BaVWm2vGl2itvcdrCX/L
- 96jM9pChE5UbZ/sz70w90VqUZ1sVEIEWiBT7WgGU59mFqQXlYdiB1jNgE+1v94Ma/j/R
- 4qyGhMvbZV4Sja83O1eT6JWy8OVyobcHju58plohpuTnTplCbCKYbCD5DKw39VYYgAc+
- x8WQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=WUm6kk3l/nP+LeFH6oczXVPLfb8g8NLzOSbVsoR97Mg=;
- b=msnNO+MDX2nyiphLi9xXRyrBct18Z+cxFkUMrVgimEwSv4HNuyHPXYuZAVRbJZhy/q
- vcajKxW7w5qUu5vMbA0zQx4ZUsixXXmHcqK18E/GXCmvV+2KOY1atcdV69hrx9gW3oDg
- mYY2uGSXle5oSmceDTW3E35zY1X8Yhc3T2ySX9wDV3sOaseYujXEcQUzJV12VA9XPgMi
- /0+zj3SXOJBGpXIX+PZUmEc1G3kY3Aprde/XuF0a/AFXvIeT35UV4qiyADLUtIA4CsSr
- tyBzOLxYiffhBbw7cRQBQ4jyt5CSlvEyr2Or+dzqGDRqewcfUS4gXJAoXM3zIBK0dSuB
- JQRQ==
-X-Gm-Message-State: AOAM530QCtFaQNkFxHVWemMXwlkkhtuG3erZtq60nOnFGYhi/iRqBjmB
- xjZnZqLbhO01Wpd+mL6xyCKlT2uObfYHY6AN6qA=
-X-Google-Smtp-Source: ABdhPJwUALn7Wgbr5wbZAmxFM4V+nyPN7ItEucd+1e+b5MC1H7KkIYkd5OVYJtwY7hUWjzZJhE6WigI9Kqgn54IkDnE=
-X-Received: by 2002:a2e:9dc7:: with SMTP id x7mr918997ljj.447.1602060881435;
- Wed, 07 Oct 2020 01:54:41 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>)
+ id 1kQ5Fm-0004pg-G8; Wed, 07 Oct 2020 04:56:54 -0400
+Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:33035)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>)
+ id 1kQ5Fk-0004MM-CJ; Wed, 07 Oct 2020 04:56:54 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.108.20.120])
+ by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 3D45F69893DF;
+ Wed,  7 Oct 2020 10:56:32 +0200 (CEST)
+Received: from kaod.org (37.59.142.105) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Wed, 7 Oct 2020
+ 10:56:32 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-105G0064fb63119-2f86-4692-b278-8ed45af44f34,
+ A16E168222A5E88446A1C19725E79DC133334205) smtp.auth=groug@kaod.org
+Date: Wed, 7 Oct 2020 10:56:30 +0200
+From: Greg Kurz <groug@kaod.org>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH v2 3/6] spapr/xive: Add a warning when StoreEOI is
+ activated on POWER9 CPUs
+Message-ID: <20201007105630.64e2f0c3@bahia.lan>
+In-Reply-To: <e8013373-4536-08e4-27c9-8c8b8f46f768@kaod.org>
+References: <20201005165147.526426-1-clg@kaod.org>
+ <20201005165147.526426-4-clg@kaod.org>
+ <20201006185826.65f8ff3b@bahia.lan>
+ <e8013373-4536-08e4-27c9-8c8b8f46f768@kaod.org>
+X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20201007035154.109-1-luoyonggang@gmail.com>
- <20201007035154.109-3-luoyonggang@gmail.com>
- <6b4528dc-918d-ebf4-db27-cbd67fa96c11@redhat.com>
- <90b2011a-3e58-1e91-d603-89e099162426@redhat.com>
-In-Reply-To: <90b2011a-3e58-1e91-d603-89e099162426@redhat.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Wed, 7 Oct 2020 16:54:29 +0800
-Message-ID: <CAE2XoE_okx+xQKsroYOfduqUMgiXoSX4dCMcuyO8+7Oh=3_XoA@mail.gmail.com>
-Subject: Re: [PATCH v3 2/3] cirrus: Fixing and speedup the msys2/mingw CI
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000bf21ae05b110dd76"
-Received-SPF: pass client-ip=2a00:1450:4864:20::244;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x244.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Originating-IP: [37.59.142.105]
+X-ClientProxiedBy: DAG9EX1.mxp5.local (172.16.2.81) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: edb4be9c-18ff-47e9-bdfa-e8cdd1207dec
+X-Ovh-Tracer-Id: 9421530422748617123
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrgeeigddutdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgihesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepveelhfdtudffhfeiveehhfelgeellefgteffteekudegheejfffghefhfeeuudffnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopegtlhhgsehkrghougdrohhrgh
+Received-SPF: pass client-ip=79.137.123.220; envelope-from=groug@kaod.org;
+ helo=smtpout1.mo804.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 03:24:13
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,83 +85,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- qemu-level <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Gustavo Romero <gromero@linux.ibm.com>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000bf21ae05b110dd76
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Tue, 6 Oct 2020 19:03:28 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-On Wed, Oct 7, 2020 at 4:41 PM Thomas Huth <thuth@redhat.com> wrote:
->
-> On 07/10/2020 10.18, Paolo Bonzini wrote:
-> [...]
-> >
-> > On top of this, whoever commits this needs to replace the URL with
-> > something under download.qemu.org, but that's the easy part.
->
-> I agree with Daniel - please let's not get go this way again. We've had
-this
-> with the various Free-/Net-/OpenBSD images in the past, and then we were
-> suddenly stuck with a fixed image where most people were not able to
-change
-> it anymore. That was very frustrating.
->
-> Apart from that, you also have to respect the GPL if you provide binaries
-> ... so you'd need to gather all the sources for that blob, too, and be
-ready
-> to provide those in case somebody asks...
->
-> Yonggang, could you please try to use the caching mechanism of Cirrus-CI
-> instead? See https://cirrus-ci.org/guide/writing-tasks/#cache-instruction
-> ... then we're a little bit more independent from downloading the msys2
-for
-> each CI run.
-Looks good for me, let's me investigate
->
->  Thomas
->
+> On 10/6/20 6:58 PM, Greg Kurz wrote:
+> > On Mon, 5 Oct 2020 18:51:44 +0200
+> > C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> >=20
+> >> StoreEOI on POWER9 CPUs is racy because load-after-store ordering is
+> >> not enforced.
+> >>
+> >> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> >> ---
+> >>  hw/ppc/spapr_caps.c | 9 +++++++++
+> >>  1 file changed, 9 insertions(+)
+> >>
+> >> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> >> index b0a9d0227db2..9251badbdc27 100644
+> >> --- a/hw/ppc/spapr_caps.c
+> >> +++ b/hw/ppc/spapr_caps.c
+> >> @@ -549,6 +549,15 @@ static void cap_storeeoi_apply(SpaprMachineState =
+*spapr, uint8_t val,
+> >>              error_setg(errp, "StoreEOI not supported by KVM");
+> >>              return;
+> >>          }
+> >> +
+> >> +        /*
+> >> +         * load-after-store ordering is not enforced on POWER9 CPUs
+> >> +         * and StoreEOI can be racy.
+> >> +         */
+> >> +        if (!ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOG=
+ICAL_3_10,
+> >> +                                  0, spapr->max_compat_pvr)) {
+> >> +            warn_report("StoreEOI on a POWER9 CPU is unsafe on KVM.");
+> >=20
 
+The error message should mention XIVE KVM device actually since this only
+depends on kernel-irqchip.
 
---
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
+> > It all boils down to what "unsafe" really means here... if the outcome =
+is
+> > "very likely hang the guest" as soon as it starts doing I/O, shouldn't
+> > we error out instead ? What is the motivation to use StoreEOI if the
+> > processor doesn't really support it ?
+>=20
+> We use it in the lab on P9. We have never seen it failed even under stres=
+s.=20
+> But there is a possible race in the logic.=20
+>=20
+> C.
 
---000000000000bf21ae05b110dd76
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><br><br>On Wed, Oct 7, 2020 at 4:41 PM Thomas Huth &lt;<a =
-href=3D"mailto:thuth@redhat.com">thuth@redhat.com</a>&gt; wrote:<br>&gt;<br=
->&gt; On 07/10/2020 10.18, Paolo Bonzini wrote:<br>&gt; [...]<br>&gt; &gt;<=
-br>&gt; &gt; On top of this, whoever commits this needs to replace the URL =
-with<br>&gt; &gt; something under <a href=3D"http://download.qemu.org">down=
-load.qemu.org</a>, but that&#39;s the easy part.<br>&gt;<br>&gt; I agree wi=
-th Daniel - please let&#39;s not get go this way again. We&#39;ve had this<=
-br>&gt; with the various Free-/Net-/OpenBSD images in the past, and then we=
- were<br>&gt; suddenly stuck with a fixed image where most people were not =
-able to change<br>&gt; it anymore. That was very frustrating.<br>&gt;<br>&g=
-t; Apart from that, you also have to respect the GPL if you provide binarie=
-s<br>&gt; ... so you&#39;d need to gather all the sources for that blob, to=
-o, and be ready<br>&gt; to provide those in case somebody asks...<br>&gt;<b=
-r>&gt; Yonggang, could you please try to use the caching mechanism of Cirru=
-s-CI<br>&gt; instead? See <a href=3D"https://cirrus-ci.org/guide/writing-ta=
-sks/#cache-instruction">https://cirrus-ci.org/guide/writing-tasks/#cache-in=
-struction</a><br>&gt; ... then we&#39;re a little bit more independent from=
- downloading the msys2 for<br>&gt; each CI run.<div>Looks good for me, let&=
-#39;s me investigate<br>&gt;<br>&gt; =C2=A0Thomas<br>&gt;<br><br><br>--<br>=
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=E7=BD=
-=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincerely,<br>Yonggang Luo<=
-/div></div>
-
---000000000000bf21ae05b110dd76--
+Thinking again. P9 boston systems on the field only use emulated XIVE and
+we certainly want to be able to migrate to P9 systems that use in-kernel
+XIVE and vice-versa. So, even if StoreEOI is technically supported by
+the emulated XIVE, maybe we should disallow it anyway ?
 
