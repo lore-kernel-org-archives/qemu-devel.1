@@ -2,100 +2,91 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 179C9C4363C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 18:34:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CB71C4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 18:46:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA3232168B
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 18:34:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C75342173E
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 18:46:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QpJztbHi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA3232168B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SQXwHzlq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C75342173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53022 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQEGr-0002mw-IR
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 14:34:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43872)
+	id 1kQESO-0005Tp-EV
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 14:46:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45774)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kQEFu-0002IQ-KT
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 14:33:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43500)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQER5-0004ar-Lz
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 14:45:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49137)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kQEFr-0000OD-PM
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 14:33:37 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQER1-0001vm-NY
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 14:45:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602095613;
+ s=mimecast20190719; t=1602096304;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=iuBPqxcsv0aTQ0rcLgkKxT6k78kO6ea209eSJdeHNsw=;
- b=QpJztbHiiNM1xFmI41ObH33j+AZgBf/B2BwF3tlNcGwLwIPlC97uGjg9BS6QvL0eCNRVqY
- 3/RrnOq/3jqfAWR2QtwYIwzHSxKL5X2WbLO3LGOIvVwDgb1y/gcKPUhylaIeod0C8pAuku
- vCp7gIuSud0gPtknhmtxD8qmOlI2s+Y=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-281-Ha_E2Zg4P-uJwMCfTL3pHA-1; Wed, 07 Oct 2020 14:33:32 -0400
-X-MC-Unique: Ha_E2Zg4P-uJwMCfTL3pHA-1
-Received: by mail-qv1-f69.google.com with SMTP id h12so1954621qvk.22
- for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 11:33:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=iuBPqxcsv0aTQ0rcLgkKxT6k78kO6ea209eSJdeHNsw=;
- b=pwnvt+KYgkCQNYEfb0+662yk33535rwNU8aJ+pXBLTXMx23NNTFaLNTJ+m5Hz7tUKZ
- 8LHvnZFHC7lz3OqVxP2rNEBWL+sKm0m0LhtRa4qLiaDvU1ahUgsFWIFewjI3tL50kJhO
- FS2HeIJVNHUyirlGlB5lSyKEw+gCKi6qlh0iS0SKxYSsqId0oH6Iccmr+oU/Jst+ADol
- IMkr+ECZJS9kBKz+uAWV3hC7/7prhiKeqXDkm9VScUYvppY2P/H2qCb075zr8T/kDuRD
- wXPRwuwFOaiwDTSBqkIDQbJ3xHxyfrFx0i71xWUTtLCUcJXvCUqQegr5cNpNmEgWosWl
- VjHA==
-X-Gm-Message-State: AOAM530LkN8CPoCNI1N99d9x2qQJwSdIJhukUOYyQfEOR9dmSTu+LcPg
- MkWBnB/nokOPYFQFPwnoVyqi8+ArMBvGcwWExW007H2ZKNsOBGUkr+tRsdqit/SA4XmCHxPuTQJ
- vm1/M+fPz78Nd1fA=
-X-Received: by 2002:ac8:6047:: with SMTP id k7mr4720601qtm.60.1602095608408;
- Wed, 07 Oct 2020 11:33:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzLQd3LS9nzREe4DOgey+hzA8BMSKQKHWH0D51vX5vjt5qFY4u6ji4LJOMrEQiD4caJiPqRCA==
-X-Received: by 2002:ac8:6047:: with SMTP id k7mr4720561qtm.60.1602095607863;
- Wed, 07 Oct 2020 11:33:27 -0700 (PDT)
-Received: from xz-x1.redhat.com
- (toroon474qw-lp130-09-184-147-14-204.dsl.bell.ca. [184.147.14.204])
- by smtp.gmail.com with ESMTPSA id o4sm2040873qkk.75.2020.10.07.11.33.25
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 07 Oct 2020 11:33:26 -0700 (PDT)
-From: Peter Xu <peterx@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] migration/postcopy: Release fd before going into
- 'postcopy-pause'
-Date: Wed,  7 Oct 2020 14:33:24 -0400
-Message-Id: <20201007183324.288379-1-peterx@redhat.com>
-X-Mailer: git-send-email 2.26.2
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=O50JvdE6O3m7niQGqOmjacB96FiibHC6wH/Rs+YRiRA=;
+ b=SQXwHzlq3eZDP5l7NzF3p7/nvKb9wl5J321DVzmn6J734j7yvZVw5CPTTlmk2XhkNvy0z0
+ eUTH7jGtakKSthkHYcxoTqmIgj9hPCvNbrOQt+iIO/tCoxELqN+qBA/Sy+D7H8xmS23bNV
+ H5MsSxtqCPckLNynEMOx1yv/oGAf8y8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-556-Q6t_9CebOMOo6n5MIM8ggw-1; Wed, 07 Oct 2020 14:45:02 -0400
+X-MC-Unique: Q6t_9CebOMOo6n5MIM8ggw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 41CB1804013;
+ Wed,  7 Oct 2020 18:45:01 +0000 (UTC)
+Received: from [10.10.120.38] (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4054A757DF;
+ Wed,  7 Oct 2020 18:44:57 +0000 (UTC)
+Subject: Re: [PATCH 08/20] python/machine.py: fix _popen access
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20201006235817.3280413-1-jsnow@redhat.com>
+ <20201006235817.3280413-9-jsnow@redhat.com>
+ <20201007100705.GD7212@linux.fritz.box>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <1c562773-6216-7cbe-eddf-fa18cdcc84f3@redhat.com>
+Date: Wed, 7 Oct 2020 14:44:56 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
+In-Reply-To: <20201007100705.GD7212@linux.fritz.box>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=peterx@redhat.com;
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:54:30
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:44:56
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
 X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,67 +99,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com,
- Juan Quintela <quintela@redhat.com>
+Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Logically below race could trigger with the old code:
+On 10/7/20 6:07 AM, Kevin Wolf wrote:
+> Am 07.10.2020 um 01:58 hat John Snow geschrieben:
+>> As always, Optional[T] causes problems with unchecked access. Add a
+>> helper that asserts the pipe is present before we attempt to talk with
+>> it.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+> 
+> First a question about the preexisting state: I see that after
+> initialising self._popen once, we never reset it to None. Should we do
+> so on shutdown?
+> 
 
-          test program                        migration thread
-          ------------                        ----------------
-       wait_until('postcopy-pause')
-                                          postcopy_pause()
-                                            set_state('postcopy-pause')
-       do_postcopy_recover()
-         arm s->to_dst_file with new fd
-                                            release s->to_dst_file [1]
+Yup, we should.
 
-Here [1] could have released the just-installed recoverying channel.  Then the
-migration could hang without really resuming.
+>>   python/qemu/machine.py | 16 +++++++++++-----
+>>   1 file changed, 11 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/python/qemu/machine.py b/python/qemu/machine.py
+>> index 3e9cf09fd2d..4e762fcd529 100644
+>> --- a/python/qemu/machine.py
+>> +++ b/python/qemu/machine.py
+>> @@ -131,7 +131,7 @@ def __init__(self, binary, args=None, wrapper=None, name=None,
+>>           # Runstate
+>>           self._qemu_log_path = None
+>>           self._qemu_log_file = None
+>> -        self._popen = None
+>> +        self._popen: Optional['subprocess.Popen[bytes]'] = None
+> 
+> Another option that we have, especially if it's an attribute that is
+> never reset, would be to set the attribute only when it first gets a
+> value other than None. Accessing it while it hasn't been set yet
+> automatically results in an AttributeError. I don't think that's much
+> worse than the exception raised explicitly in a property wrapper.
+> 
+> In this case, you would only declare the type in __init__, but not
+> assign a value to it:
+> 
+>      self._popen: Optional['subprocess.Popen[bytes]']
+> 
 
-Instead, it should be very safe to release the fd before setting the state into
-'postcopy-pause', because there's no reason for any other thread to touch it
-during 'postcopy-active'.
+If you do this, you can just declare it as non-Optional. Whenever it 
+exists, it is definitely a subprocess.Popen[bytes].
 
-Dave reported a very rare postcopy recovery hang that the migration-test
-program waited for the migration to complete in migrate_postcopy_complete().
-We do suspect it's the same thing that we're gonna fix here.  Hard to tell.
-However since we've noticed this, fix this irrelevant of the hang report.
+> Maybe a nicer alternative in some cases than adding properties around
+> everything.
+> 
+> Instead of checking for None, you would then have to use hasattr(),
+> which is a bit uglier, so I guess it's mainly for attributes where you
+> can assume that you will always have a value (if the caller isn't buggy)
+> and therefore don't even have a check in most places.
+> 
 
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- migration/migration.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+As long as the style checkers are OK with that sort of thing. After a 
+very quick test, it seems like they might be.
 
-diff --git a/migration/migration.c b/migration/migration.c
-index aca7fdcd0b..e1b06e8a2a 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -3137,9 +3137,6 @@ static MigThrError postcopy_pause(MigrationState *s)
-     while (true) {
-         QEMUFile *file;
- 
--        migrate_set_state(&s->state, s->state,
--                          MIGRATION_STATUS_POSTCOPY_PAUSED);
--
-         /* Current channel is possibly broken. Release it. */
-         assert(s->to_dst_file);
-         qemu_mutex_lock(&s->qemu_file_lock);
-@@ -3150,6 +3147,9 @@ static MigThrError postcopy_pause(MigrationState *s)
-         qemu_file_shutdown(file);
-         qemu_fclose(file);
- 
-+        migrate_set_state(&s->state, s->state,
-+                          MIGRATION_STATUS_POSTCOPY_PAUSED);
-+
-         error_report("Detected IO failure for postcopy. "
-                      "Migration paused.");
- 
--- 
-2.26.2
+Generally, we run into trouble because pylint et al want variables to be 
+declared in __init__, but doing so requires Optional[T] most of the time 
+to allow something to be initialized later.
+
+A lot of our stateful objects have this kind of pattern. QAPIGen has a 
+ton of it. machine.py has a ton of it too.
+
+You can basically imply the stateful check by just foregoing the actual 
+initialization, which trades the explicit check for the implicit one 
+when you get the AttributeError.
+
+This is maybe more convenient -- less code to write, certainly. The 
+error message you get I think is going to be a little worse, though.
+
+I think I have been leaning towards the cute little @property shims 
+because it follows a familiar OO model where a specific class always has 
+a finite set of properties that does not grow or shrink. You can also 
+use the shim to give a meaningful error that might be nicer to read than 
+the AttributeError.
+
+I'm open to suggestions on better patterns. I had considered at one 
+point that it might be nice to split Machine out into a version with and 
+without the console to make stronger typing guarantees. It has 
+implications for how shutdown and cleanup and so on is handled, too.
+
+(I had some WIP patches to do this, but I think I got a little stuck 
+making the code pretty, and then the release, and then I got busy, and...)
+
+>>           self._events = []
+>>           self._iolog = None
+>>           self._qmp_set = True   # Enable QMP monitor by default.
+>> @@ -244,6 +244,12 @@ def is_running(self):
+>>           """Returns true if the VM is running."""
+>>           return self._popen is not None and self._popen.poll() is None
+>>   
+>> +    @property
+>> +    def _subp(self) -> 'subprocess.Popen[bytes]':
+>> +        if self._popen is None:
+>> +            raise QEMUMachineError('Subprocess pipe not present')
+>> +        return self._popen
+>> +
+>>       def exitcode(self):
+>>           """Returns the exit code if possible, or None."""
+>>           if self._popen is None:
+> 
+> Of course, even if an alternative is possible, what you have is still
+> correct.
+> 
+> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+> 
+
+Thanks; I'll continue with this for now, but I really am open to talking 
+about better ways to model the common pattern of "Optional sub-feature 
+for a class that can be engaged post-initialization".
+
+It's an interesting typing problem. If we were using semantic types, 
+what we are describing is an f(x) such that:
+
+f(object-without-feature) -> object-with-feature
+
+It's a kind of semantic cast where we are doing something akin to an 
+in-place transformation of a base type to a subtype. I'm not sure I have 
+encountered any language that actually intentionally supports such a 
+paradigm.
+
+(Maybe haskell? I just assume haskell can do everything if you learn to 
+lie to computers well enough.)
+
+--js
 
 
