@@ -2,127 +2,87 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EF0FC41604
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 17:29:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C9F0C41604
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 17:31:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C8412168B
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 17:29:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0FD72168B
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 17:31:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Sc+JZgZN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C8412168B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mrOG9s99"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0FD72168B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQDFY-0005q1-6H
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 13:29:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59018)
+	id 1kQDHI-0007qV-Mq
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 13:31:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59160)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kQDEd-0005L2-8K; Wed, 07 Oct 2020 13:28:15 -0400
-Received: from mail-db8eur05on2093.outbound.protection.outlook.com
- ([40.107.20.93]:39393 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kQDEY-0008Ss-DY; Wed, 07 Oct 2020 13:28:14 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dH/2Ll7x9/ge31zXxtSzA0Dkd+vkhTTsJ6aVNyWuZBA7DoD0TnpzqiZn/T9NuFbxEt9UTqI7eVy4z+IFrx2YS4R3g+JBaF0MpIW2HGFjguHatI08pe06RRdFzknAa5HqIQ4sMAw1HxRorlW+n+eIQYPULjJXrzPtDYfG4pB2Q+uIe2VxCxTWlxAFDaV6uWzaEp9f+l0NdSGLlPgZGK0LYBrqAkyfOi2CqkGAZjjGE6gO8RZ/ZtGAVLTv9RorJiXMpb9E43EZkzUIcEQr68YU/ZRG8AnLsB8ubVsIpPMykalRXtfJM1del0OTDrVP35QSipaVsR+XxdvAJkoEkRNIMA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bpxEi1RXu58fw5yvZ+tFW/DYQoRmKTqoXFYCEC8/sCg=;
- b=iwB1yQCYfCV0HBqzm9z8h/mlgsnG8lxtYu4OZfCkw0hC5zTFCfTfLfAD5gcsC7VXlszLJIzRdbzGhHmaSfb4ynzUe6XqflmEpwYOGPMfkZh21RBAfECFvhyqeZJsxcIMqq2Ahn1auSFmjZZdqdOLv7fYRY6eOkePhUWXPlm5Ed9HHYTRL2g2coebxFFqM8UISGfoNiMCgxvOTV50fcn/xCgNYQg+9G3iEIEmD19oaVqh5CwAdrAw0J1ESKGSCGwapjvF+bPyp36jvAyqId5MAhYAVZHaGjnG93FLTCYVdlZWDowfPbHBwG6f0W14Ji5ckfLuxNrPMebz4i2HBIvzQQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bpxEi1RXu58fw5yvZ+tFW/DYQoRmKTqoXFYCEC8/sCg=;
- b=Sc+JZgZN+13X6uMHC74DlldkenWvaul+FUeRZHDFRuhHrDj6wtrYBeJyOVP2fNFCy49bqGJCRY+E/3QQmfMH0X1gQc8DledJ1Ix7hKJZTpc0ZE04WSx4JeGvmqG9uEh2iKGKSrjECnxniLO3yvzJL1yYCBOFfGKOMm8guoK7aj0=
-Authentication-Results: virtuozzo.com; dkim=none (message not signed)
- header.d=none;virtuozzo.com; dmarc=none action=none
- header.from=virtuozzo.com;
-Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com (2603:10a6:3:89::22)
- by HE1PR0802MB2410.eurprd08.prod.outlook.com (2603:10a6:3:dd::20)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3433.39; Wed, 7 Oct
- 2020 17:28:02 +0000
-Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com
- ([fe80::fd10:fc33:1bb0:1036]) by HE1PR0801MB2124.eurprd08.prod.outlook.com
- ([fe80::fd10:fc33:1bb0:1036%6]) with mapi id 15.20.3433.045; Wed, 7 Oct 2020
- 17:28:02 +0000
-Subject: Re: [PATCH v10 9/9] block: apply COR-filter to block-stream jobs
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com,
- stefanha@redhat.com, fam@euphon.net, jsnow@redhat.com, armbru@redhat.com,
- eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
-References: <1601383109-110988-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1601383109-110988-10-git-send-email-andrey.shinkevich@virtuozzo.com>
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Message-ID: <9fdba83b-4f78-9cce-afbb-9d38525ab969@virtuozzo.com>
-Date: Wed, 7 Oct 2020 20:27:58 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
-In-Reply-To: <1601383109-110988-10-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [109.252.114.22]
-X-ClientProxiedBy: FR2P281CA0026.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:14::13) To HE1PR0801MB2124.eurprd08.prod.outlook.com
- (2603:10a6:3:89::22)
+ (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
+ id 1kQDFO-0005wK-Ld; Wed, 07 Oct 2020 13:29:02 -0400
+Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:43200)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
+ id 1kQDFM-00006w-RK; Wed, 07 Oct 2020 13:29:02 -0400
+Received: by mail-qk1-x744.google.com with SMTP id c2so3718096qkf.10;
+ Wed, 07 Oct 2020 10:28:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=dbk8D7k2SWsKtEykTFWEVgY+s+9kXbJHDz8Exp2s3BA=;
+ b=mrOG9s99+1GIbWioGmhuCbSkKB2umUF56la4l2kAa2yE5+pRUrOJxifk7C5+1LOY4b
+ 3zJ2rn++qGgR6CHd1lxzZD5x+76bsElFcoBmTrElmdasfenoEycrGwv5N5KflUp7rGSw
+ 9gdwwFgv+6bJnGw+Lr9Xiqz2fdqMEPbXPt3+alR0rKoUmRaktQBsDxPNhYc/v0OCF03K
+ b+e2awf2l2pzOyzD+krJlkEm5rd0+IRdD8ILw9hm0ydooKzwnhzBeMX2rwHlwTJLQaxa
+ hP35sXohCSEFvm5Qk12QXXOsEEztwGNYotArip2X8QVgPo+T6oAS+JDKg0m8JGFXJM9X
+ FPUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=dbk8D7k2SWsKtEykTFWEVgY+s+9kXbJHDz8Exp2s3BA=;
+ b=TFzg0p3wv9ByZ5LfSf3WKQbtEe/u5aLMV5KKP+V59RX+fclxRV7JpfYp3r5tIRlxzs
+ EUnxPg9Jc5wzdZvPvCJWu7VbBiLEhtdTk0VXmZn3xQKkyb28IBPvPZFG26BFz0ikoaO7
+ 52NM4DPHDghL6w9wu3i2MS6AF8YI6qzcXnCobr35w1D0/8TGwKnSPcwz8XJvQHLBqEAV
+ vDaiztoaFw+MIF5hNAUud0SNbpBx3NzC/92/reIe0uVmPm4VHW2O1dw7h/AIaBNOVu/h
+ MBEHG6cg1G4wFE7UlYRf4EqxxDZD2Sb6RNOdfoRWZBmLyEqLCBd/qT8WMBhFckZ3oBI/
+ oDSw==
+X-Gm-Message-State: AOAM5337sALygJ7D9l8N+h9S6c+Kemw4zkqsrluQAoHndim2t8e5ikaZ
+ MbLAYtGJs5AHCNc5rXy6773eDpmCIU7M3Q==
+X-Google-Smtp-Source: ABdhPJwDXH4mntZ07jKPkT67bV1LOz4OaFZDkwAUq+JYj4sYmIFAPI72bZTV/UEAC5C8AFn2ONo7/w==
+X-Received: by 2002:a37:5042:: with SMTP id e63mr3897302qkb.453.1602091737486; 
+ Wed, 07 Oct 2020 10:28:57 -0700 (PDT)
+Received: from rekt.ibmuc.com ([2804:431:c7c6:5a9b:54fc:df2a:8a5e:989b])
+ by smtp.gmail.com with ESMTPSA id e39sm2080117qtk.32.2020.10.07.10.28.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 07 Oct 2020 10:28:57 -0700 (PDT)
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 0/5] pseries NUMA distance calculation
+Date: Wed,  7 Oct 2020 14:28:44 -0300
+Message-Id: <20201007172849.302240-1-danielhb413@gmail.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Admins-MacBook-Pro.local (109.252.114.22) by
- FR2P281CA0026.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:14::13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3477.11 via Frontend Transport; Wed, 7 Oct 2020 17:28:00 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: afb59d5e-9fd8-4ee0-59f7-08d86ae6579d
-X-MS-TrafficTypeDiagnostic: HE1PR0802MB2410:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <HE1PR0802MB2410EA1A29087E31EBF5B61AF40A0@HE1PR0802MB2410.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: KgqmbrSZkxK3aETbfinSVkphKR6IMImyAtRF7e+BJmiaelNlLcLz68NIHp1ZrljcqryIKnbvjVIVsT2cwmK2rPEqCZ6weVn58SO9OBNjHRxI3ic7tgIzq805F2ozDeP9Z6FmdtXRxQMzygV3+84j4FhLWtZL5JKS6vFXSXbmeOn0YolptMB/SoSU2TDVuheZfo5/hrWQCGU8ILr/35t5VL583isgEQmfNDJc2T1r/TGPMCIeUZAloFbeLsQSmbq4KdLYK6kpNcaLJuof8t/CJgCFmsAvGuPrkgRHpkQwkvy4qYbtCNpWq0lVBMpL4jEh49M6mgv4E3ixDncvklKRaFK64ihFBWbOYHrKNRP9A/x68IuPrzz/YbfpoCvfUHzb
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:HE1PR0801MB2124.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(136003)(396003)(39840400004)(376002)(346002)(366004)(52116002)(26005)(4326008)(107886003)(6506007)(53546011)(478600001)(66556008)(66476007)(66946007)(5660300002)(186003)(16526019)(44832011)(956004)(2616005)(83380400001)(6512007)(31696002)(31686004)(2906002)(8676002)(36756003)(6916009)(8936002)(6486002)(316002)(86362001)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: YM8Pu0TM2CUfYKWNdqqoXKxyodsamZhH4ZtgNws+MaL4TEsfhCpsg+AF65k1aP8r4uprNPv8ohmLMa6uSKz7v3UVECMUkXNcj34Cv4dWlLOiT0hMDP3pcEWE7mhyBvYo/7aH7claEYeU0lZhhbaoTh+ICI08AkpyI7gczLVl1FcR+/xTQfw1wqhEM/k41m00le4BrLHPrd1+g+INqa73ilxmnMH2pPQGV3xn0p3QzOj+Fkjbgo1wy1Oj5LmMugbHp7tj89lFxDfFEq2boKus8dqhi4jbo/S9qQ6UofziQ45mw5L5o2/Ackl9Owlmfb17p2IyZsgL5ZTFdXyiCvDkI8XKbAhipldkwZEijmzHLaEjIje4kUWFd+upWyHRX3vHZGDwcXhO7kL5FjDSV1UXyQD0eD3ZiKT4OqS0WLpM7OcXt8yCK2NM6uQOw/Sa1YrAYran154XI+OIQKpYBCp8B2Uls0YtzRoM8q2DwdmX7I203N9hGfZJhM5e4sj+EieCSack1J8VgLLqf8twO0aEY/lbeMB27Pgax//SZ+DPT9qi9PSGyZBopG6uj5ZuftAYDYzELfV5a2YkG9qbwBJysw/qqFVu1JhbTdqAQZ4J1zFCPm4VJOanhkFrt3U0J/4qokgGKTUIzZ+7LmArDJIOng==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: afb59d5e-9fd8-4ee0-59f7-08d86ae6579d
-X-MS-Exchange-CrossTenant-AuthSource: HE1PR0801MB2124.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Oct 2020 17:28:02.4854 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BwYpUJ8ayMYnxWvaovLUGCoNJB3VNwMWcCZI2PC+oLIhfYMa/RclGBB20P0yOq1DtosqcYbP3uV8sPdhisRpDjEEOiiwqzkHEDxUYqQfeWU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0802MB2410
-Received-SPF: pass client-ip=40.107.20.93;
- envelope-from=andrey.shinkevich@virtuozzo.com;
- helo=EUR05-DB8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 13:28:05
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::744;
+ envelope-from=danielhb413@gmail.com; helo=mail-qk1-x744.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -136,54 +96,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-ppc@nongnu.org,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This forth version is based on review comments and suggestion
+from David in v3.
 
-On 29.09.2020 15:38, Andrey Shinkevich wrote:
-> This patch completes the series with the COR-filter insertion for
-> block-stream operations. Adding the filter makes it possible for copied
-> regions to be discarded in backing files during the block-stream job,
-> what will reduce the disk overuse.
-> The COR-filter insertion incurs changes in the iotests case
-> 245:test_block_stream_4 that reopens the backing chain during a
-> block-stream job. There are changes in the iotests #030 as well.
-> The iotests case 030:test_stream_parallel was deleted due to multiple
-> conflicts between the concurrent job operations over the same backing
-> chain. The base backing node for one job is the top node for another
-> job. It may change due to the filter node inserted into the backing
-> chain while both jobs are running. Another issue is that the parts of
-> the backing chain are being frozen by the running job and may not be
-> changed by the concurrent job when needed. The concept of the parallel
-> jobs with common nodes is considered vital no more.
-> 
-> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> ---
->   block/stream.c             | 93 ++++++++++++++++++++++++++++++----------------
->   tests/qemu-iotests/030     | 51 +++----------------------
->   tests/qemu-iotests/030.out |  4 +-
->   tests/qemu-iotests/141.out |  2 +-
->   tests/qemu-iotests/245     | 19 +++++++---
->   5 files changed, 83 insertions(+), 86 deletions(-)
-> 
-> diff --git a/block/stream.c b/block/stream.c
-> index fe2663f..240b3dc 100644
-> --- a/block/stream.c
-> +++ b/block/stream.c
-> @@ -17,8 +17,10 @@
+changes from v3:
+- patch 4:
+    * copied the explanation in spapr_numa_define_associativity_domains()
+      to the commit message
+    * return numa_level directly instead of calculating a temp
+      value in spapr_numa_get_numa_level()
+    * we're now setting assoc_src in all n_levels above it in 
+      spapr_numa_define_associativity_domains()
+- patch 5:
+    * changed the documentation as suggested by David
 
+v3 link: https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg10443.html
 
-One more change missed, as we use the COR-filter:
+Daniel Henrique Barboza (5):
+  spapr: add spapr_machine_using_legacy_numa() helper
+  spapr_numa: forbid asymmetrical NUMA setups
+  spapr_numa: change reference-points and maxdomain settings
+  spapr_numa: consider user input when defining associativity
+  specs/ppc-spapr-numa: update with new NUMA support
 
-@@ -47,8 +47,7 @@ static int coroutine_fn stream_populate(BlockBackend *blk,
-  {
-      assert(bytes < SIZE_MAX);
+ capstone                      |   2 +-
+ docs/specs/ppc-spapr-numa.rst | 235 ++++++++++++++++++++++++++++++++--
+ hw/ppc/spapr.c                |  12 ++
+ hw/ppc/spapr_numa.c           | 185 ++++++++++++++++++++++++--
+ include/hw/ppc/spapr.h        |   2 +
+ 5 files changed, 419 insertions(+), 17 deletions(-)
 
--    return blk_co_preadv(blk, offset, bytes, NULL,
--                         BDRV_REQ_COPY_ON_READ | BDRV_REQ_PREFETCH);
-+    return blk_co_preadv(blk, offset, bytes, NULL, 0);
-  }
+-- 
+2.26.2
 
-Andrey
 
