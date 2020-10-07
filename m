@@ -2,73 +2,90 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8565C4363C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 03:32:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54241C4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 03:53:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53503208C3
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 03:32:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53503208C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id A3105208C7
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 03:53:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fJB5ij0h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3105208C7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ0Bw-0008BU-An
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 23:32:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53834)
+	id 1kQ0WF-0004Q6-Ml
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 23:53:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56556)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kQ0Af-0007WZ-5b
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 23:31:18 -0400
-Resent-Date: Tue, 06 Oct 2020 23:31:17 -0400
-Resent-Message-Id: <E1kQ0Af-0007WZ-5b@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21367)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kQ0AP-0003O5-C2
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 23:31:13 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1602041444; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=hRa4/AYiptJpFYurP1m9QVpy+56V2VXzvJPWszMvugDwt6wCSibGKSnNcBayIK/9jOcsDe5QZpzD1dLBnK7udKhCgFJyY4wTfJDFNsuoeVAykELl5fuCMX0qBmshhRlJgUW4Zh7YzzZLl6ZRvbSLKJRB27WpdJfu0d24eklaiFc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1602041444;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=PExRNPmO1D9lF6I4gcRnL0OgoiQcZWoWgrC3k+LVLh8=; 
- b=cCaCzvUUJ8ZN+udsSc6ipK6S3mG+EfFhjEUSvSqGeMOXKDql1EfLCYslmRzL0MzPaW8MJH+qsW5tYw0IEFakFJIDkVBYM69wq5JpA+yTFp0Q5UVdm2ojBCmuWlw0SrzeZdikTjA3K5v4i7FNTpKygDNMhmfag8qRpanJLftma6w=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1602041443004537.6655642276976;
- Tue, 6 Oct 2020 20:30:43 -0700 (PDT)
-Subject: Re: [PATCH] Changes to support booting NetBSD/alpha
-Message-ID: <160204144177.31697.16593383562929970168@66eaa9a8a123>
-In-Reply-To: <20201007032417.26044-1-thorpej@me.com>
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kQ0V2-00038H-Vc; Tue, 06 Oct 2020 23:52:20 -0400
+Received: from mail-pj1-x1036.google.com ([2607:f8b0:4864:20::1036]:54334)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kQ0V0-0001yv-Qc; Tue, 06 Oct 2020 23:52:20 -0400
+Received: by mail-pj1-x1036.google.com with SMTP id az3so371101pjb.4;
+ Tue, 06 Oct 2020 20:52:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=dVr/fSApCdp1cCYQvU4K71KzhrNEn4Cfm+TTpJ7qcHg=;
+ b=fJB5ij0hapfLZArCRGPhnMn/8OcTgpTPlFjJ7wTEg3jlJ/2fD0kdnu+i5oEvXqhSow
+ WeNYV5Cz97gJQ4lFqfZxAaUYoVOhZZAe259/0ElNSzEpQpSvyNRPnDCrl+hLl5lfRQ/z
+ GTk+UBV2WUFWz9TiU1ckAwNJ0Zk2maLXowjFbtcbhNMpvaYPZDq1NSS5q5sHnDUNz7in
+ 11hxOpVG7tjUHaipN827twd44+zO6LAO47A4sWaj9H1n/aSwV0ty3zSgjxaoRiQKjSDN
+ oiTGn+Io9Ls4yMoHUhB0XpPPbskrQsbeaRJ2sHMAxEYAQPnXd59pWF2Fo80sZAJQTTvt
+ XV5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=dVr/fSApCdp1cCYQvU4K71KzhrNEn4Cfm+TTpJ7qcHg=;
+ b=nUdq+3+wh4a/RDOjkCjHPugFs4vc9+H0jx9wFv+YTgEg+J+SP9PtTW4zPQM33m3276
+ EWtTbNKnfmPFnsVXWh2V4vh/17PVfhR2VpDc47KJxkDigs9jBIhCLts4ir/SE4F4fXsY
+ 2uFt9/ynzVYqqBSHFMzCQmItFOKLIn8jlWLUDD4poALyk+05Rk2yqsOx8EDYarRo4QAN
+ 8PGNKrC2D25XXxccr0iYC6Aari4+bMgn6ZD2PHtgf+7RN3+iGgLZznMhpS0RZkI7UNez
+ 8LUh2McVpyzQEhragk/u4jv5tNvg+SbqJ7GqlyP79ZXKhsV9dPQITyP9pWSK/M9W4EX2
+ ZpaQ==
+X-Gm-Message-State: AOAM530EsgNGPfb2k5YFHU3jhdtRlbkHyR5Og3lBzyKwsZCbZj018V8n
+ U5CwqxLSEDlX1p0B+Gwljd/4sAAcPPPuDw==
+X-Google-Smtp-Source: ABdhPJyDc7SEb039qIkDauefVYik/uaKIyNF8a5sE1jSSBqehEGOmJ3ftjIeBzfWAMKt9AhDPKR2+w==
+X-Received: by 2002:a17:902:fe0e:b029:d3:d7fe:88eb with SMTP id
+ g14-20020a170902fe0eb02900d3d7fe88ebmr1058781plj.58.1602042736342; 
+ Tue, 06 Oct 2020 20:52:16 -0700 (PDT)
+Received: from localhost.localdomain ([103.94.185.75])
+ by smtp.googlemail.com with ESMTPSA id v10sm497031pjf.34.2020.10.06.20.52.13
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 06 Oct 2020 20:52:15 -0700 (PDT)
+From: Yonggang Luo <luoyonggang@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 1/3] docker: Add win32/msys2/mingw64 docker
+Date: Wed,  7 Oct 2020 11:51:52 +0800
+Message-Id: <20201007035154.109-2-luoyonggang@gmail.com>
+X-Mailer: git-send-email 2.28.0.windows.1
+In-Reply-To: <20201007035154.109-1-luoyonggang@gmail.com>
+References: <20201007035154.109-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: thorpej@me.com
-Date: Tue, 6 Oct 2020 20:30:43 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 23:30:54
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1036;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1036.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,107 +99,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: thorpej@me.com, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ QEMU Trivial <qemu-trivial@nongnu.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Yonggang Luo <luoyonggang@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMTAwNzAzMjQxNy4yNjA0
-NC0xLXRob3JwZWpAbWUuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUgc29t
-ZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5mb3Jt
-YXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMDEwMDcwMzI0MTcuMjYwNDQtMS10
-aG9ycGVqQG1lLmNvbQpTdWJqZWN0OiBbUEFUQ0hdIENoYW5nZXMgdG8gc3VwcG9ydCBib290aW5n
-IE5ldEJTRC9hbHBoYQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQg
-cmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNr
-cGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
-aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczov
-L2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0
-Y2hldy8yMDIwMTAwNzAzMjQxNy4yNjA0NC0xLXRob3JwZWpAbWUuY29tIC0+IHBhdGNoZXcvMjAy
-MDEwMDcwMzI0MTcuMjYwNDQtMS10aG9ycGVqQG1lLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFu
-Y2ggJ3Rlc3QnCmEzYzkyZDEgQ2hhbmdlcyB0byBzdXBwb3J0IGJvb3RpbmcgTmV0QlNEL2FscGhh
-Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFk
-aW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojNTE6IEZJTEU6IGh3L2FscGhhL2RwMjY0LmM6NzU6
-CisgICAgLyogYXJnMCAtPiBtZW1vcnkgc2l6ZQoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNl
-ICogb24gc3Vic2VxdWVudCBsaW5lcwojNTI6IEZJTEU6IGh3L2FscGhhL2RwMjY0LmM6NzY6Cisg
-ICAgLyogYXJnMCAtPiBtZW1vcnkgc2l6ZQorICAgICAgIGFyZzEgLT4ga2VybmVsIGVudHJ5IHBv
-aW50CgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM1NjogRklMRTog
-aHcvYWxwaGEvZHAyNjQuYzo4MDoKK15JXkkgICAgYml0ICA2ICAgLT4gbm9ncmFwaGljcyBvcHRp
-b24gKGZvciBIV1JQQiBDVEIpJAoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgdHJhaWxp
-bmcgKi8gb24gYSBzZXBhcmF0ZSBsaW5lCiM1ODogRklMRTogaHcvYWxwaGEvZHAyNjQuYzo4MjoK
-KyAgICAgICBTZWUgaW5pdF9od3JwYigpIGluIHRoZSBQQUxjb2RlLiAgKi8KCkVSUk9SOiBzdXNw
-ZWN0IGNvZGUgaW5kZW50IGZvciBjb25kaXRpb25hbCBzdGF0ZW1lbnRzICg0LCA2KQojNjM6IEZJ
-TEU6IGh3L2FscGhhL2RwMjY0LmM6ODc6CisgICAgaWYgKCFtYWNoaW5lLT5lbmFibGVfZ3JhcGhp
-Y3MpCisgICAgICBjcHVzWzBdLT5lbnYudHJhcF9hcmcyIHw9ICgxIDw8IDYpOwoKRVJST1I6IGJy
-YWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNjM6
-IEZJTEU6IGh3L2FscGhhL2RwMjY0LmM6ODc6CisgICAgaWYgKCFtYWNoaW5lLT5lbmFibGVfZ3Jh
-cGhpY3MpClsuLi5dCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9u
-IGEgc2VwYXJhdGUgbGluZQojNjc6IEZJTEU6IGh3L2FscGhhL2RwMjY0LmM6OTA6CisgICAgLyog
-SW5pdCB0aGUgY2hpcHNldC4gIEJlY2F1c2Ugd2UncmUgdXNpbmcgQ0xJUFBFUiBJUlEgbWFwcGlu
-Z3MsCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgKiBvbiBzdWJzZXF1ZW50IGxpbmVzCiM2
-ODogRklMRTogaHcvYWxwaGEvZHAyNjQuYzo5MToKKyAgICAvKiBJbml0IHRoZSBjaGlwc2V0LiAg
-QmVjYXVzZSB3ZSdyZSB1c2luZyBDTElQUEVSIElSUSBtYXBwaW5ncywKKyAgICAgICB0aGUgbWlu
-aW11bSBQQ0kgZGV2aWNlIElkU2VsIGlzIDEuICAqLwoKV0FSTklORzogQmxvY2sgY29tbWVudHMg
-dXNlIGEgdHJhaWxpbmcgKi8gb24gYSBzZXBhcmF0ZSBsaW5lCiM2ODogRklMRTogaHcvYWxwaGEv
-ZHAyNjQuYzo5MToKKyAgICAgICB0aGUgbWluaW11bSBQQ0kgZGV2aWNlIElkU2VsIGlzIDEuICAq
-LwoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRl
-IGxpbmUKIzEwMzogRklMRTogaHcvYWxwaGEvdHlwaG9vbi5jOjkyNToKKyAgICAvKiBJbml0IHRo
-ZSBQQ0ktSVNBIGJyaWRnZS4gIFRlY2huaWNhbGx5LCB0aGlzIHdvdWxkIGhhdmUgYmVlbgoKV0FS
-TklORzogQmxvY2sgY29tbWVudHMgdXNlICogb24gc3Vic2VxdWVudCBsaW5lcwojMTA0OiBGSUxF
-OiBody9hbHBoYS90eXBob29uLmM6OTI2OgorICAgIC8qIEluaXQgdGhlIFBDSS1JU0EgYnJpZGdl
-LiAgVGVjaG5pY2FsbHksIHRoaXMgd291bGQgaGF2ZSBiZWVuCisgICAgICAgYSBjeTgyYzY5M3Vi
-LCBidXQgYSBpODIzNzggU0lPIHdhcyBhbHNvIHVzZWQgb24gbWFueSBBbHBoYQoKV0FSTklORzog
-QmxvY2sgY29tbWVudHMgdXNlIGEgdHJhaWxpbmcgKi8gb24gYSBzZXBhcmF0ZSBsaW5lCiMxMTI6
-IEZJTEU6IGh3L2FscGhhL3R5cGhvb24uYzo5MzQ6CisgICAgICAgaXQgdG8gYmUgdGhlcmUgd2ls
-bCBzZWUgaXQuICAqLwoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBv
-biBhIHNlcGFyYXRlIGxpbmUKIzEyNTogRklMRTogaHcvYWxwaGEvdHlwaG9vbi5jOjk3MDoKKy8q
-IFRoZSBmb2xsb3dpbmcgd2FzIGNvcGllZCBmcm9tIGh3L2lzYS9pODIzNzguYyBhbmQgbW9kaWZp
-ZWQgdG8gcHJvdmlkZQoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlICogb24gc3Vic2VxdWVu
-dCBsaW5lcwojMTI2OiBGSUxFOiBody9hbHBoYS90eXBob29uLmM6OTcxOgorLyogVGhlIGZvbGxv
-d2luZyB3YXMgY29waWVkIGZyb20gaHcvaXNhL2k4MjM3OC5jIGFuZCBtb2RpZmllZCB0byBwcm92
-aWRlCisgICBvbmx5IHRoZSBtaW5pbWFsIFBDSSBkZXZpY2Ugbm9kZS4gICovCgpXQVJOSU5HOiBC
-bG9jayBjb21tZW50cyB1c2UgYSB0cmFpbGluZyAqLyBvbiBhIHNlcGFyYXRlIGxpbmUKIzEyNjog
-RklMRTogaHcvYWxwaGEvdHlwaG9vbi5jOjk3MToKKyAgIG9ubHkgdGhlIG1pbmltYWwgUENJIGRl
-dmljZSBub2RlLiAgKi8KCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMxMjg6IEZJTEU6IGh3
-L2FscGhhL3R5cGhvb24uYzo5NzM6CisvKiAgICAgICAgICAgICAgICAgICAgICAgICAgICAkCgpF
-UlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMTI5OiBGSUxFOiBody9hbHBoYS90eXBob29uLmM6
-OTc0OgorICogUUVNVSBJbnRlbCBpODIzNzggZW11bGF0aW9uIChQQ0kgdG8gSVNBIGJyaWRnZSkg
-JAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzEzMDogRklMRTogaHcvYWxwaGEvdHlwaG9v
-bi5jOjk3NToKKyAqICAgICAgICAgICAgICAgICAgICAgICAgICAgICQKCkVSUk9SOiB0cmFpbGlu
-ZyB3aGl0ZXNwYWNlCiMxMzI6IEZJTEU6IGh3L2FscGhhL3R5cGhvb24uYzo5Nzc6CisgKiAgJAoK
-RVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzEzNzogRklMRTogaHcvYWxwaGEvdHlwaG9vbi5j
-Ojk4MjoKKyAqICAkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMTQyOiBGSUxFOiBody9h
-bHBoYS90eXBob29uLmM6OTg3OgorICogICAgICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNl
-CiMxNDU6IEZJTEU6IGh3L2FscGhhL3R5cGhvb24uYzo5OTA6CisgKi8gICAgJAoKRVJST1I6IHRy
-YWlsaW5nIHdoaXRlc3BhY2UKIzE2MjogRklMRTogaHcvYWxwaGEvdHlwaG9vbi5jOjEwMDc6Cisg
-ICAgICAgIFZNU1RBVEVfUENJX0RFVklDRShwYXJlbnRfb2JqLCBJODIzNzhTdGF0ZSksICQKCkVS
-Uk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMxNjQ6IEZJTEU6IGh3L2FscGhhL3R5cGhvb24uYzox
-MDA5OgorICAgIH0sICAgICAgICAgICAgICAgICAgICAgICAgJAoKRVJST1I6IHRyYWlsaW5nIHdo
-aXRlc3BhY2UKIzE2NTogRklMRTogaHcvYWxwaGEvdHlwaG9vbi5jOjEwMTA6Cit9OyAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMTcwOiBG
-SUxFOiBody9hbHBoYS90eXBob29uLmM6MTAxNToKKyAkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVz
-cGFjZQojMTc2OiBGSUxFOiBody9hbHBoYS90eXBob29uLmM6MTAyMToKKyAkCgpFUlJPUjogdHJh
-aWxpbmcgd2hpdGVzcGFjZQojMTgyOiBGSUxFOiBody9hbHBoYS90eXBob29uLmM6MTAyNzoKK30g
-ICAgICAkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMTg1OiBGSUxFOiBody9hbHBoYS90
-eXBob29uLmM6MTAzMDoKK3sgICAkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMTg5OiBG
-SUxFOiBody9hbHBoYS90eXBob29uLmM6MTAzNDoKKyAgICBrLT5yZWFsaXplID0gaTgyMzc4X3Jl
-YWxpemU7ICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMxOTY6IEZJTEU6IGh3L2FscGhh
-L3R5cGhvb24uYzoxMDQxOgorfSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJAoKRVJST1I6
-IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzIwNjogRklMRTogaHcvYWxwaGEvdHlwaG9vbi5jOjEwNTE6
-CisgICAgICAgIHsgfSwgICAgICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMyMDg6IEZJ
-TEU6IGh3L2FscGhhL3R5cGhvb24uYzoxMDUzOgorfTsgICQKCkVSUk9SOiBpZiB0aGlzIGNvZGUg
-aXMgcmVkdW5kYW50IGNvbnNpZGVyIHJlbW92aW5nIGl0CiMyMjY6IEZJTEU6IGh3L3J0Yy9tYzE0
-NjgxOHJ0Yy5jOjE1ODoKKyNpZiAwCgp0b3RhbDogMjIgZXJyb3JzLCAxMiB3YXJuaW5ncywgMTky
-IGxpbmVzIGNoZWNrZWQKCkNvbW1pdCBhM2M5MmQxYWE1ZTYgKENoYW5nZXMgdG8gc3VwcG9ydCBi
-b290aW5nIE5ldEJTRC9hbHBoYSkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
-SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBV
-VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxv
-ZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDEwMDcwMzI0MTcu
-MjYwNDQtMS10aG9ycGVqQG1lLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4K
-LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0
-Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
-ZGhhdC5jb20=
+This docker is used to preparing a msys2/mingw with basic software installed.
+
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+---
+ tests/docker/dockerfiles/msys2.docker | 57 +++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
+ create mode 100644 tests/docker/dockerfiles/msys2.docker
+
+diff --git a/tests/docker/dockerfiles/msys2.docker b/tests/docker/dockerfiles/msys2.docker
+new file mode 100644
+index 0000000000..ce1404cbb8
+--- /dev/null
++++ b/tests/docker/dockerfiles/msys2.docker
+@@ -0,0 +1,57 @@
++FROM mcr.microsoft.com/windows/servercore:2004
++RUN cmd /S /C powershell -NoLogo -NoProfile -Command netsh interface ipv4 show interfaces ; netsh interface ipv4 set subinterface 18 mtu=1460 store=persistent ; netsh interface ipv4 show interfaces ; Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')) ;
++RUN choco install -y --no-progress git 7zip
++RUN cmd /S /C powershell -NoLogo -NoProfile -Command Remove-Item C:\ProgramData\chocolatey\logs -Force -Recurse ; Remove-Item C:\Users\ContainerAdministrator\AppData\Local\Temp -Force -Recurse
++RUN mkdir C:\tools
++RUN bitsadmin /transfer msys_download /dynamic /download /priority FOREGROUND https://github.com/msys2/msys2-installer/releases/download/2020-09-03/msys2-base-x86_64-20200903.sfx.exe C:\tools\base.exe
++RUN cd /d C:\tools && base.exe -y
++RUN cmd /S /C powershell -NoLogo -NoProfile -Command "((Get-Content -path C:\tools\msys64\etc\\post-install\\07-pacman-key.post -Raw) -replace '--refresh-keys', '--version') | Set-Content -Path C:\tools\msys64\etc\\post-install\\07-pacman-key.post"
++RUN C:\tools\msys64\usr\bin\bash.exe -lc "sed -i 's/^CheckSpace/#CheckSpace/g' /etc/pacman.conf"
++RUN C:\tools\msys64\usr\bin\bash.exe -lc "echo $MSYSTEM" >nul 2>&1
++# RUN C:\tools\msys64\usr\bin\bash.exe -lc "sed -i 's/Server = http:\/\/repo.msys2.org\/msys\/.arch\///g' /etc/pacman.d/mirrorlist.msys"
++# RUN C:\tools\msys64\usr\bin\bash.exe -lc "sed -i 's/Server = http:\/\/repo.msys2.org\/mingw\/i686\///g' /etc/pacman.d/mirrorlist.mingw32"
++# RUN C:\tools\msys64\usr\bin\bash.exe -lc "sed -i 's/Server = http:\/\/repo.msys2.org\/mingw\/x86_64\///g' /etc/pacman.d/mirrorlist.mingw64"
++RUN C:\tools\msys64\usr\bin\bash.exe -lc "grep -rl 'repo.msys2.org/' /etc/pacman.d/mirrorlist.* | xargs sed -i 's/repo.msys2.org\//mirrors.tuna.tsinghua.edu.cn\/msys2\//g'"
++RUN C:\tools\msys64\usr\bin\pacman.exe --noconfirm -Sy
++RUN echo Y | C:\tools\msys64\usr\bin\pacman.exe -Suu --noconfirm --needed
++RUN taskkill /F /FI "MODULES eq msys-2.0.dll"
++RUN tasklist
++RUN C:\tools\msys64\usr\bin\bash.exe -lc "pacman.exe --noconfirm -S --needed \
++base-devel \
++git \
++mingw-w64-x86_64-python \
++mingw-w64-x86_64-python-setuptools \
++mingw-w64-x86_64-toolchain \
++mingw-w64-x86_64-SDL2 \
++mingw-w64-x86_64-SDL2_image \
++mingw-w64-x86_64-gtk3 \
++mingw-w64-x86_64-glib2 \
++mingw-w64-x86_64-ninja \
++mingw-w64-x86_64-make \
++mingw-w64-x86_64-jemalloc \
++mingw-w64-x86_64-lzo2 \
++mingw-w64-x86_64-zstd \
++mingw-w64-x86_64-libjpeg-turbo \
++mingw-w64-x86_64-pixman \
++mingw-w64-x86_64-libgcrypt \
++mingw-w64-x86_64-libpng \
++mingw-w64-x86_64-libssh \
++mingw-w64-x86_64-libxml2 \
++mingw-w64-x86_64-snappy \
++mingw-w64-x86_64-libusb \
++mingw-w64-x86_64-usbredir \
++mingw-w64-x86_64-libtasn1 \
++mingw-w64-x86_64-nettle \
++mingw-w64-x86_64-cyrus-sasl \
++mingw-w64-x86_64-curl \
++mingw-w64-x86_64-gnutls \
++mingw-w64-x86_64-zstd"
++
++RUN C:\tools\msys64\usr\bin\bash.exe -lc "rm -rf /var/cache/pacman/pkg/*"
++RUN del C:\tools\base.exe
++RUN cd C:\tools\msys64 && cmd /C "7z a -ttar . -so | 7z a -txz -simsys2-x86_64.tar C:\tools\msys2-x86_64.tar.xz"
++# docker build --tag lygstate/windowsservercore:msys2 -f "msys2.docker" .
++# docker run -it --rm -v c:/work:c:/work lygstate/windowsservercore:msys2 cmd
++# docker push lygstate/windowsservercore:msys2
++# no cache
++# docker build --no-cache --tag lygstate/windowsservercore:msys2 -f "msys2.docker" .
+-- 
+2.28.0.windows.1
+
 
