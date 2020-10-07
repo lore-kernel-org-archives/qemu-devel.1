@@ -2,94 +2,90 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F13C47095
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 15:05:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B62ADC41604
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 15:07:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17D4C21582
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 15:05:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B35C20797
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 15:07:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UEu3ZyKN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17D4C21582
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PdAOJJpV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B35C20797
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQB0a-0006Aj-Ql
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 11:05:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48966)
+	id 1kQB2H-000848-RF
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 11:07:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49422)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kQAvG-00033r-6S
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 11:00:06 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38303)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kQAvD-0007WP-VJ
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 11:00:05 -0400
-Received: by mail-wr1-x442.google.com with SMTP id n18so2572775wrs.5
- for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 08:00:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=Qi4UiNQj5hOPKgDoPmfBZqIKb5l9fjXDNTmOGcW1hKY=;
- b=UEu3ZyKNif7Jv9IOkVOv4Yr/eyGif40QgnhWYTYvAdEwXm2Q5pZq/aGxS97YveUEY0
- muDcqKXHp/vK9QxAWu5ryE8753TqfJ9Gv/nbqTdlnT/GeLQr7tyy6FvGDjCSAmgGAIj/
- CPzu0fkjhgv7ONEAbvbwkD6eymcCt4gx51Ec+PAB+YMPjAZw9qfJKsJsLFdIm2N6AHdG
- k2hyNbVb6DQ8BAN8+8n3dqhJm8/Cs5cPecdRSadUuM7eMxtBrjT4MaMA5r3/pyRGQXaz
- 6AABDFxs+jz3nxsdWzcCmnOI93M1KBWBUu+31d8Ft1NPcNJ06AGgUzFDMDWTd4t2mTJN
- FCIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=Qi4UiNQj5hOPKgDoPmfBZqIKb5l9fjXDNTmOGcW1hKY=;
- b=bhG3tONcGTy/4LA71LpKq98evEexbINBbQmfCfLFuGVwZvu3ujO7Tx/2efXPG2QSik
- NNQiBMtlLJRx6pHeR6cpN233whUROZVAUpGyuxpIbDT+onOkKiqNvFIPI8rIUNA/T0ix
- XB1SmpGI2ayXenwFgdnnEBdEVoUKLrGmfJURz6Etjqoge/1wK7CVVCcJ2vyGOBaHQyIO
- 7DUfcVIu9KaYjMUPBr2K+mp/OZ2s4YVZIfqSDFRUqjWC9pK5jd79WI0HEQPodhiT5dgk
- HGN92Kj3WeqEppgak1H2xWzhpcTQRg75ciHNSjKYa4OWR9PZZXfHuMC5OcCQ/FHU+Orq
- mjcA==
-X-Gm-Message-State: AOAM531QlSj5F0vL4n0shdjvD/tJtiQ0tglLDQOG7abe9a+P5mnG4I8C
- X+16afHUbOrhUmKb/gJ3sGkU98NJFf6f2w==
-X-Google-Smtp-Source: ABdhPJw5MR1jTJ2ThrMQyiVbDd5jNFo3h/iDso+gsX2x7huCon1rgdq9kjsAm4VuPRspBPs9eUXD8A==
-X-Received: by 2002:a5d:6551:: with SMTP id z17mr4010033wrv.200.1602082801321; 
- Wed, 07 Oct 2020 08:00:01 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id f14sm3445233wrt.53.2020.10.07.07.59.59
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 07 Oct 2020 07:59:59 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 354471FF7E;
- Wed,  7 Oct 2020 15:59:59 +0100 (BST)
-References: <20201007140103.711142-1-pbonzini@redhat.com>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] cirrus: use V=1 when running tests on FreeBSD and macOS
-In-reply-to: <20201007140103.711142-1-pbonzini@redhat.com>
-Date: Wed, 07 Oct 2020 15:59:59 +0100
-Message-ID: <87o8leytcg.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQAxA-0004BI-KB
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 11:02:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38500)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQAx7-00081V-G4
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 11:02:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602082920;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=sqzOE/EGwCISd06vhWmMom+3fdKFgMwXUnWyqtlzcpM=;
+ b=PdAOJJpVQdIeaBcWK42K4YvLyrzeDf4FLsqXaS2xyp7jSrYmuuZNrOTh0nd5b9mDu1Bo17
+ k1d72dO1DEMYdjUz0YsH7FZx2nCrc4/JdyKpGOphov15hNe/f2s+hK3l2ZySxZ/g0j12hL
+ hrmiLlOElPBzUxJJ7rSvbx7z5Auj7Sw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-437-GCfm7SO4Pt2dmL1PNWxkag-1; Wed, 07 Oct 2020 11:01:33 -0400
+X-MC-Unique: GCfm7SO4Pt2dmL1PNWxkag-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC967805F0A
+ for <qemu-devel@nongnu.org>; Wed,  7 Oct 2020 15:01:32 +0000 (UTC)
+Received: from [10.10.120.38] (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 17AC55D9F1;
+ Wed,  7 Oct 2020 15:01:32 +0000 (UTC)
+Subject: Re: [PATCH v5 15/36] qapi/common.py: add type hint annotations
+To: Markus Armbruster <armbru@redhat.com>
+References: <20201005195158.2348217-1-jsnow@redhat.com>
+ <20201005195158.2348217-16-jsnow@redhat.com>
+ <877ds2if13.fsf@dusky.pond.sub.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <2432ffd2-320c-05c7-f64b-faaa891e03b8@redhat.com>
+Date: Wed, 7 Oct 2020 11:01:31 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <877ds2if13.fsf@dusky.pond.sub.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:54:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,63 +99,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 10/7/20 5:03 AM, Markus Armbruster wrote:
+> John Snow <jsnow@redhat.com> writes:
+> 
+>> Annotations do not change runtime behavior.
+>> This commit *only* adds annotations.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>> Reviewed-by: Cleber Rosa <crosa@redhat.com>
+>> ---
+>>   scripts/qapi/common.py | 27 ++++++++++++++++-----------
+>>   1 file changed, 16 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+>> index 338adedef4f..74a2c001ed9 100644
+>> --- a/scripts/qapi/common.py
+>> +++ b/scripts/qapi/common.py
+>> @@ -12,6 +12,7 @@
+>>   # See the COPYING file in the top-level directory.
+>>   
+>>   import re
+>> +from typing import Optional, Sequence
+>>   
+>>   
+>>   EATSPACE = '\033EATSPACE.'
+>> @@ -22,7 +23,7 @@
+>>   # ENUMName -> ENUM_NAME, EnumName1 -> ENUM_NAME1
+>>   # ENUM_NAME -> ENUM_NAME, ENUM_NAME1 -> ENUM_NAME1, ENUM_Name2 -> ENUM_NAME2
+>>   # ENUM24_Name -> ENUM24_NAME
+>> -def camel_to_upper(value):
+>> +def camel_to_upper(value: str) -> str:
+>>       c_fun_str = c_name(value, False)
+>>       if value.isupper():
+>>           return c_fun_str
+>> @@ -41,7 +42,9 @@ def camel_to_upper(value):
+>>       return new_name.lstrip('_').upper()
+>>   
+>>   
+>> -def c_enum_const(type_name, const_name, prefix=None):
+>> +def c_enum_const(type_name: str,
+>> +                 const_name: str,
+>> +                 prefix: Optional[str] = None) -> str:
+>>       if prefix is not None:
+>>           type_name = prefix
+>>       return camel_to_upper(type_name) + '_' + c_name(const_name, False).upper()
+>> @@ -56,7 +59,7 @@ def c_enum_const(type_name, const_name, prefix=None):
+>>   # into substrings of a generated C function name.
+>>   # '__a.b_c' -> '__a_b_c', 'x-foo' -> 'x_foo'
+>>   # protect=True: 'int' -> 'q_int'; protect=False: 'int' -> 'int'
+>> -def c_name(name, protect=True):
+>> +def c_name(name: str, protect: bool = True) -> str:
+>>       # ANSI X3J11/88-090, 3.1.1
+>>       c89_words = set(['auto', 'break', 'case', 'char', 'const', 'continue',
+>>                        'default', 'do', 'double', 'else', 'enum', 'extern',
+>> @@ -131,24 +134,24 @@ def decrease(self, amount: int = 4) -> None:
+>>   
+>>   # Generate @code with @kwds interpolated.
+>>   # Obey indent, and strip EATSPACE.
+>> -def cgen(code, **kwds):
+>> +def cgen(code: str, **kwds: object) -> str:
+>>       raw = code % kwds
+>>       if indent:
+>>           raw = re.sub(r'^(?!(#|$))', str(indent), raw, flags=re.MULTILINE)
+>>       return re.sub(re.escape(EATSPACE) + r' *', '', raw)
+>>   
+>>   
+>> -def mcgen(code, **kwds):
+>> +def mcgen(code: str, **kwds: object) -> str:
+>>       if code[0] == '\n':
+>>           code = code[1:]
+>>       return cgen(code, **kwds)
+>>   
+>>   
+>> -def c_fname(filename):
+>> +def c_fname(filename: str) -> str:
+>>       return re.sub(r'[^A-Za-z0-9_]', '_', filename)
+>>   
+>>   
+>> -def guardstart(name):
+>> +def guardstart(name: str) -> str:
+>>       return mcgen('''
+>>   #ifndef %(name)s
+>>   #define %(name)s
+>> @@ -157,7 +160,7 @@ def guardstart(name):
+>>                    name=c_fname(name).upper())
+>>   
+>>   
+>> -def guardend(name):
+>> +def guardend(name: str) -> str:
+>>       return mcgen('''
+>>   
+>>   #endif /* %(name)s */
+>> @@ -165,7 +168,7 @@ def guardend(name):
+>>                    name=c_fname(name).upper())
+>>   
+>>   
+>> -def gen_if(ifcond):
+>> +def gen_if(ifcond: Sequence[str]) -> str:
+>>       ret = ''
+>>       for ifc in ifcond:
+>>           ret += mcgen('''
+>> @@ -174,7 +177,7 @@ def gen_if(ifcond):
+>>       return ret
+>>   
+>>   
+>> -def gen_endif(ifcond):
+>> +def gen_endif(ifcond: Sequence[str]) -> str:
+>>       ret = ''
+>>       for ifc in reversed(ifcond):
+>>           ret += mcgen('''
+>> @@ -183,7 +186,9 @@ def gen_endif(ifcond):
+>>       return ret
+>>   
+>>   
+>> -def build_params(arg_type, boxed, extra=None):
+>> +def build_params(arg_type,
+>> +                 boxed: bool,
+>> +                 extra: Optional[str] = None) -> str:
+>>       ret = ''
+>>       sep = ''
+>>       if boxed:
+> 
+> @arg_type is the only parameter left unannotated.  Scratching head...
+> aha:
+> 
+>      qapi/common.py: move build_params into gen.py
+>      
+>      Including it in common.py creates a circular import dependency; schema
+>      relies on common, but common.build_params requires a type annotation
+>      from schema. To type this properly, it needs to be moved outside the
+>      cycle.
+> 
+> Let's amend the commit message:
+> 
+>      Note that build_params() cannot be fully annotated due to import
+>      dependency issues.  The commit after next will take care of it.
+> 
+> If we swap the next two commits, the fix follows immediately.  Better,
+> but only worth it if swapping is pretty much effortless.
+> 
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+The reason they're not flipped was to avoid giving the impression that 
+docstrings were what was preventing us from enabling the mypy type checking.
 
-> Using "V=3D1" makes it easier to identify hanging tests, especially
-> since they are run with -j1.  It is already used on Windows builds,
-> do the same for FreeBSD and macOS.
->
-> Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+The reason I don't flip the comments and the type hints is because 
+that's a lot of rebase pain for perceptibly little benefit.
 
-Queued to prepr/misc-testing-gitdm-plugin-fixes, thanks.
+I amended the commit message.
 
-> ---
->  .cirrus.yml | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/.cirrus.yml b/.cirrus.yml
-> index d58782ce67..4d236fdefa 100644
-> --- a/.cirrus.yml
-> +++ b/.cirrus.yml
-> @@ -15,7 +15,7 @@ freebsd_12_task:
->      - cd build
->      - ../configure --enable-werror || { cat config.log; exit 1; }
->      - gmake -j$(sysctl -n hw.ncpu)
-> -    - gmake -j$(sysctl -n hw.ncpu) check
-> +    - gmake -j$(sysctl -n hw.ncpu) check V=3D1
->=20=20
->  macos_task:
->    osx_instance:
-> @@ -29,7 +29,7 @@ macos_task:
->                     --extra-cflags=3D'-Wno-error=3Ddeprecated-declaration=
-s'
->                     || { cat config.log; exit 1; }
->      - gmake -j$(sysctl -n hw.ncpu)
-> -    - gmake check
-> +    - gmake check V=3D1
->=20=20
->  macos_xcode_task:
->    osx_instance:
-> @@ -43,7 +43,7 @@ macos_xcode_task:
->      - ../configure --extra-cflags=3D'-Wno-error=3Ddeprecated-declaration=
-s'
->                     --enable-werror --cc=3Dclang || { cat config.log; exi=
-t 1; }
->      - gmake -j$(sysctl -n hw.ncpu)
-> -    - gmake check
-> +    - gmake check V=3D1
->=20=20
->  windows_msys2_task:
->    windows_container:
-
-
---=20
-Alex Benn=C3=A9e
 
