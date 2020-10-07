@@ -2,82 +2,96 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ACB4C4363C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 03:59:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28BC8C4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 04:10:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E79F2208C7
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 03:59:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 59ADE208C3
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 04:10:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="Lb4H5PiD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E79F2208C7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tGyHcqbs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59ADE208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ0bj-000834-Sh
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 23:59:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57232)
+	id 1kQ0mk-0002Oc-DG
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 00:10:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58968)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
- id 1kQ0YG-0006VG-5y; Tue, 06 Oct 2020 23:55:40 -0400
-Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:37611)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kQ0lH-0001Uc-Cb
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 00:09:07 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38062)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
- id 1kQ0YD-000341-JR; Tue, 06 Oct 2020 23:55:39 -0400
-Received: by mail-qt1-x843.google.com with SMTP id s47so580349qth.4;
- Tue, 06 Oct 2020 20:55:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=58glUXUN0QTNVBya/nI4I789n2KDinn6WIOsGIH0uDY=;
- b=Lb4H5PiDSQZ5fVYuCRNDVNZr4UgaHLY9uvPoaaQ7RoRmC3lc56LKuigaBapJhGna64
- N4mm6Dt42M701YVs/dc32X3ak7/gfN2eA7BadxBHFEaHlr2/tkx7Hi753msCfLUdTYXB
- rSdE8+F6XLuGbeFyP7KDpHLwgNYQR2j3kjRVw=
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kQ0lF-0007O5-6O
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 00:09:07 -0400
+Received: by mail-wm1-x343.google.com with SMTP id v12so827500wmh.3
+ for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 21:09:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=TT1TUmO44LCjCtXHOLpqxj04IhS53zSYbviDkOeqULc=;
+ b=tGyHcqbsEBWk5HfIgcuftuRyR9ohP58hdlDMFS0c2TRdEwDRuDlgFnI7tHDIJ9MKBj
+ FwzfkPWsrYgmD8OK5YS3jgEUDzbLeTa2R6MO8ltvKHRVgpu+kIjm1NvSFNjYRA5AYGCX
+ /R/o4IKSaxpxP8USV8WC04gK8m9NPc5SYjhNhu7wsJsX3Rj78c7q8IDA18bN6s0HHxlj
+ MP0kFqwfJod8xbxXtIQL1ohGtO0eixK8s3IfQ4MyasJClhH1ib5sQ3M+/TZF0nqsNHua
+ uBMTL3Buh8xfRQ9EncmZ4Apk/Psy0ZZFuU7YFFFhIFBqSN5e7YuWELAPiCDFd2QqdKPp
+ sa4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=58glUXUN0QTNVBya/nI4I789n2KDinn6WIOsGIH0uDY=;
- b=rgDrioeLYHEaxU5d00nK/+uEYnStwZq3VQH2eGKyuBIvxhe0vQ5MJYHq4NY88EHl+X
- t0JCIxNlz0eLYLQ+9qgKUZT0X4QXPOc8BqBRPkmMTUVFk2LTEKJ9aE4lAeaJB6k0+fpA
- RduW6PuImAnsivC8oJrSF33cGeCG4MFXCZf30Y5e/vEJZf8cx82vzWBLuEhrZPCvtgLc
- 1kIobojxR4b2OU7lkRIgdzxTP0HGLw9xjLWmJWGjSKOchLNcB7Df3tn+ua7/YF3sXVcG
- yD7Z05QPvuujj0QXeWpUz/kNQ5GWn2oqojs7adk4Hf/CZHge7R6ibvleC6DKxMhuKRl+
- gKGg==
-X-Gm-Message-State: AOAM532AqWi9zO2esxnYLVlPZQFrJJXglA56Rvhts6GiXIXAXHwzspxx
- bycZntaEbVIEnkWATxNdmsG6bhOO7MPtr29DIOo=
-X-Google-Smtp-Source: ABdhPJzkVsIFRm7ngRivHU27QYHjzpItaIPtSA6HmUTrNftrVi00lSVUGIQn1KJxP5Ufs6sZHVlMqP03mFCXEEbva/k=
-X-Received: by 2002:ac8:47d3:: with SMTP id d19mr1468000qtr.263.1602042935353; 
- Tue, 06 Oct 2020 20:55:35 -0700 (PDT)
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=TT1TUmO44LCjCtXHOLpqxj04IhS53zSYbviDkOeqULc=;
+ b=MtEvq7FZSjez+e2FdFZvJFAYYYuedY66ifR/QsQpK7dgQr9A7H0u+O9KERwhDQvuC7
+ LTeU3y+EPoCw/m8s15IjphdcHY2eTbSNeGjjNB6NGwJDj8Ve8MnJbrIY45I5UrfBhleQ
+ ERDOjGzSU1VsOCBcLBsfeA+Wf5B1AYFUeLjSh4PSGekwm0I0L5kRXgwKszN9q/GMIyfb
+ Fa9vuK0KyZCLK0k6c4kC81BAnmnFogRSRimictMCQj4G1AJLksOv0gR/v8C1hXvWEtWk
+ a4Ecg0jbJ/jQeQwZimhMeLkCzw7yINUVFcpsZKmdd7mqzKaZOdEcxt0876WS5uGk2erw
+ O44w==
+X-Gm-Message-State: AOAM530YhdiYlXMUBEgTuLTHbSrgvdwX/9mTsjc6860tPyiUxJTWqWSq
+ VlLjfPR39OGPw0fnbyERcww=
+X-Google-Smtp-Source: ABdhPJzBCXa3qbFu/pUK8rbFs83y9ZK2zy09kxcEqpqRao4H/HMbp3ROoYlfAoZDMSwV1HyibYcYaQ==
+X-Received: by 2002:a1c:2108:: with SMTP id h8mr1000918wmh.63.1602043740560;
+ Tue, 06 Oct 2020 21:09:00 -0700 (PDT)
+Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id 4sm1019486wrn.48.2020.10.06.21.08.58
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 06 Oct 2020 21:08:59 -0700 (PDT)
+Subject: Re: [PATCH 01/14] arc: Add initial core cpu files
+To: cupertinomiranda@gmail.com, qemu-devel@nongnu.org
+References: <20200930204604.20663-1-cupertinomiranda@gmail.com>
+ <20200930204604.20663-2-cupertinomiranda@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <ec923290-b6a1-00ab-030b-21676a36dae3@amsat.org>
+Date: Wed, 7 Oct 2020 06:08:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200902093107.608000-1-clg@kaod.org>
- <CACPK8XdsX1hfNTw+Eb-=u2AXc8Ww5wVwU0mRnRo=p=d_VBTA0A@mail.gmail.com>
-In-Reply-To: <CACPK8XdsX1hfNTw+Eb-=u2AXc8Ww5wVwU0mRnRo=p=d_VBTA0A@mail.gmail.com>
-From: Joel Stanley <joel@jms.id.au>
-Date: Wed, 7 Oct 2020 03:55:22 +0000
-Message-ID: <CACPK8XcaUXxtr-+sj8s8oHR1O+wqwEiZ2jyr7nJL9hh=YGFauA@mail.gmail.com>
-Subject: Re: [PATCH v2 0/9] 5p80: Add SFDP support
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::843;
- envelope-from=joel.stan@gmail.com; helo=mail-qt1-x843.google.com
+In-Reply-To: <20200930204604.20663-2-cupertinomiranda@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
 X-Spam_score: -1.5
 X-Spam_bar: -
 X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.248,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.248,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
@@ -92,133 +106,285 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
- Francisco Iglesias <frasse.iglesias@gmail.com>,
- Alistair Francis <alistair@alistair23.me>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+Cc: Claudiu Zissulescu <claziss@gmail.com>,
+ Shahab Vahedi <shahab.vahedi@gmail.com>, Shahab Vahedi <shahab@synopsys.com>,
+ Cupertino Miranda <cmiranda@synopsys.com>, linux-snps-arc@lists.infradead.org,
+ Claudiu Zissulescu <claziss@synopsys.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 7 Oct 2020 at 01:43, Joel Stanley <joel@jms.id.au> wrote:
->
-> On Wed, 2 Sep 2020 at 09:31, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> >
-> > Hello,
-> >
-> > JEDEC STANDARD JESD216 for Serial Flash Discovery Parameters (SFDP)
-> > provides a mean to describe the features of a serial flash device
-> > using a set of internal parameter tables. Support in Linux has been
-> > added some time ago and the spi-nor driver is using it more often
-> > to detect the flash settings and even flash models.
-> >
-> > This is the initial framework for the RDSFDP command giving access to
-> > a private SFDP area under the flash.
-> >
-> > The patches available here :
-> >
-> >   https://github.com/legoater/qemu/commits/aspeed-5.2
->
-> Reviewed-by: Joel Stanley <joel@jms.id.au>
-> Tested-by: Joel Stanley <joel@jms.id.au>
->
-> Note that these need to be rebased on master; there are some minor confli=
-cts.
->
-> These patches have proved essential in debugging a recent kernel
-> regression. Thanks for adding this support C=C3=A9dric.
+Hi Cupertino,
 
-For reference, an OpenBMC UBI based NOR image with an upstream (5.8,
-5.9-rc) kernel can be used to reproduce the bug as follows:
+On 9/30/20 10:45 PM, cupertinomiranda@gmail.com wrote:
+> From: Cupertino Miranda <cmiranda@synopsys.com>
+> 
+> Signed-off-by: Cupertino Miranda <cmiranda@synopsys.com>
+> ---
+...
 
-qemu-system-arm -M witherspoon-bmc -nic user -nographic \
- -drive file=3Dobmc-phosphor-image-witherspoon.ubi.mtd,format=3Draw,if=3Dmt=
-d \
- -kernel aspeed-g5-dev/arch/arm/boot/zImage \
- -dtb aspeed-g5-dev/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dtb \
- -append "console=3DttyS4,115200n8 ubi.mtd=3Dobmc-ubi,0,0,0
-ubi.mtd=3Dalt-obmc-ubi,0,0,4 ro rootfstype=3Dsquashfs ubi.block=3D0,1
-root=3D/dev/ubiblock0_1"
+> diff --git a/target/arc/Makefile.objs b/target/arc/Makefile.objs
+> new file mode 100644
+> index 0000000000..7b2afd08e4
+> --- /dev/null
+> +++ b/target/arc/Makefile.objs
+> @@ -0,0 +1,34 @@
+> +#
+> +#  QEMU ARC CPU
+> +#
+> +#  Copyright (c) 2020
+> +#
+> +#  This library is free software; you can redistribute it and/or
+> +#  modify it under the terms of the GNU Lesser General Public
+> +#  License as published by the Free Software Foundation; either
+> +#  version 2.1 of the License, or (at your option) any later version.
+> +#
+> +#  This library is distributed in the hope that it will be useful,
+> +#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> +#  Lesser General Public License for more details.
+> +#
+> +#  You should have received a copy of the GNU Lesser General Public
+> +#  License along with this library; if not, see
+> +#  <http://www.gnu.org/licenses/lgpl-2.1.html>
+> +#
+> +
+> +obj-y   += translate.o
+> +obj-y   += helper.o
+> +obj-y   += cpu.o
+> +obj-y   += op_helper.o
+> +obj-y   += gdbstub.o
+> +obj-y   += decoder.o
+> +obj-y   += regs.o
+> +obj-y   += semfunc.o
+> +obj-y   += semfunc-helper.o
+> +obj-y   += mmu.o
+> +obj-y   += mpu.o
+> +obj-y   += timer.o
+> +obj-y   += irq.o
+> +obj-y   += cache.o
 
-The ubi.mtd can be found here[1].
+We don't use Makefiles anymore, and you already provides meson.build.
 
-This assumes you're running qemu with this series applied, and an
-upstream kernel built with aspeed_g5_defconfig:
+> diff --git a/target/arc/arc-common.h b/target/arc/arc-common.h
+> new file mode 100644
+> index 0000000000..8013e1d2ed
+> --- /dev/null
+> +++ b/target/arc/arc-common.h
+> @@ -0,0 +1,55 @@
+> +/*
+> + *  Common header file to be used by cpu and disassembler.
+> + *  Copyright (C) 2017 Free Software Foundation, Inc.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with GAS or GDB; see the file COPYING3. If not, write to
+> + *  the Free Software Foundation, 51 Franklin Street - Fifth Floor, Boston,
+> + *  MA 02110-1301, USA.
+> + */
+> +
+> +#ifndef ARC_COMMON_H
+> +#define ARC_COMMON_H
+> +
+> +#include "qemu/osdep.h"
+...
 
-git checkout v5.8
-CROSS_COMPILE=3D"ccache arm-linux-gnueabi-" ARCH=3Darm make -j8
-O=3Daspeed-g5-dev aspeed_g5_defconfig
-CROSS_COMPILE=3D"ccache arm-linux-gnueabi-" ARCH=3Darm make -j8 O=3Daspeed-=
-g5-dev
+Do not include "qemu/osdep.h" in headers.
 
-The fix for the Linux kernel issue is on the linux-mtd list[2].
-WIthout the fix, the kernel will fail to attach the UBI volume:
+> +/*-*-indent-tabs-mode:nil;tab-width:4;indent-line-function:'insert-tab'-*-*/
+> +/* vim: set ts=4 sw=4 et: */
+> diff --git a/target/arc/cpu-qom.h b/target/arc/cpu-qom.h
+> new file mode 100644
+> index 0000000000..413b693558
+> --- /dev/null
+> +++ b/target/arc/cpu-qom.h
+> @@ -0,0 +1,53 @@
+> +/*
+> + * QEMU ARC CPU
+> + *
+> + * Copyright (c) 2016 Michael Rolnik
 
-[    1.453224] ubi0: default fastmap pool size: 25
-[    1.453370] ubi0: default fastmap WL pool size: 12
-[    1.453505] ubi0: attaching mtd3
-[    1.467316] ubi0 error: ubi_compare_lebs: unsupported on-flash UBI forma=
-t
-[    1.467902] ubi0 error: ubi_attach_mtd_dev: failed to attach mtd3, error=
- -22
+???
 
-With the fix, the system will boot through to userspace.
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2.1 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see
+> + * <http://www.gnu.org/licenses/lgpl-2.1.html>
+> + */
+> +
+...
 
-Cheers,
+> diff --git a/target/arc/cpu.c b/target/arc/cpu.c
+> new file mode 100644
+> index 0000000000..bbcb371760
+> --- /dev/null
+> +++ b/target/arc/cpu.c
+> @@ -0,0 +1,468 @@
+> +/*
+> + * QEMU ARC CPU
+> + *
+> + * Copyright (c) 2020
 
-Joel
+(c) Synopsys?
 
-[1] https://jenkins.openbmc.org/view/latest/job/latest-master/label=3Ddocke=
-r-builder,target=3Dwitherspoon/lastSuccessfulBuild/artifact/openbmc/build/t=
-mp/deploy/images/witherspoon/obmc-phosphor-image-witherspoon.ubi.mtd
-[2] https://lore.kernel.org/linux-mtd/CACPK8XceL_QHCQOhfus27rei0vwfRJAFjfL6=
-JkVw9pwxJj2d6Q@mail.gmail.com/
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2.1 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see
+> + * http://www.gnu.org/licenses/lgpl-2.1.html
+> + */
+...
 
+> +/*-*-indent-tabs-mode:nil;tab-width:4;indent-line-function:'insert-tab'-*-*/
+> +/* vim: set ts=4 sw=4 et: */
+> diff --git a/target/arc/cpu.h b/target/arc/cpu.h
+> new file mode 100644
+> index 0000000000..e8446366e5
+> --- /dev/null
+> +++ b/target/arc/cpu.h
+> @@ -0,0 +1,532 @@
+> + /*
+> +  * QEMU ARC CPU
+> +  *
+> +  * Copyright (c) 2020
 
+Again.
 
->
-> Cheers,
->
-> Joel
->
-> >
-> > Thanks,
-> >
-> > C.
-> >
-> > Changes in v2:
-> >
-> >  - fixed dummy value
-> >  - replaced  'sfdp' table by a 'sfdp_read' handler
-> >  - more SFDP tables
-> >  - fixed Aspeed SMC support
-> >  - introduced mx25l25635f chip model for test under Linux.
-> >
-> > C=C3=A9dric Le Goater (9):
-> >   m25p80: Add basic support for the SFDP command
-> >   m25p80: Add the n25q256a SFDP table
-> >   m25p80: Add the mx25l25635e SFPD table
-> >   m25p80: Add the mx25l25635f SFPD table
-> >   m25p80: Add the mx66l1g45g SFDP table
-> >   m25p80: Add the w25q256 SFPD table
-> >   m25p80: Add the w25q512jv SFPD table
-> >   arm/aspeed: Replace mx25l25635e chip model
-> >   aspeed/smc: Add support for RDSFDP command
-> >
-> >  hw/block/m25p80_sfdp.h      |  27 ++++
-> >  include/hw/ssi/aspeed_smc.h |   1 +
-> >  hw/arm/aspeed.c             |   6 +-
-> >  hw/block/m25p80.c           |  47 +++++-
-> >  hw/block/m25p80_sfdp.c      | 296 ++++++++++++++++++++++++++++++++++++
-> >  hw/ssi/aspeed_smc.c         |  21 ++-
-> >  MAINTAINERS                 |   2 +-
-> >  hw/block/meson.build        |   1 +
-> >  hw/block/trace-events       |   1 +
-> >  9 files changed, 385 insertions(+), 17 deletions(-)
-> >  create mode 100644 hw/block/m25p80_sfdp.h
-> >  create mode 100644 hw/block/m25p80_sfdp.c
-> >
-> > --
-> > 2.25.4
-> >
+> +  *
+> +  * This library is free software; you can redistribute it and/or
+> +  * modify it under the terms of the GNU Lesser General Public
+> +  * License as published by the Free Software Foundation; either
+> +  * version 2.1 of the License, or (at your option) any later version.
+> +  *
+> +  * This library is distributed in the hope that it will be useful,
+> +  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+> +  * Lesser General Public License for more details.
+> +  *
+> +  * You should have received a copy of the GNU Lesser General Public
+> +  * License along with this library; if not, see
+> +  * <http://www.gnu.org/licenses/lgpl-2.1.html>
+> +  */
+> +
+> +#ifndef CPU_ARC_H
+> +#define CPU_ARC_H
+> +
+...
+
+> +
+> +/*
+> + * ArcCPU:
+> + * @env: #CPUMBState
+> + *
+> + * An ARC CPU.
+> + */
+> +struct ARCCPU {
+> +  /*< private >*/
+> +  CPUState parent_obj;
+> +
+> +  /*< public >*/
+> +
+> +  /* ARC Configuration Settings. */
+> +  struct {
+> +    uint32_t addr_size;
+> +    bool     aps_feature;
+> +    bool     byte_order;
+> +    bool     bitscan_option;
+> +    uint32_t br_bc_entries;
+> +    uint32_t br_pt_entries;
+> +    bool     br_bc_full_tag;
+> +    uint8_t  br_rs_entries;
+> +    uint32_t br_bc_tag_size;
+> +    uint8_t  br_tosq_entries;
+> +    uint8_t  br_fb_entries;
+> +    bool     code_density;
+> +    bool     code_protect;
+> +    uint8_t  dccm_mem_cycles;
+> +    bool     dccm_posedge;
+> +    uint8_t  dccm_mem_bancks;
+> +    uint8_t  dc_mem_cycles;
+> +    bool     dc_posedge;
+> +    bool     dmp_unaligned;
+> +    bool     ecc_exception;
+> +    uint32_t external_interrupts;
+> +    uint8_t  ecc_option;
+> +    bool     firq_option;
+> +    bool     fpu_dp_option;
+> +    bool     fpu_fma_option;
+> +    bool     fpu_div_option;
+> +    bool     has_actionpoints;
+> +    bool     has_fpu;
+> +    bool     has_interrupts;
+> +    bool     has_mmu;
+> +    bool     has_mpu;
+> +    bool     has_timer_0;
+> +    bool     has_timer_1;
+> +    bool     has_pct;
+> +    bool     has_rtt;
+> +    bool     has_smart;
+> +    uint32_t intvbase_preset;
+> +    uint32_t lpc_size;
+> +    uint8_t  mpu_num_regions;
+> +    uint8_t  mpy_option;
+> +    uint32_t mmu_page_size_sel0;
+> +    uint32_t mmu_page_size_sel1;
+> +    uint32_t mmu_pae_enabled;
+> +    uint32_t ntlb_num_entries;
+> +    uint32_t num_actionpoints;
+> +    uint32_t number_of_interrupts;
+> +    uint32_t number_of_levels;
+> +    uint32_t pct_counters;
+> +    uint32_t pct_interrupt;
+> +    uint32_t pc_size;
+> +    uint32_t rgf_num_regs;
+
+Maybe use 'unsigned' for numbers (various uses).
+
+> +    uint32_t rgf_banked_regs;
+> +    uint32_t rgf_num_banks;
+> +    bool     rtc_option;
+> +    uint32_t rtt_feature_level;
+> +    bool     stack_checking;
+> +    bool     swap_option;
+> +    uint32_t smar_stack_entries;
+> +    uint32_t smart_implementation;
+> +    uint32_t stlb_num_entries;
+> +    uint32_t slc_size;
+> +    uint32_t slc_line_size;
+> +    uint32_t slc_ways;
+> +    uint32_t slc_tag_banks;
+> +    uint32_t slc_tram_delay;
+> +    uint32_t slc_dbank_width;
+> +    uint32_t slc_data_banks;
+> +    uint32_t slc_dram_delay;
+> +    bool     slc_mem_bus_width;
+> +    uint32_t slc_ecc_option;
+> +    bool     slc_data_halfcycle_steal;
+> +    bool     slc_data_add_pre_pipeline;
+> +    bool     uaux_option;
+> +    uint32_t freq_hz; /* CPU frequency in hz, needed for timers. */
+> +  } cfg;
+> +
+[...]
+Regards,
+
+Phil.
 
