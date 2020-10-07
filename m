@@ -2,81 +2,83 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D15F0C4363C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 05:22:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 284FAC4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 05:44:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05D62208C7
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 05:22:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6C2B1208C7
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 05:44:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KVxrxbqB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05D62208C7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F4VahVoB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C2B1208C7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ1uO-0005L5-Vg
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 01:22:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40720)
+	id 1kQ2FP-0003pN-Aq
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 01:44:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43632)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kQ1so-0004dA-RH
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 01:20:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28411)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kQ2Dw-0002xz-Ql
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 01:42:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42234)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kQ1sm-0005MS-5J
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 01:20:58 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kQ2Du-0007W4-A0
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 01:42:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602048054;
+ s=mimecast20190719; t=1602049365;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=155nRlOUgpB7tpMso1AZ5Bdijv2DuGHaQ0Nx1JxhHvc=;
- b=KVxrxbqBhU3CWFWDcluCfz6r0Bz3VBr4yyylE5sN7Kq6vPgTAqCNHHt7XkxHVlt4F5M1uB
- KpmNHOFEWK7epZWqSz+F1AicaSUHntshAB0E/xqZwRr/GjqvETNVvGbyQkI1fYHpGbPe52
- G5VyQTVPt5Ke8J+Bqnjx3jthAxxCP1U=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-579-GdOCxBTDOKSTJbqJu7sFlg-1; Wed, 07 Oct 2020 01:20:53 -0400
-X-MC-Unique: GdOCxBTDOKSTJbqJu7sFlg-1
-Received: by mail-wm1-f71.google.com with SMTP id s12so1695373wmj.0
- for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 22:20:53 -0700 (PDT)
+ bh=GrBLzYVAzSy4umfJgdGVu5FoZ37hFhzpmmee3WNsmVY=;
+ b=F4VahVoBgtwu7wZBblipTaFTS9OPW9UHv89DdDq7b1flAi2zf13T6y83JCcuDYCl4JJZ5F
+ fY3Eqat1Z6BEbC2UMBi5tbAf5iHP4Iqmth35ImcAmG5aExBTkrJHvjzaQl8wHpLM77R8M5
+ 2DtqwsJ4G0FeIyUC3cUiffWyU6vOyps=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-91-UhZzD3xXO2qGZwel5Z4koQ-1; Wed, 07 Oct 2020 01:42:43 -0400
+X-MC-Unique: UhZzD3xXO2qGZwel5Z4koQ-1
+Received: by mail-wm1-f72.google.com with SMTP id 73so127731wma.5
+ for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 22:42:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ h=x-gm-message-state:subject:from:to:cc:references:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=155nRlOUgpB7tpMso1AZ5Bdijv2DuGHaQ0Nx1JxhHvc=;
- b=ldDdMsro14h8tHSCoHTj14fdRpyWs7+2zb+Wj4xNBEroLmkWUi/hjmbzz08Civ1QXW
- rNrcQPFukFnkFEs7LiZUfIRsRy6pYkDiJ1ntsl9a8Zrxhrm1oMJvegulqhopCXo2G3bv
- CDYUFNSyb1t9OqQOIygN22x62Zy3vAEVy9Eup9dp5Vx9ZaYynmlISpMAQxaIfDRCrRTn
- dRYcJ4Bheh1lO3Pqq4tfdOMhZz3jZqDs9hKv4bgHNHoUwbPirf1KZf2JvED6q+sPtcyk
- TGeoPYFkTAWAJYKy/iW74UIIN5ueTjcCYucseMic0Vvh7vOl3dwyYAKtK/ecpCOLZ5M8
- 6Ifw==
-X-Gm-Message-State: AOAM530w76YgJiM4wOVAjDTACcaMtm7BorUIiBLy244x+/PtzG/s1OeS
- iS2PcZOisq7gA+0IIU54vNX3J6lIzAwyDhQEL+Rm+RRXuwzgbjV1dn2yDVLQEqotARL9Wn5JAsm
- oZa48yqHl5ZE4p3Q=
-X-Received: by 2002:a1c:e082:: with SMTP id x124mr1237158wmg.60.1602048051956; 
- Tue, 06 Oct 2020 22:20:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyfu8iHo05Q8qvHd2j1mwTBmZ1k++IkaBVgyGqDGkjw4wZUe0SQrbKpVqS8fJW9b/gh6fCk6g==
-X-Received: by 2002:a1c:e082:: with SMTP id x124mr1237142wmg.60.1602048051725; 
- Tue, 06 Oct 2020 22:20:51 -0700 (PDT)
+ bh=GrBLzYVAzSy4umfJgdGVu5FoZ37hFhzpmmee3WNsmVY=;
+ b=JmSR2YSklLs8I6n00tDX4jSOvsL+JvzcCObZnLeIWM+QBgdlYdwzlcB1yS7F6/kV9m
+ DzkwAEQ7UaBt+OnBkxRnsoLeA5ULoWUdwes3muHc2ce3woqZW9PWMIoSO0xCjp+X4gsF
+ jgJ45hLxZUigcZTQ54zzKwjdjs36ZkGyv71FetQl765FKcIb1yed324kz7j/w5oSvsT2
+ 1eXy43u3IwC1ylx6mCVi1qwidCdIPBji8x1kEXE15tgePry3VsxaRms7c76IgqxYfy0f
+ hjZx2hu2ZYmEPG16o0ZRf3bpg0uQIm2ksYyob7QaqbY6loy91fvnuLjtEj7dGh5vIjeL
+ s8jw==
+X-Gm-Message-State: AOAM530co10lcpQw/t3h56heDmJS1k9Rgj0aIKjm3BRmNytIHF8C6fUm
+ 912PYM5Yq2ig/CKHEgP1qnvFuAHcSSIsEm49KrplGME4lrJ83rzOsZABuwkGyAPW75z3lfE59rR
+ Hy3H+u/KwqRqImHg=
+X-Received: by 2002:a1c:f311:: with SMTP id q17mr1423175wmq.168.1602049362160; 
+ Tue, 06 Oct 2020 22:42:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw4XhdUUNBCPx0QdnLhML8khYH/OrK5toXwD7EIDqDERzRsHyNLgnyDDmsvWZLIY4kOKd+BbA==
+X-Received: by 2002:a1c:f311:: with SMTP id q17mr1423151wmq.168.1602049361957; 
+ Tue, 06 Oct 2020 22:42:41 -0700 (PDT)
 Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
  [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id c4sm1036836wme.27.2020.10.06.22.20.50
+ by smtp.gmail.com with ESMTPSA id c14sm1193648wrm.64.2020.10.06.22.42.40
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 06 Oct 2020 22:20:51 -0700 (PDT)
-Subject: Re: acceptance-system-fedora failures
-To: John Snow <jsnow@redhat.com>, Cleber Rosa <crosa@redhat.com>
-References: <f9e09f0b-3915-382c-d670-8d33d164ad7b@redhat.com>
+ Tue, 06 Oct 2020 22:42:41 -0700 (PDT)
+Subject: Re: [PATCH v7 14/14] tests/acceptance: add reverse debugging test
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>, qemu-devel@nongnu.org
+References: <160174516520.12451.10785284392438702137.stgit@pasha-ThinkPad-X280>
+ <160174524678.12451.13258942849173670277.stgit@pasha-ThinkPad-X280>
+ <31cffd67-388e-96df-d4f1-c971d3bb0016@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
  bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
@@ -100,12 +102,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <4e191372-c332-8f69-85e2-1ff6ead0f40d@redhat.com>
-Date: Wed, 7 Oct 2020 07:20:49 +0200
+Message-ID: <dc58c359-44cc-f897-2b84-efc1387e473a@redhat.com>
+Date: Wed, 7 Oct 2020 07:42:39 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <f9e09f0b-3915-382c-d670-8d33d164ad7b@redhat.com>
+In-Reply-To: <31cffd67-388e-96df-d4f1-c971d3bb0016@redhat.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -123,8 +125,8 @@ X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- WEIRD_PORT=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -137,65 +139,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: kwolf@redhat.com, wrampazz@redhat.com, ehabkost@redhat.com,
+ mtosatti@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com,
+ crosa@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org,
+ zhiwei_liu@c-sky.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/7/20 1:07 AM, John Snow wrote:
-> I'm seeing this gitlab test fail quite often in my Python work; I don't
-> *think* this has anything to do with my patches, but maybe I need to try
-> and bisect this more aggressively.
+On 10/6/20 9:55 PM, Philippe Mathieu-Daudé wrote:
+> On 10/3/20 7:14 PM, Pavel Dovgalyuk wrote:
+>> From: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
+>>
+>> This is a test for GDB reverse debugging commands: reverse step and reverse continue.
+>> Every test in this suite consists of two phases: record and replay.
+>> Recording saves the execution of some instructions and makes an initial
+>> VM snapshot to allow reverse execution.
+>> Replay saves the order of the first instructions and then checks that they
+>> are executed backwards in the correct order.
+>> After that the execution is replayed to the end, and reverse continue
+>> command is checked by setting several breakpoints, and asserting
+>> that the execution is stopped at the last of them.
+>>
+>> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
+>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> Reviewed-by: Willian Rampazzo <willianr@redhat.com>
+>>
+>> --
+
+This separator confuses the git tools. Can you stop using it
+and use the '---' one instead?
+
+>>
+>> v5:
+>>  - disabled (as some other tests) when running on gitlab
+>>    due to the unidentified timeout problem
+
+^ this should be stripped automatically but isn't.
+
+>> ---
+>>  MAINTAINERS                           |    1 
+>>  tests/acceptance/reverse_debugging.py |  208 +++++++++++++++++++++++++++++++++
+>>  2 files changed, 209 insertions(+)
+>>  create mode 100644 tests/acceptance/reverse_debugging.py
 > 
-> The very first hint of an error I see is on line 154:
-> 
-> https://gitlab.com/jsnow/qemu/-/jobs/776334918#L154
-> 
-> 22:05:36 ERROR|
-> 22:05:36 ERROR| Reproduced traceback from:
-> /builds/jsnow/qemu/build/tests/venv/lib64/python3.8/site-packages/avocado/core/test.py:753
-> 
-> 22:05:36 ERROR| Traceback (most recent call last):
-> 22:05:36 ERROR|   File
-> "/builds/jsnow/qemu/build/tests/acceptance/avocado_qemu/__init__.py",
-> line 171, in setUp
-> 22:05:36 ERROR|     self.cancel("No QEMU binary defined or found in the
-> build tree")
+> Thanks, applied to my acceptance-testing tree.
 
-Last year the Avocado developers said we could have a clearer
-log error report, but meanwhile this verbose output is better
-that not having anything ¯\_(ツ)_/¯
+This patch as already be merged by Paolo as commit be52eca309
+("tests/acceptance: add reverse debugging test").
 
-> 
-> Is this a known problem?
-
-"No QEMU binary defined or found in the build tree" is not a
-problem, it means a test is skipped because the qemu-system-$ARCH
-binary is not found. In your case this is because your job
-(acceptance-system-fedora) is based on build-system-fedora
-which only build the following targets:
-
-    TARGETS: tricore-softmmu microblaze-softmmu mips-softmmu
-      xtensa-softmmu m68k-softmmu riscv32-softmmu ppc-softmmu
-      sparc64-softmmu
-
-Now I don't understand what binary the EmptyCPUModel/Migration tests
-are expecting. Maybe these tests only work when a single target is
-built? IOW not expecting that the python code searching for a binary
-return multiple ones? -> Eduardo/Cleber.
-
-w.r.t. the error in your build, I told Thomas about the
-test_ppc_mac99/day15/invaders.elf timeouting but he said this is
-not his area. Richard has been looking yesterday to see if it is
-a TCG regression, and said the test either finished/crashed raising
-SIGCHLD, but Avocado parent is still waiting for a timeout, so the
-children become zombie and the test hang.
-
-Not sure that helps :)
+The notes below your '--' separator have been merged too.
+Dirty, but not a big deal.
 
 Regards,
 
