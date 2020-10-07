@@ -2,74 +2,124 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9E11C4363C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 09:54:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E912C4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 09:59:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0EAF22076C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 09:54:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 584CF2076C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 09:59:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DygcTLGD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EAF22076C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eFeaiEa5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 584CF2076C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ69N-00006A-39
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 05:54:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36030)
+	id 1kQ6EA-0001eS-Cl
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 05:59:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36978)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kQ68b-0007gE-74
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 05:53:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25631)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kQ6D0-0000tN-C9
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 05:58:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42897)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kQ68Y-0002Sj-8R
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 05:53:32 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kQ6Cy-000333-3L
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 05:58:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602064409;
+ s=mimecast20190719; t=1602064683;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=kXqPZ6tSoF6aIyyYv/yqz9crpudJq5z+v4WSW925OVY=;
- b=DygcTLGD+Co0P4WaMx+CEk8YXfp9MJKxIO9Rdd+qlYPisoigSCk+SiBOV0cNGKJ2K3FPsO
- /2Uxh567YX36LOXIPAWd/W3Ud93wSmjsng2+HKBLFcIfo8TuJYbjNVTJgdY8cORl+rs7rC
- OY2QQV6FMtS7alLirsE/V7ogoEHvO5E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-596-REMvjNTPOvmiEPzYbKnsww-1; Wed, 07 Oct 2020 05:53:27 -0400
-X-MC-Unique: REMvjNTPOvmiEPzYbKnsww-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5C6181018F65;
- Wed,  7 Oct 2020 09:53:26 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-113-169.ams2.redhat.com [10.36.113.169])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ED6485C1C4;
- Wed,  7 Oct 2020 09:53:23 +0000 (UTC)
-Date: Wed, 7 Oct 2020 11:53:22 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH 07/20] python/machine.py: Add _qmp access shim
-Message-ID: <20201007095322.GC7212@linux.fritz.box>
-References: <20201006235817.3280413-1-jsnow@redhat.com>
- <20201006235817.3280413-8-jsnow@redhat.com>
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=lgEWdIYvsFBloSSEo635KVir8cjWzMTWIFGQ+GsCaaI=;
+ b=eFeaiEa5Qpvxacpvelx9OtM3Ly7LA9APWmd3KQZPxPMiFyMB0IbsLZcU55B2XdglUB8cKn
+ kcr6KtpKDK2VQz8BtvDVqkisOCjZiMadMSL99aQjUNfTAaJj+U7dl2QATqTayu0Am5eAdg
+ dA+8DEPHFOZMAPGo5QrJ/U0sWMV4R9Q=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-116-FowR2hU2NgaKo3Shod95mA-1; Wed, 07 Oct 2020 05:57:59 -0400
+X-MC-Unique: FowR2hU2NgaKo3Shod95mA-1
+Received: by mail-wm1-f72.google.com with SMTP id u207so235701wmu.4
+ for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 02:57:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=lgEWdIYvsFBloSSEo635KVir8cjWzMTWIFGQ+GsCaaI=;
+ b=m4DBDlKgiBepYcrq55/Hp1oDwb+4tmM5CizrJousUJ735MrfdARNvJIkUgvxh9D5Jj
+ 0rHEWZSRnh2VlquQfbCWSbKxTR78KO0crXehmmpCxzh0Y717SFWESAVZ1obbrdcIwBH6
+ 9sZNyjnDc92iGGHzNHDYqt/sXm8pjG1fkpFCfJGahUMwpwkwKiwAJgULUFjDIcDvmhl9
+ 7ogVjbuazS7DKlhKuAWf5PMzxzlN7GQOgu+wEvWXEi/iwmM/Be+gGcPvKlaBEk4ibCxc
+ 49Q4/aWLkl08xHzl201jHg6chX7AoFZSkh0EcYHthggVkzKGxqYGpjGXxajFyEDiHdVo
+ qMpw==
+X-Gm-Message-State: AOAM531WqkdhxDxA6OrfLWx8gbKpWUYAYjuJFmJmn+MJ3L/rKvKGBDfj
+ qLSQapDBxVwyLejPgEdFVmbBgwU7m8NQlxyspfbV+J5SUR1EcR+/iSsZ1iiaZ8oEaNkN2QsWipQ
+ ugEEbO/eQBClFGww=
+X-Received: by 2002:a1c:9612:: with SMTP id y18mr2490549wmd.55.1602064678078; 
+ Wed, 07 Oct 2020 02:57:58 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzXhpiiqVmKbqvnxpPGlkuPTPvn98WoJ4Sx96kCCxqGiU511mPtRaS9MWCnf98UYw3NCfNr7Q==
+X-Received: by 2002:a1c:9612:: with SMTP id y18mr2490519wmd.55.1602064677766; 
+ Wed, 07 Oct 2020 02:57:57 -0700 (PDT)
+Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id f5sm1960503wmh.16.2020.10.07.02.57.56
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 07 Oct 2020 02:57:57 -0700 (PDT)
+Subject: Re: acceptance-system-fedora failures
+To: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>,
+ Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+References: <f9e09f0b-3915-382c-d670-8d33d164ad7b@redhat.com>
+ <4e191372-c332-8f69-85e2-1ff6ead0f40d@redhat.com>
+ <59d2a787-bcd4-7283-693b-09ea04c16dc6@redhat.com>
+ <6068346f-b034-9321-0eea-29233c23a300@redhat.com>
+ <78ce9ac1-d2a1-9dc0-bf38-f9ac34b2f203@ispras.ru>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <14ee7cc6-42ca-fd86-241b-ed85e26693f7@redhat.com>
+Date: Wed, 7 Oct 2020 11:57:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20201006235817.3280413-8-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <78ce9ac1-d2a1-9dc0-bf38-f9ac34b2f203@ispras.ru>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kwolf@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:44:56
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -78,8 +128,9 @@ X-Spam_score: -2.8
 X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,39 +143,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 07.10.2020 um 01:58 hat John Snow geschrieben:
-> Like many other Optional[] types, it's not always a given that this
-> object will be set. Wrap it in a type-shim that raises a meaningful
-> error and will always return a concrete type.
+On 10/7/20 10:51 AM, Pavel Dovgalyuk wrote:
+> On 07.10.2020 11:23, Thomas Huth wrote:
+>> On 07/10/2020 09.13, Philippe Mathieu-Daudé wrote:
+>>> On 10/7/20 7:20 AM, Philippe Mathieu-Daudé wrote:
+>>>> On 10/7/20 1:07 AM, John Snow wrote:
+>>>>> I'm seeing this gitlab test fail quite often in my Python work; I
+>>>>> don't
+>>>>> *think* this has anything to do with my patches, but maybe I need
+>>>>> to try
+>>>>> and bisect this more aggressively.
+>> [...]
+>>>> w.r.t. the error in your build, I told Thomas about the
+>>>> test_ppc_mac99/day15/invaders.elf timeouting but he said this is
+>>>> not his area. Richard has been looking yesterday to see if it is
+>>>> a TCG regression, and said the test either finished/crashed raising
+>>>> SIGCHLD, but Avocado parent is still waiting for a timeout, so the
+>>>> children become zombie and the test hang.
+>>>
+>>> Expected output:
+>>>
+>>> Quiescing Open Firmware ...
+>>> Booting Linux via __start() @ 0x01000000 ...
+>>>
+>>> But QEMU exits in replay_char_write_event_load():
+>>>
+>>> Quiescing Open Firmware ...
+>>> qemu-system-ppc: Missing character write event in the replay log
+>>> $ echo $?
+>>> 1
+>>>
+>>> Latest events are CHECKPOINT CHECKPOINT INTERRUPT INTERRUPT INTERRUPT.
+>>>
+>>> Replay file is ~22MiB. End of record using "system_powerdown + quit"
+>>> in HMP.
+>>>
+>>> I guess we have 2 bugs:
+>>> - replay log
+>>> - avocado doesn't catch children exit(1)
+>>>
+>>> Quick reproducer:
+>>>
+>>> $ make qemu-system-ppc check-venv
+>>> $ tests/venv/bin/python -m \
+>>>    avocado --show=app,console,replay \
+>>>    run --job-timeout 300 -t machine:mac99 \
+>>>    tests/acceptance/replay_kernel.py
+>>
+>> Thanks, that was helpful. ... and the winner is:
+>>
+>>      commit   55adb3c45620c31f29978f209e2a44a08d34e2da
+>>      Author:  John Snow <jsnow@redhat.com>
+>>      Date:    Fri Jul 24 01:23:00 2020 -0400
+>>      Subject: ide: cancel pending callbacks on SRST
+>>
+>> ... starting with this commit, the tests starts failing. John, any
+>> idea what
+>> might be causing this?
 > 
-> Signed-off-by: John Snow <jsnow@redhat.com>
+> This patch includes the following lines:
+> 
+> +        aio_bh_schedule_oneshot(qemu_get_aio_context(),
+> +                                ide_bus_perform_srst, bus);
+> 
+> replay_bh_schedule_oneshot_event should be used instead of this
+> function, because it synchronizes non-deterministic BHs.
 
-> @@ -515,11 +515,13 @@ def set_qmp_monitor(self, enabled=True):
->                          line. Default is True.
->          @note: call this function before launch().
->          """
-> -        if enabled:
-> -            self._qmp_set = True
-> -        else:
-> -            self._qmp_set = False
-> -            self._qmp = None
-> +        self._qmp_set = enabled
+Why do we have 2 different functions? BH are already complex
+enough, and we need to also think about the replay API...
 
-This change seems unrelated to wrapping the connection in a property.
-Intuitively, it makes sense that the connection of a running instance
-doesn't go away just because I disable QMP in the command line for the
-next launch.
+What about the other cases such vhost-user (blk/net), virtio-blk?
 
-If this is the reasoning behind the change, maybe mention it in the
-commit message.
-
-With this:
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+> 
+> 
+>>
+>>   Thomas
+>>
+> 
 
 
