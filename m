@@ -2,84 +2,81 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20B99C4363C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 05:00:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F917C4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 05:04:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A765208C7
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 05:00:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4899F208C7
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 05:04:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AZggF7Rs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A765208C7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FCP8+/Gc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4899F208C7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ1Yk-0006Ei-FS
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 01:00:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38042)
+	id 1kQ1dD-0000Cx-36
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 01:04:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37440)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kQ1XS-0005Kk-6f
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 00:58:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52083)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kQ1Rx-0007Wy-GO
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 00:53:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59594)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kQ1XP-0006iq-2Q
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 00:58:53 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kQ1Rs-0004rf-FE
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 00:53:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602046730;
+ s=mimecast20190719; t=1602046387;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=Lia97u/DG4JEvThY1wwhQjtAv1D0qBpz04v1+NXMrI0=;
- b=AZggF7RsGzlMz31zOLAPBKb3MBj3fnbx9KFj62a+FxKml/b49stgCFdEWxofk/Pn7XCHS8
- 5L2YZN1adpMdWr7ArlEXjJh3etgpFicJrqJhTBmOsOo0IxNc6pGPytqv+tOXu2qCNit13c
- KdNrl1mlJC+IMh7NwRFZiK9K7HS6YFk=
+ bh=cSrx7M7kjcVriE4aqLlHuPsFDUQ2cqFj9XAV5+1KWXM=;
+ b=FCP8+/GcWZCPVrJ9K/y+4zBwv44cg5lrcT7wSy04E+lNT3hiXPDVsT+Wb/9duX2lXPwqOd
+ 0XqWEKH9bHJXlknBA9pn31apxopUP/xz4Rtb5ymglltsz35twaEB15yEu+0/yxKGelIRk3
+ 2tDIVil+uKpJW7i/fywEMMm3Yj5oowc=
 Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
  [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-83-YPMczhv3Nvq0oCZFkpDnvQ-1; Wed, 07 Oct 2020 00:58:48 -0400
-X-MC-Unique: YPMczhv3Nvq0oCZFkpDnvQ-1
-Received: by mail-wr1-f72.google.com with SMTP id b6so478986wrn.17
- for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 21:58:48 -0700 (PDT)
+ us-mta-460-9pRT_74iNWW6hiMlJJg01w-1; Wed, 07 Oct 2020 00:53:05 -0400
+X-MC-Unique: 9pRT_74iNWW6hiMlJJg01w-1
+Received: by mail-wr1-f72.google.com with SMTP id x16so109527wrg.7
+ for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 21:53:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=Lia97u/DG4JEvThY1wwhQjtAv1D0qBpz04v1+NXMrI0=;
- b=RCx/bQ7prefJB1LTnp78dTlTPt0xyl6srq8zoUoJ1dfpU9+HLqZQskvr/JvKU6rSpL
- /tPMGmk3InG6tBSF9Td31C1tso5+ol7swnXpSVT5kVUBBSBJhnkPuqIahyHrOF/7X7Ig
- 6a1hladstXXCjfSfb0pPLHoPefasNeWIFnxJPcRWr0N3JFiLOwUE1J6o/E42NYkqreGI
- XS1QiszVEUpGl/uvKuOWZbJQD52LER4PJKtc/COAio87htlSUOIstNPycV3XYeRiBlrJ
- dng+O5By/uuDgxoCaJZYZaGgTQVOLHiXuv2PKG4mthvSUMTDvZo0Lzzm1CD3qcp/p93E
- xmyA==
-X-Gm-Message-State: AOAM533t0jO5QKKBGbApBVHAg9kcEcNa1jhtW3a0+wfhoNgZwP+hkEQ/
- f7K1f8F16wJ4rxjycaKoDz+OTjNnIoyWB+/oCwRtXJHljmJ7aSgDF1Hwp83Er2VQyaPiFNQgy8W
- OJq8yl7ph7ft2ovw=
-X-Received: by 2002:a05:6000:108a:: with SMTP id
- y10mr1384537wrw.41.1602046726875; 
- Tue, 06 Oct 2020 21:58:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyWA6ZnQI0ePQmEz3LP3luHVvnmEtjqmSopnatOnHxt8TQRISPGRBauKumSRXIBoPknNSt2rg==
-X-Received: by 2002:a05:6000:108a:: with SMTP id
- y10mr1384520wrw.41.1602046726672; 
- Tue, 06 Oct 2020 21:58:46 -0700 (PDT)
+ bh=cSrx7M7kjcVriE4aqLlHuPsFDUQ2cqFj9XAV5+1KWXM=;
+ b=RSlbolaffZ+vcNDCiBMZdU+n+Bw75DB/Bp3cALDCXve0D4jAf+pDTEskd6fSUUabq2
+ otxBo8SKVcs+9aH7EsJPPZNv2maRSN8B+tYDHfbstuOgRWv588Dqwe+1sNJzYXgRkXoU
+ 5TnpFRHV11XMR0wjSs4W1PVW3IX8Ki2jq4/Zo1kRprZipOP+SNaMkK9JlrWuA3GZawy5
+ MinocHyX4VnHbENVnOJ8r6IMTGeZ0wRKzqzC2ok3qcjO67etZEJiSP9iZgcQbim18/lQ
+ 5XSdY2VxiesVxGE2Jtx9banEpmtwyD+UE8YIwD9KaqK6Z9cINoxjeWCQWt/MvfcuQkK+
+ rYyA==
+X-Gm-Message-State: AOAM532LiY3t4COInqfLV2m8qqcyJngl0gVl+gJr3fl59jLDCqkgZhIe
+ ZD/shf7RzntcylxUv1MJx8lNkNgjY+VoABGPWNC5RPnBEbmn89xIXGjzlRdOL4jKrbVIIcOBj18
+ VaZJz1TBTnL7Do4g=
+X-Received: by 2002:a1c:2187:: with SMTP id h129mr1206570wmh.51.1602046384391; 
+ Tue, 06 Oct 2020 21:53:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwv3KJo9uT1anedURfFsHU+HmNrwWhMaykbr6tg3NRHH2qbq1O4sVW0+o+fzP1E+CzLBFd45w==
+X-Received: by 2002:a1c:2187:: with SMTP id h129mr1206550wmh.51.1602046384147; 
+ Tue, 06 Oct 2020 21:53:04 -0700 (PDT)
 Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
  [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id p4sm1103598wru.39.2020.10.06.21.58.45
+ by smtp.gmail.com with ESMTPSA id a10sm928702wmb.23.2020.10.06.21.53.02
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 06 Oct 2020 21:58:45 -0700 (PDT)
-Subject: Re: [PATCH 17/20] python/qemu/qmp.py: Preserve error context on
- re-raise
+ Tue, 06 Oct 2020 21:53:03 -0700 (PDT)
+Subject: Re: [PATCH 01/20] python/qemu: use isort to lay out imports
 To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
 References: <20201006235817.3280413-1-jsnow@redhat.com>
- <20201006235817.3280413-18-jsnow@redhat.com>
+ <20201006235817.3280413-2-jsnow@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -104,12 +101,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <543e0ac0-1095-33db-b754-2892eb89c927@redhat.com>
-Date: Wed, 7 Oct 2020 06:58:44 +0200
+Message-ID: <44747cf7-cdc7-02a7-f375-8360de40c71f@redhat.com>
+Date: Wed, 7 Oct 2020 06:53:01 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20201006235817.3280413-18-jsnow@redhat.com>
+In-Reply-To: <20201006235817.3280413-2-jsnow@redhat.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -117,16 +114,16 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:54:30
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:44:56
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
 X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
  RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
@@ -148,38 +145,20 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/7/20 1:58 AM, John Snow wrote:
-> Use the "from ..." phrasing when re-raising errors to preserve their
-> initial context, to help aid debugging when things go wrong.
-> 
-> This also silences a pylint 2.6.0+ error.
+On 10/7/20 1:57 AM, John Snow wrote:
+> Borrowed from the QAPI cleanup series, use the same configuration to
+> standardize the way we write and sort imports.
 > 
 > Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  python/qemu/qmp.py | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
-> 
-> diff --git a/python/qemu/qmp.py b/python/qemu/qmp.py
-> index 9223307ed81..d911999da1f 100644
-> --- a/python/qemu/qmp.py
-> +++ b/python/qemu/qmp.py
-> @@ -181,10 +181,11 @@ def __get_events(self, wait: Union[bool, float] = False) -> None:
->                  self.__sock.settimeout(wait)
->              try:
->                  ret = self.__json_read(only_event=True)
-> -            except socket.timeout:
-> -                raise QMPTimeoutError("Timeout waiting for event")
-> -            except:
-> -                raise QMPConnectError("Error while reading from socket")
-> +            except socket.timeout as err:
-> +                raise QMPTimeoutError("Timeout waiting for event") from err
-> +            except Exception as err:
-> +                msg = "Error while reading from socket"
-> +                raise QMPConnectError(msg) from err
->              if ret is None:
->                  raise QMPConnectError("Error while reading from socket")
->              self.__sock.settimeout(None)
-> 
+>  python/qemu/.isort.cfg        |  7 +++++++
+>  python/qemu/accel.py          |  1 +
+>  python/qemu/console_socket.py |  2 +-
+>  python/qemu/machine.py        |  8 ++++----
+>  python/qemu/qmp.py            | 10 +++++-----
+>  python/qemu/qtest.py          |  2 +-
+>  6 files changed, 19 insertions(+), 11 deletions(-)
+>  create mode 100644 python/qemu/.isort.cfg
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
