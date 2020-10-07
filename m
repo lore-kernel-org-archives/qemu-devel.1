@@ -2,89 +2,95 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD607C41604
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 16:12:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93956C41604
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 16:13:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3260920789
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 16:12:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E7DE520789
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 16:13:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="awms4eax"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3260920789
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="P/OzeKau"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7DE520789
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQC3X-0006VS-2R
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 12:12:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33270)
+	id 1kQC4K-00078B-M1
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 12:13:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34476)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kQBnn-0001Xn-4c
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 11:56:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22282)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kQBni-0000IR-7S
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 11:56:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602086181;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xiPfig7jG9VC0GE1wxVAHcnqkY098QwCgL+T1oBSk+E=;
- b=awms4eaxCSie7uUXQe4zyiM7KredyIYV66ZS9tt7YgqwTv11Sm9C3+8W9+gF7mC44NkLqm
- 2Pr030GZG4jtOTyCeR+3TiB2407kAlhd/kTtZRE//s5dmriVEP4Ef2kGLtZOzfELuocFIA
- yOD1w8Y1kCI3q4NwIPXK/753M/Grm/A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-276-O6HH763qNwiYBjxLdgGJmA-1; Wed, 07 Oct 2020 11:56:17 -0400
-X-MC-Unique: O6HH763qNwiYBjxLdgGJmA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F4F4804013;
- Wed,  7 Oct 2020 15:56:16 +0000 (UTC)
-Received: from dgilbert-t580.localhost (ovpn-112-50.ams2.redhat.com
- [10.36.112.50])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1CCA11001281;
- Wed,  7 Oct 2020 15:56:14 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org, alex.bennee@linaro.org, zhengchuan@huawei.com,
- stefanha@redhat.com, peterx@redhat.com
-Subject: [PULL 04/10] virtiofsd: avoid /proc/self/fd tempdir
-Date: Wed,  7 Oct 2020 16:55:54 +0100
-Message-Id: <20201007155600.337316-5-dgilbert@redhat.com>
-In-Reply-To: <20201007155600.337316-1-dgilbert@redhat.com>
-References: <20201007155600.337316-1-dgilbert@redhat.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kQBs4-0005EB-Mj
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 12:00:55 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45624)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kQBrz-0000tN-7X
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 12:00:52 -0400
+Received: by mail-wr1-x441.google.com with SMTP id e17so2795429wru.12
+ for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 09:00:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=qV/3JEXdswCCkH9Pi3CZ05jxPlz/Vt1p10XE1V4Oo4g=;
+ b=P/OzeKauKWWSMZEFDqLDwPk+smPLe6XRtUJai32+Dbp8isrcJU48UDNU0QO1cbYYgP
+ DNAQSk3knUko+A53g8e9TkSFbIU/0wmIfS6leOd8BJrCxPvbehcVLEppaw9b+jOfjtGv
+ RVEY+DhaSERqHsMwkKPTVNbamYDA6/shYc8mCsxE949EUMzwjqMAPBol98mYplKXAn9+
+ SLkOa1DC91MVWHprjQdsf4B3+PAWXGg9DqJak+i5Umn4VluuU3s1Phz3ze1ffYwh9fDE
+ MMPAwejOLHWMLiYT04CfKscnggLJvPabNyyHLWjPJ3VB3KK+E5weDMGqqe0leKtr9wrf
+ k2Rw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=qV/3JEXdswCCkH9Pi3CZ05jxPlz/Vt1p10XE1V4Oo4g=;
+ b=bE0aPB5L0+Leixh6+BXShzkQTT4Rm3VgUKtiuNHBlhzPWqhi4tO27kRlAyIGt80bTq
+ dLckFr1dfaFjY6Nb7fJO69ZFAyDF7E8+6j2RGMAb9bHvJnRPSaifbjd0P8bPbofdzwFE
+ ofKL3TiYj4y6vEGli8A4NqP+wKcs4o3NyCyYXmxS/ose6kkDMl0XzRGDeAB078I8HzuN
+ Xo9Dc9S0MZpLjK99fhkLiUhssoD73Yl2L9Eu0eeGmHMj9QuJ+adJ9WUW9uHTGJfNwSh0
+ 5TnDberiDFRkHF2/Z3haCfyl/VDXMyqVK4H00m8cv2XDoG8x2kr92gGvhHY2peadd2ix
+ C2dw==
+X-Gm-Message-State: AOAM533U3MsWcHfVU/10HZq2llcANt3zHMOdPPU1Zx51ef2z76wh/7qN
+ pRZU32x9V0u9+wxED3Lvr7RhTw==
+X-Google-Smtp-Source: ABdhPJzTV+tdn1ju/5TFh2TAX5fRzhsYEnp3uh06Wgu9FnQ9eiSdBUdbkASuWeXinQ0amJFcrk6bcw==
+X-Received: by 2002:adf:f2d0:: with SMTP id d16mr4150572wrp.332.1602086445373; 
+ Wed, 07 Oct 2020 09:00:45 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id t5sm3540691wrb.21.2020.10.07.09.00.38
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 07 Oct 2020 09:00:41 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 7D0241FF90;
+ Wed,  7 Oct 2020 17:00:38 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH  v1 04/22] cirrus: Fixing and speedup the msys2/mingw CI
+Date: Wed,  7 Oct 2020 17:00:20 +0100
+Message-Id: <20201007160038.26953-5-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201007160038.26953-1-alex.bennee@linaro.org>
+References: <20201007160038.26953-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:44:56
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,128 +103,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: quintela@redhat.com
+Cc: Ed Maste <emaste@freebsd.org>, Yonggang Luo <luoyonggang@gmail.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Li-Wen Hsu <lwhsu@freebsd.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+From: Yonggang Luo <luoyonggang@gmail.com>
 
-In order to prevent /proc/self/fd escapes a temporary directory is
-created where /proc/self/fd is bind-mounted. This doesn't work on
-read-only file systems.
+Use cache of cirrus caching msys2
+The install of msys2 are refer to https://github.com/msys2/setup-msys2
+The first time install msys2 would be time consuming, so increase timeout_in to 90m
+according to https://cirrus-ci.org/faq/#instance-timed-out
 
-Avoid the temporary directory by bind-mounting /proc/self/fd over /proc.
-This does not affect other processes since we remounted / with MS_REC |
-MS_SLAVE. /proc must exist and virtiofsd does not use it so it's safe to
-do this.
+Apply patch of https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg00072.html
 
-Path traversal can be tested with the following function:
-
-  static void test_proc_fd_escape(struct lo_data *lo)
-  {
-      int fd;
-      int level = 0;
-      ino_t last_ino = 0;
-
-      fd = lo->proc_self_fd;
-      for (;;) {
-          struct stat st;
-
-          if (fstat(fd, &st) != 0) {
-              perror("fstat");
-              return;
-          }
-          if (last_ino && st.st_ino == last_ino) {
-              fprintf(stderr, "inode number unchanged, stopping\n");
-              return;
-          }
-          last_ino = st.st_ino;
-
-          fprintf(stderr, "Level %d dev %lu ino %lu\n", level,
-                  (unsigned long)st.st_dev,
-                  (unsigned long)last_ino);
-          fd = openat(fd, "..", O_PATH | O_DIRECTORY | O_NOFOLLOW);
-          level++;
-      }
-  }
-
-Before and after this patch only Level 0 is displayed. Without
-/proc/self/fd bind-mount protection it is possible to traverse parent
-directories.
-
-Fixes: 397ae982f4df4 ("virtiofsd: jail lo->proc_self_fd")
-Cc: Miklos Szeredi <mszeredi@redhat.com>
-Cc: Jens Freimann <jfreimann@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20201006095826.59813-1-stefanha@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Tested-by: Jens Freimann <jfreimann@redhat.com>
-Reviewed-by: Jens Freimann <jfreimann@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+Message-Id: <20201007145300.1197-2-luoyonggang@gmail.com>
+[AJB: renamed printenv_script to setup_script]
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tools/virtiofsd/passthrough_ll.c | 34 +++++++++++---------------------
- 1 file changed, 11 insertions(+), 23 deletions(-)
+ .cirrus.yml | 112 +++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 67 insertions(+), 45 deletions(-)
 
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
-index 477e6ee0b5..ff53df4451 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -2393,8 +2393,6 @@ static void setup_wait_parent_capabilities(void)
- static void setup_namespaces(struct lo_data *lo, struct fuse_session *se)
- {
-     pid_t child;
--    char template[] = "virtiofsd-XXXXXX";
--    char *tmpdir;
+diff --git a/.cirrus.yml b/.cirrus.yml
+index d58782ce67..eb768fa260 100644
+--- a/.cirrus.yml
++++ b/.cirrus.yml
+@@ -46,64 +46,86 @@ macos_xcode_task:
+     - gmake check
  
-     /*
-      * Create a new pid namespace for *child* processes.  We'll have to
-@@ -2458,33 +2456,23 @@ static void setup_namespaces(struct lo_data *lo, struct fuse_session *se)
-         exit(1);
-     }
- 
--    tmpdir = mkdtemp(template);
--    if (!tmpdir) {
--        fuse_log(FUSE_LOG_ERR, "tmpdir(%s): %m\n", template);
--        exit(1);
--    }
--
--    if (mount("/proc/self/fd", tmpdir, NULL, MS_BIND, NULL) < 0) {
--        fuse_log(FUSE_LOG_ERR, "mount(/proc/self/fd, %s, MS_BIND): %m\n",
--                 tmpdir);
-+    /*
-+     * We only need /proc/self/fd. Prevent ".." from accessing parent
-+     * directories of /proc/self/fd by bind-mounting it over /proc. Since / was
-+     * previously remounted with MS_REC | MS_SLAVE this mount change only
-+     * affects our process.
-+     */
-+    if (mount("/proc/self/fd", "/proc", NULL, MS_BIND, NULL) < 0) {
-+        fuse_log(FUSE_LOG_ERR, "mount(/proc/self/fd, MS_BIND): %m\n");
-         exit(1);
-     }
- 
--    /* Now we can get our /proc/self/fd directory file descriptor */
--    lo->proc_self_fd = open(tmpdir, O_PATH);
-+    /* Get the /proc (actually /proc/self/fd, see above) file descriptor */
-+    lo->proc_self_fd = open("/proc", O_PATH);
-     if (lo->proc_self_fd == -1) {
--        fuse_log(FUSE_LOG_ERR, "open(%s, O_PATH): %m\n", tmpdir);
-+        fuse_log(FUSE_LOG_ERR, "open(/proc, O_PATH): %m\n");
-         exit(1);
-     }
--
--    if (umount2(tmpdir, MNT_DETACH) < 0) {
--        fuse_log(FUSE_LOG_ERR, "umount2(%s, MNT_DETACH): %m\n", tmpdir);
--        exit(1);
--    }
--
--    if (rmdir(tmpdir) < 0) {
--        fuse_log(FUSE_LOG_ERR, "rmdir(%s): %m\n", tmpdir);
--    }
- }
- 
- /*
+ windows_msys2_task:
++  timeout_in: 90m
+   windows_container:
+-    image: cirrusci/windowsservercore:cmake
++    image: cirrusci/windowsservercore:2019
+     os_version: 2019
+     cpu: 8
+     memory: 8G
+   env:
++    CIRRUS_SHELL: powershell
+     MSYS: winsymlinks:nativestrict
+     MSYSTEM: MINGW64
+     CHERE_INVOKING: 1
+-  printenv_script:
+-    - C:\tools\msys64\usr\bin\bash.exe -lc 'printenv'
++  setup_script:
++    - choco install -y --no-progress 7zip
++    - Write-Output $env:PATH
++  msys2_cache:
++    folder: C:\tools\archive
++    reupload_on_changes: false
++    fingerprint_script: cat .cirrus.yml
++    populate_script:
++      - |
++        md C:\tools
++        md C:\tools\archive
++        $start_time = Get-Date
++        cd C:\tools
++        bitsadmin /transfer msys_download /dynamic /download /priority FOREGROUND https://github.com/msys2/msys2-installer/releases/download/2020-09-03/msys2-base-x86_64-20200903.sfx.exe C:\tools\base.exe
++        Write-Output "Download time taken: $((Get-Date).Subtract($start_time).Seconds) second(s)"
++        C:\tools\base.exe -y
++        ((Get-Content -path C:\tools\msys64\etc\\post-install\\07-pacman-key.post -Raw) -replace '--refresh-keys', '--version') | Set-Content -Path C:\tools\msys64\etc\\post-install\\07-pacman-key.post
++        C:\tools\msys64\usr\bin\bash.exe -lc "sed -i 's/^CheckSpace/#CheckSpace/g' /etc/pacman.conf"
++        C:\tools\msys64\usr\bin\bash.exe -lc "export"
++        C:\tools\msys64\usr\bin\bash.exe -lc "grep -rl 'repo.msys2.org/' /etc/pacman.d/mirrorlist.* | xargs sed -i 's/repo.msys2.org\//mirrors.tuna.tsinghua.edu.cn\/msys2\//g'"
++        C:\tools\msys64\usr\bin\pacman.exe --noconfirm -Sy
++        echo Y | C:\tools\msys64\usr\bin\pacman.exe --noconfirm -Suu --overwrite=*
++        taskkill /F /FI "MODULES eq msys-2.0.dll"
++        tasklist
++        C:\tools\msys64\usr\bin\bash.exe -lc "mv -f /etc/pacman.conf.pacnew /etc/pacman.conf || true"
++        C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Suu --overwrite=*"
++        C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -S --needed \
++          diffutils git grep make pkg-config sed \
++          mingw-w64-x86_64-python \
++          mingw-w64-x86_64-python-setuptools \
++          mingw-w64-x86_64-toolchain \
++          mingw-w64-x86_64-SDL2 \
++          mingw-w64-x86_64-SDL2_image \
++          mingw-w64-x86_64-gtk3 \
++          mingw-w64-x86_64-glib2 \
++          mingw-w64-x86_64-ninja \
++          mingw-w64-x86_64-jemalloc \
++          mingw-w64-x86_64-lzo2 \
++          mingw-w64-x86_64-zstd \
++          mingw-w64-x86_64-libjpeg-turbo \
++          mingw-w64-x86_64-pixman \
++          mingw-w64-x86_64-libgcrypt \
++          mingw-w64-x86_64-libpng \
++          mingw-w64-x86_64-libssh \
++          mingw-w64-x86_64-libxml2 \
++          mingw-w64-x86_64-snappy \
++          mingw-w64-x86_64-libusb \
++          mingw-w64-x86_64-usbredir \
++          mingw-w64-x86_64-libtasn1 \
++          mingw-w64-x86_64-nettle \
++          mingw-w64-x86_64-cyrus-sasl \
++          mingw-w64-x86_64-curl \
++          mingw-w64-x86_64-gnutls \
++          "
++        C:\tools\msys64\usr\bin\bash.exe -lc "rm -rf /var/cache/pacman/pkg/*"
++        cd C:\tools\msys64
++        echo "Start archive"
++        cmd /C "7z a -ttar . -so | 7z a -txz -simsys2-x86_64.tar C:\tools\archive\msys2-x86_64.tar.xz"
+   install_script:
+-    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools &&
+-        curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
+-    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools &&
+-        curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
+-    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools &&
+-        pacman -U --noconfirm msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
+-    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Sy"
+-    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -S --needed
+-        bash pacman pacman-mirrors msys2-runtime"
+-    - taskkill /F /IM gpg-agent.exe
+-    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Su"
+-    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -S --needed
+-        base-devel
+-        git
+-        mingw-w64-x86_64-python
+-        mingw-w64-x86_64-python-setuptools
+-        mingw-w64-x86_64-toolchain
+-        mingw-w64-x86_64-capstone
+-        mingw-w64-x86_64-SDL2
+-        mingw-w64-x86_64-SDL2_image
+-        mingw-w64-x86_64-gtk3
+-        mingw-w64-x86_64-glib2
+-        mingw-w64-x86_64-ninja
+-        mingw-w64-x86_64-make
+-        mingw-w64-x86_64-lzo2
+-        mingw-w64-x86_64-zstd
+-        mingw-w64-x86_64-libjpeg-turbo
+-        mingw-w64-x86_64-pixman
+-        mingw-w64-x86_64-libgcrypt
+-        mingw-w64-x86_64-libpng
+-        mingw-w64-x86_64-libssh
+-        mingw-w64-x86_64-libxml2
+-        mingw-w64-x86_64-snappy
+-        mingw-w64-x86_64-libusb
+-        mingw-w64-x86_64-usbredir
+-        mingw-w64-x86_64-libtasn1
+-        mingw-w64-x86_64-nettle
+-        mingw-w64-x86_64-cyrus-sasl
+-        mingw-w64-x86_64-curl
+-        mingw-w64-x86_64-gnutls
+-        mingw-w64-x86_64-zstd"
++    - |
++      cd C:\tools
++      cmd /C "7z x C:\tools\archive\msys2-x86_64.tar.xz -so | 7z x -aoa -simsys2-x86_64.tar -ttar -omsys64"
++      C:\tools\msys64\usr\bin\bash.exe -lc "export"
++
+   script:
+     - C:\tools\msys64\usr\bin\bash.exe -lc "mkdir build"
+     - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && ../configure
+       --python=python3 --ninja=ninja
+       --target-list-exclude=i386-softmmu,arm-softmmu,ppc-softmmu,mips-softmmu"
+-    - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && make -j$NUMBER_OF_PROCESSORS"
++    - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && make -j8"
+   test_script:
+     - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && make V=1 check"
 -- 
-2.28.0
+2.20.1
 
 
