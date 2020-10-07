@@ -2,67 +2,88 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AE96C47095
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 12:20:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD666C4363D
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 12:22:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F2A020789
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 12:20:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F2A020789
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 0B36F206D9
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 12:22:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UQjkQcuZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B36F206D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ8Qk-0007xk-2G
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 08:20:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40078)
+	id 1kQ8T5-00014n-R3
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 08:22:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37158)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kQ8OX-0006hl-NH
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 08:18:11 -0400
-Received: from mail.ispras.ru ([83.149.199.84]:56098)
- by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kQ8OU-00042y-Sg
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 08:18:09 -0400
-Received: from [10.12.39.188] (unknown [85.142.117.224])
- by mail.ispras.ru (Postfix) with ESMTPSA id 783DB40D3BFF;
- Wed,  7 Oct 2020 12:17:58 +0000 (UTC)
-Subject: Re: acceptance-system-fedora failures
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
-References: <f9e09f0b-3915-382c-d670-8d33d164ad7b@redhat.com>
- <4e191372-c332-8f69-85e2-1ff6ead0f40d@redhat.com>
- <59d2a787-bcd4-7283-693b-09ea04c16dc6@redhat.com>
- <6068346f-b034-9321-0eea-29233c23a300@redhat.com>
- <78ce9ac1-d2a1-9dc0-bf38-f9ac34b2f203@ispras.ru>
- <14ee7cc6-42ca-fd86-241b-ed85e26693f7@redhat.com>
-From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
-Message-ID: <a1689dcd-18e0-157f-6607-562a6a3e87c6@ispras.ru>
-Date: Wed, 7 Oct 2020 15:17:55 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQ89y-0001ED-WE
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 08:03:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53306)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQ89x-0002Nf-4x
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 08:03:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602072184;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=sPS7s9BYG4eTGgTjSWjMv1brvTlPGwaG1Ry8CBTYwco=;
+ b=UQjkQcuZ0ZgYYsNBA34cn+4dqTsjAYppKNP8ngYXGZlTwomaVMi55XI7/oDoUbn3yIFCD4
+ pjqPoCOGeeZi1L9GvzfwfIUv9J2BQ+tKfc5aEsx1N+qrD180nPGoCRr8Z3mH8Rg15JNmtP
+ UyV4FV+a5Wpj1HBWSkTP52GKArPKo/w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-301-W5iInYDzMYiMJToIBz-eJQ-1; Wed, 07 Oct 2020 08:03:02 -0400
+X-MC-Unique: W5iInYDzMYiMJToIBz-eJQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D367A835B77
+ for <qemu-devel@nongnu.org>; Wed,  7 Oct 2020 12:02:59 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
+ [10.36.112.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 82C1F6E70C;
+ Wed,  7 Oct 2020 12:02:59 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 05B5D11329C1; Wed,  7 Oct 2020 14:02:58 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: [PATCH v5 26/36] qapi/gen.py: Fix edge-case of _is_user_module
+References: <20201005195158.2348217-1-jsnow@redhat.com>
+ <20201005195158.2348217-27-jsnow@redhat.com>
+Date: Wed, 07 Oct 2020 14:02:57 +0200
+In-Reply-To: <20201005195158.2348217-27-jsnow@redhat.com> (John Snow's message
+ of "Mon, 5 Oct 2020 15:51:48 -0400")
+Message-ID: <87eemackge.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <14ee7cc6-42ca-fd86-241b-ed85e26693f7@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=83.149.199.84;
- envelope-from=pavel.dovgalyuk@ispras.ru; helo=mail.ispras.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 08:18:04
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:54:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -76,98 +97,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <rth@twiddle.net>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07.10.2020 12:57, Philippe Mathieu-Daudé wrote:
-> On 10/7/20 10:51 AM, Pavel Dovgalyuk wrote:
->> On 07.10.2020 11:23, Thomas Huth wrote:
->>> On 07/10/2020 09.13, Philippe Mathieu-Daudé wrote:
->>>> On 10/7/20 7:20 AM, Philippe Mathieu-Daudé wrote:
->>>>> On 10/7/20 1:07 AM, John Snow wrote:
->>>>>> I'm seeing this gitlab test fail quite often in my Python work; I
->>>>>> don't
->>>>>> *think* this has anything to do with my patches, but maybe I need
->>>>>> to try
->>>>>> and bisect this more aggressively.
->>> [...]
->>>>> w.r.t. the error in your build, I told Thomas about the
->>>>> test_ppc_mac99/day15/invaders.elf timeouting but he said this is
->>>>> not his area. Richard has been looking yesterday to see if it is
->>>>> a TCG regression, and said the test either finished/crashed raising
->>>>> SIGCHLD, but Avocado parent is still waiting for a timeout, so the
->>>>> children become zombie and the test hang.
->>>>
->>>> Expected output:
->>>>
->>>> Quiescing Open Firmware ...
->>>> Booting Linux via __start() @ 0x01000000 ...
->>>>
->>>> But QEMU exits in replay_char_write_event_load():
->>>>
->>>> Quiescing Open Firmware ...
->>>> qemu-system-ppc: Missing character write event in the replay log
->>>> $ echo $?
->>>> 1
->>>>
->>>> Latest events are CHECKPOINT CHECKPOINT INTERRUPT INTERRUPT INTERRUPT.
->>>>
->>>> Replay file is ~22MiB. End of record using "system_powerdown + quit"
->>>> in HMP.
->>>>
->>>> I guess we have 2 bugs:
->>>> - replay log
->>>> - avocado doesn't catch children exit(1)
->>>>
->>>> Quick reproducer:
->>>>
->>>> $ make qemu-system-ppc check-venv
->>>> $ tests/venv/bin/python -m \
->>>>     avocado --show=app,console,replay \
->>>>     run --job-timeout 300 -t machine:mac99 \
->>>>     tests/acceptance/replay_kernel.py
->>>
->>> Thanks, that was helpful. ... and the winner is:
->>>
->>>       commit   55adb3c45620c31f29978f209e2a44a08d34e2da
->>>       Author:  John Snow <jsnow@redhat.com>
->>>       Date:    Fri Jul 24 01:23:00 2020 -0400
->>>       Subject: ide: cancel pending callbacks on SRST
->>>
->>> ... starting with this commit, the tests starts failing. John, any
->>> idea what
->>> might be causing this?
->>
->> This patch includes the following lines:
->>
->> +        aio_bh_schedule_oneshot(qemu_get_aio_context(),
->> +                                ide_bus_perform_srst, bus);
->>
->> replay_bh_schedule_oneshot_event should be used instead of this
->> function, because it synchronizes non-deterministic BHs.
-> 
-> Why do we have 2 different functions? BH are already complex
-> enough, and we need to also think about the replay API...
-> 
+John Snow <jsnow@redhat.com> writes:
 
-There is note about it in docs/devel/replay.txt
-It's hard to protect the guest state from incorrect operations.
-There was the similar problem with icount - everyone who modify 
-translate modules, needs to take it info account.
-But now we have record/replay tests that assert that patches do not 
-break icount/rr.
+> The edge case is that if the name is '', this expression returns a
+> string instead of a bool, which violates our declared type.
 
-> What about the other cases such vhost-user (blk/net), virtio-blk?
+The edge case is impossible, as discussed in review of v2.  I figure the
+type checker can't see that, so we need to help it some.  Can we mention
+this in the commit message?
 
-I do not know much about these modules.
-The main idea is the following: if the code works with the guest state, 
-it should deal with icount and rr functions.
+>
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> Reviewed-by: Cleber Rosa <crosa@redhat.com>
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  scripts/qapi/gen.py | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
+> index f2e2746fea5..1bad37fc06b 100644
+> --- a/scripts/qapi/gen.py
+> +++ b/scripts/qapi/gen.py
+> @@ -243,7 +243,7 @@ def __init__(self, prefix, what, user_blurb, builtin_blurb, pydoc):
+>  
+>      @staticmethod
+>      def _is_user_module(name):
+> -        return name and not name.startswith('./')
+> +        return bool(name and not name.startswith('./'))
 
-Pavel Dovgalyuk
+           return not (name is None or name.startswith('./')
+
+Looks slightly clearer to me.
+>  
+>      @staticmethod
+>      def _is_builtin_module(name):
+
 
