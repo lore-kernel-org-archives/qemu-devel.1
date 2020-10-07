@@ -6,68 +6,63 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFA4FC4363C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 04:51:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4826EC4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 04:53:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43B76208C7
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 04:51:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43B76208C7
+	by mail.kernel.org (Postfix) with ESMTPS id 91F67208C7
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 04:53:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91F67208C7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ1Pn-0005mT-EU
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 00:50:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34546)
+	id 1kQ1S6-0007Sw-Mf
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 00:53:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34552)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kQ15i-0002e1-Jy
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 00:30:14 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38276)
+ id 1kQ15k-0002h1-Qq
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 00:30:17 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38420)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kQ15e-0005Tl-MZ
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 00:30:14 -0400
+ id 1kQ15e-0005Tv-Ml
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 00:30:16 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kQ15M-00027O-Id
- for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 04:29:52 +0000
+ id 1kQ15O-00027H-JF
+ for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 04:29:54 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B819B2E80ED
- for <qemu-devel@nongnu.org>; Wed,  7 Oct 2020 04:29:51 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id E102B2E8124
+ for <qemu-devel@nongnu.org>; Wed,  7 Oct 2020 04:29:52 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 07 Oct 2020 04:17:20 -0000
-From: Launchpad Bug Tracker <897466@bugs.launchpad.net>
+Date: Wed, 07 Oct 2020 04:17:17 -0000
+From: Launchpad Bug Tracker <562107@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
  assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu-kvm; component=main; 
- status=Expired; importance=Medium; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=precise;
- sourcepackage=qemu-kvm; component=main; status=Expired; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug-Tags: regression-release
+X-Launchpad-Bug-Tags: gdb
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: janitor jdstrand serge-hallyn th-huth
-X-Launchpad-Bug-Reporter: Jamie Strandboge (jdstrand)
+X-Launchpad-Bug-Commenters: chouteau iambaim janitor matthijsterwoord th-huth
+X-Launchpad-Bug-Reporter: mterwoord (matthijsterwoord)
 X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
-References: <20111128231908.14324.64245.malonedeb@gac.canonical.com>
-Message-Id: <160204424090.20421.4991340651139250871.malone@loganberry.canonical.com>
-Subject: [Bug 897466] Re: UHCI Host Controller no longer present with -usb
+References: <20100413081304.1144.20813.malonedeb@palladium.canonical.com>
+Message-Id: <160204423760.20421.13961025768378281554.malone@loganberry.canonical.com>
+Subject: [Bug 562107] Re: QEmu GDB stub uses IPv6 instead of v4 (or both)
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="d50d1e75c500726862802414f880ee3e3bb759bf"; Instance="production"
-X-Launchpad-Hash: 89dd5c7f9573001128686e2ad1af31d536bd58cf
+X-Launchpad-Hash: 6a84994c88033251cf0347b475164a77929a3795
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 22:50:47
@@ -90,7 +85,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 897466 <897466@bugs.launchpad.net>
+Reply-To: Bug 562107 <562107@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -104,49 +99,29 @@ Sender: "Qemu-devel"
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/897466
+https://bugs.launchpad.net/bugs/562107
 
 Title:
-  UHCI Host Controller no longer present with -usb
+  QEmu GDB stub uses IPv6 instead of v4 (or both)
 
 Status in QEMU:
   Expired
-Status in qemu-kvm package in Ubuntu:
-  Expired
-Status in qemu-kvm source package in Precise:
-  Expired
 
 Bug description:
-  If on an up to date 12.04 install and I start a VM with:
-  $ qemu -m 192 -serial none -chardev null,id=3Dchardevmon -pidfile /tmp/pi=
-d -daemonize -nographic -monitor tcp:127.0.0.1:4444,server,nowait -net user=
-,hostfwd=3Dtcp:127.0.0.1:4422-:22 -usb -rtc base=3Dutc -name qatest-vm -uui=
-d ded3a46b-bb60-43f4-8113-d041aeb93cdf -hda libvirt/qatest/qatest.qcow2
+  This bug has been reported by several people already.
 
-  Then use the 'info usbhost' in the monitor, I get:
-  $ echo 'info usbhost' | nc -q 1 127.0.0.1 4444
-  (qemu) info usbhost
-  husb: using sys file-system with /dev/bus/usb
-  $
+  See http://migeel.sk/blog/2009/04/21/gdb-and-qemu-on-windows/
+  and http://qemu-forum.ipi.fi/viewtopic.php?f=3D5&t=3D5579&p=3D16248&hilit=
+=3Dgdb+ipv6#p16248
 
-  In Oneiric and eariler, 'info usbhost' would show a UHCI Host Controller.=
- Eg:
-  $ qemu -m 192 -serial none -chardev null,id=3Dchardevmon -pidfile /tmp/pi=
-d -daemonize -nographic -monitor tcp:127.0.0.1:4444,server,nowait -net user=
-,hostfwd=3Dtcp:127.0.0.1:4422-:22 -usb -rtc base=3Dutc -name qatest-vm -uui=
-d ded3a46b-bb60-43f4-8113-d041aeb93cdf -hda libvirt/qatest/qatest.qcow2
-  $ echo 'info usbhost' | nc -q 1 127.0.0.1 4444
-  QEMU 0.14.1 monitor - type 'help' for more information
-  (qemu) info usbhost
-  husb: using sys file-system with /dev/bus/usb
-  =C2=A0=C2=A0Device 1.1, speed 12 Mb/s
-  =C2=A0=C2=A0=C2=A0=C2=A0Hub: USB device 1d6b:0001, UHCI Host Controller
+  =
 
-  This breaks QRT/scripts/test-qemu.py and appears to be a regression,
-  but I am not sure if it is a 3.2 kernel issue or a 0.14.1 vs 0.15
-  issue. I should mention this is happening with qemu without /dev/kvm
-  available (ie, I am running test-qemu.py in an up to date precise VM).
+  Seems like a very easy fix. =
+
+
+  Regards,
+  Matthijs ter Woord
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/897466/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/562107/+subscriptions
 
