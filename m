@@ -2,92 +2,112 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14852C4363C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 19:06:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25CAAC4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 19:06:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 628B72168B
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 19:06:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 635B02168B
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 19:06:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iQfX/bZv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 628B72168B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nBTcs0C2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 635B02168B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQElE-0000f1-BC
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 15:06:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49796)
+	id 1kQElW-000146-Ai
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 15:06:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49920)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQEjQ-0007LB-LA
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 15:04:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48717)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQEjM-0004Yn-Io
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 15:04:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602097439;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=k2GEWLiKuixQ3QHHLWnlm8X9RZjtJYjX5HQ97JeKg0o=;
- b=iQfX/bZvwvHNReaT15MG+ZNuzTR+Ick/rX17C9SWgRyHwd0od8guujsf3I/JgIoCw/cXYo
- LbNfSQMscMosurZZnpREfOuaEvoQUK4HmCM3hWI+LmZiloVS13VXEyv0jSIdWiZuBJnpv8
- qWU/QEmVVglxUlSg1BUJLqWv3XV3T8M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-555-EI763up2MdebKobBoB1mDQ-1; Wed, 07 Oct 2020 15:03:56 -0400
-X-MC-Unique: EI763up2MdebKobBoB1mDQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F1A2A8070E2;
- Wed,  7 Oct 2020 19:03:54 +0000 (UTC)
-Received: from [10.10.120.38] (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 49E1C702E7;
- Wed,  7 Oct 2020 19:03:54 +0000 (UTC)
-Subject: Re: [PATCH 17/20] python/qemu/qmp.py: Preserve error context on
- re-raise
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20201006235817.3280413-1-jsnow@redhat.com>
- <20201006235817.3280413-18-jsnow@redhat.com>
- <20201007112107.GK7212@linux.fritz.box>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <23b52cc1-6e82-4749-f9cd-566ef07ac15b@redhat.com>
-Date: Wed, 7 Oct 2020 15:03:53 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-MIME-Version: 1.0
-In-Reply-To: <20201007112107.GK7212@linux.fritz.box>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:54:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+ (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
+ id 1kQEjl-0007e4-DA; Wed, 07 Oct 2020 15:04:29 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24988
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
+ id 1kQEjh-0004bX-Iq; Wed, 07 Oct 2020 15:04:29 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 097J2NTR035737; Wed, 7 Oct 2020 15:04:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=from : to : cc : subject
+ : date : message-id : in-reply-to : references; s=pp1;
+ bh=6S2PkKO16g+NTMVJmmUS50xG/Pjax80JpxCq2Qlgokw=;
+ b=nBTcs0C2nGyF2FXtecnvxOuiUjS4RNpcdQ+aDgfSdqixT0GoaDmFmdQwVjmze3bGDC9B
+ +u7GJffj4g0VSfLdijcEXVz+ZrrAjJmeX/jbXq0b/AEn/JOfp3D8v8MmX1S1EzQfl0dK
+ mp71GVaXR1YL3zRruJ/FzxUsQfLmprFvPxPIyf5ztgDzTnjcOjkNllcS+NbIKKkXlSqt
+ sNxQGPnFYiAa0Uxx+DnKmmrcb61fJYLiBfrbbfrc2j1U8x0VAnzXfEEkEcglvaPi5GHz
+ OXbDTEnF7f/Bts+j6hbF7tZjOTnNqs8TBp/7ThYPX2bQrfG6puqMn9yQwkbU1wc8vhAi Rw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 341jak25xg-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 07 Oct 2020 15:04:24 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 097J2QXr036157;
+ Wed, 7 Oct 2020 15:04:24 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
+ [169.53.41.122])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 341jak25x6-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 07 Oct 2020 15:04:24 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+ by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 097IllfS028843;
+ Wed, 7 Oct 2020 19:04:23 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
+ [9.57.198.26]) by ppma04dal.us.ibm.com with ESMTP id 3411xd81wr-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 07 Oct 2020 19:04:23 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
+ [9.57.199.111])
+ by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 097J4MC213435520
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 7 Oct 2020 19:04:22 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 911CFAC05F;
+ Wed,  7 Oct 2020 19:04:22 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 259C8AC059;
+ Wed,  7 Oct 2020 19:04:20 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.211.60.106])
+ by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+ Wed,  7 Oct 2020 19:04:19 +0000 (GMT)
+From: Matthew Rosato <mjrosato@linux.ibm.com>
+To: cohuck@redhat.com, thuth@redhat.com
+Subject: [PATCH v3 01/10] s390x/pci: Move header files to include/hw/s390x
+Date: Wed,  7 Oct 2020 15:04:06 -0400
+Message-Id: <1602097455-15658-2-git-send-email-mjrosato@linux.ibm.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1602097455-15658-1-git-send-email-mjrosato@linux.ibm.com>
+References: <1602097455-15658-1-git-send-email-mjrosato@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-10-07_10:2020-10-07,
+ 2020-10-07 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 impostorscore=0
+ mlxlogscore=999 malwarescore=0 suspectscore=0 clxscore=1015 phishscore=0
+ mlxscore=0 priorityscore=1501 bulkscore=0 spamscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2010070118
+Received-SPF: pass client-ip=148.163.158.5;
+ envelope-from=mjrosato@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 15:04:22
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,51 +120,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: kvm@vger.kernel.org, pmorel@linux.ibm.com, david@redhat.com,
+ schnelle@linux.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
+ pasic@linux.ibm.com, borntraeger@de.ibm.com, alex.williamson@redhat.com,
+ mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/7/20 7:21 AM, Kevin Wolf wrote:
-> Am 07.10.2020 um 01:58 hat John Snow geschrieben:
->> Use the "from ..." phrasing when re-raising errors to preserve their
->> initial context, to help aid debugging when things go wrong.
->>
->> This also silences a pylint 2.6.0+ error.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
-> 
-> I don't really understand what this improves compared to the implicit
-> chaining we got before, but if pylint says so...
-> 
-> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-> 
+Seems a more appropriate location for them.
 
-Yeah, it's a pretty minimal change. Depending on the context, I think it 
-makes a bigger difference depending on how far away you are from the 
-error you are re-raising, but I couldn't find a great real-world example 
-for you right now.
+Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+---
+ MAINTAINERS                              | 1 +
+ hw/s390x/s390-pci-bus.c                  | 4 ++--
+ hw/s390x/s390-pci-inst.c                 | 4 ++--
+ hw/s390x/s390-virtio-ccw.c               | 2 +-
+ {hw => include/hw}/s390x/s390-pci-bus.h  | 0
+ {hw => include/hw}/s390x/s390-pci-inst.h | 0
+ 6 files changed, 6 insertions(+), 5 deletions(-)
+ rename {hw => include/hw}/s390x/s390-pci-bus.h (100%)
+ rename {hw => include/hw}/s390x/s390-pci-inst.h (100%)
 
-In summary, it changes this line:
-
-"During handling of the above exception, another exception occurred:"
-
-to this one:
-
-"The above exception was the direct cause of the following exception:"
-
-Which disambiguates between wrapping an exception with a more 
-semantically meaningful exception class, vs. your handler code itself 
-faulted.
-
-Minor change, I know. You are also allowed to use "from None" to 
-suppress the chain. I use this in the QAPI series at one point because I 
-felt the underlying error was not useful to see in the traceback.
-
-I see the pylint change as forcing you not to rely on the implicit 
-chaining. Eh, fine.
-
---js
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e9d85cc..0eb8a7f 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1443,6 +1443,7 @@ S390 PCI
+ M: Matthew Rosato <mjrosato@linux.ibm.com>
+ S: Supported
+ F: hw/s390x/s390-pci*
++F: include/hw/s390x/s390-pci*
+ L: qemu-s390x@nongnu.org
+ 
+ UniCore32 Machines
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index fb4cee8..a929340 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -15,8 +15,8 @@
+ #include "qapi/error.h"
+ #include "qapi/visitor.h"
+ #include "cpu.h"
+-#include "s390-pci-bus.h"
+-#include "s390-pci-inst.h"
++#include "hw/s390x/s390-pci-bus.h"
++#include "hw/s390x/s390-pci-inst.h"
+ #include "hw/pci/pci_bus.h"
+ #include "hw/qdev-properties.h"
+ #include "hw/pci/pci_bridge.h"
+diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+index 2f7a7d7..639b13c 100644
+--- a/hw/s390x/s390-pci-inst.c
++++ b/hw/s390x/s390-pci-inst.c
+@@ -13,12 +13,12 @@
+ 
+ #include "qemu/osdep.h"
+ #include "cpu.h"
+-#include "s390-pci-inst.h"
+-#include "s390-pci-bus.h"
+ #include "exec/memop.h"
+ #include "exec/memory-internal.h"
+ #include "qemu/error-report.h"
+ #include "sysemu/hw_accel.h"
++#include "hw/s390x/s390-pci-inst.h"
++#include "hw/s390x/s390-pci-bus.h"
+ #include "hw/s390x/tod.h"
+ 
+ #ifndef DEBUG_S390PCI_INST
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 28266a3..f31ae2e 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -28,7 +28,7 @@
+ #include "qemu/error-report.h"
+ #include "qemu/option.h"
+ #include "qemu/qemu-print.h"
+-#include "s390-pci-bus.h"
++#include "hw/s390x/s390-pci-bus.h"
+ #include "sysemu/reset.h"
+ #include "hw/s390x/storage-keys.h"
+ #include "hw/s390x/storage-attributes.h"
+diff --git a/hw/s390x/s390-pci-bus.h b/include/hw/s390x/s390-pci-bus.h
+similarity index 100%
+rename from hw/s390x/s390-pci-bus.h
+rename to include/hw/s390x/s390-pci-bus.h
+diff --git a/hw/s390x/s390-pci-inst.h b/include/hw/s390x/s390-pci-inst.h
+similarity index 100%
+rename from hw/s390x/s390-pci-inst.h
+rename to include/hw/s390x/s390-pci-inst.h
+-- 
+1.8.3.1
 
 
