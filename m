@@ -2,81 +2,82 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F917C4363C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 05:04:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01F6DC4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 05:09:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4899F208C7
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 05:04:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1CA86208C7
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 05:09:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FCP8+/Gc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4899F208C7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xtdq5APe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CA86208C7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ1dD-0000Cx-36
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 01:04:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37440)
+	id 1kQ1hw-0002vM-63
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 01:09:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38152)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kQ1Rx-0007Wy-GO
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 00:53:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59594)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kQ1YE-0006A6-HI
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 00:59:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23955)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kQ1Rs-0004rf-FE
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 00:53:12 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kQ1YB-00070G-Ln
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 00:59:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602046387;
+ s=mimecast20190719; t=1602046778;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=cSrx7M7kjcVriE4aqLlHuPsFDUQ2cqFj9XAV5+1KWXM=;
- b=FCP8+/GcWZCPVrJ9K/y+4zBwv44cg5lrcT7wSy04E+lNT3hiXPDVsT+Wb/9duX2lXPwqOd
- 0XqWEKH9bHJXlknBA9pn31apxopUP/xz4Rtb5ymglltsz35twaEB15yEu+0/yxKGelIRk3
- 2tDIVil+uKpJW7i/fywEMMm3Yj5oowc=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-460-9pRT_74iNWW6hiMlJJg01w-1; Wed, 07 Oct 2020 00:53:05 -0400
-X-MC-Unique: 9pRT_74iNWW6hiMlJJg01w-1
-Received: by mail-wr1-f72.google.com with SMTP id x16so109527wrg.7
- for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 21:53:05 -0700 (PDT)
+ bh=t8py/E7QqGtVaJLAF23i3HPxh/+4NPgmmRTnLxwad4w=;
+ b=Xtdq5APekadE3GnyGiukARSf1gx5xgEBVumc0cjkhBpEEYDPZdjDWnvA3mapLHaBh/Id/e
+ w7BXTNSdNJz9GaZKXGuoTiUZpm8cpkIV0XXZ5DP5G/mBLzQCyQ875u8kega7IBDt+Oe+aj
+ FeGMalMB3PZoDZOTfaMUDKM1sWzkZO0=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-552-ixAPlSpENNWg57azzK3qbg-1; Wed, 07 Oct 2020 00:59:37 -0400
+X-MC-Unique: ixAPlSpENNWg57azzK3qbg-1
+Received: by mail-wr1-f70.google.com with SMTP id u15so499409wrn.4
+ for <qemu-devel@nongnu.org>; Tue, 06 Oct 2020 21:59:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=cSrx7M7kjcVriE4aqLlHuPsFDUQ2cqFj9XAV5+1KWXM=;
- b=RSlbolaffZ+vcNDCiBMZdU+n+Bw75DB/Bp3cALDCXve0D4jAf+pDTEskd6fSUUabq2
- otxBo8SKVcs+9aH7EsJPPZNv2maRSN8B+tYDHfbstuOgRWv588Dqwe+1sNJzYXgRkXoU
- 5TnpFRHV11XMR0wjSs4W1PVW3IX8Ki2jq4/Zo1kRprZipOP+SNaMkK9JlrWuA3GZawy5
- MinocHyX4VnHbENVnOJ8r6IMTGeZ0wRKzqzC2ok3qcjO67etZEJiSP9iZgcQbim18/lQ
- 5XSdY2VxiesVxGE2Jtx9banEpmtwyD+UE8YIwD9KaqK6Z9cINoxjeWCQWt/MvfcuQkK+
- rYyA==
-X-Gm-Message-State: AOAM532LiY3t4COInqfLV2m8qqcyJngl0gVl+gJr3fl59jLDCqkgZhIe
- ZD/shf7RzntcylxUv1MJx8lNkNgjY+VoABGPWNC5RPnBEbmn89xIXGjzlRdOL4jKrbVIIcOBj18
- VaZJz1TBTnL7Do4g=
-X-Received: by 2002:a1c:2187:: with SMTP id h129mr1206570wmh.51.1602046384391; 
- Tue, 06 Oct 2020 21:53:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwv3KJo9uT1anedURfFsHU+HmNrwWhMaykbr6tg3NRHH2qbq1O4sVW0+o+fzP1E+CzLBFd45w==
-X-Received: by 2002:a1c:2187:: with SMTP id h129mr1206550wmh.51.1602046384147; 
- Tue, 06 Oct 2020 21:53:04 -0700 (PDT)
+ bh=t8py/E7QqGtVaJLAF23i3HPxh/+4NPgmmRTnLxwad4w=;
+ b=gwX9bWXJrjzV9p6SoC5cLdHYy4hbL85T4+li+8YWK7yjNYKzbBwo12ZhpIlcAtdj2U
+ V8n2d8Et5nQPrr94eDrlZp70y+U4BX9aj5SrzxO8hZzGe6I3yD0RlZQPu2HhsBymWjTM
+ R9PI6aJYocCYAMzZoJ4YCJ6eEheJUpTbnZKN4uzI0Dt00ie7xCHrpoQMFzZCg5TdGc+F
+ 1pypgCvZSq617jfmteiAVkCGvFGcCajfIt/wRSQVES5NN5oKAUMxahyBwJDMKQ2bBl9I
+ xeXAiYXRezTR2MfcbQqP9kfLGozjbV81fPBtdTVhspoNaHQT5wLNjtc+oht8oEaHwKWF
+ ai/w==
+X-Gm-Message-State: AOAM5334q9aeKKi0jJAHznW2qMvMQkeK0LkYGf08CqF8BEgzZ1+EPihT
+ x1PU3bPZZceCMms1DKJnNghgSMTqABdMm76cvRKqVhlq/2PxlQPJo5aAkLZ/FAv4569uFoYq/fn
+ gZA1IyprS4MWkU5c=
+X-Received: by 2002:adf:f30a:: with SMTP id i10mr1378296wro.296.1602046775471; 
+ Tue, 06 Oct 2020 21:59:35 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx0VYLlBA3d44nHZSYoIBSaICvaKK9dsCLnWoFL4WWHGR4kb0Vf27Ww8KgweByrBWuUxxmMmA==
+X-Received: by 2002:adf:f30a:: with SMTP id i10mr1378283wro.296.1602046775302; 
+ Tue, 06 Oct 2020 21:59:35 -0700 (PDT)
 Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
  [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id a10sm928702wmb.23.2020.10.06.21.53.02
+ by smtp.gmail.com with ESMTPSA id n66sm944455wmb.35.2020.10.06.21.59.34
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 06 Oct 2020 21:53:03 -0700 (PDT)
-Subject: Re: [PATCH 01/20] python/qemu: use isort to lay out imports
+ Tue, 06 Oct 2020 21:59:34 -0700 (PDT)
+Subject: Re: [PATCH 18/20] python/qemu/qmp.py: re-raise OSError when
+ encountered
 To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
 References: <20201006235817.3280413-1-jsnow@redhat.com>
- <20201006235817.3280413-2-jsnow@redhat.com>
+ <20201006235817.3280413-19-jsnow@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -101,12 +102,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <44747cf7-cdc7-02a7-f375-8360de40c71f@redhat.com>
-Date: Wed, 7 Oct 2020 06:53:01 +0200
+Message-ID: <c1f18b87-c8db-956b-154f-60d73054239b@redhat.com>
+Date: Wed, 7 Oct 2020 06:59:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20201006235817.3280413-2-jsnow@redhat.com>
+In-Reply-To: <20201006235817.3280413-19-jsnow@redhat.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -125,7 +126,7 @@ X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
  RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -145,20 +146,34 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/7/20 1:57 AM, John Snow wrote:
-> Borrowed from the QAPI cleanup series, use the same configuration to
-> standardize the way we write and sort imports.
+On 10/7/20 1:58 AM, John Snow wrote:
+> Nested if conditions don't change when the exception block fires; we
+> need to explicitly re-raise the error if we didn't intend to capture and
+> suppress it.
 > 
 > Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  python/qemu/.isort.cfg        |  7 +++++++
->  python/qemu/accel.py          |  1 +
->  python/qemu/console_socket.py |  2 +-
->  python/qemu/machine.py        |  8 ++++----
->  python/qemu/qmp.py            | 10 +++++-----
->  python/qemu/qtest.py          |  2 +-
->  6 files changed, 19 insertions(+), 11 deletions(-)
->  create mode 100644 python/qemu/.isort.cfg
+>  python/qemu/qmp.py | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/python/qemu/qmp.py b/python/qemu/qmp.py
+> index d911999da1f..bdbd1e9bdbb 100644
+> --- a/python/qemu/qmp.py
+> +++ b/python/qemu/qmp.py
+> @@ -169,9 +169,9 @@ def __get_events(self, wait: Union[bool, float] = False) -> None:
+>          try:
+>              self.__json_read()
+>          except OSError as err:
+> -            if err.errno == errno.EAGAIN:
+> -                # No data available
+> -                pass
+> +            # EAGAIN: No data available; not critical
+> +            if err.errno != errno.EAGAIN:
+> +                raise
+>          self.__sock.setblocking(True)
+>  
+>          # Wait for new events, if needed.
+> 
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
