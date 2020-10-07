@@ -2,95 +2,89 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93956C41604
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 16:13:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC04BC47095
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 16:14:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7DE520789
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 16:13:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C73C20789
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 16:14:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="P/OzeKau"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7DE520789
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MEdpp32L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C73C20789
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQC4K-00078B-M1
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 12:13:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34476)
+	id 1kQC4m-0007cM-W0
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 12:14:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33284)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kQBs4-0005EB-Mj
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 12:00:55 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45624)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kQBrz-0000tN-7X
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 12:00:52 -0400
-Received: by mail-wr1-x441.google.com with SMTP id e17so2795429wru.12
- for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 09:00:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=qV/3JEXdswCCkH9Pi3CZ05jxPlz/Vt1p10XE1V4Oo4g=;
- b=P/OzeKauKWWSMZEFDqLDwPk+smPLe6XRtUJai32+Dbp8isrcJU48UDNU0QO1cbYYgP
- DNAQSk3knUko+A53g8e9TkSFbIU/0wmIfS6leOd8BJrCxPvbehcVLEppaw9b+jOfjtGv
- RVEY+DhaSERqHsMwkKPTVNbamYDA6/shYc8mCsxE949EUMzwjqMAPBol98mYplKXAn9+
- SLkOa1DC91MVWHprjQdsf4B3+PAWXGg9DqJak+i5Umn4VluuU3s1Phz3ze1ffYwh9fDE
- MMPAwejOLHWMLiYT04CfKscnggLJvPabNyyHLWjPJ3VB3KK+E5weDMGqqe0leKtr9wrf
- k2Rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=qV/3JEXdswCCkH9Pi3CZ05jxPlz/Vt1p10XE1V4Oo4g=;
- b=bE0aPB5L0+Leixh6+BXShzkQTT4Rm3VgUKtiuNHBlhzPWqhi4tO27kRlAyIGt80bTq
- dLckFr1dfaFjY6Nb7fJO69ZFAyDF7E8+6j2RGMAb9bHvJnRPSaifbjd0P8bPbofdzwFE
- ofKL3TiYj4y6vEGli8A4NqP+wKcs4o3NyCyYXmxS/ose6kkDMl0XzRGDeAB078I8HzuN
- Xo9Dc9S0MZpLjK99fhkLiUhssoD73Yl2L9Eu0eeGmHMj9QuJ+adJ9WUW9uHTGJfNwSh0
- 5TnDberiDFRkHF2/Z3haCfyl/VDXMyqVK4H00m8cv2XDoG8x2kr92gGvhHY2peadd2ix
- C2dw==
-X-Gm-Message-State: AOAM533U3MsWcHfVU/10HZq2llcANt3zHMOdPPU1Zx51ef2z76wh/7qN
- pRZU32x9V0u9+wxED3Lvr7RhTw==
-X-Google-Smtp-Source: ABdhPJzTV+tdn1ju/5TFh2TAX5fRzhsYEnp3uh06Wgu9FnQ9eiSdBUdbkASuWeXinQ0amJFcrk6bcw==
-X-Received: by 2002:adf:f2d0:: with SMTP id d16mr4150572wrp.332.1602086445373; 
- Wed, 07 Oct 2020 09:00:45 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id t5sm3540691wrb.21.2020.10.07.09.00.38
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 07 Oct 2020 09:00:41 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 7D0241FF90;
- Wed,  7 Oct 2020 17:00:38 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 04/22] cirrus: Fixing and speedup the msys2/mingw CI
-Date: Wed,  7 Oct 2020 17:00:20 +0100
-Message-Id: <20201007160038.26953-5-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201007160038.26953-1-alex.bennee@linaro.org>
-References: <20201007160038.26953-1-alex.bennee@linaro.org>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kQBnq-0001at-Fw
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 11:56:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48737)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kQBnl-0000Ix-G1
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 11:56:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602086184;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=bFiRwQ7ZTeKSTL5BA2PBbg+tO6RLunmxoTo62RCitpc=;
+ b=MEdpp32LGFX2/5DsF2lMTrKnxoxkGQ839S53kc/2c4MYhAv2jao90ilO5JO2iedGF5Kjp6
+ Mkkrl3Cg19sG+ir2Euh8M8NR7qZvZB7zcWq7JoK3ZTn2V9GvHLpEEUx2b2v/Nm3uR3rMb1
+ Onthoz0d1TqiCliqGTJff9IGQLFD5Nw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-428-GbyQjSm4Na2GPyDOfH661A-1; Wed, 07 Oct 2020 11:56:22 -0400
+X-MC-Unique: GbyQjSm4Na2GPyDOfH661A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B0D7D6883;
+ Wed,  7 Oct 2020 15:56:21 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-112-50.ams2.redhat.com
+ [10.36.112.50])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 244741000320;
+ Wed,  7 Oct 2020 15:56:19 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, alex.bennee@linaro.org, zhengchuan@huawei.com,
+ stefanha@redhat.com, peterx@redhat.com
+Subject: [PULL 07/10] migration: Maintain postcopy faulted addresses
+Date: Wed,  7 Oct 2020 16:55:57 +0100
+Message-Id: <20201007155600.337316-8-dgilbert@redhat.com>
+In-Reply-To: <20201007155600.337316-1-dgilbert@redhat.com>
+References: <20201007155600.337316-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:44:56
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,167 +97,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ed Maste <emaste@freebsd.org>, Yonggang Luo <luoyonggang@gmail.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yonggang Luo <luoyonggang@gmail.com>
+From: Peter Xu <peterx@redhat.com>
 
-Use cache of cirrus caching msys2
-The install of msys2 are refer to https://github.com/msys2/setup-msys2
-The first time install msys2 would be time consuming, so increase timeout_in to 90m
-according to https://cirrus-ci.org/faq/#instance-timed-out
+Maintain a list of faulted addresses on the destination host for which we're
+waiting on.  This is implemented using a GTree rather than a real list to make
+sure even there're plenty of vCPUs/threads that are faulting, the lookup will
+still be fast with O(log(N)) (because we'll do that after placing each page).
+It should bring a slight overhead, but ideally that shouldn't be a big problem
+simply because in most cases the requested page list will be short.
 
-Apply patch of https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg00072.html
+Actually we did similar things for postcopy blocktime measurements.  This patch
+didn't use that simply because:
 
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-Message-Id: <20201007145300.1197-2-luoyonggang@gmail.com>
-[AJB: renamed printenv_script to setup_script]
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+  (1) blocktime measurement is towards vcpu threads only, but here we need to
+      record all faulted addresses, including main thread and external
+      thread (like, DPDK via vhost-user).
+
+  (2) blocktime measurement will require UFFD_FEATURE_THREAD_ID, but here we
+      don't want to add that extra dependency on the kernel version since not
+      necessary.  E.g., we don't need to know which thread faulted on which
+      page, we also don't care about multiple threads faulting on the same
+      page.  But we only care about what addresses are faulted so waiting for a
+      page copying from src.
+
+  (3) blocktime measurement is not enabled by default.  However we need this by
+      default especially for postcopy recover.
+
+Another thing to mention is that this patch introduced a new mutex to serialize
+the receivedmap and the page_requested tree, however that serialization does
+not cover other procedures like UFFDIO_COPY.
+
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20201002175336.30858-4-peterx@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- .cirrus.yml | 112 +++++++++++++++++++++++++++++++---------------------
- 1 file changed, 67 insertions(+), 45 deletions(-)
+ migration/migration.c    | 41 +++++++++++++++++++++++++++++++++++++++-
+ migration/migration.h    | 19 ++++++++++++++++++-
+ migration/postcopy-ram.c | 17 ++++++++++++++---
+ migration/trace-events   |  2 ++
+ 4 files changed, 74 insertions(+), 5 deletions(-)
 
-diff --git a/.cirrus.yml b/.cirrus.yml
-index d58782ce67..eb768fa260 100644
---- a/.cirrus.yml
-+++ b/.cirrus.yml
-@@ -46,64 +46,86 @@ macos_xcode_task:
-     - gmake check
+diff --git a/migration/migration.c b/migration/migration.c
+index b2dac6b39c..e7d179bffc 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -143,6 +143,13 @@ static int migration_maybe_pause(MigrationState *s,
+                                  int new_state);
+ static void migrate_fd_cancel(MigrationState *s);
  
- windows_msys2_task:
-+  timeout_in: 90m
-   windows_container:
--    image: cirrusci/windowsservercore:cmake
-+    image: cirrusci/windowsservercore:2019
-     os_version: 2019
-     cpu: 8
-     memory: 8G
-   env:
-+    CIRRUS_SHELL: powershell
-     MSYS: winsymlinks:nativestrict
-     MSYSTEM: MINGW64
-     CHERE_INVOKING: 1
--  printenv_script:
--    - C:\tools\msys64\usr\bin\bash.exe -lc 'printenv'
-+  setup_script:
-+    - choco install -y --no-progress 7zip
-+    - Write-Output $env:PATH
-+  msys2_cache:
-+    folder: C:\tools\archive
-+    reupload_on_changes: false
-+    fingerprint_script: cat .cirrus.yml
-+    populate_script:
-+      - |
-+        md C:\tools
-+        md C:\tools\archive
-+        $start_time = Get-Date
-+        cd C:\tools
-+        bitsadmin /transfer msys_download /dynamic /download /priority FOREGROUND https://github.com/msys2/msys2-installer/releases/download/2020-09-03/msys2-base-x86_64-20200903.sfx.exe C:\tools\base.exe
-+        Write-Output "Download time taken: $((Get-Date).Subtract($start_time).Seconds) second(s)"
-+        C:\tools\base.exe -y
-+        ((Get-Content -path C:\tools\msys64\etc\\post-install\\07-pacman-key.post -Raw) -replace '--refresh-keys', '--version') | Set-Content -Path C:\tools\msys64\etc\\post-install\\07-pacman-key.post
-+        C:\tools\msys64\usr\bin\bash.exe -lc "sed -i 's/^CheckSpace/#CheckSpace/g' /etc/pacman.conf"
-+        C:\tools\msys64\usr\bin\bash.exe -lc "export"
-+        C:\tools\msys64\usr\bin\bash.exe -lc "grep -rl 'repo.msys2.org/' /etc/pacman.d/mirrorlist.* | xargs sed -i 's/repo.msys2.org\//mirrors.tuna.tsinghua.edu.cn\/msys2\//g'"
-+        C:\tools\msys64\usr\bin\pacman.exe --noconfirm -Sy
-+        echo Y | C:\tools\msys64\usr\bin\pacman.exe --noconfirm -Suu --overwrite=*
-+        taskkill /F /FI "MODULES eq msys-2.0.dll"
-+        tasklist
-+        C:\tools\msys64\usr\bin\bash.exe -lc "mv -f /etc/pacman.conf.pacnew /etc/pacman.conf || true"
-+        C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Suu --overwrite=*"
-+        C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -S --needed \
-+          diffutils git grep make pkg-config sed \
-+          mingw-w64-x86_64-python \
-+          mingw-w64-x86_64-python-setuptools \
-+          mingw-w64-x86_64-toolchain \
-+          mingw-w64-x86_64-SDL2 \
-+          mingw-w64-x86_64-SDL2_image \
-+          mingw-w64-x86_64-gtk3 \
-+          mingw-w64-x86_64-glib2 \
-+          mingw-w64-x86_64-ninja \
-+          mingw-w64-x86_64-jemalloc \
-+          mingw-w64-x86_64-lzo2 \
-+          mingw-w64-x86_64-zstd \
-+          mingw-w64-x86_64-libjpeg-turbo \
-+          mingw-w64-x86_64-pixman \
-+          mingw-w64-x86_64-libgcrypt \
-+          mingw-w64-x86_64-libpng \
-+          mingw-w64-x86_64-libssh \
-+          mingw-w64-x86_64-libxml2 \
-+          mingw-w64-x86_64-snappy \
-+          mingw-w64-x86_64-libusb \
-+          mingw-w64-x86_64-usbredir \
-+          mingw-w64-x86_64-libtasn1 \
-+          mingw-w64-x86_64-nettle \
-+          mingw-w64-x86_64-cyrus-sasl \
-+          mingw-w64-x86_64-curl \
-+          mingw-w64-x86_64-gnutls \
-+          "
-+        C:\tools\msys64\usr\bin\bash.exe -lc "rm -rf /var/cache/pacman/pkg/*"
-+        cd C:\tools\msys64
-+        echo "Start archive"
-+        cmd /C "7z a -ttar . -so | 7z a -txz -simsys2-x86_64.tar C:\tools\archive\msys2-x86_64.tar.xz"
-   install_script:
--    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools &&
--        curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
--    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools &&
--        curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
--    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools &&
--        pacman -U --noconfirm msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
--    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Sy"
--    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -S --needed
--        bash pacman pacman-mirrors msys2-runtime"
--    - taskkill /F /IM gpg-agent.exe
--    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Su"
--    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -S --needed
--        base-devel
--        git
--        mingw-w64-x86_64-python
--        mingw-w64-x86_64-python-setuptools
--        mingw-w64-x86_64-toolchain
--        mingw-w64-x86_64-capstone
--        mingw-w64-x86_64-SDL2
--        mingw-w64-x86_64-SDL2_image
--        mingw-w64-x86_64-gtk3
--        mingw-w64-x86_64-glib2
--        mingw-w64-x86_64-ninja
--        mingw-w64-x86_64-make
--        mingw-w64-x86_64-lzo2
--        mingw-w64-x86_64-zstd
--        mingw-w64-x86_64-libjpeg-turbo
--        mingw-w64-x86_64-pixman
--        mingw-w64-x86_64-libgcrypt
--        mingw-w64-x86_64-libpng
--        mingw-w64-x86_64-libssh
--        mingw-w64-x86_64-libxml2
--        mingw-w64-x86_64-snappy
--        mingw-w64-x86_64-libusb
--        mingw-w64-x86_64-usbredir
--        mingw-w64-x86_64-libtasn1
--        mingw-w64-x86_64-nettle
--        mingw-w64-x86_64-cyrus-sasl
--        mingw-w64-x86_64-curl
--        mingw-w64-x86_64-gnutls
--        mingw-w64-x86_64-zstd"
-+    - |
-+      cd C:\tools
-+      cmd /C "7z x C:\tools\archive\msys2-x86_64.tar.xz -so | 7z x -aoa -simsys2-x86_64.tar -ttar -omsys64"
-+      C:\tools\msys64\usr\bin\bash.exe -lc "export"
++static gint page_request_addr_cmp(gconstpointer ap, gconstpointer bp)
++{
++    unsigned long a = (unsigned long) ap, b = (unsigned long) bp;
 +
-   script:
-     - C:\tools\msys64\usr\bin\bash.exe -lc "mkdir build"
-     - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && ../configure
-       --python=python3 --ninja=ninja
-       --target-list-exclude=i386-softmmu,arm-softmmu,ppc-softmmu,mips-softmmu"
--    - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && make -j$NUMBER_OF_PROCESSORS"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && make -j8"
-   test_script:
-     - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && make V=1 check"
++    return (a > b) - (a < b);
++}
++
+ void migration_object_init(void)
+ {
+     MachineState *ms = MACHINE(qdev_get_machine());
+@@ -165,6 +172,8 @@ void migration_object_init(void)
+     qemu_event_init(&current_incoming->main_thread_load_event, false);
+     qemu_sem_init(&current_incoming->postcopy_pause_sem_dst, 0);
+     qemu_sem_init(&current_incoming->postcopy_pause_sem_fault, 0);
++    qemu_mutex_init(&current_incoming->page_request_mutex);
++    current_incoming->page_requested = g_tree_new(page_request_addr_cmp);
+ 
+     if (!migration_object_check(current_migration, &err)) {
+         error_report_err(err);
+@@ -240,6 +249,11 @@ void migration_incoming_state_destroy(void)
+ 
+     qemu_event_reset(&mis->main_thread_load_event);
+ 
++    if (mis->page_requested) {
++        g_tree_destroy(mis->page_requested);
++        mis->page_requested = NULL;
++    }
++
+     if (mis->socket_address_list) {
+         qapi_free_SocketAddressList(mis->socket_address_list);
+         mis->socket_address_list = NULL;
+@@ -354,8 +368,33 @@ int migrate_send_rp_message_req_pages(MigrationIncomingState *mis,
+ }
+ 
+ int migrate_send_rp_req_pages(MigrationIncomingState *mis,
+-                              RAMBlock *rb, ram_addr_t start)
++                              RAMBlock *rb, ram_addr_t start, uint64_t haddr)
+ {
++    void *aligned = (void *)(uintptr_t)(haddr & (-qemu_target_page_size()));
++    bool received;
++
++    WITH_QEMU_LOCK_GUARD(&mis->page_request_mutex) {
++        received = ramblock_recv_bitmap_test_byte_offset(rb, start);
++        if (!received && !g_tree_lookup(mis->page_requested, aligned)) {
++            /*
++             * The page has not been received, and it's not yet in the page
++             * request list.  Queue it.  Set the value of element to 1, so that
++             * things like g_tree_lookup() will return TRUE (1) when found.
++             */
++            g_tree_insert(mis->page_requested, aligned, (gpointer)1);
++            mis->page_requested_count++;
++            trace_postcopy_page_req_add(aligned, mis->page_requested_count);
++        }
++    }
++
++    /*
++     * If the page is there, skip sending the message.  We don't even need the
++     * lock because as long as the page arrived, it'll be there forever.
++     */
++    if (received) {
++        return 0;
++    }
++
+     return migrate_send_rp_message_req_pages(mis, rb, start);
+ }
+ 
+diff --git a/migration/migration.h b/migration/migration.h
+index e853ccf8b1..8d2d1ce839 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -104,6 +104,23 @@ struct MigrationIncomingState {
+ 
+     /* List of listening socket addresses  */
+     SocketAddressList *socket_address_list;
++
++    /* A tree of pages that we requested to the source VM */
++    GTree *page_requested;
++    /* For debugging purpose only, but would be nice to keep */
++    int page_requested_count;
++    /*
++     * The mutex helps to maintain the requested pages that we sent to the
++     * source, IOW, to guarantee coherent between the page_requests tree and
++     * the per-ramblock receivedmap.  Note! This does not guarantee consistency
++     * of the real page copy procedures (using UFFDIO_[ZERO]COPY).  E.g., even
++     * if one bit in receivedmap is cleared, UFFDIO_COPY could have happened
++     * for that page already.  This is intended so that the mutex won't
++     * serialize and blocked by slow operations like UFFDIO_* ioctls.  However
++     * this should be enough to make sure the page_requested tree always
++     * contains valid information.
++     */
++    QemuMutex page_request_mutex;
+ };
+ 
+ MigrationIncomingState *migration_incoming_get_current(void);
+@@ -332,7 +349,7 @@ void migrate_send_rp_shut(MigrationIncomingState *mis,
+ void migrate_send_rp_pong(MigrationIncomingState *mis,
+                           uint32_t value);
+ int migrate_send_rp_req_pages(MigrationIncomingState *mis, RAMBlock *rb,
+-                              ram_addr_t start);
++                              ram_addr_t start, uint64_t haddr);
+ int migrate_send_rp_message_req_pages(MigrationIncomingState *mis,
+                                       RAMBlock *rb, ram_addr_t start);
+ void migrate_send_rp_recv_bitmap(MigrationIncomingState *mis,
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index 722034dc01..ca1daf0024 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -684,7 +684,7 @@ int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *rb,
+                                         qemu_ram_get_idstr(rb), rb_offset);
+         return postcopy_wake_shared(pcfd, client_addr, rb);
+     }
+-    migrate_send_rp_req_pages(mis, rb, aligned_rbo);
++    migrate_send_rp_req_pages(mis, rb, aligned_rbo, client_addr);
+     return 0;
+ }
+ 
+@@ -979,7 +979,8 @@ retry:
+              * Send the request to the source - we want to request one
+              * of our host page sizes (which is >= TPS)
+              */
+-            ret = migrate_send_rp_req_pages(mis, rb, rb_offset);
++            ret = migrate_send_rp_req_pages(mis, rb, rb_offset,
++                                            msg.arg.pagefault.address);
+             if (ret) {
+                 /* May be network failure, try to wait for recovery */
+                 if (ret == -EIO && postcopy_pause_fault_thread(mis)) {
+@@ -1149,10 +1150,20 @@ static int qemu_ufd_copy_ioctl(MigrationIncomingState *mis, void *host_addr,
+         ret = ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
+     }
+     if (!ret) {
++        qemu_mutex_lock(&mis->page_request_mutex);
+         ramblock_recv_bitmap_set_range(rb, host_addr,
+                                        pagesize / qemu_target_page_size());
++        /*
++         * If this page resolves a page fault for a previous recorded faulted
++         * address, take a special note to maintain the requested page list.
++         */
++        if (g_tree_lookup(mis->page_requested, host_addr)) {
++            g_tree_remove(mis->page_requested, host_addr);
++            mis->page_requested_count--;
++            trace_postcopy_page_req_del(host_addr, mis->page_requested_count);
++        }
++        qemu_mutex_unlock(&mis->page_request_mutex);
+         mark_postcopy_blocktime_end((uintptr_t)host_addr);
+-
+     }
+     return ret;
+ }
+diff --git a/migration/trace-events b/migration/trace-events
+index 338f38b3dd..e4d5eb94ca 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -162,6 +162,7 @@ postcopy_pause_return_path(void) ""
+ postcopy_pause_return_path_continued(void) ""
+ postcopy_pause_continued(void) ""
+ postcopy_start_set_run(void) ""
++postcopy_page_req_add(void *addr, int count) "new page req %p total %d"
+ source_return_path_thread_bad_end(void) ""
+ source_return_path_thread_end(void) ""
+ source_return_path_thread_entry(void) ""
+@@ -272,6 +273,7 @@ postcopy_ram_incoming_cleanup_blocktime(uint64_t total) "total blocktime %" PRIu
+ postcopy_request_shared_page(const char *sharer, const char *rb, uint64_t rb_offset) "for %s in %s offset 0x%"PRIx64
+ postcopy_request_shared_page_present(const char *sharer, const char *rb, uint64_t rb_offset) "%s already %s offset 0x%"PRIx64
+ postcopy_wake_shared(uint64_t client_addr, const char *rb) "at 0x%"PRIx64" in %s"
++postcopy_page_req_del(void *addr, int count) "resolved page req %p total %d"
+ 
+ get_mem_fault_cpu_index(int cpu, uint32_t pid) "cpu: %d, pid: %u"
+ 
 -- 
-2.20.1
+2.28.0
 
 
