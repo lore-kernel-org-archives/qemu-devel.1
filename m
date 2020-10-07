@@ -2,95 +2,89 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 675AFC41604
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 16:14:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB7B2C41604
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 16:16:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0408820789
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 16:14:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3E9A320789
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 16:16:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SASI/WUR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0408820789
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="daRazf1N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E9A320789
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQC4p-0007gF-P1
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 12:14:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34464)
+	id 1kQC74-0001we-9s
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 12:16:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33282)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kQBs2-0005DZ-Bx
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 12:00:50 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39890)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kQBrw-0000sw-VA
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 12:00:49 -0400
-Received: by mail-wr1-x442.google.com with SMTP id k10so2816318wru.6
- for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 09:00:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=dNHnnNf2fBdlVjmyimawuNWkUDFu8uys3FqvGBSdx28=;
- b=SASI/WURW4KwhFAVV5FUgG2sI/u7IoD5wkTSCJ+DSVuEk3jZJp+KICs3iu6oFBvHTT
- m1WPxdWYY7BcxnyCgTqEQcJZW+sJSAtU3JxPWinDs4pkSqQ6AhoUFGdhUNpmkT7RwZk+
- Uwxklvg+JwEfWG/wI6vd0zZm2lqTzwq5oCFR1F/Mec2ofcS39fzEixKxbXrXMOxaLqXT
- 32xUNz8llskdkWl8uMjM81G2kUt7W8vY9NWcVjnOSJ71M3sbeTRP3oMSunNceQBawsfO
- 8TPuYLnehHasHImipBshZLvHEC/Q6qeA+gTPpa3T5uiRX2O2HGVr/iAuG3rgvXFvAsrs
- SExw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=dNHnnNf2fBdlVjmyimawuNWkUDFu8uys3FqvGBSdx28=;
- b=P2KRF3ifWoYxqX8SJLnKE0X/2Zqn435U856vPw0cKhF93yKlOUs58HiEieqYaFTYHr
- GBEoZhqryzq2KmiZxlq/PhAhH/DG3QnvxFmwxPSl8wH0r0nOhAXZBSOl4aGP1ebKasVs
- rekQg+EZKxhOhHR268vTUsXW8wMKomquog65pdKkRHzwlah0WEAwJji0V58G1ZfWyo3f
- +4N+5FWOhqt0LapVQBhavJRJnduQGMbiHTE9yEDlCgFH2FwJ/auYURGlKVcVcTiFruB5
- b2SeJ1Px3y9eZYngvaVhdzDxBn1OBaHPFvGm3Av5d5xcUCmPy0170okPVZGS3w8A9pxr
- o7eQ==
-X-Gm-Message-State: AOAM531ys1lPmK4u/K69550nYBbM2xw0nWqhDfPWPE5Hi809ebqg+gaZ
- 2O1pAcUiAXvCXeSwwt+a2v38Gw==
-X-Google-Smtp-Source: ABdhPJyrOQwtRBzUFxyZ39Rc4MDM4q+aHhiQAYVc1zpuaA2Do53f5S5HZ9XJH9E6vpogEpotqM/Rew==
-X-Received: by 2002:adf:e74d:: with SMTP id c13mr4168973wrn.45.1602086442525; 
- Wed, 07 Oct 2020 09:00:42 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 10sm3158084wmn.9.2020.10.07.09.00.38
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 07 Oct 2020 09:00:41 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 4D8061FF8C;
- Wed,  7 Oct 2020 17:00:38 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 02/22] hw/misc/mips_cpc: Start vCPU when powered on
-Date: Wed,  7 Oct 2020 17:00:18 +0100
-Message-Id: <20201007160038.26953-3-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201007160038.26953-1-alex.bennee@linaro.org>
-References: <20201007160038.26953-1-alex.bennee@linaro.org>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kQBno-0001YJ-Qs
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 11:56:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51851)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kQBnl-0000Ir-1n
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 11:56:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602086183;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ETXftxfOfwsfPpoqGQE70ovEFgQN8TGTkEmuE25RerY=;
+ b=daRazf1Nh4Sf1N1NgO7XD0byFlthx46aSRtqGDfQ+eZF9s85wLPq03iwEHfRb4gYOT9YDD
+ 39S91Dm604JowPZcJfm5s18m7BusCDNXv3fVUkYxOsOzyFIu9gTGpeTLayYuQOwbzbgCj7
+ 6jHc7rFrD0JzxfVqbed5I5y97E3NJL4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-586-fIFH8_2QPNqcHotMiTURww-1; Wed, 07 Oct 2020 11:56:20 -0400
+X-MC-Unique: fIFH8_2QPNqcHotMiTURww-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CAE7381F00D;
+ Wed,  7 Oct 2020 15:56:19 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-112-50.ams2.redhat.com
+ [10.36.112.50])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6B73410021AA;
+ Wed,  7 Oct 2020 15:56:18 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, alex.bennee@linaro.org, zhengchuan@huawei.com,
+ stefanha@redhat.com, peterx@redhat.com
+Subject: [PULL 06/10] migration: Introduce migrate_send_rp_message_req_pages()
+Date: Wed,  7 Oct 2020 16:55:56 +0100
+Message-Id: <20201007155600.337316-7-dgilbert@redhat.com>
+In-Reply-To: <20201007155600.337316-1-dgilbert@redhat.com>
+References: <20201007155600.337316-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:44:56
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,55 +97,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Jiaxun Yang <jiaxun.yang@flygoat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Peter Xu <peterx@redhat.com>
 
-In commit 102ca9667d we set "start-powered-off" on all vCPUs
-included in the CPS (Coherent Processing System) but forgot to
-start the vCPUS on when they are powered on in the CPC (Cluster
-Power Controller).
+This is another layer wrapper for sending a page request to the source VM.  The
+new migrate_send_rp_message_req_pages() will be used elsewhere in coming
+patches.
 
-This fixes the following tests:
-
-  $ avocado run tests/acceptance/machine_mips_malta.py
-   (1/3) test_mips_malta_i6400_framebuffer_logo_1core: PASS (3.67 s)
-   (2/3) test_mips_malta_i6400_framebuffer_logo_7cores: INTERRUPTED: Test interrupted by SIGTERM (30.22 s)
-   (3/3) test_mips_malta_i6400_framebuffer_logo_8cores: INTERRUPTED: Test interrupted by SIGTERM (30.25 s)
-  RESULTS    : PASS 1 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 2 | CANCEL 0
-
-Fixes: 102ca9667d ("mips/cps: Use start-powered-off CPUState property")
-Reported-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20201007113942.2523866-1-f4bug@amsat.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20201002175336.30858-3-peterx@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/misc/mips_cpc.c | 1 +
- 1 file changed, 1 insertion(+)
+ migration/migration.c | 10 ++++++++--
+ migration/migration.h |  2 ++
+ 2 files changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/hw/misc/mips_cpc.c b/hw/misc/mips_cpc.c
-index 2f7b2c9592..7c11fb3d44 100644
---- a/hw/misc/mips_cpc.c
-+++ b/hw/misc/mips_cpc.c
-@@ -38,6 +38,7 @@ static void mips_cpu_reset_async_work(CPUState *cs, run_on_cpu_data data)
-     MIPSCPCState *cpc = (MIPSCPCState *) data.host_ptr;
- 
-     cpu_reset(cs);
-+    cs->halted = 0;
-     cpc->vp_running |= 1ULL << cs->cpu_index;
+diff --git a/migration/migration.c b/migration/migration.c
+index aca7fdcd0b..b2dac6b39c 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -316,8 +316,8 @@ error:
+  *   Start: Address offset within the RB
+  *   Len: Length in bytes required - must be a multiple of pagesize
+  */
+-int migrate_send_rp_req_pages(MigrationIncomingState *mis, RAMBlock *rb,
+-                              ram_addr_t start)
++int migrate_send_rp_message_req_pages(MigrationIncomingState *mis,
++                                      RAMBlock *rb, ram_addr_t start)
+ {
+     uint8_t bufc[12 + 1 + 255]; /* start (8), len (4), rbname up to 256 */
+     size_t msglen = 12; /* start + len */
+@@ -353,6 +353,12 @@ int migrate_send_rp_req_pages(MigrationIncomingState *mis, RAMBlock *rb,
+     return migrate_send_rp_message(mis, msg_type, msglen, bufc);
  }
  
++int migrate_send_rp_req_pages(MigrationIncomingState *mis,
++                              RAMBlock *rb, ram_addr_t start)
++{
++    return migrate_send_rp_message_req_pages(mis, rb, start);
++}
++
+ static bool migration_colo_enabled;
+ bool migration_incoming_colo_enabled(void)
+ {
+diff --git a/migration/migration.h b/migration/migration.h
+index deb411aaad..e853ccf8b1 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -333,6 +333,8 @@ void migrate_send_rp_pong(MigrationIncomingState *mis,
+                           uint32_t value);
+ int migrate_send_rp_req_pages(MigrationIncomingState *mis, RAMBlock *rb,
+                               ram_addr_t start);
++int migrate_send_rp_message_req_pages(MigrationIncomingState *mis,
++                                      RAMBlock *rb, ram_addr_t start);
+ void migrate_send_rp_recv_bitmap(MigrationIncomingState *mis,
+                                  char *block_name);
+ void migrate_send_rp_resume_ack(MigrationIncomingState *mis, uint32_t value);
 -- 
-2.20.1
+2.28.0
 
 
