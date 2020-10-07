@@ -2,66 +2,69 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CB1CC4363C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 11:58:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78720C4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 11:58:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FAC620782
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 11:58:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EAEEE20782
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 11:58:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g3CRXfn6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FAC620782
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ODh4kMwy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAEEE20782
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ85a-00038W-R6
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 07:58:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35614)
+	id 1kQ85u-0003pY-Rv
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 07:58:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35776)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kQ84B-0001O6-64
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 07:57:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45566)
+ id 1kQ84J-0001VT-8X
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 07:57:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31019)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kQ849-0001g9-Ds
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 07:57:06 -0400
+ id 1kQ84F-0001hC-6r
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 07:57:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602071824;
+ s=mimecast20190719; t=1602071830;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=FPTkqf6WJkhrShPR5axybp+wjVEJuJhv7BBbf18NsUw=;
- b=g3CRXfn69Ooq+IdSna9qP81VhlFn7+WqwNJ9h9rDzzU+9vZtZn/mwtgLyd2PP1FYpZw5gM
- dsZBYM8zMOuliUwzf8ax0M6pbYsj88lAeZpn5fZuYx73Fb1v/trx5kYEtASAjYvrcLbQbi
- gpSZM+vKKSJK0fh575ClOO2IkhgfJLk=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=55WpEi90PG0R1Tz2B85E8h1Orp/fQfXznmS5ayIoWgQ=;
+ b=ODh4kMwySwVvIpH9XFFfSOAoOjmSHahVgmzpQmkIsir4UuvXaGAAKYFXdsXNBeWkGrjyGT
+ AeJKrgeOgscQX9NHCniNZklULXGrAGnusTBwMcGOFL6KnJLD3m5zUw9gRJN5TMZB77bdHR
+ GmjeARQo2irAXOnWjXZOfgpVVF4uHAc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-175-mQ9btBxmPXyyffNxCe-pDw-1; Wed, 07 Oct 2020 07:57:02 -0400
-X-MC-Unique: mQ9btBxmPXyyffNxCe-pDw-1
+ us-mta-179-MCSYwST9NnOgEnClt9k9-Q-1; Wed, 07 Oct 2020 07:57:08 -0400
+X-MC-Unique: MCSYwST9NnOgEnClt9k9-Q-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D40318A076E;
- Wed,  7 Oct 2020 11:57:01 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B2898031F9;
+ Wed,  7 Oct 2020 11:57:07 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2F47D55795;
- Wed,  7 Oct 2020 11:57:01 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 91A0055760;
+ Wed,  7 Oct 2020 11:57:06 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 00/17] Fix scsi devices plug/unplug races w.r.t virtio-scsi
- iothread
-Date: Wed,  7 Oct 2020 07:56:43 -0400
-Message-Id: <20201007115700.707938-1-pbonzini@redhat.com>
+Subject: [PATCH v8 05/17] qtest: switch users back to qtest_qmp_receive
+Date: Wed,  7 Oct 2020 07:56:48 -0400
+Message-Id: <20201007115700.707938-6-pbonzini@redhat.com>
+In-Reply-To: <20201007115700.707938-1-pbonzini@redhat.com>
+References: <20201007115700.707938-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
@@ -93,65 +96,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+Cc: kwolf@redhat.com, Maxim Levitsky <mlevitsk@redhat.com>,
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hopefully the final version of the patches, fixing the remaining
-testsuite issues.  Kevin or Max, please take a look at patches 6 and 7
-as they affect qemu-iotests.
+From: Maxim Levitsky <mlevitsk@redhat.com>
 
-Paolo
+Let test use the new functionality for buffering events.
+The only remaining users of qtest_qmp_receive_dict are tests
+that fuzz the QMP protocol.
 
-Maxim Levitsky (11):
-  qtest: rename qtest_qmp_receive to qtest_qmp_receive_dict
-  qtest: Reintroduce qtest_qmp_receive
-  qtest: remove qtest_qmp_receive_success
-  qtest: switch users back to qtest_qmp_receive
-  scsi/scsi_bus: switch search direction in scsi_device_find
-  device_core: use drain_call_rcu in in qmp_device_add
-  device-core: use RCU for list of children of a bus
-  device-core: use atomic_set on .realized property
-  scsi/scsi_bus: Add scsi_device_get
-  virtio-scsi: use scsi_device_get
-  scsi/scsi_bus: fix races in REPORT LUNS
+Tested with 'make check-qtest'.
 
-Paolo Bonzini (6):
-  device-plug-test: use qtest_qmp to send the device_del command
-  qtest: check that drives are really appearing and disappearing
-  qemu-iotests, qtest: rewrite test 067 as a qtest
-  qdev: add "check if address free" callback for buses
-  scsi: switch to bus->check_address
-  scsi/scsi-bus: scsi_device_find: don't return unrealized devices
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Message-Id: <20201006123904.610658-4-mlevitsk@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ tests/qtest/ahci-test.c      |  4 ++--
+ tests/qtest/drive_del-test.c |  9 +++------
+ tests/qtest/libqtest.c       | 12 +++---------
+ tests/qtest/pvpanic-test.c   |  4 +---
+ tests/qtest/tpm-util.c       |  8 ++++++--
+ 5 files changed, 15 insertions(+), 22 deletions(-)
 
- .gitlab-ci.yml                  |   2 +-
- hw/core/bus.c                   |  28 ++-
- hw/core/qdev.c                  |  73 ++++--
- hw/net/virtio-net.c             |   2 +-
- hw/scsi/scsi-bus.c              | 262 ++++++++++++--------
- hw/scsi/virtio-scsi.c           |  27 ++-
- hw/sd/core.c                    |   3 +-
- include/hw/qdev-core.h          |  24 +-
- include/hw/scsi/scsi.h          |   1 +
- softmmu/qdev-monitor.c          |  12 +
- tests/qemu-iotests/067          | 157 ------------
- tests/qemu-iotests/067.out      | 414 --------------------------------
- tests/qemu-iotests/group        |   1 -
- tests/qtest/device-plug-test.c  |  32 +--
- tests/qtest/drive_del-test.c    | 244 ++++++++++++++++---
- tests/qtest/libqos/libqtest.h   |  34 +--
- tests/qtest/libqtest.c          | 110 +++++----
- tests/qtest/meson.build         |   4 +-
- tests/qtest/migration-helpers.c |  25 +-
- tests/qtest/pvpanic-test.c      |   4 +-
- tests/qtest/qmp-test.c          |  18 +-
- tests/qtest/tpm-util.c          |   8 +-
- 22 files changed, 637 insertions(+), 848 deletions(-)
- delete mode 100755 tests/qemu-iotests/067
- delete mode 100644 tests/qemu-iotests/067.out
-
+diff --git a/tests/qtest/ahci-test.c b/tests/qtest/ahci-test.c
+index d42ebaeb4c..5e1954852e 100644
+--- a/tests/qtest/ahci-test.c
++++ b/tests/qtest/ahci-test.c
+@@ -1590,7 +1590,7 @@ static void test_atapi_tray(void)
+     qtest_qmp_send(ahci->parent->qts, "{'execute': 'blockdev-open-tray', "
+                     "'arguments': {'id': 'cd0'}}");
+     atapi_wait_tray(ahci, true);
+-    rsp = qtest_qmp_receive_dict(ahci->parent->qts);
++    rsp = qtest_qmp_receive(ahci->parent->qts);
+     qobject_unref(rsp);
+ 
+     qmp_discard_response(ahci->parent->qts,
+@@ -1620,7 +1620,7 @@ static void test_atapi_tray(void)
+     qtest_qmp_send(ahci->parent->qts, "{'execute': 'blockdev-close-tray', "
+                    "'arguments': {'id': 'cd0'}}");
+     atapi_wait_tray(ahci, false);
+-    rsp = qtest_qmp_receive_dict(ahci->parent->qts);
++    rsp = qtest_qmp_receive(ahci->parent->qts);
+     qobject_unref(rsp);
+ 
+     /* Now, to convince ATAPI we understand the media has changed... */
+diff --git a/tests/qtest/drive_del-test.c b/tests/qtest/drive_del-test.c
+index ba0cd77445..9d20a1ed8b 100644
+--- a/tests/qtest/drive_del-test.c
++++ b/tests/qtest/drive_del-test.c
+@@ -15,9 +15,6 @@
+ #include "libqos/virtio.h"
+ #include "qapi/qmp/qdict.h"
+ 
+-/* TODO actually test the results and get rid of this */
+-#define qmp_discard_response(q, ...) qobject_unref(qtest_qmp(q, __VA_ARGS__))
+-
+ static void drive_add(QTestState *qts)
+ {
+     char *resp = qtest_hmp(qts, "drive_add 0 if=none,id=drive0");
+@@ -38,13 +35,13 @@ static void device_del(QTestState *qts)
+ {
+     QDict *response;
+ 
+-    /* Complication: ignore DEVICE_DELETED event */
+-    qmp_discard_response(qts, "{'execute': 'device_del',"
++    response = qtest_qmp(qts, "{'execute': 'device_del',"
+                          " 'arguments': { 'id': 'dev0' } }");
+-    response = qtest_qmp_receive_dict(qts);
+     g_assert(response);
+     g_assert(qdict_haskey(response, "return"));
+     qobject_unref(response);
++
++    qtest_qmp_eventwait(qts, "DEVICE_DELETED");
+ }
+ 
+ static void test_drive_without_dev(void)
+diff --git a/tests/qtest/libqtest.c b/tests/qtest/libqtest.c
+index baac667b8d..08929f5ff6 100644
+--- a/tests/qtest/libqtest.c
++++ b/tests/qtest/libqtest.c
+@@ -324,7 +324,7 @@ QTestState *qtest_init(const char *extra_args)
+     QDict *greeting;
+ 
+     /* Read the QMP greeting and then do the handshake */
+-    greeting = qtest_qmp_receive_dict(s);
++    greeting = qtest_qmp_receive(s);
+     qobject_unref(greeting);
+     qobject_unref(qtest_qmp(s, "{ 'execute': 'qmp_capabilities' }"));
+ 
+@@ -700,7 +700,7 @@ QDict *qtest_vqmp_fds(QTestState *s, int *fds, size_t fds_num,
+     qtest_qmp_vsend_fds(s, fds, fds_num, fmt, ap);
+ 
+     /* Receive reply */
+-    return qtest_qmp_receive_dict(s);
++    return qtest_qmp_receive(s);
+ }
+ 
+ QDict *qtest_vqmp(QTestState *s, const char *fmt, va_list ap)
+@@ -708,7 +708,7 @@ QDict *qtest_vqmp(QTestState *s, const char *fmt, va_list ap)
+     qtest_qmp_vsend(s, fmt, ap);
+ 
+     /* Receive reply */
+-    return qtest_qmp_receive_dict(s);
++    return qtest_qmp_receive(s);
+ }
+ 
+ QDict *qmp_fd(int fd, const char *fmt, ...)
+@@ -850,12 +850,6 @@ char *qtest_vhmp(QTestState *s, const char *fmt, va_list ap)
+                      " 'arguments': {'command-line': %s}}",
+                      cmd);
+     ret = g_strdup(qdict_get_try_str(resp, "return"));
+-    while (ret == NULL && qdict_get_try_str(resp, "event")) {
+-        /* Ignore asynchronous QMP events */
+-        qobject_unref(resp);
+-        resp = qtest_qmp_receive_dict(s);
+-        ret = g_strdup(qdict_get_try_str(resp, "return"));
+-    }
+     g_assert(ret);
+     qobject_unref(resp);
+     g_free(cmd);
+diff --git a/tests/qtest/pvpanic-test.c b/tests/qtest/pvpanic-test.c
+index b0b20ad340..0657de797f 100644
+--- a/tests/qtest/pvpanic-test.c
++++ b/tests/qtest/pvpanic-test.c
+@@ -24,9 +24,7 @@ static void test_panic(void)
+ 
+     qtest_outb(qts, 0x505, 0x1);
+ 
+-    response = qtest_qmp_receive_dict(qts);
+-    g_assert(qdict_haskey(response, "event"));
+-    g_assert_cmpstr(qdict_get_str(response, "event"), ==, "GUEST_PANICKED");
++    response = qtest_qmp_eventwait_ref(qts, "GUEST_PANICKED");
+     g_assert(qdict_haskey(response, "data"));
+     data = qdict_get_qdict(response, "data");
+     g_assert(qdict_haskey(data, "action"));
+diff --git a/tests/qtest/tpm-util.c b/tests/qtest/tpm-util.c
+index 3ed6c8548a..5a33a6ef0f 100644
+--- a/tests/qtest/tpm-util.c
++++ b/tests/qtest/tpm-util.c
+@@ -237,12 +237,16 @@ void tpm_util_migrate(QTestState *who, const char *uri)
+ void tpm_util_wait_for_migration_complete(QTestState *who)
+ {
+     while (true) {
++        QDict *rsp;
+         QDict *rsp_return;
+         bool completed;
+         const char *status;
+ 
+-        qtest_qmp_send(who, "{ 'execute': 'query-migrate' }");
+-        rsp_return = qtest_qmp_receive_success(who, NULL, NULL);
++        rsp = qtest_qmp(who, "{ 'execute': 'query-migrate' }");
++        g_assert(qdict_haskey(rsp, "return"));
++        rsp_return = qdict_get_qdict(rsp, "return");
++
++        g_assert(!qdict_haskey(rsp_return, "error"));
+         status = qdict_get_str(rsp_return, "status");
+         completed = strcmp(status, "completed") == 0;
+         g_assert_cmpstr(status, !=,  "failed");
 -- 
 2.26.2
+
 
 
