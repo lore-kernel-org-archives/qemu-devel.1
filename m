@@ -2,88 +2,70 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A836C41604
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 16:43:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D142FC4727F
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 16:43:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDA39206BE
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 16:43:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43E9A206BE
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 16:43:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q5grEhYm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDA39206BE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="XKvZvr0P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43E9A206BE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQCX8-0000UI-Rq
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 12:43:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40638)
+	id 1kQCXQ-0001D5-4m
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 12:43:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35214)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kQCCZ-0002B2-Ud; Wed, 07 Oct 2020 12:22:03 -0400
-Received: from mail-pg1-x52e.google.com ([2607:f8b0:4864:20::52e]:32912)
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1kQBup-0006NM-5X; Wed, 07 Oct 2020 12:03:43 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:54926)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kQCCX-0005WQ-De; Wed, 07 Oct 2020 12:22:03 -0400
-Received: by mail-pg1-x52e.google.com with SMTP id o25so1703494pgm.0;
- Wed, 07 Oct 2020 09:21:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=zSsDnCu2xfO7roPjdDMghbRXhd6/t/v6INO/sWdZhMs=;
- b=Q5grEhYmho5ZZoCZ2KWdZGDsHc79ZJ+GHZSlkfL9Y8+wQ9ckBJKNZHc9BDdhofXAtp
- Eu4krlgI7yvuM2Y99hvBMaKlavwhbBb6s+6NTeHtcq3ey9RCpu2QnBolAXc+ky3IbB/1
- XYJnElM3YMkxjCVvi5KHOJ7gMY0Az/6ZPGjtfHJzNIFADZqXTTNVPmy9cdl3Ai3J9tcN
- OxBHaydqHyF8RDEuy9KN5aixOjkocGmP/ViZg0lG56vLRB6lo56V6pxbg1o7B9AjMI9m
- UhXPHzyCWvkYJOI2m4G+M67Nw8gJxDJsTqsvCWEhHEBmWmqiEpWmkRIAiBR3rO662Frn
- A/NA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=zSsDnCu2xfO7roPjdDMghbRXhd6/t/v6INO/sWdZhMs=;
- b=n3IDbFOWYs5ccuzXv/IvKwt9isG7/BIqRh9ccp0gTGPqqgARSC3Q/wY0Yo5gUqaExZ
- Rzz/lXO5YMRhSS4EvwJL6JlCaVu8iyd9TJHcZuYC3fEr73no68saPjTGqB9gx6iiAhog
- akHjVahmMd3tcw4GtYn0B/2vQhMjOe4MGajAoz8J79VGQXt7s+EpAPJfHcyzQlOfJQ6e
- VdERftsNEJPZGNk8W12wm0H0zYCmR+z82I1j2HrvYlj1RowPH6fw+fhan40t22mumJCO
- kZxrRJBk2S192xtJMm+YczCv1kxe6rN1lr1sytz1eBpyFN0nMz4e/6vM1SsPPKHWuwBF
- mf4A==
-X-Gm-Message-State: AOAM532z7kjtuQ7JKheTqs4If7stVYxcqE0ezSMmyzwsrzWsx0Bv8JZ4
- 537bCQYwuhvuHasQ1sFeSnK7vagsohclBg==
-X-Google-Smtp-Source: ABdhPJzkq89oSb5m9tDu2iBDhB4My26rW5lAFMTI+k0hY/xxhbiInyXmHtdj01aAxe6YT91wQqv5Vw==
-X-Received: by 2002:aa7:9712:0:b029:152:69ab:b507 with SMTP id
- a18-20020aa797120000b029015269abb507mr3731651pfg.30.1602087718039; 
- Wed, 07 Oct 2020 09:21:58 -0700 (PDT)
-Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id v10sm2974021pjf.34.2020.10.07.09.21.54
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 07 Oct 2020 09:21:57 -0700 (PDT)
-From: Yonggang Luo <luoyonggang@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6] scripts: Convert qemu-version.sh to qemu-version.py
-Date: Thu,  8 Oct 2020 00:21:38 +0800
-Message-Id: <20201007162138.425-1-luoyonggang@gmail.com>
-X-Mailer: git-send-email 2.28.0.windows.1
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1kQBuk-0001Sq-Nu; Wed, 07 Oct 2020 12:03:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=M6KJSNHjziQgjjDm3jqlOAWE3wt+M4set/Bj8vieMW0=; 
+ b=XKvZvr0PrqWMthJf455u1R3hmqLzao9IqNCp/d0HY6DEIDqlaqoiGf21JXs2gjT0naEE65qdFgT9PXNZgG1djruxWOMZeBbhX/JzM5uf2TCztO4trkRcQXZzCYFKPrggmN3t5EB6bmRs3RKdmysy0hfdoXR4bNTOpFOR1UUZ85LflHdBhKigZSAHl/S0b0KPJ6Bp9qlbjMkfd56xtXQo/YoiM9PCJlWbPoqtcmTHUKa1CO9uLnCOkEQqSGBW3JtKX7R5M+JUrd18s9oIOYb8zxCjLQxIWHbNISDC/uFOMe54w74Q+sxNjk6zJBpRYXMdHTQ1x2vOuayq/iV9LVC0fg==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1kQBuf-0006am-W5; Wed, 07 Oct 2020 18:03:34 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1kQBuf-0006Hh-GK; Wed, 07 Oct 2020 18:03:33 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Subject: Re: [PATCH] qcow2: Document and enforce the QCowL2Meta invariants
+In-Reply-To: <9105bbe6-dd05-4568-b2ee-9eb8f943c535@virtuozzo.com>
+References: <20201007115217.18013-1-berto@igalia.com>
+ <f53af87c-15e3-4de5-42e0-213363759231@virtuozzo.com>
+ <w51d01uavxi.fsf@maestria.local.igalia.com>
+ <9105bbe6-dd05-4568-b2ee-9eb8f943c535@virtuozzo.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Wed, 07 Oct 2020 18:03:33 +0200
+Message-ID: <w51a6wyauqy.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::52e;
- envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x52e.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Content-Type: text/plain
+Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
+ helo=fanzine.igalia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 11:38:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,117 +79,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- QEMU Trivial <qemu-trivial@nongnu.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Yonggang Luo <luoyonggang@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The sh script are harder to maintain for compatible different
-xsh environment so convert it to python script
-Also incorporate the fixes in
-https://patchew.org/QEMU/20200929143654.518157-1-marcandre.lureau@redhat.com/
+On Wed 07 Oct 2020 05:47:32 PM CEST, Vladimir Sementsov-Ogievskiy wrote:
+> 07.10.2020 18:38, Alberto Garcia wrote:
+>> On Wed 07 Oct 2020 04:42:37 PM CEST, Vladimir Sementsov-Ogievskiy wrote:
+>>>>        /**
+>>>> -     * The COW Region between the start of the first allocated cluster and the
+>>>> -     * area the guest actually writes to.
+>>>> +     * The COW Region immediately before the area the guest actually
+>>>> +     * writes to. This (part of the) write request starts at
+>>>> +     * cow_start.offset + cow_start.nb_bytes.
+>>>
+>>> "starts at" is a bit misleading.. As here is not guest offset, not
+>>> host offset, but offset relative to QCowL2Meta.offset
+>> 
+>> I thought it was clear by the context since Qcow2COWRegion.offset is
+>> defined to be relative to QCowL2Meta.offset
+>> 
+>>>> @@ -1049,6 +1049,8 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
+>>>>        qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
+>>>>    
+>>>>        assert(l2_index + m->nb_clusters <= s->l2_slice_size);
+>>>> +    assert(m->cow_end.offset + m->cow_end.nb_bytes <=
+>>>> +           m->nb_clusters << s->cluster_bits);
+>>>
+>>> should we also assert that cow_end.offset + cow_end.nb_bytes is not
+>>> zero?
+>> 
+>> No, a write request that fills a complete cluster has no COW but still
+>> needs to call qcow2_alloc_cluster_link_l2() to update the L2 metadata.
+>
+> but cow_end.offset will not be zero still? I suggest it because you
+> actually rely on this fact by dropping written_to conditional
+> assignment.
 
-The quote of v* should preserve, otherwise git command would fail
+No, cow_end.offset must not be 0 but the offset where the data region
+ends, this is already enforced by this assertion in perform_cow():
 
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-Message-Id: <20201006112139.700-1-luoyonggang@gmail.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- meson.build             |  2 +-
- scripts/qemu-version.py | 34 ++++++++++++++++++++++++++++++++++
- scripts/qemu-version.sh | 25 -------------------------
- 3 files changed, 35 insertions(+), 26 deletions(-)
- create mode 100644 scripts/qemu-version.py
- delete mode 100755 scripts/qemu-version.sh
+    assert(start->offset + start->nb_bytes <= end->offset);
 
-diff --git a/meson.build b/meson.build
-index 26230614ba..1d3bb25bc6 100644
---- a/meson.build
-+++ b/meson.build
-@@ -1132,7 +1132,7 @@ tracetool = [
-    '--backend=' + config_host['TRACE_BACKENDS']
- ]
- 
--qemu_version_cmd = [find_program('scripts/qemu-version.sh'),
-+qemu_version_cmd = [find_program('scripts/qemu-version.py'),
-                     meson.current_source_dir(),
-                     config_host['PKGVERSION'], meson.project_version()]
- qemu_version = custom_target('qemu-version.h',
-diff --git a/scripts/qemu-version.py b/scripts/qemu-version.py
-new file mode 100644
-index 0000000000..019911b270
---- /dev/null
-+++ b/scripts/qemu-version.py
-@@ -0,0 +1,34 @@
-+#!/usr/bin/env python3
-+
-+#
-+# Script for retrieve qemu git version information
-+#
-+# Authors:
-+#  Yonggang Luo <luoyonggang@gmail.com>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2
-+# or, at your option, any later version.  See the COPYING file in
-+# the top-level directory.
-+
-+import sys
-+import subprocess
-+import os, os.path
-+
-+def main(_program, dir, pkgversion, version, *unused):
-+    os.chdir(dir)
-+    if not pkgversion and os.path.exists('.git'):
-+        # The quote of v* should preserve, otherwise git command would fail
-+        pc = subprocess.run(['git', 'describe', '--match', "'v*'", '--dirty', '--always'],
-+                            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, encoding='utf8')
-+        if pc.returncode == 0:
-+            pkgversion = pc.stdout.strip()
-+
-+    fullversion = version
-+    if pkgversion:
-+        fullversion = "{} ({})".format(version, pkgversion)
-+
-+    print('#define QEMU_PKGVERSION "%s"' % pkgversion)
-+    print('#define QEMU_FULL_VERSION "%s"' % fullversion)
-+
-+if __name__ == "__main__":
-+    main(*sys.argv)
-diff --git a/scripts/qemu-version.sh b/scripts/qemu-version.sh
-deleted file mode 100755
-index 03128c56a2..0000000000
---- a/scripts/qemu-version.sh
-+++ /dev/null
-@@ -1,25 +0,0 @@
--#!/bin/sh
--
--set -eu
--
--dir="$1"
--pkgversion="$2"
--version="$3"
--
--if [ -z "$pkgversion" ]; then
--    cd "$dir"
--    if [ -e .git ]; then
--        pkgversion=$(git describe --match 'v*' --dirty | echo "")
--    fi
--fi
--
--if [ -n "$pkgversion" ]; then
--    fullversion="$version ($pkgversion)"
--else
--    fullversion="$version"
--fi
--
--cat <<EOF
--#define QEMU_PKGVERSION "$pkgversion"
--#define QEMU_FULL_VERSION "$fullversion"
--EOF
--- 
-2.28.0.windows.1
+And it is explicitly mentioned in the commit message:
 
+    Even when those regions themselves are empty their offsets must be
+    correct because they are used to know the location of the middle
+    region.
+
+and also in qcow2.h:
+
+  /**
+   * The COW Region immediately after the area the guest actually
+   * writes to. This (part of the) write request ends at cow_end.offset
+   * (which must always be set even when cow_end.nb_bytes is 0).
+   */
+  Qcow2COWRegion cow_end;
+
+Berto
 
