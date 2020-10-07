@@ -2,94 +2,90 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BA8AC4727E
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 16:30:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9E98C47095
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 16:30:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 868E220708
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 16:30:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0FA322064E
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 16:30:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dn5uKd9N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 868E220708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MvxOoLSY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FA322064E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQCKJ-00017I-7K
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 12:30:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34506)
+	id 1kQCKd-0001MQ-T4
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 12:30:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36278)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kQBsC-0005F6-BH
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 12:01:00 -0400
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:40223)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kQBs4-0000zB-4L
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 12:00:56 -0400
-Received: by mail-wm1-x32b.google.com with SMTP id k18so2964257wmj.5
- for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 09:00:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=IRAdzJ9Fz7lwIEn0uOrEMb6UUG23jZ5P/nghwH5F3rs=;
- b=dn5uKd9N4M+yJzBqA+TpW/E/u7+IphQ0ybtWhiLVd4BJuKj9/aCEJPqkI3Jnfrr/AI
- kzJs7hzBDuCTWu1LCy1WoXNd7627OYjozlUpJWsMZ4+nV5eF9lt5ltn9ZzT4lgrgmVZc
- re+puXb1F/hxr6nB8NnEEa3PITpebBcnlVvPNxeokmvSHtvDbbga0coxpOEYVCDN3TkR
- 5+i9E6PhhUylsyR/mJIh1hJSH18umUWiDgL3XyK8Ls8oRoOJAa9PZBAsCb9Rf24syTAy
- O4ykd5ZVTlI0n7ciydy5gJMfSVhpNkXnZIQi5xa2paPInIgDQJvlA9CngAC96qcs4J01
- gn+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=IRAdzJ9Fz7lwIEn0uOrEMb6UUG23jZ5P/nghwH5F3rs=;
- b=D58zogtnmNS2OBnKmQSOJ4DYCMT2od/h39l28udq+cxoSZIEM0ZjLn4PoDEtfS1iTx
- 1fgitrda/9tS2TDt5m+H2PH3y327MCbIhzbpNTCK/EVmNjIuQtzPlS0tMvMzu4W2DjQr
- Ms0q3BJOj7B6hz5rmmGOIZ5D/14BBec5QpVJ8zzJO9s8ZBLqSe+ARZY13VJJLFANPKt4
- nvKnfXktyzReA/1TgSkc3jPaZmhskB8vcV3VN9uwFAca0yolgWPcmQmdp4+jA8CGnYMI
- 2G9S0E+8YQKLzYHVL8H46jvb6AuYuPVC2Zd+B+Rf2MKHS0hAIjvdU29sjU03BI1I3bZA
- Tbpg==
-X-Gm-Message-State: AOAM530kWvJMW5YQqqTQ5Eu9TgHH6C4ZQoLlix0J7ruiD6b345BEAdvY
- ye7y1XhC3h2bOOsCNXIYOAWubg==
-X-Google-Smtp-Source: ABdhPJxp2ssTVJ+yC+Hide5r8LP9CMniGq6QZxUxWjfrqmaC2CPmjevj2g2qQHafd+lx/um+IkaKEw==
-X-Received: by 2002:a7b:c847:: with SMTP id c7mr4191616wml.41.1602086449068;
- Wed, 07 Oct 2020 09:00:49 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id f14sm3318700wme.22.2020.10.07.09.00.40
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 07 Oct 2020 09:00:41 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id AE4F31FF92;
- Wed,  7 Oct 2020 17:00:38 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 06/22] tests/docker: Add genisoimage to the docker file
-Date: Wed,  7 Oct 2020 17:00:22 +0100
-Message-Id: <20201007160038.26953-7-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201007160038.26953-1-alex.bennee@linaro.org>
-References: <20201007160038.26953-1-alex.bennee@linaro.org>
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQC0Y-0003tP-36
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 12:09:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30760)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQC0V-00039a-DN
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 12:09:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602086973;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=katADo/Y/OL0goxHUzK5+bflziYjOe1d9usGMhtxLWk=;
+ b=MvxOoLSYV5Il01/AAs2483gSBgK5vhu38ZF0w0fbmULl0oh3mU6b7cdIKZFWaWEc8CHsOg
+ 1gtDeODhbcguxSLNrpAVn7BqU4aunHD8fyko+NuatErpQigig6XjpNU4sSRZeX9C2w3ePy
+ 6Yb4dyQ9bBP76urG9qU/o9ynOC0eA4Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-584-qpbw-xOsP3eWq7jVoewbSw-1; Wed, 07 Oct 2020 12:09:30 -0400
+X-MC-Unique: qpbw-xOsP3eWq7jVoewbSw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03FF718A822E
+ for <qemu-devel@nongnu.org>; Wed,  7 Oct 2020 16:09:30 +0000 (UTC)
+Received: from [10.10.120.38] (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id ED9B97664C;
+ Wed,  7 Oct 2020 16:09:28 +0000 (UTC)
+Subject: Re: [PATCH v5 26/36] qapi/gen.py: Fix edge-case of _is_user_module
+To: Markus Armbruster <armbru@redhat.com>
+References: <20201005195158.2348217-1-jsnow@redhat.com>
+ <20201005195158.2348217-27-jsnow@redhat.com>
+ <87eemackge.fsf@dusky.pond.sub.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <7b2f0d13-ecbf-7e4a-4a68-bb31e833db41@redhat.com>
+Date: Wed, 7 Oct 2020 12:09:28 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32b;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32b.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <87eemackge.fsf@dusky.pond.sub.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:44:56
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,78 +99,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+On 10/7/20 8:02 AM, Markus Armbruster wrote:
+> John Snow <jsnow@redhat.com> writes:
+> 
+>> The edge case is that if the name is '', this expression returns a
+>> string instead of a bool, which violates our declared type.
+> 
+> The edge case is impossible, as discussed in review of v2.  I figure the
+> type checker can't see that, so we need to help it some.  Can we mention
+> this in the commit message?
+> 
 
-genisoimage is needed for running the tests/qtest/cdrom-test qtest.
+Sure. It's quite possible we will be able to better model and constrain 
+these types, but that will come after all of these patches.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20201006174347.152040-1-thuth@redhat.com>
----
- tests/docker/dockerfiles/centos8.docker      | 1 +
- tests/docker/dockerfiles/debian-amd64.docker | 1 +
- tests/docker/dockerfiles/fedora.docker       | 1 +
- tests/docker/dockerfiles/ubuntu2004.docker   | 1 +
- 4 files changed, 4 insertions(+)
+Mypy just has no way of knowing that '' is forbidden. That constraint 
+does not exist in the type system we have here at present.
 
-diff --git a/tests/docker/dockerfiles/centos8.docker b/tests/docker/dockerfiles/centos8.docker
-index f435616d6a..0fc2697491 100644
---- a/tests/docker/dockerfiles/centos8.docker
-+++ b/tests/docker/dockerfiles/centos8.docker
-@@ -8,6 +8,7 @@ ENV PACKAGES \
-     dbus-daemon \
-     gcc \
-     gcc-c++ \
-+    genisoimage \
-     gettext \
-     git \
-     glib2-devel \
-diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/dockerfiles/debian-amd64.docker
-index d2500dcff1..314c6bae83 100644
---- a/tests/docker/dockerfiles/debian-amd64.docker
-+++ b/tests/docker/dockerfiles/debian-amd64.docker
-@@ -14,6 +14,7 @@ RUN apt update && \
- RUN apt update && \
-     DEBIAN_FRONTEND=noninteractive eatmydata \
-     apt install -y --no-install-recommends \
-+        genisoimage \
-         libbz2-dev \
-         liblzo2-dev \
-         libgcrypt20-dev \
-diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
-index ec783418c8..85c975543d 100644
---- a/tests/docker/dockerfiles/fedora.docker
-+++ b/tests/docker/dockerfiles/fedora.docker
-@@ -15,6 +15,7 @@ ENV PACKAGES \
-     findutils \
-     gcc \
-     gcc-c++ \
-+    genisoimage \
-     gettext \
-     git \
-     glib2-devel \
-diff --git a/tests/docker/dockerfiles/ubuntu2004.docker b/tests/docker/dockerfiles/ubuntu2004.docker
-index cafe8443fb..f4b9556b9e 100644
---- a/tests/docker/dockerfiles/ubuntu2004.docker
-+++ b/tests/docker/dockerfiles/ubuntu2004.docker
-@@ -3,6 +3,7 @@ ENV PACKAGES flex bison \
-     ccache \
-     clang-10\
-     gcc \
-+    genisoimage \
-     gettext \
-     git \
-     glusterfs-common \
--- 
-2.20.1
+You could, by the way, create a type called NonEmptyString and create a 
+function that casts from str to NonEmptyString by means of an assertion 
+and then annotating the return type.
+
+Anyway, I'll update the commit message for now.
+
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> Reviewed-by: Cleber Rosa <crosa@redhat.com>
+>> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>> ---
+>>   scripts/qapi/gen.py | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
+>> index f2e2746fea5..1bad37fc06b 100644
+>> --- a/scripts/qapi/gen.py
+>> +++ b/scripts/qapi/gen.py
+>> @@ -243,7 +243,7 @@ def __init__(self, prefix, what, user_blurb, builtin_blurb, pydoc):
+>>   
+>>       @staticmethod
+>>       def _is_user_module(name):
+>> -        return name and not name.startswith('./')
+>> +        return bool(name and not name.startswith('./'))
+> 
+>             return not (name is None or name.startswith('./')
+> 
+> Looks slightly clearer to me.
+>>   
+>>       @staticmethod
+>>       def _is_builtin_module(name):
 
 
