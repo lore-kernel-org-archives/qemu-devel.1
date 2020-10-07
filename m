@@ -2,90 +2,111 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFB81C4363C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 19:12:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7281BC4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 19:12:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FAE02076B
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 19:12:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C18782076B
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 19:12:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NtVdBTck"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FAE02076B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ppaXn1gB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C18782076B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46912 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQErj-0000iq-5F
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 15:12:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50786)
+	id 1kQEru-0000u6-QV
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 15:12:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50002)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQEnl-0004Aq-NR
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 15:08:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54492)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQEnj-0005CE-LR
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 15:08:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602097714;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Vwmw/lWjME6i14BmmG0pUwrjtaiOPUgVNszRJnnOGNc=;
- b=NtVdBTck0s6DcHboA+2Xabw4dIGa8UqVOwsc1BllAKp6kEu9UF6DMBXeLCmj8kS9+Et7/o
- jxT5EITaDLmlCNFFn0WNTArUrOTxh8tS4ML2Iv4EXmqSuEBz1kcunownYFXj7JDQNH/p1p
- wv/WLFDRQpUX9vn4FikjNY6DI/njJOU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-318-UvkmISbeMj2wCYnak_XSEw-1; Wed, 07 Oct 2020 15:08:31 -0400
-X-MC-Unique: UvkmISbeMj2wCYnak_XSEw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CDDA41007283;
- Wed,  7 Oct 2020 19:08:30 +0000 (UTC)
-Received: from [10.10.120.38] (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F3C435D9DD;
- Wed,  7 Oct 2020 19:08:29 +0000 (UTC)
-Subject: Re: [PATCH 20/20] python: add mypy config
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20201006235817.3280413-1-jsnow@redhat.com>
- <20201006235817.3280413-21-jsnow@redhat.com>
- <20201007113512.GM7212@linux.fritz.box>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <3bf02c13-c376-16f8-160a-c70e3abe835d@redhat.com>
-Date: Wed, 7 Oct 2020 15:08:29 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-MIME-Version: 1.0
-In-Reply-To: <20201007113512.GM7212@linux.fritz.box>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:44:56
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+ (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
+ id 1kQEk0-0007ub-RC; Wed, 07 Oct 2020 15:04:44 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57340
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
+ id 1kQEjx-0004ct-O5; Wed, 07 Oct 2020 15:04:44 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 097J2VW9155947; Wed, 7 Oct 2020 15:04:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=from : to : cc : subject
+ : date : message-id : in-reply-to : references; s=pp1;
+ bh=mPRqIry+1htThAWT37oYyw8XVX4dUwbBHMUdDjTjQWY=;
+ b=ppaXn1gBc73BzCAXxUDtT6KyAZZUO5B/pISdf4faOH81SP61CLEiAVoQ+w2XRpGo/jag
+ HkX16Cug4g8UckgQP1i5Wj0+VDnDTbhrP3MGx3BltLi3PleKAeGz7fzC6c6DdBY3enuQ
+ Gp/CLuzXzA1Puy29sXGg5wkQC2gTKDM4MDH/XSKpGbd9c9mjycEdPNn+fR6+Ehbi5Vs4
+ TteCM4dhZElNeiuZZoNUZyid0yaQIvhvEoFtDrhpTcdZpjMLC1kLnACvZh060QdH6tK9
+ 6UhuTHVeFa0fV88q6fBFNztE2s6BhJ2puG56mC+fVPY8bGExCd8pWXkpS8Y5kltdkTDL Jg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 341j4yjmpw-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 07 Oct 2020 15:04:40 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 097J2ekd156546;
+ Wed, 7 Oct 2020 15:04:40 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.11])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 341j4yjmpd-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 07 Oct 2020 15:04:40 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+ by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 097IlUre003045;
+ Wed, 7 Oct 2020 19:04:39 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com
+ [9.57.198.28]) by ppma03dal.us.ibm.com with ESMTP id 33xgx9spb5-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 07 Oct 2020 19:04:39 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
+ [9.57.199.111])
+ by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 097J4cNC30015976
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 7 Oct 2020 19:04:38 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 7481BAC05F;
+ Wed,  7 Oct 2020 19:04:38 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 1BA7EAC05E;
+ Wed,  7 Oct 2020 19:04:36 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.211.60.106])
+ by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+ Wed,  7 Oct 2020 19:04:35 +0000 (GMT)
+From: Matthew Rosato <mjrosato@linux.ibm.com>
+To: cohuck@redhat.com, thuth@redhat.com
+Subject: [PATCH v3 07/10] s390x/pci: clean up s390 PCI groups
+Date: Wed,  7 Oct 2020 15:04:12 -0400
+Message-Id: <1602097455-15658-8-git-send-email-mjrosato@linux.ibm.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1602097455-15658-1-git-send-email-mjrosato@linux.ibm.com>
+References: <1602097455-15658-1-git-send-email-mjrosato@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-10-07_10:2020-10-07,
+ 2020-10-07 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 mlxscore=0
+ adultscore=0 phishscore=0 lowpriorityscore=0 clxscore=1015 spamscore=0
+ mlxlogscore=999 suspectscore=0 impostorscore=0 bulkscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2010070118
+Received-SPF: pass client-ip=148.163.158.5;
+ envelope-from=mjrosato@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 15:04:22
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,62 +120,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: kvm@vger.kernel.org, pmorel@linux.ibm.com, david@redhat.com,
+ schnelle@linux.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
+ pasic@linux.ibm.com, borntraeger@de.ibm.com, alex.williamson@redhat.com,
+ mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/7/20 7:35 AM, Kevin Wolf wrote:
-> Am 07.10.2020 um 01:58 hat John Snow geschrieben:
->> Formalize the options used for checking the python library. You can run
->> mypy from the directory that mypy.ini is in by typing `mypy qemu/`.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>   python/mypy.ini | 4 ++++
->>   1 file changed, 4 insertions(+)
->>   create mode 100644 python/mypy.ini
->>
->> diff --git a/python/mypy.ini b/python/mypy.ini
->> new file mode 100644
->> index 00000000000..7a70eca47c6
->> --- /dev/null
->> +++ b/python/mypy.ini
->> @@ -0,0 +1,4 @@
->> +[mypy]
->> +strict = True
-> 
-> $ mypy --strict qemu
-> mypy.ini: [mypy]: Strict mode is not supported in configuration files: specify individual flags instead (see 'mypy -h' for the list of flags enabled in strict mode)
-> Success: no issues found in 6 source files
-> $ mypy --version
-> mypy 0.740
-> 
-> Did this change in newer mypy versions? I guess it's time that I get the
-> new laptop which will involve installing a newer Fedora release. :-)
-> 
->> +python_version = 3.6
->> +warn_unused_configs = True
->> \ No newline at end of file
-> 
-> Kevin
-> 
+Add a step to remove all stashed PCI groups to avoid stale data between
+machine resets.
 
-0.770 lets you use strict in the config file. Fairly modern. I intend to 
-use this version in the CI venv that I am cooking up to check these, so 
-no need to hurry and update your fedora.
+Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+---
+ hw/s390x/s390-pci-bus.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-'pip3 install --user mypy>=0.770' should work out just fine until then.
-
-Maybe I should drop back down to >=0.730, but I liked being able to 
-force the stricter options in the conf file directly. I also liked the 
-idea that if new strict options got added in the future, we'd acquire 
-them automatically.
-
-I felt like anything we disabled should be a conscious and explicit 
-choice, instead of the opposite.
-
---js
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index c99f2f0..c34f14a 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -811,6 +811,17 @@ static void s390_pcihost_realize(DeviceState *dev, Error **errp)
+                              S390_ADAPTER_SUPPRESSIBLE, errp);
+ }
+ 
++static void s390_pcihost_unrealize(DeviceState *dev)
++{
++    S390PCIGroup *group;
++    S390pciState *s = S390_PCI_HOST_BRIDGE(dev);
++
++    while (!QTAILQ_EMPTY(&s->zpci_groups)) {
++        group = QTAILQ_FIRST(&s->zpci_groups);
++        QTAILQ_REMOVE(&s->zpci_groups, group, link);
++    }
++}
++
+ static int s390_pci_msix_init(S390PCIBusDevice *pbdev)
+ {
+     char *name;
+@@ -1165,6 +1176,7 @@ static void s390_pcihost_class_init(ObjectClass *klass, void *data)
+ 
+     dc->reset = s390_pcihost_reset;
+     dc->realize = s390_pcihost_realize;
++    dc->unrealize = s390_pcihost_unrealize;
+     hc->pre_plug = s390_pcihost_pre_plug;
+     hc->plug = s390_pcihost_plug;
+     hc->unplug_request = s390_pcihost_unplug_request;
+-- 
+1.8.3.1
 
 
