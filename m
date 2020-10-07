@@ -7,84 +7,91 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29333C4363C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 09:26:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FBBEC4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 09:29:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9273D2080A
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 09:26:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4E5A42080A
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 09:29:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dg/uWpbW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9273D2080A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dacR37Ob"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E5A42080A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ5iF-0007r4-Fg
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 05:26:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58874)
+	id 1kQ5lV-0000fu-62
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 05:29:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59480)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQ5hJ-0006xX-GJ
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 05:25:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33658)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQ5hH-0007fT-Ja
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 05:25:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602062718;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=KqcWTlNtLQQGCPrOMvFxh+Bg9REuhPBTph1QQGHcQZc=;
- b=dg/uWpbWQbaOzeZ7Ew7wuoJ+M/zWYz3zt97JmWokFF5a+FDSoaCDl6ZFDXN/bXe7J+F5NB
- lcmAFrs3VR3ILK/O5y/UcFuRHSTmKjrzA+BlPHHSkRbNTfOYqTA9XUt/JOvdiAmkvowKAo
- FOs4Xc/VMt/grk/QVURMpI4sTCuzN98=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-450-nFHHoxRmPdiPoxAVe0DN2g-1; Wed, 07 Oct 2020 05:25:16 -0400
-X-MC-Unique: nFHHoxRmPdiPoxAVe0DN2g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E2890802B46
- for <qemu-devel@nongnu.org>; Wed,  7 Oct 2020 09:25:14 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
- [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A8CA255783;
- Wed,  7 Oct 2020 09:25:14 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 230FA11329C1; Wed,  7 Oct 2020 11:25:13 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v5 18/36] qapi: establish mypy type-checking baseline
-References: <20201005195158.2348217-1-jsnow@redhat.com>
- <20201005195158.2348217-19-jsnow@redhat.com>
-Date: Wed, 07 Oct 2020 11:25:12 +0200
-In-Reply-To: <20201005195158.2348217-19-jsnow@redhat.com> (John Snow's message
- of "Mon, 5 Oct 2020 15:51:40 -0400")
-Message-ID: <87pn5ugzgn.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kQ5kt-0008W3-LQ
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 05:29:03 -0400
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:56234)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kQ5kq-00083a-JF
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 05:29:03 -0400
+Received: by mail-wm1-x32e.google.com with SMTP id d4so1539611wmd.5
+ for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 02:29:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=/hNZPjZ9WvEhyG9rJ+9mXwP/eEmTwUSEEvcX6A8ZY0U=;
+ b=dacR37Ob6ihIN0EVqXunlmG+GdxBT17penTUb+pVL3qa7h79UwBtt/TU2loXM7AM+D
+ y1vBkHqcRNaIly97nY1k5Xe5Vp27bHDBg1Ye334fuTrROrr7azgafLCSSFBhuf7kuB3T
+ nEn08nVsmIaDnW3jEo2HrHX5/1eWXSqWsXfbc09LN8T6KltMwOcQALyLVWtt3Byq9gnB
+ vG2FS9LZpKtKENSMlrctrIcrcOgbPtzJqdKHrCLjnNZ8HUhLA84QQz8hs0LMKI9MvsL7
+ eiqFBc+ocPTnWE8Si6hVzbJ2mns8J4e+8QfNVqmkg0m9rpJ2IGcoOp1xbcW+Z/8hMuJi
+ Xbdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=/hNZPjZ9WvEhyG9rJ+9mXwP/eEmTwUSEEvcX6A8ZY0U=;
+ b=TEMHRXHnMm6mkAMlIc4ogqzhjM77y0+f0gI9Xmm2PY/XjDg0f0y9KDRvT71ZEEtEkj
+ TYT17ySmAjUKKFhJn3SUhIfGsAkKQCjuRGTbRHQK+xhKGX8SdTlOW4dfDAkgz8/obnA5
+ LnK5/3Wv8mIWX0DbD1GcUIk3io08Bdd1FgUOxLpFXQR/ln8EfvbkGByOfQ3SoF7iBL2A
+ LVixm4HzU8re08gLbOSVmSHJ2Zqg5yoaoM6qvD+/4US2gUclDN6ys6s1grsGHSHoScj+
+ Bl2k5Lmy7tiJKiBM4rIcu9yyz8zlZYypnX0Zt9FcA1uCMvarY9ybnxveIot+UJYi9I2K
+ 3bOw==
+X-Gm-Message-State: AOAM532YjbAnNNLSDPLqUGYiFcIlfG4+O10VLn1q5IejpEuKOaghXEVa
+ r68pIGRXEZ8fNWduIsqLOyUtPw==
+X-Google-Smtp-Source: ABdhPJyTDwKtH79sZ85njCgtVZwL5aYJRQIaAFeTKjRut8hnXcZoKacxOws9nAH4jCGgovL6hhYjzg==
+X-Received: by 2002:a1c:7f97:: with SMTP id a145mr2387510wmd.160.1602062938657; 
+ Wed, 07 Oct 2020 02:28:58 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id z127sm1943298wmc.2.2020.10.07.02.28.57
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 07 Oct 2020 02:28:57 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 77EE51FF7E;
+ Wed,  7 Oct 2020 10:28:56 +0100 (BST)
+References: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
+ <20200908051953.1616885-20-david@gibson.dropbear.id.au>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PULL 19/33] mips/cps: Use start-powered-off CPUState property
+In-reply-to: <20200908051953.1616885-20-david@gibson.dropbear.id.au>
+Date: Wed, 07 Oct 2020 10:28:56 +0100
+Message-ID: <87h7r61j1j.fsf@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:44:56
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::32e;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32e.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,126 +104,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: peter.maydell@linaro.org, danielhb413@gmail.com, groug@kaod.org,
+ qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ bauerman@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-John Snow <jsnow@redhat.com> writes:
 
-> Fix two very minor issues,
+David Gibson <david@gibson.dropbear.id.au> writes:
 
-What are the two issues?  I'm asking because I can see only one.
-
->                            and then establish a mypy type-checking
-> baseline.
-
-Any particular reason this can't go before PATCH 15 "qapi/common.py: add
-type hint annotations".
-
-> Like pylint, this should be run from the folder above:
+> From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 >
->  > mypy --config-file=qapi/mypy.ini qapi/
+> Instead of setting CPUState::halted to 1 in main_cpu_reset(), use the
+> start-powered-off property which makes cpu_common_reset() initialize it
+> to 1 in common code.
 >
-> This is designed and tested for mypy 0.770 or greater.
+> Also change creation of CPU object from cpu_create() to object_new() and
+> qdev_realize_and_unref() because cpu_create() realizes the CPU and it's n=
+ot
+> possible to set a property after the object is realized.
 >
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> Tested-by: Eduardo Habkost <ehabkost@redhat.com>
-> Reviewed-by: Cleber Rosa <crosa@redhat.com>
-> Tested-by: Cleber Rosa <crosa@redhat.com>
+> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+> Message-Id: <20200826055535.951207-6-bauerman@linux.ibm.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+
+I've finally bisected the breakage in check-acceptance to this patch:
+
+  10:24:09 [alex.bennee@hackbox2:~/l/q/b/bisect] (102ca966=E2=80=A6)|BISECT=
+ING|=E2=9C=94 + ./tests/venv/bin/avocado run tests/acceptance/machine_mips_=
+malta.py
+  /home/alex.bennee/lsrc/qemu.git/builds/bisect/tests/venv/lib/python3.6/si=
+te-packages/avocado/plugins/run.py:214: FutureWarning: The following argume=
+nts will be changed to boolean soon: sysinfo, output-check, failfast, keep-=
+tmp and ignore-missing-references.
+    FutureWarning)
+  JOB ID     : 1a71a0a81cf9fb9a387d2ab105f8196a26cab84e
+  JOB LOG    : /home/alex.bennee/avocado/job-results/job-2020-10-07T10.24-1=
+a71a0a/job.log
+   (1/3) tests/acceptance/machine_mips_malta.py:MaltaMachineFramebuffer.tes=
+t_mips_malta_i6400_framebuffer_logo_1core: PASS (5.70 s)
+   (2/3) tests/acceptance/machine_mips_malta.py:MaltaMachineFramebuffer.tes=
+t_mips_malta_i6400_framebuffer_logo_7cores: INTERRUPTED: Test interrupted b=
+y SIGTERM\nRunner error occurred: Timeout reached\nOriginal status: ERROR\n=
+{'name': '2-tests/acceptance/machine_mips_malta.py:MaltaMachineFramebuffer.=
+test_mips_malta_i6400_framebuffer_logo_7cores',
+  'logdir': '/home/alex.bennee/avocado/job-r... (28.91 s)
+   (3/3) tests/acceptance/machine_mips_malta.py:MaltaMachineFramebuffer.tes=
+t_mips_malta_i6400_framebuffer_logo_8cores: INTERRUPTED: Test interrupted b=
+y SIGTERM\nRunner error occurred: Timeout reached\nOriginal status: ERROR\n=
+{'name': '3-tests/acceptance/machine_mips_malta.py:MaltaMachineFramebuffer.=
+test_mips_malta_i6400_framebuffer_logo_8cores',
+  'logdir': '/home/alex.bennee/avocado/job-r... (30.58 s)
+  RESULTS    : PASS 1 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 2 | =
+CANCEL 0
+  JOB TIME   : 70.12 s
+  10:25:27 [alex.bennee@hackbox2:~/l/q/b/bisect] (102ca966=E2=80=A6)|BISECT=
+ING|=E2=9C=94 8 + make -j30
+  make[1]: Entering directory '/home/alex.bennee/lsrc/qemu.git/slirp'
+  make[1]: Nothing to be done for 'all'.
+  make[1]: Leaving directory '/home/alex.bennee/lsrc/qemu.git/slirp'
+  Generating qemu-version.h with a meson_exe.py custom command
+  Compiling C object libqemu-mips64el-softmmu.fa.p/hw_mips_cps.c.o
+  Compiling C object libqemu-mips64-softmmu.fa.p/hw_mips_cps.c.o
+  Compiling C object libqemu-mipsel-softmmu.fa.p/hw_mips_cps.c.o
+  Compiling C object libqemu-mips-softmmu.fa.p/hw_mips_cps.c.o
+  Linking target qemu-system-mips
+  Linking target qemu-system-mips64el
+  Linking target qemu-system-mips64
+  Linking target qemu-system-mipsel
+  10:26:26 [alex.bennee@hackbox2:~/l/q/b/bisect] (a2c93f06=E2=80=A6)|BISECT=
+ING|=E2=9C=94 + ./tests/venv/bin/avocado run tests/acceptance/machine_mips_=
+malta.py
+  /home/alex.bennee/lsrc/qemu.git/builds/bisect/tests/venv/lib/python3.6/si=
+te-packages/avocado/plugins/run.py:214: FutureWarning: The following argume=
+nts will be changed to boolean soon: sysinfo, output-check, failfast, keep-=
+tmp and ignore-missing-references.
+    FutureWarning)
+  JOB ID     : ccf294ef4e5ebdf19b3a0b53479d574df4ea54ea
+  JOB LOG    : /home/alex.bennee/avocado/job-results/job-2020-10-07T10.26-c=
+cf294e/job.log
+   (1/3) tests/acceptance/machine_mips_malta.py:MaltaMachineFramebuffer.tes=
+t_mips_malta_i6400_framebuffer_logo_1core: PASS (5.82 s)
+   (2/3) tests/acceptance/machine_mips_malta.py:MaltaMachineFramebuffer.tes=
+t_mips_malta_i6400_framebuffer_logo_7cores: PASS (15.16 s)
+   (3/3) tests/acceptance/machine_mips_malta.py:MaltaMachineFramebuffer.tes=
+t_mips_malta_i6400_framebuffer_logo_8cores: PASS (15.97 s)
+  RESULTS    : PASS 3 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | =
+CANCEL 0
+  JOB TIME   : 40.01 s
+
 > ---
->  scripts/qapi/mypy.ini  | 60 ++++++++++++++++++++++++++++++++++++++++++
->  scripts/qapi/schema.py |  3 ++-
->  2 files changed, 62 insertions(+), 1 deletion(-)
->  create mode 100644 scripts/qapi/mypy.ini
+>  hw/mips/cps.c | 15 +++++++++++----
+>  1 file changed, 11 insertions(+), 4 deletions(-)
 >
-> diff --git a/scripts/qapi/mypy.ini b/scripts/qapi/mypy.ini
-> new file mode 100644
-> index 00000000000..00fac15dc6e
-> --- /dev/null
-> +++ b/scripts/qapi/mypy.ini
-> @@ -0,0 +1,60 @@
-> +[mypy]
-> +strict = True
-> +strict_optional = False
-> +disallow_untyped_calls = False
-> +python_version = 3.6
+> diff --git a/hw/mips/cps.c b/hw/mips/cps.c
+> index 615e1a1ad2..23c0f87e41 100644
+> --- a/hw/mips/cps.c
+> +++ b/hw/mips/cps.c
+> @@ -52,9 +52,6 @@ static void main_cpu_reset(void *opaque)
+>      CPUState *cs =3D CPU(cpu);
+>=20=20
+>      cpu_reset(cs);
+> -
+> -    /* All VPs are halted on reset. Leave powering up to CPC. */
+> -    cs->halted =3D 1;
+>  }
+>=20=20
+>  static bool cpu_mips_itu_supported(CPUMIPSState *env)
+> @@ -76,7 +73,17 @@ static void mips_cps_realize(DeviceState *dev, Error *=
+*errp)
+>      bool saar_present =3D false;
+>=20=20
+>      for (i =3D 0; i < s->num_vp; i++) {
+> -        cpu =3D MIPS_CPU(cpu_create(s->cpu_type));
+> +        cpu =3D MIPS_CPU(object_new(s->cpu_type));
 > +
-> +[mypy-qapi.commands]
-> +disallow_untyped_defs = False
-> +disallow_incomplete_defs = False
-> +check_untyped_defs = False
+> +        /* All VPs are halted on reset. Leave powering up to CPC. */
+> +        if (!object_property_set_bool(OBJECT(cpu), "start-powered-off", =
+true,
+> +                                      errp)) {
+> +            return;
+> +        }
 > +
-> +[mypy-qapi.error]
-> +disallow_untyped_defs = False
-> +disallow_incomplete_defs = False
-> +check_untyped_defs = False
-> +
-> +[mypy-qapi.events]
-> +disallow_untyped_defs = False
-> +disallow_incomplete_defs = False
-> +check_untyped_defs = False
-> +
-> +[mypy-qapi.expr]
-> +disallow_untyped_defs = False
-> +disallow_incomplete_defs = False
-> +check_untyped_defs = False
-> +
-> +[mypy-qapi.gen]
-> +disallow_untyped_defs = False
-> +disallow_incomplete_defs = False
-> +check_untyped_defs = False
-> +
-> +[mypy-qapi.introspect]
-> +disallow_untyped_defs = False
-> +disallow_incomplete_defs = False
-> +check_untyped_defs = False
-> +
-> +[mypy-qapi.parser]
-> +disallow_untyped_defs = False
-> +disallow_incomplete_defs = False
-> +check_untyped_defs = False
-> +
-> +[mypy-qapi.schema]
-> +disallow_untyped_defs = False
-> +disallow_incomplete_defs = False
-> +check_untyped_defs = False
-> +
-> +[mypy-qapi.source]
-> +disallow_untyped_defs = False
-> +disallow_incomplete_defs = False
-> +check_untyped_defs = False
-> +
-> +[mypy-qapi.types]
-> +disallow_untyped_defs = False
-> +disallow_incomplete_defs = False
-> +check_untyped_defs = False
-> +
-> +[mypy-qapi.visit]
-> +disallow_untyped_defs = False
-> +disallow_incomplete_defs = False
-> +check_untyped_defs = False
-> diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-> index 74c6b96d391..483b4b68dff 100644
-> --- a/scripts/qapi/schema.py
-> +++ b/scripts/qapi/schema.py
-> @@ -17,6 +17,7 @@
->  from collections import OrderedDict
->  import os
->  import re
-> +from typing import Optional
->  
->  from .common import POINTER_SUFFIX, c_name
->  from .error import QAPIError, QAPISemError
-> @@ -25,7 +26,7 @@
->  
->  
->  class QAPISchemaEntity:
-> -    meta = None
-> +    meta: Optional[str] = None
->  
->      def __init__(self, name, info, doc, ifcond=None, features=None):
->          assert name is None or isinstance(name, str)
+> +        if (!qdev_realize_and_unref(DEVICE(cpu), NULL, errp)) {
+> +            return;
+> +        }
+>=20=20
+>          /* Init internal devices */
+>          cpu_mips_irq_init_cpu(cpu);
 
+
+--=20
+Alex Benn=C3=A9e
 
