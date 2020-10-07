@@ -2,76 +2,80 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4E88C4727E
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 20:38:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49A14C4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 20:38:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6204920760
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 20:38:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B19E020760
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 20:38:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JAwqc9OA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6204920760
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MxLJ6FG7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B19E020760
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQGCs-0001Vb-AD
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 16:38:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40226)
+	id 1kQGCu-0001Zn-ID
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 16:38:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40230)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1kQGBn-0000Il-Il
+ id 1kQGBn-0000It-Ua
  for qemu-devel@nongnu.org; Wed, 07 Oct 2020 16:37:31 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:36181)
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36188)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1kQGBm-0000f2-4x
+ id 1kQGBm-0000f4-Dv
  for qemu-devel@nongnu.org; Wed, 07 Oct 2020 16:37:31 -0400
-Received: by mail-wr1-x429.google.com with SMTP id z1so3860856wrt.3
- for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 13:37:29 -0700 (PDT)
+Received: by mail-wm1-x341.google.com with SMTP id e2so4035475wme.1
+ for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 13:37:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id;
- bh=Wion4bXNxUG6gI6d7TJrAqixP4aRBEiFI6SiTdGp8Zg=;
- b=JAwqc9OAV6eOObw0KD7wBvJSk5MUv1tQRf8qaqnwN/bNxDFuguEs02ck/6Er7W2FHw
- STKFHk2IX0wyrm2YltqXMP9yUBo1/E/WeANB8/C8cNq8ADLJTzQGSW20T8JvL3KhpGOP
- FfHU+VZrjh3LzAychfxB0Yy7QfTvAMTo1pSI32uSAq5LtvsxZaGvCKJrEzZe4WqCgfKO
- Xq6X610vybmHMpgmbFMaAVVxjrlVvN9oubQzxAztgdJdhRJu7aKQqCYs55rc/FfNx+lJ
- 9PGJyeoTeJ4CewxV0LD0XSWnMQyQIkBQpYx+hWNqKs49XUw1UUklpVDJkWPuSugWksTD
- HepQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=GafXqa426HzZ2OyxbkkhzXpXgv6Bqp75Rh5uU2w03mw=;
+ b=MxLJ6FG793Xg5O6NA/4J1hntNX3P+yt+kgjKoa6+XNNwJfg4pan6YeiA+Dr66YKKr3
+ QBnWQpHXeqxET9MEW18wIzIx20nLJaZonQ+wZV6YGTkAY8r40P4AFEcw0A6IIOiN85r8
+ SuX5IzzVngwVOohiWViUOooFBG7Dr/eCHDxCvtKjIYe46Riobz1K5UkMmOh9O1ovJg9P
+ fNVFikoCFSovH9uNG3JXCS0b5v2GBJ7vXxcTN9tXziFg9syun8AMwvt7xfyq3cyKDyLY
+ bP5er4hJkmMgRjOYm1jzaUEng5OkySYHjM9qhjw5mT0KJJR1KqTTrEWNxaqYvUCBtTpc
+ 5BdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=Wion4bXNxUG6gI6d7TJrAqixP4aRBEiFI6SiTdGp8Zg=;
- b=qhIeKO7+Yq5ECfdhh0WgFh6vhFk1kQE7JXrDUoj53NGkpvim0C0xO4txTTaWFWpJLz
- fB3DfzNykXP+mJbwMsp40DJMoxj+8cwDEk1/hN7JCBgKkl2l9mo1BgxVu+sVBviKz/fB
- zshAZ7ikb3xh8/8A3ONLQsIVtmy04fGSzzWwAAb1g3PwjrCiSY89pYgaoXz3wUZlQ85M
- vjHcEy62UKG24l3XmhAy9cwne0zUXwHEZ9fZ+y0sdxTq8cwDSxcjT9sDtUR0j2gEvHAV
- ufF/4Rb6TodlAzIhoV8VMC/ZGGdz2HI83EtZs99jpwlTUJLr6AnBRbLh6IxJjbCuodQZ
- fClw==
-X-Gm-Message-State: AOAM533JlO93RdK2sRxeAIuqWlIIqUHIxCFVXODDNicz467KywjK4kME
- ebMmCyWHmWDpqZbKQ7cxVw4iISXuXOo=
-X-Google-Smtp-Source: ABdhPJxT21WJpqzddSug3xX3Bb1IOkb2zaGO9gswfC1DA+PceLODMgYcQ69jQeLjbEJKSzsHUE6NZQ==
-X-Received: by 2002:a5d:6ca6:: with SMTP id a6mr5463236wra.348.1602103048027; 
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=GafXqa426HzZ2OyxbkkhzXpXgv6Bqp75Rh5uU2w03mw=;
+ b=rPPnDjcaiv5xxEIupo5/vETpXsAfHJwCkbsB0ASjp+rApn+Vq4R8EFR/IhnCI8ZLEb
+ PrbJJXsNh2FIR+TaCIG2SaZtVP8Jykr6FDoSJf+qq9x9u0zY4yDV57oRlxMgYjuxc5kW
+ 92XmDxceb/qAwaNcRXC3lMKiLH9nl0m0pfsUATABYhXjC9cNgYUU/CnrkdSdrc64N2YJ
+ 7XExlAsxMpAAD+KpK2+OswHQ1uS3k1veuoxyjP/XHuuIL0GEXgShzpPnCfJrTErDBj0b
+ pUamss6x4o3hgCWHeKd03GSyt3QvQSz8r4WY3Jmn+hUHldv03k4cfAzXgmNJO6QSQNKj
+ JXlQ==
+X-Gm-Message-State: AOAM532Y2nT9nGK+0MI5zoExGlkSBaqnutJwRD+qTZyrQde2VHms42Nd
+ FSx88utJFBM3f2MiRBjqMxlIEXOSG8c=
+X-Google-Smtp-Source: ABdhPJxw9zJ/H8vHFRKX09VYq2XxKeiPTeKkGXC+BQTiJFJwHwhAKIL9A0JS285vL5k0AlTF3U8Y/Q==
+X-Received: by 2002:a1c:e919:: with SMTP id q25mr5005318wmc.142.1602103048849; 
  Wed, 07 Oct 2020 13:37:28 -0700 (PDT)
 Received: from rtrkw774-lin.syrmia.com ([46.240.135.226])
- by smtp.gmail.com with ESMTPSA id d2sm4359083wro.34.2020.10.07.13.37.27
+ by smtp.gmail.com with ESMTPSA id d2sm4359083wro.34.2020.10.07.13.37.28
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 07 Oct 2020 13:37:27 -0700 (PDT)
+ Wed, 07 Oct 2020 13:37:28 -0700 (PDT)
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 0/5] target/mips: Misc patches  
-Date: Wed,  7 Oct 2020 22:37:16 +0200
-Message-Id: <1602103041-32017-1-git-send-email-aleksandar.qemu.devel@gmail.com>
+Subject: [PATCH v2 1/5] target/mips: Demacro helpers for <ABS|CHS>.<D|S|PS>
+Date: Wed,  7 Oct 2020 22:37:17 +0200
+Message-Id: <1602103041-32017-2-git-send-email-aleksandar.qemu.devel@gmail.com>
 X-Mailer: git-send-email 2.7.4
-Received-SPF: pass client-ip=2a00:1450:4864:20::429;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x429.google.com
+In-Reply-To: <1602103041-32017-1-git-send-email-aleksandar.qemu.devel@gmail.com>
+References: <1602103041-32017-1-git-send-email-aleksandar.qemu.devel@gmail.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -100,23 +104,85 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A set of several, mostly FP, refactorings and improvements.
+Remove function definitions via macros to achieve better code clarity.
 
-v1->v2:
+Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+---
+ target/mips/fpu_helper.c | 61 +++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 40 insertions(+), 21 deletions(-)
 
-  - added a patch on MAINTAINERS
-
-Aleksandar Markovic (5):
-  target/mips: Demacro helpers for <ABS|CHS>.<D|S|PS>
-  target/mips: Demacro helpers for M<ADD|SUB>F.<D|S>
-  target/mips: Demacro helpers for <MAX|MAXA|MIN|MINA>.<D|S>
-  target/mips: Refactor helpers for fp comparison instructions
-  MAINTAINERS: Remove myself
-
- target/mips/fpu_helper.c | 276 +++++++++++++++++++++++++++++++++--------------
- MAINTAINERS              |  17 +--
- 2 files changed, 200 insertions(+), 93 deletions(-)
-
+diff --git a/target/mips/fpu_helper.c b/target/mips/fpu_helper.c
+index 56beda4..f851723 100644
+--- a/target/mips/fpu_helper.c
++++ b/target/mips/fpu_helper.c
+@@ -983,27 +983,46 @@ uint32_t helper_float_floor_2008_w_s(CPUMIPSState *env, uint32_t fst0)
+ }
+ 
+ /* unary operations, not modifying fp status  */
+-#define FLOAT_UNOP(name)                                       \
+-uint64_t helper_float_ ## name ## _d(uint64_t fdt0)                \
+-{                                                              \
+-    return float64_ ## name(fdt0);                             \
+-}                                                              \
+-uint32_t helper_float_ ## name ## _s(uint32_t fst0)                \
+-{                                                              \
+-    return float32_ ## name(fst0);                             \
+-}                                                              \
+-uint64_t helper_float_ ## name ## _ps(uint64_t fdt0)               \
+-{                                                              \
+-    uint32_t wt0;                                              \
+-    uint32_t wth0;                                             \
+-                                                               \
+-    wt0 = float32_ ## name(fdt0 & 0XFFFFFFFF);                 \
+-    wth0 = float32_ ## name(fdt0 >> 32);                       \
+-    return ((uint64_t)wth0 << 32) | wt0;                       \
+-}
+-FLOAT_UNOP(abs)
+-FLOAT_UNOP(chs)
+-#undef FLOAT_UNOP
++
++uint64_t helper_float_abs_d(uint64_t fdt0)
++{
++   return float64_abs(fdt0);
++}
++
++uint32_t helper_float_abs_s(uint32_t fst0)
++{
++    return float32_abs(fst0);
++}
++
++uint64_t helper_float_abs_ps(uint64_t fdt0)
++{
++    uint32_t wt0;
++    uint32_t wth0;
++
++    wt0 = float32_abs(fdt0 & 0XFFFFFFFF);
++    wth0 = float32_abs(fdt0 >> 32);
++    return ((uint64_t)wth0 << 32) | wt0;
++}
++
++uint64_t helper_float_chs_d(uint64_t fdt0)
++{
++   return float64_chs(fdt0);
++}
++
++uint32_t helper_float_chs_s(uint32_t fst0)
++{
++    return float32_chs(fst0);
++}
++
++uint64_t helper_float_chs_ps(uint64_t fdt0)
++{
++    uint32_t wt0;
++    uint32_t wth0;
++
++    wt0 = float32_chs(fdt0 & 0XFFFFFFFF);
++    wth0 = float32_chs(fdt0 >> 32);
++    return ((uint64_t)wth0 << 32) | wt0;
++}
+ 
+ /* MIPS specific unary operations */
+ uint64_t helper_float_recip_d(CPUMIPSState *env, uint64_t fdt0)
 -- 
 2.7.4
 
