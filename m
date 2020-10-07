@@ -2,78 +2,74 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B23BC4363C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 03:25:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8565C4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 03:32:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 753E02087E
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 03:25:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=me.com header.i=@me.com header.b="vnuv3Non"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 753E02087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=me.com
+	by mail.kernel.org (Postfix) with ESMTPS id 53503208C3
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 03:32:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53503208C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ04w-0005iT-EL
-	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 23:25:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52604)
+	id 1kQ0Bw-0008BU-An
+	for qemu-devel@archiver.kernel.org; Tue, 06 Oct 2020 23:32:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53834)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thorpej@me.com>) id 1kQ04E-0005Dm-Um
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 23:24:38 -0400
-Received: from mr85p00im-ztdg06011201.me.com ([17.58.23.181]:40618)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kQ0Af-0007WZ-5b
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 23:31:18 -0400
+Resent-Date: Tue, 06 Oct 2020 23:31:17 -0400
+Resent-Message-Id: <E1kQ0Af-0007WZ-5b@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21367)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thorpej@me.com>) id 1kQ04C-0001Gk-Jo
- for qemu-devel@nongnu.org; Tue, 06 Oct 2020 23:24:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=me.com; s=1a1hai;
- t=1602041075; bh=RUSVo/LlfiKQ4shovhCJZboxE/aCKjsmZnWSqeO3ztw=;
- h=From:To:Subject:Date:Message-Id:MIME-Version;
- b=vnuv3NonbQLSxOX6K6Aw46grrwZiyVCKq6EAcLiXYfGbeAlBQAKfNvHfvnzING3eK
- 7tnMwMtVEbcqNZew3iPD+LrugCi2Q5qsjnN/PTfkfG0I8euNcE/9K9C59bR29NrVXB
- 5brt0afU4nbBQAo0p6PmFdTusKcZ8lNnWdfl1zORkj7QNYGmvJpkJCO5U2Cw4KxMeg
- Ovgkf56Wm1ZlljW7TOVNwriCEbbUG7weqnQnKqAelAKqpV2UPMVL8ZgRA/qWhb8UvT
- XcU4q6nJNeCWOs4RG70SThDpTCDd3shqfAmMk1CgSsxTyzq1yBOcM6d34VtDdfd5HM
- b+uOd3Y53WugQ==
-Received: from localhost.localdomain (c-67-180-181-196.hsd1.ca.comcast.net
- [67.180.181.196])
- by mr85p00im-ztdg06011201.me.com (Postfix) with ESMTPSA id DF74E4004E7;
- Wed,  7 Oct 2020 03:24:34 +0000 (UTC)
-From: Jason Thorpe <thorpej@me.com>
-To: qemu-devel@nongnu.org
-Cc: Jason Thorpe <thorpej@me.com>
-Subject: [PATCH] Changes to support booting NetBSD/alpha
-Date: Tue,  6 Oct 2020 20:24:17 -0700
-Message-Id: <20201007032417.26044-1-thorpej@me.com>
-X-Mailer: git-send-email 2.28.0
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kQ0AP-0003O5-C2
+ for qemu-devel@nongnu.org; Tue, 06 Oct 2020 23:31:13 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1602041444; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=hRa4/AYiptJpFYurP1m9QVpy+56V2VXzvJPWszMvugDwt6wCSibGKSnNcBayIK/9jOcsDe5QZpzD1dLBnK7udKhCgFJyY4wTfJDFNsuoeVAykELl5fuCMX0qBmshhRlJgUW4Zh7YzzZLl6ZRvbSLKJRB27WpdJfu0d24eklaiFc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1602041444;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=PExRNPmO1D9lF6I4gcRnL0OgoiQcZWoWgrC3k+LVLh8=; 
+ b=cCaCzvUUJ8ZN+udsSc6ipK6S3mG+EfFhjEUSvSqGeMOXKDql1EfLCYslmRzL0MzPaW8MJH+qsW5tYw0IEFakFJIDkVBYM69wq5JpA+yTFp0Q5UVdm2ojBCmuWlw0SrzeZdikTjA3K5v4i7FNTpKygDNMhmfag8qRpanJLftma6w=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1602041443004537.6655642276976;
+ Tue, 6 Oct 2020 20:30:43 -0700 (PDT)
+Subject: Re: [PATCH] Changes to support booting NetBSD/alpha
+Message-ID: <160204144177.31697.16593383562929970168@66eaa9a8a123>
+In-Reply-To: <20201007032417.26044-1-thorpej@me.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-10-07_03:2020-10-06,
- 2020-10-07 signatures=0
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 clxscore=1011 mlxscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-2006250000 definitions=main-2010070022
-Received-SPF: pass client-ip=17.58.23.181; envelope-from=thorpej@me.com;
- helo=mr85p00im-ztdg06011201.me.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 23:24:35
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: thorpej@me.com
+Date: Tue, 6 Oct 2020 20:30:43 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 23:30:54
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -86,255 +82,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: qemu-devel@nongnu.org
+Cc: thorpej@me.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Along with the previous patch set for qemu-palcode, these changes
-allow NetBSD/alpha to run in qemu-system-alpha.
-
-- Allow a the minimum PCI device number to be passed to typhoon_init().
-  Use this to specify a minimum PCI device number of 1 in the Clipper
-  system emulation, since that's the lowest PCI device number with
-  valid interrupt mappings on that system.
-- Instead of passing just the CPU count in trap_arg2, also pass other
-  configuration information.  Define the first config bit (bit 6) to
-  reflect the "-nographic" option; PALcode will use this to initialize
-  the Console Terminal Block to specify serial console.
-- Attach a minimal i82378 SIO PCI node; some operating systems won't
-  scan for ISA devices unless a PCI-ISA bridge is detected.  Real hardware
-  would have had a Cypress or ALI bridge, but many Alpha models shipped
-  with a i82378, and most operating sytems are not picky about the specific
-  model.
-- Modify the mc146818rtc emulation to ensure the timer is started as soon
-  as the device is realized, and update the PF bit in REG_C even if it is
-  not going to result in raising an interrupt, as the real hardware does.
-
-Signed-off-by: Jason Thorpe <thorpej@me.com>
----
- hw/alpha/alpha_sys.h |   2 +-
- hw/alpha/dp264.c     |  16 ++++++-
- hw/alpha/typhoon.c   | 104 +++++++++++++++++++++++++++++++++++++++++--
- hw/rtc/mc146818rtc.c |   7 +++
- 4 files changed, 123 insertions(+), 6 deletions(-)
-
-diff --git a/hw/alpha/alpha_sys.h b/hw/alpha/alpha_sys.h
-index e2c02e2bbe..4835b3d5ee 100644
---- a/hw/alpha/alpha_sys.h
-+++ b/hw/alpha/alpha_sys.h
-@@ -11,7 +11,7 @@
- 
- 
- PCIBus *typhoon_init(MemoryRegion *, ISABus **, qemu_irq *, AlphaCPU *[4],
--                     pci_map_irq_fn);
-+                     pci_map_irq_fn, uint8_t devfn_min);
- 
- /* alpha_pci.c.  */
- extern const MemoryRegionOps alpha_pci_ignore_ops;
-diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
-index 4d24518d1d..de59ae78cb 100644
---- a/hw/alpha/dp264.c
-+++ b/hw/alpha/dp264.c
-@@ -72,13 +72,25 @@ static void clipper_init(MachineState *machine)
-         cpus[i] = ALPHA_CPU(cpu_create(machine->cpu_type));
-     }
- 
-+    /* arg0 -> memory size
-+       arg1 -> kernel entry point
-+       arg2 -> config word
-+
-+       Config word: bits 0-5 -> ncpus
-+		    bit  6   -> nographics option (for HWRPB CTB)
-+
-+       See init_hwrpb() in the PALcode.  */
-+
-     cpus[0]->env.trap_arg0 = ram_size;
-     cpus[0]->env.trap_arg1 = 0;
-     cpus[0]->env.trap_arg2 = smp_cpus;
-+    if (!machine->enable_graphics)
-+      cpus[0]->env.trap_arg2 |= (1 << 6);
- 
--    /* Init the chipset.  */
-+    /* Init the chipset.  Because we're using CLIPPER IRQ mappings,
-+       the minimum PCI device IdSel is 1.  */
-     pci_bus = typhoon_init(machine->ram, &isa_bus, &rtc_irq, cpus,
--                           clipper_pci_map_irq);
-+                           clipper_pci_map_irq, PCI_DEVFN(1, 0));
- 
-     /* Since we have an SRM-compatible PALcode, use the SRM epoch.  */
-     mc146818_rtc_init(isa_bus, 1900, rtc_irq);
-diff --git a/hw/alpha/typhoon.c b/hw/alpha/typhoon.c
-index a42b319812..cfe7fd5098 100644
---- a/hw/alpha/typhoon.c
-+++ b/hw/alpha/typhoon.c
-@@ -817,7 +817,8 @@ static void typhoon_alarm_timer(void *opaque)
- }
- 
- PCIBus *typhoon_init(MemoryRegion *ram, ISABus **isa_bus, qemu_irq *p_rtc_irq,
--                     AlphaCPU *cpus[4], pci_map_irq_fn sys_map_irq)
-+                     AlphaCPU *cpus[4], pci_map_irq_fn sys_map_irq,
-+                     uint8_t devfn_min)
- {
-     MemoryRegion *addr_space = get_system_memory();
-     DeviceState *dev;
-@@ -887,7 +888,7 @@ PCIBus *typhoon_init(MemoryRegion *ram, ISABus **isa_bus, qemu_irq *p_rtc_irq,
-     b = pci_register_root_bus(dev, "pci",
-                               typhoon_set_irq, sys_map_irq, s,
-                               &s->pchip.reg_mem, &s->pchip.reg_io,
--                              0, 64, TYPE_PCI_BUS);
-+                              devfn_min, 64, TYPE_PCI_BUS);
-     phb->bus = b;
-     sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
- 
-@@ -921,10 +922,21 @@ PCIBus *typhoon_init(MemoryRegion *ram, ISABus **isa_bus, qemu_irq *p_rtc_irq,
-     /* Pchip1 PCI configuration, 0x802.FE00.0000, 16MB.  */
- 
-     /* Init the ISA bus.  */
--    /* ??? Technically there should be a cy82c693ub pci-isa bridge.  */
-+    /* Init the PCI-ISA bridge.  Technically, this would have been
-+       a cy82c693ub, but a i82378 SIO was also used on many Alpha
-+       systems and is close enough.
-+
-+       ??? We are using a private, stripped down implementation of i82378
-+       so that we can handle the way the ISA interrupts are wired up on
-+       Tsunami-type systems.  We're leaving that (and the rest of the board
-+       peripheral setup) untoucned; we merely need to instantiate the PCI
-+       device node for the bridge, so that operating systems that expect
-+       it to be there will see it.  */
-     {
-         qemu_irq *isa_irqs;
- 
-+        pci_create_simple(b, PCI_DEVFN(7, 0), "i82378-typhoon");
-+
-         *isa_bus = isa_bus_new(NULL, get_system_memory(), &s->pchip.reg_io,
-                                &error_abort);
-         isa_irqs = i8259_init(*isa_bus,
-@@ -955,10 +967,96 @@ static const TypeInfo typhoon_iommu_memory_region_info = {
-     .class_init = typhoon_iommu_memory_region_class_init,
- };
- 
-+/* The following was copied from hw/isa/i82378.c and modified to provide
-+   only the minimal PCI device node.  */
-+
-+/*                            
-+ * QEMU Intel i82378 emulation (PCI to ISA bridge) 
-+ *                            
-+ * Copyright (c) 2010-2011 Herv\xc3\xa9 Poussineau
-+ *  
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *  
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *     
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ */    
-+
-+#include "migration/vmstate.h"
-+
-+#define TYPE_I82378 "i82378-typhoon"
-+#define I82378(obj) \
-+    OBJECT_CHECK(I82378State, (obj), TYPE_I82378)
-+
-+typedef struct I82378State {
-+    PCIDevice parent_obj;
-+} I82378State;
-+
-+static const VMStateDescription vmstate_i82378 = {
-+    .name = "pci-i82378-typhoon",
-+    .version_id = 0,
-+    .minimum_version_id = 0,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_PCI_DEVICE(parent_obj, I82378State), 
-+        VMSTATE_END_OF_LIST()
-+    },                        
-+};                            
-+
-+static void i82378_realize(PCIDevice *pci, Error **errp)
-+{
-+    uint8_t *pci_conf;
-+ 
-+    pci_conf = pci->config;
-+    pci_set_word(pci_conf + PCI_COMMAND,
-+                 PCI_COMMAND_IO | PCI_COMMAND_MEMORY | PCI_COMMAND_MASTER);
-+    pci_set_word(pci_conf + PCI_STATUS,
-+                 PCI_STATUS_DEVSEL_MEDIUM);
-+ 
-+    pci_config_set_interrupt_pin(pci_conf, 1); /* interrupt pin 0 */
-+}
-+
-+static void i82378_init(Object *obj)
-+{
-+}      
-+
-+static void i82378_class_init(ObjectClass *klass, void *data)
-+{   
-+    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    k->realize = i82378_realize; 
-+    k->vendor_id = PCI_VENDOR_ID_INTEL;
-+    k->device_id = PCI_DEVICE_ID_INTEL_82378;
-+    k->revision = 0x03;
-+    k->class_id = PCI_CLASS_BRIDGE_ISA;
-+    dc->vmsd = &vmstate_i82378;
-+    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-+}                             
-+
-+static const TypeInfo i82378_typhoon_type_info = {
-+    .name = TYPE_I82378,
-+    .parent = TYPE_PCI_DEVICE,
-+    .instance_size = sizeof(I82378State),
-+    .instance_init = i82378_init,
-+    .class_init = i82378_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
-+        { },     
-+    },
-+};  
-+
- static void typhoon_register_types(void)
- {
-     type_register_static(&typhoon_pcihost_info);
-     type_register_static(&typhoon_iommu_memory_region_info);
-+    type_register_static(&i82378_typhoon_type_info);
- }
- 
- type_init(typhoon_register_types)
-diff --git a/hw/rtc/mc146818rtc.c b/hw/rtc/mc146818rtc.c
-index 7a38540cb9..596876cb43 100644
---- a/hw/rtc/mc146818rtc.c
-+++ b/hw/rtc/mc146818rtc.c
-@@ -155,9 +155,15 @@ static uint32_t rtc_periodic_clock_ticks(RTCState *s)
- {
-     int period_code;
- 
-+#if 0
-+    /*
-+     * Real hardware sets the PF bit rergardless if it actually
-+     * raises an interrupt.
-+     */
-     if (!(s->cmos_data[RTC_REG_B] & REG_B_PIE)) {
-         return 0;
-      }
-+#endif
- 
-     period_code = s->cmos_data[RTC_REG_A] & 0x0f;
- 
-@@ -944,6 +950,7 @@ static void rtc_realizefn(DeviceState *dev, Error **errp)
-     }
- 
-     s->periodic_timer = timer_new_ns(rtc_clock, rtc_periodic_timer, s);
-+    periodic_timer_update(s, qemu_clock_get_ns(rtc_clock), 0, true);
-     s->update_timer = timer_new_ns(rtc_clock, rtc_update_timer, s);
-     check_update_timer(s);
- 
--- 
-2.28.0
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMTAwNzAzMjQxNy4yNjA0
+NC0xLXRob3JwZWpAbWUuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUgc29t
+ZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5mb3Jt
+YXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMDEwMDcwMzI0MTcuMjYwNDQtMS10
+aG9ycGVqQG1lLmNvbQpTdWJqZWN0OiBbUEFUQ0hdIENoYW5nZXMgdG8gc3VwcG9ydCBib290aW5n
+IE5ldEJTRC9hbHBoYQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQg
+cmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNr
+cGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
+aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczov
+L2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0
+Y2hldy8yMDIwMTAwNzAzMjQxNy4yNjA0NC0xLXRob3JwZWpAbWUuY29tIC0+IHBhdGNoZXcvMjAy
+MDEwMDcwMzI0MTcuMjYwNDQtMS10aG9ycGVqQG1lLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFu
+Y2ggJ3Rlc3QnCmEzYzkyZDEgQ2hhbmdlcyB0byBzdXBwb3J0IGJvb3RpbmcgTmV0QlNEL2FscGhh
+Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFk
+aW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojNTE6IEZJTEU6IGh3L2FscGhhL2RwMjY0LmM6NzU6
+CisgICAgLyogYXJnMCAtPiBtZW1vcnkgc2l6ZQoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNl
+ICogb24gc3Vic2VxdWVudCBsaW5lcwojNTI6IEZJTEU6IGh3L2FscGhhL2RwMjY0LmM6NzY6Cisg
+ICAgLyogYXJnMCAtPiBtZW1vcnkgc2l6ZQorICAgICAgIGFyZzEgLT4ga2VybmVsIGVudHJ5IHBv
+aW50CgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM1NjogRklMRTog
+aHcvYWxwaGEvZHAyNjQuYzo4MDoKK15JXkkgICAgYml0ICA2ICAgLT4gbm9ncmFwaGljcyBvcHRp
+b24gKGZvciBIV1JQQiBDVEIpJAoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgdHJhaWxp
+bmcgKi8gb24gYSBzZXBhcmF0ZSBsaW5lCiM1ODogRklMRTogaHcvYWxwaGEvZHAyNjQuYzo4MjoK
+KyAgICAgICBTZWUgaW5pdF9od3JwYigpIGluIHRoZSBQQUxjb2RlLiAgKi8KCkVSUk9SOiBzdXNw
+ZWN0IGNvZGUgaW5kZW50IGZvciBjb25kaXRpb25hbCBzdGF0ZW1lbnRzICg0LCA2KQojNjM6IEZJ
+TEU6IGh3L2FscGhhL2RwMjY0LmM6ODc6CisgICAgaWYgKCFtYWNoaW5lLT5lbmFibGVfZ3JhcGhp
+Y3MpCisgICAgICBjcHVzWzBdLT5lbnYudHJhcF9hcmcyIHw9ICgxIDw8IDYpOwoKRVJST1I6IGJy
+YWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNjM6
+IEZJTEU6IGh3L2FscGhhL2RwMjY0LmM6ODc6CisgICAgaWYgKCFtYWNoaW5lLT5lbmFibGVfZ3Jh
+cGhpY3MpClsuLi5dCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9u
+IGEgc2VwYXJhdGUgbGluZQojNjc6IEZJTEU6IGh3L2FscGhhL2RwMjY0LmM6OTA6CisgICAgLyog
+SW5pdCB0aGUgY2hpcHNldC4gIEJlY2F1c2Ugd2UncmUgdXNpbmcgQ0xJUFBFUiBJUlEgbWFwcGlu
+Z3MsCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgKiBvbiBzdWJzZXF1ZW50IGxpbmVzCiM2
+ODogRklMRTogaHcvYWxwaGEvZHAyNjQuYzo5MToKKyAgICAvKiBJbml0IHRoZSBjaGlwc2V0LiAg
+QmVjYXVzZSB3ZSdyZSB1c2luZyBDTElQUEVSIElSUSBtYXBwaW5ncywKKyAgICAgICB0aGUgbWlu
+aW11bSBQQ0kgZGV2aWNlIElkU2VsIGlzIDEuICAqLwoKV0FSTklORzogQmxvY2sgY29tbWVudHMg
+dXNlIGEgdHJhaWxpbmcgKi8gb24gYSBzZXBhcmF0ZSBsaW5lCiM2ODogRklMRTogaHcvYWxwaGEv
+ZHAyNjQuYzo5MToKKyAgICAgICB0aGUgbWluaW11bSBQQ0kgZGV2aWNlIElkU2VsIGlzIDEuICAq
+LwoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRl
+IGxpbmUKIzEwMzogRklMRTogaHcvYWxwaGEvdHlwaG9vbi5jOjkyNToKKyAgICAvKiBJbml0IHRo
+ZSBQQ0ktSVNBIGJyaWRnZS4gIFRlY2huaWNhbGx5LCB0aGlzIHdvdWxkIGhhdmUgYmVlbgoKV0FS
+TklORzogQmxvY2sgY29tbWVudHMgdXNlICogb24gc3Vic2VxdWVudCBsaW5lcwojMTA0OiBGSUxF
+OiBody9hbHBoYS90eXBob29uLmM6OTI2OgorICAgIC8qIEluaXQgdGhlIFBDSS1JU0EgYnJpZGdl
+LiAgVGVjaG5pY2FsbHksIHRoaXMgd291bGQgaGF2ZSBiZWVuCisgICAgICAgYSBjeTgyYzY5M3Vi
+LCBidXQgYSBpODIzNzggU0lPIHdhcyBhbHNvIHVzZWQgb24gbWFueSBBbHBoYQoKV0FSTklORzog
+QmxvY2sgY29tbWVudHMgdXNlIGEgdHJhaWxpbmcgKi8gb24gYSBzZXBhcmF0ZSBsaW5lCiMxMTI6
+IEZJTEU6IGh3L2FscGhhL3R5cGhvb24uYzo5MzQ6CisgICAgICAgaXQgdG8gYmUgdGhlcmUgd2ls
+bCBzZWUgaXQuICAqLwoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBv
+biBhIHNlcGFyYXRlIGxpbmUKIzEyNTogRklMRTogaHcvYWxwaGEvdHlwaG9vbi5jOjk3MDoKKy8q
+IFRoZSBmb2xsb3dpbmcgd2FzIGNvcGllZCBmcm9tIGh3L2lzYS9pODIzNzguYyBhbmQgbW9kaWZp
+ZWQgdG8gcHJvdmlkZQoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlICogb24gc3Vic2VxdWVu
+dCBsaW5lcwojMTI2OiBGSUxFOiBody9hbHBoYS90eXBob29uLmM6OTcxOgorLyogVGhlIGZvbGxv
+d2luZyB3YXMgY29waWVkIGZyb20gaHcvaXNhL2k4MjM3OC5jIGFuZCBtb2RpZmllZCB0byBwcm92
+aWRlCisgICBvbmx5IHRoZSBtaW5pbWFsIFBDSSBkZXZpY2Ugbm9kZS4gICovCgpXQVJOSU5HOiBC
+bG9jayBjb21tZW50cyB1c2UgYSB0cmFpbGluZyAqLyBvbiBhIHNlcGFyYXRlIGxpbmUKIzEyNjog
+RklMRTogaHcvYWxwaGEvdHlwaG9vbi5jOjk3MToKKyAgIG9ubHkgdGhlIG1pbmltYWwgUENJIGRl
+dmljZSBub2RlLiAgKi8KCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMxMjg6IEZJTEU6IGh3
+L2FscGhhL3R5cGhvb24uYzo5NzM6CisvKiAgICAgICAgICAgICAgICAgICAgICAgICAgICAkCgpF
+UlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMTI5OiBGSUxFOiBody9hbHBoYS90eXBob29uLmM6
+OTc0OgorICogUUVNVSBJbnRlbCBpODIzNzggZW11bGF0aW9uIChQQ0kgdG8gSVNBIGJyaWRnZSkg
+JAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzEzMDogRklMRTogaHcvYWxwaGEvdHlwaG9v
+bi5jOjk3NToKKyAqICAgICAgICAgICAgICAgICAgICAgICAgICAgICQKCkVSUk9SOiB0cmFpbGlu
+ZyB3aGl0ZXNwYWNlCiMxMzI6IEZJTEU6IGh3L2FscGhhL3R5cGhvb24uYzo5Nzc6CisgKiAgJAoK
+RVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzEzNzogRklMRTogaHcvYWxwaGEvdHlwaG9vbi5j
+Ojk4MjoKKyAqICAkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMTQyOiBGSUxFOiBody9h
+bHBoYS90eXBob29uLmM6OTg3OgorICogICAgICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNl
+CiMxNDU6IEZJTEU6IGh3L2FscGhhL3R5cGhvb24uYzo5OTA6CisgKi8gICAgJAoKRVJST1I6IHRy
+YWlsaW5nIHdoaXRlc3BhY2UKIzE2MjogRklMRTogaHcvYWxwaGEvdHlwaG9vbi5jOjEwMDc6Cisg
+ICAgICAgIFZNU1RBVEVfUENJX0RFVklDRShwYXJlbnRfb2JqLCBJODIzNzhTdGF0ZSksICQKCkVS
+Uk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMxNjQ6IEZJTEU6IGh3L2FscGhhL3R5cGhvb24uYzox
+MDA5OgorICAgIH0sICAgICAgICAgICAgICAgICAgICAgICAgJAoKRVJST1I6IHRyYWlsaW5nIHdo
+aXRlc3BhY2UKIzE2NTogRklMRTogaHcvYWxwaGEvdHlwaG9vbi5jOjEwMTA6Cit9OyAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMTcwOiBG
+SUxFOiBody9hbHBoYS90eXBob29uLmM6MTAxNToKKyAkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVz
+cGFjZQojMTc2OiBGSUxFOiBody9hbHBoYS90eXBob29uLmM6MTAyMToKKyAkCgpFUlJPUjogdHJh
+aWxpbmcgd2hpdGVzcGFjZQojMTgyOiBGSUxFOiBody9hbHBoYS90eXBob29uLmM6MTAyNzoKK30g
+ICAgICAkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMTg1OiBGSUxFOiBody9hbHBoYS90
+eXBob29uLmM6MTAzMDoKK3sgICAkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMTg5OiBG
+SUxFOiBody9hbHBoYS90eXBob29uLmM6MTAzNDoKKyAgICBrLT5yZWFsaXplID0gaTgyMzc4X3Jl
+YWxpemU7ICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMxOTY6IEZJTEU6IGh3L2FscGhh
+L3R5cGhvb24uYzoxMDQxOgorfSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJAoKRVJST1I6
+IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzIwNjogRklMRTogaHcvYWxwaGEvdHlwaG9vbi5jOjEwNTE6
+CisgICAgICAgIHsgfSwgICAgICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMyMDg6IEZJ
+TEU6IGh3L2FscGhhL3R5cGhvb24uYzoxMDUzOgorfTsgICQKCkVSUk9SOiBpZiB0aGlzIGNvZGUg
+aXMgcmVkdW5kYW50IGNvbnNpZGVyIHJlbW92aW5nIGl0CiMyMjY6IEZJTEU6IGh3L3J0Yy9tYzE0
+NjgxOHJ0Yy5jOjE1ODoKKyNpZiAwCgp0b3RhbDogMjIgZXJyb3JzLCAxMiB3YXJuaW5ncywgMTky
+IGxpbmVzIGNoZWNrZWQKCkNvbW1pdCBhM2M5MmQxYWE1ZTYgKENoYW5nZXMgdG8gc3VwcG9ydCBi
+b290aW5nIE5ldEJTRC9hbHBoYSkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
+SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
+IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBV
+VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxv
+ZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDEwMDcwMzI0MTcu
+MjYwNDQtMS10aG9ycGVqQG1lLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4K
+LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0
+Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
+ZGhhdC5jb20=
 
