@@ -2,129 +2,87 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FD1BC4363C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 19:29:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D24DC4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 19:31:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D7AC2076B
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 19:29:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C547D2076B
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 19:31:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="mlepZO6U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D7AC2076B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lKsQUtbZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C547D2076B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQF7x-0001dY-HM
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 15:29:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54964)
+	id 1kQF9Z-0003Yq-EE
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 15:31:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55188)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kQF6r-0000yG-7H; Wed, 07 Oct 2020 15:28:21 -0400
-Received: from mail-vi1eur05on2118.outbound.protection.outlook.com
- ([40.107.21.118]:4000 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kQF6n-0007y2-C5; Wed, 07 Oct 2020 15:28:20 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NIGkFqQ6ENWhyEGO4IZx9BbYRFq1a+VCKhaM3CK7S4I8uitfqlGHzoGJ01LjYMCkqdJKlQ1bBZhF+piqKGd5rv4Ym5T2BxrJ4rIHEQ0VIMUVLCMOekEP4xkksXvAyieEJ2HBV3gZYJ7lyc3ITYhKUXyH8qKW1YK5PtB1RKMze4qdRjaP1csFcgEV4uBKBRpd9kww72WXoj6FlnclsWbxQF1ftHMh3PgRufDfU4tTm6C2V/XMfcuNEnTEYFzXl0bhmeNG4l618M4gNLvetcl/481yh94c4weeXeJKynSX5MLO2TEEbWEyiq5x+HmrOlhx5Q7e8AF3brwfVCbQeFOgCQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=q/c5/QL03rbnAhbxPYiLN0Z6YvdpgD7EfyQYy0s9Swo=;
- b=gCvzqEsjqcmXR39n95fQ6lrG/+sJgCW5cxrCHW4OSIpZKKNQIKeD5SYoW5McA9EnTMPcTHRmjajsbWjNZ5rnD4kOPf0JIfOkl1/yhE0UswcgEDovlQ/sVek0P+SHaRtlBlZuiNxoQ8VWhCjR2WLwN7b+nLM/nhYGqLV+N3oqCjpGYmPXrZkqeiFQvVILYN8ztKouxNxzeR/+nnNQJZFgd4RgGzEEhCmb2Ea1Poo1geHwjDAwumJyy13sLeln3TZFtM67hYv4UteUtq+D+wJNxf41lynDhGQvfs+f6eR5YLOimRB8+75BPBpaVVEe8F9u51Bn8VqfkQkfXY8Slx1JYA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=q/c5/QL03rbnAhbxPYiLN0Z6YvdpgD7EfyQYy0s9Swo=;
- b=mlepZO6UXsMwQ4FmQh3eGEN6xH3gb9SxjZVFYDc108vbUVNuvR1BtSGWlpo7ECzL/6gkQFrk0SRn4JtCESQGHCXAR2mnTHIFUP/CXq88yLHJl1EU0XyhCyE6vGLBxD3HXZZOyKlZdmgSvrplXtKKCg986jQJwZZQmhQcrzxB0wA=
-Authentication-Results: openvz.org; dkim=none (message not signed)
- header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB5254.eurprd08.prod.outlook.com (2603:10a6:20b:d6::15)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3433.37; Wed, 7 Oct
- 2020 19:28:13 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3433.045; Wed, 7 Oct 2020
- 19:28:13 +0000
-Subject: Re: [PATCH v10 6/9] copy-on-read: skip non-guest reads if no copy
- needed
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com,
- stefanha@redhat.com, fam@euphon.net, jsnow@redhat.com, armbru@redhat.com,
- eblake@redhat.com, den@openvz.org
-References: <1601383109-110988-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1601383109-110988-7-git-send-email-andrey.shinkevich@virtuozzo.com>
- <531a938b-4b76-c506-59be-eafc1ea85159@virtuozzo.com>
- <de411799-a8a1-4bff-a48d-2692cc29be61@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <e4153b7f-21ed-1e3e-b7e9-414bd1a4f11b@virtuozzo.com>
-Date: Wed, 7 Oct 2020 22:28:11 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
-In-Reply-To: <de411799-a8a1-4bff-a48d-2692cc29be61@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [185.215.60.87]
-X-ClientProxiedBy: AM0PR04CA0091.eurprd04.prod.outlook.com
- (2603:10a6:208:be::32) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kQF8W-0002NT-TY; Wed, 07 Oct 2020 15:30:04 -0400
+Received: from mail-pg1-x532.google.com ([2607:f8b0:4864:20::532]:46527)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kQF8U-00086Q-9e; Wed, 07 Oct 2020 15:30:04 -0400
+Received: by mail-pg1-x532.google.com with SMTP id 34so2076230pgo.13;
+ Wed, 07 Oct 2020 12:30:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Irdtj8q1RD0LQlLWbA57KSRDKqcckx9crXDBvCEWy6o=;
+ b=lKsQUtbZK/DO0Z3wVfDs8Btysz/qTPzOxk68evJw/G+V9OaSSZzRfRc6Q9fTbepWVN
+ cX6iD7s+G4noHFIb/hcprSPuLmJW6S7923H/Ea2VZqARoVCxspV10TOVENAcEsJj6zCK
+ c90vt1Vet8YQjutaSMvL/jVHS5kmp30A69s1Nzungt2G2XoHJNlPvKbPE8bdCsLbPFy/
+ qq7gCwHO0JvAXVZxv63Q/c3r1I9eV/ZtYX4ThXCVzBOjrwAwm8cALuWTDh4BQs05iQDM
+ SPRYjM+tbaCDPEp8kwdfgk2DFwVUJzDhNxRABW9GnWSOuVlQ1xPEqdpl1AAblkdLviKl
+ mW6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Irdtj8q1RD0LQlLWbA57KSRDKqcckx9crXDBvCEWy6o=;
+ b=bbkcu7R2h6XEbuCWM9AyCd3MpX7IzSWg6INkI53GngsP5GoBsJK0Kbx6IEOxlmjhHt
+ PJJG6hWcLO4tm+0z/2bC4e39t70z3Elfc/hQpUTZbZHFWJzQwy3pMSz/m/YESWeZ3e2r
+ mItPXOT1TFqterBBz6v4fnIu4qQ2stdp30/wyc2f4bopU9itOsha4wr7Xtbvn2YhAkgc
+ zN5CzfdLgWNijNEGk1TOmwnaeFuGHJjiBR6j71f97qzEcrkFE4JRWQ7+gwDZVTkBxS3H
+ u939utKoXMVvuTeOwsx6oXfTXyyreWvn+A/fWj29ttc93cCga3BrboK/c0CpoO38/EpZ
+ //hQ==
+X-Gm-Message-State: AOAM532SMsGc8D1Hhe9JthR+0n3fEUNMUwdqtbP3t+/ef07lHMWOUcSo
+ kt3jBPtwV5F8SMDGlpv5NMVZCy+vet4LAQ==
+X-Google-Smtp-Source: ABdhPJzbDrktx04Y6h0y8NbnZLEe2lUBZrYMVhJA5Q5axeh5ucEvy3oGPYkqVkWe3GTU26PrtqWu3A==
+X-Received: by 2002:a65:63ca:: with SMTP id n10mr4466327pgv.271.1602098999458; 
+ Wed, 07 Oct 2020 12:29:59 -0700 (PDT)
+Received: from localhost.localdomain ([103.94.185.75])
+ by smtp.googlemail.com with ESMTPSA id q15sm4397797pgr.27.2020.10.07.12.29.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 07 Oct 2020 12:29:58 -0700 (PDT)
+From: Yonggang Luo <luoyonggang@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v7] scripts: Convert qemu-version.sh to qemu-version.py
+Date: Thu,  8 Oct 2020 03:29:40 +0800
+Message-Id: <20201007192940.280-1-luoyonggang@gmail.com>
+X-Mailer: git-send-email 2.28.0.windows.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.5] (185.215.60.87) by
- AM0PR04CA0091.eurprd04.prod.outlook.com (2603:10a6:208:be::32) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3455.23 via Frontend Transport; Wed, 7 Oct 2020 19:28:12 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: bcf9fcdd-4605-451c-4eaa-08d86af721ce
-X-MS-TrafficTypeDiagnostic: AM6PR08MB5254:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB5254B311B158AB6AF942841FC10A0@AM6PR08MB5254.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ufdrF5Wh/NedON1AVQPWNr2nJlBqKZmgeHIsJZ0cTTmXJ7USIvtKyVBsmCwytjn/+3iYuRF2ZI3hJJc2YJ9CnuoIv/E4zCxVXTB019RmdiU8MYHGNIRWIFGMEfHD4KfQvt6mza9LQz0RorPfSD4S8AguXgzzsK4Z4a7TRdgFGth0ycQRvne7OZEixNsKivMZnApOVfAtPYfDduGLSowa5inr5goiH6NALulIC/fji1vLMavOEXBjFcUjrAUYvABEEYhACvqTPlFHEDW8nmkLmDSC6YMX7lsBOZjc9mU5uFu+FBlQzCWrMccPHlSgCerNiWulgat9JePmBIl+WHcsYGtN4rFayBJ20z2x7mLyaLAQHKQzkagjV8/o2ZjyUzyU
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(346002)(39850400004)(396003)(376002)(136003)(186003)(16526019)(4326008)(8936002)(31696002)(26005)(66556008)(6486002)(53546011)(8676002)(66476007)(66946007)(52116002)(478600001)(956004)(2906002)(36756003)(83380400001)(31686004)(5660300002)(16576012)(316002)(86362001)(2616005)(107886003)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 4zq9SsaEUxvQsPNaOPiQqwUSisCaZvOJWhzmR7mFoPXTxxbVIwZVztsk3xdKM5x0H6+mXUbynpXkj337Obmfv68m9XSykLYs9kCtukN9RAPzPbauTIUrC9ILsvKZO6bsvDgIpcG2tGLLZtpFuj63TX25ZKwJietn+r6RNzr4bJ9t1OkLsmOdqutpgljfhOINAZlSNza/qtqLADyx06UBTS8LER9T6ToMfG9Zvx0gCYENwsu7uTnTIdAhQnuAo2kVdPDbVSiux4pB4GP7Q1QpAIzWwKc4YcmrwRsnkpR+NyJORfhxSACWXYvlFiPT4HtO4ro2EzllWpO7RUtvtosl2XpnLeanDTnC6Za+vLigB3DdVdO85W07NxzrX7L7hvt3U/uPEZlizI+yExXoCqUBx2hK4dtNRmcW1WR2wxwjr0i44cibsHxufQG14cmVfrM2uCSNk2B5z03ocRKO1mZhhrfFdSGc2Em+O29LFc1dNyhR4g2m1qaeDZcMliBtvBopgEYc+oqyurVlQRZvw3Rj36DXtCrwrXnXZle72d8cmqvdU6OU2Qw0sjEm0Sggh7pID6vKn3ZpvCoMHbRXeowK9I+bGWYiS3nVQ/8q/+N7kpQBeFQWkcbd8bWe5FdkJ32uR2eHSeHAhXvvvYVMdF5Tcg==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bcf9fcdd-4605-451c-4eaa-08d86af721ce
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Oct 2020 19:28:13.0316 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Smdmm2GRqc0z4okJbAMC3CD4/W1iKGtmEQxxNmZzjxS+rU+OtCizsVOBruY+nrnmaN9jzI/+RgSA0yBmQ08vP69LTCPLHO92jS7uXZFBLoM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5254
-Received-SPF: pass client-ip=40.107.21.118;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 15:28:14
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::532;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x532.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -138,118 +96,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ QEMU Trivial <qemu-trivial@nongnu.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=E8=8C=85?= <f4bug@amsat.org>,
+ Yonggang Luo <luoyonggang@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-07.10.2020 22:01, Andrey Shinkevich wrote:
-> 
-> On 07.10.2020 13:06, Vladimir Sementsov-Ogievskiy wrote:
->> 29.09.2020 15:38, Andrey Shinkevich wrote:
->>> If the flag BDRV_REQ_PREFETCH was set, pass it further to the
->>> COR-driver to skip unneeded reading. It can be taken into account for
->>> the COR-algorithms optimization. That check is being made during the
->>> block stream job by the moment.
->>>
->>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
->>> ---
->>>   block/copy-on-read.c | 14 ++++++++++----
->>>   block/io.c           |  2 +-
->>>   2 files changed, 11 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/block/copy-on-read.c b/block/copy-on-read.c
->>> index f53f7e0..5389dca 100644
->>> --- a/block/copy-on-read.c
->>> +++ b/block/copy-on-read.c
->>> @@ -145,10 +145,16 @@ static int coroutine_fn cor_co_preadv_part(BlockDriverState *bs,
->>>               }
->>>           }
->>> -        ret = bdrv_co_preadv_part(bs->file, offset, n, qiov, qiov_offset,
->>> -                                  local_flags);
->>> -        if (ret < 0) {
->>> -            return ret;
->>> +        if ((flags & BDRV_REQ_PREFETCH) &
->>
->> BDRV_REQ_PREFETCH is documented to be only used with BDRV_REQ_COPY_ON_READ. But here
->> BDRV_REQ_COPY_ON_READ appears intermediately. We should change documentation in block.h
->> in a separate patch (and probably code in bdrv_aligned_preadv())
->>
-> 
-> OK, we will come here without the BDRV_REQ_PREFETCH flag set.
+The sh script are harder to maintain for compatible different
+xsh environment so convert it to python script
+Also incorporate the fixes in
+https://patchew.org/QEMU/20200929143654.518157-1-marcandre.lureau@redhat.com/
+Using --match=v* instead of --match 'v*' for speed up the git version
+retrieve, and also resolve the Windows wildcard match problem. only when the
+.git parallel folder have filenames start with --match=v such as --match=v123
+would cause issue, and that's rare.
 
-flag BDRV_REQ_PREFETCH should be set in stream job. Where should it be handled, I don't follow?
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+Message-Id: <20201006112139.700-1-luoyonggang@gmail.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ meson.build             |  2 +-
+ scripts/qemu-version.py | 33 +++++++++++++++++++++++++++++++++
+ scripts/qemu-version.sh | 25 -------------------------
+ 3 files changed, 34 insertions(+), 26 deletions(-)
+ create mode 100644 scripts/qemu-version.py
+ delete mode 100755 scripts/qemu-version.sh
 
-> To differ between guest reads and the stream job ones, we would set it here by checking for the qiov NULL pointer:
-> 
-> 
-> diff --git a/block/copy-on-read.c b/block/copy-on-read.c
-> index 4e3b1c5..df2c2ab 100644
-> --- a/block/copy-on-read.c
-> +++ b/block/copy-on-read.c
-> @@ -144,6 +144,9 @@ static int coroutine_fn cor_co_preadv_part(BlockDriverState *bs,
->                                             n, &n);
->               if (ret) {
->                   local_flags |= BDRV_REQ_COPY_ON_READ;
-> +                if (!qiov) {
-> +                    local_flags |= BDRV_REQ_PREFETCH;
-
-if qiov is NULL, this means that flags must include BDRV_REQ_PREFETCH. local_flags should inherit flags I think.
-
-> +                }
->               }
->           }
-> 
-> Andrey
-> 
->>> +            !(local_flags & BDRV_REQ_COPY_ON_READ)) {
->>> +            /* Skip non-guest reads if no copy needed */
->>> +        } else {
->>> +
->>
->> extra new-line ?
->>
->>> +            ret = bdrv_co_preadv_part(bs->file, offset, n, qiov, qiov_offset,
->>> +                                      local_flags);
->>> +            if (ret < 0) {
->>> +                return ret;
->>> +            }
->>>           }
->>>           offset += n;
->>> diff --git a/block/io.c b/block/io.c
->>> index 11df188..62b75a5 100644
->>> --- a/block/io.c
->>> +++ b/block/io.c
->>> @@ -1388,7 +1388,7 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
->>>               qemu_iovec_init_buf(&local_qiov, bounce_buffer, pnum);
->>>               ret = bdrv_driver_preadv(bs, cluster_offset, pnum,
->>> -                                     &local_qiov, 0, 0);
->>> +                                     &local_qiov, 0, flags & BDRV_REQ_PREFETCH);
->>
->> Why? In this place we want to read. We'll write back the data a few lines below. What will we write,
->> if underlying driver decide to do nothing because of BDRV_REQ_PREFETCH?
->>
-> 
-> See my comment above please.
-
-Anyway, BDRV_REQ_PREFETCH here is wrong. You should not pass any qiov, if you set BDRV_REQ_PREFETCH flag.
-
-If we come to bdrv_co_do_copy_on_readv, it means that we have COPY_ON_READ flag. And therefore, we will handle
-PREFETCH and COPY_ON_READ here in generic layer. And therefore, we shouldn't pass them to driver.
-
-On the contrary, if we have PREFETCH flag in bdrv_co_aligned_preadv, but don't have COPY_ON_READ in the same time,
-this means that we must pass PREFETCH flag to the driver if it supports it. And do nothing if driver
-doesn't support PREFETCH. That's how I see it.
-
-> 
->>>               if (ret < 0) {
->>>                   goto err;
->>>               }
->>>
->>
->>
-
-
+diff --git a/meson.build b/meson.build
+index 26230614ba..1d3bb25bc6 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1132,7 +1132,7 @@ tracetool = [
+    '--backend=' + config_host['TRACE_BACKENDS']
+ ]
+ 
+-qemu_version_cmd = [find_program('scripts/qemu-version.sh'),
++qemu_version_cmd = [find_program('scripts/qemu-version.py'),
+                     meson.current_source_dir(),
+                     config_host['PKGVERSION'], meson.project_version()]
+ qemu_version = custom_target('qemu-version.h',
+diff --git a/scripts/qemu-version.py b/scripts/qemu-version.py
+new file mode 100644
+index 0000000000..52b23ceb01
+--- /dev/null
++++ b/scripts/qemu-version.py
+@@ -0,0 +1,33 @@
++#!/usr/bin/env python3
++
++#
++# Script for retrieve qemu git version information
++#
++# Authors:
++#  Yonggang Luo <luoyonggang@gmail.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2
++# or, at your option, any later version.  See the COPYING file in
++# the top-level directory.
++
++import sys
++import subprocess
++import os, os.path
++
++def main(_program, dir, pkgversion, version, *unused):
++    os.chdir(dir)
++    if not pkgversion and os.path.exists('.git'):
++        pc = subprocess.run(['git', 'describe', '--match=v*', '--always'],
++                            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, encoding='utf8', shell=False)
++        if pc.returncode == 0:
++            pkgversion = pc.stdout.strip()
++
++    fullversion = version
++    if pkgversion:
++        fullversion = "{} ({})".format(version, pkgversion)
++
++    print('#define QEMU_PKGVERSION "%s"' % pkgversion)
++    print('#define QEMU_FULL_VERSION "%s"' % fullversion)
++
++if __name__ == "__main__":
++    main(*sys.argv)
+diff --git a/scripts/qemu-version.sh b/scripts/qemu-version.sh
+deleted file mode 100755
+index 03128c56a2..0000000000
+--- a/scripts/qemu-version.sh
++++ /dev/null
+@@ -1,25 +0,0 @@
+-#!/bin/sh
+-
+-set -eu
+-
+-dir="$1"
+-pkgversion="$2"
+-version="$3"
+-
+-if [ -z "$pkgversion" ]; then
+-    cd "$dir"
+-    if [ -e .git ]; then
+-        pkgversion=$(git describe --match 'v*' --dirty | echo "")
+-    fi
+-fi
+-
+-if [ -n "$pkgversion" ]; then
+-    fullversion="$version ($pkgversion)"
+-else
+-    fullversion="$version"
+-fi
+-
+-cat <<EOF
+-#define QEMU_PKGVERSION "$pkgversion"
+-#define QEMU_FULL_VERSION "$fullversion"
+-EOF
 -- 
-Best regards,
-Vladimir
+2.28.0.windows.1
+
 
