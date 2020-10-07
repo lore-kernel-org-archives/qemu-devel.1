@@ -2,90 +2,94 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEB79C41604
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 15:01:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F13C47095
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 15:05:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 109A220797
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 15:01:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 17D4C21582
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 15:05:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fy4M7FIm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 109A220797
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UEu3ZyKN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17D4C21582
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQAwk-0003NC-RU
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 11:01:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48096)
+	id 1kQB0a-0006Aj-Ql
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 11:05:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48966)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQAqG-00065D-TU
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 10:54:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36204)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQAqE-0006sR-Ky
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 10:54:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602082493;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ddiuB38payEMwfEes7mKTrBeZFuSQ93aiV4yYQX0ChI=;
- b=fy4M7FImupdqcuBpBtFuzvjqV/EcV115DgCfrqllrap0F/aew6XlcOFdopKp1wcyipe5bm
- iHLM5nv2eKc+gvq5F77kAqMJWvdCDC577VTSB6tmB3xEbnxYKN0KR8rJW88X3wVoSSR00u
- +d4G5+a2+Q4xoKUPpTtAv676tC/mXys=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-26-Df6W-xGjPv6yqTMgr99KlQ-1; Wed, 07 Oct 2020 10:54:51 -0400
-X-MC-Unique: Df6W-xGjPv6yqTMgr99KlQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E37A1835B47
- for <qemu-devel@nongnu.org>; Wed,  7 Oct 2020 14:54:50 +0000 (UTC)
-Received: from [10.10.120.38] (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 343805C1BD;
- Wed,  7 Oct 2020 14:54:50 +0000 (UTC)
-Subject: Re: [PATCH v5 08/36] qapi: delint using flake8
-To: Markus Armbruster <armbru@redhat.com>
-References: <20201005195158.2348217-1-jsnow@redhat.com>
- <20201005195158.2348217-9-jsnow@redhat.com>
- <87imbmih3d.fsf@dusky.pond.sub.org>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <699585c8-d063-b48c-05ea-dc4b231ed4b0@redhat.com>
-Date: Wed, 7 Oct 2020 10:54:49 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kQAvG-00033r-6S
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 11:00:06 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38303)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kQAvD-0007WP-VJ
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 11:00:05 -0400
+Received: by mail-wr1-x442.google.com with SMTP id n18so2572775wrs.5
+ for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 08:00:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=Qi4UiNQj5hOPKgDoPmfBZqIKb5l9fjXDNTmOGcW1hKY=;
+ b=UEu3ZyKNif7Jv9IOkVOv4Yr/eyGif40QgnhWYTYvAdEwXm2Q5pZq/aGxS97YveUEY0
+ muDcqKXHp/vK9QxAWu5ryE8753TqfJ9Gv/nbqTdlnT/GeLQr7tyy6FvGDjCSAmgGAIj/
+ CPzu0fkjhgv7ONEAbvbwkD6eymcCt4gx51Ec+PAB+YMPjAZw9qfJKsJsLFdIm2N6AHdG
+ k2hyNbVb6DQ8BAN8+8n3dqhJm8/Cs5cPecdRSadUuM7eMxtBrjT4MaMA5r3/pyRGQXaz
+ 6AABDFxs+jz3nxsdWzcCmnOI93M1KBWBUu+31d8Ft1NPcNJ06AGgUzFDMDWTd4t2mTJN
+ FCIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=Qi4UiNQj5hOPKgDoPmfBZqIKb5l9fjXDNTmOGcW1hKY=;
+ b=bhG3tONcGTy/4LA71LpKq98evEexbINBbQmfCfLFuGVwZvu3ujO7Tx/2efXPG2QSik
+ NNQiBMtlLJRx6pHeR6cpN233whUROZVAUpGyuxpIbDT+onOkKiqNvFIPI8rIUNA/T0ix
+ XB1SmpGI2ayXenwFgdnnEBdEVoUKLrGmfJURz6Etjqoge/1wK7CVVCcJ2vyGOBaHQyIO
+ 7DUfcVIu9KaYjMUPBr2K+mp/OZ2s4YVZIfqSDFRUqjWC9pK5jd79WI0HEQPodhiT5dgk
+ HGN92Kj3WeqEppgak1H2xWzhpcTQRg75ciHNSjKYa4OWR9PZZXfHuMC5OcCQ/FHU+Orq
+ mjcA==
+X-Gm-Message-State: AOAM531QlSj5F0vL4n0shdjvD/tJtiQ0tglLDQOG7abe9a+P5mnG4I8C
+ X+16afHUbOrhUmKb/gJ3sGkU98NJFf6f2w==
+X-Google-Smtp-Source: ABdhPJw5MR1jTJ2ThrMQyiVbDd5jNFo3h/iDso+gsX2x7huCon1rgdq9kjsAm4VuPRspBPs9eUXD8A==
+X-Received: by 2002:a5d:6551:: with SMTP id z17mr4010033wrv.200.1602082801321; 
+ Wed, 07 Oct 2020 08:00:01 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id f14sm3445233wrt.53.2020.10.07.07.59.59
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 07 Oct 2020 07:59:59 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 354471FF7E;
+ Wed,  7 Oct 2020 15:59:59 +0100 (BST)
+References: <20201007140103.711142-1-pbonzini@redhat.com>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] cirrus: use V=1 when running tests on FreeBSD and macOS
+In-reply-to: <20201007140103.711142-1-pbonzini@redhat.com>
+Date: Wed, 07 Oct 2020 15:59:59 +0100
+Message-ID: <87o8leytcg.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <87imbmih3d.fsf@dusky.pond.sub.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:44:56
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,155 +103,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/7/20 4:19 AM, Markus Armbruster wrote:
-> John Snow <jsnow@redhat.com> writes:
-> 
->> Petty style guide fixes and line length enforcement.  Not a big win, not
->> a big loss, but flake8 passes 100% on the qapi module, which gives us an
->> easy baseline to enforce hereafter.
->>
->> A note on the flake8 exception: flake8 will warn on *any* bare except,
->> but pylint's is context-aware and will suppress the warning if you
->> re-raise the exception.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
->> Reviewed-by: Cleber Rosa <crosa@redhat.com>
->> ---
->>   scripts/qapi/.flake8     |  2 ++
->>   scripts/qapi/commands.py |  3 ++-
->>   scripts/qapi/schema.py   |  8 +++++---
->>   scripts/qapi/visit.py    | 16 +++++++++++-----
->>   4 files changed, 20 insertions(+), 9 deletions(-)
->>   create mode 100644 scripts/qapi/.flake8
->>
->> diff --git a/scripts/qapi/.flake8 b/scripts/qapi/.flake8
->> new file mode 100644
->> index 00000000000..6b158c68b84
->> --- /dev/null
->> +++ b/scripts/qapi/.flake8
->> @@ -0,0 +1,2 @@
->> +[flake8]
->> +extend-ignore = E722  # Prefer pylint's bare-except checks to flake8's
->> diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
->> index 64ed5278f93..5dc2f5a9fa8 100644
->> --- a/scripts/qapi/commands.py
->> +++ b/scripts/qapi/commands.py
->> @@ -65,7 +65,8 @@ def gen_call(name, arg_type, boxed, ret_type):
->>   def gen_marshal_output(ret_type):
->>       return mcgen('''
->>   
->> -static void qmp_marshal_output_%(c_name)s(%(c_type)s ret_in, QObject **ret_out, Error **errp)
->> +static void qmp_marshal_output_%(c_name)s(%(c_type)s ret_in,
->> +                                QObject **ret_out, Error **errp)
->>   {
->>       Visitor *v;
->>   
->> diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
->> index 093f7a38d88..cfc52e1ae44 100644
->> --- a/scripts/qapi/schema.py
->> +++ b/scripts/qapi/schema.py
->> @@ -536,7 +536,7 @@ def set_defined_in(self, name):
->>               v.set_defined_in(name)
->>   
->>       def check(self, schema, seen):
->> -        if not self.tag_member: # flat union
->> +        if not self.tag_member:  # flat union
->>               self.tag_member = seen.get(c_name(self._tag_name))
->>               base = "'base'"
->>               # Pointing to the base type when not implicit would be
->> @@ -821,7 +821,7 @@ def __init__(self, fname):
->>           self._entity_dict = {}
->>           self._module_dict = OrderedDict()
->>           self._schema_dir = os.path.dirname(fname)
->> -        self._make_module(None) # built-ins
->> +        self._make_module(None)  # built-ins
->>           self._make_module(fname)
->>           self._predefining = True
->>           self._def_predefineds()
->> @@ -965,7 +965,9 @@ def _make_implicit_object_type(self, name, info, ifcond, role, members):
->>               # But it's not tight: the disjunction need not imply it.  We
->>               # may end up compiling useless wrapper types.
->>               # TODO kill simple unions or implement the disjunction
->> -            assert (ifcond or []) == typ._ifcond # pylint: disable=protected-access
->> +
->> +            # pylint: disable=protected-access
->> +            assert (ifcond or []) == typ._ifcond
->>           else:
->>               self._def_entity(QAPISchemaObjectType(
->>                   name, info, None, ifcond, None, None, members, None))
->> diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
->> index ea277e7704b..808410d6f1b 100644
->> --- a/scripts/qapi/visit.py
->> +++ b/scripts/qapi/visit.py
->> @@ -31,7 +31,9 @@ def gen_visit_decl(name, scalar=False):
->>       if not scalar:
->>           c_type += '*'
->>       return mcgen('''
->> -bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_type)sobj, Error **errp);
->> +
->> +bool visit_type_%(c_name)s(Visitor *v, const char *name,
->> +                 %(c_type)sobj, Error **errp);
->>   ''',
->>                    c_name=c_name(name), c_type=c_type)
->>   
->> @@ -125,7 +127,8 @@ def gen_visit_object_members(name, base, members, variants):
->>   def gen_visit_list(name, element_type):
->>       return mcgen('''
->>   
->> -bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error **errp)
->> +bool visit_type_%(c_name)s(Visitor *v, const char *name,
->> +                 %(c_name)s **obj, Error **errp)
->>   {
->>       bool ok = false;
->>       %(c_name)s *tail;
->> @@ -158,7 +161,8 @@ def gen_visit_list(name, element_type):
->>   def gen_visit_enum(name):
->>       return mcgen('''
->>   
->> -bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s *obj, Error **errp)
->> +bool visit_type_%(c_name)s(Visitor *v, const char *name,
->> +                 %(c_name)s *obj, Error **errp)
->>   {
->>       int value = *obj;
->>       bool ok = visit_type_enum(v, name, &value, &%(c_name)s_lookup, errp);
->> @@ -172,7 +176,8 @@ def gen_visit_enum(name):
->>   def gen_visit_alternate(name, variants):
->>       ret = mcgen('''
->>   
->> -bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error **errp)
->> +bool visit_type_%(c_name)s
->> +    (Visitor *v, const char *name, %(c_name)s **obj, Error **errp)
-> 
-> Please break this line the same way as the ones above:
-> 
->     bool visit_type_%(c_name)s(Visitor *v, const char *name,
->                      %(c_name)s **obj, Error **errp)
-> 
->>   {
->>       bool ok = false;
->>   
->> @@ -247,7 +252,8 @@ def gen_visit_alternate(name, variants):
->>   def gen_visit_object(name, base, members, variants):
->>       return mcgen('''
->>   
->> -bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error **errp)
->> +bool visit_type_%(c_name)s
->> +    (Visitor *v, const char *name, %(c_name)s **obj, Error **errp)
->>   {
->>       bool ok = false;
-> 
-> Likewise.
-> 
 
-Whupps. Bad conflict resolution on my part. Didn't mean to do this.
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
---js
+> Using "V=3D1" makes it easier to identify hanging tests, especially
+> since they are run with -j1.  It is already used on Windows builds,
+> do the same for FreeBSD and macOS.
+>
+> Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
+Queued to prepr/misc-testing-gitdm-plugin-fixes, thanks.
+
+> ---
+>  .cirrus.yml | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/.cirrus.yml b/.cirrus.yml
+> index d58782ce67..4d236fdefa 100644
+> --- a/.cirrus.yml
+> +++ b/.cirrus.yml
+> @@ -15,7 +15,7 @@ freebsd_12_task:
+>      - cd build
+>      - ../configure --enable-werror || { cat config.log; exit 1; }
+>      - gmake -j$(sysctl -n hw.ncpu)
+> -    - gmake -j$(sysctl -n hw.ncpu) check
+> +    - gmake -j$(sysctl -n hw.ncpu) check V=3D1
+>=20=20
+>  macos_task:
+>    osx_instance:
+> @@ -29,7 +29,7 @@ macos_task:
+>                     --extra-cflags=3D'-Wno-error=3Ddeprecated-declaration=
+s'
+>                     || { cat config.log; exit 1; }
+>      - gmake -j$(sysctl -n hw.ncpu)
+> -    - gmake check
+> +    - gmake check V=3D1
+>=20=20
+>  macos_xcode_task:
+>    osx_instance:
+> @@ -43,7 +43,7 @@ macos_xcode_task:
+>      - ../configure --extra-cflags=3D'-Wno-error=3Ddeprecated-declaration=
+s'
+>                     --enable-werror --cc=3Dclang || { cat config.log; exi=
+t 1; }
+>      - gmake -j$(sysctl -n hw.ncpu)
+> -    - gmake check
+> +    - gmake check V=3D1
+>=20=20
+>  windows_msys2_task:
+>    windows_container:
+
+
+--=20
+Alex Benn=C3=A9e
 
