@@ -2,94 +2,136 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66CA1C4363D
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 13:10:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E205EC4363D
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 13:10:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5442206F4
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 13:10:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3028C206F4
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 13:10:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hx57rpvj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5442206F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cUXvMLAA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3028C206F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ9D1-0006pK-Jz
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 09:10:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52038)
+	id 1kQ9DP-0007Y4-4D
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 09:10:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52246)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kQ9Be-0005aV-OZ
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 09:08:54 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40708)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kQ9BZ-0002PE-BF
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 09:08:54 -0400
-Received: by mail-wr1-x443.google.com with SMTP id j2so2083673wrx.7
- for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 06:08:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=YRTHziXE3efCJEmeU85Y64K3ObXF157HZlRNDQGvv5k=;
- b=hx57rpvj2MmSAGOgTRVnnOb7B0lYNKMRlbPJcdRbt9Ew4xP6FfmFxFxjE7lYfshSRx
- /ZxD9gX8KdoVkRkknR9hrQuNhZy57uarImupyvcsmdwr7AlXyFGadJeG3b1vwNN9sDrc
- b2HQjSqXJYtc4M3L8UoE7VetAhW6K4SifWip+2sbMOiqCGMMJz5zfLu0VpRAjhun23Ux
- 4C9b1Vv5PPtpUki/OkVM+raywwQqLWA0jrW48j3hz5G6/7nOxTNu+jxppgMaivxIy03I
- qkWM4skqGHeQIdA8s2ttHZebg7QluA06lDtNr+vg0Pnn3SWiZWpLw9JrulLmn5LZiPPM
- iTsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=YRTHziXE3efCJEmeU85Y64K3ObXF157HZlRNDQGvv5k=;
- b=NQQ0q6HDwy00/jRY1J8Lmz2GjTIw/cmz77IuhGLzzwzR2OLTNL/NJaUAEUnn9X+cBZ
- S2ugcJugoSKybBTaL7Sr6gaZiwTCM9zVD+kTmOlMYZrgfQnwx0x3ILwWRB6dtnwoAByq
- iSPxNDDIOw9tiWJdnQszFx7JxaBW9yjDDdkEa+lwsEHlA1/FROXUTQFGQHjt7Tzag4HL
- 5+B2y2Ve7Kfn2W9INIqAsazsFsvv65w/ymILe8MqTf+lP9pmq1NQMYq04j+REUx/fl7z
- /s7B4wEDch0TqlQHYPf7cFFqKuvZWvUxMDiecQj8et1fSNgbSTo6GNz841z0hU3E2hHY
- gdKA==
-X-Gm-Message-State: AOAM530ZQQGg/QNch3TyDoCnfDxQijxXufp+PDHeSwg47sGrkJsvUtAR
- SPzJG7ljavG4eEXoDJFBJf4ZFQ==
-X-Google-Smtp-Source: ABdhPJzgiz9g0/KxEpfHHqyWsRAx+Cf+uhu/MorLH9Ff7j+2xCeUh2Wa0k8dkNSS9a/lP613HyCmOg==
-X-Received: by 2002:adf:ea52:: with SMTP id j18mr3385255wrn.422.1602076126863; 
- Wed, 07 Oct 2020 06:08:46 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id n2sm2863811wrt.82.2020.10.07.06.08.43
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 07 Oct 2020 06:08:43 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 199311FF7E;
- Wed,  7 Oct 2020 14:08:43 +0100 (BST)
-References: <20201007105518.1019-1-luoyonggang@gmail.com>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Yonggang Luo <luoyonggang@gmail.com>
-Subject: Re: [PATCH v4 0/2] Improve cirrus msys2
-In-reply-to: <20201007105518.1019-1-luoyonggang@gmail.com>
-Date: Wed, 07 Oct 2020 14:08:43 +0100
-Message-ID: <87zh4yyyhw.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kQ9CK-0006MU-Gd
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 09:09:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27615)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kQ9CF-0002Tq-Ec
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 09:09:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602076168;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=TnTnO74i0qcbl6seTNJoV8gNdgMrWs/H46jOrtd7UZA=;
+ b=cUXvMLAAmqohrJTjsvWRzNDwXROVM0Gryn7U4PsB13YOcUXv9NDh82KRthv3hw+TdFDlQO
+ MmyKAcHAqVAeNzn/npLdrgAcmlAa6vJZkLBRCoY7fKh1o9z2/f+j/b8Nm+flrRRgWfcv8v
+ SG5074V7hZau8G3ti+eGoSDooQ2E97s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-527-8XRzcoFxPna59uPwawcdbA-1; Wed, 07 Oct 2020 09:09:25 -0400
+X-MC-Unique: 8XRzcoFxPna59uPwawcdbA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C8DA64088;
+ Wed,  7 Oct 2020 13:09:23 +0000 (UTC)
+Received: from [10.36.115.15] (ovpn-115-15.ams2.redhat.com [10.36.115.15])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 50A5210021AA;
+ Wed,  7 Oct 2020 13:09:21 +0000 (UTC)
+Subject: Re: [PATCH v1 00/20] s390x/tcg: Implement Vector enhancements
+ facility and switch to z14
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200930145523.71087-1-david@redhat.com>
+ <5f9e3398-d84c-17af-42b2-c011cb5074f3@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat GmbH
+Message-ID: <6ebc5bdf-9259-bc39-af65-c079de7e2613@redhat.com>
+Date: Wed, 7 Oct 2020 15:09:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
+In-Reply-To: <5f9e3398-d84c-17af-42b2-c011cb5074f3@linaro.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=david@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:54:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,22 +145,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- QEMU Trivial <qemu-trivial@nongnu.org>, qemu-devel@nongnu.org,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+ Cornelia Huck <cohuck@redhat.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 01.10.20 17:07, Richard Henderson wrote:
+> On 9/30/20 9:55 AM, David Hildenbrand wrote:
+>> This series adds support for the "Vector enhancements facility" and bumps
+>> the qemu CPU model tp to a stripped-down z14.
+>>
+>> I yet have to find a way to get more test coverage - looks like some of
+>> the functions aren't used anywhere yet (e.g., VECTOR FP MAXIMUM), writing
+>> unit tests to cover all functions and cases is just nasty. But I might be
+>> wrong - I'm planning to at least test basic functionality of all new added
+>> instructions.
+> 
+> This is where RISU can be helpful.  Auto-generate 100k random variations,
+> record known good results on hardware, verify that replay on qemu produces the
+> same results.
 
-Yonggang Luo <luoyonggang@gmail.com> writes:
+Makes sense, however, some corner cases (e.g., MAX(+0, -O)) still might
+have to be handled manually.
 
-> Fixes the broken msys2/mingw ci and speed it up.
+It might take me a while to address the feedback (I'm  fairly busy as
+usual ...). Thanks!
 
-Queued to testing/next, thanks.
-<snip>
+-- 
+Thanks,
 
+David / dhildenb
 
---=20
-Alex Benn=C3=A9e
 
