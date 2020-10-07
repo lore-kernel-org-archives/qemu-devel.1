@@ -2,89 +2,65 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
+	SPF_HELO_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43A37C47095
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 13:22:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7D64C4363D
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 13:40:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7A6921548
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 13:22:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hXgNQ3TJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7A6921548
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 108E82087D
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 13:40:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 108E82087D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56112 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ9Ov-0004wL-Kp
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 09:22:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54688)
+	id 1kQ9gM-0001ST-Ne
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 09:40:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58884)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQ9Ni-000449-Py
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 09:21:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27383)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQ9Nb-000409-KN
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 09:21:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602076873;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=gjChceSm+R2EM26/f1k5OZlxGqPtRm/W65rMMn28ew4=;
- b=hXgNQ3TJK9gW7laudj4QLjSTokj9b+DQkvBNOukxglguGel2JuKYe0op15kIL/dtVY1CmK
- ffy4vr8nBEBPQ8CLdOOhedq7RWJF3k+xwPJK5qOiURB03ZcMdpzByB9linkpHl6/vuc+h/
- qK7lVEELPXE+CLr/cFLjaLGNjhjHRXU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-590-JS0eJIQdMFyMBvrUaZULyg-1; Wed, 07 Oct 2020 09:21:11 -0400
-X-MC-Unique: JS0eJIQdMFyMBvrUaZULyg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71D50801FD7
- for <qemu-devel@nongnu.org>; Wed,  7 Oct 2020 13:20:59 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
- [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1C0C85D9DD;
- Wed,  7 Oct 2020 13:20:59 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 88B7111329C1; Wed,  7 Oct 2020 15:20:57 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v5 27/36] qapi/gen.py: add type hint annotations
-References: <20201005195158.2348217-1-jsnow@redhat.com>
- <20201005195158.2348217-28-jsnow@redhat.com>
-Date: Wed, 07 Oct 2020 15:20:57 +0200
-In-Reply-To: <20201005195158.2348217-28-jsnow@redhat.com> (John Snow's message
- of "Mon, 5 Oct 2020 15:51:49 -0400")
-Message-ID: <87tuv68952.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kQ9fh-0000nu-3s
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 09:39:57 -0400
+Received: from relay64.bu.edu ([128.197.228.104]:51652)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kQ9ff-00063T-5D
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 09:39:56 -0400
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: mozz.bu.edu [128.197.127.33]
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay64.bu.edu (8.14.3/8.14.3) with ESMTP id 097DdWQQ008551
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+ Wed, 7 Oct 2020 09:39:35 -0400
+Date: Wed, 7 Oct 2020 09:39:32 -0400
+From: Alexander Bulekov <alxndr@bu.edu>
+To: Darren Kenny <darren.kenny@oracle.com>
+Subject: Re: [PATCH v3 02/16] fuzz: Add general virtual-device fuzzer
+Message-ID: <20201007133932.ua6tg7hnr3ixpgni@mozz.bu.edu>
+References: <20200921022506.873303-1-alxndr@bu.edu>
+ <20200921022506.873303-3-alxndr@bu.edu>
+ <63ca7622-557b-4217-f15e-ee9b024fbd77@redhat.com>
+ <20200921143405.3taiymgzwvscxsry@mozz.bu.edu>
+ <m2h7re6k3b.fsf@oracle.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:44:56
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <m2h7re6k3b.fsf@oracle.com>
+Received-SPF: pass client-ip=128.197.228.104; envelope-from=alxndr@bu.edu;
+ helo=relay64.bu.edu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 09:39:52
+X-ACL-Warn: Detected OS   = Linux 2.6.x
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
+ HK_RANDOM_FROM=0.902, RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,52 +73,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-devel@nongnu.org, bsd@redhat.com, stefanha@redhat.com,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-John Snow <jsnow@redhat.com> writes:
+On 201001 1629, Darren Kenny wrote:
+> Hi Alex,
+> 
+> On Monday, 2020-09-21 at 10:34:05 -04, Alexander Bulekov wrote:
+> > On 200921 0743, Philippe Mathieu-Daudé wrote:
+> >> Hi Alexander,
+> >> 
+> >> On 9/21/20 4:24 AM, Alexander Bulekov wrote:
+> >> > This is a generic fuzzer designed to fuzz a virtual device's
+> >> > MemoryRegions, as long as they exist within the Memory or Port IO (if it
+> >> > exists) AddressSpaces. The fuzzer's input is interpreted into a sequence
+> >> > of qtest commands (outb, readw, etc). The interpreted commands are
+> >> > separated by a magic seaparator, which should be easy for the fuzzer to
+> >> > guess. Without ASan, the separator can be specified as a "dictionary
+> >> > value" using the -dict argument (see libFuzzer documentation).
+> >> > 
+> >> > Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+> >> > ---
+> >> >  tests/qtest/fuzz/general_fuzz.c | 498 ++++++++++++++++++++++++++++++++
+> >> >  tests/qtest/fuzz/meson.build    |   1 +
+> >> >  2 files changed, 499 insertions(+)
+> >> >  create mode 100644 tests/qtest/fuzz/general_fuzz.c
+> >> > 
+> >> > diff --git a/tests/qtest/fuzz/general_fuzz.c b/tests/qtest/fuzz/general_fuzz.c
+> >> > new file mode 100644
+> >> > index 0000000000..bf75b215ca
+> >> > --- /dev/null
+> >> > +++ b/tests/qtest/fuzz/general_fuzz.c
+> >> > @@ -0,0 +1,498 @@
+> >> > +/*
+> >> > + * General Virtual-Device Fuzzing Target
+> >> > + *
+> >> > + * Copyright Red Hat Inc., 2020
+> >> > + *
+> >> > + * Authors:
+> >> > + *  Alexander Bulekov   <alxndr@bu.edu>
+> >> > + *
+> >> > + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> >> > + * See the COPYING file in the top-level directory.
+> >> > + */
+> >> > +
+> >> > +#include "qemu/osdep.h"
+> >> > +
+> >> > +#include <wordexp.h>
+> >> > +
+> >> > +#include "hw/core/cpu.h"
+> >> > +#include "tests/qtest/libqos/libqtest.h"
+> >> > +#include "fuzz.h"
+> >> > +#include "fork_fuzz.h"
+> >> > +#include "exec/address-spaces.h"
+> >> > +#include "string.h"
+> >> > +#include "exec/memory.h"
+> >> > +#include "exec/ramblock.h"
+> >> > +#include "exec/address-spaces.h"
+> >> > +#include "hw/qdev-core.h"
+> >> > +
+> >> > +/*
+> >> > + * SEPARATOR is used to separate "operations" in the fuzz input
+> >> > + */
+> >> > +#define SEPARATOR "FUZZ"
+> >> 
+> >> Why use a separator when all pkt sizes are known?
+> > Good point. 
+> > 1. When we add the DMA Pattern OP in patch 04/16, we now have
+> > variable-width OPs.
+> > 2. Even when everything has a known size, take for example the input:
+> > Acb Bd Caaaa Effff
+> > Where Operation A has size 3, B: size 2, C size 5 ...:
+> > Simply by removing the first byte, we now have a completely different
+> > sequence of operations:
+> > Cbbdc Aaa Aef Ff...
+> > Thus the separators "add some stability" to random mutations:
+> > Cb FUZZ Bd FUZZ Caaaa FUZZ Effff ...
+> > (Cb is now invalid/ignored, but the rest of the commands are still
+> > intact)
+> > There is some libfuzzer documentation about this technique:
+> > https://github.com/google/fuzzing/blob/master/docs/split-inputs.md#magic-separator
+> >
+> > There is also a promising "FuzzDataProvider" header library that lets
+> > you directly call functions, such as ConsumeBytes, or
+> > ConsumeIntegralInRange, but unfortunately it is a C++ header.
+> 
+> It might make sense to put the definition of SEPARATOR and some variant
+> of the above the comments in patch 9 where you're adding this related
+> functionality?
+> 
+> It seems a little out of place here.
+> 
+> Thanks,
+> 
+> Darren.
+> 
 
-> Annotations do not change runtime behavior.
-> This commit *only* adds annotations.
->
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> Reviewed-by: Cleber Rosa <crosa@redhat.com>
-> ---
->  scripts/qapi/gen.py | 104 ++++++++++++++++++++++++--------------------
->  1 file changed, 57 insertions(+), 47 deletions(-)
->
-> diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
-> index 1bad37fc06b..d0391cd8718 100644
-> --- a/scripts/qapi/gen.py
-> +++ b/scripts/qapi/gen.py
-> @@ -17,7 +17,13 @@
->  import errno
->  import os
->  import re
-> -from typing import Optional
-> +from typing import (
-> +    Dict,
-> +    Iterator,
-> +    List,
-> +    Optional,
-> +    Tuple,
-> +)
->  
->  from .common import (
->      c_fname,
-> @@ -29,31 +35,31 @@
->      mcgen,
->  )
->  from .schema import QAPISchemaObjectType, QAPISchemaVisitor
-> +from .source import QAPISourceInfo
+Hi Darren,
+If I move the definition of SEPARATOR to Patch 9, I would need some
+different way to parse commands here, to keep everything bisectable. I
+don't think the separator is only important in the context of the
+Crossover functionality (Patch 9) - it is useful in general as a
+"stable" way to parse an input into multiple commands.
+Is it OK if I keep SEPARATOR in this patch and add the comments you
+mention to both this patch and patch 9?
+Thanks
+-Alex
 
-PATCH 03 has a similar cleanup.  Are there more?  Perhaps a separate
-patch doing just this kind of cleanup would make sense.  Up to you.
-
-[...]
-
+> >> 
+> >> Can you fuzz writing "FUZZ" in memory? Like:
+> >> OP_WRITE(0x100000, "UsingLibFUZZerString")?
+> >
+> > No.. Hopefully that's not a huge problem.
+> >
+> >> > +
+> >> > +enum cmds {
+> >> > +    OP_IN,
+> >> > +    OP_OUT,
+> >> > +    OP_READ,
+> >> > +    OP_WRITE,
+> >> > +    OP_CLOCK_STEP,
+> >> > +};
+> >> > +
+> >> > +#define DEFAULT_TIMEOUT_US 100000
+> >> > +#define USEC_IN_SEC 100000000
+> >> 
+> >> Are you sure this definition is correct?
+> >> 
+> > Thanks for the catch...
+> >
+> >> > +
+> >> > +typedef struct {
+> >> > +    ram_addr_t addr;
+> >> > +    ram_addr_t size; /* The number of bytes until the end of the I/O region */
+> >> > +} address_range;
+> >> > +
+> >> > +static useconds_t timeout = 100000;
+> >> [...]
+> >> 
 
