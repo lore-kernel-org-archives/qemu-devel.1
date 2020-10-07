@@ -2,79 +2,121 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAFC9C4363C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 08:20:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BA85C4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 08:21:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 361A32083B
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 08:20:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D3F720659
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 08:21:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BWg8xns8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 361A32083B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ONwLOM5r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D3F720659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ4gP-0003LH-83
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 04:20:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44764)
+	id 1kQ4hf-0004Mh-1p
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 04:21:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44896)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQ4fG-0002DU-0R
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 04:19:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47422)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kQ4fl-0002uA-Jv
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 04:19:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29180)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQ4fE-000839-3a
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 04:19:09 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kQ4fj-000867-Rk
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 04:19:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602058747;
+ s=mimecast20190719; t=1602058779;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=BZRLLFG6tdPimUzxw+QwdO80QGyYlVxwOyx1cV1Tquw=;
- b=BWg8xns8Sfc0XN/07kE6lfNPgD16/CMDfvK1inWqpW3F1QdfvatN/kY69EThtXy7tJ/1SK
- XQBK4I6Cg0JV4KgEbyX9n2pSEWT8V8lNhf4c2A2HlLJiFGiqdqjOadMFkbJjnTGngl0uhI
- qTdPhMuJniBo8C9wx7/G3y/OQ37suQA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-23-W0JomLHENju1ggHpdicngQ-1; Wed, 07 Oct 2020 04:19:05 -0400
-X-MC-Unique: W0JomLHENju1ggHpdicngQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 77E4D10866A8
- for <qemu-devel@nongnu.org>; Wed,  7 Oct 2020 08:19:04 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
- [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1FBFC1002C27;
- Wed,  7 Oct 2020 08:19:04 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 9E1E111329C1; Wed,  7 Oct 2020 10:19:02 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v5 08/36] qapi: delint using flake8
-References: <20201005195158.2348217-1-jsnow@redhat.com>
- <20201005195158.2348217-9-jsnow@redhat.com>
-Date: Wed, 07 Oct 2020 10:19:02 +0200
-In-Reply-To: <20201005195158.2348217-9-jsnow@redhat.com> (John Snow's message
- of "Mon, 5 Oct 2020 15:51:30 -0400")
-Message-ID: <87imbmih3d.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=/bqT0yts++FYegCQzqbFikDxvze9DpzAErnr7TU/7ZE=;
+ b=ONwLOM5rTcMBm13pxvIq0yTv31LaUrwc4Pkfe9QDPwRdd621/E8eIqPv4eg+q4vy2Qy2LQ
+ JfltFP1RFaITiMcbjo+xfoBeVjLG5rb5jC1uvqSzKcXlg1Q0idewaSHq/p0ORfA6xIMC4q
+ aTGHY2W7DrtSYyTISypILMTYGlKQdRg=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-47-Yq_FHWVxPCKfQVikn8O_MQ-1; Wed, 07 Oct 2020 04:19:35 -0400
+X-MC-Unique: Yq_FHWVxPCKfQVikn8O_MQ-1
+Received: by mail-wm1-f72.google.com with SMTP id s25so212573wmj.7
+ for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 01:19:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=/bqT0yts++FYegCQzqbFikDxvze9DpzAErnr7TU/7ZE=;
+ b=e/NW69sq2NaZtAGrsNhHVy2/OFsg4qfEBFF+XDsRGpwhh92U1yVHy9GB1SdoobsQxv
+ 31JM7TC+xfcv29ieo3fZ4KPnRGCSz72tit6Suyqn43qbcrwhBCjOhSqiqU5WWIY2Kfom
+ nDlRCs7AoUzZYOqBny5eo5iAhbKUXjx10ciat5hVvO+GfKkrWHXk14+eUN7cCTCNnbAh
+ FRGgXGgCs3Yn18f9Ky/0HzRQOytA6DOm4vlxT7wIa7WfyMcB7h121T5gmz/9Jw6bfO2B
+ jBD4hMs9EzCky97TobbXBGmdiL1lFfFsmd3kE4AX5+FR49yGuaT5DYmxcNlOn/Ahj48n
+ Tqlw==
+X-Gm-Message-State: AOAM532kSFg0uRnYStUnvoDwjL5wM/Km+7j5SCQQXS2QMbyc50XyRNoL
+ K/N0+cdE51tNTo1hXBWci+TxmkdIvk8lEfaoZuOWBjzkSS76+BnTu4sZr71+cK5uRFjYxQoLhi9
+ TcobJimZC6RnLJ+w=
+X-Received: by 2002:a5d:5548:: with SMTP id g8mr2139493wrw.364.1602058774428; 
+ Wed, 07 Oct 2020 01:19:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxLdtsk6EsAaP7+K6PBBdn5FvERRK1VQ8AqBoUQD1zLnNCYBUa51s2+66Vfc9vmZIgRFUGg5A==
+X-Received: by 2002:a5d:5548:: with SMTP id g8mr2139471wrw.364.1602058774203; 
+ Wed, 07 Oct 2020 01:19:34 -0700 (PDT)
+Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id v8sm1647013wmb.20.2020.10.07.01.19.32
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 07 Oct 2020 01:19:33 -0700 (PDT)
+Subject: Re: acceptance-system-fedora failures
+To: Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
+References: <f9e09f0b-3915-382c-d670-8d33d164ad7b@redhat.com>
+ <4e191372-c332-8f69-85e2-1ff6ead0f40d@redhat.com>
+ <e577dded-ed2b-6cd0-5119-9bde4ab0c492@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <0c0a2036-1927-e228-fb56-14ec1e75e488@redhat.com>
+Date: Wed, 7 Oct 2020 10:19:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <e577dded-ed2b-6cd0-5119-9bde4ab0c492@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:54:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -83,8 +125,9 @@ X-Spam_score: -2.8
 X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,149 +140,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-John Snow <jsnow@redhat.com> writes:
+On 10/7/20 9:23 AM, Thomas Huth wrote:
+> On 07/10/2020 07.20, Philippe Mathieu-Daudé wrote:
+>> On 10/7/20 1:07 AM, John Snow wrote:
+>>> I'm seeing this gitlab test fail quite often in my Python work; I don't
+>>> *think* this has anything to do with my patches, but maybe I need to try
+>>> and bisect this more aggressively.
+> [...]
+>> w.r.t. the error in your build, I told Thomas about the
+>> test_ppc_mac99/day15/invaders.elf timeouting but he said this is
+>> not his area. Richard has been looking yesterday to see if it is
+>> a TCG regression, and said the test either finished/crashed raising
+>> SIGCHLD, but Avocado parent is still waiting for a timeout, so the
+>> children become zombie and the test hang.
+>>
+>> Not sure that helps :)
+> 
+> No clue why that invaders.elf is now failing with the replay test, but if
+> you look at the history of the CI runs:
+> 
+>  https://gitlab.com/qemu-project/qemu/-/pipelines
+> 
+> ... you can clearly see that the problem started with John's
+> ide-pull-request 5 days ago:
+> 
+>  https://gitlab.com/qemu-project/qemu/-/pipelines/197124608
+> 
+> So maybe it's worth the effort to have a look at the patches that got merged
+> here?
 
-> Petty style guide fixes and line length enforcement.  Not a big win, not
-> a big loss, but flake8 passes 100% on the qapi module, which gives us an
-> easy baseline to enforce hereafter.
->
-> A note on the flake8 exception: flake8 will warn on *any* bare except,
-> but pylint's is context-aware and will suppress the warning if you
-> re-raise the exception.
->
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> Reviewed-by: Cleber Rosa <crosa@redhat.com>
-> ---
->  scripts/qapi/.flake8     |  2 ++
->  scripts/qapi/commands.py |  3 ++-
->  scripts/qapi/schema.py   |  8 +++++---
->  scripts/qapi/visit.py    | 16 +++++++++++-----
->  4 files changed, 20 insertions(+), 9 deletions(-)
->  create mode 100644 scripts/qapi/.flake8
->
-> diff --git a/scripts/qapi/.flake8 b/scripts/qapi/.flake8
-> new file mode 100644
-> index 00000000000..6b158c68b84
-> --- /dev/null
-> +++ b/scripts/qapi/.flake8
-> @@ -0,0 +1,2 @@
-> +[flake8]
-> +extend-ignore = E722  # Prefer pylint's bare-except checks to flake8's
-> diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
-> index 64ed5278f93..5dc2f5a9fa8 100644
-> --- a/scripts/qapi/commands.py
-> +++ b/scripts/qapi/commands.py
-> @@ -65,7 +65,8 @@ def gen_call(name, arg_type, boxed, ret_type):
->  def gen_marshal_output(ret_type):
->      return mcgen('''
->  
-> -static void qmp_marshal_output_%(c_name)s(%(c_type)s ret_in, QObject **ret_out, Error **errp)
-> +static void qmp_marshal_output_%(c_name)s(%(c_type)s ret_in,
-> +                                QObject **ret_out, Error **errp)
->  {
->      Visitor *v;
->  
-> diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-> index 093f7a38d88..cfc52e1ae44 100644
-> --- a/scripts/qapi/schema.py
-> +++ b/scripts/qapi/schema.py
-> @@ -536,7 +536,7 @@ def set_defined_in(self, name):
->              v.set_defined_in(name)
->  
->      def check(self, schema, seen):
-> -        if not self.tag_member: # flat union
-> +        if not self.tag_member:  # flat union
->              self.tag_member = seen.get(c_name(self._tag_name))
->              base = "'base'"
->              # Pointing to the base type when not implicit would be
-> @@ -821,7 +821,7 @@ def __init__(self, fname):
->          self._entity_dict = {}
->          self._module_dict = OrderedDict()
->          self._schema_dir = os.path.dirname(fname)
-> -        self._make_module(None) # built-ins
-> +        self._make_module(None)  # built-ins
->          self._make_module(fname)
->          self._predefining = True
->          self._def_predefineds()
-> @@ -965,7 +965,9 @@ def _make_implicit_object_type(self, name, info, ifcond, role, members):
->              # But it's not tight: the disjunction need not imply it.  We
->              # may end up compiling useless wrapper types.
->              # TODO kill simple unions or implement the disjunction
-> -            assert (ifcond or []) == typ._ifcond # pylint: disable=protected-access
-> +
-> +            # pylint: disable=protected-access
-> +            assert (ifcond or []) == typ._ifcond
->          else:
->              self._def_entity(QAPISchemaObjectType(
->                  name, info, None, ifcond, None, None, members, None))
-> diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
-> index ea277e7704b..808410d6f1b 100644
-> --- a/scripts/qapi/visit.py
-> +++ b/scripts/qapi/visit.py
-> @@ -31,7 +31,9 @@ def gen_visit_decl(name, scalar=False):
->      if not scalar:
->          c_type += '*'
->      return mcgen('''
-> -bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_type)sobj, Error **errp);
-> +
-> +bool visit_type_%(c_name)s(Visitor *v, const char *name,
-> +                 %(c_type)sobj, Error **errp);
->  ''',
->                   c_name=c_name(name), c_type=c_type)
->  
-> @@ -125,7 +127,8 @@ def gen_visit_object_members(name, base, members, variants):
->  def gen_visit_list(name, element_type):
->      return mcgen('''
->  
-> -bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error **errp)
-> +bool visit_type_%(c_name)s(Visitor *v, const char *name,
-> +                 %(c_name)s **obj, Error **errp)
->  {
->      bool ok = false;
->      %(c_name)s *tail;
-> @@ -158,7 +161,8 @@ def gen_visit_list(name, element_type):
->  def gen_visit_enum(name):
->      return mcgen('''
->  
-> -bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s *obj, Error **errp)
-> +bool visit_type_%(c_name)s(Visitor *v, const char *name,
-> +                 %(c_name)s *obj, Error **errp)
->  {
->      int value = *obj;
->      bool ok = visit_type_enum(v, name, &value, &%(c_name)s_lookup, errp);
-> @@ -172,7 +176,8 @@ def gen_visit_enum(name):
->  def gen_visit_alternate(name, variants):
->      ret = mcgen('''
->  
-> -bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error **errp)
-> +bool visit_type_%(c_name)s
-> +    (Visitor *v, const char *name, %(c_name)s **obj, Error **errp)
+Great idea!
 
-Please break this line the same way as the ones above:
+Bisected using:
 
-   bool visit_type_%(c_name)s(Visitor *v, const char *name,
-                    %(c_name)s **obj, Error **errp)
+$ make qemu-system-ppc check-venv && \
+  tests/venv/bin/python -m \
+  avocado --show=app,console,replay \
+  run -t machine:mac99 \
+  tests/acceptance/replay_kernel.py
 
->  {
->      bool ok = false;
->  
-> @@ -247,7 +252,8 @@ def gen_visit_alternate(name, variants):
->  def gen_visit_object(name, base, members, variants):
->      return mcgen('''
->  
-> -bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error **errp)
-> +bool visit_type_%(c_name)s
-> +    (Visitor *v, const char *name, %(c_name)s **obj, Error **errp)
->  {
->      bool ok = false;
+55adb3c45620c31f29978f209e2a44a08d34e2da is the first bad commit
+commit 55adb3c45620c31f29978f209e2a44a08d34e2da
+Author: John Snow <jsnow@redhat.com>
+Date:   Fri Jul 24 01:23:00 2020 -0400
 
-Likewise.
+    ide: cancel pending callbacks on SRST
+
+    The SRST implementation did not keep up with the rest of IDE;
+    it is possible to perform a weak reset on an IDE device to
+    remove the BSY/DRQ bits, and then issue writes to the
+    control/device registers which can cause chaos with the state
+    machine.
+
+    Fix that by actually performing a real reset.
+
+    Reported-by: Alexander Bulekov <alxndr@bu.edu>
+    Fixes: https://bugs.launchpad.net/qemu/+bug/1878253
+    Fixes: https://bugs.launchpad.net/qemu/+bug/1887303
+    Fixes: https://bugs.launchpad.net/qemu/+bug/1887309
+    Signed-off-by: John Snow <jsnow@redhat.com>
+
+ hw/ide/core.c | 58
+++++++++++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 40 insertions(+), 18 deletions(-)
+
+Regards,
+
+Phil.
 
 
