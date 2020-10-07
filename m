@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D200C4363C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 04:49:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFA4FC4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 04:51:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95EE6208C7
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 04:49:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95EE6208C7
+	by mail.kernel.org (Postfix) with ESMTPS id 43B76208C7
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 04:51:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43B76208C7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ1OR-0004lI-Pg
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 00:49:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34544)
+	id 1kQ1Pn-0005mT-EU
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 00:50:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34546)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kQ15i-0002dP-9h
+ id 1kQ15i-0002e1-Jy
  for qemu-devel@nongnu.org; Wed, 07 Oct 2020 00:30:14 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38160)
+Received: from indium.canonical.com ([91.189.90.7]:38276)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kQ15e-0005Ta-13
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 00:30:13 -0400
+ id 1kQ15e-0005Tl-MZ
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 00:30:14 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kQ15K-0002Cd-O8
- for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 04:29:51 +0000
+ id 1kQ15M-00027O-Id
+ for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 04:29:52 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 39C972E812C
- for <qemu-devel@nongnu.org>; Wed,  7 Oct 2020 04:29:50 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id B819B2E80ED
+ for <qemu-devel@nongnu.org>; Wed,  7 Oct 2020 04:29:51 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 07 Oct 2020 04:17:19 -0000
+Date: Wed, 07 Oct 2020 04:17:20 -0000
 From: Launchpad Bug Tracker <897466@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -60,14 +60,14 @@ X-Launchpad-Bug-Commenters: janitor jdstrand serge-hallyn th-huth
 X-Launchpad-Bug-Reporter: Jamie Strandboge (jdstrand)
 X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
 References: <20111128231908.14324.64245.malonedeb@gac.canonical.com>
-Message-Id: <160204423980.20421.4700954759354775935.malone@loganberry.canonical.com>
+Message-Id: <160204424090.20421.4991340651139250871.malone@loganberry.canonical.com>
 Subject: [Bug 897466] Re: UHCI Host Controller no longer present with -usb
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="d50d1e75c500726862802414f880ee3e3bb759bf"; Instance="production"
-X-Launchpad-Hash: 1d10e731dd4c1c588fbe5c0e03ab9e8abcc0e979
+X-Launchpad-Hash: 89dd5c7f9573001128686e2ad1af31d536bd58cf
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/06 22:50:47
@@ -95,10 +95,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-[Expired for qemu-kvm (Ubuntu Precise) because there has been no
-activity for 60 days.]
+[Expired for QEMU because there has been no activity for 60 days.]
 
-** Changed in: qemu-kvm (Ubuntu Precise)
+** Changed in: qemu
        Status: Incomplete =3D> Expired
 
 -- =
