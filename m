@@ -2,97 +2,86 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C8CBC41604
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 17:56:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D2B9C4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 18:05:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE6312173E
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 17:56:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CFD9F2168B
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 18:05:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HLXnPJ+O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE6312173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gFsoczKD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFD9F2168B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQDg1-0006Mf-GD
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 13:56:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36106)
+	id 1kQDok-0000Ze-LE
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 14:05:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37706)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kQDfO-0005um-Vg
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 13:55:55 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54495)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kQDfN-0003nh-DN
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 13:55:54 -0400
-Received: by mail-wm1-x344.google.com with SMTP id p15so3308630wmi.4
- for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 10:55:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=lSz0YWB7gFXbZmT1s8tI5W0MPmM0x31+cjvaWbwB5Ck=;
- b=HLXnPJ+OY4K8obu3amdMp2EyF5241j/ZUzZMSvF9wzav/9mqyjeo97KnfOGo/SRZkY
- Rqp/JUhW33HpdqV7fx6Ve6T1nD27oq88w82BeVpX4GtMNUgHzgmq7w6Yp/kRt2/wJ0JT
- 38wP9sdcn+u7lRyWvBug29HekQd374BQLDZIQp3RvziHeuMdQY2tahzwAvt9Bb/vcy4F
- 8yKbX6arD3T4kkrKNDxEyUkERqWXJis55obW6wypRi9fitCa7NcDw6g5p3Hv95sFoE8F
- ahGh+FkHb4/9kjFCoLSdAbgLJOBXKB3Dj+nR/6jzHFnPRLQusu3qU4Zf3ChARpPTu7dA
- YLhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=lSz0YWB7gFXbZmT1s8tI5W0MPmM0x31+cjvaWbwB5Ck=;
- b=c98HEwZ8hL3yIUtXV5pmOV1yfaEXaUhjrKj+xncKsNRbkAkiNRp9HUhyw3YKGZUGVI
- F1iSHUFJYF30L5SYxzNJyjrYvneQkFvxyWHIWKC8wF6/kOTGmC5Nl+ayEfGkYTHQFsSj
- 3WWpg2dcxcTeKo+2a6lFi6fovdo9vGYoy8hYwOvL9PH45HTiUBQCyS/3gUOZ0huSBmX/
- 6sZOJWEK0F2ndsbtWxasnT5TjHy5gAbHmfzUVQMea/iGXdv1XHfulQ9xzDU6zcslPbdf
- AU3YlKntnvcnJgzjbXlK9jccMU5FkdtvE0f1Zo+OqkUJhLDHuutT/xq54JER7rUKcbZJ
- 7mSw==
-X-Gm-Message-State: AOAM530/BkQ6EeROzGqvbhv3Z6KkMRAon9r0X5vjuCitk4/gLt1ipNKa
- JcZuOOsf1QAa51abeMhNH+I=
-X-Google-Smtp-Source: ABdhPJwyoChasmgjzD0sI5izjvEZHbw6wgxCLWgAkkPAjSR1/jbAUJoQDIRTI/VBV1vuO+A5eSLSqw==
-X-Received: by 2002:a7b:c04a:: with SMTP id u10mr4789557wmc.83.1602093351644; 
- Wed, 07 Oct 2020 10:55:51 -0700 (PDT)
-Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
- [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id k190sm3645311wme.33.2020.10.07.10.55.50
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 07 Oct 2020 10:55:51 -0700 (PDT)
-Subject: Re: [PATCH v2] Adding ani's email as an individual contributor
-To: Ani Sinha <ani@anisinha.ca>, qemu-devel@nongnu.org
-References: <20201007161940.1478-1-ani@anisinha.ca>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <0250c54c-ea93-335b-7d37-cbfe79e4086f@amsat.org>
-Date: Wed, 7 Oct 2020 19:55:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kQDo2-00005r-PD
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 14:04:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29942)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kQDnz-0004rp-2g
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 14:04:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602093885;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=hA/Ic/DvHRIWAAPJE/LGTu0E2S1egMhpGna2Sykdi3w=;
+ b=gFsoczKD154lsyNb1b3O0vqhlDCSL57YrjDb+A99qai/65XVGYgxQ0BuzhqVwetDNDTpum
+ iAhvK0k40ku/7K2vBOS0bIyAQzccdCYymBk7SQdgLmxVqWfs7pDiczmoi6WIwljdGG//jD
+ bhQn1d0e8OR+OSKMFx0ZxYJ4Mz+OisM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-179-6FM-k7x8Mj2c74P_45QdLQ-1; Wed, 07 Oct 2020 14:04:36 -0400
+X-MC-Unique: 6FM-k7x8Mj2c74P_45QdLQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD39F18C9F59;
+ Wed,  7 Oct 2020 18:04:34 +0000 (UTC)
+Received: from redhat.com (ovpn-114-68.ams2.redhat.com [10.36.114.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4F6C55DA2A;
+ Wed,  7 Oct 2020 18:04:32 +0000 (UTC)
+Date: Wed, 7 Oct 2020 19:04:29 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: KVM call for agenda for 2020-10-06
+Message-ID: <20201007180429.GI2505881@redhat.com>
+References: <874kndm1t3.fsf@secure.mitica>
+ <20201005144615.GE5029@stefanha-x1.localdomain>
+ <CAJSP0QVZcEQueXG1gjwuLszdUtXWi1tgB5muLL6QHJjNTOmyfQ@mail.gmail.com>
+ <8fce8f99-56bd-6a87-9789-325d6ffff54d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201007161940.1478-1-ani@anisinha.ca>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.248,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Disposition: inline
+In-Reply-To: <8fce8f99-56bd-6a87-9789-325d6ffff54d@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:54:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,36 +94,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ kvm-devel <kvm@vger.kernel.org>, Stefan Hajnoczi <stefanha@gmail.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/7/20 6:19 PM, Ani Sinha wrote:
-> Ani is an individual contributor into qemu project. Adding my email into the
-> correct file to reflect so.
+On Wed, Oct 07, 2020 at 07:50:20PM +0200, Paolo Bonzini wrote:
+> On 06/10/20 20:21, Stefan Hajnoczi wrote:
+> >     * Does command-line order matter?
+> >         * Two options: allow any order OR left-to-right ordering
+> >         * Andrea Bolognani: Most users expect left-to-right ordering,
+> > why allow any order?
+> >         * Eduardo Habkost: Can we enforce left-to-right ordering or do
+> > we need to follow the deprecation process?
+> >         * Daniel Berrange: Solve compability by introducing new
+> > binaries without the burden of backwards compability
 > 
+> I think "new binaries" shouldn't even have a command line; all
+> configuration should happen through QMP commands.  Those are naturally
+> time-ordered, which is equivalent to left-to-right, and therefore the
+> question is sidestepped.  Perhaps even having a command line in
+> qemu-storage-daemon was a mistake.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Thanks!
+Non-interactive configuration is a nice property for simpler integration
+use cases. eg launching from the shell is tedious with QMP compared to
+CLI args.
 
-> Signed-off-by: Ani Sinha <ani@anisinha.ca>
-> ---
->  contrib/gitdm/group-map-individuals | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> changelog:
-> v2: removed accidentally added submodule update into this commit
-> v1: initial patch
-> 
-> diff --git a/contrib/gitdm/group-map-individuals b/contrib/gitdm/group-map-individuals
-> index cf8a2ce367..64cb859193 100644
-> --- a/contrib/gitdm/group-map-individuals
-> +++ b/contrib/gitdm/group-map-individuals
-> @@ -16,3 +16,4 @@ aurelien@aurel32.net
->  balaton@eik.bme.hu
->  e.emanuelegiuseppe@gmail.com
->  andrew.smirnov@gmail.com
-> +ani@anisinha.ca
-> 
+This could be addressed though by having a configuration file to load
+config from, where the config entries can be mapped 1-1 onto QMP commands,
+essentially making the config file a non-interactive QMP.
+
+> The big question to me is whether the configuration should be
+> QAPI-based, that is based on QAPI structs, or QMP-based.  If the latter,
+> "object-add" (and to a lesser extent "device-add") are fine mechanisms
+> for configuration.  There is still need for better QOM introspection,
+> but it would be much simpler than doing QOM object creation via QAPI
+> struct, if at all possible.
+
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
 
