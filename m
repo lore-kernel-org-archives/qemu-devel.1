@@ -2,123 +2,77 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB136C47095
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 14:41:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F05A1C4363D
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 14:43:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36092208C7
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 14:41:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3CBAF208C7
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 14:43:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LiYPlimM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36092208C7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T1CdRMcs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CBAF208C7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQAda-00054x-Mw
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 10:41:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43608)
+	id 1kQAer-00064N-5X
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 10:43:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44444)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kQAXO-00077b-Do
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 10:35:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29459)
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kQAan-0001pX-LK
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 10:38:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54735)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kQAXL-0004TZ-6s
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 10:35:26 -0400
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kQAal-0004nF-18
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 10:38:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602081322;
+ s=mimecast20190719; t=1602081534;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=qTLCsJxcEE55/fFCKv8Kh44P3psul8EZEHtuNjVWP9M=;
- b=LiYPlimMEKoXMmzGgr0Dyp5asoiEN1FqcJ0QL/9LSinlRQAvXbKhFlpa/NLFQLMYQI3ytZ
- 6HwyHcCjLZ3hmUpr2gQv9A4JXqKIKXEzz31b0MEZFtmIIpSTLX6TIwN3skkmGdjkMFvhyZ
- kW3Weu/xLlkTXhJhh8yoMRH+xRVnfpg=
+ in-reply-to:in-reply-to:references:references;
+ bh=D7DqiWwtlPgyI4TMpWNlRQBpxsyPz4B7Gk7InmRaKAE=;
+ b=T1CdRMcsREwH1QQzL4Y33pLoJ3iX2TaEkigIKmLSYhCRTMaEWjwCJ4B9O9FxvOgHnz1dOm
+ GmDuGBuAxJOG+x3CmBh84K1GWVpgDTnrC+kCHSNhQRnmdbmv+ei4VUmZbC3yE9iznprdSL
+ d2rWA31FSAjpvgvQdJrB2k5YNJuHmWA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-VGP4QC1HPFW5Iaz6fndDxQ-1; Wed, 07 Oct 2020 10:35:18 -0400
-X-MC-Unique: VGP4QC1HPFW5Iaz6fndDxQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-453--8y8u11TN_is56nEzet3hQ-1; Wed, 07 Oct 2020 10:38:52 -0400
+X-MC-Unique: -8y8u11TN_is56nEzet3hQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E3248107819D;
- Wed,  7 Oct 2020 14:34:05 +0000 (UTC)
-Received: from [10.3.113.66] (ovpn-113-66.phx2.redhat.com [10.3.113.66])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0F9CE78831;
- Wed,  7 Oct 2020 14:34:04 +0000 (UTC)
-Subject: Re: [PATCH] qcow2: Document and enforce the QCowL2Meta invariants
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <20201007115217.18013-1-berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Autocrypt: addr=eblake@redhat.com; keydata=
- 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
-Organization: Red Hat, Inc.
-Message-ID: <21d332f9-5174-f552-ff07-8109b3673c52@redhat.com>
-Date: Wed, 7 Oct 2020 09:34:04 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E296B420EA;
+ Wed,  7 Oct 2020 14:38:50 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-119-55.rdu2.redhat.com
+ [10.10.119.55])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F1B515D9DD;
+ Wed,  7 Oct 2020 14:38:49 +0000 (UTC)
+Date: Wed, 7 Oct 2020 10:38:48 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: acceptance-system-fedora failures
+Message-ID: <20201007143848.GG240186@localhost.localdomain>
+References: <f9e09f0b-3915-382c-d670-8d33d164ad7b@redhat.com>
+ <4e191372-c332-8f69-85e2-1ff6ead0f40d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201007115217.18013-1-berto@igalia.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <4e191372-c332-8f69-85e2-1ff6ead0f40d@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="Mj1x30xMeXrv7dVGbYd2agmeKci3cmLOy"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=eblake@redhat.com;
+ protocol="application/pgp-signature"; boundary="VACxsDaSTfeluoxK"
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=crosa@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:54:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -127,9 +81,9 @@ X-Spam_score: -2.8
 X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ WEIRD_PORT=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -142,105 +96,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Mj1x30xMeXrv7dVGbYd2agmeKci3cmLOy
-Content-Type: multipart/mixed; boundary="dYPYqcNPdk5WsGUvEoRlifdhAUEYZ8F32";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
-Message-ID: <21d332f9-5174-f552-ff07-8109b3673c52@redhat.com>
-Subject: Re: [PATCH] qcow2: Document and enforce the QCowL2Meta invariants
-References: <20201007115217.18013-1-berto@igalia.com>
-In-Reply-To: <20201007115217.18013-1-berto@igalia.com>
-
---dYPYqcNPdk5WsGUvEoRlifdhAUEYZ8F32
+--VACxsDaSTfeluoxK
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 10/7/20 6:52 AM, Alberto Garcia wrote:
-> The QCowL2Meta structure is used to store information about a part of
-> a write request that touches clusters that need changes in their L2
-> entries. This happens with newly-allocated clusters or subclusters.
+On Wed, Oct 07, 2020 at 07:20:49AM +0200, Philippe Mathieu-Daud=C3=A9 wrote=
+:
+> On 10/7/20 1:07 AM, John Snow wrote:
+> > I'm seeing this gitlab test fail quite often in my Python work; I don't
+> > *think* this has anything to do with my patches, but maybe I need to tr=
+y
+> > and bisect this more aggressively.
+> >=20
+> > The very first hint of an error I see is on line 154:
+> >=20
+> > https://gitlab.com/jsnow/qemu/-/jobs/776334918#L154
+> >=20
+> > 22:05:36 ERROR|
+> > 22:05:36 ERROR| Reproduced traceback from:
+> > /builds/jsnow/qemu/build/tests/venv/lib64/python3.8/site-packages/avoca=
+do/core/test.py:753
+> >=20
+> > 22:05:36 ERROR| Traceback (most recent call last):
+> > 22:05:36 ERROR|=C2=A0=C2=A0 File
+> > "/builds/jsnow/qemu/build/tests/acceptance/avocado_qemu/__init__.py",
+> > line 171, in setUp
+> > 22:05:36 ERROR|=C2=A0=C2=A0=C2=A0=C2=A0 self.cancel("No QEMU binary def=
+ined or found in the
+> > build tree")
+>
+
+One very bad aspect of this output is that the test outcome (a test
+cancelation) is determined by an exception handler by the runner, and
+the "ERROR" prefix is indeed very misleading.
+
+But yes, in short, it's not an *error*, but the test getting canceled.
+
+> Last year the Avocado developers said we could have a clearer
+> log error report, but meanwhile this verbose output is better
+> that not having anything =C2=AF\_(=E3=83=84)_/=C2=AF
+>
+
+With the new test runner ("avocado run --test-runner=3Dnrunner") that
+just made its way into Avocado 81.0, there's a much better separation
+of what happens within the test, and within the runner.
+
+The next step is to post the QEMU and "Avocado >=3D 82.0" integration, so
+hopefully this will improve soon.
+
+> >=20
+> > Is this a known problem?
 >=20
-> This structure has changed a bit since it was first created and its
-> current documentation is not quite up-to-date.
+> "No QEMU binary defined or found in the build tree" is not a
+> problem, it means a test is skipped because the qemu-system-$ARCH
+> binary is not found. In your case this is because your job
+> (acceptance-system-fedora) is based on build-system-fedora
+> which only build the following targets:
 >=20
-> A write request can span a region consisting on a combination of
+>     TARGETS: tricore-softmmu microblaze-softmmu mips-softmmu
+>       xtensa-softmmu m68k-softmmu riscv32-softmmu ppc-softmmu
+>       sparc64-softmmu
+>
 
-s/on/of/
+Right.
 
-> clusters of different types, and qcow2_alloc_host_offset() can
-> repeatedly call handle_copied() and handle_alloc() to add more
-> clusters to the mix as long as they all are contiguous on the image
-> file.
->=20
-> Because of this a write request has a list of QCowL2Meta structures,
-> one for each part of the request that needs changes in the L2
-> metadata.
->=20
-> Each one of them spans nb_clusters and has two copy-on-write regions
-> located immediately before and after the middle region that that part
-> of the write request touches. Even when those regions themselves are
+> Now I don't understand what binary the EmptyCPUModel/Migration tests
+> are expecting. Maybe these tests only work when a single target is
+> built? IOW not expecting that the python code searching for a binary
+> return multiple ones? -> Eduardo/Cleber.
+>
 
-Grammatically correct, but the doubled 'that' caught me on my first
-read.  Maybe you want:
+`avocado_qemu.pick_default_qemu()`, if not given an arch, will try to
+find a target binary that matches the host.  The problem with picking
+any (first available?) built target is the non-deterministic aspect.
 
-s/that that part of the write request touches/touched by that part of
-the write request/
+BTW, with regards to how `avocado_qemu.pick_default_qemu()` will get
+an arch, it can come either from a test parameter, or from an "arch"
+tag.
 
-> empty their offsets must be correct because they are used to know the
-> location of the middle region.
->=20
-> This was not always the case but it is not a problem anymore
-> because the only two places where QCowL2Meta structures are created
-> (calculate_l2_meta() and qcow2_co_truncate()) ensure that the
-> copy-on-write regions are correctly defined, and so do assertions like
-> the ones in perform_cow().
->=20
-> The conditional initialization of the 'written_to' variable is
-> therefore unnecessary and is removed by this patch.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
+Cheers,
+- Cleber.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---dYPYqcNPdk5WsGUvEoRlifdhAUEYZ8F32--
-
---Mj1x30xMeXrv7dVGbYd2agmeKci3cmLOy
+--VACxsDaSTfeluoxK
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl990dwACgkQp6FrSiUn
-Q2rzpAgAkr7XUw2/IX6Gyxptats8RkOc/yCUq8jkFnJtoXS3FSmxemNtEBjDqGec
-gy2JjaTyp6iYg0TpqhuKmZ7xajwup37CvtjX0wduOi2qzSsQjuYpxe/AmjH95fzb
-1ijZ/w111+nSuBq3pHALIfs7HcoPsJJ3lDLafSmw59zzANjAz+VEmBh0j857hCna
-h5neh94BwsKbBbjvApaGKVJy319BQ17lNpeLjK67X2/D7vdExydYRUFPVsmX3ViR
-xmtctZi2S+sFJMHSUrSIbRgF7WZpOCW/IJ+/18dOFdYy0qiQJNhVw85vSAXWHWnJ
-tbLJT6L5q2tD2KU3BumUshIHNMsXAQ==
-=BBey
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl990vUACgkQZX6NM6Xy
+CfNBJA//a8pfr9CObPnB3eprL5sU0O4mLYEVxH4PAt9C48JamN7Hvcn3n2UWoJsR
+aPNxDvLSBuyilnR+OYmOBEu3gTQZ4jmVvRJMVCFazewNUNSt8X8y395KMWV+cI7M
+92HG5KpsOpSbBCByeWpoUUleMUEUniGR/qNjzuYO+tVsVqaFAF34kLAFcIKqi90h
+q0JPTMz+o50WWmDojNT93jmz3AdhcVPUUNNKgMraxLgT2QUUkx8dWVnXizqKJTC7
+s4e8DYfqn4+Y9IJj1h1w+r6U+y91E+vIflcL/r2wtQYLzTWZo36NoumEKEMV2JQH
+wgmoMdEmOr1J/Q8k2jr/+o2n4HGrVchFz7zAhUFWGVnJmIs1Ca6Txv/ovSDHmYWL
+dEaJaj6214MgoU/r3s/Il+5EeXI+Qx4rIGSxdgo9qYUOO7bqImLh3cUwN4xzsLnm
+dgc+L/Ii8JyXbvm+zU7sEUrmGRJkmXJNJHmuA7dfr++c4I7Xi3SgjumCRNH5oKWY
+NxsXb8CvluRqfgETek64Ov3W8Kb8Rmfnx9YTnHbDVHGWhuBXE9PRpJPkEMHb3zex
+OYDiIm61McfoPOE6Kw5J2HwmpaUL79ZASX8hhwtOxSKpAALgoHuHgb789PT1xPzJ
+vDGV0CsvHQSKRSynDjoQofJcWIvrx8r5PAX8zT3CA/5s3vlkJxw=
+=SQXj
 -----END PGP SIGNATURE-----
 
---Mj1x30xMeXrv7dVGbYd2agmeKci3cmLOy--
+--VACxsDaSTfeluoxK--
 
 
