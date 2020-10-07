@@ -2,88 +2,85 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFFBFC4727F
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 16:04:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69250C41604
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 16:05:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 572A521707
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 16:04:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B198C216C4
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 16:05:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GKhc+ezv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 572A521707
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MgA68b9n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B198C216C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQBve-0006N5-72
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 12:04:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33254)
+	id 1kQBwS-0006q1-Hm
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 12:05:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33140)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kQBnl-0001Th-DN
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 11:56:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20680)
+ id 1kQBnc-0001Cc-RG
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 11:56:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56357)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kQBnh-0000IL-Sa
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 11:56:25 -0400
+ id 1kQBna-0000F0-6O
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 11:56:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602086181;
+ s=mimecast20190719; t=1602086172;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=W85WJLLeimVgYQvZmhoPM6kQHkNmqQwrNZAwhc++t9I=;
- b=GKhc+ezvD8zsk/BICs5Eut2P21iwiaVKbllqVUycBQdk7d35kKxBs6AdCZqqAqqwNppnIb
- DdDjV1aT2CJ1cX/Qoe0h04PLU+ODyxPC5S4Rdow/RF/gfnOneumTos1ZxtP813kR1imeBs
- BON0ErDJqXUCh3cGml6BiupKfk71NqY=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=KkHEj8jmk45TqPAjqKynHPSqVw2rKaJ/0+EBNaN2O28=;
+ b=MgA68b9nJOeTU2vGClVa7MhfIMLQ5m/0HiCBHObL6FBqXjPouyN7pslqTFigAzdxrnIU4H
+ LG0kUBCmomObv++Ri+zl3lSyW11ZQfGhWixAJuoV8Qd4JbQZvgALyyGAUcbmGEhWi8pD+C
+ rKrUXdiacmb+F9QIFFK//HWXEQvqAzw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-194-hDdMebllOVCKVRzcyzmIqA-1; Wed, 07 Oct 2020 11:56:19 -0400
-X-MC-Unique: hDdMebllOVCKVRzcyzmIqA-1
+ us-mta-47-cnioxLUdMgyaU832IUuiug-1; Wed, 07 Oct 2020 11:56:10 -0400
+X-MC-Unique: cnioxLUdMgyaU832IUuiug-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 204E71021202;
- Wed,  7 Oct 2020 15:56:18 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE47318C5201;
+ Wed,  7 Oct 2020 15:56:09 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-112-50.ams2.redhat.com
  [10.36.112.50])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B9B861000320;
- Wed,  7 Oct 2020 15:56:16 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 370BF10021AA;
+ Wed,  7 Oct 2020 15:56:02 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, alex.bennee@linaro.org, zhengchuan@huawei.com,
  stefanha@redhat.com, peterx@redhat.com
-Subject: [PULL 05/10] migration: Pass incoming state into qemu_ufd_copy_ioctl()
-Date: Wed,  7 Oct 2020 16:55:55 +0100
-Message-Id: <20201007155600.337316-6-dgilbert@redhat.com>
-In-Reply-To: <20201007155600.337316-1-dgilbert@redhat.com>
-References: <20201007155600.337316-1-dgilbert@redhat.com>
+Subject: [PULL 00/10] migration queue
+Date: Wed,  7 Oct 2020 16:55:50 +0100
+Message-Id: <20201007155600.337316-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:44:56
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:54:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
 X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,56 +99,66 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Peter Xu <peterx@redhat.com>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-It'll be used in follow up patches to access more fields out of it.  Meanwhile
-fetch the userfaultfd inside the function.
+The following changes since commit f2687fdb7571a444b5af3509574b659d35ddd601:
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20201002175336.30858-2-peterx@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/postcopy-ram.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+  Merge remote-tracking branch 'remotes/bonzini-gitlab/tags/for-upstream' into staging (2020-10-06 15:04:10 +0100)
 
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index 0a2f88a87d..722034dc01 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -1128,10 +1128,12 @@ int postcopy_ram_incoming_setup(MigrationIncomingState *mis)
-     return 0;
- }
- 
--static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
-+static int qemu_ufd_copy_ioctl(MigrationIncomingState *mis, void *host_addr,
-                                void *from_addr, uint64_t pagesize, RAMBlock *rb)
- {
-+    int userfault_fd = mis->userfault_fd;
-     int ret;
-+
-     if (from_addr) {
-         struct uffdio_copy copy_struct;
-         copy_struct.dst = (uint64_t)(uintptr_t)host_addr;
-@@ -1185,7 +1187,7 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
-      * which would be slightly cheaper, but we'd have to be careful
-      * of the order of updating our page state.
-      */
--    if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, from, pagesize, rb)) {
-+    if (qemu_ufd_copy_ioctl(mis, host, from, pagesize, rb)) {
-         int e = errno;
-         error_report("%s: %s copy host: %p from: %p (size: %zd)",
-                      __func__, strerror(e), host, from, pagesize);
-@@ -1212,7 +1214,7 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
-      * but it's not available for everything (e.g. hugetlbpages)
-      */
-     if (qemu_ram_is_uf_zeroable(rb)) {
--        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, NULL, pagesize, rb)) {
-+        if (qemu_ufd_copy_ioctl(mis, host, NULL, pagesize, rb)) {
-             int e = errno;
-             error_report("%s: %s zero host: %p",
-                          __func__, strerror(e), host);
--- 
-2.28.0
+are available in the Git repository at:
+
+  git://github.com/dagrh/qemu.git tags/pull-migration-20201007b
+
+for you to fetch changes up to 1df31b8aca2aa4f83d5827d74700eeb6d711bbdf:
+
+  migration/dirtyrate: present dirty rate only when querying the rate has completed (2020-10-07 16:49:26 +0100)
+
+----------------------------------------------------------------
+Migration and virtiofs pull 2020-07-10
+
+Migration:
+  Dirtyrate measurement API cleanup
+  Postcopy recovery fixes
+
+Virtiofsd:
+  Missing qemu_init_exec_dir call
+  Support for setting the group on socket creation
+  Stop a gcc warning
+  Avoid tempdir in sandboxing
+
+----------------------------------------------------------------
+Alex Bennée (1):
+      tools/virtiofsd: add support for --socket-group
+
+Chuan Zheng (2):
+      migration/dirtyrate: record start_time and calc_time while at the measuring state
+      migration/dirtyrate: present dirty rate only when querying the rate has completed
+
+Dr. David Alan Gilbert (2):
+      virtiofsd: Silence gcc warning
+      virtiofsd: Call qemu_init_exec_dir
+
+Peter Xu (4):
+      migration: Pass incoming state into qemu_ufd_copy_ioctl()
+      migration: Introduce migrate_send_rp_message_req_pages()
+      migration: Maintain postcopy faulted addresses
+      migration: Sync requested pages after postcopy recovery
+
+Stefan Hajnoczi (1):
+      virtiofsd: avoid /proc/self/fd tempdir
+
+ docs/tools/virtiofsd.rst         |  4 +++
+ migration/dirtyrate.c            | 16 ++++++-----
+ migration/migration.c            | 49 ++++++++++++++++++++++++++++++++--
+ migration/migration.h            | 21 ++++++++++++++-
+ migration/postcopy-ram.c         | 25 +++++++++++++-----
+ migration/savevm.c               | 57 ++++++++++++++++++++++++++++++++++++++++
+ migration/trace-events           |  3 +++
+ qapi/migration.json              |  8 +++---
+ tools/virtiofsd/fuse_i.h         |  1 +
+ tools/virtiofsd/fuse_lowlevel.c  |  6 +++++
+ tools/virtiofsd/fuse_virtio.c    | 21 +++++++++++++--
+ tools/virtiofsd/passthrough_ll.c | 38 ++++++++++-----------------
+ 12 files changed, 203 insertions(+), 46 deletions(-)
 
 
