@@ -6,63 +6,63 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 988B4C4363C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 09:46:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9E11C4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 09:54:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED5DB2076C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 09:46:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0EAF22076C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 09:54:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DGjs64U2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED5DB2076C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DygcTLGD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EAF22076C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ61s-000643-0e
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 05:46:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34500)
+	id 1kQ69N-00006A-39
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 05:54:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36030)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kQ60p-0005aG-Nj
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 05:45:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:24580)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kQ68b-0007gE-74
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 05:53:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25631)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kQ60o-0001aj-9w
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 05:45:31 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kQ68Y-0002Sj-8R
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 05:53:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602063929;
+ s=mimecast20190719; t=1602064409;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=fYu2qycwwyfNwiGEqxLdnhNomoko+1lS+NMbIJNPd2U=;
- b=DGjs64U2nHpLmnJoMeSTGtfKIK2PjXnXqX0HHPyBaG20zPrKEvl2JvimwH4WHkR05/iqN+
- +ZKhEs8EletjNQ1e9LA0of3brX2QtoBtUGsvTDtAhqgwEwB9olHrjYdY14Jr9wkNtIblVh
- vRk2K+eEzFCrI/D81tbl2MMQDTabh/E=
+ bh=kXqPZ6tSoF6aIyyYv/yqz9crpudJq5z+v4WSW925OVY=;
+ b=DygcTLGD+Co0P4WaMx+CEk8YXfp9MJKxIO9Rdd+qlYPisoigSCk+SiBOV0cNGKJ2K3FPsO
+ /2Uxh567YX36LOXIPAWd/W3Ud93wSmjsng2+HKBLFcIfo8TuJYbjNVTJgdY8cORl+rs7rC
+ OY2QQV6FMtS7alLirsE/V7ogoEHvO5E=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-308-wqFBLUI5Njqi5yGzQowv-g-1; Wed, 07 Oct 2020 05:45:25 -0400
-X-MC-Unique: wqFBLUI5Njqi5yGzQowv-g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-596-REMvjNTPOvmiEPzYbKnsww-1; Wed, 07 Oct 2020 05:53:27 -0400
+X-MC-Unique: REMvjNTPOvmiEPzYbKnsww-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D08A1021203;
- Wed,  7 Oct 2020 09:45:24 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5C6181018F65;
+ Wed,  7 Oct 2020 09:53:26 +0000 (UTC)
 Received: from linux.fritz.box (ovpn-113-169.ams2.redhat.com [10.36.113.169])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BB77F1001281;
- Wed,  7 Oct 2020 09:45:22 +0000 (UTC)
-Date: Wed, 7 Oct 2020 11:45:21 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id ED6485C1C4;
+ Wed,  7 Oct 2020 09:53:23 +0000 (UTC)
+Date: Wed, 7 Oct 2020 11:53:22 +0200
 From: Kevin Wolf <kwolf@redhat.com>
 To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH 01/20] python/qemu: use isort to lay out imports
-Message-ID: <20201007094521.GB7212@linux.fritz.box>
+Subject: Re: [PATCH 07/20] python/machine.py: Add _qmp access shim
+Message-ID: <20201007095322.GC7212@linux.fritz.box>
 References: <20201006235817.3280413-1-jsnow@redhat.com>
- <20201006235817.3280413-2-jsnow@redhat.com>
+ <20201006235817.3280413-8-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201006235817.3280413-2-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20201006235817.3280413-8-jsnow@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -98,12 +98,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 07.10.2020 um 01:57 hat John Snow geschrieben:
-> Borrowed from the QAPI cleanup series, use the same configuration to
-> standardize the way we write and sort imports.
+Am 07.10.2020 um 01:58 hat John Snow geschrieben:
+> Like many other Optional[] types, it's not always a given that this
+> object will be set. Wrap it in a type-shim that raises a meaningful
+> error and will always return a concrete type.
 > 
 > Signed-off-by: John Snow <jsnow@redhat.com>
 
+> @@ -515,11 +515,13 @@ def set_qmp_monitor(self, enabled=True):
+>                          line. Default is True.
+>          @note: call this function before launch().
+>          """
+> -        if enabled:
+> -            self._qmp_set = True
+> -        else:
+> -            self._qmp_set = False
+> -            self._qmp = None
+> +        self._qmp_set = enabled
+
+This change seems unrelated to wrapping the connection in a property.
+Intuitively, it makes sense that the connection of a running instance
+doesn't go away just because I disable QMP in the command line for the
+next launch.
+
+If this is the reasoning behind the change, maybe mention it in the
+commit message.
+
+With this:
 Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 
 
