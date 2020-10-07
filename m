@@ -2,92 +2,87 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AFB6C4363D
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 14:55:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DD8EC4363D
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 14:55:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BA91208C7
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 14:55:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 15E54208C7
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 14:55:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KXRiw0Pn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BA91208C7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PYkE5TqT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15E54208C7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQAqa-0005p3-Cu
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 10:55:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47582)
+	id 1kQAqm-00062g-2q
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 10:55:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47778)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQAoc-0004P5-1V
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 10:53:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53898)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQAoV-0006ic-Qd
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 10:53:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602082386;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=PbdgrKzUBg2lo4DEn0w8O5bpjSgWWrpQawN5LJKU92Y=;
- b=KXRiw0Pn/tnXC1USBAwLyY2TwtYzwJCF07a+nqbzH3d176PmqJXjCc6QieeVz62MH70QVr
- WTfatV+7B4ikF5z2G1GXHq1tHK/6GpcvyLQZJDNMVT/WpfLASphWS0KatpCBOh7OaTEEGH
- gVyihVcK1w192jOKnw6TwuGJALPXTn8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-23-Jtd3PNr-OhaTY7fpAus00w-1; Wed, 07 Oct 2020 10:53:03 -0400
-X-MC-Unique: Jtd3PNr-OhaTY7fpAus00w-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E5FB1019632
- for <qemu-devel@nongnu.org>; Wed,  7 Oct 2020 14:53:02 +0000 (UTC)
-Received: from [10.10.120.38] (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A8E251002EEA;
- Wed,  7 Oct 2020 14:52:55 +0000 (UTC)
-Subject: Re: [PATCH v5 03/36] qapi-gen: Separate arg-parsing from generation
-To: Markus Armbruster <armbru@redhat.com>
-References: <20201005195158.2348217-1-jsnow@redhat.com>
- <20201005195158.2348217-4-jsnow@redhat.com>
- <87imbntvw9.fsf@dusky.pond.sub.org>
- <69effb8e-3d83-a2e7-c484-feea8ed850b9@redhat.com>
- <87h7r6jws4.fsf@dusky.pond.sub.org>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <65c2a120-e29e-b572-680a-ee6d141ff9c8@redhat.com>
-Date: Wed, 7 Oct 2020 10:52:54 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kQAp0-0004cs-L6; Wed, 07 Oct 2020 10:53:38 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:44954)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kQAov-0006lC-Kg; Wed, 07 Oct 2020 10:53:38 -0400
+Received: by mail-pf1-x442.google.com with SMTP id f19so1448162pfj.11;
+ Wed, 07 Oct 2020 07:53:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=9kbGEm3EbGzEmJKqtgZ7++E9UoagfgdWtumbA/uZFN0=;
+ b=PYkE5TqT2sO6/WFUWBnU9rVS/M0QJZS/SZVDBRXCfpW+grlprQ8nTQzIfsZqu5AfH4
+ 56YlR4FwckuDr2CUCFJbNMzybO1wZWZ4TgcF93NkEp8t8d9rxoBWdO84EtvPGJdJP8vQ
+ hZDXAPNasUnb4NhTjbcuv2iFmGLIXHDP1rusAqFeIEKPHyOp/d1PQFMgedto6fIbn9u9
+ VuvLiEcI6uNfRTnePrO0OZdQ/jo5GlzC6EzzlZqukCbMXE0kTQIXxTY4a/mQi4fVMM7D
+ pB2zMgGevBqKyhy9/f8YdhMKjQ+hG8gTYTVYcwZH1anYRVXQmfKYYfCXaMW7yGvQ4s7H
+ HBSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=9kbGEm3EbGzEmJKqtgZ7++E9UoagfgdWtumbA/uZFN0=;
+ b=Mh4MNHZfDrC9NUFROLi7T1iRd95/GZh9CIXy/Gv3ChEyUfH7wE4egBxD0ygm0tKELg
+ goMpQKdp+pJrH3daKBwmlMywF/MDyv66895zDaSmx+a/MQlteLSCOpIXSykc0pbAgk4Q
+ mDVSLexmr/PKLWh4Em0irsETKk3fK7qYxo08h89r5uvilph+daAyErC+RM0hdy9mT0ll
+ hYbY5ZCvI114kAUg+7/YD6j4IeU2umuWe/NJLKKF1TjrujjJVy+Ajm6m9vVKydMx80Uz
+ 0iWp75KDU+ZrSkV0REe2mt584xVBTDjqc6bH+jsiZKdPLEtTmvyTAOXP9YYkl9/cxIjV
+ SreQ==
+X-Gm-Message-State: AOAM5319S96xIlz+bVeQumBLJ6D0cWMpA7/at2IcrLDIzyrGAush8rvR
+ edGFbLuXptboPybQ4Hqa9b/+U1iXE21pTw==
+X-Google-Smtp-Source: ABdhPJyOONQOeE/4HYH82Eb52eOXSCdaLswNoKl5CzRz7FfporyZhTkg802+SK5czC5qVSTBezL/WA==
+X-Received: by 2002:a63:145c:: with SMTP id 28mr3295608pgu.451.1602082400289; 
+ Wed, 07 Oct 2020 07:53:20 -0700 (PDT)
+Received: from localhost.localdomain ([103.94.185.75])
+ by smtp.googlemail.com with ESMTPSA id u14sm3301514pfm.80.2020.10.07.07.53.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 07 Oct 2020 07:53:19 -0700 (PDT)
+From: Yonggang Luo <luoyonggang@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v5 0/2] Improve cirrus msys2
+Date: Wed,  7 Oct 2020 22:52:58 +0800
+Message-Id: <20201007145300.1197-1-luoyonggang@gmail.com>
+X-Mailer: git-send-email 2.28.0.windows.1
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <87h7r6jws4.fsf@dusky.pond.sub.org>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:54:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,270 +96,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ QEMU Trivial <qemu-trivial@nongnu.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Yonggang Luo <luoyonggang@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/7/20 3:54 AM, Markus Armbruster wrote:
-> John Snow <jsnow@redhat.com> writes:
-> 
->> On 10/6/20 7:51 AM, Markus Armbruster wrote:
->>> John Snow <jsnow@redhat.com> writes:
->>>
->>>> This is a minor re-work of the entrypoint script. It isolates a
->>>> generate() method from the actual command-line mechanism.
->>>>
->>>> Signed-off-by: John Snow <jsnow@redhat.com>
->>>> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
->>>> Reviewed-by: Cleber Rosa <crosa@redhat.com>
->>>> Tested-by: Cleber Rosa <crosa@redhat.com>
->>>> ---
->>>>    scripts/qapi-gen.py | 85 +++++++++++++++++++++++++++++++++------------
->>>>    1 file changed, 62 insertions(+), 23 deletions(-)
->>>>
->>>> diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
->>>> index 541e8c1f55d..117b396a595 100644
->>>> --- a/scripts/qapi-gen.py
->>>> +++ b/scripts/qapi-gen.py
->>>> @@ -1,30 +1,77 @@
->>>>    #!/usr/bin/env python3
->>>> -# QAPI generator
->>>> -#
->>>> +
->>>>    # This work is licensed under the terms of the GNU GPL, version 2 or later.
->>>>    # See the COPYING file in the top-level directory.
->>>>    +"""
->>>> +QAPI Generator
->>>> +
->>>> +This script is the main entry point for generating C code from the QAPI schema.
->>>> +"""
->>>>      import argparse
->>>>    import re
->>>>    import sys
->>>>      from qapi.commands import gen_commands
->>>> +from qapi.error import QAPIError
->>>>    from qapi.events import gen_events
->>>>    from qapi.introspect import gen_introspect
->>>> -from qapi.schema import QAPIError, QAPISchema
->>>> +from qapi.schema import QAPISchema
->>>>    from qapi.types import gen_types
->>>>    from qapi.visit import gen_visit
->>> Unrelated cleanup.  Okay.
->>>
->>>>      
->>>> -def main(argv):
->>>> +DEFAULT_OUTPUT_DIR = ''
->>>> +DEFAULT_PREFIX = ''
->>>> +
->>>> +
->>>> +def generate(schema_file: str,
->>>> +             output_dir: str,
->>>> +             prefix: str,
->>>> +             unmask: bool = False,
->>>> +             builtins: bool = False) -> None:
->>>> +    """
->>>> +    generate uses a given schema to produce C code in the target directory.
->>>> +
->>>> +    :param schema_file: The primary QAPI schema file.
->>>> +    :param output_dir: The output directory to store generated code.
->>>> +    :param prefix: Optional C-code prefix for symbol names.
->>>> +    :param unmask: Expose non-ABI names through introspection?
->>>> +    :param builtins: Generate code for built-in types?
->>>> +
->>>> +    :raise QAPIError: On failures.
->>>> +    """
->>>> +    match = re.match(r'([A-Za-z_.-][A-Za-z0-9_.-]*)?', prefix)
->>>> +    if match.end() != len(prefix):
->>>> +        msg = "funny character '{:s}' in prefix '{:s}'".format(
->>>> +            prefix[match.end()], prefix)
->>>> +        raise QAPIError('', None, msg)
->>> Uh...
->>>       $ python3 scripts/qapi-gen.py --prefix=@ x
->>>       scripts/qapi-gen.py: : funny character '@' in prefix '@'
->>> Unwanted " :".
->>> This is due to a hack: you pass '' for info (*quack*).  Everything
->>> else
->>> passes QAPISourceInfo (I believe).
->>>
->>
->> Quack indeed - why does our base error class require so much
->> information from a specific part of the generation process?
-> 
-> Because it's not "a base error class", it's a base error class for the
-> QAPI schema compiler frontend.
-> 
-
-Well. It's the base for every error we /had/.
-
->> Ah, someone changes this in part 4 so that we have a more generic
->> error class to use as a base when we are missing such information.
-> 
-> Evolving it to satisfy a need for a more widely usable error class is
-> okay.
-> 
-
-Yep. It's helpful to keep a very generic form on which we grow other 
-errors from, so that things like the entry point can be written legibly.
-
->> You are witnessing some more future-bleed.
->>> Is it really a good idea to do this in generate?  It's not about
->>> generating code, it's about validating a CLI option.
->>>
->>
->> One might also ask: Is it a good idea to only validate this on a
->> frontend, and not in the implementation?
-> 
-> Yes, because that's where you can emit the better error message more
-> easily.
-> 
->      $ python3 scripts/qapi-gen.py --prefix=@ x
->      scripts/qapi-gen.py: 'funny character '@' in argument of --prefix
-> 
-> is better than
-> 
->      $ python3 scripts/qapi-gen.py --prefix=@ x
->      scripts/qapi-gen.py: funny character '@' in prefix '@'
-> 
-> In generate(), the knowledge where the offending prefix value comes from
-> is no longer available.
-> 
-> To emit this error message, you'd have to raise a sufficiently distinct
-> error in generate, catch it in main(), then put the error message
-> together somehow.  Bah.
-> 
-> Aside: there's a stray ' in the old error message.
-> 
->> The idea here was to create a function that could be used in a script
->> (for tests, debugging interfaces, other python packages) to do all of
->> the same things that the CLI tool did, just sans the actual CLI.
-> 
-> YAGNI.
-> 
-
-It's useful for testing and debugging to be able to just call it outside 
-of the CLI, though. Maybe you won't use it, but I will.
-
-I could always add the prefix check into a tiny function and give the 
-good error message in main(), and just assert in generate() if you 
-insist on the slightly more specific error message from the CLI script.
-
->> Wouldn't make sense to allow garbage to flow in from one interface but
->> not the other; so the check is here.
-> 
-> "@prefix is sane" is a precondition of generate().
-> 
-> When there's a real risk of preconditions getting violated, or readers
-> getting confused about preconditions, check them with assert.
-> 
->>>> +
->>>> +    schema = QAPISchema(schema_file)
->>>> +    gen_types(schema, output_dir, prefix, builtins)
->>>> +    gen_visit(schema, output_dir, prefix, builtins)
->>>> +    gen_commands(schema, output_dir, prefix)
->>>> +    gen_events(schema, output_dir, prefix)
->>>> +    gen_introspect(schema, output_dir, prefix, unmask)
->>>> +
->>>> +
->>>> +def main() -> int:
->>>> +    """
->>>> +    gapi-gen shell script entrypoint.
->>>> +    Expects arguments via sys.argv, see --help for details.
->>>> +
->>>> +    :return: int, 0 on success, 1 on failure.
->>>> +    """
->>>>        parser = argparse.ArgumentParser(
->>>>            description='Generate code from a QAPI schema')
->>>>        parser.add_argument('-b', '--builtins', action='store_true',
->>>>                            help="generate code for built-in types")
->>>> -    parser.add_argument('-o', '--output-dir', action='store', default='',
->>>> +    parser.add_argument('-o', '--output-dir', action='store',
->>>> +                        default=DEFAULT_OUTPUT_DIR,
->>>>                            help="write output to directory OUTPUT_DIR")
->>>> -    parser.add_argument('-p', '--prefix', action='store', default='',
->>>> +    parser.add_argument('-p', '--prefix', action='store',
->>>> +                        default=DEFAULT_PREFIX,
->>>>                            help="prefix for symbols")
->>> I don't like the changes to default=, because:
->>> 1. They are only losely related to the patch's purpose.
->>>
->>
->> Subjective, but OK.
->>
->>> 2. They split the definition of the CLI: most of it is here, except for
->>> defaults, which are defined elsewhere.
->>>
->>
->> All of it is in main.py, though! If you were to, say, move generate()
->> elsewhere, it'd look pretty compact as just the CLI frontend, no?
-> 
-> Same statement is more compact than same screenful is more compact than
-> same file :)
-> 
->>> 3. The defaults will not change, and nothing else uses the constants.
->>>
->>
->> But, fine. Cleber had the same comment but I wasn't fully on-board,
->> but two folks saying the same thing ...
->>
->>>>        parser.add_argument('-u', '--unmask-non-abi-names', action='store_true',
->>>>                            dest='unmask',
->>>> @@ -32,25 +79,17 @@ def main(argv):
->>>>        parser.add_argument('schema', action='store')
->>>>        args = parser.parse_args()
->>>>    -    match = re.match(r'([A-Za-z_.-][A-Za-z0-9_.-]*)?',
->>>> args.prefix)
->>>> -    if match.end() != len(args.prefix):
->>>> -        print("%s: 'funny character '%s' in argument of --prefix"
->>>> -              % (sys.argv[0], args.prefix[match.end()]),
->>>> -              file=sys.stderr)
->>>> -        sys.exit(1)
->>>> -
->>>>        try:
->>>> -        schema = QAPISchema(args.schema)
->>>> +        generate(args.schema,
->>>> +                 output_dir=args.output_dir,
->>>> +                 prefix=args.prefix,
->>>> +                 unmask=args.unmask,
->>>> +                 builtins=args.builtins)
->>>>        except QAPIError as err:
->>>> -        print(err, file=sys.stderr)
->>>> -        exit(1)
->>>> -
->>>> -    gen_types(schema, args.output_dir, args.prefix, args.builtins)
->>>> -    gen_visit(schema, args.output_dir, args.prefix, args.builtins)
->>>> -    gen_commands(schema, args.output_dir, args.prefix)
->>>> -    gen_events(schema, args.output_dir, args.prefix)
->>>> -    gen_introspect(schema, args.output_dir, args.prefix, args.unmask)
->>>> +        print(f"{sys.argv[0]}: {str(err)}", file=sys.stderr)
->>>> +        return 1
->>>> +    return 0
->>> Subtle change: you move the gen_FOO() into the try ... except.
->>> Okay;
->>> they don't raise QAPIError, but perhaps worth a mention in the commit
->>> message.
->>>
->>
->> Forbidden future knowledge; I intend them to.
-> 
-> I don't mind the move.
-> 
->>>>      
->>>>    if __name__ == '__main__':
->>>> -    main(sys.argv)
->>>> +    sys.exit(main())
->>> "Python was designed to be easy to understand and fun to use."
->>> Ha ha ha.
->>>
->>
->> I mean, I'm having fun, aren't you?
-> 
-> So many kinds of fun!  The fun I'm having with this patch hunk is
-> mocking "easy and fun" Python for requiring such an elaborate menuett
-> just to express "can run as program".
-> 
-> This emperor has no clothes, either.  And that's funny, isn't it?
-> 
-
+Fixes the broken msys2/mingw ci and speed it up.=0D
+=0D
+V4-V5=0D
+Now the cache are usefull by using 7zip to archive msys64=0D
+Saved about 18min, compare=0D
+https://cirrus-ci.com/task/5093551157542912=0D
+https://cirrus-ci.com/task/6177196538593280=0D
+=0D
+V3-V4=0D
+Using cirrus cache to speed up msys2 ci instead of downloading archive file=
+=0D
+=0D
+V2-V3=0D
+Add one more patch:=0D
+cirrus: msys2/mingw speed is up, add excluded target back=0D
+Do not build sphinx on windows, that's failing=0D
+set the number of parallel count to fixed number 8=0D
+=0D
+V1-V2=0D
+Resolve the cirrus conflict=0D
+=0D
+Yonggang Luo (2):=0D
+  cirrus: Fixing and speedup the msys2/mingw CI=0D
+  cirrus: msys2/mingw speed is up, add excluded target back=0D
+=0D
+ .cirrus.yml | 113 +++++++++++++++++++++++++++++++---------------------=0D
+ 1 file changed, 67 insertions(+), 46 deletions(-)=0D
+=0D
+-- =0D
+2.28.0.windows.1=0D
+=0D
 
