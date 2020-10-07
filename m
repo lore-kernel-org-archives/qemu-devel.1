@@ -2,88 +2,71 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57C27C4363C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 19:51:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CACFFC4727E
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 19:53:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B924206F4
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 19:51:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IpTz36up"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B924206F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 46E1120872
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 19:53:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46E1120872
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQFTY-000391-KM
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 15:51:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58988)
+	id 1kQFV4-0004m2-8C
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 15:53:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59184)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kQFSl-0002D0-Jx; Wed, 07 Oct 2020 15:50:59 -0400
-Received: from mail-pf1-x42e.google.com ([2607:f8b0:4864:20::42e]:35561)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kQFSj-0002YF-89; Wed, 07 Oct 2020 15:50:59 -0400
-Received: by mail-pf1-x42e.google.com with SMTP id k8so1999908pfk.2;
- Wed, 07 Oct 2020 12:50:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=1YYyNUTrs8LpEP4iBDXNDMxJb6UWYAD/KDaE5MUPJZw=;
- b=IpTz36upedFkt5KT5PKxM98CEnCkW7Wp0xFqsr5n12rLDEDxYqqWAfaWsZRYUbfhF1
- /zb5YOmarZcJWGo4ilM7R6CehJX4g2ijtxQtd/ACd0wzoPF5dpOqvyQ4WDckbkW3W1e2
- Sv6EXK7hhW58XoZQ9/A/xqK/n0x5bvmz2f00gOXthJgSpKXJDfA4/7GDbT8sCua+BBdO
- dBHIx7vcGowLvi/nLXvgDSGfsm9uHBIdhVBQNXOHNmPRM1RfvHVw+FmU177zt4es81YV
- fQh2kChBWUVFFj6cOMd1s15nmWeEKocPa5kyf4D9Zo5eAEw2MZecGMczDVDI7V3MRYO9
- OKKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=1YYyNUTrs8LpEP4iBDXNDMxJb6UWYAD/KDaE5MUPJZw=;
- b=phob5T9u7dmbwLlgFrOiIc5DgqoG9OCWxwqn2//w8IXep5FBQToHk2Di5IzEwO9b8R
- IrzJtcKQpVbe3ubPMg/EjADsYfGAtDq1/ivg5PdUI9wYg7A+RyRqSOms9bf19mskhwoi
- WpjEhA+CAUzqQpejsjbWeLIcrIIDD8s+hX080sD/TDOqw1nOBZRIFpsofpby+5U4NNQM
- a4RqTZvjl5jHAvMzeIXi7XT7AQVUQLTrk05HVz2oWfsTIAE7pesvkNzC8+u2T3oQt5TR
- XbbSDDfIo1O8qxO8d9B2vQvOS6gUG4ErD8y+UO5z2Io3fnvdiBiI+rgBxHnneoCNpgUf
- +eLA==
-X-Gm-Message-State: AOAM530JDhXUzisIcbxhsPzT2q1vhG8ie5w3QdxMnEv2AYS7W1WEhutc
- 1ztvBrG4vX19rOXWiRDX/k4592sGHCJ9pA==
-X-Google-Smtp-Source: ABdhPJxFOWK6IQ+T8mIXPzDhYfnts6HsMzIHq4gbwkWkgWhh/q8XtopCMtr1Px/gZbXpXvXk9rOZcg==
-X-Received: by 2002:a17:90a:64ce:: with SMTP id
- i14mr2879009pjm.97.1602100254788; 
- Wed, 07 Oct 2020 12:50:54 -0700 (PDT)
-Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id 9sm4105141pfx.138.2020.10.07.12.50.52
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 07 Oct 2020 12:50:53 -0700 (PDT)
-From: Yonggang Luo <luoyonggang@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v9] scripts: Convert qemu-version.sh to qemu-version.py
-Date: Thu,  8 Oct 2020 03:50:35 +0800
-Message-Id: <20201007195035.2006-1-luoyonggang@gmail.com>
-X-Mailer: git-send-email 2.28.0.windows.1
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kQFTl-0003ly-H4; Wed, 07 Oct 2020 15:52:01 -0400
+Resent-Date: Wed, 07 Oct 2020 15:52:01 -0400
+Resent-Message-Id: <E1kQFTl-0003ly-H4@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21721)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kQFTi-0002mB-Q7; Wed, 07 Oct 2020 15:52:01 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1602100304; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=QAo3LofllLQTI9KKgYoGMFHTJP9Z1rG+/inzaKPXSVPn52UUfT92nPbh5QWSPrWfLhSEuTum+UwuIFlXnkj57SCmrEkFe1FmE9YJJXkPWxiDArB8FBngrP37WKvn5a9CdUzvjkOWR90DhNbHxlgi1NY0eeDrgtxmlZAeSSxm7GI=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1602100304;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=uOFKHfboKe2Sq0a8DxPnJLFG6h6aem4avFMcGrmriAQ=; 
+ b=KPphti01OsVbReQEl73NCzqus2C0TUZxEzDplDc8M5HP/Qm8FaIZ0OJdfNJXQIxELyQkZPqTgrmtY1CY5CMalgzF3CoDbMA/dym6wmB9KEEKfeGiSPZ9wEkVmcQgiM2XBCiKrIyY7jdK6rZFIbxTNjHAH5zPJaoquPum1ycxpTg=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1602100301901347.32368104405873;
+ Wed, 7 Oct 2020 12:51:41 -0700 (PDT)
+Subject: Re: [PATCH v8] scripts: Convert qemu-version.sh to qemu-version.py
+Message-ID: <160210030021.3664.1462361095891786135@66eaa9a8a123>
+In-Reply-To: <20201007194526.1778-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::42e;
- envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x42e.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: luoyonggang@gmail.com
+Date: Wed, 7 Oct 2020 12:51:41 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 15:33:55
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,119 +80,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- QEMU Trivial <qemu-trivial@nongnu.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=E8=8C=85?= <f4bug@amsat.org>,
- Yonggang Luo <luoyonggang@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, thuth@redhat.com, qemu-trivial@nongnu.org,
+ qemu-devel@nongnu.org, f4bug@amsat.org, luoyonggang@gmail.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The sh script are harder to maintain for compatible different
-xsh environment so convert it to python script
-Also incorporate the fixes in
-https://patchew.org/QEMU/20200929143654.518157-1-marcandre.lureau@redhat.com/
-Using --match=v* instead of --match 'v*' for speed up the git version
-And using --match=v\\* to resolve wildcard problem on windows.
-Tested under Ubuntu/msys2/mingw.
-
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-Message-Id: <20201006112139.700-1-luoyonggang@gmail.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- meson.build             |  2 +-
- scripts/qemu-version.py | 35 +++++++++++++++++++++++++++++++++++
- scripts/qemu-version.sh | 25 -------------------------
- 3 files changed, 36 insertions(+), 26 deletions(-)
- create mode 100644 scripts/qemu-version.py
- delete mode 100755 scripts/qemu-version.sh
-
-diff --git a/meson.build b/meson.build
-index 26230614ba..1d3bb25bc6 100644
---- a/meson.build
-+++ b/meson.build
-@@ -1132,7 +1132,7 @@ tracetool = [
-    '--backend=' + config_host['TRACE_BACKENDS']
- ]
- 
--qemu_version_cmd = [find_program('scripts/qemu-version.sh'),
-+qemu_version_cmd = [find_program('scripts/qemu-version.py'),
-                     meson.current_source_dir(),
-                     config_host['PKGVERSION'], meson.project_version()]
- qemu_version = custom_target('qemu-version.h',
-diff --git a/scripts/qemu-version.py b/scripts/qemu-version.py
-new file mode 100644
-index 0000000000..c633cb1e54
---- /dev/null
-+++ b/scripts/qemu-version.py
-@@ -0,0 +1,35 @@
-+#!/usr/bin/env python3
-+
-+#
-+# Script for retrieve qemu git version information
-+#
-+# Authors:
-+#  Yonggang Luo <luoyonggang@gmail.com>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2
-+# or, at your option, any later version.  See the COPYING file in
-+# the top-level directory.
-+
-+import sys
-+import subprocess
-+import os, os.path
-+import platform
-+
-+def main(_program, dir, pkgversion, version, *unused):
-+    os.chdir(dir)
-+    if not pkgversion and os.path.exists('.git'):
-+        match_expression = '--match=v\\*' if platform.system() == 'Windows' else '--match=v*'
-+        pc = subprocess.run(['git', 'describe', match_expression, '--dirty', '--always'],
-+                            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, encoding='utf8', shell=False)
-+        if pc.returncode == 0:
-+            pkgversion = pc.stdout.strip()
-+
-+    fullversion = version
-+    if pkgversion:
-+        fullversion = "{} ({})".format(version, pkgversion)
-+
-+    print('#define QEMU_PKGVERSION "%s"' % pkgversion)
-+    print('#define QEMU_FULL_VERSION "%s"' % fullversion)
-+
-+if __name__ == "__main__":
-+    main(*sys.argv)
-diff --git a/scripts/qemu-version.sh b/scripts/qemu-version.sh
-deleted file mode 100755
-index 03128c56a2..0000000000
---- a/scripts/qemu-version.sh
-+++ /dev/null
-@@ -1,25 +0,0 @@
--#!/bin/sh
--
--set -eu
--
--dir="$1"
--pkgversion="$2"
--version="$3"
--
--if [ -z "$pkgversion" ]; then
--    cd "$dir"
--    if [ -e .git ]; then
--        pkgversion=$(git describe --match 'v*' --dirty | echo "")
--    fi
--fi
--
--if [ -n "$pkgversion" ]; then
--    fullversion="$version ($pkgversion)"
--else
--    fullversion="$version"
--fi
--
--cat <<EOF
--#define QEMU_PKGVERSION "$pkgversion"
--#define QEMU_FULL_VERSION "$fullversion"
--EOF
--- 
-2.28.0.windows.1
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMTAwNzE5NDUyNi4xNzc4
+LTEtbHVveW9uZ2dhbmdAZ21haWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
+dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
+aW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMDEwMDcxOTQ1MjYuMTc3
+OC0xLWx1b3lvbmdnYW5nQGdtYWlsLmNvbQpTdWJqZWN0OiBbUEFUQ0ggdjhdIHNjcmlwdHM6IENv
+bnZlcnQgcWVtdS12ZXJzaW9uLnNoIHRvIHFlbXUtdmVyc2lvbi5weQoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwg
+ZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAt
+LWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRo
+bSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09
+IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3
+ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3Fl
+bXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDIwMTAwNzE5NDUyNi4xNzc4LTEtbHVv
+eW9uZ2dhbmdAZ21haWwuY29tIC0+IHBhdGNoZXcvMjAyMDEwMDcxOTQ1MjYuMTc3OC0xLWx1b3lv
+bmdnYW5nQGdtYWlsLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmY0MmI5OGQg
+c2NyaXB0czogQ29udmVydCBxZW11LXZlcnNpb24uc2ggdG8gcWVtdS12ZXJzaW9uLnB5Cgo9PT0g
+T1VUUFVUIEJFR0lOID09PQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMp
+LCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzNDogCm5ldyBmaWxlIG1vZGUgMTAw
+NjQ0CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzU5OiBGSUxFOiBzY3JpcHRzL3Fl
+bXUtdmVyc2lvbi5weToyMToKKyAgICAgICAgbWF0Y2hfZXhwcmVzc2lvbiA9ICctLW1hdGNoPXZc
+XConIGlmIHBsYXRmb3JtLnN5c3RlbSgpID09ICdXaW5kb3dzJyBlbHNlICctLW1hdGNoPXYqJwoK
+RVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM2MTogRklMRTogc2NyaXB0cy9xZW11LXZl
+cnNpb24ucHk6MjM6CisgICAgICAgICAgICAgICAgICAgICAgICAgICAgc3Rkb3V0PXN1YnByb2Nl
+c3MuUElQRSwgc3RkZXJyPXN1YnByb2Nlc3MuREVWTlVMTCwgZW5jb2Rpbmc9J3V0ZjgnLCBzaGVs
+bD1GYWxzZSkKCnRvdGFsOiAyIGVycm9ycywgMSB3YXJuaW5ncywgNDMgbGluZXMgY2hlY2tlZAoK
+Q29tbWl0IGY0MmI5OGRmN2NhMCAoc2NyaXB0czogQ29udmVydCBxZW11LXZlcnNpb24uc2ggdG8g
+cWVtdS12ZXJzaW9uLnB5KSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVO
+RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlz
+IGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMTAwNzE5NDUyNi4xNzc4
+LTEtbHVveW9uZ2dhbmdAZ21haWwuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdl
+LgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9w
+YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
+cmVkaGF0LmNvbQ==
 
