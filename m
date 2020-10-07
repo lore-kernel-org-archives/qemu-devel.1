@@ -2,90 +2,98 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9F4AC4727E
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 10:49:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C64AAC41604
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 10:50:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2BFFB20870
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 10:49:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 29E1C212CC
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 10:50:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SrcAbS4d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BFFB20870
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BbBMcjU6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29E1C212CC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ70l-0001dg-2g
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 06:49:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48202)
+	id 1kQ71U-0002H5-PL
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 06:50:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48106)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kQ6za-0000l2-44
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 06:48:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48955)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kQ6zY-0001Ca-2k
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 06:48:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602067695;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ya6O5cqck50WgGNUT5w2qYKSjg7Ab2CofO7s+gDR1Hk=;
- b=SrcAbS4dqjU7VO7IkzVhNBjiX/fXERkEVYRkgORgE7O8xfPNsjZe/rQf4oc6n2tm16upBC
- e6oiiaOg+OEniV/4KryAlGm95Z8U4g839QOt6fjoR6i1exbnOOwFMxiP4CXF57YHD1WhEq
- eSvodPkOKOel1wSy5ft7KJv2MnJbD40=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-474-1DK8heIuM4eNb_aMJAorLA-1; Wed, 07 Oct 2020 06:48:11 -0400
-X-MC-Unique: 1DK8heIuM4eNb_aMJAorLA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 19A09420F0;
- Wed,  7 Oct 2020 10:48:09 +0000 (UTC)
-Received: from work-vm (ovpn-112-50.ams2.redhat.com [10.36.112.50])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DBF7C5C1BD;
- Wed,  7 Oct 2020 10:48:02 +0000 (UTC)
-Date: Wed, 7 Oct 2020 11:48:00 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Subject: Re: [RFC PATCH  01/19] tools/virtiofsd: add support for --socket-group
-Message-ID: <20201007104800.GB3085@work-vm>
-References: <20200925125147.26943-1-alex.bennee@linaro.org>
- <20200925125147.26943-2-alex.bennee@linaro.org>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kQ6yt-0000Nb-St
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 06:47:35 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44292)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kQ6yr-00019Z-FD
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 06:47:35 -0400
+Received: by mail-wr1-x443.google.com with SMTP id t9so1568676wrq.11
+ for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 03:47:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=90aLAokvFx9ZFzi2SSnBpXhISmm0mqbGol/9TnGcntw=;
+ b=BbBMcjU6ynGQNBhLyTJpersZkC22NfiMtc5F8pjAwqVk93bv4DNkFgyz67bAFlbOTQ
+ 2LjCfDDyzEz+NzCkZqTpCshwzuhrHIMlT7PtTGUEqCsgmPr9c6QCbyFggiqHtKBSJiNZ
+ 1nN9cuOynibBlS53ZtM6kv2MxSraDlUFIHLq4vDfznzmf5B2kdQJ/+pzLqdNObtSHQx0
+ PRSynCeSLOe4gONibvZuzDAqxKDwnFQ0ooqwQ1H4xyvaKgU/cVtS6eRrjDsZmoR66YCz
+ /Z1B92l5hAcPXDwFpbZ43dK4n0R8jbz/7827qCF7JR3Jy5lbCURllCSv98er607RO4NU
+ U73A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=90aLAokvFx9ZFzi2SSnBpXhISmm0mqbGol/9TnGcntw=;
+ b=YXEf/th8vzg3RWh9Tou2SVWObBd0Ei+7xmtvIycEYwBfcHVUtj1UiumR4GLqkm/b/A
+ 4Q3Lo+X0YAlz1BUZ2EaBczUZu8snr7IrJ7NrSzm89llA/nOgufZOGpF308EIANxFvCHJ
+ NqNMgOQTSJ1FkkRy0KI2fkqMuBWhVGdAE5UzNm6z7YdmeZcazXZg7L2i56XeJZHPRUwp
+ yRbeKg+RWhVDxA6mvf1qLVf1+gtlXOxrIDI0jRZqAt7c5H5nkokPM0+gLL0jgdDeJNxN
+ CIXV8KLKRZX1i4W23Jdg4yI1lBNJ1TcJNM8Q3boKSRfQ9A9oVa4PLDSfoJCvlO56f6mU
+ uWeA==
+X-Gm-Message-State: AOAM533StRTZ4FpYymb4OuGIeBkc8PszrDylr/6A58clZ5+z8mGzWRaC
+ CkUdeRqMSTJOfS1hqJu4nN+yag==
+X-Google-Smtp-Source: ABdhPJwuVP3TRsQ+FiE8Nogs112rMlwJKP07+/QkzyWI/kwdpEIMz7rSztvnhnvEm/0XL/p3esNyOQ==
+X-Received: by 2002:adf:9504:: with SMTP id 4mr3004091wrs.27.1602067651545;
+ Wed, 07 Oct 2020 03:47:31 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id f63sm2263676wme.38.2020.10.07.03.47.30
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 07 Oct 2020 03:47:30 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id A29E01FF7E;
+ Wed,  7 Oct 2020 11:47:29 +0100 (BST)
+References: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
+ <20200908051953.1616885-20-david@gibson.dropbear.id.au>
+ <87h7r61j1j.fsf@linaro.org>
+ <1ffe5f96-be5e-f151-a1fe-7c9f4f765b4d@amsat.org>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PULL 19/33] mips/cps: Use start-powered-off CPUState property
+In-reply-to: <1ffe5f96-be5e-f151-a1fe-7c9f4f765b4d@amsat.org>
+Date: Wed, 07 Oct 2020 11:47:29 +0100
+Message-ID: <87eema1fem.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200925125147.26943-2-alex.bennee@linaro.org>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:44:56
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,137 +106,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jean-philippe@linaro.org, maxim.uvarov@linaro.org, bing.zhu@intel.com,
- Matti.Moell@opensynergy.com, virtualization@lists.linuxfoundation.org,
- ilias.apalodimas@linaro.org, qemu-devel@nongnu.org, arnd@linaro.org,
- hmo@opensynergy.com, takahiro.akashi@linaro.org,
- Stefan Hajnoczi <stefanha@redhat.com>, joakim.bech@linaro.org,
- stratos-dev@op-lists.linaro.org, tomas.winkler@intel.com, yang.huang@intel.com
+Cc: peter.maydell@linaro.org, danielhb413@gmail.com, groug@kaod.org,
+ qemu-devel@nongnu.org, qemu-ppc@nongnu.org, bauerman@linux.ibm.com,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Alex Bennée (alex.bennee@linaro.org) wrote:
-> If you like running QEMU as a normal user (very common for TCG runs)
-> but you have to run virtiofsd as a root user you run into connection
-> problems. Adding support for an optional --socket-group allows the
-> users to keep using the command line.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Queued
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-> ---
-> v1
->   - tweak documentation and commentary
-> ---
->  docs/tools/virtiofsd.rst        |  4 ++++
->  tools/virtiofsd/fuse_i.h        |  1 +
->  tools/virtiofsd/fuse_lowlevel.c |  6 ++++++
->  tools/virtiofsd/fuse_virtio.c   | 20 ++++++++++++++++++--
->  4 files changed, 29 insertions(+), 2 deletions(-)
-> 
-> diff --git a/docs/tools/virtiofsd.rst b/docs/tools/virtiofsd.rst
-> index e33c81ed41f1..085f9b12a6a3 100644
-> --- a/docs/tools/virtiofsd.rst
-> +++ b/docs/tools/virtiofsd.rst
-> @@ -87,6 +87,10 @@ Options
->  
->    Listen on vhost-user UNIX domain socket at PATH.
->  
-> +.. option:: --socket-group=GROUP
-> +
-> +  Set the vhost-user UNIX domain socket gid to GROUP.
-> +
->  .. option:: --fd=FDNUM
->  
->    Accept connections from vhost-user UNIX domain socket file descriptor FDNUM.
-> diff --git a/tools/virtiofsd/fuse_i.h b/tools/virtiofsd/fuse_i.h
-> index 1240828208ab..492e002181e2 100644
-> --- a/tools/virtiofsd/fuse_i.h
-> +++ b/tools/virtiofsd/fuse_i.h
-> @@ -68,6 +68,7 @@ struct fuse_session {
->      size_t bufsize;
->      int error;
->      char *vu_socket_path;
-> +    char *vu_socket_group;
->      int   vu_listen_fd;
->      int   vu_socketfd;
->      struct fv_VuDev *virtio_dev;
-> diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowlevel.c
-> index 2dd36ec03b6e..4d1ba2925d1b 100644
-> --- a/tools/virtiofsd/fuse_lowlevel.c
-> +++ b/tools/virtiofsd/fuse_lowlevel.c
-> @@ -2523,6 +2523,7 @@ static const struct fuse_opt fuse_ll_opts[] = {
->      LL_OPTION("--debug", debug, 1),
->      LL_OPTION("allow_root", deny_others, 1),
->      LL_OPTION("--socket-path=%s", vu_socket_path, 0),
-> +    LL_OPTION("--socket-group=%s", vu_socket_group, 0),
->      LL_OPTION("--fd=%d", vu_listen_fd, 0),
->      LL_OPTION("--thread-pool-size=%d", thread_pool_size, 0),
->      FUSE_OPT_END
-> @@ -2630,6 +2631,11 @@ struct fuse_session *fuse_session_new(struct fuse_args *args,
->                   "fuse: --socket-path and --fd cannot be given together\n");
->          goto out4;
->      }
-> +    if (se->vu_socket_group && !se->vu_socket_path) {
-> +        fuse_log(FUSE_LOG_ERR,
-> +                 "fuse: --socket-group can only be used with --socket-path\n");
-> +        goto out4;
-> +    }
->  
->      se->bufsize = FUSE_MAX_MAX_PAGES * getpagesize() + FUSE_BUFFER_HEADER_SIZE;
->  
-> diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
-> index 9e5537506c16..7942d3d11a87 100644
-> --- a/tools/virtiofsd/fuse_virtio.c
-> +++ b/tools/virtiofsd/fuse_virtio.c
-> @@ -31,6 +31,8 @@
->  #include <sys/socket.h>
->  #include <sys/types.h>
->  #include <sys/un.h>
-> +#include <sys/types.h>
-> +#include <grp.h>
->  #include <unistd.h>
->  
->  #include "contrib/libvhost-user/libvhost-user.h"
-> @@ -924,15 +926,29 @@ static int fv_create_listen_socket(struct fuse_session *se)
->  
->      /*
->       * Unfortunately bind doesn't let you set the mask on the socket,
-> -     * so set umask to 077 and restore it later.
-> +     * so set umask appropriately and restore it later.
->       */
-> -    old_umask = umask(0077);
-> +    if (se->vu_socket_group) {
-> +        old_umask = umask(S_IROTH | S_IWOTH | S_IXOTH);
-> +    } else {
-> +        old_umask = umask(S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IWOTH | S_IXOTH);
-> +    }
->      if (bind(listen_sock, (struct sockaddr *)&un, addr_len) == -1) {
->          fuse_log(FUSE_LOG_ERR, "vhost socket bind: %m\n");
->          close(listen_sock);
->          umask(old_umask);
->          return -1;
->      }
-> +    if (se->vu_socket_group) {
-> +        struct group *g = getgrnam(se->vu_socket_group);
-> +        if (g) {
-> +            if (!chown(se->vu_socket_path, -1, g->gr_gid)) {
-> +                fuse_log(FUSE_LOG_WARNING,
-> +                         "vhost socket failed to set group to %s (%d)\n",
-> +                         se->vu_socket_group, g->gr_gid);
-> +            }
-> +        }
-> +    }
->      umask(old_umask);
->  
->      if (listen(listen_sock, 1) == -1) {
-> -- 
-> 2.20.1
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> On 10/7/20 11:28 AM, Alex Benn=C3=A9e wrote:
+>>=20
+>> David Gibson <david@gibson.dropbear.id.au> writes:
+>>=20
+>>> From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+>>>
+>>> Instead of setting CPUState::halted to 1 in main_cpu_reset(), use the
+>>> start-powered-off property which makes cpu_common_reset() initialize it
+>>> to 1 in common code.
+>>>
+>>> Also change creation of CPU object from cpu_create() to object_new() and
+>>> qdev_realize_and_unref() because cpu_create() realizes the CPU and it's=
+ not
+>>> possible to set a property after the object is realized.
+>>>
+>>> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+>>> Message-Id: <20200826055535.951207-6-bauerman@linux.ibm.com>
+>>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>>=20
+>> I've finally bisected the breakage in check-acceptance to this patch:
+>>=20
+>>   10:24:09 [alex.bennee@hackbox2:~/l/q/b/bisect] (102ca966=E2=80=A6)|BIS=
+ECTING|=E2=9C=94 + ./tests/venv/bin/avocado run tests/acceptance/machine_mi=
+ps_malta.py
+>>   /home/alex.bennee/lsrc/qemu.git/builds/bisect/tests/venv/lib/python3.6=
+/site-packages/avocado/plugins/run.py:214: FutureWarning: The following arg=
+uments will be changed to boolean soon: sysinfo, output-check, failfast, ke=
+ep-tmp and ignore-missing-references.
+>>     FutureWarning)
+>>   JOB ID     : 1a71a0a81cf9fb9a387d2ab105f8196a26cab84e
+>>   JOB LOG    : /home/alex.bennee/avocado/job-results/job-2020-10-07T10.2=
+4-1a71a0a/job.log
+>>    (1/3) tests/acceptance/machine_mips_malta.py:MaltaMachineFramebuffer.=
+test_mips_malta_i6400_framebuffer_logo_1core: PASS (5.70 s)
+>>    (2/3) tests/acceptance/machine_mips_malta.py:MaltaMachineFramebuffer.=
+test_mips_malta_i6400_framebuffer_logo_7cores: INTERRUPTED: Test interrupte=
+d by SIGTERM\nRunner error occurred: Timeout reached\nOriginal status: ERRO=
+R\n{'name': '2-tests/acceptance/machine_mips_malta.py:MaltaMachineFramebuff=
+er.test_mips_malta_i6400_framebuffer_logo_7cores',
+>>   'logdir': '/home/alex.bennee/avocado/job-r... (28.91 s)
+>>    (3/3) tests/acceptance/machine_mips_malta.py:MaltaMachineFramebuffer.=
+test_mips_malta_i6400_framebuffer_logo_8cores: INTERRUPTED: Test interrupte=
+d by SIGTERM\nRunner error occurred: Timeout reached\nOriginal status: ERRO=
+R\n{'name': '3-tests/acceptance/machine_mips_malta.py:MaltaMachineFramebuff=
+er.test_mips_malta_i6400_framebuffer_logo_8cores',
+>>   'logdir': '/home/alex.bennee/avocado/job-r... (30.58 s)
+>>   RESULTS    : PASS 1 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 2=
+ | CANCEL 0
+>>   JOB TIME   : 70.12 s
+>>   10:25:27 [alex.bennee@hackbox2:~/l/q/b/bisect] (102ca966=E2=80=A6)|BIS=
+ECTING|=E2=9C=94 8 + make -j30
+>>   make[1]: Entering directory '/home/alex.bennee/lsrc/qemu.git/slirp'
+>>   make[1]: Nothing to be done for 'all'.
+>>   make[1]: Leaving directory '/home/alex.bennee/lsrc/qemu.git/slirp'
+>>   Generating qemu-version.h with a meson_exe.py custom command
+>>   Compiling C object libqemu-mips64el-softmmu.fa.p/hw_mips_cps.c.o
+>>   Compiling C object libqemu-mips64-softmmu.fa.p/hw_mips_cps.c.o
+>>   Compiling C object libqemu-mipsel-softmmu.fa.p/hw_mips_cps.c.o
+>>   Compiling C object libqemu-mips-softmmu.fa.p/hw_mips_cps.c.o
+>>   Linking target qemu-system-mips
+>>   Linking target qemu-system-mips64el
+>>   Linking target qemu-system-mips64
+>>   Linking target qemu-system-mipsel
+>>   10:26:26 [alex.bennee@hackbox2:~/l/q/b/bisect] (a2c93f06=E2=80=A6)|BIS=
+ECTING|=E2=9C=94 + ./tests/venv/bin/avocado run tests/acceptance/machine_mi=
+ps_malta.py
+>>   /home/alex.bennee/lsrc/qemu.git/builds/bisect/tests/venv/lib/python3.6=
+/site-packages/avocado/plugins/run.py:214: FutureWarning: The following arg=
+uments will be changed to boolean soon: sysinfo, output-check, failfast, ke=
+ep-tmp and ignore-missing-references.
+>>     FutureWarning)
+>>   JOB ID     : ccf294ef4e5ebdf19b3a0b53479d574df4ea54ea
+>>   JOB LOG    : /home/alex.bennee/avocado/job-results/job-2020-10-07T10.2=
+6-ccf294e/job.log
+>>    (1/3) tests/acceptance/machine_mips_malta.py:MaltaMachineFramebuffer.=
+test_mips_malta_i6400_framebuffer_logo_1core: PASS (5.82 s)
+>>    (2/3) tests/acceptance/machine_mips_malta.py:MaltaMachineFramebuffer.=
+test_mips_malta_i6400_framebuffer_logo_7cores: PASS (15.16 s)
+>>    (3/3) tests/acceptance/machine_mips_malta.py:MaltaMachineFramebuffer.=
+test_mips_malta_i6400_framebuffer_logo_8cores: PASS (15.97 s)
+>>   RESULTS    : PASS 3 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0=
+ | CANCEL 0
+>>   JOB TIME   : 40.01 s
+>
+> Using:
+>
+> -- >8 --
+> diff --git a/hw/misc/mips_cpc.c b/hw/misc/mips_cpc.c
+> index 2f7b2c9592..7c11fb3d44 100644
+> --- a/hw/misc/mips_cpc.c
+> +++ b/hw/misc/mips_cpc.c
+> @@ -38,6 +38,7 @@ static void mips_cpu_reset_async_work(CPUState *cs,
+> run_on_cpu_data data)
+>      MIPSCPCState *cpc =3D (MIPSCPCState *) data.host_ptr;
+>
+>      cpu_reset(cs);
+> +    cs->halted =3D 0;
+>      cpc->vp_running |=3D 1ULL << cs->cpu_index;
+>  }
 
+That seems reasonable.
+
+Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+Do you want to roll that into a proper patch or shall I apply directly
+into my testing/next tree?
+
+--=20
+Alex Benn=C3=A9e
 
