@@ -2,87 +2,81 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FF8EC41604
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 13:50:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADE40C4363D
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 13:51:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D48CB206F0
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 13:50:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="x7DiEV0+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D48CB206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	by mail.kernel.org (Postfix) with ESMTPS id F36E5206F0
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 13:50:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F36E5206F0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ9ph-0000L9-QG
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 09:50:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60790)
+	id 1kQ9qL-0001D2-RW
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 09:50:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59822)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1kQ9o3-0007Tr-0r
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 09:48:35 -0400
-Received: from forwardcorp1o.mail.yandex.net ([2a02:6b8:0:1a2d::193]:42090)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>)
+ id 1kQ9jU-0004MJ-9R; Wed, 07 Oct 2020 09:43:52 -0400
+Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:49811)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1kQ9nt-0007Ig-Ll
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 09:48:33 -0400
-Received: from myt5-23f0be3aa648.qloud-c.yandex.net
- (myt5-23f0be3aa648.qloud-c.yandex.net
- [IPv6:2a02:6b8:c12:3e29:0:640:23f0:be3a])
- by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id A181A2E1572;
- Wed,  7 Oct 2020 16:48:20 +0300 (MSK)
-Received: from myt4-18a966dbd9be.qloud-c.yandex.net
- (myt4-18a966dbd9be.qloud-c.yandex.net [2a02:6b8:c00:12ad:0:640:18a9:66db])
- by myt5-23f0be3aa648.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id
- p8rJt6NTWn-mKuSEXi2; Wed, 07 Oct 2020 16:48:20 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1602078500; bh=Ed3V2uDCYaTMbWC549uxzC5eGMWrG5FCIfLRUAtVye8=;
- h=In-Reply-To:In-Reply-To:Message-Id:References:References:Date:
- Subject:To:From:Cc;
- b=x7DiEV0+D/GC0ubEyMGX1bm2nZ1JlyQGqYjmYwTqSlYUOeTqIk0VbwuHYw2ykecu/
- Q46+u1p1iBySUassb96tU+I7LdqCP75PUWeQBKrWvIj7Qfgbs7KdHgRJu2qEo8prq5
- ZX06OR51Ne+u4aq0uViPUGVP1w1jg64dO0iPlroQ=
-Authentication-Results: myt5-23f0be3aa648.qloud-c.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
- [2a02:6b8:b081:413::1:13])
- by myt4-18a966dbd9be.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- OPBmtt5AQX-mKoex0lM; Wed, 07 Oct 2020 16:48:20 +0300
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
- (Client certificate not present)
-From: Dima Stepanov <dimastep@yandex-team.ru>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v1 1/2] fuzz: add virtio-blk fuzz target
-Date: Wed,  7 Oct 2020 16:47:58 +0300
-Message-Id: <0b922b854ac4121dd8574c3e9cd36c562f7d0a3c.1602078083.git.dimastep@yandex-team.ru>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <cover.1602078083.git.dimastep@yandex-team.ru>
-References: <cover.1602078083.git.dimastep@yandex-team.ru>
-In-Reply-To: <cover.1602078083.git.dimastep@yandex-team.ru>
-References: <cover.1602078083.git.dimastep@yandex-team.ru>
-Received-SPF: pass client-ip=2a02:6b8:0:1a2d::193;
- envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1o.mail.yandex.net
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>)
+ id 1kQ9jR-0006do-Rm; Wed, 07 Oct 2020 09:43:52 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.109.143.183])
+ by mo804.mail-out.ovh.net (Postfix) with ESMTPS id AC68469A89F9;
+ Wed,  7 Oct 2020 15:43:38 +0200 (CEST)
+Received: from kaod.org (37.59.142.103) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Wed, 7 Oct 2020
+ 15:43:37 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-103G005b7bae41a-75d9-44d8-9bfc-b52c2f1faa19,
+ A16E168222A5E88446A1C19725E79DC133334205) smtp.auth=groug@kaod.org
+Date: Wed, 7 Oct 2020 15:43:35 +0200
+From: Greg Kurz <groug@kaod.org>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH v2 6/6] spapr/xive: Introduce a new CAS value for the
+ StoreEOI capability
+Message-ID: <20201007154335.6914bbbc@bahia.lan>
+In-Reply-To: <75092c78-6a20-4870-8c06-76aa93365418@kaod.org>
+References: <20201005165147.526426-1-clg@kaod.org>
+ <20201005165147.526426-7-clg@kaod.org>
+ <20201006193909.617cc487@bahia.lan>
+ <75092c78-6a20-4870-8c06-76aa93365418@kaod.org>
+X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Originating-IP: [37.59.142.103]
+X-ClientProxiedBy: DAG2EX2.mxp5.local (172.16.2.12) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: 4f66c924-5506-4a1e-8d5a-903f93225f4e
+X-Ovh-Tracer-Id: 14269936894672542115
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrgeeigdeilecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgihesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepveelhfdtudffhfeiveehhfelgeellefgteffteekudegheejfffghefhfeeuudffnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopegtlhhgsehkrghougdrohhrgh
+Received-SPF: pass client-ip=79.137.123.220; envelope-from=groug@kaod.org;
+ helo=smtpout1.mo804.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 09:43:39
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -91,276 +85,254 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alxndr@bu.edu, yc-core@yandex-team.ru, stefanha@gmail.com
+Cc: Gustavo Romero <gromero@linux.ibm.com>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The virtio-blk fuzz target sets up and fuzzes the available virtio-blk
-queues. The implementation is based on two files:
-  - tests/qtest/fuzz/virtio_scsi_fuzz.c
-  - tests/qtest/virtio_blk_test.c
+On Tue, 6 Oct 2020 19:56:20 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
----
- tests/qtest/fuzz/meson.build       |   1 +
- tests/qtest/fuzz/virtio_blk_fuzz.c | 234 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 235 insertions(+)
- create mode 100644 tests/qtest/fuzz/virtio_blk_fuzz.c
+> On 10/6/20 7:39 PM, Greg Kurz wrote:
+> > On Mon, 5 Oct 2020 18:51:47 +0200
+> > C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> >=20
+> >> When the StoreEOI capability is set to "cas", let CAS decide when
+> >> StoreEOI should be advertised. StoreEOI is safe to use with a P10
+> >> compat machine because the OS enforces load-after-store ordering but
+> >> not with P9 compat.
 
-diff --git a/tests/qtest/fuzz/meson.build b/tests/qtest/fuzz/meson.build
-index b31ace7..3b923dc 100644
---- a/tests/qtest/fuzz/meson.build
-+++ b/tests/qtest/fuzz/meson.build
-@@ -5,6 +5,7 @@ specific_fuzz_ss.add(files('fuzz.c', 'fork_fuzz.c', 'qos_fuzz.c',
- specific_fuzz_ss.add(when: 'CONFIG_I440FX', if_true: files('i440fx_fuzz.c'))
- specific_fuzz_ss.add(when: 'CONFIG_VIRTIO_NET', if_true: files('virtio_net_fuzz.c'))
- specific_fuzz_ss.add(when: 'CONFIG_VIRTIO_SCSI', if_true: files('virtio_scsi_fuzz.c'))
-+specific_fuzz_ss.add(files('virtio_blk_fuzz.c'))
- 
- fork_fuzz = declare_dependency(
-   link_args: config_host['FUZZ_EXE_LDFLAGS'].split() +
-diff --git a/tests/qtest/fuzz/virtio_blk_fuzz.c b/tests/qtest/fuzz/virtio_blk_fuzz.c
-new file mode 100644
-index 0000000..623a756
---- /dev/null
-+++ b/tests/qtest/fuzz/virtio_blk_fuzz.c
-@@ -0,0 +1,234 @@
-+/*
-+ * virtio-blk Fuzzing Target
-+ *
-+ * Copyright Red Hat Inc., 2020
-+ *
-+ * Based on virtio-scsi-fuzz target.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+
-+#include "tests/qtest/libqos/libqtest.h"
-+#include "tests/qtest/libqos/virtio-blk.h"
-+#include "tests/qtest/libqos/virtio.h"
-+#include "tests/qtest/libqos/virtio-pci.h"
-+#include "standard-headers/linux/virtio_ids.h"
-+#include "standard-headers/linux/virtio_pci.h"
-+#include "standard-headers/linux/virtio_blk.h"
-+#include "fuzz.h"
-+#include "fork_fuzz.h"
-+#include "qos_fuzz.h"
-+
-+#define TEST_IMAGE_SIZE         (64 * 1024 * 1024)
-+#define PCI_SLOT                0x02
-+#define PCI_FN                  0x00
-+
-+#define MAX_NUM_QUEUES 64
-+
-+/* Based on tests/qtest/virtio-blk-test.c. */
-+typedef struct {
-+    int num_queues;
-+    QVirtQueue *vq[MAX_NUM_QUEUES + 2];
-+} QVirtioBlkQueues;
-+
-+static QVirtioBlkQueues *qvirtio_blk_init(QVirtioDevice *dev, uint64_t mask)
-+{
-+    QVirtioBlkQueues *vs;
-+    uint64_t features;
-+
-+    vs = g_new0(QVirtioBlkQueues, 1);
-+
-+    features = qvirtio_get_features(dev);
-+    if (!mask) {
-+        mask = ~((1u << VIRTIO_RING_F_INDIRECT_DESC) |
-+                (1u << VIRTIO_RING_F_EVENT_IDX) |
-+                (1u << VIRTIO_BLK_F_SCSI));
-+    }
-+    mask |= ~QVIRTIO_F_BAD_FEATURE;
-+    features &= mask;
-+    qvirtio_set_features(dev, features);
-+
-+    vs->num_queues = 1;
-+    vs->vq[0] = qvirtqueue_setup(dev, fuzz_qos_alloc, 0);
-+
-+    qvirtio_set_driver_ok(dev);
-+
-+    return vs;
-+}
-+
-+static void virtio_blk_fuzz(QTestState *s, QVirtioBlkQueues* queues,
-+        const unsigned char *Data, size_t Size)
-+{
-+    /*
-+     * Data is a sequence of random bytes. We split them up into "actions",
-+     * followed by data:
-+     * [vqa][dddddddd][vqa][dddd][vqa][dddddddddddd] ...
-+     * The length of the data is specified by the preceding vqa.length
-+     */
-+    typedef struct vq_action {
-+        uint8_t queue;
-+        uint8_t length;
-+        uint8_t write;
-+        uint8_t next;
-+        uint8_t kick;
-+    } vq_action;
-+
-+    /* Keep track of the free head for each queue we interact with */
-+    bool vq_touched[MAX_NUM_QUEUES + 2] = {0};
-+    uint32_t free_head[MAX_NUM_QUEUES + 2];
-+
-+    QGuestAllocator *t_alloc = fuzz_qos_alloc;
-+
-+    QVirtioBlk *blk = fuzz_qos_obj;
-+    QVirtioDevice *dev = blk->vdev;
-+    QVirtQueue *q;
-+    vq_action vqa;
-+    while (Size >= sizeof(vqa)) {
-+        /* Copy the action, so we can normalize length, queue and flags */
-+        memcpy(&vqa, Data, sizeof(vqa));
-+
-+        Data += sizeof(vqa);
-+        Size -= sizeof(vqa);
-+
-+        vqa.queue = vqa.queue % queues->num_queues;
-+        /* Cap length at the number of remaining bytes in data */
-+        vqa.length = vqa.length >= Size ? Size : vqa.length;
-+        vqa.write = vqa.write & 1;
-+        vqa.next = vqa.next & 1;
-+        vqa.kick = vqa.kick & 1;
-+
-+        q = queues->vq[vqa.queue];
-+
-+        /* Copy the data into ram, and place it on the virtqueue */
-+        uint64_t req_addr = guest_alloc(t_alloc, vqa.length);
-+        qtest_memwrite(s, req_addr, Data, vqa.length);
-+        if (vq_touched[vqa.queue] == 0) {
-+            vq_touched[vqa.queue] = 1;
-+            free_head[vqa.queue] = qvirtqueue_add(s, q, req_addr, vqa.length,
-+                    vqa.write, vqa.next);
-+        } else {
-+            qvirtqueue_add(s, q, req_addr, vqa.length, vqa.write , vqa.next);
-+        }
-+
-+        if (vqa.kick) {
-+            qvirtqueue_kick(s, dev, q, free_head[vqa.queue]);
-+            free_head[vqa.queue] = 0;
-+        }
-+        Data += vqa.length;
-+        Size -= vqa.length;
-+    }
-+    /* In the end, kick each queue we interacted with */
-+    for (int i = 0; i < MAX_NUM_QUEUES + 2; i++) {
-+        if (vq_touched[i]) {
-+            qvirtqueue_kick(s, dev, queues->vq[i], free_head[i]);
-+        }
-+    }
-+}
-+
-+static void virtio_blk_fork_fuzz(QTestState *s,
-+        const unsigned char *Data, size_t Size)
-+{
-+    QVirtioBlk *blk = fuzz_qos_obj;
-+    static QVirtioBlkQueues *queues;
-+    if (!queues) {
-+        queues = qvirtio_blk_init(blk->vdev, 0);
-+    }
-+    if (fork() == 0) {
-+        virtio_blk_fuzz(s, queues, Data, Size);
-+        flush_events(s);
-+        _Exit(0);
-+    } else {
-+        flush_events(s);
-+        wait(NULL);
-+    }
-+}
-+
-+static void virtio_blk_with_flag_fuzz(QTestState *s,
-+        const unsigned char *Data, size_t Size)
-+{
-+    QVirtioBlk *blk = fuzz_qos_obj;
-+    static QVirtioBlkQueues *queues;
-+
-+    if (fork() == 0) {
-+        if (Size >= sizeof(uint64_t)) {
-+            queues = qvirtio_blk_init(blk->vdev, *(uint64_t *)Data);
-+            virtio_blk_fuzz(s, queues,
-+                             Data + sizeof(uint64_t), Size - sizeof(uint64_t));
-+            flush_events(s);
-+        }
-+        _Exit(0);
-+    } else {
-+        flush_events(s);
-+        wait(NULL);
-+    }
-+}
-+
-+static void virtio_blk_pre_fuzz(QTestState *s)
-+{
-+    qos_init_path(s);
-+    counter_shm_init();
-+}
-+
-+static void drive_destroy(void *path)
-+{
-+    unlink(path);
-+    g_free(path);
-+}
-+
-+static char *drive_create(void)
-+{
-+    int fd, ret;
-+    char *t_path = g_strdup("/tmp/qtest.XXXXXX");
-+
-+    /* Create a temporary raw image */
-+    fd = mkstemp(t_path);
-+    g_assert_cmpint(fd, >=, 0);
-+    ret = ftruncate(fd, TEST_IMAGE_SIZE);
-+    g_assert_cmpint(ret, ==, 0);
-+    close(fd);
-+
-+    g_test_queue_destroy(drive_destroy, t_path);
-+    return t_path;
-+}
-+
-+static void *virtio_blk_test_setup(GString *cmd_line, void *arg)
-+{
-+    char *tmp_path = drive_create();
-+
-+    g_string_append_printf(cmd_line,
-+                           " -drive if=none,id=drive0,file=%s,"
-+                           "format=raw,auto-read-only=off ",
-+                           tmp_path);
-+
-+    return arg;
-+}
-+
-+static void register_virtio_blk_fuzz_targets(void)
-+{
-+    fuzz_add_qos_target(&(FuzzTarget){
-+                .name = "virtio-blk-fuzz",
-+                .description = "Fuzz the virtio-blk virtual queues, forking "
-+                                "for each fuzz run",
-+                .pre_vm_init = &counter_shm_init,
-+                .pre_fuzz = &virtio_blk_pre_fuzz,
-+                .fuzz = virtio_blk_fork_fuzz,},
-+                "virtio-blk",
-+                &(QOSGraphTestOptions){.before = virtio_blk_test_setup}
-+                );
-+
-+    fuzz_add_qos_target(&(FuzzTarget){
-+                .name = "virtio-blk-flags-fuzz",
-+                .description = "Fuzz the virtio-blk virtual queues, forking "
-+                "for each fuzz run (also fuzzes the virtio flags)",
-+                .pre_vm_init = &counter_shm_init,
-+                .pre_fuzz = &virtio_blk_pre_fuzz,
-+                .fuzz = virtio_blk_with_flag_fuzz,},
-+                "virtio-blk",
-+                &(QOSGraphTestOptions){.before = virtio_blk_test_setup}
-+                );
-+}
-+
-+fuzz_target_init(register_virtio_blk_fuzz_targets);
--- 
-2.7.4
+Hmm... OS enforcing load-after-store based on a PVR ? I can't find
+such a thing in the kernel sources. What I find is:
+
+	if (offset =3D=3D XIVE_ESB_SET_PQ_10 && xd->flags & XIVE_IRQ_FLAG_STORE_EO=
+I)
+		offset |=3D XIVE_ESB_LD_ST_MO;
+
+where xd->flags comes from H_INT_GET_SOURCE_INFO, so this essentially
+depends on what the hypervisor advertises. For example a P9 compat
+guest could use it if QEMU has an emulated XIVE, right ?
+
+> >>
+> >> The question now is : should we make "cas" the default at the machine
+> >> level ?
+> >>
+> >=20
+> > Hmm, spapr capabilities are knobs for the end user to provide a specific
+> > and consistent behavior to the guest... so the "let CAS decide depending
+> > on what the guest asked for" thing looks awkward...=20
+>=20
+> The guest doesn't ask for StoreEOI. The hypervisor will return StoreEOI
+> if the kernel is P10 compat and will not if it's P9 to make sure that
+> it can be migrated to a P9 host. =20
+>=20
+
+Yeah I know that the guest doesn't ask for StoreEOI. What I mean is that
+the idea behind spapr capabilities is only about saying "this machine type
+offers this feature and the host supports it". The fact that the guest
+might use it or not is another matter. So I don't quite see how "cas" fits
+into this model...
+
+> > I mean that making
+> > "cas" the default at the machine level looks like you don't really want
+> > this to be a capability at all.
+>=20
+> It means that you are not forcing a behaviour "off" or "on". It depends
+> on the guest support, P10 or P9, which is what we want as a default=20
+> behavior to be in sync with pHyp.
+>=20
+
+I think there's confusion here. Setting the capability to "on"/"off"
+doesn't mean your force anything. As said above, this isn't related
+to what the guest supports but essentially to what the host supports.
+"on" means that we can offer the feature to the guest in a reliable
+manner because we have verified it can work, and "off" simply means
+we don't offer the feature (but of course the guest is still free
+to shoot itself in the foot).
+
+The reference to what pHyp does is thus irrelevant here because we
+won't ever migrate a guest between KVM and PowerVM. We could decide
+to do nothing and let the OS only do "LoadEOI" operations as it does
+today.
+
+If we want StoreEOI to be usable by default, then the default value
+should definitely be "on". This should be kept to "off" for older
+machine types to stay compatible with existing setups.
+
+Let's only consider the KVM case only because we don't explicitly
+support KVM<->TCG migration. The availability of StoreEOI is:
+- emulated XIVE on P9 system =3D> ok
+- emulated XIVE on P10 system =3D> ok
+- in-kernel XIVE on P10 system =3D> ok
+- in-kernel XIVE on P9 system =3D> not ok
+
+This means that on a P9 system we must fallback on emulated XIVE, like
+we already do with bostons today. This might look sub-optimal from a
+performance standpoint but this is the price to pay to guarantee
+migration doesn't fail with the default settings.
+
+> > If the user asked for StoreEOI but the guest chose a compat mode that
+> > can't support it, QEMU should simply exit IMHO
+> It's not like XICS. A P8 compat can not run on XIVE. A P9 compat can use=
+=20
+> StoreEOI. So it should be considered more like a mitigation. But anyhow,=
+=20
+> the P9 systems currenly shipped never activate StoreEOI. So you will get=
+=20
+> the error.
+> =20
+> > Or alternatively I guess you can just forget about the spapr capability
+> > and do all the checks (XIVE interrupt controller, KVM support, guest
+> > asked for P10) at CAS.
+>=20
+> That's how I did in the fisrt patches but then you loose the ability to=20
+> switch it off on P10 and switch on on P9. Which is good to have for tests=
+=20
+> and performance and for possible issues if we ever have to handle a sourc=
+e=20
+> which has different charateristics. In that case, we would switch it off.=
+=20
+>=20
+
+I understand that having fine grain knobs is cool for tests and performance
+but keep in mind that we mostly target end-users who expect this to work
+out of the box with the default settings. This being said, if some end-users
+might hit a corner case where it would be valuable to switch it off, then
+it makes sense to keep the ability to do so of course.
+
+> Thanks,
+>=20
+> C.
+>=20
+>=20
+> =20
+> >> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> >> ---
+> >>  include/hw/ppc/spapr.h      |  1 +
+> >>  include/hw/ppc/spapr_xive.h |  1 +
+> >>  hw/intc/spapr_xive.c        |  9 +++++++++
+> >>  hw/ppc/spapr_caps.c         | 21 +++++++++++++++++----
+> >>  hw/ppc/spapr_hcall.c        |  7 +++++++
+> >>  5 files changed, 35 insertions(+), 4 deletions(-)
+> >>
+> >> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> >> index b701c14b4e09..17e7d873e8dc 100644
+> >> --- a/include/hw/ppc/spapr.h
+> >> +++ b/include/hw/ppc/spapr.h
+> >> @@ -87,6 +87,7 @@ typedef enum {
+> >>  #define SPAPR_CAP_ON                    0x01
+> >> =20
+> >>  /* Custom Caps */
+> >> +#define SPAPR_CAP_CAS                   0x02
+> >> =20
+> >>  /* Generic */
+> >>  #define SPAPR_CAP_BROKEN                0x00
+> >> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+> >> index 26c8d90d7196..8b8aa586e44f 100644
+> >> --- a/include/hw/ppc/spapr_xive.h
+> >> +++ b/include/hw/ppc/spapr_xive.h
+> >> @@ -75,6 +75,7 @@ void spapr_xive_map_mmio(SpaprXive *xive);
+> >> =20
+> >>  int spapr_xive_end_to_target(uint8_t end_blk, uint32_t end_idx,
+> >>                               uint32_t *out_server, uint8_t *out_prio);
+> >> +void spapr_xive_enable_store_eoi(SpaprXive *xive, bool enable);
+> >> =20
+> >>  /*
+> >>   * KVM XIVE device helpers
+> >> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> >> index 41f2719ff93a..f57a2681dd91 100644
+> >> --- a/hw/intc/spapr_xive.c
+> >> +++ b/hw/intc/spapr_xive.c
+> >> @@ -1802,3 +1802,12 @@ void spapr_xive_hcall_init(SpaprMachineState *s=
+papr)
+> >>      spapr_register_hypercall(H_INT_SYNC, h_int_sync);
+> >>      spapr_register_hypercall(H_INT_RESET, h_int_reset);
+> >>  }
+> >> +
+> >> +void spapr_xive_enable_store_eoi(SpaprXive *xive, bool enable)
+> >> +{
+> >> +    if (enable) {
+> >> +        xive->source.esb_flags |=3D XIVE_SRC_STORE_EOI;
+> >> +    } else {
+> >> +        xive->source.esb_flags &=3D ~XIVE_SRC_STORE_EOI;
+> >> +    }
+> >> +}
+> >> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> >> index 9251badbdc27..c55e1fccb9bc 100644
+> >> --- a/hw/ppc/spapr_caps.c
+> >> +++ b/hw/ppc/spapr_caps.c
+> >> @@ -524,6 +524,13 @@ static void cap_fwnmi_apply(SpaprMachineState *sp=
+apr, uint8_t val,
+> >>      }
+> >>  }
+> >> =20
+> >> +SpaprCapPossible cap_storeeoi_possible =3D {
+> >> +    .num =3D 3,
+> >> +    .vals =3D { "off", "on", "cas" },
+> >> +    .help =3D "off - no StoreEOI, on - StoreEOI, "
+> >> +            "cas - negotiated at CAS (POWER10 compat only)",
+> >> +};
+> >> +
+> >>  static void cap_storeeoi_apply(SpaprMachineState *spapr, uint8_t val,
+> >>                                 Error **errp)
+> >>  {
+> >> @@ -550,6 +557,11 @@ static void cap_storeeoi_apply(SpaprMachineState =
+*spapr, uint8_t val,
+> >>              return;
+> >>          }
+> >> =20
+> >> +        /* CAS will decide to advertise StoreEOI (P10 compat kernels =
+only) */
+> >> +        if (val =3D=3D SPAPR_CAP_CAS) {
+> >> +            return;
+> >> +        }
+> >> +
+> >>          /*
+> >>           * load-after-store ordering is not enforced on POWER9 CPUs
+> >>           * and StoreEOI can be racy.
+> >> @@ -671,11 +683,12 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP_N=
+UM] =3D {
+> >>      },
+> >>      [SPAPR_CAP_STOREEOI] =3D {
+> >>          .name =3D "storeeoi",
+> >> -        .description =3D "Implements XIVE StoreEOI feature",
+> >> +        .description =3D "Implements XIVE StoreEOI feature (off, on, =
+cas)",
+> >>          .index =3D SPAPR_CAP_STOREEOI,
+> >> -        .get =3D spapr_cap_get_bool,
+> >> -        .set =3D spapr_cap_set_bool,
+> >> -        .type =3D "bool",
+> >> +        .get =3D spapr_cap_get_string,
+> >> +        .set =3D spapr_cap_set_string,
+> >> +        .type =3D "string",
+> >> +        .possible =3D &cap_storeeoi_possible,
+> >>          .apply =3D cap_storeeoi_apply,
+> >>      },
+> >>  };
+> >> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> >> index 607740150fa2..158b122b9192 100644
+> >> --- a/hw/ppc/spapr_hcall.c
+> >> +++ b/hw/ppc/spapr_hcall.c
+> >> @@ -1804,6 +1804,13 @@ target_ulong do_client_architecture_support(Pow=
+erPCCPU *cpu,
+> >>  "Guest requested unavailable interrupt mode (XIVE), try the ic-mode=
+=3Dxive or ic-mode=3Ddual machine property");
+> >>              exit(EXIT_FAILURE);
+> >>          }
+> >> +
+> >> +        /* Advertise StoreEOI for a P10 compat guest. */
+> >> +        if (spapr_get_cap(spapr, SPAPR_CAP_STOREEOI) =3D=3D SPAPR_CAP=
+_CAS) {
+> >> +            bool enable =3D ppc_check_compat(cpu, CPU_POWERPC_LOGICAL=
+_3_10, 0,
+> >> +                                           cpu->compat_pvr);
+> >> +            spapr_xive_enable_store_eoi(spapr->xive, enable);
+> >> +        }
+> >>      } else {
+> >>          if (!spapr->irq->xics) {
+> >>              error_report(
+> >=20
+>=20
 
 
