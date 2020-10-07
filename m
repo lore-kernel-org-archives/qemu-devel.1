@@ -2,85 +2,94 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC4DCC4363D
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 14:02:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 986A0C47095
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 14:05:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10850205F4
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 14:02:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A61A20870
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 14:05:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hbkapO6W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10850205F4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Oppmw6N6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A61A20870
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQA1a-00081b-Ht
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 10:02:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35556)
+	id 1kQA44-0001LF-KR
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 10:05:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36382)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kQA0J-0007b5-3f
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 10:01:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35513)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQA2X-0000Np-FF
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 10:03:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35082)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kQA0C-0000YA-Mt
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 10:01:14 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQA2V-0000kl-OO
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 10:03:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602079266;
+ s=mimecast20190719; t=1602079411;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=OsBzUL+VVYavUtuaA3Li5ELBLj/94UlCLlGFRzmyr60=;
- b=hbkapO6Wu8FRzMkL6Q8HB1oOJ25BHxzGVs8kHS5qxcyHBldz/gIX7ZDyqgBX5doxCse99F
- Sanjs2rvo/1ATEO9NGsj8IKbx3WiQTbfWyOiSocylvj0OPZLDl9w8M38J6fV7uYPpAwOQx
- 8fgeo5ZVjwyaRLuMuzAcBHyL5YXPBvU=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kwFNeLzgHY1WLAm3y5hGGNDgDx/g5h5uRXFUxlwWMZQ=;
+ b=Oppmw6N66MMjYP7udGS6mD9GzQTPTOqDeAmRptn7//05fH/pHUj0Ck1TM29EpfnyXWN/pe
+ T+tJABSfwiupZ9WZK1sEfJqS1G5J1kksxiB279sZlle97JGmsm0YZyC+defST7mOD0+Wfb
+ K1exxKXBHIDjtT5OwOEBGvbD66UhGJk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-502-EoVZU-_5OEeIjdyMi6-uIA-1; Wed, 07 Oct 2020 10:01:04 -0400
-X-MC-Unique: EoVZU-_5OEeIjdyMi6-uIA-1
+ us-mta-221-IR93E1oGMHmBkUu-PaCPTw-1; Wed, 07 Oct 2020 10:03:27 -0400
+X-MC-Unique: IR93E1oGMHmBkUu-PaCPTw-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E3AD0805EF6;
- Wed,  7 Oct 2020 14:01:03 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 849B96EF43;
- Wed,  7 Oct 2020 14:01:03 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] cirrus: use V=1 when running tests on FreeBSD and macOS
-Date: Wed,  7 Oct 2020 10:01:03 -0400
-Message-Id: <20201007140103.711142-1-pbonzini@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D2E0D808245;
+ Wed,  7 Oct 2020 14:03:25 +0000 (UTC)
+Received: from [10.10.120.38] (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0C53E6EF49;
+ Wed,  7 Oct 2020 14:03:20 +0000 (UTC)
+Subject: Re: acceptance-system-fedora failures
+To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <philmd@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+References: <f9e09f0b-3915-382c-d670-8d33d164ad7b@redhat.com>
+ <4e191372-c332-8f69-85e2-1ff6ead0f40d@redhat.com>
+ <59d2a787-bcd4-7283-693b-09ea04c16dc6@redhat.com>
+ <6068346f-b034-9321-0eea-29233c23a300@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <1f981fb2-34a4-95f0-8034-40c653ca2012@redhat.com>
+Date: Wed, 7 Oct 2020 10:03:20 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
+In-Reply-To: <6068346f-b034-9321-0eea-29233c23a300@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:44:56
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:54:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
 X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,53 +102,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Using "V=1" makes it easier to identify hanging tests, especially
-since they are run with -j1.  It is already used on Windows builds,
-do the same for FreeBSD and macOS.
+On 10/7/20 4:23 AM, Thomas Huth wrote:
+> 
+> ... starting with this commit, the tests starts failing. John, any idea what
+> might be causing this?
+> 
+>   Thomas
 
-Cc: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- .cirrus.yml | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Ahh, oh no! It *was* my fault, just nothing to do with what I was 
+actually working on. good!
 
-diff --git a/.cirrus.yml b/.cirrus.yml
-index d58782ce67..4d236fdefa 100644
---- a/.cirrus.yml
-+++ b/.cirrus.yml
-@@ -15,7 +15,7 @@ freebsd_12_task:
-     - cd build
-     - ../configure --enable-werror || { cat config.log; exit 1; }
-     - gmake -j$(sysctl -n hw.ncpu)
--    - gmake -j$(sysctl -n hw.ncpu) check
-+    - gmake -j$(sysctl -n hw.ncpu) check V=1
- 
- macos_task:
-   osx_instance:
-@@ -29,7 +29,7 @@ macos_task:
-                    --extra-cflags='-Wno-error=deprecated-declarations'
-                    || { cat config.log; exit 1; }
-     - gmake -j$(sysctl -n hw.ncpu)
--    - gmake check
-+    - gmake check V=1
- 
- macos_xcode_task:
-   osx_instance:
-@@ -43,7 +43,7 @@ macos_xcode_task:
-     - ../configure --extra-cflags='-Wno-error=deprecated-declarations'
-                    --enable-werror --cc=clang || { cat config.log; exit 1; }
-     - gmake -j$(sysctl -n hw.ncpu)
--    - gmake check
-+    - gmake check V=1
- 
- windows_msys2_task:
-   windows_container:
--- 
-2.26.2
+I'll look a little more closely, I see some more discussion below; I'll 
+see if the recommended changes to the BH oneshot help alleviate the problem.
+
+Thanks.
+
+--js
 
 
