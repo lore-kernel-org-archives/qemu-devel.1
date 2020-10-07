@@ -7,67 +7,69 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CABFCC4363D
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 14:47:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AFB6C4363D
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 14:55:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4BE18208C7
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 14:47:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6BA91208C7
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 14:55:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QAi2k7kY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BE18208C7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KXRiw0Pn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BA91208C7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQAii-0001iu-CX
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 10:47:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45114)
+	id 1kQAqa-0005p3-Cu
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 10:55:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47582)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQAdh-0005ad-IF
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 10:41:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57593)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQAoc-0004P5-1V
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 10:53:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53898)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQAdd-0005Mr-Fh
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 10:41:57 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQAoV-0006ic-Qd
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 10:53:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602081712;
+ s=mimecast20190719; t=1602082386;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XeGmzCDaRela4Pk592WzllU2rX1jMa7IHTWvw+NIfD4=;
- b=QAi2k7kYoTj55Q6oEuRDvtcEYQO0Wwwe8hsbgPwvvvZPApPON/AFLel98Ga/Dk7zv8kt6e
- 9dr8rYkII2uxJJjHecxIht8GzVHLUbdENUSWlP4GFrw4NrQ/5VMuOc0mUCeLcWqoEz/ksM
- VTrvnnUzXu7+lheq80r0Vmo0xfjKg2w=
+ bh=PbdgrKzUBg2lo4DEn0w8O5bpjSgWWrpQawN5LJKU92Y=;
+ b=KXRiw0Pn/tnXC1USBAwLyY2TwtYzwJCF07a+nqbzH3d176PmqJXjCc6QieeVz62MH70QVr
+ WTfatV+7B4ikF5z2G1GXHq1tHK/6GpcvyLQZJDNMVT/WpfLASphWS0KatpCBOh7OaTEEGH
+ gVyihVcK1w192jOKnw6TwuGJALPXTn8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-388-gxJ2yjCPORyBKhRWu_1acA-1; Wed, 07 Oct 2020 10:41:49 -0400
-X-MC-Unique: gxJ2yjCPORyBKhRWu_1acA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-23-Jtd3PNr-OhaTY7fpAus00w-1; Wed, 07 Oct 2020 10:53:03 -0400
+X-MC-Unique: Jtd3PNr-OhaTY7fpAus00w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B9FFAAFD07
- for <qemu-devel@nongnu.org>; Wed,  7 Oct 2020 14:41:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E5FB1019632
+ for <qemu-devel@nongnu.org>; Wed,  7 Oct 2020 14:53:02 +0000 (UTC)
 Received: from [10.10.120.38] (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 193125D9F7;
- Wed,  7 Oct 2020 14:41:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A8E251002EEA;
+ Wed,  7 Oct 2020 14:52:55 +0000 (UTC)
 Subject: Re: [PATCH v5 03/36] qapi-gen: Separate arg-parsing from generation
 To: Markus Armbruster <armbru@redhat.com>
 References: <20201005195158.2348217-1-jsnow@redhat.com>
  <20201005195158.2348217-4-jsnow@redhat.com>
- <87r1qaihen.fsf@dusky.pond.sub.org>
+ <87imbntvw9.fsf@dusky.pond.sub.org>
+ <69effb8e-3d83-a2e7-c484-feea8ed850b9@redhat.com>
+ <87h7r6jws4.fsf@dusky.pond.sub.org>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <50e590af-deff-3864-9abd-710a30eaa804@redhat.com>
-Date: Wed, 7 Oct 2020 10:41:47 -0400
+Message-ID: <65c2a120-e29e-b572-680a-ee6d141ff9c8@redhat.com>
+Date: Wed, 7 Oct 2020 10:52:54 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <87r1qaihen.fsf@dusky.pond.sub.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <87h7r6jws4.fsf@dusky.pond.sub.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -75,16 +77,16 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:44:56
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:54:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
 X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
  RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -99,117 +101,270 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/7/20 4:12 AM, Markus Armbruster wrote:
-> I keep stumbling over things in later patches that turn out to go back
-> to this one.
-> 
+On 10/7/20 3:54 AM, Markus Armbruster wrote:
 > John Snow <jsnow@redhat.com> writes:
 > 
->> This is a minor re-work of the entrypoint script. It isolates a
->> generate() method from the actual command-line mechanism.
+>> On 10/6/20 7:51 AM, Markus Armbruster wrote:
+>>> John Snow <jsnow@redhat.com> writes:
+>>>
+>>>> This is a minor re-work of the entrypoint script. It isolates a
+>>>> generate() method from the actual command-line mechanism.
+>>>>
+>>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>>> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>>>> Reviewed-by: Cleber Rosa <crosa@redhat.com>
+>>>> Tested-by: Cleber Rosa <crosa@redhat.com>
+>>>> ---
+>>>>    scripts/qapi-gen.py | 85 +++++++++++++++++++++++++++++++++------------
+>>>>    1 file changed, 62 insertions(+), 23 deletions(-)
+>>>>
+>>>> diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
+>>>> index 541e8c1f55d..117b396a595 100644
+>>>> --- a/scripts/qapi-gen.py
+>>>> +++ b/scripts/qapi-gen.py
+>>>> @@ -1,30 +1,77 @@
+>>>>    #!/usr/bin/env python3
+>>>> -# QAPI generator
+>>>> -#
+>>>> +
+>>>>    # This work is licensed under the terms of the GNU GPL, version 2 or later.
+>>>>    # See the COPYING file in the top-level directory.
+>>>>    +"""
+>>>> +QAPI Generator
+>>>> +
+>>>> +This script is the main entry point for generating C code from the QAPI schema.
+>>>> +"""
+>>>>      import argparse
+>>>>    import re
+>>>>    import sys
+>>>>      from qapi.commands import gen_commands
+>>>> +from qapi.error import QAPIError
+>>>>    from qapi.events import gen_events
+>>>>    from qapi.introspect import gen_introspect
+>>>> -from qapi.schema import QAPIError, QAPISchema
+>>>> +from qapi.schema import QAPISchema
+>>>>    from qapi.types import gen_types
+>>>>    from qapi.visit import gen_visit
+>>> Unrelated cleanup.  Okay.
+>>>
+>>>>      
+>>>> -def main(argv):
+>>>> +DEFAULT_OUTPUT_DIR = ''
+>>>> +DEFAULT_PREFIX = ''
+>>>> +
+>>>> +
+>>>> +def generate(schema_file: str,
+>>>> +             output_dir: str,
+>>>> +             prefix: str,
+>>>> +             unmask: bool = False,
+>>>> +             builtins: bool = False) -> None:
+>>>> +    """
+>>>> +    generate uses a given schema to produce C code in the target directory.
+>>>> +
+>>>> +    :param schema_file: The primary QAPI schema file.
+>>>> +    :param output_dir: The output directory to store generated code.
+>>>> +    :param prefix: Optional C-code prefix for symbol names.
+>>>> +    :param unmask: Expose non-ABI names through introspection?
+>>>> +    :param builtins: Generate code for built-in types?
+>>>> +
+>>>> +    :raise QAPIError: On failures.
+>>>> +    """
+>>>> +    match = re.match(r'([A-Za-z_.-][A-Za-z0-9_.-]*)?', prefix)
+>>>> +    if match.end() != len(prefix):
+>>>> +        msg = "funny character '{:s}' in prefix '{:s}'".format(
+>>>> +            prefix[match.end()], prefix)
+>>>> +        raise QAPIError('', None, msg)
+>>> Uh...
+>>>       $ python3 scripts/qapi-gen.py --prefix=@ x
+>>>       scripts/qapi-gen.py: : funny character '@' in prefix '@'
+>>> Unwanted " :".
+>>> This is due to a hack: you pass '' for info (*quack*).  Everything
+>>> else
+>>> passes QAPISourceInfo (I believe).
+>>>
 >>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
->> Reviewed-by: Cleber Rosa <crosa@redhat.com>
->> Tested-by: Cleber Rosa <crosa@redhat.com>
->> ---
->>   scripts/qapi-gen.py | 85 +++++++++++++++++++++++++++++++++------------
->>   1 file changed, 62 insertions(+), 23 deletions(-)
+>> Quack indeed - why does our base error class require so much
+>> information from a specific part of the generation process?
+> 
+> Because it's not "a base error class", it's a base error class for the
+> QAPI schema compiler frontend.
+> 
+
+Well. It's the base for every error we /had/.
+
+>> Ah, someone changes this in part 4 so that we have a more generic
+>> error class to use as a base when we are missing such information.
+> 
+> Evolving it to satisfy a need for a more widely usable error class is
+> okay.
+> 
+
+Yep. It's helpful to keep a very generic form on which we grow other 
+errors from, so that things like the entry point can be written legibly.
+
+>> You are witnessing some more future-bleed.
+>>> Is it really a good idea to do this in generate?  It's not about
+>>> generating code, it's about validating a CLI option.
+>>>
 >>
->> diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
->> index 541e8c1f55d..117b396a595 100644
->> --- a/scripts/qapi-gen.py
->> +++ b/scripts/qapi-gen.py
->> @@ -1,30 +1,77 @@
->>   #!/usr/bin/env python3
->> -# QAPI generator
->> -#
->> +
->>   # This work is licensed under the terms of the GNU GPL, version 2 or later.
->>   # See the COPYING file in the top-level directory.
->>   
->> +"""
->> +QAPI Generator
->> +
->> +This script is the main entry point for generating C code from the QAPI schema.
+>> One might also ask: Is it a good idea to only validate this on a
+>> frontend, and not in the implementation?
 > 
-> PEP 8: For flowing long blocks of text with fewer structural
-> restrictions (docstrings or comments), the line length should be limited
-> to 72 characters.
+> Yes, because that's where you can emit the better error message more
+> easily.
 > 
-
-Eugh. OK, but I don't have a good way to check or enforce this, 
-admittedly. I have to change my emacs settings to understand this when I 
-hit the reflow key. I don't know if the python mode has a context-aware 
-reflow length.
-
-("I don't disagree, but I'm not immediately sure right now how I will 
-make sure I, or anyone else, complies with this. Low priority as a result?")
-
->> +"""
->>   
->>   import argparse
->>   import re
->>   import sys
->>   
->>   from qapi.commands import gen_commands
->> +from qapi.error import QAPIError
->>   from qapi.events import gen_events
->>   from qapi.introspect import gen_introspect
->> -from qapi.schema import QAPIError, QAPISchema
->> +from qapi.schema import QAPISchema
->>   from qapi.types import gen_types
->>   from qapi.visit import gen_visit
->>   
->>   
->> -def main(argv):
->> +DEFAULT_OUTPUT_DIR = ''
->> +DEFAULT_PREFIX = ''
->> +
->> +
->> +def generate(schema_file: str,
->> +             output_dir: str,
->> +             prefix: str,
->> +             unmask: bool = False,
->> +             builtins: bool = False) -> None:
->> +    """
->> +    generate uses a given schema to produce C code in the target directory.
+>      $ python3 scripts/qapi-gen.py --prefix=@ x
+>      scripts/qapi-gen.py: 'funny character '@' in argument of --prefix
 > 
-> PEP 257: The docstring is a phrase ending in a period.  It prescribes
-> the function or method's effect as a command ("Do this", "Return that"),
-> not as a description; e.g. don't write "Returns the pathname ...".
+> is better than
 > 
-> Suggest
+>      $ python3 scripts/qapi-gen.py --prefix=@ x
+>      scripts/qapi-gen.py: funny character '@' in prefix '@'
 > 
->         Generate C code for the given schema into the target directory.
+> In generate(), the knowledge where the offending prefix value comes from
+> is no longer available.
+> 
+> To emit this error message, you'd have to raise a sufficiently distinct
+> error in generate, catch it in main(), then put the error message
+> together somehow.  Bah.
+> 
+> Aside: there's a stray ' in the old error message.
+> 
+>> The idea here was to create a function that could be used in a script
+>> (for tests, debugging interfaces, other python packages) to do all of
+>> the same things that the CLI tool did, just sans the actual CLI.
+> 
+> YAGNI.
 > 
 
-OK. I don't mind trying to foster a consistent tone. I clearly didn't. I 
-will add a note to my style guide todo.
+It's useful for testing and debugging to be able to just call it outside 
+of the CLI, though. Maybe you won't use it, but I will.
 
-I give you permission to change the voice in any of my docstrings, or to 
-adjust the phrasing to be more technically accurate as you see fit. You 
-are the primary maintainer of this code, of course, and you will know best.
+I could always add the prefix check into a tiny function and give the 
+good error message in main(), and just assert in generate() if you 
+insist on the slightly more specific error message from the CLI script.
 
-It will be quicker to give you full permission to just change any of the 
-docstrings as you see fit than it will be to play review-respin ping-pong.
-
->> +
->> +    :param schema_file: The primary QAPI schema file.
->> +    :param output_dir: The output directory to store generated code.
->> +    :param prefix: Optional C-code prefix for symbol names.
->> +    :param unmask: Expose non-ABI names through introspection?
->> +    :param builtins: Generate code for built-in types?
->> +
->> +    :raise QAPIError: On failures.
->> +    """
-> [...]
+>> Wouldn't make sense to allow garbage to flow in from one interface but
+>> not the other; so the check is here.
+> 
+> "@prefix is sane" is a precondition of generate().
+> 
+> When there's a real risk of preconditions getting violated, or readers
+> getting confused about preconditions, check them with assert.
+> 
+>>>> +
+>>>> +    schema = QAPISchema(schema_file)
+>>>> +    gen_types(schema, output_dir, prefix, builtins)
+>>>> +    gen_visit(schema, output_dir, prefix, builtins)
+>>>> +    gen_commands(schema, output_dir, prefix)
+>>>> +    gen_events(schema, output_dir, prefix)
+>>>> +    gen_introspect(schema, output_dir, prefix, unmask)
+>>>> +
+>>>> +
+>>>> +def main() -> int:
+>>>> +    """
+>>>> +    gapi-gen shell script entrypoint.
+>>>> +    Expects arguments via sys.argv, see --help for details.
+>>>> +
+>>>> +    :return: int, 0 on success, 1 on failure.
+>>>> +    """
+>>>>        parser = argparse.ArgumentParser(
+>>>>            description='Generate code from a QAPI schema')
+>>>>        parser.add_argument('-b', '--builtins', action='store_true',
+>>>>                            help="generate code for built-in types")
+>>>> -    parser.add_argument('-o', '--output-dir', action='store', default='',
+>>>> +    parser.add_argument('-o', '--output-dir', action='store',
+>>>> +                        default=DEFAULT_OUTPUT_DIR,
+>>>>                            help="write output to directory OUTPUT_DIR")
+>>>> -    parser.add_argument('-p', '--prefix', action='store', default='',
+>>>> +    parser.add_argument('-p', '--prefix', action='store',
+>>>> +                        default=DEFAULT_PREFIX,
+>>>>                            help="prefix for symbols")
+>>> I don't like the changes to default=, because:
+>>> 1. They are only losely related to the patch's purpose.
+>>>
+>>
+>> Subjective, but OK.
+>>
+>>> 2. They split the definition of the CLI: most of it is here, except for
+>>> defaults, which are defined elsewhere.
+>>>
+>>
+>> All of it is in main.py, though! If you were to, say, move generate()
+>> elsewhere, it'd look pretty compact as just the CLI frontend, no?
+> 
+> Same statement is more compact than same screenful is more compact than
+> same file :)
+> 
+>>> 3. The defaults will not change, and nothing else uses the constants.
+>>>
+>>
+>> But, fine. Cleber had the same comment but I wasn't fully on-board,
+>> but two folks saying the same thing ...
+>>
+>>>>        parser.add_argument('-u', '--unmask-non-abi-names', action='store_true',
+>>>>                            dest='unmask',
+>>>> @@ -32,25 +79,17 @@ def main(argv):
+>>>>        parser.add_argument('schema', action='store')
+>>>>        args = parser.parse_args()
+>>>>    -    match = re.match(r'([A-Za-z_.-][A-Za-z0-9_.-]*)?',
+>>>> args.prefix)
+>>>> -    if match.end() != len(args.prefix):
+>>>> -        print("%s: 'funny character '%s' in argument of --prefix"
+>>>> -              % (sys.argv[0], args.prefix[match.end()]),
+>>>> -              file=sys.stderr)
+>>>> -        sys.exit(1)
+>>>> -
+>>>>        try:
+>>>> -        schema = QAPISchema(args.schema)
+>>>> +        generate(args.schema,
+>>>> +                 output_dir=args.output_dir,
+>>>> +                 prefix=args.prefix,
+>>>> +                 unmask=args.unmask,
+>>>> +                 builtins=args.builtins)
+>>>>        except QAPIError as err:
+>>>> -        print(err, file=sys.stderr)
+>>>> -        exit(1)
+>>>> -
+>>>> -    gen_types(schema, args.output_dir, args.prefix, args.builtins)
+>>>> -    gen_visit(schema, args.output_dir, args.prefix, args.builtins)
+>>>> -    gen_commands(schema, args.output_dir, args.prefix)
+>>>> -    gen_events(schema, args.output_dir, args.prefix)
+>>>> -    gen_introspect(schema, args.output_dir, args.prefix, args.unmask)
+>>>> +        print(f"{sys.argv[0]}: {str(err)}", file=sys.stderr)
+>>>> +        return 1
+>>>> +    return 0
+>>> Subtle change: you move the gen_FOO() into the try ... except.
+>>> Okay;
+>>> they don't raise QAPIError, but perhaps worth a mention in the commit
+>>> message.
+>>>
+>>
+>> Forbidden future knowledge; I intend them to.
+> 
+> I don't mind the move.
+> 
+>>>>      
+>>>>    if __name__ == '__main__':
+>>>> -    main(sys.argv)
+>>>> +    sys.exit(main())
+>>> "Python was designed to be easy to understand and fun to use."
+>>> Ha ha ha.
+>>>
+>>
+>> I mean, I'm having fun, aren't you?
+> 
+> So many kinds of fun!  The fun I'm having with this patch hunk is
+> mocking "easy and fun" Python for requiring such an elaborate menuett
+> just to express "can run as program".
+> 
+> This emperor has no clothes, either.  And that's funny, isn't it?
 > 
 
 
