@@ -2,125 +2,89 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F595C4363D
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 10:40:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E6DEC4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 10:43:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 534A6207EA
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 10:40:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BDB952080A
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 10:43:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="X7ERQzxu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 534A6207EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZjAuGU3j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDB952080A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ6sQ-0004g2-8W
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 06:40:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46520)
+	id 1kQ6ut-0006I2-Ov
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 06:43:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47060)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kQ6rX-00043G-6A; Wed, 07 Oct 2020 06:39:59 -0400
-Received: from mail-he1eur01on0716.outbound.protection.outlook.com
- ([2a01:111:f400:fe1e::716]:51741
- helo=EUR01-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kQ6rU-00005R-10; Wed, 07 Oct 2020 06:39:58 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MJRVWs2QFE7J1tqe2+g8VkFxoZjW0xJ27XbwupMlENYWOdMHyAkzdixlQ9+Ter1MQfXPAAeCX7Faz8qHGRBDj5GwfA/Zl8o7lydUfuP7i3Z3bXTXNRThE5rGbtnUi5IUn1R7yspBU6CQJvib/MN2HiLn/5nzLQby97XoWDKhJhMx/HcaUzJQ37xw0AvCB+oG5/ysY5RvuifacAuInrFMhXY3d1voJ81rwSRZENmbKHyJ7Wr6GzXqoQGNVzphi/Zfccyy4X9UGsT6weiQ++sM0F9eztxDlXrDjFEVw8LAig8uwJnknwZdKMW7ImLo5fU/qt6gTgk4wGFZuTxdjNby1g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JMaNRBu+0YEjsQtDCygXF/td39cyoU80qBwSsDvY0Ck=;
- b=E1Pkhsi+yWVY57Qkxz1p8sDW/OZQZfBhPwwlY5jn44XuxOKxFdpKwsxOE4GHbXWrsdInihSkJws0hlewOlGH8TPmq/Hi9CIBp6ysgNyCUTp5iFaOHss9SBmVSYgKpOHk+jsv2/6WdfAdQwTqjlxlv9e9aDR35S7osIftQlVmC9EjlOj2vL5aPzlQO0+gpWXipCxmOgQFy9ASD9/TbGMW7jPErIED6OGw3QbI9VpVRQlXjP9CSiohsTRYFNp2mPobt1MGf1N1BrtKNSILbcqdTeHQv5sYgGkVLhVRz2YuyEd9xQh3e9pXODFLSfuDzx8sweZrLoIWwMHDN522y/XdhA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JMaNRBu+0YEjsQtDCygXF/td39cyoU80qBwSsDvY0Ck=;
- b=X7ERQzxuWmsBXIcBxz6v3UW5Rt5bduIZetWGuU+0IAS024xfWorCosfnRahQdXJcEz6EUzQwZqz7c7l5UgmE4O78ykFqFAbf+ropMlnJDMFSPnmZehklLng0c4swx2L9B/w0atETZ1kCQyagsr9L8AF84C3FqPO92/kzskeoKuA=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB3768.eurprd08.prod.outlook.com (2603:10a6:20b:90::29)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3433.37; Wed, 7 Oct
- 2020 10:39:52 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3433.045; Wed, 7 Oct 2020
- 10:39:52 +0000
-Subject: Re: [PATCH v2 2/5] nbd/server: Reject embedded NUL in NBD strings
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, stefanha@redhat.com, pkrempa@redhat.com,
- rjones@redhat.com, qemu-block@nongnu.org
-References: <20200930121105.667049-1-eblake@redhat.com>
- <20200930121105.667049-3-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <18cef345-fd1f-6161-cdb9-c73834eac135@virtuozzo.com>
-Date: Wed, 7 Oct 2020 13:39:51 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
-In-Reply-To: <20200930121105.667049-3-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [185.215.60.87]
-X-ClientProxiedBy: AM0PR01CA0129.eurprd01.prod.exchangelabs.com
- (2603:10a6:208:168::34) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kQ6tu-0005R0-2W
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 06:42:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40042)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kQ6ts-0000Ss-EQ
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 06:42:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602067343;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=sqzMJa84CdrybgfRgbApVVCQxGrz6emPNc11Asej+TI=;
+ b=ZjAuGU3jbapsc3yUOFfVpV+hNhQF/DASZ+Gx/Ej5iv02C001N+d70xeOeGcwdRArI0ahEJ
+ 9vo+bGsoygSCSd7CP2bpS4RrRMrty/MRURiN6NF0hROR2gDRV/MfUe2Tn73AF4Zb82V7CL
+ RcOpJkQRIcz4ud73e9QvKtirjVI86oc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-217-Tcc-I0-4N3etHqY2oB5Dxg-1; Wed, 07 Oct 2020 06:42:21 -0400
+X-MC-Unique: Tcc-I0-4N3etHqY2oB5Dxg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D918410866AB
+ for <qemu-devel@nongnu.org>; Wed,  7 Oct 2020 10:42:20 +0000 (UTC)
+Received: from work-vm (ovpn-112-50.ams2.redhat.com [10.36.112.50])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F15748CD22;
+ Wed,  7 Oct 2020 10:42:13 +0000 (UTC)
+Date: Wed, 7 Oct 2020 11:42:11 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, vgoyal@redhat.com, stefanha@redhat.com,
+ virtio-fs@redhat.com
+Subject: Re: [PATCH v2 1/6] virtiofsd: Silence gcc warning
+Message-ID: <20201007104211.GA22258@work-vm>
+References: <20200827153657.111098-1-dgilbert@redhat.com>
+ <20200827153657.111098-2-dgilbert@redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.5] (185.215.60.87) by
- AM0PR01CA0129.eurprd01.prod.exchangelabs.com (2603:10a6:208:168::34) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.22 via Frontend
- Transport; Wed, 7 Oct 2020 10:39:52 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 0bc7fd66-9589-495f-d5d7-08d86aad52d8
-X-MS-TrafficTypeDiagnostic: AM6PR08MB3768:
-X-Microsoft-Antispam-PRVS: <AM6PR08MB3768E7B130EA269BAA0E2982C10A0@AM6PR08MB3768.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: avkornlZw7CNToQx+/ymfxFHOOQpptVG9XD2RwBNY7zyKGe5oJMD5Z8NXzCg+1czH6RI3ipQQJZNQXDa5mANuJq0giH6JI0YOH+HCSWW6nq3wE4oObPO8Lte2dt46J1LIlvJv4tiS6BJqah7Z9Zc5cZf+vd/MkT3Dy6aknRxTL4H4ZwCZZ+CD1LYI16PRFVaneRQg0YeZDArCAPtoWK8i6P1qAChndTLfbDtJOmjeYcBGhE8CaM4gpPAINKNdIIDGpCmbBd53kxmBRxMYVzWNfeupn6BQzcCm9JVWVLm1Jg56o6P0marXiD19g2sz+bXsXs/cCRDe58ZPRIx+uT1UMRvRYitRuttvkMwMZv3QdPyt7zP+M6I5HeoB4Jldsu+
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(376002)(136003)(346002)(39840400004)(396003)(366004)(186003)(31696002)(16526019)(86362001)(8936002)(83380400001)(6486002)(52116002)(26005)(2906002)(8676002)(4744005)(16576012)(316002)(2616005)(5660300002)(66556008)(956004)(66476007)(66946007)(31686004)(4326008)(478600001)(36756003)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 1broeBPrdPlns8u0es27d4EGV/2EmG5foCfUh8aTXGNfJxo4UupLm6CXBOvuwLo3C+EhNpJ5namnU42huM2ZmbfR8D+9J+WojbPy2uAx2MbJ97DG9iITA7NWU7TEjhQLZmFd35TLfjOFgZCO4WBSWhNhqd6+sw940oYEYmJlHgnKtFLlw8n9pF4UVG1fGGSVkCKx4cA4ZxKJ7If0/X8R+NIKBRSQvdsFSbbkKa8gNsEck5WmHhtDWyRVqalDsv6jg2zlH5MSDWIhUPSJUOYwty4los71PXSjWKniEZKclodc/gEzZAPHJiBcE9YgdKEVTFvTK46sjgXTi6ePQwcvRReWx01UGHH3y7x0MbPyJ7Q+cL0W5eTZ8DXWHg1Fb2DfgKo88jd3qv+JHQwZtZoK3IHygC8OG79Tl9+crSeatYbucrNVBjSCkt0qsLquQTZ7vnHIlBNSe1NusDTwA/Fjre5zsmumaJkUOosItadayeGSdiFluIyNBU9Ccug1tynovrmHGysl2m985xdukPEpwcIrhDQLsH2LRdGJ8yAJyWDJKLf8Uih1N+FL/B/M9M+wIFW7r2Pt2D5SzJVlkPt3OTCuJPAELsl7R26Sa8el4R8xkkZiK7N2vCIBQWcBQCCpxqzSnNa/9iNz0rOwWpyOUQ==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0bc7fd66-9589-495f-d5d7-08d86aad52d8
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Oct 2020 10:39:52.6297 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ubz/XLKX90gPyzL36RDJ/S3Cja4RFfL9xspZ1oF+ghvnOQKfDRO1yT0GMzl6HnbhLR7qDExH09wY9LoJ41iedrqp862isBD4hArVPS8FNv8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3768
-Received-SPF: pass client-ip=2a01:111:f400:fe1e::716;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR01-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <20200827153657.111098-2-dgilbert@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:54:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -137,21 +101,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-30.09.2020 15:11, Eric Blake wrote:
-> The NBD spec is clear that any string sent from the client must not
-> contain embedded NUL characters.  If the client passes "a\0", we
-> should reject that option request rather than act on "a".
+* Dr. David Alan Gilbert (git) (dgilbert@redhat.com) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
-> Testing this is not possible with a compliant client, but I was able
-> to use gdb to coerce libnbd into temporarily behaving as such a
-> client.
+> Gcc worries fd might be used unset, in reality it's always set if
+> fi is set, and only used if fi is set so it's safe.  Initialise it to -1
+> just to keep gcc happy for now.
 > 
-> Signed-off-by: Eric Blake<eblake@redhat.com>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
+Queued (just this patch)
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-
+> ---
+>  tools/virtiofsd/passthrough_ll.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+> index 63d1d00565..083d17a960 100644
+> --- a/tools/virtiofsd/passthrough_ll.c
+> +++ b/tools/virtiofsd/passthrough_ll.c
+> @@ -617,7 +617,7 @@ static void lo_setattr(fuse_req_t req, fuse_ino_t ino, struct stat *attr,
+>      struct lo_inode *inode;
+>      int ifd;
+>      int res;
+> -    int fd;
+> +    int fd = -1;
+>  
+>      inode = lo_inode(req, ino);
+>      if (!inode) {
+> -- 
+> 2.26.2
+> 
+> 
 -- 
-Best regards,
-Vladimir
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
