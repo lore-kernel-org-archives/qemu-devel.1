@@ -7,80 +7,83 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 381E3C41604
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 11:32:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CC81C4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 11:33:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 670DA20789
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 11:32:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 69B5620782
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 11:33:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nw0S7Xt/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 670DA20789
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iQxexhzK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69B5620782
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ7gI-0002MW-4Q
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 07:32:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57258)
+	id 1kQ7hI-0003Ti-2J
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 07:33:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57742)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kQ7em-0001i9-EJ
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 07:30:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31530)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQ7gZ-0002hD-4h
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 07:32:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57862)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kQ7ek-0006q2-3h
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 07:30:51 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQ7gW-0006zw-23
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 07:32:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602070249;
+ s=mimecast20190719; t=1602070358;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=lCo2tJKCNVeKjFL5aRBFnVO4rBlRtJ7nofZ+eqWUE54=;
- b=Nw0S7Xt/VEhB9yRrZHuOaWvTOfKrPrKm5Nb/ZXOC5yqTTbnrfpPRQltrO3fHSjmjInvJuy
- d1vdxPS2smeqBirJHWNgqb8+67R2dEalKe2HC5tb+KK2jFxF088Ch4I+rxr6tXm801XUHA
- V9FVpyXt3r5VSdrawmBBNG0R1eAX0YE=
+ bh=P0sn2SaJok58nsFSPBpnK6pYygl6mc/ZIc9wphyNXB0=;
+ b=iQxexhzKkkODW1p1sZ5b2wptTPLD1S8HS6CQPBkcR5VSzAvM/GFrmBTyj0vcD+VxODeK2d
+ Xqnvozwl7BrwHUh5hFSDZjVSA4E0KBKM40nev4qZSVS8v2yQxjy1UASgQxh/c8lycjXSAD
+ 9mETMVqPKwomw0qjIHyxpLUjgQqprPU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-515-Ec4r4C7zO2q3FfHT1z4yTw-1; Wed, 07 Oct 2020 07:30:47 -0400
-X-MC-Unique: Ec4r4C7zO2q3FfHT1z4yTw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-524-mwui8Xx-MDib_YSiHficLA-1; Wed, 07 Oct 2020 07:32:36 -0400
+X-MC-Unique: mwui8Xx-MDib_YSiHficLA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1075180401F;
- Wed,  7 Oct 2020 11:30:46 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-113-169.ams2.redhat.com [10.36.113.169])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8DBF45C70A;
- Wed,  7 Oct 2020 11:30:44 +0000 (UTC)
-Date: Wed, 7 Oct 2020 13:30:43 +0200
-From: Kevin Wolf <kwolf@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE89018A822F
+ for <qemu-devel@nongnu.org>; Wed,  7 Oct 2020 11:32:35 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
+ [10.36.112.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A97866EF5B;
+ Wed,  7 Oct 2020 11:32:35 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 3170711329C1; Wed,  7 Oct 2020 13:32:34 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
 To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH 18/20] python/qemu/qmp.py: re-raise OSError when
- encountered
-Message-ID: <20201007113043.GL7212@linux.fritz.box>
-References: <20201006235817.3280413-1-jsnow@redhat.com>
- <20201006235817.3280413-19-jsnow@redhat.com>
+Subject: Re: [PATCH v5 19/36] qapi/events.py: add type hint annotations
+References: <20201005195158.2348217-1-jsnow@redhat.com>
+ <20201005195158.2348217-20-jsnow@redhat.com>
+Date: Wed, 07 Oct 2020 13:32:34 +0200
+In-Reply-To: <20201005195158.2348217-20-jsnow@redhat.com> (John Snow's message
+ of "Mon, 5 Oct 2020 15:51:41 -0400")
+Message-ID: <87zh4ye0fh.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20201006235817.3280413-19-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
+Content-Type: text/plain
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:54:30
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:44:56
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
 X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,47 +97,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 07.10.2020 um 01:58 hat John Snow geschrieben:
-> Nested if conditions don't change when the exception block fires; we
-> need to explicitly re-raise the error if we didn't intend to capture and
-> suppress it.
-> 
+John Snow <jsnow@redhat.com> writes:
+
+> Annotations do not change runtime behavior.
+> This commit *only* adds annotations.
+>
 > Signed-off-by: John Snow <jsnow@redhat.com>
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> Reviewed-by: Cleber Rosa <crosa@redhat.com>
 > ---
->  python/qemu/qmp.py | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/python/qemu/qmp.py b/python/qemu/qmp.py
-> index d911999da1f..bdbd1e9bdbb 100644
-> --- a/python/qemu/qmp.py
-> +++ b/python/qemu/qmp.py
-> @@ -169,9 +169,9 @@ def __get_events(self, wait: Union[bool, float] = False) -> None:
->          try:
->              self.__json_read()
->          except OSError as err:
-> -            if err.errno == errno.EAGAIN:
-> -                # No data available
-> -                pass
-> +            # EAGAIN: No data available; not critical
-> +            if err.errno != errno.EAGAIN:
-> +                raise
-
-Hm, if we re-raise the exception here, the socket remains non-blocking.
-I think we intended to have it like that only temporarily.
-
-The same kind of exception would raise QMPConnectError below instead of
-directly OSError. Should we try to make this consistent?
-
->          self.__sock.setblocking(True)
+>  scripts/qapi/events.py | 46 ++++++++++++++++++++++++++++++++----------
+>  scripts/qapi/mypy.ini  |  5 -----
+>  2 files changed, 35 insertions(+), 16 deletions(-)
+>
+> diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
+> index f840a62ed92..57e0939e963 100644
+> --- a/scripts/qapi/events.py
+> +++ b/scripts/qapi/events.py
+> @@ -12,19 +12,31 @@
+>  See the COPYING file in the top-level directory.
+>  """
 >  
->          # Wait for new events, if needed.
+> +from typing import List
+> +
+>  from .common import c_enum_const, c_name, mcgen
+>  from .gen import QAPISchemaModularCVisitor, build_params, ifcontext
+> -from .schema import QAPISchemaEnumMember
+> +from .schema import (
+> +    QAPISchema,
+> +    QAPISchemaEnumMember,
+> +    QAPISchemaFeature,
+> +    QAPISchemaObjectType,
+> +)
+> +from .source import QAPISourceInfo
+>  from .types import gen_enum, gen_enum_lookup
+>  
+>  
+> -def build_event_send_proto(name, arg_type, boxed):
+> +def build_event_send_proto(name: str,
+> +                           arg_type: QAPISchemaObjectType,
+> +                           boxed: bool) -> str:
+>      return 'void qapi_event_send_%(c_name)s(%(param)s)' % {
+>          'c_name': c_name(name.lower()),
+>          'param': build_params(arg_type, boxed)}
+>  
+>  
+> -def gen_event_send_decl(name, arg_type, boxed):
+> +def gen_event_send_decl(name: str,
+> +                        arg_type: QAPISchemaObjectType,
+> +                        boxed: bool) -> str:
+>      return mcgen('''
+>  
+>  %(proto)s;
+> @@ -33,7 +45,7 @@ def gen_event_send_decl(name, arg_type, boxed):
+>  
+>  
+>  # Declare and initialize an object 'qapi' using parameters from build_params()
+> -def gen_param_var(typ):
+> +def gen_param_var(typ: QAPISchemaObjectType) -> str:
+>      assert not typ.variants
+>      ret = mcgen('''
+>      %(c_name)s param = {
+> @@ -61,7 +73,11 @@ def gen_param_var(typ):
+>      return ret
+>  
+>  
+> -def gen_event_send(name, arg_type, boxed, event_enum_name, event_emit):
+> +def gen_event_send(name: str,
+> +                   arg_type: QAPISchemaObjectType,
+> +                   boxed: bool,
+> +                   event_enum_name: str,
+> +                   event_emit: str) -> str:
+>      # FIXME: Our declaration of local variables (and of 'errp' in the
+>      # parameter list) can collide with exploded members of the event's
+>      # data type passed in as parameters.  If this collision ever hits in
+> @@ -137,15 +153,15 @@ def gen_event_send(name, arg_type, boxed, event_enum_name, event_emit):
+>  
+>  class QAPISchemaGenEventVisitor(QAPISchemaModularCVisitor):
+>  
+> -    def __init__(self, prefix):
+> +    def __init__(self, prefix: str):
+>          super().__init__(
+>              prefix, 'qapi-events',
+>              ' * Schema-defined QAPI/QMP events', None, __doc__)
+>          self._event_enum_name = c_name(prefix + 'QAPIEvent', protect=False)
+> -        self._event_enum_members = []
+> +        self._event_enum_members: List[QAPISchemaEnumMember] = []
+>          self._event_emit_name = c_name(prefix + 'qapi_event_emit')
+>  
+> -    def _begin_user_module(self, name):
+> +    def _begin_user_module(self, name: str) -> None:
+>          events = self._module_basename('qapi-events', name)
+>          types = self._module_basename('qapi-types', name)
+>          visit = self._module_basename('qapi-visit', name)
+> @@ -168,7 +184,7 @@ def _begin_user_module(self, name):
+>  ''',
+>                               types=types))
+>  
+> -    def visit_end(self):
+> +    def visit_end(self) -> None:
 
-Kevin
+Ignorant question: what's the difference between -> None (like here) and
+nothing (like __init__() above?
+
+>          self._add_system_module('emit', ' * QAPI Events emission')
+>          self._genc.preamble_add(mcgen('''
+>  #include "qemu/osdep.h"
+[...]
 
 
