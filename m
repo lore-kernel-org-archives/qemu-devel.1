@@ -8,81 +8,77 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DA6FC4363C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 08:50:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6861C4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 08:52:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBDC121D7A
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 08:50:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E28A221D7A
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 08:52:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A7NMupKb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBDC121D7A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OzoYvzXW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E28A221D7A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ59s-0006Z0-Nl
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 04:50:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50828)
+	id 1kQ5BK-0008R0-Is
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 04:52:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51066)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1kQ53o-0000We-Rz
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 04:44:32 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:40844)
+ id 1kQ54O-0001VW-7F
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 04:45:08 -0400
+Received: from mail-pl1-x635.google.com ([2607:f8b0:4864:20::635]:44491)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1kQ53m-0002ik-Ok
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 04:44:32 -0400
-Received: by mail-pg1-x544.google.com with SMTP id i2so939172pgh.7
- for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 01:44:30 -0700 (PDT)
+ id 1kQ54M-0002qd-0U
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 04:45:07 -0400
+Received: by mail-pl1-x635.google.com with SMTP id h2so641305pll.11
+ for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 01:45:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=SakJjJTD/kJIzKddUzQpQkxUUmMnxazzEp6k0wZwlog=;
- b=A7NMupKb3vg7jrt64XhXx/ZOUP0yy9D13+EXzVi/R9vfopANc+lt5vynMxD1qwu49F
- 3xczsWY8g1111HlbjZV2XYu0UF6+2DMw6YVq81xzPfevS0Bm8aZIA5t/+odxrom5c3Uh
- t4pJcwD0Kf2i/dlbaOpj6VYagqrRR+NkJUF0SNfdGUJWUi99/CoxuWGZKD7bC5mn48LN
- 4pkoI+G6iYaShlg/he5pN2/izp70A+748y5Y2dEThXyVtbi8XIPf2FbtBv+yMYByDDSl
- XAWWFHdVa+wtmhpOfI5TojIIdxUzlFA/3qDRZW42LeCJMOzDsUy593fsbFgfKPRlPwic
- tpbQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=/nx0v7Y3v/7WYmx+DAfRIR0wl6I4NLnpVoOUzG4A1dE=;
+ b=OzoYvzXWXwq6bFmDSH1I/cH8AMdDYSUudNlRSXcqogV/6mYWReyrufMboM8/MzMOpW
+ ZKLT3ySCOBvQSnH1wLdoTzYlBn3sRpTjQSyXHBO9EW6SQZJ8rT9hRwRZEneg1EGCQqUt
+ FbHlI41GRmiSPS2pARVxyhWCCf5YurFP/u7wgMdSo8xeEUy4/NxEr5hG2/GtHsvldwLX
+ rTDgUlOJ7bxYxiH+eo1ddeEGoumlt0sTr1kU0SWm8aj6lgodJO+keYh5fj59aoWU/Vxz
+ N2KtEj46cvTHcJcje4DdjXFs1c+iKnpLU+rUZcm6adQ4UozyeVI3Pt5rQDt8yCkJXefb
+ YDpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=SakJjJTD/kJIzKddUzQpQkxUUmMnxazzEp6k0wZwlog=;
- b=jUn9ChVT+qMYc96C3d3m7OxPUoy4MNO0xiF+slfOfB/hnFZyL/Gf4kRFZsqv+FKbbD
- uGWT8cmkyqHI6Q/Yjd3HIvBBRr6fF2CMO69iCB5fS++3LBw/VOAxOajdLLTfJoUPNPZF
- ww4OPpB+M7EAGZ3tDoDkKnnL2O6b0WlOyK/8dHFStwVRrI5M6CYtlxBL21m5v5oIsH84
- VcRLXKAT5aw0agdJTOo8E4L/nP17QCa1GKtQn7mNqaLhwMsldExfzrSbkWSgEuZfZOTV
- MQBNP0TbZrLgPofT50pXU+wtTn8DcIvPN7KqIHEnITyI4jcrJgxJqDwWEe7Fm9mlBTq6
- zpeQ==
-X-Gm-Message-State: AOAM531IsJzgYuHe5hiAv5MriXMtwCsnmtx+55FnELy8JTBv9lZjCkyV
- 2nveMZh8qnSvgX3cvnoGnd4=
-X-Google-Smtp-Source: ABdhPJzMWxq/KEfin5c02PovxdSW54OkMBR6OYOf+wO33RjEjr+DBaJWcvk2SsyD4zxGt4KBQL7rYw==
-X-Received: by 2002:aa7:9f04:0:b029:13e:d13d:a13b with SMTP id
- g4-20020aa79f040000b029013ed13da13bmr2054949pfr.35.1602060269516; 
- Wed, 07 Oct 2020 01:44:29 -0700 (PDT)
+ :references;
+ bh=/nx0v7Y3v/7WYmx+DAfRIR0wl6I4NLnpVoOUzG4A1dE=;
+ b=lHwUwug13usI84M+gS9KaBVn1jugx2crXgDs27wYhxBIlvaMQPocBk2v0hYNzoiqys
+ a5HoVej7Mvsl3MKBpu6wEZkMhA3wOdtLEGTU1E6kbdXIEmD+raCGB5i+a5PFC/ZmozNY
+ clHijSZf0z/cKHGSn0MjLl0H2LKMmbJhW7tJOk/uv4KX+rut0bRON5Z8AIiSCvOVXWF1
+ hWFkvzauO++Vv4/pwWViZJP0XwtvVT1zreppS68IYqv0LsW/EH4XKZnAw8ZQn+CQHP2I
+ KOxfHAgV9iFcHjRs1liBapxikm7P4PHK0Y+Gz8iZ5UCS2swWGsY1+jKwlUcO6fK7JG0U
+ NiJw==
+X-Gm-Message-State: AOAM530zJSVX1tB4dYOeKR62AaK6D7wwWFolM3hKwcxmmkx1aqRx+l3k
+ 1GTXdUKnqeil2C5ZOBcGYik=
+X-Google-Smtp-Source: ABdhPJz7XdFOD71Jd9WIGGiNAcdvT+xy26LeaH+dd2+mhFb96OD7x8ZPnQ/lp+vsbJBitidWhbU2sQ==
+X-Received: by 2002:a17:902:c40a:b029:d3:d448:98a8 with SMTP id
+ k10-20020a170902c40ab02900d3d44898a8mr1921446plk.29.1602060303610; 
+ Wed, 07 Oct 2020 01:45:03 -0700 (PDT)
 Received: from software.domain.org ([45.77.13.216])
- by smtp.gmail.com with ESMTPSA id i9sm1999692pfq.53.2020.10.07.01.44.25
+ by smtp.gmail.com with ESMTPSA id i9sm1999692pfq.53.2020.10.07.01.45.00
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 07 Oct 2020 01:44:28 -0700 (PDT)
+ Wed, 07 Oct 2020 01:45:02 -0700 (PDT)
 From: Huacai Chen <zltjiangshi@gmail.com>
 X-Google-Original-From: Huacai Chen <chenhc@lemote.com>
 To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Subject: [PATCH V13 7/9] hw/mips: Implement fw_cfg_arch_key_name()
-Date: Wed,  7 Oct 2020 16:39:33 +0800
-Message-Id: <1602059975-10115-8-git-send-email-chenhc@lemote.com>
+Subject: [PATCH V13 9/9] docs/system: Update MIPS machine documentation
+Date: Wed,  7 Oct 2020 16:39:35 +0800
+Message-Id: <1602059975-10115-10-git-send-email-chenhc@lemote.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1602059975-10115-1-git-send-email-chenhc@lemote.com>
 References: <1602059975-10115-1-git-send-email-chenhc@lemote.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
- envelope-from=zltjiangshi@gmail.com; helo=mail-pg1-x544.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::635;
+ envelope-from=zltjiangshi@gmail.com; helo=mail-pl1-x635.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -112,97 +108,59 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Implement fw_cfg_arch_key_name(), which returns the name of a
-mips-specific key.
+Add Loongson-3A CPU models and Loongson-3 based machine description.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Huacai Chen <chenhc@lemote.com>
-Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 ---
- hw/mips/fw_cfg.c    | 35 +++++++++++++++++++++++++++++++++++
- hw/mips/fw_cfg.h    | 19 +++++++++++++++++++
- hw/mips/meson.build |  2 +-
- 3 files changed, 55 insertions(+), 1 deletion(-)
- create mode 100644 hw/mips/fw_cfg.c
- create mode 100644 hw/mips/fw_cfg.h
+ docs/system/cpu-models-mips.rst.inc | 10 ++++++++--
+ docs/system/target-mips.rst         | 10 ++++++++++
+ 2 files changed, 18 insertions(+), 2 deletions(-)
 
-diff --git a/hw/mips/fw_cfg.c b/hw/mips/fw_cfg.c
-new file mode 100644
-index 0000000..67c4a74
---- /dev/null
-+++ b/hw/mips/fw_cfg.c
-@@ -0,0 +1,35 @@
-+/*
-+ * QEMU fw_cfg helpers (MIPS specific)
-+ *
-+ * Copyright (c) 2020 Lemote, Inc.
-+ *
-+ * Author:
-+ *   Huacai Chen (chenhc@lemote.com)
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
+diff --git a/docs/system/cpu-models-mips.rst.inc b/docs/system/cpu-models-mips.rst.inc
+index 499b5b6..02cc4bb 100644
+--- a/docs/system/cpu-models-mips.rst.inc
++++ b/docs/system/cpu-models-mips.rst.inc
+@@ -48,11 +48,17 @@ across all desired hosts.
+ ``I6400``
+     MIPS64 Processor (Release 6, 2014)
+ 
++``Loongson-2E``
++    MIPS64 Processor (Loongson 2, 2006)
 +
-+#include "qemu/osdep.h"
-+#include "hw/mips/fw_cfg.h"
-+#include "hw/nvram/fw_cfg.h"
+ ``Loongson-2F``
+     MIPS64 Processor (Loongson 2, 2008)
+ 
+-``Loongson-2E``
+-    MIPS64 Processor (Loongson 2, 2006)
++``Loongson-3A1000``
++    MIPS64 Processor (Loongson 3, 2010)
 +
-+const char *fw_cfg_arch_key_name(uint16_t key)
-+{
-+    static const struct {
-+        uint16_t key;
-+        const char *name;
-+    } fw_cfg_arch_wellknown_keys[] = {
-+        {FW_CFG_MACHINE_VERSION, "machine_version"},
-+        {FW_CFG_CPU_FREQ, "cpu_frequency"},
-+    };
++``Loongson-3A4000``
++    MIPS64 Processor (Loongson 3, 2018)
+ 
+ ``mips64dspr2``
+     MIPS64 Processor (Release 2, 2006)
+diff --git a/docs/system/target-mips.rst b/docs/system/target-mips.rst
+index cd2a931..1f86ccb 100644
+--- a/docs/system/target-mips.rst
++++ b/docs/system/target-mips.rst
+@@ -84,6 +84,16 @@ The Fuloong 2E emulation supports:
+ 
+ -  RTL8139D as a network card chipset
+ 
++The Loongson-3 virtual platform emulation supports:
 +
-+    for (size_t i = 0; i < ARRAY_SIZE(fw_cfg_arch_wellknown_keys); i++) {
-+        if (fw_cfg_arch_wellknown_keys[i].key == key) {
-+            return fw_cfg_arch_wellknown_keys[i].name;
-+        }
-+    }
-+    return NULL;
-+}
-diff --git a/hw/mips/fw_cfg.h b/hw/mips/fw_cfg.h
-new file mode 100644
-index 0000000..e317d5b
---- /dev/null
-+++ b/hw/mips/fw_cfg.h
-@@ -0,0 +1,19 @@
-+/*
-+ * QEMU fw_cfg helpers (MIPS specific)
-+ *
-+ * Copyright (c) 2020 Huacai Chen
-+ *
-+ * SPDX-License-Identifier: MIT
-+ */
++-  Loongson 3A CPU
 +
-+#ifndef HW_MIPS_FW_CFG_H
-+#define HW_MIPS_FW_CFG_H
++-  LIOINTC as interrupt controller
 +
-+#include "hw/boards.h"
-+#include "hw/nvram/fw_cfg.h"
++-  GPEX and virtio as variable devices
 +
-+/* Data for BIOS to identify machine */
-+#define FW_CFG_MACHINE_VERSION  (FW_CFG_ARCH_LOCAL + 0)
-+#define FW_CFG_CPU_FREQ         (FW_CFG_ARCH_LOCAL + 1)
++-  Both KVM and TCG supported
 +
-+#endif
-diff --git a/hw/mips/meson.build b/hw/mips/meson.build
-index 46294b7..c98391c 100644
---- a/hw/mips/meson.build
-+++ b/hw/mips/meson.build
-@@ -1,5 +1,5 @@
- mips_ss = ss.source_set()
--mips_ss.add(files('addr.c', 'mips_int.c'))
-+mips_ss.add(files('addr.c', 'mips_int.c', 'fw_cfg.c'))
- mips_ss.add(when: 'CONFIG_FULOONG', if_true: files('fuloong2e.c'))
- mips_ss.add(when: 'CONFIG_JAZZ', if_true: files('jazz.c'))
- mips_ss.add(when: 'CONFIG_MALTA', if_true: files('gt64xxx_pci.c', 'malta.c'))
+ The mipssim pseudo board emulation provides an environment similar to
+ what the proprietary MIPS emulator uses for running Linux. It supports:
+ 
 -- 
 2.7.0
 
