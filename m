@@ -2,79 +2,91 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05AB8C4363C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 09:22:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41F80C4363C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 09:23:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3318B2080A
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 09:22:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3318B2080A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 96AD02080A
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 09:23:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CzyOCEZB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96AD02080A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ5eX-0005Nt-TL
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 05:22:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58112)
+	id 1kQ5f2-0005j7-I8
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 05:23:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58148)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1kQ5ds-0004iX-AA; Wed, 07 Oct 2020 05:21:48 -0400
-Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:45267)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1kQ5dn-0007F2-7e; Wed, 07 Oct 2020 05:21:47 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.109.143.183])
- by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 3FB12698C72D;
- Wed,  7 Oct 2020 11:21:30 +0200 (CEST)
-Received: from kaod.org (37.59.142.97) by DAG4EX1.mxp5.local (172.16.2.31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Wed, 7 Oct 2020
- 11:21:29 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-97G0028ca66c1c-8905-4575-b617-d3201c9f58e9,
- A1FB6DEFD4FFF4B2E39ADAD8D1A9CF0B60FA0B96) smtp.auth=clg@kaod.org
-Subject: Re: [PATCH v2 3/6] spapr/xive: Add a warning when StoreEOI is
- activated on POWER9 CPUs
-To: Greg Kurz <groug@kaod.org>
-References: <20201005165147.526426-1-clg@kaod.org>
- <20201005165147.526426-4-clg@kaod.org> <20201006185826.65f8ff3b@bahia.lan>
- <e8013373-4536-08e4-27c9-8c8b8f46f768@kaod.org>
- <20201007105630.64e2f0c3@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <2461d5d1-7a58-b608-15cf-4723d6e62684@kaod.org>
-Date: Wed, 7 Oct 2020 11:21:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQ5e3-0004r7-F9
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 05:21:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53256)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQ5e0-0007GF-Si
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 05:21:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602062516;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=G3H0XNNrKtvs71X3+fK915l/ouj4HWF3RpGWHBnT6Ok=;
+ b=CzyOCEZBg4Lht5YnFu+FT1BKVRLuoEKGMSTS8o8Dxynmc3YjereGZOvwjZG6dhMBdYjXBI
+ 0fD2Oajb7cRAz0NQ7zTh+ZsyP5Wlvg768gHF3D33B6ktxYX2+SyGo/geOlVI4Yx+1KkPth
+ SmccoNalSHkPOEavpPpqGpnpTkA2RxU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-71-JprrLRnaO8e3fqSBS4ABog-1; Wed, 07 Oct 2020 05:21:53 -0400
+X-MC-Unique: JprrLRnaO8e3fqSBS4ABog-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09FF7420EF
+ for <qemu-devel@nongnu.org>; Wed,  7 Oct 2020 09:21:53 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
+ [10.36.112.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9DE8F55783;
+ Wed,  7 Oct 2020 09:21:52 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 26F4911329C1; Wed,  7 Oct 2020 11:21:51 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: [PATCH v5 17/36] qapi/common.py: move build_params into gen.py
+References: <20201005195158.2348217-1-jsnow@redhat.com>
+ <20201005195158.2348217-18-jsnow@redhat.com>
+Date: Wed, 07 Oct 2020 11:21:51 +0200
+In-Reply-To: <20201005195158.2348217-18-jsnow@redhat.com> (John Snow's message
+ of "Mon, 5 Oct 2020 15:51:39 -0400")
+Message-ID: <87tuv6gzm8.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20201007105630.64e2f0c3@bahia.lan>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [37.59.142.97]
-X-ClientProxiedBy: DAG4EX2.mxp5.local (172.16.2.32) To DAG4EX1.mxp5.local
- (172.16.2.31)
-X-Ovh-Tracer-GUID: fef87c23-e207-42c2-83c6-d525027e2ad3
-X-Ovh-Tracer-Id: 9842898462678616995
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrgeeigdduhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgihesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeejkeduueduveelgeduueegkeelffevledujeetffeivdelvdfgkeeufeduheehfeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehgrhhouhhgsehkrghougdrohhrgh
-Received-SPF: pass client-ip=79.137.123.220; envelope-from=clg@kaod.org;
- helo=smtpout1.mo804.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 03:24:13
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:54:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.733,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -87,71 +99,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gustavo Romero <gromero@linux.ibm.com>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/7/20 10:56 AM, Greg Kurz wrote:
-> On Tue, 6 Oct 2020 19:03:28 +0200
-> Cédric Le Goater <clg@kaod.org> wrote:
-> 
->> On 10/6/20 6:58 PM, Greg Kurz wrote:
->>> On Mon, 5 Oct 2020 18:51:44 +0200
->>> Cédric Le Goater <clg@kaod.org> wrote:
->>>
->>>> StoreEOI on POWER9 CPUs is racy because load-after-store ordering is
->>>> not enforced.
->>>>
->>>> Signed-off-by: Cédric Le Goater <clg@kaod.org>
->>>> ---
->>>>  hw/ppc/spapr_caps.c | 9 +++++++++
->>>>  1 file changed, 9 insertions(+)
->>>>
->>>> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
->>>> index b0a9d0227db2..9251badbdc27 100644
->>>> --- a/hw/ppc/spapr_caps.c
->>>> +++ b/hw/ppc/spapr_caps.c
->>>> @@ -549,6 +549,15 @@ static void cap_storeeoi_apply(SpaprMachineState *spapr, uint8_t val,
->>>>              error_setg(errp, "StoreEOI not supported by KVM");
->>>>              return;
->>>>          }
->>>> +
->>>> +        /*
->>>> +         * load-after-store ordering is not enforced on POWER9 CPUs
->>>> +         * and StoreEOI can be racy.
->>>> +         */
->>>> +        if (!ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOGICAL_3_10,
->>>> +                                  0, spapr->max_compat_pvr)) {
->>>> +            warn_report("StoreEOI on a POWER9 CPU is unsafe on KVM.");
->>>
-> 
-> The error message should mention XIVE KVM device actually since this only
-> depends on kernel-irqchip.
-> 
->>> It all boils down to what "unsafe" really means here... if the outcome is
->>> "very likely hang the guest" as soon as it starts doing I/O, shouldn't
->>> we error out instead ? What is the motivation to use StoreEOI if the
->>> processor doesn't really support it ?
->>
->> We use it in the lab on P9. We have never seen it failed even under stress. 
->> But there is a possible race in the logic. 
->>
->> C.
-> 
-> Thinking again. P9 boston systems on the field only use emulated XIVE and
-> we certainly want to be able to migrate to P9 systems that use in-kernel
-> XIVE and vice-versa. So, even if StoreEOI is technically supported by
-> the emulated XIVE, maybe we should disallow it anyway ?
+John Snow <jsnow@redhat.com> writes:
 
-yes. But to activate it, one would need to set the capability to "on"
-because the default is "off". 
+> Including it in common.py creates a circular import dependency; schema
+> relies on common, but common.build_params requires a type annotation
+> from schema. To type this properly, it needs to be moved outside the
+> cycle.
+>
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> Reviewed-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>  scripts/qapi/commands.py |  9 +++++++--
+>  scripts/qapi/common.py   | 23 -----------------------
+>  scripts/qapi/events.py   |  9 ++-------
+>  scripts/qapi/gen.py      | 31 +++++++++++++++++++++++++++++--
+>  4 files changed, 38 insertions(+), 34 deletions(-)
+>
+> diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
+> index 5dc2f5a9fa8..f67393f8713 100644
+> --- a/scripts/qapi/commands.py
+> +++ b/scripts/qapi/commands.py
+> @@ -13,8 +13,13 @@
+>  See the COPYING file in the top-level directory.
+>  """
+> =20
+> -from .common import build_params, c_name, mcgen
+> -from .gen import QAPIGenCCode, QAPISchemaModularCVisitor, ifcontext
+> +from .common import c_name, mcgen
+> +from .gen import (
+> +    QAPIGenCCode,
+> +    QAPISchemaModularCVisitor,
+> +    build_params,
+> +    ifcontext,
+> +)
+> =20
+> =20
+>  def gen_command_decl(name, arg_type, boxed, ret_type):
+> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+> index 0ef38ea5fe0..9ab0685cc51 100644
+> --- a/scripts/qapi/common.py
+> +++ b/scripts/qapi/common.py
+> @@ -209,26 +209,3 @@ def gen_endif(ifcond: Sequence[str]) -> str:
+>  #endif /* %(cond)s */
+>  ''', cond=3Difc)
+>      return ret
+> -
+> -
+> -def build_params(arg_type,
+> -                 boxed: bool,
+> -                 extra: Optional[str] =3D None) -> str:
+> -    ret =3D ''
+> -    sep =3D ''
+> -    if boxed:
+> -        assert arg_type
+> -        ret +=3D '%s arg' % arg_type.c_param_type()
+> -        sep =3D ', '
+> -    elif arg_type:
+> -        assert not arg_type.variants
+> -        for memb in arg_type.members:
+> -            ret +=3D sep
+> -            sep =3D ', '
+> -            if memb.optional:
+> -                ret +=3D 'bool has_%s, ' % c_name(memb.name)
+> -            ret +=3D '%s %s' % (memb.type.c_param_type(),
+> -                              c_name(memb.name))
+> -    if extra:
+> -        ret +=3D sep + extra
+> -    return ret if ret else 'void'
+> diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
+> index 6b3afa14d72..f840a62ed92 100644
+> --- a/scripts/qapi/events.py
+> +++ b/scripts/qapi/events.py
+> @@ -12,13 +12,8 @@
+>  See the COPYING file in the top-level directory.
+>  """
+> =20
+> -from .common import (
+> -    build_params,
+> -    c_enum_const,
+> -    c_name,
+> -    mcgen,
+> -)
+> -from .gen import QAPISchemaModularCVisitor, ifcontext
+> +from .common import c_enum_const, c_name, mcgen
+> +from .gen import QAPISchemaModularCVisitor, build_params, ifcontext
+>  from .schema import QAPISchemaEnumMember
+>  from .types import gen_enum, gen_enum_lookup
+> =20
+> diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
+> index 1fed712b43b..f2e2746fea5 100644
+> --- a/scripts/qapi/gen.py
+> +++ b/scripts/qapi/gen.py
+> @@ -2,9 +2,11 @@
+>  #
+>  # QAPI code generation
+>  #
+> -# Copyright (c) 2018-2019 Red Hat Inc.
+> +# Copyright IBM, Corp. 2011
+> +# Copyright (c) 2013-2019 Red Hat Inc.
+>  #
+>  # Authors:
+> +#  Anthony Liguori <aliguori@us.ibm.com>
+>  #  Markus Armbruster <armbru@redhat.com>
+>  #  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>  #
 
-Even with the "cas" capability value introduced at the end of the 
-patchset, StoreEOI would not be advertised to guests running under 
-P9 compat. 
+The code you move into this file is actually Red Hat's:
 
-C.
+$ git-log -L174,193:scripts/qapi/common.py master| egrep 'Author|Date'
+Author: Markus Armbruster <armbru@redhat.com>
+Date:   Wed Aug 15 21:37:36 2018 +0800
+Author: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Date:   Thu Jun 1 16:41:41 2017 +0400
+Author: Eric Blake <eblake@redhat.com>
+Date:   Wed Jul 13 21:50:20 2016 -0600
+Author: Eric Blake <eblake@redhat.com>
+Date:   Wed Jul 13 21:50:19 2016 -0600
+Author: Eric Blake <eblake@redhat.com>
+Date:   Thu Mar 17 16:48:28 2016 -0600
+Author: Markus Armbruster <armbru@redhat.com>
+Date:   Wed Sep 16 13:06:20 2015 +0200
+
+So the correct update is simply
+
+   #
+   # QAPI code generation
+   #
+  -# Copyright (c) 2018-2019 Red Hat Inc.
+  +# Copyright (c) 2015-2019 Red Hat Inc.
+   #
+   # Authors:
+   #  Markus Armbruster <armbru@redhat.com>
+   #  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+   #
+
+> @@ -15,16 +17,18 @@
+>  import errno
+>  import os
+>  import re
+> +from typing import Optional
+> =20
+>  from .common import (
+>      c_fname,
+> +    c_name,
+>      gen_endif,
+>      gen_if,
+>      guardend,
+>      guardstart,
+>      mcgen,
+>  )
+> -from .schema import QAPISchemaVisitor
+> +from .schema import QAPISchemaObjectType, QAPISchemaVisitor
+> =20
+> =20
+>  class QAPIGen:
+> @@ -90,6 +94,29 @@ def _wrap_ifcond(ifcond, before, after):
+>      return out
+> =20
+> =20
+> +def build_params(arg_type: Optional[QAPISchemaObjectType],
+> +                 boxed: bool,
+> +                 extra: Optional[str] =3D None) -> str:
+> +    ret =3D ''
+> +    sep =3D ''
+> +    if boxed:
+> +        assert arg_type
+> +        ret +=3D '%s arg' % arg_type.c_param_type()
+> +        sep =3D ', '
+> +    elif arg_type:
+> +        assert not arg_type.variants
+> +        for memb in arg_type.members:
+> +            ret +=3D sep
+> +            sep =3D ', '
+> +            if memb.optional:
+> +                ret +=3D 'bool has_%s, ' % c_name(memb.name)
+> +            ret +=3D '%s %s' % (memb.type.c_param_type(),
+> +                              c_name(memb.name))
+> +    if extra:
+> +        ret +=3D sep + extra
+> +    return ret if ret else 'void'
+> +
+> +
+>  class QAPIGenCCode(QAPIGen):
+> =20
+>      def __init__(self, fname):
 
 
