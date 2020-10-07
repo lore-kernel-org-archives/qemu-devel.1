@@ -2,108 +2,110 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6334AC4363D
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 13:57:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06C62C4363D
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 13:57:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9436F2076C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 13:57:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 700F62076C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 13:57:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="l8zLv32X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9436F2076C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i+htwH6S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 700F62076C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ9wD-0005pS-ER
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 09:57:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34218)
+	id 1kQ9wM-00063C-7d
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 09:57:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34272)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
- id 1kQ9vG-00054v-UA
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 09:56:02 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:46174)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
- id 1kQ9vE-0008Km-Si
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 09:56:02 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 097DtR8F018393;
- Wed, 7 Oct 2020 13:55:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : in-reply-to : references : date : message-id : mime-version :
- content-type; s=corp-2020-01-29;
- bh=3XBJTDlQAFCCoPHlsA4iQFPizwx3C6TOvt0o4KNaYdc=;
- b=l8zLv32XdnEi4gOuGAJXtADkhWmxmApbrlAwpW08yBsf9zkZAHpRUXE2eJPllTrIZhUC
- Yj4RQj8V12ajY2bxh2Sp/23puBG1eQm4bssnXHieesS1+WiOfEipeW73yvfGp03gp4LO
- xWkfkbUxO8efWtN8Ul0DYDFM7uEQwsPpkCtLLZltk92dKgNwfe0KnWaufGjoK7ImUflW
- 4tXGo3/xgi5Eyr9Y9pa2aVvr4se6IPe3hkbj3p80HKcfvuzQ9DBf/b7jcD360WbAloBd
- 4LI0PbV6KYKlKU4NEGTYNzEldrahB4EWlSsJJCZFsS5Xu/qRfeDA3AfWhcpKIkz1KdjB Dg== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by userp2120.oracle.com with ESMTP id 33xhxn1tdg-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Wed, 07 Oct 2020 13:55:56 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 097DZ6CH144869;
- Wed, 7 Oct 2020 13:53:55 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by aserp3020.oracle.com with ESMTP id 3410jynt71-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 07 Oct 2020 13:53:55 +0000
-Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 097DrqRW005832;
- Wed, 7 Oct 2020 13:53:52 GMT
-Received: from starbug-mbp.localdomain (/79.97.215.145)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 07 Oct 2020 06:53:52 -0700
-Received: by starbug-mbp.localdomain (Postfix, from userid 501)
- id 128251ACBA00; Wed,  7 Oct 2020 14:53:41 +0100 (IST)
-From: Darren Kenny <darren.kenny@oracle.com>
-To: Alexander Bulekov <alxndr@bu.edu>
-Subject: Re: [PATCH v3 02/16] fuzz: Add general virtual-device fuzzer
-In-Reply-To: <20201007133932.ua6tg7hnr3ixpgni@mozz.bu.edu>
-References: <20200921022506.873303-1-alxndr@bu.edu>
- <20200921022506.873303-3-alxndr@bu.edu>
- <63ca7622-557b-4217-f15e-ee9b024fbd77@redhat.com>
- <20200921143405.3taiymgzwvscxsry@mozz.bu.edu> <m2h7re6k3b.fsf@oracle.com>
- <20201007133932.ua6tg7hnr3ixpgni@mozz.bu.edu>
-Date: Wed, 07 Oct 2020 14:53:40 +0100
-Message-ID: <m27ds2dtwb.fsf@oracle.com>
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kQ9vO-0005Aw-3r
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 09:56:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54872)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kQ9vI-0008Ne-JQ
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 09:56:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602078963;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+9rNT+iiAfWSu6aL5L3R1Fn2fnsuD64gg7o9yydA8y0=;
+ b=i+htwH6SPBO8+XGYv3godjd0otQaNVYTHZ3JvJ7nqhZqtX8M1xQ8CTG8+TI1vZwuzUUbeg
+ Dh1l5m4y2fIo2ZDw8tFBPNT0AfuXZvn74M25r1/7vw144H1GxJYFwfLDA3fWjLa6aSHWFJ
+ VKoFRGIfKiJgiXkXyT2jEssJne2aLoQ=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-34--UCVPnlaPuqRliOxwV08pw-1; Wed, 07 Oct 2020 09:56:01 -0400
+X-MC-Unique: -UCVPnlaPuqRliOxwV08pw-1
+Received: by mail-wr1-f69.google.com with SMTP id 33so1036551wrk.12
+ for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 06:56:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=+9rNT+iiAfWSu6aL5L3R1Fn2fnsuD64gg7o9yydA8y0=;
+ b=RjKGHQv/AUPixQrdYRJDKnh8hz6+5EA/KLpP6W7rLAX84/73GiafPpW89rfRQ02MA6
+ w5cDMcqTfJtJSa6qc7ddESVGqlmGcdAk91kGGsTenDjaKuCcYzl4LVbVi3A7HsS8ljrt
+ fo06Znb5iIVRW8+mFOp2Y5liUdBEC3VBBEtNlUMmlxXVuAJ+QWMyNXmINcKvID7hB5oQ
+ wmA2vTgLICVcl2q5ikM0D53/pWl2kGu8sN4ZAubeNyeI901cffoyWwzgHyaunqyNSxUc
+ rgxzqZzK4GQHQuS/193IAl6B6XUJJVBrjNFa3AmPUc0H1KdB2OTyY7Hvtx5bDHnaeE8c
+ tQ8Q==
+X-Gm-Message-State: AOAM5317xrCd+e9QnWncOltykeQldOU6I4IFiF2ZxZXBT3vnXuTRQs26
+ HEkCfZLZXfT72hZncTvhJU9lDDBSe4F5Z83SK/jEEiW9jTwHiRqzRvwhBeQlTVIWiSWF8dJPZr4
+ 6wShsvRkc9f3/vww=
+X-Received: by 2002:adf:d08e:: with SMTP id y14mr820850wrh.424.1602078960658; 
+ Wed, 07 Oct 2020 06:56:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxcSN/Bzv8TInnBsMd01PlIlm59ndwFFwtdRnreC4Tx4IelfI1T0f6sD97A/KJClvDPwPR8tQ==
+X-Received: by 2002:adf:d08e:: with SMTP id y14mr820823wrh.424.1602078960382; 
+ Wed, 07 Oct 2020 06:56:00 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d2f4:5943:190c:39ff?
+ ([2001:b07:6468:f312:d2f4:5943:190c:39ff])
+ by smtp.gmail.com with ESMTPSA id w11sm2897366wrs.26.2020.10.07.06.55.59
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 07 Oct 2020 06:55:59 -0700 (PDT)
+Subject: Re: Purpose of QOM properties registered at realize time?
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <20201006220647.GR7303@habkost.net>
+ <a6e652d9-548f-4d4e-e451-48e3f5e11031@redhat.com>
+ <20201007130240.GU7303@habkost.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <659289e0-4133-b945-45fd-25e759c18b03@redhat.com>
+Date: Wed, 7 Oct 2020 15:55:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9766
- signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
- mlxlogscore=999 spamscore=0
- adultscore=0 bulkscore=0 malwarescore=0 suspectscore=1 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2010070089
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9766
- signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
- malwarescore=0 bulkscore=0
- impostorscore=0 lowpriorityscore=0 suspectscore=1 phishscore=0
- mlxlogscore=999 adultscore=0 clxscore=1015 spamscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2010070090
-Received-SPF: pass client-ip=156.151.31.85;
- envelope-from=darren.kenny@oracle.com; helo=userp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 09:55:57
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
+In-Reply-To: <20201007130240.GU7303@habkost.net>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:44:56
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -116,79 +118,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org, bsd@redhat.com, stefanha@redhat.com,
- Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ "Daniel P. Berrange" <berrange@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wednesday, 2020-10-07 at 09:39:32 -04, Alexander Bulekov wrote:
-> On 201001 1629, Darren Kenny wrote:
-
-...
-
+On 07/10/20 15:02, Eduardo Habkost wrote:
+> On Wed, Oct 07, 2020 at 02:04:23PM +0200, Paolo Bonzini wrote:
+>> On 07/10/20 00:06, Eduardo Habkost wrote:
+>>> Hi,
+>>>
+>>> While trying to understand how QOM properties are used in QEMU, I
+>>> stumbled upon multiple cases where alias properties are added at
+>>> realize time.
+>>>
+>>> Now, I don't understand why those properties exist.  As the
+>>> properties are added at realize time, I assume they aren't
+>>> supposed to be touched by the user at all.  If they are not
+>>> supposed to be touched by the user, what exactly is the purpose
+>>> of those QOM properties?
 >>
->> It might make sense to put the definition of SEPARATOR and some variant
->> of the above the comments in patch 9 where you're adding this related
->> functionality?
->> 
->> It seems a little out of place here.
->> 
->> Thanks,
->> 
->> Darren.
->> 
->
-> Hi Darren,
-> If I move the definition of SEPARATOR to Patch 9, I would need some
-> different way to parse commands here, to keep everything bisectable. I
-> don't think the separator is only important in the context of the
-> Crossover functionality (Patch 9) - it is useful in general as a
-> "stable" way to parse an input into multiple commands.
-> Is it OK if I keep SEPARATOR in this patch and add the comments you
-> mention to both this patch and patch 9?
+>> In the case of GPIOs, I think they will be used by other devices that
+>> are added afterwards.
+> 
+> Do you know how exactly are they used?  Is this always wrapped
+> behind a specific API for GPIOs, or the devices can look for the
+> properties directly?
 
-Sounds fine, it was just a suggestion since I hadn't seen it being used
-in this file, but maybe I missed something.
+It is always wrapped, but (as far as I recall, because I have never
+worked with GPIOs) they are intentionally QOM properties and not just as
+an implementation detail.  It's meant to be accessible to the user if
+only through qom-get/qom-set.
 
-Thanks,
+Paolo
 
-Darren.
+> I'm concerned by the possibility of having QOM properties as an
+> undocumented part of an internal API.
 
-> Thanks
-> -Alex
->
->> >> 
->> >> Can you fuzz writing "FUZZ" in memory? Like:
->> >> OP_WRITE(0x100000, "UsingLibFUZZerString")?
->> >
->> > No.. Hopefully that's not a huge problem.
->> >
->> >> > +
->> >> > +enum cmds {
->> >> > +    OP_IN,
->> >> > +    OP_OUT,
->> >> > +    OP_READ,
->> >> > +    OP_WRITE,
->> >> > +    OP_CLOCK_STEP,
->> >> > +};
->> >> > +
->> >> > +#define DEFAULT_TIMEOUT_US 100000
->> >> > +#define USEC_IN_SEC 100000000
->> >> 
->> >> Are you sure this definition is correct?
->> >> 
->> > Thanks for the catch...
->> >
->> >> > +
->> >> > +typedef struct {
->> >> > +    ram_addr_t addr;
->> >> > +    ram_addr_t size; /* The number of bytes until the end of the I/O region */
->> >> > +} address_range;
->> >> > +
->> >> > +static useconds_t timeout = 100000;
->> >> [...]
->> >> 
 
