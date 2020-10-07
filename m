@@ -2,88 +2,94 @@ Return-Path: <SRS0=37Ja=DO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70DABC4363D
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 13:09:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66CA1C4363D
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 13:10:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B109E20870
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 13:09:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D5442206F4
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Oct 2020 13:10:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BraIJ7rJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B109E20870
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hx57rpvj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5442206F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQ9Bv-0005dZ-EW
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 09:09:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51242)
+	id 1kQ9D1-0006pK-Jz
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 09:10:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52038)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQ98q-0003ol-Ou
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 09:06:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50242)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQ98n-00029A-Q7
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 09:06:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602075956;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=7/14k+ocreZoF/krrUlb3TqHe70XTp2MhFXhZ4qCR1c=;
- b=BraIJ7rJ/5m+U8v2/r/AgWuit3pf6/l4iQLTMZ/XVYyllGmZ7NUtvzLx1rf5TZfYlJX6k8
- tMa0TcQP/cZh3Tp/PARt11nY1x1UZGt1DHnPHjFiT50LDYGy45xReVo9rIWEWpa4i1fHfV
- c/27FDHwEJZgEIzSzzzbd9Uxw7FeX6E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-576-k2Sk-YcwNpKp2h8Z85CqxQ-1; Wed, 07 Oct 2020 09:05:49 -0400
-X-MC-Unique: k2Sk-YcwNpKp2h8Z85CqxQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C28018BA2BC
- for <qemu-devel@nongnu.org>; Wed,  7 Oct 2020 13:05:49 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
- [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D22E55D9DD;
- Wed,  7 Oct 2020 13:05:48 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 5BEB811329C1; Wed,  7 Oct 2020 15:05:47 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v5 00/36] qapi: static typing conversion, pt1
-References: <20201005195158.2348217-1-jsnow@redhat.com>
-Date: Wed, 07 Oct 2020 15:05:47 +0200
-In-Reply-To: <20201005195158.2348217-1-jsnow@redhat.com> (John Snow's message
- of "Mon, 5 Oct 2020 15:51:22 -0400")
-Message-ID: <87o8le9oes.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kQ9Be-0005aV-OZ
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 09:08:54 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40708)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kQ9BZ-0002PE-BF
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 09:08:54 -0400
+Received: by mail-wr1-x443.google.com with SMTP id j2so2083673wrx.7
+ for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 06:08:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=YRTHziXE3efCJEmeU85Y64K3ObXF157HZlRNDQGvv5k=;
+ b=hx57rpvj2MmSAGOgTRVnnOb7B0lYNKMRlbPJcdRbt9Ew4xP6FfmFxFxjE7lYfshSRx
+ /ZxD9gX8KdoVkRkknR9hrQuNhZy57uarImupyvcsmdwr7AlXyFGadJeG3b1vwNN9sDrc
+ b2HQjSqXJYtc4M3L8UoE7VetAhW6K4SifWip+2sbMOiqCGMMJz5zfLu0VpRAjhun23Ux
+ 4C9b1Vv5PPtpUki/OkVM+raywwQqLWA0jrW48j3hz5G6/7nOxTNu+jxppgMaivxIy03I
+ qkWM4skqGHeQIdA8s2ttHZebg7QluA06lDtNr+vg0Pnn3SWiZWpLw9JrulLmn5LZiPPM
+ iTsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=YRTHziXE3efCJEmeU85Y64K3ObXF157HZlRNDQGvv5k=;
+ b=NQQ0q6HDwy00/jRY1J8Lmz2GjTIw/cmz77IuhGLzzwzR2OLTNL/NJaUAEUnn9X+cBZ
+ S2ugcJugoSKybBTaL7Sr6gaZiwTCM9zVD+kTmOlMYZrgfQnwx0x3ILwWRB6dtnwoAByq
+ iSPxNDDIOw9tiWJdnQszFx7JxaBW9yjDDdkEa+lwsEHlA1/FROXUTQFGQHjt7Tzag4HL
+ 5+B2y2Ve7Kfn2W9INIqAsazsFsvv65w/ymILe8MqTf+lP9pmq1NQMYq04j+REUx/fl7z
+ /s7B4wEDch0TqlQHYPf7cFFqKuvZWvUxMDiecQj8et1fSNgbSTo6GNz841z0hU3E2hHY
+ gdKA==
+X-Gm-Message-State: AOAM530ZQQGg/QNch3TyDoCnfDxQijxXufp+PDHeSwg47sGrkJsvUtAR
+ SPzJG7ljavG4eEXoDJFBJf4ZFQ==
+X-Google-Smtp-Source: ABdhPJzgiz9g0/KxEpfHHqyWsRAx+Cf+uhu/MorLH9Ff7j+2xCeUh2Wa0k8dkNSS9a/lP613HyCmOg==
+X-Received: by 2002:adf:ea52:: with SMTP id j18mr3385255wrn.422.1602076126863; 
+ Wed, 07 Oct 2020 06:08:46 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id n2sm2863811wrt.82.2020.10.07.06.08.43
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 07 Oct 2020 06:08:43 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 199311FF7E;
+ Wed,  7 Oct 2020 14:08:43 +0100 (BST)
+References: <20201007105518.1019-1-luoyonggang@gmail.com>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Yonggang Luo <luoyonggang@gmail.com>
+Subject: Re: [PATCH v4 0/2] Improve cirrus msys2
+In-reply-to: <20201007105518.1019-1-luoyonggang@gmail.com>
+Date: Wed, 07 Oct 2020 14:08:43 +0100
+Message-ID: <87zh4yyyhw.fsf@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 00:44:56
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,32 +102,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ QEMU Trivial <qemu-trivial@nongnu.org>, qemu-devel@nongnu.org,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-John Snow <jsnow@redhat.com> writes:
 
-> Hi, this series adds static type hints to the QAPI module.
-> This is part one!
->
-> Part 1: https://gitlab.com/jsnow/qemu/-/tree/python-qapi-cleanup-pt1
-> Everything: https://gitlab.com/jsnow/qemu/-/tree/python-qapi-cleanup-pt6
->
-> - Requires Python 3.6+
-> - Requires mypy 0.770 or newer (for type analysis only)
-> - Requires pylint 2.6.0 or newer (for lint checking only)
->
-> In general, this series tackles the cleanup of one individual QAPI
-> module at a time. Once it passes pylint or mypy checks, those checks are
-> enabled for that file.
->
-> Type hints are added in patches that add *only* type hints and change no
-> other behavior. Any necessary changes to behavior to accommodate typing
-> are split out into their own tiny patches.
+Yonggang Luo <luoyonggang@gmail.com> writes:
 
-Neat and pleasant to review.  The care you put into this shows.  Thanks!
+> Fixes the broken msys2/mingw ci and speed it up.
 
+Queued to testing/next, thanks.
+<snip>
+
+
+--=20
+Alex Benn=C3=A9e
 
