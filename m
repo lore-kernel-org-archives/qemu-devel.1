@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04A81C4363C
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 14:27:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56EFFC4363A
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 14:27:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B6C620739
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 14:27:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BFA6C20739
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 14:27:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YDQ3vaem"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B6C620739
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vnna0l4a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFA6C20739
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQWtG-0005lY-63
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 10:27:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38144)
+	id 1kQWtH-0005oS-OX
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 10:27:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38120)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kQWrw-0004BJ-SB
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 10:26:08 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34314)
+ id 1kQWrv-0004BD-EH
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 10:26:07 -0400
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:46614)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kQWrt-0005yA-Gu
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 10:26:08 -0400
-Received: by mail-wr1-x444.google.com with SMTP id i1so721129wro.1
- for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 07:26:05 -0700 (PDT)
+ id 1kQWrr-0005y1-Kr
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 10:26:07 -0400
+Received: by mail-wr1-x432.google.com with SMTP id n6so6546895wrm.13
+ for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 07:26:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=TbWCRJ0BVkq6j07LdMSc/WFxA1HsyjcaL+7Jf66AQ7w=;
- b=YDQ3vaem4ICMjOVnbiqey4nL89QKVk13emEsRvcQQm/ut4obgmVAuMCOjHwq1NI3e+
- SmCjxybbevPAq2Z6+xNMXeeAt4xoAjb9Z4yfHnyrpu0KUdI1vpNKG/dE+H8sChe6wijY
- gqzP4idO++OcAa9++aEvDKOzywADrwIqWW7sX4nGfVPcu7uff7GkcL7L4TmOtsaBVNzB
- 4F94I7G2UWmqJFDCI8AjzJYi9L9yZyGL1hPOgjAZ2WYoI7I8l7yTs/9O+zc+ZQMdTnFV
- 9ftkFj2pG/6tYCZga5VRufxr+pnpayVEBpzB68wOfCM6t0cyBkGFpvITm4UNGamveilr
- CN2w==
+ bh=9RUnT5Ix7DudVKkch5jxVyO4juXX54tuStniLRWABm0=;
+ b=Vnna0l4au39C+KvMxRPK6rYHXMji8mnakh9bnZWGE5Ce4dhdphB4j+8LiPvAq9PuaN
+ M+SuZ6+7hI3gZiyh3g6ro13Dh5nfZwfzXS0ITuSOtPVqPdFeX3NKsIKiC8DPk5Sjezmb
+ /M25SHHuuppu64cqee08V7BzpFWj7d9jZAJuSgGAe5YP53T3oLR8iJDQnHrZQ+boEKJN
+ Uvjahmmaf476lOCFzkQAqQxSt3ot0ql2XyEp1Fm+3wrHOU1kazLWiY2/oxUzuZ/Legj2
+ rr954683SC+Oga7vMxx3d6RRG1KKkiwNChtWVJoHkrUuuzNSDi1cWK//4TIj0BCNl7op
+ XQGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=TbWCRJ0BVkq6j07LdMSc/WFxA1HsyjcaL+7Jf66AQ7w=;
- b=Ypiq6poSzQ/ikdJortlPanPjBwJrot5/iLiP4SWio4Whw1Aw+2l4qLNlYxagebkFfi
- 5Cd9ZT3WhVuv1HlmsRRQMORdIAvVjyTpvbuEgNW2XLn4qRHy1FRy9BvFyiVcZNkuCjbL
- AxteSCRrUHXPniIdD5FS7htQkSjgTBCqaULRIpCP3ztswU/fkC0RANnK3x6k8rHQcSk6
- h9cJ1WcPC++tYGBCIVxW0xhHuoPAPezHj2niX2RbO7JwI96k5DnCDlf2kkO0EixeKVnU
- WyrbSeo7380HhlcJKV0nQD+uj0uKECzKSGmdNzf8UyLuPdqKnUD2Qy045rETmBooemlJ
- W+WA==
-X-Gm-Message-State: AOAM532lHA205mHv7qXvfUzR3AfgRa8YPZ4GKmjxrAC4my8TXn1lzR2p
- mHfx7UqGjYRBjVW1L+G2yWSPQxnckBFUFxcS
-X-Google-Smtp-Source: ABdhPJzLE6wM4Bw79RbfLk7iclCb7xJ+uXH8Y0xvdosuzPhItjg0aaAJhBhNaYkRzOihfCpYBWEUnQ==
-X-Received: by 2002:a5d:4c52:: with SMTP id n18mr9396386wrt.267.1602167163710; 
- Thu, 08 Oct 2020 07:26:03 -0700 (PDT)
+ bh=9RUnT5Ix7DudVKkch5jxVyO4juXX54tuStniLRWABm0=;
+ b=Puie3PJCGqtNBSibT+rxuNwAz8lUknL06d6MxL73pKjH2j+mNozOdegECuPMV3SaFZ
+ ShBmPqnEjg8n1YR5kL5UCmvvqZzadXpdQaDgdg+3d83YTaWBqgh2QfZlU+OrmnSb60eI
+ sx8BeM/2II0CJhM2gcS6fKpQlS49yqQOMe1AsBqyq7aQa6Jp5zRylXEFC36MTQfvBYSw
+ 724oawwBg67ExEaKtM28I/OwOTEBbQr2X2ryrUpglOsvlHQwbHAiTGkfppQl+pSb3S2B
+ FZNXNBQ85aYCYNJ1Aw7k2DOMr6uygT3w77DJ2AEsfRvbADlJX05PFCWaTpfuiXIMo++w
+ 4vag==
+X-Gm-Message-State: AOAM530rdq3kStnfdlkLTIWAW0vErgBZmfStVy0rTj1Cmwmtzlt+WL6M
+ YpWnURHU/ZdQGg3t4ELk3fofLERRqdJs8ycp
+X-Google-Smtp-Source: ABdhPJyl6SrHluJmalYx4QMGHgUqjX9qAApH/jWThyls+ErkEluXi8cqAhjSbz8wYHXn82M/qXQxNA==
+X-Received: by 2002:adf:e445:: with SMTP id t5mr9271764wrm.387.1602167161584; 
+ Thu, 08 Oct 2020 07:26:01 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id j1sm7905104wrc.28.2020.10.08.07.26.02
+ by smtp.gmail.com with ESMTPSA id j1sm7905104wrc.28.2020.10.08.07.26.00
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 08 Oct 2020 07:26:03 -0700 (PDT)
+ Thu, 08 Oct 2020 07:26:00 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 03/12] hw/arm/sbsa-ref : Fix SMMUv3 Initialisation
-Date: Thu,  8 Oct 2020 15:25:48 +0100
-Message-Id: <20201008142557.9845-4-peter.maydell@linaro.org>
+Subject: [PULL 01/12] hw/ssi/npcm7xx_fiu: Fix handling of unsigned integer
+Date: Thu,  8 Oct 2020 15:25:46 +0100
+Message-Id: <20201008142557.9845-2-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201008142557.9845-1-peter.maydell@linaro.org>
 References: <20201008142557.9845-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::432;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x432.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,35 +105,93 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Graeme Gregory <graeme@nuviainc.com>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-SMMUv3 has an error in a previous patch where an i was transposed to a 1
-meaning interrupts would not have been correctly assigned to the SMMUv3
-instance.
+Fix integer handling issues handling issue reported by Coverity:
 
-Fixes: 48ba18e6d3f3 ("hw/arm/sbsa-ref: Simplify by moving the gic in the machine state")
-Signed-off-by: Graeme Gregory <graeme@nuviainc.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Message-id: 20201007100732.4103790-2-graeme@nuviainc.com
+  hw/ssi/npcm7xx_fiu.c: 162 in npcm7xx_fiu_flash_read()
+  >>>     CID 1432730:  Integer handling issues  (NEGATIVE_RETURNS)
+  >>>     "npcm7xx_fiu_cs_index(fiu, f)" is passed to a parameter that cannot be negative.
+  162         npcm7xx_fiu_select(fiu, npcm7xx_fiu_cs_index(fiu, f));
+
+  hw/ssi/npcm7xx_fiu.c: 221 in npcm7xx_fiu_flash_write()
+  218         cs_id = npcm7xx_fiu_cs_index(fiu, f);
+  219         trace_npcm7xx_fiu_flash_write(DEVICE(fiu)->canonical_path, cs_id, addr,
+  220                                       size, v);
+  >>>     CID 1432729:  Integer handling issues  (NEGATIVE_RETURNS)
+  >>>     "cs_id" is passed to a parameter that cannot be negative.
+  221         npcm7xx_fiu_select(fiu, cs_id);
+
+Since the index of the flash can not be negative, return an
+unsigned type.
+
+Reported-by: Coverity (CID 1432729 & 1432730: NEGATIVE_RETURNS)
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Havard Skinnemoen <hskinnemoen@google.com>
+Message-id: 20200919132435.310527-1-f4bug@amsat.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/sbsa-ref.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/ssi/npcm7xx_fiu.c | 12 ++++++------
+ hw/ssi/trace-events  |  2 +-
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
-index 9c3a893bedf..65e64883b51 100644
---- a/hw/arm/sbsa-ref.c
-+++ b/hw/arm/sbsa-ref.c
-@@ -525,7 +525,7 @@ static void create_smmu(const SBSAMachineState *sms, PCIBus *bus)
-     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
-     for (i = 0; i < NUM_SMMU_IRQS; i++) {
-         sysbus_connect_irq(SYS_BUS_DEVICE(dev), i,
--                           qdev_get_gpio_in(sms->gic, irq + 1));
-+                           qdev_get_gpio_in(sms->gic, irq + i));
-     }
+diff --git a/hw/ssi/npcm7xx_fiu.c b/hw/ssi/npcm7xx_fiu.c
+index 104e8f2b963..5040132b074 100644
+--- a/hw/ssi/npcm7xx_fiu.c
++++ b/hw/ssi/npcm7xx_fiu.c
+@@ -103,7 +103,8 @@ enum NPCM7xxFIURegister {
+  * Returns the index of flash in the fiu->flash array. This corresponds to the
+  * chip select ID of the flash.
+  */
+-static int npcm7xx_fiu_cs_index(NPCM7xxFIUState *fiu, NPCM7xxFIUFlash *flash)
++static unsigned npcm7xx_fiu_cs_index(NPCM7xxFIUState *fiu,
++                                     NPCM7xxFIUFlash *flash)
+ {
+     int index = flash - fiu->flash;
+ 
+@@ -113,20 +114,19 @@ static int npcm7xx_fiu_cs_index(NPCM7xxFIUState *fiu, NPCM7xxFIUFlash *flash)
  }
  
+ /* Assert the chip select specified in the UMA Control/Status Register. */
+-static void npcm7xx_fiu_select(NPCM7xxFIUState *s, int cs_id)
++static void npcm7xx_fiu_select(NPCM7xxFIUState *s, unsigned cs_id)
+ {
+     trace_npcm7xx_fiu_select(DEVICE(s)->canonical_path, cs_id);
+ 
+     if (cs_id < s->cs_count) {
+         qemu_irq_lower(s->cs_lines[cs_id]);
++        s->active_cs = cs_id;
+     } else {
+         qemu_log_mask(LOG_GUEST_ERROR,
+                       "%s: UMA to CS%d; this module has only %d chip selects",
+                       DEVICE(s)->canonical_path, cs_id, s->cs_count);
+-        cs_id = -1;
++        s->active_cs = -1;
+     }
+-
+-    s->active_cs = cs_id;
+ }
+ 
+ /* Deassert the currently active chip select. */
+@@ -206,7 +206,7 @@ static void npcm7xx_fiu_flash_write(void *opaque, hwaddr addr, uint64_t v,
+     NPCM7xxFIUFlash *f = opaque;
+     NPCM7xxFIUState *fiu = f->fiu;
+     uint32_t dwr_cfg;
+-    int cs_id;
++    unsigned cs_id;
+     int i;
+ 
+     if (fiu->active_cs != -1) {
+diff --git a/hw/ssi/trace-events b/hw/ssi/trace-events
+index 2f83ef833fb..612d3d6087a 100644
+--- a/hw/ssi/trace-events
++++ b/hw/ssi/trace-events
+@@ -19,4 +19,4 @@ npcm7xx_fiu_deselect(const char *id, int cs) "%s deselect CS%d"
+ npcm7xx_fiu_ctrl_read(const char *id, uint64_t addr, uint32_t data) "%s offset: 0x%04" PRIx64 " value: 0x%08" PRIx32
+ npcm7xx_fiu_ctrl_write(const char *id, uint64_t addr, uint32_t data) "%s offset: 0x%04" PRIx64 " value: 0x%08" PRIx32
+ npcm7xx_fiu_flash_read(const char *id, int cs, uint64_t addr, unsigned int size, uint64_t value) "%s[%d] offset: 0x%08" PRIx64 " size: %u value: 0x%" PRIx64
+-npcm7xx_fiu_flash_write(const char *id, int cs, uint64_t addr, unsigned int size, uint64_t value) "%s[%d] offset: 0x%08" PRIx64 " size: %u value: 0x%" PRIx64
++npcm7xx_fiu_flash_write(const char *id, unsigned cs, uint64_t addr, unsigned int size, uint64_t value) "%s[%d] offset: 0x%08" PRIx64 " size: %u value: 0x%" PRIx64
 -- 
 2.20.1
 
