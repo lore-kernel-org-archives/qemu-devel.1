@@ -2,67 +2,135 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,TRACKER_ID,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B90C2C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 16:52:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4D91C433E7
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 17:00:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0317321D7D
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 16:52:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0317321D7D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 36B0821D7D
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 17:00:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GoPPwMsW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36B0821D7D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQZ9o-0003wh-2S
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 12:52:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44268)
+	id 1kQZHk-0006dF-6C
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 13:00:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46786)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kQZ8t-0003Rw-2R
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 12:51:47 -0400
-Received: from mx2.suse.de ([195.135.220.15]:57494)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kQZ8q-0003Mo-VA
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 12:51:46 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id 86350AD7F;
- Thu,  8 Oct 2020 16:51:43 +0000 (UTC)
-Subject: Re: does make check now require TCG? Or is it a parallelism issue?
-From: Claudio Fontana <cfontana@suse.de>
-To: Paolo Bonzini <pbonzini@redhat.com>
-References: <11ef73ff-4178-b3e8-2e49-44ff014a13ed@suse.de>
- <569520f6-adf6-6212-9625-a184bf499e24@redhat.com>
- <e6300199-39e3-4f11-d97e-e2e7d9a9e8ef@suse.de>
- <16b01645-7a80-7f79-aba0-fd6c6c8ba6e8@suse.de>
- <62339951-606d-15d0-e2ad-bd46f3e6de87@redhat.com>
- <0b6397b1-019c-4b92-f00d-09214e276e46@suse.de>
-Message-ID: <8a53656a-89bb-f179-9e27-e491d83f544d@suse.de>
-Date: Thu, 8 Oct 2020 18:51:42 +0200
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kQZGS-0005eq-0e
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 12:59:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22544)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kQZGO-0004Yf-Rv
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 12:59:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602176371;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=xeXIz4UH6a54axDSxlIxRcNXoPkGu/R1u88dxsyhe3U=;
+ b=GoPPwMsWXcghHL6DvlzfCfeltq+OOsZihqPebB8ES9rJ52u615yOUpRhddhETMmuYjU87f
+ jKt8+ssmj+cVZkWt4qAMGqlgRvJBYNJx4UdRxX//05T7w+h4/S1KImblIAa6hA91EScNJK
+ FjTYh5uoSzT0XU8mhy6vXOJM56cUDm0=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-425-VXHJqwBXPkSk2yPZ-hDr-A-1; Thu, 08 Oct 2020 12:59:30 -0400
+X-MC-Unique: VXHJqwBXPkSk2yPZ-hDr-A-1
+Received: by mail-wm1-f70.google.com with SMTP id s12so4266640wmj.0
+ for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 09:59:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=xeXIz4UH6a54axDSxlIxRcNXoPkGu/R1u88dxsyhe3U=;
+ b=CaZ6WiVJ4PSxvPZkvjGrJaVQ/wm+JnGhXkEgaHi3KizUpI+ps5B5W4m8XjXr9pBfQ3
+ 95veK9b0WkUnM/GkhDxRrjrLpmb5VT73OZyoNpBDBX4CxMij07Qe6BX74guu7ZOV+/nE
+ /G4jTFEK4scIubtVsciVPxTkiYtnFEv+J9MtyVeSUFhHZbFt2RFod4fI3TVxIyNDIG8a
+ oC1weW/oQVyNDhEemFWwfvSrgwYKytYVTTakqGwKq7MoIBeB8AGnvETahFrDRQIAu3nG
+ F7EqgMFmf4mwz79bVrhAvbNsIugbGBK3sL+7AO4/VeP80rNRnysba77zdJicCJ90YTxF
+ /1SA==
+X-Gm-Message-State: AOAM530OFF6BqNY37u4YoF+f4dhWdoRQ4Xd2F+OuJ/hdxhvsKOKmGPzN
+ Hs+jfj1EQSZYP9t7wCRnrqMW3veDd8bOJzIkIxdYM9kBHdz/L9u6Ss04o9dqlRaXlLvr9akE6of
+ CZmiDzZXfYBejtm8=
+X-Received: by 2002:a1c:b7c6:: with SMTP id
+ h189mr10474661wmf.154.1602176367219; 
+ Thu, 08 Oct 2020 09:59:27 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyRlGIg2uymFURRmwrRun9jESOSrje+MWdaW2kGnsqVeQWoTfL4Y8idVC6htMPqETQXFbqZZA==
+X-Received: by 2002:a1c:b7c6:: with SMTP id
+ h189mr10474636wmf.154.1602176366991; 
+ Thu, 08 Oct 2020 09:59:26 -0700 (PDT)
+Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id x65sm8499756wmg.1.2020.10.08.09.59.25
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 08 Oct 2020 09:59:26 -0700 (PDT)
+Subject: Re: Which qemu change corresponds to RedHat bug 1655408
+To: Jakob Bohm <jb-gnumlists@wisemo.com>, qemu-discuss@nongnu.org,
+ qemu-devel <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
+ John Snow <jsnow@redhat.com>
+References: <2d9c8525-470f-a4e5-5d71-895046e2d782@wisemo.com>
+ <653b9595-ae60-181a-2975-2e351ade9788@redhat.com>
+ <43072820-c04f-b706-4b37-2d2e37e8499f@wisemo.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <9b7b9437-df3d-0090-1d5e-c61a9c245148@redhat.com>
+Date: Thu, 8 Oct 2020 18:59:25 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <0b6397b1-019c-4b92-f00d-09214e276e46@suse.de>
+In-Reply-To: <43072820-c04f-b706-4b37-2d2e37e8499f@wisemo.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 23:49:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -42
-X-Spam_score: -4.3
-X-Spam_bar: ----
-X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.214,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- TRACKER_ID=0.1 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 02:56:27
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -22
+X-Spam_score: -2.3
+X-Spam_bar: --
+X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.214, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -75,133 +143,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex Bennee <alex.bennee@linaro.org>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/8/20 6:35 PM, Claudio Fontana wrote:
-> On 10/8/20 6:31 PM, Paolo Bonzini wrote:
->> On 08/10/20 18:25, Claudio Fontana wrote:
->>> On 10/8/20 5:34 PM, Claudio Fontana wrote:
->>>> On 10/8/20 5:02 PM, Paolo Bonzini wrote:
->>>>> On 08/10/20 16:48, Claudio Fontana wrote:
->>>>>> on master, a build without tcg like:
->>>>>>
->>>>>> exec '../configure' '--disable-tcg' '--enable-kvm' '--enable-hax' "$@"
->>>>>>
->>>>>> make -j120 check
->>>>>> Generating qemu-version.h with a meson_exe.py custom command
->>>>>> make: *** No rule to make target 'qemu-system-aarch64', needed by 'check-block'.  Stop.
->>>>>> make: *** Waiting for unfinished jobs....
->>>>>>
->>>>>> qemu-system-aarch64 is required for check-block now?
->>>>>
->>>>> No, it's not, it's an unnecessary dependency.  This will fix it:
->>>>>
->>>>> diff --git a/tests/Makefile.include b/tests/Makefile.include
->>>>> index 5aca98e60c..1ca70d88ce 100644
->>>>> --- a/tests/Makefile.include
->>>>> +++ b/tests/Makefile.include
->>>>> @@ -140,7 +140,7 @@ QEMU_IOTESTS_HELPERS-$(CONFIG_LINUX) = tests/qemu-iotests/socket_scm_helper$(EXE
->>>>>  check: check-block
->>>>>  check-block: $(SRC_PATH)/tests/check-block.sh qemu-img$(EXESUF) \
->>>>>  		qemu-io$(EXESUF) qemu-nbd$(EXESUF) $(QEMU_IOTESTS_HELPERS-y) \
->>>>> -		$(patsubst %-softmmu,qemu-system-%,$(filter %-softmmu,$(TARGET_DIRS)))
->>>>> +		qemu-system-$(patsubst ppc64%,ppc64, $(shell uname -m))
->>>>>  	@$<
->>>>>  endif
->>>>>  
->>>>>
->>>>>
->>>>
->>>> thanks this works!
->>>>
->>>>>> If I run without -j:
->>>>>>
->>>>>> Running test qtest-i386: qmp-cmd-test
->>>>>> Broken pipe
->>>>>> ../tests/qtest/libqtest.c:175: kill_qemu() detected QEMU death from signal 6 (Aborted) (core dumped)
->>>>>> ERROR qtest-i386: qmp-cmd-test - too few tests run (expected 53, got 45)
->>>>>> make: *** [Makefile.mtest:1074: run-test-151] Error 1
->>>>>
->>>>> This one is different and I've never seen it.
->>>>
->>>> This one seems an additional, non-tcg build only error, will update when I have more details.
->>>>
->>>>>
->>>>> Paolo
->>>>>
->>>>
->>>> Ciao,
->>>>
->>>> Claudio
->>>>
+On 10/8/20 6:49 PM, Jakob Bohm wrote:
+> (Top posting because previous reply did so):
+
+Which previous reply? Mine? I wrote "hi Jakob" then
+replied in-line, maybe you missed it? See below...
+
+> 
+> If the bug was closed as "can't reproduce", why was a very similar bug
+> listed as fixed in RHSA-2019:2553-01 ?
+> 
+> 
+> On 2020-10-08 18:41, Philippe Mathieu-Daudé wrote:
+>> Hi Jakob,
+>>
+>> On 10/8/20 6:32 PM, Jakob Bohm wrote:
+>>> Red Hat bugzilla bug 1655408 against qemu is listed by Red Hat as
+>>> fixed in
+>>> April 2019, but I cannot find the corresponding change on qemu.org (the
+>>> Changelog in the wiki is not a traditional changelog and doesn't cover
+>>> bugfix releases such as 5.0.1, the git commit log is too detailed to
+>>> search, the Red Hat bugzilla and security advisory pages do not link
+>>> red hat bugs back to upstream (launchpad) bugs or git changes.
 >>>
->>> Seems to be some QMP calls to icount code from replay happening during the tests, which of course do not find any icount there..
+>>> Here is the bug title (which also affects my Debian packaged qemu 5.0):
 >>>
->>> (gdb) bt
->>> #0  0x00007f2b4d115520 in raise () at /lib64/libc.so.6
->>> #1  0x00007f2b4d116b01 in abort () at /lib64/libc.so.6
->>> #2  0x000056295aaf5889 in icount_get_raw () at ../stubs/icount.c:20
->>> #3  0x000056295a7934a5 in replay_get_current_icount () at ../replay/replay.c:71
->>> #4  0x000056295a78719d in qmp_query_replay (errp=errp@entry=0x7ffe727a4538) at ../replay/replay-debugging.c:55
->>> #5  0x000056295aac0137 in qmp_marshal_query_replay (args=<optimized out>, ret=0x7ffe727a45a0, errp=0x7ffe727a4598)
->>>     at qapi/qapi-commands-replay.c:55
->>> #6  0x000056295aae88a3 in qmp_dispatch
->>>     (cmds=0x56295b3b5ce0 <qmp_commands>, request=request@entry=0x7f2b3c004db0, allow_oob=<optimized out>) at ../qapi/qmp-dispatch.c:155
->>> #7  0x000056295aa6ab7f in monitor_qmp_dispatch (mon=0x56295bee7f80, req=0x7f2b3c004db0) at ../monitor/qmp.c:145
->>> #8  0x000056295aa6b3ba in monitor_qmp_bh_dispatcher (data=<optimized out>) at ../monitor/qmp.c:234
->>> #9  0x000056295aaeb5b8 in aio_bh_poll (ctx=ctx@entry=0x56295bcd5130) at ../util/async.c:164
->>> #10 0x000056295aad76de in aio_dispatch (ctx=0x56295bcd5130) at ../util/aio-posix.c:380
->>> #11 0x000056295aaeb49e in aio_ctx_dispatch (source=<optimized out>, callback=<optimized out>, user_data=<optimized out>)
->>>     at ../util/async.c:306
->>> #12 0x00007f2b4e268f07 in g_main_context_dispatch () at /usr/lib64/libglib-2.0.so.0
->>> #13 0x000056295aac96fa in glib_pollfds_poll () at ../util/main-loop.c:221
->>> #14 0x000056295aac96fa in os_host_main_loop_wait (timeout=-1) at ../util/main-loop.c:244
->>> #15 0x000056295aac96fa in main_loop_wait (nonblocking=nonblocking@entry=0) at ../util/main-loop.c:520
->>> #16 0x000056295a99083d in qemu_main_loop () at ../softmmu/vl.c:1677
->>> #17 0x000056295a71b17e in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at ../softmmu/main.c:50
+>>> VM can not boot up due to "Failed to lock byte 100" if cdrom has been
+>>> mounted on the host
+>>>
+>>> Further observation:
+>>>
+>>> The basic problem is that qemu-system refuses to start with the error
+>>> message "Failed to lock byte 100" when -drive points to a read-only
+>>> ISO file.  For the reporter of the Red Hat bug, that was a mount-induced
+>>> read-only condition, in my case it is an NFS mount of a read-only
+>>> directory.
+>>>
+>>> The error message itself seams meaningless, as there is no particular
+>>> reason to request file locks on a read-only raw disk image.
+>>>
+>>> my qemu-system-x86_64 invocation contains the option (on one line):
+>>>
+>>> -drive if=none,id=drive-ide0-1-0,readonly=on,
+>>> file=/mnt/someshare/path/gparted-live-1.1.0-5-amd64.iso,format=raw
+>>
+>> https://bugzilla.redhat.com/show_bug.cgi?id=1655408 has been
+>> closed due to lack of reproducer. Can you amend your information
+>> to the BZ? It will likely be re-opened. Thanks!
+
+... here is my reply.
+
+Regards,
+
+Phil.
+
+>>
+>>>
+>>> Enjoy
+>>>
+>>> Jakob
+>>> -- 
+>>> Jakob Bohm, CIO, Partner, WiseMo A/S.  https://www.wisemo.com
+>>> Transformervej 29, 2860 Søborg, Denmark.  Direct +45 31 13 16 10
+>>> This public discussion message is non-binding and may contain errors.
+>>> WiseMo - Remote Service Management for PCs, Phones and Embedded
 >>>
 >>
->> Ah, query-replay probably should return an error if !tcg_enabled().
->>
->> Paolo
->>
 > 
-> aha, and we might even compile away (almost) the whole replay/ if not under tcg, and just put the necessary qmp stuff in stubs/ ... ?
 > 
-> Ciao,
+> Enjoy
 > 
-> C
-> 
-
-Oh I see there has been quite a lot of new replay code grafted around the codebase.
-
-I guess the commit breaking the fun for me was
-
-e3b09ad2b6e9b23ebc7c2ba133e8a22e53dec301
-
-commit e3b09ad2b6e9b23ebc7c2ba133e8a22e53dec301
-Author: Pavel Dovgaluk <Pavel.Dovgaluk@ispras.ru>
-Date:   Sat Oct 3 20:13:20 2020 +0300
-
-    replay: introduce info hmp/qmp command
-    
-    This patch introduces 'info replay' monitor command and
-    corresponding qmp request.
-    These commands request the current record/replay mode, replay log file
-    name, and the instruction count (number of recorded/replayed
-    instructions).  The instruction count can be used with the
-    replay_seek/replay_break commands added in the next two patches.
-    
-    Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
-    Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-    Acked-by: Markus Armbruster <armbru@redhat.com>
-    Message-Id: <160174520026.12451.13112161947433306561.stgit@pasha-ThinkPad-X280>
-    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-
-
+> Jakob
 
 
