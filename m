@@ -7,82 +7,86 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DEFEC43467
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 07:07:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D238AC43467
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 07:16:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AED632064C
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 07:07:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0719F20725
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 07:16:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IZ4jgbPN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AED632064C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jAhesoOT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0719F20725
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQQ1g-0006hg-MA
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 03:07:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54572)
+	id 1kQQA2-0000nz-T9
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 03:16:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56158)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kQPze-0004fQ-NL
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 03:05:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47748)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQQ94-0000GB-NN
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 03:15:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45476)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kQPzc-0003O8-F0
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 03:05:38 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQQ91-0004ao-Tg
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 03:15:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602140735;
+ s=mimecast20190719; t=1602141317;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=Q/0DRjVMlNrsBeM6+Gbs/OPv/a+CrN7cBOde8BfdrEY=;
- b=IZ4jgbPNQl/mxP/mYuu8bgbm0R/aBX1SD6ijIHV3c4dFXScfs2/FykDiOC/yyMXeP28RA6
- nAGGt2pA8zyhGBNo3GmONEOVu9a+0KibDhJ0Ewz6ZkFtumjjeO7W/FzgvTpSOTWIOO9WTH
- cRuBNLI3uXVCa/4W1jsI/4/Uest7bP4=
+ bh=OqEp9Q+pFMby7MxaiusxWhNKmCWEaHBevuTybLxYk6M=;
+ b=jAhesoOTpNBzZxjqZhVhaTnQ6jjNSOHD58SChWi3LISSGEyuuQ8MMAq8MENM2yya8NDijD
+ dF8JrjkkmODLhyJ8MZRLMnf2bd5vJyRswbtfzHkuExS1PrBghl3WULHkvNIhZUtye7OJzu
+ IZCL4AdnBTZPsGeqefSqtmIbbBx1gdk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-51-2PNYiKF9PbWRFsA1JMZCLw-1; Thu, 08 Oct 2020 03:04:51 -0400
-X-MC-Unique: 2PNYiKF9PbWRFsA1JMZCLw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-334-iCj4z40fPsWD0nqlx8Yjtg-1; Thu, 08 Oct 2020 03:15:16 -0400
+X-MC-Unique: iCj4z40fPsWD0nqlx8Yjtg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46CB51018F83;
- Thu,  8 Oct 2020 07:04:50 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-113-68.ams2.redhat.com [10.36.113.68])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CE774100239A;
- Thu,  8 Oct 2020 07:04:48 +0000 (UTC)
-Date: Thu, 8 Oct 2020 09:04:47 +0200
-From: Kevin Wolf <kwolf@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 29F06805EF6
+ for <qemu-devel@nongnu.org>; Thu,  8 Oct 2020 07:15:15 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
+ [10.36.112.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C19B319D7C;
+ Thu,  8 Oct 2020 07:15:14 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 3B63811329C1; Thu,  8 Oct 2020 09:15:13 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
 To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH 08/20] python/machine.py: fix _popen access
-Message-ID: <20201008070447.GA4672@linux.fritz.box>
-References: <20201006235817.3280413-1-jsnow@redhat.com>
- <20201006235817.3280413-9-jsnow@redhat.com>
- <20201007100705.GD7212@linux.fritz.box>
- <1c562773-6216-7cbe-eddf-fa18cdcc84f3@redhat.com>
+Subject: Re: [PATCH v5 03/36] qapi-gen: Separate arg-parsing from generation
+References: <20201005195158.2348217-1-jsnow@redhat.com>
+ <20201005195158.2348217-4-jsnow@redhat.com>
+ <87r1qaihen.fsf@dusky.pond.sub.org>
+ <50e590af-deff-3864-9abd-710a30eaa804@redhat.com>
+Date: Thu, 08 Oct 2020 09:15:13 +0200
+In-Reply-To: <50e590af-deff-3864-9abd-710a30eaa804@redhat.com> (John Snow's
+ message of "Wed, 7 Oct 2020 10:41:47 -0400")
+Message-ID: <878sch429q.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <1c562773-6216-7cbe-eddf-fa18cdcc84f3@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
+Content-Type: text/plain
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 02:56:27
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 01:56:49
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
 X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,180 +99,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 07.10.2020 um 20:44 hat John Snow geschrieben:
-> On 10/7/20 6:07 AM, Kevin Wolf wrote:
-> > Am 07.10.2020 um 01:58 hat John Snow geschrieben:
-> > > As always, Optional[T] causes problems with unchecked access. Add a
-> > > helper that asserts the pipe is present before we attempt to talk with
-> > > it.
-> > > 
-> > > Signed-off-by: John Snow <jsnow@redhat.com>
-> > 
-> > First a question about the preexisting state: I see that after
-> > initialising self._popen once, we never reset it to None. Should we do
-> > so on shutdown?
-> > 
-> 
-> Yup, we should.
-> 
-> > >   python/qemu/machine.py | 16 +++++++++++-----
-> > >   1 file changed, 11 insertions(+), 5 deletions(-)
-> > > 
-> > > diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-> > > index 3e9cf09fd2d..4e762fcd529 100644
-> > > --- a/python/qemu/machine.py
-> > > +++ b/python/qemu/machine.py
-> > > @@ -131,7 +131,7 @@ def __init__(self, binary, args=None, wrapper=None, name=None,
-> > >           # Runstate
-> > >           self._qemu_log_path = None
-> > >           self._qemu_log_file = None
-> > > -        self._popen = None
-> > > +        self._popen: Optional['subprocess.Popen[bytes]'] = None
-> > 
-> > Another option that we have, especially if it's an attribute that is
-> > never reset, would be to set the attribute only when it first gets a
-> > value other than None. Accessing it while it hasn't been set yet
-> > automatically results in an AttributeError. I don't think that's much
-> > worse than the exception raised explicitly in a property wrapper.
-> > 
-> > In this case, you would only declare the type in __init__, but not
-> > assign a value to it:
-> > 
-> >      self._popen: Optional['subprocess.Popen[bytes]']
-> > 
-> 
-> If you do this, you can just declare it as non-Optional. Whenever it exists,
-> it is definitely a subprocess.Popen[bytes].
+John Snow <jsnow@redhat.com> writes:
 
-Sorry, yes, copied too much while thinking too little.
+> On 10/7/20 4:12 AM, Markus Armbruster wrote:
+>> I keep stumbling over things in later patches that turn out to go back
+>> to this one.
+>> John Snow <jsnow@redhat.com> writes:
+>> 
+>>> This is a minor re-work of the entrypoint script. It isolates a
+>>> generate() method from the actual command-line mechanism.
+>>>
+>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>>> Reviewed-by: Cleber Rosa <crosa@redhat.com>
+>>> Tested-by: Cleber Rosa <crosa@redhat.com>
+>>> ---
+>>>   scripts/qapi-gen.py | 85 +++++++++++++++++++++++++++++++++------------
+>>>   1 file changed, 62 insertions(+), 23 deletions(-)
+>>>
+>>> diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
+>>> index 541e8c1f55d..117b396a595 100644
+>>> --- a/scripts/qapi-gen.py
+>>> +++ b/scripts/qapi-gen.py
+>>> @@ -1,30 +1,77 @@
+>>>   #!/usr/bin/env python3
+>>> -# QAPI generator
+>>> -#
+>>> +
+>>>   # This work is licensed under the terms of the GNU GPL, version 2 or later.
+>>>   # See the COPYING file in the top-level directory.
+>>>   +"""
+>>> +QAPI Generator
+>>> +
+>>> +This script is the main entry point for generating C code from the QAPI schema.
+>> PEP 8: For flowing long blocks of text with fewer structural
+>> restrictions (docstrings or comments), the line length should be limited
+>> to 72 characters.
+>> 
+>
+> Eugh. OK, but I don't have a good way to check or enforce this,
+> admittedly. I have to change my emacs settings to understand this when
+> I hit the reflow key. I don't know if the python mode has a
+> context-aware reflow length.
+>
+> ("I don't disagree, but I'm not immediately sure right now how I will
+> make sure I, or anyone else, complies with this. Low priority as a
+> result?")
 
-Getting rid of Optional was the whole point of the suggestion.
+Emacs Python mode is close enough by default: fill-paragraph (bound to
+M-q) uses variable fill-column, which defaults to 70.  If you want the
+extra two columns PEP 8 grants you, I can show you how to bump it to 72
+just for Python mode.
 
-> > Maybe a nicer alternative in some cases than adding properties around
-> > everything.
-> > 
-> > Instead of checking for None, you would then have to use hasattr(),
-> > which is a bit uglier, so I guess it's mainly for attributes where you
-> > can assume that you will always have a value (if the caller isn't buggy)
-> > and therefore don't even have a check in most places.
-> > 
-> 
-> As long as the style checkers are OK with that sort of thing. After a very
-> quick test, it seems like they might be.
-> 
-> Generally, we run into trouble because pylint et al want variables to be
-> declared in __init__, but doing so requires Optional[T] most of the time to
-> allow something to be initialized later.
-> 
-> A lot of our stateful objects have this kind of pattern. QAPIGen has a ton
-> of it. machine.py has a ton of it too.
-> 
-> You can basically imply the stateful check by just foregoing the actual
-> initialization, which trades the explicit check for the implicit one when
-> you get the AttributeError.
-> 
-> This is maybe more convenient -- less code to write, certainly. The error
-> message you get I think is going to be a little worse, though.
+You can use fill-paragraph for code, too.  I don't myself, because I
+disagree with its line breaking decisions too often (and so does PEP 8).
+A better Python mode would break code lines more neatly, and with the
+width defaulting to 79.
 
-Whether this matters depends on the meaning of the individual attribute.
+>>> +"""
+>>>     import argparse
+>>>   import re
+>>>   import sys
+>>>     from qapi.commands import gen_commands
+>>> +from qapi.error import QAPIError
+>>>   from qapi.events import gen_events
+>>>   from qapi.introspect import gen_introspect
+>>> -from qapi.schema import QAPIError, QAPISchema
+>>> +from qapi.schema import QAPISchema
+>>>   from qapi.types import gen_types
+>>>   from qapi.visit import gen_visit
+>>>     
+>>> -def main(argv):
+>>> +DEFAULT_OUTPUT_DIR = ''
+>>> +DEFAULT_PREFIX = ''
+>>> +
+>>> +
+>>> +def generate(schema_file: str,
+>>> +             output_dir: str,
+>>> +             prefix: str,
+>>> +             unmask: bool = False,
+>>> +             builtins: bool = False) -> None:
+>>> +    """
+>>> +    generate uses a given schema to produce C code in the target directory.
+>> PEP 257: The docstring is a phrase ending in a period.  It
+>> prescribes
+>> the function or method's effect as a command ("Do this", "Return that"),
+>> not as a description; e.g. don't write "Returns the pathname ...".
+>> Suggest
+>>         Generate C code for the given schema into the target
+>> directory.
+>> 
+>
+> OK. I don't mind trying to foster a consistent tone. I clearly
+> didn't. I will add a note to my style guide todo.
+>
+> I give you permission to change the voice in any of my docstrings, or
+> to adjust the phrasing to be more technically accurate as you see
+> fit. You are the primary maintainer of this code, of course, and you
+> will know best.
+>
+> It will be quicker to give you full permission to just change any of
+> the docstrings as you see fit than it will be to play review-respin
+> ping-pong.
 
-There can be attributes that can legitimately be None during most of
-the lifetime of the object. These should clearly be Optional.
+Me rewriting your commits without your consent is putting words in your
+mouth, which I don't want to do.
 
-In many cases, however, the contract say that you must first call method
-A that initialises the attribute and then you can call method B which
-uses it.  Calling B without A would be a bug, so it's not an error
-message that users should ever see. For developers who will then look at
-the stack trace anyway, I don't think it should make a big difference.
+We can still reduce ping-pong: whenever I can, I don't just say "this
+needs improvement", I propose improvements.  If you disagree, we talk.
+Else, if you have to respin, you make a reasonable effort to take them.
+Else, the remaining improvements are trivial (because no respin), and
+I'll make them in my tree.
 
-Here, it's usually expected that the attribute is not None except during
-phases where the object is mostly inactive anyway (like VMs before
-launch or after shutdown). Then you can just not add the attribute yet
-and access it without checks (which would only throw an exception
-anyway) elsewhere.
-
-> I think I have been leaning towards the cute little @property shims because
-> it follows a familiar OO model where a specific class always has a finite
-> set of properties that does not grow or shrink. You can also use the shim to
-> give a meaningful error that might be nicer to read than the AttributeError.
-> 
-> I'm open to suggestions on better patterns. I had considered at one point
-> that it might be nice to split Machine out into a version with and without
-> the console to make stronger typing guarantees. It has implications for how
-> shutdown and cleanup and so on is handled, too.
-> 
-> (I had some WIP patches to do this, but I think I got a little stuck making
-> the code pretty, and then the release, and then I got busy, and...)
-
-I guess the way to have everything static would be splitting QEMUMachine
-into QEMUVMConfig (which exists without a running QEMU instance) and
-QEMUVMInstance (which gets a QEMUVMConfig passed to its constructor and
-is directly tied to a QEMU process).
-
-Not sure if it would be worth such a major change.
-
-> > >           self._events = []
-> > >           self._iolog = None
-> > >           self._qmp_set = True   # Enable QMP monitor by default.
-> > > @@ -244,6 +244,12 @@ def is_running(self):
-> > >           """Returns true if the VM is running."""
-> > >           return self._popen is not None and self._popen.poll() is None
-> > > +    @property
-> > > +    def _subp(self) -> 'subprocess.Popen[bytes]':
-> > > +        if self._popen is None:
-> > > +            raise QEMUMachineError('Subprocess pipe not present')
-> > > +        return self._popen
-
-The major downside that I saw while reviewing this patch (besides having
-extra code just for making the error message of what essentially a
-failed assertion nicer) is that we have two names for the same thing, we
-have both names in active use in the other methods, and I'll never be
-able to remember which of _subp and _popen is the real attribute and
-which is the property (or that they are related at all and changing one
-will actually change the other, too) without looking it up.
-
-I mean, I guess tools will tell me after getting it wrong, but still...
-
-Properties can make a nice external interface, but I feel using them
-internally while you don't avoid accessing the real attribute in methods
-other than the property implementation is more confusing than helpful.
-
-> > >       def exitcode(self):
-> > >           """Returns the exit code if possible, or None."""
-> > >           if self._popen is None:
-> > 
-> > Of course, even if an alternative is possible, what you have is still
-> > correct.
-> > 
-> > Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-> > 
-> 
-> Thanks; I'll continue with this for now, but I really am open to talking
-> about better ways to model the common pattern of "Optional sub-feature for a
-> class that can be engaged post-initialization".
-> 
-> It's an interesting typing problem. If we were using semantic types, what we
-> are describing is an f(x) such that:
-> 
-> f(object-without-feature) -> object-with-feature
-> 
-> It's a kind of semantic cast where we are doing something akin to an
-> in-place transformation of a base type to a subtype. I'm not sure I have
-> encountered any language that actually intentionally supports such a
-> paradigm.
-> 
-> (Maybe haskell? I just assume haskell can do everything if you learn to lie
-> to computers well enough.)
-
-You can always express this kind of thing as object-with-feature
-containing an object-without-feature.
-
-Kevin
+>>> +
+>>> +    :param schema_file: The primary QAPI schema file.
+>>> +    :param output_dir: The output directory to store generated code.
+>>> +    :param prefix: Optional C-code prefix for symbol names.
+>>> +    :param unmask: Expose non-ABI names through introspection?
+>>> +    :param builtins: Generate code for built-in types?
+>>> +
+>>> +    :raise QAPIError: On failures.
+>>> +    """
+>> [...]
+>> 
 
 
