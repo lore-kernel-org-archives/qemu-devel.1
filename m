@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20ECFC433E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 19:12:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BE4AC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 19:12:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A12E21789
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 19:12:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D735121789
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 19:12:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HpS+N+s9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A12E21789
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d2xvpemJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D735121789
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQbL2-0003PV-3P
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 15:12:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49216)
+	id 1kQbLJ-0003k7-Kv
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 15:12:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49328)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kQbJf-0001up-MG
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 15:11:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33828)
+ id 1kQbJn-00026m-84
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 15:11:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46813)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kQbJd-00059H-Jo
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 15:11:03 -0400
+ id 1kQbJl-0005AL-D7
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 15:11:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602184260;
+ s=mimecast20190719; t=1602184268;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=hE5tVBwV/RnyMnB02VZVAukfGpAPywHYUJDs3ZCWRMw=;
- b=HpS+N+s9H7wfvAEX+pWQ4W9twtjoFKSAJqV3+3RzA1wCdPFlF5ZY7bMfTUs0cgEEbGqbXo
- tuposC24R4rhsCZrE+H9JDEPB9ShEc+q3t0FfEyf7G33/QY6zvPeQq6QTVdmo0hCwU1reM
- vDzfBo1ZYjAmGxghikP/6QA9ef5dJ+M=
+ bh=W85WJLLeimVgYQvZmhoPM6kQHkNmqQwrNZAwhc++t9I=;
+ b=d2xvpemJc71UEZSEqf/aNcAizl4iXOvHfC7Q7EaN/8IgUyl7kxfE8Dnc5bHj4xpgh9kFsx
+ 8hs3lcmu+xZvZJfhDXJXrQvk+EMnVhURf02CTyejxzAQCDHIRL7F39KTLMzHD5SguxkTiq
+ KeGZaRWFdiAXWgDaJHOzdcXq3agUW8U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-440-McRSH0GEPAuOAozY2TMBdg-1; Thu, 08 Oct 2020 15:10:58 -0400
-X-MC-Unique: McRSH0GEPAuOAozY2TMBdg-1
+ us-mta-172-8VRy5tluNey0CSBwsjWzaA-1; Thu, 08 Oct 2020 15:11:05 -0400
+X-MC-Unique: 8VRy5tluNey0CSBwsjWzaA-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B0E9103098A;
- Thu,  8 Oct 2020 19:10:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A436107AFDB;
+ Thu,  8 Oct 2020 19:11:04 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-114-212.ams2.redhat.com
  [10.36.114.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 27D735C1BD;
- Thu,  8 Oct 2020 19:10:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DE2655C1BD;
+ Thu,  8 Oct 2020 19:11:02 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, alex.bennee@linaro.org, zhengchuan@huawei.com,
  stefanha@redhat.com, peterx@redhat.com
-Subject: [PULL 01/10] virtiofsd: Silence gcc warning
-Date: Thu,  8 Oct 2020 20:10:37 +0100
-Message-Id: <20201008191046.272549-2-dgilbert@redhat.com>
+Subject: [PULL 05/10] migration: Pass incoming state into qemu_ufd_copy_ioctl()
+Date: Thu,  8 Oct 2020 20:10:41 +0100
+Message-Id: <20201008191046.272549-6-dgilbert@redhat.com>
 In-Reply-To: <20201008191046.272549-1-dgilbert@redhat.com>
 References: <20201008191046.272549-1-dgilbert@redhat.com>
 MIME-Version: 1.0
@@ -72,8 +72,8 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 01:56:49
@@ -102,33 +102,55 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Peter Xu <peterx@redhat.com>
 
-Gcc worries fd might be used unset, in reality it's always set if
-fi is set, and only used if fi is set so it's safe.  Initialise it to -1
-just to keep gcc happy for now.
+It'll be used in follow up patches to access more fields out of it.  Meanwhile
+fetch the userfaultfd inside the function.
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <20200827153657.111098-2-dgilbert@redhat.com>
-Reviewed-by: Ján Tomko <jtomko@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20201002175336.30858-2-peterx@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tools/virtiofsd/passthrough_ll.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ migration/postcopy-ram.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
-index 0b229ebd57..36ad46e0c0 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -620,7 +620,7 @@ static void lo_setattr(fuse_req_t req, fuse_ino_t ino, struct stat *attr,
-     struct lo_inode *inode;
-     int ifd;
-     int res;
--    int fd;
-+    int fd = -1;
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index 0a2f88a87d..722034dc01 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -1128,10 +1128,12 @@ int postcopy_ram_incoming_setup(MigrationIncomingState *mis)
+     return 0;
+ }
  
-     inode = lo_inode(req, ino);
-     if (!inode) {
+-static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
++static int qemu_ufd_copy_ioctl(MigrationIncomingState *mis, void *host_addr,
+                                void *from_addr, uint64_t pagesize, RAMBlock *rb)
+ {
++    int userfault_fd = mis->userfault_fd;
+     int ret;
++
+     if (from_addr) {
+         struct uffdio_copy copy_struct;
+         copy_struct.dst = (uint64_t)(uintptr_t)host_addr;
+@@ -1185,7 +1187,7 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
+      * which would be slightly cheaper, but we'd have to be careful
+      * of the order of updating our page state.
+      */
+-    if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, from, pagesize, rb)) {
++    if (qemu_ufd_copy_ioctl(mis, host, from, pagesize, rb)) {
+         int e = errno;
+         error_report("%s: %s copy host: %p from: %p (size: %zd)",
+                      __func__, strerror(e), host, from, pagesize);
+@@ -1212,7 +1214,7 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
+      * but it's not available for everything (e.g. hugetlbpages)
+      */
+     if (qemu_ram_is_uf_zeroable(rb)) {
+-        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, NULL, pagesize, rb)) {
++        if (qemu_ufd_copy_ioctl(mis, host, NULL, pagesize, rb)) {
+             int e = errno;
+             error_report("%s: %s zero host: %p",
+                          __func__, strerror(e), host);
 -- 
 2.28.0
 
