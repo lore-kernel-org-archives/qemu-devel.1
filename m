@@ -2,82 +2,84 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7EF6C4363A
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 14:27:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04A81C4363C
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 14:27:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4190720739
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 14:27:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6B6C620739
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 14:27:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JSAMq6kh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4190720739
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YDQ3vaem"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B6C620739
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQWtF-0005j9-5U
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 10:27:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38106)
+	id 1kQWtG-0005lY-63
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 10:27:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38144)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kQWrv-0004B1-0H
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 10:26:07 -0400
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:45893)
+ id 1kQWrw-0004BJ-SB
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 10:26:08 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34314)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kQWrr-0005xm-JL
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 10:26:06 -0400
-Received: by mail-wr1-x433.google.com with SMTP id e17so6816846wru.12
- for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 07:26:01 -0700 (PDT)
+ id 1kQWrt-0005yA-Gu
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 10:26:08 -0400
+Received: by mail-wr1-x444.google.com with SMTP id i1so721129wro.1
+ for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 07:26:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=Zuko7xYsx+AobCsIhmP+yoqpYry9yrG9L5exR0uadzA=;
- b=JSAMq6khaTK0XC+AX7k5W0R5fN5n7Dp1hpKCdiw71aOFuyQ5Eq5sh3k7KaevUhJeTi
- 5DHYwpVLQGknG7km4/g3+Jp6xYd7e1YmZT6O8h6ZyPGfDpKPMJggLpIYsdvj+/5N08tN
- AQT0jfp8KlEoZX4UwKwRrTFm9Qrw8nv74f7yDLMJugzowVCctqhHpRo3GwltePgKiJFz
- P+GszsBFZm69ZoyR9xSB/wzf+ftKxHsrV6nT0KkHVpOZTAJVjOuE+Zg9HQHOFOeIeHNY
- xghG8KpL1kh/0joKPVDPnCxEnSE8zjOWx+V24OXre12SxD4SusSjRp6q2GTYmd6BsSBH
- iQpA==
+ bh=TbWCRJ0BVkq6j07LdMSc/WFxA1HsyjcaL+7Jf66AQ7w=;
+ b=YDQ3vaem4ICMjOVnbiqey4nL89QKVk13emEsRvcQQm/ut4obgmVAuMCOjHwq1NI3e+
+ SmCjxybbevPAq2Z6+xNMXeeAt4xoAjb9Z4yfHnyrpu0KUdI1vpNKG/dE+H8sChe6wijY
+ gqzP4idO++OcAa9++aEvDKOzywADrwIqWW7sX4nGfVPcu7uff7GkcL7L4TmOtsaBVNzB
+ 4F94I7G2UWmqJFDCI8AjzJYi9L9yZyGL1hPOgjAZ2WYoI7I8l7yTs/9O+zc+ZQMdTnFV
+ 9ftkFj2pG/6tYCZga5VRufxr+pnpayVEBpzB68wOfCM6t0cyBkGFpvITm4UNGamveilr
+ CN2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=Zuko7xYsx+AobCsIhmP+yoqpYry9yrG9L5exR0uadzA=;
- b=lMShrFvpspVqwgvviDPodeyLtL1jZV/+rP23KTvsbYLhtlJjoVo58LjLc2QLF4EoH4
- 1kslJpzSnrSa7zW8/WmlYCuBAIFcq447GS7OkxMm7dq7EtPprLN8BatvxpwZcuqYJCWg
- jfuKjvbccf4H0bQmAwMACe1DZylyjiWUcZbI4Mtd+NklwqZVC0vkpA4dPX9T7uxyAgQV
- ETFUQvb/SkP2Z1U81upNPzCkNgubYtP5DDWC1oZdlE6TonWBfVHAIPZdn4kYZ1m3BYOV
- o1GMPZHvigM9ZdJtFnqJmqg6vMCPDvOlgYewfJdRhBuR2TuteVQ5eCeuJH+/swBOyqb8
- sEsQ==
-X-Gm-Message-State: AOAM533kC7xETJaRZTDfOL1jGcFqDF+NyZHEThJjk1CKE+gjMQi3Msi1
- xGzg7reLeCiNPXZDdTByn07Y2UJ1FSoxWCQi
-X-Google-Smtp-Source: ABdhPJzmQ5NuTZksAECuBhC6bvnuUDth18ttY2ablRFYPHVvDyJshle0cTuSHOhsYZ5kPP2UOGFyIg==
-X-Received: by 2002:a5d:618a:: with SMTP id j10mr2034065wru.155.1602167160132; 
- Thu, 08 Oct 2020 07:26:00 -0700 (PDT)
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=TbWCRJ0BVkq6j07LdMSc/WFxA1HsyjcaL+7Jf66AQ7w=;
+ b=Ypiq6poSzQ/ikdJortlPanPjBwJrot5/iLiP4SWio4Whw1Aw+2l4qLNlYxagebkFfi
+ 5Cd9ZT3WhVuv1HlmsRRQMORdIAvVjyTpvbuEgNW2XLn4qRHy1FRy9BvFyiVcZNkuCjbL
+ AxteSCRrUHXPniIdD5FS7htQkSjgTBCqaULRIpCP3ztswU/fkC0RANnK3x6k8rHQcSk6
+ h9cJ1WcPC++tYGBCIVxW0xhHuoPAPezHj2niX2RbO7JwI96k5DnCDlf2kkO0EixeKVnU
+ WyrbSeo7380HhlcJKV0nQD+uj0uKECzKSGmdNzf8UyLuPdqKnUD2Qy045rETmBooemlJ
+ W+WA==
+X-Gm-Message-State: AOAM532lHA205mHv7qXvfUzR3AfgRa8YPZ4GKmjxrAC4my8TXn1lzR2p
+ mHfx7UqGjYRBjVW1L+G2yWSPQxnckBFUFxcS
+X-Google-Smtp-Source: ABdhPJzLE6wM4Bw79RbfLk7iclCb7xJ+uXH8Y0xvdosuzPhItjg0aaAJhBhNaYkRzOihfCpYBWEUnQ==
+X-Received: by 2002:a5d:4c52:: with SMTP id n18mr9396386wrt.267.1602167163710; 
+ Thu, 08 Oct 2020 07:26:03 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id j1sm7905104wrc.28.2020.10.08.07.25.59
+ by smtp.gmail.com with ESMTPSA id j1sm7905104wrc.28.2020.10.08.07.26.02
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 08 Oct 2020 07:25:59 -0700 (PDT)
+ Thu, 08 Oct 2020 07:26:03 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 00/12] target-arm queue
-Date: Thu,  8 Oct 2020 15:25:45 +0100
-Message-Id: <20201008142557.9845-1-peter.maydell@linaro.org>
+Subject: [PULL 03/12] hw/arm/sbsa-ref : Fix SMMUv3 Initialisation
+Date: Thu,  8 Oct 2020 15:25:48 +0100
+Message-Id: <20201008142557.9845-4-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201008142557.9845-1-peter.maydell@linaro.org>
+References: <20201008142557.9845-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::433;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x433.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,67 +105,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Graeme Gregory <graeme@nuviainc.com>
 
-The following changes since commit 6eeea6725a70e6fcb5abba0764496bdab07ddfb3:
+SMMUv3 has an error in a previous patch where an i was transposed to a 1
+meaning interrupts would not have been correctly assigned to the SMMUv3
+instance.
 
-  Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2020-10-06' into staging (2020-10-06 21:13:34 +0100)
+Fixes: 48ba18e6d3f3 ("hw/arm/sbsa-ref: Simplify by moving the gic in the machine state")
+Signed-off-by: Graeme Gregory <graeme@nuviainc.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Message-id: 20201007100732.4103790-2-graeme@nuviainc.com
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/arm/sbsa-ref.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-are available in the Git repository at:
+diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
+index 9c3a893bedf..65e64883b51 100644
+--- a/hw/arm/sbsa-ref.c
++++ b/hw/arm/sbsa-ref.c
+@@ -525,7 +525,7 @@ static void create_smmu(const SBSAMachineState *sms, PCIBus *bus)
+     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
+     for (i = 0; i < NUM_SMMU_IRQS; i++) {
+         sysbus_connect_irq(SYS_BUS_DEVICE(dev), i,
+-                           qdev_get_gpio_in(sms->gic, irq + 1));
++                           qdev_get_gpio_in(sms->gic, irq + i));
+     }
+ }
+ 
+-- 
+2.20.1
 
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20201008
-
-for you to fetch changes up to ba118c26e16a97e6ff6de8184057d3420ce16a23:
-
-  target/arm: Make '-cpu max' have a 48-bit PA (2020-10-08 15:24:32 +0100)
-
-----------------------------------------------------------------
-target-arm queue:
- * hw/ssi/npcm7xx_fiu: Fix handling of unsigned integer
- * hw/arm/fsl-imx25: Fix a typo
- * hw/arm/sbsa-ref : Fix SMMUv3 Initialisation
- * hw/arm/sbsa-ref : allocate IRQs for SMMUv3
- * hw/char/bcm2835_aux: Allow less than 32-bit accesses
- * hw/arm/virt: Implement kvm-steal-time
- * target/arm: Make '-cpu max' have a 48-bit PA
-
-----------------------------------------------------------------
-Andrew Jones (6):
-      linux headers: sync to 5.9-rc7
-      target/arm/kvm: Make uncalled stubs explicitly unreachable
-      hw/arm/virt: Move post cpu realize check into its own function
-      hw/arm/virt: Move kvm pmu setup to virt_cpu_post_init
-      tests/qtest: Restore aarch64 arm-cpu-features test
-      hw/arm/virt: Implement kvm-steal-time
-
-Graeme Gregory (2):
-      hw/arm/sbsa-ref : Fix SMMUv3 Initialisation
-      hw/arm/sbsa-ref : allocate IRQs for SMMUv3
-
-Peter Maydell (1):
-      target/arm: Make '-cpu max' have a 48-bit PA
-
-Philippe Mathieu-Daudé (3):
-      hw/ssi/npcm7xx_fiu: Fix handling of unsigned integer
-      hw/arm/fsl-imx25: Fix a typo
-      hw/char/bcm2835_aux: Allow less than 32-bit accesses
-
- docs/system/arm/cpu-features.rst |  11 ++++
- include/hw/arm/fsl-imx25.h       |   2 +-
- include/hw/arm/virt.h            |   5 ++
- linux-headers/linux/kvm.h        |   6 ++-
- target/arm/cpu.h                 |   4 ++
- target/arm/kvm_arm.h             |  94 ++++++++++++++++++++++++++-------
- hw/arm/sbsa-ref.c                |   3 +-
- hw/arm/virt.c                    | 110 ++++++++++++++++++++++++++++-----------
- hw/char/bcm2835_aux.c            |   4 +-
- hw/ssi/npcm7xx_fiu.c             |  12 ++---
- target/arm/cpu.c                 |   8 +++
- target/arm/cpu64.c               |   4 ++
- target/arm/kvm.c                 |  16 ++++++
- target/arm/kvm64.c               |  64 +++++++++++++++++++++--
- target/arm/monitor.c             |   2 +-
- tests/qtest/arm-cpu-features.c   |  25 +++++++--
- hw/ssi/trace-events              |   2 +-
- tests/qtest/meson.build          |   3 +-
- 18 files changed, 303 insertions(+), 72 deletions(-)
 
