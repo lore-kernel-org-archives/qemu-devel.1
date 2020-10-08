@@ -2,80 +2,80 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07898C4363C
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 04:26:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F619C47095
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 04:26:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9EFA20789
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 04:26:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9EFA20789
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=emindsoft.com.cn
+	by mail.kernel.org (Postfix) with ESMTPS id C67CD20789
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 04:26:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C67CD20789
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQNVw-00087B-Je
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 00:26:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56718)
+	id 1kQNW0-0008Du-Mh
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 00:26:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56758)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chengang@emindsoft.com.cn>)
- id 1kQNUj-0007DL-8b
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 00:25:33 -0400
-Received: from lucky1.263xmail.com ([211.157.147.132]:43458)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chengang@emindsoft.com.cn>)
- id 1kQNUf-0001gt-CB
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 00:25:32 -0400
-Received: from localhost (unknown [192.168.167.8])
- by lucky1.263xmail.com (Postfix) with ESMTP id 3A972EF1F0;
- Thu,  8 Oct 2020 12:25:18 +0800 (CST)
-X-MAIL-GRAY: 0
-X-MAIL-DELIVERY: 1
-X-ADDR-CHECKED4: 1
-X-ANTISPAM-LEVEL: 2
-X-ABS-CHECKED: 0
-Received: from localhost.localdomain (unknown [111.30.214.76])
- by smtp.263.net (postfix) whith ESMTP id
- P2452T140206445422336S1602131103681870_; 
- Thu, 08 Oct 2020 12:25:18 +0800 (CST)
-X-UNIQUE-TAG: <6b4f0a22e018b87b7eb2b0dc47b5f28d>
-X-RL-SENDER: chengang@emindsoft.com.cn
-X-SENDER: chengang@emindsoft.com.cn
-X-LOGIN-NAME: chengang@emindsoft.com.cn
-X-FST-TO: laurent@vivier.eu
-X-SENDER-IP: 111.30.214.76
-X-ATTACHMENT-NUM: 0
-X-DNS-TYPE: 0
-X-System-Flag: 0
-From: chengang@emindsoft.com.cn
-To: laurent@vivier.eu,
-	riku.voipio@iki.fi
-Subject: [PATCH] linux-user: signal: Support TARGET_SS_AUTODISARM
-Date: Thu,  8 Oct 2020 12:25:01 +0800
-Message-Id: <20201008042501.16857-1-chengang@emindsoft.com.cn>
-X-Mailer: git-send-email 2.24.0.308.g228f53135a
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kQNUt-0007Fu-Ie
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 00:25:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43672)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kQNUr-0001pS-8A
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 00:25:43 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kQNUo-0002Gi-7A
+ for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 04:25:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 33B162E802E
+ for <qemu-devel@nongnu.org>; Thu,  8 Oct 2020 04:25:38 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=211.157.147.132;
- envelope-from=chengang@emindsoft.com.cn; helo=lucky1.263xmail.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 00:25:19
-X-ACL-Warn: Detected OS   = ???
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 08 Oct 2020 04:17:18 -0000
+From: Launchpad Bug Tracker <1667613@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: intermediadc janitor th-huth
+X-Launchpad-Bug-Reporter: luigiburdo (intermediadc)
+X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
+References: <20170224093456.30105.18077.malonedeb@gac.canonical.com>
+Message-Id: <160213063889.310.10768474257794744326.malone@loganberry.canonical.com>
+Subject: [Bug 1667613] Re: Qemu 2.8  on PPC64 issue with input
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="d50d1e75c500726862802414f880ee3e3bb759bf"; Instance="production"
+X-Launchpad-Hash: 5147cceaa2bcf8de3ac0b63b5500d816d1bfccd3
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 00:25:37
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,111 +84,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Chen Gang <chengang@emindsoft.com.cn>, qemu-devel@nongnu.org
+Reply-To: Bug 1667613 <1667613@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Chen Gang <chengang@emindsoft.com.cn>
+[Expired for QEMU because there has been no activity for 60 days.]
 
-Microsoft sqlserver 2017 x86_64 uses it. The implementation references
-from the linux kernel.
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-Signed-off-by: Chen Gang <chengang@emindsoft.com.cn>
----
- linux-user/generic/signal.h |  6 ++++++
- linux-user/signal.c         | 23 ++++++++++++++++++-----
- 2 files changed, 24 insertions(+), 5 deletions(-)
+-- =
 
-diff --git a/linux-user/generic/signal.h b/linux-user/generic/signal.h
-index e1083f8fba..943bc1a1e2 100644
---- a/linux-user/generic/signal.h
-+++ b/linux-user/generic/signal.h
-@@ -54,4 +54,10 @@
- #define TARGET_SIG_BLOCK          0    /* for blocking signals */
- #define TARGET_SIG_UNBLOCK        1    /* for unblocking signals */
- #define TARGET_SIG_SETMASK        2    /* for setting the signal mask */
-+
-+/* bit-flags */
-+#define TARGET_SS_AUTODISARM (1U << 31) /* disable sas during sighandling */
-+/* mask for all SS_xxx flags */
-+#define TARGET_SS_FLAG_BITS  TARGET_SS_AUTODISARM
-+
- #endif
-diff --git a/linux-user/signal.c b/linux-user/signal.c
-index 8cf51ffecd..b5f04ae160 100644
---- a/linux-user/signal.c
-+++ b/linux-user/signal.c
-@@ -263,6 +263,10 @@ int on_sig_stack(unsigned long sp)
- {
-     TaskState *ts = (TaskState *)thread_cpu->opaque;
- 
-+    if (ts->sigaltstack_used.ss_flags & TARGET_SS_AUTODISARM) {
-+        return 0;
-+    }
-+
-     return (sp - ts->sigaltstack_used.ss_sp
-             < ts->sigaltstack_used.ss_size);
- }
-@@ -293,8 +297,13 @@ void target_save_altstack(target_stack_t *uss, CPUArchState *env)
-     TaskState *ts = (TaskState *)thread_cpu->opaque;
- 
-     __put_user(ts->sigaltstack_used.ss_sp, &uss->ss_sp);
--    __put_user(sas_ss_flags(get_sp_from_cpustate(env)), &uss->ss_flags);
-+    __put_user(ts->sigaltstack_used.ss_flags, &uss->ss_flags);
-     __put_user(ts->sigaltstack_used.ss_size, &uss->ss_size);
-+    if (ts->sigaltstack_used.ss_flags & TARGET_SS_AUTODISARM) {
-+        ts->sigaltstack_used.ss_sp = 0;
-+        ts->sigaltstack_used.ss_size = 0;
-+        ts->sigaltstack_used.ss_flags = TARGET_SS_DISABLE;
-+    }
- }
- 
- /* siginfo conversion */
-@@ -768,7 +777,7 @@ abi_long do_sigaltstack(abi_ulong uss_addr, abi_ulong uoss_addr, abi_ulong sp)
-     {
-         __put_user(ts->sigaltstack_used.ss_sp, &oss.ss_sp);
-         __put_user(ts->sigaltstack_used.ss_size, &oss.ss_size);
--        __put_user(sas_ss_flags(sp), &oss.ss_flags);
-+        __put_user(ts->sigaltstack_used.ss_flags, &oss.ss_flags);
-     }
- 
-     if(uss_addr)
-@@ -776,6 +785,7 @@ abi_long do_sigaltstack(abi_ulong uss_addr, abi_ulong uoss_addr, abi_ulong sp)
-         struct target_sigaltstack *uss;
-         struct target_sigaltstack ss;
-         size_t minstacksize = TARGET_MINSIGSTKSZ;
-+        int ss_mode;
- 
- #if defined(TARGET_PPC64)
-         /* ELF V2 for PPC64 has a 4K minimum stack size for signal handlers */
-@@ -799,10 +809,12 @@ abi_long do_sigaltstack(abi_ulong uss_addr, abi_ulong uoss_addr, abi_ulong sp)
-             goto out;
- 
-         ret = -TARGET_EINVAL;
--        if (ss.ss_flags != TARGET_SS_DISABLE
--            && ss.ss_flags != TARGET_SS_ONSTACK
--            && ss.ss_flags != 0)
-+        ss_mode = ss.ss_flags & ~TARGET_SS_FLAG_BITS;
-+        if (ss_mode != TARGET_SS_DISABLE
-+            && ss_mode != TARGET_SS_ONSTACK
-+            && ss_mode != 0) {
-             goto out;
-+        }
- 
-         if (ss.ss_flags == TARGET_SS_DISABLE) {
-             ss.ss_size = 0;
-@@ -814,6 +826,7 @@ abi_long do_sigaltstack(abi_ulong uss_addr, abi_ulong uoss_addr, abi_ulong sp)
-             }
-         }
- 
-+        ts->sigaltstack_used.ss_flags = ss.ss_flags;
-         ts->sigaltstack_used.ss_sp = ss.ss_sp;
-         ts->sigaltstack_used.ss_size = ss.ss_size;
-     }
--- 
-2.24.0.308.g228f53135a
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1667613
 
+Title:
+  Qemu 2.8  on PPC64 issue with input
 
+Status in QEMU:
+  Expired
 
+Bug description:
+  Hi devs,
+  on my PPC64 machine if i start qemu with gtk,gl=3Don or with sdl,gl=3Don =
+i have issue with pointer and keyboard. pratically not input at all.
+  This issue is present in tgc and in kvm
+
+  without gl=3Don option in kvm with mate as guest i have the input device
+  work in the beginning but after some time the usb goes "unplugged" (i
+  see this message on the serial log of qemu usb unplugged) and the
+  keyboard and mouse dont work.
+
+  On Debian jessie kvm i dont have input working at all.
+
+  my machine is a G5 quad with Fedora 25 PPC64
+
+  thanks
+  Luigi
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1667613/+subscriptions
 
