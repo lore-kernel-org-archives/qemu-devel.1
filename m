@@ -2,73 +2,110 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F296AC4363A
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 13:43:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7143AC4363A
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 13:53:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20E0C20782
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 13:43:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A19F4217BA
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 13:53:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="MTCb7Sui"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20E0C20782
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JS/JLDmn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A19F4217BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42450 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQWCm-0005AC-Rz
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 09:43:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56692)
+	id 1kQWLr-0007Gr-6d
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 09:52:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58460)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kQWCD-0004jP-KL
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 09:43:01 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:44827)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kQWCA-0008Qf-L4
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 09:43:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=f7qogRxNdHqLceUz0t/A92FyvSat/2/wZ/PthPITHDw=; b=MTCb7Suid/Mg8ygVA9nQJdH0wV
- eNpbqpNVn0jtc/TRYEuvZ6vo4IOGzicizRb2WaSv10GHmUit0PTTYWTs1GogZtf2yswkELgj27xBA
- tCmAGAy7OFINVlrU4zf0DawgpThYBtdgJ2bsLIKDH/5ovIyeiG6GTeEHcCGLorWNJ6/BtDSz7KqZ/
- QFqH72lvz3/H4wt7hXEpMTlENLNxrwZFuOVrSkKU86JQtzs9D0qR1i1wv1HJvN81NCNoVs7BaO1IO
- 4Lcea5nd6K7habKhfwOWpCTAjY30GwivOz0ZdeWcSrElEpfpzT5m6TpVRo/j2nlpswJBtV06tbF/s
- FN1pQ0HA==;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
- Thomas Huth <thuth@redhat.com>, berrange@redhat.com,
- Greg Kurz <groug@kaod.org>
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kQWLB-0006qr-L0
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 09:52:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36703)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kQWL9-00016Y-JU
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 09:52:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602165134;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=mO9dHNikis5azTv0FJ2hkWcE60EiZViSrSMuTVGPFyM=;
+ b=JS/JLDmn9a+JfND8+7tU9SZjJLS8Jh4gjRc7u4de1LW7CXc3wQ2pRXmrL4zCnTD9vvJuiE
+ lSu+kT56+YAy637P9e131ord6sezg8dPvZOfdicDHivPu0tKGTM/P4BKWwEpYe5rxgNAEV
+ fRZAZI3v8WWvgZ7khb+N9tJlBk7ST3k=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-489-GNip1SktOL-NLSTDeH8Yfw-1; Thu, 08 Oct 2020 09:52:12 -0400
+X-MC-Unique: GNip1SktOL-NLSTDeH8Yfw-1
+Received: by mail-wm1-f69.google.com with SMTP id w23so3158417wmi.1
+ for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 06:52:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=mO9dHNikis5azTv0FJ2hkWcE60EiZViSrSMuTVGPFyM=;
+ b=YYfeSXNtGJlKIbR/XwiZledWAN5Qthm/Sswo9SXW/A8Z/k6q1vGUQ1NUBoh9nbFFlB
+ m75hGFaUd76cpcE/v9mYmmxuvKesIO9CmNYb7fY5uVx0EbiTm3PAJFhsoADJIBzenlmt
+ 8aJPnlStpAKNrif3EHR0bfy3EkHs6fLBkFzzqYU0XGIgUhtvkTyGClEFfTs6CZAhoxR2
+ CyLUv7bW4YDQ++dZvxhY5g8oqi/ecUEoXJIC1+oqZARJFRwEqtY6JpjHey0miIf+EnTR
+ ucWP+4j03VuO6Hy+oGO7mRkb2tznbL8liXqY4sdB5n4yAmAuZpybsSLSTUt5aW6oY3A2
+ EKsA==
+X-Gm-Message-State: AOAM532f5VqexRbcXafqkg/QXHdsHD6fztEK2HL7UtuWHHkUASzrXm5o
+ GV0hBBewBTE74Mr3djMG+OypLiMazAh+vbK5srRkoH0OQeq04DiNLr74FZRO0SafOIdHye40E00
+ H8hu906uE/AynLW4=
+X-Received: by 2002:a5d:558e:: with SMTP id i14mr10039942wrv.40.1602165131478; 
+ Thu, 08 Oct 2020 06:52:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw+lA8TGYqCRr8yqJrNdrH2+NcIOccuYcY4vvb7cDzDSR8qj2ex9NfVeC0NXZxttMu4dLBmig==
+X-Received: by 2002:a5d:558e:: with SMTP id i14mr10039915wrv.40.1602165131210; 
+ Thu, 08 Oct 2020 06:52:11 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:bb8c:429c:6de1:f4ec?
+ ([2001:b07:6468:f312:bb8c:429c:6de1:f4ec])
+ by smtp.gmail.com with ESMTPSA id g139sm7796536wme.2.2020.10.08.06.52.10
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 08 Oct 2020 06:52:10 -0700 (PDT)
 Subject: Re: [PATCH v3 05/11] tests/qtest/qos-test: dump environment variables
  if verbose
-Date: Thu, 08 Oct 2020 15:42:55 +0200
-Message-ID: <2996442.YqjEYQNFnd@silver>
-In-Reply-To: <6d6247ef-94f3-3ee3-b0ad-28e870d8dc05@redhat.com>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org
 References: <cover.1601655308.git.qemu_oss@crudebyte.com>
  <1836979.gfKjIU19vi@silver> <6d6247ef-94f3-3ee3-b0ad-28e870d8dc05@redhat.com>
+ <2996442.YqjEYQNFnd@silver>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d7603332-3bad-6fd1-0140-79bdec9fa4f1@redhat.com>
+Date: Thu, 8 Oct 2020 15:52:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 08:26:30
+In-Reply-To: <2996442.YqjEYQNFnd@silver>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 02:56:27
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-Spam_score_int: -22
+X-Spam_score: -2.3
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.214, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,46 +119,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Laurent Vivier <lvivier@redhat.com>, berrange@redhat.com,
+ Thomas Huth <thuth@redhat.com>,
+ Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Donnerstag, 8. Oktober 2020 15:21:54 CEST Paolo Bonzini wrote:
-> On 08/10/20 15:09, Christian Schoenebeck wrote:
-> >> But doesn't this (and patch 6 as well) break TAP output?  Using
-> >> g_test_message + g_test_verbose would be the best of both worlds.
-> > 
-> > If there was TAP output then yes, patches 4, 5, 6 would probably break it.
-> > 
-> > How/when is TAP output enabled? I don't see any TAP output by default.
-> 
-> With "--tap", but with glib 2.62 it will be enabled by default.  For
-> example on Fedora 32:
-> 
->   $ ./test-mul64
->   # random seed: R02S3efb20d48a41e1897cb761e02393c11b
->   1..2
->   # Start of host-utils tests
->   ok 1 /host-utils/mulu64
->   ok 2 /host-utils/muls64
->   # End of host-utils tests
-> 
-> I'm okay I guess with using g_test_message on 2.62 or newer, and
-> assuming people don't use --tap --verbose on older versions.
+On 08/10/20 15:42, Christian Schoenebeck wrote:
+>>
+>> I'm okay I guess with using g_test_message on 2.62 or newer, and
+>> assuming people don't use --tap --verbose on older versions.
+> Simpler solution: just appending '#' character in front of each printf() line, 
+> that would be both fine for TAP and regular output:
+> http://testanything.org/tap-specification.html#diagnostics
 
-Simpler solution: just appending '#' character in front of each printf() line, 
-that would be both fine for TAP and regular output:
-http://testanything.org/tap-specification.html#diagnostics
+I'm not sure how it would be simpler than a
 
-Unfortunately 'test_tap_log' is a private variable in glib (gtestutils.c), 
-otherwise I could have made that conditionally. There is no getter function in 
-the glib API for this (TAP on/off) variable.
+#if !GLIB_CHECK_VERSION(2, 62, 0)
+#define qemu_test_message printf
+#else
+#define qemu_test_message g_test_message
+#endif
 
-I could check the CL for --verbose somewhere, but I think that's probably 
-overkill.
+but you choose.
 
-Best regards,
-Christian Schoenebeck
-
+Paolo
 
 
