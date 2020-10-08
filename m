@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DATE_IN_PAST_96_XX,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EEFFC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 13:05:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4987C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 13:06:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D68C21D7B
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 13:05:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0689A21D7B
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 13:06:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="nifGLwS8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D68C21D7B
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="olYVL44t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0689A21D7B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUUqd-0000S1-Dd
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 09:05:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35916)
+	id 1kUUrl-0001kB-V8
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 09:06:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35966)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
- (envelope-from <051f0e5be12b2760d7fb2095b864b26ffe21f6de@lizzy.crudebyte.com>)
- id 1kUUib-0001KU-7r
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 08:56:53 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:60589)
+ (envelope-from <e55b178b5e139fc1b951ac8f56e48db716909006@lizzy.crudebyte.com>)
+ id 1kUUij-0001Qb-1R
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 08:57:01 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:43641)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
- (envelope-from <051f0e5be12b2760d7fb2095b864b26ffe21f6de@lizzy.crudebyte.com>)
- id 1kUUiZ-0001E1-Pt
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 08:56:52 -0400
+ (envelope-from <e55b178b5e139fc1b951ac8f56e48db716909006@lizzy.crudebyte.com>)
+ id 1kUUig-0001EQ-PM
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 08:57:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
  d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
  Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
- Content-Description; bh=yDG/u17bdmxsKZTdFz3D0Y47pkgPagiwF3adJJ/WwAw=; b=nifGL
- wS8eapJghn4N4zc0fsd4eEF9N6w74BymoWrxQHIfNaOFaQeP4MKwAZ9WnHiOIcL7Rp1zhqJqAS4TJ
- lkzk5GHIu5McuLYr+42DMjul7IWeAIXZo+BxVt0X7sO6byHzp53TvvnQGx/yEl2OAjhHlLdzh/jMT
- NEHaE8LCywkkX9v8nauBRdEyrJW7o2STSJFZNW5Rx+3bHMhOM8X2budF58KUUpaJHEh9kniJ1YFy7
- /+tlzSAwgqpofJJvcQ0tt0F7SmMtWxNP+ixOt91FFEsVJtQkQNygFzxFb6MiSCZ1rRusHzIyUSvUv
- cGk3CLvFUjyi6LSW460x3V6+4KZWw==;
-Message-Id: <051f0e5be12b2760d7fb2095b864b26ffe21f6de.1603111175.git.qemu_oss@crudebyte.com>
+ Content-Description; bh=M1h+8JuW+VSud8WRZ5tHr7+ecRGCn44dlLdNtw0kNQU=; b=olYVL
+ 44tScUrBK9DElAsAGR4zIuCeAACI8WyVoyKL2pWn3K4lbwKWvTt4co5DGEq+YEvufQlnA73jbUrZD
+ t7H/YhlnIgpgwpV2NR81YaS6xqwjy40mFxbDAQIK8XNCnmn46wnQ6GmvBC4LAIJmRX1kI0hYmNUIL
+ NMGCEJtAMUaUs40P2sjoDIkJri6OMXtCd+NXjyh8srptqnWJ98Os23/15eqO8dJpannND3PgcEsNM
+ QUExVwdc3Ne540up4ez0GioioCFllzQlM2XXn5wev0ocEDfpjaKrqG7SvA1c4ZTecl5YbUIisLHgW
+ YXCTJ7AhhX6XV4i/wXJX+tF+05UVg==;
+Message-Id: <e55b178b5e139fc1b951ac8f56e48db716909006.1603111175.git.qemu_oss@crudebyte.com>
 In-Reply-To: <cover.1603111175.git.qemu_oss@crudebyte.com>
 References: <cover.1603111175.git.qemu_oss@crudebyte.com>
 From: Christian Schoenebeck <qemu_oss@crudebyte.com>
 Date: Thu, 8 Oct 2020 20:34:56 +0200
-Subject: [PULL v3 4/6] tests/9pfs: wipe local 9pfs test directory
+Subject: [PULL v3 5/6] tests/9pfs: add virtio_9p_test_path()
 To: qemu-devel@nongnu.org,
     Peter Maydell <peter.maydell@linaro.org>
 Cc: Greg Kurz <groug@kaod.org>
 Received-SPF: none client-ip=91.194.90.13;
- envelope-from=051f0e5be12b2760d7fb2095b864b26ffe21f6de@lizzy.crudebyte.com;
+ envelope-from=e55b178b5e139fc1b951ac8f56e48db716909006@lizzy.crudebyte.com;
  helo=lizzy.crudebyte.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 06:27:23
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -81,60 +81,50 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Before running the first 9pfs test case, make sure the test directory
-for running the 9pfs 'local' tests on is entirely empty. For that
-reason simply delete the test directory (if any) before (re)creating
-it on test suite startup.
-
-Note: The preferable precise behaviour would be the test directory
-only being wiped once *before* a test suite run. Right now the test
-directory is also wiped at the *end* of a test suite run because
-libqos is calling the virtio_9p_register_nodes() callback for some
-reason also when a test suite completed. This is suboptimal as
-developers cannot immediately see what files and directories the
-9pfs local tests created precisely after the test suite completed.
-But fortunately the test directory is not wiped if some test failed.
-So it is probably not worth it drilling another hole into libqos
-for this issue.
+This new public function virtio_9p_test_path() allows 9pfs
+'local' tests to translate a path from guest scope to host
+scope. For instance by passing an empty string it would
+return the root path on host of the exported 9pfs tree.
 
 Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Message-Id: <b30776ea3289dc40dabc7d0063d825d21d9a65bf.1602182956.git.qemu_oss@crudebyte.com>
+Message-Id: <b563d3c73c6391ec927a2622c9f65c09ca56bd83.1602182956.git.qemu_oss@crudebyte.com>
 Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
 ---
- tests/qtest/libqos/virtio-9p.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ tests/qtest/libqos/virtio-9p.c | 6 ++++++
+ tests/qtest/libqos/virtio-9p.h | 5 +++++
+ 2 files changed, 11 insertions(+)
 
 diff --git a/tests/qtest/libqos/virtio-9p.c b/tests/qtest/libqos/virtio-9p.c
-index ee331166de..8ee2a134bc 100644
+index 8ee2a134bc..d43647b3b7 100644
 --- a/tests/qtest/libqos/virtio-9p.c
 +++ b/tests/qtest/libqos/virtio-9p.c
-@@ -53,6 +53,18 @@ static void create_local_test_dir(void)
-     g_assert((st.st_mode & S_IFMT) == S_IFDIR);
+@@ -65,6 +65,12 @@ static void remove_local_test_dir(void)
+     g_free(cmd);
  }
  
-+/* Deletes directory previously created by create_local_test_dir(). */
-+static void remove_local_test_dir(void)
++char *virtio_9p_test_path(const char *path)
 +{
-+    g_assert(local_test_path != NULL);
-+    char *cmd = g_strdup_printf("rm -r '%s'\n", local_test_path);
-+    int res = system(cmd);
-+    if (res < 0) {
-+        /* ignore error, dummy check to prevent compiler error */
-+    }
-+    g_free(cmd);
++    g_assert(local_test_path);
++    return concat_path(local_test_path, path);
 +}
 +
  static void virtio_9p_cleanup(QVirtio9P *interface)
  {
      qvirtqueue_cleanup(interface->vdev->bus, interface->vq, alloc);
-@@ -230,6 +242,7 @@ static void virtio_9p_register_nodes(void)
+diff --git a/tests/qtest/libqos/virtio-9p.h b/tests/qtest/libqos/virtio-9p.h
+index 326a603f72..19a4d97454 100644
+--- a/tests/qtest/libqos/virtio-9p.h
++++ b/tests/qtest/libqos/virtio-9p.h
+@@ -49,4 +49,9 @@ struct QVirtio9PDevice {
+  */
+ void virtio_9p_assign_local_driver(GString *cmd_line, const char *args);
  
-     /* make sure test dir for the 'local' tests exists and is clean */
-     init_local_test_path();
-+    remove_local_test_dir();
-     create_local_test_dir();
- 
-     QPCIAddress addr = {
++/**
++ * Returns path on host to the passed guest path. Result must be freed.
++ */
++char *virtio_9p_test_path(const char *path);
++
+ #endif
 -- 
 2.20.1
 
