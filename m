@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9E57C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 19:07:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28469C433E7
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 19:07:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C44B20658
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 19:07:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6E4FB21789
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 19:07:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eDVNDjBy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C44B20658
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Me5gh8t8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E4FB21789
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQbGH-0006kR-4j
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 15:07:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46846)
+	id 1kQbGY-0006sz-9r
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 15:07:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46850)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kQb94-0007wG-Cg
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 15:00:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39395)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kQb94-0007wS-GP
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 15:00:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41138)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kQb90-0003fT-Ac
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 15:00:05 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kQb90-0003fO-Cp
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 15:00:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1602183601;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=JYA5iST+cWDAt1wdSWGbAk+O3a4gM5DDSWyahzfxfPA=;
- b=eDVNDjByxo8O9CM3hhig2bRryCgQToDwot+hY3q7W8at2nOMryEJjetZAOeHTHwDLyOFLH
- fewsYcbrA/EV9bp5qkRtsu8LJLi6bz3XH17ebmEf4PSiGkZ5teKSIxhzk7Agxlf6CtpTS7
- cj3Dw5+L1gRijSVNlC2c/HEtnBUG9qY=
+ bh=gY3Y6Sxj0tbyVRafvnFkR174lw2Nu8m6GWmsr3M3YtM=;
+ b=Me5gh8t8i0yCMO/u/oQAjyY19RN7LyGeuHe9bqNo03gE9u5yuzhDZEAado2jrTgftdlgj2
+ wQ4vfUpnT/ZT4AAxP9lnyZqTijf4O/DbdX2H4oYGe16ViI23/gXoREcHcD9spT/CBgzhi+
+ wXSlmqpacmTOawvx5DO41UljCUuNfYM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-87-3QqHqlwHONO4u8asfvOmJw-1; Thu, 08 Oct 2020 14:59:59 -0400
-X-MC-Unique: 3QqHqlwHONO4u8asfvOmJw-1
+ us-mta-584-3xpA4Gh9N2yPj_ED_0v7dQ-1; Thu, 08 Oct 2020 14:59:59 -0400
+X-MC-Unique: 3xpA4Gh9N2yPj_ED_0v7dQ-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB39E1018F83;
- Thu,  8 Oct 2020 18:59:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 55E3157052;
+ Thu,  8 Oct 2020 18:59:58 +0000 (UTC)
 Received: from blue.redhat.com (ovpn-113-14.phx2.redhat.com [10.3.113.14])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7D3AD5D9E8;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0605A5D9E8;
  Thu,  8 Oct 2020 18:59:57 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 6/8] qemu-nbd: Honor SIGINT and SIGHUP
-Date: Thu,  8 Oct 2020 13:59:49 -0500
-Message-Id: <20201008185951.1026052-7-eblake@redhat.com>
+Subject: [PULL 7/8] nbd/server: Reject embedded NUL in NBD strings
+Date: Thu,  8 Oct 2020 13:59:50 -0500
+Message-Id: <20201008185951.1026052-8-eblake@redhat.com>
 In-Reply-To: <20201008185951.1026052-1-eblake@redhat.com>
 References: <20201008185951.1026052-1-eblake@redhat.com>
 MIME-Version: 1.0
@@ -70,16 +70,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=eblake@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=eblake@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 02:56:27
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 01:56:49
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,50 +99,128 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Honoring just SIGTERM on Linux is too weak; we also want to handle
-other common signals, and do so even on BSD.  Why?  Because at least
-'qemu-nbd -B bitmap' needs a chance to clean up the in-use bit on
-bitmaps when the server is shut down via a signal.
+The NBD spec is clear that any string sent from the client must not
+contain embedded NUL characters.  If the client passes "a\0", we
+should reject that option request rather than act on "a".
 
-See also: http://bugzilla.redhat.com/1883608
+Testing this is not possible with a compliant client, but I was able
+to use gdb to coerce libnbd into temporarily behaving as such a
+client.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20200930121105.667049-2-eblake@redhat.com>
+Message-Id: <20200930121105.667049-3-eblake@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-[eblake: apply comment tweak suggested by Vladimir]
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- qemu-nbd.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ nbd/server.c | 30 ++++++++++++++++++++----------
+ 1 file changed, 20 insertions(+), 10 deletions(-)
 
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index bacb69b0898b..c731dda04ec0 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -581,17 +581,18 @@ int main(int argc, char **argv)
-     const char *pid_file_name = NULL;
-     BlockExportOptions *export_opts;
+diff --git a/nbd/server.c b/nbd/server.c
+index f25cffa334fa..50f95abe3168 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -301,10 +301,11 @@ nbd_opt_invalid(NBDClient *client, Error **errp, const char *fmt, ...)
+ }
 
--#if HAVE_NBD_DEVICE
--    /* The client thread uses SIGTERM to interrupt the server.  A signal
--     * handler ensures that "qemu-nbd -v -c" exits with a nice status code.
-+#ifdef CONFIG_POSIX
-+    /*
-+     * Exit gracefully on various signals, which includes SIGTERM used
-+     * by 'qemu-nbd -v -c'.
-      */
-     struct sigaction sa_sigterm;
-     memset(&sa_sigterm, 0, sizeof(sa_sigterm));
-     sa_sigterm.sa_handler = termsig_handler;
-     sigaction(SIGTERM, &sa_sigterm, NULL);
--#endif /* HAVE_NBD_DEVICE */
-+    sigaction(SIGINT, &sa_sigterm, NULL);
-+    sigaction(SIGHUP, &sa_sigterm, NULL);
+ /* Read size bytes from the unparsed payload of the current option.
++ * If @check_nul, require that no NUL bytes appear in buffer.
+  * Return -errno on I/O error, 0 if option was completely handled by
+  * sending a reply about inconsistent lengths, or 1 on success. */
+ static int nbd_opt_read(NBDClient *client, void *buffer, size_t size,
+-                        Error **errp)
++                        bool check_nul, Error **errp)
+ {
+     if (size > client->optlen) {
+         return nbd_opt_invalid(client, errp,
+@@ -312,7 +313,16 @@ static int nbd_opt_read(NBDClient *client, void *buffer, size_t size,
+                                nbd_opt_lookup(client->opt));
+     }
+     client->optlen -= size;
+-    return qio_channel_read_all(client->ioc, buffer, size, errp) < 0 ? -EIO : 1;
++    if (qio_channel_read_all(client->ioc, buffer, size, errp) < 0) {
++        return -EIO;
++    }
++
++    if (check_nul && strnlen(buffer, size) != size) {
++        return nbd_opt_invalid(client, errp,
++                               "Unexpected embedded NUL in option %s",
++                               nbd_opt_lookup(client->opt));
++    }
++    return 1;
+ }
 
--#ifdef CONFIG_POSIX
-     signal(SIGPIPE, SIG_IGN);
- #endif
+ /* Drop size bytes from the unparsed payload of the current option.
+@@ -349,7 +359,7 @@ static int nbd_opt_read_name(NBDClient *client, char **name, uint32_t *length,
+     g_autofree char *local_name = NULL;
 
+     *name = NULL;
+-    ret = nbd_opt_read(client, &len, sizeof(len), errp);
++    ret = nbd_opt_read(client, &len, sizeof(len), false, errp);
+     if (ret <= 0) {
+         return ret;
+     }
+@@ -361,7 +371,7 @@ static int nbd_opt_read_name(NBDClient *client, char **name, uint32_t *length,
+     }
+
+     local_name = g_malloc(len + 1);
+-    ret = nbd_opt_read(client, local_name, len, errp);
++    ret = nbd_opt_read(client, local_name, len, true, errp);
+     if (ret <= 0) {
+         return ret;
+     }
+@@ -576,14 +586,14 @@ static int nbd_negotiate_handle_info(NBDClient *client, Error **errp)
+     }
+     trace_nbd_negotiate_handle_export_name_request(name);
+
+-    rc = nbd_opt_read(client, &requests, sizeof(requests), errp);
++    rc = nbd_opt_read(client, &requests, sizeof(requests), false, errp);
+     if (rc <= 0) {
+         return rc;
+     }
+     requests = be16_to_cpu(requests);
+     trace_nbd_negotiate_handle_info_requests(requests);
+     while (requests--) {
+-        rc = nbd_opt_read(client, &request, sizeof(request), errp);
++        rc = nbd_opt_read(client, &request, sizeof(request), false, errp);
+         if (rc <= 0) {
+             return rc;
+         }
+@@ -806,7 +816,7 @@ static int nbd_meta_pattern(NBDClient *client, const char *pattern, bool *match,
+     assert(len);
+
+     query = g_malloc(len);
+-    ret = nbd_opt_read(client, query, len, errp);
++    ret = nbd_opt_read(client, query, len, true, errp);
+     if (ret <= 0) {
+         g_free(query);
+         return ret;
+@@ -943,7 +953,7 @@ static int nbd_negotiate_meta_query(NBDClient *client,
+     char ns[5];
+     uint32_t len;
+
+-    ret = nbd_opt_read(client, &len, sizeof(len), errp);
++    ret = nbd_opt_read(client, &len, sizeof(len), false, errp);
+     if (ret <= 0) {
+         return ret;
+     }
+@@ -959,7 +969,7 @@ static int nbd_negotiate_meta_query(NBDClient *client,
+     }
+
+     len -= ns_len;
+-    ret = nbd_opt_read(client, ns, ns_len, errp);
++    ret = nbd_opt_read(client, ns, ns_len, true, errp);
+     if (ret <= 0) {
+         return ret;
+     }
+@@ -1016,7 +1026,7 @@ static int nbd_negotiate_meta_queries(NBDClient *client,
+                             "export '%s' not present", sane_name);
+     }
+
+-    ret = nbd_opt_read(client, &nb_queries, sizeof(nb_queries), errp);
++    ret = nbd_opt_read(client, &nb_queries, sizeof(nb_queries), false, errp);
+     if (ret <= 0) {
+         return ret;
+     }
 -- 
 2.28.0
 
