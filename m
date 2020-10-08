@@ -2,89 +2,63 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,HTML_OBFUSCATE_05_10,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F250CC47095
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 10:56:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DF91C4363A
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 11:03:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5ED0E215A4
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 10:56:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cr1yG5Fu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5ED0E215A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id ADB02217BA
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 11:03:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADB02217BA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQTap-0003OT-75
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 06:56:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41908)
+	id 1kQTiB-0004y2-5h
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 07:03:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43022)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chetan4windows@gmail.com>)
- id 1kQTaC-0002ri-4R; Thu, 08 Oct 2020 06:55:36 -0400
-Received: from mail-io1-xd30.google.com ([2607:f8b0:4864:20::d30]:40752)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <chetan4windows@gmail.com>)
- id 1kQTaA-0000fz-B9; Thu, 08 Oct 2020 06:55:35 -0400
-Received: by mail-io1-xd30.google.com with SMTP id k25so5704467ioh.7;
- Thu, 08 Oct 2020 03:55:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=fCkHbxBuObiItJKrH2qtvQNo2ygQiWCAHqlzJ5Nd+Uo=;
- b=cr1yG5Fu9tKsmOwDQeehIDRCFWEry52M83wrjg8qcwRnCQ0LM4P/ky8GhaBTZES+t4
- +GeZY0KktbEcjUwRoabJAQ8ZRvsZ3G/C5tEjJs8Bdw2iTDWuS23FfWhLz+tih4M1Cl1E
- vw49dshAk/p/0busg0bHh5KBzc3oO0N4u38X7CjHxGfkpQBILLIvG4Q9NMPA+nOZsHSs
- SiyJXu3pVuWzZL9XrFyWL64BnStPLpmYLsRl2RPsPSpNwxGFZ3OEsh3j31IGfxsnaZ0X
- CjiimfVy1d1kc0X7AuIhbdTPI/XZA3s+ZmQ6ieNN2w9n7LDEgm8RkCPNRyWadQ3cM2Sq
- ORHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=fCkHbxBuObiItJKrH2qtvQNo2ygQiWCAHqlzJ5Nd+Uo=;
- b=l9vgYOXwi6psHpRpidP1Iodrw8amdGgMIDal3edu8s8+ZUqQryoRD+BiAFkK1SfFN9
- BGxB8tjfTJWb1Ber4h5abnP9sswCDHfSrKSE6upXEd2EMxG7y4KGjzgHzFebDT6INq++
- 1N+AwDBG9iphIO33xOkii6SOpe4wSSfaruVKgoN4DAY5DuV5Zx17IIYUfFAPgPZUoFI1
- 0m5VDeZ4aunZagqM7sqsYDzID6oSKS9zKjMU93PsTV3v2/vJ7fHxWuAsxgGVQWXFNkQ1
- EhO84Mt/lX4oLYjFL0DEaR6gk4Rd5WXd/x7uA6y6nX7ivPU7r/TK2w7Yw9EA+6Vaio9k
- eaWA==
-X-Gm-Message-State: AOAM5328u3KLvnz0qtMLSmFAnIgxQa4ULNbkX7BqUPh/9pxZQlgKICwo
- 8iN2RttTpZ38pBeY6p4lLBACeCSCfN9tzA+3qZk=
-X-Google-Smtp-Source: ABdhPJy+h/L7yMFDI9Ff/3/LRfmfHff7Nanb31QEIHAoJ+HyGZ8SMDEIgjxC7kGr66VVZjF5y6p0dSsLknsflGbVZ28=
-X-Received: by 2002:a6b:d80d:: with SMTP id y13mr5702330iob.15.1602154532923; 
- Thu, 08 Oct 2020 03:55:32 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kQTgz-0004SM-Io
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 07:02:37 -0400
+Received: from mx2.suse.de ([195.135.220.15]:44294)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kQTgw-0001Zh-VS
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 07:02:37 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+ by mx2.suse.de (Postfix) with ESMTP id 3D423AFD5;
+ Thu,  8 Oct 2020 11:02:33 +0000 (UTC)
+Subject: Re: [PATCH 2/2] exec: split out non-softmmu-specific parts
+To: Paolo Bonzini <pbonzini@redhat.com>
+References: <20201006091922.331832-1-pbonzini@redhat.com>
+ <20201006091922.331832-3-pbonzini@redhat.com>
+ <cb553da1-9cd1-1933-d678-8580a3c0d8f3@suse.de>
+ <027d0f5c-d5c4-911b-b349-f63895fc164d@redhat.com>
+From: Claudio Fontana <cfontana@suse.de>
+Message-ID: <b6e4d4e0-6170-b3e6-f2f7-e337c71b0403@suse.de>
+Date: Thu, 8 Oct 2020 13:02:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Received: by 2002:a6b:146:0:0:0:0:0 with HTTP;
- Thu, 8 Oct 2020 03:55:32 -0700 (PDT)
-In-Reply-To: <20201008102239.GA2526468@redhat.com>
-References: <20201008060528.68579-1-chetan4windows@gmail.com>
- <df199cc8-c383-ed03-6244-7a204e92397b@redhat.com>
- <ba4f81dd-8e5c-1d50-311c-fdc41f9cc504@redhat.com>
- <CAPPKfOHQV44b+kkcc3QYsLXya-5Ttcbve51uqRUS0e5GyouX6w@mail.gmail.com>
- <20201008102239.GA2526468@redhat.com>
-From: Chetan <chetan4windows@gmail.com>
-Date: Thu, 8 Oct 2020 16:25:32 +0530
-Message-ID: <CAPPKfOEbUGmjb8QfLXAUH7iqhBL-3ns6CaRMTqbVF-oAoG0dRA@mail.gmail.com>
-Subject: Re: [PATCH] Fixing LGPL version number
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000cf6d6f05b126abc6"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d30;
- envelope-from=chetan4windows@gmail.com; helo=mail-io1-xd30.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, HTML_OBFUSCATE_05_10=0.26, RCVD_IN_DNSWL_NONE=-0.0001,
+In-Reply-To: <027d0f5c-d5c4-911b-b349-f63895fc164d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 23:49:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,95 +72,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000cf6d6f05b126abc6
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 10/8/20 9:56 AM, Paolo Bonzini wrote:
+> On 08/10/20 09:47, Claudio Fontana wrote:
+>> On 10/6/20 11:19 AM, Paolo Bonzini wrote:
+>>> Over the years, most parts of exec.c that were not specific to softmmu
+>>> have been moved to accel/tcg; what's left is mostly the low-level part
+>>> of the memory API, which includes RAMBlock and AddressSpaceDispatch.
+>>> However exec.c also hosts 4-500 lines of code for the target specific
+>>> parts of the CPU QOM object, plus a few functions for user-mode
+>>> emulation that do not have a better place (they are not TCG-specific so
+>>> accel/tcg/user-exec.c is not a good place either).
+>>>
+>>> Move these parts to a new file, so that exec.c can be moved to
+>>> softmmu/physmem.c.
+>>>
+>>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>>
+>> Hi Paolo,
+>>
+>> the comment does not talk about cpu.c, which is now created in the top source directory.
+>> What is the role of this new module?
+> 
+> It's actually in the commit message: "4-500 lines of code for the target
+> specific parts of the CPU QOM object, plus a few functions for user-mode
+> emulation that do not have a better place".
+> 
+> It's basically sitting between hw/core/cpu.c and target/*/cpu.c.  Hence
+> the non-descriptive name. :)
+> 
+>> Also, could we find a more descriptive file name than cpu.c?
+>> Do you plan further renaming of this new module functions?
+>>
+>> Or its this basically a "leftovers" file for which we did not find a proper role yet?
+> 
+> The user-mode parts are, but most of it is implementing the QOM CPU
+> object.  We can move those functions to hw/core/cpu.c and make that file
+> target-dependent, I wouldn't object to that.  But since there are some
+> opportunities for simplification, I'd rather do that in a separate patch
+> and keep the pure code-movement in this one.
+> 
+> Paolo
+> 
 
-On Thursday, October 8, 2020, Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-wrote:
+Ciao Paolo,
 
->Removing existing license text is legally dubious if you are >not the
->exclusive copyright on the file being changed. Yes, the >kernel did it,
->but there was legal work behind the scenes before that >was done.
+this gives me an idea, we already basically have a target-specific part of a cpu QEMU object.
 
-Thanks Daniel, I won't be proceedings with the license text changes.
+I basically was looking for a place to graft accelerator-specific code in order to refactor target/i386/cpu..., 
+to split between tcg stuff and non-tcg stuff, and thus refactor even more code.
 
-On Thursday, October 8, 2020, Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-wrote:
+In the past I thought to put them here for example:
 
-> On Thu, Oct 08, 2020 at 02:10:01PM +0530, Chetan wrote:
-> > Hello,
-> >
-> > I'll be working on replacing the license text in LGPL licensed files wi=
-th
-> > the SPDX identifier tag and will submit it as a separate patch.
->
-> Removing existing license text is legally dubious if you are not the
-> exclusive copyright on the file being changed. Yes, the kernel did it,
-> but there was legal work behind the scenes before that was done.
->
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/
-> dberrange :|
-> |: https://libvirt.org         -o-
-> https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/
-> dberrange :|
->
->
+diff --git a/target/i386/cpu-qom.h b/target/i386/cpu-qom.h
+index 3e96f8d668..3716c3e949 100644
+--- a/target/i386/cpu-qom.h
++++ b/target/i386/cpu-qom.h
+@@ -72,6 +72,12 @@ typedef struct X86CPUClass {
+     DeviceRealize parent_realize;
+     DeviceUnrealize parent_unrealize;
+     DeviceReset parent_reset;
++
++    /* methods operating on CPUX86State */
++    uint32_t (*cpu_compute_eflags)(CPUX86State *env);
++    void (*cpu_set_mxcsr)(CPUX86State *env, uint32_t mxcsr);
++    void (*cpu_set_fpuc)(CPUX86State *env, uint16_t fpuc);
++    void (*cpu_report_tpr_access)(CPUX86State *env, TPRAccess access);
+ } X86CPUClass;
+ 
+ typedef struct X86CPU X86CPU;
 
---000000000000cf6d6f05b126abc6
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thursday, October 8, 2020, Daniel P. Berrang=C3=A9 &lt;<a href=3D"mailto=
-:berrange@redhat.com">berrange@redhat.com</a>&gt; wrote:<div><br></div><div=
->&gt;Removing existing license text is legally dubious if you are &gt;not t=
-he<br>&gt;exclusive copyright on the file being changed. Yes, the &gt;kerne=
-l did it,<br>&gt;but there was legal work behind the scenes before that &gt=
-;was done.</div><div><br></div><div>Thanks Daniel, I won&#39;t be proceedin=
-gs with the license text changes.<br><br>On Thursday, October 8, 2020, Dani=
-el P. Berrang=C3=A9 &lt;<a href=3D"mailto:berrange@redhat.com">berrange@red=
-hat.com</a>&gt; wrote:<br><blockquote class=3D"gmail_quote" style=3D"margin=
-:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">On Thu, Oct 08, 20=
-20 at 02:10:01PM +0530, Chetan wrote:<br>
-&gt; Hello,<br>
-&gt; <br>
-&gt; I&#39;ll be working on replacing the license text in LGPL licensed fil=
-es with<br>
-&gt; the SPDX identifier tag and will submit it as a separate patch.<br>
-<br>
-Removing existing license text is legally dubious if you are not the<br>
-exclusive copyright on the file being changed. Yes, the kernel did it,<br>
-but there was legal work behind the scenes before that was done.<br>
-<br>
-Regards,<br>
-Daniel<br>
--- <br>
-|: <a href=3D"https://berrange.com" target=3D"_blank">https://berrange.com<=
-/a>=C2=A0 =C2=A0 =C2=A0 -o-=C2=A0 =C2=A0 <a href=3D"https://www.flickr.com/=
-photos/dberrange" target=3D"_blank">https://www.flickr.com/photos/<wbr>dber=
-range</a> :|<br>
-|: <a href=3D"https://libvirt.org" target=3D"_blank">https://libvirt.org</a=
->=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0-o-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 <a href=3D"https://fstop138.berrange.com" target=3D"_blank">https://=
-fstop138.berrange.com</a> :|<br>
-|: <a href=3D"https://entangle-photo.org" target=3D"_blank">https://entangl=
-e-photo.org</a>=C2=A0 =C2=A0 -o-=C2=A0 =C2=A0 <a href=3D"https://www.instag=
-ram.com/dberrange" target=3D"_blank">https://www.instagram.com/<wbr>dberran=
-ge</a> :|<br>
-<br>
-</blockquote></div>
+But maybe that is the right component?
 
---000000000000cf6d6f05b126abc6--
+Just thinking out loud here.
+
+Ciao,
+
+Claudio
 
