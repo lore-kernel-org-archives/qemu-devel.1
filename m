@@ -2,81 +2,87 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4198C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 17:49:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4590C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 17:49:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D372B2184D
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 17:49:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 187E12184D
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 17:49:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X+r6GNrp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D372B2184D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TGDK8+Hn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 187E12184D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQa2x-00075X-NM
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 13:49:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58536)
+	id 1kQa30-00079V-OE
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 13:49:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58556)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kQa1Y-0005h8-D8
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 13:48:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54966)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kQa1b-0005iJ-UJ
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 13:48:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51238)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kQa1U-0003KD-KS
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 13:48:15 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kQa1Y-0003KU-33
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 13:48:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602179290;
+ s=mimecast20190719; t=1602179294;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=MeHSPirPXsHxU4y+2oaf1A36RDYhuNCiinC6MS1TIxg=;
- b=X+r6GNrp4+6EWr7z2EaOjlnYSX9X5MAmB/hkj0bmpIjCDD8n+LjONPgd47PXX2+bdLaYzu
- rPx89ZL/QkI4Wp74VGFYn1+Qh/f5nk3LqbxXpoKsCVjTyIXVJ2F25Z/1sHf/PDFPomklng
- rttmI4l/xUFnoPTVTQayDD728PcsirE=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-492-cVMsqJlbNAuD8GsNfmyXMw-1; Thu, 08 Oct 2020 13:48:07 -0400
-X-MC-Unique: cVMsqJlbNAuD8GsNfmyXMw-1
-Received: by mail-wr1-f69.google.com with SMTP id 47so4154410wrc.19
- for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 10:48:06 -0700 (PDT)
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ovB74Si3ek3jQLoyWkkaLDVrBy+bYBEfB0/xyEBcs9k=;
+ b=TGDK8+HnkWWtFJEvyrEOrBwj239+K64J6V9wPJWHAFyiCkCmEkithn+IM62HKP86tYSEAO
+ XeW6S1PFM53t9WjfRGaGugygY4u244kQ3p906cCQo5RlEfhRCdndml8zP/X6mE756OMApa
+ 9OqA2sHvQdAlRDkhmtFs1Tqqo+9FwZw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-12-SON7lMI0MEqHSdDjif_qsQ-1; Thu, 08 Oct 2020 13:48:12 -0400
+X-MC-Unique: SON7lMI0MEqHSdDjif_qsQ-1
+Received: by mail-wm1-f71.google.com with SMTP id c204so3408031wmd.5
+ for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 10:48:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=MeHSPirPXsHxU4y+2oaf1A36RDYhuNCiinC6MS1TIxg=;
- b=lew2G4FmL3u4SbZUBD9C0/30usSmRhCKQVuytzhlkVOGtn5bJVTJQxx5kC7Tbw5chC
- T0kqkm2O1QUxM4zQvZPJbSNPclWohoyO7asr0LeeOtG+i03vmNxfqrnIVjeqJ7nc+v0N
- ci4BY5rHP9XAH2l3lkY+mPsJ8ICYCaao/8748LbyhzisvI/D3UBRiGX5KJf2eHoaPTll
- K4GztHXXCTPAHQkwf7nLN9V2iBtDiQTAJ1fxRDPc4Do7nz7n7U3PMMiPPtiGFSA8T/bf
- ngiS7F4nK7EpEgm/7Xn44l+CjEF4Mm5o9/7MHTMGN3YKbezDCn83nPFvUVq7OPYX+Iqj
- fyQg==
-X-Gm-Message-State: AOAM533Ni/5ChMws/RWsZtLYwNZn3y74KW0MnrRuu+UVhnpwB7e6ZWTD
- BqA5OBylDqciU+818Bq0A/MqPt3jA0QBk9ZmepRQj/8dWsHp0HlDAg9zGJJlJ/S1xt2k93Efyur
- oMjlRem6vv9bXSIg=
-X-Received: by 2002:adf:9504:: with SMTP id 4mr11128355wrs.27.1602179285503;
- Thu, 08 Oct 2020 10:48:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxCGjZ7arffDgo9HpLoAr2AittBAPG2v1iwQHfSyKc5tdu3Wd9Rs4TMJsxsZ/mSMpfikw7WTQ==
-X-Received: by 2002:adf:9504:: with SMTP id 4mr11128335wrs.27.1602179285298;
- Thu, 08 Oct 2020 10:48:05 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=ovB74Si3ek3jQLoyWkkaLDVrBy+bYBEfB0/xyEBcs9k=;
+ b=V2hgJHT5aj9zpLvvc9rh+luqVAKUpjT8EQFHJ/TrNTeC/zh29OZvn5+eJw7jyF8Ycq
+ kvcZ/tu3qf9+pjO8Xhotjs8eYYK8iM93DX+MM0ZpNbGM3AOnTKAJLUuZrwIlxSMuUNoZ
+ jT9XyM8Sw7GZWpAMy7Dh+pz0IRjYl1GvtJp7PT1zlIiup229NJNOfhJFLPm3A3npF0X2
+ DYLTFOmHi3gOHvOpkylTiCmjxAgP61Jw6QwxHF6IbgCuD9RhYo1JnxghGj7epaWVFAje
+ +ozFN8mgvBqRHUQbpUmIdgSORN2UdOoBit6QpxUUaVLkHx+gsZlNtwxOAHCeaXBVPGQ9
+ hpjw==
+X-Gm-Message-State: AOAM53033Xx5P6tbht9garN4dwGtKlvnE3eTRNrBKad9xJMsnNzPibof
+ 3WIdDeBGtky2MyRZ9F0vQyf9wmuZXlblckXy9HZvYOBFsNuxltLO1A+WGC7JHlc7SJfgcJXaAtH
+ WOROq7D95mEgPE64=
+X-Received: by 2002:a05:600c:210f:: with SMTP id
+ u15mr10493466wml.53.1602179290736; 
+ Thu, 08 Oct 2020 10:48:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzWDjBcOeMvqZWHrhqZXsdV4t5gL1MWWGg0AArzzD8hxpTLuoSvxI8/x1XCbOMuQc4sl3/7vA==
+X-Received: by 2002:a05:600c:210f:: with SMTP id
+ u15mr10493443wml.53.1602179290458; 
+ Thu, 08 Oct 2020 10:48:10 -0700 (PDT)
 Received: from x1w.redhat.com (106.red-83-59-162.dynamicip.rima-tde.net.
  [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id i14sm9228847wro.96.2020.10.08.10.48.03
+ by smtp.gmail.com with ESMTPSA id o6sm8521316wrm.69.2020.10.08.10.48.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 08 Oct 2020 10:48:04 -0700 (PDT)
+ Thu, 08 Oct 2020 10:48:09 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/3] migration: Make save/load_snapshot() return boolean
-Date: Thu,  8 Oct 2020 19:48:00 +0200
-Message-Id: <20201008174803.2696619-1-philmd@redhat.com>
+Subject: [PATCH 1/3] block: push error reporting into bdrv_all_*_snapshot
+ functions
+Date: Thu,  8 Oct 2020 19:48:01 +0200
+Message-Id: <20201008174803.2696619-2-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201008174803.2696619-1-philmd@redhat.com>
+References: <20201008174803.2696619-1-philmd@redhat.com>
 MIME-Version: 1.0
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
@@ -112,48 +118,468 @@ Cc: Kevin Wolf <kwolf@redhat.com>,
  qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
  Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I had a pair of patches making save_snapshot/load_snapshot()
-return a boolean (like Markus recent qdev/QOM cleanup), then
-realized Daniel already has series changing migration/, so I
-rebased my patches in the first part of his v6 series:
-"migration: bring improved savevm/loadvm/delvm to QMP"
-https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg02158.html
+From: Daniel P. Berrangé <berrange@redhat.com>
 
-I included patch #1/#3 from Daniel, #2 is my first patch,
-and my second patch is squashed with Daniel's #3.
+The bdrv_all_*_snapshot functions return a BlockDriverState pointer
+for the invalid backend, which the callers then use to report an
+error message. In some cases multiple callers are reporting the
+same error message, but with slightly different text. In the future
+there will be more error scenarios for some of these methods, which
+will benefit from fine grained error message reporting. So it is
+helpful to push error reporting down a level.
 
-Daniel if you find these patches worthwhile, please consider them
-while merging your series (or respining).
-
-Regards,
-
-Phil.
-
-Daniel P. Berrangé (2):
-  block: push error reporting into bdrv_all_*_snapshot functions
-  migration: stop returning errno from load_snapshot()
-
-Philippe Mathieu-Daudé (1):
-  migration: Make save_snapshot() return bool, not 0/-1
-
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
  include/block/snapshot.h       | 14 +++----
- include/migration/snapshot.h   | 18 +++++++-
  block/monitor/block-hmp-cmds.c |  7 ++--
  block/snapshot.c               | 77 +++++++++++++++++-----------------
- migration/savevm.c             | 72 ++++++++++++-------------------
- monitor/hmp-cmds.c             |  9 +---
- replay/replay-debugging.c      |  6 +--
- replay/replay-snapshot.c       |  4 +-
- softmmu/vl.c                   |  2 +-
+ migration/savevm.c             | 37 +++++-----------
+ monitor/hmp-cmds.c             |  7 +---
+ replay/replay-debugging.c      |  4 +-
  tests/qemu-iotests/267.out     | 10 ++---
- 10 files changed, 105 insertions(+), 114 deletions(-)
+ 7 files changed, 67 insertions(+), 89 deletions(-)
 
+diff --git a/include/block/snapshot.h b/include/block/snapshot.h
+index b0fe42993d..5cb2b696ad 100644
+--- a/include/block/snapshot.h
++++ b/include/block/snapshot.h
+@@ -77,17 +77,15 @@ int bdrv_snapshot_load_tmp_by_id_or_name(BlockDriverState *bs,
+  * These functions will properly handle dataplane (take aio_context_acquire
+  * when appropriate for appropriate block drivers */
+ 
+-bool bdrv_all_can_snapshot(BlockDriverState **first_bad_bs);
+-int bdrv_all_delete_snapshot(const char *name, BlockDriverState **first_bsd_bs,
+-                             Error **errp);
+-int bdrv_all_goto_snapshot(const char *name, BlockDriverState **first_bad_bs,
+-                           Error **errp);
+-int bdrv_all_find_snapshot(const char *name, BlockDriverState **first_bad_bs);
++bool bdrv_all_can_snapshot(Error **errp);
++int bdrv_all_delete_snapshot(const char *name, Error **errp);
++int bdrv_all_goto_snapshot(const char *name, Error **errp);
++int bdrv_all_find_snapshot(const char *name, Error **errp);
+ int bdrv_all_create_snapshot(QEMUSnapshotInfo *sn,
+                              BlockDriverState *vm_state_bs,
+                              uint64_t vm_state_size,
+-                             BlockDriverState **first_bad_bs);
++                             Error **errp);
+ 
+-BlockDriverState *bdrv_all_find_vmstate_bs(void);
++BlockDriverState *bdrv_all_find_vmstate_bs(Error **errp);
+ 
+ #endif
+diff --git a/block/monitor/block-hmp-cmds.c b/block/monitor/block-hmp-cmds.c
+index d15a2be827..548bb6b5e3 100644
+--- a/block/monitor/block-hmp-cmds.c
++++ b/block/monitor/block-hmp-cmds.c
+@@ -899,10 +899,11 @@ void hmp_info_snapshots(Monitor *mon, const QDict *qdict)
+ 
+     ImageEntry *image_entry, *next_ie;
+     SnapshotEntry *snapshot_entry;
++    Error *err = NULL;
+ 
+-    bs = bdrv_all_find_vmstate_bs();
++    bs = bdrv_all_find_vmstate_bs(&err);
+     if (!bs) {
+-        monitor_printf(mon, "No available block device supports snapshots\n");
++        error_report_err(err);
+         return;
+     }
+     aio_context = bdrv_get_aio_context(bs);
+@@ -952,7 +953,7 @@ void hmp_info_snapshots(Monitor *mon, const QDict *qdict)
+     total = 0;
+     for (i = 0; i < nb_sns; i++) {
+         SnapshotEntry *next_sn;
+-        if (bdrv_all_find_snapshot(sn_tab[i].name, &bs1) == 0) {
++        if (bdrv_all_find_snapshot(sn_tab[i].name, NULL) == 0) {
+             global_snapshots[total] = i;
+             total++;
+             QTAILQ_FOREACH(image_entry, &image_list, next) {
+diff --git a/block/snapshot.c b/block/snapshot.c
+index a2bf3a54eb..50e35bb9fa 100644
+--- a/block/snapshot.c
++++ b/block/snapshot.c
+@@ -462,14 +462,14 @@ static bool bdrv_all_snapshots_includes_bs(BlockDriverState *bs)
+  * These functions will properly handle dataplane (take aio_context_acquire
+  * when appropriate for appropriate block drivers) */
+ 
+-bool bdrv_all_can_snapshot(BlockDriverState **first_bad_bs)
++bool bdrv_all_can_snapshot(Error **errp)
+ {
+-    bool ok = true;
+     BlockDriverState *bs;
+     BdrvNextIterator it;
+ 
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+         AioContext *ctx = bdrv_get_aio_context(bs);
++        bool ok;
+ 
+         aio_context_acquire(ctx);
+         if (bdrv_all_snapshots_includes_bs(bs)) {
+@@ -477,26 +477,25 @@ bool bdrv_all_can_snapshot(BlockDriverState **first_bad_bs)
+         }
+         aio_context_release(ctx);
+         if (!ok) {
++            error_setg(errp, "Device '%s' is writable but does not support "
++                       "snapshots", bdrv_get_device_or_node_name(bs));
+             bdrv_next_cleanup(&it);
+-            goto fail;
++            return false;
+         }
+     }
+ 
+-fail:
+-    *first_bad_bs = bs;
+-    return ok;
++    return true;
+ }
+ 
+-int bdrv_all_delete_snapshot(const char *name, BlockDriverState **first_bad_bs,
+-                             Error **errp)
++int bdrv_all_delete_snapshot(const char *name, Error **errp)
+ {
+-    int ret = 0;
+     BlockDriverState *bs;
+     BdrvNextIterator it;
+     QEMUSnapshotInfo sn1, *snapshot = &sn1;
+ 
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+         AioContext *ctx = bdrv_get_aio_context(bs);
++        int ret;
+ 
+         aio_context_acquire(ctx);
+         if (bdrv_all_snapshots_includes_bs(bs) &&
+@@ -507,26 +506,25 @@ int bdrv_all_delete_snapshot(const char *name, BlockDriverState **first_bad_bs,
+         }
+         aio_context_release(ctx);
+         if (ret < 0) {
++            error_prepend(errp, "Could not delete snapshot '%s' on '%s': ",
++                          name, bdrv_get_device_or_node_name(bs));
+             bdrv_next_cleanup(&it);
+-            goto fail;
++            return -1;
+         }
+     }
+ 
+-fail:
+-    *first_bad_bs = bs;
+-    return ret;
++    return 0;
+ }
+ 
+ 
+-int bdrv_all_goto_snapshot(const char *name, BlockDriverState **first_bad_bs,
+-                           Error **errp)
++int bdrv_all_goto_snapshot(const char *name, Error **errp)
+ {
+-    int ret = 0;
+     BlockDriverState *bs;
+     BdrvNextIterator it;
+ 
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+         AioContext *ctx = bdrv_get_aio_context(bs);
++        int ret;
+ 
+         aio_context_acquire(ctx);
+         if (bdrv_all_snapshots_includes_bs(bs)) {
+@@ -534,75 +532,75 @@ int bdrv_all_goto_snapshot(const char *name, BlockDriverState **first_bad_bs,
+         }
+         aio_context_release(ctx);
+         if (ret < 0) {
++            error_prepend(errp, "Could not load snapshot '%s' on '%s': ",
++                          name, bdrv_get_device_or_node_name(bs));
+             bdrv_next_cleanup(&it);
+-            goto fail;
++            return -1;
+         }
+     }
+ 
+-fail:
+-    *first_bad_bs = bs;
+-    return ret;
++    return 0;
+ }
+ 
+-int bdrv_all_find_snapshot(const char *name, BlockDriverState **first_bad_bs)
++int bdrv_all_find_snapshot(const char *name, Error **errp)
+ {
+     QEMUSnapshotInfo sn;
+-    int err = 0;
+     BlockDriverState *bs;
+     BdrvNextIterator it;
+ 
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+         AioContext *ctx = bdrv_get_aio_context(bs);
++        int ret;
+ 
+         aio_context_acquire(ctx);
+         if (bdrv_all_snapshots_includes_bs(bs)) {
+-            err = bdrv_snapshot_find(bs, &sn, name);
++            ret = bdrv_snapshot_find(bs, &sn, name);
+         }
+         aio_context_release(ctx);
+-        if (err < 0) {
++        if (ret < 0) {
++            error_setg(errp, "Could not find snapshot '%s' on '%s'",
++                       name, bdrv_get_device_or_node_name(bs));
+             bdrv_next_cleanup(&it);
+-            goto fail;
++            return -1;
+         }
+     }
+ 
+-fail:
+-    *first_bad_bs = bs;
+-    return err;
++    return 0;
+ }
+ 
+ int bdrv_all_create_snapshot(QEMUSnapshotInfo *sn,
+                              BlockDriverState *vm_state_bs,
+                              uint64_t vm_state_size,
+-                             BlockDriverState **first_bad_bs)
++                             Error **errp)
+ {
+-    int err = 0;
+     BlockDriverState *bs;
+     BdrvNextIterator it;
+ 
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+         AioContext *ctx = bdrv_get_aio_context(bs);
++        int ret;
+ 
+         aio_context_acquire(ctx);
+         if (bs == vm_state_bs) {
+             sn->vm_state_size = vm_state_size;
+-            err = bdrv_snapshot_create(bs, sn);
++            ret = bdrv_snapshot_create(bs, sn);
+         } else if (bdrv_all_snapshots_includes_bs(bs)) {
+             sn->vm_state_size = 0;
+-            err = bdrv_snapshot_create(bs, sn);
++            ret = bdrv_snapshot_create(bs, sn);
+         }
+         aio_context_release(ctx);
+-        if (err < 0) {
++        if (ret < 0) {
++            error_setg(errp, "Could not create snapshot '%s' on '%s'",
++                       sn->name, bdrv_get_device_or_node_name(bs));
+             bdrv_next_cleanup(&it);
+-            goto fail;
++            return -1;
+         }
+     }
+ 
+-fail:
+-    *first_bad_bs = bs;
+-    return err;
++    return 0;
+ }
+ 
+-BlockDriverState *bdrv_all_find_vmstate_bs(void)
++BlockDriverState *bdrv_all_find_vmstate_bs(Error **errp)
+ {
+     BlockDriverState *bs;
+     BdrvNextIterator it;
+@@ -620,5 +618,8 @@ BlockDriverState *bdrv_all_find_vmstate_bs(void)
+             break;
+         }
+     }
++    if (!bs) {
++        error_setg(errp, "No block device supports snapshots");
++    }
+     return bs;
+ }
+diff --git a/migration/savevm.c b/migration/savevm.c
+index d2e141f7b1..a52da440f4 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2660,7 +2660,7 @@ int qemu_load_device_state(QEMUFile *f)
+ 
+ int save_snapshot(const char *name, Error **errp)
+ {
+-    BlockDriverState *bs, *bs1;
++    BlockDriverState *bs;
+     QEMUSnapshotInfo sn1, *sn = &sn1, old_sn1, *old_sn = &old_sn1;
+     int ret = -1, ret2;
+     QEMUFile *f;
+@@ -2680,25 +2680,19 @@ int save_snapshot(const char *name, Error **errp)
+         return ret;
+     }
+ 
+-    if (!bdrv_all_can_snapshot(&bs)) {
+-        error_setg(errp, "Device '%s' is writable but does not support "
+-                   "snapshots", bdrv_get_device_or_node_name(bs));
++    if (!bdrv_all_can_snapshot(errp)) {
+         return ret;
+     }
+ 
+     /* Delete old snapshots of the same name */
+     if (name) {
+-        ret = bdrv_all_delete_snapshot(name, &bs1, errp);
+-        if (ret < 0) {
+-            error_prepend(errp, "Error while deleting snapshot on device "
+-                          "'%s': ", bdrv_get_device_or_node_name(bs1));
++        if (bdrv_all_delete_snapshot(name, errp) < 0) {
+             return ret;
+         }
+     }
+ 
+-    bs = bdrv_all_find_vmstate_bs();
++    bs = bdrv_all_find_vmstate_bs(errp);
+     if (bs == NULL) {
+-        error_setg(errp, "No block device can accept snapshots");
+         return ret;
+     }
+     aio_context = bdrv_get_aio_context(bs);
+@@ -2768,10 +2762,8 @@ int save_snapshot(const char *name, Error **errp)
+     aio_context_release(aio_context);
+     aio_context = NULL;
+ 
+-    ret = bdrv_all_create_snapshot(sn, bs, vm_state_size, &bs);
++    ret = bdrv_all_create_snapshot(sn, bs, vm_state_size, errp);
+     if (ret < 0) {
+-        error_setg(errp, "Error while creating snapshot on '%s'",
+-                   bdrv_get_device_or_node_name(bs));
+         goto the_end;
+     }
+ 
+@@ -2874,30 +2866,23 @@ void qmp_xen_load_devices_state(const char *filename, Error **errp)
+ 
+ int load_snapshot(const char *name, Error **errp)
+ {
+-    BlockDriverState *bs, *bs_vm_state;
++    BlockDriverState *bs_vm_state;
+     QEMUSnapshotInfo sn;
+     QEMUFile *f;
+     int ret;
+     AioContext *aio_context;
+     MigrationIncomingState *mis = migration_incoming_get_current();
+ 
+-    if (!bdrv_all_can_snapshot(&bs)) {
+-        error_setg(errp,
+-                   "Device '%s' is writable but does not support snapshots",
+-                   bdrv_get_device_or_node_name(bs));
++    if (!bdrv_all_can_snapshot(errp)) {
+         return -ENOTSUP;
+     }
+-    ret = bdrv_all_find_snapshot(name, &bs);
++    ret = bdrv_all_find_snapshot(name, errp);
+     if (ret < 0) {
+-        error_setg(errp,
+-                   "Device '%s' does not have the requested snapshot '%s'",
+-                   bdrv_get_device_or_node_name(bs), name);
+         return ret;
+     }
+ 
+-    bs_vm_state = bdrv_all_find_vmstate_bs();
++    bs_vm_state = bdrv_all_find_vmstate_bs(errp);
+     if (!bs_vm_state) {
+-        error_setg(errp, "No block device supports snapshots");
+         return -ENOTSUP;
+     }
+     aio_context = bdrv_get_aio_context(bs_vm_state);
+@@ -2923,10 +2908,8 @@ int load_snapshot(const char *name, Error **errp)
+     /* Flush all IO requests so they don't interfere with the new state.  */
+     bdrv_drain_all_begin();
+ 
+-    ret = bdrv_all_goto_snapshot(name, &bs, errp);
++    ret = bdrv_all_goto_snapshot(name, errp);
+     if (ret < 0) {
+-        error_prepend(errp, "Could not load snapshot '%s' on '%s': ",
+-                      name, bdrv_get_device_or_node_name(bs));
+         goto err_drain;
+     }
+ 
+diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+index dc0de39219..14848a3381 100644
+--- a/monitor/hmp-cmds.c
++++ b/monitor/hmp-cmds.c
+@@ -1139,15 +1139,10 @@ void hmp_savevm(Monitor *mon, const QDict *qdict)
+ 
+ void hmp_delvm(Monitor *mon, const QDict *qdict)
+ {
+-    BlockDriverState *bs;
+     Error *err = NULL;
+     const char *name = qdict_get_str(qdict, "name");
+ 
+-    if (bdrv_all_delete_snapshot(name, &bs, &err) < 0) {
+-        error_prepend(&err,
+-                      "deleting snapshot on device '%s': ",
+-                      bdrv_get_device_name(bs));
+-    }
++    bdrv_all_delete_snapshot(name, &err);
+     hmp_handle_error(mon, err);
+ }
+ 
+diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
+index ee9e86daa9..8785489c02 100644
+--- a/replay/replay-debugging.c
++++ b/replay/replay-debugging.c
+@@ -149,7 +149,7 @@ static char *replay_find_nearest_snapshot(int64_t icount,
+ 
+     *snapshot_icount = -1;
+ 
+-    bs = bdrv_all_find_vmstate_bs();
++    bs = bdrv_all_find_vmstate_bs(NULL);
+     if (!bs) {
+         goto fail;
+     }
+@@ -160,7 +160,7 @@ static char *replay_find_nearest_snapshot(int64_t icount,
+     aio_context_release(aio_context);
+ 
+     for (i = 0; i < nb_sns; i++) {
+-        if (bdrv_all_find_snapshot(sn_tab[i].name, &bs) == 0) {
++        if (bdrv_all_find_snapshot(sn_tab[i].name, NULL) == 0) {
+             if (sn_tab[i].icount != -1ULL
+                 && sn_tab[i].icount <= icount
+                 && (!nearest || nearest->icount < sn_tab[i].icount)) {
+diff --git a/tests/qemu-iotests/267.out b/tests/qemu-iotests/267.out
+index 27471ffae8..6149029b25 100644
+--- a/tests/qemu-iotests/267.out
++++ b/tests/qemu-iotests/267.out
+@@ -6,9 +6,9 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
+ Testing:
+ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+-Error: No block device can accept snapshots
++Error: No block device supports snapshots
+ (qemu) info snapshots
+-No available block device supports snapshots
++No block device supports snapshots
+ (qemu) loadvm snap0
+ Error: No block device supports snapshots
+ (qemu) quit
+@@ -22,7 +22,7 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ Error: Device 'none0' is writable but does not support snapshots
+ (qemu) info snapshots
+-No available block device supports snapshots
++No block device supports snapshots
+ (qemu) loadvm snap0
+ Error: Device 'none0' is writable but does not support snapshots
+ (qemu) quit
+@@ -58,7 +58,7 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ Error: Device 'virtio0' is writable but does not support snapshots
+ (qemu) info snapshots
+-No available block device supports snapshots
++No block device supports snapshots
+ (qemu) loadvm snap0
+ Error: Device 'virtio0' is writable but does not support snapshots
+ (qemu) quit
+@@ -83,7 +83,7 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ Error: Device 'file' is writable but does not support snapshots
+ (qemu) info snapshots
+-No available block device supports snapshots
++No block device supports snapshots
+ (qemu) loadvm snap0
+ Error: Device 'file' is writable but does not support snapshots
+ (qemu) quit
 -- 
 2.26.2
 
