@@ -2,72 +2,76 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A25F6C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 20:29:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1846FC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 20:29:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23CDD22227
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 20:29:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 88D2D22227
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 20:29:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DNytWCu2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23CDD22227
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iyFdy8wU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88D2D22227
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQcX5-0004LB-V9
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 16:28:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38784)
+	id 1kQcXF-0004Rr-B5
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 16:29:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38804)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kQcVb-00039S-E5
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 16:27:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58688)
+ id 1kQcVd-0003BU-N8
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 16:27:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50496)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kQcVY-0005tM-Gl
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 16:27:26 -0400
+ id 1kQcVc-0005uT-5A
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 16:27:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602188841;
+ s=mimecast20190719; t=1602188847;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=bPz4mqzHktM9OEKeQiK2njcyV0sHq1ItduZZwWI/O9Y=;
- b=DNytWCu2KvlXRpiHFTX0D9iO2jvWJGFMwJec+7xuNb1h19l+WQVd5VBovoxc/1FgZefP0v
- +cRTIxv4/axOrSxx7Pd2+4eptV6yPH6FHxK4biMSHk6L/fLByp0bzH6g95RseP9eeXsczV
- Fg3HtTaMDq/QhlnU9rLbEAR7VvKz1bU=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=yj12oITVEgWM3MNWR3Hu+YVNSz6iK8jlQxvhaPR1rew=;
+ b=iyFdy8wUe04hBo/1jn6N+op9U+BKI1x9AtzlrnF93ur+hiJl0chJuHlK6FV6S+8QjjL6eM
+ 34cuSUsRiqXrBuqRGYoCSoWwXYDusH8GONTm6sHEEoEV2vteDuwXkn2XSIgSI2EpuY/LvZ
+ 0GZAJCtxfwseATiwa5l0NhP0WPx6gMA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-16-pFhXB6TGPP2w3hkZRlokXA-1; Thu, 08 Oct 2020 16:27:19 -0400
-X-MC-Unique: pFhXB6TGPP2w3hkZRlokXA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-200-MT3ppzEyN0qpShjqqiKMRQ-1; Thu, 08 Oct 2020 16:27:23 -0400
+X-MC-Unique: MT3ppzEyN0qpShjqqiKMRQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 21A30805EF9;
- Thu,  8 Oct 2020 20:27:18 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9C5731019626;
+ Thu,  8 Oct 2020 20:27:22 +0000 (UTC)
 Received: from localhost (ovpn-119-102.rdu2.redhat.com [10.10.119.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3C77510023A7;
- Thu,  8 Oct 2020 20:27:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 84516702E7;
+ Thu,  8 Oct 2020 20:27:19 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/3] Fix some crashes when using -object
-Date: Thu,  8 Oct 2020 16:27:10 -0400
-Message-Id: <20201008202713.1416823-1-ehabkost@redhat.com>
+Subject: [PATCH 1/3] authz-list-file: Fix crash when filename is not set
+Date: Thu,  8 Oct 2020 16:27:11 -0400
+Message-Id: <20201008202713.1416823-2-ehabkost@redhat.com>
+In-Reply-To: <20201008202713.1416823-1-ehabkost@redhat.com>
+References: <20201008202713.1416823-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 01:56:49
@@ -102,23 +106,37 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fix two crashes when using `-object` with no extra arguments, and=0D
-add a acceptance test case to detect similar crashes in the=0D
-future.=0D
-=0D
-Eduardo Habkost (3):=0D
-  authz-list-file: Fix crash when filename is not set=0D
-  can-host-socketcan: Fix crash when 'if' option is not set=0D
-  tests/acceptance: Test case for detecting -object crashes=0D
-=0D
- authz/listfile.c                  |  5 ++++=0D
- net/can/can_socketcan.c           |  5 ++++=0D
- tests/acceptance/object_option.py | 49 +++++++++++++++++++++++++++++++=0D
- 3 files changed, 59 insertions(+)=0D
- create mode 100644 tests/acceptance/object_option.py=0D
-=0D
---=20=0D
-2.26.2=0D
-=0D
+Fix the following crash:
+
+  $ qemu-system-x86_64 -object authz-list-file,id=obj0
+  qemu-system-x86_64: -object authz-list-file,id=obj0: GLib: g_file_get_contents: assertion 'filename != NULL' failed
+  Segmentation fault (core dumped)
+
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+Cc: "Daniel P. Berrangé" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
+---
+ authz/listfile.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/authz/listfile.c b/authz/listfile.c
+index cd6163aa40..aaf930453d 100644
+--- a/authz/listfile.c
++++ b/authz/listfile.c
+@@ -122,6 +122,11 @@ qauthz_list_file_complete(UserCreatable *uc, Error **errp)
+     QAuthZListFile *fauthz = QAUTHZ_LIST_FILE(uc);
+     gchar *dir = NULL, *file = NULL;
+ 
++    if (!fauthz->filename) {
++        error_setg(errp, "filename not provided");
++        return;
++    }
++
+     fauthz->list = qauthz_list_file_load(fauthz, errp);
+ 
+     if (!fauthz->refresh) {
+-- 
+2.26.2
 
 
