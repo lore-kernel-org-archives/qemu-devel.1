@@ -2,80 +2,81 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A02B2C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 06:25:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B8ABC433E7
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 06:52:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAE6F2076B
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 06:25:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F0572087D
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 06:52:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LcJaiDv+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAE6F2076B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BixosWsr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F0572087D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQPN8-0006eV-OU
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 02:25:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46664)
+	id 1kQPmz-0004Bm-Fr
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 02:52:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51570)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kQPLM-0005f1-22
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 02:24:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51599)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQPm5-0003jj-HP
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 02:51:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29806)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kQPLF-0006AO-S4
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 02:23:59 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQPm1-0001SJ-Je
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 02:51:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602138232;
+ s=mimecast20190719; t=1602139890;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=1x1IevKNGxdaE3Ghq7QXMVnbRGazny19seJ3MxyjZkY=;
- b=LcJaiDv+jbyXHtTlqJakyFGFud2IkhZQRZym6WwELiRHzUfP7wyEJFu4a4rMi96TDnrubn
- NiSvuYFyUW3GvfjHedr0iPEQMsC4/GszNQWezHjnSMpyuXG+NTUpVpwxn4/iAnQbtt6AKm
- AFOVLrq1DqbuUembGcn6GV1c04wcaGU=
+ bh=amZgRW4PlZK94RN2tJD3FIHYW9vI7sdYFqUezQ1j9vo=;
+ b=BixosWsrUxvIEYRwIbrPivb85wAApjUNgdv0C3GA/RmSd7R8EfAvYUyp3ivTfN+Lq4tJ4l
+ l1wxyvAC2Ueqxd87Sz/L/zYbsAKOeY0T3WGq5ZZKTDNmK29Lu0stZVWasgHue/6hKYvdtS
+ VnvIWTbHBWqCCUuxKVxcNbPUhwQFwjU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-62-3B1fqYa6MWSjoIyU-5lgbA-1; Thu, 08 Oct 2020 02:23:50 -0400
-X-MC-Unique: 3B1fqYa6MWSjoIyU-5lgbA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-238-W0uzJv-rOSmigRSei40plg-1; Thu, 08 Oct 2020 02:51:28 -0400
+X-MC-Unique: W0uzJv-rOSmigRSei40plg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B0DC318A076B;
- Thu,  8 Oct 2020 06:23:48 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-113-40.ams2.redhat.com [10.36.113.40])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B3D969F63;
- Thu,  8 Oct 2020 06:23:44 +0000 (UTC)
-Subject: Re: [PATCH v10] scripts: Convert qemu-version.sh to qemu-version.py
-To: luoyonggang@gmail.com, Paolo Bonzini <pbonzini@redhat.com>
-References: <20201007195934.297-1-luoyonggang@gmail.com>
- <CABgObfboc5-01TVBgLw-u8eKzR2QJkRYA5cTQ0wpx4SD2D92yw@mail.gmail.com>
- <CAE2XoE8JV0G=3yK3HzMuXb19925p1J76rm2rVQH-OMhniPS8-g@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <3c8e44c9-d302-1869-258c-65fa77ecbbb4@redhat.com>
-Date: Thu, 8 Oct 2020 08:23:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB415107AD74
+ for <qemu-devel@nongnu.org>; Thu,  8 Oct 2020 06:51:27 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
+ [10.36.112.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8418955764;
+ Thu,  8 Oct 2020 06:51:27 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id EEF5111329C1; Thu,  8 Oct 2020 08:51:25 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: [PATCH v5 03/36] qapi-gen: Separate arg-parsing from generation
+References: <20201005195158.2348217-1-jsnow@redhat.com>
+ <20201005195158.2348217-4-jsnow@redhat.com>
+ <877ds2jw6t.fsf@dusky.pond.sub.org>
+ <007985f2-2872-1ab7-16aa-19414ba8cc78@redhat.com>
+Date: Thu, 08 Oct 2020 08:51:25 +0200
+In-Reply-To: <007985f2-2872-1ab7-16aa-19414ba8cc78@redhat.com> (John Snow's
+ message of "Wed, 7 Oct 2020 10:36:46 -0400")
+Message-ID: <87d01t43de.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <CAE2XoE8JV0G=3yK3HzMuXb19925p1J76rm2rVQH-OMhniPS8-g@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
+Content-Type: text/plain
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 01:56:49
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -84,9 +85,8 @@ X-Spam_score: -2.8
 X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,27 +99,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
- Peter Maydell <peter.maydell@linaro.org>, qemu-devel <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/10/2020 23.51, 罗勇刚(Yonggang Luo) wrote:
-> 
-> On Thu, Oct 8, 2020 at 4:31 AM Paolo Bonzini <pbonzini@redhat.com
-> <mailto:pbonzini@redhat.com>> wrote:
->>
->> You won't hear no for an answer, right?...
-> I am trying to figure out the real issue, it's the issue of git,
-> https://github.com/msys2/MSYS2-packages/issues/2176
-Can you at least please stop crap-flooding the QEMU mailing list with
-multiple versions of your patches each day? We are all busy, so nobody is
-going to review 5 or more iterations of your patches each day. Work on your
-patches first, make sure that they are working, and only if you think that
-they are really, really good, then send them to the list. Thanks.
+John Snow <jsnow@redhat.com> writes:
 
- Thomas
+> On 10/7/20 4:07 AM, Markus Armbruster wrote:
+>> John Snow <jsnow@redhat.com> writes:
+>> 
+>>> This is a minor re-work of the entrypoint script. It isolates a
+>>> generate() method from the actual command-line mechanism.
+>>>
+>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>>> Reviewed-by: Cleber Rosa <crosa@redhat.com>
+>>> Tested-by: Cleber Rosa <crosa@redhat.com>
+>>> ---
+>>>   scripts/qapi-gen.py | 85 +++++++++++++++++++++++++++++++++------------
+>>>   1 file changed, 62 insertions(+), 23 deletions(-)
+>>>
+>>> diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
+>>> index 541e8c1f55d..117b396a595 100644
+>>> --- a/scripts/qapi-gen.py
+>>> +++ b/scripts/qapi-gen.py
+>>> @@ -1,30 +1,77 @@
+>>>   #!/usr/bin/env python3
+>>> -# QAPI generator
+>>> -#
+>>> +
+>>>   # This work is licensed under the terms of the GNU GPL, version 2 or later.
+>>>   # See the COPYING file in the top-level directory.
+>>>   +"""
+>>> +QAPI Generator
+>>> +
+>>> +This script is the main entry point for generating C code from the QAPI schema.
+>>> +"""
+>>>     import argparse
+>>>   import re
+>>>   import sys
+>>>     from qapi.commands import gen_commands
+>>> +from qapi.error import QAPIError
+>>>   from qapi.events import gen_events
+>>>   from qapi.introspect import gen_introspect
+>>> -from qapi.schema import QAPIError, QAPISchema
+>>> +from qapi.schema import QAPISchema
+>>>   from qapi.types import gen_types
+>>>   from qapi.visit import gen_visit
+>>>     
+>>> -def main(argv):
+>>> +DEFAULT_OUTPUT_DIR = ''
+>>> +DEFAULT_PREFIX = ''
+>>> +
+>>> +
+>>> +def generate(schema_file: str,
+>>> +             output_dir: str,
+>>> +             prefix: str,
+>>> +             unmask: bool = False,
+>>> +             builtins: bool = False) -> None:
+>>> +    """
+>>> +    generate uses a given schema to produce C code in the target directory.
+>>> +
+>>> +    :param schema_file: The primary QAPI schema file.
+>>> +    :param output_dir: The output directory to store generated code.
+>>> +    :param prefix: Optional C-code prefix for symbol names.
+>>> +    :param unmask: Expose non-ABI names through introspection?
+>>> +    :param builtins: Generate code for built-in types?
+>>> +
+>>> +    :raise QAPIError: On failures.
+>>> +    """
+>>> +    match = re.match(r'([A-Za-z_.-][A-Za-z0-9_.-]*)?', prefix)
+>>> +    if match.end() != len(prefix):
+>>> +        msg = "funny character '{:s}' in prefix '{:s}'".format(
+>>> +            prefix[match.end()], prefix)
+>>> +        raise QAPIError('', None, msg)
+>>> +
+>>> +    schema = QAPISchema(schema_file)
+>>> +    gen_types(schema, output_dir, prefix, builtins)
+>>> +    gen_visit(schema, output_dir, prefix, builtins)
+>>> +    gen_commands(schema, output_dir, prefix)
+>>> +    gen_events(schema, output_dir, prefix)
+>>> +    gen_introspect(schema, output_dir, prefix, unmask)
+>>> +
+>>> +
+>>> +def main() -> int:
+>>> +    """
+>>> +    gapi-gen shell script entrypoint.
+>> What's a "shell script entrypoint"?
+>> Python docs talk about "when [...] run as a script":
+>> https://docs.python.org/3/library/__main__.html
+>> Similar:
+>> https://docs.python.org/3/tutorial/modules.html#executing-modules-as-scripts
+>> 
+>
+> "entrypoint" is Python garble for a function that can be registered as
+> a callable from the command line.
+>
+> So in a theoretical setup.py, you'd do something like:
+>
+> 'entry_points': {
+>   'console_scripts': [
+>     'qapi-gen = qapi.main:main',
+>   ]
+> }
+>
+> so when I say "shell script entrypoint", I am referring to a shell
+> script (I mean: it has a shebang and can be executed by an interactive 
+> shell process) that calls the entrypoint.
+
+It can be executed by any process.  See execve(2):
+
+       pathname must be either a binary executable, or a script starting  with
+       a line of the form:
+
+           #!interpreter [optional-arg]
+
+       For details of the latter case, see "Interpreter scripts" below.
+
+"Entry point" makes sense in Python context, "script entry point" also
+makes sense (since every Python program is a script, script is
+redundant, but not wrong).  "Shell script entry point" is misleading.
+
+> Once (if) QAPI migrates to ./python/qemu/qapi, it will be possible to
+> just generate that script.
+>
+> (i.e. doing `pip install qemu.qapi` will install a 'qapi-gen' CLI
+> script for you. this is how packages like sphinx create the
+> 'sphinx-build' script, etc.)
+>
+>>> +    Expects arguments via sys.argv, see --help for details.
+>>> +
+>>> +    :return: int, 0 on success, 1 on failure.
+>>> +    """
+>>>       parser = argparse.ArgumentParser(
+>>>           description='Generate code from a QAPI schema')
+>>>       parser.add_argument('-b', '--builtins', action='store_true',
+>>>                           help="generate code for built-in types")
+>>> -    parser.add_argument('-o', '--output-dir', action='store', default='',
+>>> +    parser.add_argument('-o', '--output-dir', action='store',
+>>> +                        default=DEFAULT_OUTPUT_DIR,
+>>>                           help="write output to directory OUTPUT_DIR")
+>>> -    parser.add_argument('-p', '--prefix', action='store', default='',
+>>> +    parser.add_argument('-p', '--prefix', action='store',
+>>> +                        default=DEFAULT_PREFIX,
+>>>                           help="prefix for symbols")
+>>>       parser.add_argument('-u', '--unmask-non-abi-names', action='store_true',
+>>>                           dest='unmask',
+>>> @@ -32,25 +79,17 @@ def main(argv):
+>>>       parser.add_argument('schema', action='store')
+>>>       args = parser.parse_args()
+>>>   -    match = re.match(r'([A-Za-z_.-][A-Za-z0-9_.-]*)?',
+>>> args.prefix)
+>>> -    if match.end() != len(args.prefix):
+>>> -        print("%s: 'funny character '%s' in argument of --prefix"
+>>> -              % (sys.argv[0], args.prefix[match.end()]),
+>>> -              file=sys.stderr)
+>>> -        sys.exit(1)
+>>> -
+>>>       try:
+>>> -        schema = QAPISchema(args.schema)
+>>> +        generate(args.schema,
+>>> +                 output_dir=args.output_dir,
+>>> +                 prefix=args.prefix,
+>>> +                 unmask=args.unmask,
+>>> +                 builtins=args.builtins)
+>>>       except QAPIError as err:
+>>> -        print(err, file=sys.stderr)
+>>> -        exit(1)
+>>> -
+>>> -    gen_types(schema, args.output_dir, args.prefix, args.builtins)
+>>> -    gen_visit(schema, args.output_dir, args.prefix, args.builtins)
+>>> -    gen_commands(schema, args.output_dir, args.prefix)
+>>> -    gen_events(schema, args.output_dir, args.prefix)
+>>> -    gen_introspect(schema, args.output_dir, args.prefix, args.unmask)
+>>> +        print(f"{sys.argv[0]}: {str(err)}", file=sys.stderr)
+>>> +        return 1
+>>> +    return 0
+>>>     
+>>>   if __name__ == '__main__':
+>>> -    main(sys.argv)
+>>> +    sys.exit(main())
+>> What does sys.exit() really buy us here?  I'm asking because both
+>> spots
+>> in the Python docs I referenced above do without.
+>> 
+>
+> It just pushes the sys.exit out of the main function so it can be
+> invoked by other machinery. (And takes the return code from main and 
+> turns it into the return code for the process.)
+>
+> I don't think it winds up mattering for simple "console_script" entry
+> points, but you don't want the called function to exit and deny the 
+> caller the chance to do their own tidying post-call.
+>
+> You've already offered a "YAGNI", but it's just the convention I tend
+> to stick to for how to structure entry points.
+
+I'm not questioning the conventional if __name__ == '__main__' menuett.
+I wonder why *we* need sys.exit() where the examples in the Python docs
+don't.
 
 
