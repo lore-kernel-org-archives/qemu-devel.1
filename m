@@ -2,77 +2,82 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DB78C4363A
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 12:54:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FE50C43467
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 12:58:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC653207DE
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 12:54:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 76CE9207DE
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 12:58:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i8VIieey"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC653207DE
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LyCKhUK+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76CE9207DE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQVRe-0002AI-T3
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 08:54:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44332)
+	id 1kQVVF-00052v-EK
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 08:58:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45240)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kQVQo-0001hl-Ci
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 08:54:02 -0400
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:37220)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kQVTm-0003R9-UZ
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 08:57:06 -0400
+Received: from mail-ot1-x336.google.com ([2607:f8b0:4864:20::336]:36073)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kQVQk-0001Pq-Cl
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 08:54:01 -0400
-Received: by mail-ed1-x544.google.com with SMTP id o18so5725927edq.4
- for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 05:53:57 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kQVTk-0001wR-IA
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 08:57:06 -0400
+Received: by mail-ot1-x336.google.com with SMTP id 60so5384108otw.3
+ for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 05:57:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Yls9ZC0VO5ylKhPi7qnP5iii08Gb+4vluiuZKcCXoIw=;
- b=i8VIieey7xCEwnsQb0gUlPinVo0aiaUmHqp/EeDzidPhjC9Bhz2TUbJauDj79rMv9z
- h77oikGS7xEbsANKkeHN+HcuRKpKst+GgGCTuIuDbO7QeBiKwfUloAMxWAEt3narKfQh
- hwSidfvESaIFPwK2SGpHAmjbOyHCNH5nX4SpbgEejCkeYEltl2nIbsauunRhCfCA+5MK
- hTdbZ84+Ik3gnaq4UmUeq6Ze2J1O0e8xNPBq8kZNg0ZC/Mg5a4kUVDvH/+Ojoq9cxlky
- Aji3du38LNnXIskr+DbeAzljxG9zk+i8vdj8ovKWJERJWJnYRpEIOuIbzeYfIlj+f35q
- zqqQ==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=mPIyfTm041fTvU3FUvByVd+GgdIdYXOlVkaF050SeRQ=;
+ b=LyCKhUK+MEI20OsEtd8GP+HLX47qwexhjbROdWCqxoAfUQyVr9MqlO2vrzct9gw6ZO
+ Y2gQT22yMEaFwjb0MOK5blbXAadT2tps1gRNOapA6/XjFjJlsQJe7w7FrzD9myp+D1Wc
+ iqCP2UW8cM9ofAAaL6WnWVOgw8iLJnwSLWx3bpctPATR87NMCYK/8lFB4a/s1g7N0fEN
+ vfor+MMTYvRILEU/Hfxbn5qK1vNIGRlY5hAWQm8buBENwuztiJT3RQRb1+cUiJeK+T3Y
+ nMgjPM4Rj542Mt/iYVWZ36PUvNbQ2Y2Xu1TpnwsHHUK7ux58J/oRIQlh4mU7uJvE+h4k
+ 5qJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Yls9ZC0VO5ylKhPi7qnP5iii08Gb+4vluiuZKcCXoIw=;
- b=jGnq4jmeAWDGnmCk3ZPPtgF80W5ijMHYggUc151Uu+yo91o6DSF9HCxG4071Y64hMj
- oV5N1PRNcS6jJZJ8mBGgK8oyS0HUOXU+sqbv7vV5KTjSPZtEdU9MKM6DZ8+0BS27IGYB
- ncYrZYEQGVHRBEeuknnnRwKPpQpbDGcpeURn9nTT752minUQ9mMNEERyfcOHd3uNQXiG
- gkKSKj1LKM2ucbStbqdAOrH2hIsNfywkpFvuIr2xdmmo6FWhTi9iM0f8v3qUx9DA5C0e
- WFvh+6pqVmOFy+4z+oca2VGqlOM2Tio6n6NFs0tQ6zhhoSKfhWOJTKyQ6PdodjWGkLXb
- kjPg==
-X-Gm-Message-State: AOAM531YCdFgkYrbksqRd4trWTQCYmq1QOBwmO3/pcw6oAPIgk6Uh7OX
- I4p+XKmJZp4NH3L8SyPv5DFtnMk/bXQQt5HtD1atCg==
-X-Google-Smtp-Source: ABdhPJwGR2xg96/sVIfK1Ybnhz7hU26jsoTcTP8uQPgs3nIob0AlgAJbujOGqr+x0rEztZHRaMYvE4M3RoIP9m0sP9w=
-X-Received: by 2002:aa7:c7d7:: with SMTP id o23mr8756577eds.44.1602161636491; 
- Thu, 08 Oct 2020 05:53:56 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=mPIyfTm041fTvU3FUvByVd+GgdIdYXOlVkaF050SeRQ=;
+ b=GlemayijJP6MlRuGWfkOTVsG8Y/qHXuIOeQm99cSyTVHq1sLSx5FvV6Ztd5/l5FUyO
+ HhWvkItQceGX78jbvR6XR84+EPhpaR1hPcNagvWopZ3ittBZaTPeFtIiAwYXL2LuRIRa
+ ASVlO/8ph7nRyC+WYxrOyZYJRgs09Eh6rgdNJzn7uuAvntDP0WRYp/hqEwKDarG3OMbW
+ b7lyAgKnUYKR3ns0kPtPc73SVX1N0YSzBWHF6QFUfbZdeD6oSODFG2evuqQ5aFycqyU1
+ qRAeG2ka/1raSyi7C5rYodcsDSNbKBXl8fMD3kvxHLP5GKq3t2dniymEqsYWRBCkA2vV
+ 8wPw==
+X-Gm-Message-State: AOAM532lEt6EDGafeGe7Zzt6JUljrlrpBhnGamgy80fGSm3eIYhpUIt0
+ rJ4I5V8lBgGBAg9iXQk1+SHmFX2d8ZYeg/7h
+X-Google-Smtp-Source: ABdhPJyPfLvuDx6AG0ovz4tx/JDHEs4MJEPzeWPXlMX3fnYwAgbOjCANjXf2z8lcaeaEuVSwJjZzkw==
+X-Received: by 2002:a9d:4b10:: with SMTP id q16mr4961618otf.274.1602161822621; 
+ Thu, 08 Oct 2020 05:57:02 -0700 (PDT)
+Received: from localhost.localdomain (168.189-204-159.bestelclientes.com.mx.
+ [189.204.159.168])
+ by smtp.gmail.com with ESMTPSA id w64sm4701933oig.31.2020.10.08.05.57.00
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 08 Oct 2020 05:57:01 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 00/11] tcg patch queue
+Date: Thu,  8 Oct 2020 07:56:48 -0500
+Message-Id: <20201008125659.49857-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20201001170752.82063-1-richard.henderson@linaro.org>
- <20201001170752.82063-2-richard.henderson@linaro.org>
-In-Reply-To: <20201001170752.82063-2-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 8 Oct 2020 13:53:45 +0100
-Message-ID: <CAFEAcA9JbDSVA5rCNbdAXsytLcpAOJP8bnjqbugYL-EicFUXNw@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/2] accel/tcg: Add tlb_flush_page_bits_by_mmuidx*
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::544;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x544.google.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::336;
+ envelope-from=richard.henderson@linaro.org; helo=mail-ot1-x336.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -94,58 +99,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jordan Frank <jordanfrank@fb.com>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 1 Oct 2020 at 18:07, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On ARM, the Top Byte Ignore feature means that only 56 bits of
-> the address are significant in the virtual address.  We are
-> required to give the entire 64-bit address to FAR_ELx on fault,
-> which means that we do not "clean" the top byte early in TCG.
->
-> This new interface allows us to flush all 256 possible aliases
-> for a given page, currently missed by tlb_flush_page*.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> +static void tlb_flush_page_bits_by_mmuidx_async_1(CPUState *cpu,
-> +                                                  run_on_cpu_data data)
-> +{
-> +    target_ulong addr_map_bits = (target_ulong) data.target_ptr;
-> +    target_ulong addr = addr_map_bits & TARGET_PAGE_MASK;
-> +    uint16_t idxmap = (addr_map_bits & ~TARGET_PAGE_MASK) >> 6;
-> +    unsigned bits = addr_map_bits & 0x3f;
+The following changes since commit 6eeea6725a70e6fcb5abba0764496bdab07ddfb3:
 
-So this is unpacking...
+  Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2020-10-06' into staging (2020-10-06 21:13:34 +0100)
 
-> +    } else if (idxmap <= MAKE_64BIT_MASK(0, TARGET_PAGE_BITS - 6)) {
-> +        run_on_cpu_data data
-> +            = RUN_ON_CPU_TARGET_PTR(addr | (idxmap << 6) | bits);
+are available in the Git repository at:
 
-...the value that we packed into an integer here...
+  https://github.com/rth7680/qemu.git tags/pull-tcg-20201008
 
-> +        run_on_cpu_data data
-> +            = RUN_ON_CPU_TARGET_PTR(addr | (idxmap << 6) | bits);
+for you to fetch changes up to 62475e9d007d83db4d0a6ccebcda8914f392e9c9:
 
-...here...
+  accel/tcg: Fix computing of is_write for MIPS (2020-10-08 05:57:32 -0500)
 
-> +    if (idxmap <= MAKE_64BIT_MASK(0, TARGET_PAGE_BITS - 6)) {
-> +        run_on_cpu_data data
-> +            = RUN_ON_CPU_TARGET_PTR(addr | (idxmap << 6) | bits);
+----------------------------------------------------------------
+Extend maximum gvec vector size
+Fix i386 avx2 dupi
+Fix mips host user-only write detection
+Misc cleanups.
 
-...and here.
+----------------------------------------------------------------
+Kele Huang (1):
+      accel/tcg: Fix computing of is_write for MIPS
 
-Could we do something to avoid all these hard-coded 6s and
-maybe make it a bit clearer that these two operations
-are the inverse of each other?
+Richard Henderson (10):
+      tcg: Adjust simd_desc size encoding
+      tcg: Drop union from TCGArgConstraint
+      tcg: Move sorted_args into TCGArgConstraint.sort_index
+      tcg: Remove TCG_CT_REG
+      tcg: Move some TCG_CT_* bits to TCGArgConstraint bitfields
+      tcg: Remove TCGOpDef.used
+      tcg/i386: Fix dupi for avx2 32-bit hosts
+      tcg: Fix generation of dupi_vec for 32-bit host
+      tcg/optimize: Fold dup2_vec
+      tcg: Remove TCG_TARGET_HAS_cmp_vec
 
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+ include/tcg/tcg-gvec-desc.h  | 38 ++++++++++++------
+ include/tcg/tcg.h            | 22 ++++------
+ tcg/aarch64/tcg-target.h     |  1 -
+ tcg/i386/tcg-target.h        |  1 -
+ tcg/ppc/tcg-target.h         |  1 -
+ accel/tcg/user-exec.c        | 43 ++++++++++++++++++--
+ tcg/optimize.c               | 15 +++++++
+ tcg/tcg-op-gvec.c            | 35 ++++++++++++----
+ tcg/tcg-op-vec.c             | 12 ++++--
+ tcg/tcg.c                    | 96 +++++++++++++++++++-------------------------
+ tcg/aarch64/tcg-target.c.inc | 17 ++++----
+ tcg/arm/tcg-target.c.inc     | 29 ++++++-------
+ tcg/i386/tcg-target.c.inc    | 39 +++++++-----------
+ tcg/mips/tcg-target.c.inc    | 21 +++++-----
+ tcg/ppc/tcg-target.c.inc     | 29 ++++++-------
+ tcg/riscv/tcg-target.c.inc   | 16 ++++----
+ tcg/s390/tcg-target.c.inc    | 22 +++++-----
+ tcg/sparc/tcg-target.c.inc   | 21 ++++------
+ tcg/tci/tcg-target.c.inc     |  3 +-
+ 19 files changed, 244 insertions(+), 217 deletions(-)
 
