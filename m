@@ -2,94 +2,73 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39AFFC4363A
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 11:51:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED8CCC43467
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 12:28:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58FE820B1F
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 11:51:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AD30F2083B
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 12:28:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SRxXHwNn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58FE820B1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="BSFGL+fC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD30F2083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQUS9-0000Uo-9d
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 07:51:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51596)
+	id 1kQV2C-000176-Cn
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 08:28:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34634)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kQURR-0008Qp-Fp
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 07:50:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41423)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kQURN-0007zf-Bw
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 07:50:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602157831;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=MMFfFrmzQ0jxj+83olHwkGlUT9eJyGfxrIQV+dctoUI=;
- b=SRxXHwNnIMM9jk9Doz8d03H7JzZsbrOUkUjAoxXCE+FNE/DgSVcKHahB20b1iFr3k8R9fb
- Pcfc0NGFX1sED1eOqzTNM/JAtYs/1KwzzRus2HgjY+hXdl0pQLJpIoL1J+UudZUWKjw88t
- aI1LxsHthX8yneFunrM6/rDfr+CDRy0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-551-B6raCMDINkSAF9UpdWhU_g-1; Thu, 08 Oct 2020 07:50:29 -0400
-X-MC-Unique: B6raCMDINkSAF9UpdWhU_g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2703C1091074;
- Thu,  8 Oct 2020 11:50:28 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-113-68.ams2.redhat.com [10.36.113.68])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4E6027664D;
- Thu,  8 Oct 2020 11:50:20 +0000 (UTC)
-Date: Thu, 8 Oct 2020 13:50:18 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: acceptance-system-fedora failures
-Message-ID: <20201008115018.GD4672@linux.fritz.box>
-References: <4e191372-c332-8f69-85e2-1ff6ead0f40d@redhat.com>
- <59d2a787-bcd4-7283-693b-09ea04c16dc6@redhat.com>
- <6068346f-b034-9321-0eea-29233c23a300@redhat.com>
- <78ce9ac1-d2a1-9dc0-bf38-f9ac34b2f203@ispras.ru>
- <14ee7cc6-42ca-fd86-241b-ed85e26693f7@redhat.com>
- <878sci1dt0.fsf@linaro.org>
- <d86c9425-dcb2-7fa7-1f6f-bd7b8dab53c1@ispras.ru>
- <c5e6f7ea-93c4-a46a-dfee-7699c08c1060@redhat.com>
- <4f4eee5e-e8cd-0595-cccc-8b648773c9ba@ispras.ru>
- <43eac2fb-7325-9e9f-ce13-d0774638753f@redhat.com>
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1kQV0G-0000EB-D1
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 08:26:36 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:51981)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1kQV0E-0005Q7-8I
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 08:26:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=LcjZF5esGMdSvlR6q2ebFSoCcA1CmVagInjD/W7UOZc=; b=BSFGL+fCmrKD+L7mGSoNJMQDXV
+ KK3mCiBiL8iSWkSHDt4KsEzM8agqmQX5eU/RFv2uBextoik5xyBEulLbqqbCyDOD/nCRYRUkAYI1d
+ dbBp7h4osrptGlnGvho7ZjqShkd/h3GssBR7VvNF6bE6CoK3mQgvjlpmogXTbhTBJ6B8JGWR4SS+8
+ AxFGyGsL0GnAQWLILtFo4le02yUYPgUpS0rMfRS7mpW8QhRJKktFqe0ZK/ScVu4nFNDQ4US+/sUs+
+ LFv77hFdZutt3KP40vI4NnJmwt+kFp0QYBIBKcPCzg6lo4bcZPLZ6zlbWklmP6bFmq7BoD5qN2OvP
+ IuAR8S0A==;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
+ Greg Kurz <groug@kaod.org>, berrange@redhat.com
+Subject: Re: [PATCH v3 09/11] tests/9pfs: wipe local 9pfs test directory
+Date: Thu, 08 Oct 2020 14:26:28 +0200
+Message-ID: <10015241.kaXt91Qapa@silver>
+In-Reply-To: <0c54a2ca2049e9824df9805324cac8dac029c113.1601655308.git.qemu_oss@crudebyte.com>
+References: <cover.1601655308.git.qemu_oss@crudebyte.com>
+ <0c54a2ca2049e9824df9805324cac8dac029c113.1601655308.git.qemu_oss@crudebyte.com>
 MIME-Version: 1.0
-In-Reply-To: <43eac2fb-7325-9e9f-ce13-d0774638753f@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 02:56:27
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
+ helo=lizzy.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 08:26:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,220 +81,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>,
- Eduardo Habkost <ehabkost@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 08.10.2020 um 12:26 hat Philippe Mathieu-Daudé geschrieben:
-> On 10/7/20 3:11 PM, Pavel Dovgalyuk wrote:
-> > On 07.10.2020 15:49, Philippe Mathieu-Daudé wrote:
-> >> On 10/7/20 2:20 PM, Pavel Dovgalyuk wrote:
-> >>> On 07.10.2020 14:22, Alex Bennée wrote:
-> >>>>
-> >>>> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
-> >>>>
-> >>>>> On 10/7/20 10:51 AM, Pavel Dovgalyuk wrote:
-> >>>>>> On 07.10.2020 11:23, Thomas Huth wrote:
-> >>>>>>> On 07/10/2020 09.13, Philippe Mathieu-Daudé wrote:
-> >>>>>>> Thanks, that was helpful. ... and the winner is:
-> >>>>>>>
-> >>>>>>>        commit   55adb3c45620c31f29978f209e2a44a08d34e2da
-> >>>>>>>        Author:  John Snow <jsnow@redhat.com>
-> >>>>>>>        Date:    Fri Jul 24 01:23:00 2020 -0400
-> >>>>>>>        Subject: ide: cancel pending callbacks on SRST
-> >>>>>>>
-> >>>>>>> ... starting with this commit, the tests starts failing. John, any
-> >>>>>>> idea what
-> >>>>>>> might be causing this?
-> >>>>>>
-> >>>>>> This patch includes the following lines:
-> >>>>>>
-> >>>>>> +        aio_bh_schedule_oneshot(qemu_get_aio_context(),
-> >>>>>> +                                ide_bus_perform_srst, bus);
-> >>>>>>
-> >>>>>> replay_bh_schedule_oneshot_event should be used instead of this
-> >>>>>> function, because it synchronizes non-deterministic BHs.
-> >>>>>
-> >>>>> Why do we have 2 different functions? BH are already complex
-> >>>>> enough, and we need to also think about the replay API...
-> >>>>>
-> >>>>> What about the other cases such vhost-user (blk/net), virtio-blk?
-> >>>>
-> >>>> This does seem like something that should be wrapped up inside
-> >>>> aio_bh_schedule_oneshot itself or maybe we need a
-> >>>> aio_bh_schedule_transaction_oneshot to distinguish it from the other
-> >>>> uses the function has.
-> >>>>
-> >>>
-> >>> Maybe there should be two functions:
-> >>> - one for the guest modification
-> >>
-> >> aio_bh_schedule_oneshot_deterministic()?
-> >>
-> >>> - one for internal qemu things
-> >>
-> >> Not sure why there is a difference, BH are used to
-> >> avoid delaying the guest, so there always something
-> >> related to "guest modification".
-> > 
-> > Not exactly. At least there is one non-related-to-guest case
-> > in monitor_init_qmp:
-> >         /*
-> >          * We can't call qemu_chr_fe_set_handlers() directly here
-> >          * since chardev might be running in the monitor I/O
-> >          * thread.  Schedule a bottom half.
-> >          */
-> >         aio_bh_schedule_oneshot(iothread_get_aio_context(mon_iothread),
-> >                                 monitor_qmp_setup_handlers_bh, mon);
+On Freitag, 2. Oktober 2020 18:15:05 CEST Christian Schoenebeck wrote:
+> Before running the first 9pfs test case, make sure the test directory
+> for running the 9pfs 'local' tests on is entirely empty. For that
+> reason simply delete the test directory (if any) before (re)creating
+> it on test suite startup.
 > 
-> I don't understand the documentation in docs/devel/replay.txt:
-> 
+> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
 > ---
-> Bottom halves
-> =============
+>  tests/qtest/libqos/virtio-9p.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
 > 
-> Bottom half callbacks, that affect the guest state, should be invoked
-> through
-> replay_bh_schedule_event or replay_bh_schedule_oneshot_event functions.
-> Their invocations are saved in record mode and synchronized with the
-> existing
-> log in replay mode.
-> ---
+> diff --git a/tests/qtest/libqos/virtio-9p.c b/tests/qtest/libqos/virtio-9p.c
+> index 1bada47af1..41a7c2baaa 100644
+> --- a/tests/qtest/libqos/virtio-9p.c
+> +++ b/tests/qtest/libqos/virtio-9p.c
+> @@ -53,6 +53,18 @@ static void create_local_test_dir(void)
+>      g_assert((st.st_mode & S_IFMT) == S_IFDIR);
+>  }
 > 
-> But then it is only used in block drivers, which are not
-> related to guest state:
+> +/* Deletes directory previously created by create_local_test_dir(). */
+> +static void remove_local_test_dir(void)
+> +{
+> +    g_assert(local_test_path != NULL);
+> +    char *cmd = g_strdup_printf("rm -r '%s'\n", local_test_path);
+> +    int res = system(cmd);
+> +    if (res < 0) {
+> +        /* ignore error, dummy check to prevent compiler error */
+> +    }
+> +    g_free(cmd);
+> +}
+> +
+>  static void virtio_9p_cleanup(QVirtio9P *interface)
+>  {
+>      qvirtqueue_cleanup(interface->vdev->bus, interface->vq, alloc);
+> @@ -220,6 +232,7 @@ static void virtio_9p_register_nodes(void)
+> 
+>      /* make sure test dir for the 'local' tests exists and is clean */
+>      init_local_test_path();
+> +    remove_local_test_dir();
+>      create_local_test_dir();
+> 
+>      QPCIAddress addr = {
+>          .devfn = QPCI_DEVFN(4, 0),
+>      };
+>     
+>      QOSGraphEdgeOptions opts = {
+>          .before_cmd_line = "-fsdev synth,id=fsdev0",
+>      };
+>     
+>      /* virtio-9p-device */
+>      opts.extra_device_opts = str_simple,
+>      qos_node_create_driver("virtio-9p-device", virtio_9p_device_create);
+>      qos_node_consumes("virtio-9p-device", "virtio-bus", &opts);
+>      qos_node_produces("virtio-9p-device", "virtio");
+>      qos_node_produces("virtio-9p-device", "virtio-9p");
+>     
+>      /* virtio-9p-pci */
+>      opts.extra_device_opts = str_addr;
+>      add_qpci_address(&opts, &addr);
+>      qos_node_create_driver("virtio-9p-pci", virtio_9p_pci_create);
+>      qos_node_consumes("virtio-9p-pci", "pci-bus", &opts);
+>      qos_node_produces("virtio-9p-pci", "pci-device");
+>      qos_node_produces("virtio-9p-pci", "virtio");
+>      qos_node_produces("virtio-9p-pci", "virtio-9p");
+> }
+> 
+> libqos_init(virtio_9p_register_nodes);
 
-Pavel can tell you the details, but I think the idea was that you need
-to use this function not when the code calling it modifies guest state,
-but when the BH implementation can do so.
+I wonder why libqos is calling virtio_9p_register_nodes() again after all 
+qtests ended.
 
-In the case of generic callbacks like provided by the blk_aio_*()
-functions, we don't know whether this is the case, but it's generally
-device emulation code, so chances are relatively high that they do.
+That's somewhat suboptimal here, as it causes remove_local_test_dir() to be 
+called again after all qtests completed. My intention was actually only to 
+wipe the "qtest-9p-local" test directory at the *start* of the test suite run. 
+Not at the end of the test suite. Because it would allow developers to look at 
+the actual dirs/files created after the tests completed.
 
-I seem to remember that when reviewing the code that introduced
-replay_bh_schedule_event(), I was relatively sure that we didn't catch
-all necessary instances, but since it worked for Pavel and I didn't feel
-like getting too involved with replay code, we just merged it anyway.
+I could of course misuse and add a dedicated "wipedir" test as workaround, but 
+that OTOH would break the option of running individual tests with the -p CL 
+switch.
 
-As I said, the details are a question for Pavel.
+Best regards,
+Christian Schoenebeck
 
-Kevin
-
-> $ git grep replay_bh_schedule_oneshot_event
-> block/block-backend.c:1385:
-> replay_bh_schedule_oneshot_event(blk_get_aio_context(blk),
-> block/block-backend.c:1450:
-> replay_bh_schedule_oneshot_event(blk_get_aio_context(blk),
-> block/io.c:371:
-> replay_bh_schedule_oneshot_event(bdrv_get_aio_context(bs),
-> block/iscsi.c:286:
-> replay_bh_schedule_oneshot_event(iTask->iscsilun->aio_context,
-> block/nfs.c:262:
-> replay_bh_schedule_oneshot_event(task->client->aio_context,
-> block/null.c:183:
-> replay_bh_schedule_oneshot_event(bdrv_get_aio_context(bs),
-> block/nvme.c:323:        replay_bh_schedule_oneshot_event(q->aio_context,
-> block/nvme.c:1075:    replay_bh_schedule_oneshot_event(data->ctx,
-> nvme_rw_cb_bh, data);
-> block/rbd.c:865:
-> replay_bh_schedule_oneshot_event(bdrv_get_aio_context(acb->common.bs),
-> docs/devel/replay.txt:25:replay_bh_schedule_event or
-> replay_bh_schedule_oneshot_event functions.
-> include/sysemu/replay.h:178:void
-> replay_bh_schedule_oneshot_event(AioContext *ctx,
-> replay/replay-events.c:141:void
-> replay_bh_schedule_oneshot_event(AioContext *ctx,
-> stubs/replay-user.c:5:void replay_bh_schedule_oneshot_event(AioContext *ctx,
-> 
-> Is replay_bh_schedule_oneshot_event ever used by replay?
-> Maybe we can remove it and use aio_bh_schedule_oneshot()
-> in place?
-> 
-> Else the documentation need to be clarified please.
-> 
-> > 
-> > 
-> >>
-> >>>
-> >>> The first one may be implemented though the rr+second one.
-> >>> Maybe replay_ prefix is confusing and the whole BH interface should look
-> >>> like that?
-> >>
-> >> Yes, but it would be safer/clearer if we don't need to use
-> >> a replay_ API.
-> >>
-> >> Can we embed these functions?
-> >>
-> >> - replay_bh_schedule_event
-> >> - replay_bh_schedule_oneshot_event
-> >>
-> >> If compiled without rr, events_enabled=false and
-> >> compiler can optimize:
-> >>
-> >> -- >8 --
-> >> diff --git a/util/async.c b/util/async.c
-> >> index f758354c6a..376b6d4e27 100644
-> >> --- a/util/async.c
-> >> +++ b/util/async.c
-> >> @@ -109,14 +109,19 @@ static QEMUBH *aio_bh_dequeue(BHList *head,
-> >> unsigned *flags)
-> >>
-> >>   void aio_bh_schedule_oneshot(AioContext *ctx, QEMUBHFunc *cb, void
-> >> *opaque)
-> >>   {
-> >> -    QEMUBH *bh;
-> >> -    bh = g_new(QEMUBH, 1);
-> >> -    *bh = (QEMUBH){
-> >> -        .ctx = ctx,
-> >> -        .cb = cb,
-> >> -        .opaque = opaque,
-> >> -    };
-> >> -    aio_bh_enqueue(bh, BH_SCHEDULED | BH_ONESHOT);
-> >> +    if (events_enabled) {
-> >> +        replay_add_event(REPLAY_ASYNC_EVENT_BH_ONESHOT, cb,
-> >> +                         opaque, replay_get_current_icount());
-> >> +    } else {
-> >> +        QEMUBH *bh;
-> >> +        bh = g_new(QEMUBH, 1);
-> >> +        *bh = (QEMUBH){
-> >> +            .ctx = ctx,
-> >> +            .cb = cb,
-> >> +            .opaque = opaque,
-> >> +        };
-> >> +        aio_bh_enqueue(bh, BH_SCHEDULED | BH_ONESHOT);
-> >> +    }
-> >>   }
-> >>
-> >>   QEMUBH *aio_bh_new(AioContext *ctx, QEMUBHFunc *cb, void *opaque)
-> >> @@ -178,7 +183,12 @@ void qemu_bh_schedule_idle(QEMUBH *bh)
-> >>
-> >>   void qemu_bh_schedule(QEMUBH *bh)
-> > 
-> > qemu_bh_schedule is even worse.
-> > Many modules use it (e.g., loadvm_postcopy_handle_run), and there is no
-> > need to use replay version there. In such cases QEMU will halt if trying
-> > to call replay_bh_schedule_event.
-> > 
-> >>   {
-> >> -    aio_bh_enqueue(bh, BH_SCHEDULED);
-> >> +    if (events_enabled) {
-> >> +        replay_add_event(REPLAY_ASYNC_EVENT_BH, bh, NULL,
-> >> +                         replay_get_current_icount());
-> >> +    } else {
-> >> +        aio_bh_enqueue(bh, BH_SCHEDULED);
-> >> +    }
-> >>   }
-> >>
-> > 
-> 
-> 
 
 
