@@ -2,76 +2,82 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A1EAC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 20:42:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8AC1C433E7
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 20:44:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5E38207CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 20:42:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B8C521D46
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 20:44:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QyfskRwS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5E38207CD
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="smweyr5A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B8C521D46
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQck2-00021c-NB
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 16:42:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42800)
+	id 1kQcmM-0003jN-RD
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 16:44:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43142)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kQchx-0000gu-NZ
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 16:40:13 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:36624)
+ id 1kQciu-0001Ob-Af
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 16:41:12 -0400
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:39045)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kQchv-0007mW-Vt
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 16:40:13 -0400
-Received: by mail-ed1-x541.google.com with SMTP id l16so7196831eds.3
- for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 13:40:11 -0700 (PDT)
+ id 1kQcis-000866-C4
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 16:41:11 -0400
+Received: by mail-wr1-x42a.google.com with SMTP id y12so2647631wrp.6
+ for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 13:41:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=G3fapPkb6Gmr4cexZnT4DAT69IL+SilREqXWZZPjQy0=;
- b=QyfskRwSuuk+mHKReYYO/+YCD2hYYHD5BykYaqS4eH5G86jo8yCGbTJ1G6Hrd8NQdV
- w+RvkOWKP/UEmC3bMVn2aR1k95+avyRLjMEucl1wqIyHsPHLt63BFxxUSPLp77k0FA50
- jyWPqkqK7u4ova6JncZCS1u1eRMD/m+/5X84cj4fr74OnyhYuUS0di2pzH7PT7BrI8Np
- NBpuXx0vWy78hfJjkgzuhs/ix+3t+pY4QgYHlbwrlWDuJ4W8J7XSpobavzmAFngYM9/+
- 5JUJqgNh4oSf1/CTW7Lol/SsFtV1eLPeWpxPgKRroYRI0TchO0DLOxwGP23lTWZZ3Bte
- YEhA==
+ h=from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=subg3dyqvWhfFamVjCOHboJh+VXVdE2fxJoFUzhd4N0=;
+ b=smweyr5AaXqapMokzLJd8VYgt6bdHMfYvZTn0PjMSrgZQQMZv7HeeMc1m72nlOr2rG
+ oSfzME+9dZqwADelUzmFpkrSlwGWuKvqnsV9q0gEIUpk3sABbvrcpGJaGxtC8BXLw9/y
+ Ks2M73eqkbxBPYKUv236wIFGhsczkXE7e5dRQX6wg7EmyZfKpcqqwB0L2n6cx+zANq6j
+ hv4elzZJq5a6rSA4wsYU84TIVtCuyD0LRd1v5PjO6zbKlH5uZdOLQYZ96kJS+RjzKjy6
+ 9BL3mGHHM7Ln/zggDQ6/EarxXZwYkCH0i+0r/doGBJ4KnhxQV5axKIkD1yHwrvm35XaC
+ p4YA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=G3fapPkb6Gmr4cexZnT4DAT69IL+SilREqXWZZPjQy0=;
- b=FSc18otX9TByjKEKOxvuh0TfieLNmFzUw0TsycWlalAw+dye2NOepEx81hy2V6adNt
- HyS5dCmLbsbEZZhNKZPe3m4kCNlUYDSiZm3mepgz0qbFLZaoguZ9OP09cCbXP3HFQWXo
- jxZF1+58VN/9xcvwvxC4KDVMFcTjCfBiNFOwrAeVYFNFyi3Ix+0qVgRWTKT7AcA5L8R8
- cIiwu4slYLX7LcSRBDGjKD71GQniO0ZqP4yRctUnHPptqSNoXlErGEmdgWK4QVC3203h
- zR74t6aXwpLXcIL0G4xoVaZD4aj6yW3RfeGodIz1R5x20tlstkf9FH4OULPVUJMMSi0n
- JmSA==
-X-Gm-Message-State: AOAM531CY+xnCxm1iH1bZncr4oDz7VX8+ke0xAtIi5cJxs9/53JF+2/V
- pURq+IgE04KGycScEUCCpVVnAQJl9lJ8R9TRf8Tz2w==
-X-Google-Smtp-Source: ABdhPJxg6tihgeupNoH5xtppF9jYST49F7z0XieU6UFiux7DXkBvw+Xce44+2kBzKQaoSE98dN3jPyaQtH/++T/MAc8=
-X-Received: by 2002:a50:9ea6:: with SMTP id a35mr11512471edf.52.1602189610373; 
- Thu, 08 Oct 2020 13:40:10 -0700 (PDT)
-MIME-Version: 1.0
-References: <20201001061718.101915-1-drjones@redhat.com>
- <20201001061718.101915-7-drjones@redhat.com>
-In-Reply-To: <20201001061718.101915-7-drjones@redhat.com>
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=subg3dyqvWhfFamVjCOHboJh+VXVdE2fxJoFUzhd4N0=;
+ b=oNy6fxRe/wbeg6OKq0eUPZD12DyvytU7jdcxBiBEhtIYSQmBaGM8AgGpUlsV/+kbhJ
+ 6HMkhOBtRkrUM/hVqv1pbR+ppKU2mfUph0588osZxdrYhElipuI03BmAzPVSpg+5drA3
+ vGF/nBPkglTmv/EzVMQlAZZ5ttvsIA+uSeRH/s+L8M7vre65zyBy8EfXmFFw1CHykicX
+ X1Z60ltm3QzQKN5+yK8zOzgtHVjt3sl6S7TKdqZs4Us8j95V81xqIOYHVtwz+d5lRJRb
+ IfNpa1p/qGkYi5REditr8Z7ELkrRDenwY9GWSdzzkdvzhmnKqz8VjPdc2cdoHTDw5I9N
+ Bkhw==
+X-Gm-Message-State: AOAM531VlhTBh4qbqcm8BNWbYocliDdzcEdbXYlXuA691rG6dcxbztRo
+ BDSEXVb0atgkKKEExdAuVKQ7Ueur+9JOU2pt
+X-Google-Smtp-Source: ABdhPJyFSWnktgBZXJjlKvjdEKKyDua2RL9A/TbbtvZAh9sDXa4IPq9Seb1qNTLbq8J+1RGxJ2AWgQ==
+X-Received: by 2002:adf:ffd0:: with SMTP id x16mr11440979wrs.104.1602189668304; 
+ Thu, 08 Oct 2020 13:41:08 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id i11sm8819945wre.32.2020.10.08.13.41.07
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 08 Oct 2020 13:41:07 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 8 Oct 2020 21:39:59 +0100
-Message-ID: <CAFEAcA-ZwwzrjPjsaGJbwW-y0g+j-usk25f1hiFVadaS74Nv+w@mail.gmail.com>
-Subject: Re: [PATCH v4 6/6] hw/arm/virt: Implement kvm-steal-time
-To: Andrew Jones <drjones@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::541;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x541.google.com
+To: qemu-devel@nongnu.org
+Subject: [PULL v2 00/12] target-arm queue
+Date: Thu,  8 Oct 2020 21:41:06 +0100
+Message-Id: <20201008204106.26629-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::42a;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42a.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -93,51 +99,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eric Auger <eric.auger@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 1 Oct 2020 at 07:17, Andrew Jones <drjones@redhat.com> wrote:
->
-> We add the kvm-steal-time CPU property and implement it for machvirt.
-> A tiny bit of refactoring was also done to allow pmu and pvtime to
-> use the same vcpu device helper functions.
+v2: minor tweak to fix format string issue on Windows hosts...
 
-> +            if (pvtime_size > pvtime_reg_size) {
-> +                error_report("pvtime requires a %ld byte memory region for "
-> +                             "%d CPUs, but only %ld has been reserved",
-> +                             pvtime_size, max_cpus, pvtime_reg_size);
-> +                exit(1);
-> +            }
 
-This turns out not to compile on Windows:
+The following changes since commit 6eeea6725a70e6fcb5abba0764496bdab07ddfb3:
 
-../../hw/arm/virt.c:1693:30: error: format '%ld' expects argument of
-type 'long int', but argument 2 has type 'hwaddr {aka long long
-unsigned int}' [-Werror=format=]
-                 error_report("pvtime requires a %ld byte memory region for "
-                              ^
+  Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2020-10-06' into staging (2020-10-06 21:13:34 +0100)
 
-I'm going to squash this fix into the pullreq:
+are available in the Git repository at:
 
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1690,8 +1690,9 @@ static void virt_cpu_post_init(VirtMachineState
-*vms, int max_cpus,
-             pvtime_size = REAL_HOST_PAGE_ALIGN(pvtime_size);
+  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20201008-1
 
-             if (pvtime_size > pvtime_reg_size) {
--                error_report("pvtime requires a %ld byte memory region for "
--                             "%d CPUs, but only %ld has been reserved",
-+                error_report("pvtime requires a %" HWADDR_PRId
-+                             " byte memory region for %d CPUs,"
-+                             " but only %" HWADDR_PRId " has been reserved",
-                              pvtime_size, max_cpus, pvtime_reg_size);
-                 exit(1);
-             }
+for you to fetch changes up to d1b6b7017572e8d82f26eb827a1dba0e8cf3cae6:
 
-thanks
--- PMM
+  target/arm: Make '-cpu max' have a 48-bit PA (2020-10-08 21:40:01 +0100)
+
+----------------------------------------------------------------
+target-arm queue:
+ * hw/ssi/npcm7xx_fiu: Fix handling of unsigned integer
+ * hw/arm/fsl-imx25: Fix a typo
+ * hw/arm/sbsa-ref : Fix SMMUv3 Initialisation
+ * hw/arm/sbsa-ref : allocate IRQs for SMMUv3
+ * hw/char/bcm2835_aux: Allow less than 32-bit accesses
+ * hw/arm/virt: Implement kvm-steal-time
+ * target/arm: Make '-cpu max' have a 48-bit PA
+
+----------------------------------------------------------------
+Andrew Jones (6):
+      linux headers: sync to 5.9-rc7
+      target/arm/kvm: Make uncalled stubs explicitly unreachable
+      hw/arm/virt: Move post cpu realize check into its own function
+      hw/arm/virt: Move kvm pmu setup to virt_cpu_post_init
+      tests/qtest: Restore aarch64 arm-cpu-features test
+      hw/arm/virt: Implement kvm-steal-time
+
+Graeme Gregory (2):
+      hw/arm/sbsa-ref : Fix SMMUv3 Initialisation
+      hw/arm/sbsa-ref : allocate IRQs for SMMUv3
+
+Peter Maydell (1):
+      target/arm: Make '-cpu max' have a 48-bit PA
+
+Philippe Mathieu-Daudé (3):
+      hw/ssi/npcm7xx_fiu: Fix handling of unsigned integer
+      hw/arm/fsl-imx25: Fix a typo
+      hw/char/bcm2835_aux: Allow less than 32-bit accesses
+
+ docs/system/arm/cpu-features.rst |  11 ++++
+ include/hw/arm/fsl-imx25.h       |   2 +-
+ include/hw/arm/virt.h            |   5 ++
+ linux-headers/linux/kvm.h        |   6 ++-
+ target/arm/cpu.h                 |   4 ++
+ target/arm/kvm_arm.h             |  94 ++++++++++++++++++++++++++-------
+ hw/arm/sbsa-ref.c                |   3 +-
+ hw/arm/virt.c                    | 111 ++++++++++++++++++++++++++++-----------
+ hw/char/bcm2835_aux.c            |   4 +-
+ hw/ssi/npcm7xx_fiu.c             |  12 ++---
+ target/arm/cpu.c                 |   8 +++
+ target/arm/cpu64.c               |   4 ++
+ target/arm/kvm.c                 |  16 ++++++
+ target/arm/kvm64.c               |  64 ++++++++++++++++++++--
+ target/arm/monitor.c             |   2 +-
+ tests/qtest/arm-cpu-features.c   |  25 +++++++--
+ hw/ssi/trace-events              |   2 +-
+ tests/qtest/meson.build          |   3 +-
+ 18 files changed, 304 insertions(+), 72 deletions(-)
 
