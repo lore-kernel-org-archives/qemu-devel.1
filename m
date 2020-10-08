@@ -2,92 +2,89 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A499FC433E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 17:16:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51966C433E7
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 17:18:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0A06221FC
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 17:16:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 888ED204EF
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 17:18:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R4QaytcP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0A06221FC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rGgAm5Cg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 888ED204EF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQZWe-00042C-By
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 13:16:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50092)
+	id 1kQZYT-00066g-9I
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 13:18:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50494)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQZVG-0003cY-PY
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 13:14:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33370)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQZVE-0006JL-Rf
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 13:14:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602177291;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=q4h577DG8nuyqkApXoYK+eU7+hyGiZV9ReHnxTD7QGA=;
- b=R4QaytcPeCf3MVV0vm/hFKDtpELfBcJY9DIeFmULbiq634jiAR4DjRKBxLWqBF3KFuPPIZ
- x/Ow5joJltnFGI4olr6sFl7ciXdrV6Jl+t2Ktq+bPDXpfppSOMg9wimEEUCxcQ/Badtl1c
- L5K+kUIsOYXAZ9cjt1vm248qAH7jI3I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-257-IBElIZ8SOIORiZem2_bXSw-1; Thu, 08 Oct 2020 13:14:50 -0400
-X-MC-Unique: IBElIZ8SOIORiZem2_bXSw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB40287950B
- for <qemu-devel@nongnu.org>; Thu,  8 Oct 2020 17:14:48 +0000 (UTC)
-Received: from [10.10.120.38] (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1916C60BFA;
- Thu,  8 Oct 2020 17:14:47 +0000 (UTC)
-Subject: Re: [PATCH v5 03/36] qapi-gen: Separate arg-parsing from generation
-To: Markus Armbruster <armbru@redhat.com>
-References: <20201005195158.2348217-1-jsnow@redhat.com>
- <20201005195158.2348217-4-jsnow@redhat.com>
- <87r1qaihen.fsf@dusky.pond.sub.org>
- <50e590af-deff-3864-9abd-710a30eaa804@redhat.com>
- <878sch429q.fsf@dusky.pond.sub.org>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <98cec6c2-fd10-42f5-873d-ae6748d2feff@redhat.com>
-Date: Thu, 8 Oct 2020 13:14:47 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <jean-philippe@linaro.org>)
+ id 1kQZX9-0004gr-Tl
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 13:16:51 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54803)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <jean-philippe@linaro.org>)
+ id 1kQZX8-0006dq-6B
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 13:16:51 -0400
+Received: by mail-wm1-x344.google.com with SMTP id p15so7235793wmi.4
+ for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 10:16:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Ov7qk3cmZdLbo6B66/DwhAswXTq22jpqn9muQ2KRmCk=;
+ b=rGgAm5CgewJ/FebnO1UC9WYSW59EBcIlT9RQwqTDQC4HNmDvsfCYelk5KAByfudpwB
+ AqupzZsfoDq6LImGktLi4S98IIB2abYJimbwZ4pqkkSYh7n5EYuf9X8g0G0QZOc6A4Ye
+ hGvefPQz2WXfkzUTV2nhNEFiozMicEG32mfzsrjxu+jHXy95DpFzhUxR/Jw4RIAI7eFK
+ LqoFumb8lnqYclVjnAMoIAl+1x+1jblcE2aFvilqx49lZYWsjAKHg5LgQaN18yd8VFNA
+ GfjUpjSjOBWFnN0jpliEbP1QcvjpcSUUH9UZB6S2eCqae3NM0nx7d8eDfhlh3ev/4rLo
+ Vj0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Ov7qk3cmZdLbo6B66/DwhAswXTq22jpqn9muQ2KRmCk=;
+ b=gBPoHCdpEG/1zHIESBpLZpzHxikbG+CpyiyhWVPUCFCXdPWgCTs6+MDPVaGsmLKL4N
+ OVMx5fPHGiijL9zi6C0HinmlA6mRoDeO6vO2af6yBhXMXuDSLxXCI/UBdC9/ifPIwA+Z
+ kKady6kZSHCTu7qZK1Z7xerHfo1QygN1buajWMlv6ynEDmAbtJ3BTBotfzwvUgS87i2h
+ H03K8uJdYIv8nlokm65OcafH1zfTGD9VqP4Iv320VwLd2yi6lkM9DCitndTnbFOi0en2
+ rHo9Kx+lT+LNtfjObJ6Oov7ZG6QP7SIe6VPD6INkjcrNWfwdwJ1lnBz0lQxtnpufGTqN
+ hA8g==
+X-Gm-Message-State: AOAM530qLyf8/WScJlB0olXtZ1VLmDK4Cxc6OWAsre7rngx6NfMyyery
+ 5pgKA7qt5BFDure9RWHXNL+8kA==
+X-Google-Smtp-Source: ABdhPJwo1OSthaM/mayhzFOlyEtsd02UvzE2zv9lhAv7fLPOhwdGotkzFjgLCMzSKOilPgv41K9RMw==
+X-Received: by 2002:a1c:f20f:: with SMTP id s15mr10003451wmc.69.1602177408236; 
+ Thu, 08 Oct 2020 10:16:48 -0700 (PDT)
+Received: from localhost.localdomain
+ ([2001:1715:4e26:a7e0:116c:c27a:3e7f:5eaf])
+ by smtp.gmail.com with ESMTPSA id x1sm719413wrl.41.2020.10.08.10.16.47
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 08 Oct 2020 10:16:47 -0700 (PDT)
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: eric.auger@redhat.com,
+	alex.williamson@redhat.com
+Subject: [PATCH v10 00/10] virtio-iommu: VFIO integration
+Date: Thu,  8 Oct 2020 19:15:48 +0200
+Message-Id: <20201008171558.410886-1-jean-philippe@linaro.org>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-In-Reply-To: <878sch429q.fsf@dusky.pond.sub.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 02:56:27
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -22
-X-Spam_score: -2.3
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=jean-philippe@linaro.org; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.214, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,167 +98,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>, mst@redhat.com,
+ qemu-devel@nongnu.org, peterx@redhat.com, pbonzini@redhat.com,
+ bbhushan2@marvell.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/8/20 3:15 AM, Markus Armbruster wrote:
-> John Snow <jsnow@redhat.com> writes:
-> 
->> On 10/7/20 4:12 AM, Markus Armbruster wrote:
->>> I keep stumbling over things in later patches that turn out to go back
->>> to this one.
->>> John Snow <jsnow@redhat.com> writes:
->>>
->>>> This is a minor re-work of the entrypoint script. It isolates a
->>>> generate() method from the actual command-line mechanism.
->>>>
->>>> Signed-off-by: John Snow <jsnow@redhat.com>
->>>> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
->>>> Reviewed-by: Cleber Rosa <crosa@redhat.com>
->>>> Tested-by: Cleber Rosa <crosa@redhat.com>
->>>> ---
->>>>    scripts/qapi-gen.py | 85 +++++++++++++++++++++++++++++++++------------
->>>>    1 file changed, 62 insertions(+), 23 deletions(-)
->>>>
->>>> diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
->>>> index 541e8c1f55d..117b396a595 100644
->>>> --- a/scripts/qapi-gen.py
->>>> +++ b/scripts/qapi-gen.py
->>>> @@ -1,30 +1,77 @@
->>>>    #!/usr/bin/env python3
->>>> -# QAPI generator
->>>> -#
->>>> +
->>>>    # This work is licensed under the terms of the GNU GPL, version 2 or later.
->>>>    # See the COPYING file in the top-level directory.
->>>>    +"""
->>>> +QAPI Generator
->>>> +
->>>> +This script is the main entry point for generating C code from the QAPI schema.
->>> PEP 8: For flowing long blocks of text with fewer structural
->>> restrictions (docstrings or comments), the line length should be limited
->>> to 72 characters.
->>>
->>
->> Eugh. OK, but I don't have a good way to check or enforce this,
->> admittedly. I have to change my emacs settings to understand this when
->> I hit the reflow key. I don't know if the python mode has a
->> context-aware reflow length.
->>
->> ("I don't disagree, but I'm not immediately sure right now how I will
->> make sure I, or anyone else, complies with this. Low priority as a
->> result?")
-> 
-> Emacs Python mode is close enough by default: fill-paragraph (bound to
-> M-q) uses variable fill-column, which defaults to 70.  If you want the
-> extra two columns PEP 8 grants you, I can show you how to bump it to 72
-> just for Python mode.
-> 
-> You can use fill-paragraph for code, too.  I don't myself, because I
-> disagree with its line breaking decisions too often (and so does PEP 8).
-> A better Python mode would break code lines more neatly, and with the
-> width defaulting to 79.
-> 
+This series adds support for VFIO endpoints to virtio-iommu.
 
-Yeah, how do I set the reflow to 72 for specific modes?
+Versions 1 to 9 were posted by Bharat Bhushan, but I am taking over for
+now since he doesn't have much time to spend on it. Thanks again Bharat
+for the work!
 
-I tend to do a lot of refactoring and "prototyping" in Pycharm, but when 
-it comes to bread and butter edits I still prefer emacs. I kinda bounce 
-between 'em a lot. Having emacs DTRT is still useful to me.
+Two major changes since [v9]:
 
->>>> +"""
->>>>      import argparse
->>>>    import re
->>>>    import sys
->>>>      from qapi.commands import gen_commands
->>>> +from qapi.error import QAPIError
->>>>    from qapi.events import gen_events
->>>>    from qapi.introspect import gen_introspect
->>>> -from qapi.schema import QAPIError, QAPISchema
->>>> +from qapi.schema import QAPISchema
->>>>    from qapi.types import gen_types
->>>>    from qapi.visit import gen_visit
->>>>      
->>>> -def main(argv):
->>>> +DEFAULT_OUTPUT_DIR = ''
->>>> +DEFAULT_PREFIX = ''
->>>> +
->>>> +
->>>> +def generate(schema_file: str,
->>>> +             output_dir: str,
->>>> +             prefix: str,
->>>> +             unmask: bool = False,
->>>> +             builtins: bool = False) -> None:
->>>> +    """
->>>> +    generate uses a given schema to produce C code in the target directory.
->>> PEP 257: The docstring is a phrase ending in a period.  It
->>> prescribes
->>> the function or method's effect as a command ("Do this", "Return that"),
->>> not as a description; e.g. don't write "Returns the pathname ...".
->>> Suggest
->>>          Generate C code for the given schema into the target
->>> directory.
->>>
->>
->> OK. I don't mind trying to foster a consistent tone. I clearly
->> didn't. I will add a note to my style guide todo.
->>
->> I give you permission to change the voice in any of my docstrings, or
->> to adjust the phrasing to be more technically accurate as you see
->> fit. You are the primary maintainer of this code, of course, and you
->> will know best.
->>
->> It will be quicker to give you full permission to just change any of
->> the docstrings as you see fit than it will be to play review-respin
->> ping-pong.
-> 
-> Me rewriting your commits without your consent is putting words in your
-> mouth, which I don't want to do.
-> 
-> We can still reduce ping-pong: whenever I can, I don't just say "this
-> needs improvement", I propose improvements.  If you disagree, we talk.
-> Else, if you have to respin, you make a reasonable effort to take them.
-> Else, the remaining improvements are trivial (because no respin), and
-> I'll make them in my tree.
-> 
+* Don't use per-endoint page_size_mask properties. Instead keep a global
+  page size for the virtio-iommu device, updated when adding a VFIO
+  endpoint. Reject hotplug if the page size is incompatible.
 
-I appreciate the consideration. They're not just "my" words, though, 
-they are "our" words!
+* Try to make the MAP/UNMAP paths more efficient, by keeping track of
+  memory region within the endpoint structure.
 
-I do give you permission to touch up things like punctuation, voice, 
-etc. If I dislike the changes I can always yelp at you post-hoc when you 
-post the PR email.
+More testing would be appreciated, since I can only test using a software
+model as host at the moment. But it does seem to hold well with PCIe
+hotplug/unplug, and pass-through to guest userspace, which are no mean
+feat.
 
-So I'll reiterate that I am definitely happy with such changes -- the 
-precision of the technical writing here is not my strong suit as I do 
-not know QAPI as intimately as you, and it's not the focus of this 
-series. I don't think of it as a personal offense that someone would 
-copy-edit these things.
+Note that one page size combination is not supported: host 64kB guest
+4kB cannot work, because the host IOMMU driver will automatically pick
+64kB pages which prevents mapping at a smaller granule. Supporting this
+case would require introducing a page size negotiation mechanism from
+the guest all the way to the host IOMMU driver. Possible, but not
+planned at the moment.
 
-If you're not comfortable doing it, that's OK too, but I'm definitely 
-okay with things like comment and docstring edits in particular. It's 
-just something that feels hard to predict.
+[v9] https://lore.kernel.org/qemu-devel/20200323084617.1782-1-bbhushan2@marvell.com/
 
-(Anyway, I made this change. There are likely other voice and line 
-length changes needed, but I think I will try to address those 
-systematically when I lift missing-docstring for pylint. Probably I will 
-craft a series that creates a style guide, enables sphinx, lifts 
-missing-docstring, and performs this same style of cleanup, going 
-module-by-module.)
+Bharat Bhushan (7):
+  virtio-iommu: Add memory notifiers for map/unmap
+  virtio-iommu: Call memory notifiers in attach/detach
+  virtio-iommu: Add replay() memory region callback
+  virtio-iommu: Add notify_flag_changed() memory region callback
+  memory: Add interface to set iommu page size mask
+  vfio: Set IOMMU page size as per host supported page size
+  virtio-iommu: Set supported page size mask
 
->>>> +
->>>> +    :param schema_file: The primary QAPI schema file.
->>>> +    :param output_dir: The output directory to store generated code.
->>>> +    :param prefix: Optional C-code prefix for symbol names.
->>>> +    :param unmask: Expose non-ABI names through introspection?
->>>> +    :param builtins: Generate code for built-in types?
->>>> +
->>>> +    :raise QAPIError: On failures.
->>>> +    """
->>> [...]
->>>
+Jean-Philippe Brucker (3):
+  virtio-iommu: Fix virtio_iommu_mr()
+  virtio-iommu: Store memory region in endpoint struct
+  vfio: Don't issue full 2^64 unmap
+
+ include/exec/memory.h    |  26 +++++
+ hw/vfio/common.c         |  19 ++++
+ hw/virtio/virtio-iommu.c | 204 ++++++++++++++++++++++++++++++++++++++-
+ softmmu/memory.c         |  13 +++
+ hw/virtio/trace-events   |   5 +
+ 5 files changed, 265 insertions(+), 2 deletions(-)
+
+-- 
+2.28.0
 
 
