@@ -2,64 +2,88 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DF91C4363A
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 11:03:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58E38C43467
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 11:06:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ADB02217BA
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 11:03:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADB02217BA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 86D9F215A4
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 11:06:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u1sD84H/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86D9F215A4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQTiB-0004y2-5h
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 07:03:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43022)
+	id 1kQTkp-0006Jo-Gg
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 07:06:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43840)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kQTgz-0004SM-Io
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 07:02:37 -0400
-Received: from mx2.suse.de ([195.135.220.15]:44294)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kQTgw-0001Zh-VS
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 07:02:37 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id 3D423AFD5;
- Thu,  8 Oct 2020 11:02:33 +0000 (UTC)
-Subject: Re: [PATCH 2/2] exec: split out non-softmmu-specific parts
-To: Paolo Bonzini <pbonzini@redhat.com>
-References: <20201006091922.331832-1-pbonzini@redhat.com>
- <20201006091922.331832-3-pbonzini@redhat.com>
- <cb553da1-9cd1-1933-d678-8580a3c0d8f3@suse.de>
- <027d0f5c-d5c4-911b-b349-f63895fc164d@redhat.com>
-From: Claudio Fontana <cfontana@suse.de>
-Message-ID: <b6e4d4e0-6170-b3e6-f2f7-e337c71b0403@suse.de>
-Date: Thu, 8 Oct 2020 13:02:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kQTjp-0005i1-7z
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 07:05:33 -0400
+Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:39045)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kQTjl-0001rW-Sn
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 07:05:32 -0400
+Received: by mail-ej1-x641.google.com with SMTP id lw21so7492053ejb.6
+ for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 04:05:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=G4MqhLqpjMcTPLUEHu+e5WavH2k49KYPVDzsHyniNXI=;
+ b=u1sD84H/Td+ncJk3VHEhOQbsgvpquiGKHv7UPQTcbhDXN74GY8CysqTNVhkLQ/Ig/4
+ Ty02vHI4ql7AXY7x3HMbYLMAMR2ZVeRlLuvrcSUzaKkbqY9JsOoD8maapGklfGxdeECV
+ ER+k3Oudwf8VjpzqQ2WFkaueLanztSjxH6BpimJGcDM5yHfpR4JB6K5xl9ieJSRjqElH
+ MM28H5h3H//vPoVgu2v3VIVhkEWCP4YccuhiJ0U91WapWAneqJwLAw4xg8gpnHdniHsP
+ eJkT12nJNhgOySkcmSjsN+9/GzK/zgQwM9/BWE5HHyn48OuSvTaQ35vAMlf5ee223pX6
+ NAXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=G4MqhLqpjMcTPLUEHu+e5WavH2k49KYPVDzsHyniNXI=;
+ b=QD+b247kx5Fvaq8gVN+IvG1G6e+AgJg0uxSr1JYgC9QQZNQDrzm0RJbmgx+ou4PwLh
+ F8xAiGsgV2gqSgInOFN6L/1g3Hkn8aS5+tOgUTH9HzJmnwYnLQLURvn7cPUoYe9VZPtR
+ IT+OjE3R1zx6tLZuNfwMn9K78CXSvHjj/QHFMPDbMPTAlNtJYoXeku29wG33q7Ld6Qdk
+ DMHpWTA8vNQo2caO+YQYopyE74CtsCfglfdLPBluDQl+FqtJgNpV579ZRYyy1x0BCJcB
+ +IlWQmW9gwmq41bR6XEec0F/26y8YzHw+J7XqYcgJJXwGU+Ggz7y19ToOz3+jA2cSd/r
+ jFqw==
+X-Gm-Message-State: AOAM5307AQo5gf05mEZTKjzw8SDetdSNFv0pyARKuL/lIw0rD3VRWTTB
+ LsNi1TTjZOOflDfYPoQybHn8/jr1DbmMuoEnINptOA==
+X-Google-Smtp-Source: ABdhPJygOkRHPzzCYx16qklrexgJa+piwJ2IhPnbM096E/hNH5HECV7YzYWZRU/ofeqijz6iXMpQIqScfnAoFlx3zVk=
+X-Received: by 2002:a17:906:ce21:: with SMTP id
+ sd1mr8354395ejb.4.1602155127018; 
+ Thu, 08 Oct 2020 04:05:27 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <027d0f5c-d5c4-911b-b349-f63895fc164d@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 23:49:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20201002181032.1899463-1-f4bug@amsat.org>
+In-Reply-To: <20201002181032.1899463-1-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 8 Oct 2020 12:05:15 +0100
+Message-ID: <CAFEAcA__ibwCfP72qQch9ahmQAo07i-yTzTPbK60H5H0Trubtg@mail.gmail.com>
+Subject: Re: [PATCH] hw/char/bcm2835_aux: Allow less than 32-bit accesses
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::641;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x641.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -72,86 +96,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Luc Michel <luc@lmichel.fr>, "Michael S . Tsirkin" <mst@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Paul Zimmerman <pauldzim@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/8/20 9:56 AM, Paolo Bonzini wrote:
-> On 08/10/20 09:47, Claudio Fontana wrote:
->> On 10/6/20 11:19 AM, Paolo Bonzini wrote:
->>> Over the years, most parts of exec.c that were not specific to softmmu
->>> have been moved to accel/tcg; what's left is mostly the low-level part
->>> of the memory API, which includes RAMBlock and AddressSpaceDispatch.
->>> However exec.c also hosts 4-500 lines of code for the target specific
->>> parts of the CPU QOM object, plus a few functions for user-mode
->>> emulation that do not have a better place (they are not TCG-specific so
->>> accel/tcg/user-exec.c is not a good place either).
->>>
->>> Move these parts to a new file, so that exec.c can be moved to
->>> softmmu/physmem.c.
->>>
->>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->>
->> Hi Paolo,
->>
->> the comment does not talk about cpu.c, which is now created in the top source directory.
->> What is the role of this new module?
-> 
-> It's actually in the commit message: "4-500 lines of code for the target
-> specific parts of the CPU QOM object, plus a few functions for user-mode
-> emulation that do not have a better place".
-> 
-> It's basically sitting between hw/core/cpu.c and target/*/cpu.c.  Hence
-> the non-descriptive name. :)
-> 
->> Also, could we find a more descriptive file name than cpu.c?
->> Do you plan further renaming of this new module functions?
->>
->> Or its this basically a "leftovers" file for which we did not find a proper role yet?
-> 
-> The user-mode parts are, but most of it is implementing the QOM CPU
-> object.  We can move those functions to hw/core/cpu.c and make that file
-> target-dependent, I wouldn't object to that.  But since there are some
-> opportunities for simplification, I'd rather do that in a separate patch
-> and keep the pure code-movement in this one.
-> 
-> Paolo
-> 
+On Fri, 2 Oct 2020 at 19:10, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
+wrote:
+>
+> The "BCM2835 ARM Peripherals" datasheet [*] chapter 2
+> ("Auxiliaries: UART1 & SPI1, SPI2"), list the register
+> sizes as 3/8/16/32 bits. We assume this means this
+> peripheral allows 8-bit accesses.
+>
+> This was not an issue until commit 5d971f9e67 which reverted
+> ("memory: accept mismatching sizes in memory_region_access_valid").
+>
+> The model is implemented as 32-bit accesses (see commit 97398d900c,
+> all registers are 32-bit) so replace MemoryRegionOps.valid as
+> MemoryRegionOps.impl, and re-introduce MemoryRegionOps.valid
+> with a 8/32-bit range.
+>
+> [*] https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Periphera=
+ls.pdf
+>
+> Fixes: 97398d900c ("bcm2835_aux: add emulation of BCM2835 AUX (aka UART1)=
+ block")
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+> Noticed while running Trusted Firmware-A on the raspi3:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg680115.html
+> ---
+>  hw/char/bcm2835_aux.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/char/bcm2835_aux.c b/hw/char/bcm2835_aux.c
+> index ee3dd40e3c..dade2ab5fd 100644
+> --- a/hw/char/bcm2835_aux.c
+> +++ b/hw/char/bcm2835_aux.c
+> @@ -249,7 +249,9 @@ static const MemoryRegionOps bcm2835_aux_ops =3D {
+>      .read =3D bcm2835_aux_read,
+>      .write =3D bcm2835_aux_write,
+>      .endianness =3D DEVICE_NATIVE_ENDIAN,
+> -    .valid.min_access_size =3D 4,
+> +    .impl.min_access_size =3D 4,
+> +    .impl.max_access_size =3D 4,
+> +    .valid.min_access_size =3D 1,
+>      .valid.max_access_size =3D 4,
+>  };
 
-Ciao Paolo,
+We don't seem to document the exact semantics you get for
+a write with a size smaller than the impl.min_access_size.
+Looking at the implementation in softmmu/memory.c, the
+answer seems to be "it's turned into a write at the larger
+size where the other bits in the write are zeroes".
+Those semantics seem OK for this device (though there are
+devices where they would not be, I suspect).
+(The other plausible implementation would have been
+"we do a read-modify-write sequence", which would not be
+OK for this device, since it has some "device state changes
+on read" registers like AUX_MU_IO_REG.)
 
-this gives me an idea, we already basically have a target-specific part of a cpu QEMU object.
+We should probably clarify the comments in the MemoryRegionOps
+struct to nail down the behaviour when the .impl constraints
+are tighter than the .valid ones, but for this patch:
 
-I basically was looking for a place to graft accelerator-specific code in order to refactor target/i386/cpu..., 
-to split between tcg stuff and non-tcg stuff, and thus refactor even more code.
+Applied to target-arm.next, thanks.
 
-In the past I thought to put them here for example:
-
-diff --git a/target/i386/cpu-qom.h b/target/i386/cpu-qom.h
-index 3e96f8d668..3716c3e949 100644
---- a/target/i386/cpu-qom.h
-+++ b/target/i386/cpu-qom.h
-@@ -72,6 +72,12 @@ typedef struct X86CPUClass {
-     DeviceRealize parent_realize;
-     DeviceUnrealize parent_unrealize;
-     DeviceReset parent_reset;
-+
-+    /* methods operating on CPUX86State */
-+    uint32_t (*cpu_compute_eflags)(CPUX86State *env);
-+    void (*cpu_set_mxcsr)(CPUX86State *env, uint32_t mxcsr);
-+    void (*cpu_set_fpuc)(CPUX86State *env, uint16_t fpuc);
-+    void (*cpu_report_tpr_access)(CPUX86State *env, TPRAccess access);
- } X86CPUClass;
- 
- typedef struct X86CPU X86CPU;
-
-
-But maybe that is the right component?
-
-Just thinking out loud here.
-
-Ciao,
-
-Claudio
+-- PMM
 
