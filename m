@@ -2,63 +2,66 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45A57C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 19:02:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D1B3C433E7
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 19:02:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F27E207DE
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 19:02:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A28B207DE
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 19:02:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gNkdFeB2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F27E207DE
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GOlWO45A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A28B207DE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQbBF-0001Av-Fs
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 15:02:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46710)
+	id 1kQbBP-0001GF-2r
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 15:02:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46782)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kQb90-0007qE-2M
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 15:00:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53001)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kQb92-0007sa-Bm
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 15:00:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45975)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kQb8x-0003e8-Oa
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 15:00:01 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kQb8y-0003eh-Q9
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 15:00:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602183598;
+ s=mimecast20190719; t=1602183600;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=4rH7SCLNftujNBG8qvGoPgJAONA4bPJF54Um58rRv9k=;
- b=gNkdFeB2veOkUnj1tppv3h2eSJgL/u+iIwfd41rVgDm0eINY/Tojb3Eit6CHP9gjeXxw6i
- Oq7o1c/iLv9Pwjhu6KfY7i9jz1Zc2Nbs4MbDTn3iUkcAfLkIQO1VL8/apOvMh2SzgtU5WW
- kyLTwJ//G3B4I6X9+I9tT68DMM9zaWk=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=rMbqo0xt+T/OQzwlre+9lBBzOy3KdXiaGhZEG3FlEfc=;
+ b=GOlWO45AinmphwLyCb+3Ii2AnZoJwgJT7RJoZ6FJPLdZVGonLZXVbtX8WrKh5OJdurUL1r
+ CcQhGrj+FJH1qcZioSF5XyvswJuZiaW69p+mEyT0+l/s/fwcIKkDh4YW1Cot93RIXn2+nV
+ Ij82l4gM6/QDkT+VfQ7ml9/QebZAVVA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-539-CnIR6Zy9O9O0Ax9ETzTU-w-1; Thu, 08 Oct 2020 14:59:55 -0400
-X-MC-Unique: CnIR6Zy9O9O0Ax9ETzTU-w-1
+ us-mta-275-DV8XQzGrMcikI7NI_t6FGQ-1; Thu, 08 Oct 2020 14:59:56 -0400
+X-MC-Unique: DV8XQzGrMcikI7NI_t6FGQ-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3282E80401A
- for <qemu-devel@nongnu.org>; Thu,  8 Oct 2020 18:59:54 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B0C131018F83;
+ Thu,  8 Oct 2020 18:59:54 +0000 (UTC)
 Received: from blue.redhat.com (ovpn-113-14.phx2.redhat.com [10.3.113.14])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0132E5D9E8
- for <qemu-devel@nongnu.org>; Thu,  8 Oct 2020 18:59:53 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5FA0A5D9E8;
+ Thu,  8 Oct 2020 18:59:54 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 0/8] NBD patches through 2020-10-08
-Date: Thu,  8 Oct 2020 13:59:43 -0500
-Message-Id: <20201008185951.1026052-1-eblake@redhat.com>
+Subject: [PULL 1/8] nbd: silence maybe-uninitialized warnings
+Date: Thu,  8 Oct 2020 13:59:44 -0500
+Message-Id: <20201008185951.1026052-2-eblake@redhat.com>
+In-Reply-To: <20201008185951.1026052-1-eblake@redhat.com>
+References: <20201008185951.1026052-1-eblake@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
@@ -77,7 +80,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -90,50 +93,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
+ "open list:Network Block Dev..." <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit e64cf4d569f6461d6b9072e00d6e78d0ab8bd4a7:
+From: Christian Borntraeger <borntraeger@de.ibm.com>
 
-  Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20201008' into staging (2020-10-08 17:18:46 +0100)
+gcc 10 from Fedora 32 gives me:
 
-are available in the Git repository at:
+Compiling C object libblock.fa.p/nbd_server.c.o
+../nbd/server.c: In function ‘nbd_co_client_start’:
+../nbd/server.c:625:14: error: ‘namelen’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
+  625 |         rc = nbd_negotiate_send_info(client, NBD_INFO_NAME, namelen, name,
+      |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  626 |                                      errp);
+      |                                      ~~~~~
+../nbd/server.c:564:14: note: ‘namelen’ was declared here
+  564 |     uint32_t namelen;
+      |              ^~~~~~~
+cc1: all warnings being treated as errors
 
-  https://repo.or.cz/qemu/ericb.git tags/pull-nbd-2020-10-08
+As I cannot see how this can happen, let uns silence the warning.
 
-for you to fetch changes up to 82cd3c26889adbd41756de121d38a3aa7c9351c7:
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Message-Id: <20200930155859.303148-3-borntraeger@de.ibm.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ nbd/server.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  nbd: Simplify meta-context parsing (2020-10-08 13:35:07 -0500)
-
-----------------------------------------------------------------
-nbd patches for 2020-10-08
-
-- silence compilation warnings
-- more fixes to prevent reconnect hangs
-- improve 'qemu-nbd' termination behavior
-- cleaner NBD protocol compliance on string handling
-
-----------------------------------------------------------------
-Christian Borntraeger (1):
-      nbd: silence maybe-uninitialized warnings
-
-Eric Blake (3):
-      qemu-nbd: Honor SIGINT and SIGHUP
-      nbd/server: Reject embedded NUL in NBD strings
-      nbd: Simplify meta-context parsing
-
-Vladimir Sementsov-Ogievskiy (4):
-      block/nbd: fix drain dead-lock because of nbd reconnect-delay
-      block/nbd: correctly use qio_channel_detach_aio_context when needed
-      block/nbd: fix reconnect-delay
-      block/nbd: nbd_co_reconnect_loop(): don't connect if drained
-
- block/nbd.c  |  71 ++++++++++++++++---
- nbd/server.c | 221 ++++++++++++++++++++++++-----------------------------------
- qemu-nbd.c   |  11 +--
- 3 files changed, 155 insertions(+), 148 deletions(-)
-
+diff --git a/nbd/server.c b/nbd/server.c
+index f74766add7b7..f25cffa334fa 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -556,7 +556,7 @@ static int nbd_negotiate_handle_info(NBDClient *client, Error **errp)
+     NBDExport *exp;
+     uint16_t requests;
+     uint16_t request;
+-    uint32_t namelen;
++    uint32_t namelen = 0;
+     bool sendname = false;
+     bool blocksize = false;
+     uint32_t sizes[3];
 -- 
 2.28.0
 
