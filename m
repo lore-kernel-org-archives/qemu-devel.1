@@ -2,66 +2,86 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7AB6C43467
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 12:43:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DB78C4363A
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 12:54:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E86CC206E9
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 12:43:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E86CC206E9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id EC653207DE
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 12:54:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i8VIieey"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC653207DE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQVGE-0007Y3-Tg
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 08:43:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40030)
+	id 1kQVRe-0002AI-T3
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 08:54:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44332)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kQVFK-00074r-6h
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 08:42:10 -0400
-Received: from mx2.suse.de ([195.135.220.15]:43012)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kQVFI-00081k-0D
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 08:42:09 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id 9AF68AFDF;
- Thu,  8 Oct 2020 12:42:06 +0000 (UTC)
-Subject: Re: [PATCH 2/2] exec: split out non-softmmu-specific parts
-To: Paolo Bonzini <pbonzini@redhat.com>
-References: <20201006091922.331832-1-pbonzini@redhat.com>
- <20201006091922.331832-3-pbonzini@redhat.com>
- <cb553da1-9cd1-1933-d678-8580a3c0d8f3@suse.de>
- <027d0f5c-d5c4-911b-b349-f63895fc164d@redhat.com>
- <b6e4d4e0-6170-b3e6-f2f7-e337c71b0403@suse.de>
- <0ad53a3b-f28b-b53b-2541-3108e40e282a@redhat.com>
-From: Claudio Fontana <cfontana@suse.de>
-Message-ID: <d013a1c0-9450-c864-d762-13ead60ab8f3@suse.de>
-Date: Thu, 8 Oct 2020 14:42:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kQVQo-0001hl-Ci
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 08:54:02 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:37220)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kQVQk-0001Pq-Cl
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 08:54:01 -0400
+Received: by mail-ed1-x544.google.com with SMTP id o18so5725927edq.4
+ for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 05:53:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Yls9ZC0VO5ylKhPi7qnP5iii08Gb+4vluiuZKcCXoIw=;
+ b=i8VIieey7xCEwnsQb0gUlPinVo0aiaUmHqp/EeDzidPhjC9Bhz2TUbJauDj79rMv9z
+ h77oikGS7xEbsANKkeHN+HcuRKpKst+GgGCTuIuDbO7QeBiKwfUloAMxWAEt3narKfQh
+ hwSidfvESaIFPwK2SGpHAmjbOyHCNH5nX4SpbgEejCkeYEltl2nIbsauunRhCfCA+5MK
+ hTdbZ84+Ik3gnaq4UmUeq6Ze2J1O0e8xNPBq8kZNg0ZC/Mg5a4kUVDvH/+Ojoq9cxlky
+ Aji3du38LNnXIskr+DbeAzljxG9zk+i8vdj8ovKWJERJWJnYRpEIOuIbzeYfIlj+f35q
+ zqqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Yls9ZC0VO5ylKhPi7qnP5iii08Gb+4vluiuZKcCXoIw=;
+ b=jGnq4jmeAWDGnmCk3ZPPtgF80W5ijMHYggUc151Uu+yo91o6DSF9HCxG4071Y64hMj
+ oV5N1PRNcS6jJZJ8mBGgK8oyS0HUOXU+sqbv7vV5KTjSPZtEdU9MKM6DZ8+0BS27IGYB
+ ncYrZYEQGVHRBEeuknnnRwKPpQpbDGcpeURn9nTT752minUQ9mMNEERyfcOHd3uNQXiG
+ gkKSKj1LKM2ucbStbqdAOrH2hIsNfywkpFvuIr2xdmmo6FWhTi9iM0f8v3qUx9DA5C0e
+ WFvh+6pqVmOFy+4z+oca2VGqlOM2Tio6n6NFs0tQ6zhhoSKfhWOJTKyQ6PdodjWGkLXb
+ kjPg==
+X-Gm-Message-State: AOAM531YCdFgkYrbksqRd4trWTQCYmq1QOBwmO3/pcw6oAPIgk6Uh7OX
+ I4p+XKmJZp4NH3L8SyPv5DFtnMk/bXQQt5HtD1atCg==
+X-Google-Smtp-Source: ABdhPJwGR2xg96/sVIfK1Ybnhz7hU26jsoTcTP8uQPgs3nIob0AlgAJbujOGqr+x0rEztZHRaMYvE4M3RoIP9m0sP9w=
+X-Received: by 2002:aa7:c7d7:: with SMTP id o23mr8756577eds.44.1602161636491; 
+ Thu, 08 Oct 2020 05:53:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <0ad53a3b-f28b-b53b-2541-3108e40e282a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 23:49:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.214,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20201001170752.82063-1-richard.henderson@linaro.org>
+ <20201001170752.82063-2-richard.henderson@linaro.org>
+In-Reply-To: <20201001170752.82063-2-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 8 Oct 2020 13:53:45 +0100
+Message-ID: <CAFEAcA9JbDSVA5rCNbdAXsytLcpAOJP8bnjqbugYL-EicFUXNw@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/2] accel/tcg: Add tlb_flush_page_bits_by_mmuidx*
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::544;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x544.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -74,70 +94,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Jordan Frank <jordanfrank@fb.com>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/8/20 1:36 PM, Paolo Bonzini wrote:
-> On 08/10/20 13:02, Claudio Fontana wrote:
->>>> What is the role of this new module?
->>>
->>> It's [...] "4-500 lines of code for the target
->>> specific parts of the CPU QOM object, plus a few functions for user-mode
->>> emulation that do not have a better place".
->>>
->>> It's basically sitting between hw/core/cpu.c and target/*/cpu.c.  Hence
->>> the non-descriptive name. :)
->>>
->>>> Or its this basically a "leftovers" file for which we did not find a proper role yet?
->>>
->>> The user-mode parts are, but most of it is implementing the QOM CPU
->>> object.  We can move those functions to hw/core/cpu.c and make that file
->>> target-dependent, I wouldn't object to that.
->>
->> this gives me an idea, we already basically have a target-specific part of a cpu QEMU object.
-> 
-> Which is? :)  Sorry I don't follow.  We have one that depends on the
-> target architecture (methods in the CPU class), but not one that depends
-> on the target kind.  We could add more methods in the CPU class for
-> that, but I'm not sure it would be useful because (unlike CPUs of which
-> in theory there could be >1 class in the system) the whole emulation
-> _has_ to be either user-level or system.
-> 
->> I basically was looking for a place to graft accelerator-specific code in order to refactor target/i386/cpu..., 
->> to split between tcg stuff and non-tcg stuff, and thus refactor even more code.
->>
->> In the past I thought to put them here for example:
->>
->> diff --git a/target/i386/cpu-qom.h b/target/i386/cpu-qom.h
->> index 3e96f8d668..3716c3e949 100644
->> --- a/target/i386/cpu-qom.h
->> +++ b/target/i386/cpu-qom.h
->> @@ -72,6 +72,12 @@ typedef struct X86CPUClass {
->>      DeviceRealize parent_realize;
->>      DeviceUnrealize parent_unrealize;
->>      DeviceReset parent_reset;
->> +
->> +    /* methods operating on CPUX86State */
->> +    uint32_t (*cpu_compute_eflags)(CPUX86State *env);
->> +    void (*cpu_set_mxcsr)(CPUX86State *env, uint32_t mxcsr);
->> +    void (*cpu_set_fpuc)(CPUX86State *env, uint16_t fpuc);
->> +    void (*cpu_report_tpr_access)(CPUX86State *env, TPRAccess access);
->>  } X86CPUClass;
->>  
->>  typedef struct X86CPU X86CPU;
-> 
-> I think in this case you would have an X86AccelOps struct and a global
-> variable pointing to it.
-> 
-> Paolo
-> 
-> 
+On Thu, 1 Oct 2020 at 18:07, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> On ARM, the Top Byte Ignore feature means that only 56 bits of
+> the address are significant in the virtual address.  We are
+> required to give the entire 64-bit address to FAR_ELx on fault,
+> which means that we do not "clean" the top byte early in TCG.
+>
+> This new interface allows us to flush all 256 possible aliases
+> for a given page, currently missed by tlb_flush_page*.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> +static void tlb_flush_page_bits_by_mmuidx_async_1(CPUState *cpu,
+> +                                                  run_on_cpu_data data)
+> +{
+> +    target_ulong addr_map_bits = (target_ulong) data.target_ptr;
+> +    target_ulong addr = addr_map_bits & TARGET_PAGE_MASK;
+> +    uint16_t idxmap = (addr_map_bits & ~TARGET_PAGE_MASK) >> 6;
+> +    unsigned bits = addr_map_bits & 0x3f;
 
-I was hoping to make use of some of the object model ... but lets get to this when we get to this later on.
+So this is unpacking...
 
-Ciao, thanks!
+> +    } else if (idxmap <= MAKE_64BIT_MASK(0, TARGET_PAGE_BITS - 6)) {
+> +        run_on_cpu_data data
+> +            = RUN_ON_CPU_TARGET_PTR(addr | (idxmap << 6) | bits);
 
-Claudio
+...the value that we packed into an integer here...
+
+> +        run_on_cpu_data data
+> +            = RUN_ON_CPU_TARGET_PTR(addr | (idxmap << 6) | bits);
+
+...here...
+
+> +    if (idxmap <= MAKE_64BIT_MASK(0, TARGET_PAGE_BITS - 6)) {
+> +        run_on_cpu_data data
+> +            = RUN_ON_CPU_TARGET_PTR(addr | (idxmap << 6) | bits);
+
+...and here.
+
+Could we do something to avoid all these hard-coded 6s and
+maybe make it a bit clearer that these two operations
+are the inverse of each other?
+
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
 
