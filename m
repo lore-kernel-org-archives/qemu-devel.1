@@ -7,79 +7,80 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52BA4C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 17:24:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DF9CC433E7
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 17:24:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC772204EF
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 17:24:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C36FA204EF
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 17:24:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yIw1MAKa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC772204EF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EyrxZREV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C36FA204EF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQZeK-0006Kf-MS
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 13:24:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50662)
+	id 1kQZea-0006NB-B9
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 13:24:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50628)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jean-philippe@linaro.org>)
- id 1kQZXK-0004yX-Mw
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 13:17:02 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33634)
+ id 1kQZXI-0004tL-Ad
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 13:17:00 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45192)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <jean-philippe@linaro.org>)
- id 1kQZXJ-0006fr-0P
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 13:17:02 -0400
-Received: by mail-wr1-x444.google.com with SMTP id m6so7473672wrn.0
- for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 10:17:00 -0700 (PDT)
+ id 1kQZXG-0006fW-N2
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 13:16:59 -0400
+Received: by mail-wr1-x441.google.com with SMTP id e17so7441976wru.12
+ for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 10:16:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=p50MWhGLP7hiQqo9k1Cd/hlKchaRnczIO062DRXykeA=;
- b=yIw1MAKayAf8CcmYBRcz1zSVjIHA2H8NHC5brGv6QPyhJgr59niuFEFagtORN2/L+6
- SBrmOgZrXrubkw/AYVv5yvyRT8vpolsAF2dvulie5Jhh17xRagfltp8WJ0RiYsx8DeeN
- VRNkCa7H9gpm9aa3znGgwNLHsIcFovDaosH/88DzCkMZjFjbkJ7NAjcvcg2XbK2Lz3/x
- UimfQmNn1qHLhsud3Yq+W3j5p4FQPsE5b2kTt3uMe9RdaY4E9oSUpN5lkQ9qvOMvgpDp
- 7uiI2AIpUu1FEoUpnvqhPPf/APQ4MZtV/SajK83EaqHUw9gdqtfRtkZ5hyExbyLZ09XP
- Q2XA==
+ bh=L1iwuBZlH4emBp6JRkoZKYjiVdXM0akqIZ599ofxEZI=;
+ b=EyrxZREVUHgy5vw5UiEmWm03eUn0arKOFhK+mjzTZ7AeN/CRCExxvbDQ6i6krXVuKe
+ 9UFs4pVf6DVAHtgUO6pf2MNpnc8BdOkkcJU958m577J4kFZMZPVdvEQCUHhYFQ+VLdrx
+ txNKQIIhOwSYvr8xV5DGNiIkAf972NCmn8JKUVa1lR05vRXh37sRheKkUw0S9H4cY0wk
+ T/+FQQuKpwFB9C6hrT0Jg/Tj5RZ8KaOq5RS4A1bFs+xoV3JcEUHhLpFqdnDGgcX96tNB
+ DBaWdY4tfrXFvEO6cjSiV9GE3DMh39O2Q1q86+QrS6/N4UoEMNBTa1LO63XzJ10wx3wp
+ 6vgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=p50MWhGLP7hiQqo9k1Cd/hlKchaRnczIO062DRXykeA=;
- b=OG0v0mVV/b27B/iW+JL8+IEGKOWSaHL0wqYm8aJhky8YmqAMNkCpmX6U069Ap1GzQT
- mLWyRfLEJUoaZkcjd1ZRRc00U6Mj427dR4oqNNo4bXraqzyYSAkrY2XZ+47sYx/1oxmw
- jrWrz4ZL8jzdEg0WTnTcqkWgahXnR8JxXw/VAACjldPDUdG8SLsE4eNw8UaMzJ3LD6tn
- P0JskkKQmP0KVXHAABpM3QYlAAH1TL++l212u5ekIQNQibrFJBUXUVEoL5MpVdTD0zLO
- e2mI4d9D8HVzr+T3isH7grn2HDRybpX2tddT2bbvvOBd8B88M/s8CZQMWYTxhLbURJtt
- Fawg==
-X-Gm-Message-State: AOAM530nDnL+Wr51gdb7yYttYS1GBvj/Tz4hD1wojka+k7smBhKl7mMs
- BXlTgs74QvVYK66Hb57Udje94A==
-X-Google-Smtp-Source: ABdhPJz4WnokWMCtKF28HBnMb9p1e5OoHBhB5yOGo+66ZSP6TVJY6+dY+UIDqeJLVinwMxq9tkMbVw==
-X-Received: by 2002:a5d:4d01:: with SMTP id z1mr10377411wrt.366.1602177419675; 
- Thu, 08 Oct 2020 10:16:59 -0700 (PDT)
+ bh=L1iwuBZlH4emBp6JRkoZKYjiVdXM0akqIZ599ofxEZI=;
+ b=mPlDbWP+GL/VBMVT6hgjpAju1gp3hZ0BxDR1XMgGeenDUNdceswJby8DpWKGnBjoJP
+ 86Q4p/7aYhezczNoVIfX9KjM6FWI3/jNlYUgB+bQK+DMLnHT7Am8HhCD+Hda/fZBzkIG
+ nWQRnGux/QhW5N6B6MatQqUhV49MH2Sg5KSpTndDiZQAa8KRx33wFZ5Ielseaersop3u
+ LF9WdgAokWdLJuoNfavQia4eviRoelep8QDq25xQJ3hdf0YpUrJJrLpKgO855HGkvxtY
+ 1sdn8kR/b8IhnE4V/Z64a/qkfXO/5VXUcN/+oowtEds1rcR39JXiU57bhIkq36rfcoqY
+ 9aYg==
+X-Gm-Message-State: AOAM5320+PBYlewNvX5KLDBRNj2KaSp3vGqew1e5IybRRRhM+BZYvkFd
+ NFWrFIwGZg4lOtPtQhUWs5zcdA==
+X-Google-Smtp-Source: ABdhPJwUD5wqrfTkVf7dJLrztglZojWpDXiWoQLF71FQHxzME82ACP02kH50uvUg3wnfQsj9ZFwVzQ==
+X-Received: by 2002:a5d:5146:: with SMTP id u6mr11122776wrt.255.1602177417377; 
+ Thu, 08 Oct 2020 10:16:57 -0700 (PDT)
 Received: from localhost.localdomain
  ([2001:1715:4e26:a7e0:116c:c27a:3e7f:5eaf])
- by smtp.gmail.com with ESMTPSA id x1sm719413wrl.41.2020.10.08.10.16.58
+ by smtp.gmail.com with ESMTPSA id x1sm719413wrl.41.2020.10.08.10.16.56
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 08 Oct 2020 10:16:59 -0700 (PDT)
+ Thu, 08 Oct 2020 10:16:56 -0700 (PDT)
 From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 To: eric.auger@redhat.com,
 	alex.williamson@redhat.com
-Subject: [PATCH v10 10/10] vfio: Don't issue full 2^64 unmap
-Date: Thu,  8 Oct 2020 19:15:58 +0200
-Message-Id: <20201008171558.410886-11-jean-philippe@linaro.org>
+Subject: [PATCH v10 08/10] vfio: Set IOMMU page size as per host supported
+ page size
+Date: Thu,  8 Oct 2020 19:15:56 +0200
+Message-Id: <20201008171558.410886-9-jean-philippe@linaro.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201008171558.410886-1-jean-philippe@linaro.org>
 References: <20201008171558.410886-1-jean-philippe@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=jean-philippe@linaro.org; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=jean-philippe@linaro.org; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -108,45 +109,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-IOMMUs may declare memory regions spanning from 0 to UINT64_MAX. When
-attempting to deal with such region, vfio_listener_region_del() passes a
-size of 2^64 to int128_get64() which throws an assertion failure.  Even
-ignoring this, the VFIO_IOMMU_DMA_MAP ioctl cannot handle this size
-since the size field is 64-bit. Split the request in two.
+From: Bharat Bhushan <bbhushan2@marvell.com>
 
+Set IOMMU supported page size mask same as host Linux supported page
+size mask.
+
+Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
 Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 ---
-For me this happens when memory_region_iommu_set_page_size_mask()
-returns an error because a hotplugged endpoint uses an incompatible page
-mask. vfio_connect_container() releases the memory listener which calls
-region_del() with the 2^64 IOMMU region. There are probably other ways
-to reach this.
----
- hw/vfio/common.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ hw/vfio/common.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index e66054b02a7..e90a89c389e 100644
+index 13471ae2943..e66054b02a7 100644
 --- a/hw/vfio/common.c
 +++ b/hw/vfio/common.c
-@@ -797,6 +797,17 @@ static void vfio_listener_region_del(MemoryListener *listener,
-     }
+@@ -636,6 +636,14 @@ static void vfio_listener_region_add(MemoryListener *listener,
+                             int128_get64(llend),
+                             iommu_idx);
  
-     if (try_unmap) {
-+        if (llsize == int128_2_64()) {
-+            /* The unmap ioctl doesn't accept a full 64-bit span. */
-+            llsize = int128_rshift(llsize, 1);
-+            ret = vfio_dma_unmap(container, iova, int128_get64(llsize));
-+            if (ret) {
-+                error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
-+                             "0x%"HWADDR_PRIx") = %d (%m)",
-+                             container, iova, int128_get64(llsize), ret);
-+            }
-+            iova += int128_get64(llsize);
++        ret = memory_region_iommu_set_page_size_mask(giommu->iommu,
++                                                     container->pgsizes,
++                                                     &err);
++        if (ret) {
++            g_free(giommu);
++            goto fail;
 +        }
-         ret = vfio_dma_unmap(container, iova, int128_get64(llsize));
++
+         ret = memory_region_register_iommu_notifier(section->mr, &giommu->n,
+                                                     &err);
          if (ret) {
-             error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
 -- 
 2.28.0
 
