@@ -2,68 +2,68 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 615A9C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 19:15:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 237BEC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 19:17:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C22E32184D
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 19:15:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A069208C7
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 19:17:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vx6k2tRR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C22E32184D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Esadjbf6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A069208C7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQbOC-000075-31
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 15:15:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49306)
+	id 1kQbQ0-0001uE-66
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 15:17:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49296)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kQbJk-00022a-JD
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 15:11:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50600)
+ id 1kQbJj-000203-A6
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 15:11:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52203)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kQbJi-00059y-Mb
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 15:11:08 -0400
+ id 1kQbJh-00059n-HI
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 15:11:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602184265;
+ s=mimecast20190719; t=1602184264;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xiPfig7jG9VC0GE1wxVAHcnqkY098QwCgL+T1oBSk+E=;
- b=Vx6k2tRRMMB5uvMIUr9eUOKSGaalSkBwicBdSwPL9Pom6tVrMdEA/UM/PR0VcVyN63rX9Q
- FeCjEzPp57/xsEBjMmp0un8/WL6Di/cx40lGy/kbV9XIZgSpFzRery61hLjKUIizdI1ihO
- w329dny6uY9WDaqQBzC6GEFy+yy4xlo=
+ bh=BJR6SWX9PO2YeU8RnGbYoAO1TtPIctVvTm8T9SR/Fy4=;
+ b=Esadjbf6Ll+ONcTbPQyFaFP0QibV++B4b7TVBUQlPMfNFmQA+weH0SnY2MM2GVEJUTgOd8
+ jO34HscCELH1oIk7LCtuf8nDJ6EdjSJSqdN5ktMuianT3dR93tQxW2M4Jxp2JTbqcZWEQe
+ D489NPvwVXe64hhqNxGYCy5dHa85L98=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-120-Jp9XRHudMkCXvjjWDvrCEA-1; Thu, 08 Oct 2020 15:11:03 -0400
-X-MC-Unique: Jp9XRHudMkCXvjjWDvrCEA-1
+ us-mta-488-0P_4sym6NiaID5vLCJo8Cg-1; Thu, 08 Oct 2020 15:11:02 -0400
+X-MC-Unique: 0P_4sym6NiaID5vLCJo8Cg-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9484818CBC42;
- Thu,  8 Oct 2020 19:11:02 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED24618CBC41;
+ Thu,  8 Oct 2020 19:11:00 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-114-212.ams2.redhat.com
  [10.36.114.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 450635C1BD;
- Thu,  8 Oct 2020 19:11:01 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9F8185C1BD;
+ Thu,  8 Oct 2020 19:10:59 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, alex.bennee@linaro.org, zhengchuan@huawei.com,
  stefanha@redhat.com, peterx@redhat.com
-Subject: [PULL 04/10] virtiofsd: avoid /proc/self/fd tempdir
-Date: Thu,  8 Oct 2020 20:10:40 +0100
-Message-Id: <20201008191046.272549-5-dgilbert@redhat.com>
+Subject: [PULL 03/10] virtiofsd: Call qemu_init_exec_dir
+Date: Thu,  8 Oct 2020 20:10:39 +0100
+Message-Id: <20201008191046.272549-4-dgilbert@redhat.com>
 In-Reply-To: <20201008191046.272549-1-dgilbert@redhat.com>
 References: <20201008191046.272549-1-dgilbert@redhat.com>
 MIME-Version: 1.0
@@ -72,8 +72,8 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 01:56:49
@@ -102,122 +102,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-In order to prevent /proc/self/fd escapes a temporary directory is
-created where /proc/self/fd is bind-mounted. This doesn't work on
-read-only file systems.
+Since fcb4f59c879 qemu_get_local_state_pathname relies on the
+init_exec_dir, and virtiofsd asserts because we never set it.
+Set it.
 
-Avoid the temporary directory by bind-mounting /proc/self/fd over /proc.
-This does not affect other processes since we remounted / with MS_REC |
-MS_SLAVE. /proc must exist and virtiofsd does not use it so it's safe to
-do this.
-
-Path traversal can be tested with the following function:
-
-  static void test_proc_fd_escape(struct lo_data *lo)
-  {
-      int fd;
-      int level = 0;
-      ino_t last_ino = 0;
-
-      fd = lo->proc_self_fd;
-      for (;;) {
-          struct stat st;
-
-          if (fstat(fd, &st) != 0) {
-              perror("fstat");
-              return;
-          }
-          if (last_ino && st.st_ino == last_ino) {
-              fprintf(stderr, "inode number unchanged, stopping\n");
-              return;
-          }
-          last_ino = st.st_ino;
-
-          fprintf(stderr, "Level %d dev %lu ino %lu\n", level,
-                  (unsigned long)st.st_dev,
-                  (unsigned long)last_ino);
-          fd = openat(fd, "..", O_PATH | O_DIRECTORY | O_NOFOLLOW);
-          level++;
-      }
-  }
-
-Before and after this patch only Level 0 is displayed. Without
-/proc/self/fd bind-mount protection it is possible to traverse parent
-directories.
-
-Fixes: 397ae982f4df4 ("virtiofsd: jail lo->proc_self_fd")
-Cc: Miklos Szeredi <mszeredi@redhat.com>
-Cc: Jens Freimann <jfreimann@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20201006095826.59813-1-stefanha@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Tested-by: Jens Freimann <jfreimann@redhat.com>
-Reviewed-by: Jens Freimann <jfreimann@redhat.com>
+Reported-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-Id: <20201002124015.44820-1-dgilbert@redhat.com>
+Tested-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tools/virtiofsd/passthrough_ll.c | 34 +++++++++++---------------------
- 1 file changed, 11 insertions(+), 23 deletions(-)
+ tools/virtiofsd/passthrough_ll.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
-index 477e6ee0b5..ff53df4451 100644
+index 36ad46e0c0..477e6ee0b5 100644
 --- a/tools/virtiofsd/passthrough_ll.c
 +++ b/tools/virtiofsd/passthrough_ll.c
-@@ -2393,8 +2393,6 @@ static void setup_wait_parent_capabilities(void)
- static void setup_namespaces(struct lo_data *lo, struct fuse_session *se)
- {
-     pid_t child;
--    char template[] = "virtiofsd-XXXXXX";
--    char *tmpdir;
+@@ -2839,6 +2839,8 @@ int main(int argc, char *argv[])
+     /* Don't mask creation mode, kernel already did that */
+     umask(0);
  
-     /*
-      * Create a new pid namespace for *child* processes.  We'll have to
-@@ -2458,33 +2456,23 @@ static void setup_namespaces(struct lo_data *lo, struct fuse_session *se)
-         exit(1);
-     }
- 
--    tmpdir = mkdtemp(template);
--    if (!tmpdir) {
--        fuse_log(FUSE_LOG_ERR, "tmpdir(%s): %m\n", template);
--        exit(1);
--    }
--
--    if (mount("/proc/self/fd", tmpdir, NULL, MS_BIND, NULL) < 0) {
--        fuse_log(FUSE_LOG_ERR, "mount(/proc/self/fd, %s, MS_BIND): %m\n",
--                 tmpdir);
-+    /*
-+     * We only need /proc/self/fd. Prevent ".." from accessing parent
-+     * directories of /proc/self/fd by bind-mounting it over /proc. Since / was
-+     * previously remounted with MS_REC | MS_SLAVE this mount change only
-+     * affects our process.
-+     */
-+    if (mount("/proc/self/fd", "/proc", NULL, MS_BIND, NULL) < 0) {
-+        fuse_log(FUSE_LOG_ERR, "mount(/proc/self/fd, MS_BIND): %m\n");
-         exit(1);
-     }
- 
--    /* Now we can get our /proc/self/fd directory file descriptor */
--    lo->proc_self_fd = open(tmpdir, O_PATH);
-+    /* Get the /proc (actually /proc/self/fd, see above) file descriptor */
-+    lo->proc_self_fd = open("/proc", O_PATH);
-     if (lo->proc_self_fd == -1) {
--        fuse_log(FUSE_LOG_ERR, "open(%s, O_PATH): %m\n", tmpdir);
-+        fuse_log(FUSE_LOG_ERR, "open(/proc, O_PATH): %m\n");
-         exit(1);
-     }
--
--    if (umount2(tmpdir, MNT_DETACH) < 0) {
--        fuse_log(FUSE_LOG_ERR, "umount2(%s, MNT_DETACH): %m\n", tmpdir);
--        exit(1);
--    }
--
--    if (rmdir(tmpdir) < 0) {
--        fuse_log(FUSE_LOG_ERR, "rmdir(%s): %m\n", tmpdir);
--    }
- }
- 
- /*
++    qemu_init_exec_dir(argv[0]);
++
+     pthread_mutex_init(&lo.mutex, NULL);
+     lo.inodes = g_hash_table_new(lo_key_hash, lo_key_equal);
+     lo.root.fd = -1;
 -- 
 2.28.0
 
