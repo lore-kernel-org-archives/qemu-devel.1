@@ -2,84 +2,109 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DE06C43467
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 07:05:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B6BAC433E7
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 07:05:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58470217BA
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 07:05:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B7E9A217BA
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 07:05:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aXfaXYLu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58470217BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ioAsH7qy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7E9A217BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQPzc-000492-2y
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 03:05:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53766)
+	id 1kQPzl-0004Uj-Mr
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 03:05:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54276)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kQPwG-0000p4-QC; Thu, 08 Oct 2020 03:02:09 -0400
-Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:37306)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kQPwE-0002wm-1o; Thu, 08 Oct 2020 03:02:08 -0400
-Received: by mail-ej1-x642.google.com with SMTP id e22so6546217ejr.4;
- Thu, 08 Oct 2020 00:02:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=JeRqgtDBYnHt5SiMKhN4RpRt4Xe1xXTtzB3loz7l9lE=;
- b=aXfaXYLutYEFPbA811Sjsv3WJPjDJao+A4UYGzOWwtnjC5+nSoqbpIMuEjez82ivhX
- 0gmul1O0IyyzKzQ7wD1C3Y9T7lxHiLilPogwYUnrWI9I+AcYqV/Q7sowLwx2TWqLm9gD
- 6Pn1P6veaD9beAI+IEbNZoRw4j6zwiLU/JuC+V0fVosy4OolYdaE7U3LFQHnv3XJcKy0
- Wc1omKCkd+XEiBgAnz5JAYioCtzfNFPLTo5bcNGwMwjPOZT6nAp6ApstROPkLzuo0NVE
- lBtzqykztoR0Qim2pvZEkUmY0es5KMKq4I52lhsCpHvpTfINda6vPrEV5JookdiPGCIt
- cqWQ==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kQPyX-00035t-Dt
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 03:04:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59079)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kQPyV-0003Bt-Rs
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 03:04:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602140667;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=08qWo4EpYw9DnUtsKhu8PIQ4TwVPG3MfhOzZ1DCYm2s=;
+ b=ioAsH7qytwisC1xtMKsZa1+uubsLMq/XT2d3mTmeyehUb8J8h+oBhDncMNDDZMgSZekWME
+ LwFkVsYUM6QA51YXqqnc1nQ07oN/wArH3L85OO9o6tVBcutqWWNHtpGjCeICOO7j+gVOpR
+ m7HTrP7BiRIh5wBvXa8GZI//580CaEE=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-341-kpUVCPCkNi20R0bwJs8z6w-1; Thu, 08 Oct 2020 03:04:25 -0400
+X-MC-Unique: kpUVCPCkNi20R0bwJs8z6w-1
+Received: by mail-wr1-f72.google.com with SMTP id l17so3486674wrw.11
+ for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 00:04:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=JeRqgtDBYnHt5SiMKhN4RpRt4Xe1xXTtzB3loz7l9lE=;
- b=bnLmBXz69WWZj8Eu5Sq9H2LM5uBT6u3HsfNZaxLqaZMRonTXoQf5oixAN9ulJodEPj
- 8PGODMXLKzEzmAscXQ8iYS4j4xYPop0shn5OPZP6/uG+ProiNrUqoz+x9oo0xwTGMKNS
- oNQyzEFOkHyKAS0nsUKf7QIWhYj9AOlwW9b9c8stWRAh3gv1TTQGs486ObjTfCXeBGZ7
- LEwUpa5N338IIduamfidjvMBZ7kCCjItt7Qns1IKo20Icghrnf2wLHhTnSL2mQ1mwQC5
- uVdBl65a7PEMT7ea3pqp1yq5lY9LWxvR2EnW1TLEUpZuVC8v5+mdnUilcSjcNU/tLbkE
- VFQA==
-X-Gm-Message-State: AOAM531L48Snid/CTqsVDabUHLEOSjdpDEUIsPPs2rqO+ElxwkjMQpCI
- z4i3BlZMaemZT+SUd2M5DsbeNYK7yfFhCiTj9wk=
-X-Google-Smtp-Source: ABdhPJxZx/OeEvTmIYzGl25AD13iihRSWkEsRRkJFCZu6VT1ac53IMKaMb73pibS8ZgvuxR+T8WlRHVET3gEe+9VeaY=
-X-Received: by 2002:a17:906:4e16:: with SMTP id
- z22mr1182161eju.527.1602140523901; 
- Thu, 08 Oct 2020 00:02:03 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=08qWo4EpYw9DnUtsKhu8PIQ4TwVPG3MfhOzZ1DCYm2s=;
+ b=QXSDxiW7nvm/b1FHB0F3gUrijiCVTxtgwUsPlNhv9O4YGHDfR3VN3sdUh76hr+TQw/
+ SgQr0UERCLR9uKC6XAvJsxPJ18P+quyTv/rwB1k6GFbl5uDlMVR2IBCFcRwoZ6j1rVyK
+ 43NgmSzI3Uf7CgxdlwOfgACMtyzCA/Amn6Qf+tWqG5iYXZe+HWBadFc6YMxUjiuik4Xq
+ DTui/D7pzpzkZ8tN8GhMB8t6hZdt3eWfjGPTUc4UunIXRVBV0z87jC8yBaE8NxfMDFfQ
+ Vj2R0Vxoe+FkbQzccK3SvIyaw08MLwt9T50MhNNuwgF8/okhD1RgACHTX87lfCaJzxeT
+ wd1A==
+X-Gm-Message-State: AOAM531/lOAfXxrPVyz547rqKr1aHmyB6H1WIp3demvOa4rfg1rDDyOg
+ l+7l0Kwv39A1mQsADMt+MivMDVUfp0FB2A5FTUPDlOQH6jKkCPtV+8o6V++4hrr7dCoCXgS3ajI
+ 0aZQdFZ3ujdpc748=
+X-Received: by 2002:a1c:a9d1:: with SMTP id s200mr7041112wme.107.1602140664359; 
+ Thu, 08 Oct 2020 00:04:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz7FUAxSXo7TyltjDGvSoOmBAGQKiW2/T43tS1laaeuKyOjGWEO6URLo2f02dnaN9HAjLBGgQ==
+X-Received: by 2002:a1c:a9d1:: with SMTP id s200mr7041088wme.107.1602140664053; 
+ Thu, 08 Oct 2020 00:04:24 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:bb8c:429c:6de1:f4ec?
+ ([2001:b07:6468:f312:bb8c:429c:6de1:f4ec])
+ by smtp.gmail.com with ESMTPSA id i11sm5748138wre.32.2020.10.08.00.04.23
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 08 Oct 2020 00:04:23 -0700 (PDT)
+Subject: Re: [PATCH v3 02/16] fuzz: Add general virtual-device fuzzer
+To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
+References: <20200921022506.873303-1-alxndr@bu.edu>
+ <20200921022506.873303-3-alxndr@bu.edu>
+ <20200922140350.slchhw6qw4ia3bmp@mozz.bu.edu>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5ec0a9dc-1754-7873-0789-5170cbe8c898@redhat.com>
+Date: Thu, 8 Oct 2020 09:04:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20201007220255.1170167-1-ehabkost@redhat.com>
-In-Reply-To: <20201007220255.1170167-1-ehabkost@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 8 Oct 2020 11:01:52 +0400
-Message-ID: <CAJ+F1C+G-oU9qQMUFKqQqWxPqvA2k_qSJnYcYCPMu=Y8T+Hw5A@mail.gmail.com>
-Subject: Re: [PATCH] qom: Fix "typddef" typo
-To: Eduardo Habkost <ehabkost@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000ceb96405b12368ce"
-Received-SPF: pass client-ip=2a00:1450:4864:20::642;
- envelope-from=marcandre.lureau@gmail.com; helo=mail-ej1-x642.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <20200922140350.slchhw6qw4ia3bmp@mozz.bu.edu>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 02:56:27
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -93,102 +118,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu trival <qemu-trivial@nongnu.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ darren.kenny@oracle.com, bsd@redhat.com, stefanha@redhat.com,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000ceb96405b12368ce
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 22/09/20 16:03, Alexander Bulekov wrote:
+>> +        if ((memory_region_is_ram(mr) ||
+>> +            memory_region_is_ram_device(mr) ||
+>> +            memory_region_is_rom(mr) ||
+>> +            memory_region_is_romd(mr)) == false) {
+>> +            name = object_get_canonical_path_component(child);
+> This isn't a great way to check whether MRs have ops with code that is
+> interesting to fuzz (for example the pflash MemoryRegions do not pass
+> these checks, so you can't fuzz the pflash device). Need to think of
+> some better checks to identify MRs that we are interested in fuzzing.
 
-On Thu, Oct 8, 2020 at 2:04 AM Eduardo Habkost <ehabkost@redhat.com> wrote:
+I think you can simply remove the ROMD check.
 
-> Fix typo introduced in the C11 #ifdef for qemu_max_align_t.  It
-> never caused any problems because we always compile using
-> -std=3Dgnu99.
->
-> Fixes: 4c880f363e9e ("qom: Allow objects to be allocated with increased
-> alignment")
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
->
+Paolo
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-
-> ---
->  qom/object.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/qom/object.c b/qom/object.c
-> index c335dce7e4..125dabd28b 100644
-> --- a/qom/object.c
-> +++ b/qom/object.c
-> @@ -692,7 +692,7 @@ static void object_finalize(void *data)
->
->  /* Find the minimum alignment guaranteed by the system malloc. */
->  #if __STDC_VERSION__ >=3D 201112L
-> -typddef max_align_t qemu_max_align_t;
-> +typedef max_align_t qemu_max_align_t;
->  #else
->  typedef union {
->      long l;
-> --
-> 2.26.2
->
->
->
-
---=20
-Marc-Andr=C3=A9 Lureau
-
---000000000000ceb96405b12368ce
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Thu, Oct 8, 2020 at 2:04 AM Eduard=
-o Habkost &lt;<a href=3D"mailto:ehabkost@redhat.com">ehabkost@redhat.com</a=
->&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px=
- 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Fix=
- typo introduced in the C11 #ifdef for qemu_max_align_t.=C2=A0 It<br>
-never caused any problems because we always compile using<br>
--std=3Dgnu99.<br>
-<br>
-Fixes: 4c880f363e9e (&quot;qom: Allow objects to be allocated with increase=
-d alignment&quot;)<br>
-Signed-off-by: Eduardo Habkost &lt;<a href=3D"mailto:ehabkost@redhat.com" t=
-arget=3D"_blank">ehabkost@redhat.com</a>&gt;<br></blockquote><div><br></div=
-><div><div>Reviewed-by: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcan=
-dre.lureau@redhat.com" target=3D"_blank">marcandre.lureau@redhat.com</a>&gt=
-;</div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0p=
-x 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
----<br>
-=C2=A0qom/object.c | 2 +-<br>
-=C2=A01 file changed, 1 insertion(+), 1 deletion(-)<br>
-<br>
-diff --git a/qom/object.c b/qom/object.c<br>
-index c335dce7e4..125dabd28b 100644<br>
---- a/qom/object.c<br>
-+++ b/qom/object.c<br>
-@@ -692,7 +692,7 @@ static void object_finalize(void *data)<br>
-<br>
-=C2=A0/* Find the minimum alignment guaranteed by the system malloc. */<br>
-=C2=A0#if __STDC_VERSION__ &gt;=3D 201112L<br>
--typddef max_align_t qemu_max_align_t;<br>
-+typedef max_align_t qemu_max_align_t;<br>
-=C2=A0#else<br>
-=C2=A0typedef union {<br>
-=C2=A0 =C2=A0 =C2=A0long l;<br>
--- <br>
-2.26.2<br>
-<br>
-<br>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
-mail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
-
---000000000000ceb96405b12368ce--
 
