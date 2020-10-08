@@ -2,110 +2,87 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7143AC4363A
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 13:53:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21953C4363C
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 14:03:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A19F4217BA
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 13:53:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C02E217BA
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 14:03:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JS/JLDmn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A19F4217BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cpKciGAS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C02E217BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQWLr-0007Gr-6d
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 09:52:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58460)
+	id 1kQWWA-000385-RQ
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 10:03:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60812)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kQWLB-0006qr-L0
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 09:52:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36703)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kQWL9-00016Y-JU
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 09:52:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602165134;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=mO9dHNikis5azTv0FJ2hkWcE60EiZViSrSMuTVGPFyM=;
- b=JS/JLDmn9a+JfND8+7tU9SZjJLS8Jh4gjRc7u4de1LW7CXc3wQ2pRXmrL4zCnTD9vvJuiE
- lSu+kT56+YAy637P9e131ord6sezg8dPvZOfdicDHivPu0tKGTM/P4BKWwEpYe5rxgNAEV
- fRZAZI3v8WWvgZ7khb+N9tJlBk7ST3k=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-489-GNip1SktOL-NLSTDeH8Yfw-1; Thu, 08 Oct 2020 09:52:12 -0400
-X-MC-Unique: GNip1SktOL-NLSTDeH8Yfw-1
-Received: by mail-wm1-f69.google.com with SMTP id w23so3158417wmi.1
- for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 06:52:12 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kQWV3-0002Pa-R5
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 10:02:29 -0400
+Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:34760)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kQWV0-0002aF-U9
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 10:02:29 -0400
+Received: by mail-ej1-x643.google.com with SMTP id u8so8304814ejg.1
+ for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 07:02:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=K9tBDfuop8j2E6u+TWsjamk6eN0eE07ZY8wkUtvmSZc=;
+ b=cpKciGASCkLJE8WzsRHZCnIpzlQBkX+zz5bxGk+YChLDD+ewnadvGFWEs2CNF47/UQ
+ 8rCkti66OklQKw9M3HRRwSiZNfwO8vLThEhkeXUnetC+NFx7YzzgnOdFt4Ir8ptaQCbT
+ HHXW2z3MTwxTKSr+BaNuPTeN1+uvSuaNfMeDWuiNiM0YSOtsNHEvrz9UaPRdxJw6A8vq
+ Q8QDsBrNjANSvA1J79hUnef/QNNGyV7boIHHHp8TmXs9a+iMNQ8QG+F34avGtqi7mhhV
+ 9cWSWBXuP/I8u8JXud5y58wAQtcqnqg0hI042O0/QkRb4tYtUb44aAlQI2fiIyZ7xToV
+ +ZgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=mO9dHNikis5azTv0FJ2hkWcE60EiZViSrSMuTVGPFyM=;
- b=YYfeSXNtGJlKIbR/XwiZledWAN5Qthm/Sswo9SXW/A8Z/k6q1vGUQ1NUBoh9nbFFlB
- m75hGFaUd76cpcE/v9mYmmxuvKesIO9CmNYb7fY5uVx0EbiTm3PAJFhsoADJIBzenlmt
- 8aJPnlStpAKNrif3EHR0bfy3EkHs6fLBkFzzqYU0XGIgUhtvkTyGClEFfTs6CZAhoxR2
- CyLUv7bW4YDQ++dZvxhY5g8oqi/ecUEoXJIC1+oqZARJFRwEqtY6JpjHey0miIf+EnTR
- ucWP+4j03VuO6Hy+oGO7mRkb2tznbL8liXqY4sdB5n4yAmAuZpybsSLSTUt5aW6oY3A2
- EKsA==
-X-Gm-Message-State: AOAM532f5VqexRbcXafqkg/QXHdsHD6fztEK2HL7UtuWHHkUASzrXm5o
- GV0hBBewBTE74Mr3djMG+OypLiMazAh+vbK5srRkoH0OQeq04DiNLr74FZRO0SafOIdHye40E00
- H8hu906uE/AynLW4=
-X-Received: by 2002:a5d:558e:: with SMTP id i14mr10039942wrv.40.1602165131478; 
- Thu, 08 Oct 2020 06:52:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw+lA8TGYqCRr8yqJrNdrH2+NcIOccuYcY4vvb7cDzDSR8qj2ex9NfVeC0NXZxttMu4dLBmig==
-X-Received: by 2002:a5d:558e:: with SMTP id i14mr10039915wrv.40.1602165131210; 
- Thu, 08 Oct 2020 06:52:11 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:bb8c:429c:6de1:f4ec?
- ([2001:b07:6468:f312:bb8c:429c:6de1:f4ec])
- by smtp.gmail.com with ESMTPSA id g139sm7796536wme.2.2020.10.08.06.52.10
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 08 Oct 2020 06:52:10 -0700 (PDT)
-Subject: Re: [PATCH v3 05/11] tests/qtest/qos-test: dump environment variables
- if verbose
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org
-References: <cover.1601655308.git.qemu_oss@crudebyte.com>
- <1836979.gfKjIU19vi@silver> <6d6247ef-94f3-3ee3-b0ad-28e870d8dc05@redhat.com>
- <2996442.YqjEYQNFnd@silver>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d7603332-3bad-6fd1-0140-79bdec9fa4f1@redhat.com>
-Date: Thu, 8 Oct 2020 15:52:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=K9tBDfuop8j2E6u+TWsjamk6eN0eE07ZY8wkUtvmSZc=;
+ b=fONCySZ++vv1a2sjcu/k50rmd4gn2oyU1r7k9Zkyj4YFy5EyYbt9t7c3QhxOTvGI6t
+ zimeyVU2Jye7j3MdOqe8/kqNXTq9uEom5rOBKfiXV3qm8l6PaOAtfm3PDQzGwaMhRCkP
+ IOvtvXt+JZcYIry2IB9VYZFsE/V7lz/r82+O5ls28/PM99/EwDGF+gpOR38Cf/OmLLe5
+ IpMWaSpvjaO8rfAFki6OD7enQkfkvgObApV3QpK8b2Wsy06pTriIYmMmo3sPkNAmNudo
+ cE6IFBRoiOoMpV8fMTwHiaTdRlp6TZgIzaKIY76bcooEAHyvHPZ397ETw5ozUyKBVBOd
+ sDhA==
+X-Gm-Message-State: AOAM533yvcno70vjV86xsmimxrsiwRfUNjdVzUWlgJc9zfnCO2sUYvCe
+ plWrOpdQ3av07D+bQlkWf1GQIo9QXE6U1XgjpxUtqQ==
+X-Google-Smtp-Source: ABdhPJwS4/obQMPI37vi76IWf/JDsu9IHChDyPxdc3OUZXXa33DMOD2qCtEMCJWJI+uSBqOOfAol6XTf39hBMaBA+ic=
+X-Received: by 2002:a17:906:1f42:: with SMTP id
+ d2mr8792238ejk.407.1602165745209; 
+ Thu, 08 Oct 2020 07:02:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <2996442.YqjEYQNFnd@silver>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 02:56:27
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -22
-X-Spam_score: -2.3
+References: <20201002215955.254866-1-richard.henderson@linaro.org>
+ <20201002215955.254866-8-richard.henderson@linaro.org>
+In-Reply-To: <20201002215955.254866-8-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 8 Oct 2020 15:02:13 +0100
+Message-ID: <CAFEAcA8jBAKe_tWAKzAXq4LFO5vk1H8AZN+s+3oWsLfoRugQdQ@mail.gmail.com>
+Subject: Re: [PATCH v10 7/8] linux-user/elfload: Parse NT_GNU_PROPERTY_TYPE_0
+ notes
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::643;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x643.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.214, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -119,32 +96,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, berrange@redhat.com,
- Thomas Huth <thuth@redhat.com>,
- Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
- Greg Kurz <groug@kaod.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08/10/20 15:42, Christian Schoenebeck wrote:
->>
->> I'm okay I guess with using g_test_message on 2.62 or newer, and
->> assuming people don't use --tap --verbose on older versions.
-> Simpler solution: just appending '#' character in front of each printf() line, 
-> that would be both fine for TAP and regular output:
-> http://testanything.org/tap-specification.html#diagnostics
+On Fri, 2 Oct 2020 at 23:00, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> For aarch64, this includes the GNU_PROPERTY_AARCH64_FEATURE_1_BTI bit,
+> which indicates that the image should be mapped with guarded pages.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+> v9: Only map the startup executable with BTI; anything else must be
+>     handled by the interpreter.
+> v10: Split out preparatory patches (pmm).
 
-I'm not sure how it would be simpler than a
+> @@ -2467,6 +2467,50 @@ static void load_elf_image(const char *image_name, int image_fd,
+>                  goto exit_errmsg;
+>              }
+>              *pinterp_name = interp_name;
+> +        } else if (eppnt->p_type == PT_GNU_PROPERTY) {
+> +            /* Process NT_GNU_PROPERTY_TYPE_0. */
+> +            const uint32_t gnu0_magic = const_le32('G' | 'N' << 8 | 'U' << 16);
+> +            uint32_t note[7];
+> +
+> +            /*
+> +             * The note contents are 7 words, but depending on LP64 vs ILP32
+> +             * there may be an 8th padding word at the end.  Check for and
+> +             * read the minimum size.  Further checks below will validate
+> +             * that the sizes of everything involved are as we expect.
+> +             */
+> +            if (eppnt->p_filesz < sizeof(note)) {
+> +                continue;
+> +            }
+> +            if (eppnt->p_offset + eppnt->p_filesz <= BPRM_BUF_SIZE) {
+> +                memcpy(note, bprm_buf + eppnt->p_offset, sizeof(note));
+> +            } else {
+> +                retval = pread(image_fd, note, sizeof(note), eppnt->p_offset);
+> +                if (retval != sizeof(note)) {
+> +                    goto exit_perror;
+> +                }
+> +            }
+> +#ifdef BSWAP_NEEDED
+> +            for (i = 0; i < ARRAY_SIZE(note); ++i) {
+> +                bswap32s(note + i);
+> +            }
+> +#endif
+> +            /*
+> +             * Check that this is a NT_GNU_PROPERTY_TYPE_0 note.
+> +             * Again, descsz includes padding.  Full size validation
+> +             * awaits checking the final payload.
+> +             */
+> +            if (note[0] != 4 ||                       /* namesz */
+> +                note[1] < 12 ||                       /* descsz */
+> +                note[2] != NT_GNU_PROPERTY_TYPE_0 ||  /* type */
+> +                note[3] != gnu0_magic) {              /* name */
 
-#if !GLIB_CHECK_VERSION(2, 62, 0)
-#define qemu_test_message printf
-#else
-#define qemu_test_message g_test_message
-#endif
+note[2] and note[3] are both basically magic numbers, AIUI.
+Why do we have a #define for one but we assemble the other
+with a const_le32() expression ?
 
-but you choose.
+> +                continue;
+> +            }
+> +#ifdef TARGET_AARCH64
+> +            if (note[4] == GNU_PROPERTY_AARCH64_FEATURE_1_AND &&
+> +                note[5] == 4) {
+> +                info->note_flags = note[6];
+> +            }
 
-Paolo
+The spec for the .note.gnu.property section (which AIUI is
+https://raw.githubusercontent.com/wiki/hjl-tools/linux-abi/linux-abi-draft.pdf
+) says that the n_desc (words 4 and up) is an array of program
+properties. There doesn't seem to be any guarantee that there
+is only one entry or that the FEATURE_1_AND entry is the first
+in the list. Don't we need to iterate through the array to find
+matches? This seems to be how the kernel does it:
+ https://elixir.bootlin.com/linux/latest/source/fs/binfmt_elf.c#L786
 
+(Is it worth adding the infrastructure to parse notes generically
+the way the kernel has? I dunno if we think it's likely we'll
+want to do this for more note types and/or other architectures
+in future, so it might just be pointless complexity.)
+
+thanks
+-- PMM
 
