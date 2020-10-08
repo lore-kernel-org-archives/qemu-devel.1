@@ -2,78 +2,82 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C948C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 00:31:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A55CC4363D
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 01:32:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A582207EA
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 00:31:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A582207EA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id CC49320B1F
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 01:32:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC49320B1F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=freebsd.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQJqJ-0002Zo-8x
-	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 20:31:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54318)
+	id 1kQKnQ-0003Ru-Lg
+	for qemu-devel@archiver.kernel.org; Wed, 07 Oct 2020 21:32:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33822)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kQJpc-00027A-Ja
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 20:30:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54238)
+ (Exim 4.90_1) (envelope-from <carpeddiem@gmail.com>)
+ id 1kQKmI-0002yO-Al
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 21:31:30 -0400
+Received: from mail-io1-f50.google.com ([209.85.166.50]:39468)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kQJpa-0006Ts-Dl
- for qemu-devel@nongnu.org; Wed, 07 Oct 2020 20:30:52 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kQJpX-0003jE-Vt
- for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 00:30:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id F04B72E80DE
- for <qemu-devel@nongnu.org>; Thu,  8 Oct 2020 00:30:47 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <carpeddiem@gmail.com>)
+ id 1kQKmG-0005ol-Qb
+ for qemu-devel@nongnu.org; Wed, 07 Oct 2020 21:31:30 -0400
+Received: by mail-io1-f50.google.com with SMTP id q9so4566905iow.6
+ for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 18:31:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=coBg1jC0x6z7EUaxgBqzICCl/yeU3OQzxeZ+m50SssM=;
+ b=tn/AkI+sgeUv8WmsxdQ812VI8R2FbmwodxcT3p0q1pz2vn/T9BVW++aH6iroDH1vyv
+ QpN9ToirOPsrvIrUezgeOjp1XMks3jKuFVEbXPVluzPm4txaicJcETsLimDGJm8PLxU8
+ bgpsJJCL39Ae9g2fpwBvfP9J+N2+dDmJ8cnglGwy696sA8wcFH+3DxTxxUorWVNqMOhM
+ BC6gDaGUJiU7/ESD9aMEsipla1gOqpumEjdgnfVwOlE6xvi2YbGsSmza0GjFS4Sh13Lx
+ bG78jChzeIs3uRr67VK29NDu/B+tvXNm0Z76e9MmWJ+z42xrTZV5BBivh4MPkGrTN5en
+ rC+A==
+X-Gm-Message-State: AOAM532eTB+F5usw45IFLrPbmQH5n5c79Ort3Lm8dwA6B5WjcqcNEY0s
+ lEoXhn2K2heKbg+V99L/8lUzR+cI9M5WneeiAZA=
+X-Google-Smtp-Source: ABdhPJySluF6T6v8RMvtx1VMPl4VZq5rL1ymMyOWCoL/S1zzePxMCGHU6Bg7ekIlOOLoSTUsp5/nthCWZx9fol8w/dE=
+X-Received: by 2002:a05:6638:14c8:: with SMTP id
+ l8mr5102142jak.136.1602120687002; 
+ Wed, 07 Oct 2020 18:31:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20201007160038.26953-1-alex.bennee@linaro.org>
+ <20201007160038.26953-22-alex.bennee@linaro.org>
+In-Reply-To: <20201007160038.26953-22-alex.bennee@linaro.org>
+From: Ed Maste <emaste@freebsd.org>
+Date: Wed, 7 Oct 2020 21:31:15 -0400
+Message-ID: <CAPyFy2AkuD3Wi1-wH7VhCQ8WheeZhbUdqPt=Yyvs1XUkg3HN+g@mail.gmail.com>
+Subject: Re: [PATCH v1 21/22] cirrus: use V=1 when running tests on FreeBSD
+ and macOS
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 08 Oct 2020 00:21:13 -0000
-From: pat leese <1898954@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: 0qivronovrpmqmcl
-X-Launchpad-Bug-Reporter: pat leese (0qivronovrpmqmcl)
-X-Launchpad-Bug-Modifier: pat leese (0qivronovrpmqmcl)
-Message-Id: <160211647401.12043.14789296539766807523.malonedeb@gac.canonical.com>
-Subject: [Bug 1898954] [NEW] x86 f1 opcode hangs qemu
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="d50d1e75c500726862802414f880ee3e3bb759bf"; Instance="production"
-X-Launchpad-Hash: 67306497d075db64d6f4e1b2b08a6761951fcd39
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 20:30:48
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=209.85.166.50; envelope-from=carpeddiem@gmail.com;
+ helo=mail-io1-f50.google.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 21:31:27
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -13
+X-Spam_score: -1.4
+X-Spam_bar: -
+X-Spam_report: (-1.4 / 5.0 requ) BAYES_00=-1.9,
+ FREEMAIL_FORGED_FROMDOMAIN=0.248, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,90 +86,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1898954 <1898954@bugs.launchpad.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>,
+ qemu-devel <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
-
-I have qemu installed and running in linux and windows
-in linux i execute the following simple code in real mode of cpu in my vm
-90 nop
-90 nop
-90 nop
-f1         ;this should conjure up my interrupt handler from ivt int 1
---------- end of code ----
-it works properly in vbox,qemu linux,and even in my boot loder
-on a real platform
-   it doeas not work fine in windows 10 (32 bit efi) based qemu
----
-all of the below was retyped there may be typo
-so onwards to the flawed software =
-
-********** for qemu-system-x86_64.exe **********
-info version =
-
-4.2.0v4.2.0.11797-g2890edc853-dirty
-********** for qemu-system-i386.exe **********
-info version =
-
-4.2.0v4.2.0.11797-g2890edc853-dirty
-***********************************************
-my startup code is
-"d:\programs\qemu\qemu-system-x86_64.exe" -m 16M -boot a -fda "d:\floppy.im=
-g" -cpu Nehalem -machine pc
----
-also same flaw if i change above section to
-"d:\programs\qemu\qemu-system-i386.exe"
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1898954
-
-Title:
-  x86 f1 opcode hangs qemu
-
-Status in QEMU:
-  New
-
-Bug description:
-  I have qemu installed and running in linux and windows
-  in linux i execute the following simple code in real mode of cpu in my vm
-  90 nop
-  90 nop
-  90 nop
-  f1         ;this should conjure up my interrupt handler from ivt int 1
-  --------- end of code ----
-  it works properly in vbox,qemu linux,and even in my boot loder
-  on a real platform
-     it doeas not work fine in windows 10 (32 bit efi) based qemu
-  ---
-  all of the below was retyped there may be typo
-  so onwards to the flawed software =
-
-  ********** for qemu-system-x86_64.exe **********
-  info version =
-
-  4.2.0v4.2.0.11797-g2890edc853-dirty
-  ********** for qemu-system-i386.exe **********
-  info version =
-
-  4.2.0v4.2.0.11797-g2890edc853-dirty
-  ***********************************************
-  my startup code is
-  "d:\programs\qemu\qemu-system-x86_64.exe" -m 16M -boot a -fda "d:\floppy.=
-img" -cpu Nehalem -machine pc
-  ---
-  also same flaw if i change above section to
-  "d:\programs\qemu\qemu-system-i386.exe"
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1898954/+subscriptions
+On Wed, 7 Oct 2020 at 12:09, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
+e:
+>
+> From: Paolo Bonzini <pbonzini@redhat.com>
+>
+> Using "V=3D1" makes it easier to identify hanging tests, especially
+> since they are run with -j1.  It is already used on Windows builds,
+> do the same for FreeBSD and macOS.
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Message-Id: <20201007140103.711142-1-pbonzini@redhat.com>
+Reviewed-by: Ed Maste <emaste@FreeBSD.org>
 
