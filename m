@@ -4,86 +4,85 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41030C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 09:46:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EDDDC43467
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 10:02:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B09320725
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 09:46:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C20872083B
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 10:02:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PKmf2qRX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B09320725
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QnK0u8W+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C20872083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQSVS-0001DE-CN
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 05:46:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56020)
+	id 1kQSki-0003m4-Gj
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 06:02:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59358)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQSUA-0000AV-Ac
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 05:45:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57992)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQSU7-0007aN-2A
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 05:45:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602150313;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=jl5cviXlEHzI+ZegVgF0X0nh8+RWz+fpzNI+amOmLrI=;
- b=PKmf2qRX5oIBYTakK6WOkrpzv3d6PrF6sDUJ+EiOYXwUBNXwaHPTodQVry/GU/hpEcyzj+
- vcSyiraZ+dZ/bpqegw9Y03gyyRvlr68rUYSiHk4A9tcpFog/cDkEKXSEieSEt/D/7+dk8e
- Ya5ej2ZgmLtgVfC27Imq63KtJx4lUy4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-385-y1DWi0XvPLaVPDny_lrfhw-1; Thu, 08 Oct 2020 05:45:12 -0400
-X-MC-Unique: y1DWi0XvPLaVPDny_lrfhw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A6A00191F541;
- Thu,  8 Oct 2020 09:45:10 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
- [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 718B95D9D5;
- Thu,  8 Oct 2020 09:45:10 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C192D11329C1; Thu,  8 Oct 2020 11:45:08 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: Purpose of QOM properties registered at realize time?
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kQSjY-00039i-Nv
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 06:01:12 -0400
+Received: from mail-ej1-x62d.google.com ([2a00:1450:4864:20::62d]:40621)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kQSjV-0001Vc-N3
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 06:01:12 -0400
+Received: by mail-ej1-x62d.google.com with SMTP id p15so7223864ejm.7
+ for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 03:01:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=eloJToFC63NRjpwM8VbhiW+S7qE4fG6bP32gqbRdD+k=;
+ b=QnK0u8W+wVMbGRCeazs2dDyNdOlbNEzt8uirEZsCt5ypeiw/supPdgEebDQ0A7m2Ri
+ EmCEDXKJbcdFadyNZdPk7pNAVxARHckeoW5eEjZePyhICgpo6DPjcSxEh/2Dq7O0H4tu
+ CH6vcR7saT5SWbvzvZBXxLNpAYxWDb5pl+74UTJvBVmqRqS1pXkb8OovFkODyNGXj5nj
+ Oe9rpXZencEiyGRLIChDA9LuGCCZe0hcuzrHY7s1gX+we3kbIYXFNSYvGKNCWhpGP3qD
+ xr6ra93x8kQ2d6xOU9kQpzxPIX48dZmVnvAPoD7IcJfXdFLap3zN19sWX9e682t1PMx4
+ M8RQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=eloJToFC63NRjpwM8VbhiW+S7qE4fG6bP32gqbRdD+k=;
+ b=cj58nzFnXkYE3/1f3fbCzlM1fhpODQcH1dmQSPoO7/AMmKF1YPuiaie6vUE6GbhNrd
+ ADKrezoBBJ8a2i0iMK5+S3Q5F10bvvf2+gaE2jKMU5+zEowMJEI3pd+7DtgnzOiXLTgV
+ S2fOEg5Ny2/68bS7IU7PrIV8awbhpXnaOs52MYmbfBng5HCVVw9SWq6aowi9LAM0IHEp
+ c0CshMVn3Glxhu7csl1nd4zhcXfkECvxCqDwVwNif3mzU7vEpGvS1QD8iy9s9GEwd8eK
+ wsg/dVLSTbI2Rl5/JhVVdWX7D8Kt6zveCidI0RaPiohLeOvrtD1yqfPHyYw8h6GXlncX
+ xFjw==
+X-Gm-Message-State: AOAM532zC7he4kLd8eNC2++xzeYIA4MJqaTjmnR+0Lzk/2pG8AFqqcYf
+ +UazcUU22l5MtZyOv9A/bm6deLD8LopGJiP0TRWEqg==
+X-Google-Smtp-Source: ABdhPJwILtXqid7N8FtTtnQcgK4rxvfw8FVqz6Bw3uEo5KF0fO3M1LOMZKZJdUQa/MQFavFueafAq4pQzuwuQ4A0xB0=
+X-Received: by 2002:a17:907:4365:: with SMTP id
+ nd5mr8128802ejb.56.1602151265968; 
+ Thu, 08 Oct 2020 03:01:05 -0700 (PDT)
+MIME-Version: 1.0
 References: <20201006220647.GR7303@habkost.net>
  <CAFEAcA_se7jErv9AFM2D7UdDMurB9Lb6W9aAXD6648spQ6idKg@mail.gmail.com>
-Date: Thu, 08 Oct 2020 11:45:08 +0200
-In-Reply-To: <CAFEAcA_se7jErv9AFM2D7UdDMurB9Lb6W9aAXD6648spQ6idKg@mail.gmail.com>
- (Peter Maydell's message of "Wed, 7 Oct 2020 15:28:52 +0100")
-Message-ID: <87mu0xyrtn.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 02:56:27
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+ <87mu0xyrtn.fsf@dusky.pond.sub.org>
+In-Reply-To: <87mu0xyrtn.fsf@dusky.pond.sub.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 8 Oct 2020 11:00:54 +0100
+Message-ID: <CAFEAcA_txULmHTGipXp=7PW9gkM-JFf=5WT9h=BNKKpLcr+uEQ@mail.gmail.com>
+Subject: Re: Purpose of QOM properties registered at realize time?
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::62d;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x62d.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,36 +104,14 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+On Thu, 8 Oct 2020 at 10:45, Markus Armbruster <armbru@redhat.com> wrote:
+> In real hardware, the number of GPIOs and such is fixed.
 
-[...]
-> Possibly one could move the code in the devices which creates the
-> GPIO array/sdbus/whatever so that it does so in instance_init
-> rather than in realize, and then more of these "alias a connection
-> through" bits of code could also move to instance_init. But there are
-> cases where the GPiO/etc can only be created in realize because
-> the number of GPIOs depends on properties of the device and so isn't
-> know at instance_init time.
+That depends on your point of view. Often this kind of
+parameter is configurable in the hardware also, as a
+parameter to the RTL, so different boards/SoCs using the
+same device may vary in how they choose to configure it.
 
-In real hardware, the number of GPIOs and such is fixed.
-
-When modelling a family of related chips, a "number of GPIOs" property
-is sometimes convenient.  The property value is not available at
-instance_init time.
-
-By delaying GPIO creation to realize, you can create the configured
-number.  The GPIO's QOM property becomes dynamic.
-
-To keep the QOM property static, we'd have to provide the maximum number
-of properties, and then connect only the configured number to actual
-GPIOs.  This arguably goes against the grain of QOMs dynamic design.  I
-never liked that part of the design anyway; I strongly prefer data to
-code, and static to dynamic.
-
-For purely virtual hardware, the maximum number might be impractically
-large, though.
-
-A first class static array property, where the size of the array is part
-of the value could perhaps cover this case.
-
+thanks
+-- PMM
 
