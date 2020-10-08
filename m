@@ -2,112 +2,94 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08065C43467
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 11:37:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39AFFC4363A
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 11:51:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29548206E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 11:37:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 58FE820B1F
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 11:51:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gKsZHOcA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29548206E7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SRxXHwNn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58FE820B1F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQUEs-00067k-1k
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 07:37:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49522)
+	id 1kQUS9-0000Uo-9d
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 07:51:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51596)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kQUEB-0005hk-3S
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 07:36:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45842)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kQURR-0008Qp-Fp
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 07:50:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41423)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kQUE7-0006Oj-Im
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 07:36:54 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kQURN-0007zf-Bw
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 07:50:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602157009;
+ s=mimecast20190719; t=1602157831;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=KHMyyw+2p8BS3U8iHSSbubCiURNTDwEdVjEwsIu91II=;
- b=gKsZHOcAxW2KGGPQZC1bToaq5bunt97huqlik+F1OIGaYmtRA4dnwExAS+g3dF04pQQPqA
- 4q400ZwVQAy/1Arb1urJzZ2nZ1BiIDL/FlaaHS3Z9nMVa8BE6TL8EP/6ovacGTQCkFz504
- jpaPXufW8vJTN7SEPmRfIDnhHAc2V3w=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-189-wIcYjk8ZPx2H7QRAVHDQgg-1; Thu, 08 Oct 2020 07:36:48 -0400
-X-MC-Unique: wIcYjk8ZPx2H7QRAVHDQgg-1
-Received: by mail-wr1-f71.google.com with SMTP id r16so3755385wrm.18
- for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 04:36:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=KHMyyw+2p8BS3U8iHSSbubCiURNTDwEdVjEwsIu91II=;
- b=g10/aQxCobhd3yw1k3rrV77yzAsnBqi+LHfG8Ww9gfzlPttecUf8OFDStk5ssi0cEo
- +lIoXYGv93Nkx1gBo/E3SzGQgBhZqO44wboN9XlrgDyDxlney++ptrWAiVlZaVfwYPNs
- 1QO8m0eXYs6hpQJtlyNVZIBlTf/0XHhvsHkGtWj9uWUzesq2kX3CNsvBy6BP9oX2KzJp
- UZNc718PMVnMhz1txAnYcXbj0Yp76RXZShxAoYBQn9ihbfepGR7PEY7X5gklTaWQO0G+
- 6Q0g+1xKFKwhheRmUVHmQff1K81rWQwqb6hP119rMKRxVQdIXjiYRmZwJzU2pRIl1+rj
- 4p7g==
-X-Gm-Message-State: AOAM531gSSL+uydcNlgVEZPn9coqNfExFou4WAPWJFi0wdsogEW8KNNL
- EwjeHyUsSf0ZEvzI2ozcquiXYHiHqURTyi0y061+5tdrBR26GbXARBalX/9//UuYOCM6axEX2ej
- A0pemlzOjTscdpTc=
-X-Received: by 2002:a5d:6551:: with SMTP id z17mr8751954wrv.200.1602157006800; 
- Thu, 08 Oct 2020 04:36:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw2fsP4bsAGatWuAFVi5H5/kBDmS4jZH+HVqRzoin86Cn3f+ciSa0EQl7jROlFXUePvQVjWSQ==
-X-Received: by 2002:a5d:6551:: with SMTP id z17mr8751925wrv.200.1602157006479; 
- Thu, 08 Oct 2020 04:36:46 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:bb8c:429c:6de1:f4ec?
- ([2001:b07:6468:f312:bb8c:429c:6de1:f4ec])
- by smtp.gmail.com with ESMTPSA id o6sm7012608wrm.69.2020.10.08.04.36.45
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 08 Oct 2020 04:36:45 -0700 (PDT)
-Subject: Re: [PATCH 2/2] exec: split out non-softmmu-specific parts
-To: Claudio Fontana <cfontana@suse.de>
-References: <20201006091922.331832-1-pbonzini@redhat.com>
- <20201006091922.331832-3-pbonzini@redhat.com>
- <cb553da1-9cd1-1933-d678-8580a3c0d8f3@suse.de>
- <027d0f5c-d5c4-911b-b349-f63895fc164d@redhat.com>
- <b6e4d4e0-6170-b3e6-f2f7-e337c71b0403@suse.de>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0ad53a3b-f28b-b53b-2541-3108e40e282a@redhat.com>
-Date: Thu, 8 Oct 2020 13:36:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ bh=MMFfFrmzQ0jxj+83olHwkGlUT9eJyGfxrIQV+dctoUI=;
+ b=SRxXHwNnIMM9jk9Doz8d03H7JzZsbrOUkUjAoxXCE+FNE/DgSVcKHahB20b1iFr3k8R9fb
+ Pcfc0NGFX1sED1eOqzTNM/JAtYs/1KwzzRus2HgjY+hXdl0pQLJpIoL1J+UudZUWKjw88t
+ aI1LxsHthX8yneFunrM6/rDfr+CDRy0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-551-B6raCMDINkSAF9UpdWhU_g-1; Thu, 08 Oct 2020 07:50:29 -0400
+X-MC-Unique: B6raCMDINkSAF9UpdWhU_g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2703C1091074;
+ Thu,  8 Oct 2020 11:50:28 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-113-68.ams2.redhat.com [10.36.113.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4E6027664D;
+ Thu,  8 Oct 2020 11:50:20 +0000 (UTC)
+Date: Thu, 8 Oct 2020 13:50:18 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: acceptance-system-fedora failures
+Message-ID: <20201008115018.GD4672@linux.fritz.box>
+References: <4e191372-c332-8f69-85e2-1ff6ead0f40d@redhat.com>
+ <59d2a787-bcd4-7283-693b-09ea04c16dc6@redhat.com>
+ <6068346f-b034-9321-0eea-29233c23a300@redhat.com>
+ <78ce9ac1-d2a1-9dc0-bf38-f9ac34b2f203@ispras.ru>
+ <14ee7cc6-42ca-fd86-241b-ed85e26693f7@redhat.com>
+ <878sci1dt0.fsf@linaro.org>
+ <d86c9425-dcb2-7fa7-1f6f-bd7b8dab53c1@ispras.ru>
+ <c5e6f7ea-93c4-a46a-dfee-7699c08c1060@redhat.com>
+ <4f4eee5e-e8cd-0595-cccc-8b648773c9ba@ispras.ru>
+ <43eac2fb-7325-9e9f-ce13-d0774638753f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <b6e4d4e0-6170-b3e6-f2f7-e337c71b0403@suse.de>
+In-Reply-To: <43eac2fb-7325-9e9f-ce13-d0774638753f@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 02:56:27
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -22
-X-Spam_score: -2.3
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.214, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -120,62 +102,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>,
+ Eduardo Habkost <ehabkost@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08/10/20 13:02, Claudio Fontana wrote:
->>> What is the role of this new module?
->>
->> It's [...] "4-500 lines of code for the target
->> specific parts of the CPU QOM object, plus a few functions for user-mode
->> emulation that do not have a better place".
->>
->> It's basically sitting between hw/core/cpu.c and target/*/cpu.c.  Hence
->> the non-descriptive name. :)
->>
->>> Or its this basically a "leftovers" file for which we did not find a proper role yet?
->>
->> The user-mode parts are, but most of it is implementing the QOM CPU
->> object.  We can move those functions to hw/core/cpu.c and make that file
->> target-dependent, I wouldn't object to that.
+Am 08.10.2020 um 12:26 hat Philippe Mathieu-Daudé geschrieben:
+> On 10/7/20 3:11 PM, Pavel Dovgalyuk wrote:
+> > On 07.10.2020 15:49, Philippe Mathieu-Daudé wrote:
+> >> On 10/7/20 2:20 PM, Pavel Dovgalyuk wrote:
+> >>> On 07.10.2020 14:22, Alex Bennée wrote:
+> >>>>
+> >>>> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
+> >>>>
+> >>>>> On 10/7/20 10:51 AM, Pavel Dovgalyuk wrote:
+> >>>>>> On 07.10.2020 11:23, Thomas Huth wrote:
+> >>>>>>> On 07/10/2020 09.13, Philippe Mathieu-Daudé wrote:
+> >>>>>>> Thanks, that was helpful. ... and the winner is:
+> >>>>>>>
+> >>>>>>>        commit   55adb3c45620c31f29978f209e2a44a08d34e2da
+> >>>>>>>        Author:  John Snow <jsnow@redhat.com>
+> >>>>>>>        Date:    Fri Jul 24 01:23:00 2020 -0400
+> >>>>>>>        Subject: ide: cancel pending callbacks on SRST
+> >>>>>>>
+> >>>>>>> ... starting with this commit, the tests starts failing. John, any
+> >>>>>>> idea what
+> >>>>>>> might be causing this?
+> >>>>>>
+> >>>>>> This patch includes the following lines:
+> >>>>>>
+> >>>>>> +        aio_bh_schedule_oneshot(qemu_get_aio_context(),
+> >>>>>> +                                ide_bus_perform_srst, bus);
+> >>>>>>
+> >>>>>> replay_bh_schedule_oneshot_event should be used instead of this
+> >>>>>> function, because it synchronizes non-deterministic BHs.
+> >>>>>
+> >>>>> Why do we have 2 different functions? BH are already complex
+> >>>>> enough, and we need to also think about the replay API...
+> >>>>>
+> >>>>> What about the other cases such vhost-user (blk/net), virtio-blk?
+> >>>>
+> >>>> This does seem like something that should be wrapped up inside
+> >>>> aio_bh_schedule_oneshot itself or maybe we need a
+> >>>> aio_bh_schedule_transaction_oneshot to distinguish it from the other
+> >>>> uses the function has.
+> >>>>
+> >>>
+> >>> Maybe there should be two functions:
+> >>> - one for the guest modification
+> >>
+> >> aio_bh_schedule_oneshot_deterministic()?
+> >>
+> >>> - one for internal qemu things
+> >>
+> >> Not sure why there is a difference, BH are used to
+> >> avoid delaying the guest, so there always something
+> >> related to "guest modification".
+> > 
+> > Not exactly. At least there is one non-related-to-guest case
+> > in monitor_init_qmp:
+> >         /*
+> >          * We can't call qemu_chr_fe_set_handlers() directly here
+> >          * since chardev might be running in the monitor I/O
+> >          * thread.  Schedule a bottom half.
+> >          */
+> >         aio_bh_schedule_oneshot(iothread_get_aio_context(mon_iothread),
+> >                                 monitor_qmp_setup_handlers_bh, mon);
 > 
-> this gives me an idea, we already basically have a target-specific part of a cpu QEMU object.
-
-Which is? :)  Sorry I don't follow.  We have one that depends on the
-target architecture (methods in the CPU class), but not one that depends
-on the target kind.  We could add more methods in the CPU class for
-that, but I'm not sure it would be useful because (unlike CPUs of which
-in theory there could be >1 class in the system) the whole emulation
-_has_ to be either user-level or system.
-
-> I basically was looking for a place to graft accelerator-specific code in order to refactor target/i386/cpu..., 
-> to split between tcg stuff and non-tcg stuff, and thus refactor even more code.
+> I don't understand the documentation in docs/devel/replay.txt:
 > 
-> In the past I thought to put them here for example:
+> ---
+> Bottom halves
+> =============
 > 
-> diff --git a/target/i386/cpu-qom.h b/target/i386/cpu-qom.h
-> index 3e96f8d668..3716c3e949 100644
-> --- a/target/i386/cpu-qom.h
-> +++ b/target/i386/cpu-qom.h
-> @@ -72,6 +72,12 @@ typedef struct X86CPUClass {
->      DeviceRealize parent_realize;
->      DeviceUnrealize parent_unrealize;
->      DeviceReset parent_reset;
-> +
-> +    /* methods operating on CPUX86State */
-> +    uint32_t (*cpu_compute_eflags)(CPUX86State *env);
-> +    void (*cpu_set_mxcsr)(CPUX86State *env, uint32_t mxcsr);
-> +    void (*cpu_set_fpuc)(CPUX86State *env, uint16_t fpuc);
-> +    void (*cpu_report_tpr_access)(CPUX86State *env, TPRAccess access);
->  } X86CPUClass;
->  
->  typedef struct X86CPU X86CPU;
+> Bottom half callbacks, that affect the guest state, should be invoked
+> through
+> replay_bh_schedule_event or replay_bh_schedule_oneshot_event functions.
+> Their invocations are saved in record mode and synchronized with the
+> existing
+> log in replay mode.
+> ---
+> 
+> But then it is only used in block drivers, which are not
+> related to guest state:
 
-I think in this case you would have an X86AccelOps struct and a global
-variable pointing to it.
+Pavel can tell you the details, but I think the idea was that you need
+to use this function not when the code calling it modifies guest state,
+but when the BH implementation can do so.
 
-Paolo
+In the case of generic callbacks like provided by the blk_aio_*()
+functions, we don't know whether this is the case, but it's generally
+device emulation code, so chances are relatively high that they do.
+
+I seem to remember that when reviewing the code that introduced
+replay_bh_schedule_event(), I was relatively sure that we didn't catch
+all necessary instances, but since it worked for Pavel and I didn't feel
+like getting too involved with replay code, we just merged it anyway.
+
+As I said, the details are a question for Pavel.
+
+Kevin
+
+> $ git grep replay_bh_schedule_oneshot_event
+> block/block-backend.c:1385:
+> replay_bh_schedule_oneshot_event(blk_get_aio_context(blk),
+> block/block-backend.c:1450:
+> replay_bh_schedule_oneshot_event(blk_get_aio_context(blk),
+> block/io.c:371:
+> replay_bh_schedule_oneshot_event(bdrv_get_aio_context(bs),
+> block/iscsi.c:286:
+> replay_bh_schedule_oneshot_event(iTask->iscsilun->aio_context,
+> block/nfs.c:262:
+> replay_bh_schedule_oneshot_event(task->client->aio_context,
+> block/null.c:183:
+> replay_bh_schedule_oneshot_event(bdrv_get_aio_context(bs),
+> block/nvme.c:323:        replay_bh_schedule_oneshot_event(q->aio_context,
+> block/nvme.c:1075:    replay_bh_schedule_oneshot_event(data->ctx,
+> nvme_rw_cb_bh, data);
+> block/rbd.c:865:
+> replay_bh_schedule_oneshot_event(bdrv_get_aio_context(acb->common.bs),
+> docs/devel/replay.txt:25:replay_bh_schedule_event or
+> replay_bh_schedule_oneshot_event functions.
+> include/sysemu/replay.h:178:void
+> replay_bh_schedule_oneshot_event(AioContext *ctx,
+> replay/replay-events.c:141:void
+> replay_bh_schedule_oneshot_event(AioContext *ctx,
+> stubs/replay-user.c:5:void replay_bh_schedule_oneshot_event(AioContext *ctx,
+> 
+> Is replay_bh_schedule_oneshot_event ever used by replay?
+> Maybe we can remove it and use aio_bh_schedule_oneshot()
+> in place?
+> 
+> Else the documentation need to be clarified please.
+> 
+> > 
+> > 
+> >>
+> >>>
+> >>> The first one may be implemented though the rr+second one.
+> >>> Maybe replay_ prefix is confusing and the whole BH interface should look
+> >>> like that?
+> >>
+> >> Yes, but it would be safer/clearer if we don't need to use
+> >> a replay_ API.
+> >>
+> >> Can we embed these functions?
+> >>
+> >> - replay_bh_schedule_event
+> >> - replay_bh_schedule_oneshot_event
+> >>
+> >> If compiled without rr, events_enabled=false and
+> >> compiler can optimize:
+> >>
+> >> -- >8 --
+> >> diff --git a/util/async.c b/util/async.c
+> >> index f758354c6a..376b6d4e27 100644
+> >> --- a/util/async.c
+> >> +++ b/util/async.c
+> >> @@ -109,14 +109,19 @@ static QEMUBH *aio_bh_dequeue(BHList *head,
+> >> unsigned *flags)
+> >>
+> >>   void aio_bh_schedule_oneshot(AioContext *ctx, QEMUBHFunc *cb, void
+> >> *opaque)
+> >>   {
+> >> -    QEMUBH *bh;
+> >> -    bh = g_new(QEMUBH, 1);
+> >> -    *bh = (QEMUBH){
+> >> -        .ctx = ctx,
+> >> -        .cb = cb,
+> >> -        .opaque = opaque,
+> >> -    };
+> >> -    aio_bh_enqueue(bh, BH_SCHEDULED | BH_ONESHOT);
+> >> +    if (events_enabled) {
+> >> +        replay_add_event(REPLAY_ASYNC_EVENT_BH_ONESHOT, cb,
+> >> +                         opaque, replay_get_current_icount());
+> >> +    } else {
+> >> +        QEMUBH *bh;
+> >> +        bh = g_new(QEMUBH, 1);
+> >> +        *bh = (QEMUBH){
+> >> +            .ctx = ctx,
+> >> +            .cb = cb,
+> >> +            .opaque = opaque,
+> >> +        };
+> >> +        aio_bh_enqueue(bh, BH_SCHEDULED | BH_ONESHOT);
+> >> +    }
+> >>   }
+> >>
+> >>   QEMUBH *aio_bh_new(AioContext *ctx, QEMUBHFunc *cb, void *opaque)
+> >> @@ -178,7 +183,12 @@ void qemu_bh_schedule_idle(QEMUBH *bh)
+> >>
+> >>   void qemu_bh_schedule(QEMUBH *bh)
+> > 
+> > qemu_bh_schedule is even worse.
+> > Many modules use it (e.g., loadvm_postcopy_handle_run), and there is no
+> > need to use replay version there. In such cases QEMU will halt if trying
+> > to call replay_bh_schedule_event.
+> > 
+> >>   {
+> >> -    aio_bh_enqueue(bh, BH_SCHEDULED);
+> >> +    if (events_enabled) {
+> >> +        replay_add_event(REPLAY_ASYNC_EVENT_BH, bh, NULL,
+> >> +                         replay_get_current_icount());
+> >> +    } else {
+> >> +        aio_bh_enqueue(bh, BH_SCHEDULED);
+> >> +    }
+> >>   }
+> >>
+> > 
+> 
+> 
 
 
