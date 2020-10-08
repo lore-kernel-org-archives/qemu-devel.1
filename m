@@ -2,97 +2,84 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3AB5C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 18:05:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1AF1C433E7
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 18:14:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10FDB20725
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 18:05:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1F37721527
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 18:14:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QSsDdC9C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10FDB20725
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J4qyVJFQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F37721527
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQaIc-0000cT-OZ
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 14:05:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35116)
+	id 1kQaRM-0003DV-0c
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 14:14:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37014)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kQaHx-00006M-HF
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 14:05:13 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:43620)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kQaQX-0002j5-Kk
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 14:14:05 -0400
+Received: from mail-ej1-x629.google.com ([2a00:1450:4864:20::629]:39795)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kQaHu-0005YF-Rh
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 14:05:13 -0400
-Received: by mail-ot1-x341.google.com with SMTP id n61so6345574ota.10
- for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 11:05:10 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kQaQV-0006gM-OE
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 14:14:05 -0400
+Received: by mail-ej1-x629.google.com with SMTP id lw21so9451884ejb.6
+ for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 11:14:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=xRePpg2o5XBZSI86KvKhqkw+l7jkaMotD5KhSHRs6HU=;
- b=QSsDdC9C8IqERPcA1zgLCgm6VQhDifX0G1ibyTyY3ib37IsE/4vc5sdmAeaC+KXN+0
- EkvmhhXJCsu6+kKhFmn91m5v1zZAullc5o/16rea7RoUJ8OTYDNs980uGQKtGRnJ9E8y
- AjHCyFBRSX8Sqige66u5geD+JNVUkptsDcvrgDOiOj9eBhkzPG0RE6SJkfYtdjsztIz0
- YP0m7PeMs25zObKJXUKsctj/h93xAKbqd/cpCLUWGhQ0mbjL9JaBuQvI3S7KZdJBSetC
- XuM452dp0hSJrZgDYBTJErQYZdfKms8xAMOXeVxr/V7ivZ88hya9KuI5Z70CJZwR62oO
- 51NA==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=WiH6aljJP5gpqhzYGNvsmhrd3632yLdiaBU1X3zIY2s=;
+ b=J4qyVJFQkJh1kDm153iDry+8aFKYin+I++BJdapdlvur65MDJCiY6OSuaWhY/A+Xs+
+ TENcKfs5E9GpekX/uneV64/qmDMYGHpCuSE+sHJ3KYQa6VDwTM7oiuNeK9s6+op1z00O
+ ZCGB3XJYCwTi0oxppULdyl8VvRHgxY7B6/8f5x64DBtXWb3sGEeSRW23+rlALHwUhCpj
+ n8UHNlbcUHxJBMSZqWqjQKZrnPmIvA0/pN47O1mQ+MaZUTIsFBSGGBkvZqzpWJWbqJHp
+ tasIJx9+jyQsyLi4yU6uFQZxvFyBWh0KuWCNX8vhwZBgqPgzIg7LOVytIppeiuDCCEAw
+ mV8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=xRePpg2o5XBZSI86KvKhqkw+l7jkaMotD5KhSHRs6HU=;
- b=m+ObSVVpNRQBSf9rnV/lmyvp5qdnrunPIz/4ZPJ274n1nyhYV70Th/qtCQlS+q81kP
- +eKmti24QH1xUT2M3jt1WoFmIHrToQ/XHaDRNbyMwPA6IDQx4b4MftHqxwJIdaVhSjLB
- zHVp3dQcQ+9D5OgvJBnW4UlSmuZnoWwv6MSX9EVHHkcackjzIhib/yK/yaFjz4mBo2l0
- u/x1XghZf4Oq+ArvwXZYN2IjFEZLW8uHHIIuhx8rp3uz9+G6vxsLuIzlW7knfeywHRhN
- rqV8ELwUel//6OEs24MTdJFzvoP2KtIjzh/P6yKyqg/PdG+Lp8QNRrNlXHboQhsNAmkt
- 2gNw==
-X-Gm-Message-State: AOAM530Ek0h28gAPUiIKQWt5BANjkATKOeVZJRSBGmif7FIMVagyu8iC
- cdoa1Bg0Q4iRziTMJwpYgCzYnNPQlt7REeey
-X-Google-Smtp-Source: ABdhPJxBgg2bt5Vif5CWbeNRGXRrUMctkyBFwyXCZr18TLGwefKxir36ZUYjD2prfckzEeg23HSgvw==
-X-Received: by 2002:a9d:ecc:: with SMTP id 70mr6135216otj.66.1602180308917;
- Thu, 08 Oct 2020 11:05:08 -0700 (PDT)
-Received: from [172.24.51.127] (168.189-204-159.bestelclientes.com.mx.
- [189.204.159.168])
- by smtp.gmail.com with ESMTPSA id 12sm5120917oir.57.2020.10.08.11.05.07
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 08 Oct 2020 11:05:07 -0700 (PDT)
-Subject: Re: does make check now require TCG? Or is it a parallelism issue?
-To: Claudio Fontana <cfontana@suse.de>, Paolo Bonzini <pbonzini@redhat.com>
-References: <11ef73ff-4178-b3e8-2e49-44ff014a13ed@suse.de>
- <569520f6-adf6-6212-9625-a184bf499e24@redhat.com>
- <d21dff22-90b1-4769-0948-6bc37eaeb885@linaro.org>
- <6fe91a5a-c136-9af3-c48a-97ccdca7a543@suse.de>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <3c527b0f-afa1-4b86-4fa5-9acca2a296bd@linaro.org>
-Date: Thu, 8 Oct 2020 13:05:05 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=WiH6aljJP5gpqhzYGNvsmhrd3632yLdiaBU1X3zIY2s=;
+ b=fJDxPappZAPfKO5hj8OwkcaVEcH/1itP25SwuRwAho2AjCqiZPLOzQVU/Y4RGMHurr
+ FqiUv2UKm/tZESxafEaAKL8R9mDMssXC3jI/smVLgZY8biRVQj/xLD1dnZ6aeZkRynDo
+ f6qJnGIx97tnfEW+xFyQoF/Ee/lUTnO5gYhwPk9nOlWZIiflLvHYs5oy2nT493I0nkHa
+ zfC5lBND31UNzD4YX8fkUoY6TTGyGqT+3OSDjfeXwSTAV/chMbx3W+v/0hr05MqgXy/e
+ 4shRgwpI1yoRuQ0286XRm8yP9+xbqYnw23rjkSTN9Z3REfKmd6E6b0xHoziUgpZblcnq
+ GX8Q==
+X-Gm-Message-State: AOAM533M0tiBBVFDIDdvcq4BnHtwtwnYFaHxZh+Wsuz2nT4e3w0WnDBs
+ dgj7ByulgUGy5bN+LEPeLCliqUTWXM5aSQcKDePdXA==
+X-Google-Smtp-Source: ABdhPJzTRmhoQROPXKk7vf5X6JOxaGcDkCVPyBSGEVhsgamEcA5PUXxj4FhnbHMKSiZr5xeBacKlzvO3oPYYUN4DoeU=
+X-Received: by 2002:a17:906:ad87:: with SMTP id
+ la7mr9952290ejb.85.1602180841672; 
+ Thu, 08 Oct 2020 11:14:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <6fe91a5a-c136-9af3-c48a-97ccdca7a543@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=richard.henderson@linaro.org; helo=mail-ot1-x341.google.com
+References: <20201008125659.49857-1-richard.henderson@linaro.org>
+In-Reply-To: <20201008125659.49857-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 8 Oct 2020 19:13:50 +0100
+Message-ID: <CAFEAcA8-ebSKAuBEAthZsHa5Ht7U=mLYOVch1Y7ZJu2g4snKFw@mail.gmail.com>
+Subject: Re: [PULL 00/11] tcg patch queue
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::629;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x629.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -22
-X-Spam_score: -2.3
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.214,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -107,54 +94,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex Bennee <alex.bennee@linaro.org>, qemu-devel <qemu-devel@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/8/20 12:53 PM, Claudio Fontana wrote:
-> On 10/8/20 7:44 PM, Richard Henderson wrote:
->> On 10/8/20 10:02 AM, Paolo Bonzini wrote:
->>> On 08/10/20 16:48, Claudio Fontana wrote:
->>>> on master, a build without tcg like:
->>>>
->>>> exec '../configure' '--disable-tcg' '--enable-kvm' '--enable-hax' "$@"
->>>>
->>>> make -j120 check
->>>> Generating qemu-version.h with a meson_exe.py custom command
->>>> make: *** No rule to make target 'qemu-system-aarch64', needed by 'check-block'.  Stop.
->>>> make: *** Waiting for unfinished jobs....
->>>>
->>>> qemu-system-aarch64 is required for check-block now?
->>>
->>> No, it's not, it's an unnecessary dependency.  This will fix it:
->>>
->>> diff --git a/tests/Makefile.include b/tests/Makefile.include
->>> index 5aca98e60c..1ca70d88ce 100644
->>> --- a/tests/Makefile.include
->>> +++ b/tests/Makefile.include
->>> @@ -140,7 +140,7 @@ QEMU_IOTESTS_HELPERS-$(CONFIG_LINUX) = tests/qemu-iotests/socket_scm_helper$(EXE
->>>  check: check-block
->>>  check-block: $(SRC_PATH)/tests/check-block.sh qemu-img$(EXESUF) \
->>>  		qemu-io$(EXESUF) qemu-nbd$(EXESUF) $(QEMU_IOTESTS_HELPERS-y) \
->>> -		$(patsubst %-softmmu,qemu-system-%,$(filter %-softmmu,$(TARGET_DIRS)))
->>> +		qemu-system-$(patsubst ppc64%,ppc64, $(shell uname -m))
->>
->> Why doesn't the original line work?  Waiting until all of the configured
-> 
-> The original line breaks because without TCG built-in there will be no qemu-system-aarch64 to wait for.
-
-But aarch64 should not be in TARGET_DIRS (for x86 host) with --disable-tcg.
-There must be some other problem.
-
-I can reproduce this though, just as you say.
-
-Ah, TARGET_DIRS isn't being pruned anymore when a target is disabled for lack
-of accelerator.
-
-Paolo, side effect of 8a19980e3f ("configure: move accelerator logic to
-meson")?  I guess we should move the setting of TARGET_DIRS to meson as well.
+On Thu, 8 Oct 2020 at 13:57, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> The following changes since commit 6eeea6725a70e6fcb5abba0764496bdab07ddfb3:
+>
+>   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2020-10-06' into staging (2020-10-06 21:13:34 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/rth7680/qemu.git tags/pull-tcg-20201008
+>
+> for you to fetch changes up to 62475e9d007d83db4d0a6ccebcda8914f392e9c9:
+>
+>   accel/tcg: Fix computing of is_write for MIPS (2020-10-08 05:57:32 -0500)
+>
+> ----------------------------------------------------------------
+> Extend maximum gvec vector size
+> Fix i386 avx2 dupi
+> Fix mips host user-only write detection
+> Misc cleanups.
+>
 
 
-r~
+
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
+
+-- PMM
 
