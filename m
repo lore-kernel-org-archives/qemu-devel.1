@@ -2,93 +2,89 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F58C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 16:21:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 277E7C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 16:23:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29ACD221FC
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 16:21:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 805F9221F1
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 16:23:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bHDuCLhj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29ACD221FC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="f9W3ge+M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 805F9221F1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQYfN-0001uE-8J
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 12:21:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36952)
+	id 1kQYhd-0003l7-DY
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 12:23:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37260)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQYe1-00017x-53
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 12:19:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39677)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQYdt-0007ND-Vx
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 12:19:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602173985;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=88C+pzMBzlLNdKKHzw4YTD6a/pn1VpviIHe3d6PmAVA=;
- b=bHDuCLhj4nza1L9+GLhcyMmBlXYA4nYrRezZO7awME7MQ9in/+q/IDRrmlrT0vRqPHFzoZ
- JuXyTh3isvxHsBEog8/NkM9bgcfOhIuqOK/RWspWq59pfvA2LmFWrJp+27KXqCA46GhgFn
- HAuDq+jQgTYTWlbu9eOBC6gpPRmTAcc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-521-FrFzkHAZP2-KFGVsnzUH2Q-1; Thu, 08 Oct 2020 12:19:42 -0400
-X-MC-Unique: FrFzkHAZP2-KFGVsnzUH2Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4117D88C783
- for <qemu-devel@nongnu.org>; Thu,  8 Oct 2020 16:19:41 +0000 (UTC)
-Received: from [10.10.120.38] (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 76C6410013C1;
- Thu,  8 Oct 2020 16:19:40 +0000 (UTC)
-Subject: Re: [PATCH v5 19/36] qapi/events.py: add type hint annotations
-To: Markus Armbruster <armbru@redhat.com>
-References: <20201005195158.2348217-1-jsnow@redhat.com>
- <20201005195158.2348217-20-jsnow@redhat.com>
- <87zh4ye0fh.fsf@dusky.pond.sub.org> <87pn5ucl3n.fsf@dusky.pond.sub.org>
- <69622744-fb05-2db7-47cf-533a3a3d89ac@redhat.com>
- <87v9fl13ij.fsf@dusky.pond.sub.org>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <7bc02d33-e3ab-38cd-3620-4eee501fe311@redhat.com>
-Date: Thu, 8 Oct 2020 12:19:39 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kQYgD-0002Rw-9W
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 12:22:09 -0400
+Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:45951)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kQYg3-0007dt-Sf
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 12:22:05 -0400
+Received: by mail-ot1-x333.google.com with SMTP id f37so5958610otf.12
+ for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 09:21:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=94Z0jUkUzmfUn5U+1GJavLRJ+p/K0pJn87QewJivFBY=;
+ b=f9W3ge+Movwd8twHI8VvsMejpdOToEATUscBDM1oa4DKnLFT73ge/UoiTX0c/0zhhi
+ hOKZRt5LULKbGq7my4nYuBDFrfOlg+iPNwi0myomZlDyyNaq+IOePyywrmOtXMypxQ8T
+ D1JQ3LWyh3jE8pHFzxlrFNCt5bL0FHey7OJA+jGb9dbaA2gOqhcAsgmGoAxlpyhZnQ7/
+ gG54RYNexgFnqJvK498znxV/GIC3+pnraW3oesIgjchnbrdlIhsDSPvIU/arvwq619MH
+ DF5UpJ+PW04fqCKBIfoRtucMGpIudgEWTXa7pA+igwA6V4bZVUbvtg9Q45oXGWsT3hFV
+ cgdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=94Z0jUkUzmfUn5U+1GJavLRJ+p/K0pJn87QewJivFBY=;
+ b=cR504tPmWXerRe4sFXzxaY98gWMSzGgilLRe6L8YGaZ/4aB1qMdXmB9hyR1/4SJKR+
+ ivASAajjGA0uNhGx19P9fOFx1azxJKoK5PCRW6LiLV320OLygFdtMmztrPaHGONHVMSh
+ o7bHlc9TnuFpzwigO4Uc4NV+YHLPNr533OyuVNIvibcl8R1o2owES/FlYm4TuNe4+hY5
+ ofVEEP2rWGPfFPV3BNJDiVJVYqZYRTGlR3iEWhZVwUHbm35ZN2FYPuQE1N4xMqzPWcHK
+ 3Jpr2WT9L5j2kBWrJPECY0T8ksfHAeTLxKOhoBTh9C/kTyp0D+Y52oLKUwT+n9JtoGsU
+ 2lAA==
+X-Gm-Message-State: AOAM533CX8L8eSkphz/iauF3vwVOHxJxioHvgxrVC1n3pASZaHtUedKJ
+ 0LgS0RRFXy/mH/msO17sDtC/hiX+tEUtNEQi
+X-Google-Smtp-Source: ABdhPJwPFYB8fScArqG5bVbI7LDrX+gjFfXX7H4rpG6Zko/h+13Wid/bC/0T6Ie6U4Dkhusd6pD0bg==
+X-Received: by 2002:a9d:4e18:: with SMTP id p24mr5918518otf.190.1602174118112; 
+ Thu, 08 Oct 2020 09:21:58 -0700 (PDT)
+Received: from localhost.localdomain (168.189-204-159.bestelclientes.com.mx.
+ [189.204.159.168])
+ by smtp.gmail.com with ESMTPSA id l138sm5076218oih.32.2020.10.08.09.21.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 08 Oct 2020 09:21:57 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/3] target/arm: MTE fixes
+Date: Thu,  8 Oct 2020 11:21:52 -0500
+Message-Id: <20201008162155.161886-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <87v9fl13ij.fsf@dusky.pond.sub.org>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 02:56:27
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -22
-X-Spam_score: -2.3
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::333;
+ envelope-from=richard.henderson@linaro.org; helo=mail-ot1-x333.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.214, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,69 +97,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, vincenzo.frascino@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/8/20 5:16 AM, Markus Armbruster wrote:
-> John Snow <jsnow@redhat.com> writes:
-> 
->> On 10/7/20 7:49 AM, Markus Armbruster wrote:
->>> Looks like commit message of PATCH 24 has an answer.
->>> Copy to all the commits that omit -> None similarly?
->>
->> Probably not needed.
->>
->> It's covered by the class basics section in the mypy manual;
->> https://mypy.readthedocs.io/en/stable/class_basics.html#annotating-init-methods
->>
->> and if you should happen to omit annotations for __init__ entirely as
->> a novice, you will be treated to messages such as these:
->>
->> qapi/source.py:18: error: Function is missing a return type annotation
->> qapi/source.py:18: note: Use "-> None" if function does not return a value
->> Found 1 error in 1 file (checked 14 source files)
->>
->> Pretty good error!
->>
->> There's no error if you DO explicitly add a -> None from __init__, but
->> at worst it's just extraneous (but correct) information.
-> 
-> Let me apply the zero-one-infinity rule:
-> 
-> * Zero: explain it in none of the commit messages, i.e. dumb down PATCH
->    24.
-> 
-> * One: explain it in one.  Do it in the first one, please (here, I
->    think).
-> 
-> * Infinity: explain it in every one.
-> 
-> Up to you!
-> 
+One code cleanup and two bug fixes for MTE.
 
-I'm just bad at predicting which things people will want explained. I 
-know people don't read the cover letters already, so I'd rather go for 
-less instead of more.
+Vincenzo, thanks for the clear report.  Can you please run
+this through your test case?
 
-I think you and Cleber each noticed a different angle of this: Cleber 
-noticed the first time I *did* annotate __init__'s return and you 
-noticed the first time I *didn't*.
 
-I'll just add it here too, but I have doubts it will be useful reference 
-once it's merged. I guess it doesn't hurt to add it either, I just find 
-it difficult to predict what reviewers will want.
+r~
 
->> I could add a note to the style guide that I prefer omitting the
->> return from __init__. I like omitting as much as I possibly can.
->>
->> (You'll notice I don't always type every local, either -- when local
->> inference is accurate, I leave it alone.)
-> 
-> Type inference can save us from repeating the obvious over and over, and
-> that's lovely.
-> 
+
+Richard Henderson (3):
+  target/arm: Remove redundant mmu_idx lookup
+  target/arm: Fix reported EL for mte_check_fail
+  target/arm: Ignore HCR_EL2.ATA when {E2H,TGE} != 11
+
+ target/arm/internals.h  |  9 +++++----
+ target/arm/helper.c     |  9 +++++----
+ target/arm/mte_helper.c | 13 ++++---------
+ 3 files changed, 14 insertions(+), 17 deletions(-)
+
+-- 
+2.25.1
 
 
