@@ -2,82 +2,120 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43B48C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 16:38:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00FFDC433E7
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 16:43:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FC992184D
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 16:38:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A72F21D7D
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 16:43:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CjDpyayT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FC992184D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hUWiOApo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A72F21D7D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQYvs-0006TX-Ci
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 12:38:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40350)
+	id 1kQZ10-0000PV-7A
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 12:43:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41056)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQYv4-0005zH-50
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 12:37:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54006)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kQYyq-0007VI-GK
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 12:41:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58859)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQYv1-0001I1-3W
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 12:37:29 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kQYyg-0001ve-GN
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 12:41:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602175046;
+ s=mimecast20190719; t=1602175273;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=dxxONaYem8O7JVEiRaa/6Mh1KS4eQrfVxEls5syAK3A=;
- b=CjDpyayTrTIW93FsbdjTHapeHlytP4sSE1aU0+a+97TXukzBRZE4doZTghQokKyIqe77J5
- OTB0A6ON1NkdRz9+qF5E2kXdkKOZYtki2oHy5ip7Gi8hfBo6bk3yuK92ROOuokcX4e+JC4
- H7gFvMmAEW/XB80VcL6AxcrZ3Jh4LT8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-561-UVJgbQunPQCeXDp6sQcolg-1; Thu, 08 Oct 2020 12:37:24 -0400
-X-MC-Unique: UVJgbQunPQCeXDp6sQcolg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 48D418070F0
- for <qemu-devel@nongnu.org>; Thu,  8 Oct 2020 16:37:23 +0000 (UTC)
-Received: from [10.10.120.38] (ovpn-120-38.rdu2.redhat.com [10.10.120.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 99F241001281;
- Thu,  8 Oct 2020 16:37:22 +0000 (UTC)
-Subject: Re: [PATCH v5 03/36] qapi-gen: Separate arg-parsing from generation
-To: Markus Armbruster <armbru@redhat.com>
-References: <20201005195158.2348217-1-jsnow@redhat.com>
- <20201005195158.2348217-4-jsnow@redhat.com>
- <877ds2jw6t.fsf@dusky.pond.sub.org>
- <007985f2-2872-1ab7-16aa-19414ba8cc78@redhat.com>
- <87d01t43de.fsf@dusky.pond.sub.org>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <69a5950a-0b38-d819-641a-3ef4962974d8@redhat.com>
-Date: Thu, 8 Oct 2020 12:37:22 -0400
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=eWqZhk2BcBR2+UsbPyC3JRe2QQdkXfkJDkFQ/OsrtHQ=;
+ b=hUWiOApoW7MnXjGeLJFuo/gpi9RFAWjvDcR1BQ44lw5cs3Bzv5BaaWqKRA6EUrECG46rUi
+ jAK+rrY3WOVtI3G2ur784Uj1rprA8VLT44U9vE9Utd57hy3IAwPvyQn44pjizfoXQIqUHM
+ sqLmfymolaX+E0IILDnWh3MJ2He4Opg=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-389-q8jZ8_JON8SaPMOlIz_hAA-1; Thu, 08 Oct 2020 12:41:04 -0400
+X-MC-Unique: q8jZ8_JON8SaPMOlIz_hAA-1
+Received: by mail-wr1-f71.google.com with SMTP id n14so612406wrp.1
+ for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 09:41:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=eWqZhk2BcBR2+UsbPyC3JRe2QQdkXfkJDkFQ/OsrtHQ=;
+ b=XBI5JKYU/CZLKG+V+N6B/uunb8A8dbvb4+bqKVXD5P9Bc4fOipcO1lD9LWbYPzSGK5
+ AZxA8Mnh23oAypZPRP1f3WcFJ/dOqlMAkv0WdLp2w9hHHDcIv2pFH8rlZoosH/Y4c8g9
+ X5eslII7GnDi9ji9NT+i036vdIuOgorOeQ8sFGP8nXQBd08Lcqk0wiVeYzjXSkjG7QTZ
+ zNwaqE5RcTxwTX0h4Chr+zjElCp/4+VA9jtXXq9iScn22DvLwxc3OnoQKZzWosxUpWTe
+ IV0ySYB/8LY9Lv7qLOy07lR9w1MmmaJisTnCwHOtTUVqqF24zB6O8u2LW/dK8SVpCEOh
+ BiSA==
+X-Gm-Message-State: AOAM5305J8WajnPq1yNvIS5un8IXWqcULVQUDeYYMkS0Qlbhd7smnPlQ
+ QI1cEPLJc/KA8vJ/K95H9c0KZInIKUulW972efpbRGwLUsw21bEkPtye9NH0/k6kVPilh9uJB/c
+ YnQT1pWIwx0j6T7A=
+X-Received: by 2002:a1c:e48b:: with SMTP id b133mr9557778wmh.0.1602175262498; 
+ Thu, 08 Oct 2020 09:41:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxV0u/XTZy2BrFydpXK/qiT005Xt17Vz4+KafSyi8efSlIZUpE676+am9hAd0hHHccPSandAQ==
+X-Received: by 2002:a1c:e48b:: with SMTP id b133mr9557758wmh.0.1602175262199; 
+ Thu, 08 Oct 2020 09:41:02 -0700 (PDT)
+Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id e15sm7688524wro.13.2020.10.08.09.41.00
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 08 Oct 2020 09:41:01 -0700 (PDT)
+Subject: Re: Which qemu change corresponds to RedHat bug 1655408
+To: Jakob Bohm <jb-gnumlists@wisemo.com>, qemu-discuss@nongnu.org,
+ qemu-devel <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
+ John Snow <jsnow@redhat.com>
+References: <2d9c8525-470f-a4e5-5d71-895046e2d782@wisemo.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <653b9595-ae60-181a-2975-2e351ade9788@redhat.com>
+Date: Thu, 8 Oct 2020 18:41:00 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <87d01t43de.fsf@dusky.pond.sub.org>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <2d9c8525-470f-a4e5-5d71-895046e2d782@wisemo.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 02:56:27
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -101,219 +139,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/8/20 2:51 AM, Markus Armbruster wrote:
-> John Snow <jsnow@redhat.com> writes:
-> 
->> On 10/7/20 4:07 AM, Markus Armbruster wrote:
->>> John Snow <jsnow@redhat.com> writes:
->>>
->>>> This is a minor re-work of the entrypoint script. It isolates a
->>>> generate() method from the actual command-line mechanism.
->>>>
->>>> Signed-off-by: John Snow <jsnow@redhat.com>
->>>> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
->>>> Reviewed-by: Cleber Rosa <crosa@redhat.com>
->>>> Tested-by: Cleber Rosa <crosa@redhat.com>
->>>> ---
->>>>    scripts/qapi-gen.py | 85 +++++++++++++++++++++++++++++++++------------
->>>>    1 file changed, 62 insertions(+), 23 deletions(-)
->>>>
->>>> diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
->>>> index 541e8c1f55d..117b396a595 100644
->>>> --- a/scripts/qapi-gen.py
->>>> +++ b/scripts/qapi-gen.py
->>>> @@ -1,30 +1,77 @@
->>>>    #!/usr/bin/env python3
->>>> -# QAPI generator
->>>> -#
->>>> +
->>>>    # This work is licensed under the terms of the GNU GPL, version 2 or later.
->>>>    # See the COPYING file in the top-level directory.
->>>>    +"""
->>>> +QAPI Generator
->>>> +
->>>> +This script is the main entry point for generating C code from the QAPI schema.
->>>> +"""
->>>>      import argparse
->>>>    import re
->>>>    import sys
->>>>      from qapi.commands import gen_commands
->>>> +from qapi.error import QAPIError
->>>>    from qapi.events import gen_events
->>>>    from qapi.introspect import gen_introspect
->>>> -from qapi.schema import QAPIError, QAPISchema
->>>> +from qapi.schema import QAPISchema
->>>>    from qapi.types import gen_types
->>>>    from qapi.visit import gen_visit
->>>>      
->>>> -def main(argv):
->>>> +DEFAULT_OUTPUT_DIR = ''
->>>> +DEFAULT_PREFIX = ''
->>>> +
->>>> +
->>>> +def generate(schema_file: str,
->>>> +             output_dir: str,
->>>> +             prefix: str,
->>>> +             unmask: bool = False,
->>>> +             builtins: bool = False) -> None:
->>>> +    """
->>>> +    generate uses a given schema to produce C code in the target directory.
->>>> +
->>>> +    :param schema_file: The primary QAPI schema file.
->>>> +    :param output_dir: The output directory to store generated code.
->>>> +    :param prefix: Optional C-code prefix for symbol names.
->>>> +    :param unmask: Expose non-ABI names through introspection?
->>>> +    :param builtins: Generate code for built-in types?
->>>> +
->>>> +    :raise QAPIError: On failures.
->>>> +    """
->>>> +    match = re.match(r'([A-Za-z_.-][A-Za-z0-9_.-]*)?', prefix)
->>>> +    if match.end() != len(prefix):
->>>> +        msg = "funny character '{:s}' in prefix '{:s}'".format(
->>>> +            prefix[match.end()], prefix)
->>>> +        raise QAPIError('', None, msg)
->>>> +
->>>> +    schema = QAPISchema(schema_file)
->>>> +    gen_types(schema, output_dir, prefix, builtins)
->>>> +    gen_visit(schema, output_dir, prefix, builtins)
->>>> +    gen_commands(schema, output_dir, prefix)
->>>> +    gen_events(schema, output_dir, prefix)
->>>> +    gen_introspect(schema, output_dir, prefix, unmask)
->>>> +
->>>> +
->>>> +def main() -> int:
->>>> +    """
->>>> +    gapi-gen shell script entrypoint.
->>> What's a "shell script entrypoint"?
->>> Python docs talk about "when [...] run as a script":
->>> https://docs.python.org/3/library/__main__.html
->>> Similar:
->>> https://docs.python.org/3/tutorial/modules.html#executing-modules-as-scripts
->>>
->>
->> "entrypoint" is Python garble for a function that can be registered as
->> a callable from the command line.
->>
->> So in a theoretical setup.py, you'd do something like:
->>
->> 'entry_points': {
->>    'console_scripts': [
->>      'qapi-gen = qapi.main:main',
->>    ]
->> }
->>
->> so when I say "shell script entrypoint", I am referring to a shell
->> script (I mean: it has a shebang and can be executed by an interactive
->> shell process) that calls the entrypoint.
-> 
-> It can be executed by any process.  See execve(2):
-> 
->         pathname must be either a binary executable, or a script starting  with
->         a line of the form:
-> 
->             #!interpreter [optional-arg]
-> 
->         For details of the latter case, see "Interpreter scripts" below.
-> 
-> "Entry point" makes sense in Python context, "script entry point" also
-> makes sense (since every Python program is a script, script is
-> redundant, but not wrong).  "Shell script entry point" is misleading.
-> 
->> Once (if) QAPI migrates to ./python/qemu/qapi, it will be possible to
->> just generate that script.
->>
->> (i.e. doing `pip install qemu.qapi` will install a 'qapi-gen' CLI
->> script for you. this is how packages like sphinx create the
->> 'sphinx-build' script, etc.)
->>
->>>> +    Expects arguments via sys.argv, see --help for details.
->>>> +
->>>> +    :return: int, 0 on success, 1 on failure.
->>>> +    """
->>>>        parser = argparse.ArgumentParser(
->>>>            description='Generate code from a QAPI schema')
->>>>        parser.add_argument('-b', '--builtins', action='store_true',
->>>>                            help="generate code for built-in types")
->>>> -    parser.add_argument('-o', '--output-dir', action='store', default='',
->>>> +    parser.add_argument('-o', '--output-dir', action='store',
->>>> +                        default=DEFAULT_OUTPUT_DIR,
->>>>                            help="write output to directory OUTPUT_DIR")
->>>> -    parser.add_argument('-p', '--prefix', action='store', default='',
->>>> +    parser.add_argument('-p', '--prefix', action='store',
->>>> +                        default=DEFAULT_PREFIX,
->>>>                            help="prefix for symbols")
->>>>        parser.add_argument('-u', '--unmask-non-abi-names', action='store_true',
->>>>                            dest='unmask',
->>>> @@ -32,25 +79,17 @@ def main(argv):
->>>>        parser.add_argument('schema', action='store')
->>>>        args = parser.parse_args()
->>>>    -    match = re.match(r'([A-Za-z_.-][A-Za-z0-9_.-]*)?',
->>>> args.prefix)
->>>> -    if match.end() != len(args.prefix):
->>>> -        print("%s: 'funny character '%s' in argument of --prefix"
->>>> -              % (sys.argv[0], args.prefix[match.end()]),
->>>> -              file=sys.stderr)
->>>> -        sys.exit(1)
->>>> -
->>>>        try:
->>>> -        schema = QAPISchema(args.schema)
->>>> +        generate(args.schema,
->>>> +                 output_dir=args.output_dir,
->>>> +                 prefix=args.prefix,
->>>> +                 unmask=args.unmask,
->>>> +                 builtins=args.builtins)
->>>>        except QAPIError as err:
->>>> -        print(err, file=sys.stderr)
->>>> -        exit(1)
->>>> -
->>>> -    gen_types(schema, args.output_dir, args.prefix, args.builtins)
->>>> -    gen_visit(schema, args.output_dir, args.prefix, args.builtins)
->>>> -    gen_commands(schema, args.output_dir, args.prefix)
->>>> -    gen_events(schema, args.output_dir, args.prefix)
->>>> -    gen_introspect(schema, args.output_dir, args.prefix, args.unmask)
->>>> +        print(f"{sys.argv[0]}: {str(err)}", file=sys.stderr)
->>>> +        return 1
->>>> +    return 0
->>>>      
->>>>    if __name__ == '__main__':
->>>> -    main(sys.argv)
->>>> +    sys.exit(main())
->>> What does sys.exit() really buy us here?  I'm asking because both
->>> spots
->>> in the Python docs I referenced above do without.
->>>
->>
->> It just pushes the sys.exit out of the main function so it can be
->> invoked by other machinery. (And takes the return code from main and
->> turns it into the return code for the process.)
->>
->> I don't think it winds up mattering for simple "console_script" entry
->> points, but you don't want the called function to exit and deny the
->> caller the chance to do their own tidying post-call.
->>
->> You've already offered a "YAGNI", but it's just the convention I tend
->> to stick to for how to structure entry points.
-> 
-> I'm not questioning the conventional if __name__ == '__main__' menuett.
-> I wonder why *we* need sys.exit() where the examples in the Python docs
-> don't.
-> 
+Hi Jakob,
 
-I assume they don't care about setting that return code manually. By 
-default it's going to be 0 on normal exit, and non-zero if it raises or 
-aborts.
+On 10/8/20 6:32 PM, Jakob Bohm wrote:
+> Red Hat bugzilla bug 1655408 against qemu is listed by Red Hat as fixed in
+> April 2019, but I cannot find the corresponding change on qemu.org (the
+> Changelog in the wiki is not a traditional changelog and doesn't cover
+> bugfix releases such as 5.0.1, the git commit log is too detailed to
+> search, the Red Hat bugzilla and security advisory pages do not link
+> red hat bugs back to upstream (launchpad) bugs or git changes.
+> 
+> Here is the bug title (which also affects my Debian packaged qemu 5.0):
+> 
+> VM can not boot up due to "Failed to lock byte 100" if cdrom has been
+> mounted on the host
+> 
+> Further observation:
+> 
+> The basic problem is that qemu-system refuses to start with the error
+> message "Failed to lock byte 100" when -drive points to a read-only
+> ISO file.  For the reporter of the Red Hat bug, that was a mount-induced
+> read-only condition, in my case it is an NFS mount of a read-only
+> directory.
+> 
+> The error message itself seams meaningless, as there is no particular
+> reason to request file locks on a read-only raw disk image.
+> 
+> my qemu-system-x86_64 invocation contains the option (on one line):
+> 
+> -drive if=none,id=drive-ide0-1-0,readonly=on,
+> file=/mnt/someshare/path/gparted-live-1.1.0-5-amd64.iso,format=raw
 
-We catch the error to pretty-print it to console instead, and want to 
-avoid the stack trace so we return a status code instead.
+https://bugzilla.redhat.com/show_bug.cgi?id=1655408 has been
+closed due to lack of reproducer. Can you amend your information
+to the BZ? It will likely be re-opened. Thanks!
 
-I assume that's the only difference, really.
-
---js
+> 
+> Enjoy
+> 
+> Jakob
+> -- 
+> Jakob Bohm, CIO, Partner, WiseMo A/S.  https://www.wisemo.com
+> Transformervej 29, 2860 Søborg, Denmark.  Direct +45 31 13 16 10
+> This public discussion message is non-binding and may contain errors.
+> WiseMo - Remote Service Management for PCs, Phones and Embedded 
+> 
 
 
