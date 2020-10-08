@@ -2,81 +2,95 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DC06C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 07:51:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C941C43467
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 07:53:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6575C206F4
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 07:51:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6575C206F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id D1515206F4
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 07:53:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J8LQMF9x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1515206F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQQiI-0001O2-B1
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 03:51:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34980)
+	id 1kQQjg-0002He-Sn
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 03:53:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35312)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kQQhP-0000wV-Kc
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 03:50:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33812)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kQQhN-0000rE-AU
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 03:50:51 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kQQhK-0000Wd-SW
- for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 07:50:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id BF9432E80EA
- for <qemu-devel@nongnu.org>; Thu,  8 Oct 2020 07:50:46 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQQiz-0001sP-1w
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 03:52:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40347)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQQiw-00016Z-Q7
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 03:52:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602143545;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=zeFgKOqyd59D6PpX1KEynLSjbtuAPVD2wu0jwTRYm6o=;
+ b=J8LQMF9xzRt3SlQIv0q72zcgyM/fVgk7FzEwdEsz4VvIaX7w9H554X3XOGwjZQ/5j3DhF4
+ 5z+lHhAJ2G7RZoS+XTMAi1yYHFEyJk2AJnTK2vqfB80yO2Mahv8gvr5aNMJROFNl46Lghp
+ s63YJJUxy7vf3XCS0Um1bQcsBFYPYfQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-101-z1Jgg2YXOparmSUpyr_opg-1; Thu, 08 Oct 2020 03:52:23 -0400
+X-MC-Unique: z1Jgg2YXOparmSUpyr_opg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8E48F425D0
+ for <qemu-devel@nongnu.org>; Thu,  8 Oct 2020 07:52:22 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
+ [10.36.112.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F5496715F;
+ Thu,  8 Oct 2020 07:52:22 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id D0AC111329C1; Thu,  8 Oct 2020 09:52:20 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: [PATCH v5 23/36] qapi/commands.py: enable checking with mypy
+References: <20201005195158.2348217-1-jsnow@redhat.com>
+ <20201005195158.2348217-24-jsnow@redhat.com>
+ <87r1qae07b.fsf@dusky.pond.sub.org>
+ <145205fe-346b-b382-1cc6-a888dbcf2f65@redhat.com>
+Date: Thu, 08 Oct 2020 09:52:20 +0200
+In-Reply-To: <145205fe-346b-b382-1cc6-a888dbcf2f65@redhat.com> (John Snow's
+ message of "Wed, 7 Oct 2020 11:49:57 -0400")
+Message-ID: <87mu0x2lzf.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 08 Oct 2020 07:41:33 -0000
-From: Petunia <1895053@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: linux-user
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: laurent-vivier pauldzim petunia2000
-X-Launchpad-Bug-Reporter: Petunia (petunia2000)
-X-Launchpad-Bug-Modifier: Petunia (petunia2000)
-References: <159968542073.11462.1191604929312152807.malonedeb@chaenomeles.canonical.com>
-Message-Id: <160214289372.9309.2536829259261008553.malone@wampee.canonical.com>
-Subject: [Bug 1895053] Re: Cannot nspawn raspbian 10 [FAILED] Failed to start
- Journal Service.
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="d50d1e75c500726862802414f880ee3e3bb759bf"; Instance="production"
-X-Launchpad-Hash: 600f9f29208ddbc93ab42b89de382a786a77aa82
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 00:25:37
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 02:56:27
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,82 +99,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1895053 <1895053@bugs.launchpad.net>
+Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There is no syslog and everything else is empty:
-ls -ltrR /mnt/var/log/
-/mnt/var/log/:
-total 8
-drwxr-xr-x 2 root root 4096 20. Aug 12:33 apt
--rw-r--r-- 1 root root    0 20. Aug 12:47 faillog
--rw-r--r-- 1 root root    0 20. Aug 12:47 dpkg.log
--rw-rw-r-- 1 root tor     0 20. Aug 12:47 lastlog
--rw-r--r-- 1 root root    0 20. Aug 12:47 bootstrap.log
--rw-rw---- 1 root tor     0 20. Aug 12:47 btmp
--rw-r--r-- 1 root root    0 20. Aug 12:47 alternatives.log
--rw-rw-r-- 1 root tor     0 20. Aug 12:47 wtmp
-drwxr-xr-x 2 root root 4096 13. Sep 21:58 journal
+John Snow <jsnow@redhat.com> writes:
 
-/mnt/var/log/apt:
-total 0
--rw-r----- 1 root adm  0 20. Aug 12:47 term.log
--rw-r--r-- 1 root root 0 20. Aug 12:47 history.log
--rw-r--r-- 1 root root 0 20. Aug 12:47 eipp.log.xz
+> On 10/7/20 7:37 AM, Markus Armbruster wrote:
+>> John Snow <jsnow@redhat.com> writes:
+>> 
+>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>>> Reviewed-by: Cleber Rosa <crosa@redhat.com>
+>>> ---
+>>>   scripts/qapi/mypy.ini | 5 -----
+>>>   1 file changed, 5 deletions(-)
+>>>
+>>> diff --git a/scripts/qapi/mypy.ini b/scripts/qapi/mypy.ini
+>>> index 5df11e53fd1..8ab9ac52cc4 100644
+>>> --- a/scripts/qapi/mypy.ini
+>>> +++ b/scripts/qapi/mypy.ini
+>>> @@ -4,11 +4,6 @@ strict_optional = False
+>>>   disallow_untyped_calls = False
+>>>   python_version = 3.6
+>>>   -[mypy-qapi.commands]
+>>> -disallow_untyped_defs = False
+>>> -disallow_incomplete_defs = False
+>>> -check_untyped_defs = False
+>>> -
+>>>   [mypy-qapi.error]
+>>>   disallow_untyped_defs = False
+>>>   disallow_incomplete_defs = False
+>> The equivalent change for  events.py you squashed into the commit
+>> adding
+>> type hints.  Any particular reason for not doing the same here?
+>> 
+>
+> Just making my life easier for re-arranging commits and rebasing. By
+> separating them out whenever I had > 1 fix patch prior, I was able to 
+> freely re-arrange and re-order the prior fix patches.
+>
+> They can be squashed on commit if desired, but for my own sake and
+> inability to predict review comments, they are separate.
 
-/mnt/var/log/journal:
-total 0
+I only asked because some are separate, and some are not.
 
--- =
+Squashing on commit is an easy way toward consistency here.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1895053
-
-Title:
-  Cannot nspawn raspbian 10 [FAILED] Failed to start Journal Service.
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hi, I'm using nspawn and asked the question @systemd-devel. They redirect=
-ed me to you, guessing that nspawn calls a syscall or ioctl qemu isnt aware=
- of and can't implement properly?
-  They were like: "Sorry, that's not my department." ^^
-
-  Maybe you can reproduce the issue or help me investigating whats wrong
-  or put the ball right back into their court? :D
-
-  Testscript:
-  wget https://downloads.raspberrypi.org/raspios_lite_armhf_latest -o r.zip
-  unzip r.zip
-  LOOP=3D$(losetup --show -Pf *raspios-buster-armhf-lite.img)
-  mount ${LOOP}p2 /mnt
-  mount ${LOOP}p1 /mnt/boot
-  systemd-nspawn --bind /usr/bin/qemu-arm-static --boot --directory=3D/mnt =
--- systemd.log_level=3Ddebug
-
-  Output:
-  see attachment
-
-  System:
-  uname -a
-  Linux MArch 5.8.7-arch1-1 #1 SMP PREEMPT Sat, 05 Sep 2020 12:31:32 +0000
-  x86_64 GNU/Linux
-
-  qemu-arm-static --version
-  qemu-arm version 5.1.0
-
-  systemd-nspawn --version
-  systemd 246 (246.4-1-arch)
-  +PAM +AUDIT -SELINUX -IMA -APPARMOR +SMACK -SYSVINIT +UTMP +LIBCRYPTSETUP
-  +GCRYPT +GNUTLS +ACL +XZ +LZ4 +ZSTD +SECCOMP +BLKID +ELFUTILS +KMOD +IDN2=
- -IDN
-  +PCRE2 default-hierarchy=3Dhybrid
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1895053/+subscriptions
 
