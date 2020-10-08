@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4896FC4363A
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 13:06:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA88AC4363A
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 13:06:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 871312083B
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 13:06:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1ABD22083B
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 13:06:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ru8Vj5ot"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 871312083B
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="asyC2R8O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ABD22083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQVcW-0004BT-9K
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 09:06:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45396)
+	id 1kQVca-0004Ma-2L
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 09:06:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45482)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kQVTx-0003l9-OL
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 08:57:17 -0400
-Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:37746)
+ id 1kQVU4-0003ui-4f
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 08:57:26 -0400
+Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:41590)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kQVTw-0001z1-7g
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 08:57:17 -0400
-Received: by mail-oi1-x22f.google.com with SMTP id t77so6184513oie.4
- for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 05:57:15 -0700 (PDT)
+ id 1kQVU1-0001zt-2t
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 08:57:23 -0400
+Received: by mail-ot1-x333.google.com with SMTP id q21so5351496ota.8
+ for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 05:57:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=gnZVZh1VIOx2Bn7nb5JDBu+SrUOXUk1VIW8AryTGMI0=;
- b=ru8Vj5otdLG3SQmnBAPtF4jbZcc4YjSLViq82IGnqsbnwg9HJmmyqZzRCLBhpBgxRL
- ecakmSCSiMpl8h0QBaGw+jb69toESr4GWNFlxWIANssC6QiBuUV/yo/LOKv7mJgKV8mD
- P5bjoVO6yAEIpr9qdK+nqZSl6c2rttgN/kJBd3ijw8diYz1y0IIuCROYVw/0ddp34D/f
- H7ejZqZGT+7ZUX1wYEVgiYqffFGDq77PsvD8BuBQTDWifGfP/JZIqXi0jVP2gFSFOcBX
- tVx+vEUe1qshaOx35J94NAt5esIhOa8JkIOdhsAtERpxYwp9+cZARKz72oRmPLMqNAlX
- WKag==
+ bh=3WLaue+ohvo+ZmGquck7e37eq47w4KHNDVCyGwhwpsE=;
+ b=asyC2R8OX0WPqNzMwC/sBb/N/5pYUvJ8+JIAbbXPEDRS8VSjJ8FCJSi6jg8lQK1I6o
+ cBrXkvEddLkwcN8fpiSB9FKzZEXCG1Ph/AG6fiMvC622n5pLNf/Mo1qBB9kwPEH6pm98
+ 5scTeT63oMpC3Hl0TSttwrxbu/2jqzYNJ8GYqdHwNdd7ww48HzZRGMtIrCDgapeHRQgB
+ wYPUofTy5mg+chVr1fMJGVLHfdTIHclOpcUFE6TfgvErGQDHy67yxDKwSXiilhu2olin
+ BQLBJBkQsLStjvyb7g1Fp5HrruyMLtTEKZmWxchKKvXphgyruGE0huxU8JZS0/KyBTMX
+ IWoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=gnZVZh1VIOx2Bn7nb5JDBu+SrUOXUk1VIW8AryTGMI0=;
- b=fZmkRgvTwURGovlsJXvvyreHGEONLMUkAt5jw8I+ivWBLc70/xr1Bf5ho5XmLRrIyn
- Fev1q6gV6Kdms5FTEQMLLiCGyYGapokEH13GxtLq7Y126gLDY41nURbja6KwhRlIDDe2
- GunFyNhR6d5JcEQpeAr2ALJxcK2umRwy9XFzYJcb763Z+xAVZcc+qjs3b5CHleM+UYa6
- twqP26Z/oagrcQCdMp4k05tJeVUe+pHEjEeI5E5qp9Ucwu8+qKSRzSj9Sm8zxZ5rnpir
- ETe8zJNxvS7WyZdBiI4gmgXNFQlw/b/VCHm+pgvyZzyRbiVLAiwpEt3YvYzIA5yBE5wZ
- y4/g==
-X-Gm-Message-State: AOAM533w+Y9wHpKq6wVmRoi7ezOtKSi8IzO/xxvsbO4iVNFm/A86l35a
- 4xZ9vcepvypCaCuTk6UPlyBCQjYtM3YZPegt
-X-Google-Smtp-Source: ABdhPJxZ8J48d3lzNMKzVe7imxMS6hBZtO2MM+YBF7sXAeHMvRc5eor4dGh0ck2mXILV4YzdYS/HKg==
-X-Received: by 2002:aca:5143:: with SMTP id f64mr4653748oib.161.1602161834780; 
- Thu, 08 Oct 2020 05:57:14 -0700 (PDT)
+ bh=3WLaue+ohvo+ZmGquck7e37eq47w4KHNDVCyGwhwpsE=;
+ b=WuHBB887vMxu1AbP3UJegi/RHIQCqN2qJATsOWgAJFsVEENlMGiIG7M+Dz15WMk4vz
+ ZhiGFpAOiezgPyLsW+I1Qn1AfOAjpQAm5uEZ11DGJyRJRJvmavqCNGGe6ZevURHWhSS7
+ diKVpD0wfhHXJbYGyjC+t6Q4qqPzRWRurSZyR59Wu86vC956OyfghUYatgDruOLOkmz4
+ 6+E0NwC9QxPMsdHzQZW5rDPzn6kq9ENtvgR2pqL52damuAmmsswOhykzzjIW3OzsmN0j
+ SfpxZfGBWepu2mG9doXMFKT3d4wQHqD0Wcv+SFOO80VKU32F5USvIrBgEzZjm/r8A7gj
+ Wozw==
+X-Gm-Message-State: AOAM530nDENCWP+8+8HoBWf7cHu7kmiNNDfD1ufw9o4JI/kcd/3ilZnU
+ lABpHbGLbKkDBVkzum3VRx9PWQL7ECLlDuMe
+X-Google-Smtp-Source: ABdhPJwJtBPj6YzcbiiL4mZ1F1FzwrkRkddMiycQ+oQwv2ZEc22TLwTVBVPeyIyjUljKJ9X5PMjieg==
+X-Received: by 2002:a9d:6488:: with SMTP id g8mr4789878otl.211.1602161839641; 
+ Thu, 08 Oct 2020 05:57:19 -0700 (PDT)
 Received: from localhost.localdomain (168.189-204-159.bestelclientes.com.mx.
  [189.204.159.168])
- by smtp.gmail.com with ESMTPSA id w64sm4701933oig.31.2020.10.08.05.57.13
+ by smtp.gmail.com with ESMTPSA id w64sm4701933oig.31.2020.10.08.05.57.17
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 08 Oct 2020 05:57:14 -0700 (PDT)
+ Thu, 08 Oct 2020 05:57:18 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 07/11] tcg/i386: Fix dupi for avx2 32-bit hosts
-Date: Thu,  8 Oct 2020 07:56:55 -0500
-Message-Id: <20201008125659.49857-8-richard.henderson@linaro.org>
+Subject: [PULL 10/11] tcg: Remove TCG_TARGET_HAS_cmp_vec
+Date: Thu,  8 Oct 2020 07:56:58 -0500
+Message-Id: <20201008125659.49857-11-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201008125659.49857-1-richard.henderson@linaro.org>
 References: <20201008125659.49857-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::22f;
- envelope-from=richard.henderson@linaro.org; helo=mail-oi1-x22f.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::333;
+ envelope-from=richard.henderson@linaro.org; helo=mail-ot1-x333.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -87,7 +88,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,35 +101,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-stable@nongnu.org
+Cc: peter.maydell@linaro.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The previous change wrongly stated that 32-bit avx2 should have
-used VPBROADCASTW.  But that's a 16-bit broadcast and we want a
-32-bit broadcast.
+The cmp_vec opcode is mandatory; this symbol is unused.
 
-Fixes: 7b60ef3264e
-Cc: qemu-stable@nongnu.org
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/i386/tcg-target.c.inc | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tcg/aarch64/tcg-target.h | 1 -
+ tcg/i386/tcg-target.h    | 1 -
+ tcg/ppc/tcg-target.h     | 1 -
+ 3 files changed, 3 deletions(-)
 
-diff --git a/tcg/i386/tcg-target.c.inc b/tcg/i386/tcg-target.c.inc
-index 2f696074ab..d8797ed398 100644
---- a/tcg/i386/tcg-target.c.inc
-+++ b/tcg/i386/tcg-target.c.inc
-@@ -958,7 +958,7 @@ static void tcg_out_dupi_vec(TCGContext *s, TCGType type,
-         new_pool_label(s, arg, R_386_PC32, s->code_ptr - 4, -4);
-     } else {
-         if (have_avx2) {
--            tcg_out_vex_modrm_pool(s, OPC_VPBROADCASTW + vex_l, ret);
-+            tcg_out_vex_modrm_pool(s, OPC_VPBROADCASTD + vex_l, ret);
-         } else {
-             tcg_out_vex_modrm_pool(s, OPC_VBROADCASTSS, ret);
-         }
+diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
+index 9bc2a5ecbe..663dd0b95e 100644
+--- a/tcg/aarch64/tcg-target.h
++++ b/tcg/aarch64/tcg-target.h
+@@ -139,7 +139,6 @@ typedef enum {
+ #define TCG_TARGET_HAS_shi_vec          1
+ #define TCG_TARGET_HAS_shs_vec          0
+ #define TCG_TARGET_HAS_shv_vec          1
+-#define TCG_TARGET_HAS_cmp_vec          1
+ #define TCG_TARGET_HAS_mul_vec          1
+ #define TCG_TARGET_HAS_sat_vec          1
+ #define TCG_TARGET_HAS_minmax_vec       1
+diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
+index d2baf796b0..abd4ac7fc0 100644
+--- a/tcg/i386/tcg-target.h
++++ b/tcg/i386/tcg-target.h
+@@ -189,7 +189,6 @@ extern bool have_avx2;
+ #define TCG_TARGET_HAS_shi_vec          1
+ #define TCG_TARGET_HAS_shs_vec          1
+ #define TCG_TARGET_HAS_shv_vec          have_avx2
+-#define TCG_TARGET_HAS_cmp_vec          1
+ #define TCG_TARGET_HAS_mul_vec          1
+ #define TCG_TARGET_HAS_sat_vec          1
+ #define TCG_TARGET_HAS_minmax_vec       1
+diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
+index aee38157a2..be10363956 100644
+--- a/tcg/ppc/tcg-target.h
++++ b/tcg/ppc/tcg-target.h
+@@ -169,7 +169,6 @@ extern bool have_vsx;
+ #define TCG_TARGET_HAS_shi_vec          0
+ #define TCG_TARGET_HAS_shs_vec          0
+ #define TCG_TARGET_HAS_shv_vec          1
+-#define TCG_TARGET_HAS_cmp_vec          1
+ #define TCG_TARGET_HAS_mul_vec          1
+ #define TCG_TARGET_HAS_sat_vec          1
+ #define TCG_TARGET_HAS_minmax_vec       1
 -- 
 2.25.1
 
