@@ -2,97 +2,103 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C815BC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 17:43:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6778C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 17:45:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03B05221FE
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 17:43:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EDCD1221FE
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 17:45:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="di5bDTXC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03B05221FE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xh6vhJMB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDCD1221FE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQZxB-0008HL-Pl
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 13:43:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56832)
+	id 1kQZyY-00016q-MF
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 13:45:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57240)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kQZwW-0007pQ-6P
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 13:43:04 -0400
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:50187)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kQZwU-0002UL-Mm
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 13:43:03 -0400
-Received: by mail-wm1-x32c.google.com with SMTP id 13so7338078wmf.0
- for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 10:43:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=U2rVO0NSdBgmlltw9sGv1pYDe2kEE0Ih/cyTu6bZ8F0=;
- b=di5bDTXCmMzyzCn0gJfrwHXam2MJ5rHv4EoF9r3eQzJkiVDOXeszIeVDHOXu0tsshh
- 06Y7wkKxirqtI10gUIMxUG+RgAIkPH7KNQXV2Sicb5pOBKQFquQZTmYk2cRCZYACL2Kt
- KtQWkIKj2bYyN7cJ5DvLM8E/ep+/UnYUep8iPrW4ATLMXUH5JUzW2SEhXP7TmBJ3HWWm
- AnOGISW9lFJtIiBOkqnEMKmd1km/uq7VNzI7O87P01AcfObcUmIa8n1qyD72HRZfsJLd
- VdtV4N3CZvpwjVTHdzCger1d0gDvwPZvtNXeUJPMNp+eDVVwxk1bSF/IRlLvx8O4X1Ol
- +rHQ==
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kQZxb-0000Bj-T2
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 13:44:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28107)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kQZxY-0002cG-JK
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 13:44:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602179042;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=z5hS/8gZzlQfHyKryqUpDqJo343u1ugJwRjUMyYdO0w=;
+ b=Xh6vhJMBHuqkZZreEm+Mm3BnLn6THuLVmt8i3zzoFeEM3gfPsHwV5yZN+Sg8t9KddenkYY
+ /bFKPBZKGxfQzSfqFXty6klFrcEqRCybo0TJqmE89oC3mmz+dDNGHg4LNtYaDjkJePMBlA
+ LIElFS56Q7iHznRNSlDGiFu3R5p6qHk=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-99-3iVcBFy2OWKMpTyTAMEL7g-1; Thu, 08 Oct 2020 13:43:58 -0400
+X-MC-Unique: 3iVcBFy2OWKMpTyTAMEL7g-1
+Received: by mail-qk1-f198.google.com with SMTP id f126so4501642qke.17
+ for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 10:43:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=U2rVO0NSdBgmlltw9sGv1pYDe2kEE0Ih/cyTu6bZ8F0=;
- b=MR8QPg84irF6+qVBqE9tC+QnCBR4HgmDeh6C0L529z3hi6/y4Kw4LseB5zBvIIHhZK
- VsK7CmoEHJEszKfVKHm8a8TWS3+a/uwlHlkWcfchirIXADQHpwuch65QvHCtabexpcQ4
- 6RWIfiaMznqzb5n095djATjDSC7VzHVrfs7ITF4soU1U2RLfcGcgmfgJ0vFXApEOIWBf
- 4ax73FkwoZp2YtQuD6MXBWCzGZnmXr+oI2rWNLGfuN17e+yPM+9C1YpDvS04T0r18yBq
- nl83KcWmvHHhqzLm9Z2iJLWtMMkl8oECRVXFGZk6AP4MNdMpZcrf/aMDPvxMLnYeCxm1
- A3uQ==
-X-Gm-Message-State: AOAM5300CwgNe9v8XIM56QHXLAVunFZqghEGrGbeaqFcUyuS7vsBfht6
- iprmSzw1qSnHJsnm3H6vx7U=
-X-Google-Smtp-Source: ABdhPJzjWnnIVh+K/cFZpGmnKOVWKIxiGtj+aqNKDSicp88V4xkgNVVEOMdXcynKDWhoYhooL1Yktw==
-X-Received: by 2002:a7b:c7c9:: with SMTP id z9mr10528739wmk.91.1602178981139; 
- Thu, 08 Oct 2020 10:43:01 -0700 (PDT)
-Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
- [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id z127sm7828475wmc.2.2020.10.08.10.42.59
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 08 Oct 2020 10:43:00 -0700 (PDT)
-Subject: Re: [PATCH v2] mingw: fix error __USE_MINGW_ANSI_STDIO redefined
-To: marcandre.lureau@redhat.com, qemu-devel@nongnu.org
-References: <20201008165953.884599-1-marcandre.lureau@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <48fa7bd8-d07f-80af-1c66-9cb083f5c34c@amsat.org>
-Date: Thu, 8 Oct 2020 19:42:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=z5hS/8gZzlQfHyKryqUpDqJo343u1ugJwRjUMyYdO0w=;
+ b=C84Ial6CtIuL9UQzcGn/StOZfPUh79f9VB654tKdZ3sLPKjDc1oRm1B7WfodC+IM43
+ Ah6TbkLSfcvL8IlceVDj260K0N4XDMu/8KfhUw/F1H22SiazKpSr0+U0v5DuhrOm2weC
+ i9a90yNeP4EJ4jU4D+KmzBr2GsvGfrlSf9klTGg34cHdrOXC7enhBmC8umMOVynFnk4K
+ C1G5JJHsuAhOoDBwtQ0c+9pmKQwJkdk8X/Vcbg39hNjI6tzk2SA+yKIeOjopkEJqms9+
+ B6Vcv4na71qBDZmu/aiN60Y2BpEKIBKF1X7K2F3Z/xrMQAMwRXChPqY3i8XEwbWNcdAn
+ A7BQ==
+X-Gm-Message-State: AOAM532tQQ/ydcqADP98cyxKJf6xV38T64ik7KZpRZyW3vZ9spS5IOHl
+ iyzLdJmH4+5h+XrRbD9xyMlQYwy81kgN+crg4HL07RScZFyUzGvAEqx6V4jwufcYAkoCDbzFMSQ
+ /Gf6BT21dc8iktn4=
+X-Received: by 2002:a05:620a:4b:: with SMTP id
+ t11mr9419458qkt.96.1602179038277; 
+ Thu, 08 Oct 2020 10:43:58 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxw1EUVKjueTySRWRZ6XBS9hwqopisvvGJL9BKQ6voa86Yf7ruOgeyIZYt8bdG4yxkgFlcuXw==
+X-Received: by 2002:a05:620a:4b:: with SMTP id
+ t11mr9419434qkt.96.1602179037968; 
+ Thu, 08 Oct 2020 10:43:57 -0700 (PDT)
+Received: from xz-x1 (toroon474qw-lp140-04-174-95-215-133.dsl.bell.ca.
+ [174.95.215.133])
+ by smtp.gmail.com with ESMTPSA id 198sm4475209qki.117.2020.10.08.10.43.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 08 Oct 2020 10:43:57 -0700 (PDT)
+Date: Thu, 8 Oct 2020 13:43:55 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PULL 00/10] migration queue
+Message-ID: <20201008174355.GH6026@xz-x1>
+References: <20201007155600.337316-1-dgilbert@redhat.com>
+ <CAFEAcA9fjk5gpuV5Pq46DS8gux0gkY1fkhn=GU6W=B9jdAKBdg@mail.gmail.com>
+ <9a226239-5041-c3fb-1e19-10148cfbe8f7@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201008165953.884599-1-marcandre.lureau@redhat.com>
+In-Reply-To: <9a226239-5041-c3fb-1e19-10148cfbe8f7@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32c;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32c.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -19
-X-Spam_score: -2.0
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=peterx@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 02:56:27
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.214,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,21 +111,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: sw@weilnetz.de, armbru@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Juan Quintela <quintela@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ "Dr. David Alan Gilbert \(git\)" <dgilbert@redhat.com>, zhengchuan@huawei.com,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/8/20 6:59 PM, marcandre.lureau@redhat.com wrote:
-> From: Marc-André Lureau <marcandre.lureau@redhat.com>
+On Thu, Oct 08, 2020 at 12:09:15PM -0500, Eric Blake wrote:
+> On 10/8/20 11:18 AM, Peter Maydell wrote:
 > 
-> Always put osdep.h first, and remove redundant stdlib.h include.
+> > 
+> > Compile failure, windows crossbuilds:
+> > 
+> > ../../migration/migration.c: In function 'page_request_addr_cmp':
+> > ../../migration/migration.c:148:23: error: cast from pointer to
+> > integer of different size [-Werror=pointer-to-int-cast]
+> >      unsigned long a = (unsigned long) ap, b = (unsigned long) bp;
+> >                        ^
 > 
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-> ---
->  migration/dirtyrate.c | 3 ++-
->  tests/test-bitmap.c   | 1 -
->  2 files changed, 2 insertions(+), 2 deletions(-)
+> 'unsigned long' is platform specific; so is uintptr_t, but it may fit
+> more naturally.  Or maybe you are better off with a specific 32- or
+> 64-bit type, but even so, may need a double cast (first to uintptr_t
+> then to your real target) to shut up warnings?
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Sorry for that.
+
+When I was initially trying to fix the 32bit build failure I did use double
+cast, but I (obviously, wrongly) thought sizeof(unsigned long) should always be
+the same size as sizeof(void *), so I explicitly removed that, since at least
+my 32bit compile didn't complaint.
+
+But obviously Windows/mingw is probably different on that..
+
+I'll find a mingw environment soon and verify.  It would take some more time
+after docker stopped to work on my current host due to cgroup versions, however
+shouldn't be long.
+
+Thanks,
+
+-- 
+Peter Xu
+
 
