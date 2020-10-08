@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DATE_IN_PAST_96_XX,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77782C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 12:59:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8FB5C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 13:02:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5058222BA
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 12:59:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E132221D7B
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 13:02:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="orrIkXif"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5058222BA
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="HvaM660g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E132221D7B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUUlW-0004A5-Sp
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 08:59:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36002)
+	id 1kUUoK-0006Mv-Pm
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 09:02:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35870)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
- (envelope-from <653daf38978d101d8810f96b9337ebc6b7b1423f@lizzy.crudebyte.com>)
- id 1kUUip-0001TL-Fe
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 08:57:07 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:59167)
+ (envelope-from <3a565c641a5c50bd6d0cb4df881b607a279505f6@lizzy.crudebyte.com>)
+ id 1kUUiU-00019o-0n
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 08:56:46 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:39149)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
- (envelope-from <653daf38978d101d8810f96b9337ebc6b7b1423f@lizzy.crudebyte.com>)
- id 1kUUin-0001G8-MF
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 08:57:07 -0400
+ (envelope-from <3a565c641a5c50bd6d0cb4df881b607a279505f6@lizzy.crudebyte.com>)
+ id 1kUUiS-0001Dl-8T
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 08:56:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
  d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
  Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
- Content-Description; bh=ChL4aj+c4Ghn+OQaOLCugF8LTTtqC1UX+xccoudNuYY=; b=orrIk
- XifeV+kB932wuoO51z2EXIlSP1dTSU+TAx7Im4FvS6v/P5AmUaAeaOemF5QPrsXjRwEq9/wj/Shx/
- 5aQBvaOz5zOi2UruZa/HRH5svTAxZrPy3R2tmHIO7qV2Pp5wcy4S2SXSvHD4ZUFernjvdVecHkPW+
- h6O3khR6S80Cv/LiU6CCOCdwN1MX9XjkGS287nGmDArS12+YLIJ8SnCUe2NieR/MbJqtRzaz93eWj
- zowUy6IftGyUPc+fMExfoBbxROkq3FNhEHWQjtNw2F6nWHvQiS1EWbx6oFswlB2YwcYbeIaNC8REs
- PteTAf2DMctj2fno8Fj2ArDEpoBOw==;
-Message-Id: <653daf38978d101d8810f96b9337ebc6b7b1423f.1603111175.git.qemu_oss@crudebyte.com>
+ Content-Description; bh=UXdORMhNTzUaXATYfFlOjsg4HMQM6pqpJfi/o477dzE=; b=HvaM6
+ 60gWN9+nPx/DN8XSCVHwLQfIzNx8uCyQmBKNtRSwT+gCY31K49bjbWVURco4lhKaaxm33u448/03u
+ xArs5LETfaZoo89aPft2M1TYFxBZCMeNab66bwaoXIAuHeg9yah4ELZoSFVwbeMZSvpl6izsW6fzG
+ uP8+qE2Pp/uZrACBy3TtuXKABhkva4RhLYiO2ZT9q1uJaOW6JRlr0zgT3SGI58H5+ixKDTReyEA63
+ v7Sh5yv3Wd6vRED6pWpYB2KFMYXE6uYFubdqJLkqGgPbya65oD3TCSFBlN9tYBbSMmqWtSpGusiEl
+ 2cm/Vks7yLDim/4ampXbLQf4ok8ZA==;
+Message-Id: <3a565c641a5c50bd6d0cb4df881b607a279505f6.1603111175.git.qemu_oss@crudebyte.com>
 In-Reply-To: <cover.1603111175.git.qemu_oss@crudebyte.com>
 References: <cover.1603111175.git.qemu_oss@crudebyte.com>
 From: Christian Schoenebeck <qemu_oss@crudebyte.com>
 Date: Thu, 8 Oct 2020 20:34:56 +0200
-Subject: [PULL v3 6/6] tests/9pfs: add local Tmkdir test
+Subject: [PULL v3 3/6] tests/9pfs: introduce local tests
 To: qemu-devel@nongnu.org,
     Peter Maydell <peter.maydell@linaro.org>
 Cc: Greg Kurz <groug@kaod.org>
 Received-SPF: none client-ip=91.194.90.13;
- envelope-from=653daf38978d101d8810f96b9337ebc6b7b1423f@lizzy.crudebyte.com;
+ envelope-from=3a565c641a5c50bd6d0cb4df881b607a279505f6@lizzy.crudebyte.com;
  helo=lizzy.crudebyte.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 06:27:23
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -81,206 +81,205 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This test case uses the 9pfs 'local' driver to create a directory
-and then checks if the expected directory was actually created
-(as real directory) on host side.
+This patch introduces 9pfs test cases using the 9pfs 'local'
+filesystem driver which reads/writes/creates/deletes real files
+and directories.
 
-This patch introduces a custom split() implementation, because
-the test code requires non empty array elements as result. For
-that reason g_strsplit() would not be a good alternative, as
-it would require additional filter code for reshuffling the
-array, and the resulting code would be even more complex than
-this split() function.
+In this initial version, there is only one local test which actually
+only checks if the 9pfs 'local' device was created successfully.
+
+Before the 9pfs 'local' tests are run, a test directory 'qtest-9p-local'
+is created (with world rwx permissions) under the current working
+directory. At this point that test directory is not auto deleted yet.
 
 Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Message-Id: <be342f236842272275f65dbe05587f0a5409ad77.1602182956.git.qemu_oss@crudebyte.com>
+Message-Id: <81fc4b3b6b6c9bf7999e79f5e7cbc364a5f09ddb.1602182956.git.qemu_oss@crudebyte.com>
 Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
 ---
- tests/qtest/virtio-9p-test.c | 139 +++++++++++++++++++++++++++++++++++
- 1 file changed, 139 insertions(+)
+ tests/qtest/libqos/virtio-9p.c | 81 ++++++++++++++++++++++++++++++++++
+ tests/qtest/libqos/virtio-9p.h |  5 +++
+ tests/qtest/virtio-9p-test.c   | 44 ++++++++++++------
+ 3 files changed, 116 insertions(+), 14 deletions(-)
 
+diff --git a/tests/qtest/libqos/virtio-9p.c b/tests/qtest/libqos/virtio-9p.c
+index 2e300063e3..ee331166de 100644
+--- a/tests/qtest/libqos/virtio-9p.c
++++ b/tests/qtest/libqos/virtio-9p.c
+@@ -24,6 +24,34 @@
+ #include "qgraph.h"
+ 
+ static QGuestAllocator *alloc;
++static char *local_test_path;
++
++/* Concatenates the passed 2 pathes. Returned result must be freed. */
++static char *concat_path(const char* a, const char* b)
++{
++    return g_build_filename(a, b, NULL);
++}
++
++static void init_local_test_path(void)
++{
++    char *pwd = g_get_current_dir();
++    local_test_path = concat_path(pwd, "qtest-9p-local");
++    g_free(pwd);
++}
++
++/* Creates the directory for the 9pfs 'local' filesystem driver to access. */
++static void create_local_test_dir(void)
++{
++    struct stat st;
++
++    g_assert(local_test_path != NULL);
++    mkdir(local_test_path, 0777);
++
++    /* ensure test directory exists now ... */
++    g_assert(stat(local_test_path, &st) == 0);
++    /* ... and is actually a directory */
++    g_assert((st.st_mode & S_IFMT) == S_IFDIR);
++}
+ 
+ static void virtio_9p_cleanup(QVirtio9P *interface)
+ {
+@@ -146,11 +174,64 @@ static void *virtio_9p_pci_create(void *pci_bus, QGuestAllocator *t_alloc,
+     return obj;
+ }
+ 
++/**
++ * Performs regular expression based search and replace on @a haystack.
++ *
++ * @param haystack - input string to be parsed, result of replacement is
++ *                   stored back to @a haystack
++ * @param pattern - the regular expression pattern for scanning @a haystack
++ * @param replace_fmt - matches of supplied @a pattern are replaced by this,
++ *                      if necessary glib printf format can be used to add
++ *                      variable arguments of this function to this
++ *                      replacement string
++ */
++static void regex_replace(GString *haystack, const char *pattern,
++                          const char *replace_fmt, ...)
++{
++    GRegex *regex;
++    char *replace, *s;
++    va_list argp;
++
++    va_start(argp, replace_fmt);
++    replace = g_strdup_vprintf(replace_fmt, argp);
++    va_end(argp);
++
++    regex = g_regex_new(pattern, 0, 0, NULL);
++    s = g_regex_replace(regex, haystack->str, -1, 0, replace, 0, NULL);
++    g_string_assign(haystack, s);
++    g_free(s);
++    g_regex_unref(regex);
++    g_free(replace);
++}
++
++void virtio_9p_assign_local_driver(GString *cmd_line, const char *args)
++{
++    g_assert_nonnull(local_test_path);
++
++    /* replace 'synth' driver by 'local' driver */
++    regex_replace(cmd_line, "-fsdev synth,", "-fsdev local,");
++
++    /* append 'path=...' to '-fsdev ...' group */
++    regex_replace(cmd_line, "(-fsdev \\w[^ ]*)", "\\1,path='%s'",
++                  local_test_path);
++
++    if (!args) {
++        return;
++    }
++
++    /* append passed args to '-fsdev ...' group */
++    regex_replace(cmd_line, "(-fsdev \\w[^ ]*)", "\\1,%s", args);
++}
++
+ static void virtio_9p_register_nodes(void)
+ {
+     const char *str_simple = "fsdev=fsdev0,mount_tag=" MOUNT_TAG;
+     const char *str_addr = "fsdev=fsdev0,addr=04.0,mount_tag=" MOUNT_TAG;
+ 
++    /* make sure test dir for the 'local' tests exists and is clean */
++    init_local_test_path();
++    create_local_test_dir();
++
+     QPCIAddress addr = {
+         .devfn = QPCI_DEVFN(4, 0),
+     };
+diff --git a/tests/qtest/libqos/virtio-9p.h b/tests/qtest/libqos/virtio-9p.h
+index b1e6badc4a..326a603f72 100644
+--- a/tests/qtest/libqos/virtio-9p.h
++++ b/tests/qtest/libqos/virtio-9p.h
+@@ -44,4 +44,9 @@ struct QVirtio9PDevice {
+     QVirtio9P v9p;
+ };
+ 
++/**
++ * Prepares QEMU command line for 9pfs tests using the 'local' fs driver.
++ */
++void virtio_9p_assign_local_driver(GString *cmd_line, const char *args);
++
+ #endif
 diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
-index af7e169d3a..c15908f27b 100644
+index 3281153b9c..af7e169d3a 100644
 --- a/tests/qtest/virtio-9p-test.c
 +++ b/tests/qtest/virtio-9p-test.c
-@@ -18,6 +18,62 @@
- #define QVIRTIO_9P_TIMEOUT_US (10 * 1000 * 1000)
- static QGuestAllocator *alloc;
- 
-+/*
-+ * Used to auto generate new fids. Start with arbitrary high value to avoid
-+ * collision with hard coded fids in basic test code.
-+ */
-+static uint32_t fid_generator = 1000;
-+
-+static uint32_t genfid(void)
-+{
-+    return fid_generator++;
-+}
-+
-+/**
-+ * Splits the @a in string by @a delim into individual (non empty) strings
-+ * and outputs them to @a out. The output array @a out is NULL terminated.
-+ *
-+ * Output array @a out must be freed by calling split_free().
-+ *
-+ * @returns number of individual elements in output array @a out (without the
-+ *          final NULL terminating element)
-+ */
-+static int split(const char *in, const char *delim, char ***out)
-+{
-+    int n = 0, i = 0;
-+    char *tmp, *p;
-+
-+    tmp = g_strdup(in);
-+    for (p = strtok(tmp, delim); p != NULL; p = strtok(NULL, delim)) {
-+        if (strlen(p) > 0) {
-+            ++n;
-+        }
-+    }
-+    g_free(tmp);
-+
-+    *out = g_new0(char *, n + 1); /* last element NULL delimiter */
-+
-+    tmp = g_strdup(in);
-+    for (p = strtok(tmp, delim); p != NULL; p = strtok(NULL, delim)) {
-+        if (strlen(p) > 0) {
-+            (*out)[i++] = g_strdup(p);
-+        }
-+    }
-+    g_free(tmp);
-+
-+    return n;
-+}
-+
-+static void split_free(char ***out)
-+{
-+    int i;
-+    for (i = 0; (*out)[i]; ++i) {
-+        g_free((*out)[i]);
-+    }
-+    g_free(*out);
-+    *out = NULL;
-+}
-+
- static void pci_config(void *obj, void *data, QGuestAllocator *t_alloc)
- {
-     QVirtio9P *v9p = obj;
-@@ -201,6 +257,7 @@ static const char *rmessage_name(uint8_t id)
-         id == P9_RWALK ? "RWALK" :
-         id == P9_RLOPEN ? "RLOPEN" :
-         id == P9_RWRITE ? "RWRITE" :
-+        id == P9_RMKDIR ? "RMKDIR" :
-         id == P9_RFLUSH ? "RFLUSH" :
-         id == P9_RREADDIR ? "READDIR" :
-         "<unknown>";
-@@ -578,6 +635,39 @@ static bool fs_dirents_contain_name(struct V9fsDirent *e, const char* name)
-     return false;
- }
- 
-+/* size[4] Tmkdir tag[2] dfid[4] name[s] mode[4] gid[4] */
-+static P9Req *v9fs_tmkdir(QVirtio9P *v9p, uint32_t dfid, const char *name,
-+                          uint32_t mode, uint32_t gid, uint16_t tag)
-+{
-+    P9Req *req;
-+
-+    uint32_t body_size = 4 + 4 + 4;
-+    uint16_t string_size = v9fs_string_size(name);
-+
-+    g_assert_cmpint(body_size, <=, UINT32_MAX - string_size);
-+    body_size += string_size;
-+
-+    req = v9fs_req_init(v9p, body_size, P9_TMKDIR, tag);
-+    v9fs_uint32_write(req, dfid);
-+    v9fs_string_write(req, name);
-+    v9fs_uint32_write(req, mode);
-+    v9fs_uint32_write(req, gid);
-+    v9fs_req_send(req);
-+    return req;
-+}
-+
-+/* size[4] Rmkdir tag[2] qid[13] */
-+static void v9fs_rmkdir(P9Req *req, v9fs_qid *qid)
-+{
-+    v9fs_req_recv(req, P9_RMKDIR);
-+    if (qid) {
-+        v9fs_memread(req, qid, 13);
-+    } else {
-+        v9fs_memskip(req, 13);
-+    }
-+    v9fs_req_free(req);
-+}
-+
- /* basic readdir test where reply fits into a single response message */
- static void fs_readdir(void *obj, void *data, QGuestAllocator *t_alloc)
- {
-@@ -877,6 +967,30 @@ static void fs_flush_ignored(void *obj, void *data, QGuestAllocator *t_alloc)
-     g_free(wnames[0]);
- }
- 
-+static void fs_mkdir(void *obj, void *data, QGuestAllocator *t_alloc,
-+                     const char *path, const char *cname)
-+{
-+    QVirtio9P *v9p = obj;
-+    alloc = t_alloc;
-+    char **wnames;
-+    char *const name = g_strdup(cname);
-+    P9Req *req;
-+    const uint32_t fid = genfid();
-+
-+    int nwnames = split(path, "/", &wnames);
-+
-+    req = v9fs_twalk(v9p, 0, fid, nwnames, wnames, 0);
-+    v9fs_req_wait_for_reply(req, NULL);
-+    v9fs_rwalk(req, NULL, NULL);
-+
-+    req = v9fs_tmkdir(v9p, fid, name, 0750, 0, 0);
-+    v9fs_req_wait_for_reply(req, NULL);
-+    v9fs_rmkdir(req, NULL);
-+
-+    g_free(name);
-+    split_free(&wnames);
-+}
-+
- static void fs_readdir_split_128(void *obj, void *data,
-                                  QGuestAllocator *t_alloc)
- {
-@@ -895,6 +1009,30 @@ static void fs_readdir_split_512(void *obj, void *data,
+@@ -895,29 +895,45 @@ static void fs_readdir_split_512(void *obj, void *data,
      fs_readdir_split(obj, data, t_alloc, 512);
  }
  
-+
-+/* tests using the 9pfs 'local' fs driver */
-+
-+static void fs_create_dir(void *obj, void *data, QGuestAllocator *t_alloc)
++static void *assign_9p_local_driver(GString *cmd_line, void *arg)
 +{
-+    QVirtio9P *v9p = obj;
-+    struct stat st;
-+    char *root_path = virtio_9p_test_path("");
-+    char *new_dir = virtio_9p_test_path("01");
-+
-+    g_assert(root_path != NULL);
-+
-+    fs_attach(v9p, NULL, t_alloc);
-+    fs_mkdir(v9p, data, t_alloc, "/", "01");
-+
-+    /* check if created directory really exists now ... */
-+    g_assert(stat(new_dir, &st) == 0);
-+    /* ... and is actually a directory */
-+    g_assert((st.st_mode & S_IFMT) == S_IFDIR);
-+
-+    g_free(new_dir);
-+    g_free(root_path);
++    virtio_9p_assign_local_driver(cmd_line, "security_model=mapped-xattr");
++    return arg;
 +}
 +
- static void *assign_9p_local_driver(GString *cmd_line, void *arg)
+ static void register_virtio_9p_test(void)
  {
-     virtio_9p_assign_local_driver(cmd_line, "security_model=mapped-xattr");
-@@ -934,6 +1072,7 @@ static void register_virtio_9p_test(void)
-     /* 9pfs test cases using the 'local' filesystem driver */
-     opts.before = assign_9p_local_driver;
-     qos_add_test("local/config", "virtio-9p", pci_config,  &opts);
-+    qos_add_test("local/create_dir", "virtio-9p", fs_create_dir, &opts);
+-    qos_add_test("synth/config", "virtio-9p", pci_config, NULL);
+-    qos_add_test("synth/version/basic", "virtio-9p", fs_version, NULL);
+-    qos_add_test("synth/attach/basic", "virtio-9p", fs_attach, NULL);
+-    qos_add_test("synth/walk/basic", "virtio-9p", fs_walk, NULL);
++
++    QOSGraphTestOptions opts = {
++    };
++
++    /* 9pfs test cases using the 'synth' filesystem driver */
++    qos_add_test("synth/config", "virtio-9p", pci_config, &opts);
++    qos_add_test("synth/version/basic", "virtio-9p", fs_version,  &opts);
++    qos_add_test("synth/attach/basic", "virtio-9p", fs_attach,  &opts);
++    qos_add_test("synth/walk/basic", "virtio-9p", fs_walk,  &opts);
+     qos_add_test("synth/walk/no_slash", "virtio-9p", fs_walk_no_slash,
+-                 NULL);
++                  &opts);
+     qos_add_test("synth/walk/dotdot_from_root", "virtio-9p",
+-                 fs_walk_dotdot, NULL);
+-    qos_add_test("synth/lopen/basic", "virtio-9p", fs_lopen, NULL);
+-    qos_add_test("synth/write/basic", "virtio-9p", fs_write, NULL);
++                 fs_walk_dotdot,  &opts);
++    qos_add_test("synth/lopen/basic", "virtio-9p", fs_lopen,  &opts);
++    qos_add_test("synth/write/basic", "virtio-9p", fs_write,  &opts);
+     qos_add_test("synth/flush/success", "virtio-9p", fs_flush_success,
+-                 NULL);
++                  &opts);
+     qos_add_test("synth/flush/ignored", "virtio-9p", fs_flush_ignored,
+-                 NULL);
+-    qos_add_test("synth/readdir/basic", "virtio-9p", fs_readdir, NULL);
++                  &opts);
++    qos_add_test("synth/readdir/basic", "virtio-9p", fs_readdir,  &opts);
+     qos_add_test("synth/readdir/split_512", "virtio-9p",
+-                 fs_readdir_split_512, NULL);
++                 fs_readdir_split_512,  &opts);
+     qos_add_test("synth/readdir/split_256", "virtio-9p",
+-                 fs_readdir_split_256, NULL);
++                 fs_readdir_split_256,  &opts);
+     qos_add_test("synth/readdir/split_128", "virtio-9p",
+-                 fs_readdir_split_128, NULL);
++                 fs_readdir_split_128,  &opts);
++
++
++    /* 9pfs test cases using the 'local' filesystem driver */
++    opts.before = assign_9p_local_driver;
++    qos_add_test("local/config", "virtio-9p", pci_config,  &opts);
  }
  
  libqos_init(register_virtio_9p_test);
