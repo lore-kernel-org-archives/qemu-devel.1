@@ -2,110 +2,66 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD15AC43467
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 12:39:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7AB6C43467
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 12:43:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53D872083B
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 12:39:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g4+hW0I3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53D872083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E86CC206E9
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 12:43:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E86CC206E9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQVCX-0005vp-2J
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 08:39:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38486)
+	id 1kQVGE-0007Y3-Tg
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 08:43:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40030)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kQVAS-0004G7-Rb
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 08:37:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31462)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kQVAQ-0007Fx-73
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 08:37:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602160625;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=IRcG75tZk0vu22SxcgYOvD1PB127bK/OTP8m7a4jaF0=;
- b=g4+hW0I32E+BcvgXRglp0DrMUQNP8+ConFkbDdmUi0nINS8BT/ApHVUWJ52jtGOsr+igzw
- ztCcQi50eMjb3bero4LWUoW1tbqZ3ImcS0Mz7DmXM7bsYdfWPEpzwGBJpm8rcz+KV1QIcH
- T6l4PG5zilpIh3jWqsrhgOG+0rX1m2U=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-581-U-yhPUAHPOGpV64ot8AlmA-1; Thu, 08 Oct 2020 08:37:03 -0400
-X-MC-Unique: U-yhPUAHPOGpV64ot8AlmA-1
-Received: by mail-wm1-f72.google.com with SMTP id w23so3075737wmi.1
- for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 05:37:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=IRcG75tZk0vu22SxcgYOvD1PB127bK/OTP8m7a4jaF0=;
- b=rhULADqfnxdTb3vGkh04XorjOcyVJTIZLo7nNw3RkLLh/CBO78D7zI3+/sWE/QPBpm
- 3quG8r7xNG+NU8uF/GnIbV+dp2DhKY1DquuOkjsZBpt8wv9fZKxB7zw+uLKaS8bbYMpq
- R4CFAnwdWen5smHyj8ezMVgyildTwLT3ahQctzuE14JZxuOo+32O+wCy0lL9CRg0IMen
- BWGXfDuHkCMLW3T7uHICTF3RDJ/q3/FHo7IMdQraXWnA1YMHK3hvqLiLgt5PA6FyFGJE
- DFHxoZUSlQUIXJhuhV92t41Bqkozg+duFeQxvMfT2FiemZiVxnPwfQJOaVNZIRUeM48a
- rcEA==
-X-Gm-Message-State: AOAM531PJgiTcLVYaAjg/3bppWO83jAijkxRtvws5F4P8DoRoDw7xMv0
- opoJikUzQaOIWJF6vPKEmakqx1S+sCP8sUHPUeqKWxWRbyWlsXMqdbjIu9J80pfb/EJZzOmFGRB
- KXJZdVfR6PcAsAyM=
-X-Received: by 2002:adf:d850:: with SMTP id k16mr9006559wrl.259.1602160622695; 
- Thu, 08 Oct 2020 05:37:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzlcgjyvVZbBRcQBEgJ9tak8/xFt7Ug8nilsiilb+G9K0fMyg8lukjC6iqyBc2yhzPBXvwEwg==
-X-Received: by 2002:adf:d850:: with SMTP id k16mr9006546wrl.259.1602160622490; 
- Thu, 08 Oct 2020 05:37:02 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:bb8c:429c:6de1:f4ec?
- ([2001:b07:6468:f312:bb8c:429c:6de1:f4ec])
- by smtp.gmail.com with ESMTPSA id x15sm8051847wrr.36.2020.10.08.05.37.01
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 08 Oct 2020 05:37:01 -0700 (PDT)
-Subject: Re: [PATCH v3 05/11] tests/qtest/qos-test: dump environment variables
- if verbose
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org
-References: <cover.1601655308.git.qemu_oss@crudebyte.com>
- <8d8b242f38caccd81c27125167862f4457e8a22f.1601655308.git.qemu_oss@crudebyte.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ff76657f-4da1-5131-f981-02ea975cf1a3@redhat.com>
-Date: Thu, 8 Oct 2020 14:37:00 +0200
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kQVFK-00074r-6h
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 08:42:10 -0400
+Received: from mx2.suse.de ([195.135.220.15]:43012)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kQVFI-00081k-0D
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 08:42:09 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+ by mx2.suse.de (Postfix) with ESMTP id 9AF68AFDF;
+ Thu,  8 Oct 2020 12:42:06 +0000 (UTC)
+Subject: Re: [PATCH 2/2] exec: split out non-softmmu-specific parts
+To: Paolo Bonzini <pbonzini@redhat.com>
+References: <20201006091922.331832-1-pbonzini@redhat.com>
+ <20201006091922.331832-3-pbonzini@redhat.com>
+ <cb553da1-9cd1-1933-d678-8580a3c0d8f3@suse.de>
+ <027d0f5c-d5c4-911b-b349-f63895fc164d@redhat.com>
+ <b6e4d4e0-6170-b3e6-f2f7-e337c71b0403@suse.de>
+ <0ad53a3b-f28b-b53b-2541-3108e40e282a@redhat.com>
+From: Claudio Fontana <cfontana@suse.de>
+Message-ID: <d013a1c0-9450-c864-d762-13ead60ab8f3@suse.de>
+Date: Thu, 8 Oct 2020 14:42:05 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <8d8b242f38caccd81c27125167862f4457e8a22f.1601655308.git.qemu_oss@crudebyte.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <0ad53a3b-f28b-b53b-2541-3108e40e282a@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 02:56:27
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -22
-X-Spam_score: -2.3
-X-Spam_bar: --
-X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.214, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/07 23:49:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.214,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,33 +74,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, berrange@redhat.com,
- Thomas Huth <thuth@redhat.com>,
- Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
- Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/10/20 18:15, Christian Schoenebeck wrote:
-> -int main(int argc, char **argv)
-> +int main(int argc, char **argv, char** envp)
->  {
->      g_test_init(&argc, &argv, NULL);
-> +    if (g_test_verbose()) {
-> +        printf("ENVIRONMENT VARIABLES: {\n");
-> +        for (char **env = envp; *env != 0; env++) {
-> +            printf("\t%s\n", *env);
-> +        }
-> +        printf("}\n");
-> +    }
+On 10/8/20 1:36 PM, Paolo Bonzini wrote:
+> On 08/10/20 13:02, Claudio Fontana wrote:
+>>>> What is the role of this new module?
+>>>
+>>> It's [...] "4-500 lines of code for the target
+>>> specific parts of the CPU QOM object, plus a few functions for user-mode
+>>> emulation that do not have a better place".
+>>>
+>>> It's basically sitting between hw/core/cpu.c and target/*/cpu.c.  Hence
+>>> the non-descriptive name. :)
+>>>
+>>>> Or its this basically a "leftovers" file for which we did not find a proper role yet?
+>>>
+>>> The user-mode parts are, but most of it is implementing the QOM CPU
+>>> object.  We can move those functions to hw/core/cpu.c and make that file
+>>> target-dependent, I wouldn't object to that.
+>>
+>> this gives me an idea, we already basically have a target-specific part of a cpu QEMU object.
+> 
+> Which is? :)  Sorry I don't follow.  We have one that depends on the
+> target architecture (methods in the CPU class), but not one that depends
+> on the target kind.  We could add more methods in the CPU class for
+> that, but I'm not sure it would be useful because (unlike CPUs of which
+> in theory there could be >1 class in the system) the whole emulation
+> _has_ to be either user-level or system.
+> 
+>> I basically was looking for a place to graft accelerator-specific code in order to refactor target/i386/cpu..., 
+>> to split between tcg stuff and non-tcg stuff, and thus refactor even more code.
+>>
+>> In the past I thought to put them here for example:
+>>
+>> diff --git a/target/i386/cpu-qom.h b/target/i386/cpu-qom.h
+>> index 3e96f8d668..3716c3e949 100644
+>> --- a/target/i386/cpu-qom.h
+>> +++ b/target/i386/cpu-qom.h
+>> @@ -72,6 +72,12 @@ typedef struct X86CPUClass {
+>>      DeviceRealize parent_realize;
+>>      DeviceUnrealize parent_unrealize;
+>>      DeviceReset parent_reset;
+>> +
+>> +    /* methods operating on CPUX86State */
+>> +    uint32_t (*cpu_compute_eflags)(CPUX86State *env);
+>> +    void (*cpu_set_mxcsr)(CPUX86State *env, uint32_t mxcsr);
+>> +    void (*cpu_set_fpuc)(CPUX86State *env, uint16_t fpuc);
+>> +    void (*cpu_report_tpr_access)(CPUX86State *env, TPRAccess access);
+>>  } X86CPUClass;
+>>  
+>>  typedef struct X86CPU X86CPU;
+> 
+> I think in this case you would have an X86AccelOps struct and a global
+> variable pointing to it.
+> 
+> Paolo
+> 
+> 
 
-But doesn't this (and patch 6 as well) break TAP output?  Using
-g_test_message + g_test_verbose would be the best of both worlds.
+I was hoping to make use of some of the object model ... but lets get to this when we get to this later on.
 
-In fact using printf in tests should be forbidden, since glib 2.62 and
-newer _always_ emit TAP.
+Ciao, thanks!
 
-Paolo
-
+Claudio
 
