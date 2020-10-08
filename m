@@ -2,88 +2,142 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 043CCC4363A
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 14:57:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2104EC04EBE
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 15:03:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4989D20708
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 14:57:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3FCEC20708
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 15:03:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Oby04/AG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4989D20708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="KaTKV1kn";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="N5cZI2rs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FCEC20708
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQXMV-0002HV-1w
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 10:57:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44598)
+	id 1kQXS1-0004X0-Pk
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 11:03:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45876)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kQXKv-0001EF-Bw
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 10:56:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46548)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kQXKr-0001Yt-5Q
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 10:56:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602168959;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=iWfIE4I0KlAgZ8tU8HocZq1+26WHpPm5a9jve5BZASk=;
- b=Oby04/AGxIueGbfVHSunaLtZqMLiZauFZBsSW6l+n9Jw2t9tXOBOAXje4wmKLE5/Jq9q9H
- J9qeDnW0f+pnsd1P6ZRspdJafwe1ODa/odxxHzlZ5K3TiQREUIlMwOES85v1gb2sckMROo
- 91XL3RL3CaWSLNxpTjo/KuPyk3qasE8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-439-I76J1zmXMD2Bq3mErfC7SA-1; Thu, 08 Oct 2020 10:55:56 -0400
-X-MC-Unique: I76J1zmXMD2Bq3mErfC7SA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 432F381EE7F;
- Thu,  8 Oct 2020 14:55:45 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-119-55.rdu2.redhat.com
- [10.10.119.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7EEB75576E;
- Thu,  8 Oct 2020 14:55:44 +0000 (UTC)
-Date: Thu, 8 Oct 2020 10:55:42 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v1 22/22] tests/acceptance: disable machine_rx_gdbsim on
- GitLab
-Message-ID: <20201008145542.GI240186@localhost.localdomain>
-References: <20201007160038.26953-1-alex.bennee@linaro.org>
- <20201007160038.26953-23-alex.bennee@linaro.org>
+ (Exim 4.90_1) (envelope-from <tsimpson@quicinc.com>)
+ id 1kQXPb-0003N8-FM
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 11:00:56 -0400
+Received: from alexa-out-sd-01.qualcomm.com ([199.106.114.38]:13189)
+ by eggs.gnu.org with esmtps (TLS1.2:RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <tsimpson@quicinc.com>)
+ id 1kQXPW-0002I1-5S
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 11:00:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+ t=1602169250; x=1633705250;
+ h=from:to:cc:subject:date:message-id:references:
+ in-reply-to:content-transfer-encoding:mime-version;
+ bh=h4UkRNRrbyyvtSq+VguIWIYTYhDuL+7VR+lSsq1GoF8=;
+ b=KaTKV1knh9MF/fq0WLe3Rqlee51D9BIHRr9n+1rGVLGxR5uQLX9TDMqn
+ XFcOLNsEqFD9vKkpwZnkveFub+kAApdC+CWFJtsv/AJ13Cd5tp43N7ngE
+ nbvg8t35ON5VppEnNpchPSEAxg1SOIucn6tBzVKsyzp2ziRO3vkrbkU3Z 0=;
+Received: from unknown (HELO ironmsg05-sd.qualcomm.com) ([10.53.140.145])
+ by alexa-out-sd-01.qualcomm.com with ESMTP; 08 Oct 2020 08:00:44 -0700
+X-QCInternal: smtphost
+Received: from nasanexm03c.na.qualcomm.com ([10.85.0.106])
+ by ironmsg05-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
+ 08 Oct 2020 08:00:44 -0700
+Received: from nasanexm03c.na.qualcomm.com (10.85.0.106) by
+ nasanexm03c.na.qualcomm.com (10.85.0.106) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Thu, 8 Oct 2020 08:00:43 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (199.106.107.6)
+ by nasanexm03c.na.qualcomm.com (10.85.0.106) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2 via Frontend Transport; Thu, 8 Oct 2020 08:00:43 -0700
+Received: from BYAPR02MB4886.namprd02.prod.outlook.com (2603:10b6:a03:46::32)
+ by BY5PR02MB6324.namprd02.prod.outlook.com (2603:10b6:a03:1f6::24)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.21; Thu, 8 Oct
+ 2020 15:00:32 +0000
+Received: from BYAPR02MB4886.namprd02.prod.outlook.com
+ ([fe80::76:5029:2fff:f10c]) by BYAPR02MB4886.namprd02.prod.outlook.com
+ ([fe80::76:5029:2fff:f10c%6]) with mapi id 15.20.3455.025; Thu, 8 Oct 2020
+ 15:00:32 +0000
+From: Taylor Simpson <tsimpson@quicinc.com>
+To: Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Subject: RE: [RFC PATCH v3 26/34] Hexagon (target/hexagon) macros referenced
+ in instruction semantics
+Thread-Topic: [RFC PATCH v3 26/34] Hexagon (target/hexagon) macros referenced
+ in instruction semantics
+Thread-Index: AQHWdXdf6p/vkS3v9UGs80VPN3oP2KlOWTUAgD+1nUA=
+Date: Thu, 8 Oct 2020 15:00:32 +0000
+Message-ID: <BYAPR02MB4886F48B7E22A43984D78A13DE0B0@BYAPR02MB4886.namprd02.prod.outlook.com>
+References: <1597765847-16637-1-git-send-email-tsimpson@quicinc.com>
+ <1597765847-16637-27-git-send-email-tsimpson@quicinc.com>
+ <75d5275b-76e5-38a5-f9a3-f36d1ee08c74@linaro.org>
+In-Reply-To: <75d5275b-76e5-38a5-f9a3-f36d1ee08c74@linaro.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: linaro.org; dkim=none (message not signed)
+ header.d=none;linaro.org; dmarc=none action=none header.from=quicinc.com;
+x-originating-ip: [76.120.51.212]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 38bee6ff-5ec1-4aed-420b-08d86b9ae79a
+x-ms-traffictypediagnostic: BY5PR02MB6324:
+x-microsoft-antispam-prvs: <BY5PR02MB63245DC55BC39A198581301DDE0B0@BY5PR02MB6324.namprd02.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 5mN30AfGM1L4kbCnFj8J1BF9ZYI1ogJ2d9xX0tnTAlbBZJ1tZMulVHFUP/5UXCaFdn3eeeTnotspdz+G48eMd1DPeuhreivoKmvq2zXwhXSHf4F2QcrwXMPTFKYRoZkMhwl2S2u9gyeByehoy1CYjNf9Pc8dpvHTfeMJr0l9wAWWAHfGVH38xlDfduu2hb4A6L3tjOlqX0e0AMxDphGcNqecs0ZXXu2JwyeRA/idZ6K1rpbzF7iJyaSzDzvjQy3Pp8cnw+WTob42k0gbnS2hGi5Zzv4KfOyzjRRcFPsTuFlRxP0xvNerj5OosMFGgljhChGyWdKK5t/HfTTu4Pf/8w==
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:BYAPR02MB4886.namprd02.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(396003)(136003)(39860400002)(376002)(346002)(366004)(66446008)(316002)(6506007)(53546011)(186003)(71200400001)(478600001)(26005)(7696005)(66946007)(76116006)(86362001)(110136005)(54906003)(66476007)(33656002)(52536014)(5660300002)(8936002)(4326008)(55016002)(9686003)(83380400001)(2906002)(66556008)(64756008)(8676002);
+ DIR:OUT; SFP:1102; 
+x-ms-exchange-antispam-messagedata: gXZNGpyVvtePeqdL+A9Y1NgaOJOkWh2GfOQc9WMYVy9r4L4K3qHHbGlun222Jcd8NHhrNPAAKgMCTCyE27nspzMOZiC+LlkB1VdOu3A5ZsIujoBOke+w3QRX5654/5S5h3AmRitJqn78QpgSxqad9ANLljgT3WWOFJtoWojJBU970NX+jEN/Sk8Kvrff/4Jhq+vYeioC5F5+ElZGflydK0RixbpW3rWZTyXxJ06fQPjEVcvIaJF5Vmqk0Midr1+D/yhy8qhARvf1fOHRWYEmkf+1uSnKanMz5KpurRLRV9mYR57he0KHMKPmfuru4wjRy6IlHLun33NgXhV496X1SNP1iJ+mXhZQZCJTbf8hFmdmozTtLQhaIOZCfXeF3NXpzhC+L/Zfgsg2bRrEMhauJ0Fum+bbyaIwXrXmuQx0Jzmg3hQZYOHmctqK1EeSQ7kvJPqS1UUXVCt8dmgJeB3YEkor+xYZn7C5fM+nU0lS6fCtVfgpdPJtmVqrz+jsuMAiRJSc7aYmyz2MEiYqskG16E7ecnGuVsOaq5z8lxIrT8SfZMSRxYlQZtNrgx9ko5f5JCDY6Ja5qSvV4som+YCxn6Mldp+63GJ6Nr+f+o4lL42CLjJH1EbeKTNaG204t6A6hS2P0WOUpNrQGT2hdsb2JQ==
+x-ms-exchange-transport-forked: True
+arc-seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GNDDne+Qppw5qH360DbPyCwZwBqoYSijUfRX1HpLmgYigDwJFgvkNA3gRrT8GcdnqsB3MGRTUTFF43ZiORwIGJDbwxGgNTyBVT7XEbNCWkYP+LErY1HHqAmFWK+xezaLt8615l41MLeZkqbFzVig3F1DL8o7FBCzbni4dim+Y6ULdztAUaKaVirVwmQLqu0+jGXAgzvoXRXSQgVPkpP19xw+OHfOMoXrJorpsZ0iutBURS9l0OeARUF/G0ysopqL0pqyvJ7sNr9BEFyR2TVUJxDYRv8n2TbTeXhSq91KiINDL7eQoUwFD2HVnkhnvXoJkfZeBDYf++gwxEti6IU5vA==
+arc-message-signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=T8XjQKril3PWizEpKnysy1FqgSn77EupH83k4n6hw7k=;
+ b=OXsQg1rjJ7H/wSMflgihJ8FWeWvNIvBtvSxO/601S2ZCV1etUMhTigkUKFP+UwxUdl2qyldo045LF/dts2vEBnXO6DplwjiyMh2U6uKxCRnm8WzvF/x1iEbEZGx/4Bz4+hJ9O3lF/er5QGDCbYOW76Gp5i56Ze0xx0Ser7/CcIXek4xVbWTanC9sY/TTxICPBiDWD5CBqcdz7RQE11OYuFJ8Jt6PnyUshhGrrz3dHvXq1aodyZmPwuZ5g2hMCf3Pf4Odbi7bZKEpB4vFoz5P3LbmVcS/ERza2az8x4g8w7VhG51LvItHGF+gewtS9ubYHB2fcyRuu4ns1h9Hq22jGQ==
+arc-authentication-results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
+ dkim=pass header.d=quicinc.com; arc=none
+dkim-signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=T8XjQKril3PWizEpKnysy1FqgSn77EupH83k4n6hw7k=;
+ b=N5cZI2rsG1JKQMeTAiutRxlyWZCUVnn/8Ivvz7uE5m17gjEfvpiAPl5187uqnYs6omkUamr/RKKmaqOhvonpEJ/oxrj65yOokphNqMDBINRQh+jBaTqu5V5nBsl+24R8WkyLH0Z4PAlCzkvAznQHiA5Z7RxpBT+Ps0UsHN6bO6Q=
+x-ms-exchange-crosstenant-authas: Internal
+x-ms-exchange-crosstenant-authsource: BYAPR02MB4886.namprd02.prod.outlook.com
+x-ms-exchange-crosstenant-network-message-id: 38bee6ff-5ec1-4aed-420b-08d86b9ae79a
+x-ms-exchange-crosstenant-originalarrivaltime: 08 Oct 2020 15:00:32.6327 (UTC)
+x-ms-exchange-crosstenant-fromentityheader: Hosted
+x-ms-exchange-crosstenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
+x-ms-exchange-crosstenant-mailboxtype: HOSTED
+x-ms-exchange-crosstenant-userprincipalname: hags7EW0TOZ3wHKO5uYQ9TaeLaoURvo3lr93QNd9HU44u7RMTzAPqguIqrQAyDDn4t62moU8FB+FwDHqeSmnpw==
+x-ms-exchange-transport-crosstenantheadersstamped: BY5PR02MB6324
+x-originatororg: quicinc.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20201007160038.26953-23-alex.bennee@linaro.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="BWWlCdgt6QLN7tv3"
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=crosa@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 02:56:27
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=199.106.114.38; envelope-from=tsimpson@quicinc.com;
+ helo=alexa-out-sd-01.qualcomm.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 11:00:45
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,47 +150,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Yoshinori Sato <ysato@users.sourceforge.jp>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: "ale@rev.ng" <ale@rev.ng>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
+ "philmd@redhat.com" <philmd@redhat.com>,
+ "laurent@vivier.eu" <laurent@vivier.eu>,
+ "aleksandar.m.mail@gmail.com" <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---BWWlCdgt6QLN7tv3
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Oct 07, 2020 at 05:00:38PM +0100, Alex Benn=E9e wrote:
-> While I can get the ssh test to fail on my test setup this seems a lot
-> more stable except when on GitLab. Hopefully we can re-enable both
-> once the serial timing patches have been added.
->=20
-> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
-
---BWWlCdgt6QLN7tv3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl9/KG4ACgkQZX6NM6Xy
-CfOp9xAAkAAdpD8TbpL+zmXgDhuj9YhGPYITSJBGHbVXQ6c7Mx7t4rkQTZb/RdDn
-KiD18HTsmiq1IGzu/U1EFVJRuW5Gu48o5M8gnHCBeMMHjHdGpGocY999zLH8UJhk
-aFz8O0YglHq1bo+EMpjfEVHHMNL1O8aF9PYuzei7/v2gr05AL8eNc6t01JGMriz2
-SS301XnkDBo+72HGyFDs6ZwDZ1vCaoY9Nck4QGEitxIALVBnpw2d8tj3MpLFhtvw
-6I1H1j+duDpML4GNI1FvEYHRpze9QkJOl3JqbVosOvppWb8wwilAwOshFSsxc1NC
-7272qGatCI6UdyFbt2PwGr9mGntcWViSrka2NXsGtkyAkjGUUQnXs6RS3yn3/vIr
-/iA2gxXvpGFeU5tCvVf0RenR4q4Ko09y5d2PXE5WeRnCattPTQxpljXfe2K+8akh
-H0f/9U7BjsgPRWJk+g6X2jrv0SUQBbm7+Dpyjf2QscrgZsr7N2EqLJVEwMwQfxKG
-zj4pJO8DXj4SorJlrwF/V8fKGpQdWu3Rn6h9wzMxj9Gj2hZ4ZQJ0NotZSzS5pSDs
-JXi2XKHHcij2spoAkYdk8nvPTQOCU+nDOale5HtRta4g/oy5VKC81H8DSSZyX+X9
-TIlD0Xkzoy4GcxxzNeEzFpUEANZxHIO0rCKsr2EDJtfcgU6wZuY=
-=SX5D
------END PGP SIGNATURE-----
-
---BWWlCdgt6QLN7tv3--
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUmljaGFyZCBIZW5kZXJz
+b24gPHJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmc+DQo+IFNlbnQ6IEZyaWRheSwgQXVndXN0
+IDI4LCAyMDIwIDc6MTcgUE0NCj4gVG86IFRheWxvciBTaW1wc29uIDx0c2ltcHNvbkBxdWljaW5j
+LmNvbT47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiBDYzogcGhpbG1kQHJlZGhhdC5jb207IGxh
+dXJlbnRAdml2aWVyLmV1OyByaWt1LnZvaXBpb0Bpa2kuZmk7DQo+IGFsZWtzYW5kYXIubS5tYWls
+QGdtYWlsLmNvbTsgYWxlQHJldi5uZw0KPiBTdWJqZWN0OiBSZTogW1JGQyBQQVRDSCB2MyAyNi8z
+NF0gSGV4YWdvbiAodGFyZ2V0L2hleGFnb24pIG1hY3Jvcw0KPiByZWZlcmVuY2VkIGluIGluc3Ry
+dWN0aW9uIHNlbWFudGljcw0KPg0KPg0KPiBBaCwgc28gSSBzZWUgd2hhdCB5b3UncmUgdHJ5aW5n
+IHRvIGRvIHdpdGggdGhlIG1lcmdlIHRoaW5nLCB3aGljaCBoYWQgdGhlDQo+IGhvc3QtZW5kaWFu
+IHByb2JsZW1zLg0KPg0KPiBJIHRoaW5rIHRoZSBtZXJnZSBzdHVmZiBpcyBhIG1pc3Rha2UuICBJ
+IHRoaW5rIHlvdSBjYW4gZ2V0IHRoZSBzZW1hbnRpY3MgdGhhdA0KPiB5b3Ugd2FudCB3aXRoDQo+
+DQo+IHByb2JlX3JlYWQobGRfYWRkciwgbGRfbGVuKQ0KPiBxZW11X3N0KHN0X3ZhbHVlLCBzdF9h
+ZGRyKQ0KPiBxZW11X2xkKGxkX3ZhbHVlLCBsZF9hZGRyKQ0KPg0KPiBJbiB0aGlzIHdheSwgYWxs
+IGV4Y2VwdGlvbnMgYXJlIHJlY29nbml6ZWQgYmVmb3JlIHRoZSBzdG9yZSBpcyBjb21wbGV0ZSwg
+dGhlDQo+IG5vcm1hbCBtZW1vcnkgb3BlcmF0aW9ucyBoYW5kbGUgYW55IHBvc3NpYmxlIG92ZXJs
+YXAuDQoNCkZvbGxvd2luZyB1cCBvbiB0aGlzLi4uDQoNCjEpIFdlIGRvbid0IG5lZWQgdG8gZG8g
+dGhlIHByb2JlX3JlYWQgYmVjYXVzZSB0aGUgbG9hZCBoYXMgYWxyZWFkeSBoYXBwZW5lZCBhdCB0
+aGlzIHBvaW50Lg0KDQoyKSBJJ20gbm90IGZhbWlsaWFyIHdpdGggcWVtdV9zdC9xZW11X2xkLiAg
+QXJlIHRoZXNlIHNob3J0aGFuZCBmb3IgdGNnX2dlbl9xZW11X3N0Ki90Y2dfZ2VuX3FlbXVfbGQq
+PyAgV2UgY2FuJ3QgYWN0dWFsbHkgZG8gdGhlIHN0b3JlIGF0IHRoaXMgcG9pbnQgYmVjYXVzZSBp
+dCB3b3VsZCBhbHRlciB0aGUgbWVtb3J5IGJlZm9yZSB3ZSBhcmUgc3VyZSB0aGUgcGFja2V0IHdp
+bGwgY29tbWl0IChpLmUuLCB0aGVyZSBtaWdodCBiZSBzdGlsbCBiZSBhbiBleGNlcHRpb24gcmFp
+c2VkIGJ5IGFub3RoZXIgaW5zdHJ1Y3Rpb24gaW4gdGhlIHBhY2tldCkuDQoNCjMpIEhvdyBpbXBv
+cnRhbnQgaXMgaXQgdG8gc3VwcG9ydCBiaWcgZW5kaWFuIGhvc3RzPyAgV291bGQgaXQgYmUgT0sg
+dG8gcHV0IHNvbWV0aGluZyBsaWtlIHRoaXMgdG8gZGVjbGFyZSBpdCBpc24ndCBzdXBwb3J0ZWQg
+Zm9yIEhleGFnb24/DQojaWYgZGVmaW5lZChIT1NUX1dPUkRTX0JJR0VORElBTikNCiNlcnJvciBI
+ZXhhZ29uIGd1ZXN0IG5vdCBzdXBwb3J0ZWQgb24gYmlnIGVuZGlhbiBob3N0DQojZW5kaWYNCg0K
+NCkgSWYgdGhlIGFib3ZlIGlzIG5vdCBPSywgYXJlIHRoZSBtYWNyb3MgaW4gYnN3YXAuaCB0aGUg
+Y29ycmVjdCBvbmVzIHRvIHVzZT8gIElzIHRoaXMgcHNldWRvLWNvZGUgY29ycmVjdD8NCnN0b3Jl
+X3ZhbCA9IGxlMzJfdG9fY3B1KHN0b3JlX3ZhbCk7DQpsb2FkX3ZhbCA9IGxlMzJfdG9fY3B1KGxv
+YWRfdmFsKTsNCjxtZXJnZSBieXRlcz4NCi8qIHN0b3JlX3ZhbCBpcyBkZWFkIHNvIG5vIG5lZWQg
+dG8gY29udmVydCBiYWNrICovDQpsb2FkX3ZhbCA9IGNwdV90b19sZTMyKGxvYWRfdmFsKQ0KDQoN
+ClRoYW5rcywNClRheWxvcg0KDQo=
 
