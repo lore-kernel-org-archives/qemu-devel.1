@@ -6,63 +6,64 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D23D8C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 04:28:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 928D8C4363C
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 04:30:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F49420789
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 04:28:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F49420789
+	by mail.kernel.org (Postfix) with ESMTPS id 035B220789
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 04:30:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 035B220789
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQNXo-0001KJ-2u
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 00:28:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56762)
+	id 1kQNZK-0002GI-1B
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 00:30:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57158)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kQNUv-0007Gd-Go
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 00:25:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43640)
+ id 1kQNYW-0001p4-S3
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 00:29:28 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43796)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kQNUr-0001ou-86
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 00:25:45 -0400
+ id 1kQNYV-00037D-7x
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 00:29:28 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kQNUm-0002CB-T7
- for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 04:25:36 +0000
+ id 1kQNYU-0002P8-65
+ for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 04:29:26 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id DADA52E80DF
- for <qemu-devel@nongnu.org>; Thu,  8 Oct 2020 04:25:36 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 17EF22E802E
+ for <qemu-devel@nongnu.org>; Thu,  8 Oct 2020 04:29:26 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 08 Oct 2020 04:17:16 -0000
-From: Launchpad Bug Tracker <1860610@bugs.launchpad.net>
+Date: Thu, 08 Oct 2020 04:17:18 -0000
+From: Launchpad Bug Tracker <584146@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
  assignee=None; 
-X-Launchpad-Bug-Tags: plugin tcg
+X-Launchpad-Bug: product=qemu-kvm; status=Incomplete; importance=Undecided;
+ assignee=None; 
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee janitor mhodog
-X-Launchpad-Bug-Reporter: Robert Henry (mhodog)
+X-Launchpad-Bug-Commenters: janitor mjt+launchpad-tls th-huth
+X-Launchpad-Bug-Reporter: Michael Tokarev (mjt+launchpad-tls)
 X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
-References: <157973034496.4473.7342941286220324914.malonedeb@soybean.canonical.com>
-Message-Id: <160213063757.310.18261944975505270589.malone@loganberry.canonical.com>
-Subject: [Bug 1860610] Re: cap_disas_plugin leaks memory
+References: <20100522092545.29377.46473.malonedeb@soybean.canonical.com>
+Message-Id: <160213063827.310.17139194637254550837.malone@loganberry.canonical.com>
+Subject: [Bug 584146] Re: Virtual fat breaks with -snapshot
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="d50d1e75c500726862802414f880ee3e3bb759bf"; Instance="production"
-X-Launchpad-Hash: 7611398f3fdc0e7ec149ffa9a690b172e75774ec
+X-Launchpad-Hash: e82857dc6755dff4fc320fb51def989372a59114
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 00:25:37
@@ -85,7 +86,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1860610 <1860610@bugs.launchpad.net>
+Reply-To: Bug 584146 <584146@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -99,23 +100,27 @@ Sender: "Qemu-devel"
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1860610
+https://bugs.launchpad.net/bugs/584146
 
 Title:
-  cap_disas_plugin leaks memory
+  Virtual fat breaks with -snapshot
 
 Status in QEMU:
   Expired
+Status in qemu-kvm:
+  Incomplete
 
 Bug description:
-  Looking at origin/master head, the function cap_disas_plugin leaks
-  memory.
+  When using fat emulation together with snapshot, qemu fails to find
+  the directory for the fat "filesystem".
 
-  per capstone's examples using their ABI, cs_free(insn, count); needs
-  to called just before cs_close.
+  See Debian bug#504049, http://bugs.debian.org/cgi-
+  bin/bugreport.cgi?bug=3D504049 and discussion on qemu-devel with Kevin
+  Wolf, http://marc.info/?t=3D126850802800001 for details.
 
-  I discovered this running qemu under valgrind.
+  There's a workaround for this bug: when using full path for
+  fat:/dir/name it works.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1860610/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/584146/+subscriptions
 
