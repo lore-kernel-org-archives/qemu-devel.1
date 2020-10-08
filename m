@@ -2,108 +2,87 @@ Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D744FC43467
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 06:59:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E01CC433E7
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 07:00:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1DBF2087D
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 06:59:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6545C2087D
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 07:00:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hEKIuPwp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1DBF2087D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tBa0ETRx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6545C2087D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQPtN-0006lE-1S
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 02:59:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53038)
+	id 1kQPuC-0007gj-Da
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 03:00:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53174)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kQPrs-0005nO-6d
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 02:57:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33440)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kQPrq-0002C0-J5
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 02:57:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602140252;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pmnFu4M88+QOrTGnDa4e8fEpP81Bw7vd+WjZ5eh+Rpo=;
- b=hEKIuPwp1k8GK1Yv7HJ/oxk4PKcxPGHqBjx8N7nOltZJWIxQhZ5PHB4ramLpTcxUdKLUXQ
- yAYx+Fz0zZpNu4bhaGmeiz+saerIhTw52J6mWohZ7bUtZNz9BZG42n51jIly0P+gevw6O2
- EUjCYFL4PdhCaI7dJ7IGcdUO8xGlYWE=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-181-lKeMjuxxMAGXF3HlG5dKlQ-1; Thu, 08 Oct 2020 02:57:30 -0400
-X-MC-Unique: lKeMjuxxMAGXF3HlG5dKlQ-1
-Received: by mail-wm1-f70.google.com with SMTP id 73so2795704wma.5
- for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 23:57:30 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kQPtL-0006uy-Jo
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 02:59:07 -0400
+Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:37261)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kQPtJ-0002Ha-U0
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 02:59:07 -0400
+Received: by mail-ej1-x642.google.com with SMTP id e22so6533422ejr.4
+ for <qemu-devel@nongnu.org>; Wed, 07 Oct 2020 23:59:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=0EvW5PeP7LBqh7p+ru8kqqwOGDHS0Scl/D01QEKxaqM=;
+ b=tBa0ETRxUfaNMRsyt7jIL48P2FYMiaoBuX/MiudkQwiqbOHPzi7mjGrR+y5pyKnX0E
+ RpoXxMf/XfQCsd+KMn+UcIuHUGkEyjYCyNjsCIUJGpNPZ5p7q1r94/MSGfonVDYUmJic
+ p/X3uwd1JaeSYDIY90jKlGDvS8hZOyg+llYmwYYG/zRX2kbitsor/Hhg27tFkmkA4s/u
+ paHkGU017SCTQDxijlAAlSzJRjPC3DCPdMOVVv30J07icIZPa7vwLs+mxMn7A8YSacOm
+ EWFouv8MMh/RHgxRyyva/tEFZttqfLcveslllrt0vqyJIv2SqmFbJV/2jo7ZMmbitXsg
+ K1Hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=pmnFu4M88+QOrTGnDa4e8fEpP81Bw7vd+WjZ5eh+Rpo=;
- b=lIA6GFWHpIUC2m+kmICje97Ss/fNAl3a6gdP/jY2lsSOYrY+8Ipo0MqONfzbi7SNCe
- dlCaj1VSCbINEFU6YflW4XwV6nLKhiI6vYAX2L77NOSgIbe7k2USgTOHfVL+mmcK20j/
- If0kLERvsZtNXH73jDynf31cO4qOafEMeV+3Wuz11DW6Lflp10uw6jrkxXV2eDxM0sh8
- MhLAMx5sg9nDwDQHnB6NcZsq9IA3+I8yDrJXL7P4ixTJRUJkFYm4tpJ+AOjVO7v1vddJ
- G8A7tgelU7YKooSXh/AzWy5E7GnQhKC6/ZKPg5r8mGJIMUp1NUv0iorRrC1qsFiM6yyP
- /H7Q==
-X-Gm-Message-State: AOAM531R3ULn7nx1WEAQoc8n1Rh8CahCbfZMMFpQi4mbXe4AXUrJ5oVA
- QL4I77si4vBGYvpDhduWvsqsRUrD4rrYK0hkzcqHYgS0UmafTm2w9lcdhMOARVfrbscbrKVQiQ9
- 6AS3jYWUarkYmdlA=
-X-Received: by 2002:a7b:c401:: with SMTP id k1mr6936829wmi.120.1602140248961; 
- Wed, 07 Oct 2020 23:57:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJywt86Xm3S00iYNeKf6KOmFjR1DwsBhB/vb1+IeeqkLiIwSMIYsJn4uF0cSOoMDalr9yiuQJQ==
-X-Received: by 2002:a7b:c401:: with SMTP id k1mr6936811wmi.120.1602140248705; 
- Wed, 07 Oct 2020 23:57:28 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:bb8c:429c:6de1:f4ec?
- ([2001:b07:6468:f312:bb8c:429c:6de1:f4ec])
- by smtp.gmail.com with ESMTPSA id p21sm5585173wmc.28.2020.10.07.23.57.27
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 07 Oct 2020 23:57:28 -0700 (PDT)
-Subject: Re: [PATCH v3 01/16] memory: Add FlatView foreach function
-To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
-References: <20200921022506.873303-1-alxndr@bu.edu>
- <20200921022506.873303-2-alxndr@bu.edu>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <962ba8d5-e44a-8d0b-e5ba-003b6777585e@redhat.com>
-Date: Thu, 8 Oct 2020 08:57:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=0EvW5PeP7LBqh7p+ru8kqqwOGDHS0Scl/D01QEKxaqM=;
+ b=Lfz2laSP7mwMSiQQNhZ5u49IMLu0fKHEgE6voyDn3vYQsscRSV+W/kOTCEBGjuLOyD
+ 5ZjxGe7yeqqEBjxjGQBXNhvtKXOdKQ9mp+FHTjsySwMzi3gXDrv9K7ABwxJ8fgVUVyru
+ SvD0YNFWBZH1BcGirM9OVQOQC+98zGakbX6WDYWeVqdGX7T5cxd+/pG9OEkvN01Efm8F
+ H+qR+TJlFy5tmQzXT2rUm2s4OyjpMIEGJk8J96su7GpcqkqY565WA+iw6t7MtN45P0ma
+ 0WwN5ixLtw/V0zc+Vjf1OG9rlZlEFk0nYJ461aDIynWkyPlwFsWK8aq4EVgOiYXI7lpC
+ FHSw==
+X-Gm-Message-State: AOAM530WurwCY7gyJBgP3GaM8vBUkKY+bKe5W0nTPMwj6ROjOsDRSoaJ
+ Xg6E6uL9pn4hxt0an+63lC35IM11Jq0oj3Z5N8Y=
+X-Google-Smtp-Source: ABdhPJyvZzAKfTcp8mpOmguhe4Nphvi4MqWzDjua3OY2acU+CsKtlHyrePGHgijkQ91z72+b7Eg8WFa6soQTaySkpw0=
+X-Received: by 2002:a17:906:515:: with SMTP id
+ j21mr7111161eja.105.1602140343941; 
+ Wed, 07 Oct 2020 23:59:03 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200921022506.873303-2-alxndr@bu.edu>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/08 02:56:27
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+References: <20200921221045.699690-1-ehabkost@redhat.com>
+ <20200921221045.699690-6-ehabkost@redhat.com>
+In-Reply-To: <20200921221045.699690-6-ehabkost@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 8 Oct 2020 10:58:51 +0400
+Message-ID: <CAJ+F1C+FjGkqFRzehGbTNcGBizsz0+tkit+vjqmKSDvB--YbDw@mail.gmail.com>
+Subject: Re: [PATCH 05/24] vhost-user: Register "chardev" as class property
+To: Eduardo Habkost <ehabkost@redhat.com>
+Content-Type: multipart/alternative; boundary="00000000000014c00405b1235efe"
+Received-SPF: pass client-ip=2a00:1450:4864:20::642;
+ envelope-from=marcandre.lureau@gmail.com; helo=mail-ej1-x642.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.742,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -117,57 +96,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: darren.kenny@oracle.com, bsd@redhat.com, philmd@redhat.com,
- stefanha@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, John Snow <jsnow@redhat.com>,
+ QEMU <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21/09/20 04:24, Alexander Bulekov wrote:
-> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+--00000000000014c00405b1235efe
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Sep 22, 2020 at 2:13 AM Eduardo Habkost <ehabkost@redhat.com> wrote=
+:
+
+> Class properties make QOM introspection simpler and easier, as
+> they don't require an object to be instantiated.
+>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+---
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: qemu-devel@nongnu.org
 > ---
->  include/exec/memory.h | 5 +++++
->  softmmu/memory.c      | 9 +++++++++
->  2 files changed, 14 insertions(+)
-> 
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index f1bb2a7df5..975a90c871 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -688,6 +688,11 @@ static inline FlatView *address_space_to_flatview(AddressSpace *as)
->      return atomic_rcu_read(&as->current_map);
+>  backends/vhost-user.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/backends/vhost-user.c b/backends/vhost-user.c
+> index 9e6e1985465..858fdeae26c 100644
+> --- a/backends/vhost-user.c
+> +++ b/backends/vhost-user.c
+> @@ -175,9 +175,9 @@ static char *get_chardev(Object *obj, Error **errp)
+>      return NULL;
 >  }
->  
-> +typedef int (*flatview_cb)(ram_addr_t start,
-> +                           ram_addr_t len,
-> +                           const MemoryRegion*, void*);
-> +
-> +void flatview_for_each_range(FlatView *fv, flatview_cb cb , void *opaque);
->  
->  /**
->   * MemoryRegionSection: describes a fragment of a #MemoryRegion
-> diff --git a/softmmu/memory.c b/softmmu/memory.c
-> index d030eb6f7c..9db5fbe43a 100644
-> --- a/softmmu/memory.c
-> +++ b/softmmu/memory.c
-> @@ -655,6 +655,15 @@ static void render_memory_region(FlatView *view,
->      }
->  }
->  
-> +void flatview_for_each_range(FlatView *fv, flatview_cb cb , void *opaque)
-> +{
-> +    FlatRange *fr;
-> +    FOR_EACH_FLAT_RANGE(fr, fv) {
-> +        if (cb(fr->addr.start, fr->addr.size, fr->mr, opaque))
-> +            break;
-> +    }
-> +}
-
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-
->  static MemoryRegion *memory_region_get_flatview_root(MemoryRegion *mr)
+>
+> -static void vhost_user_backend_init(Object *obj)
+> +static void vhost_user_backend_class_init(ObjectClass *oc, void *data)
 >  {
->      while (mr->enabled) {
-> 
+> -    object_property_add_str(obj, "chardev", get_chardev, set_chardev);
+> +    object_class_property_add_str(oc, "chardev", get_chardev,
+> set_chardev);
+>  }
+>
+>  static void vhost_user_backend_finalize(Object *obj)
+> @@ -195,7 +195,7 @@ static const TypeInfo vhost_user_backend_info =3D {
+>      .name =3D TYPE_VHOST_USER_BACKEND,
+>      .parent =3D TYPE_OBJECT,
+>      .instance_size =3D sizeof(VhostUserBackend),
+> -    .instance_init =3D vhost_user_backend_init,
+> +    .class_init =3D vhost_user_backend_class_init,
+>      .instance_finalize =3D vhost_user_backend_finalize,
+>      .class_size =3D sizeof(VhostUserBackendClass),
+>  };
+> --
+> 2.26.2
+>
+>
+>
 
+--=20
+Marc-Andr=C3=A9 Lureau
+
+--00000000000014c00405b1235efe
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Tue, Sep 22, 2020 at 2:13 AM Eduar=
+do Habkost &lt;<a href=3D"mailto:ehabkost@redhat.com">ehabkost@redhat.com</=
+a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0p=
+x 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Cl=
+ass properties make QOM introspection simpler and easier, as<br>
+they don&#39;t require an object to be instantiated.<br>
+<br>
+Signed-off-by: Eduardo Habkost &lt;<a href=3D"mailto:ehabkost@redhat.com" t=
+arget=3D"_blank">ehabkost@redhat.com</a>&gt;<br></blockquote><div><br></div=
+><div>Reviewed-by: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.l=
+ureau@redhat.com">marcandre.lureau@redhat.com</a>&gt;</div><div> <br></div>=
+<blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-=
+left:1px solid rgb(204,204,204);padding-left:1ex">
+---<br>
+Cc: &quot;Michael S. Tsirkin&quot; &lt;<a href=3D"mailto:mst@redhat.com" ta=
+rget=3D"_blank">mst@redhat.com</a>&gt;<br>
+Cc: <a href=3D"mailto:qemu-devel@nongnu.org" target=3D"_blank">qemu-devel@n=
+ongnu.org</a><br>
+---<br>
+=C2=A0backends/vhost-user.c | 6 +++---<br>
+=C2=A01 file changed, 3 insertions(+), 3 deletions(-)<br>
+<br>
+diff --git a/backends/vhost-user.c b/backends/vhost-user.c<br>
+index 9e6e1985465..858fdeae26c 100644<br>
+--- a/backends/vhost-user.c<br>
++++ b/backends/vhost-user.c<br>
+@@ -175,9 +175,9 @@ static char *get_chardev(Object *obj, Error **errp)<br>
+=C2=A0 =C2=A0 =C2=A0return NULL;<br>
+=C2=A0}<br>
+<br>
+-static void vhost_user_backend_init(Object *obj)<br>
++static void vhost_user_backend_class_init(ObjectClass *oc, void *data)<br>
+=C2=A0{<br>
+-=C2=A0 =C2=A0 object_property_add_str(obj, &quot;chardev&quot;, get_charde=
+v, set_chardev);<br>
++=C2=A0 =C2=A0 object_class_property_add_str(oc, &quot;chardev&quot;, get_c=
+hardev, set_chardev);<br>
+=C2=A0}<br>
+<br>
+=C2=A0static void vhost_user_backend_finalize(Object *obj)<br>
+@@ -195,7 +195,7 @@ static const TypeInfo vhost_user_backend_info =3D {<br>
+=C2=A0 =C2=A0 =C2=A0.name =3D TYPE_VHOST_USER_BACKEND,<br>
+=C2=A0 =C2=A0 =C2=A0.parent =3D TYPE_OBJECT,<br>
+=C2=A0 =C2=A0 =C2=A0.instance_size =3D sizeof(VhostUserBackend),<br>
+-=C2=A0 =C2=A0 .instance_init =3D vhost_user_backend_init,<br>
++=C2=A0 =C2=A0 .class_init =3D vhost_user_backend_class_init,<br>
+=C2=A0 =C2=A0 =C2=A0.instance_finalize =3D vhost_user_backend_finalize,<br>
+=C2=A0 =C2=A0 =C2=A0.class_size =3D sizeof(VhostUserBackendClass),<br>
+=C2=A0};<br>
+-- <br>
+2.26.2<br>
+<br>
+<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
+
+--00000000000014c00405b1235efe--
 
