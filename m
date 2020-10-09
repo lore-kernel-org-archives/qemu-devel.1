@@ -2,103 +2,104 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E57FFC433E7
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 07:38:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D62DBC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 07:41:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2AA8222277
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 07:38:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5F6E222277
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 07:41:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R5ER/UQp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AA8222277
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZUq8n5wL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F6E222277
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQmz6-0001ib-V6
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 03:38:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37632)
+	id 1kQn1o-0003jn-DO
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 03:41:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38134)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kQmxj-0001FC-11
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 03:37:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48053)
+ id 1kQn0z-00036q-3l
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 03:40:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58035)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kQmxh-0007PX-4f
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 03:37:10 -0400
+ id 1kQn0x-0007mr-HT
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 03:40:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602229028;
+ s=mimecast20190719; t=1602229230;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xIdQhgt0E06qvYHAWpF/kPvjinJryG9+XsqL2A4ukNw=;
- b=R5ER/UQp78VT8d7IEMlceptzehePautAkaNv+joNw1OSJhKnVtjYTKhEVPMj/RC/FqukXx
- G3VopCaWDXCPcr6NLFWLjRyCyl/F/ML7gwSdFJBH4yziIG6R958pfBapaBhs9B7CNq0onE
- Nxtyx4pSuqnIq5UQYZ4vKyucvx5mix8=
+ bh=0QpIi+NO1E7TW+l+6Cu8HuQos58eXFVHh9DLnR4VFbE=;
+ b=ZUq8n5wLLB1ief9j6htGFGnv2BAmkElSDVTwpZj/mgqrn71MyhlQ8xLkzOb/rvA9pnOhzA
+ va3iqc8AlZFW8oE4FOEwzSS3DoxaMkJFavVcCEcbZrgX3LNfuZ8ffuH4a76fYrtluj68uM
+ vuUis0wlCQ0LhQw0he1DD8DZye+mm64=
 Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
  [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-282-iH4pwj6-MoKVM3DEKoU4Mg-1; Fri, 09 Oct 2020 03:37:06 -0400
-X-MC-Unique: iH4pwj6-MoKVM3DEKoU4Mg-1
-Received: by mail-wm1-f71.google.com with SMTP id f2so3809786wml.6
- for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 00:37:06 -0700 (PDT)
+ us-mta-534-mz0pq582OQK8dL6caGCJKA-1; Fri, 09 Oct 2020 03:40:28 -0400
+X-MC-Unique: mz0pq582OQK8dL6caGCJKA-1
+Received: by mail-wm1-f71.google.com with SMTP id p17so3816467wmi.7
+ for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 00:40:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=xIdQhgt0E06qvYHAWpF/kPvjinJryG9+XsqL2A4ukNw=;
- b=JVsH/KxoHDu9p9WbMJ3ALNA2OtblftJ9Gbu3fG4ryVBZ5RYPe1om6TmUa6xZL09F6+
- JjKS1eczGhJfMj3nJD0LuSk+BiytQnw8pG1FieB1OL16BnQZfFJWtAzefUFM5gYKtCZo
- Rexnn0yxr4sDl/7MFiD3gG2x+3dwWCJ1dN+iv1ysac5znxcsYel0eBNxF8fyf2r5Z/to
- iHwGs0HqHFT/vG4NFPWfI2VI2lrqrPbwywrCyw9JYfPmNRop8ziITFICK3Ne2K/rdlc3
- bWpp+ed6fA0ZEk+Y8vC0u2FJYTwEfgRa66z/SvdsHy43eth1a+cAJkVP6lIT7okWyRUL
- XECA==
-X-Gm-Message-State: AOAM530Biq0MQLDnzntAj8F+Ms9oxJ52FOvi6aM9HCLXBkO1aJX5dN3d
- WagbAAs7CNM8rKXaWcQ0DsQIcHzuGWbNrnohtJTiz72IcQ0Ko+kLOMhoPZot+tpdXMGCYC2hQUV
- bwnLZgTA/0jJbu2M=
-X-Received: by 2002:adf:9507:: with SMTP id 7mr425529wrs.365.1602229025365;
- Fri, 09 Oct 2020 00:37:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx2emzv8rW5E4rMNZlwUJWKbEzz5hoVY+EHO1CGIKrfe+7yj2wpROjXjT3XF+8hlzQ+LnPXuw==
-X-Received: by 2002:adf:9507:: with SMTP id 7mr425491wrs.365.1602229024906;
- Fri, 09 Oct 2020 00:37:04 -0700 (PDT)
+ bh=0QpIi+NO1E7TW+l+6Cu8HuQos58eXFVHh9DLnR4VFbE=;
+ b=S5ThhWE7RKALO8JWtLLpXO6f1Kd2hoxhdi5kZ6ihQ+f1w3kqFnGdND0fpZQYdQBBFI
+ 4ZSFcgoSDfASVAALYvqmgJTXD3m/MKZQ3zgw723gpiAV4Zck/wt13KF4YaIOtXc4CZVr
+ hsHnSh8uEuzM+3aNXbFBWIsfgTVrGT1cTNvG/AOPCXP7m4aobAFS4wOCgoycyzrIpB+I
+ A0vVjXgR1roMviL6F4nh7DnVdcoI4JOBiSFBNfCvirufYW9lI9S5LES9NaHac7W6H3xi
+ JZEUZBuWBhHGhRpRxRSXHuNzuZk9pC547z0Xck4T34q7e8MofR/zTqbhBzzoA0cYUcVt
+ WLuw==
+X-Gm-Message-State: AOAM533w7yWJVJounhaVJw5BfPyciZJW1sdi5/Wzie5/FZSlkt16nxdI
+ YOehKmA7yP+opLy/colktqTgEBFdj+kLCTd1kxeRz2xZ97k60nXSFuYGPl+MB2eUsvppKh4LE9P
+ CHLv9h7P+nneG5nQ=
+X-Received: by 2002:a05:6000:81:: with SMTP id
+ m1mr13651454wrx.67.1602229227055; 
+ Fri, 09 Oct 2020 00:40:27 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw7L2Tj7GXPqmti644vQrFLnUCNS2qDzrrJexXFzFxlFTlw964vB8ysP16m752hIIhxKBCqzQ==
+X-Received: by 2002:a05:6000:81:: with SMTP id
+ m1mr13651446wrx.67.1602229226871; 
+ Fri, 09 Oct 2020 00:40:26 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:cee1:4797:6958:7698?
  ([2001:b07:6468:f312:cee1:4797:6958:7698])
- by smtp.gmail.com with ESMTPSA id o129sm10765615wmb.25.2020.10.09.00.37.03
+ by smtp.gmail.com with ESMTPSA id c4sm10655023wrp.85.2020.10.09.00.40.25
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 09 Oct 2020 00:37:04 -0700 (PDT)
+ Fri, 09 Oct 2020 00:40:26 -0700 (PDT)
 Subject: Re: does make check now require TCG? Or is it a parallelism issue?
-To: Thomas Huth <thuth@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>
+To: Claudio Fontana <cfontana@suse.de>
 References: <11ef73ff-4178-b3e8-2e49-44ff014a13ed@suse.de>
  <569520f6-adf6-6212-9625-a184bf499e24@redhat.com>
  <d21dff22-90b1-4769-0948-6bc37eaeb885@linaro.org>
  <6fe91a5a-c136-9af3-c48a-97ccdca7a543@suse.de>
  <3c527b0f-afa1-4b86-4fa5-9acca2a296bd@linaro.org>
  <CABgObfYWK2E8PsSFOcHpuA2vuA3HWgvtuLbrtQCWA=9=r07=5w@mail.gmail.com>
- <061f1bde-db0e-bc34-dae0-161606092bb0@redhat.com>
+ <a1694fe3-9bc8-df93-345f-29f0de37b923@suse.de>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <fb916248-ac1a-8e46-8808-4b4cc743672c@redhat.com>
-Date: Fri, 9 Oct 2020 09:37:02 +0200
+Message-ID: <8cedd3e4-dc6a-30ee-fd71-f4776aa8c953@redhat.com>
+Date: Fri, 9 Oct 2020 09:40:24 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <061f1bde-db0e-bc34-dae0-161606092bb0@redhat.com>
+In-Reply-To: <a1694fe3-9bc8-df93-345f-29f0de37b923@suse.de>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:34:40
@@ -123,39 +124,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex Bennee <alex.bennee@linaro.org>, Claudio Fontana <cfontana@suse.de>,
+Cc: Alex Bennee <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
  qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/10/20 09:21, Thomas Huth wrote:
-> On 08/10/2020 20.24, Paolo Bonzini wrote:
->>
->>
->> Il gio 8 ott 2020, 20:05 Richard Henderson <richard.henderson@linaro.org
->> <mailto:richard.henderson@linaro.org>> ha scritto:
->>
->>     Ah, TARGET_DIRS isn't being pruned anymore when a target is disabled for
->>     lack
->>     of accelerator.
->>
->>     Paolo, side effect of 8a19980e3f ("configure: move accelerator logic to
->>     meson")?  I guess we should move the setting of TARGET_DIRS to meson as
->>     well.
->>
->>
->> TARGET_DIRS is pruned by Meson, I didn't add any back propagation to make
->> because it is not really needed; qemu-iotests only every uses the "host
->> architecture" QEMU binary (see tests/qemu-iotests/common.config),
->> check-block + --target-list has never worked.
+On 08/10/20 23:07, Claudio Fontana wrote:
+> qtests are also broken for me now with --disable-tcg build,
+> it _seems_ to me that TCG-only tests are being run for --disable-tcg too.
 > 
-> I haven't tried since the meson conversion, but at least a couple of months
-> ago, it was perfectly fine to run configure with
-> --target-list=tricore-softmmu and then to run "make check-block" afterwards.
+> I am not sure if this is a test problem (for example tests/qtest/bios-tables-test.c): data->tcg_only
+> or if it is a build system problem, or some combination.
 
-Thanks, I didn't know.  Actually it's possible to get the targets from
-Makefile.ninja.  I'll send a patch.
+Yes, this is due to tcg_only.  But since CONFIG_TCG is included in
+config-host.mak, it should be easy to add a call to g_test_skip.
 
 Paolo
 
