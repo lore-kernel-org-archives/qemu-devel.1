@@ -2,91 +2,88 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_IMAGE_ONLY_08,
-	HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43E22C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 17:32:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF636C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 17:33:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1F432225B
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 17:32:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 40E3222261
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 17:33:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RyZt4PZc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1F432225B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="exkDYaku"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40E3222261
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44984 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQwFV-0000TM-Pr
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 13:32:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52184)
+	id 1kQwGm-0001We-8q
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 13:33:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52456)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <shashi.mallela@linaro.org>)
- id 1kQwE5-0008C9-N9
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 13:30:41 -0400
-Received: from mail-qv1-xf34.google.com ([2607:f8b0:4864:20::f34]:37912)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <shashi.mallela@linaro.org>)
- id 1kQwE2-0004Q1-9U
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 13:30:40 -0400
-Received: by mail-qv1-xf34.google.com with SMTP id de3so5132704qvb.5
- for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 10:30:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=date:from:to:cc:message-id:subject:mime-version;
- bh=tgawoEedLRoE+ws7lMMliLdCAPjD+aQtngXCBKV9GDg=;
- b=RyZt4PZcVrjz4RjI5ZGtkS7vlZQ2M06xZHENFjf3qINu8qBujLze/XnceyP8RPPLNu
- bgo6oy7Ko5pWLXP2ZJDDLxlDalXLNem6y/L3g9ftTSYSkd1luvvQFnrGcuRxg1yjO8o+
- WXtwiSmGkgqYYv9LH9Qpxllrl/Lc4IYpbCu3ULbFSMaoITh+Wh/QXiYgR6snhuy+ZNKy
- 55vLJzkYq5B8WQu3VQD7tgXLZQhYPsQqOiGKFcRfsBJSSUksqN0LbVqRGPcPwCftmKnd
- 5wqQ5zBtsTWdV1m/oTIKgNbZdMjAJA2zXhyygzV9rD0IHv/MzhHlEofc3XM8iHNMXx7D
- uZsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:message-id:subject:mime-version;
- bh=tgawoEedLRoE+ws7lMMliLdCAPjD+aQtngXCBKV9GDg=;
- b=ITKdzevtGev4BPfjj8QnYk7480tzzvTjBJCZlos7qCp+4vMNppZFaR4awyNyWJAPGB
- /1ctBmzda04nzi20X6kOi9+mgU+K56G+AqfaZGbuZrUygiMTFwIgbPzybSgp/Qkc//t3
- QhJC/niKnkB94fYs9n4tH7c/Li5qZGmVLxY6B9+KMkuIn3xid+HYu0YTlq+LKlhVxrgZ
- lTv5RrwaQEtMmxzYOEpHJwPnd+i5FWTMx4SZj4nrpu4ux8+dHFWR7etBgLHhpiO9DFgW
- LKg7BwOd7QIvaAH0kL0RKu3WuweX9EXqhD4tBhWzAZtcxqZWxNaE1XSNl6LbPGDzQNAl
- mQiw==
-X-Gm-Message-State: AOAM532lTtx5MUyTVz4R0LOUGRoDxg7Hv53dKctlxfH2PyZ2FcopClgx
- SnYQjkJJtOY17lvAAMkNkF9bh+0QnWWcbhGT
-X-Google-Smtp-Source: ABdhPJyVhsWxbFuUKre2epR276r1E88T8M+G98q+OREmp91FpQT5GVHkZQfvUSKkFeoAW/CBSH9dpg==
-X-Received: by 2002:a05:6214:546:: with SMTP id
- ci6mr1565949qvb.0.1602264637152; 
- Fri, 09 Oct 2020 10:30:37 -0700 (PDT)
-Received: from master ([2607:fea8:e2a0:e950::d884])
- by smtp.gmail.com with ESMTPSA id f189sm6459302qkd.20.2020.10.09.10.30.36
- for <qemu-devel@nongnu.org>
- (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Fri, 09 Oct 2020 10:30:37 -0700 (PDT)
-Date: Fri, 9 Oct 2020 13:30:30 -0400
-From: Shashi Mallela <shashi.mallela@linaro.org>
-To: Maxim Uvarov <maxim.uvarov@linaro.org>
-Message-ID: <74151CBD-4750-4E68-9127-21076C019036@getmailspring.com>
-Subject: Re%3A [PATCH v4 1%2F2] hw%2Fwatchdog%3A Implement SBSA watchdog
- =?utf-8?Q?device&In-Reply-To=3D<CAD8XO3YmTC7fzxttg%3DQLMpJbg7uLogatxN7q7vf-iGZjyQLjjQ%40mail.gmail.com>?=
-X-Mailer: Mailspring
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kQwF7-0000V5-OA
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 13:31:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40092)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kQwF6-0004Uh-6V
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 13:31:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602264703;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=tItRc03f4qzLsmT5PUbjHQ/ITQERIPr5khk67Uv2gXg=;
+ b=exkDYakuXFSsnA16+C/ldAYh2BANwOAzDwyzNkE4OwxiK47cNTec7C9SMl05cXLgC+XAKX
+ QWTqiPh0OIJWYidOzVsw8g61QHVXus+ZpC2wvf/WtZBdKaXTV7Ou3wk0JQx0Sd9CbMHNir
+ HVJ8kvi1h5RwvtEf5a8+GEQu1NctXvE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-568-jMwQDyF_N16_0rL112LPQw-1; Fri, 09 Oct 2020 13:31:41 -0400
+X-MC-Unique: jMwQDyF_N16_0rL112LPQw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B17F18A0760
+ for <qemu-devel@nongnu.org>; Fri,  9 Oct 2020 17:31:40 +0000 (UTC)
+Received: from localhost (ovpn-119-102.rdu2.redhat.com [10.10.119.102])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4247E19D7C;
+ Fri,  9 Oct 2020 17:31:37 +0000 (UTC)
+Date: Fri, 9 Oct 2020 13:31:36 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH 03/12] qom: Make object_class_property_add_uint*_ptr()
+ get offset
+Message-ID: <20201009173136.GD7303@habkost.net>
+References: <20201009160122.1662082-1-ehabkost@redhat.com>
+ <20201009160122.1662082-4-ehabkost@redhat.com>
+ <eeb91413-2a1e-5c83-e756-11dbe3be1b6f@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="5f809e36_50dbf110_10e8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::f34;
- envelope-from=shashi.mallela@linaro.org; helo=mail-qv1-xf34.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -3
-X-Spam_score: -0.4
-X-Spam_bar: /
-X-Spam_report: (-0.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- HTML_IMAGE_ONLY_08=1.651, HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- T_REMOTE_IMAGE=0.01 autolearn=no autolearn_force=no
+In-Reply-To: <eeb91413-2a1e-5c83-e756-11dbe3be1b6f@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:34:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,41 +96,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "=?utf-8?Q?peter.maydell=40linaro.org?=" <peter.maydell@linaro.org>,
- "=?utf-8?Q?qemu-arm=40nongnu.org?=" <qemu-arm@nongnu.org>,
- "=?utf-8?Q?qemu-devel=40nongnu.org?=" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---5f809e36_50dbf110_10e8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+On Fri, Oct 09, 2020 at 12:24:19PM -0500, Eric Blake wrote:
+> On 10/9/20 11:01 AM, Eduardo Habkost wrote:
+> > The existing object_class_property_add_uint*_ptr() functions are
+> > not very useful, because they need a pointer to the property
+> > value, which can't really be provided before the object is
+> > created.
+> > 
+> > Replace the pointer parameter in those functions with a
+> > `ptrdiff_t offset` parameter.
+> > 
+> > Include a uint8 class property in check-qom-proplist unit tests,
+> > to ensure the feature is working.
+> > 
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> 
+> >  static void *pointer_property_get_ptr(Object *obj, PointerProperty *prop)
+> >  {
+> > -    return prop->ptr;
+> > +    if (prop->is_offset) {
+> > +        return (void *)obj + prop->offset;
+> 
+> Addition on void* is a gcc extension.  Does clang support it as well, or
+> should you be casting to char* instead?
 
-The value being returned here is 0 (initialized to 0 at the beginning of read function).
-I have seen similar practices being followed in other qemu implementations like for example bcm2835_dma_read() in qemu/hw/dma/bcm2835_dma.c,a9_scu_read() in qemu/hw/misc/a9scu.c.
+Both object_link_get_targetp() and object_link_get_targetp()
+already use it, so it should be OK.
 
-Please confirm if you would still like to add specific value like 0xdeadbeef for bad read offset.
-Thanks
-Shashi
-
---5f809e36_50dbf110_10e8
-Content-Type: text/html; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-<div>The value being returned here is 0 (initialized to 0 at the beginnin=
-g of read function).</div><div>I have seen similar practices being follow=
-ed in other qemu implementations like for example bcm2835=5Fdma=5Fread() =
-in qemu/hw/dma/bcm2835=5Fdma.c,a9=5Fscu=5Fread() in qemu/hw/misc/a9scu.c.=
-</div><br><div>Please confirm if you would still like to add specific val=
-ue like 0xdeadbeef for bad read offset.</div><br><div>Thanks</div><div>Sh=
-ashi</div><img class=3D=22mailspring-open=22 alt=3D=22Sent from Mailsprin=
-g=22 width=3D=220=22 height=3D=220=22 style=3D=22border:0; width:0; heigh=
-t:0;=22 src=3D=22https://link.getmailspring.com/open/74151CBD-4750-4E68-9=
-127-21076C019036=40getmailspring.com=3Fme=3D2a4b90d6&amp;recipient=3DcWVt=
-dS1kZXZlbEBub25nbnUub3Jn=22>
---5f809e36_50dbf110_10e8--
+-- 
+Eduardo
 
 
