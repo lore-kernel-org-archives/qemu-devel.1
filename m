@@ -2,95 +2,108 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93FC9C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 13:17:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C374C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 13:26:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E316B22276
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 13:17:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C8F2B22276
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 13:26:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HmitRWhV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E316B22276
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XTEZr0KK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8F2B22276
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQsHR-0005lY-Vn
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 09:17:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50166)
+	id 1kQsPQ-0008UT-R1
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 09:26:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52392)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kQsFz-0004sU-R5; Fri, 09 Oct 2020 09:16:23 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38886)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kQsFu-0006JL-63; Fri, 09 Oct 2020 09:16:23 -0400
-Received: by mail-wr1-x441.google.com with SMTP id n18so10265476wrs.5;
- Fri, 09 Oct 2020 06:16:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=BCBRkd7SY1UGBTvNjwTUZiHdR4k7LgdAwwkOsNr4HZc=;
- b=HmitRWhVocYgSOtXwuynB0laV7+779gNP5WyPmGsnLmV0Wdr1AOxYCB//YgqMJMDYd
- YBKnylVN4WkCwNelgHbEV0ebCkrI4XV2V6qVA1iEmFf2dE3vhgwdOveSaiobqsO+R5NC
- VXd0gSG+GKjQjVGg+EvTNUr9Tis8ujquK8ViJdScF0zugPQTebioMi8Q09ppaVSkbw03
- LQc4e225Z7w+F4gttVuZK86R5HKKr+ItjBISoKaBRr6xz3OelbTe1lYrv5Sv0R3b1C0c
- 0R7Hz/qGEH9RHiabNj8CKw0j+nYV9dV7/VEBrw2oUihRIJr91BeBjAKMDoaiuEDgqWOk
- CJCg==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kQsOa-0007uk-Ul
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 09:25:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58155)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kQsOX-0007M6-GC
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 09:25:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602249912;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=KAgktXEx3NaZtyyZCrF4aprF5W6Wd+DS4VAOjYum3+Q=;
+ b=XTEZr0KK1zdLtAqPXM65nHEOFMlpaQhqUb7INb8LyWATEC7izrVwccPucrLw80o6cPkppj
+ jcKBlmqE2EorK2uJt0ZBiOCqscfvwU6hCKFjZDEwCExa4sS4gUOXISXg38lKbOa94hDUob
+ Ki9tSNHz5Jitu6Oa11V6Fg/d3cJ/JWQ=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-270-UkbilAJOMMuURQSXOQU4aQ-1; Fri, 09 Oct 2020 09:25:10 -0400
+X-MC-Unique: UkbilAJOMMuURQSXOQU4aQ-1
+Received: by mail-wr1-f69.google.com with SMTP id p6so4737194wrm.23
+ for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 06:25:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=BCBRkd7SY1UGBTvNjwTUZiHdR4k7LgdAwwkOsNr4HZc=;
- b=bsSV411EaFJ0vCZI6OvhAhVs861XQmjCXcVZZzmtTC9nAvCkyDwIDuEnkLNzbWST4j
- JYnooWuAZQp0JeCYTN/SNS8K6sh3VsVVPr+CWSu3+OlizVptd57ZaMFqMB7Q7kiDJaCM
- Lndov6y9xGB0t2KNe5vGJ208QIlDo3gzDRSonWPHUd9xRTpO4cb5xQ9fUjEIqaivS9/Z
- 9D6HKCJht9FQEZ9WyF8TANW84qZIgzJkUxc9EiaRksOb6rV8fmHDq0GhNDux0YFv2DEX
- BUzttU67SLB7gPUxNGI+PWe++pKT5oflxpp4kM/3/VXAy4WZKTuQRItHV6iT7fp/pcxZ
- wEaA==
-X-Gm-Message-State: AOAM533oI/QcME0GNptwrt7DFsYJajXBzp8q7K2gwvrBwViPS2GQfqpB
- /UZcxXyGKqhyeIvmatxwWyE=
-X-Google-Smtp-Source: ABdhPJx43Sc1uffzDRFdDFnR7yJXhv8U6uF6XLhW8Y5iGr/UPkQiLkVVfgOiblm7b7nvYqS+PhbNwQ==
-X-Received: by 2002:adf:a345:: with SMTP id d5mr16166666wrb.55.1602249375258; 
- Fri, 09 Oct 2020 06:16:15 -0700 (PDT)
-Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
- [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id m1sm11297366wmm.34.2020.10.09.06.16.13
+ bh=KAgktXEx3NaZtyyZCrF4aprF5W6Wd+DS4VAOjYum3+Q=;
+ b=hUjR6QHzZalwz3STaUm9urln0NubaPdLwpUTrgRlHUyqhev5PBo0ZWLYlJTWwhUFEc
+ Gf8YzW8IqSk6CgELKrYZi0kzuqMUPHHf5VzKl8OjCaKnxdeMSs5ARMoDWwWOgTUKYQvV
+ YT4frU9sn9HVXPPt1UepqSbpSunRvBoQnZ1quUp+Ya64mRtNeyWtwonYgwFnXXZgBw3w
+ ACfl6H7eUXiPnmvKKZJo2nUir5bX1YO7w4pupKs2x+tfkgBxoaoFM6R8Pbbny1YYaz55
+ SQDahvq7PX1XsX9dd8jmeF40oeiCfwFQSS8/F5EdmLCytAKRCEMiPnncVRJkD5w9ZMed
+ XBMA==
+X-Gm-Message-State: AOAM530lOgr1YpusBEfZ5joCXdeGPManOUqSqoVdSWvlCQWQDSdcS67b
+ B5ynkPD3pixxKIeQZZumx6N56C0xmljUjzq/o0FPgUL5Jm11rJgLjLw7WecFHnW78HlndvPQD4P
+ xH/PnZGVpS/N0taQ=
+X-Received: by 2002:adf:f50e:: with SMTP id q14mr8040734wro.56.1602249909606; 
+ Fri, 09 Oct 2020 06:25:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw4Cem/sv0F8sxnDTrfRPeapqzojCC+HnseN/9+G78EbnO78o8FNkZMRRhcv+iVmmNDM0WDow==
+X-Received: by 2002:adf:f50e:: with SMTP id q14mr8040700wro.56.1602249909395; 
+ Fri, 09 Oct 2020 06:25:09 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:cee1:4797:6958:7698?
+ ([2001:b07:6468:f312:cee1:4797:6958:7698])
+ by smtp.gmail.com with ESMTPSA id u17sm12913257wri.45.2020.10.09.06.25.07
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 09 Oct 2020 06:16:14 -0700 (PDT)
-Subject: Re: [PATCH 1/2] hw/char/serial: remove duplicate .class_init in
- serial_mm_info
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-References: <20201009113843.60995-1-lvivier@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <8ddff8d3-752b-2219-dd49-bfe53b925c43@amsat.org>
-Date: Fri, 9 Oct 2020 15:16:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ Fri, 09 Oct 2020 06:25:08 -0700 (PDT)
+Subject: Re: How about using clang-format instead checkpatch for fixing style?
+To: luoyonggang@gmail.com, qemu-level <qemu-devel@nongnu.org>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <CAE2XoE9YyZwRr5j3fCATTb32pacuGrT_yUBoUTd30k+id1D3iw@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <27f82fe6-5b0f-7e35-29d9-7b00ae8f189e@redhat.com>
+Date: Fri, 9 Oct 2020 15:25:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20201009113843.60995-1-lvivier@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CAE2XoE9YyZwRr5j3fCATTb32pacuGrT_yUBoUTd30k+id1D3iw@mail.gmail.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -19
-X-Spam_score: -2.0
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:34:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -22
+X-Spam_score: -2.3
 X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.208,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.208, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,43 +117,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-trivial@nongnu.org, Anup Patel <anup.patel@wdc.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/9/20 1:38 PM, Laurent Vivier wrote:
-> .class_init is already set to serial_mm_class_init.
-> 
-> Remove the duplicate entry.
-> 
-> Fixes: 17fd1a6490b1 ("serial-mm: add "regshift" property")
-> Cc: marcandre.lureau@redhat.com
+On 09/10/20 15:02, 罗勇刚(Yonggang Luo) wrote:
+> We can even using clang-format to format the whole repository.
 
-I was going to send exactly the same one tomorrow =)
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+checkpatch does other checks than formatting.
 
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
->   hw/char/serial.c | 1 -
->   1 file changed, 1 deletion(-)
-> 
-> diff --git a/hw/char/serial.c b/hw/char/serial.c
-> index 4386adabd466..97f71879ff2a 100644
-> --- a/hw/char/serial.c
-> +++ b/hw/char/serial.c
-> @@ -1120,7 +1120,6 @@ static const TypeInfo serial_mm_info = {
->       .class_init = serial_mm_class_init,
->       .instance_init = serial_mm_instance_init,
->       .instance_size = sizeof(SerialMM),
-> -    .class_init = serial_mm_class_init,
->   };
->   
->   static void serial_register_types(void)
-> 
+Reformatting the whole repository has been mentioned many times, people
+were worried of messing up the result of "git blame".  But without doing
+that, it's hard to get rid of checkpatch because checkpatch only looks
+at the lines that are touched by the patch.
+
+Paolo
 
 
