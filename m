@@ -2,86 +2,86 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA02EC433E7
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 17:03:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C4F1C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 17:04:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F5CE2225F
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 17:03:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2DA662225F
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 17:04:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ThpUSC5g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F5CE2225F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YcUsIMod"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DA662225F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQvnO-0006vi-Em
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 13:03:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38380)
+	id 1kQvoj-0000Fm-Bx
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 13:04:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38554)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kQvJM-0000LR-7U
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:32:04 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:46975)
+ id 1kQvJj-0000YC-NH
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:32:27 -0400
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:55695)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kQvJJ-0005A9-Ta
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:32:03 -0400
-Received: by mail-wr1-x429.google.com with SMTP id n6so10635913wrm.13
- for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 09:32:01 -0700 (PDT)
+ id 1kQvJZ-0005DF-Jc
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:32:27 -0400
+Received: by mail-wm1-x32d.google.com with SMTP id d4so10391835wmd.5
+ for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 09:32:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=0dekJyMhyeb+pZDMdujnt332y1YtHIKVKhKPCl8YUr0=;
- b=ThpUSC5g/UYZBA9aIWZ2c2dA2jB8sIDbuAfmzIjUku3dklqnGsYlyGHdxjkmqli05X
- weew9/1TPwu0uJhoaHfJRz+jdxUFWKpUzHIDAOP/2yd+vNFLkcdzYnEwY7OTphytUx+5
- gH6jdOgPFXEu17eJzdVsGYHDmrCSHCrmeYLl+rmdOrToYCwem4Wtvr5aNNUrMpoAl3PJ
- JiWPtfnWFvF7fu22CJL5OaJd6hf7JjZFCjFQzWHONc5/qDdn9486vSmi8juOzt+OYw6R
- VBARdsCiR4CjTcvY4F5Y2gwH6o2n8mJ3NcSJuPUfb7EoAuutQMsibIzrrab/8DD5gYof
- 8P3A==
+ bh=QSRJirT04KzPlTG554HUlrK3ZZFI9u30wr3rgSYwDnE=;
+ b=YcUsIModY0W1po6WbK48GXm4vg57VZv3K04+OjhnusnKvw2GJCYNQESxAMYcS3X5wx
+ xZ4eQb0pDDA4tTp27+x36rb0W6NSsC136QPDDNhoM/nxsFEEgPMbCJUPBPw8HSu6hK5r
+ ptH4CsyUW0Hb7fexPx9KIGF27cb4+mu42Tyk4w4ETH2JFxDi4WO6C1myZBxG8hYJFejT
+ FjLOaybpgzr4EqgEiHY7Ul7Ox46h2REh5sX6DJ7IzOYeZGtuNS4hiQTosCzX6xysD4Nl
+ Xee357ZzZCQ/ueifrKr1ccECwyZ/jEFE+P7MCPYHx/hSxebA8jz953CR4uzRqbP8GiFQ
+ SCLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=0dekJyMhyeb+pZDMdujnt332y1YtHIKVKhKPCl8YUr0=;
- b=p1+oj2t6lCVVbN09seZeWbIfD34h+GEXkCU9tW/extWpIoEjHcwYUC5jHys4YuzdRG
- r7qqTfoN0bHtb4+CpYK+0kl7XEinMkhwGji320J4pfU98oTeWCAAvRfMdOZxsikYwmFT
- HihvoYVTQ5As1VoOwXeRijc6sYSuidC2DFAWg/vdguHNk2M1ARiqcdICmvUJOfwjPi1N
- lRK0baZir98qlha4Utw4kINh9LCnqiLdTI78MPVv9rq6pMDjBBhWDy4YQ8cNbNNz4+y8
- XmBG6AF6/cizOPUZd+gapjDPK94rw6gkfuNYbzUsL4nr5Vhess4zkK+1o6KgoeQ/VlA6
- TrpA==
-X-Gm-Message-State: AOAM5321WOk7c2azZV6atyyQlHDnbdyye4YG/vT84em6op3wfEapijal
- G+oeOt1N8VwtP4HpfoGsQP1zcA==
-X-Google-Smtp-Source: ABdhPJx6U1XoZz/zB4zkeSdVUxgdRVQVX691onkVIWrxflf5ZNrL+UdJsac/6VlG1iS8z2Xi4PiEOw==
-X-Received: by 2002:adf:dccd:: with SMTP id x13mr17020229wrm.403.1602261120360; 
- Fri, 09 Oct 2020 09:32:00 -0700 (PDT)
+ bh=QSRJirT04KzPlTG554HUlrK3ZZFI9u30wr3rgSYwDnE=;
+ b=Xi50VHvzqWJcd7QPneLAYl5wb0wM/Q9h7MNqI3C7X7Ixmy1YzPFV+BUV9BnJ+PMLfZ
+ QPiZd5F2bUhvE1n1YbwxOCQLfdqSAZO1jdJbZpAF2sA40r453On8zzMdqGGUIvBz7072
+ OjdYVA+XBfbNHRwVJoAUlSGf+1IeXL08HxFfAf5E+iCeLXz+Idv1EqGFRTQ/NkqYhG34
+ hYfH3tZxga+15j4ecuBbkiKN5XKKrlnwrUS+7KvaQRl+fXUJ1zgMpX4FhcSgMoFG7yGS
+ 44f9ZDvuasNohAE4XjZqDcONuC5fi9LwcYPaMybSijIPA1EjDBd1oCCi54h1tZf4xQJc
+ o7Mw==
+X-Gm-Message-State: AOAM531yYqT4PNFETZ5pFidmNCgXep4PH54n0cn2oBL2qAgaVYSaoJjQ
+ XLhCv8Pk7+Bl1EAswq9GZkH+ug==
+X-Google-Smtp-Source: ABdhPJzwRHAk10l5mpe/BPFqsT+oeE4FNLzt3dbq7ro9UEeP6P4EE8oTW732nU3xsbtTGiPjIAp5Iw==
+X-Received: by 2002:a7b:c401:: with SMTP id k1mr14743509wmi.120.1602261136085; 
+ Fri, 09 Oct 2020 09:32:16 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id i126sm12529139wmi.0.2020.10.09.09.31.47
+ by smtp.gmail.com with ESMTPSA id g2sm12119518wmg.38.2020.10.09.09.31.58
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 09 Oct 2020 09:31:52 -0700 (PDT)
+ Fri, 09 Oct 2020 09:32:14 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 6DDB91FF90;
- Fri,  9 Oct 2020 17:31:47 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 1386E1FFAC;
+ Fri,  9 Oct 2020 17:31:49 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 04/22] cirrus: Fixing and speedup the msys2/mingw CI
-Date: Fri,  9 Oct 2020 17:31:29 +0100
-Message-Id: <20201009163147.28512-5-alex.bennee@linaro.org>
+Subject: [PULL 22/22] tests/acceptance: disable machine_rx_gdbsim on GitLab
+Date: Fri,  9 Oct 2020 17:31:47 +0100
+Message-Id: <20201009163147.28512-23-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201009163147.28512-1-alex.bennee@linaro.org>
 References: <20201009163147.28512-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::429;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x429.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32d;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -90,7 +90,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,165 +103,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ed Maste <emaste@freebsd.org>, Yonggang Luo <luoyonggang@gmail.com>,
+Cc: Yoshinori Sato <ysato@users.sourceforge.jp>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Li-Wen Hsu <lwhsu@freebsd.org>
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Willian Rampazzo <willianr@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yonggang Luo <luoyonggang@gmail.com>
+While I can get the ssh test to fail on my test setup this seems a lot
+more stable except when on GitLab. Hopefully we can re-enable both
+once the serial timing patches have been added.
 
-Use cache of cirrus caching msys2
-The install of msys2 are refer to https://github.com/msys2/setup-msys2
-The first time install msys2 would be time consuming, so increase timeout_in to 90m
-according to https://cirrus-ci.org/faq/#instance-timed-out
-
-Apply patch of https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg00072.html
-
-[AJB: renamed printenv_script to setup_script]
-
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20201007145300.1197-2-luoyonggang@gmail.com>
-Message-Id: <20201007160038.26953-5-alex.bennee@linaro.org>
+Reviewed-by: Willian Rampazzo <willianr@redhat.com>
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Message-Id: <20201007160038.26953-23-alex.bennee@linaro.org>
 
-diff --git a/.cirrus.yml b/.cirrus.yml
-index d58782ce67..eb768fa260 100644
---- a/.cirrus.yml
-+++ b/.cirrus.yml
-@@ -46,64 +46,86 @@ macos_xcode_task:
-     - gmake check
+diff --git a/tests/acceptance/machine_rx_gdbsim.py b/tests/acceptance/machine_rx_gdbsim.py
+index 0c72506028..32b737b6d8 100644
+--- a/tests/acceptance/machine_rx_gdbsim.py
++++ b/tests/acceptance/machine_rx_gdbsim.py
+@@ -22,6 +22,7 @@ class RxGdbSimMachine(Test):
+     timeout = 30
+     KERNEL_COMMON_COMMAND_LINE = 'printk.time=0 '
  
- windows_msys2_task:
-+  timeout_in: 90m
-   windows_container:
--    image: cirrusci/windowsservercore:cmake
-+    image: cirrusci/windowsservercore:2019
-     os_version: 2019
-     cpu: 8
-     memory: 8G
-   env:
-+    CIRRUS_SHELL: powershell
-     MSYS: winsymlinks:nativestrict
-     MSYSTEM: MINGW64
-     CHERE_INVOKING: 1
--  printenv_script:
--    - C:\tools\msys64\usr\bin\bash.exe -lc 'printenv'
-+  setup_script:
-+    - choco install -y --no-progress 7zip
-+    - Write-Output $env:PATH
-+  msys2_cache:
-+    folder: C:\tools\archive
-+    reupload_on_changes: false
-+    fingerprint_script: cat .cirrus.yml
-+    populate_script:
-+      - |
-+        md C:\tools
-+        md C:\tools\archive
-+        $start_time = Get-Date
-+        cd C:\tools
-+        bitsadmin /transfer msys_download /dynamic /download /priority FOREGROUND https://github.com/msys2/msys2-installer/releases/download/2020-09-03/msys2-base-x86_64-20200903.sfx.exe C:\tools\base.exe
-+        Write-Output "Download time taken: $((Get-Date).Subtract($start_time).Seconds) second(s)"
-+        C:\tools\base.exe -y
-+        ((Get-Content -path C:\tools\msys64\etc\\post-install\\07-pacman-key.post -Raw) -replace '--refresh-keys', '--version') | Set-Content -Path C:\tools\msys64\etc\\post-install\\07-pacman-key.post
-+        C:\tools\msys64\usr\bin\bash.exe -lc "sed -i 's/^CheckSpace/#CheckSpace/g' /etc/pacman.conf"
-+        C:\tools\msys64\usr\bin\bash.exe -lc "export"
-+        C:\tools\msys64\usr\bin\bash.exe -lc "grep -rl 'repo.msys2.org/' /etc/pacman.d/mirrorlist.* | xargs sed -i 's/repo.msys2.org\//mirrors.tuna.tsinghua.edu.cn\/msys2\//g'"
-+        C:\tools\msys64\usr\bin\pacman.exe --noconfirm -Sy
-+        echo Y | C:\tools\msys64\usr\bin\pacman.exe --noconfirm -Suu --overwrite=*
-+        taskkill /F /FI "MODULES eq msys-2.0.dll"
-+        tasklist
-+        C:\tools\msys64\usr\bin\bash.exe -lc "mv -f /etc/pacman.conf.pacnew /etc/pacman.conf || true"
-+        C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Suu --overwrite=*"
-+        C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -S --needed \
-+          diffutils git grep make pkg-config sed \
-+          mingw-w64-x86_64-python \
-+          mingw-w64-x86_64-python-setuptools \
-+          mingw-w64-x86_64-toolchain \
-+          mingw-w64-x86_64-SDL2 \
-+          mingw-w64-x86_64-SDL2_image \
-+          mingw-w64-x86_64-gtk3 \
-+          mingw-w64-x86_64-glib2 \
-+          mingw-w64-x86_64-ninja \
-+          mingw-w64-x86_64-jemalloc \
-+          mingw-w64-x86_64-lzo2 \
-+          mingw-w64-x86_64-zstd \
-+          mingw-w64-x86_64-libjpeg-turbo \
-+          mingw-w64-x86_64-pixman \
-+          mingw-w64-x86_64-libgcrypt \
-+          mingw-w64-x86_64-libpng \
-+          mingw-w64-x86_64-libssh \
-+          mingw-w64-x86_64-libxml2 \
-+          mingw-w64-x86_64-snappy \
-+          mingw-w64-x86_64-libusb \
-+          mingw-w64-x86_64-usbredir \
-+          mingw-w64-x86_64-libtasn1 \
-+          mingw-w64-x86_64-nettle \
-+          mingw-w64-x86_64-cyrus-sasl \
-+          mingw-w64-x86_64-curl \
-+          mingw-w64-x86_64-gnutls \
-+          "
-+        C:\tools\msys64\usr\bin\bash.exe -lc "rm -rf /var/cache/pacman/pkg/*"
-+        cd C:\tools\msys64
-+        echo "Start archive"
-+        cmd /C "7z a -ttar . -so | 7z a -txz -simsys2-x86_64.tar C:\tools\archive\msys2-x86_64.tar.xz"
-   install_script:
--    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools &&
--        curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
--    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools &&
--        curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
--    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools &&
--        pacman -U --noconfirm msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
--    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Sy"
--    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -S --needed
--        bash pacman pacman-mirrors msys2-runtime"
--    - taskkill /F /IM gpg-agent.exe
--    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Su"
--    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -S --needed
--        base-devel
--        git
--        mingw-w64-x86_64-python
--        mingw-w64-x86_64-python-setuptools
--        mingw-w64-x86_64-toolchain
--        mingw-w64-x86_64-capstone
--        mingw-w64-x86_64-SDL2
--        mingw-w64-x86_64-SDL2_image
--        mingw-w64-x86_64-gtk3
--        mingw-w64-x86_64-glib2
--        mingw-w64-x86_64-ninja
--        mingw-w64-x86_64-make
--        mingw-w64-x86_64-lzo2
--        mingw-w64-x86_64-zstd
--        mingw-w64-x86_64-libjpeg-turbo
--        mingw-w64-x86_64-pixman
--        mingw-w64-x86_64-libgcrypt
--        mingw-w64-x86_64-libpng
--        mingw-w64-x86_64-libssh
--        mingw-w64-x86_64-libxml2
--        mingw-w64-x86_64-snappy
--        mingw-w64-x86_64-libusb
--        mingw-w64-x86_64-usbredir
--        mingw-w64-x86_64-libtasn1
--        mingw-w64-x86_64-nettle
--        mingw-w64-x86_64-cyrus-sasl
--        mingw-w64-x86_64-curl
--        mingw-w64-x86_64-gnutls
--        mingw-w64-x86_64-zstd"
-+    - |
-+      cd C:\tools
-+      cmd /C "7z x C:\tools\archive\msys2-x86_64.tar.xz -so | 7z x -aoa -simsys2-x86_64.tar -ttar -omsys64"
-+      C:\tools\msys64\usr\bin\bash.exe -lc "export"
-+
-   script:
-     - C:\tools\msys64\usr\bin\bash.exe -lc "mkdir build"
-     - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && ../configure
-       --python=python3 --ninja=ninja
-       --target-list-exclude=i386-softmmu,arm-softmmu,ppc-softmmu,mips-softmmu"
--    - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && make -j$NUMBER_OF_PROCESSORS"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && make -j8"
-   test_script:
-     - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && make V=1 check"
++    @skipIf(os.getenv('GITLAB_CI'), 'Running on GitLab')
+     def test_uboot(self):
+         """
+         U-Boot and checks that the console is operational.
 -- 
 2.20.1
 
