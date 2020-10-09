@@ -2,88 +2,90 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66B7BC433E7
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 15:51:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5183DC433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:04:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C55922225D
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 15:51:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0A0B22259
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:04:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kfZB+HGF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C55922225D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IP0cnvW6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0A0B22259
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQugX-0000Ix-Ao
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 11:51:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57164)
+	id 1kQusf-0005ay-MJ
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:04:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58626)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kQufy-0008L6-LP
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 11:51:22 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35278)
+ id 1kQuov-0002m4-Hr
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:00:37 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35406)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kQufx-0008SH-4K
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 11:51:22 -0400
-Received: by mail-wr1-x443.google.com with SMTP id n15so10812001wrq.2
- for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 08:51:20 -0700 (PDT)
+ id 1kQuot-0000yp-IJ
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:00:37 -0400
+Received: by mail-wr1-x442.google.com with SMTP id n15so10841038wrq.2
+ for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 09:00:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=vUw25a+JF28NDJn2+bNEzpLoUNqu5DI1Lon8tieP4jc=;
- b=kfZB+HGFlYlXiei/c2tiqXL7S6OO2l7GXQ4Nbg4E9BSh+PefJpARLoVoLIEH8j12wI
- PAvjJXLiUu9Sx4GZSNIeUwPsnVP+Mr0eChtF0eQi4Hj5DlUlWBDvmN1pu/tRbJ6uwudv
- 2h/ycrS5wRCdfxnX/c860of7ZeQwQkPNSzKnK5+32Mfdfo+42f5DLDjLIKaEDqkdwVOE
- JUY72lgazZ6BcN0toA75NJLnt4svB+PRM5WPob6AicDlXXFkzWl87PhsTfIE5xks8vP1
- HGWiLEGr2b6mADZT7roE2PpNy/Ofr9s+Idat7WDg5+f7ecWtzO2jfn0962SYHIerkkz1
- Cd0g==
+ bh=JEPggkBeI4VNTiOy1yfzZusKLxuhYM1OP47yibR9+tg=;
+ b=IP0cnvW6t1ly0Ps0UwkTgu/LhT2hb/ZfTaCYT6QK/6TXkBzdcHGKQSyzKsOJ7PKVCy
+ L0hvy12YmBnamN7KJPazLCmD8ojIzG69l9hnQFUrx0c1mNaozI6AuepJyG/zhhJPQBQL
+ Q/dJgb9m8p0683wjw6cPCq3VKbgRdaqppyho4qLCz98wJ2FuZu7t1AACsLR8R3vfQFBZ
+ mIt/8F+/s+bxsdhF3LYJ/apTuLy6U4/hc6MIVlFx6iJc4bsNYBV/MSCv26pfNEH9TbgG
+ BtxO4P8f2Lh73RW4jag9Dr9ewl+s9aQ2vv4RgyA1NWES5lMyHBMu65CHwtBqmi4bc1dL
+ d94w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=vUw25a+JF28NDJn2+bNEzpLoUNqu5DI1Lon8tieP4jc=;
- b=h/zbqDK3PlTC2JJrF2yW51jBml6kdBQ0I5QZS5LBEmzk0hnieaPY9l/s4f0Ub7sGr9
- jG9jPzaJ0Ruq8aKNL8s2obee3aPmGTIvCrFG5KXd6tU2qaUJIHC3jwQTWNf2O8Y/CKvq
- njhk/lcxYBJ1g/0GSXz8/iPxMyqw6+ZcfUJqM6wfmFkOrDebRGUoCsUZSUEf/IFl9SOY
- 3wFklDu3L1d5HvKBW5GdOcW5RGwKWBaVor1Q1+Mb3/rb1RXMdYhQokqIex4uxWoMTKgT
- ABjB6ppH/h5WeRDcTZLR8rAiIxMzWvCWj3IGVBpKIayK8Z8aHZJk7bcxsxJy2ZnIOXqo
- WI4w==
-X-Gm-Message-State: AOAM532wi7wN9fFumaWEfP2zkTvv1kBUYhfop/LMXKzvg5Zz8ZwIqcER
- 5PM6jbti8dTgcAg+vf9WSDA=
-X-Google-Smtp-Source: ABdhPJz4K/oCUeF2NhUD/KwP4Va2A37AiyoyaEtypkKKmeJOLCyy7jSqEBZil0LOTRQHhqWHI5fPGw==
-X-Received: by 2002:adf:f44d:: with SMTP id f13mr11424377wrp.385.1602258679529; 
- Fri, 09 Oct 2020 08:51:19 -0700 (PDT)
+ bh=JEPggkBeI4VNTiOy1yfzZusKLxuhYM1OP47yibR9+tg=;
+ b=cJN2SicLWvOJF7DQ3PS51SAGFE5MYHbD2h7HMA00JcEM6spTgCtA1EDhoBnutZ3bSW
+ vXPAuGr8vlH2fuMpMy+xlV/iWE0yrR/dfP0tVdaf8DC2+wmV2Jg6IQH7jTXEjTe9lxXk
+ hNm7UzO5k+veA6de0Ng5LJvDat/mZENKiJRi5yJ226QJucG8j8Hk0Ixwfhd/FnFzT7Kq
+ SCb1tF2zc5k2vtwNbdbwn79fxFnafjkCXIKLfox1Fd7kI5+DJsNBGs7jo9a6bSdYU/XK
+ 6snOVxdzbzIlZfIOAyzV7DIZ8m2ldg+AdvcMS9ggIQtuXQqiq4/O50lHI0ESoP1LoeRF
+ XvIA==
+X-Gm-Message-State: AOAM531HjmMnHNuiTh3jwoQZXstWg0FyMxu0VwkZzc0kxKi7j9harbD1
+ CFhMTsWj+4Wn0Yo71Cq/Zdo=
+X-Google-Smtp-Source: ABdhPJwTFcKGwaN3dSAetTQwMkiopdKrZ0ZgFPK8xEi+pZ229j0+b3iMLndPVFwDOyt0ckYZEbIpLA==
+X-Received: by 2002:adf:f212:: with SMTP id p18mr16260777wro.386.1602259233864; 
+ Fri, 09 Oct 2020 09:00:33 -0700 (PDT)
 Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
  [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id x64sm12415748wmg.33.2020.10.09.08.51.18
+ by smtp.gmail.com with ESMTPSA id v8sm12344013wmb.20.2020.10.09.09.00.32
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 09 Oct 2020 08:51:18 -0700 (PDT)
-Subject: Re: [RFC PATCH v2 0/3] target/mips: Report unimplemented cache()
- operations
-To: qemu-devel@nongnu.org
-References: <20200813181527.22551-1-f4bug@amsat.org>
+ Fri, 09 Oct 2020 09:00:32 -0700 (PDT)
+Subject: Re: [PATCH 2/2] hw/arm: remove exit(1) in case of missing ROM
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
+References: <159480834629.15819.10175861928294983612.stgit@pasha-ThinkPad-X280>
+ <159480835744.15819.10383908697966018668.stgit@pasha-ThinkPad-X280>
+ <CAFEAcA9f18nwJQhX5EGtHWeHjw4DbRBmU1xmZm8gCgOkSgP+Mw@mail.gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <012b6a7a-09de-977d-d57f-aaf8d83140fe@amsat.org>
-Date: Fri, 9 Oct 2020 17:51:18 +0200
+Message-ID: <be1c96a6-4d9f-a4e9-15b6-e7a6ef5827f0@amsat.org>
+Date: Fri, 9 Oct 2020 18:00:31 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200813181527.22551-1-f4bug@amsat.org>
+In-Reply-To: <CAFEAcA9f18nwJQhX5EGtHWeHjw4DbRBmU1xmZm8gCgOkSgP+Mw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -19
@@ -106,27 +108,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+Cc: Huacai Chen <chenhc@lemote.com>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+ QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>,
+ Antony Pavlov <antonynpavlov@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/13/20 8:15 PM, Philippe Mathieu-Daudé wrote:
-> Few patches to improve the handling of the 'cache' opcode.
+On 7/20/20 11:56 AM, Peter Maydell wrote:
+> On Wed, 15 Jul 2020 at 11:19, Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru> wrote:
+>>
+>> This patch updates ARM-based machines to allow starting them without ROM.
+>> In this case CPU starts to execute instructions from the empty memory,
+>> but QEMU allows introspecting the machine configuration.
+>>
+>> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
 > 
-> I'm not sure why helper_cache() is generated for user-only mode.
-> 
-> v1 was:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg727959.html
-> Supersedes: <20200806122612.17167-1-f4bug@amsat.org>
-> 
-> Philippe Mathieu-Daudé (3):
->    target/mips/op_helper: Convert multiple if() to switch case
->    target/mips/op_helper: Document Invalidate/Writeback opcodes as no-op
->    target/mips/op_helper: Log unimplemented cache opcode
+> I guess this makes sense -- this is how most of our machines
+> already behave, so consistency and being able to introspect
+> the machine config are both worth having. Also these errors
+> mostly pre-date the 'generic loader' device, which is another
+> way to load guest code that the error-exit prevents. (You could
+> even load guest code via the gdbstub if you wanted...)
 
-Thanks, added to mips-next (addressing Richard comments).
+Note the 'generic loader' device allows you to select any CPU
+address space, while gdbstub is restricted to the first CPU.
+
+> 
+> Calling arm_load_kernel() must not be conditional -- it is the
+> function which makes sure the guest CPU is reset.
+> 
+> (A handful of boards will call arm_load_kernel() only if
+> !qtest_enabled(), but most call it unconditionally. We should
+> look at why those handful of boards seem to need the conditional
+> and either remove it if useless or see if it should be applied
+> in other places or if arm_load_kernel() itself could be improved
+> to make the check unnecessary for all boards.)
+
+Who should look at that? Maybe add that as a byte-sized task?
+
+Regards,
+
+Phil.
 
