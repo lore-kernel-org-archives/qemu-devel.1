@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5302EC433E7
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 14:41:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49887C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 14:43:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACAE520709
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 14:41:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF87922260
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 14:43:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FXvA/geY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACAE520709
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L3v2pAfT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF87922260
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQtaB-0002cW-Qf
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 10:41:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40248)
+	id 1kQtbx-0004aW-DC
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 10:43:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40710)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kQtYp-0001ej-Op
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 10:39:55 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39451)
+ id 1kQtb4-0003jU-Tz
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 10:42:14 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41811)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kQtYn-0007tW-52
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 10:39:55 -0400
-Received: by mail-wr1-x442.google.com with SMTP id y12so5189358wrp.6
- for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 07:39:52 -0700 (PDT)
+ id 1kQtb3-0008HB-6i
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 10:42:14 -0400
+Received: by mail-wr1-x442.google.com with SMTP id w5so10563273wrp.8
+ for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 07:42:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=zgfnGkPBA3qkybEVDjdheXx2JxGRwcxImG5qqCyNfAM=;
- b=FXvA/geYUG8yRgnoGAfV/n5prZHnERN7s/Ga5wgwGCqn5xpNRQ9FPGUdVY27dlfMaw
- 24Ut4omrDt2rCDWYjcuZfY/Xmk72Mp9iTGRFe2/MLM8RmzJzMeTxdBaHXCVRTPzo0cY6
- bYO6DtMdycFuTJmkKWbu5xHAX6g2MToOkIK34Ls4SPMAV6hwYjIaLqMTN0wu8zCJxWHz
- /ytnQbtgDnJzveaAy6kSjyvOmSxGJ9fqwVlwRNNHV/lwMoLSRPOZFKNsiXUXZGs/9pan
- NKyC5ESZvFhrf0fEUzZfhIqnZPttdsPn/fcmQMDxF1gJPXRdFht0kRtGAR1KYYLpyh8A
- /sLw==
+ bh=FLiJF2GMh1mx19H/JE+HGjSmozMM0wqdCHoeOE4nMSQ=;
+ b=L3v2pAfTMpV+1zU3v2/EV/xTTqSzx5M0bj0Fmbkgd1LtgVOs+e4OY3vvR5B0i8aKdG
+ Y0+cFYhcwTeGJsVmaiWxkbzZ+EFemIhOLwn7cHYw+4mWkrcgfBslXGy3n37EHOcFw8Co
+ BcyfyjEGxQGSD8JG+O/2p5ausXAysnk3ozwtoD7phaa4TfincAcAiIG5XiJN3/BlheuZ
+ SAZ35VN1ZBu14FrvoQbgCYq+BeAcxkg0LvoH2xn8n272e0Qd/YoVyaxctOx/P7XcD2XJ
+ g1cW/mDHRVUDNT99Z7RbDy/tAyxvmQ3x3dfGFzperaNw0yIwg2we2OhIYIeVmyrv0KLO
+ UnnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=zgfnGkPBA3qkybEVDjdheXx2JxGRwcxImG5qqCyNfAM=;
- b=ipY9XlHy5SQ+2mJ1AW+SYNBsMOyXE7xPL8iyxnHrBJ9sjFvNYPwxHCz+QAcoQg7uqr
- ICuSHYVfzxf9EKWNv2KgS5DuE+Weo8GP3MdfGQn36VL6OStCP/AlfZlYJ5j5jWuvyR/d
- v6HIB/e6kUytfMkxG+2YKFanMfzkIpmFNGi6l4FEA/UJTe27Z91pfvwoqnK6uReTMQ7u
- c5QTwRP+zIkgowFOwC7PNvCwDpkolcN1b4VAcJ0UkOBS3kabawG/bs860BXaXObsYxqo
- cvV+c9Ofkmu9TxWhLWJ4oFndbTEA/EjVpa2/tGzaoxXgc8K0igEZYZQcy0ahqP6AZag3
- 0eUg==
-X-Gm-Message-State: AOAM533TCgqvHj36ynSnWwdACEGYpGboQoE6trS5HWNhuAWd3SNmu0iU
- BhfQP+s8THhoCPkK1EkUZSc=
-X-Google-Smtp-Source: ABdhPJwa6sWOCEtXmChGdEAvrntvfmq0ZPNeBkuzAkDm8aradBsfGWYqxkVFdMCBRg7BsUaH6Pvnyg==
-X-Received: by 2002:adf:9507:: with SMTP id 7mr2374602wrs.365.1602254391219;
- Fri, 09 Oct 2020 07:39:51 -0700 (PDT)
+ bh=FLiJF2GMh1mx19H/JE+HGjSmozMM0wqdCHoeOE4nMSQ=;
+ b=M+DyRz24AxMqKRyNDWBdNaXILIPFoCEeYMWU9mI2MV4s5giZMw99Tj+xEValF31PQ8
+ 3uwMJaO3cpb/noU3Loy+KN68VqEerpV5TNamTvMhQ+Uh/PSm+sq6XaUrmqYQQwRvUwm4
+ X6280/RYnJhPiPHEmBuqx0C4d5lGEGtJCLNXlisdyrLNzewbnhyDEvhqsX2Lociie6JI
+ 8sxFhrKooW6RCZJk0GuXfYkFiuCl4rus+BkBkJylUYgeC2ZjKXzXJjTyMifc/OjV/lsJ
+ y752O/xm9/6i65f2cguy70dsYcvIzzWmZ8DEcEDZMSf69lDdYStvhALltbCjT83ErC/I
+ uIWA==
+X-Gm-Message-State: AOAM532ElpGhy9wzqUDc0J75uT8tiB1tqLErJkdQY9Ir34e28ORG9Eku
+ G1Ppr4gEtNSHDiexlhO8pPY=
+X-Google-Smtp-Source: ABdhPJxuRTJblYITGoTk6DFnKc/slf/o4qhBHPn6FhUrUm/TxWWtamlWvk/S5yvtOFRVHqnZNa/7WA==
+X-Received: by 2002:adf:fa02:: with SMTP id m2mr15012921wrr.273.1602254531940; 
+ Fri, 09 Oct 2020 07:42:11 -0700 (PDT)
 Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
  [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id t12sm2899262wrm.25.2020.10.09.07.39.49
+ by smtp.gmail.com with ESMTPSA id u63sm12390630wmb.13.2020.10.09.07.42.10
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 09 Oct 2020 07:39:50 -0700 (PDT)
-Subject: Re: [PATCH v2 1/5] target/mips: Demacro helpers for <ABS|CHS>.<D|S|PS>
+ Fri, 09 Oct 2020 07:42:11 -0700 (PDT)
+Subject: Re: [PATCH v2 2/5] target/mips: Demacro helpers for M<ADD|SUB>F.<D|S>
 To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
  qemu-devel@nongnu.org
 References: <1602103041-32017-1-git-send-email-aleksandar.qemu.devel@gmail.com>
- <1602103041-32017-2-git-send-email-aleksandar.qemu.devel@gmail.com>
+ <1602103041-32017-3-git-send-email-aleksandar.qemu.devel@gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <74dec616-dcbc-28f8-6e3a-a5880de1f110@amsat.org>
-Date: Fri, 9 Oct 2020 16:39:49 +0200
+Message-ID: <022e59dd-adff-4ab4-df34-387ef3df1d2f@amsat.org>
+Date: Fri, 9 Oct 2020 16:42:10 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <1602103041-32017-2-git-send-email-aleksandar.qemu.devel@gmail.com>
+In-Reply-To: <1602103041-32017-3-git-send-email-aleksandar.qemu.devel@gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -118,8 +118,8 @@ On 10/7/20 10:37 PM, Aleksandar Markovic wrote:
 > 
 > Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 > ---
->   target/mips/fpu_helper.c | 61 +++++++++++++++++++++++++++++++-----------------
->   1 file changed, 40 insertions(+), 21 deletions(-)
+>   target/mips/fpu_helper.c | 63 +++++++++++++++++++++++++++++++++++-------------
+>   1 file changed, 46 insertions(+), 17 deletions(-)
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
