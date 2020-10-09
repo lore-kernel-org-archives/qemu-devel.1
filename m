@@ -2,109 +2,83 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7717C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:09:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94D98C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:10:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F7102225D
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:09:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0992022261
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:10:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rc+9Wp+7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F7102225D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a6uQzgD5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0992022261
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQuxZ-0003rD-Fk
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:09:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58920)
+	id 1kQuy0-0004eL-4x
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:10:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58922)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kQupn-0003cn-5x
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kQupn-0003dR-9K
  for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:01:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60819)
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36700)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kQupk-00016W-Od
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kQupl-00016d-En
  for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:01:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1602259288;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=WzfW2G2YyArVvPSRfAD+ZcXcvWq+k4EkN7y6hBkUoCM=;
- b=Rc+9Wp+7a07A0AjayI16W2wuzSZYnRtF6PyPLtpvOTles+CsSJwY5R+QouDTwXvIq8xEyk
- LZz5r8lAKbe95ELPvuigWlKbiNHwInBOzy0IAZBWcBqTA0sF0KKwL2eoRo/NYXNU0naOTu
- WcV5Xk71D3EzMqRZCTo2UMhZy32KPpU=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-44-pPgIaW-NOQ6XKZjV8Jtihw-1; Fri, 09 Oct 2020 12:01:23 -0400
-X-MC-Unique: pPgIaW-NOQ6XKZjV8Jtihw-1
-Received: by mail-wm1-f70.google.com with SMTP id w23so4279408wmi.1
- for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 09:01:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=WzfW2G2YyArVvPSRfAD+ZcXcvWq+k4EkN7y6hBkUoCM=;
- b=PMRtrc18uroFbl36uV4zaKtK6U1s6CuFnf8qyCT5bX/DmHKF03t/miVvMGwLkQM6rb
- Rl4gJp5JVtpMQBkPenna0WhZc3c6tI9x4xGyvNViBHqQvg87sjD5UH/84H65Bx8HMyHm
- ye5N/7bM0WdbSPHa/2SmiQoGkJlmLQrABePkRW+wNoLGmMGJBwvN6V2aOLTugvrApH2Z
- KeYvtkGV4AVwS+y9q1lCVUIgwhmdsfSixBEytqnVfkI8M7ZPj4JDJQqL6Zmv3Ddiceso
- albWi2GAryQ16+yk+Xzdy80zlipLTwj6qVsFZUGX/9QGrdCLUQ4fwaSRr/psRDzTG0ud
- 0HTA==
-X-Gm-Message-State: AOAM531babNZZsNs3L6C9Xw1k7hnEbh2Co/+FZ88lYpakOuJZBdij3kC
- PzoqXMC1HuiRsljrClXb8JakW1orsh51fXkYAITef4wo6avOYVwHSGhTt/KJlENzs5FsHvJQcNp
- GnlZ3DGTMC3BiElw=
-X-Received: by 2002:a5d:6a43:: with SMTP id t3mr16295853wrw.426.1602259282511; 
- Fri, 09 Oct 2020 09:01:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxbJ4919KL0TjSqGLFKGoKgwxjShxGH6C65OV6Y7M14mIo9t3NMAZVojut/VQaD3wqpThW1Cw==
-X-Received: by 2002:a5d:6a43:: with SMTP id t3mr16295826wrw.426.1602259282298; 
- Fri, 09 Oct 2020 09:01:22 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:cee1:4797:6958:7698?
- ([2001:b07:6468:f312:cee1:4797:6958:7698])
- by smtp.gmail.com with ESMTPSA id w11sm12782744wrn.27.2020.10.09.09.01.21
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 09 Oct 2020 09:01:21 -0700 (PDT)
-Subject: Re: [RFC v1 3/4] qtest: do not build ide-test if TCG is not available
-To: Claudio Fontana <cfontana@suse.de>
-References: <20201009152108.16120-1-cfontana@suse.de>
- <20201009152108.16120-4-cfontana@suse.de>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <673c52e5-e22e-bda1-b262-ec476a966f3f@redhat.com>
-Date: Fri, 9 Oct 2020 18:01:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ content-transfer-encoding:content-transfer-encoding;
+ bh=/SYhszIXA0xCmoEZQMOxUX9tfGF1A44jM698h/Hu00Y=;
+ b=a6uQzgD5VwfTBAZW01Awr9s/aMf6aIGhVYMwa4n3RlG5mGnneZu225A/2FKcRNtAHPMhQ3
+ bvdO7zi+Pbb68xkeYyLAO1o1A9FufdIDafU/rVmGklENGdIxM1W4+2b4Z40bi+Nb0bd1gP
+ 95K0SGGk4l2n8jmHi61+1NIonlpn/ks=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-11-_9IxrQuyPEu2mGgAIHhdbA-1; Fri, 09 Oct 2020 12:01:26 -0400
+X-MC-Unique: _9IxrQuyPEu2mGgAIHhdbA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E7188802B6A
+ for <qemu-devel@nongnu.org>; Fri,  9 Oct 2020 16:01:25 +0000 (UTC)
+Received: from localhost (ovpn-119-102.rdu2.redhat.com [10.10.119.102])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CF15D6EF6C;
+ Fri,  9 Oct 2020 16:01:22 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 00/12] qom: Make all -object types use only class properties
+Date: Fri,  9 Oct 2020 12:01:10 -0400
+Message-Id: <20201009160122.1662082-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201009152108.16120-4-cfontana@suse.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:34:40
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:34:37
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -22
-X-Spam_score: -2.3
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.208, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -117,42 +91,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Pavel Dovgalyuk <dovgaluk@ispras.ru>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/10/20 17:21, Claudio Fontana wrote:
-> it seems that ide-test depends on TCG currently.
-> 
-> Signed-off-by: Claudio Fontana <cfontana@suse.de>
-> ---
->  tests/qtest/meson.build | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tests/qtest/meson.build b/tests/qtest/meson.build
-> index ad33ac311d..3418f65e2a 100644
-> --- a/tests/qtest/meson.build
-> +++ b/tests/qtest/meson.build
-> @@ -46,9 +46,9 @@ qtests_i386 = \
->    (config_all_devices.has_key('CONFIG_TPM_TIS_ISA') ? ['tpm-tis-test'] : []) +              \
->    (config_all_devices.has_key('CONFIG_TPM_TIS_ISA') ? ['tpm-tis-swtpm-test'] : []) +        \
->    (config_all_devices.has_key('CONFIG_RTL8139_PCI') ? ['rtl8139-test'] : []) +              \
-> +  (config_all.has_key('CONFIG_TCG') ? ['ide-test'] : []) +                                  \
->    qtests_pci +                                                                              \
->    ['fdc-test',
-> -   'ide-test',
->     'hd-geo-test',
->     'boot-order-test',
->     'bios-tables-test',
-> 
-
-Interesting, why?...
-
-Paolo
+To make introspection possible, make all TYPE_USER_CREATABLE=0D
+classes use only class properties, and add a mechanism to lock=0D
+QOM properties so writable instance properties won't be allowed=0D
+anymore.=0D
+=0D
+Eduardo Habkost (12):=0D
+  qom: Helpers for pointer properties=0D
+  qom: Introduce PointerProperty struct=0D
+  qom: Make object_class_property_add_uint*_ptr() get offset=0D
+  sev: Use class properties=0D
+  rng: Use class properties=0D
+  can_host: Use class properties=0D
+  colo: Use class properties=0D
+  netfilter: Reorder functions=0D
+  netfilter: Use class properties=0D
+  input: Use class properties=0D
+  [RFC] qom: Property lock mechanism=0D
+  [RFC] qom: Lock properties of all TYPE_USER_CREATABLE types=0D
+=0D
+ include/qom/object.h           |  25 +++-=0D
+ backends/rng-egd.c             |  10 +-=0D
+ backends/rng-random.c          |   8 +-=0D
+ backends/rng.c                 |   6 +-=0D
+ net/can/can_host.c             |  16 +--=0D
+ net/colo-compare.c             |  57 ++++----=0D
+ net/dump.c                     |  10 +-=0D
+ net/filter-buffer.c            |  26 ++--=0D
+ net/filter-mirror.c            |  64 ++++-----=0D
+ net/filter-rewriter.c          |   7 +-=0D
+ net/filter.c                   |  24 ++--=0D
+ qom/object.c                   | 256 ++++++++++++++++++---------------=0D
+ qom/object_interfaces.c        |  11 ++=0D
+ target/i386/sev.c              |  22 +--=0D
+ tests/check-qom-proplist.c     |  10 +-=0D
+ tests/test-qdev-global-props.c |  70 +++++++++=0D
+ ui/input-barrier.c             |  44 +++---=0D
+ ui/input-linux.c               |  27 ++--=0D
+ 18 files changed, 407 insertions(+), 286 deletions(-)=0D
+=0D
+--=20=0D
+2.26.2=0D
+=0D
 
 
