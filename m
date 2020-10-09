@@ -2,98 +2,84 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96E19C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 14:48:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11217C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 14:49:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFBE4221FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 14:48:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 88D19222C2
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 14:49:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KveGJrsV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFBE4221FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LzUvLAGH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88D19222C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQthM-0008W4-23
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 10:48:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41812)
+	id 1kQtiG-0001GL-Ld
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 10:49:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41954)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kQtg2-0007Ze-Q4
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 10:47:22 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39531)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kQtgf-0007x9-JT
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 10:48:01 -0400
+Received: from mail-ej1-x62d.google.com ([2a00:1450:4864:20::62d]:34783)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kQtfx-0000Ri-Hk
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 10:47:20 -0400
-Received: by mail-wr1-x441.google.com with SMTP id y12so5215424wrp.6
- for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 07:47:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=hmnSzgCxOYplz49V09b2rB+1Y5/XK5reFSxCJhsq/+s=;
- b=KveGJrsVDSFHS3fR4r52mUza9wajxAKoYTXKhgmiy6u1yio+C4mOuIGDRgCXFVPQ9+
- 6KK8ArAe4Ks9bezqLytn4jPClF/oiNnjnVfi/2VuvXi+0aN+Yy1wn43NYzFpEBYIYRkM
- LDqacrwiyKmxHcJIlwywGAZZWj5Vylm68WfE9bP/PqQqqW/Ua+M5CYmKayvpG9CsTdg4
- R1okmTNpaASG7/wdh3cb5Zowvh9zNXV/IC4exLiIlBi6hzm44nRa4IF/NQp8cRK7gfCf
- VkxMeSchqs1JtwpyUHtLg62Qd+oyPOhB6ZX9qHMjLO2GqC1qG3FZa6LODvNk2lnTyyuc
- Flmw==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kQtgd-0000Ts-QZ
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 10:48:01 -0400
+Received: by mail-ej1-x62d.google.com with SMTP id u8so13485702ejg.1
+ for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 07:47:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=u8wMj9ibMiD/FOoQMtJ7Nkl9t2/9EGFEVfb5tzV0hzg=;
+ b=LzUvLAGHD1GWtrt6Y6PjykJ1/SynEgunWe9Xfj9gQCqmj12m9ty1DY+mzZTJVnKLmz
+ UIphideExK+muV8j8W9KnJtFS1h44aIsNMD5EQ6MpXi1Cjgs6eoJxvHGhrJwnydOE5pV
+ r927xFWdGD8bdy7OTIX1hyGRhiSA21RLBfCbdJW6VFTAjaSgN60fyIVY7pJwGHX435rB
+ 6lJLJADPG3xqw0ugZd96XcnZdN+ADoZSBtMNqdM/IcUzWWWMEIhWKe0tdpdiaJDak1kf
+ yzwglPrXfSyXjL1C2nJHGxcHUJ3uZ/VzdKNSAfMZGVMHvB8B26x9aSV02hQpQSh+eYzH
+ 059w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=hmnSzgCxOYplz49V09b2rB+1Y5/XK5reFSxCJhsq/+s=;
- b=BUaMCBHU/0kuGB/Z9drRKAyEsvbx6+31NwD77MB9lMcq8cdQb+uMTBouRXxDPddWx+
- h5uKjaZJonbc5GUBJnnY4u6aa47N8vkqIU1GqVFNl30TY1JZe+SiGRJBQppi5LycPDcQ
- ZKgsJ5VqMnoKoAQiZzgQwNwpRMjJ0ajpnDzdwCKZRTDHn04m2Tk52hD2EHWs2DU/+RdB
- PLCj6rUFpNiaYQtxtIWdpzI7HdWXqzyVz/rwiN8MZnyiY+QrgJQEmhJJIxZLqgwEL/Bs
- DGs8hhkI5k8nPrqyGn1FQpBKJsTTxnzgH/x3yAo3C1V9tq9NsZXN2DrITIid/DCXevI6
- XgDQ==
-X-Gm-Message-State: AOAM531b5pW3PaZRlA+aFRVEDh4iMVx5VqbJuoMYvQzJq26qaDqqY48S
- HzD3J2KyEFSYsRLvRSErFOs=
-X-Google-Smtp-Source: ABdhPJyOhme5qUfZevS8RC9F18U/FPgBqIYRoIDGKeosFcVMtglGCAA54ZKrJMb8jJniDtWRjFN2jQ==
-X-Received: by 2002:a05:6000:6:: with SMTP id h6mr6683622wrx.112.1602254836234; 
- Fri, 09 Oct 2020 07:47:16 -0700 (PDT)
-Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
- [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id j101sm13294001wrj.9.2020.10.09.07.47.15
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 09 Oct 2020 07:47:15 -0700 (PDT)
-Subject: Re: [PATCH v2 4/5] target/mips: Refactor helpers for fp comparison
- instructions
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- qemu-devel@nongnu.org
-References: <1602103041-32017-1-git-send-email-aleksandar.qemu.devel@gmail.com>
- <1602103041-32017-5-git-send-email-aleksandar.qemu.devel@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7da26134-7e26-457a-c48e-877e66309793@amsat.org>
-Date: Fri, 9 Oct 2020 16:47:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=u8wMj9ibMiD/FOoQMtJ7Nkl9t2/9EGFEVfb5tzV0hzg=;
+ b=KkRW947iFGdFhBd/NPqEGQPpAugps+JSCHzx1Uxo3KRp6gfk92hXGVKhq/8ZbWqtow
+ hmcIXHk7/bZ1fCBpAC9YP2um/QIum9LpprS4D8xzwlC9asTUXCHjIobW6f3QqCuPHo4m
+ byspBIdLoqvEL/gZ+ABWdmDrlVEt5ZmfR+dNwV5E8j6ClO2X8Pyuq8Am4t19oliIj7QQ
+ K/5RFgV1c5qMEVyASxaWQpRQQzTOD15KMHwNYVdAwWhNTT9gBExMfFXD2uuFrZPIjIGm
+ 4X1mj81XEh0fn9DTzTEHLfPx5iykG5CnQrBFMhcCaYps21gr0gFERbU8h9uGJ5GaoBmN
+ B5RA==
+X-Gm-Message-State: AOAM532AvyrrVhzP4fjvMjfKRH40iQZqTvWqWpoRFWTCtarg84xV+it5
+ eBHi7GetODEqLsWFt85FDm541+n+kPGtygG82tK8og==
+X-Google-Smtp-Source: ABdhPJxO4xZS+Q4Hz+F7+oJxQxSlwRz5gEkUYBS6X+Kzfeej7nJepl/YJ5MxtWuJVNN/+8aA4puVwwcBV3UsV3M/200=
+X-Received: by 2002:a17:906:ce21:: with SMTP id
+ sd1mr15026086ejb.4.1602254878173; 
+ Fri, 09 Oct 2020 07:47:58 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1602103041-32017-5-git-send-email-aleksandar.qemu.devel@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+References: <20201009064858.323624-1-armbru@redhat.com>
+In-Reply-To: <20201009064858.323624-1-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 9 Oct 2020 15:47:46 +0100
+Message-ID: <CAFEAcA-snMmt1XBeJymUHcj+dc4fySZyU05BQKxL-oXA-r-qTQ@mail.gmail.com>
+Subject: Re: [PULL 0/2] Error reporting patches for 2020-10-09
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::62d;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x62d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -19
-X-Spam_score: -2.0
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.208,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -108,60 +94,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, aleksandar.rikalo@syrmia.com,
- hpoussin@reactos.org, chenhc@lemote.com, aurelien@aurel32.net
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Aleksandar,
+On Fri, 9 Oct 2020 at 07:49, Markus Armbruster <armbru@redhat.com> wrote:
+>
+> The following changes since commit 497d415d76b9f59fcae27f22df1ca2c3fa4df64e:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20201008-1' into staging (2020-10-08 21:41:20 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-error-2020-10-09
+>
+> for you to fetch changes up to 805d44961b9015716cc13c1d3e49457af3970d82:
+>
+>   error: Use error_fatal to simplify obvious fatal errors (again) (2020-10-09 08:36:23 +0200)
+>
+> ----------------------------------------------------------------
+> Error reporting patches for 2020-10-09
+>
+> ----------------------------------------------------------------
+> Markus Armbruster (2):
+>       error: Remove NULL checks on error_propagate() calls (again)
+>       error: Use error_fatal to simplify obvious fatal errors (again)
 
-On 10/7/20 10:37 PM, Aleksandar Markovic wrote:
-> This change causes slighlty better performance of emulation of fp
-> comparison instructions via better compiler optimization of refactored
-> code. The functionality is otherwise unchanged.
-> 
-> Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-> ---
->   target/mips/fpu_helper.c | 56 +++++++++++++++++++++++++++---------------------
->   1 file changed, 32 insertions(+), 24 deletions(-)
-> 
-[...]
 
->   /*
-> @@ -2080,12 +2088,12 @@ uint64_t helper_r6_cmp_d_ ## op(CPUMIPSState *env, uint64_t fdt0,   \
->   {                                                                   \
->       uint64_t c;                                                     \
->       c = cond;                                                       \
-> -    update_fcr31(env, GETPC());                                     \
->       if (c) {                                                        \
->           return -1;                                                  \
->       } else {                                                        \
->           return 0;                                                   \
->       }                                                               \
-> +    update_fcr31(env, GETPC());                                     \
+Applied, thanks.
 
-Isn't it now never called (dead code)?
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
 
->   }
->   
->   /*
-> @@ -2175,12 +2183,12 @@ uint32_t helper_r6_cmp_s_ ## op(CPUMIPSState *env, uint32_t fst0,   \
->   {                                                                   \
->       uint64_t c;                                                     \
->       c = cond;                                                       \
-> -    update_fcr31(env, GETPC());                                     \
->       if (c) {                                                        \
->           return -1;                                                  \
->       } else {                                                        \
->           return 0;                                                   \
->       }                                                               \
-> +    update_fcr31(env, GETPC());                                     \
-
-Ditto.
-
->   }
->   
->   /*
-> 
+-- PMM
 
