@@ -2,64 +2,64 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57AE2C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:29:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CA30C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:29:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D584F2227F
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:29:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C55122227F
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:29:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MVK6vNK8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D584F2227F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="akcaVvdq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C55122227F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQvGy-000418-VX
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:29:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34666)
+	id 1kQvH0-00045V-Qn
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:29:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34270)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv4N-0004HW-N6
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36222)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv42-0003o0-FP
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23757)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv4L-0003Jx-RX
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:35 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv40-0003EM-Jp
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602260193;
+ s=mimecast20190719; t=1602260168;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=iLzIE3YsbPKP9FDVkEtcrn2UpHf4H0cbAdScAbS77Ko=;
- b=MVK6vNK8xaWyc2eIrdAnaRSl9fm8Lxr3IwrypYlsT34PoLqqGZ0XSz4CkjidDaocfJInze
- HYW2tZfSZSHl8gDmTMxdnIAdRQ5YSoyDSmYz5keTlIS43L0mPHzB5cZ733w0sZDGi0v/ba
- hNULiwQSZ80MJfyPCogxLTvEEgNWERg=
+ bh=ksAvwBgTkP36TK2l/cDDZbXxzNHg6nzwET102AvLoQY=;
+ b=akcaVvdqWOWOYqKgEKZ9z5MuC+6v5sf2ux1oJ6/ljaPzCjhhtkNK3yuPh0ZI3RLQ9hwlfE
+ RCSB26zwUFCHtc3+UN8/0Tdt/iHG0Ho71hDyuNSiVoq7CrXhwXTvwucwKXrf0gflQ7nONO
+ klv6g/4hgZbJf1PzBk2QOFTlHxsUWJs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-577-B0Lvz9bGMPuMTgX8t3bQKw-1; Fri, 09 Oct 2020 12:16:30 -0400
-X-MC-Unique: B0Lvz9bGMPuMTgX8t3bQKw-1
+ us-mta-495-JGXXNCjUP3--7hoXXaxryQ-1; Fri, 09 Oct 2020 12:16:05 -0400
+X-MC-Unique: JGXXNCjUP3--7hoXXaxryQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D90F1074657;
- Fri,  9 Oct 2020 16:16:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D49381019627;
+ Fri,  9 Oct 2020 16:16:04 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-112-203.rdu2.redhat.com [10.10.112.203])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DF9B51A925;
- Fri,  9 Oct 2020 16:16:28 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B249638A;
+ Fri,  9 Oct 2020 16:16:00 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 23/36] qapi/commands.py: enable checking with mypy
-Date: Fri,  9 Oct 2020 12:15:45 -0400
-Message-Id: <20201009161558.107041-24-jsnow@redhat.com>
+Subject: [PATCH v6 02/36] qapi: modify docstrings to be sphinx-compatible
+Date: Fri,  9 Oct 2020 12:15:24 -0400
+Message-Id: <20201009161558.107041-3-jsnow@redhat.com>
 In-Reply-To: <20201009161558.107041-1-jsnow@redhat.com>
 References: <20201009161558.107041-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -100,29 +100,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
----
- scripts/qapi/mypy.ini | 5 -----
- 1 file changed, 5 deletions(-)
+A precise style guide and a package-wide overhaul is forthcoming pending
+further discussion and consensus. For now, merely avoid obvious errors
+that cause Sphinx documentation build problems, using a style loosely
+based on PEP 257 and Sphinx Autodoc. It is chosen for interoperability
+with our existing Sphinx framework, and because it has loose recognition
+in the Pycharm IDE.
 
-diff --git a/scripts/qapi/mypy.ini b/scripts/qapi/mypy.ini
-index 5df11e53fd1..8ab9ac52cc4 100644
---- a/scripts/qapi/mypy.ini
-+++ b/scripts/qapi/mypy.ini
-@@ -4,11 +4,6 @@ strict_optional = False
- disallow_untyped_calls = False
- python_version = 3.6
+See also:
+
+https://www.python.org/dev/peps/pep-0257/
+https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#info-field-lists
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ scripts/qapi/gen.py | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
+index ca66c82b5b8..dc7b94aa115 100644
+--- a/scripts/qapi/gen.py
++++ b/scripts/qapi/gen.py
+@@ -154,9 +154,11 @@ def _bottom(self):
  
--[mypy-qapi.commands]
--disallow_untyped_defs = False
--disallow_incomplete_defs = False
--check_untyped_defs = False
--
- [mypy-qapi.error]
- disallow_untyped_defs = False
- disallow_incomplete_defs = False
+ @contextmanager
+ def ifcontext(ifcond, *args):
+-    """A 'with' statement context manager to wrap with start_if()/end_if()
++    """
++    A with-statement context manager that wraps with `start_if()` / `end_if()`.
+ 
+-    *args: any number of QAPIGenCCode
++    :param ifcond: A list of conditionals, passed to `start_if()`.
++    :param args: any number of `QAPIGenCCode`.
+ 
+     Example::
+ 
 -- 
 2.26.2
 
