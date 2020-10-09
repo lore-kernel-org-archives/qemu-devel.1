@@ -2,85 +2,98 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38385C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:24:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E555CC433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:24:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C124622276
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:24:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9640D22276
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:24:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iiDOWJym"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C124622276
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AOPrQ+D1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9640D22276
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQvBb-0004SY-RI
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:24:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34504)
+	id 1kQvCO-0005Rf-Nr
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:24:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33116)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv4I-00047t-D7
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33351)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv4G-0003He-J6
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602260183;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=dzDMefnNZNoEKn8iwNmWWwoUzTm42txJyV0yVF2JleQ=;
- b=iiDOWJymlAx2OoTywxupGAhkCmArm44MJluwXn4e/NeOIvdyQ3k+2g45w9DVdfAEV1qtfP
- mM7fJr5n2HtlUAJhl8WSoEHYYgmvaRx1K+ntAgx2hzstwWsAyeDRJmIXcpqkbdBxAdx5qs
- axysznqdDzRwME7o/I8W4zf92+keUnU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-115-IkFXDzgZPhK4F-Rd-f4QvQ-1; Fri, 09 Oct 2020 12:16:21 -0400
-X-MC-Unique: IkFXDzgZPhK4F-Rd-f4QvQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74F3F186DD36;
- Fri,  9 Oct 2020 16:16:19 +0000 (UTC)
-Received: from scv.redhat.com (ovpn-112-203.rdu2.redhat.com [10.10.112.203])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 125B419936;
- Fri,  9 Oct 2020 16:16:14 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 13/36] qapi/common.py: Replace one-letter 'c' variable
-Date: Fri,  9 Oct 2020 12:15:35 -0400
-Message-Id: <20201009161558.107041-14-jsnow@redhat.com>
-In-Reply-To: <20201009161558.107041-1-jsnow@redhat.com>
-References: <20201009161558.107041-1-jsnow@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kQuza-0007J5-9D
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:11:38 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46981)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kQuzW-0002RC-AE
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:11:38 -0400
+Received: by mail-wr1-x443.google.com with SMTP id n6so10571862wrm.13
+ for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 09:11:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=mqxFxVOr8tdiQL7hqF7/ddTzf0u7nrTMIJtH/RfDeYA=;
+ b=AOPrQ+D1H/ZPWq26dfVdNpd6ZyItHmuGPEuiezkwZKIF3ULGrOkmUp0G/3SGOT/x/u
+ AGsqid/KAdfaHCOhFPhTcD6FS5xo/answkzcBC99UAbzg3QF2QipjXez1eCOYbTRBbGd
+ /dE6ir4G9X6WaEMcgyk8xgD7hQCi3MslWUENav/JV6neOO4B2GwOqtbaJbdZCu57GFed
+ RhPWXDmk/zQPtqa0N8ricTk013wrpR4iDaUikJJWbfYoQdA5GSoGLPhLHV2v/6cyrw5g
+ mslKkyEtPU4dpfgx5ZjCyiAk+p99ewAQwCpCi5p8jqVWK0LjkHByQ3JuPY3qGdJ6w6Bm
+ 9Yew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=mqxFxVOr8tdiQL7hqF7/ddTzf0u7nrTMIJtH/RfDeYA=;
+ b=E2G0pngMAGrfW8MwKj/UgiZamrAhD3KSLkjNSEB2FfYYkVC0dhMp4WwFLj4zvH5d+u
+ ibh029Mg+MAeyXEv2o5s5q4qQSAZGPrbMGvJ3pkc57aC3sfNh21CwSrU0a7gvpseKmfZ
+ mL36PIu7fP3muo2E0lxwz9lQp+wRLHGQB7UGXojjfaSsLOrx4Kj4b2DQxofO/ckYOKym
+ uY6CK948si7Boe1T7eFCznrMHcskllIqMmk/44TY20Pcl6UahBQDHMMAsZBtFFVuDTLq
+ ruSxz4rQOfWXixJzXGSzlfcSQb3AaUAAZhHXgKFkqmisht4cW9T61iME4pXdPbltpinD
+ +KLQ==
+X-Gm-Message-State: AOAM533mHw9DhrvhzFmisRH4TzhGUqsJ6q2q4rJi77ZaOK9fuzftNcNM
+ tN/A8iR4c6IFOBO59+XHY0A=
+X-Google-Smtp-Source: ABdhPJxx9g4DOUVdQ5oMOyVRLKwZP3EbSX+yado16ePf5Ea/zdWWp93NazgJKBvxSPQKWvcQwhWSFA==
+X-Received: by 2002:adf:f989:: with SMTP id f9mr2655271wrr.22.1602259892784;
+ Fri, 09 Oct 2020 09:11:32 -0700 (PDT)
+Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id d30sm13767406wrc.19.2020.10.09.09.11.31
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 09 Oct 2020 09:11:32 -0700 (PDT)
+Subject: Re: [PATCH v2 1/2] hw/mips: remove exit(1) in case of missing ROM
+To: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>, qemu-devel@nongnu.org
+References: <159531210010.24117.10018704762356020189.stgit@pasha-ThinkPad-X280>
+ <159531210571.24117.231100997794891819.stgit@pasha-ThinkPad-X280>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <83988fc1-2d25-7064-0d6f-25179f94b449@amsat.org>
+Date: Fri, 9 Oct 2020 18:11:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <159531210571.24117.231100997794891819.stgit@pasha-ThinkPad-X280>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:34:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -19
+X-Spam_score: -2.0
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.208,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,46 +106,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, John Snow <jsnow@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Markus Armbruster <armbru@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: peter.maydell@linaro.org, aleksandar.qemu.devel@gmail.com,
+ antonynpavlov@gmail.com, aurelien@aurel32.net, chenhc@lemote.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- scripts/qapi/common.py | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+On 7/21/20 8:15 AM, Pavel Dovgalyuk wrote:
+> This patch updates MIPS-based machines to allow starting them without ROM.
+> In this case CPU starts to execute instructions from the empty memory,
+> but QEMU allows introspecting the machine configuration.
+> 
+> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
+> ---
+>   hw/mips/fuloong2e.c |    8 +++-----
+>   hw/mips/jazz.c      |    8 +++-----
+>   hw/mips/malta.c     |   11 ++++-------
+>   hw/mips/mipssim.c   |   10 +++-------
+>   4 files changed, 13 insertions(+), 24 deletions(-)
 
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index a417b6029c8..338adedef4f 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -30,14 +30,14 @@ def camel_to_upper(value):
-     new_name = ''
-     length = len(c_fun_str)
-     for i in range(length):
--        c = c_fun_str[i]
--        # When c is upper and no '_' appears before, do more checks
--        if c.isupper() and (i > 0) and c_fun_str[i - 1] != '_':
-+        char = c_fun_str[i]
-+        # When char is upper case and no '_' appears before, do more checks
-+        if char.isupper() and (i > 0) and c_fun_str[i - 1] != '_':
-             if i < length - 1 and c_fun_str[i + 1].islower():
-                 new_name += '_'
-             elif c_fun_str[i - 1].isdigit():
-                 new_name += '_'
--        new_name += c
-+        new_name += char
-     return new_name.lstrip('_').upper()
- 
- 
--- 
-2.26.2
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
+And added to mips-next, thanks.
 
