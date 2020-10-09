@@ -2,92 +2,80 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DFE4C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 07:26:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D96D4C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 07:32:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 601C022244
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 07:26:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ANckZpvS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 601C022244
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id B6CDD22244
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 07:32:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6CDD22244
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQmnn-0005K8-EP
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 03:26:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36020)
+	id 1kQmsu-00073P-Cg
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 03:32:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36770)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kQmn3-0004uS-3R
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 03:26:09 -0400
-Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:32884)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kQmrX-0006LU-6m
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 03:30:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55872)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kQmmx-000650-09
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 03:26:08 -0400
-Received: by mail-yb1-xb43.google.com with SMTP id c3so6554517ybl.0
- for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 00:26:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=vFplZKhhVDbkXyNgMBGgN6B7vlMdbvNAyiPS+SVtwDE=;
- b=ANckZpvSK2nZgCwS1TUnEEDa7pZbWY3L/EwYdcXETD1qu1PUKcVTfjd/ZFjYPaohZu
- 6xPzfBCjCydzaT4XfVbLX9T2vXdJb3EvWcDhk69Ua3jizYJIwrVfsUEZXokSRnLuNbIf
- CIiW3BqOgIvkFEVQscrVIMe5cnk6TJ5A3DM2mluqjT9NI5Jvns+FYToPZ6viIwB0iptl
- wteGzru/OYY0/5sDsDavarvd2zsmW1tTSGa7vWzqax/Y86WExTbSrzyCRRfC3hmbkIoM
- sRwg7H2ICAuQ4q8qah2361OAKYnOaglEWHgsCssQvLebMuS/3RzD/tPkUXfkpFI0ewDy
- q62w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=vFplZKhhVDbkXyNgMBGgN6B7vlMdbvNAyiPS+SVtwDE=;
- b=eTh+MtwN/dCkyxKq0ytZqubXdCoclY+nvaf9soacFv1z/Kz9fAx2YvuJCis5+sd14+
- Shwrltcc7zZfQxmKxAY6YU03mLJ0j0gjDoreFkrv2HMXJOKg3k04+cWMCgsH4CyYtx/A
- E9/nMYtuhXO/AGerK6oq5a+DGlFnG2p7DCrXpXKtxMf8JizdOgiQN82QPZtatLEYWBz/
- mIItO8ugYgEh6wzMudevm7/kp2jPSDw1zfJMbpm8GTmL4MJmm/RF0PcHLRDjpDFc+Gvt
- MQrxgN37EVLqMwfs8FHzZXzQDe03+qdmCk7SfzbFNT8ZW0Y+EFj+OXb/+zY8uDBSqAl2
- e6Ow==
-X-Gm-Message-State: AOAM53371RK/GPezNStE4Ammyon49Jahp1YD1PDM32ZosC5KxhJM5jN2
- wnbMVGtEn29BixtqhUgrncnf+YDQ7IM9n3sH0NDWJ19Ljzg=
-X-Google-Smtp-Source: ABdhPJyFtd79L4a+nLjAYgjgNh6ditJApE8B7IKHjLBUWQaaVQaMTGCx4ugyR0lL+e8i+qGN8q1IEZEomXSz2JhcAWs=
-X-Received: by 2002:a25:705:: with SMTP id 5mr16496211ybh.239.1602228361776;
- Fri, 09 Oct 2020 00:26:01 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kQmrU-0006kT-HQ
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 03:30:46 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kQmrS-0004CC-F9
+ for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 07:30:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 6D3EB2E80AB
+ for <qemu-devel@nongnu.org>; Fri,  9 Oct 2020 07:30:42 +0000 (UTC)
 MIME-Version: 1.0
-References: <160208094339.8985.13177411264868514958.malonedeb@wampee.canonical.com>
-In-Reply-To: <160208094339.8985.13177411264868514958.malonedeb@wampee.canonical.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Fri, 9 Oct 2020 15:25:50 +0800
-Message-ID: <CAEUhbmU3fjgVT3_cLEo6AyDW6KtUgO+tvSX5uEoBu2+1k21Dtg@mail.gmail.com>
-Subject: Re: [Bug 1898883] [NEW] qemu-system-riscv64 failed to load binary
- kernel into memory
-To: Bug 1898883 <1898883@bugs.launchpad.net>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b43;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb43.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Date: Fri, 09 Oct 2020 07:21:36 -0000
+From: Pavel Dovgalyuk <1899082@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: acceptance pc replay test x86
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: cleber-gnu dovgalyuk
+X-Launchpad-Bug-Reporter: Cleber Rosa (cleber-gnu)
+X-Launchpad-Bug-Modifier: Pavel Dovgalyuk (dovgalyuk)
+References: <160219062643.30310.16188463455229225461.malonedeb@gac.canonical.com>
+Message-Id: <160222809687.1876.5895051421616608857.malone@soybean.canonical.com>
+Subject: [Bug 1899082] Re: ReplayKernel.test_x86_64_pc fails intermittently
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="781851f4dc11c93bc506eb54e6a0d35c919a1ce6"; Instance="production"
+X-Launchpad-Hash: 8d3d68e95eb5263aa3fb102c5fc032beef38e0ab
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:10:46
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001, WEIRD_PORT=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -96,42 +84,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Reply-To: Bug 1899082 <1899082@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Oct 7, 2020 at 10:37 PM Azuk 443 <1898883@bugs.launchpad.net> wrote=
-:
->
-> Public bug reported:
->
-> QEMU Version: 5.1.0
-> Compiled in Ubuntu 20.04 for riscv64, following the guide https://risc-v-=
-getting-started-guide.readthedocs.io/en/latest/linux-qemu.html.
->
-> In qemu-system-riscv64, code at 0x80000000 will be executed by virtual CP=
-U.
-> For example, using `qemu-system-riscv64 -nographic -machine virt -bios no=
-ne -kernel vmlinux -S -s`, my homebrew kernel(ELF file) will load at 0x8000=
-0000. If I strip the kernel using `riscv64-linux-gnu-objcopy -O binary vmli=
-nux Image`, qemu-system-riscv64 will not load the binary machine code into =
-the riscv64 load address, but `-bios Image` will.
+But I can't reproduce it outside the avocado toolchain, by running qemu
+directly.
 
-This is not a bug. As you said, please use `-bios Image` for your
-special purpose.
+-- =
 
->
-> In `qemu-system-aarch64` compiled by Ubuntu team, I can use `qemu-
-> system-aarch64 -M raspi3 -kernel Image_aarch64 -S -s` to load a specific
-> machine code binary into 0x80000. And the elf kernel can be loaded to
-> that address, too.
->
-> ** Affects: qemu
->      Importance: Undecided
->          Status: New
->
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1899082
 
-Regards,
-Bin
+Title:
+  ReplayKernel.test_x86_64_pc fails intermittently
+
+Status in QEMU:
+  New
+
+Bug description:
+  Even though this acceptance test is already skipped on GitLab CI, the
+  intermittent failures can be seen on other environments too.
+
+  The record phase works fine, but during the replay phase fail to
+  finish booting the kernel (until the expected place):
+
+  16:34:47 DEBUG| [    0.034498] Last level dTLB entries: 4KB 0, 2MB 0, 4MB=
+ 0, 1GB 0
+  16:34:47 DEBUG| [    0.034790] Spectre V2 : Spectre mitigation: LFENCE no=
+t serializing, switching to generic retpoline
+  16:34:47 DEBUG| [    0.035093] Spectre V2 : Mitigation: Full generic retp=
+oline
+  16:34:47 DEBUG| [    0.035347] Spectre V2 : Spectre v2 / SpectreRSB mitig=
+ation: Filling RSB on context switch
+  16:34:47 DEBUG| [    0.035667]
+  16:36:02 ERROR| =
+
+  16:36:02 ERROR| Reproduced traceback from: /home/cleber/src/avocado/avoca=
+do/avocado/core/test.py:767
+  16:36:02 ERROR| Traceback (most recent call last):
+  16:36:02 ERROR|   File "/var/lib/users/cleber/build/qemu/tests/acceptance=
+/replay_kernel.py", line 92, in test_x86_64_pc
+  16:36:02 ERROR|     self.run_rr(kernel_path, kernel_command_line, console=
+_pattern, shift=3D5)
+  16:36:02 ERROR|   File "/var/lib/users/cleber/build/qemu/tests/acceptance=
+/replay_kernel.py", line 73, in run_rr
+  16:36:02 ERROR|     False, shift, args, replay_path)
+  16:36:02 ERROR|   File "/var/lib/users/cleber/build/qemu/tests/acceptance=
+/replay_kernel.py", line 55, in run_vm
+  16:36:02 ERROR|     self.wait_for_console_pattern(console_pattern, vm)
+  16:36:02 ERROR|   File "/var/lib/users/cleber/build/qemu/tests/acceptance=
+/boot_linux_console.py", line 53, in wait_for_console_pattern
+  16:36:02 ERROR|     vm=3Dvm)
+  16:36:02 ERROR|   File "/var/lib/users/cleber/build/qemu/tests/acceptance=
+/avocado_qemu/__init__.py", line 130, in wait_for_console_pattern
+  16:36:02 ERROR|     _console_interaction(test, success_message, failure_m=
+essage, None, vm=3Dvm)
+  16:36:02 ERROR|   File "/var/lib/users/cleber/build/qemu/tests/acceptance=
+/avocado_qemu/__init__.py", line 82, in _console_interaction
+  16:36:02 ERROR|     msg =3D console.readline().strip()
+  16:36:02 ERROR|   File "/usr/lib64/python3.7/socket.py", line 575, in rea=
+dinto
+  16:36:02 ERROR|     def readinto(self, b):
+  16:36:02 ERROR|   File "/home/cleber/src/avocado/avocado/avocado/plugins/=
+runner.py", line 77, in sigterm_handler
+  16:36:02 ERROR|     raise RuntimeError("Test interrupted by SIGTERM")
+  16:36:02 ERROR| RuntimeError: Test interrupted by SIGTERM
+  16:36:02 ERROR| =
+
+
+  On my workstation, I can replicate the failure roughly once every 50
+  runs.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1899082/+subscriptions
 
