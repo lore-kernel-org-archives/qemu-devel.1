@@ -2,68 +2,71 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF6A8C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 06:36:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E132C43457
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 06:36:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44F3A22251
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 06:36:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E8BD22251
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 06:36:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dVwXE9qA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44F3A22251
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GPmVytoq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E8BD22251
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQm1N-0003kH-Rq
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 02:36:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53788)
+	id 1kQm1Q-0003ne-G2
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 02:36:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53842)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQlzG-0001ws-3s
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 02:34:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21223)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQlzH-0001x5-6S
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 02:34:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29797)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQlzD-0008Tw-78
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 02:34:41 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQlzF-0008UC-8Y
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 02:34:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602225277;
+ s=mimecast20190719; t=1602225280;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=VuXdYM6etcvUwJ5R2PrYu0vd1gWeG/r5KPCH50xhNU8=;
- b=dVwXE9qASpakGvM2gwnA/bNehn5RvRcJ5NVN9dQyj2ukXA/bIz6gPX2UtMm1t6Ovx+wIIe
- 5Cel9HOYTqZ7zuoHTo7lJco2tHOOtbmZgrgAxlh7uIx9BbHC1Zlc33uw8Q5iJgANcSpS4/
- bwQLIDEi+S+huOOj+gwZuxojzORyTkc=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=OBkniY5zYY8f0UMKJUn+DDWI2bGks6XloSLFLnQ1cOo=;
+ b=GPmVytoq2Ygq/4YueYN2B0sH+v6Ee5iUa77geGpD6ZY+kJZj8jXD6ZNrtRi2AjkJXQA3Re
+ C1PNEacW0K8X/xGt82rYr+Or6aqqZKAUIZbdXKljwk0tSANEqIVsHwh/0nSW9YYIFZlOL+
+ F0KlFxl1bac0ROqk+tvD8iLJ0lelqqY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-83-J1LpNc8CO-uk4eR9Djgr3w-1; Fri, 09 Oct 2020 02:34:35 -0400
-X-MC-Unique: J1LpNc8CO-uk4eR9Djgr3w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-327-WSGKsM66NZyS1janEWMLIA-1; Fri, 09 Oct 2020 02:34:38 -0400
+X-MC-Unique: WSGKsM66NZyS1janEWMLIA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CDB27101FFA2
- for <qemu-devel@nongnu.org>; Fri,  9 Oct 2020 06:34:34 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA84364143
+ for <qemu-devel@nongnu.org>; Fri,  9 Oct 2020 06:34:37 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
  [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9BF1D5C1BB;
- Fri,  9 Oct 2020 06:34:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 62A7910002A4;
+ Fri,  9 Oct 2020 06:34:36 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 046C1112CE10; Fri,  9 Oct 2020 08:34:33 +0200 (CEST)
+ id 16C10112CE1D; Fri,  9 Oct 2020 08:34:33 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 00/14] Monitor patches for 2020-10-09
-Date: Fri,  9 Oct 2020 08:34:18 +0200
-Message-Id: <20201009063432.303441-1-armbru@redhat.com>
+Subject: [PULL 06/14] qmp: Call monitor_set_cur() only in qmp_dispatch()
+Date: Fri,  9 Oct 2020 08:34:24 +0200
+Message-Id: <20201009063432.303441-7-armbru@redhat.com>
+In-Reply-To: <20201009063432.303441-1-armbru@redhat.com>
+References: <20201009063432.303441-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -93,101 +96,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com
+Cc: kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 497d415d76b9f59fcae27f22df1ca2c3fa4df64e:
+From: Kevin Wolf <kwolf@redhat.com>
 
-  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20201008-1' into staging (2020-10-08 21:41:20 +0100)
+The correct way to set the current monitor for a coroutine handler will
+be different than for a blocking handler, so monitor_set_cur() needs to
+be called in qmp_dispatch().
 
-are available in the Git repository at:
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Message-Id: <20201005155855.256490-7-kwolf@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ include/qapi/qmp/dispatch.h | 3 ++-
+ monitor/qmp.c               | 9 ++-------
+ qapi/qmp-dispatch.c         | 8 +++++++-
+ qga/main.c                  | 2 +-
+ stubs/monitor-core.c        | 5 +++++
+ tests/test-qmp-cmds.c       | 6 +++---
+ 6 files changed, 20 insertions(+), 13 deletions(-)
 
-  git://repo.or.cz/qemu/armbru.git tags/pull-monitor-2020-10-09
-
-for you to fetch changes up to eb94b81a94bce112e6b206df846c1551aaf6cab6:
-
-  block: Convert 'block_resize' to coroutine (2020-10-09 07:08:20 +0200)
-
-----------------------------------------------------------------
-Monitor patches for 2020-10-09
-
-* QMP command block-resize and HMP command block_resize no longer
-  block the main loop.
-
-----------------------------------------------------------------
-Kevin Wolf (14):
-      monitor: Add Monitor parameter to monitor_set_cpu()
-      monitor: Add Monitor parameter to monitor_get_cpu_index()
-      monitor: Use getter/setter functions for cur_mon
-      hmp: Update current monitor only in handle_hmp_command()
-      qmp: Assert that no other monitor is active
-      qmp: Call monitor_set_cur() only in qmp_dispatch()
-      monitor: Make current monitor a per-coroutine property
-      qapi: Add a 'coroutine' flag for commands
-      qmp: Move dispatcher to a coroutine
-      hmp: Add support for coroutine command handlers
-      util/async: Add aio_co_reschedule_self()
-      block: Add bdrv_co_enter()/leave()
-      block: Add bdrv_lock()/unlock()
-      block: Convert 'block_resize' to coroutine
-
- docs/devel/qapi-code-gen.txt            |  29 +++++++
- docs/sphinx/qapidoc.py                  |   2 +-
- qapi/block-core.json                    |   3 +-
- include/block/aio.h                     |  10 +++
- include/block/block.h                   |  31 ++++++++
- include/monitor/monitor.h               |   7 +-
- include/qapi/qmp/dispatch.h             |   5 +-
- monitor/monitor-internal.h              |   7 +-
- audio/wavcapture.c                      |   8 +-
- block.c                                 |  50 ++++++++++++
- blockdev.c                              |  16 ++--
- dump/dump.c                             |   2 +-
- hw/core/machine-hmp-cmds.c              |   2 +-
- hw/scsi/vhost-scsi.c                    |   2 +-
- hw/virtio/vhost-vsock.c                 |   2 +-
- migration/fd.c                          |   4 +-
- monitor/hmp-cmds.c                      |   4 +-
- monitor/hmp.c                           |  44 ++++++++---
- monitor/misc.c                          |  38 +++++----
- monitor/monitor.c                       | 101 +++++++++++++++++++++---
- monitor/qmp-cmds-control.c              |   2 +
- monitor/qmp-cmds.c                      |   2 +-
- monitor/qmp.c                           | 131 +++++++++++++++++++++++---------
- net/socket.c                            |   2 +-
- net/tap.c                               |   6 +-
- qapi/qmp-dispatch.c                     |  65 +++++++++++++++-
- qapi/qmp-registry.c                     |   3 +
- qga/main.c                              |   2 +-
- softmmu/cpus.c                          |   2 +-
- stubs/monitor-core.c                    |  10 ++-
- tests/test-qmp-cmds.c                   |  10 ++-
- tests/test-util-sockets.c               |  12 +--
- trace/control.c                         |   2 +-
- util/aio-posix.c                        |   8 +-
- util/async.c                            |  30 ++++++++
- util/qemu-error.c                       |   6 +-
- util/qemu-print.c                       |   3 +-
- util/qemu-sockets.c                     |   1 +
- hmp-commands.hx                         |   1 +
- scripts/qapi/commands.py                |  10 ++-
- scripts/qapi/expr.py                    |  11 ++-
- scripts/qapi/introspect.py              |   2 +-
- scripts/qapi/schema.py                  |  13 +++-
- tests/qapi-schema/meson.build           |   1 +
- tests/qapi-schema/oob-coroutine.err     |   2 +
- tests/qapi-schema/oob-coroutine.json    |   2 +
- tests/qapi-schema/oob-coroutine.out     |   0
- tests/qapi-schema/qapi-schema-test.json |   1 +
- tests/qapi-schema/qapi-schema-test.out  |   2 +
- tests/qapi-schema/test-qapi.py          |   7 +-
- 50 files changed, 573 insertions(+), 143 deletions(-)
- create mode 100644 tests/qapi-schema/oob-coroutine.err
- create mode 100644 tests/qapi-schema/oob-coroutine.json
- create mode 100644 tests/qapi-schema/oob-coroutine.out
-
+diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
+index 5a9cf82472..0c2f467028 100644
+--- a/include/qapi/qmp/dispatch.h
++++ b/include/qapi/qmp/dispatch.h
+@@ -14,6 +14,7 @@
+ #ifndef QAPI_QMP_DISPATCH_H
+ #define QAPI_QMP_DISPATCH_H
+ 
++#include "monitor/monitor.h"
+ #include "qemu/queue.h"
+ 
+ typedef void (QmpCommandFunc)(QDict *, QObject **, Error **);
+@@ -49,7 +50,7 @@ const char *qmp_command_name(const QmpCommand *cmd);
+ bool qmp_has_success_response(const QmpCommand *cmd);
+ QDict *qmp_error_response(Error *err);
+ QDict *qmp_dispatch(const QmpCommandList *cmds, QObject *request,
+-                    bool allow_oob);
++                    bool allow_oob, Monitor *cur_mon);
+ bool qmp_is_oob(const QDict *dict);
+ 
+ typedef void (*qmp_cmd_callback_fn)(const QmpCommand *cmd, void *opaque);
+diff --git a/monitor/qmp.c b/monitor/qmp.c
+index 8469970c69..e746b3575d 100644
+--- a/monitor/qmp.c
++++ b/monitor/qmp.c
+@@ -135,16 +135,11 @@ static void monitor_qmp_respond(MonitorQMP *mon, QDict *rsp)
+ 
+ static void monitor_qmp_dispatch(MonitorQMP *mon, QObject *req)
+ {
+-    Monitor *old_mon;
+     QDict *rsp;
+     QDict *error;
+ 
+-    old_mon = monitor_set_cur(&mon->common);
+-    assert(old_mon == NULL);
+-
+-    rsp = qmp_dispatch(mon->commands, req, qmp_oob_enabled(mon));
+-
+-    monitor_set_cur(NULL);
++    rsp = qmp_dispatch(mon->commands, req, qmp_oob_enabled(mon),
++                       &mon->common);
+ 
+     if (mon->commands == &qmp_cap_negotiation_commands) {
+         error = qdict_get_qdict(rsp, "error");
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index 79347e0864..2fdbc0fba4 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -89,7 +89,7 @@ bool qmp_is_oob(const QDict *dict)
+ }
+ 
+ QDict *qmp_dispatch(const QmpCommandList *cmds, QObject *request,
+-                    bool allow_oob)
++                    bool allow_oob, Monitor *cur_mon)
+ {
+     Error *err = NULL;
+     bool oob;
+@@ -152,7 +152,13 @@ QDict *qmp_dispatch(const QmpCommandList *cmds, QObject *request,
+         args = qdict_get_qdict(dict, "arguments");
+         qobject_ref(args);
+     }
++
++    assert(monitor_cur() == NULL);
++    monitor_set_cur(cur_mon);
++
+     cmd->fn(args, &ret, &err);
++
++    monitor_set_cur(NULL);
+     qobject_unref(args);
+     if (err) {
+         /* or assert(!ret) after reviewing all handlers: */
+diff --git a/qga/main.c b/qga/main.c
+index 740f5f7303..dea6a3aa64 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -579,7 +579,7 @@ static void process_event(void *opaque, QObject *obj, Error *err)
+     }
+ 
+     g_debug("processing command");
+-    rsp = qmp_dispatch(&ga_commands, obj, false);
++    rsp = qmp_dispatch(&ga_commands, obj, false, NULL);
+ 
+ end:
+     ret = send_response(s, rsp);
+diff --git a/stubs/monitor-core.c b/stubs/monitor-core.c
+index 0cd2d864b2..dc1748bf13 100644
+--- a/stubs/monitor-core.c
++++ b/stubs/monitor-core.c
+@@ -8,6 +8,11 @@ Monitor *monitor_cur(void)
+     return NULL;
+ }
+ 
++Monitor *monitor_set_cur(Monitor *mon)
++{
++    return NULL;
++}
++
+ void monitor_init_qmp(Chardev *chr, bool pretty, Error **errp)
+ {
+ }
+diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
+index d12ff47e26..5f1b245e19 100644
+--- a/tests/test-qmp-cmds.c
++++ b/tests/test-qmp-cmds.c
+@@ -152,7 +152,7 @@ static QObject *do_qmp_dispatch(bool allow_oob, const char *template, ...)
+     req = qdict_from_vjsonf_nofail(template, ap);
+     va_end(ap);
+ 
+-    resp = qmp_dispatch(&qmp_commands, QOBJECT(req), allow_oob);
++    resp = qmp_dispatch(&qmp_commands, QOBJECT(req), allow_oob, NULL);
+     g_assert(resp);
+     ret = qdict_get(resp, "return");
+     g_assert(ret);
+@@ -175,7 +175,7 @@ static void do_qmp_dispatch_error(bool allow_oob, ErrorClass cls,
+     req = qdict_from_vjsonf_nofail(template, ap);
+     va_end(ap);
+ 
+-    resp = qmp_dispatch(&qmp_commands, QOBJECT(req), allow_oob);
++    resp = qmp_dispatch(&qmp_commands, QOBJECT(req), allow_oob, NULL);
+     g_assert(resp);
+     error = qdict_get_qdict(resp, "error");
+     g_assert(error);
+@@ -231,7 +231,7 @@ static void test_dispatch_cmd_success_response(void)
+     QDict *resp;
+ 
+     qdict_put_str(req, "execute", "cmd-success-response");
+-    resp = qmp_dispatch(&qmp_commands, QOBJECT(req), false);
++    resp = qmp_dispatch(&qmp_commands, QOBJECT(req), false, NULL);
+     g_assert_null(resp);
+     qobject_unref(req);
+ }
 -- 
 2.26.2
 
