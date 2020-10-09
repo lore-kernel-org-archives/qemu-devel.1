@@ -2,86 +2,96 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86BEBC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:44:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 341BAC433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:45:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26AB72227F
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:44:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AA94A2227F
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:45:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CNXegZT+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26AB72227F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="slhjeBkp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA94A2227F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQvVf-00011D-1A
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:44:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34682)
+	id 1kQvWC-00020s-IR
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:45:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40302)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv4O-0004Iv-AB
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40498)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv4J-0003Ir-DS
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602260190;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ZSXFkRwHbPunRSzU+vUPOn8b7MbTz73+W8h9ko6/cig=;
- b=CNXegZT+bNpzHQuQfQKi1PzqtTnhG3LmE8eftq5pdkwLI+h/6+Ssim+FmD7HK/gSP0LzRF
- HexWeKsiOuuvp1giQCQTrPUVdx9uFGYwoQRzc7e7wQdhQlFCFMn3Fbr8ziJNsHNnH45xNZ
- Ty8XJx1X6nRd0hWEA0rwbK+Q4l+jF5k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-545-f-fUpstTNae7kL9o2vKnKQ-1; Fri, 09 Oct 2020 12:16:28 -0400
-X-MC-Unique: f-fUpstTNae7kL9o2vKnKQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB34364084;
- Fri,  9 Oct 2020 16:16:27 +0000 (UTC)
-Received: from scv.redhat.com (ovpn-112-203.rdu2.redhat.com [10.10.112.203])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 176982547D;
- Fri,  9 Oct 2020 16:16:27 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 21/36] qapi/commands.py: Don't re-bind to variable of
- different type
-Date: Fri,  9 Oct 2020 12:15:43 -0400
-Message-Id: <20201009161558.107041-22-jsnow@redhat.com>
-In-Reply-To: <20201009161558.107041-1-jsnow@redhat.com>
-References: <20201009161558.107041-1-jsnow@redhat.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kQvRC-00034q-Qw
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:40:10 -0400
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:33714)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kQvRB-0006HR-3A
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:40:10 -0400
+Received: by mail-wr1-x435.google.com with SMTP id m6so10980644wrn.0
+ for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 09:40:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=7hehInkKQivK5jFvcBnQIy+vpL6uJMeHgLNPrr9WBHA=;
+ b=slhjeBkpyRRdsfiOmXlKp7mLTtMtXI4tPE6qF16agAiTRQnL/Kr8TVxF/wDf5Dg0W9
+ w3H6iwViDtXCOzCS78QVm7I5w9kQPo9Viti9tpEOXfaj3j2VRGvJSK3TYFClUJbPfZ1B
+ WTeOHrx9zrWFwMcqnhgBhiw73Gj2dbFcMoaDRNgtu07jhvBU4tW+8TAo35UuksigWK6v
+ r5MdDo0is6dz8n9W8GdU859KMqPQnrrHM7OSqbTQGsrOQmSXd0ZpR90krx2ajB8zwJbw
+ 46Z+C8BRNyptTN8Ia3J5N9Bj1ni/W2ZA4yKUE3DLuR4VKdCXK7drpUJtKGwD/lLDu8Sd
+ M5TA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=7hehInkKQivK5jFvcBnQIy+vpL6uJMeHgLNPrr9WBHA=;
+ b=Q6mzbhccCVXRPOkUA4a1vmvWSuhHrH2P5I5/JYRVr//LLOq44ceg6rzluokmQn44w2
+ hD+tqy9y9faEa9p5DPY3wpkzgGqahIRq9QaMFtsU7iiOHNc9EH8WzM7B6pgJw1J3cye5
+ B+w6Ti8PFyEzNRmMZ1P+49ygTvj/yYba3v/MojL5bI28BJwCIgMup5keqR4TuDL6wPdH
+ yeML+ab0gyG/780hLvzyHBcjj0XTIohFs6DnIiT1aX0HrSAVLTR8lBeCwUW3qe4lqdDm
+ qExl85VJI2yuFHevXjyBS22JnMbPJ+f6prve36r91O6/EeY/psDErbT+qZWgxf5V1g4o
+ eltA==
+X-Gm-Message-State: AOAM530Hqvgu9Asqkk6F9wYNZJkpEm1iucGKBmWjtN9lJ2cpppYsKKxA
+ umUx3FfFN58lt13uNbtEDIyJN0xfliWmpQ==
+X-Google-Smtp-Source: ABdhPJxlQHuyxXhkFJdUVzHLPsJ3UIpFUPjj5o/V+ZE8K1MtBq9sxRCkbRU8ijIzxRasyre/AvaYfQ==
+X-Received: by 2002:a05:6000:8e:: with SMTP id
+ m14mr15877518wrx.400.1602261607674; 
+ Fri, 09 Oct 2020 09:40:07 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id p21sm12676556wmc.28.2020.10.09.09.40.02
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 09 Oct 2020 09:40:02 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id DD07C1FFAA;
+ Fri,  9 Oct 2020 17:31:48 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Subject: [PULL 20/22] plugin: Fixes compiling errors on msys2/mingw
+Date: Fri,  9 Oct 2020 17:31:45 +0100
+Message-Id: <20201009163147.28512-21-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201009163147.28512-1-alex.bennee@linaro.org>
+References: <20201009163147.28512-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:34:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=2a00:1450:4864:20::435;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x435.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,45 +104,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, John Snow <jsnow@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: Yonggang Luo <luoyonggang@gmail.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Mypy isn't a fan of rebinding a variable with a new data type.
-It's easy enough to avoid.
+From: Yonggang Luo <luoyonggang@gmail.com>
 
-Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
----
- scripts/qapi/commands.py | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20201001163429.1348-3-luoyonggang@gmail.com>
+Message-Id: <20201007160038.26953-21-alex.bennee@linaro.org>
 
-diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
-index 88ba11c40e1..b0abb985a4e 100644
---- a/scripts/qapi/commands.py
-+++ b/scripts/qapi/commands.py
-@@ -198,14 +198,12 @@ def gen_register_command(name, success_response, allow_oob, allow_preconfig,
-     if not options:
-         options = ['QCO_NO_OPTIONS']
+diff --git a/contrib/plugins/hotblocks.c b/contrib/plugins/hotblocks.c
+index 3942a2ca54..37435a3fc7 100644
+--- a/contrib/plugins/hotblocks.c
++++ b/contrib/plugins/hotblocks.c
+@@ -102,7 +102,7 @@ static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
+ {
+     ExecCount *cnt;
+     uint64_t pc = qemu_plugin_tb_vaddr(tb);
+-    unsigned long insns = qemu_plugin_tb_n_insns(tb);
++    size_t insns = qemu_plugin_tb_n_insns(tb);
+     uint64_t hash = pc ^ insns;
  
--    options = " | ".join(options)
--
-     ret = mcgen('''
-     qmp_register_command(cmds, "%(name)s",
-                          qmp_marshal_%(c_name)s, %(opts)s);
- ''',
-                 name=name, c_name=c_name(name),
--                opts=options)
-+                opts=" | ".join(options))
-     return ret
+     g_mutex_lock(&lock);
+diff --git a/tests/plugin/bb.c b/tests/plugin/bb.c
+index e4cc7fdd6e..de09bdde4e 100644
+--- a/tests/plugin/bb.c
++++ b/tests/plugin/bb.c
+@@ -72,7 +72,7 @@ static void vcpu_tb_exec(unsigned int cpu_index, void *udata)
+     CPUCount *count = max_cpus ?
+         g_ptr_array_index(counts, cpu_index) : &inline_count;
  
+-    unsigned long n_insns = (unsigned long)udata;
++    uintptr_t n_insns = (uintptr_t)udata;
+     g_mutex_lock(&count->lock);
+     count->insn_count += n_insns;
+     count->bb_count++;
+@@ -81,7 +81,7 @@ static void vcpu_tb_exec(unsigned int cpu_index, void *udata)
  
+ static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
+ {
+-    unsigned long n_insns = qemu_plugin_tb_n_insns(tb);
++    size_t n_insns = qemu_plugin_tb_n_insns(tb);
+ 
+     if (do_inline) {
+         qemu_plugin_register_vcpu_tb_exec_inline(tb, QEMU_PLUGIN_INLINE_ADD_U64,
 -- 
-2.26.2
+2.20.1
 
 
