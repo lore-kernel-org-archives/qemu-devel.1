@@ -2,87 +2,86 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63B47C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:54:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF0E5C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:54:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F32A922251
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:54:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9B78822251
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:54:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ObR/Cce7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F32A922251
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iU5bVLo1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B78822251
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQveu-0005Kk-3o
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:54:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40366)
+	id 1kQvfA-00061l-Ok
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:54:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38282)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kQvRG-0003Bz-W9
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:40:15 -0400
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:51748)
+ id 1kQvJD-0008Qz-I9
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:31:55 -0400
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:41230)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kQvRF-0006IG-64
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:40:14 -0400
-Received: by mail-wm1-x32c.google.com with SMTP id d81so10449691wmc.1
- for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 09:40:12 -0700 (PDT)
+ id 1kQvJA-00058Z-0J
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:31:55 -0400
+Received: by mail-wr1-x432.google.com with SMTP id w5so10932778wrp.8
+ for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 09:31:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=5SSb91lE5qyANttReMxR3EV3dROMQzH23SGqYPpptZI=;
- b=ObR/Cce79MlUvFwVuynnNMcuz/uwPTrnyhtepw5nzaUcTnEtEwtvS23DqUR80RN0GI
- LL09g23icvt6rtp4UhgQwVIjxa5xOF2cjfpFBkSQiLA5zdQOd+p5VKCky57wOezVkDSv
- DWjixVnlHOyheSxJmcpXDsTLZfHlf9f2a9hmH3dv3uwQTGeCPpv0uuTvRLJmfX6MrzxV
- 2dTpLn55Xl2yhFDNEu1TxN2GLwSXppjZiUbjt5iszkBUnhwyK6OdlxA/AoNqlr7qLZpp
- QuFLJ2UbtVFVFx6D3pAI09sOmhHi6BxbFOfdeGi+6/8prcMnegOtYZ2vEsjmmmNN9S2d
- JY6Q==
+ bh=2zl15kTFfsHZ2Bh7jmqvRG3PAJE7u2kyw5BRKdhzziI=;
+ b=iU5bVLo1FHbfFcM3Wxf8oxY9wbmPRPHZbg4TMlkSojQOecFFIupcWhuOB2If6Tfm2j
+ 4Lt5weSaDeyVC9T8beBAojs00d8xbx4ItlfyiD2iqqTvCyTURzp6jj144rZocGz8lAAs
+ U2BzTLBzpvnd8vLLaEB/xQLGOFPYqsVbvZlBG4OwZ3fKauim2PgmVH6nTMeuDAbFklq7
+ NUBdnreYlBTWp2S+mFkq3AvLuFP8Iqs/n/0zk2Y37o2+1u/s1oxeuX3cZTG5Xibkbg3m
+ FHeetR8n/xwe5bA82kcBvVN5Fu3wrrPf55pt7ciNlSl6tOQvA6uZXKx/owiS6kbNSzV7
+ /Feg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=5SSb91lE5qyANttReMxR3EV3dROMQzH23SGqYPpptZI=;
- b=I7EeqQhd24+mCof2zYXcRjZxCG23+gnEv1ZCp0D7gYTmauhfJwX1v8g0OsQOS4N3Dx
- XTejzdKO9D9igb9y6lTNVu2noZClKMqYnEdpGsaiZiwpo127TAdz40i5cOFoxbfBRssk
- 6C1nEX+Xg0CiCoteyRR/EMt2isTHczPXTeSQFmjRtM6ktJtY49CrEkp+hHtwtIAPzyFG
- 8rrI/oVVeb8BrtPXlhOFS+ZVK05s743REUxm+zyGr93/J0q0ZWfuVnIaFfykv4A4T4IY
- MQeu0iswnvPmTCeEUo+ELj38tTgxGn4RGs8SSfsaAJUNsVyz7Fn/v1eXPpi05LU7g05v
- ntdg==
-X-Gm-Message-State: AOAM530V9QTEZtQ0aNB06YFhzLQxYsA2jZhio/QV127m0GjpXhN4DErl
- W7MwMw9kr6tSIe/QJcRLizvHbg==
-X-Google-Smtp-Source: ABdhPJwcpqGOpK9idu++GR+oNfaHujSRqgRK4nlHXFM40iR7KNWA78H3IuMY6L+giYXITPQ96OoIwA==
-X-Received: by 2002:a1c:b657:: with SMTP id g84mr15107101wmf.0.1602261611751; 
- Fri, 09 Oct 2020 09:40:11 -0700 (PDT)
+ bh=2zl15kTFfsHZ2Bh7jmqvRG3PAJE7u2kyw5BRKdhzziI=;
+ b=BXiL4fjVjLPQYKNlAQOsCUpJ7ucaZ8wgZTIWyHm7RKYFC1AzY2Q1C0qs3OdVvohANH
+ XVlTDtF2niHH7I5R7pP39Wl0FlyTPyIGXibOPlqF3RsEUL3WVlstdg+DfKBuRA7RKxMb
+ xM8ODYDLVlnJKzYqMJ0T1Xa6I1gbjGAUwaCiTYQ8MNz5I3/gUm75Lq9A1Ugq57lusnJw
+ LaCTTrncUQDg6bFu166y3B2/NB4GZSbAHQWk+WSuZtFjoOuZXuoCjBc2gj7b2f1LoNvT
+ QH5NS/ymVXn4zaUigGokI/QedWO2+jRL2exd/WMCGupj0aFyElblyjwhCg19R4p9p2cP
+ 9r7A==
+X-Gm-Message-State: AOAM532Pg/dRUUzALGClJp1xrBKVxLRidvWxk9TeV/wBBwl84SxpUZJB
+ 5sseCg0Y18/ipGnO89+up4W+9w==
+X-Google-Smtp-Source: ABdhPJzg7a1or2kKK1+vI9gzDxRZxLa6t+v7Thq3YVWjJKlRxUJXX7SAtMltVL5ATnFO4MNq3cO3RA==
+X-Received: by 2002:adf:fd07:: with SMTP id e7mr15232931wrr.377.1602261110474; 
+ Fri, 09 Oct 2020 09:31:50 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z13sm12469291wro.97.2020.10.09.09.40.03
+ by smtp.gmail.com with ESMTPSA id t124sm13215223wmg.31.2020.10.09.09.31.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 09 Oct 2020 09:40:09 -0700 (PDT)
+ Fri, 09 Oct 2020 09:31:47 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id C3DA61FFA9;
- Fri,  9 Oct 2020 17:31:48 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 2B3B71FF87;
+ Fri,  9 Oct 2020 17:31:47 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 19/22] plugins: Fixes a issue when dlsym failed,
- the handle not closed
-Date: Fri,  9 Oct 2020 17:31:44 +0100
-Message-Id: <20201009163147.28512-20-alex.bennee@linaro.org>
+Subject: [PULL 01/22] configure: fix performance regression due to PIC objects
+Date: Fri,  9 Oct 2020 17:31:26 +0100
+Message-Id: <20201009163147.28512-2-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201009163147.28512-1-alex.bennee@linaro.org>
 References: <20201009163147.28512-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32c;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32c.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::432;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x432.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,33 +103,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yonggang Luo <luoyonggang@gmail.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Ahmed Karaman <ahmedkrmn@outlook.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yonggang Luo <luoyonggang@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+Because most files in QEMU are grouped into static libraries, Meson conservatively
+compiles them with -fPIC.  This is overkill and produces slowdowns up to 20% on
+some TCG tests.
+
+As a stopgap measure, use the b_staticpic option to limit the slowdown to
+--enable-pie.  https://github.com/mesonbuild/meson/pull/7760 will allow
+us to use b_staticpic=false and let Meson do the right thing.
+
+Reported-by: Ahmed Karaman <ahmedkrmn@outlook.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20201001163429.1348-2-luoyonggang@gmail.com>
-Message-Id: <20201007160038.26953-20-alex.bennee@linaro.org>
+Message-Id: <20200924092314.1722645-57-pbonzini@redhat.com>
+Message-Id: <20201007160038.26953-2-alex.bennee@linaro.org>
 
-diff --git a/plugins/loader.c b/plugins/loader.c
-index 685d334e1a..8ac5dbc20f 100644
---- a/plugins/loader.c
-+++ b/plugins/loader.c
-@@ -235,6 +235,7 @@ static int plugin_load(struct qemu_plugin_desc *desc, const qemu_info_t *info)
-     return rc;
- 
-  err_symbol:
-+    g_module_close(ctx->handle);
-  err_dlopen:
-     qemu_vfree(ctx);
-     return 1;
+diff --git a/configure b/configure
+index 28df227db5..b553288c5e 100755
+--- a/configure
++++ b/configure
+@@ -7209,6 +7209,7 @@ NINJA=${ninja:-$PWD/ninjatool} $meson setup \
+         -Dwerror=$(if test "$werror" = yes; then echo true; else echo false; fi) \
+         -Dstrip=$(if test "$strip_opt" = yes; then echo true; else echo false; fi) \
+         -Db_pie=$(if test "$pie" = yes; then echo true; else echo false; fi) \
++        -Db_staticpic=$(if test "$pie" = yes; then echo true; else echo false; fi) \
+         -Db_coverage=$(if test "$gcov" = yes; then echo true; else echo false; fi) \
+ 	-Dmalloc=$malloc -Dmalloc_trim=$malloc_trim -Dsparse=$sparse \
+ 	-Dkvm=$kvm -Dhax=$hax -Dwhpx=$whpx -Dhvf=$hvf \
 -- 
 2.20.1
 
