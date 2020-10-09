@@ -4,62 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14C82C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:34:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25CAEC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:35:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B7002227F
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:34:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE50D2227F
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:35:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H7TO3reQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B7002227F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XAasKlE1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE50D2227F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQvLZ-0003US-Nb
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:34:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34588)
+	id 1kQvMv-0005IT-PM
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:35:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34796)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv4L-0004DU-AR
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58710)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv4X-0004Pu-En
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42794)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv4G-0003I3-OL
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:32 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv4P-0003LR-L2
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602260186;
+ s=mimecast20190719; t=1602260196;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rWIbXdxRs3lE+1KS0JUCPqOLY9xCWHxaIGU8gRTTZLo=;
- b=H7TO3reQihn3poAy+VGR9B1vxMOGaSKCVO6h3btETtzjhVmr2MYygOIav6wz31T43ZZgF7
- 5lxFf39yaFG7gxFtw5GSorR6jWDnhLxDqUIFuBraBAIt8xCnEeuf18YjS90fXz5cxPvZiI
- zMV2CcRCk/WPTIHFl6CoBrf8fz+261M=
+ bh=NokZjup1s/JJJLtM1cjZYz1WaakVYpJE4WuZHADWMxE=;
+ b=XAasKlE16s4hmnlWJCW2Xpp3tawfMAoa9F8eLmRHQ5xBhyQ5GiXJ3DFRIkzoxdglW5Sjun
+ uEbgpMeJT6oSrk4cLJBumx0b3RmF6YrEXbRgJIVc79P6Un+6EEsqY8OfF0Qb8cKbedeUuI
+ JhfWsQGLmi+I1Xvqk0AL7Bfb+fWV59Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-51-hWHlvYSJPe6bRMt9Bp5DSQ-1; Fri, 09 Oct 2020 12:16:24 -0400
-X-MC-Unique: hWHlvYSJPe6bRMt9Bp5DSQ-1
+ us-mta-311-xhhzAJ5kPO60m1UEoG-M9A-1; Fri, 09 Oct 2020 12:16:35 -0400
+X-MC-Unique: xhhzAJ5kPO60m1UEoG-M9A-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8103A18829E4;
- Fri,  9 Oct 2020 16:16:23 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 41A3318829D4;
+ Fri,  9 Oct 2020 16:16:34 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-112-203.rdu2.redhat.com [10.10.112.203])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5D6AF1A92A;
- Fri,  9 Oct 2020 16:16:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7F9961A925;
+ Fri,  9 Oct 2020 16:16:33 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 17/36] qapi/common.py: move build_params into gen.py
-Date: Fri,  9 Oct 2020 12:15:39 -0400
-Message-Id: <20201009161558.107041-18-jsnow@redhat.com>
+Subject: [PATCH v6 28/36] qapi/gen.py: Enable checking with mypy
+Date: Fri,  9 Oct 2020 12:15:50 -0400
+Message-Id: <20201009161558.107041-29-jsnow@redhat.com>
 In-Reply-To: <20201009161558.107041-1-jsnow@redhat.com>
 References: <20201009161558.107041-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -100,155 +99,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Including it in common.py creates a circular import dependency; schema
-relies on common, but common.build_params requires a type annotation
-from schema. To type this properly, it needs to be moved outside the
-cycle.
-
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Tested-by: Cleber Rosa <crosa@redhat.com>
 ---
- scripts/qapi/commands.py |  9 +++++++--
- scripts/qapi/common.py   | 23 -----------------------
- scripts/qapi/events.py   |  9 ++-------
- scripts/qapi/gen.py      | 29 +++++++++++++++++++++++++++--
- 4 files changed, 36 insertions(+), 34 deletions(-)
+ scripts/qapi/mypy.ini | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
-index cde0c1e7770..88ba11c40e1 100644
---- a/scripts/qapi/commands.py
-+++ b/scripts/qapi/commands.py
-@@ -13,8 +13,13 @@
- See the COPYING file in the top-level directory.
- """
+diff --git a/scripts/qapi/mypy.ini b/scripts/qapi/mypy.ini
+index 1b8555dfa39..c6960ff2dbd 100644
+--- a/scripts/qapi/mypy.ini
++++ b/scripts/qapi/mypy.ini
+@@ -14,11 +14,6 @@ disallow_untyped_defs = False
+ disallow_incomplete_defs = False
+ check_untyped_defs = False
  
--from .common import build_params, c_name, mcgen
--from .gen import QAPIGenCCode, QAPISchemaModularCVisitor, ifcontext
-+from .common import c_name, mcgen
-+from .gen import (
-+    QAPIGenCCode,
-+    QAPISchemaModularCVisitor,
-+    build_params,
-+    ifcontext,
-+)
- 
- 
- def gen_command_decl(name, arg_type, boxed, ret_type):
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 669e3829b34..11b86beeabe 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -210,26 +210,3 @@ def gen_endif(ifcond: Sequence[str]) -> str:
- #endif /* %(cond)s */
- ''', cond=ifc)
-     return ret
+-[mypy-qapi.gen]
+-disallow_untyped_defs = False
+-disallow_incomplete_defs = False
+-check_untyped_defs = False
 -
--
--def build_params(arg_type,
--                 boxed: bool,
--                 extra: Optional[str] = None) -> str:
--    ret = ''
--    sep = ''
--    if boxed:
--        assert arg_type
--        ret += '%s arg' % arg_type.c_param_type()
--        sep = ', '
--    elif arg_type:
--        assert not arg_type.variants
--        for memb in arg_type.members:
--            ret += sep
--            sep = ', '
--            if memb.optional:
--                ret += 'bool has_%s, ' % c_name(memb.name)
--            ret += '%s %s' % (memb.type.c_param_type(),
--                              c_name(memb.name))
--    if extra:
--        ret += sep + extra
--    return ret if ret else 'void'
-diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
-index 6b3afa14d72..f840a62ed92 100644
---- a/scripts/qapi/events.py
-+++ b/scripts/qapi/events.py
-@@ -12,13 +12,8 @@
- See the COPYING file in the top-level directory.
- """
- 
--from .common import (
--    build_params,
--    c_enum_const,
--    c_name,
--    mcgen,
--)
--from .gen import QAPISchemaModularCVisitor, ifcontext
-+from .common import c_enum_const, c_name, mcgen
-+from .gen import QAPISchemaModularCVisitor, build_params, ifcontext
- from .schema import QAPISchemaEnumMember
- from .types import gen_enum, gen_enum_lookup
- 
-diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
-index 1fed712b43b..fff0c0acb6d 100644
---- a/scripts/qapi/gen.py
-+++ b/scripts/qapi/gen.py
-@@ -2,7 +2,7 @@
- #
- # QAPI code generation
- #
--# Copyright (c) 2018-2019 Red Hat Inc.
-+# Copyright (c) 2015-2019 Red Hat Inc.
- #
- # Authors:
- #  Markus Armbruster <armbru@redhat.com>
-@@ -15,16 +15,18 @@
- import errno
- import os
- import re
-+from typing import Optional
- 
- from .common import (
-     c_fname,
-+    c_name,
-     gen_endif,
-     gen_if,
-     guardend,
-     guardstart,
-     mcgen,
- )
--from .schema import QAPISchemaVisitor
-+from .schema import QAPISchemaObjectType, QAPISchemaVisitor
- 
- 
- class QAPIGen:
-@@ -90,6 +92,29 @@ def _wrap_ifcond(ifcond, before, after):
-     return out
- 
- 
-+def build_params(arg_type: Optional[QAPISchemaObjectType],
-+                 boxed: bool,
-+                 extra: Optional[str] = None) -> str:
-+    ret = ''
-+    sep = ''
-+    if boxed:
-+        assert arg_type
-+        ret += '%s arg' % arg_type.c_param_type()
-+        sep = ', '
-+    elif arg_type:
-+        assert not arg_type.variants
-+        for memb in arg_type.members:
-+            ret += sep
-+            sep = ', '
-+            if memb.optional:
-+                ret += 'bool has_%s, ' % c_name(memb.name)
-+            ret += '%s %s' % (memb.type.c_param_type(),
-+                              c_name(memb.name))
-+    if extra:
-+        ret += sep + extra
-+    return ret if ret else 'void'
-+
-+
- class QAPIGenCCode(QAPIGen):
- 
-     def __init__(self, fname):
+ [mypy-qapi.introspect]
+ disallow_untyped_defs = False
+ disallow_incomplete_defs = False
 -- 
 2.26.2
 
