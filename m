@@ -2,75 +2,132 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD67CC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 12:56:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC6CBC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 12:58:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 060DD222BA
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 12:56:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B739E222BA
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 12:58:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=wisemo.com header.i=@wisemo.com header.b="Jqau0dLd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 060DD222BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=wisemo.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="vq2vqs2P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B739E222BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQrx1-0006Ax-V9
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 08:56:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45202)
+	id 1kQryJ-0007K7-Kw
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 08:58:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45486)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jb-gnumlists@wisemo.com>)
- id 1kQrvq-0005C3-EJ; Fri, 09 Oct 2020 08:55:35 -0400
-Received: from smtpv6n-hq2.wisemo.com ([2a01:4f0:4018::24b]:14116)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <jb-gnumlists@wisemo.com>)
- id 1kQrvm-0003nK-HI; Fri, 09 Oct 2020 08:55:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=wisemo.com;
- s=v2016; 
- h=Content-Transfer-Encoding:Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject;
- bh=DrvXzFI1YHdgWlC3gusRgx0Xw8T3FY9WMoUFwiv5jH8=; 
- b=Jqau0dLdkkPD7o/OxzwUPTNBtVqzdDnPuOn3GgK40LIvYLi76FX8Xcw8icumewrGaeoYC9QhSMgW6V93Z9968Lb98XQBvHD61+KnQAGfXhJIiedWrDTJYp5Hv6jng8HhtriPp9dyxvAFlZJukvuNIvhgNuM7JlTTlXW59RGTxSG+O6nxoQ2axpKCL+fKIxcaXP3e1GA1FO5bEQBKr0VhppDz6oD2RowCmw7EPq50IvrgTf89dohUQxSldHXOSUAxZz5i7X1khljLvLkAweCEW3oeaVsPubbmmuaY6vSunJiRSNZ1Kk3AJnBbknO+tRhnx+NkZqttoB9IbtCdBZYHsw==;
-Received: from [2a01:4f0:4018:f0:c157:9fbe:14ab:e29d]
- by mailout.i.wisemo.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.84_2) (envelope-from <jb-gnumlists@wisemo.com>)
- id 1kQrvc-0003Co-V2; Fri, 09 Oct 2020 14:55:20 +0200
-Subject: Re: Which qemu change corresponds to RedHat bug 1655408
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-discuss@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <philmd@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Qemu-block <qemu-block@nongnu.org>, John Snow <jsnow@redhat.com>
-References: <2d9c8525-470f-a4e5-5d71-895046e2d782@wisemo.com>
- <653b9595-ae60-181a-2975-2e351ade9788@redhat.com>
- <43072820-c04f-b706-4b37-2d2e37e8499f@wisemo.com>
- <0c76d4c9-a203-8bc3-e367-b198efe819d9@redhat.com>
-From: Jakob Bohm <jb-gnumlists@wisemo.com>
-Organization: WiseMo A/S
-Message-ID: <7d9328d2-69b6-5bb4-405d-5756e14688ec@wisemo.com>
-Date: Fri, 9 Oct 2020 14:55:20 +0200
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
-MIME-Version: 1.0
-In-Reply-To: <0c76d4c9-a203-8bc3-e367-b198efe819d9@redhat.com>
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1kQrxS-0006aQ-Gy; Fri, 09 Oct 2020 08:57:17 -0400
+Received: from mail-eopbgr140093.outbound.protection.outlook.com
+ ([40.107.14.93]:59889 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1kQrxL-0003zM-7O; Fri, 09 Oct 2020 08:57:11 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=T2fkSXgTxAwBu44rx+V3ou5NRpVBQfC5OB0J5gQFUnBZBxs0OVz7tiX9+2+/hvoq6hsFkHwic3cuuAQ67BjxsXDy9YjYSC5Qv5zd3Ff47xxVVFVUkJXcmt691zjWTg+gFf0cykrZASPEmlHpcH+MJ235xA826spisAyg1DzKcCqZ4ONg9D0hIZrvv6gwtwYHpxH89A7mlGFaI8oYnw/jeDcg1lj2p9Sda1LmD8mBqD/rZe0tDfrmhOpctdUfHcUBs1audZQ3HEJstcjP1S2QJBQu64ibzikGL46gorcJLKCVdZKyXgR62R6It1b79KGCaBNw3mQVdVVdtVqhzqlnFQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WMGzOeMIoxw07oAlOUqIvk32aWa1lSYiAwFY8CstEaM=;
+ b=dmJMtLlK4vkusJSldF9+yneTel1d4NtuRdIPRDJTXrcwUUYNr3aMaUhfphnmXWBu7fOx3XszM12izdvmxBbheF/0/patKNxuD+GKAvO0AasbFzv9QRQ+XqHVY4tMJmU7kemFS2NC7tPaZrUQM3+dlgVnnAcV0m5/qk70Y8JakyX458BtnY9xZjNyOjXjJk1fbPj/msFXNASRB3a8vUb7jec/3F7Orw9Tpt4hgSL2kS1xIo+Dh2USeJVuegpcaLMsnrEsTwA0vwMr5/TRBar0lQrptrzk6FapGHHDR3Ciyjxiggpo2OjDdC85IprKBl1aGUTEyFhNOXvZn8wStJPomw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WMGzOeMIoxw07oAlOUqIvk32aWa1lSYiAwFY8CstEaM=;
+ b=vq2vqs2Pbj5EPUUTAvGRHEFsCOi2FG4816GG8I3Oml5z3UpFQIIuFYbDhqosiWsbPurIScAQBJAG8Q/870yaeYu3rYT7dA4DTvhOG4bcEBlQ52zrjMHR1T6Pw4T621D8O6RljbS9I98WzULp2V8pZeDFfFdBbjDHEcoyuTZ3IQw=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com (2603:10a6:3:89::22)
+ by HE1PR08MB2650.eurprd08.prod.outlook.com (2603:10a6:7:2d::26) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3433.44; Fri, 9 Oct
+ 2020 12:56:54 +0000
+Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com
+ ([fe80::fd10:fc33:1bb0:1036]) by HE1PR0801MB2124.eurprd08.prod.outlook.com
+ ([fe80::fd10:fc33:1bb0:1036%6]) with mapi id 15.20.3455.027; Fri, 9 Oct 2020
+ 12:56:53 +0000
+Subject: Re: [PATCH v10 6/9] copy-on-read: skip non-guest reads if no copy
+ needed
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com,
+ stefanha@redhat.com, fam@euphon.net, jsnow@redhat.com, armbru@redhat.com,
+ eblake@redhat.com, den@openvz.org
+References: <1601383109-110988-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1601383109-110988-7-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <531a938b-4b76-c506-59be-eafc1ea85159@virtuozzo.com>
+ <de411799-a8a1-4bff-a48d-2692cc29be61@virtuozzo.com>
+ <e4153b7f-21ed-1e3e-b7e9-414bd1a4f11b@virtuozzo.com>
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Message-ID: <e17e600e-2a59-5df2-623b-2bb200e4a851@virtuozzo.com>
+Date: Fri, 9 Oct 2020 15:56:50 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
+In-Reply-To: <e4153b7f-21ed-1e3e-b7e9-414bd1a4f11b@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a01:4f0:4018::24b;
- envelope-from=jb-gnumlists@wisemo.com; helo=smtpv6n-hq2.wisemo.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -22
-X-Spam_score: -2.3
-X-Spam_bar: --
-X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.208,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Originating-IP: [109.252.114.22]
+X-ClientProxiedBy: AM0PR08CA0023.eurprd08.prod.outlook.com
+ (2603:10a6:208:d2::36) To HE1PR0801MB2124.eurprd08.prod.outlook.com
+ (2603:10a6:3:89::22)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from Admins-MacBook-Pro.local (109.252.114.22) by
+ AM0PR08CA0023.eurprd08.prod.outlook.com (2603:10a6:208:d2::36) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3455.21 via Frontend Transport; Fri, 9 Oct 2020 12:56:52 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 1e241701-d98a-492b-532c-08d86c52cbb5
+X-MS-TrafficTypeDiagnostic: HE1PR08MB2650:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <HE1PR08MB2650C90142C790AD13E700D3F4080@HE1PR08MB2650.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: FFqoptwP3+8Lb3BNcw/KctQLjN2WKSF5B062y5ruKGQJdtKCqKvheeFTx16INOdBkwG1gWcRyTutGYOyY6ttUfcUCixJFbPEXXi5qOYHbIrtGxGAiwv0amDh4xNN24eZUjfoPVp/+B58di8iqq+4kfGMDmFEK9Q2LafbnRG7l6JfSJ1kBPHxD5i2MD91P1jmxK4jM9S+6+SBEFAH6JKPEPc1SbV/qeRjah5JEs6Dcb8R1SGUk6aphuATTcwuBZDrDhEnd8M60JwPhMNL+8nks3jcFv0bWICmjThrR5gx8rGhRzkmin14rA3uyrSIbHdwAGdj9PF1wxSI/Th1Hy+AyXsgbUrr6nFn3lq/LVrWlqhkfgLK0QclqJ2oJh6kYCIJ
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:HE1PR0801MB2124.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(346002)(39830400003)(396003)(136003)(366004)(376002)(44832011)(53546011)(478600001)(66476007)(31696002)(66946007)(6506007)(36756003)(956004)(2616005)(6512007)(66556008)(5660300002)(6486002)(107886003)(8676002)(31686004)(86362001)(4326008)(26005)(186003)(52116002)(8936002)(83380400001)(2906002)(16526019)(316002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: eopHItmEKjP5GCAHIwtZd3mbN70f8XB+dqFtmAKMAWuoBsNRtNZeUwZABwPvKFD96riJa85LVarFDqH3jp2VfSt89irvHfHpaBTVt6hLC1u9afHfSYhoTSRqXl7loi5xO0kxyob5U8lSV7jIf3L9n4ZtzzmsMMH0xaBO5HQahk5iJyliVyJmkHV+WGlCzQ+eaO1aL5yOQToglFFAUB5A5eqJsR+/Bh7HkOVU8rXGbGg8DLYxTApsuTD+t+EaWZ2uQTeMtTzoeOMUq0tnH7obiRa4tTv2UL+wLfe8GBVTI+vSrzTvYiFtHDOMMqben+aSSKIL3MkjMFsOPIx+Bjwlqq9l0MBGVSqx/PK0C2IVzaB3ZYK8VWIbEJvc6SXUp3Uju2AMS3RYkHkSq9sX1byDxrKA04kGaaoJOHth64wZSM7qTOPbRVTJRoNpv19ZfBL0p8V6b+DpjEm/Ux4ATZlNED/bcjyYO1SC6PDDPFKLlk2I21HiOX6g+yWIIFl1TEgfbLOGaCE6cqBIKNhiwmLX6eP90yoLpXNopyT5ygDrXuJrZei7KzW9/stYW3l6HD8jEW+VgoJR78E9diE52QW9DYS1+TJMuUsXKp5rzdvDTpIIR+b8SBuPZ+7wxzeMdo65EDfe4ACVzRP+CRplZR2Teg==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1e241701-d98a-492b-532c-08d86c52cbb5
+X-MS-Exchange-CrossTenant-AuthSource: HE1PR0801MB2124.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Oct 2020 12:56:53.8189 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jVS3ZVRlAlMYJpr7MkXk+582fdNC/OepYg4tD0riLQHZWcuR5ANpVXeSeCpGRize6EwXzFslzO1zBiJL6QxWoMaDe9KPlaxMvfFouqlzfls=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR08MB2650
+Received-SPF: pass client-ip=40.107.14.93;
+ envelope-from=andrey.shinkevich@virtuozzo.com;
+ helo=EUR01-VE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 08:57:03
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -29
+X-Spam_score: -3.0
+X-Spam_bar: ---
+X-Spam_report: (-3.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.208, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -87,199 +144,167 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2020-10-09 10:48, Max Reitz wrote:
-> On 08.10.20 18:49, Jakob Bohm wrote:
->> (Top posting because previous reply did so):
+On 07.10.2020 22:28, Vladimir Sementsov-Ogievskiy wrote:
+> 07.10.2020 22:01, Andrey Shinkevich wrote:
 >>
->> If the bug was closed as "can't reproduce", why was a very similar bug
->> listed as fixed in RHSA-2019:2553-01 ?
-> 
-> Hi,
-> 
-> Which very similar bug do you mean?  I can only guess that perhaps you
-> mean 1603104 or 1551486.
-> 
-> Bug 1603104 was about qemu not ignoring errors when releasing file locks
-> fails (we should ignore errors then, because they're not fatal, and we
-> often cannot return errors, so they ended up as aborts).  (To give more
-> context, this error generally appeared only when the storage the image
-> is on somehow disappeared while qemu is running.  E.g. when the
-> connection to an NFS server was lost.)
-> 
-> Bug 1551486 entailed a bit of a rewrite of the whole locking code, which
-> may have resulted in the bug 1655408 no longer appearing for our QE
-> team.  But it was a different bug, as it wasn’t about any error, but
-> just about the fact that qemu used more FDs than necessary.
-> 
-> (Although I see 1655408 was reported for RHEL 8, whereas 1603104 and
-> 1551486 (as part of RHSA-2019:2553) were reported for RHEL 7.  The
-> corresponding RHEL 8 bug for those two is 1694148.)
-> 
-> Either way, both of those bugs are fixed in 5.0.
-> 
-> 
-> 1655408 in contrast reports an error at startup; locking itself failed.
->   I couldn’t reproduce it, and I still can’t; neither with the image
-> mounted concurrently, nor with an RO NFS mount.
-> 
-> (For example:
-> 
-> exports:
-> [...]/test-nfs-ro
-> 127.0.0.1(ro,sync,no_subtree_check,fsid=0,insecure,crossmnt)
-> 
-> $ for i in $(seq 100); do \
->      echo -e '\033[1m---\033[0m'; \
->      x86_64-softmmu/qemu-system-x86_64 \
->        -drive \
->          if=none,id=drv0,readonly=on,file=/mnt/tmp/arch.iso,format=raw \
->        -device ide-cd,drive=drv0 \
->        -enable-kvm -m 2048 -display none &; \
->      pid=$!; \
->      sleep 1; \
->      kill $pid; \
->    done
-> 
-> (Where x86_64-softmmu/qemu-system-x86_64 is upstream 5.0.1.)
-> 
-> All I see is something like:
-> 
-> ---
-> qemu-system-x86_64: terminating on signal 15 from pid 7278 (/bin/zsh)
-> [2] 34103
-> [3]  - 34095 terminated  x86_64-softmmu/qemu-system-x86_64 -drive
-> -device ide-cd,drive=drv0  -m 2048
-> 
-> So no file locking errors.)
-> 
-
-The error I got was specifically "Failed to lock byte 100" and VM not 
-starting.  The ISO file was on a R/W NFS3 share, but was itself R/O for 
-the user that root was mapped to by linux-nfs-server via /etc/exports
-options, specifically the file iso file was mode 0444 in a 0755 
-directory, and the exports line was (simplified)
-
-/share1 
-xxxx:xxxx:xxxx:xxxx/64(ro,sync,mp,subtree_check,anonuid=1000,anongid=1000)
-
-where xxxx:xxxx:xxxx:xxxx/64 is the numeric IPv6 prefix of the LAN
-
-NFS kernel Server ran Debian Stretch kernel 4.19.0-0.bpo.8-amd64 #1 SMP 
-Debian 4.19.98-1~bpo9+1 (2020-03-09) x86_64 GNU/Linux
-
-NFS client mount options were:
-
-rw,nosuid,nodev,noatime,vers=3,rsize=1048576,wsize=1048576,namlen=255,
-soft,proto=tcp6,timeo=600,retrans=6,sec=sys,mountaddr=xxxx:xxxx:xxxx:xxxx:xxxx:xxff:fexx:xxxx,
-mountvers=3,mountport=45327,mountproto=udp6,local_lock=none,addr=xxxx:xxxx:xxxx:xxxx:xxxx:xxff:fexx:xxxx
-
-NFS client ran Debian Buster kernel 4.19.0-0.bpo.6-amd64 #1 SMP Debian
-4.19.67-2+deb10u2~bpo9+1 (2019-11-12) x86_64 with Debian qemu-system-
-x86 version 1:5.0-14~bpo10+1  Booting used SysV init and libvirt
-was not used.
-
-Copying the ISO to a local drive (where qemu-as-root had full 
-capabilities to bypass file security) worked around the failure.
-
-I hope these details help reproduce the bug.
-
-And I still have no idea why qemu tried to lock bytes in a read-only raw
-image file, there is no block metadata to synchronize access to (like in
-qcow2), when the option explicitly said ",format=raw" to avoid attempts
-to access the iso file as any of the advanced virtual disk formats.
-
-
-
->> On 2020-10-08 18:41, Philippe Mathieu-Daudé wrote:
->>> Hi Jakob,
+>> On 07.10.2020 13:06, Vladimir Sementsov-Ogievskiy wrote:
+>>> 29.09.2020 15:38, Andrey Shinkevich wrote:
+>>>> If the flag BDRV_REQ_PREFETCH was set, pass it further to the
+>>>> COR-driver to skip unneeded reading. It can be taken into account for
+>>>> the COR-algorithms optimization. That check is being made during the
+>>>> block stream job by the moment.
+>>>>
+>>>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>>>> ---
+>>>>   block/copy-on-read.c | 14 ++++++++++----
+>>>>   block/io.c           |  2 +-
+>>>>   2 files changed, 11 insertions(+), 5 deletions(-)
+>>>>
+>>>> diff --git a/block/copy-on-read.c b/block/copy-on-read.c
+>>>> index f53f7e0..5389dca 100644
+>>>> --- a/block/copy-on-read.c
+>>>> +++ b/block/copy-on-read.c
+>>>> @@ -145,10 +145,16 @@ static int coroutine_fn 
+>>>> cor_co_preadv_part(BlockDriverState *bs,
+>>>>               }
+>>>>           }
+>>>> -        ret = bdrv_co_preadv_part(bs->file, offset, n, qiov, 
+>>>> qiov_offset,
+>>>> -                                  local_flags);
+>>>> -        if (ret < 0) {
+>>>> -            return ret;
+>>>> +        if ((flags & BDRV_REQ_PREFETCH) &
 >>>
->>> On 10/8/20 6:32 PM, Jakob Bohm wrote:
->>>> Red Hat bugzilla bug 1655408 against qemu is listed by Red Hat as
->>>> fixed in
->>>> April 2019, but I cannot find the corresponding change on qemu.org (the
->>>> Changelog in the wiki is not a traditional changelog and doesn't cover
->>>> bugfix releases such as 5.0.1, the git commit log is too detailed to
->>>> search, the Red Hat bugzilla and security advisory pages do not link
->>>> red hat bugs back to upstream (launchpad) bugs or git changes.
->>>>
->>>> Here is the bug title (which also affects my Debian packaged qemu 5.0):
->>>>
->>>> VM can not boot up due to "Failed to lock byte 100" if cdrom has been
->>>> mounted on the host
->>>>
->>>> Further observation:
->>>>
->>>> The basic problem is that qemu-system refuses to start with the error
->>>> message "Failed to lock byte 100" when -drive points to a read-only
->>>> ISO file.  For the reporter of the Red Hat bug, that was a mount-induced
->>>> read-only condition, in my case it is an NFS mount of a read-only
->>>> directory.
->>>>
->>>> The error message itself seams meaningless, as there is no particular
->>>> reason to request file locks on a read-only raw disk image.
-> 
-> Yes, there is.  We must prevent a concurrent instance from writing to
-> the image[1], and so we have to signal that somehow, which we do through
-> file locks.
-> 
-> I suppose it can be argued that if the image file itself is read-only
-> (outside of qemu), there is no need for locks, because nothing could
-> ever modify the image anyway.  But wouldn’t it be possible to change the
-> modifications after qemu has opened the image, or to remount some RO
-> filesystem R/W?
-> 
-> Perhaps we could automatically switch off file locks for a given image
-> file when taking the first one fails, and the image is read-only.  But
-> first I’d rather know what exactly is causing the error you see to appear.
-> 
-> [1] Technically, byte 100 is about being able to read valid data from
-> the image, which is a constraint that’s only very rarely broken.  But
-> still, it’s a constraint that must be signaled.  (You only see the
-> failure on this byte, because the later bytes (like the one not
-> preventing concurrent R/W access, 201) are not even attempted to be
-> locked after the first lock fails.)
-> 
-> (As for other instances writing to the image, you can allow that by
-> setting the share-rw=on option on the guest device.  This tells qemu
-> that the guest will accept modifications from the outside.  But that
-> still won’t prevent qemu from having to take a shared lock on byte 100.)
-> 
-> Max
-> 
->>>> my qemu-system-x86_64 invocation contains the option (on one line):
->>>>
->>>> -drive if=none,id=drive-ide0-1-0,readonly=on,
->>>> file=/mnt/someshare/path/gparted-live-1.1.0-5-amd64.iso,format=raw
->>>
->>> https://bugzilla.redhat.com/show_bug.cgi?id=1655408 has been
->>> closed due to lack of reproducer. Can you amend your information
->>> to the BZ? It will likely be re-opened. Thanks!
->>>
->>>>
->>>> Enjoy
->>>>
->>>> Jakob
->>>> -- 
->>>> Jakob Bohm, CIO, Partner, WiseMo A/S.  https://www.wisemo.com
->>>> Transformervej 29, 2860 Søborg, Denmark.  Direct +45 31 13 16 10
->>>> This public discussion message is non-binding and may contain errors.
->>>> WiseMo - Remote Service Management for PCs, Phones and Embedded
->>>>
+>>> BDRV_REQ_PREFETCH is documented to be only used with 
+>>> BDRV_REQ_COPY_ON_READ. But here
+>>> BDRV_REQ_COPY_ON_READ appears intermediately. We should change 
+>>> documentation in block.h
+>>> in a separate patch (and probably code in bdrv_aligned_preadv())
 >>>
 >>
->>
->> Enjoy
->>
->> Jakob
+>> OK, we will come here without the BDRV_REQ_PREFETCH flag set.
+> 
+> flag BDRV_REQ_PREFETCH should be set in stream job. Where should it be 
+> handled, I don't follow?
 > 
 
+If we leave block/io.c unchanged in this patch, what I'm agreeing with, 
+we'll come to the COR-driver with the hardcoded flags = 0 :
 
-Enjoy
+#4  0x000055a22bb480cf in cor_co_preadv_part (bs=0x55a22d593710, 
+offset=0, bytes=524288, qiov=0x0, qiov_offset=0, flags=0) at 
+../block/copy-on-read.c:149
+#5  0x000055a22badcb1d in bdrv_driver_preadv (bs=0x55a22d593710, 
+offset=0, bytes=524288, qiov=0x0, qiov_offset=0, flags=0) at 
+../block/io.c:1129
+#6  0x000055a22baddc81 in bdrv_aligned_preadv (child=0x55a22d814780, 
+req=0x7f8c1abffce0, offset=0, bytes=524288, align=1, qiov=0x0, 
+qiov_offset=0, flags=512) at ../block/io.c:1515
+#7  0x000055a22bade59a in bdrv_co_preadv_part (child=0x55a22d814780, 
+offset=0, bytes=524288, qiov=0x0, qiov_offset=0, 
+flags=BDRV_REQ_PREFETCH) at ../block/io.c:1757
+#8  0x000055a22bade3d2 in bdrv_co_preadv (child=0x55a22d814780, 
+offset=0, bytes=524288, qiov=0x0, flags=BDRV_REQ_PREFETCH) at 
+../block/io.c:1715
+#9  0x000055a22baf5d09 in blk_do_preadv (blk=0x55a22d818c00, offset=0, 
+bytes=524288, qiov=0x0, flags=BDRV_REQ_PREFETCH) at 
+../block/block-backend.c:1211
+#10 0x000055a22baf5d61 in blk_co_preadv (blk=0x55a22d818c00, offset=0, 
+bytes=524288, qiov=0x0, flags=BDRV_REQ_PREFETCH) at 
+../block/block-backend.c:1223
+#11 0x000055a22bab4eba in stream_populate (blk=0x55a22d818c00, offset=0, 
+bytes=524288) at ../block/stream.c:50
+#12 0x000055a22bab52c2 in stream_run (job=0x55a22d810a20, 
+errp=0x55a22d810aa0) at ../block/stream.c:162
+#13 0x000055a22bab79f0 in job_co_entry (opaque=0x55a22d810a20) at 
+../job.c:908
 
-Jakob
--- 
-Jakob Bohm, CIO, Partner, WiseMo A/S.  https://www.wisemo.com
-Transformervej 29, 2860 Søborg, Denmark.  Direct +45 31 13 16 10
-This public discussion message is non-binding and may contain errors.
-WiseMo - Remote Service Management for PCs, Phones and Embedded
+So, the only way for the COR-filter driver to differ between guests 
+reads and the stream job is to check the qiov pointer for NULL and reset 
+the flags as appropriate. This is what I am going to do in the next version.
+
+Andrey
+
+>> To differ between guest reads and the stream job ones, we would set it 
+>> here by checking for the qiov NULL pointer:
+>>
+>>
+>> diff --git a/block/copy-on-read.c b/block/copy-on-read.c
+>> index 4e3b1c5..df2c2ab 100644
+>> --- a/block/copy-on-read.c
+>> +++ b/block/copy-on-read.c
+>> @@ -144,6 +144,9 @@ static int coroutine_fn 
+>> cor_co_preadv_part(BlockDriverState *bs,
+>>                                             n, &n);
+>>               if (ret) {
+>>                   local_flags |= BDRV_REQ_COPY_ON_READ;
+>> +                if (!qiov) {
+>> +                    local_flags |= BDRV_REQ_PREFETCH;
+> 
+> if qiov is NULL, this means that flags must include BDRV_REQ_PREFETCH. 
+> local_flags should inherit flags I think.
+> 
+>> +                }
+>>               }
+>>           }
+>>
+>> Andrey
+>>
+>>>> +            !(local_flags & BDRV_REQ_COPY_ON_READ)) {
+>>>> +            /* Skip non-guest reads if no copy needed */
+>>>> +        } else {
+>>>> +
+>>>
+>>> extra new-line ?
+>>>
+>>>> +            ret = bdrv_co_preadv_part(bs->file, offset, n, qiov, 
+>>>> qiov_offset,
+>>>> +                                      local_flags);
+>>>> +            if (ret < 0) {
+>>>> +                return ret;
+>>>> +            }
+>>>>           }
+>>>>           offset += n;
+>>>> diff --git a/block/io.c b/block/io.c
+>>>> index 11df188..62b75a5 100644
+>>>> --- a/block/io.c
+>>>> +++ b/block/io.c
+>>>> @@ -1388,7 +1388,7 @@ static int coroutine_fn 
+>>>> bdrv_co_do_copy_on_readv(BdrvChild *child,
+>>>>               qemu_iovec_init_buf(&local_qiov, bounce_buffer, pnum);
+>>>>               ret = bdrv_driver_preadv(bs, cluster_offset, pnum,
+>>>> -                                     &local_qiov, 0, 0);
+>>>> +                                     &local_qiov, 0, flags & 
+>>>> BDRV_REQ_PREFETCH);
+>>>
+>>> Why? In this place we want to read. We'll write back the data a few 
+>>> lines below. What will we write,
+>>> if underlying driver decide to do nothing because of BDRV_REQ_PREFETCH?
+>>>
+>>
+>> See my comment above please.
+> 
+> Anyway, BDRV_REQ_PREFETCH here is wrong. You should not pass any qiov, 
+> if you set BDRV_REQ_PREFETCH flag.
+> 
+> If we come to bdrv_co_do_copy_on_readv, it means that we have 
+> COPY_ON_READ flag. And therefore, we will handle
+> PREFETCH and COPY_ON_READ here in generic layer. And therefore, we 
+> shouldn't pass them to driver.
+> 
+> On the contrary, if we have PREFETCH flag in bdrv_co_aligned_preadv, but 
+> don't have COPY_ON_READ in the same time,
+> this means that we must pass PREFETCH flag to the driver if it supports 
+> it. And do nothing if driver
+> doesn't support PREFETCH. That's how I see it.
+> 
+>>
+>>>>               if (ret < 0) {
+>>>>                   goto err;
+>>>>               }
+>>>>
+>>>
+>>>
+> 
+> 
 
