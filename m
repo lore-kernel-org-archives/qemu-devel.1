@@ -1,4 +1,4 @@
-Return-Path: <SRS0=Ajie=DP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -7,70 +7,72 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F69DC04EBE
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 18:32:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E29BC433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 14:29:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76207221FC
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Oct 2020 18:32:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 779522225D
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 14:29:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TSS6pHLO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76207221FC
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yowob/UK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 779522225D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQahu-0001Ba-7A
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 14:32:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40670)
+	id 1kQtP1-00028G-9o
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 10:29:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36972)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kQagQ-0000Z4-15
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 14:30:30 -0400
-Received: from mail-lj1-x22a.google.com ([2a00:1450:4864:20::22a]:46821)
+ (Exim 4.90_1) (envelope-from <chetan4windows@gmail.com>)
+ id 1kQtLD-0007zM-UJ; Fri, 09 Oct 2020 10:25:52 -0400
+Received: from mail-io1-xd34.google.com ([2607:f8b0:4864:20::d34]:37069)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kQagO-0000Is-1x
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 14:30:29 -0400
-Received: by mail-lj1-x22a.google.com with SMTP id c21so6796941ljn.13
- for <qemu-devel@nongnu.org>; Thu, 08 Oct 2020 11:30:27 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <chetan4windows@gmail.com>)
+ id 1kQtLB-0006I2-Ry; Fri, 09 Oct 2020 10:25:51 -0400
+Received: by mail-io1-xd34.google.com with SMTP id b1so5468915iot.4;
+ Fri, 09 Oct 2020 07:25:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:reply-to:from:date:message-id:subject:to;
- bh=0pW70IpVl910aem2KrNbmk7ncsNMVTVjWFcQNCw0uyg=;
- b=TSS6pHLOH+KNq5UY69+3mgcegvdKmIY+bfG+R/F0N6f92Xw/IUkqu7k03g3OMdiYGP
- uRr5T8iJVQ6pfFgbfASInKxTtiquvHa78/ZsbLlOriOYtw0rpumZxvxk1lW0Mn7a7OFl
- 5238JK3oWLKV9pi3WgR/DQwoawjz7qb+3UkgLArVaWmUBSOD0AWGCyoujEjxtGP8mcM2
- lsz2cgaHkAuNZcNj4sLdOuX4yNOof+/T6TghUIqHCOVP326euZRfvvPUf3Gr03cyOf/X
- osi9l4Nzu1rRn9uPEzCCHUi7KmxjC8Rq7y2QBR1ntgb/qTl0P+yznvbWT+E+Bdrjx2+Y
- x2Yg==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=0leBTqsGF+DNwQbpDJ19tNyoY37fFPsxJznx7B0Alkc=;
+ b=Yowob/UKWoMsozpB02XCuFMTQtfzHZ30gJA2EjYQlyY9J+8D3pjB+OjrfJvTLQOwf8
+ x9iPfqIbD2Ho328MIF65TmckEyGixyz99i6DoFmJCZayRQ63UiD4bPiI4e/2sp13euEe
+ mJ4TUcGKspGBlGCvvOP9FDIdxsm7A/mqn3zKVWjrylM1rGdbbtVv49fkDMvrW0Jb/0Xe
+ epGFnPmSVvh2B8LYyEIgtuc34JPMFTDh1qkkjZlgqK4mB1OdfB7hFMI5paVW7F8pqEOA
+ aOAHEPrGaZ23pq2zQYu+misI1cY+wPw/KYvvsTobHKXaakwnNHAUL7E2oUaOy+op591L
+ JBrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:reply-to:from:date:message-id
- :subject:to;
- bh=0pW70IpVl910aem2KrNbmk7ncsNMVTVjWFcQNCw0uyg=;
- b=U9u0vRucPoYsnrDvDmcwEdqiII066tcX0h6gnIQCUOVNPYbt2LDASHesxMLIQnY59a
- l2U1svHWdU8v7u1LPtluyrZL8KTrAna7w4yQxIbN/0F+3J8xFxO3uBy0NdyAluym/Lm3
- 7RZ+0dPb1bjVhoTTLtQQKVktEcScI9FRRPhPcyjWcMjIY0TXsgjIVoQyuvL1dzfoTmiY
- tE+xUx5V4TdyiSyb7ZGTTDoxrfOG0ZVMAZpYC/5AuPogEnEcz7XamCm791E4lV0i5Rbz
- aNUJwW395M+nUkrhL6QTtxt82khnvwOaZpdzGR7Yv/NzTbM9lvT+RO2xBR2Kqm+5JvMJ
- 6nYw==
-X-Gm-Message-State: AOAM53288Xyco6RsxiAYvYxzgNCdcATRZZFodNz6G8SJNRR+s6tqJxj3
- XHoOVNKxNIH8mS0rZxgoWa5eCciRGTjgjxklyQNi/2wEsr/5gw==
-X-Google-Smtp-Source: ABdhPJyeap5Bk/QO4gVP++WSPAHd+qJUo7ObdAypP3y7JfbT8wIIEHHTWCf5fNuEs3iDNLldFOQqFnhyH8NhWbNDJjo=
-X-Received: by 2002:a05:651c:1b6:: with SMTP id
- c22mr1627641ljn.447.1602181824730; 
- Thu, 08 Oct 2020 11:30:24 -0700 (PDT)
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=0leBTqsGF+DNwQbpDJ19tNyoY37fFPsxJznx7B0Alkc=;
+ b=j5uViaBa0jldiy/R0VrUsavjj0fwRe35vg8xaacQn1KH+ae68bFhVi6lRPR5MvpOqw
+ MM+XPcMmPw+/hI8jS4h3sr1kTnHYz5ZwkGCjSEutw9MS6LoPfbGcgl6gzBZDxtwAKrfS
+ avlMGJ2N6HsXY9x5H1c4a4s71SpppZeemhOxPgEiqs5Ft4mDEAsecF9qdxmiGCv7HdEQ
+ XYK6dBGTnxu0XJMwOppJ/wE07QpYQSbe+grZyMbJ+Edu85iyEq0F7oO3EhPZUZAJW3Un
+ 3vLijlk5nN0rhRmfF4kagR0BQ+cKcD4FIynNh+ZIJPRc8/W+xUx/jNRUFEqPx4nzXlLh
+ ih5Q==
+X-Gm-Message-State: AOAM531ETWYli5oJwbOamZG8m4LmdoW9K2zdZjpVyIGvkjAI+xa/bp1+
+ RL93drSrX1iKDJ6x+bzMb3cmUu8cZiuwj9u2MeA=
+X-Google-Smtp-Source: ABdhPJzFd2qS6dH1r1ZYfS5MWUA62TlPFxm0gqsElGr+0iqdK4Pfeb3E+ohl7thf8H3or9xQMoDCQgNjUZy2fHPPLSU=
+X-Received: by 2002:a5d:9042:: with SMTP id v2mr9511137ioq.18.1602253548296;
+ Fri, 09 Oct 2020 07:25:48 -0700 (PDT)
 MIME-Version: 1.0
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Fri, 9 Oct 2020 02:30:13 +0800
-Message-ID: <CAE2XoE_2hL5yJr6BSF+1cQTWBkegL_N1S7AEjx41kNzuS3XfPg@mail.gmail.com>
-Subject: 
-To: qemu-level <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000875c1405b12d0680"
-Received-SPF: pass client-ip=2a00:1450:4864:20::22a;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x22a.google.com
+References: <20201009063734.2627-1-chetan4windows@gmail.com>
+ <9f236758-8039-0a16-df3a-b49b7e24168d@redhat.com>
+ <20201009134337.GC25901@redhat.com>
+In-Reply-To: <20201009134337.GC25901@redhat.com>
+From: Chetan <chetan4windows@gmail.com>
+Date: Fri, 9 Oct 2020 19:55:35 +0530
+Message-ID: <CAPPKfOEvCvGHEPLJ0uJEabAGyZQUHoeDgvKyyv5M0wEv83N-_g@mail.gmail.com>
+Subject: Re: [PATCH 1/5] Fixing Lesser GPL version number [1/5]
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, 
+ Eric Blake <eblake@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000961e6c05b13db9da"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d34;
+ envelope-from=chetan4windows@gmail.com; helo=mail-io1-xd34.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -92,101 +94,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
+Cc: qemu-trivial@nongnu.org, Thomas Huth <thuth@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000875c1405b12d0680
+--000000000000961e6c05b13db9da
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-qapi docs tests building failed on win32
+Hello,
 
-looking for now-outdated files... none found
-pickling environment... done
-checking consistency... done
-preparing documents... done
-writing output... [100%] doc-good
+On Fri, Oct 9, 2020 at 6:38 PM Eric Blake <eblake@redhat.com> wrote:
+>Thank you for contributing.  However, it will require more work before
+>this is ready to merge; while I have a lot of comments below, I hope you
+>read them in the intended tone of ideas on making your v2 better.  For
+>more thoughts on patch submission, see
+>.
 
-build succeeded.
+Thanks for the remarks Eric, they are definitely going to help me a lot in
+making v2 better.
 
-The text files are in tests/qapi-schema.
-"C:/CI-Tools/msys64/mingw64/bin/python3.exe"
-"C:/work/xemu/qemu/meson/meson.py" "--internal" "exe" "--capture"
-"tests/qapi-schema/doc-good.txt.nocr" "--" "perl" "-pe" "$x =3D chr 13;
-s/$x$//" "tests/qapi-schema/doc-good.txt" && if test -e
-tests/qapi-schema/doc-good.txt.nocr; then printf '%s\n'
-tests/qapi-schema/doc-good.txt.nocr >
-tests/qapi-schema/doc-good.txt.nocr.stamp; fi
-syntax error at -e line 1, near "=3D"
-Execution of -e aborted due to compilation errors.
-make: *** [Makefile.ninja:2555=EF=BC=9Atests/qapi-schema/doc-good.txt.nocr.=
-stamp]
-=E9=94=99=E8=AF=AF 255
-"C:/CI-Tools/msys64/mingw64/bin/python3.exe"
-"C:/work/xemu/qemu/meson/meson.py" "--internal" "exe" "--capture"
-"qemu-version.h" "--" "C:/CI-Tools/msys64/mingw64/bin/python3.exe"
-"C:/work/xemu/qemu/scripts/qemu-version.py" "C:/work/xemu/qemu" "" "5.1.50"
-&& if test -e qemu-version.h; then printf '%s\n' qemu-version.h >
-qemu-version.h.stamp; fi
-"C:/CI-Tools/msys64/mingw64/bin/python3.exe"
-"C:/work/xemu/qemu/meson/meson.py" "--internal" "exe" "--capture"
-"tests/qapi-schema/doc-good.txt.nocr" "--" "perl" "-pe" "$x =3D chr 13;
-s/$x$//" "tests/qapi-schema/doc-good.txt" && if test -e
-tests/qapi-schema/doc-good.txt.nocr; then printf '%s\n'
-tests/qapi-schema/doc-good.txt.nocr >
-tests/qapi-schema/doc-good.txt.nocr.stamp; fi
-syntax error at -e line 1, near "=3D"
-Execution of -e aborted due to compilation errors.
-make: *** [Makefile.ninja:2555=EF=BC=9Atests/qapi-schema/doc-good.txt.nocr.=
-stamp]
-=E9=94=99=E8=AF=AF 255
---
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
+On Fri, Oct 9, 2020 at 7:13 PM Daniel P. Berrang=C3=A9 <berrange@redhat.com=
+>
+wrote:
+>I'm happy to queue 80% of this patch, and a patch of patch 2, since
+>they cover files in subsystems I maintain and the typos are largely
+>my fault :-)
 
---000000000000875c1405b12d0680
+Thanks Daniel, as the idea was to get familiar with the process of sending
+patches.
+I=E2=80=99ll draft and split the patches again as per your and Eric=E2=80=
+=99s comments and
+then send them again.
+
+Regards,
+Chetan P.
+
+On Fri, Oct 9, 2020 at 7:13 PM Daniel P. Berrang=C3=A9 <berrange@redhat.com=
+>
+wrote:
+
+> On Fri, Oct 09, 2020 at 08:07:52AM -0500, Eric Blake wrote:
+>
+> > > There is no "version 2" of the "Lesser" General Public License. It is
+> > > either "GPL version 2.0" or "Lesser GPL version 2.1". This patch
+> replaces all
+> > > occurrences of "Lesser GPL version 2" with "Lesser GPL version 2.1" i=
+n
+> comment section.
+> >
+> > I'm not a copyright lawyer; there may be legal ramifications for doing
+> > this on files where you are not the copyright owner, although to me it
+> > looks like an obvious correction of intent, so I'm okay with the idea.
+>
+> Yes, we've done exactly this same cleanup for various files before,
+> and considered it acceptable since it is matching the intent.
+>
+>
+> > Thus, maybe something like:
+> >
+> > backends: Fix LGPL version number
+> > disas: Fix LGPL version number
+> > target: Fix LGPL version number
+> >
+> > and so on.  There may be a smarter division of the work based on which
+> > maintainer(s) will have to ack various patches; breaking the series int=
+o
+> > more than 5 chunks may be easier, although it then requires more topic
+> > lines.  Or, if it truly is automated, doing it all in one shot may be
+> > best after all.
+>
+> I'm happy to queue 80% of this patch, and a patch of patch 2, since
+> they cover files in subsystems I maintain and the typos are largely
+> my fault :-)
+>
+>
+>
+> Regards,
+> Daniel
+> --
+> |: https://berrange.com      -o-
+> https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-
+> https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-
+> https://www.instagram.com/dberrange :|
+>
+>
+
+--000000000000961e6c05b13db9da
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"ltr">qapi docs tests building failed on win32<br><br>looking fo=
-r now-outdated files... none found<br>pickling environment... done<br>check=
-ing consistency... done<br>preparing documents... done<br>writing output...=
- [100%] doc-good<br><br>build succeeded.<br><br>The text files are in tests=
-/qapi-schema.<br>&quot;C:/CI-Tools/msys64/mingw64/bin/python3.exe&quot; &qu=
-ot;C:/work/xemu/qemu/meson/meson.py&quot; &quot;--internal&quot; &quot;exe&=
-quot; &quot;--capture&quot; &quot;tests/qapi-schema/doc-good.txt.nocr&quot;=
- &quot;--&quot; &quot;perl&quot; &quot;-pe&quot; &quot;$x =3D chr 13; s/$x$=
-//&quot; &quot;tests/qapi-schema/doc-good.txt&quot; &amp;&amp; if test -e t=
-ests/qapi-schema/doc-good.txt.nocr; then printf &#39;%s\n&#39; tests/qapi-s=
-chema/doc-good.txt.nocr &gt; tests/qapi-schema/doc-good.txt.nocr.stamp; fi<=
-br>syntax error at -e line 1, near &quot;=3D&quot;<br>Execution of -e abort=
-ed due to compilation errors.<br>make: *** [Makefile.ninja:2555=EF=BC=9Ates=
-ts/qapi-schema/doc-good.txt.nocr.stamp] =E9=94=99=E8=AF=AF 255<br>&quot;C:/=
-CI-Tools/msys64/mingw64/bin/python3.exe&quot; &quot;C:/work/xemu/qemu/meson=
-/meson.py&quot; &quot;--internal&quot; &quot;exe&quot; &quot;--capture&quot=
-; &quot;qemu-version.h&quot; &quot;--&quot; &quot;C:/CI-Tools/msys64/mingw6=
-4/bin/python3.exe&quot; &quot;C:/work/xemu/qemu/scripts/qemu-version.py&quo=
-t; &quot;C:/work/xemu/qemu&quot; &quot;&quot; &quot;5.1.50&quot; &amp;&amp;=
- if test -e qemu-version.h; then printf &#39;%s\n&#39; qemu-version.h &gt; =
-qemu-version.h.stamp; fi<br>&quot;C:/CI-Tools/msys64/mingw64/bin/python3.ex=
-e&quot; &quot;C:/work/xemu/qemu/meson/meson.py&quot; &quot;--internal&quot;=
- &quot;exe&quot; &quot;--capture&quot; &quot;tests/qapi-schema/doc-good.txt=
-.nocr&quot; &quot;--&quot; &quot;perl&quot; &quot;-pe&quot; &quot;$x =3D ch=
-r 13; s/$x$//&quot; &quot;tests/qapi-schema/doc-good.txt&quot; &amp;&amp; i=
-f test -e tests/qapi-schema/doc-good.txt.nocr; then printf &#39;%s\n&#39; t=
-ests/qapi-schema/doc-good.txt.nocr &gt; tests/qapi-schema/doc-good.txt.nocr=
-.stamp; fi<br>syntax error at -e line 1, near &quot;=3D&quot;<br>Execution =
-of -e aborted due to compilation errors.<br>make: *** [Makefile.ninja:2555=
-=EF=BC=9Atests/qapi-schema/doc-good.txt.nocr.stamp] =E9=94=99=E8=AF=AF 255<=
-br>--<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=B4<br>=E7=A4=BC<=
-br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincerely,<br>Yong=
-gang Luo</div>
+<div dir=3D"ltr"><div>Hello,</div><div><br></div><div>
+On Fri, Oct 9, 2020 at 6:38 PM Eric Blake &lt;<a href=3D"mailto:eblake@redh=
+at.com">eblake@redhat.com</a>&gt; wrote: <br></div><div>
+&gt;Thank you for contributing.=C2=A0 However, it will require more work be=
+fore<br>
+&gt;this is ready to merge; while I have a lot of comments below, I hope yo=
+u<br>
+&gt;read them in the intended tone of ideas on making your v2 better.=C2=A0=
+ For<br>
+&gt;more thoughts on patch submission, see
 
---000000000000875c1405b12d0680--
+</div><div>&gt;.</div><div><br></div><div>Thanks for the remarks Eric, they=
+ are definitely going to help me a lot in making v2 better.</div><div><br><=
+/div><div>
+On Fri, Oct 9, 2020 at 7:13 PM Daniel P. Berrang=C3=A9 &lt;<a href=3D"mailt=
+o:berrange@redhat.com">berrange@redhat.com</a>&gt; wrote: <br></div><div>
+&gt;I&#39;m happy to queue 80% of this patch, and a patch of patch 2, since=
+<br>
+&gt;they cover files in subsystems I maintain and the typos are largely<br>
+&gt;my fault :-)
+
+
+
+=20
+
+ </div><div><br></div><div>Thanks Daniel, as the idea was to get familiar w=
+ith the process of sending patches.</div>I=E2=80=99ll draft and split the p=
+atches again as per your and Eric=E2=80=99s comments and then send them aga=
+in.<div><br></div><div>Regards,</div><div>Chetan P.<br></div></div><br><div=
+ class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Fri, Oct 9,=
+ 2020 at 7:13 PM Daniel P. Berrang=C3=A9 &lt;<a href=3D"mailto:berrange@red=
+hat.com">berrange@redhat.com</a>&gt; wrote:<br></div><blockquote class=3D"g=
+mail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204=
+,204,204);padding-left:1ex">On Fri, Oct 09, 2020 at 08:07:52AM -0500, Eric =
+Blake wrote:<br>
+<br>
+&gt; &gt; There is no &quot;version 2&quot; of the &quot;Lesser&quot; Gener=
+al Public License. It is<br>
+&gt; &gt; either &quot;GPL version 2.0&quot; or &quot;Lesser GPL version 2.=
+1&quot;. This patch replaces all<br>
+&gt; &gt; occurrences of &quot;Lesser GPL version 2&quot; with &quot;Lesser=
+ GPL version 2.1&quot; in comment section.<br>
+&gt; <br>
+&gt; I&#39;m not a copyright lawyer; there may be legal ramifications for d=
+oing<br>
+&gt; this on files where you are not the copyright owner, although to me it=
+<br>
+&gt; looks like an obvious correction of intent, so I&#39;m okay with the i=
+dea.<br>
+<br>
+Yes, we&#39;ve done exactly this same cleanup for various files before,<br>
+and considered it acceptable since it is matching the intent.<br>
+<br>
+<br>
+&gt; Thus, maybe something like:<br>
+&gt; <br>
+&gt; backends: Fix LGPL version number<br>
+&gt; disas: Fix LGPL version number<br>
+&gt; target: Fix LGPL version number<br>
+&gt; <br>
+&gt; and so on.=C2=A0 There may be a smarter division of the work based on =
+which<br>
+&gt; maintainer(s) will have to ack various patches; breaking the series in=
+to<br>
+&gt; more than 5 chunks may be easier, although it then requires more topic=
+<br>
+&gt; lines.=C2=A0 Or, if it truly is automated, doing it all in one shot ma=
+y be<br>
+&gt; best after all.<br>
+<br>
+I&#39;m happy to queue 80% of this patch, and a patch of patch 2, since<br>
+they cover files in subsystems I maintain and the typos are largely<br>
+my fault :-)<br>
+<br>
+<br>
+<br>
+Regards,<br>
+Daniel<br>
+-- <br>
+|: <a href=3D"https://berrange.com" rel=3D"noreferrer" target=3D"_blank">ht=
+tps://berrange.com</a>=C2=A0 =C2=A0 =C2=A0 -o-=C2=A0 =C2=A0 <a href=3D"http=
+s://www.flickr.com/photos/dberrange" rel=3D"noreferrer" target=3D"_blank">h=
+ttps://www.flickr.com/photos/dberrange</a> :|<br>
+|: <a href=3D"https://libvirt.org" rel=3D"noreferrer" target=3D"_blank">htt=
+ps://libvirt.org</a>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0-o-=C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 <a href=3D"https://fstop138.berrange.com" rel=3D"n=
+oreferrer" target=3D"_blank">https://fstop138.berrange.com</a> :|<br>
+|: <a href=3D"https://entangle-photo.org" rel=3D"noreferrer" target=3D"_bla=
+nk">https://entangle-photo.org</a>=C2=A0 =C2=A0 -o-=C2=A0 =C2=A0 <a href=3D=
+"https://www.instagram.com/dberrange" rel=3D"noreferrer" target=3D"_blank">=
+https://www.instagram.com/dberrange</a> :|<br>
+<br>
+</blockquote></div>
+
+--000000000000961e6c05b13db9da--
 
