@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D077C43457
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 12:23:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05BAFC43467
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 12:23:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF3A922284
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 12:23:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 55B7422284
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 12:23:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E1Y2Bizx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF3A922284
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LYKiNSb+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55B7422284
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQrQu-00050a-Oo
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 08:23:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38382)
+	id 1kQrQv-00051X-9x
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 08:23:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38314)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
- id 1kQrMV-0008Jf-SF
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 08:19:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48818)
+ id 1kQrMM-0008Cd-Oi
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 08:18:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44083)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
- id 1kQrMR-0007vm-KO
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 08:19:03 -0400
+ id 1kQrMK-0007tz-WD
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 08:18:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602245938;
+ s=mimecast20190719; t=1602245932;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0tT6pTTej2yatf8fMzxJfzoh3zO+2aZRpKmOqKc2NEI=;
- b=E1Y2Bizxfz5yGhWK6U06tCg6Jdm62PLnEXYV59A+5Pk8haW3w24ZNhzyqwwi8edTie5l/q
- Vnwl1K6QeQD1ST+XOVfwbeybKzmaHrZMQx1oZRMYqbF146QG+80nAdcibqARLEQLoWkMyT
- 1RftfB/9pSr5OXw78jwmHWNVJWwEz3w=
+ bh=TUYMLH2ggTcrD/F/kmD011uAsOlGebjgC/tzd3ZqTiw=;
+ b=LYKiNSb+218bJ41B9yO9fcQ9m33LlrJRoi8BAfArWwKX2PScrW/lVjMAp6EoLZbRQDel1y
+ 11h+OQRaV0PQ/GrHhVCjtGLqEq85lSRrtr48Amit0D1FfiQO4yOsiOS0YYqvfbFs4lYdxi
+ CAzup8She46vqFmxQ9K3csIfvrmTW6A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-272-YTlNrsZcPoyRQjVv2YomWA-1; Fri, 09 Oct 2020 08:18:56 -0400
-X-MC-Unique: YTlNrsZcPoyRQjVv2YomWA-1
+ us-mta-330-R9n4jdPVN_uysCvnWQjSBQ-1; Fri, 09 Oct 2020 08:18:50 -0400
+X-MC-Unique: R9n4jdPVN_uysCvnWQjSBQ-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EFFA7196C900
- for <qemu-devel@nongnu.org>; Fri,  9 Oct 2020 12:18:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 83B56AFD07
+ for <qemu-devel@nongnu.org>; Fri,  9 Oct 2020 12:18:49 +0000 (UTC)
 Received: from vitty.brq.redhat.com (unknown [10.40.195.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 524365C1BB;
- Fri,  9 Oct 2020 12:18:54 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BA3E05C1BB;
+ Fri,  9 Oct 2020 12:18:47 +0000 (UTC)
 From: Vitaly Kuznetsov <vkuznets@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH RFC v3 05/23] i386: move hyperv_interface_id initialization to
- x86_cpu_realizefn()
-Date: Fri,  9 Oct 2020 14:18:24 +0200
-Message-Id: <20201009121842.1938010-6-vkuznets@redhat.com>
+Subject: [PATCH RFC v3 02/23] i386: fill in FEAT_HYPERV_EDX from edx instead
+ of eax
+Date: Fri,  9 Oct 2020 14:18:21 +0200
+Message-Id: <20201009121842.1938010-3-vkuznets@redhat.com>
 In-Reply-To: <20201009121842.1938010-1-vkuznets@redhat.com>
 References: <20201009121842.1938010-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -103,88 +103,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As a preparation to expanding Hyper-V CPU features early, move
-hyperv_interface_id initialization to x86_cpu_realizefn().
+There was a typo which went unnoticed.
 
+Fixes: e48ddcc6ce13 ("i386/kvm: implement 'hv-passthrough' mode")
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- target/i386/cpu.c |  6 ++++++
- target/i386/cpu.h |  1 +
- target/i386/kvm.c | 18 ++++++++++++------
- 3 files changed, 19 insertions(+), 6 deletions(-)
+- Similar fix had been submitted at:                                                                                                                                                                                                          https://lore.kernel.org/qemu-devel/20190820103030.12515-1-zhenyuw@linux.intel.com/
+---
+ target/i386/kvm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index ce485dd9afd9..52e050a7785c 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -6507,6 +6507,12 @@ static void x86_cpu_hyperv_realize(X86CPU *cpu)
-         memset(cpu->hyperv_vendor_id, 0, 12);
-         memcpy(cpu->hyperv_vendor_id, cpu->hyperv_vendor, len);
-     }
-+
-+    /* 'Hv#1' interface identification*/
-+    cpu->hyperv_interface_id[0] = 0x31237648;
-+    cpu->hyperv_interface_id[1] = 0;
-+    cpu->hyperv_interface_id[2] = 0;
-+    cpu->hyperv_interface_id[3] = 0;
- }
- 
- static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 2e7ee40372de..d49e34a80a34 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1661,6 +1661,7 @@ struct X86CPU {
-     bool hyperv_passthrough;
-     OnOffAuto hyperv_no_nonarch_cs;
-     uint32_t hyperv_vendor_id[3];
-+    uint32_t hyperv_interface_id[4];
- 
-     bool check_cpuid;
-     bool enforce_cpuid;
 diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 75d4cb17a5ba..eec0a7e31315 100644
+index 8b12387d30af..0098be701511 100644
 --- a/target/i386/kvm.c
 +++ b/target/i386/kvm.c
-@@ -1173,7 +1173,6 @@ static int hyperv_handle_properties(CPUState *cs,
-     CPUX86State *env = &cpu->env;
-     struct kvm_cpuid2 *cpuid;
-     struct kvm_cpuid_entry2 *c;
--    uint32_t signature[3];
-     uint32_t cpuid_i = 0;
-     int r;
- 
-@@ -1217,6 +1216,14 @@ static int hyperv_handle_properties(CPUState *cs,
-             cpu->hyperv_vendor_id[2] = c->edx;
-         }
- 
-+        c = cpuid_find_entry(cpuid, HV_CPUID_INTERFACE, 0);
-+        if (c) {
-+            cpu->hyperv_interface_id[0] = c->eax;
-+            cpu->hyperv_interface_id[1] = c->ebx;
-+            cpu->hyperv_interface_id[2] = c->ecx;
-+            cpu->hyperv_interface_id[3] = c->edx;
-+        }
-+
-         c = cpuid_find_entry(cpuid, HV_CPUID_FEATURES, 0);
+@@ -1214,7 +1214,7 @@ static int hyperv_handle_properties(CPUState *cs,
          if (c) {
              env->features[FEAT_HYPERV_EAX] = c->eax;
-@@ -1299,11 +1306,10 @@ static int hyperv_handle_properties(CPUState *cs,
- 
-     c = &cpuid_ent[cpuid_i++];
-     c->function = HV_CPUID_INTERFACE;
--    memcpy(signature, "Hv#1\0\0\0\0\0\0\0\0", 12);
--    c->eax = signature[0];
--    c->ebx = 0;
--    c->ecx = 0;
--    c->edx = 0;
-+    c->eax = cpu->hyperv_interface_id[0];
-+    c->ebx = cpu->hyperv_interface_id[1];
-+    c->ecx = cpu->hyperv_interface_id[2];
-+    c->edx = cpu->hyperv_interface_id[3];
- 
-     c = &cpuid_ent[cpuid_i++];
-     c->function = HV_CPUID_VERSION;
+             env->features[FEAT_HYPERV_EBX] = c->ebx;
+-            env->features[FEAT_HYPERV_EDX] = c->eax;
++            env->features[FEAT_HYPERV_EDX] = c->edx;
+         }
+         c = cpuid_find_entry(cpuid, HV_CPUID_ENLIGHTMENT_INFO, 0);
+         if (c) {
 -- 
 2.25.4
 
