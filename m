@@ -2,64 +2,64 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CEA9C43467
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:27:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FAC0C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:27:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C042922276
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:27:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E31282227E
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:27:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b46dGkRp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C042922276
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i3QV4f+R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E31282227E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQvEV-0000Zx-SY
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:27:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34232)
+	id 1kQvEz-0001E8-2c
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:27:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34340)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv41-0003mP-DF
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22654)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv45-0003tP-9x
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31143)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv3w-0003Dp-7P
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:12 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv41-0003F1-FV
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602260164;
+ s=mimecast20190719; t=1602260172;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=uK8aJWmONLmLz8GThMNVOIyusxyJ7b5QrlusdD7Nbd4=;
- b=b46dGkRpgWIVi9LXAY+a3uSyaTqk1Gdpq7YDth0VPQkOqd2sBKho3opVtDYkUNCLCx/n/u
- Esp3CJubMAiTnIVi1tL6s3SCY3/qhZzhjf2OBmmKAmg9D2kecjZTrSmVJ6LwJ3CwG1pW7n
- Ih5pfnom7gLkQA7BjRrIHyG5Neurwuo=
+ bh=1iHAWFK5hEPkFza6aTuhnCLY5QE27kffQhXifiMaVy0=;
+ b=i3QV4f+RRiFhX4T30Ri8QixUaaifEj2R/+hf/4+1Frez97isx1el01u8fBLwS1AOOtfIrA
+ oFn5zF8dBZsCDF/Kc7RwhvK+zrQSJFez8mddvv7aFFIHjWqrlgct8wGaO4kekjmlOXIY0L
+ qeJYCOUQ3kKOTArxB2P8MCI3kN2WBFc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-482-2b62jCfWPkeU6n3NXc6Oyg-1; Fri, 09 Oct 2020 12:16:01 -0400
-X-MC-Unique: 2b62jCfWPkeU6n3NXc6Oyg-1
+ us-mta-3-NDtc3uVBPQWDWI4z9vhHNw-1; Fri, 09 Oct 2020 12:16:10 -0400
+X-MC-Unique: NDtc3uVBPQWDWI4z9vhHNw-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 861131084D69;
- Fri,  9 Oct 2020 16:16:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A18C61084D6A;
+ Fri,  9 Oct 2020 16:16:09 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-112-203.rdu2.redhat.com [10.10.112.203])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C648338A;
- Fri,  9 Oct 2020 16:15:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E25AF19936;
+ Fri,  9 Oct 2020 16:16:08 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 01/36] docs: repair broken references
-Date: Fri,  9 Oct 2020 12:15:23 -0400
-Message-Id: <20201009161558.107041-2-jsnow@redhat.com>
+Subject: [PATCH v6 07/36] qapi: enforce import order/styling with isort
+Date: Fri,  9 Oct 2020 12:15:29 -0400
+Message-Id: <20201009161558.107041-8-jsnow@redhat.com>
 In-Reply-To: <20201009161558.107041-1-jsnow@redhat.com>
 References: <20201009161558.107041-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -70,16 +70,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:34:40
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:34:37
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,41 +100,121 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In two different places, we are not making a cross-reference to some
-resource correctly.
+While we're mucking around with imports, we might as well formalize the
+style we use. Let's use isort to do it for us.
 
+lines_after_imports=2: Use two lines after imports, to match PEP8's
+desire to have "two lines before and after" class definitions, which are
+likely to start immediately after imports.
+
+force_sort_within_sections: Intermingles "from x" and "import x" style
+statements, such that sorting is always performed strictly on the module
+name itself.
+
+force_grid_wrap=4: Four or more imports from a single module will force
+the one-per-line style that's more git-friendly. This will generally
+happen for 'typing' imports.
+
+multi_line_output=3: Uses the one-per-line indented style for long
+imports.
+
+include_trailing_comma: Adds a comma to the last import in a group,
+which makes git conflicts nicer to deal with, generally.
+
+line_length: 72 is chosen to match PEP8's "docstrings and comments" line
+length limit. If you have a single line import that exceeds 72
+characters, your names are too long!
+
+Suggested-by: Cleber Rosa <crosa@redhat.com>
 Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Tested-by: Cleber Rosa <crosa@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- docs/devel/multi-thread-tcg.rst | 2 +-
- docs/devel/testing.rst          | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ scripts/qapi/.isort.cfg    | 7 +++++++
+ scripts/qapi/expr.py       | 3 ++-
+ scripts/qapi/introspect.py | 7 +++++--
+ scripts/qapi/parser.py     | 2 +-
+ scripts/qapi/schema.py     | 2 +-
+ 5 files changed, 16 insertions(+), 5 deletions(-)
+ create mode 100644 scripts/qapi/.isort.cfg
 
-diff --git a/docs/devel/multi-thread-tcg.rst b/docs/devel/multi-thread-tcg.rst
-index 21483870dbc..92a9eba13c9 100644
---- a/docs/devel/multi-thread-tcg.rst
-+++ b/docs/devel/multi-thread-tcg.rst
-@@ -267,7 +267,7 @@ of view of external observers (e.g. another processor core). They can
- apply to any memory operations as well as just loads or stores.
+diff --git a/scripts/qapi/.isort.cfg b/scripts/qapi/.isort.cfg
+new file mode 100644
+index 00000000000..643caa1fbd6
+--- /dev/null
++++ b/scripts/qapi/.isort.cfg
+@@ -0,0 +1,7 @@
++[settings]
++force_grid_wrap=4
++force_sort_within_sections=True
++include_trailing_comma=True
++line_length=72
++lines_after_imports=2
++multi_line_output=3
+diff --git a/scripts/qapi/expr.py b/scripts/qapi/expr.py
+index bb4dc55f56f..2fcaaa2497a 100644
+--- a/scripts/qapi/expr.py
++++ b/scripts/qapi/expr.py
+@@ -14,8 +14,9 @@
+ # This work is licensed under the terms of the GNU GPL, version 2.
+ # See the COPYING file in the top-level directory.
  
- The Linux kernel has an excellent `write-up
--<https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/plain/Documentation/memory-barriers.txt>`
-+<https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/plain/Documentation/memory-barriers.txt>`_
- on the various forms of memory barrier and the guarantees they can
- provide.
+-import re
+ from collections import OrderedDict
++import re
++
+ from .common import c_name
+ from .error import QAPISemError
  
-diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-index bd64c1bdcdd..8875a40a2b6 100644
---- a/docs/devel/testing.rst
-+++ b/docs/devel/testing.rst
-@@ -953,7 +953,7 @@ compiler flags are needed to build for a given target.
- If you have the ability to run containers as the user you can also
- take advantage of the build systems "Docker" support. It will then use
- containers to build any test case for an enabled guest where there is
--no system compiler available. See :ref: `_docker-ref` for details.
-+no system compiler available. See :ref:`docker-ref` for details.
+diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+index 42016a7e668..fafec94e022 100644
+--- a/scripts/qapi/introspect.py
++++ b/scripts/qapi/introspect.py
+@@ -17,8 +17,11 @@
+     mcgen,
+ )
+ from .gen import QAPISchemaMonolithicCVisitor
+-from .schema import (QAPISchemaArrayType, QAPISchemaBuiltinType,
+-                     QAPISchemaType)
++from .schema import (
++    QAPISchemaArrayType,
++    QAPISchemaBuiltinType,
++    QAPISchemaType,
++)
  
- Running subset of tests
- -----------------------
+ 
+ def _make_tree(obj, ifcond, features, extra=None):
+diff --git a/scripts/qapi/parser.py b/scripts/qapi/parser.py
+index 7298f5dbd14..e7b9d670ad6 100644
+--- a/scripts/qapi/parser.py
++++ b/scripts/qapi/parser.py
+@@ -14,9 +14,9 @@
+ # This work is licensed under the terms of the GNU GPL, version 2.
+ # See the COPYING file in the top-level directory.
+ 
++from collections import OrderedDict
+ import os
+ import re
+-from collections import OrderedDict
+ 
+ from .error import QAPIParseError, QAPISemError
+ from .source import QAPISourceInfo
+diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
+index 676185d1a71..71ebb1e396d 100644
+--- a/scripts/qapi/schema.py
++++ b/scripts/qapi/schema.py
+@@ -14,9 +14,9 @@
+ 
+ # TODO catching name collisions in generated code would be nice
+ 
++from collections import OrderedDict
+ import os
+ import re
+-from collections import OrderedDict
+ 
+ from .common import c_name, pointer_suffix
+ from .error import QAPIError, QAPISemError
 -- 
 2.26.2
 
