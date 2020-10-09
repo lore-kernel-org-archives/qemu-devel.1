@@ -2,62 +2,66 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F65BC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 02:11:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E388DC433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 02:13:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA8D122255
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 02:11:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F3CF322255
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 02:13:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JTE8ENCv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA8D122255
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LEzdxmN/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3CF322255
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQhsN-0001uF-QR
-	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 22:11:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33056)
+	id 1kQhuU-0003Ms-Md
+	for qemu-devel@archiver.kernel.org; Thu, 08 Oct 2020 22:13:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33074)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kQhon-00064j-Of
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 22:07:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22969)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kQhoo-00067C-P7
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 22:07:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49063)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kQhof-0006sH-PW
- for qemu-devel@nongnu.org; Thu, 08 Oct 2020 22:07:37 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kQhog-0006sB-2e
+ for qemu-devel@nongnu.org; Thu, 08 Oct 2020 22:07:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602209248;
+ s=mimecast20190719; t=1602209247;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=s9m3+R8yE7Y80bW6r260IfS4ye1Ft7F4+DbPcRAR138=;
- b=JTE8ENCvpfFvXeuh6yUVz7cn4Udc2b6MBZysoFuVYyZEpTSbkquAWqhZsFdgR7rOh8qnWI
- mETt/MSW5ojH+sRn5GaayCEH4lErsh7ffJsEIph41rfOvXrsCwT3mYE4k5VNWQLvyrB/nk
- 8mOu0njq4mTV3hQ/2IDScpB7W7+T0+k=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=jnj9zIISjvynJAb3iL34smTPNKHTz5UdnoDisyXaetk=;
+ b=LEzdxmN/2c9Ys+gXQF5381sjWcIghqYcNB4yVUFVRVilNDxZfxHXuooEJ+DweQfoTiq/5L
+ rew+uSQvCIlH7ePEqo6TFTRnKlBD3U786fzxmZsk7dGrG8MCJvqLDRxXhk6bSMQaSm5wei
+ SePPNoEwZiYt95l7oSDNWWhgFp1u0K8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-37-F6cZ4JNzM420kb1esaUhgg-1; Thu, 08 Oct 2020 22:07:20 -0400
-X-MC-Unique: F6cZ4JNzM420kb1esaUhgg-1
+ us-mta-583-gdennriqMnOyb5osbg190Q-1; Thu, 08 Oct 2020 22:07:25 -0400
+X-MC-Unique: gdennriqMnOyb5osbg190Q-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE06B18C5201;
- Fri,  9 Oct 2020 02:07:18 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA7D084A5F7;
+ Fri,  9 Oct 2020 02:07:24 +0000 (UTC)
 Received: from blue.redhat.com (ovpn-113-14.phx2.redhat.com [10.3.113.14])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5756876651;
- Fri,  9 Oct 2020 02:07:15 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3F9FB76650;
+ Fri,  9 Oct 2020 02:07:24 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 0/6] Exposing backing-chain allocation over NBD
-Date: Thu,  8 Oct 2020 21:07:08 -0500
-Message-Id: <20201009020714.1074061-1-eblake@redhat.com>
+Subject: [PATCH v3 6/6] nbd: Allow export of multiple bitmaps for one device
+Date: Thu,  8 Oct 2020 21:07:14 -0500
+Message-Id: <20201009020714.1074061-7-eblake@redhat.com>
+In-Reply-To: <20201009020714.1074061-1-eblake@redhat.com>
+References: <20201009020714.1074061-1-eblake@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
@@ -76,7 +80,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -89,58 +93,268 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com,
- rjones@redhat.com, stefanha@redhat.com
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org,
+ rjones@redhat.com, Max Reitz <mreitz@redhat.com>, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v2 was here:
-https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg10926.html
+With this, 'qemu-nbd -B b0 -B b1 -f qcow2 img.qcow2' can let you sniff
+out multiple bitmaps from one server.  qemu-img as client can still
+only read one bitmap per client connection, but other NBD clients
+(hello libnbd) can now read multiple bitmaps in a single pass.
 
-Since then:
-rebase to master
-patches 1-3/5 of v2 are in pull request
-patch 4/5 in v2 (1/6 here) includes improvements from Vladimir
-patches 3-6/6 here are new (and I hope to have public patches to
-libnbd's 'nbdinfo --map' to take advantage of it posted soon...)
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ nbd/server.c           | 89 +++++++++++++++++++++++++++++-------------
+ tests/qemu-iotests/291 |  6 +--
+ 2 files changed, 63 insertions(+), 32 deletions(-)
 
-Based-on: <20201008185951.1026052-1-eblake@redhat.com>
-([PULL 0/8] NBD patches through 2020-10-08)
+diff --git a/nbd/server.c b/nbd/server.c
+index 3664f9e744b4..0017e18254a3 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -96,7 +96,8 @@ struct NBDExport {
+     Notifier eject_notifier;
 
-Also available at:
-https://repo.or.cz/qemu/ericb.git/shortlog/refs/tags/nbd-alloc-depth-v3
+     bool alloc_context;
+-    BdrvDirtyBitmap *export_bitmap;
++    BdrvDirtyBitmap **export_bitmaps;
++    size_t nr_export_bitmaps;
+ };
 
-001/6:[0056] [FC] 'nbd: Add new qemu:allocation-depth metacontext'
-002/6:[0002] [FC] 'nbd: Add 'qemu-nbd -A' to expose allocation depth'
-003/6:[down] 'nbd: Update qapi to support multiple bitmaps'
-004/6:[down] 'nbd: Simplify qemu bitmap context name'
-005/6:[down] 'nbd: Refactor counting of meta contexts'
-006/6:[down] 'nbd: Allow export of multiple bitmaps for one device'
+ static QTAILQ_HEAD(, NBDExport) exports = QTAILQ_HEAD_INITIALIZER(exports);
+@@ -109,7 +110,10 @@ typedef struct NBDExportMetaContexts {
+     size_t count; /* number of negotiated contexts */
+     bool base_allocation; /* export base:allocation context (block status) */
+     bool allocation_depth; /* export qemu:allocation-depth */
+-    bool bitmap; /* export qemu:dirty-bitmap:<export bitmap name> */
++    bool *bitmaps; /*
++                    * export qemu:dirty-bitmap:<export bitmap name>,
++                    * sized by exp->nr_export_bitmaps
++                    */
+ } NBDExportMetaContexts;
 
-Eric Blake (6):
-  nbd: Add new qemu:allocation-depth metacontext
-  nbd: Add 'qemu-nbd -A' to expose allocation depth
-  nbd: Update qapi to support multiple bitmaps
-  nbd: Simplify qemu bitmap context name
-  nbd: Refactor counting of meta contexts
-  nbd: Allow export of multiple bitmaps for one device
+ struct NBDClient {
+@@ -861,6 +865,8 @@ static bool nbd_meta_base_query(NBDClient *client, NBDExportMetaContexts *meta,
+ static bool nbd_meta_qemu_query(NBDClient *client, NBDExportMetaContexts *meta,
+                                 const char *query)
+ {
++    size_t i;
++
+     if (!nbd_strshift(&query, "qemu:")) {
+         return false;
+     }
+@@ -869,7 +875,7 @@ static bool nbd_meta_qemu_query(NBDClient *client, NBDExportMetaContexts *meta,
+     if (!*query) {
+         if (client->opt == NBD_OPT_LIST_META_CONTEXT) {
+             meta->allocation_depth = meta->exp->alloc_context;
+-            meta->bitmap = !!meta->exp->export_bitmap;
++            memset(meta->bitmaps, 1, meta->exp->nr_export_bitmaps);
+         }
+         trace_nbd_negotiate_meta_query_parse("empty");
+         return true;
+@@ -882,17 +888,26 @@ static bool nbd_meta_qemu_query(NBDClient *client, NBDExportMetaContexts *meta,
+     }
 
- docs/interop/nbd.txt       |  23 +++-
- docs/tools/qemu-nbd.rst    |   6 ++
- qapi/block-core.json       |   7 +-
- qapi/block-export.json     |  20 +++-
- include/block/nbd.h        |   8 +-
- blockdev-nbd.c             |  20 +++-
- nbd/server.c               | 210 +++++++++++++++++++++++++++++--------
- qemu-nbd.c                 |  25 +++--
- tests/qemu-iotests/291     |   6 +-
- tests/qemu-iotests/309     |  73 +++++++++++++
- tests/qemu-iotests/309.out |  22 ++++
- tests/qemu-iotests/group   |   1 +
- 12 files changed, 350 insertions(+), 71 deletions(-)
- create mode 100755 tests/qemu-iotests/309
- create mode 100644 tests/qemu-iotests/309.out
+     if (nbd_strshift(&query, "dirty-bitmap:")) {
+-        const char *bm_name;
+-
+         trace_nbd_negotiate_meta_query_parse("dirty-bitmap:");
+-        if (!meta->exp->export_bitmap) {
+-            trace_nbd_negotiate_meta_query_skip("no dirty-bitmap exported");
++        if (!*query) {
++            if (client->opt == NBD_OPT_LIST_META_CONTEXT) {
++                memset(meta->bitmaps, 1, meta->exp->nr_export_bitmaps);
++            }
++            trace_nbd_negotiate_meta_query_parse("empty");
+             return true;
+         }
+-        bm_name = bdrv_dirty_bitmap_name(meta->exp->export_bitmap);
+-        if (nbd_meta_empty_or_pattern(client, bm_name, query)) {
+-            meta->bitmap = true;
++
++        for (i = 0; i < meta->exp->nr_export_bitmaps; i++) {
++            const char *bm_name;
++
++            bm_name = bdrv_dirty_bitmap_name(meta->exp->export_bitmaps[i]);
++            if (strcmp(bm_name, query) == 0) {
++                meta->bitmaps[i] = true;
++                trace_nbd_negotiate_meta_query_parse(query);
++                return true;
++            }
+         }
++        trace_nbd_negotiate_meta_query_skip("no dirty-bitmap match");
+         return true;
+     }
+
+@@ -954,9 +969,10 @@ static int nbd_negotiate_meta_queries(NBDClient *client,
+ {
+     int ret;
+     g_autofree char *export_name = NULL;
+-    NBDExportMetaContexts local_meta;
++    g_autofree bool *bitmaps = NULL;
++    NBDExportMetaContexts local_meta = {0};
+     uint32_t nb_queries;
+-    int i;
++    size_t i;
+     size_t count = 0;
+
+     if (!client->structured_reply) {
+@@ -971,6 +987,7 @@ static int nbd_negotiate_meta_queries(NBDClient *client,
+         meta = &local_meta;
+     }
+
++    g_free(meta->bitmaps);
+     memset(meta, 0, sizeof(*meta));
+
+     ret = nbd_opt_read_name(client, &export_name, NULL, errp);
+@@ -985,6 +1002,10 @@ static int nbd_negotiate_meta_queries(NBDClient *client,
+         return nbd_opt_drop(client, NBD_REP_ERR_UNKNOWN, errp,
+                             "export '%s' not present", sane_name);
+     }
++    meta->bitmaps = g_new0(bool, meta->exp->nr_export_bitmaps);
++    if (client->opt == NBD_OPT_LIST_META_CONTEXT) {
++        bitmaps = meta->bitmaps;
++    }
+
+     ret = nbd_opt_read(client, &nb_queries, sizeof(nb_queries), false, errp);
+     if (ret <= 0) {
+@@ -998,7 +1019,7 @@ static int nbd_negotiate_meta_queries(NBDClient *client,
+         /* enable all known contexts */
+         meta->base_allocation = true;
+         meta->allocation_depth = meta->exp->alloc_context;
+-        meta->bitmap = !!meta->exp->export_bitmap;
++        memset(meta->bitmaps, 1, meta->exp->nr_export_bitmaps);
+     } else {
+         for (i = 0; i < nb_queries; ++i) {
+             ret = nbd_negotiate_meta_query(client, meta, errp);
+@@ -1028,13 +1049,19 @@ static int nbd_negotiate_meta_queries(NBDClient *client,
+         count++;
+     }
+
+-    if (meta->bitmap) {
+-        const char *bm_name = bdrv_dirty_bitmap_name(meta->exp->export_bitmap);
+-        g_autofree char *context = g_strdup_printf("qemu:dirty-bitmap:%s",
+-                                                   bm_name);
++    for (i = 0; i < meta->exp->nr_export_bitmaps; i++) {
++        const char *bm_name;
++        g_autofree char *context = NULL;
++
++        if (!meta->bitmaps[i]) {
++            continue;
++        }
++
++        bm_name = bdrv_dirty_bitmap_name(meta->exp->export_bitmaps[i]);
++        context = g_strdup_printf("qemu:dirty-bitmap:%s", bm_name);
+
+         ret = nbd_negotiate_send_meta_context(client, context,
+-                                              NBD_META_ID_DIRTY_BITMAP,
++                                              NBD_META_ID_DIRTY_BITMAP + i,
+                                               errp);
+         if (ret < 0) {
+             return ret;
+@@ -1388,6 +1415,7 @@ void nbd_client_put(NBDClient *client)
+             QTAILQ_REMOVE(&client->exp->clients, client, next);
+             blk_exp_unref(&client->exp->common);
+         }
++        g_free(client->export_meta.bitmaps);
+         g_free(client);
+     }
+ }
+@@ -1565,11 +1593,11 @@ static int nbd_export_create(BlockExport *blk_exp, BlockExportOptions *exp_args,
+     }
+     exp->size = QEMU_ALIGN_DOWN(size, BDRV_SECTOR_SIZE);
+
+-    /* XXX Allow more than one bitmap */
+-    if (arg->bitmaps && arg->bitmaps->next) {
+-        error_setg(errp, "multiple bitmaps per export not supported yet");
+-        return -EOPNOTSUPP;
++    for (bitmaps = arg->bitmaps; bitmaps; bitmaps = bitmaps->next) {
++        exp->nr_export_bitmaps++;
+     }
++    exp->export_bitmaps = g_new0(BdrvDirtyBitmap *, exp->nr_export_bitmaps);
++    exp->nr_export_bitmaps = 0;
+     for (bitmaps = arg->bitmaps; bitmaps; bitmaps = bitmaps->next) {
+         const char *bitmap = bitmaps->value;
+         BlockDriverState *bs = blk_bs(blk);
+@@ -1605,7 +1633,7 @@ static int nbd_export_create(BlockExport *blk_exp, BlockExportOptions *exp_args,
+         }
+
+         bdrv_dirty_bitmap_set_busy(bm, true);
+-        exp->export_bitmap = bm;
++        exp->export_bitmaps[exp->nr_export_bitmaps++] = bm;
+         assert(strlen(bitmap) <= BDRV_BITMAP_MAX_NAME_SIZE);
+     }
+
+@@ -1667,6 +1695,7 @@ static void nbd_export_request_shutdown(BlockExport *blk_exp)
+
+ static void nbd_export_delete(BlockExport *blk_exp)
+ {
++    size_t i;
+     NBDExport *exp = container_of(blk_exp, NBDExport, common);
+
+     assert(exp->name == NULL);
+@@ -1684,8 +1713,8 @@ static void nbd_export_delete(BlockExport *blk_exp)
+                                         blk_aio_detach, exp);
+     }
+
+-    if (exp->export_bitmap) {
+-        bdrv_dirty_bitmap_set_busy(exp->export_bitmap, false);
++    for (i = 0; i < exp->nr_export_bitmaps; i++) {
++        bdrv_dirty_bitmap_set_busy(exp->export_bitmaps[i], false);
+     }
+ }
+
+@@ -2332,6 +2361,7 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
+     int flags;
+     NBDExport *exp = client->exp;
+     char *msg;
++    size_t i;
+
+     switch (request->type) {
+     case NBD_CMD_CACHE:
+@@ -2435,12 +2465,15 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
+                 }
+             }
+
+-            if (client->export_meta.bitmap) {
++            for (i = 0; i < client->exp->nr_export_bitmaps; i++) {
++                if (!client->export_meta.bitmaps[i]) {
++                    continue;
++                }
+                 ret = nbd_co_send_bitmap(client, request->handle,
+-                                         client->exp->export_bitmap,
++                                         client->exp->export_bitmaps[i],
+                                          request->from, request->len,
+                                          dont_fragment, !--contexts_remaining,
+-                                         NBD_META_ID_DIRTY_BITMAP, errp);
++                                         NBD_META_ID_DIRTY_BITMAP + i, errp);
+                 if (ret < 0) {
+                     return ret;
+                 }
+diff --git a/tests/qemu-iotests/291 b/tests/qemu-iotests/291
+index 4f837b205655..37848ac60bba 100755
+--- a/tests/qemu-iotests/291
++++ b/tests/qemu-iotests/291
+@@ -107,16 +107,14 @@ echo
+ # x-dirty-bitmap is a hack for reading bitmaps; it abuses block status to
+ # report "data":false for portions of the bitmap which are set
+ IMG="driver=nbd,server.type=unix,server.path=$nbd_unix_socket"
+-nbd_server_start_unix_socket -r -f qcow2 -B b0 "$TEST_IMG"
++nbd_server_start_unix_socket -r -f qcow2 \
++    -B b0 -B b1 -B b2 -B b3 "$TEST_IMG"
+ $QEMU_IMG map --output=json --image-opts \
+     "$IMG,x-dirty-bitmap=qemu:dirty-bitmap:b0" | _filter_qemu_img_map
+-nbd_server_start_unix_socket -r -f qcow2 -B b1 "$TEST_IMG"
+ $QEMU_IMG map --output=json --image-opts \
+     "$IMG,x-dirty-bitmap=qemu:dirty-bitmap:b1" | _filter_qemu_img_map
+-nbd_server_start_unix_socket -r -f qcow2 -B b2 "$TEST_IMG"
+ $QEMU_IMG map --output=json --image-opts \
+     "$IMG,x-dirty-bitmap=qemu:dirty-bitmap:b2" | _filter_qemu_img_map
+-nbd_server_start_unix_socket -r -f qcow2 -B b3 "$TEST_IMG"
+ $QEMU_IMG map --output=json --image-opts \
+     "$IMG,x-dirty-bitmap=qemu:dirty-bitmap:b3" | _filter_qemu_img_map
 
 -- 
 2.28.0
