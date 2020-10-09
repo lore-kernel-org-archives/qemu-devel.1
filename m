@@ -2,88 +2,85 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2A12C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 12:18:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 281C0C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 12:18:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 560462184D
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 12:18:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 959912184D
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 12:18:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UD2YNMdG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 560462184D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Rh1O8giy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 959912184D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQrLi-00075A-3M
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 08:18:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37016)
+	id 1kQrMD-0007ft-FW
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 08:18:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37656)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kQrHL-0005Uc-KW
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 08:13:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34465)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kQrHJ-0007MA-Eq
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 08:13:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602245620;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=js5CP0Qql0dPLWIH2kAUBJqrOzLXC60+IR24383gV4E=;
- b=UD2YNMdGQG3S4CXTFpguJDABpr8DlVpYx/qEfdfdDTSU38gYXnx0c07Tp3Ckqx4ukK8zXs
- Drz68GS0FcJo62y1uLzp3j+23Q5Q9x5+nx8cMzjpkowSHNiPwXgxCJTwt1zFGxJ3vxabLQ
- kefP1X3mN/cSWbYiNbVidUa+CFmP0K4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-188-PqJwGeDpMaO_CkyRt_SkGQ-1; Fri, 09 Oct 2020 08:13:37 -0400
-X-MC-Unique: PqJwGeDpMaO_CkyRt_SkGQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B3DC8C2C4A;
- Fri,  9 Oct 2020 12:13:36 +0000 (UTC)
-Received: from work-vm (ovpn-113-175.ams2.redhat.com [10.36.113.175])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1E1545D9E8;
- Fri,  9 Oct 2020 12:13:31 +0000 (UTC)
-Date: Fri, 9 Oct 2020 13:13:29 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [Virtio-fs] [PATCH v2] configure: add option for virtiofsd
-Message-ID: <20201009121329.GH3071@work-vm>
-References: <20201008103133.2722903-1-misono.tomohiro@jp.fujitsu.com>
- <ea7dc73c-7ca5-924e-756e-02a5e66f85c7@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kQrKF-0006gS-0p
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 08:16:43 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:45573)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kQrKD-0007jP-3U
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 08:16:42 -0400
+Received: by mail-ed1-x544.google.com with SMTP id dg9so6753351edb.12
+ for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 05:16:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Yn0kblmzf0znt1St/jcqzNWz4E4y7g4ifHANsNjv9qo=;
+ b=Rh1O8giyOmdFm77SpqUvSb1t50WG9U5F5n0ouoGqNP8v2WXRlFfpKg7yJ3TAAMitMC
+ XlvqBujX0C0hx4DJDcCbIk1XLNDfGTu1UVi05T6rcmPxyyaSyhG+q4okENVFYFbKduuq
+ WBP2BB4yUjhkzBXZJlemWNrmJL3vD6CTTdPmwcboOKumd4g3lA5Oe8jXRYr1HVWaz5jQ
+ zu2xvphBe8jNr3ofC3mt7Y14i9SxeU6KJIUcZWPZ5e0yOQk0rW0a4hH9g5vjyNFj/qds
+ WwLEWzDodCspgxO5mWwUT4uYw21oX7yUm8/I/nFcbr7AVLiDybjtd5NsaRcbRogkF3Jp
+ hvYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Yn0kblmzf0znt1St/jcqzNWz4E4y7g4ifHANsNjv9qo=;
+ b=o0LmMJhgo3jd4JVnlJCwaFhqVZ25cTjb8wfMw5XrFARkWM0d0zY+H3DNZkSuJK3mh9
+ lEHfr1Zfw0q/+3K1rIoQBGorZZ3a/Rc+9TOtb5l9AH09QtVKckzDMHS31LPLcEPzAPqf
+ 3O6hRuwI5WRnfzf4dBU181+5MdQya9EaLb9I29Ffl6+nnTeBLSgPMknRcDsNIby2TgVg
+ R1ERuOqjAdOrkud8ln8HbRtMA5k/bTyFeNfqPWVRkso+KbHEPiIt7oZYHcCeSQD9nDkr
+ o/r4Y6xw6leuqcs3Zl/bRbKT370/1of/NN56UCNNtqKRdetOF050hEkiF0/C3dcR1q4o
+ yCaw==
+X-Gm-Message-State: AOAM533o3OKoMHDnEBCM+peGe3LMPIIzlttjKw0c38Qd+akeiSUVjGAu
+ MQdFcfYvVWI4z1Ne+8lp2nUgoTnu8NT98S3OTrJekA==
+X-Google-Smtp-Source: ABdhPJxkUCAU5YoQZpXn0+H5FEyyjtlPvSAKcstZ7VCKuslRVW0HPrn9KA6Uf20zejOj4s9IpU/GJWh3BL7avwn5pKM=
+X-Received: by 2002:a50:e68a:: with SMTP id z10mr14631104edm.100.1602245798941; 
+ Fri, 09 Oct 2020 05:16:38 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <ea7dc73c-7ca5-924e-756e-02a5e66f85c7@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:34:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20201008185951.1026052-1-eblake@redhat.com>
+In-Reply-To: <20201008185951.1026052-1-eblake@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 9 Oct 2020 13:16:27 +0100
+Message-ID: <CAFEAcA-EO9C+JsH_J+teH9RPFM17OVaYY4x=OF6wnC-d-YwSog@mail.gmail.com>
+Subject: Re: [PULL 0/8] NBD patches through 2020-10-08
+To: Eric Blake <eblake@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::544;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x544.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,159 +93,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>,
- qemu-devel@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> On 08/10/20 12:31, Misono Tomohiro wrote:
-> > Currently it is unknown whether virtiofsd will be built at
-> > configuration time. It will be automatically built when dependency
-> > is met. Also, required libraries are not clear.
-> > 
-> > To make this clear, add configure option --{enable,disable}-virtiofsd.
-> > The default is the same as current (enabled if available) like many
-> > other options. When --enable-virtiofsd is given and dependency is not
-> > met, we get:
-> > 
-> >   ERROR: Problem encountered: virtiofsd requires libcap-ng-devel and seccomp-devel
-> > or
-> >   ERROR: Problem encountered: virtiofsd needs tools and vhost-user support
-> > 
-> > In addition, configuration summary now includes virtiofsd entry:
-> > 
-> >   build virtiofs daemon: YES/NO
-> > 
-> > Signed-off-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
-> > ---
-> > This patch is based on current master branch
-> > 
-> > v1 ... https://lore.kernel.org/qemu-devel/20201007092913.1524199-1-misono.tomohiro@jp.fujitsu.com/
-> > v1 -> v2: Update to follow the current meson build style
-> > 
-> >  configure         |  8 +++++++-
-> >  meson.build       |  1 +
-> >  meson_options.txt |  2 ++
-> >  tools/meson.build | 17 +++++++++++++++--
-> >  4 files changed, 25 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/configure b/configure
-> > index 28df227db5..2bd8419b1f 100755
-> > --- a/configure
-> > +++ b/configure
-> > @@ -302,6 +302,7 @@ netmap="no"
-> >  sdl="auto"
-> >  sdl_image="auto"
-> >  virtfs=""
-> > +virtiofsd="auto"
-> >  mpath="auto"
-> >  vnc="enabled"
-> >  sparse="auto"
-> > @@ -1004,6 +1005,10 @@ for opt do
-> >    ;;
-> >    --enable-virtfs) virtfs="yes"
-> >    ;;
-> > +  --disable-virtiofsd) virtiofsd="disabled"
-> > +  ;;
-> > +  --enable-virtiofsd) virtiofsd="enabled"
-> > +  ;;
-> >    --disable-mpath) mpath="disabled"
-> >    ;;
-> >    --enable-mpath) mpath="enabled"
-> > @@ -1761,6 +1766,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-> >    vnc-png         PNG compression for VNC server
-> >    cocoa           Cocoa UI (Mac OS X only)
-> >    virtfs          VirtFS
-> > +  virtiofsd       build virtiofs daemon (virtiofsd)
-> >    mpath           Multipath persistent reservation passthrough
-> >    xen             xen backend driver support
-> >    xen-pci-passthrough    PCI passthrough support for Xen
-> > @@ -7215,7 +7221,7 @@ NINJA=${ninja:-$PWD/ninjatool} $meson setup \
-> >  	-Dxen=$xen -Dxen_pci_passthrough=$xen_pci_passthrough -Dtcg=$tcg \
-> >  	-Dcocoa=$cocoa -Dmpath=$mpath -Dsdl=$sdl -Dsdl_image=$sdl_image \
-> >  	-Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
-> > -	-Dgettext=$gettext -Dxkbcommon=$xkbcommon -Du2f=$u2f \
-> > +	-Dgettext=$gettext -Dxkbcommon=$xkbcommon -Du2f=$u2f -Dvirtiofsd=$virtiofsd \
-> >  	-Dcapstone=$capstone -Dslirp=$slirp -Dfdt=$fdt \
-> >          $cross_arg \
-> >          "$PWD" "$source_path"
-> > diff --git a/meson.build b/meson.build
-> > index 17c89c87c6..a087239009 100644
-> > --- a/meson.build
-> > +++ b/meson.build
-> > @@ -1843,6 +1843,7 @@ summary_info += {'Audio drivers':     config_host['CONFIG_AUDIO_DRIVERS']}
-> >  summary_info += {'Block whitelist (rw)': config_host['CONFIG_BDRV_RW_WHITELIST']}
-> >  summary_info += {'Block whitelist (ro)': config_host['CONFIG_BDRV_RO_WHITELIST']}
-> >  summary_info += {'VirtFS support':    config_host.has_key('CONFIG_VIRTFS')}
-> > +summary_info += {'build virtiofs daemon': have_virtiofsd}
-> >  summary_info += {'Multipath support': mpathpersist.found()}
-> >  summary_info += {'VNC support':       vnc.found()}
-> >  if vnc.found()
-> > diff --git a/meson_options.txt b/meson_options.txt
-> > index 1d3c94840a..80637ada63 100644
-> > --- a/meson_options.txt
-> > +++ b/meson_options.txt
-> > @@ -48,6 +48,8 @@ option('vnc_sasl', type : 'feature', value : 'auto',
-> >         description: 'SASL authentication for VNC server')
-> >  option('xkbcommon', type : 'feature', value : 'auto',
-> >         description: 'xkbcommon support')
-> > +option('virtiofsd', type: 'feature', value: 'auto',
-> > +       description: 'build virtiofs daemon (virtiofsd)')
-> >  
-> >  option('capstone', type: 'combo', value: 'auto',
-> >         choices: ['disabled', 'enabled', 'auto', 'system', 'internal'],
-> > diff --git a/tools/meson.build b/tools/meson.build
-> > index 513bd2ff4f..76bf84df52 100644
-> > --- a/tools/meson.build
-> > +++ b/tools/meson.build
-> > @@ -1,10 +1,23 @@
-> > -have_virtiofsd = (have_system and
-> > +have_virtiofsd = (targetos == 'linux' and
-> >      have_tools and
-> > -    'CONFIG_LINUX' in config_host and 
-> >      'CONFIG_SECCOMP' in config_host and
-> >      'CONFIG_LIBCAP_NG' in config_host and
-> >      'CONFIG_VHOST_USER' in config_host)
-> >  
-> > +if get_option('virtiofsd').enabled()
-> > +  if not have_virtiofsd
-> > +    if targetos != 'linux'
-> > +      error('virtiofsd requires Linux')
-> > +    elif 'CONFIG_SECCOMP' not in config_host or 'CONFIG_LIBCAP_NG' not in config_host
-> > +      error('virtiofsd requires libcap-ng-devel and seccomp-devel')
-> > +    elif not have_tools or 'CONFIG_VHOST_USER' not in config_host
-> > +      error('virtiofsd needs tools and vhost-user support')
-> > +    endif
-> > +  endif
-> > +elif get_option('virtiofsd').disabled() or not have_system
-> > +  have_virtiofsd = false
-> > +endif
-> > +
-> >  if have_virtiofsd
-> >    subdir('virtiofsd')
-> >  endif
-> > 
-> 
-> This looks good and the way you solved --enable-virtiofsd
-> --disable-tools makes sense.  I'll let David pick it up or decide if he
-> wants a different approach.
+On Thu, 8 Oct 2020 at 20:03, Eric Blake <eblake@redhat.com> wrote:
+>
+> The following changes since commit e64cf4d569f6461d6b9072e00d6e78d0ab8bd4a7:
+>
+>   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20201008' into staging (2020-10-08 17:18:46 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://repo.or.cz/qemu/ericb.git tags/pull-nbd-2020-10-08
+>
+> for you to fetch changes up to 82cd3c26889adbd41756de121d38a3aa7c9351c7:
+>
+>   nbd: Simplify meta-context parsing (2020-10-08 13:35:07 -0500)
+>
+> ----------------------------------------------------------------
+> nbd patches for 2020-10-08
+>
+> - silence compilation warnings
+> - more fixes to prevent reconnect hangs
+> - improve 'qemu-nbd' termination behavior
+> - cleaner NBD protocol compliance on string handling
 
-In that case I'll take your word the meson bit is OK, so:
+Build failure, OSX, FreeBSD, NetBSD:
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Linking static target libqemuutil.a
+../../qemu-nbd.c:591:29: error: use of undeclared identifier 'termsig_handler'
+    sa_sigterm.sa_handler = termsig_handler;
+                            ^
+1 error generated.
 
-(I've also hit this, wondering why virtiofsd hasn't been built and
-realising I was missing capng on a new host).
-
-> Paolo
-> 
-> _______________________________________________
-> Virtio-fs mailing list
-> Virtio-fs@redhat.com
-> https://www.redhat.com/mailman/listinfo/virtio-fs
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+thanks
+-- PMM
 
