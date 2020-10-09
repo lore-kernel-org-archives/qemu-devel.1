@@ -8,76 +8,76 @@ X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,
 	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14A21C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 11:10:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCF89C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 11:12:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BB43222B8
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 11:10:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3984422269
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 11:12:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sbscYl1N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BB43222B8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lBgVwGlH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3984422269
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQqIa-0005Iu-E9
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 07:10:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54108)
+	id 1kQqKS-0007jx-1F
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 07:12:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54052)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kQqGE-0003Is-GJ; Fri, 09 Oct 2020 07:08:30 -0400
-Received: from mail-pl1-x630.google.com ([2607:f8b0:4864:20::630]:36071)
+ id 1kQqGA-0003As-Uf; Fri, 09 Oct 2020 07:08:26 -0400
+Received: from mail-pf1-x435.google.com ([2607:f8b0:4864:20::435]:40925)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kQqGB-000804-Jp; Fri, 09 Oct 2020 07:08:30 -0400
-Received: by mail-pl1-x630.google.com with SMTP id w21so1536441plq.3;
- Fri, 09 Oct 2020 04:08:26 -0700 (PDT)
+ id 1kQqG8-0007ze-R0; Fri, 09 Oct 2020 07:08:26 -0400
+Received: by mail-pf1-x435.google.com with SMTP id w21so6573954pfc.7;
+ Fri, 09 Oct 2020 04:08:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Mg39he2ihF2KQD3pRXZcx4vq8zLMJm3/bTiO7l/IBtU=;
- b=sbscYl1NY5AN15fOCMYUWrgARkHe5gayj2EI250AU8vtLOkEdistaIoosslq/FQPho
- reDUBfTAIXNaO+3GlFnvjuNd0F42KHsiexfg/hxtlYogx7kVjD7DTaX2BYThHMwtqRC/
- F4dMCfGV48K8UnjWvG5sCqnlPOBuSOdF5DIuR+q1BW+SUEFnI+rvZG0Ls6ye6jEXvtLa
- HJFVVzhfpR5PqtalV1ZrcE4gHoLxwafqkWGl+ZuKvP/o5RLfHBCcUWoctkGs9ku9t8U5
- 1TuflaRfvpzbosxrlFN7urghfHaK90G+1RnTqfFsFcMs+rMTrJSbdziOKZO6KYepRYPU
- F6cQ==
+ bh=7SLaojD6nPx1Ab15Mm0PQZhp0vssO9QPF0B/GdQmMBs=;
+ b=lBgVwGlHS1mQdQVpiVruu8RfeSwEwRs9jybYRjyrUQrh1CEx91I7ZAEIUClg8sLUT/
+ qpf5VYK8jxvCiHrJOizmwKR8Nx0KaOAsub/99cNWJfMrLQf6Isjve+ufSYMUpAMeYBoy
+ hcyMzeqFq9WvmX7i1vrYmIF+G7m+FZT+d1XvIkidGPxeubT/XEtK1ggoddJSKU8C0DdT
+ 6H4/982UZHTvWlhxomzLBbJezCVoT5qJGk72wUCimpdQjsWeBnRUjFeWw4op9F8ayp2+
+ rkVLx0/jSmeHm06JnsMIMNH+HAxmcin9KGsMl3gcRUlpw6lxQ50MOPQMLD8uF4sQP9Mo
+ ilfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Mg39he2ihF2KQD3pRXZcx4vq8zLMJm3/bTiO7l/IBtU=;
- b=hphTXTQZXLD3iURmFzDkm8PVRIOP3eZ3orZ59E/HBoyJ8kflFO7Pu6MlU7VVYufdH+
- yqUKzDomtOsHNuD43EGDPbhsctzNo7W4nKHE5vXgSHDQXzZc2FDE+C9Lf4z9G4Dru5S5
- jLCvBjhfxtgQjC/+Ou6b13BTjO8bLf251V+4v2kEHS+Y3dWhg3jsMybqkbPZ7ljBgL5z
- e3fhLTYo8HPQnhtYuCNN201yTGlGS/KTN2gFbsCNYE22ee9h7omF+hieXrU1n0g/v02D
- gS7JGBgiII2YfrOzBRi/kpi7NxKc1wWs4FWztPnRla0e7LQhQfXsyjZx4fEWSOMRxzBB
- UaOQ==
-X-Gm-Message-State: AOAM533iopcaWuPN+BJdCfUpD9UAC5uIY5wxvekbYGuBncfkGasU8Ngu
- di1fuUmOjNfiSPtm0oa1tWqsjrrIkxLbmuY3
-X-Google-Smtp-Source: ABdhPJxU/W5DT/QbVGrMYJYxKqoOc1nN+RzrSIXFKpRmP2imzrf6c+ENvvm6/j3fq7GrvcBBW8k2/Q==
-X-Received: by 2002:a17:902:b402:b029:d3:db79:c019 with SMTP id
- x2-20020a170902b402b02900d3db79c019mr11893997plr.82.1602241705467; 
- Fri, 09 Oct 2020 04:08:25 -0700 (PDT)
+ bh=7SLaojD6nPx1Ab15Mm0PQZhp0vssO9QPF0B/GdQmMBs=;
+ b=ef3pkzCdYUQiAiNtC+wWo+Z8RRDtATv+0KmKauDSLdv3D2l7cdbyE5cpF82X7KQtGz
+ SySm4ZlfCq3Cb4MEspJuaDJIedZTEbtRaM+DtByclZ1S2ArIKts5GAJMRd3/4pLbUv2k
+ 9QtdjxX6e9GzSlcz3uJ4KiIJp/evwMtZliU6ZzO564CcdA5PgOO+djw6ZZZQ9xCwjo/h
+ ukcNEhPQ3pVUpPqVjv+yr78G99CO8SHIBhHQ9cGlpUQQAfSFdmF0u+JmRuIIDsvxSne0
+ k78vGhfUnMGbnMzeKnwQiTriIFGS0+Qatad5mYMzPMeBCgS7tkxLgSFSZTZN4yN58VqT
+ t7Jw==
+X-Gm-Message-State: AOAM5300gLehAqiEAlSkC59xdwFsOAH/MKd5av4faVLH9qWakXeEJwDv
+ WqXF9Bn/EYr/D42vQrDSQFmSYPHBPc4FTBmd
+X-Google-Smtp-Source: ABdhPJzsl7TBnH98EnkyjFLDn+H8zJpSGcBYWvcASwC8XlHLjK4ib5CR+PFkShsWoKf8jj3Uc1ts/Q==
+X-Received: by 2002:a62:1613:0:b029:152:743c:355c with SMTP id
+ 19-20020a6216130000b0290152743c355cmr11733675pfw.15.1602241699817; 
+ Fri, 09 Oct 2020 04:08:19 -0700 (PDT)
 Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id v1sm2619462pjt.2.2020.10.09.04.08.22
+ by smtp.googlemail.com with ESMTPSA id v1sm2619462pjt.2.2020.10.09.04.08.17
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 09 Oct 2020 04:08:24 -0700 (PDT)
+ Fri, 09 Oct 2020 04:08:19 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 3/4] docs: Fixes build docs on msys2/mingw
-Date: Fri,  9 Oct 2020 19:07:59 +0800
-Message-Id: <20201009110800.432-4-luoyonggang@gmail.com>
+Subject: [PATCH v6 1/4] cirrus: Fixing and speedup the msys2/mingw CI
+Date: Fri,  9 Oct 2020 19:07:57 +0800
+Message-Id: <20201009110800.432-2-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20201009110800.432-1-luoyonggang@gmail.com>
 References: <20201009110800.432-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::630;
- envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x630.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::435;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x435.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,94 +107,153 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Use cache of cirrus caching msys2
+The install of msys2 are refer to https://github.com/msys2/setup-msys2
+The first time install msys2 would be time consuming, so increase timeout_in to 90m
+according to https://cirrus-ci.org/faq/#instance-timed-out
+
+Apply patch of https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg00072.html
+
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- docs/conf.py                  |  2 +-
- docs/sphinx/kerneldoc.py      |  2 +-
- scripts/rst-sanitize.py       | 21 +++++++++++++++++++++
- tests/qapi-schema/meson.build |  5 +++--
- 4 files changed, 26 insertions(+), 4 deletions(-)
- create mode 100644 scripts/rst-sanitize.py
+ .cirrus.yml | 111 +++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 66 insertions(+), 45 deletions(-)
 
-diff --git a/docs/conf.py b/docs/conf.py
-index 00e1b750e2..e584f68393 100644
---- a/docs/conf.py
-+++ b/docs/conf.py
-@@ -241,7 +241,7 @@ texinfo_documents = [
- # We use paths starting from qemu_docdir here so that you can run
- # sphinx-build from anywhere and the kerneldoc extension can still
- # find everything.
--kerneldoc_bin = os.path.join(qemu_docdir, '../scripts/kernel-doc')
-+kerneldoc_bin = ['perl', os.path.join(qemu_docdir, '../scripts/kernel-doc')]
- kerneldoc_srctree = os.path.join(qemu_docdir, '..')
- hxtool_srctree = os.path.join(qemu_docdir, '..')
- qapidoc_srctree = os.path.join(qemu_docdir, '..')
-diff --git a/docs/sphinx/kerneldoc.py b/docs/sphinx/kerneldoc.py
-index 3e87940206..3ac277d162 100644
---- a/docs/sphinx/kerneldoc.py
-+++ b/docs/sphinx/kerneldoc.py
-@@ -67,7 +67,7 @@ class KernelDocDirective(Directive):
+diff --git a/.cirrus.yml b/.cirrus.yml
+index d58782ce67..ed3db10e45 100644
+--- a/.cirrus.yml
++++ b/.cirrus.yml
+@@ -46,64 +46,85 @@ macos_xcode_task:
+     - gmake check
  
-     def run(self):
-         env = self.state.document.settings.env
--        cmd = [env.config.kerneldoc_bin, '-rst', '-enable-lineno']
-+        cmd = env.config.kerneldoc_bin + ['-rst', '-enable-lineno']
- 
-         filename = env.config.kerneldoc_srctree + '/' + self.arguments[0]
-         export_file_patterns = []
-diff --git a/scripts/rst-sanitize.py b/scripts/rst-sanitize.py
-new file mode 100644
-index 0000000000..26060f1208
---- /dev/null
-+++ b/scripts/rst-sanitize.py
-@@ -0,0 +1,21 @@
-+#!/usr/bin/env python3
+ windows_msys2_task:
++  timeout_in: 90m
+   windows_container:
+-    image: cirrusci/windowsservercore:cmake
++    image: cirrusci/windowsservercore:2019
+     os_version: 2019
+     cpu: 8
+     memory: 8G
+   env:
++    CIRRUS_SHELL: powershell
+     MSYS: winsymlinks:nativestrict
+     MSYSTEM: MINGW64
+     CHERE_INVOKING: 1
+-  printenv_script:
+-    - C:\tools\msys64\usr\bin\bash.exe -lc 'printenv'
++  setup_script:
++    - choco install -y --no-progress 7zip
++    - Write-Output $env:PATH
++  msys2_cache:
++    folder: C:\tools\archive
++    reupload_on_changes: false
++    fingerprint_script: cat .cirrus.yml
++    populate_script:
++      - |
++        md C:\tools
++        md C:\tools\archive
++        $start_time = Get-Date
++        cd C:\tools
++        bitsadmin /transfer msys_download /dynamic /download /priority FOREGROUND https://github.com/msys2/msys2-installer/releases/download/2020-09-03/msys2-base-x86_64-20200903.sfx.exe C:\tools\base.exe
++        Write-Output "Download time taken: $((Get-Date).Subtract($start_time).Seconds) second(s)"
++        C:\tools\base.exe -y
++        ((Get-Content -path C:\tools\msys64\etc\\post-install\\07-pacman-key.post -Raw) -replace '--refresh-keys', '--version') | Set-Content -Path C:\tools\msys64\etc\\post-install\\07-pacman-key.post
++        C:\tools\msys64\usr\bin\bash.exe -lc "sed -i 's/^CheckSpace/#CheckSpace/g' /etc/pacman.conf"
++        C:\tools\msys64\usr\bin\bash.exe -lc "export"
++        C:\tools\msys64\usr\bin\pacman.exe --noconfirm -Sy
++        echo Y | C:\tools\msys64\usr\bin\pacman.exe --noconfirm -Suu --overwrite=*
++        taskkill /F /FI "MODULES eq msys-2.0.dll"
++        tasklist
++        C:\tools\msys64\usr\bin\bash.exe -lc "mv -f /etc/pacman.conf.pacnew /etc/pacman.conf || true"
++        C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Suu --overwrite=*"
++        C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -S --needed \
++          diffutils git grep make pkg-config sed \
++          mingw-w64-x86_64-python \
++          mingw-w64-x86_64-python-setuptools \
++          mingw-w64-x86_64-toolchain \
++          mingw-w64-x86_64-SDL2 \
++          mingw-w64-x86_64-SDL2_image \
++          mingw-w64-x86_64-gtk3 \
++          mingw-w64-x86_64-glib2 \
++          mingw-w64-x86_64-ninja \
++          mingw-w64-x86_64-jemalloc \
++          mingw-w64-x86_64-lzo2 \
++          mingw-w64-x86_64-zstd \
++          mingw-w64-x86_64-libjpeg-turbo \
++          mingw-w64-x86_64-pixman \
++          mingw-w64-x86_64-libgcrypt \
++          mingw-w64-x86_64-libpng \
++          mingw-w64-x86_64-libssh \
++          mingw-w64-x86_64-libxml2 \
++          mingw-w64-x86_64-snappy \
++          mingw-w64-x86_64-libusb \
++          mingw-w64-x86_64-usbredir \
++          mingw-w64-x86_64-libtasn1 \
++          mingw-w64-x86_64-nettle \
++          mingw-w64-x86_64-cyrus-sasl \
++          mingw-w64-x86_64-curl \
++          mingw-w64-x86_64-gnutls \
++          "
++        C:\tools\msys64\usr\bin\bash.exe -lc "rm -rf /var/cache/pacman/pkg/*"
++        cd C:\tools\msys64
++        echo "Start archive"
++        cmd /C "7z a -ttar . -so | 7z a -txz -simsys2-x86_64.tar C:\tools\archive\msys2-x86_64.tar.xz"
+   install_script:
+-    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools &&
+-        curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
+-    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools &&
+-        curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
+-    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools &&
+-        pacman -U --noconfirm msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
+-    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Sy"
+-    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -S --needed
+-        bash pacman pacman-mirrors msys2-runtime"
+-    - taskkill /F /IM gpg-agent.exe
+-    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Su"
+-    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -S --needed
+-        base-devel
+-        git
+-        mingw-w64-x86_64-python
+-        mingw-w64-x86_64-python-setuptools
+-        mingw-w64-x86_64-toolchain
+-        mingw-w64-x86_64-capstone
+-        mingw-w64-x86_64-SDL2
+-        mingw-w64-x86_64-SDL2_image
+-        mingw-w64-x86_64-gtk3
+-        mingw-w64-x86_64-glib2
+-        mingw-w64-x86_64-ninja
+-        mingw-w64-x86_64-make
+-        mingw-w64-x86_64-lzo2
+-        mingw-w64-x86_64-zstd
+-        mingw-w64-x86_64-libjpeg-turbo
+-        mingw-w64-x86_64-pixman
+-        mingw-w64-x86_64-libgcrypt
+-        mingw-w64-x86_64-libpng
+-        mingw-w64-x86_64-libssh
+-        mingw-w64-x86_64-libxml2
+-        mingw-w64-x86_64-snappy
+-        mingw-w64-x86_64-libusb
+-        mingw-w64-x86_64-usbredir
+-        mingw-w64-x86_64-libtasn1
+-        mingw-w64-x86_64-nettle
+-        mingw-w64-x86_64-cyrus-sasl
+-        mingw-w64-x86_64-curl
+-        mingw-w64-x86_64-gnutls
+-        mingw-w64-x86_64-zstd"
++    - |
++      cd C:\tools
++      cmd /C "7z x C:\tools\archive\msys2-x86_64.tar.xz -so | 7z x -aoa -simsys2-x86_64.tar -ttar -omsys64"
++      C:\tools\msys64\usr\bin\bash.exe -lc "export"
 +
-+#
-+# Script for remove cr line ending in file
-+#
-+# Authors:
-+#  Yonggang Luo <luoyonggang@gmail.com>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2
-+# or, at your option, any later version.  See the COPYING file in
-+# the top-level directory.
-+
-+import sys
-+
-+def main(_program, file, *unused):
-+    with open(file, 'rb') as content_file:
-+        content = content_file.read()
-+        sys.stdout.buffer.write(content.replace(b'\r', b''))
-+
-+if __name__ == "__main__":
-+    main(*sys.argv)
-diff --git a/tests/qapi-schema/meson.build b/tests/qapi-schema/meson.build
-index f08c902911..a6832634b3 100644
---- a/tests/qapi-schema/meson.build
-+++ b/tests/qapi-schema/meson.build
-@@ -250,18 +250,19 @@ qapi_doc_out = custom_target('QAPI rST doc',
- # using an explicit '\' character in the command arguments to
- # a custom_target(), as Meson will unhelpfully replace it with a '/'
- # (https://github.com/mesonbuild/meson/issues/1564)
-+rst_sanitize_cmd = [find_program('../../scripts/rst-sanitize.py'), '@INPUT@']
- qapi_doc_out_nocr = custom_target('QAPI rST doc newline-sanitized',
-                                   output: ['doc-good.txt.nocr'],
-                                   input: qapi_doc_out[0],
-                                   build_by_default: build_docs,
--                                  command: ['perl', '-pe', '$x = chr 13; s/$x$//', '@INPUT@'],
-+                                  command: rst_sanitize_cmd,
-                                   capture: true)
- 
- qapi_doc_ref_nocr = custom_target('QAPI rST doc reference newline-sanitized',
-                                   output: ['doc-good.ref.nocr'],
-                                   input: files('doc-good.txt'),
-                                   build_by_default: build_docs,
--                                  command: ['perl', '-pe', '$x = chr 13; s/$x$//', '@INPUT@'],
-+                                  command: rst_sanitize_cmd,
-                                   capture: true)
- 
- if build_docs
+   script:
+     - C:\tools\msys64\usr\bin\bash.exe -lc "mkdir build"
+     - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && ../configure
+       --python=python3 --ninja=ninja
+       --target-list-exclude=i386-softmmu,arm-softmmu,ppc-softmmu,mips-softmmu"
+-    - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && make -j$NUMBER_OF_PROCESSORS"
++    - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && make -j8"
+   test_script:
+     - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && make V=1 check"
 -- 
 2.28.0.windows.1
 
