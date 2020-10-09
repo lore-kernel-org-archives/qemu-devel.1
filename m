@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F17D2C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 06:59:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8480BC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 07:00:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DB4922248
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 06:59:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DB4922248
+	by mail.kernel.org (Postfix) with ESMTPS id E9A1422248
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 06:59:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9A1422248
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56126 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQmMy-00041m-8h
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 02:59:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56194)
+	id 1kQmNi-0005y4-OZ
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 02:59:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56302)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1kQmA4-0005nM-SF; Fri, 09 Oct 2020 02:45:54 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:4774 helo=huawei.com)
+ id 1kQmAU-00065K-Fk; Fri, 09 Oct 2020 02:46:20 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:5162 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1kQmA1-0001C5-2f; Fri, 09 Oct 2020 02:45:52 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 823846AE669EF6E15121;
- Fri,  9 Oct 2020 14:45:42 +0800 (CST)
-Received: from localhost (10.174.186.238) by DGGEMS408-HUB.china.huawei.com
- (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Fri, 9 Oct 2020
- 14:45:36 +0800
+ id 1kQmAM-0001Jp-S5; Fri, 09 Oct 2020 02:46:18 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id B65DFF7FCAA9C07AA396;
+ Fri,  9 Oct 2020 14:46:06 +0800 (CST)
+Received: from localhost (10.174.186.238) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.487.0; Fri, 9 Oct 2020
+ 14:45:57 +0800
 From: zhaolichang <zhaolichang@huawei.com>
 To: <qemu-trivial@nongnu.org>
-Subject: [PATCH V2 01/14] cris/: fix some comment spelling errors
-Date: Fri, 9 Oct 2020 14:44:36 +0800
-Message-ID: <20201009064449.2336-2-zhaolichang@huawei.com>
+Subject: [PATCH V2 07/14] s390x/: fix some comment spelling errors
+Date: Fri, 9 Oct 2020 14:44:42 +0800
+Message-ID: <20201009064449.2336-8-zhaolichang@huawei.com>
 X-Mailer: git-send-email 2.26.2.windows.1
 In-Reply-To: <20201009064449.2336-1-zhaolichang@huawei.com>
 References: <20201009064449.2336-1-zhaolichang@huawei.com>
@@ -49,9 +49,9 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-Originating-IP: [10.174.186.238]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.191;
+Received-SPF: pass client-ip=45.249.212.190;
  envelope-from=zhaolichang@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:45:42
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:45:16
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -78,125 +78,128 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I found that there are many spelling errors in the comments of qemu/target/cris.
+I found that there are many spelling errors in the comments of qemu/target/s390x.
 I used spellcheck to check the spelling errors and found some errors in the folder.
 
 Signed-off-by: zhaolichang <zhaolichang@huawei.com>
 Reviewed-by: David Edmondson <david.edmondson@oracle.com>
 ---
- target/cris/helper.c    |  6 +++---
- target/cris/op_helper.c |  2 +-
- target/cris/translate.c | 14 +++++++-------
- 3 files changed, 11 insertions(+), 11 deletions(-)
+ target/s390x/cpu_models.h       | 4 ++--
+ target/s390x/excp_helper.c      | 2 +-
+ target/s390x/fpu_helper.c       | 2 +-
+ target/s390x/insn-data.def      | 2 +-
+ target/s390x/misc_helper.c      | 2 +-
+ target/s390x/translate.c        | 4 ++--
+ target/s390x/translate_vx.c.inc | 2 +-
+ 7 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/target/cris/helper.c b/target/cris/helper.c
-index b5159b8357..50419e72c5 100644
---- a/target/cris/helper.c
-+++ b/target/cris/helper.c
-@@ -141,7 +141,7 @@ void crisv10_cpu_do_interrupt(CPUState *cs)
-     assert(!(env->pregs[PR_CCS] & PFIX_FLAG));
-     switch (cs->exception_index) {
-     case EXCP_BREAK:
--        /* These exceptions are genereated by the core itself.
-+        /* These exceptions are generated by the core itself.
-            ERP should point to the insn following the brk.  */
-         ex_vec = env->trap_vector;
-         env->pregs[PRV10_BRP] = env->pc;
-@@ -197,7 +197,7 @@ void cris_cpu_do_interrupt(CPUState *cs)
- 
-     switch (cs->exception_index) {
-     case EXCP_BREAK:
--        /* These exceptions are genereated by the core itself.
-+        /* These exceptions are generated by the core itself.
-            ERP should point to the insn following the brk.  */
-         ex_vec = env->trap_vector;
-         env->pregs[PR_ERP] = env->pc;
-@@ -256,7 +256,7 @@ void cris_cpu_do_interrupt(CPUState *cs)
-        undefined.  */
-     env->pc = cpu_ldl_code(env, env->pregs[PR_EBP] + ex_vec * 4);
- 
--    /* Clear the excption_index to avoid spurios hw_aborts for recursive
-+    /* Clear the excption_index to avoid spurious hw_aborts for recursive
-        bus faults.  */
-     cs->exception_index = -1;
- 
-diff --git a/target/cris/op_helper.c b/target/cris/op_helper.c
-index 6b1e7ae4a8..3c4aacc26a 100644
---- a/target/cris/op_helper.c
-+++ b/target/cris/op_helper.c
-@@ -231,7 +231,7 @@ static inline uint32_t evaluate_flags_writeback(CPUCRISState *env,
- {
-     unsigned int x, z, mask;
- 
--    /* Extended arithmetics, leave the z flag alone.  */
-+    /* Extended arithmetic, leave the z flag alone.  */
-     x = env->cc_x;
-     mask = env->cc_mask | X_FLAG;
-     if (x) {
-diff --git a/target/cris/translate.c b/target/cris/translate.c
-index c312e6f8a6..16b0ef8073 100644
---- a/target/cris/translate.c
-+++ b/target/cris/translate.c
-@@ -348,7 +348,7 @@ static void t_gen_cris_mstep(TCGv d, TCGv a, TCGv b, TCGv ccs)
-     tcg_temp_free(t);
+diff --git a/target/s390x/cpu_models.h b/target/s390x/cpu_models.h
+index 74d1f87e4f..15c0f0dcfe 100644
+--- a/target/s390x/cpu_models.h
++++ b/target/s390x/cpu_models.h
+@@ -24,13 +24,13 @@ struct S390CPUDef {
+     uint8_t gen;            /* hw generation identification */
+     uint16_t type;          /* cpu type identification */
+     uint8_t ec_ga;          /* EC GA version (on which also the BC is based) */
+-    uint8_t mha_pow;        /* Maximum Host Adress Power, mha = 2^pow-1 */
++    uint8_t mha_pow;        /* Maximum Host Address Power, mha = 2^pow-1 */
+     uint32_t hmfai;         /* hypervisor-managed facilities */
+     /* base/min features, must never be changed between QEMU versions */
+     S390FeatBitmap base_feat;
+     /* used to init base_feat from generated data */
+     S390FeatInit base_init;
+-    /* deafault features, QEMU version specific */
++    /* default features, QEMU version specific */
+     S390FeatBitmap default_feat;
+     /* used to init default_feat from generated data */
+     S390FeatInit default_init;
+diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
+index 0adfbbda27..36ab5c7c43 100644
+--- a/target/s390x/excp_helper.c
++++ b/target/s390x/excp_helper.c
+@@ -538,7 +538,7 @@ try_deliver:
+         /* don't trigger a cpu_loop_exit(), use an interrupt instead */
+         cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HALT);
+     } else if (cs->halted) {
+-        /* unhalt if we had a WAIT PSW somehwere in our injection chain */
++        /* unhalt if we had a WAIT PSW somewhere in our injection chain */
+         s390_cpu_unhalt(cpu);
+     }
  }
- 
--/* Extended arithmetics on CRIS.  */
-+/* Extended arithmetic on CRIS.  */
- static inline void t_gen_add_flag(TCGv d, int flag)
+diff --git a/target/s390x/fpu_helper.c b/target/s390x/fpu_helper.c
+index f155bc048c..3e609b7fd0 100644
+--- a/target/s390x/fpu_helper.c
++++ b/target/s390x/fpu_helper.c
+@@ -89,7 +89,7 @@ static void handle_exceptions(CPUS390XState *env, bool XxC, uintptr_t retaddr)
+     /*
+      * invalid/divbyzero cannot coexist with other conditions.
+      * overflow/underflow however can coexist with inexact, we have to
+-     * handle it separatly.
++     * handle it separately.
+      */
+     if (s390_exc & ~S390_IEEE_MASK_INEXACT) {
+         if (s390_exc & ~S390_IEEE_MASK_INEXACT & env->fpc >> 24) {
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index d3bcdfd67b..2469415319 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -526,7 +526,7 @@
+ /* LOAD LOGICAL HALFWORD RELATIVE LONG */
+     C(0xc402, LLHRL,   RIL_b, GIE, 0, ri2, new, r1_32, ld16u, 0)
+     C(0xc406, LLGHRL,  RIL_b, GIE, 0, ri2, r1, 0, ld16u, 0)
+-/* LOAD LOGICAL IMMEDATE */
++/* LOAD LOGICAL IMMEDIATE */
+     D(0xc00e, LLIHF,   RIL_a, EI, 0, i2_32u_shl, 0, r1, mov2, 0, 32)
+     D(0xc00f, LLILF,   RIL_a, EI, 0, i2_32u_shl, 0, r1, mov2, 0, 0)
+     D(0xa50c, LLIHH,   RI_a,  Z,  0, i2_16u_shl, 0, r1, mov2, 0, 48)
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index 58dbc023eb..929e509519 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -312,7 +312,7 @@ uint32_t HELPER(stsi)(CPUS390XState *env, uint64_t a0, uint64_t r0, uint64_t r1)
+             /* same as machine type number in STORE CPU ID, but in EBCDIC */
+             snprintf(type, ARRAY_SIZE(type), "%X", cpu->model->def->type);
+             ebcdic_put(sysib.sysib_111.type, type, 4);
+-            /* model number (not stored in STORE CPU ID for z/Architecure) */
++            /* model number (not stored in STORE CPU ID for z/Architecture) */
+             ebcdic_put(sysib.sysib_111.model, "QEMU            ", 16);
+             ebcdic_put(sysib.sysib_111.sequence, "QEMU            ", 16);
+             ebcdic_put(sysib.sysib_111.plant, "QEMU", 4);
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index ac10f42f10..4395455e0a 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -433,7 +433,7 @@ static void gen_program_exception(DisasContext *s, int code)
  {
-     TCGv c;
-@@ -725,7 +725,7 @@ static void cris_alu_op_exec(DisasContext *dc, int op,
-     switch (op) {
-     case CC_OP_ADD:
-         tcg_gen_add_tl(dst, a, b);
--        /* Extended arithmetics.  */
-+        /* Extended arithmetic.  */
-         t_gen_addx_carry(dc, dst);
+     TCGv_i32 tmp;
+ 
+-    /* Remember what pgm exeption this was.  */
++    /* Remember what pgm exception this was.  */
+     tmp = tcg_const_i32(code);
+     tcg_gen_st_i32(tmp, cpu_env, offsetof(CPUS390XState, int_pgm_code));
+     tcg_temp_free_i32(tmp);
+@@ -489,7 +489,7 @@ static TCGv_i64 get_address(DisasContext *s, int x2, int b2, int d2)
+ 
+     /*
+      * Note that d2 is limited to 20 bits, signed.  If we crop negative
+-     * displacements early we create larger immedate addends.
++     * displacements early we create larger immediate addends.
+      */
+     if (b2 && x2) {
+         tcg_gen_add_i64(tmp, regs[b2], regs[x2]);
+diff --git a/target/s390x/translate_vx.c.inc b/target/s390x/translate_vx.c.inc
+index eb767f5288..983da56b9d 100644
+--- a/target/s390x/translate_vx.c.inc
++++ b/target/s390x/translate_vx.c.inc
+@@ -789,7 +789,7 @@ static DisasJumpType op_vpk(DisasContext *s, DisasOps *o)
+         }
          break;
-     case CC_OP_ADDC:
-@@ -738,7 +738,7 @@ static void cris_alu_op_exec(DisasContext *dc, int op,
-         break;
-     case CC_OP_SUB:
-         tcg_gen_sub_tl(dst, a, b);
--        /* Extended arithmetics.  */
-+        /* Extended arithmetic.  */
-         t_gen_subx_carry(dc, dst);
-         break;
-     case CC_OP_MOVE:
-@@ -764,7 +764,7 @@ static void cris_alu_op_exec(DisasContext *dc, int op,
-         break;
-     case CC_OP_NEG:
-         tcg_gen_neg_tl(dst, b);
--        /* Extended arithmetics.  */
-+        /* Extended arithmetic.  */
-         t_gen_subx_carry(dc, dst);
-         break;
-     case CC_OP_LZ:
-@@ -787,7 +787,7 @@ static void cris_alu_op_exec(DisasContext *dc, int op,
-         break;
-     case CC_OP_CMP:
-         tcg_gen_sub_tl(dst, a, b);
--        /* Extended arithmetics.  */
-+        /* Extended arithmetic.  */
-         t_gen_subx_carry(dc, dst);
-         break;
-     default:
-@@ -3053,12 +3053,12 @@ static unsigned int crisv32_decoder(CPUCRISState *env, DisasContext *dc)
-  * On QEMU care needs to be taken when a branch+delayslot sequence is broken
-  * and the branch and delayslot don't share pages.
-  *
-- * The TB contaning the branch insn will set up env->btarget and evaluate 
-+ * The TB containing the branch insn will set up env->btarget and evaluate 
-  * env->btaken. When the translation loop exits we will note that the branch 
-  * sequence is broken and let env->dslot be the size of the branch insn (those
-  * vary in length).
-  *
-- * The TB contaning the delayslot will have the PC of its real insn (i.e no lsb
-+ * The TB containing the delayslot will have the PC of its real insn (i.e no lsb
-  * set). It will also expect to have env->dslot setup with the size of the 
-  * delay slot so that env->pc - env->dslot point to the branch insn. This TB 
-  * will execute the dslot and take the branch, either to btarget or just one 
+     case 0x94:
+-        /* If sources and destination dont't overlap -> fast path */
++        /* If sources and destination don't overlap -> fast path */
+         if (v1 != v2 && v1 != v3) {
+             const uint8_t src_es = get_field(s, m4);
+             const uint8_t dst_es = src_es - 1;
 -- 
 2.26.2.windows.1
 
