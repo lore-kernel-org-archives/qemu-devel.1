@@ -5,80 +5,79 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
 	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8F3DC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 11:10:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59475C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 11:10:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FCFF222B8
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 11:10:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BBB5A222B9
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 11:10:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H1d09k6R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FCFF222B8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="APODdLwY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBB5A222B9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQqHr-0004r7-6z
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 07:10:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54048)
+	id 1kQqIa-0005KL-LL
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 07:10:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54132)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kQqGA-00039w-8j; Fri, 09 Oct 2020 07:08:26 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:38263)
+ id 1kQqGG-0003Ms-7C; Fri, 09 Oct 2020 07:08:32 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:42843)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kQqG8-0007zl-Rj; Fri, 09 Oct 2020 07:08:25 -0400
-Received: by mail-pl1-x641.google.com with SMTP id p11so4299019pld.5;
- Fri, 09 Oct 2020 04:08:24 -0700 (PDT)
+ id 1kQqGE-00080Z-Fs; Fri, 09 Oct 2020 07:08:31 -0400
+Received: by mail-pl1-x644.google.com with SMTP id c6so4292542plr.9;
+ Fri, 09 Oct 2020 04:08:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=shDbs72Mi+RqLYhm6I3yrmO256TOYZSOuCzg8ZyfMmM=;
- b=H1d09k6RE4jj34vcaEQeQMzLe5zEPjT6tH4jmvv9DbH095Z5p4YpVRQjf5HDSIMffD
- ZylBeg4F/22SJWD7Lhwgy+ec8Of7//ekB103U0LQwYBCuD/rTcDRLo4s7Kvn+Ks86A+s
- eQxGGKKtR+8M1GetdR3AIpCP8T121COvp5o5/jS2W3/50ovZK1EdRMThyXP8TqvdFXB/
- ++XEwoi5unGDvNV/lKD6AM8NiG2TXV2tT5rWnKbBUEtbtzY7v26MQwJnZIqutoL1shgs
- 6gZC/UqwoB3LBfAO61js2+wOv7xick0XM49yrUYxK8BfLQoygnYqioJFIOBj+puoQucz
- AoFg==
+ bh=CfxDjHtrn5O00fJ1IvioOLeTqC6Mh44tAZ370lRy+RA=;
+ b=APODdLwYeXpWO6/mLSMN4U67JNuac/M6VrhzLsGnFCq+VJSX34y50/CAQry1/O6csr
+ mczFT8HW4NncTqEQnIg8Y7BEnh4GJ9f3sAtprqR9czClHlYtdT/9KCER4cG4gcF/nhdf
+ gpkFX95rU+fkGizAJRe7jVw49SDktPGgrNA4UEXIYjoDZfo3GIYWSG/cjO2TndxULR+x
+ uVDa0cLd4nf+INxQCJ70t9OBs0eD8XGlKRo9jq0LMA0X53QrE7T20L6FOHvH3HX+4KR/
+ +0rHJ6tccRIUA8q23/dfIA5nhhBfJloOYO/mpZY7uSyeqONgXTSLhRM5Y9S4xDkxbDuc
+ umug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=shDbs72Mi+RqLYhm6I3yrmO256TOYZSOuCzg8ZyfMmM=;
- b=qxrUCacUBusO4Zsu4Jciy2lmvl4ce9+P3o7+xcrRVkSPVZTuakx/cw85pRK7u5B0FS
- pj+PVjYN/byKzXr7wilumk92izHwoLdFOyetlFpW0TqQLKRvHxgj1WVB4egIHNQTzM2r
- xkB0LXwZ2FfYQN6a/1ppzgur/uCdbqRDJ6ZH7BS4l/Kf4F+cApixZlThMTk3BbGrfyAQ
- d0BEZcgcM55AYI2T5ayG1s/jZJrob2QyniUd+t7goYNKD33HgY/zYjgNM0qjYzBA02hT
- dyTy+CX+Sz93rrwBT34g8kAtA2tpj0kOMjT23p1TvC77j7N4jZF0qaPVv7kum2xblBZr
- 9XJw==
-X-Gm-Message-State: AOAM5334wctoYyR7jsGQCh/hpKkPSKORd7VCZ6tPb3eFvIXL852a+o9N
- WWU8i5spFaC4caF4+Jrr2EWK9V/+sP0BrUOw
-X-Google-Smtp-Source: ABdhPJytRbLv3BgXwe8P0Cvzhgaq+3oi0jSRv3lNYNBEc4mgGKO57C6DupR5W+a08w1DSHR8gjQKGw==
-X-Received: by 2002:a17:902:be0c:b029:d2:8ceb:f39c with SMTP id
- r12-20020a170902be0cb02900d28cebf39cmr11438208pls.71.1602241702632; 
- Fri, 09 Oct 2020 04:08:22 -0700 (PDT)
+ bh=CfxDjHtrn5O00fJ1IvioOLeTqC6Mh44tAZ370lRy+RA=;
+ b=eHfScAn80sw18RGUR3gxvnkcTHjF0PInnGRmcWCIizUDi7gBwnHoonXduH5V3XAArw
+ JbMMSjQiA7tIxKW53ss3IqbKElqjysG97uyA0VrWYg5bwm3pWrnq9f0wwMMZW7CGnf1h
+ hUdxYdh46jDtBvnuq/+A1l6nd0bdT4hz7VbGo6VFRad0Hk9PaLxEdF62ZFm5kAgLfiA9
+ 07fgDYwT7BHRDoMlj5eBtdUHA8nCOrNx2oXOhkHUBU7Wfmj2hEyrCRDlUbFNyuCRyhbW
+ X41Qq/iUXoivgax/80R0GiNcS8t3cmlAsHOfpO6UL+uLF1WAYiwivu2+8Ydzq9ZCC0eY
+ VaRw==
+X-Gm-Message-State: AOAM531/tEOyJhDVsKaE8JAkHqQOec3YBd31mmmsWxciZ1F1n83y89Q5
+ tXYNY3/iEh8OZk0Q1lwXwux4NptYsbek4kkQ
+X-Google-Smtp-Source: ABdhPJx73ya+67xcv4su9VZrQWy5DshPB855YDCMXA1Z9tgcWCHYE3nZzG9RAsuIA9eveYQPwFb3lQ==
+X-Received: by 2002:a17:902:7589:b029:d2:686a:4ede with SMTP id
+ j9-20020a1709027589b02900d2686a4edemr11889012pll.45.1602241708288; 
+ Fri, 09 Oct 2020 04:08:28 -0700 (PDT)
 Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id v1sm2619462pjt.2.2020.10.09.04.08.20
+ by smtp.googlemail.com with ESMTPSA id v1sm2619462pjt.2.2020.10.09.04.08.25
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 09 Oct 2020 04:08:21 -0700 (PDT)
+ Fri, 09 Oct 2020 04:08:27 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 2/4] cirrus: msys2/mingw speed is up,
- add excluded target back
-Date: Fri,  9 Oct 2020 19:07:58 +0800
-Message-Id: <20201009110800.432-3-luoyonggang@gmail.com>
+Subject: [PATCH v6 4/4] cirrus: Enable doc build on msys2/mingw
+Date: Fri,  9 Oct 2020 19:08:00 +0800
+Message-Id: <20201009110800.432-5-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20201009110800.432-1-luoyonggang@gmail.com>
 References: <20201009110800.432-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
- envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x641.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x644.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -108,28 +107,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following target are add back:
-i386-softmmu,arm-softmmu,ppc-softmmu,mips-softmmu
+Currently rST depends on old version sphinx-2.x.
+Install it by downloading it.
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- .cirrus.yml | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ .cirrus.yml | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/.cirrus.yml b/.cirrus.yml
-index ed3db10e45..d1fe63b343 100644
+index d1fe63b343..599fd299e3 100644
 --- a/.cirrus.yml
 +++ b/.cirrus.yml
-@@ -123,8 +123,7 @@ windows_msys2_task:
-   script:
-     - C:\tools\msys64\usr\bin\bash.exe -lc "mkdir build"
-     - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && ../configure
--      --python=python3 --ninja=ninja
--      --target-list-exclude=i386-softmmu,arm-softmmu,ppc-softmmu,mips-softmmu"
-+      --python=python3 --ninja=ninja"
-     - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && make -j8"
-   test_script:
-     - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && make V=1 check"
+@@ -110,6 +110,11 @@ windows_msys2_task:
+           mingw-w64-x86_64-curl \
+           mingw-w64-x86_64-gnutls \
+           "
++        bitsadmin /transfer msys_download /dynamic /download /priority FOREGROUND `
++          https://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-python-sphinx-2.3.1-1-any.pkg.tar.xz `
++          C:\tools\mingw-w64-x86_64-python-sphinx-2.3.1-1-any.pkg.tar.xz
++        C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -U /c/tools/mingw-w64-x86_64-python-sphinx-2.3.1-1-any.pkg.tar.xz"
++        del C:\tools\mingw-w64-x86_64-python-sphinx-2.3.1-1-any.pkg.tar.xz
+         C:\tools\msys64\usr\bin\bash.exe -lc "rm -rf /var/cache/pacman/pkg/*"
+         cd C:\tools\msys64
+         echo "Start archive"
 -- 
 2.28.0.windows.1
 
