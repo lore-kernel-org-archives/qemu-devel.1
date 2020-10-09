@@ -2,57 +2,56 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80773C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 10:43:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77C08C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 10:43:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D698522277
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 10:43:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D698522277
+	by mail.kernel.org (Postfix) with ESMTPS id D824722251
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 10:43:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D824722251
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQprZ-0004Sh-KO
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 06:43:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47070)
+	id 1kQprg-0004fA-Sx
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 06:43:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47800)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kQpkp-0006F2-Ce
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 06:36:04 -0400
-Received: from mail.ispras.ru ([83.149.199.84]:36548)
+ id 1kQpmq-0000ZT-VQ; Fri, 09 Oct 2020 06:38:10 -0400
+Received: from mail.ispras.ru ([83.149.199.84]:36902)
  by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kQpkm-0003tP-8s
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 06:36:03 -0400
+ id 1kQpmm-000478-OZ; Fri, 09 Oct 2020 06:38:08 -0400
 Received: from [192.168.0.183] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id 4560B40A1DCC;
- Fri,  9 Oct 2020 10:35:54 +0000 (UTC)
-Subject: Re: does make check now require TCG? Or is it a parallelism issue?
-To: Claudio Fontana <cfontana@suse.de>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-References: <11ef73ff-4178-b3e8-2e49-44ff014a13ed@suse.de>
- <569520f6-adf6-6212-9625-a184bf499e24@redhat.com>
- <e6300199-39e3-4f11-d97e-e2e7d9a9e8ef@suse.de>
- <16b01645-7a80-7f79-aba0-fd6c6c8ba6e8@suse.de>
- <62339951-606d-15d0-e2ad-bd46f3e6de87@redhat.com>
- <0b6397b1-019c-4b92-f00d-09214e276e46@suse.de>
- <b8487188-e492-d6f3-6c3d-c33fdf6f2404@redhat.com>
- <b6065b6e-4191-5e79-3187-86d827c65651@suse.de>
+ by mail.ispras.ru (Postfix) with ESMTPSA id 93D1440A1DCC;
+ Fri,  9 Oct 2020 10:37:59 +0000 (UTC)
+Subject: Re: acceptance-system-fedora failures
+To: Kevin Wolf <kwolf@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <philmd@redhat.com>
+References: <4e191372-c332-8f69-85e2-1ff6ead0f40d@redhat.com>
+ <59d2a787-bcd4-7283-693b-09ea04c16dc6@redhat.com>
+ <6068346f-b034-9321-0eea-29233c23a300@redhat.com>
+ <78ce9ac1-d2a1-9dc0-bf38-f9ac34b2f203@ispras.ru>
+ <14ee7cc6-42ca-fd86-241b-ed85e26693f7@redhat.com> <878sci1dt0.fsf@linaro.org>
+ <d86c9425-dcb2-7fa7-1f6f-bd7b8dab53c1@ispras.ru>
+ <c5e6f7ea-93c4-a46a-dfee-7699c08c1060@redhat.com>
+ <4f4eee5e-e8cd-0595-cccc-8b648773c9ba@ispras.ru>
+ <43eac2fb-7325-9e9f-ce13-d0774638753f@redhat.com>
+ <20201008115018.GD4672@linux.fritz.box>
 From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
-Message-ID: <da34950f-8a1f-7a85-0014-705694c50573@ispras.ru>
-Date: Fri, 9 Oct 2020 13:35:54 +0300
+Message-ID: <a1230ec4-13ae-3a0b-5b8a-71c9c87250ac@ispras.ru>
+Date: Fri, 9 Oct 2020 13:37:59 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <b6065b6e-4191-5e79-3187-86d827c65651@suse.de>
+In-Reply-To: <20201008115018.GD4672@linux.fritz.box>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -77,149 +76,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Alex Bennee <alex.bennee@linaro.org>, qemu-devel <qemu-devel@nongnu.org>,
- Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09.10.2020 12:40, Claudio Fontana wrote:
-> On 10/9/20 11:23 AM, Philippe Mathieu-Daudé wrote:
->> On 10/8/20 6:35 PM, Claudio Fontana wrote:
->>> On 10/8/20 6:31 PM, Paolo Bonzini wrote:
->>>> On 08/10/20 18:25, Claudio Fontana wrote:
->>>>> On 10/8/20 5:34 PM, Claudio Fontana wrote:
->>>>>> On 10/8/20 5:02 PM, Paolo Bonzini wrote:
->>>>>>> On 08/10/20 16:48, Claudio Fontana wrote:
->>>>>>>> on master, a build without tcg like:
+On 08.10.2020 14:50, Kevin Wolf wrote:
+> Am 08.10.2020 um 12:26 hat Philippe Mathieu-DaudÃ© geschrieben:
+>> On 10/7/20 3:11 PM, Pavel Dovgalyuk wrote:
+>>> On 07.10.2020 15:49, Philippe Mathieu-DaudÃ© wrote:
+>>>> On 10/7/20 2:20 PM, Pavel Dovgalyuk wrote:
+>>>>> On 07.10.2020 14:22, Alex BennÃ©e wrote:
+>>>>>>
+>>>>>> Philippe Mathieu-DaudÃ© <philmd@redhat.com> writes:
+>>>>>>
+>>>>>>> On 10/7/20 10:51 AM, Pavel Dovgalyuk wrote:
+>>>>>>>> On 07.10.2020 11:23, Thomas Huth wrote:
+>>>>>>>>> On 07/10/2020 09.13, Philippe Mathieu-DaudÃ© wrote:
+>>>>>>>>> Thanks, that was helpful. ... and the winner is:
+>>>>>>>>>
+>>>>>>>>> Â Â Â Â Â Â  commitÂ Â  55adb3c45620c31f29978f209e2a44a08d34e2da
+>>>>>>>>> Â Â Â Â Â Â  Author:Â  John Snow <jsnow@redhat.com>
+>>>>>>>>> Â Â Â Â Â Â  Date:Â Â Â  Fri Jul 24 01:23:00 2020 -0400
+>>>>>>>>> Â Â Â Â Â Â  Subject: ide: cancel pending callbacks on SRST
+>>>>>>>>>
+>>>>>>>>> ... starting with this commit, the tests starts failing. John, any
+>>>>>>>>> idea what
+>>>>>>>>> might be causing this?
 >>>>>>>>
->>>>>>>> exec '../configure' '--disable-tcg' '--enable-kvm' '--enable-hax' "$@"
+>>>>>>>> This patch includes the following lines:
 >>>>>>>>
->>>>>>>> make -j120 check
->>>>>>>> Generating qemu-version.h with a meson_exe.py custom command
->>>>>>>> make: *** No rule to make target 'qemu-system-aarch64', needed by 'check-block'.  Stop.
->>>>>>>> make: *** Waiting for unfinished jobs....
+>>>>>>>> +Â Â Â Â Â Â Â  aio_bh_schedule_oneshot(qemu_get_aio_context(),
+>>>>>>>> +Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  ide_bus_perform_srst, bus);
 >>>>>>>>
->>>>>>>> qemu-system-aarch64 is required for check-block now?
+>>>>>>>> replay_bh_schedule_oneshot_event should be used instead of this
+>>>>>>>> function, because it synchronizes non-deterministic BHs.
 >>>>>>>
->>>>>>> No, it's not, it's an unnecessary dependency.  This will fix it:
+>>>>>>> Why do we have 2 different functions? BH are already complex
+>>>>>>> enough, and we need to also think about the replay API...
 >>>>>>>
->>>>>>> diff --git a/tests/Makefile.include b/tests/Makefile.include
->>>>>>> index 5aca98e60c..1ca70d88ce 100644
->>>>>>> --- a/tests/Makefile.include
->>>>>>> +++ b/tests/Makefile.include
->>>>>>> @@ -140,7 +140,7 @@ QEMU_IOTESTS_HELPERS-$(CONFIG_LINUX) = tests/qemu-iotests/socket_scm_helper$(EXE
->>>>>>>    check: check-block
->>>>>>>    check-block: $(SRC_PATH)/tests/check-block.sh qemu-img$(EXESUF) \
->>>>>>>    		qemu-io$(EXESUF) qemu-nbd$(EXESUF) $(QEMU_IOTESTS_HELPERS-y) \
->>>>>>> -		$(patsubst %-softmmu,qemu-system-%,$(filter %-softmmu,$(TARGET_DIRS)))
->>>>>>> +		qemu-system-$(patsubst ppc64%,ppc64, $(shell uname -m))
->>>>>>>    	@$<
->>>>>>>    endif
->>>>>>>    
->>>>>>>
->>>>>>>
+>>>>>>> What about the other cases such vhost-user (blk/net), virtio-blk?
 >>>>>>
->>>>>> thanks this works!
->>>>>>
->>>>>>>> If I run without -j:
->>>>>>>>
->>>>>>>> Running test qtest-i386: qmp-cmd-test
->>>>>>>> Broken pipe
->>>>>>>> ../tests/qtest/libqtest.c:175: kill_qemu() detected QEMU death from signal 6 (Aborted) (core dumped)
->>>>>>>> ERROR qtest-i386: qmp-cmd-test - too few tests run (expected 53, got 45)
->>>>>>>> make: *** [Makefile.mtest:1074: run-test-151] Error 1
->>>>>>>
->>>>>>> This one is different and I've never seen it.
->>>>>>
->>>>>> This one seems an additional, non-tcg build only error, will update when I have more details.
->>>>>>
->>>>>>>
->>>>>>> Paolo
->>>>>>>
->>>>>>
->>>>>> Ciao,
->>>>>>
->>>>>> Claudio
+>>>>>> This does seem like something that should be wrapped up inside
+>>>>>> aio_bh_schedule_oneshot itself or maybe we need a
+>>>>>> aio_bh_schedule_transaction_oneshot to distinguish it from the other
+>>>>>> uses the function has.
 >>>>>>
 >>>>>
->>>>> Seems to be some QMP calls to icount code from replay happening during the tests, which of course do not find any icount there..
->>>>>
->>>>> (gdb) bt
->>>>> #0  0x00007f2b4d115520 in raise () at /lib64/libc.so.6
->>>>> #1  0x00007f2b4d116b01 in abort () at /lib64/libc.so.6
->>>>> #2  0x000056295aaf5889 in icount_get_raw () at ../stubs/icount.c:20
->>>>> #3  0x000056295a7934a5 in replay_get_current_icount () at ../replay/replay.c:71
->>>>> #4  0x000056295a78719d in qmp_query_replay (errp=errp@entry=0x7ffe727a4538) at ../replay/replay-debugging.c:55
->>>>> #5  0x000056295aac0137 in qmp_marshal_query_replay (args=<optimized out>, ret=0x7ffe727a45a0, errp=0x7ffe727a4598)
->>>>>       at qapi/qapi-commands-replay.c:55
->>>>> #6  0x000056295aae88a3 in qmp_dispatch
->>>>>       (cmds=0x56295b3b5ce0 <qmp_commands>, request=request@entry=0x7f2b3c004db0, allow_oob=<optimized out>) at ../qapi/qmp-dispatch.c:155
->>>>> #7  0x000056295aa6ab7f in monitor_qmp_dispatch (mon=0x56295bee7f80, req=0x7f2b3c004db0) at ../monitor/qmp.c:145
->>>>> #8  0x000056295aa6b3ba in monitor_qmp_bh_dispatcher (data=<optimized out>) at ../monitor/qmp.c:234
->>>>> #9  0x000056295aaeb5b8 in aio_bh_poll (ctx=ctx@entry=0x56295bcd5130) at ../util/async.c:164
->>>>> #10 0x000056295aad76de in aio_dispatch (ctx=0x56295bcd5130) at ../util/aio-posix.c:380
->>>>> #11 0x000056295aaeb49e in aio_ctx_dispatch (source=<optimized out>, callback=<optimized out>, user_data=<optimized out>)
->>>>>       at ../util/async.c:306
->>>>> #12 0x00007f2b4e268f07 in g_main_context_dispatch () at /usr/lib64/libglib-2.0.so.0
->>>>> #13 0x000056295aac96fa in glib_pollfds_poll () at ../util/main-loop.c:221
->>>>> #14 0x000056295aac96fa in os_host_main_loop_wait (timeout=-1) at ../util/main-loop.c:244
->>>>> #15 0x000056295aac96fa in main_loop_wait (nonblocking=nonblocking@entry=0) at ../util/main-loop.c:520
->>>>> #16 0x000056295a99083d in qemu_main_loop () at ../softmmu/vl.c:1677
->>>>> #17 0x000056295a71b17e in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at ../softmmu/main.c:50
->>>>>
+>>>>> Maybe there should be two functions:
+>>>>> - one for the guest modification
 >>>>
->>>> Ah, query-replay probably should return an error if !tcg_enabled().
+>>>> aio_bh_schedule_oneshot_deterministic()?
 >>>>
->>>> Paolo
+>>>>> - one for internal qemu things
 >>>>
+>>>> Not sure why there is a difference, BH are used to
+>>>> avoid delaying the guest, so there always something
+>>>> related to "guest modification".
 >>>
->>> aha, and we might even compile away (almost) the whole replay/ if not under tcg, and just put the necessary qmp stuff in stubs/ ... ?
+>>> Not exactly. At least there is one non-related-to-guest case
+>>> in monitor_init_qmp:
+>>> Â Â Â Â Â Â Â  /*
+>>> Â Â Â Â Â Â Â Â  * We can't call qemu_chr_fe_set_handlers() directly here
+>>> Â Â Â Â Â Â Â Â  * since chardev might be running in the monitor I/O
+>>> Â Â Â Â Â Â Â Â  * thread.Â  Schedule a bottom half.
+>>> Â Â Â Â Â Â Â Â  */
+>>> Â Â Â Â Â Â Â  aio_bh_schedule_oneshot(iothread_get_aio_context(mon_iothread),
+>>> Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  monitor_qmp_setup_handlers_bh, mon);
 >>
->> Soft accelerator are TCG and QTest. Replay only works with soft
->> accelerator. Should replay work with QTest? Is this useful?
->> (if there are no instructions, what can we replay, IRQs?)
+>> I don't understand the documentation in docs/devel/replay.txt:
 >>
->> If replay is only usable with TCG, can we merge it into it?
->> It seems quite accel-related.
+>> ---
+>> Bottom halves
+>> =============
 >>
->> Noob questions as I don't understand well the coverage of replay.
+>> Bottom half callbacks, that affect the guest state, should be invoked
+>> through
+>> replay_bh_schedule_event or replay_bh_schedule_oneshot_event functions.
+>> Their invocations are saved in record mode and synchronized with the
+>> existing
+>> log in replay mode.
+>> ---
 >>
->> Regards,
->>
->> Phil.
->>
+>> But then it is only used in block drivers, which are not
+>> related to guest state:
 > 
-> Hello Philippe,
+> Pavel can tell you the details, but I think the idea was that you need
+> to use this function not when the code calling it modifies guest state,
+> but when the BH implementation can do so.
 > 
-> I have the same questions, and I am trying to understand what is the best way forward.
-> As a background, ultimately I would like all components of qemu to be highly modular and we are very much on this path I think.
+> In the case of generic callbacks like provided by the blk_aio_*()
+> functions, we don't know whether this is the case, but it's generally
+> device emulation code, so chances are relatively high that they do.
 > 
-> Accelerator-wise, as I mentioned previously I am trying to reach the point where we can say CONFIG_TCG=m,
-> (and CONFIG_KVM=m, etc...) and be able to install only a simple qemu base,
-> and have everything else as optional modules, including per-target accelerator modules.
-> 
-> Currently (in master) replay/ is built unconditionally, but I have already a rough patch to make it conditional
-> on CONFIG_TCG with a lot of stuff added to stub/ .
-> 
-> However, I'd like it even better if it is part of accel/ in the sense that it would be easier then to limit the scope of the overall tcg dynamic module,
-> which is already quite spread out in the code
-> 
-> (fpu/, tcg/, target/$(TARGET_BASE_ARCH)/, accel/tcg/ , replay/ at least).
-> 
-> Maybe Pavel has some clarification for us on the role and relationships of the replay module with the other components?
-> Where do we think is the right balance in general in sorting out TCG components?
+> I seem to remember that when reviewing the code that introduced
+> replay_bh_schedule_event(), I was relatively sure that we didn't catch
+> all necessary instances, but since it worked for Pavel and I didn't feel
+> like getting too involved with replay code, we just merged it anyway.
 
-replay/ files control external machine inputs and outputs to record and 
-replay them: network input, keyboard, serial ports, ....
-That's why replay requires some wrappers and filters in that modules.
-
-replay also synchronizes vCPU with external interrupt/DMA 
-transactions/... sources: iothread, BHs, and timers.
-
-Without TCG replay becomes useless, because it cooperates with icount. 
-Therefore it might be put under CONFIG_TCG to build kvm and other stuff.
+That's right.
+Block layer does not touch guest by itself.
+But it includes callbacks that may invoke interrupts on finishing disk 
+operations. That is why we synchronize these callbacks with vCPU through 
+the replay layer.
 
 Pavel Dovgalyuk
 
