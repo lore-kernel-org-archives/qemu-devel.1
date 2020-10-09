@@ -2,115 +2,61 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D62DBC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 07:41:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 376E3C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 07:59:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F6E222277
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 07:41:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZUq8n5wL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F6E222277
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C348E22275
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 07:59:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C348E22275
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQn1o-0003jn-DO
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 03:41:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38134)
+	id 1kQnIv-0007VQ-J1
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 03:59:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40822)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kQn0z-00036q-3l
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 03:40:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58035)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kQn0x-0007mr-HT
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 03:40:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602229230;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=0QpIi+NO1E7TW+l+6Cu8HuQos58eXFVHh9DLnR4VFbE=;
- b=ZUq8n5wLLB1ief9j6htGFGnv2BAmkElSDVTwpZj/mgqrn71MyhlQ8xLkzOb/rvA9pnOhzA
- va3iqc8AlZFW8oE4FOEwzSS3DoxaMkJFavVcCEcbZrgX3LNfuZ8ffuH4a76fYrtluj68uM
- vuUis0wlCQ0LhQw0he1DD8DZye+mm64=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-534-mz0pq582OQK8dL6caGCJKA-1; Fri, 09 Oct 2020 03:40:28 -0400
-X-MC-Unique: mz0pq582OQK8dL6caGCJKA-1
-Received: by mail-wm1-f71.google.com with SMTP id p17so3816467wmi.7
- for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 00:40:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=0QpIi+NO1E7TW+l+6Cu8HuQos58eXFVHh9DLnR4VFbE=;
- b=S5ThhWE7RKALO8JWtLLpXO6f1Kd2hoxhdi5kZ6ihQ+f1w3kqFnGdND0fpZQYdQBBFI
- 4ZSFcgoSDfASVAALYvqmgJTXD3m/MKZQ3zgw723gpiAV4Zck/wt13KF4YaIOtXc4CZVr
- hsHnSh8uEuzM+3aNXbFBWIsfgTVrGT1cTNvG/AOPCXP7m4aobAFS4wOCgoycyzrIpB+I
- A0vVjXgR1roMviL6F4nh7DnVdcoI4JOBiSFBNfCvirufYW9lI9S5LES9NaHac7W6H3xi
- JZEUZBuWBhHGhRpRxRSXHuNzuZk9pC547z0Xck4T34q7e8MofR/zTqbhBzzoA0cYUcVt
- WLuw==
-X-Gm-Message-State: AOAM533w7yWJVJounhaVJw5BfPyciZJW1sdi5/Wzie5/FZSlkt16nxdI
- YOehKmA7yP+opLy/colktqTgEBFdj+kLCTd1kxeRz2xZ97k60nXSFuYGPl+MB2eUsvppKh4LE9P
- CHLv9h7P+nneG5nQ=
-X-Received: by 2002:a05:6000:81:: with SMTP id
- m1mr13651454wrx.67.1602229227055; 
- Fri, 09 Oct 2020 00:40:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw7L2Tj7GXPqmti644vQrFLnUCNS2qDzrrJexXFzFxlFTlw964vB8ysP16m752hIIhxKBCqzQ==
-X-Received: by 2002:a05:6000:81:: with SMTP id
- m1mr13651446wrx.67.1602229226871; 
- Fri, 09 Oct 2020 00:40:26 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:cee1:4797:6958:7698?
- ([2001:b07:6468:f312:cee1:4797:6958:7698])
- by smtp.gmail.com with ESMTPSA id c4sm10655023wrp.85.2020.10.09.00.40.25
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 09 Oct 2020 00:40:26 -0700 (PDT)
-Subject: Re: does make check now require TCG? Or is it a parallelism issue?
-To: Claudio Fontana <cfontana@suse.de>
-References: <11ef73ff-4178-b3e8-2e49-44ff014a13ed@suse.de>
- <569520f6-adf6-6212-9625-a184bf499e24@redhat.com>
- <d21dff22-90b1-4769-0948-6bc37eaeb885@linaro.org>
- <6fe91a5a-c136-9af3-c48a-97ccdca7a543@suse.de>
- <3c527b0f-afa1-4b86-4fa5-9acca2a296bd@linaro.org>
- <CABgObfYWK2E8PsSFOcHpuA2vuA3HWgvtuLbrtQCWA=9=r07=5w@mail.gmail.com>
- <a1694fe3-9bc8-df93-345f-29f0de37b923@suse.de>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8cedd3e4-dc6a-30ee-fd71-f4776aa8c953@redhat.com>
-Date: Fri, 9 Oct 2020 09:40:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
+ id 1kQnI8-0006xj-3a; Fri, 09 Oct 2020 03:58:16 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:40920 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
+ id 1kQnI5-00012V-JT; Fri, 09 Oct 2020 03:58:15 -0400
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 441313AAF4FEEA558ADA;
+ Fri,  9 Oct 2020 15:57:58 +0800 (CST)
+Received: from huawei.com (10.174.185.47) by DGGEMS410-HUB.china.huawei.com
+ (10.3.19.210) with Microsoft SMTP Server id 14.3.487.0; Fri, 9 Oct 2020
+ 15:57:49 +0800
+From: Yifei Jiang <jiangyifei@huawei.com>
+To: <qemu-devel@nongnu.org>, <qemu-riscv@nongnu.org>
+Subject: [PATCH V2] target/riscv: raise exception to HS-mode at
+ get_physical_address
+Date: Fri, 9 Oct 2020 15:57:40 +0800
+Message-ID: <20201009075740.688-1-jiangyifei@huawei.com>
+X-Mailer: git-send-email 2.26.2.windows.1
 MIME-Version: 1.0
-In-Reply-To: <a1694fe3-9bc8-df93-345f-29f0de37b923@suse.de>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:34:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -22
-X-Spam_score: -2.3
-X-Spam_bar: --
-X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.214, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain
+X-Originating-IP: [10.174.185.47]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.35; envelope-from=jiangyifei@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:46:07
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -124,23 +70,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex Bennee <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- qemu-devel <qemu-devel@nongnu.org>
+Cc: zhang.zhanghailiang@huawei.com, sagark@eecs.berkeley.edu,
+ kbastian@mail.uni-paderborn.de, victor.zhangxiaofeng@huawei.com,
+ Yifei Jiang <jiangyifei@huawei.com>, Alistair.Francis@wdc.com,
+ yinyipeng1@huawei.com, palmer@dabbelt.com, wu.wubin@huawei.com,
+ dengkai1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08/10/20 23:07, Claudio Fontana wrote:
-> qtests are also broken for me now with --disable-tcg build,
-> it _seems_ to me that TCG-only tests are being run for --disable-tcg too.
-> 
-> I am not sure if this is a test problem (for example tests/qtest/bios-tables-test.c): data->tcg_only
-> or if it is a build system problem, or some combination.
+VS-stage translation at get_physical_address needs to translate pte
+address by G-stage translation. But the G-stage translation error
+can not be distinguished from VS-stage translation error in
+riscv_cpu_tlb_fill. On migration, destination needs to rebuild pte,
+and this G-stage translation error must be handled by HS-mode. So
+introduce TRANSLATE_STAGE2_FAIL so that riscv_cpu_tlb_fill could
+distinguish and raise it to HS-mode.
 
-Yes, this is due to tcg_only.  But since CONFIG_TCG is included in
-config-host.mak, it should be easy to add a call to g_test_skip.
+Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
+Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
+---
+ target/riscv/cpu.h        |  1 +
+ target/riscv/cpu_helper.c | 17 +++++++++++++++--
+ 2 files changed, 16 insertions(+), 2 deletions(-)
 
-Paolo
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index de275782e6..8b856d518e 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -86,6 +86,7 @@ enum {
+ #define TRANSLATE_FAIL 1
+ #define TRANSLATE_SUCCESS 0
+ #define MMU_USER_IDX 3
++#define TRANSLATE_G_STAGE_FAIL 4
+ 
+ #define MAX_RISCV_PMPS (16)
+ 
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index 904899054d..096006dc00 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -451,7 +451,10 @@ restart:
+                                                  mmu_idx, false, true);
+ 
+             if (vbase_ret != TRANSLATE_SUCCESS) {
+-                return vbase_ret;
++                env->guest_phys_fault_addr = (base |
++                                              (addr &
++                                               (TARGET_PAGE_SIZE - 1))) >> 2;
++                return TRANSLATE_G_STAGE_FAIL;
+             }
+ 
+             pte_addr = vbase + idx * ptesize;
+@@ -730,12 +733,22 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+         ret = get_physical_address(env, &pa, &prot, address, access_type,
+                                    mmu_idx, true, true);
+ 
++        /*
++         * A G-stage exception may be triggered during VS-stage translation.
++         * And the env->guest_phys_fault_addr has already been set in
++         * get_physical_address().
++         */
++        if (ret == TRANSLATE_G_STAGE_FAIL) {
++            first_stage_error = false;
++            access_type = MMU_DATA_LOAD;
++        }
++
+         qemu_log_mask(CPU_LOG_MMU,
+                       "%s 1st-stage address=%" VADDR_PRIx " ret %d physical "
+                       TARGET_FMT_plx " prot %d\n",
+                       __func__, address, ret, pa, prot);
+ 
+-        if (ret != TRANSLATE_FAIL) {
++        if (ret != TRANSLATE_FAIL && ret != TRANSLATE_G_STAGE_FAIL) {
+             /* Second stage lookup */
+             im_address = pa;
+ 
+-- 
+2.19.1
 
 
