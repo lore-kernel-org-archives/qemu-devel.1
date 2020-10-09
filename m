@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A34BC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 12:39:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A64A9C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 12:39:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0EE3622284
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 12:39:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A9A722284
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 12:39:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UaAhQQ33"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EE3622284
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LR0AcQvp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A9A722284
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34112 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQrgY-0004R1-2T
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 08:39:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38680)
+	id 1kQrgb-0004ZT-7E
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 08:39:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38678)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
- id 1kQrMv-0000Ex-7V
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 08:19:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50815)
+ id 1kQrMu-0000Dp-PV
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 08:19:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45709)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
- id 1kQrMo-0007yc-PN
+ id 1kQrMs-0007zV-PY
  for qemu-devel@nongnu.org; Fri, 09 Oct 2020 08:19:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602245962;
+ s=mimecast20190719; t=1602245966;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0JZHbOlTqt3A5jWQdh+w6TWh01jeQl9kVh7EGIr7CVA=;
- b=UaAhQQ33xsvSzIUCZFjQrcz3z7MOFy+VM2OHBGNZ7kWbmFb/vLKpW19ZBGnU7JJMsyYz2A
- aqMDbzqlkeT10GZ9buOyc9E0EosQ7oXisr5+sn/u2XzeeiPeWyswJsiZkuN57F2Ia8xM+R
- f6omV7KmKqL/ypLIOcGqpqlmnqlKi0o=
+ bh=2zkz2SEKDwDKngOS2g2FJBlJQ/tGTWTMzrwYb9qJdhk=;
+ b=LR0AcQvp5cPzUyWfYNX7sSy1vle2u6WaRbVlW0cC2TgYQdDyyHdEXJfZkPqIBcmPqWIabG
+ 1yL/lP6nfnl1PckqRwKzMzcDNzdXS/TlOr19eNrw8DdbUopYJENE2F/YTVKw0dHFC0j6p6
+ z8QWNOUbgNHAlCYbxtj4RRaVfycm43U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-443-KCtTAco-OUS9t1De0u-CZw-1; Fri, 09 Oct 2020 08:19:19 -0400
-X-MC-Unique: KCtTAco-OUS9t1De0u-CZw-1
+ us-mta-549-xOtzICMpPfeobKMH4iPIEw-1; Fri, 09 Oct 2020 08:19:24 -0400
+X-MC-Unique: xOtzICMpPfeobKMH4iPIEw-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1607CAFD03
- for <qemu-devel@nongnu.org>; Fri,  9 Oct 2020 12:19:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0140108E1A0
+ for <qemu-devel@nongnu.org>; Fri,  9 Oct 2020 12:19:23 +0000 (UTC)
 Received: from vitty.brq.redhat.com (unknown [10.40.195.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 67BE05C1BB;
- Fri,  9 Oct 2020 12:19:17 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 904F45C1BB;
+ Fri,  9 Oct 2020 12:19:21 +0000 (UTC)
 From: Vitaly Kuznetsov <vkuznets@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH RFC v3 16/23] i386: split hyperv_handle_properties() into
- hyperv_expand_features()/hyperv_fill_cpuids()
-Date: Fri,  9 Oct 2020 14:18:35 +0200
-Message-Id: <20201009121842.1938010-17-vkuznets@redhat.com>
+Subject: [PATCH RFC v3 18/23] i386: switch hyperv_expand_features() to using
+ error_setg()
+Date: Fri,  9 Oct 2020 14:18:37 +0200
+Message-Id: <20201009121842.1938010-19-vkuznets@redhat.com>
 In-Reply-To: <20201009121842.1938010-1-vkuznets@redhat.com>
 References: <20201009121842.1938010-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -103,79 +103,169 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The intention is to call hyperv_expand_features() early, before vCPUs
-are created and use the acquired data later when we set guest visible
-CPUID data.
+Use standard error_setg() mechanism in hyperv_expand_features().
 
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- target/i386/kvm.c | 34 ++++++++++++++++++++++++----------
- 1 file changed, 24 insertions(+), 10 deletions(-)
+ target/i386/kvm.c | 101 ++++++++++++++++++++++++++++------------------
+ 1 file changed, 61 insertions(+), 40 deletions(-)
 
 diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index cfb5ced003f6..8c846f80a25f 100644
+index 06f78a09304e..1c1fa04b7c02 100644
 --- a/target/i386/kvm.c
 +++ b/target/i386/kvm.c
-@@ -1185,16 +1185,15 @@ static uint32_t hv_build_cpuid_leaf(CPUState *cs, uint32_t func, int reg)
+@@ -1134,7 +1134,7 @@ static bool hyperv_feature_supported(CPUState *cs, int feature)
+     return true;
+ }
+ 
+-static int hv_cpuid_check_and_set(CPUState *cs, int feature)
++static int hv_cpuid_check_and_set(CPUState *cs, int feature, Error **errp)
+ {
+     X86CPU *cpu = X86_CPU(cs);
+     uint64_t deps;
+@@ -1148,20 +1148,18 @@ static int hv_cpuid_check_and_set(CPUState *cs, int feature)
+     while (deps) {
+         dep_feat = ctz64(deps);
+         if (!(hyperv_feat_enabled(cpu, dep_feat))) {
+-                fprintf(stderr,
+-                        "Hyper-V %s requires Hyper-V %s\n",
+-                        kvm_hyperv_properties[feature].desc,
+-                        kvm_hyperv_properties[dep_feat].desc);
+-                return 1;
++            error_setg(errp, "Hyper-V %s requires Hyper-V %s",
++                       kvm_hyperv_properties[feature].desc,
++                       kvm_hyperv_properties[dep_feat].desc);
++            return 1;
+         }
+         deps &= ~(1ull << dep_feat);
+     }
+ 
+     if (!hyperv_feature_supported(cs, feature)) {
+         if (hyperv_feat_enabled(cpu, feature)) {
+-            fprintf(stderr,
+-                    "Hyper-V %s is not supported by kernel\n",
+-                    kvm_hyperv_properties[feature].desc);
++            error_setg(errp, "Hyper-V %s is not supported by kernel",
++                       kvm_hyperv_properties[feature].desc);
+             return 1;
+         } else {
+             return 0;
+@@ -1208,13 +1206,12 @@ static uint32_t hv_build_cpuid_leaf(CPUState *cs, uint32_t func, int reg)
+  * of 'hv_passthrough' mode and fills the environment with all supported
+  * Hyper-V features.
+  */
+-static int hyperv_expand_features(CPUState *cs)
++static void hyperv_expand_features(CPUState *cs, Error **errp)
+ {
+     X86CPU *cpu = X86_CPU(cs);
+-    int r;
+ 
+     if (!hyperv_enabled(cpu))
+-        return 0;
++        return;
+ 
+     if (cpu->hyperv_passthrough) {
+         cpu->hyperv_vendor_id[0] =
+@@ -1260,37 +1257,60 @@ static int hyperv_expand_features(CPUState *cs)
+     }
+ 
+     /* Features */
+-    r = hv_cpuid_check_and_set(cs, HYPERV_FEAT_RELAXED);
+-    r |= hv_cpuid_check_and_set(cs, HYPERV_FEAT_VAPIC);
+-    r |= hv_cpuid_check_and_set(cs, HYPERV_FEAT_TIME);
+-    r |= hv_cpuid_check_and_set(cs, HYPERV_FEAT_CRASH);
+-    r |= hv_cpuid_check_and_set(cs, HYPERV_FEAT_RESET);
+-    r |= hv_cpuid_check_and_set(cs, HYPERV_FEAT_VPINDEX);
+-    r |= hv_cpuid_check_and_set(cs, HYPERV_FEAT_RUNTIME);
+-    r |= hv_cpuid_check_and_set(cs, HYPERV_FEAT_SYNIC);
+-    r |= hv_cpuid_check_and_set(cs, HYPERV_FEAT_STIMER);
+-    r |= hv_cpuid_check_and_set(cs, HYPERV_FEAT_FREQUENCIES);
+-    r |= hv_cpuid_check_and_set(cs, HYPERV_FEAT_REENLIGHTENMENT);
+-    r |= hv_cpuid_check_and_set(cs, HYPERV_FEAT_TLBFLUSH);
+-    r |= hv_cpuid_check_and_set(cs, HYPERV_FEAT_EVMCS);
+-    r |= hv_cpuid_check_and_set(cs, HYPERV_FEAT_IPI);
+-    r |= hv_cpuid_check_and_set(cs, HYPERV_FEAT_STIMER_DIRECT);
++    if (hv_cpuid_check_and_set(cs, HYPERV_FEAT_RELAXED, errp)) {
++        return;
++    }
++    if (hv_cpuid_check_and_set(cs, HYPERV_FEAT_VAPIC, errp)) {
++        return;
++    }
++    if (hv_cpuid_check_and_set(cs, HYPERV_FEAT_TIME, errp)) {
++        return;
++    }
++    if (hv_cpuid_check_and_set(cs, HYPERV_FEAT_CRASH, errp)) {
++        return;
++    }
++    if (hv_cpuid_check_and_set(cs, HYPERV_FEAT_RESET, errp)) {
++        return;
++    }
++    if (hv_cpuid_check_and_set(cs, HYPERV_FEAT_VPINDEX, errp)) {
++        return;
++    }
++    if (hv_cpuid_check_and_set(cs, HYPERV_FEAT_RUNTIME, errp)) {
++        return;
++    }
++    if (hv_cpuid_check_and_set(cs, HYPERV_FEAT_SYNIC, errp)) {
++        return;
++    }
++    if (hv_cpuid_check_and_set(cs, HYPERV_FEAT_STIMER, errp)) {
++        return;
++    }
++    if (hv_cpuid_check_and_set(cs, HYPERV_FEAT_FREQUENCIES, errp)) {
++        return;
++    }
++    if (hv_cpuid_check_and_set(cs, HYPERV_FEAT_REENLIGHTENMENT, errp)) {
++        return;
++    }
++    if (hv_cpuid_check_and_set(cs, HYPERV_FEAT_TLBFLUSH, errp)) {
++        return;
++    }
++    if (hv_cpuid_check_and_set(cs, HYPERV_FEAT_EVMCS, errp)) {
++        return;
++    }
++    if (hv_cpuid_check_and_set(cs, HYPERV_FEAT_IPI, errp)) {
++        return;
++    }
++    if (hv_cpuid_check_and_set(cs, HYPERV_FEAT_STIMER_DIRECT, errp)) {
++        return;
++    }
+ 
+     /* Additional dependencies not covered by kvm_hyperv_properties[] */
+     if (hyperv_feat_enabled(cpu, HYPERV_FEAT_SYNIC) &&
+         !cpu->hyperv_synic_kvm_only &&
+         !hyperv_feat_enabled(cpu, HYPERV_FEAT_VPINDEX)) {
+-        fprintf(stderr, "Hyper-V %s requires Hyper-V %s\n",
+-                kvm_hyperv_properties[HYPERV_FEAT_SYNIC].desc,
+-                kvm_hyperv_properties[HYPERV_FEAT_VPINDEX].desc);
+-        r |= 1;
+-    }
+-
+-    if (r) {
+-        return -ENOSYS;
++        error_setg(errp, "Hyper-V %s requires Hyper-V %s",
++                   kvm_hyperv_properties[HYPERV_FEAT_SYNIC].desc,
++                   kvm_hyperv_properties[HYPERV_FEAT_VPINDEX].desc);
+     }
+-
+-    return 0;
  }
  
  /*
-- * Fill in Hyper-V CPUIDs. Returns the number of entries filled in cpuid_ent in
-- * case of success, errno < 0 in case of failure and 0 when no Hyper-V
-- * extentions are enabled.
-+ * Expand Hyper-V CPU features. In partucular, check that all the requested
-+ * features are supported by the host and the sanity of the configuration
-+ * (that all the required dependencies are included). Also, this takes care
-+ * of 'hv_passthrough' mode and fills the environment with all supported
-+ * Hyper-V features.
-  */
--static int hyperv_handle_properties(CPUState *cs,
--                                    struct kvm_cpuid_entry2 *cpuid_ent)
-+static int hyperv_expand_features(CPUState *cs)
- {
-     X86CPU *cpu = X86_CPU(cs);
--    struct kvm_cpuid_entry2 *c;
--    uint32_t cpuid_i = 0;
-     int r;
- 
-     if (!hyperv_enabled(cpu))
-@@ -1292,6 +1291,19 @@ static int hyperv_handle_properties(CPUState *cs,
-         return -ENOSYS;
-     }
- 
-+    return 0;
-+}
-+
-+/*
-+ * Fill in Hyper-V CPUIDs. Returns the number of entries filled in cpuid_ent.
-+ */
-+static int hyperv_fill_cpuids(CPUState *cs,
-+                              struct kvm_cpuid_entry2 *cpuid_ent)
-+{
-+    X86CPU *cpu = X86_CPU(cs);
-+    struct kvm_cpuid_entry2 *c;
-+    uint32_t cpuid_i = 0;
-+
-     c = &cpuid_ent[cpuid_i++];
-     c->function = HV_CPUID_VENDOR_AND_MAX_FUNCTIONS;
-     c->eax = hyperv_feat_enabled(cpu, HYPERV_FEAT_EVMCS) ?
-@@ -1499,11 +1511,13 @@ int kvm_arch_init_vcpu(CPUState *cs)
+@@ -1525,9 +1545,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
      env->apic_bus_freq = KVM_APIC_BUS_FREQUENCY;
  
      /* Paravirtualization CPUIDs */
--    r = hyperv_handle_properties(cs, cpuid_data.entries);
-+    r = hyperv_expand_features(cs);
-     if (r < 0) {
-         return r;
--    } else if (r > 0) {
--        cpuid_i = r;
-+    }
-+
-+    if (hyperv_enabled(cpu)) {
-+        cpuid_i = hyperv_fill_cpuids(cs, cpuid_data.entries);
-         kvm_base = KVM_CPUID_SIGNATURE_NEXT;
-         has_msr_hv_hypercall = true;
+-    r = hyperv_expand_features(cs);
+-    if (r < 0) {
+-        return r;
++    hyperv_expand_features(cs, &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++        return -ENOSYS;
      }
+ 
+     if (hyperv_enabled(cpu)) {
 -- 
 2.25.4
 
