@@ -2,89 +2,85 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E083C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 20:16:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C74D7C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 20:16:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5776215A4
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 20:16:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4556D221FD
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 20:16:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q8a36lUn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5776215A4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QWKrod/U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4556D221FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQyoO-0008Nk-Ty
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 16:16:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48686)
+	id 1kQyoo-0000YM-CI
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 16:16:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57996)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kQyDI-0003Uc-QT
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 15:38:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37935)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kQygG-0000R7-FM
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 16:07:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50463)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kQyDF-000379-2e
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 15:38:00 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kQyg8-0007QC-Qv
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 16:07:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602272276;
+ s=mimecast20190719; t=1602274068;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Itz/H77O8YQ99CGzsq9afhukogYzz/U6DlCXeUrgRFQ=;
- b=Q8a36lUnIzk74uhHm+6s5NNCLYUQyFSDBcFyj+pVACfdLcAEnij6WhtWRaCqK+OrEfTpDc
- GMwJ7ii/YQMzOk4mZ/G0+CVm6ixlFYFqXg+xGVCBIsBHNEuQgvgBju6NRLWU0LyOU/0S2A
- sYzIglXK1gbkaOnqKfcVabgQOune/U0=
+ bh=rYjVE2VFRDXGvlQ06vD3869NYaSOfANpD5uHf5tCdrM=;
+ b=QWKrod/UUYfvfaAyh6CjvS+2bRtvVPx5ugWFK/V6P6/nZFFxZ2ECbl6n21VMP9K+aqvoCb
+ lcfYwEJcEin7Qav6V1rEGxQUCCHMk/rcoPED3FDPcD921686ETvyhBO3AbmNkt/+r5OM0/
+ 0E5HQTsYMYsCW3QIc0NOUnGo0uAn5LY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-277-_gAqFssVOk68kcBkN_u5Dw-1; Fri, 09 Oct 2020 15:37:54 -0400
-X-MC-Unique: _gAqFssVOk68kcBkN_u5Dw-1
+ us-mta-239-DwIp_0nyPoCMehK0VAgHFQ-1; Fri, 09 Oct 2020 16:07:45 -0400
+X-MC-Unique: DwIp_0nyPoCMehK0VAgHFQ-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 12BF018829DA;
- Fri,  9 Oct 2020 19:37:53 +0000 (UTC)
-Received: from localhost (ovpn-112-20.ams2.redhat.com [10.36.112.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 109711002C01;
- Fri,  9 Oct 2020 19:37:49 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-devel@nongnu.org
-Subject: [PULL 30/30] iotests: add commit top->base cases to 274
-Date: Fri,  9 Oct 2020 20:35:29 +0100
-Message-Id: <20201009193529.322822-31-stefanha@redhat.com>
-In-Reply-To: <20201009193529.322822-1-stefanha@redhat.com>
-References: <20201009193529.322822-1-stefanha@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 923B41084C92;
+ Fri,  9 Oct 2020 20:07:44 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-113-14.phx2.redhat.com [10.3.113.14])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 416FE10027AB;
+ Fri,  9 Oct 2020 20:07:44 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL v3 6/8] qemu-nbd: Honor SIGINT and SIGHUP
+Date: Fri,  9 Oct 2020 15:07:18 -0500
+Message-Id: <20201009200720.1169904-7-eblake@redhat.com>
+In-Reply-To: <20201009200720.1169904-1-eblake@redhat.com>
+References: <20201009200720.1169904-1-eblake@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=eblake@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:34:37
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -3
-X-Spam_score: -0.4
-X-Spam_bar: /
-X-Spam_report: (-0.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MIME_BASE64_TEXT=1.741, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,114 +93,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <thuth@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Coiby Xu <Coiby.Xu@gmail.com>,
- Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "open list:Network Block Dev..." <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-RnJvbTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8u
-Y29tPgoKVGhlc2UgY2FzZXMgYXJlIGZpeGVkIGJ5IHByZXZpb3VzIHBhdGNoZXMgYXJvdW5kIGJs
-b2NrX3N0YXR1cyBhbmQKaXNfYWxsb2NhdGVkLgoKU2lnbmVkLW9mZi1ieTogVmxhZGltaXIgU2Vt
-ZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPgpSZXZpZXdlZC1ieTog
-RXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+ClJldmlld2VkLWJ5OiBBbGJlcnRvIEdhcmNp
-YSA8YmVydG9AaWdhbGlhLmNvbT4KTWVzc2FnZS1pZDogMjAyMDA5MjQxOTQwMDMuMjIwODAtNi12
-c2VtZW50c292QHZpcnR1b3p6by5jb20KU2lnbmVkLW9mZi1ieTogU3RlZmFuIEhham5vY3ppIDxz
-dGVmYW5oYUByZWRoYXQuY29tPgotLS0KIHRlc3RzL3FlbXUtaW90ZXN0cy8yNzQgICAgIHwgMjAg
-KysrKysrKysrKysKIHRlc3RzL3FlbXUtaW90ZXN0cy8yNzQub3V0IHwgNjggKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysKIDIgZmlsZXMgY2hhbmdlZCwgODggaW5zZXJ0aW9u
-cygrKQoKZGlmZiAtLWdpdCBhL3Rlc3RzL3FlbXUtaW90ZXN0cy8yNzQgYi90ZXN0cy9xZW11LWlv
-dGVzdHMvMjc0CmluZGV4IGQ0NTcxYzU0NjUuLjc2YjFiYTZhNTIgMTAwNzU1Ci0tLSBhL3Rlc3Rz
-L3FlbXUtaW90ZXN0cy8yNzQKKysrIGIvdGVzdHMvcWVtdS1pb3Rlc3RzLzI3NApAQCAtMTE1LDYg
-KzExNSwyNiBAQCB3aXRoIGlvdGVzdHMuRmlsZVBhdGgoJ2Jhc2UnKSBhcyBiYXNlLCBcCiAgICAg
-aW90ZXN0cy5xZW11X2lvX2xvZygnLWMnLCAncmVhZCAtUCAxIDAgJWQnICUgc2l6ZV9zaG9ydCwg
-bWlkKQogICAgIGlvdGVzdHMucWVtdV9pb19sb2coJy1jJywgJ3JlYWQgLVAgMCAlZCAlZCcgJSAo
-c2l6ZV9zaG9ydCwgc2l6ZV9kaWZmKSwgbWlkKQogCisgICAgaW90ZXN0cy5sb2coJz09PSBUZXN0
-aW5nIHFlbXUtaW1nIGNvbW1pdCAodG9wIC0+IGJhc2UpID09PScpCisKKyAgICBjcmVhdGVfY2hh
-aW4oKQorICAgIGlvdGVzdHMucWVtdV9pbWdfbG9nKCdjb21taXQnLCAnLWInLCBiYXNlLCB0b3Ap
-CisgICAgaW90ZXN0cy5pbWdfaW5mb19sb2coYmFzZSkKKyAgICBpb3Rlc3RzLnFlbXVfaW9fbG9n
-KCctYycsICdyZWFkIC1QIDEgMCAlZCcgJSBzaXplX3Nob3J0LCBiYXNlKQorICAgIGlvdGVzdHMu
-cWVtdV9pb19sb2coJy1jJywgJ3JlYWQgLVAgMCAlZCAlZCcgJSAoc2l6ZV9zaG9ydCwgc2l6ZV9k
-aWZmKSwgYmFzZSkKKworICAgIGlvdGVzdHMubG9nKCc9PT0gVGVzdGluZyBRTVAgYWN0aXZlIGNv
-bW1pdCAodG9wIC0+IGJhc2UpID09PScpCisKKyAgICBjcmVhdGVfY2hhaW4oKQorICAgIHdpdGgg
-Y3JlYXRlX3ZtKCkgYXMgdm06CisgICAgICAgIHZtLmxhdW5jaCgpCisgICAgICAgIHZtLnFtcF9s
-b2coJ2Jsb2NrLWNvbW1pdCcsIGRldmljZT0ndG9wJywgYmFzZV9ub2RlPSdiYXNlJywKKyAgICAg
-ICAgICAgICAgICAgICBqb2JfaWQ9J2pvYjAnLCBhdXRvX2Rpc21pc3M9RmFsc2UpCisgICAgICAg
-IHZtLnJ1bl9qb2IoJ2pvYjAnLCB3YWl0PTUpCisKKyAgICBpb3Rlc3RzLmltZ19pbmZvX2xvZyht
-aWQpCisgICAgaW90ZXN0cy5xZW11X2lvX2xvZygnLWMnLCAncmVhZCAtUCAxIDAgJWQnICUgc2l6
-ZV9zaG9ydCwgYmFzZSkKKyAgICBpb3Rlc3RzLnFlbXVfaW9fbG9nKCctYycsICdyZWFkIC1QIDAg
-JWQgJWQnICUgKHNpemVfc2hvcnQsIHNpemVfZGlmZiksIGJhc2UpCiAKICAgICBpb3Rlc3RzLmxv
-ZygnPT0gUmVzaXplIHRlc3RzID09JykKIApkaWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3Rz
-LzI3NC5vdXQgYi90ZXN0cy9xZW11LWlvdGVzdHMvMjc0Lm91dAppbmRleCBiZjVhYmQ0YzEwLi5j
-ZmUxN2E4NjU5IDEwMDY0NAotLS0gYS90ZXN0cy9xZW11LWlvdGVzdHMvMjc0Lm91dAorKysgYi90
-ZXN0cy9xZW11LWlvdGVzdHMvMjc0Lm91dApAQCAtMTM1LDYgKzEzNSw3NCBAQCByZWFkIDEwNDg1
-NzYvMTA0ODU3NiBieXRlcyBhdCBvZmZzZXQgMAogcmVhZCAxMDQ4NTc2LzEwNDg1NzYgYnl0ZXMg
-YXQgb2Zmc2V0IDEwNDg1NzYKIDEgTWlCLCBYIG9wczsgWFg6WFg6WFguWCAoWFhYIFlZWS9zZWMg
-YW5kIFhYWCBvcHMvc2VjKQogCis9PT0gVGVzdGluZyBxZW11LWltZyBjb21taXQgKHRvcCAtPiBi
-YXNlKSA9PT0KK0Zvcm1hdHRpbmcgJ1RFU1RfRElSL1BJRC1iYXNlJywgZm10PXFjb3cyIGNsdXN0
-ZXJfc2l6ZT02NTUzNiBleHRlbmRlZF9sMj1vZmYgY29tcHJlc3Npb25fdHlwZT16bGliIHNpemU9
-MjA5NzE1MiBsYXp5X3JlZmNvdW50cz1vZmYgcmVmY291bnRfYml0cz0xNgorCitGb3JtYXR0aW5n
-ICdURVNUX0RJUi9QSUQtbWlkJywgZm10PXFjb3cyIGNsdXN0ZXJfc2l6ZT02NTUzNiBleHRlbmRl
-ZF9sMj1vZmYgY29tcHJlc3Npb25fdHlwZT16bGliIHNpemU9MTA0ODU3NiBiYWNraW5nX2ZpbGU9
-VEVTVF9ESVIvUElELWJhc2UgYmFja2luZ19mbXQ9cWNvdzIgbGF6eV9yZWZjb3VudHM9b2ZmIHJl
-ZmNvdW50X2JpdHM9MTYKKworRm9ybWF0dGluZyAnVEVTVF9ESVIvUElELXRvcCcsIGZtdD1xY293
-MiBjbHVzdGVyX3NpemU9NjU1MzYgZXh0ZW5kZWRfbDI9b2ZmIGNvbXByZXNzaW9uX3R5cGU9emxp
-YiBzaXplPTIwOTcxNTIgYmFja2luZ19maWxlPVRFU1RfRElSL1BJRC1taWQgYmFja2luZ19mbXQ9
-cWNvdzIgbGF6eV9yZWZjb3VudHM9b2ZmIHJlZmNvdW50X2JpdHM9MTYKKword3JvdGUgMjA5NzE1
-Mi8yMDk3MTUyIGJ5dGVzIGF0IG9mZnNldCAwCisyIE1pQiwgWCBvcHM7IFhYOlhYOlhYLlggKFhY
-WCBZWVkvc2VjIGFuZCBYWFggb3BzL3NlYykKKworSW1hZ2UgY29tbWl0dGVkLgorCitpbWFnZTog
-VEVTVF9JTUcKK2ZpbGUgZm9ybWF0OiBJTUdGTVQKK3ZpcnR1YWwgc2l6ZTogMiBNaUIgKDIwOTcx
-NTIgYnl0ZXMpCitjbHVzdGVyX3NpemU6IDY1NTM2CitGb3JtYXQgc3BlY2lmaWMgaW5mb3JtYXRp
-b246CisgICAgY29tcGF0OiAxLjEKKyAgICBjb21wcmVzc2lvbiB0eXBlOiB6bGliCisgICAgbGF6
-eSByZWZjb3VudHM6IGZhbHNlCisgICAgcmVmY291bnQgYml0czogMTYKKyAgICBjb3JydXB0OiBm
-YWxzZQorICAgIGV4dGVuZGVkIGwyOiBmYWxzZQorCityZWFkIDEwNDg1NzYvMTA0ODU3NiBieXRl
-cyBhdCBvZmZzZXQgMAorMSBNaUIsIFggb3BzOyBYWDpYWDpYWC5YIChYWFggWVlZL3NlYyBhbmQg
-WFhYIG9wcy9zZWMpCisKK3JlYWQgMTA0ODU3Ni8xMDQ4NTc2IGJ5dGVzIGF0IG9mZnNldCAxMDQ4
-NTc2CisxIE1pQiwgWCBvcHM7IFhYOlhYOlhYLlggKFhYWCBZWVkvc2VjIGFuZCBYWFggb3BzL3Nl
-YykKKworPT09IFRlc3RpbmcgUU1QIGFjdGl2ZSBjb21taXQgKHRvcCAtPiBiYXNlKSA9PT0KK0Zv
-cm1hdHRpbmcgJ1RFU1RfRElSL1BJRC1iYXNlJywgZm10PXFjb3cyIGNsdXN0ZXJfc2l6ZT02NTUz
-NiBleHRlbmRlZF9sMj1vZmYgY29tcHJlc3Npb25fdHlwZT16bGliIHNpemU9MjA5NzE1MiBsYXp5
-X3JlZmNvdW50cz1vZmYgcmVmY291bnRfYml0cz0xNgorCitGb3JtYXR0aW5nICdURVNUX0RJUi9Q
-SUQtbWlkJywgZm10PXFjb3cyIGNsdXN0ZXJfc2l6ZT02NTUzNiBleHRlbmRlZF9sMj1vZmYgY29t
-cHJlc3Npb25fdHlwZT16bGliIHNpemU9MTA0ODU3NiBiYWNraW5nX2ZpbGU9VEVTVF9ESVIvUElE
-LWJhc2UgYmFja2luZ19mbXQ9cWNvdzIgbGF6eV9yZWZjb3VudHM9b2ZmIHJlZmNvdW50X2JpdHM9
-MTYKKworRm9ybWF0dGluZyAnVEVTVF9ESVIvUElELXRvcCcsIGZtdD1xY293MiBjbHVzdGVyX3Np
-emU9NjU1MzYgZXh0ZW5kZWRfbDI9b2ZmIGNvbXByZXNzaW9uX3R5cGU9emxpYiBzaXplPTIwOTcx
-NTIgYmFja2luZ19maWxlPVRFU1RfRElSL1BJRC1taWQgYmFja2luZ19mbXQ9cWNvdzIgbGF6eV9y
-ZWZjb3VudHM9b2ZmIHJlZmNvdW50X2JpdHM9MTYKKword3JvdGUgMjA5NzE1Mi8yMDk3MTUyIGJ5
-dGVzIGF0IG9mZnNldCAwCisyIE1pQiwgWCBvcHM7IFhYOlhYOlhYLlggKFhYWCBZWVkvc2VjIGFu
-ZCBYWFggb3BzL3NlYykKKworeyJleGVjdXRlIjogImJsb2NrLWNvbW1pdCIsICJhcmd1bWVudHMi
-OiB7ImF1dG8tZGlzbWlzcyI6IGZhbHNlLCAiYmFzZS1ub2RlIjogImJhc2UiLCAiZGV2aWNlIjog
-InRvcCIsICJqb2ItaWQiOiAiam9iMCJ9fQoreyJyZXR1cm4iOiB7fX0KK3siZXhlY3V0ZSI6ICJq
-b2ItY29tcGxldGUiLCAiYXJndW1lbnRzIjogeyJpZCI6ICJqb2IwIn19Cit7InJldHVybiI6IHt9
-fQoreyJkYXRhIjogeyJkZXZpY2UiOiAiam9iMCIsICJsZW4iOiAxMDQ4NTc2LCAib2Zmc2V0Ijog
-MTA0ODU3NiwgInNwZWVkIjogMCwgInR5cGUiOiAiY29tbWl0In0sICJldmVudCI6ICJCTE9DS19K
-T0JfUkVBRFkiLCAidGltZXN0YW1wIjogeyJtaWNyb3NlY29uZHMiOiAiVVNFQ1MiLCAic2Vjb25k
-cyI6ICJTRUNTIn19Cit7ImRhdGEiOiB7ImRldmljZSI6ICJqb2IwIiwgImxlbiI6IDEwNDg1NzYs
-ICJvZmZzZXQiOiAxMDQ4NTc2LCAic3BlZWQiOiAwLCAidHlwZSI6ICJjb21taXQifSwgImV2ZW50
-IjogIkJMT0NLX0pPQl9DT01QTEVURUQiLCAidGltZXN0YW1wIjogeyJtaWNyb3NlY29uZHMiOiAi
-VVNFQ1MiLCAic2Vjb25kcyI6ICJTRUNTIn19Cit7ImV4ZWN1dGUiOiAiam9iLWRpc21pc3MiLCAi
-YXJndW1lbnRzIjogeyJpZCI6ICJqb2IwIn19Cit7InJldHVybiI6IHt9fQoraW1hZ2U6IFRFU1Rf
-SU1HCitmaWxlIGZvcm1hdDogSU1HRk1UCit2aXJ0dWFsIHNpemU6IDEgTWlCICgxMDQ4NTc2IGJ5
-dGVzKQorY2x1c3Rlcl9zaXplOiA2NTUzNgorYmFja2luZyBmaWxlOiBURVNUX0RJUi9QSUQtYmFz
-ZQorYmFja2luZyBmaWxlIGZvcm1hdDogSU1HRk1UCitGb3JtYXQgc3BlY2lmaWMgaW5mb3JtYXRp
-b246CisgICAgY29tcGF0OiAxLjEKKyAgICBjb21wcmVzc2lvbiB0eXBlOiB6bGliCisgICAgbGF6
-eSByZWZjb3VudHM6IGZhbHNlCisgICAgcmVmY291bnQgYml0czogMTYKKyAgICBjb3JydXB0OiBm
-YWxzZQorICAgIGV4dGVuZGVkIGwyOiBmYWxzZQorCityZWFkIDEwNDg1NzYvMTA0ODU3NiBieXRl
-cyBhdCBvZmZzZXQgMAorMSBNaUIsIFggb3BzOyBYWDpYWDpYWC5YIChYWFggWVlZL3NlYyBhbmQg
-WFhYIG9wcy9zZWMpCisKK3JlYWQgMTA0ODU3Ni8xMDQ4NTc2IGJ5dGVzIGF0IG9mZnNldCAxMDQ4
-NTc2CisxIE1pQiwgWCBvcHM7IFhYOlhYOlhYLlggKFhYWCBZWVkvc2VjIGFuZCBYWFggb3BzL3Nl
-YykKKwogPT0gUmVzaXplIHRlc3RzID09CiA9PT0gcHJlYWxsb2NhdGlvbj1vZmYgPT09CiBGb3Jt
-YXR0aW5nICdURVNUX0RJUi9QSUQtYmFzZScsIGZtdD1xY293MiBjbHVzdGVyX3NpemU9NjU1MzYg
-ZXh0ZW5kZWRfbDI9b2ZmIGNvbXByZXNzaW9uX3R5cGU9emxpYiBzaXplPTY0NDI0NTA5NDQgbGF6
-eV9yZWZjb3VudHM9b2ZmIHJlZmNvdW50X2JpdHM9MTYKLS0gCjIuMjYuMgoK
+Honoring just SIGTERM on Linux is too weak; we also want to handle
+other common signals, and do so even on BSD.  Why?  Because at least
+'qemu-nbd -B bitmap' needs a chance to clean up the in-use bit on
+bitmaps when the server is shut down via a signal.
+
+See also: http://bugzilla.redhat.com/1883608
+
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20200930121105.667049-2-eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+[eblake: apply comment tweak suggested by Vladimir; fix ifdef around
+termsig_handler]
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ qemu-nbd.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index bacb69b0898b..bc644a0670b6 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -154,13 +154,13 @@ QEMU_COPYRIGHT "\n"
+     , name);
+ }
+
+-#if HAVE_NBD_DEVICE
++#ifdef CONFIG_POSIX
+ static void termsig_handler(int signum)
+ {
+     qatomic_cmpxchg(&state, RUNNING, TERMINATE);
+     qemu_notify_event();
+ }
+-#endif /* HAVE_NBD_DEVICE */
++#endif /* CONFIG_POSIX */
+
+ static int qemu_nbd_client_list(SocketAddress *saddr, QCryptoTLSCreds *tls,
+                                 const char *hostname)
+@@ -581,17 +581,18 @@ int main(int argc, char **argv)
+     const char *pid_file_name = NULL;
+     BlockExportOptions *export_opts;
+
+-#if HAVE_NBD_DEVICE
+-    /* The client thread uses SIGTERM to interrupt the server.  A signal
+-     * handler ensures that "qemu-nbd -v -c" exits with a nice status code.
++#ifdef CONFIG_POSIX
++    /*
++     * Exit gracefully on various signals, which includes SIGTERM used
++     * by 'qemu-nbd -v -c'.
+      */
+     struct sigaction sa_sigterm;
+     memset(&sa_sigterm, 0, sizeof(sa_sigterm));
+     sa_sigterm.sa_handler = termsig_handler;
+     sigaction(SIGTERM, &sa_sigterm, NULL);
+-#endif /* HAVE_NBD_DEVICE */
++    sigaction(SIGINT, &sa_sigterm, NULL);
++    sigaction(SIGHUP, &sa_sigterm, NULL);
+
+-#ifdef CONFIG_POSIX
+     signal(SIGPIPE, SIG_IGN);
+ #endif
+
+-- 
+2.28.0
 
 
