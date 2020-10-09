@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDFEAC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:32:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44CBAC433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:33:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 358E520732
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:32:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C83102227F
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:33:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Owbm5rCC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 358E520732
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MQWWHToO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C83102227F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQvJy-0008Q9-EX
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:32:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34560)
+	id 1kQvKr-0001o0-T4
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:33:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34768)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv4K-0004Ae-2X
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40314)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv4W-0004O2-ON
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22947)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv4G-0003Hq-JX
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:31 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv4O-0003LB-Sb
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602260184;
+ s=mimecast20190719; t=1602260196;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=uzWtOCuBHxv0uBQt9mqperOOrxpQMDVzXHiuOcdXAu8=;
- b=Owbm5rCCJrVHIJdDVPljS+HP5422QTQ8hUVLqpN8hba+LaALxUmA1M7526VsF1vEODyGoh
- Fd4BTe2sFp3QPu62SAI8MSNQBH1q0jpFTtLpOMUCKzDC90Qyq+0BeANmt/wX/+EzLyw9y4
- 2dRGw4ton5H/h5PCCAO1xd8rUDX+sPs=
+ bh=IsDKDkgExvu7y3hn9COPAwhXOGkQ3b8Eei+wplqK5i8=;
+ b=MQWWHToOdnjLPLrlvAS4tSiz9f9leEBOlbcBSXKJ1mYKvCB50FDwgUAgbX4bdmtSbDlQfQ
+ z7Y+o6mSfEi2Ua3TbX97cfJvczP6sCcvd9jpDcE0VqcOCIpfqzg8MPUcTqM6tmsVFU0X3D
+ xO7HapYnbSzWrw9kxjS6yM8VsI5jtN0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-495-B7d_QcfOO_KJxNLbIM-3Aw-1; Fri, 09 Oct 2020 12:16:22 -0400
-X-MC-Unique: B7d_QcfOO_KJxNLbIM-3Aw-1
+ us-mta-587-iB7XsAPMMP2jyc9C3hMNWA-1; Fri, 09 Oct 2020 12:16:34 -0400
+X-MC-Unique: iB7XsAPMMP2jyc9C3hMNWA-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A5B0101962D;
- Fri,  9 Oct 2020 16:16:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 57673100746C;
+ Fri,  9 Oct 2020 16:16:33 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-112-203.rdu2.redhat.com [10.10.112.203])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7DFE21A92A;
- Fri,  9 Oct 2020 16:16:20 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9444E19936;
+ Fri,  9 Oct 2020 16:16:32 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 15/36] qapi/common.py: add type hint annotations
-Date: Fri,  9 Oct 2020 12:15:37 -0400
-Message-Id: <20201009161558.107041-16-jsnow@redhat.com>
+Subject: [PATCH v6 27/36] qapi/gen.py: add type hint annotations
+Date: Fri,  9 Oct 2020 12:15:49 -0400
+Message-Id: <20201009161558.107041-28-jsnow@redhat.com>
 In-Reply-To: <20201009161558.107041-1-jsnow@redhat.com>
 References: <20201009161558.107041-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -103,124 +103,286 @@ Sender: "Qemu-devel"
 Annotations do not change runtime behavior.
 This commit *only* adds annotations.
 
-Note that build_params() cannot be fully annotated due to import
-dependency issues.  The commit after next will take care of it.
-
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: Cleber Rosa <crosa@redhat.com>
 ---
- scripts/qapi/common.py | 27 ++++++++++++++++-----------
- 1 file changed, 16 insertions(+), 11 deletions(-)
+ scripts/qapi/gen.py | 104 ++++++++++++++++++++++++--------------------
+ 1 file changed, 57 insertions(+), 47 deletions(-)
 
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 338adedef4f..74a2c001ed9 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -12,6 +12,7 @@
- # See the COPYING file in the top-level directory.
- 
+diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
+index 2c305c4f82c..6b1007a0351 100644
+--- a/scripts/qapi/gen.py
++++ b/scripts/qapi/gen.py
+@@ -15,7 +15,13 @@
+ import errno
+ import os
  import re
-+from typing import Optional, Sequence
+-from typing import Optional
++from typing import (
++    Dict,
++    Iterator,
++    List,
++    Optional,
++    Tuple,
++)
+ 
+ from .common import (
+     c_fname,
+@@ -27,31 +33,31 @@
+     mcgen,
+ )
+ from .schema import QAPISchemaObjectType, QAPISchemaVisitor
++from .source import QAPISourceInfo
  
  
- EATSPACE = '\033EATSPACE.'
-@@ -22,7 +23,7 @@
- # ENUMName -> ENUM_NAME, EnumName1 -> ENUM_NAME1
- # ENUM_NAME -> ENUM_NAME, ENUM_NAME1 -> ENUM_NAME1, ENUM_Name2 -> ENUM_NAME2
- # ENUM24_Name -> ENUM24_NAME
--def camel_to_upper(value):
-+def camel_to_upper(value: str) -> str:
-     c_fun_str = c_name(value, False)
-     if value.isupper():
-         return c_fun_str
-@@ -41,7 +42,9 @@ def camel_to_upper(value):
-     return new_name.lstrip('_').upper()
+ class QAPIGen:
+-
+-    def __init__(self, fname):
++    def __init__(self, fname: Optional[str]):
+         self.fname = fname
+         self._preamble = ''
+         self._body = ''
+ 
+-    def preamble_add(self, text):
++    def preamble_add(self, text: str) -> None:
+         self._preamble += text
+ 
+-    def add(self, text):
++    def add(self, text: str) -> None:
+         self._body += text
+ 
+-    def get_content(self):
++    def get_content(self) -> str:
+         return self._top() + self._preamble + self._body + self._bottom()
+ 
+-    def _top(self):
++    def _top(self) -> str:
+         return ''
+ 
+-    def _bottom(self):
++    def _bottom(self) -> str:
+         return ''
+ 
+-    def write(self, output_dir):
++    def write(self, output_dir: str) -> None:
+         # Include paths starting with ../ are used to reuse modules of the main
+         # schema in specialised schemas. Don't overwrite the files that are
+         # already generated for the main schema.
+@@ -76,7 +82,7 @@ def write(self, output_dir):
+         f.close()
  
  
--def c_enum_const(type_name, const_name, prefix=None):
-+def c_enum_const(type_name: str,
-+                 const_name: str,
-+                 prefix: Optional[str] = None) -> str:
-     if prefix is not None:
-         type_name = prefix
-     return camel_to_upper(type_name) + '_' + c_name(const_name, False).upper()
-@@ -56,7 +59,7 @@ def c_enum_const(type_name, const_name, prefix=None):
- # into substrings of a generated C function name.
- # '__a.b_c' -> '__a_b_c', 'x-foo' -> 'x_foo'
- # protect=True: 'int' -> 'q_int'; protect=False: 'int' -> 'int'
--def c_name(name, protect=True):
-+def c_name(name: str, protect: bool = True) -> str:
-     # ANSI X3J11/88-090, 3.1.1
-     c89_words = set(['auto', 'break', 'case', 'char', 'const', 'continue',
-                      'default', 'do', 'double', 'else', 'enum', 'extern',
-@@ -131,24 +134,24 @@ def decrease(self, amount: int = 4) -> None:
+-def _wrap_ifcond(ifcond, before, after):
++def _wrap_ifcond(ifcond: List[str], before: str, after: str) -> str:
+     if before == after:
+         return after   # suppress empty #if ... #endif
  
- # Generate @code with @kwds interpolated.
- # Obey indent, and strip EATSPACE.
--def cgen(code, **kwds):
-+def cgen(code: str, **kwds: object) -> str:
-     raw = code % kwds
-     if indent:
-         raw = re.sub(r'^(?!(#|$))', str(indent), raw, flags=re.MULTILINE)
-     return re.sub(re.escape(EATSPACE) + r' *', '', raw)
+@@ -116,40 +122,38 @@ def build_params(arg_type: Optional[QAPISchemaObjectType],
  
  
--def mcgen(code, **kwds):
-+def mcgen(code: str, **kwds: object) -> str:
-     if code[0] == '\n':
-         code = code[1:]
-     return cgen(code, **kwds)
+ class QAPIGenCCode(QAPIGen):
+-
+-    def __init__(self, fname):
++    def __init__(self, fname: Optional[str]):
+         super().__init__(fname)
+-        self._start_if = None
++        self._start_if: Optional[Tuple[List[str], str, str]] = None
+ 
+-    def start_if(self, ifcond):
++    def start_if(self, ifcond: List[str]) -> None:
+         assert self._start_if is None
+         self._start_if = (ifcond, self._body, self._preamble)
+ 
+-    def end_if(self):
++    def end_if(self) -> None:
+         assert self._start_if
+         self._wrap_ifcond()
+         self._start_if = None
+ 
+-    def _wrap_ifcond(self):
++    def _wrap_ifcond(self) -> None:
+         self._body = _wrap_ifcond(self._start_if[0],
+                                   self._start_if[1], self._body)
+         self._preamble = _wrap_ifcond(self._start_if[0],
+                                       self._start_if[2], self._preamble)
+ 
+-    def get_content(self):
++    def get_content(self) -> str:
+         assert self._start_if is None
+         return super().get_content()
  
  
--def c_fname(filename):
-+def c_fname(filename: str) -> str:
-     return re.sub(r'[^A-Za-z0-9_]', '_', filename)
+ class QAPIGenC(QAPIGenCCode):
+-
+-    def __init__(self, fname, blurb, pydoc):
++    def __init__(self, fname: str, blurb: str, pydoc: str):
+         super().__init__(fname)
+         self._blurb = blurb
+         self._copyright = '\n * '.join(re.findall(r'^Copyright .*', pydoc,
+                                                   re.MULTILINE))
+ 
+-    def _top(self):
++    def _top(self) -> str:
+         return mcgen('''
+ /* AUTOMATICALLY GENERATED, DO NOT MODIFY */
+ 
+@@ -165,7 +169,7 @@ def _top(self):
+ ''',
+                      blurb=self._blurb, copyright=self._copyright)
+ 
+-    def _bottom(self):
++    def _bottom(self) -> str:
+         return mcgen('''
+ 
+ /* Dummy declaration to prevent empty .o file */
+@@ -175,16 +179,15 @@ def _bottom(self):
  
  
--def guardstart(name):
-+def guardstart(name: str) -> str:
-     return mcgen('''
- #ifndef %(name)s
- #define %(name)s
-@@ -157,7 +160,7 @@ def guardstart(name):
-                  name=c_fname(name).upper())
+ class QAPIGenH(QAPIGenC):
+-
+-    def _top(self):
++    def _top(self) -> str:
+         return super()._top() + guardstart(self.fname)
+ 
+-    def _bottom(self):
++    def _bottom(self) -> str:
+         return guardend(self.fname)
  
  
--def guardend(name):
-+def guardend(name: str) -> str:
-     return mcgen('''
+ @contextmanager
+-def ifcontext(ifcond, *args):
++def ifcontext(ifcond: List[str], *args: QAPIGenCCode) -> Iterator[None]:
+     """
+     A with-statement context manager that wraps with `start_if()` / `end_if()`.
  
- #endif /* %(name)s */
-@@ -165,7 +168,7 @@ def guardend(name):
-                  name=c_fname(name).upper())
- 
- 
--def gen_if(ifcond):
-+def gen_if(ifcond: Sequence[str]) -> str:
-     ret = ''
-     for ifc in ifcond:
-         ret += mcgen('''
-@@ -174,7 +177,7 @@ def gen_if(ifcond):
-     return ret
+@@ -212,8 +215,11 @@ def ifcontext(ifcond, *args):
  
  
--def gen_endif(ifcond):
-+def gen_endif(ifcond: Sequence[str]) -> str:
-     ret = ''
-     for ifc in reversed(ifcond):
-         ret += mcgen('''
-@@ -183,7 +186,9 @@ def gen_endif(ifcond):
-     return ret
+ class QAPISchemaMonolithicCVisitor(QAPISchemaVisitor):
+-
+-    def __init__(self, prefix, what, blurb, pydoc):
++    def __init__(self,
++                 prefix: str,
++                 what: str,
++                 blurb: str,
++                 pydoc: str):
+         self._prefix = prefix
+         self._what = what
+         self._genc = QAPIGenC(self._prefix + self._what + '.c',
+@@ -221,38 +227,42 @@ def __init__(self, prefix, what, blurb, pydoc):
+         self._genh = QAPIGenH(self._prefix + self._what + '.h',
+                               blurb, pydoc)
+ 
+-    def write(self, output_dir):
++    def write(self, output_dir: str) -> None:
+         self._genc.write(output_dir)
+         self._genh.write(output_dir)
  
  
--def build_params(arg_type, boxed, extra=None):
-+def build_params(arg_type,
-+                 boxed: bool,
-+                 extra: Optional[str] = None) -> str:
-     ret = ''
-     sep = ''
-     if boxed:
+ class QAPISchemaModularCVisitor(QAPISchemaVisitor):
+-
+-    def __init__(self, prefix, what, user_blurb, builtin_blurb, pydoc):
++    def __init__(self,
++                 prefix: str,
++                 what: str,
++                 user_blurb: str,
++                 builtin_blurb: Optional[str],
++                 pydoc: str):
+         self._prefix = prefix
+         self._what = what
+         self._user_blurb = user_blurb
+         self._builtin_blurb = builtin_blurb
+         self._pydoc = pydoc
+-        self._genc = None
+-        self._genh = None
+-        self._module = {}
+-        self._main_module = None
++        self._genc: Optional[QAPIGenC] = None
++        self._genh: Optional[QAPIGenH] = None
++        self._module: Dict[Optional[str], Tuple[QAPIGenC, QAPIGenH]] = {}
++        self._main_module: Optional[str] = None
+ 
+     @staticmethod
+-    def _is_user_module(name):
++    def _is_user_module(name: Optional[str]) -> bool:
+         return bool(name and not name.startswith('./'))
+ 
+     @staticmethod
+-    def _is_builtin_module(name):
++    def _is_builtin_module(name: Optional[str]) -> bool:
+         return not name
+ 
+-    def _module_dirname(self, what, name):
++    def _module_dirname(self, what: str, name: Optional[str]) -> str:
+         if self._is_user_module(name):
+             return os.path.dirname(name)
+         return ''
+ 
+-    def _module_basename(self, what, name):
++    def _module_basename(self, what: str, name: Optional[str]) -> str:
+         ret = '' if self._is_builtin_module(name) else self._prefix
+         if self._is_user_module(name):
+             basename = os.path.basename(name)
+@@ -264,27 +274,27 @@ def _module_basename(self, what, name):
+             ret += re.sub(r'-', '-' + name + '-', what)
+         return ret
+ 
+-    def _module_filename(self, what, name):
++    def _module_filename(self, what: str, name: Optional[str]) -> str:
+         return os.path.join(self._module_dirname(what, name),
+                             self._module_basename(what, name))
+ 
+-    def _add_module(self, name, blurb):
++    def _add_module(self, name: Optional[str], blurb: str) -> None:
+         basename = self._module_filename(self._what, name)
+         genc = QAPIGenC(basename + '.c', blurb, self._pydoc)
+         genh = QAPIGenH(basename + '.h', blurb, self._pydoc)
+         self._module[name] = (genc, genh)
+         self._genc, self._genh = self._module[name]
+ 
+-    def _add_user_module(self, name, blurb):
++    def _add_user_module(self, name: str, blurb: str) -> None:
+         assert self._is_user_module(name)
+         if self._main_module is None:
+             self._main_module = name
+         self._add_module(name, blurb)
+ 
+-    def _add_system_module(self, name, blurb):
++    def _add_system_module(self, name: Optional[str], blurb: str) -> None:
+         self._add_module(name and './' + name, blurb)
+ 
+-    def write(self, output_dir, opt_builtins=False):
++    def write(self, output_dir: str, opt_builtins: bool = False) -> None:
+         for name in self._module:
+             if self._is_builtin_module(name) and not opt_builtins:
+                 continue
+@@ -292,13 +302,13 @@ def write(self, output_dir, opt_builtins=False):
+             genc.write(output_dir)
+             genh.write(output_dir)
+ 
+-    def _begin_system_module(self, name):
++    def _begin_system_module(self, name: None) -> None:
+         pass
+ 
+-    def _begin_user_module(self, name):
++    def _begin_user_module(self, name: str) -> None:
+         pass
+ 
+-    def visit_module(self, name):
++    def visit_module(self, name: Optional[str]) -> None:
+         if name is None:
+             if self._builtin_blurb:
+                 self._add_system_module(None, self._builtin_blurb)
+@@ -312,7 +322,7 @@ def visit_module(self, name):
+             self._add_user_module(name, self._user_blurb)
+             self._begin_user_module(name)
+ 
+-    def visit_include(self, name, info):
++    def visit_include(self, name: str, info: QAPISourceInfo) -> None:
+         relname = os.path.relpath(self._module_filename(self._what, name),
+                                   os.path.dirname(self._genh.fname))
+         self._genh.preamble_add(mcgen('''
 -- 
 2.26.2
 
