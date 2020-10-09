@@ -6,54 +6,54 @@ X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6FDBC433E7
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 08:12:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4EE7C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 08:30:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4397B22227
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 08:12:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4397B22227
+	by mail.kernel.org (Postfix) with ESMTPS id B205122240
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 08:30:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B205122240
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQnWG-0004or-Cj
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 04:12:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44080)
+	id 1kQnnh-0000pX-HS
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 04:30:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48004)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
- id 1kQnUs-0003ss-M5; Fri, 09 Oct 2020 04:11:28 -0400
-Received: from szxga08-in.huawei.com ([45.249.212.255]:33210 helo=huawei.com)
+ id 1kQnmA-0000Gt-GZ; Fri, 09 Oct 2020 04:29:18 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:33232 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
- id 1kQnUp-0002lL-8E; Fri, 09 Oct 2020 04:11:26 -0400
-Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.55])
- by Forcepoint Email with ESMTP id 85CE5910DEC40175DEA9;
- Fri,  9 Oct 2020 16:11:17 +0800 (CST)
-Received: from dggemm754-chm.china.huawei.com (10.1.198.60) by
- DGGEMM406-HUB.china.huawei.com (10.3.20.214) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Fri, 9 Oct 2020 16:11:16 +0800
+ id 1kQnm7-0005Eo-SH; Fri, 09 Oct 2020 04:29:18 -0400
+Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.56])
+ by Forcepoint Email with ESMTP id 06C15196E1DB82C64339;
+ Fri,  9 Oct 2020 16:29:04 +0800 (CST)
 Received: from dggpemm000001.china.huawei.com (7.185.36.245) by
- dggemm754-chm.china.huawei.com (10.1.198.60) with Microsoft SMTP Server
+ DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Fri, 9 Oct 2020 16:29:03 +0800
+Received: from dggpemm000001.china.huawei.com (7.185.36.245) by
+ dggpemm000001.china.huawei.com (7.185.36.245) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1913.5; Fri, 9 Oct 2020 16:11:16 +0800
+ 15.1.1913.5; Fri, 9 Oct 2020 16:29:03 +0800
 Received: from dggpemm000001.china.huawei.com ([7.185.36.245]) by
  dggpemm000001.china.huawei.com ([7.185.36.245]) with mapi id 15.01.1913.007;
- Fri, 9 Oct 2020 16:11:16 +0800
+ Fri, 9 Oct 2020 16:29:03 +0800
 From: Jiangyifei <jiangyifei@huawei.com>
 To: Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org"
  <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
-Subject: RE: [PATCH 1/5] target/riscv: Add basic vmstate description of CPU
-Thread-Topic: [PATCH 1/5] target/riscv: Add basic vmstate description of CPU
-Thread-Index: AQHWlgTPXzkF3VtIQkeKFYSkPm7jUqmCfPUAgAx+QoA=
-Date: Fri, 9 Oct 2020 08:11:16 +0000
-Message-ID: <8882324c7f3d46e08d9c2fb902c14cac@huawei.com>
+Subject: RE: [PATCH 3/5] target/riscv: Add H extention state description
+Thread-Topic: [PATCH 3/5] target/riscv: Add H extention state description
+Thread-Index: AQHWlgTPDj3GKB4dC0y+2FIpBPS75amCfl6AgAyA2wA=
+Date: Fri, 9 Oct 2020 08:29:03 +0000
+Message-ID: <e7be2fdaaf364c11a1124544da497e4f@huawei.com>
 References: <20200929020337.1559-1-jiangyifei@huawei.com>
- <20200929020337.1559-2-jiangyifei@huawei.com>
- <b70824e1-aed9-1d72-21e8-ac444ccc9a09@linaro.org>
-In-Reply-To: <b70824e1-aed9-1d72-21e8-ac444ccc9a09@linaro.org>
+ <20200929020337.1559-4-jiangyifei@huawei.com>
+ <2e725e26-3952-dbd2-c4aa-d9e933406220@linaro.org>
+In-Reply-To: <2e725e26-3952-dbd2-c4aa-d9e933406220@linaro.org>
 Accept-Language: zh-CN, en-US
 Content-Language: zh-CN
 X-MS-Has-Attach: 
@@ -97,7 +97,7 @@ Sender: "Qemu-devel"
 
 DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUmljaGFyZCBIZW5kZXJz
 b24gW21haWx0bzpyaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnXQ0KPiBTZW50OiBGcmlkYXks
-IE9jdG9iZXIgMiwgMjAyMCAxOjIzIEFNDQo+IFRvOiBKaWFuZ3lpZmVpIDxqaWFuZ3lpZmVpQGh1
+IE9jdG9iZXIgMiwgMjAyMCAxOjI4IEFNDQo+IFRvOiBKaWFuZ3lpZmVpIDxqaWFuZ3lpZmVpQGh1
 YXdlaS5jb20+OyBxZW11LWRldmVsQG5vbmdudS5vcmc7DQo+IHFlbXUtcmlzY3ZAbm9uZ251Lm9y
 Zw0KPiBDYzogWmhhbmdoYWlsaWFuZyA8emhhbmcuemhhbmdoYWlsaWFuZ0BodWF3ZWkuY29tPjsN
 Cj4gc2FnYXJrQGVlY3MuYmVya2VsZXkuZWR1OyBrYmFzdGlhbkBtYWlsLnVuaS1wYWRlcmJvcm4u
@@ -105,12 +105,29 @@ ZGU7IFpoYW5neGlhb2ZlbmcNCj4gKEYpIDx2aWN0b3Iuemhhbmd4aWFvZmVuZ0BodWF3ZWkuY29t
 PjsgQWxpc3RhaXIuRnJhbmNpc0B3ZGMuY29tOyB5aW55aXBlbmcNCj4gPHlpbnlpcGVuZzFAaHVh
 d2VpLmNvbT47IHBhbG1lckBkYWJiZWx0LmNvbTsgV3ViaW4gKEgpDQo+IDx3dS53dWJpbkBodWF3
 ZWkuY29tPjsgZGVuZ2thaSAoQSkgPGRlbmdrYWkxQGh1YXdlaS5jb20+DQo+IFN1YmplY3Q6IFJl
-OiBbUEFUQ0ggMS81XSB0YXJnZXQvcmlzY3Y6IEFkZCBiYXNpYyB2bXN0YXRlIGRlc2NyaXB0aW9u
-IG9mIENQVQ0KPiANCj4gT24gOS8yOC8yMCA5OjAzIFBNLCBZaWZlaSBKaWFuZyB3cm90ZToNCj4g
-PiAtLS0gL2Rldi9udWxsDQo+ID4gKysrIGIvdGFyZ2V0L3Jpc2N2L21hY2hpbmUuYw0KPiA+IEBA
-IC0wLDAgKzEsNTkgQEANCj4gPiArI2luY2x1ZGUgInFlbXUvb3NkZXAuaCINCj4gPiArI2luY2x1
-ZGUgImNwdS5oIg0KPiANCj4gQWxsIG5ldyBmaWxlcyBtdXN0IGNvbnRhaW4gbGljZW5zZSBib2ls
-ZXJwbGF0ZS4NCj4gDQo+IE90aGVyd2lzZSwgY29uc2lkZXJpbmcgdGhlIGZvbGxvd3VwcywgdGhp
-cyBzZWVtcyBvay4NCj4gDQoNClRoYW5rcywgSSdsbCBhZGQgbGljZW5zZSBib2lsZXJwbGF0ZSBp
-biB0aGUgbmV4dCBzZXJpZXMuDQoNCllpZmVpDQoNCj4gDQo+IHJ+DQo=
+OiBbUEFUQ0ggMy81XSB0YXJnZXQvcmlzY3Y6IEFkZCBIIGV4dGVudGlvbiBzdGF0ZSBkZXNjcmlw
+dGlvbg0KPiANCj4gT24gOS8yOC8yMCA5OjAzIFBNLCBZaWZlaSBKaWFuZyB3cm90ZToNCj4gPiAr
+ICAgICAgICBWTVNUQVRFX1VJTlRUTChlbnYudnNzdGF0dXMsIFJJU0NWQ1BVKSwNCj4gPiArICAg
+ICAgICBWTVNUQVRFX1VJTlRUTChlbnYudnN0dmVjLCBSSVNDVkNQVSksDQo+ID4gKyAgICAgICAg
+Vk1TVEFURV9VSU5UVEwoZW52LnZzc2NyYXRjaCwgUklTQ1ZDUFUpLA0KPiA+ICsgICAgICAgIFZN
+U1RBVEVfVUlOVFRMKGVudi52c2VwYywgUklTQ1ZDUFUpLA0KPiA+ICsgICAgICAgIFZNU1RBVEVf
+VUlOVFRMKGVudi52c2NhdXNlLCBSSVNDVkNQVSksDQo+ID4gKyAgICAgICAgVk1TVEFURV9VSU5U
+VEwoZW52LnZzdHZhbCwgUklTQ1ZDUFUpLA0KPiA+ICsgICAgICAgIFZNU1RBVEVfVUlOVFRMKGVu
+di52c2F0cCwgUklTQ1ZDUFUpLA0KPiANCj4gU28uLi4gaWYgSSB1bmRlcnN0YW5kIHRoaW5ncyBj
+b3JyZWN0bHksIHRoaXMgaXMgc3ludGhldGljIHN0YXRlLCBpbnRlcm5hbCB0byBRRU1VLg0KPiBJ
+dCBpcyBnZW5lcmFsbHkgYmV0dGVyIHRvIG9ubHkgc2VyaWFsaXplIGFyY2hpdGVjdHVyYWwgc3Rh
+dGUsIHNvIHRoYXQgaWYgcWVtdQ0KPiBpbnRlcm5hbHMgYXJlIHJlYXJyYW5nZWQsIGl0IGlzIGVh
+c3kgdG8gZGVjaWRlIG9uIHRoZSBjb3JyZWN0IHNlcXVlbmNlIG9mDQo+IG9wZXJhdGlvbnMuDQo+
+IA0KPiBJdCBzZWVtcyBsaWtlIHRoaXMgc2hvdWxkIGJlIHJlLWdlbmVyYXRlZCB3aXRoIGEgcG9z
+dF9sb2FkIGhvb2ssIGNhbGxpbmcgc29tZSBvZg0KPiB0aGUgY29kZSBjdXJyZW50bHkgaW4gcmlz
+Y3ZfY3B1X3N3YXBfaHlwZXJ2aXNvcl9yZWdzKCkuICBOb3RlIHRoYXQgc29tZQ0KPiBtaW5vciBy
+ZWFycmFuZ2VtZW50IHdvdWxkIGJlIG5lZWRlZCB0byBjYWxsIHRoYXQgY29kZSBmcm9tIHRoaXMg
+bmV3IGNvbnRleHQuDQo+IA0KPiANCj4gcn4NCg0KVGhhbmsgeW91IGZvciB5b3VyIGNvbW1lbnRz
+Lg0KDQpBcyBBbGlzdGFpciBzYWlkLCBUaG9zZSB2cyogYXJlIFZpcnR1YWwgU3VwZXJ2aXNvciBD
+U1JzLiBIeXBlcnZpc29yIG1heSB3cml0ZSB0aG9zZS4NCkFjdHVhbGx577yMZXhjZXB0ICpfaHMs
+IGFsbCBzdGF0ZXMgYXJlIHJlYWwgQ1NScyBhbmQgY2Fubm90IGJlIHJlZ2VuZXJhdGVkLg0KKl9o
+cyBhcmUgYmFja3VwIG9mIFN1cGVydmlzb3IgQ1NScyB3aGVuIFY9Me+8jHNvLCBJIGRvbid0IHRo
+aW5rIGNvdWxkIHJlLWdlbmVyYXRlIHRoZW0uDQoNCkluIGNvbmNsdXNpb24sIEkgdGhpbmsgYWxs
+IEggZXh0ZW5zaW9uIHN0YXRlcyBpbiB0aGlzIHBhdGNoIG5lZWQgdG8gYmUgZGVzY3JpYmVkIGlu
+IHZtc3RhdGUuDQoNCllpZmVpDQoNCg==
 
