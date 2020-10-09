@@ -7,90 +7,90 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2588C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:56:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6996DC43457
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:56:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D3A122251
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:56:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F2A8D22251
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:56:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UMTRXZni"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D3A122251
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cT5edKb+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2A8D22251
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQvgm-0000F4-9r
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:56:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38340)
+	id 1kQvgn-0000IL-SZ
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:56:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42708)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kQvJI-0000BZ-5t
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:32:00 -0400
-Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:34626)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kQvct-0002bb-1E
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:52:15 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45769)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kQvJG-00059o-9q
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:31:59 -0400
-Received: by mail-wm1-x330.google.com with SMTP id l15so9325270wmh.1
- for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 09:31:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kQvcr-0007iF-GR
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:52:14 -0400
+Received: by mail-wr1-x443.google.com with SMTP id e17so10973528wru.12
+ for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 09:52:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Vw8FtkbtTEObTeK+pxZFlR23uufEuCQrBlYw/T1QDlM=;
- b=UMTRXZniPLeneNkF7dNw5klBsvulV3SHhucio00iioii544P+GUdEdBhsTuLm7ZjEr
- mdfFdeaniFj3PVkc04dPvGJWtidcB3+RZN/MPuO8QeUitDgiLW9Pdzm5O0mgIc0h4H/t
- OEyOYdai2Ey4RZRU9g9bNLtlGehDeS1B5YSDV3A6hl8LJU/g6UElByHIGLnquo2cu9YA
- 2aoQ7XCP9gy8S5WxH9Xy435xGScPu2/ICk/2ibyUKStDvSFVd3KQj3XApz+9WiS7DP+z
- AmcwssJvWJ9pOhupvyiubbkZG1hvwFipw0FWGkqtBLYaEBxC0fYyx1tRQkEp5imxlxjx
- OzAw==
+ bh=ED9ctdoCK+AGBSvVR1uFGDxKqs1IT3566nbTYT2S4dU=;
+ b=cT5edKb+3luGr3fwd+TyfChIspEXb6AZbUatl1YGG7M+g6VsxQujwzW7JnwLiwAcpJ
+ SVc2q27f56vm4xr8OjP87YG2gtC1Yygknz2Mte+6oV5fqEYHT6Nqs3kqdQnSPwDzBbDJ
+ lV+29cuGmDdVL0dEekVIHkkXZEhvujp5nryk4BQxD2TC6o/5Dcjqkw/tdyFJTaoedqKY
+ tIfqTjr5OMMbxSBlXcTcWLML/XDgwMr+QUWKNeLW3Km8At7ofStr+LZWJeskk03aU05d
+ RfwmozU/DdpfirDF7UN0YC+ebUqLxsYb4YsG6YNutSg8eQdnexJnGnDCbNG+TqO2kkIa
+ S/Dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Vw8FtkbtTEObTeK+pxZFlR23uufEuCQrBlYw/T1QDlM=;
- b=QRC/igVySKRzH/N/ofuNzqvv1aqmugMYqQtjjqN9BlHLaR/ZSGvyEsrHEnPCizhBVv
- pU8o3OWpP6Ay6goDrM04PbroK1RhBD1lf/McWPiUgPk31OJTsL+atyJDyR0HpN0wX3A/
- kxykEaJsB+XUdh0BgrDCw8OmQ+wg6ULPswgFUVOh927CDFhGnZiyqcUY/GzwbItJsWrK
- F8jSmnSm5Zg468eB4mThdok5UgjEM8inL2/iSkXZEdy8GD2c2hVRN276xaD230/zW0YI
- HmeL9eJ04avK4yBdAlBGbeqoOguZTK1oYjUq5lIVksos9oZZGMjHYK+lqFiLjmQJpDRt
- C7Nw==
-X-Gm-Message-State: AOAM533IApE/fZPbJO43t4mROCGhm6EHxrmJgbJ8C6M4DwMok5CDL089
- gtn1PWJnU9+fiGZF4rindWuRMA==
-X-Google-Smtp-Source: ABdhPJyGBr4Pdh7FWYdj0QaPSh+lgCCgTlFwEH/WpQY0Fmfd9lWi1Q/cpBhYl7WiGttbi2V80mruZg==
-X-Received: by 2002:a7b:c453:: with SMTP id l19mr14880452wmi.50.1602261116873; 
- Fri, 09 Oct 2020 09:31:56 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id x3sm3214910wmi.45.2020.10.09.09.31.49
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=ED9ctdoCK+AGBSvVR1uFGDxKqs1IT3566nbTYT2S4dU=;
+ b=S2/lvGnSTnOvZYHsvx0W192PyfIm/p794emXaGO/vGKNVxk5BVbMdB36YCiuqPiCc8
+ HrvNyrmyhS6FF8igp7w23YjWfDzKzU5ks5/A7ua84ic40tJlnp6ukGUed+5CcvWLmbg3
+ f54JFkCK+SXvjz7i8PLUljvV9kRcNcnjnNkXVZGNF/437bvgQYqFjKOcOSEYrFN8BNzQ
+ 7FqyG6i6cMhccOTuq7HriOnE5nj28P9ovOmoNI7Y4sKkDXiRDhLpR3g99eHIG0DikNrz
+ 0oHYFXQGICObpbOkt4b0CroUR4WdaDWwiTMvgV/8h7/F1TWMso4/zJC63d8xPYcXTm+J
+ umcQ==
+X-Gm-Message-State: AOAM532WiJSMsSU1i0F20hN3jTLvmO1yxspK5VFXlFQniJyJWfbJ0slv
+ RX6KQQJPJ0aqRcxQr28HVYKhPYIEdR8=
+X-Google-Smtp-Source: ABdhPJzSo5YBcDC6Sfj2HX87r0VrvpdBBv4jJmrHx9I3JNaHgSnpxSTsTJayQt5w85qO6mP08U/BDA==
+X-Received: by 2002:adf:9dd1:: with SMTP id q17mr9330396wre.317.1602262331861; 
+ Fri, 09 Oct 2020 09:52:11 -0700 (PDT)
+Received: from x1w.redhat.com (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id p13sm12777125wmb.5.2020.10.09.09.52.10
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 09 Oct 2020 09:31:52 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 9FA5B1FF92;
- Fri,  9 Oct 2020 17:31:47 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Subject: [PULL 06/22] tests/docker: Add genisoimage to the docker file
-Date: Fri,  9 Oct 2020 17:31:31 +0100
-Message-Id: <20201009163147.28512-7-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201009163147.28512-1-alex.bennee@linaro.org>
-References: <20201009163147.28512-1-alex.bennee@linaro.org>
+ Fri, 09 Oct 2020 09:52:11 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 1/5] MAINTAINERS: Put myself forward for MIPS target
+Date: Fri,  9 Oct 2020 18:52:04 +0200
+Message-Id: <20201009165208.2905569-2-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201009165208.2905569-1-f4bug@amsat.org>
+References: <20201009165208.2905569-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::330;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x330.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,73 +103,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: Chen Huacai <zltjiangshi@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+To avoid the MIPS target being orphan, volunteer to keep an eye
+on it and put together pull requests.
 
-genisoimage is needed for running the tests/qtest/cdrom-test qtest.
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ MAINTAINERS | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20201006174347.152040-1-thuth@redhat.com>
-Message-Id: <20201007160038.26953-7-alex.bennee@linaro.org>
-
-diff --git a/tests/docker/dockerfiles/centos8.docker b/tests/docker/dockerfiles/centos8.docker
-index f435616d6a..0fc2697491 100644
---- a/tests/docker/dockerfiles/centos8.docker
-+++ b/tests/docker/dockerfiles/centos8.docker
-@@ -8,6 +8,7 @@ ENV PACKAGES \
-     dbus-daemon \
-     gcc \
-     gcc-c++ \
-+    genisoimage \
-     gettext \
-     git \
-     glib2-devel \
-diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/dockerfiles/debian-amd64.docker
-index d2500dcff1..314c6bae83 100644
---- a/tests/docker/dockerfiles/debian-amd64.docker
-+++ b/tests/docker/dockerfiles/debian-amd64.docker
-@@ -14,6 +14,7 @@ RUN apt update && \
- RUN apt update && \
-     DEBIAN_FRONTEND=noninteractive eatmydata \
-     apt install -y --no-install-recommends \
-+        genisoimage \
-         libbz2-dev \
-         liblzo2-dev \
-         libgcrypt20-dev \
-diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
-index ec783418c8..85c975543d 100644
---- a/tests/docker/dockerfiles/fedora.docker
-+++ b/tests/docker/dockerfiles/fedora.docker
-@@ -15,6 +15,7 @@ ENV PACKAGES \
-     findutils \
-     gcc \
-     gcc-c++ \
-+    genisoimage \
-     gettext \
-     git \
-     glib2-devel \
-diff --git a/tests/docker/dockerfiles/ubuntu2004.docker b/tests/docker/dockerfiles/ubuntu2004.docker
-index cafe8443fb..f4b9556b9e 100644
---- a/tests/docker/dockerfiles/ubuntu2004.docker
-+++ b/tests/docker/dockerfiles/ubuntu2004.docker
-@@ -3,6 +3,7 @@ ENV PACKAGES flex bison \
-     ccache \
-     clang-10\
-     gcc \
-+    genisoimage \
-     gettext \
-     git \
-     glusterfs-common \
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 426f52c1f63..d59e5c05c10 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -221,10 +221,11 @@ F: hw/microblaze/
+ F: disas/microblaze.c
+ 
+ MIPS TCG CPUs
++M: Philippe Mathieu-Daudé <f4bug@amsat.org>
+ R: Aurelien Jarno <aurelien@aurel32.net>
+ R: Jiaxun Yang <jiaxun.yang@flygoat.com>
+ R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+-S: Orphaned
++S: Odd Fixes
+ F: target/mips/
+ F: default-configs/*mips*
+ F: disas/*mips*
+@@ -2815,11 +2816,12 @@ F: tcg/i386/
+ F: disas/i386.c
+ 
+ MIPS TCG target
++M: Philippe Mathieu-Daudé <f4bug@amsat.org>
+ R: Aurelien Jarno <aurelien@aurel32.net>
+ R: Huacai Chen <chenhc@lemote.com>
+ R: Jiaxun Yang <jiaxun.yang@flygoat.com>
+ R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+-S: Orphaned
++S: Odd Fixes
+ F: tcg/mips/
+ 
+ PPC TCG target
 -- 
-2.20.1
+2.26.2
 
 
