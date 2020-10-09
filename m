@@ -2,85 +2,95 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00733C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:34:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81D58C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:34:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96C912227F
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:34:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 221052227F
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:34:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MD70R9xZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96C912227F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SChqv4Uw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 221052227F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQvLL-0002t0-Mx
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:34:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34334)
+	id 1kQvLS-000395-60
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:34:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38394)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv45-0003su-3v
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54470)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv40-0003Ew-Ng
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602260171;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=SPfnjfrOlLsUE7jHCe08cK+cSvcFh3jpGCbJzLC8hew=;
- b=MD70R9xZshGsm+k5sSiKGF/f2a6xTJMD12rCFigiwc9YJYYrTXl/P8mYnyk/IPV66w7UgO
- vcgE8tGMl+VfENSy5WzAkAaBGVpkt7jGPNc1h5kgpBXaXaFnC4+o1+FXzfiIzR9ZE1ZV8l
- tPM1tlOg/Fis4cDx/nfwQOZVeAyGlIQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-421-Tc3txzENOqCkchfqRh-LpA-1; Fri, 09 Oct 2020 12:16:07 -0400
-X-MC-Unique: Tc3txzENOqCkchfqRh-LpA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C26B680401F;
- Fri,  9 Oct 2020 16:16:06 +0000 (UTC)
-Received: from scv.redhat.com (ovpn-112-203.rdu2.redhat.com [10.10.112.203])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E4FC01A925;
- Fri,  9 Oct 2020 16:16:05 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 04/36] qapi: move generator entrypoint into package
-Date: Fri,  9 Oct 2020 12:15:26 -0400
-Message-Id: <20201009161558.107041-5-jsnow@redhat.com>
-In-Reply-To: <20201009161558.107041-1-jsnow@redhat.com>
-References: <20201009161558.107041-1-jsnow@redhat.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kQvJO-0000Ok-0X
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:32:06 -0400
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:41226)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kQvJM-0005BS-2X
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:32:05 -0400
+Received: by mail-wr1-x42c.google.com with SMTP id w5so10933337wrp.8
+ for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 09:32:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=gsDouCBVlFBVfNRF7cV6v+NhB9KLpFTT2Y32SQbVexw=;
+ b=SChqv4UwGUYj1LkQtqcG6GnuvcJ8Ed31k4JLg9wsleaTElhqE6I5N6VhbWaaxtpVSJ
+ TFOI+yh8ctd3fOzNB975zvZSQELLInpeL3I6Y3gE7tHcPQ+cm5kD3HlV9Elnsv7h0DRH
+ XhjR5t0ndGq1H7CrStSPkUz95x3+EA6JkOLjPzDe7rXWIGf/c0bERA8UkFG0gfwogJ9W
+ cm0npoqQZRzJGeWlFpIefj98iNRBqx12J2KZT5qQm91/fZkYVF5T8rtaeRIvOPhjO7Qa
+ JqPBUGoBffGtjdXr+4xbG0qRrlL3PY4vxCklL7RnVduukav8Kgy4Xim1b3fEL0WDldAr
+ 8quw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=gsDouCBVlFBVfNRF7cV6v+NhB9KLpFTT2Y32SQbVexw=;
+ b=XGpDPWn8t8R8zMVy4EEJ1h/OuEmVO0VLnekL3QIzn+VCaTFYD+ri0WGH2TmA57Ng8a
+ lQ+BZkh+jnmVXODia0QUIVFLeDYZq7kQL3Kkph8l9NI8rkPiK6G7NBAyvl5QDGSWn8p7
+ MUeF9ViWVEjUULnh7Fcew7QmzPig9KOlHyzn3lzzVweWWdSmen/xXwejzPHVCaScHjcE
+ xOnuLMUGB8l9KZjhW5YLQziC+9y5lFJowc5b1bPmvJXJYYhEWeKZegLcHYGnBjJbhl03
+ KlUxXtC2l13bprAv32eyTZPRzWn+j+JOfPtVhny+0m1B3MDCSbTCtB6Hfqtgzmqs5+G9
+ tdBg==
+X-Gm-Message-State: AOAM530/VnHEyDRZvj3gJ4HH5g3uV9VR47vrIlhgTx7/fw3iRPY6w/fk
+ Z1+OTgB7s6LwlUlladwALJmzrQ==
+X-Google-Smtp-Source: ABdhPJzQke/kmJgz/0dI00cbbBm0nSRBJd0TGDBTPMEAe90iDspLlwXuOZKSgY4Pf0EgtQPWvxLkhg==
+X-Received: by 2002:adf:d849:: with SMTP id k9mr7030565wrl.332.1602261122728; 
+ Fri, 09 Oct 2020 09:32:02 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id n65sm12922807wmb.12.2020.10.09.09.31.50
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 09 Oct 2020 09:31:53 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id CAFA81FF96;
+ Fri,  9 Oct 2020 17:31:47 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Subject: [PULL 08/22] contrib/gitdm: Add more individual contributors
+Date: Fri,  9 Oct 2020 17:31:33 +0100
+Message-Id: <20201009163147.28512-9-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201009163147.28512-1-alex.bennee@linaro.org>
+References: <20201009163147.28512-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:34:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42c.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,238 +103,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, John Snow <jsnow@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: Stefan Weil <sw@weilnetz.de>, Helge Deller <deller@gmx.de>,
+ =?UTF-8?q?Volker=20R=C3=BCmelin?= <vr_qemu@t-online.de>, qemu-devel@nongnu.org,
+ Finn Thain <fthain@telegraphics.com.au>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>,
+ Paul Zimmerman <pauldzim@gmail.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ David Carlier <devnexen@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As part of delinting and adding type hints to the QAPI generator, it's
-helpful for the entrypoint to be part of the package, only leaving a
-very tiny entrypoint shim outside of the package.
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
-Tested-by: Cleber Rosa <crosa@redhat.com>
----
- scripts/qapi-gen.py  | 94 +++----------------------------------------
- scripts/qapi/main.py | 95 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 101 insertions(+), 88 deletions(-)
- create mode 100644 scripts/qapi/main.py
+These individual contributors have a number of contributions,
+add them to the 'individual' group map.
 
-diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
-index 054554ed846..f3518d29a54 100644
---- a/scripts/qapi-gen.py
-+++ b/scripts/qapi-gen.py
-@@ -4,98 +4,16 @@
- # See the COPYING file in the top-level directory.
- 
- """
--QAPI Generator
-+QAPI code generation execution shim.
- 
--This is the main entry point for generating C code from the QAPI schema.
-+This standalone script exists primarily to facilitate the running of the QAPI
-+code generator without needing to install the python module to the current
-+execution environment.
- """
- 
--import argparse
--import re
- import sys
--from typing import Optional
--
--from qapi.commands import gen_commands
--from qapi.error import QAPIError
--from qapi.events import gen_events
--from qapi.introspect import gen_introspect
--from qapi.schema import QAPISchema
--from qapi.types import gen_types
--from qapi.visit import gen_visit
--
--
--def invalid_char(prefix: str) -> Optional[str]:
--    match = re.match(r'([A-Za-z_.-][A-Za-z0-9_.-]*)?', prefix)
--    if match.end() != len(prefix):
--        return prefix[match.end()]
--    return None
--
--
--def generate(schema_file: str,
--             output_dir: str,
--             prefix: str,
--             unmask: bool = False,
--             builtins: bool = False) -> None:
--    """
--    Generate C code for the given schema into the target directory.
--
--    :param schema_file: The primary QAPI schema file.
--    :param output_dir: The output directory to store generated code.
--    :param prefix: Optional C-code prefix for symbol names.
--    :param unmask: Expose non-ABI names through introspection?
--    :param builtins: Generate code for built-in types?
--
--    :raise QAPIError: On failures.
--    """
--    assert invalid_char(prefix) is None
--
--    schema = QAPISchema(schema_file)
--    gen_types(schema, output_dir, prefix, builtins)
--    gen_visit(schema, output_dir, prefix, builtins)
--    gen_commands(schema, output_dir, prefix)
--    gen_events(schema, output_dir, prefix)
--    gen_introspect(schema, output_dir, prefix, unmask)
--
--
--def main() -> int:
--    """
--    gapi-gen executable entry point.
--    Expects arguments via sys.argv, see --help for details.
--
--    :return: int, 0 on success, 1 on failure.
--    """
--    parser = argparse.ArgumentParser(
--        description='Generate code from a QAPI schema')
--    parser.add_argument('-b', '--builtins', action='store_true',
--                        help="generate code for built-in types")
--    parser.add_argument('-o', '--output-dir', action='store',
--                        default='',
--                        help="write output to directory OUTPUT_DIR")
--    parser.add_argument('-p', '--prefix', action='store',
--                        default='',
--                        help="prefix for symbols")
--    parser.add_argument('-u', '--unmask-non-abi-names', action='store_true',
--                        dest='unmask',
--                        help="expose non-ABI names in introspection")
--    parser.add_argument('schema', action='store')
--    args = parser.parse_args()
--
--    funny_char = invalid_char(args.prefix)
--    if funny_char:
--        msg = f"funny character '{funny_char}' in argument of --prefix"
--        print(f"{sys.argv[0]}: {msg}", file=sys.stderr)
--        return 1
--
--    try:
--        generate(args.schema,
--                 output_dir=args.output_dir,
--                 prefix=args.prefix,
--                 unmask=args.unmask,
--                 builtins=args.builtins)
--    except QAPIError as err:
--        print(f"{sys.argv[0]}: {str(err)}", file=sys.stderr)
--        return 1
--    return 0
- 
-+from qapi import main
- 
- if __name__ == '__main__':
--    sys.exit(main())
-+    sys.exit(main.main())
-diff --git a/scripts/qapi/main.py b/scripts/qapi/main.py
-new file mode 100644
-index 00000000000..f3003065d8e
---- /dev/null
-+++ b/scripts/qapi/main.py
-@@ -0,0 +1,95 @@
-+# This work is licensed under the terms of the GNU GPL, version 2 or later.
-+# See the COPYING file in the top-level directory.
-+
-+"""
-+QAPI Generator
-+
-+This is the main entry point for generating C code from the QAPI schema.
-+"""
-+
-+import argparse
-+import re
-+import sys
-+from typing import Optional
-+
-+from qapi.commands import gen_commands
-+from qapi.error import QAPIError
-+from qapi.events import gen_events
-+from qapi.introspect import gen_introspect
-+from qapi.schema import QAPISchema
-+from qapi.types import gen_types
-+from qapi.visit import gen_visit
-+
-+
-+def invalid_char(prefix: str) -> Optional[str]:
-+    match = re.match(r'([A-Za-z_.-][A-Za-z0-9_.-]*)?', prefix)
-+    if match.end() != len(prefix):
-+        return prefix[match.end()]
-+    return None
-+
-+
-+def generate(schema_file: str,
-+             output_dir: str,
-+             prefix: str,
-+             unmask: bool = False,
-+             builtins: bool = False) -> None:
-+    """
-+    Generate C code for the given schema into the target directory.
-+
-+    :param schema_file: The primary QAPI schema file.
-+    :param output_dir: The output directory to store generated code.
-+    :param prefix: Optional C-code prefix for symbol names.
-+    :param unmask: Expose non-ABI names through introspection?
-+    :param builtins: Generate code for built-in types?
-+
-+    :raise QAPIError: On failures.
-+    """
-+    assert invalid_char(prefix) is None
-+
-+    schema = QAPISchema(schema_file)
-+    gen_types(schema, output_dir, prefix, builtins)
-+    gen_visit(schema, output_dir, prefix, builtins)
-+    gen_commands(schema, output_dir, prefix)
-+    gen_events(schema, output_dir, prefix)
-+    gen_introspect(schema, output_dir, prefix, unmask)
-+
-+
-+def main() -> int:
-+    """
-+    gapi-gen executable entry point.
-+    Expects arguments via sys.argv, see --help for details.
-+
-+    :return: int, 0 on success, 1 on failure.
-+    """
-+    parser = argparse.ArgumentParser(
-+        description='Generate code from a QAPI schema')
-+    parser.add_argument('-b', '--builtins', action='store_true',
-+                        help="generate code for built-in types")
-+    parser.add_argument('-o', '--output-dir', action='store',
-+                        default='',
-+                        help="write output to directory OUTPUT_DIR")
-+    parser.add_argument('-p', '--prefix', action='store',
-+                        default='',
-+                        help="prefix for symbols")
-+    parser.add_argument('-u', '--unmask-non-abi-names', action='store_true',
-+                        dest='unmask',
-+                        help="expose non-ABI names in introspection")
-+    parser.add_argument('schema', action='store')
-+    args = parser.parse_args()
-+
-+    funny_char = invalid_char(args.prefix)
-+    if funny_char:
-+        msg = f"funny character '{funny_char}' in argument of --prefix"
-+        print(f"{sys.argv[0]}: {msg}", file=sys.stderr)
-+        return 1
-+
-+    try:
-+        generate(args.schema,
-+                 output_dir=args.output_dir,
-+                 prefix=args.prefix,
-+                 unmask=args.unmask,
-+                 builtins=args.builtins)
-+    except QAPIError as err:
-+        print(f"{sys.argv[0]}: {str(err)}", file=sys.stderr)
-+        return 1
-+    return 0
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Acked-by: Helge Deller <deller@gmx.de>
+Acked-by: Stefan Weil <sw@weilnetz.de>
+Acked-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+Acked-by: David Carlier <devnexen@gmail.com>
+Acked-by: Paul Zimmerman <pauldzim@gmail.com>
+Acked-by: Volker Rümelin <vr_qemu@t-online.de>
+Acked-by: Finn Thain <fthain@telegraphics.com.au>
+Message-Id: <20201006160653.2391972-3-f4bug@amsat.org>
+Message-Id: <20201007160038.26953-9-alex.bennee@linaro.org>
+
+diff --git a/contrib/gitdm/group-map-individuals b/contrib/gitdm/group-map-individuals
+index cf8a2ce367..641169fa63 100644
+--- a/contrib/gitdm/group-map-individuals
++++ b/contrib/gitdm/group-map-individuals
+@@ -16,3 +16,10 @@ aurelien@aurel32.net
+ balaton@eik.bme.hu
+ e.emanuelegiuseppe@gmail.com
+ andrew.smirnov@gmail.com
++sw@weilnetz.de
++deller@gmx.de
++fthain@telegraphics.com.au
++vr_qemu@t-online.de
++nieklinnenbank@gmail.com
++devnexen@gmail.com
++pauldzim@gmail.com
 -- 
-2.26.2
+2.20.1
 
 
