@@ -2,73 +2,89 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C6E1C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 15:33:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B13DCC433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 15:40:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C5D821D6C
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 15:32:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C5D821D6C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id DDBE322251
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 15:40:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zfEPA0sb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDBE322251
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQuOA-0001RR-KN
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 11:32:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52786)
+	id 1kQuVW-0004gi-VP
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 11:40:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54580)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kQuMZ-0000gd-9J
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 11:31:19 -0400
-Resent-Date: Fri, 09 Oct 2020 11:31:19 -0400
-Resent-Message-Id: <E1kQuMZ-0000gd-9J@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21760)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kQuMU-0006KL-Kv
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 11:31:18 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1602257450; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=Pj22OKnTAdNTViZN88k35QKbAoF9XLwW0E8W2okOklZ8n4ngHX1bmtF1pW250bB+OL9vcbs6jwFOzxqFAAY1y15jsxRi/KRagpxOMeW9nD/FQoyibROr5I0PdCfL0qZ/AExGMtWYnX1uR2EsVdH7IydLGIUlJoijM62v4oGuzKs=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1602257450;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=E0yXyTticcYKtQEAWV1Gpl9vfnZEqpeIwy49XczUM1E=; 
- b=Zukt1iPqTXpSmhbXH3ahRwFmOExQAVt1TiGf9Q46B7H23aklkEbaTSyAw7S4jbeCQPN1MRKKZmjbeCn5pHIq6f9qFE+I3IjmvMtYI/UcCz8PCAHu5VJbDv7savt+eVL9o28/GM8Y6fFdgWjWQ4MCIYZPQnBPdA+9gpvNXq9RMwM=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1602257448856688.8160920995659;
- Fri, 9 Oct 2020 08:30:48 -0700 (PDT)
-Subject: Re: [RFC v1 0/4] unbreak non-tcg builds
-Message-ID: <160225744684.23495.13434707595649634323@66eaa9a8a123>
-In-Reply-To: <20201009152108.16120-1-cfontana@suse.de>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kQuUA-00044l-Id
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 11:39:10 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41475)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kQuU8-00073t-R0
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 11:39:10 -0400
+Received: by mail-wr1-x442.google.com with SMTP id w5so10763078wrp.8
+ for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 08:39:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=m+57w4waUDsMvpjTdXukUzVLKUiAH7ggRqO2IkZWWK8=;
+ b=zfEPA0sbIKc7BepKUD4ycqD72V2CdcgFW9Nw480YWGBnSAei9TCbuibGeZwVeUdlSa
+ jBC7CkBhjL/iRfyVyYUVh17yW7Im8y8TtyEMpN17nbx9VhvHQ5coKwNnDLiP29d8a7tn
+ H0J4H/vujHMu9AxWDVltkY4AO7ocMnbYctFzabS8/ucGkhIRsOikLq3ZHVVcxiidPb81
+ V4bPPsQetOY2lXFKLajXyr09CcbJz4KchO+VdwCE4riLpJLjnH9RVryQWmhyZNxz/KJu
+ mCwx5024Thk4ejD+LAMRaoPOQQDh+FRNozUnzs9ksUuf0JjJyLyK7RJga7eh8NqJJD5u
+ U7bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=m+57w4waUDsMvpjTdXukUzVLKUiAH7ggRqO2IkZWWK8=;
+ b=EY6AQWL9ImnG4o49hVX+jQPGjw+i5EdFfGtQqdSDNz/10FIeXVmJz4JSqRpNdn6+fa
+ cIh6phIr5BKiONwI4mbxT5dbwjo/agiy7Lu4f7ogG0G/uxd8r1E1t9GV5sRMj8oJfc49
+ vGyRi6AgpE54hrbbf48fm+scwxwazEeIHT3Uklx30BbWrqnuiWF+91hRMjVixVDLxTcN
+ PxSt7aUZvbzw7cyU09DLPBoExoK6NDn3oG/AP+zydGxc4poJwJd/nYA7QyWU9IFYlYAF
+ GfEe9Tojh37SsnZHLsK6dNzswEOm+ljJSP2pzVhShzF68aRuMrI92Dq8FP8xj0Ipczsq
+ ihYA==
+X-Gm-Message-State: AOAM533sYyVMUAgfTlJrdd8YSwAcYwKqLfG+wCvMMlG7T5DrdvfTlXhF
+ i8IWXzcwqFPbR5+FdNxqck+6Mw==
+X-Google-Smtp-Source: ABdhPJzRO5OYSD84zVXadug50AaLA0OPa+yrnkwj3ZzeJqTbfz/36Xkc1iOxrWcOLPVB9B6xYejbAw==
+X-Received: by 2002:a5d:40c3:: with SMTP id b3mr17209904wrq.157.1602257946742; 
+ Fri, 09 Oct 2020 08:39:06 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id h3sm13050598wrq.0.2020.10.09.08.39.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 09 Oct 2020 08:39:05 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH] hw/intc/arm_gicv3_cpuif: Make GIC maintenance interrupts work
+Date: Fri,  9 Oct 2020 16:39:04 +0100
+Message-Id: <20201009153904.28529-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: cfontana@suse.de
-Date: Fri, 9 Oct 2020 08:30:48 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 11:31:12
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,78 +98,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, philmd@redhat.com, qemu-devel@nongnu.org,
- dovgaluk@ispras.ru, cfontana@suse.de, pbonzini@redhat.com,
- alex.bennee@linaro.org, rth@twiddle.net
+Cc: Jose Martins <josemartins90@gmail.com>, Marc Zyngier <maz@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMTAwOTE1MjEwOC4xNjEy
-MC0xLWNmb250YW5hQHN1c2UuZGUvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
-b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
-cm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDIwMTAwOTE1MjEwOC4xNjEyMC0x
-LWNmb250YW5hQHN1c2UuZGUKU3ViamVjdDogW1JGQyB2MSAwLzRdIHVuYnJlYWsgbm9uLXRjZyBi
-dWlsZHMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJz
-ZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
-bWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
-IC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhj
-ZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIu
-Y29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAgIGI3MDkyY2QuLmUxYzMwYzQgIG1hc3RlciAgICAg
-LT4gbWFzdGVyCiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAyMDA5MzAwMDMwMzMuNTU0
-MTI0LTEtbGF1cmVudEB2aXZpZXIuZXUgLT4gcGF0Y2hldy8yMDIwMDkzMDAwMzAzMy41NTQxMjQt
-MS1sYXVyZW50QHZpdmllci5ldQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMjAxMDA4
-MjAyNzEzLjE0MTY4MjMtMS1laGFia29zdEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAyMDEwMDgy
-MDI3MTMuMTQxNjgyMy0xLWVoYWJrb3N0QHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAgICAg
-cGF0Y2hldy8yMDIwMTAwOTE1MjEwOC4xNjEyMC0xLWNmb250YW5hQHN1c2UuZGUgLT4gcGF0Y2hl
-dy8yMDIwMTAwOTE1MjEwOC4xNjEyMC0xLWNmb250YW5hQHN1c2UuZGUKIC0gW3RhZyB1cGRhdGVd
-ICAgICAgcGF0Y2hldy84ZjA3MTMyNDc4NDY5YjM1ZmI1MGE0NzA2NjkxZTJiNTZiMTBhNjdiLmNh
-bWVsQGdtYWlsLmNvbSAtPiBwYXRjaGV3LzhmMDcxMzI0Nzg0NjliMzVmYjUwYTQ3MDY2OTFlMmI1
-NmIxMGE2N2IuY2FtZWxAZ21haWwuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
-MmNhN2VmNiByZXBsYXk6IGRvIG5vdCBidWlsZCBpZiBUQ0cgaXMgbm90IGF2YWlsYWJsZQo4ZDUx
-NzZiIHF0ZXN0OiBkbyBub3QgYnVpbGQgaWRlLXRlc3QgaWYgVENHIGlzIG5vdCBhdmFpbGFibGUK
-MmM4NzY4ZCBxdGVzdDogdW5icmVhayBub24tVENHIGJ1aWxkcyBpbiBiaW9zLXRhYmxlcy10ZXN0
-CjkzYmRmNTMgdGVzdHMvTWFrZWZpbGUuaW5jbHVkZTogdW5icmVhayBub24tdGNnIGJ1aWxkcwoK
-PT09IE9VVFBVVCBCRUdJTiA9PT0KMS80IENoZWNraW5nIGNvbW1pdCA5M2JkZjUzY2UxZDIgKHRl
-c3RzL01ha2VmaWxlLmluY2x1ZGU6IHVuYnJlYWsgbm9uLXRjZyBidWlsZHMpCkVSUk9SOiBNaXNz
-aW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUocykKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywg
-OCBsaW5lcyBjaGVja2VkCgpQYXRjaCAxLzQgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjIv
-NCBDaGVja2luZyBjb21taXQgMmM4NzY4ZDk4YTgyIChxdGVzdDogdW5icmVhayBub24tVENHIGJ1
-aWxkcyBpbiBiaW9zLXRhYmxlcy10ZXN0KQozLzQgQ2hlY2tpbmcgY29tbWl0IDhkNTE3NmJhODhm
-YiAocXRlc3Q6IGRvIG5vdCBidWlsZCBpZGUtdGVzdCBpZiBUQ0cgaXMgbm90IGF2YWlsYWJsZSkK
-NC80IENoZWNraW5nIGNvbW1pdCAyY2E3ZWY2YjRkOGUgKHJlcGxheTogZG8gbm90IGJ1aWxkIGlm
-IFRDRyBpcyBub3QgYXZhaWxhYmxlKQpFUlJPUjogRXJyb3IgbWVzc2FnZXMgc2hvdWxkIG5vdCBj
-b250YWluIG5ld2xpbmVzCiMxMzA6IEZJTEU6IHN0dWJzL3JlcGxheS5jOjE3NDoKKyAgICBlcnJv
-cl9yZXBvcnQoInJlcGxheSBzdXBwb3J0IG5vdCBhdmFpbGFibGVcbiIpOwoKRVJST1I6IEVycm9y
-IG1lc3NhZ2VzIHNob3VsZCBub3QgY29udGFpbiBuZXdsaW5lcwojMTM0OiBGSUxFOiBzdHVicy9y
-ZXBsYXkuYzoxNzg6CisgICAgZXJyb3JfcmVwb3J0KCJyZXBsYXkgc3VwcG9ydCBub3QgYXZhaWxh
-YmxlXG4iKTsKCkVSUk9SOiBFcnJvciBtZXNzYWdlcyBzaG91bGQgbm90IGNvbnRhaW4gbmV3bGlu
-ZXMKIzEzODogRklMRTogc3R1YnMvcmVwbGF5LmM6MTgyOgorICAgIGVycm9yX3JlcG9ydCgicmVw
-bGF5IHN1cHBvcnQgbm90IGF2YWlsYWJsZVxuIik7CgpFUlJPUjogRXJyb3IgbWVzc2FnZXMgc2hv
-dWxkIG5vdCBjb250YWluIG5ld2xpbmVzCiMxNDI6IEZJTEU6IHN0dWJzL3JlcGxheS5jOjE4NjoK
-KyAgICBlcnJvcl9yZXBvcnQoInJlcGxheSBzdXBwb3J0IG5vdCBhdmFpbGFibGVcbiIpOwoKV0FS
-TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE0NjogRklMRTogc3R1YnMvcmVwbGF5LmM6
-MTkwOgorICAgIGVycm9yX3NldChlcnJwLCBFUlJPUl9DTEFTU19DT01NQU5EX05PVF9GT1VORCwg
-InJlcGxheSBzdXBwb3J0IG5vdCBhdmFpbGFibGUiKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBj
-aGFyYWN0ZXJzCiMxNTE6IEZJTEU6IHN0dWJzL3JlcGxheS5jOjE5NToKKyAgICBlcnJvcl9zZXQo
-ZXJycCwgRVJST1JfQ0xBU1NfQ09NTUFORF9OT1RfRk9VTkQsICJyZXBsYXkgc3VwcG9ydCBub3Qg
-YXZhaWxhYmxlIik7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTU1OiBGSUxF
-OiBzdHVicy9yZXBsYXkuYzoxOTk6CisgICAgZXJyb3Jfc2V0KGVycnAsIEVSUk9SX0NMQVNTX0NP
-TU1BTkRfTk9UX0ZPVU5ELCAicmVwbGF5IHN1cHBvcnQgbm90IGF2YWlsYWJsZSIpOwoKV0FSTklO
-RzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE1OTogRklMRTogc3R1YnMvcmVwbGF5LmM6MjAz
-OgorICAgIGVycm9yX3NldChlcnJwLCBFUlJPUl9DTEFTU19DT01NQU5EX05PVF9GT1VORCwgInJl
-cGxheSBzdXBwb3J0IG5vdCBhdmFpbGFibGUiKTsKCnRvdGFsOiA0IGVycm9ycywgNCB3YXJuaW5n
-cywgMTM5IGxpbmVzIGNoZWNrZWQKClBhdGNoIDQvNCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoK
-ClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAy
-MDEwMDkxNTIxMDguMTYxMjAtMS1jZm9udGFuYUBzdXNlLmRlL3Rlc3RpbmcuY2hlY2twYXRjaC8/
-dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
-dyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBh
-dGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+In gicv3_init_cpuif() we copy the ARMCPU gicv3_maintenance_interrupt
+into the GICv3CPUState struct's maintenance_irq field.  This will
+only work if the board happens to have already wired up the CPU
+maintenance IRQ before the GIC was realized.  Unfortunately this is
+not the case for the 'virt' board, and so the value that gets copied
+is NULL (since a qemu_irq is really a pointer to an IRQState struct
+under the hood).  The effect is that the CPU interface code never
+actually raises the maintenance interrupt line.
+
+Instead, since the GICv3CPUState has a pointer to the CPUState, make
+the dereference at the point where we want to raise the interrupt, to
+avoid an implicit requirement on board code to wire things up in a
+particular order.
+
+Reported-by: Jose Martins <josemartins90@gmail.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+
+QEMU's implementation here is a bit odd because we've put all the
+logic into the "GIC" device where in real hardware it's split between
+a GIC device and the CPU interface part in the CPU.  If we had
+arranged it in that way then we wouldn't have this odd bit of code
+where the GIC device needs to raise an IRQ line that belongs to the
+CPU.
+
+Not sure why we've never noticed this bug previously with KVM as a
+guest, you'd think we'd have spotted "maintenance interrupts just
+don't work"...
+---
+ include/hw/intc/arm_gicv3_common.h | 1 -
+ hw/intc/arm_gicv3_cpuif.c          | 5 ++---
+ 2 files changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
+index 0331b0ffdb8..91491a2f664 100644
+--- a/include/hw/intc/arm_gicv3_common.h
++++ b/include/hw/intc/arm_gicv3_common.h
+@@ -153,7 +153,6 @@ struct GICv3CPUState {
+     qemu_irq parent_fiq;
+     qemu_irq parent_virq;
+     qemu_irq parent_vfiq;
+-    qemu_irq maintenance_irq;
+ 
+     /* Redistributor */
+     uint32_t level;                  /* Current IRQ level */
+diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
+index 08e000e33c6..43ef1d7a840 100644
+--- a/hw/intc/arm_gicv3_cpuif.c
++++ b/hw/intc/arm_gicv3_cpuif.c
+@@ -399,6 +399,7 @@ static void gicv3_cpuif_virt_update(GICv3CPUState *cs)
+     int irqlevel = 0;
+     int fiqlevel = 0;
+     int maintlevel = 0;
++    ARMCPU *cpu = ARM_CPU(cs->cpu);
+ 
+     idx = hppvi_index(cs);
+     trace_gicv3_cpuif_virt_update(gicv3_redist_affid(cs), idx);
+@@ -424,7 +425,7 @@ static void gicv3_cpuif_virt_update(GICv3CPUState *cs)
+ 
+     qemu_set_irq(cs->parent_vfiq, fiqlevel);
+     qemu_set_irq(cs->parent_virq, irqlevel);
+-    qemu_set_irq(cs->maintenance_irq, maintlevel);
++    qemu_set_irq(cpu->gicv3_maintenance_interrupt, maintlevel);
+ }
+ 
+ static uint64_t icv_ap_read(CPUARMState *env, const ARMCPRegInfo *ri)
+@@ -2624,8 +2625,6 @@ void gicv3_init_cpuif(GICv3State *s)
+             && cpu->gic_num_lrs) {
+             int j;
+ 
+-            cs->maintenance_irq = cpu->gicv3_maintenance_interrupt;
+-
+             cs->num_list_regs = cpu->gic_num_lrs;
+             cs->vpribits = cpu->gic_vpribits;
+             cs->vprebits = cpu->gic_vprebits;
+-- 
+2.20.1
+
 
