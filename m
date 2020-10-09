@@ -2,87 +2,85 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E2AC433E7
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 13:49:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BEB8C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 13:50:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F37F4222BA
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 13:49:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D607222BA
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 13:49:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VfBB+ZWa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F37F4222BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dgMez5Yo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D607222BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQsln-0000Pd-Tc
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 09:49:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56394)
+	id 1kQsmU-00012k-8S
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 09:49:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56764)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kQsiC-0006dX-Ni
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 09:45:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52940)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kQsiA-0001Mz-KX
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 09:45:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602251129;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=bLgBf2EQvQav7x/C2D0ump4vSp4cER5SB/Nd+1wfrp0=;
- b=VfBB+ZWaIcYhBiKQUn+S3tcQzNL3+RAeMGjvZyR1QklkR5yx8icJaBQOZpir6x9GEmX0m3
- OzgwvMP9Fj+atufhotMX3Yko/zffCD3O9SMTyrKe8RIGVANPv5kPuEf6x4DQPngdM8fYCQ
- +yF7UXaxYk2VeKBcnxhlyfm3A7IbUD4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-ye3ZxogOObeQ1PRqo0ygzw-1; Fri, 09 Oct 2020 09:45:27 -0400
-X-MC-Unique: ye3ZxogOObeQ1PRqo0ygzw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE0FC101962D;
- Fri,  9 Oct 2020 13:45:26 +0000 (UTC)
-Received: from redhat.com (ovpn-114-251.ams2.redhat.com [10.36.114.251])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 538A650B44;
- Fri,  9 Oct 2020 13:45:25 +0000 (UTC)
-Date: Fri, 9 Oct 2020 14:45:22 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Chetan Pant <chetan4windows@gmail.com>
-Subject: Re: [PATCH 5/5] Fixing Lesser GPL version number [5/5]
-Message-ID: <20201009134522.GE25901@redhat.com>
-References: <20201009064410.2913-1-chetan4windows@gmail.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kQskV-0008ON-W0
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 09:47:57 -0400
+Received: from mail-ed1-x530.google.com ([2a00:1450:4864:20::530]:38116)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kQskS-0001f7-BK
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 09:47:55 -0400
+Received: by mail-ed1-x530.google.com with SMTP id i5so9415498edr.5
+ for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 06:47:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=duWop+e731ht/Xspc/oaKxTuhDscVIFeOyQZBik6qDA=;
+ b=dgMez5YoNbJV92eEH89GFDIO0zVsRe28Dz3HExYPllPYPx96K8IubCSAnnfdZbb4sV
+ mkWRfyCcj0x40CD9UBNv2/+uKKPxEUQtV+U7U0QBHgFTHm2utJRlCtpEmhW1RK9/dI4A
+ cVumoNxvHzCIBEp5KzE03MLRMGJo4NRbMnEcNBLxIzLkm+3TwUYFbAQOKQQvg9Z05PIO
+ aEba8ErLAwYHdzQsSs91LRKrFHSPdw0U1p/pP2BwI1d8KkOiY36bdnhBagSMMGqqwSIL
+ HnsN+sGQ7qVC9dk4I4xqm879QgYEVw0IUmXgFPHYQO+e1o8xiFeGM+Q3K8rb2Pa+DdrZ
+ YGbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=duWop+e731ht/Xspc/oaKxTuhDscVIFeOyQZBik6qDA=;
+ b=Yj6raGoxQwHjN4QvT454k9a4r/Heq6E1hhGevK2Qrn5ioTLuQEyuN9iX1hHBdqiq09
+ LQBF8uZ9GnG/O1vksjIjx+M00Nw2adV4RqzNYjmjbb5M2d+uhMm5FH9nZ6QuASlSM8hv
+ b6k65j7TVoz7pHAZhfVLtvyoyYhk8pCgupBCDB7OFsQ9RQ+LdcHTzRXwL7f3YQHVStPR
+ 1sXWeVQZN8N2H6K0RJrJ4yb5hbmzG4ER1HwUB0BhK6vFtHtZX2dIj7t6gmfODsDFOiDu
+ pj3F9ZVpAvKI92cOKNaNaGKnzReBwc6pplh4KckloAdpm9k/u4SVhqLOrRFi/5mqEGB9
+ VNKw==
+X-Gm-Message-State: AOAM532lfKRQ/+fvC1oDBqkh2pVbbYYhsmbx+2MH3OebOPWbtfOiVTCY
+ Cyn8SbcnSP5H3dKK+511jek6eoRWGnGLI1Nzgqh/VA==
+X-Google-Smtp-Source: ABdhPJwvVcXL21uAdiFmyR7xvXky39Rg5LqmW+RjAY8/Heu5FRE3VD3otJOquF2Hlxq8Tk5gsqskI7B8q+dj1mTlaDw=
+X-Received: by 2002:a50:c34a:: with SMTP id q10mr15159710edb.36.1602251265854; 
+ Fri, 09 Oct 2020 06:47:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20201009064410.2913-1-chetan4windows@gmail.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:34:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20201009063432.303441-1-armbru@redhat.com>
+In-Reply-To: <20201009063432.303441-1-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 9 Oct 2020 14:47:34 +0100
+Message-ID: <CAFEAcA8=CmXq4hOy8M16mj+UyszXFE2kxC=C06DTMp_O_7MoTw@mail.gmail.com>
+Subject: Re: [PULL 00/14] Monitor patches for 2020-10-09
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::530;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x530.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,79 +93,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-trivial@nongnu.org, thuth@redhat.com, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 09, 2020 at 06:44:10AM +0000, Chetan Pant wrote:
-> There is no "version 2" of the "Lesser" General Public License. It is
-> either "GPL version 2.0" or "Lesser GPL version 2.1". This patch replaces all
-> occurrences of "Lesser GPL version 2" with "Lesser GPL version 2.1" in comment section.
-> Also, It came to notice that some of the files that were edited for the change
-> were not following latest comment rules. For example using "//" to mark comment
-> instead of "/*". That is also fixed in this patch.
-> 
-> This patch is divided in 5 parts, directory wise, in order to make reviewing process easier.
-> Below listed are the parts of the patch, where asterisk denotes the part you are currently viewing.
-> 
-> 	[ ] Files in authz/backends/block/linux-user/tests/migration directory (82 Files)
-> 	[ ] Files in hw/include/disas (100 files)
-> 	[ ] Files inside target/ 'alpha,arm,cris,hppa,i386' (96 files)
-> 	[ ] Files inside target/ 'lm32,microblaze,mips,ppc,rx,sparc,tilegx,tricore,xtensa' (63 files)
-> 	[*] Files in ui/util/include/scripts and QEMU root directory (76 Files)
-> 
-> Below is how the license version was corrected:
-> 
-> 1. To find the number of file having "Lesser GPL version 2 ":
-> 	grep -l Lesser $(grep -rl "version 2 " * ) > result.dat
->    Total of 417 files were found (After manually exluding the files like COPYING and COPYING.LIB from the result)
-> 
-> 2. To find the number of occurences of "version 2 " in the resulted files:
-> 	egrep -c "version 2 " $(cat result.dat)
->    410 files had "version 2" occurence 1 time (name of those files was saved in one_timers.dat)
->    and in 7 files "version 2" occurences were multiple times.
-> 
-> 3. Files having occurence exactly 1 time were corrected using below command:
-> 	sed -i "s/version 2 /version 2.1 /g" $(cat one_timers.dat)
->    For rest of 7 files, correction was done manually.
-> 
-> Signed-off-by: Chetan Pant <chetan4windows@gmail.com>
-> ---
->  cpus-common.c                         | 2 +-
->  exec-vary.c                           | 2 +-
->  exec.c                                | 2 +-
->  include/authz/base.h                  | 2 +-
->  include/authz/list.h                  | 2 +-
->  include/authz/listfile.h              | 2 +-
->  include/authz/pamacct.h               | 2 +-
->  include/authz/simple.h                | 2 +-
-
-Can you include these with the "authz" pieces from patch 1 and I'll
-queue them
+On Fri, 9 Oct 2020 at 07:37, Markus Armbruster <armbru@redhat.com> wrote:
+>
+> The following changes since commit 497d415d76b9f59fcae27f22df1ca2c3fa4df64e:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20201008-1' into staging (2020-10-08 21:41:20 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-monitor-2020-10-09
+>
+> for you to fetch changes up to eb94b81a94bce112e6b206df846c1551aaf6cab6:
+>
+>   block: Convert 'block_resize' to coroutine (2020-10-09 07:08:20 +0200)
+>
+> ----------------------------------------------------------------
+> Monitor patches for 2020-10-09
+>
+> * QMP command block-resize and HMP command block_resize no longer
+>   block the main loop.
 
 
->  include/io/channel-buffer.h           | 2 +-
->  include/io/channel-command.h          | 2 +-
->  include/io/channel-file.h             | 2 +-
->  include/io/channel-socket.h           | 2 +-
->  include/io/channel-tls.h              | 2 +-
->  include/io/channel-util.h             | 2 +-
->  include/io/channel-watch.h            | 2 +-
->  include/io/channel-websock.h          | 2 +-
->  include/io/channel.h                  | 2 +-
->  include/io/dns-resolver.h             | 2 +-
->  include/io/task.h                     | 2 +-
+Applied, thanks.
 
-Combine with the "io" pieces from patch 1.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
 
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+-- PMM
 
