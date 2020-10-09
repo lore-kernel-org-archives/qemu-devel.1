@@ -7,46 +7,46 @@ X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B7FDC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 13:27:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F4F8C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 13:27:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A58E820658
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 13:27:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A58E820658
+	by mail.kernel.org (Postfix) with ESMTPS id 07C7320658
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 13:27:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07C7320658
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQsQa-0002C8-GP
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 09:27:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54422)
+	id 1kQsQc-0002Ck-1w
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 09:27:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53844)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vincenzo.frascino@arm.com>)
- id 1kQqHe-0004tJ-EY; Fri, 09 Oct 2020 07:09:58 -0400
-Received: from foss.arm.com ([217.140.110.172]:40854)
+ id 1kQqFS-00035b-46; Fri, 09 Oct 2020 07:07:42 -0400
+Received: from foss.arm.com ([217.140.110.172]:40786)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <vincenzo.frascino@arm.com>)
- id 1kQqHc-0008D6-GM; Fri, 09 Oct 2020 07:09:58 -0400
+ id 1kQqFP-0007vT-Io; Fri, 09 Oct 2020 07:07:41 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 37B45D6E;
- Fri,  9 Oct 2020 04:09:55 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4E291D6E;
+ Fri,  9 Oct 2020 04:07:36 -0700 (PDT)
 Received: from [10.37.12.22] (unknown [10.37.12.22])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 45D9C3F66B;
- Fri,  9 Oct 2020 04:09:54 -0700 (PDT)
-Subject: Re: [PATCH 1/3] target/arm: Remove redundant mmu_idx lookup
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4FCC23F66B;
+ Fri,  9 Oct 2020 04:07:35 -0700 (PDT)
+Subject: Re: [PATCH 2/3] target/arm: Fix reported EL for mte_check_fail
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20201008162155.161886-1-richard.henderson@linaro.org>
- <20201008162155.161886-2-richard.henderson@linaro.org>
+ <20201008162155.161886-3-richard.henderson@linaro.org>
 From: Vincenzo Frascino <vincenzo.frascino@arm.com>
-Message-ID: <9f06c3d1-982e-1c7e-b480-6978259432ab@arm.com>
-Date: Fri, 9 Oct 2020 12:12:35 +0100
+Message-ID: <3e2f2248-8810-bf72-a498-91fa65eeded9@arm.com>
+Date: Fri, 9 Oct 2020 12:10:16 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20201008162155.161886-2-richard.henderson@linaro.org>
+In-Reply-To: <20201008162155.161886-3-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -81,37 +81,45 @@ Sender: "Qemu-devel"
 
 
 On 10/8/20 5:21 PM, Richard Henderson wrote:
-> We already have the full ARMMMUIdx as computed from the
-> function parameter.
+> The reporting in AArch64.TagCheckFail only depends on PSTATE.EL,
+> and not the AccType of the operation.  There are two guest
+> visible problems that affect LDTR and STTR because of this:
 > 
-> For the purpose of regime_has_2_ranges, we can ignore any
-> difference between AccType_Normal and AccType_Unpriv, which
-> would be the only difference between the passed mmu_idx
-> and arm_mmu_idx_el.
+> (1) Selecting TCF0 vs TCF1 to decide on reporting,
+> (2) Report "data abort same el" not "data abort lower el".
 > 
+> Reported-by: Vincenzo Frascino <vincenzo.frascino@arm.com>
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
 Reviewed-by: Vincenzo Frascino <vincenzo.frascino@arm.com>
 Tested-by: Vincenzo Frascino <vincenzo.frascino@arm.com>
 
 > ---
->  target/arm/mte_helper.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+>  target/arm/mte_helper.c | 10 +++-------
+>  1 file changed, 3 insertions(+), 7 deletions(-)
 > 
 > diff --git a/target/arm/mte_helper.c b/target/arm/mte_helper.c
-> index 5615c6706c..734cc5ca67 100644
+> index 734cc5ca67..153bd1e9df 100644
 > --- a/target/arm/mte_helper.c
 > +++ b/target/arm/mte_helper.c
-> @@ -563,8 +563,7 @@ static void mte_check_fail(CPUARMState *env, uint32_t desc,
+> @@ -525,14 +525,10 @@ static void mte_check_fail(CPUARMState *env, uint32_t desc,
+>      reg_el = regime_el(env, arm_mmu_idx);
+>      sctlr = env->cp15.sctlr_el[reg_el];
 >  
->      case 2:
->          /* Tag check fail causes asynchronous flag set.  */
-> -        mmu_idx = arm_mmu_idx_el(env, el);
-> -        if (regime_has_2_ranges(mmu_idx)) {
-> +        if (regime_has_2_ranges(arm_mmu_idx)) {
->              select = extract64(dirty_ptr, 55, 1);
->          } else {
->              select = 0;
+> -    switch (arm_mmu_idx) {
+> -    case ARMMMUIdx_E10_0:
+> -    case ARMMMUIdx_E20_0:
+> -        el = 0;
+> +    el = arm_current_el(env);
+> +    if (el == 0) {
+>          tcf = extract64(sctlr, 38, 2);
+> -        break;
+> -    default:
+> -        el = reg_el;
+> +    } else {
+>          tcf = extract64(sctlr, 40, 2);
+>      }
+>  
 > 
 
 -- 
