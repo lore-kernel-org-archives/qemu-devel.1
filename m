@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8C08C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 06:57:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B292EC433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 06:57:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73E1122245
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 06:57:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73E1122245
+	by mail.kernel.org (Postfix) with ESMTPS id 0A41C22245
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 06:57:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A41C22245
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQmKs-0001qU-H8
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 02:57:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56336)
+	id 1kQmL7-000220-VB
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 02:57:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56220)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1kQmAX-00066R-74; Fri, 09 Oct 2020 02:46:21 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:5163 helo=huawei.com)
+ id 1kQmAG-0005xw-9f; Fri, 09 Oct 2020 02:46:04 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:55030 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1kQmAS-0001K8-Gv; Fri, 09 Oct 2020 02:46:20 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 00A93FCF439F12BC3E80;
- Fri,  9 Oct 2020 14:46:09 +0800 (CST)
-Received: from localhost (10.174.186.238) by DGGEMS403-HUB.china.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0; Fri, 9 Oct 2020
- 14:45:58 +0800
+ id 1kQmAE-0001J8-5C; Fri, 09 Oct 2020 02:46:03 -0400
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 28578F2F243A03987B3E;
+ Fri,  9 Oct 2020 14:45:58 +0800 (CST)
+Received: from localhost (10.174.186.238) by DGGEMS407-HUB.china.huawei.com
+ (10.3.19.207) with Microsoft SMTP Server id 14.3.487.0; Fri, 9 Oct 2020
+ 14:45:51 +0800
 From: zhaolichang <zhaolichang@huawei.com>
 To: <qemu-trivial@nongnu.org>
-Subject: [PATCH V2 09/14] sh4/: fix some comment spelling errors
-Date: Fri, 9 Oct 2020 14:44:44 +0800
-Message-ID: <20201009064449.2336-10-zhaolichang@huawei.com>
+Subject: [PATCH V2 03/14] riscv/: fix some comment spelling errors
+Date: Fri, 9 Oct 2020 14:44:38 +0800
+Message-ID: <20201009064449.2336-4-zhaolichang@huawei.com>
 X-Mailer: git-send-email 2.26.2.windows.1
 In-Reply-To: <20201009064449.2336-1-zhaolichang@huawei.com>
 References: <20201009064449.2336-1-zhaolichang@huawei.com>
@@ -49,9 +49,9 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-Originating-IP: [10.174.186.238]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.190;
+Received-SPF: pass client-ip=45.249.212.32;
  envelope-from=zhaolichang@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:45:16
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:45:58
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -73,62 +73,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: David
  Edmondson <david.edmondson@oracle.com>, zhaolichang <zhaolichang@huawei.com>,
- qemu-devel@nongnu.org, Philippe Mathieu-Daude <f4bug@amsat.org>
+ Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I found that there are many spelling errors in the comments of qemu/target/sh4.
+I found that there are many spelling errors in the comments of qemu/target/riscv.
 I used spellcheck to check the spelling errors and found some errors in the folder.
 
 Signed-off-by: zhaolichang <zhaolichang@huawei.com>
 Reviewed-by: David Edmondson <david.edmondson@oracle.com>
-Reviewed-by: Philippe Mathieu-Daude<f4bug@amsat.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/sh4/cpu.h       | 2 +-
- target/sh4/op_helper.c | 2 +-
- target/sh4/translate.c | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+ target/riscv/cpu.c           | 2 +-
+ target/riscv/cpu_bits.h      | 2 +-
+ target/riscv/csr.c           | 6 +++---
+ target/riscv/vector_helper.c | 2 +-
+ 4 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
-index dbe58c7888..91fa9498f0 100644
---- a/target/sh4/cpu.h
-+++ b/target/sh4/cpu.h
-@@ -160,7 +160,7 @@ typedef struct CPUSH4State {
-     uint32_t pteh;		/* page table entry high register */
-     uint32_t ptel;		/* page table entry low register */
-     uint32_t ptea;		/* page table entry assistance register */
--    uint32_t ttb;		/* tranlation table base register */
-+    uint32_t ttb;		/* translation table base register */
-     uint32_t tea;		/* TLB exception address register */
-     uint32_t tra;		/* TRAPA exception register */
-     uint32_t expevt;		/* exception event register */
-diff --git a/target/sh4/op_helper.c b/target/sh4/op_helper.c
-index 14c3db0f48..9de4152735 100644
---- a/target/sh4/op_helper.c
-+++ b/target/sh4/op_helper.c
-@@ -400,7 +400,7 @@ float32 helper_fsrra_FT(CPUSH4State *env, float32 t0)
-     t0 = float32_div(float32_one, t0, &env->fp_status);
-     /* Since this is supposed to be an approximation, an imprecision
-        exception is required.  One supposes this also follows the usual
--       IEEE rule that other exceptions take precidence.  */
-+       IEEE rule that other exceptions take precedence.  */
-     if (get_float_exception_flags(&env->fp_status) == 0) {
-         set_float_exception_flags(float_flag_inexact, &env->fp_status);
-     }
-diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index 60c863d9e1..c57218eb7d 100644
---- a/target/sh4/translate.c
-+++ b/target/sh4/translate.c
-@@ -1959,7 +1959,7 @@ static void decode_gusa(DisasContext *ctx, CPUSH4State *env)
-     NEXT_INSN;
-     switch (ctx->opcode & 0xf00f) {
-     case 0x6003: /* mov Rm,Rn */
--        /* Here we want to recognize ld_dst being saved for later consumtion,
-+        /* Here we want to recognize ld_dst being saved for later consumption,
-            or for another input register being copied so that ld_dst need not
-            be clobbered during the operation.  */
-         op_dst = B11_8;
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 0bbfd7f457..f40a0b26a3 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -472,7 +472,7 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+                     return;
+                 }
+             } else {
+-                qemu_log("vector verison is not specified, "
++                qemu_log("vector version is not specified, "
+                         "use the default value v0.7.1\n");
+             }
+             set_vext_version(env, vext_version);
+diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+index bd36062877..6e1155560b 100644
+--- a/target/riscv/cpu_bits.h
++++ b/target/riscv/cpu_bits.h
+@@ -536,7 +536,7 @@
+ /* Leaf page shift amount */
+ #define PGSHIFT             12
+ 
+-/* Default Reset Vector adress */
++/* Default Reset Vector address */
+ #define DEFAULT_RSTVEC      0x1000
+ 
+ /* Exception causes */
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index aaef6c6f20..93e117020d 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -624,7 +624,7 @@ static int write_mcounteren(CPURISCVState *env, int csrno, target_ulong val)
+     return 0;
+ }
+ 
+-/* This regiser is replaced with CSR_MCOUNTINHIBIT in 1.11.0 */
++/* This register is replaced with CSR_MCOUNTINHIBIT in 1.11.0 */
+ static int read_mscounteren(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+     if (env->priv_ver < PRIV_VERSION_1_11_0) {
+@@ -634,7 +634,7 @@ static int read_mscounteren(CPURISCVState *env, int csrno, target_ulong *val)
+     return 0;
+ }
+ 
+-/* This regiser is replaced with CSR_MCOUNTINHIBIT in 1.11.0 */
++/* This register is replaced with CSR_MCOUNTINHIBIT in 1.11.0 */
+ static int write_mscounteren(CPURISCVState *env, int csrno, target_ulong val)
+ {
+     if (env->priv_ver < PRIV_VERSION_1_11_0) {
+@@ -1278,7 +1278,7 @@ int riscv_csrrw(CPURISCVState *env, int csrno, target_ulong *ret_value,
+         !riscv_cpu_virt_enabled(env)) {
+         /*
+          * We are in S mode without virtualisation, therefore we are in HS Mode.
+-         * Add 1 to the effective privledge level to allow us to access the
++         * Add 1 to the effective privilege level to allow us to access the
+          * Hypervisor CSRs.
+          */
+         effective_priv++;
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index a156573d28..fa89a6e6c1 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -709,7 +709,7 @@ typedef void vext_amo_noatomic_fn(void *vs3, target_ulong addr,
+                                   uint32_t wd, uint32_t idx, CPURISCVState *env,
+                                   uintptr_t retaddr);
+ 
+-/* no atomic opreation for vector atomic insructions */
++/* no atomic operation for vector atomic insructions */
+ #define DO_SWAP(N, M) (M)
+ #define DO_AND(N, M)  (N & M)
+ #define DO_XOR(N, M)  (N ^ M)
 -- 
 2.26.2.windows.1
 
