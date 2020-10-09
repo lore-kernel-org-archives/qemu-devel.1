@@ -2,63 +2,88 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E6B0C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 06:52:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DA7BC433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 06:54:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCA3C22245
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 06:52:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCA3C22245
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id B695B22245
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 06:54:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iIARToML"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B695B22245
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59230 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQmGC-0003ZA-SW
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 02:52:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56268)
+	id 1kQmI9-0005lC-K9
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 02:54:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53974)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1kQmAS-00064N-2I; Fri, 09 Oct 2020 02:46:16 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:55124 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1kQmAJ-0001JX-Gd; Fri, 09 Oct 2020 02:46:10 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id A13BBF941449DCC8CF80;
- Fri,  9 Oct 2020 14:46:03 +0800 (CST)
-Received: from localhost (10.174.186.238) by DGGEMS414-HUB.china.huawei.com
- (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Fri, 9 Oct 2020
- 14:45:56 +0800
-From: zhaolichang <zhaolichang@huawei.com>
-To: <qemu-trivial@nongnu.org>
-Subject: [PATCH V2 06/14] mips/: fix some comment spelling errors
-Date: Fri, 9 Oct 2020 14:44:41 +0800
-Message-ID: <20201009064449.2336-7-zhaolichang@huawei.com>
-X-Mailer: git-send-email 2.26.2.windows.1
-In-Reply-To: <20201009064449.2336-1-zhaolichang@huawei.com>
-References: <20201009064449.2336-1-zhaolichang@huawei.com>
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQlzN-00029q-3q
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 02:34:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58648)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQlzJ-0008Vd-Ld
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 02:34:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602225285;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=NwBaSYBB/sxiJzmlg84ife1ZA83qDiOPiyoHyauG2Lw=;
+ b=iIARToMLqqMh5c+qvWAKiolWpJ2TQWW+CqWi6lRBuOxMMPMv3uxmL7ziel6PzgdvgYEw7b
+ GX40JwJZ1KlDN1yBAn4WubanwTXn18r5jS1on5SatG2vsr9Tq0UxWmo6UY9J+srMg4h5Ni
+ Jh8+sugPWvr0LTI+4hSfDC7LTG1zRTA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-513-2qxebLqAMyue0duwd84OKA-1; Fri, 09 Oct 2020 02:34:43 -0400
+X-MC-Unique: 2qxebLqAMyue0duwd84OKA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6178885B686
+ for <qemu-devel@nongnu.org>; Fri,  9 Oct 2020 06:34:42 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
+ [10.36.112.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 71C835D9F3;
+ Fri,  9 Oct 2020 06:34:39 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 272F41129C66; Fri,  9 Oct 2020 08:34:33 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 11/14] util/async: Add aio_co_reschedule_self()
+Date: Fri,  9 Oct 2020 08:34:29 +0200
+Message-Id: <20201009063432.303441-12-armbru@redhat.com>
+In-Reply-To: <20201009063432.303441-1-armbru@redhat.com>
+References: <20201009063432.303441-1-armbru@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.174.186.238]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32;
- envelope-from=zhaolichang@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:45:58
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:34:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,101 +96,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David
- Edmondson <david.edmondson@oracle.com>, zhaolichang <zhaolichang@huawei.com>,
- qemu-devel@nongnu.org, Philippe Mathieu-Daude <f4bug@amsat.org>
+Cc: kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I found that there are many spelling errors in the comments of qemu/target/mips.
-I used spellcheck to check the spelling errors and found some errors in the folder.
+From: Kevin Wolf <kwolf@redhat.com>
 
-Signed-off-by: zhaolichang <zhaolichang@huawei.com>
-Reviewed-by: David Edmondson <david.edmondson@oracle.com>
-Reviewed-by: Philippe Mathieu-Daude<f4bug@amsat.org>
+Add a function that can be used to move the currently running coroutine
+to a different AioContext (and therefore potentially a different
+thread).
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20201005155855.256490-12-kwolf@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- target/mips/internal.h           |  2 +-
- target/mips/translate.c          | 10 +++++-----
- target/mips/translate_init.c.inc |  2 +-
- 3 files changed, 7 insertions(+), 7 deletions(-)
+ include/block/aio.h | 10 ++++++++++
+ util/async.c        | 30 ++++++++++++++++++++++++++++++
+ 2 files changed, 40 insertions(+)
 
-diff --git a/target/mips/internal.h b/target/mips/internal.h
-index 7f159a9230..b811f547f3 100644
---- a/target/mips/internal.h
-+++ b/target/mips/internal.h
-@@ -188,7 +188,7 @@ static inline bool cpu_mips_hw_interrupts_pending(CPUMIPSState *env)
-         /*
-          * A MIPS configured with a vectorizing external interrupt controller
-          * will feed a vector into the Cause pending lines. The core treats
--         * the status lines as a vector level, not as indiviual masks.
-+         * the status lines as a vector level, not as individual masks.
-          */
-         r = pending > status;
-     } else {
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 398edf7289..b4d009078e 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -3718,7 +3718,7 @@ static void gen_st_cond(DisasContext *ctx, int rt, int base, int offset,
+diff --git a/include/block/aio.h b/include/block/aio.h
+index ec8c5af642..5f342267d5 100644
+--- a/include/block/aio.h
++++ b/include/block/aio.h
+@@ -17,6 +17,7 @@
+ #ifdef CONFIG_LINUX_IO_URING
+ #include <liburing.h>
+ #endif
++#include "qemu/coroutine.h"
+ #include "qemu/queue.h"
+ #include "qemu/event_notifier.h"
+ #include "qemu/thread.h"
+@@ -654,6 +655,15 @@ static inline bool aio_node_check(AioContext *ctx, bool is_external)
+  */
+ void aio_co_schedule(AioContext *ctx, struct Coroutine *co);
  
-     t0 = tcg_temp_new();
-     addr = tcg_temp_new();
--    /* compare the address against that of the preceeding LL */
-+    /* compare the address against that of the preceding LL */
-     gen_base_offset_addr(ctx, addr, base, offset);
-     tcg_gen_brcond_tl(TCG_COND_EQ, addr, cpu_lladdr, l1);
-     tcg_temp_free(addr);
-@@ -25597,7 +25597,7 @@ static void gen_mxu_D16MAX_D16MIN(DisasContext *ctx)
-         }
-         /* return resulting half-words to its original position */
-         tcg_gen_shri_i32(t0, t0, 16);
--        /* finaly update the destination */
-+        /* finally update the destination */
-         tcg_gen_or_i32(mxu_gpr[XRa - 1], mxu_gpr[XRa - 1], t0);
++/**
++ * aio_co_reschedule_self:
++ * @new_ctx: the new context
++ *
++ * Move the currently running coroutine to new_ctx. If the coroutine is already
++ * running in new_ctx, do nothing.
++ */
++void coroutine_fn aio_co_reschedule_self(AioContext *new_ctx);
++
+ /**
+  * aio_co_wake:
+  * @co: the coroutine
+diff --git a/util/async.c b/util/async.c
+index f758354c6a..674dbefb7c 100644
+--- a/util/async.c
++++ b/util/async.c
+@@ -569,6 +569,36 @@ void aio_co_schedule(AioContext *ctx, Coroutine *co)
+     aio_context_unref(ctx);
+ }
  
-         tcg_temp_free(t1);
-@@ -25633,7 +25633,7 @@ static void gen_mxu_D16MAX_D16MIN(DisasContext *ctx)
-         }
-         /* return resulting half-words to its original position */
-         tcg_gen_shri_i32(t0, t0, 16);
--        /* finaly update the destination */
-+        /* finally update the destination */
-         tcg_gen_or_i32(mxu_gpr[XRa - 1], mxu_gpr[XRa - 1], t0);
- 
-         tcg_temp_free(t1);
-@@ -25702,7 +25702,7 @@ static void gen_mxu_Q8MAX_Q8MIN(DisasContext *ctx)
-             }
-             /* return resulting byte to its original position */
-             tcg_gen_shri_i32(t0, t0, 8 * (3 - i));
--            /* finaly update the destination */
-+            /* finally update the destination */
-             tcg_gen_or_i32(mxu_gpr[XRa - 1], mxu_gpr[XRa - 1], t0);
-         }
- 
-@@ -25742,7 +25742,7 @@ static void gen_mxu_Q8MAX_Q8MIN(DisasContext *ctx)
-             }
-             /* return resulting byte to its original position */
-             tcg_gen_shri_i32(t0, t0, 8 * (3 - i));
--            /* finaly update the destination */
-+            /* finally update the destination */
-             tcg_gen_or_i32(mxu_gpr[XRa - 1], mxu_gpr[XRa - 1], t0);
-         }
- 
-diff --git a/target/mips/translate_init.c.inc b/target/mips/translate_init.c.inc
-index 637caccd89..c735b2bf66 100644
---- a/target/mips/translate_init.c.inc
-+++ b/target/mips/translate_init.c.inc
-@@ -995,7 +995,7 @@ static void mvp_init (CPUMIPSState *env, const mips_def_t *def)
- 
-     /* MVPConf1 implemented, TLB sharable, no gating storage support,
-        programmable cache partitioning implemented, number of allocatable
--       and sharable TLB entries, MVP has allocatable TCs, 2 VPEs
-+       and shareable TLB entries, MVP has allocatable TCs, 2 VPEs
-        implemented, 5 TCs implemented. */
-     env->mvp->CP0_MVPConf0 = (1U << CP0MVPC0_M) | (1 << CP0MVPC0_TLBS) |
-                              (0 << CP0MVPC0_GS) | (1 << CP0MVPC0_PCP) |
++typedef struct AioCoRescheduleSelf {
++    Coroutine *co;
++    AioContext *new_ctx;
++} AioCoRescheduleSelf;
++
++static void aio_co_reschedule_self_bh(void *opaque)
++{
++    AioCoRescheduleSelf *data = opaque;
++    aio_co_schedule(data->new_ctx, data->co);
++}
++
++void coroutine_fn aio_co_reschedule_self(AioContext *new_ctx)
++{
++    AioContext *old_ctx = qemu_get_current_aio_context();
++
++    if (old_ctx != new_ctx) {
++        AioCoRescheduleSelf data = {
++            .co = qemu_coroutine_self(),
++            .new_ctx = new_ctx,
++        };
++        /*
++         * We can't directly schedule the coroutine in the target context
++         * because this would be racy: The other thread could try to enter the
++         * coroutine before it has yielded in this one.
++         */
++        aio_bh_schedule_oneshot(old_ctx, aio_co_reschedule_self_bh, &data);
++        qemu_coroutine_yield();
++    }
++}
++
+ void aio_co_wake(struct Coroutine *co)
+ {
+     AioContext *ctx;
 -- 
-2.26.2.windows.1
+2.26.2
 
 
