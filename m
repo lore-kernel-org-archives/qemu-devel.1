@@ -7,52 +7,51 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D401C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 10:35:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A5B0C43457
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 10:35:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1360221FC
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 10:35:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 20CC4221FC
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 10:35:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="D/CRotbM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1360221FC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="H5vhfWNw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20CC4221FC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54100 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQpk6-0004kx-Gt
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 06:35:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43164)
+	id 1kQpk9-0004pC-4D
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 06:35:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43150)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kQpVb-0005Q7-DP
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 06:20:19 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:45971 helo=ozlabs.org)
+ id 1kQpVa-0005OB-NH
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 06:20:18 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:41521 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kQpVY-0001nr-3K
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 06:20:19 -0400
+ id 1kQpVY-0001oM-3n
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 06:20:18 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4C73wc1k38z9sWP; Fri,  9 Oct 2020 21:19:58 +1100 (AEDT)
+ id 4C73wd1l5Pz9sWR; Fri,  9 Oct 2020 21:20:00 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1602238800;
- bh=OAaG0EfHUCTPTYELPg04P7dVR70GRYrY3vEIgbH0kBk=;
+ d=gibson.dropbear.id.au; s=201602; t=1602238801;
+ bh=qJ4Ji0iyaU1fszfkvRKFJtc6r0OCUXI1lcF947bdAts=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=D/CRotbMhdfvLinWZPrKW/QVqMGcUOK8myuGDpdXgj7GMjl6oHPB0ZHnUxKF9zEnK
- TPNv2/nlBeJuKZXUDC6rKWXnaDEdEHC8U46p1M50dFYUknocHvq18kGyXGaWgGZEh3
- QK5FdpLvHVppx9ouj4F8SgNsXy/kHYr3lmqFoVEk=
+ b=H5vhfWNwYlzkT7vvuvi7pE0kfzMO7zyHKnSkKUC7Bmqbqr2JXqqY02L7geebvVqKq
+ Vbmqa09/NtwboOE90gFtayIvSElvxzEe6/We+z2VJIUYnOsldV9IiBIgT8lHNAAIYE
+ eB//SjNcM0sSYAwTfQgAvlr6GeCktp2ei21QSY/o=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 14/20] spapr: Add a return value to spapr_check_pagesize()
-Date: Fri,  9 Oct 2020 21:19:45 +1100
-Message-Id: <20201009101951.1569252-15-david@gibson.dropbear.id.au>
+Subject: [PULL 17/20] spapr_numa: forbid asymmetrical NUMA setups
+Date: Fri,  9 Oct 2020 21:19:48 +1100
+Message-Id: <20201009101951.1569252-18-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201009101951.1569252-1-david@gibson.dropbear.id.au>
 References: <20201009101951.1569252-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
@@ -76,90 +75,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- dbarboza@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nonngu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+Cc: dbarboza@redhat.com, Daniel Henrique Barboza <danielhb413@gmail.com>,
+ qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nonngu.org,
  David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Greg Kurz <groug@kaod.org>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
 
-As recommended in "qapi/error.h", return true on success and false on
-failure. This allows to reduce error propagation overhead in the callers.
+The pSeries machine does not support asymmetrical NUMA
+configurations. This doesn't make much of a different
+since we're not using user input for pSeries NUMA setup,
+but this will change in the next patches.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <20200914123505.612812-14-groug@kaod.org>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+To avoid breaking existing setups, gate this change by
+checking for legacy NUMA support.
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-Id: <20201007172849.302240-3-danielhb413@gmail.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c         | 4 +---
- hw/ppc/spapr_caps.c    | 7 +++++--
- include/hw/ppc/spapr.h | 2 +-
- 3 files changed, 7 insertions(+), 6 deletions(-)
+ hw/ppc/spapr_numa.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 7f3a620d41..4256794f3b 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3490,9 +3490,7 @@ static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     memdev = object_property_get_link(OBJECT(dimm), PC_DIMM_MEMDEV_PROP,
-                                       &error_abort);
-     pagesize = host_memory_backend_pagesize(MEMORY_BACKEND(memdev));
--    spapr_check_pagesize(spapr, pagesize, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (!spapr_check_pagesize(spapr, pagesize, errp)) {
-         return;
-     }
+diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
+index 64fe567f5d..fe395e80a3 100644
+--- a/hw/ppc/spapr_numa.c
++++ b/hw/ppc/spapr_numa.c
+@@ -19,6 +19,24 @@
+ /* Moved from hw/ppc/spapr_pci_nvlink2.c */
+ #define SPAPR_GPU_NUMA_ID           (cpu_to_be32(1))
  
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 10a80a8159..9341e9782a 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -310,13 +310,13 @@ static void cap_safe_indirect_branch_apply(SpaprMachineState *spapr,
- 
- #define VALUE_DESC_TRISTATE     " (broken, workaround, fixed)"
- 
--void spapr_check_pagesize(SpaprMachineState *spapr, hwaddr pagesize,
-+bool spapr_check_pagesize(SpaprMachineState *spapr, hwaddr pagesize,
-                           Error **errp)
- {
-     hwaddr maxpagesize = (1ULL << spapr->eff.caps[SPAPR_CAP_HPT_MAXPAGESIZE]);
- 
-     if (!kvmppc_hpt_needs_host_contiguous_pages()) {
--        return;
-+        return true;
-     }
- 
-     if (maxpagesize > pagesize) {
-@@ -324,7 +324,10 @@ void spapr_check_pagesize(SpaprMachineState *spapr, hwaddr pagesize,
-                    "Can't support %"HWADDR_PRIu" kiB guest pages with %"
-                    HWADDR_PRIu" kiB host pages with this KVM implementation",
-                    maxpagesize >> 10, pagesize >> 10);
-+        return false;
-     }
++static bool spapr_numa_is_symmetrical(MachineState *ms)
++{
++    int src, dst;
++    int nb_numa_nodes = ms->numa_state->num_nodes;
++    NodeInfo *numa_info = ms->numa_state->nodes;
++
++    for (src = 0; src < nb_numa_nodes; src++) {
++        for (dst = src; dst < nb_numa_nodes; dst++) {
++            if (numa_info[src].distance[dst] !=
++                numa_info[dst].distance[src]) {
++                return false;
++            }
++        }
++    }
 +
 +    return true;
++}
++
+ void spapr_numa_associativity_init(SpaprMachineState *spapr,
+                                    MachineState *machine)
+ {
+@@ -61,6 +79,22 @@ void spapr_numa_associativity_init(SpaprMachineState *spapr,
+ 
+         spapr->numa_assoc_array[i][MAX_DISTANCE_REF_POINTS] = cpu_to_be32(i);
+     }
++
++    /*
++     * Legacy NUMA guests (pseries-5.1 and older, or guests with only
++     * 1 NUMA node) will not benefit from anything we're going to do
++     * after this point.
++     */
++    if (spapr_machine_using_legacy_numa(spapr)) {
++        return;
++    }
++
++    if (!spapr_numa_is_symmetrical(machine)) {
++        error_report("Asymmetrical NUMA topologies aren't supported "
++                     "in the pSeries machine");
++        exit(EXIT_FAILURE);
++    }
++
  }
  
- static void cap_hpt_maxpagesize_apply(SpaprMachineState *spapr,
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 02f3c29838..bba8736269 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -934,7 +934,7 @@ void spapr_caps_cpu_apply(SpaprMachineState *spapr, PowerPCCPU *cpu);
- void spapr_caps_add_properties(SpaprMachineClass *smc);
- int spapr_caps_post_migration(SpaprMachineState *spapr);
- 
--void spapr_check_pagesize(SpaprMachineState *spapr, hwaddr pagesize,
-+bool spapr_check_pagesize(SpaprMachineState *spapr, hwaddr pagesize,
-                           Error **errp);
- /*
-  * XIVE definitions
+ void spapr_numa_write_associativity_dt(SpaprMachineState *spapr, void *fdt,
 -- 
 2.26.2
 
