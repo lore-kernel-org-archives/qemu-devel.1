@@ -2,85 +2,95 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF0C1C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:36:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67778C43457
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:36:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55B4F2227F
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:36:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 103D42227F
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:36:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ehn9eeq4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55B4F2227F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="maAT/LL9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 103D42227F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQvNs-0006OW-3d
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:36:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34402)
+	id 1kQvNy-0006ee-7d
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:36:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38430)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv48-0003zJ-2Q
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26350)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv46-0003GU-3D
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602260177;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=0HkGlH/S1G8I1HloqL7saGuuP/XHnYpyYBQxvhdOfUY=;
- b=ehn9eeq4eY6DO7WAHW8UEPtig/xvODb7xc39R7nNq/fBYPnPCSotmT7ZHG3wdD5i9OJU54
- HYBRrt9DqHtVSIcHX/acZtggbsqNzKil7HqNesEWy+eXL8TMiYk5ElE1CuR+zsGzwRVLhr
- XIayo7Ev4fIGgIu6cwo0ejY8zZKvrkY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-274-xasv_TYlMtiL8QsojjIHyQ-1; Fri, 09 Oct 2020 12:16:12 -0400
-X-MC-Unique: xasv_TYlMtiL8QsojjIHyQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74FB518A8236;
- Fri,  9 Oct 2020 16:16:11 +0000 (UTC)
-Received: from scv.redhat.com (ovpn-112-203.rdu2.redhat.com [10.10.112.203])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B40211A8EC;
- Fri,  9 Oct 2020 16:16:10 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 09/36] qapi: add pylintrc
-Date: Fri,  9 Oct 2020 12:15:31 -0400
-Message-Id: <20201009161558.107041-10-jsnow@redhat.com>
-In-Reply-To: <20201009161558.107041-1-jsnow@redhat.com>
-References: <20201009161558.107041-1-jsnow@redhat.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kQvJQ-0000Qz-LQ
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:32:10 -0400
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:53265)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kQvJN-0005Bg-Nc
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:32:08 -0400
+Received: by mail-wm1-x331.google.com with SMTP id f21so10407839wml.3
+ for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 09:32:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=HxIyoYU/k3kOEGuCcAHD+FnA8yS+62GGIqaWUy0Cfjg=;
+ b=maAT/LL9ZGDpzigG9B2jN538myI+Hw+enELSp8Jf3LH2su8BVZC7QCyJc3AVbYYNbT
+ cN1LJvQ6y5ODS+/CTRWyZJ+qmioNUhqe59mNRgYKpqWOTveXBeW0n2r/aXd9p1aNqM6E
+ +GFHAyt5wZToIsJlmeDNqQyXT1XSBszYQxSTl5pyDRGMaCS5uTUo+U6hJaNsFsCSh41z
+ 0jtzYd3kojJLfoqMLmUNlFmVt3Yzq9Jlxiu+tM9ySCppcRVe+WhVSyp+gRgQSX6iiSjU
+ wpuetf+MwTOLcov1mF8v9amtxHuO9iF7T0k57vyWi8tb6AiIY8C6AbsuEPKDcW7rC3ko
+ FMjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=HxIyoYU/k3kOEGuCcAHD+FnA8yS+62GGIqaWUy0Cfjg=;
+ b=BkM/lnhxuRl/IT05B4LF/LO43lS3sKoEIYeVvOeXNNoDqmD3h+xsQKspI/1Nz9dFIJ
+ kh9uOsS7qRzW6dADYeTCPJo6S+xlmJ3lTbSxxWnA1eTXCZdP/7WgANYHxp+JodEuvTQN
+ QfdK7PUkzNWMy7e4tB/93CGuBoPDqBjOECcHT4x+/et0kU2WGx/FSqdTcS/Ii+phhbL8
+ /h9gM0IWlFz92aXDoAlB1NnjVDcMK1GaaNHnGTQ89eGLdxBEoguKiaQqMiSyqz8kHK9d
+ f6ALXialXQ+BB+FRZZa/3l4u4TJkSQJb4Z8N8E5x2iEspE4ug5OD35GphxMMmPXr7d2/
+ Ogaw==
+X-Gm-Message-State: AOAM531GSkAj/MLxCusDEm6fXC9KPnofBl/Xgun4XO7buPrnPKBl7DzC
+ CqH7UolKzASxb7l6ZWyOpm1IXA==
+X-Google-Smtp-Source: ABdhPJw2aIjTi5HwR5CwybXinCl/781XbzD4Emcjpb8vRB2Sz5IxRVfsA1oLklJMzWdgkoXSRgvHjQ==
+X-Received: by 2002:a7b:cb47:: with SMTP id v7mr15289783wmj.150.1602261123983; 
+ Fri, 09 Oct 2020 09:32:03 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id q13sm13127891wra.93.2020.10.09.09.31.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 09 Oct 2020 09:31:53 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 002E01FF99;
+ Fri,  9 Oct 2020 17:31:48 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Subject: [PULL 10/22] contrib/gitdm: Add ByteDance to the domain map
+Date: Fri,  9 Oct 2020 17:31:35 +0100
+Message-Id: <20201009163147.28512-11-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201009163147.28512-1-alex.bennee@linaro.org>
+References: <20201009163147.28512-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:34:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=2a00:1450:4864:20::331;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x331.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,128 +103,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, John Snow <jsnow@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: Jiachen Zhang <zhangjiachen.jaycee@bytedance.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Using `pylint --generate-rcfile > pylintrc`, generate a skeleton
-pylintrc file. Sections that are not presently relevant (by the end of
-this series) are removed leaving just the empty section as a search
-engine / documentation hint to future authors.
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-I am targeting pylint 2.6.0. In the future (and hopefully before 5.2 is
-released), I aim to have gitlab CI running the specific targeted
-versions of pylint, mypy, flake8, etc in a job.
+There is a number of contributors from this domain,
+add its own entry to the gitdm domain map.
 
-2.5.x will work if you additionally pass --disable=bad-whitespace.
-This warning was removed from 2.6.x, for lack of consistent support.
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Acked-by: Jiachen Zhang <zhangjiachen.jaycee@bytedance.com>
+Message-Id: <20201006160653.2391972-5-f4bug@amsat.org>
+Message-Id: <20201007160038.26953-11-alex.bennee@linaro.org>
 
-Right now, quite a few modules are ignored as they are known to fail as
-of this commit. modules will be removed from the known-bad list
-throughout this and following series as they are repaired.
-
-Note: Normally, pylintrc would go in the folder above the module, but as
-that folder is shared by many things, it is going inside the module
-folder (for now). Due to a bug in pylint 2.5+, pylint does not
-correctly recognize when it is being run from "inside" a package, and
-must be run *outside* of the package.
-
-Therefore, to run it, you must:
-
- > pylint scripts/qapi/ --rcfile=scripts/qapi/pylintrc
-
-Signed-off-by: John Snow <jsnow@redhat.com>
-Tested-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
-Tested-by: Cleber Rosa <crosa@redhat.com>
----
- scripts/qapi/pylintrc | 73 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 73 insertions(+)
- create mode 100644 scripts/qapi/pylintrc
-
-diff --git a/scripts/qapi/pylintrc b/scripts/qapi/pylintrc
-new file mode 100644
-index 00000000000..76d54c30f85
---- /dev/null
-+++ b/scripts/qapi/pylintrc
-@@ -0,0 +1,73 @@
-+[MASTER]
-+
-+# Add files or directories matching the regex patterns to the ignore list.
-+# The regex matches against base names, not paths.
-+ignore-patterns=common.py,
-+                error.py,
-+                expr.py,
-+                gen.py,
-+                parser.py,
-+                schema.py,
-+                source.py,
-+                types.py,
-+                visit.py,
-+
-+
-+[MESSAGES CONTROL]
-+
-+# Disable the message, report, category or checker with the given id(s). You
-+# can either give multiple identifiers separated by comma (,) or put this
-+# option multiple times (only on the command line, not in the configuration
-+# file where it should appear only once). You can also use "--disable=all" to
-+# disable everything first and then reenable specific checks. For example, if
-+# you want to run only the similarities checker, you can use "--disable=all
-+# --enable=similarities". If you want to run only the classes checker, but have
-+# no Warning level messages displayed, use "--disable=all --enable=classes
-+# --disable=W".
-+disable=fixme,
-+        missing-docstring,
-+        too-many-arguments,
-+        too-many-branches,
-+        too-many-statements,
-+        too-many-instance-attributes,
-+
-+[REPORTS]
-+
-+[REFACTORING]
-+
-+[MISCELLANEOUS]
-+
-+[LOGGING]
-+
-+[BASIC]
-+
-+# Good variable names which should always be accepted, separated by a comma.
-+good-names=i,
-+           j,
-+           k,
-+           ex,
-+           Run,
-+           _
-+
-+[VARIABLES]
-+
-+[STRING]
-+
-+[SPELLING]
-+
-+[FORMAT]
-+
-+[SIMILARITIES]
-+
-+# Ignore import statements themselves when computing similarities.
-+ignore-imports=yes
-+
-+[TYPECHECK]
-+
-+[CLASSES]
-+
-+[IMPORTS]
-+
-+[DESIGN]
-+
-+[EXCEPTIONS]
+diff --git a/contrib/gitdm/domain-map b/contrib/gitdm/domain-map
+index a4102154b6..ae5d149434 100644
+--- a/contrib/gitdm/domain-map
++++ b/contrib/gitdm/domain-map
+@@ -6,6 +6,7 @@
+ 
+ amd.com         AMD
+ baidu.com       Baidu
++bytedance.com   ByteDance
+ cmss.chinamobile.com China Mobile
+ citrix.com      Citrix
+ greensocs.com   GreenSocs
 -- 
-2.26.2
+2.20.1
 
 
