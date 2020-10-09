@@ -2,83 +2,98 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7186C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 15:49:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66B7BC433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 15:51:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DB712225D
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 15:49:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C55922225D
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 15:51:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CVp36Dfz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DB712225D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kfZB+HGF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C55922225D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38992 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQueT-0007XE-2x
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 11:49:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56608)
+	id 1kQugX-0000Ix-Ao
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 11:51:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57164)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kQudC-00075M-Ox
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 11:48:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21869)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kQud9-00085C-DB
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 11:48:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602258505;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=owaindMyLhIAH/J2944aY891LF7tAEUEV8ivsVgZfgw=;
- b=CVp36DfzJr4+AJpAtcga7ED/KVB1SJ9eWH88KtbCarSsSjTWXP7Dpd6JoPO6davNo+oVEh
- VkvHKvts4B7InFohfXx0i7AiuLk0Jnw4MdrXKYjpzTShcqgnPDATHCcNiqsu9D2T/+GR7P
- xuCBWf5Vsn6svUH6qSAW4hwQMbp58aM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-546-UJFqftlUPC-QpjCRkZOVoA-1; Fri, 09 Oct 2020 11:48:23 -0400
-X-MC-Unique: UJFqftlUPC-QpjCRkZOVoA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3521A8015B0;
- Fri,  9 Oct 2020 15:48:22 +0000 (UTC)
-Received: from gondolin (ovpn-113-40.ams2.redhat.com [10.36.113.40])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6CC021A887;
- Fri,  9 Oct 2020 15:48:10 +0000 (UTC)
-Date: Fri, 9 Oct 2020 17:48:07 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Matthew Rosato <mjrosato@linux.ibm.com>
-Subject: Re: [PATCH v3 10/10] s390x/pci: get zPCI function info from host
-Message-ID: <20201009174807.6d800999.cohuck@redhat.com>
-In-Reply-To: <1602097455-15658-11-git-send-email-mjrosato@linux.ibm.com>
-References: <1602097455-15658-1-git-send-email-mjrosato@linux.ibm.com>
- <1602097455-15658-11-git-send-email-mjrosato@linux.ibm.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kQufy-0008L6-LP
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 11:51:22 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35278)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kQufx-0008SH-4K
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 11:51:22 -0400
+Received: by mail-wr1-x443.google.com with SMTP id n15so10812001wrq.2
+ for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 08:51:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=vUw25a+JF28NDJn2+bNEzpLoUNqu5DI1Lon8tieP4jc=;
+ b=kfZB+HGFlYlXiei/c2tiqXL7S6OO2l7GXQ4Nbg4E9BSh+PefJpARLoVoLIEH8j12wI
+ PAvjJXLiUu9Sx4GZSNIeUwPsnVP+Mr0eChtF0eQi4Hj5DlUlWBDvmN1pu/tRbJ6uwudv
+ 2h/ycrS5wRCdfxnX/c860of7ZeQwQkPNSzKnK5+32Mfdfo+42f5DLDjLIKaEDqkdwVOE
+ JUY72lgazZ6BcN0toA75NJLnt4svB+PRM5WPob6AicDlXXFkzWl87PhsTfIE5xks8vP1
+ HGWiLEGr2b6mADZT7roE2PpNy/Ofr9s+Idat7WDg5+f7ecWtzO2jfn0962SYHIerkkz1
+ Cd0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=vUw25a+JF28NDJn2+bNEzpLoUNqu5DI1Lon8tieP4jc=;
+ b=h/zbqDK3PlTC2JJrF2yW51jBml6kdBQ0I5QZS5LBEmzk0hnieaPY9l/s4f0Ub7sGr9
+ jG9jPzaJ0Ruq8aKNL8s2obee3aPmGTIvCrFG5KXd6tU2qaUJIHC3jwQTWNf2O8Y/CKvq
+ njhk/lcxYBJ1g/0GSXz8/iPxMyqw6+ZcfUJqM6wfmFkOrDebRGUoCsUZSUEf/IFl9SOY
+ 3wFklDu3L1d5HvKBW5GdOcW5RGwKWBaVor1Q1+Mb3/rb1RXMdYhQokqIex4uxWoMTKgT
+ ABjB6ppH/h5WeRDcTZLR8rAiIxMzWvCWj3IGVBpKIayK8Z8aHZJk7bcxsxJy2ZnIOXqo
+ WI4w==
+X-Gm-Message-State: AOAM532wi7wN9fFumaWEfP2zkTvv1kBUYhfop/LMXKzvg5Zz8ZwIqcER
+ 5PM6jbti8dTgcAg+vf9WSDA=
+X-Google-Smtp-Source: ABdhPJz4K/oCUeF2NhUD/KwP4Va2A37AiyoyaEtypkKKmeJOLCyy7jSqEBZil0LOTRQHhqWHI5fPGw==
+X-Received: by 2002:adf:f44d:: with SMTP id f13mr11424377wrp.385.1602258679529; 
+ Fri, 09 Oct 2020 08:51:19 -0700 (PDT)
+Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id x64sm12415748wmg.33.2020.10.09.08.51.18
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 09 Oct 2020 08:51:18 -0700 (PDT)
+Subject: Re: [RFC PATCH v2 0/3] target/mips: Report unimplemented cache()
+ operations
+To: qemu-devel@nongnu.org
+References: <20200813181527.22551-1-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <012b6a7a-09de-977d-d57f-aaf8d83140fe@amsat.org>
+Date: Fri, 9 Oct 2020 17:51:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:34:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <20200813181527.22551-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -19
+X-Spam_score: -2.0
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.208,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,83 +106,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, kvm@vger.kernel.org, pmorel@linux.ibm.com,
- david@redhat.com, schnelle@linux.ibm.com, qemu-s390x@nongnu.org,
- qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
- alex.williamson@redhat.com, mst@redhat.com, pbonzini@redhat.com,
- rth@twiddle.net
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed,  7 Oct 2020 15:04:15 -0400
-Matthew Rosato <mjrosato@linux.ibm.com> wrote:
-
-> We use the capability chains of the VFIO_DEVICE_GET_INFO ioctl to retrieve
-> the CLP information that the kernel exports.
+On 8/13/20 8:15 PM, Philippe Mathieu-Daudé wrote:
+> Few patches to improve the handling of the 'cache' opcode.
 > 
-> To be compatible with previous kernel versions we fall back on previous
-> predefined values, same as the emulation values, when the ioctl is found
-> to not support capability chains. If individual CLP capabilities are not
-> found, we fall back on default values for only those capabilities missing
-> from the chain.
+> I'm not sure why helper_cache() is generated for user-only mode.
 > 
-> This patch is based on work previously done by Pierre Morel.
+> v1 was:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg727959.html
+> Supersedes: <20200806122612.17167-1-f4bug@amsat.org>
 > 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> ---
->  hw/s390x/meson.build             |   1 +
->  hw/s390x/s390-pci-bus.c          |  10 +-
->  hw/s390x/s390-pci-vfio.c         | 197 +++++++++++++++++++++++++++++++++++++++
->  include/hw/s390x/s390-pci-bus.h  |   1 +
->  include/hw/s390x/s390-pci-clp.h  |  12 ++-
->  include/hw/s390x/s390-pci-vfio.h |  19 ++++
->  6 files changed, 233 insertions(+), 7 deletions(-)
->  create mode 100644 hw/s390x/s390-pci-vfio.c
->  create mode 100644 include/hw/s390x/s390-pci-vfio.h
+> Philippe Mathieu-Daudé (3):
+>    target/mips/op_helper: Convert multiple if() to switch case
+>    target/mips/op_helper: Document Invalidate/Writeback opcodes as no-op
+>    target/mips/op_helper: Log unimplemented cache opcode
 
-(...)
-
-> diff --git a/hw/s390x/s390-pci-vfio.c b/hw/s390x/s390-pci-vfio.c
-> new file mode 100644
-> index 0000000..43684c6
-> --- /dev/null
-> +++ b/hw/s390x/s390-pci-vfio.c
-> @@ -0,0 +1,197 @@
-> +/*
-> + * s390 vfio-pci interfaces
-> + *
-> + * Copyright 2020 IBM Corp.
-> + * Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
-> + * your option) any later version. See the COPYING file in the top-level
-> + * directory.
-> + */
-> +
-> +#include <sys/ioctl.h>
-> +#include <linux/vfio.h>
-> +#include <linux/vfio_zdev.h>
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/s390x/s390-pci-bus.h"
-> +#include "hw/s390x/s390-pci-clp.h"
-> +#include "hw/s390x/s390-pci-vfio.h"
-> +#include "hw/vfio/pci.h"
-> +
-> +#ifndef DEBUG_S390PCI_VFIO
-> +#define DEBUG_S390PCI_VFIO  0
-> +#endif
-> +
-> +#define DPRINTF(fmt, ...)                                          \
-> +    do {                                                           \
-> +        if (DEBUG_S390PCI_VFIO) {                                  \
-> +            fprintf(stderr, "S390pci-vfio: " fmt, ## __VA_ARGS__); \
-> +        }                                                          \
-> +    } while (0)
-
-Not really a fan of DPRINTF. Can you maybe use trace events instead?
-
-Other than that, looks good to me.
-
+Thanks, added to mips-next (addressing Richard comments).
 
