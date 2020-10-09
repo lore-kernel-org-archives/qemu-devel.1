@@ -2,98 +2,89 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 111CCC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 14:36:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11CE9C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 14:38:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65CC62226B
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 14:36:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A06FB20709
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 14:38:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hOfJNZph"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65CC62226B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hFzSjV+w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A06FB20709
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52756 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQtV9-00063d-FB
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 10:36:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39240)
+	id 1kQtX8-0007pd-Lc
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 10:38:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39600)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kQtTi-00058Z-SG
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 10:34:38 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41277)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kQtTh-0007M8-2d
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 10:34:38 -0400
-Received: by mail-ot1-x342.google.com with SMTP id q21so9153935ota.8
- for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 07:34:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=CO5LLPPDG1Pz5zpShDhiW+Tssla1SONHoMCkPsvk0Ys=;
- b=hOfJNZphWd++o8bENpYKTKBR0N3T3UWJsinP0HOuBWOdMoHvySFWGoDi3xBFviasIo
- MRqLh0LrUw3yrWRm0tn+OZYPvv5uRvQs+ZBrgJx4NO8iZ0QrWQfcU+pDqr+bfpQjFnAl
- /iRPliXRr//14NbSCNWlo8zQ4RslcgNaXbhi9sgR1ZRdWTBn02KBehmQQxD1GlKhuy9M
- 4spJxUIRSQ33t1LDiV72FuvdHLpRqIjyjHVKB40G5XnOx/6ZaFEIWHL7iIm3bkkiZmGa
- Q0Wj6dI3wSddlnylVyvfUAi7OZYFa8MaITsZEVvU9Zru+4EYcVtO/zk8yBJ1FeBqFGKy
- fjPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=CO5LLPPDG1Pz5zpShDhiW+Tssla1SONHoMCkPsvk0Ys=;
- b=jNPAc/e0HGsYEVRa/kvU6dAQqx2nqSzrV12K+QDzmo+I7XAyerWGI0WvzfxTER6o5w
- sSOQBVQou3xF4OcBQ/mSDRkjAk48eFm6coLwj6WgEpONBNNnXVukLylhfohXOxa3Ybuz
- HhyHHkVYf5OTMqJWSCGpi5blRhsuKI3SbBR2FzntxMgklkR1D11k45gKXBOCfhlMjLF9
- EPjbI/TxgOtljvJeQG3OflItV5lwUcApgWt1YH+FwjUMgdix6hGP0LmAu/RnUwFHJhvB
- 5BT0i4t0F2rD0wLabfWKtjhce9gpGBPP8IIAfS4Fz73IJ68irYn10yuI2fmwiFJOuFL6
- 8cZQ==
-X-Gm-Message-State: AOAM5315Ju+zjVO7+kaVsSm/cFC3VB0cQi0+gBPRd5MnMl9aC5TJfzlZ
- 3LRo1DYqZ+hcNrZCvzhU8ir5UA==
-X-Google-Smtp-Source: ABdhPJyTxodjNSNZIBt6/NWSH/pJWl833SbCTLYZ9PXtkeuJB+dwd0OnWQIR4GelXbJt/r7XWT4IxA==
-X-Received: by 2002:a9d:6013:: with SMTP id h19mr8750979otj.262.1602254072549; 
- Fri, 09 Oct 2020 07:34:32 -0700 (PDT)
-Received: from [172.24.51.127] (168.189-204-159.bestelclientes.com.mx.
- [189.204.159.168])
- by smtp.gmail.com with ESMTPSA id d27sm6307463otc.6.2020.10.09.07.34.30
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 09 Oct 2020 07:34:31 -0700 (PDT)
-Subject: Re: [PATCH V2] target/riscv: raise exception to HS-mode at
- get_physical_address
-To: Yifei Jiang <jiangyifei@huawei.com>, qemu-devel@nongnu.org,
- qemu-riscv@nongnu.org
-References: <20201009075740.688-1-jiangyifei@huawei.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <26316865-1a25-0e12-ee65-76d79e26603d@linaro.org>
-Date: Fri, 9 Oct 2020 09:34:28 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQtVL-0006LL-P4
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 10:36:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25087)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kQtVH-0007df-MT
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 10:36:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602254174;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=xHizHi/RtEFe+/dn6td7sn9ASMLRm1S1SgWNGCdn/ys=;
+ b=hFzSjV+wgk1Sz7VmvrNaGUKp+Vs2NSaIMMaG+J/w0tiJNWb0FMXBPaeKCB73G2EE4RRqZ4
+ RoTqFo7qNt5YWlOUw805xUA+b1eXIVh9MyynuPzhiFixA0WS0UoHJLmks9VtMHZSh8SL/X
+ v+tISfcGqPMJjXlHDbqbe8u7dZ5IPk0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-159-n1qN2tPDMbuZgHiqo3R3wQ-1; Fri, 09 Oct 2020 10:36:10 -0400
+X-MC-Unique: n1qN2tPDMbuZgHiqo3R3wQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 51744802B66;
+ Fri,  9 Oct 2020 14:36:08 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
+ [10.36.112.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 22F575D9E8;
+ Fri,  9 Oct 2020 14:36:08 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 982FE11329AE; Fri,  9 Oct 2020 16:36:06 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH 1/4] keyval: Parse help options
+References: <20200929172649.158086-1-kwolf@redhat.com>
+ <20200929172649.158086-2-kwolf@redhat.com>
+ <b28cad72-d344-78fa-fc07-b4a6a63fbc50@redhat.com>
+Date: Fri, 09 Oct 2020 16:36:06 +0200
+In-Reply-To: <b28cad72-d344-78fa-fc07-b4a6a63fbc50@redhat.com> (Eric Blake's
+ message of "Tue, 29 Sep 2020 12:46:55 -0500")
+Message-ID: <871ri7ii09.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20201009075740.688-1-jiangyifei@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
- envelope-from=richard.henderson@linaro.org; helo=mail-ot1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -22
-X-Spam_score: -2.3
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:34:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.208,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,59 +97,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, sagark@eecs.berkeley.edu,
- kbastian@mail.uni-paderborn.de, victor.zhangxiaofeng@huawei.com,
- Alistair.Francis@wdc.com, yinyipeng1@huawei.com, palmer@dabbelt.com,
- wu.wubin@huawei.com, dengkai1@huawei.com
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/9/20 2:57 AM, Yifei Jiang wrote:
->  #define TRANSLATE_FAIL 1
->  #define TRANSLATE_SUCCESS 0
->  #define MMU_USER_IDX 3
-> +#define TRANSLATE_G_STAGE_FAIL 4
+Eric Blake <eblake@redhat.com> writes:
 
-Note that you're interleaving TRANSLATE_* around an unrelated define.  Perhaps
-rearrange to
+> On 9/29/20 12:26 PM, Kevin Wolf wrote:
+>> This adds a new parameter 'help' to keyval_parse() that enables parsing
+>> of help options. If NULL is passed, the function behaves the same as
+>> before. But if a bool pointer is given, it contains the information
+>> whether an option "help" without value was given (which would otherwise
+>> either result in an error or be interpreted as the value for an implied
+>> key).
+>> 
+>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>> ---
+>
+>> +++ b/util/keyval.c
+>
+> Might be nice to see this before the testsuite changes by tweaking the
+> git orderfile.
+>
+>> @@ -166,7 +166,7 @@ static QObject *keyval_parse_put(QDict *cur,
+>>   * On failure, return NULL.
+>>   */
+>>  static const char *keyval_parse_one(QDict *qdict, const char *params,
+>> -                                    const char *implied_key,
+>> +                                    const char *implied_key, bool *help,
+>>                                      Error **errp)
+>>  {
+>>      const char *key, *key_end, *s, *end;
+>> @@ -179,6 +179,16 @@ static const char *keyval_parse_one(QDict *qdict, const char *params,
+>>  
+>>      key = params;
+>>      len = strcspn(params, "=,");
+>> +
+>> +    if (help && key[len] != '=' && !strncmp(key, "help", len)) {
+>
+> What if the user typed "help,," to get "help," as the value of the
+> implied key?
 
-enum {
-    TRANSLATE_SUCCESS = 0,
-    TRANSLATE_FAIL,
-    TRANSLATE_PMP_FAIL,
-    TRANSLATE_G_STAGE_FAIL,
-};
+The value of an implied key cannot contain ','.  This is intentional.
 
+test-keyval.c:
 
-> +++ b/target/riscv/cpu_helper.c
-> @@ -451,7 +451,10 @@ restart:
->                                                   mmu_idx, false, true);
->  
->              if (vbase_ret != TRANSLATE_SUCCESS) {
-> -                return vbase_ret;
-> +                env->guest_phys_fault_addr = (base |
-> +                                              (addr &
-> +                                               (TARGET_PAGE_SIZE - 1))) >> 2;
-> +                return TRANSLATE_G_STAGE_FAIL;
->              }
+    /* Implied key with empty value (qemu_opts_parse() accepts this) */
+    qdict = keyval_parse(",", "implied", &err);
+    error_free_or_abort(&err);
+    g_assert(!qdict);
 
-I don't think you can make this change to cpu state, as this function is also
-used by gdb.  I think you'll need to add a new (target_ulong *) parameter to
-get_physical_address to return this.
+    /* Likewise (qemu_opts_parse(): implied key with comma value) */
+    qdict = keyval_parse(",,,a=1", "implied", &err);
+    error_free_or_abort(&err);
+    g_assert(!qdict);
 
-The usage in riscv_cpu_tlb_fill could pass &env->guest_phys_fault_addr, and the
-usage in riscv_cpu_get_phys_page_debug could pass the address of a local
-variable (which it then ignores).
+Grammar:
 
-Also, isn't the offset more naturally written idx * ptesize, as seen just a few
-lines below?
+ *   val-no-key   = / [^=,]* /
 
-> +        if (ret != TRANSLATE_FAIL && ret != TRANSLATE_G_STAGE_FAIL) {
+Aside: should be + instead of *.  Doc bug.  I'll fix it.
 
-Should this not be ret == TRANSLATE_SUCCESS?
-This looks buggy with TRANSLATE_PMP_FAIL...
+[...]
 
-
-r~
 
