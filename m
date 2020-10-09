@@ -2,88 +2,98 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0444C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 14:48:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96E19C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 14:48:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4755C221FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 14:48:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DFBE4221FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 14:48:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bIkhuDHR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4755C221FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KveGJrsV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFBE4221FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQthH-0008UX-9R
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 10:48:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41814)
+	id 1kQthM-0008W4-23
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 10:48:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41812)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kQtg3-0007Zf-3E
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 10:47:23 -0400
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:37419)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kQtfx-0000Rf-IN
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kQtg2-0007Ze-Q4
  for qemu-devel@nongnu.org; Fri, 09 Oct 2020 10:47:22 -0400
-Received: by mail-wm1-x336.google.com with SMTP id j136so10104096wmj.2
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39531)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kQtfx-0000Ri-Hk
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 10:47:20 -0400
+Received: by mail-wr1-x441.google.com with SMTP id y12so5215424wrp.6
  for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 07:47:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=uWUs5XS37Km3EAJspIL0UZAFkTxAe4sbDHRIXZCWeRE=;
- b=bIkhuDHRKYvRui1SAZn4x4iLExMG29e8sy6s5imaclj9ZD34/1+FJADv5R6ZrAAj8p
- GfOxXzHZKX5XlZElwqfIfpcSd53uKUPkWOfjo4bOSnkVeabmxo8jTmJo495tbVOitX2C
- cGo04i4FaAxSGGx8truD2+55bzKVgRKG2CWa6O3zRDdPkY0lUXpgdcnoi7nfV8fkm2EN
- PmIRxI+3uMDlHb4ZgXzwi/9thYrVFYxWMjnCcH0MKwa9g+EUMBa4J6U9OOP7sIaBqRAo
- ko4IVKfdGZ6yz7x5kGN75wc8ABLs07YTXjxGKdF8UVq4awOLNXRNLp0zsinKJI1LTIfz
- IZSA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=hmnSzgCxOYplz49V09b2rB+1Y5/XK5reFSxCJhsq/+s=;
+ b=KveGJrsVDSFHS3fR4r52mUza9wajxAKoYTXKhgmiy6u1yio+C4mOuIGDRgCXFVPQ9+
+ 6KK8ArAe4Ks9bezqLytn4jPClF/oiNnjnVfi/2VuvXi+0aN+Yy1wn43NYzFpEBYIYRkM
+ LDqacrwiyKmxHcJIlwywGAZZWj5Vylm68WfE9bP/PqQqqW/Ua+M5CYmKayvpG9CsTdg4
+ R1okmTNpaASG7/wdh3cb5Zowvh9zNXV/IC4exLiIlBi6hzm44nRa4IF/NQp8cRK7gfCf
+ VkxMeSchqs1JtwpyUHtLg62Qd+oyPOhB6ZX9qHMjLO2GqC1qG3FZa6LODvNk2lnTyyuc
+ Flmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=uWUs5XS37Km3EAJspIL0UZAFkTxAe4sbDHRIXZCWeRE=;
- b=C7J/VYQTUw/jRQr/bq/JrwczIR7Odq9GQnPmZslvlNVGx5A8nmivgZe8FVcAaUaMvn
- bCU54//HY3Hs2cRAvr6Dy0ZSkZ3b9O/fc54hOuvyPrtN9yxPgpA3Ng919TJSJ+iQ6iES
- bBlC+VUWczSVwHC4Mfl4RJi3gI+2h4Asdzxc/GuLFl6MXqSphh7Wph5oUFqe1JobfDOU
- S2hzbkyjSKZ95dJqwaaYwLo7cHQfV4QX0F/SZ2vlHSmA7M8Ah05JV/+7XMBZkTNCwUdb
- e7FepoyCKW/hxBN/OFV2dLxIgrPXqiI9iZegw2WzbxMUg7CD8nVuB5i7oEKMTTYuPDcm
- ITiw==
-X-Gm-Message-State: AOAM530eqhFlTHS5lmb0HMODK2qp0vXrpofjUIFdLJ/48h5hQBaN5tza
- lWR6V4QrzUuyP6krhAw7bKkFUO0dl6tY6O3R
-X-Google-Smtp-Source: ABdhPJyeCW/HOkMJdUvl5XFC/ruKrzSHTJAX/fJ0j1125x3+NQ/azRI80UI/FveLiVtTbvXVhOYNFw==
-X-Received: by 2002:a7b:c2a9:: with SMTP id c9mr14565273wmk.87.1602254835612; 
+ bh=hmnSzgCxOYplz49V09b2rB+1Y5/XK5reFSxCJhsq/+s=;
+ b=BUaMCBHU/0kuGB/Z9drRKAyEsvbx6+31NwD77MB9lMcq8cdQb+uMTBouRXxDPddWx+
+ h5uKjaZJonbc5GUBJnnY4u6aa47N8vkqIU1GqVFNl30TY1JZe+SiGRJBQppi5LycPDcQ
+ ZKgsJ5VqMnoKoAQiZzgQwNwpRMjJ0ajpnDzdwCKZRTDHn04m2Tk52hD2EHWs2DU/+RdB
+ PLCj6rUFpNiaYQtxtIWdpzI7HdWXqzyVz/rwiN8MZnyiY+QrgJQEmhJJIxZLqgwEL/Bs
+ DGs8hhkI5k8nPrqyGn1FQpBKJsTTxnzgH/x3yAo3C1V9tq9NsZXN2DrITIid/DCXevI6
+ XgDQ==
+X-Gm-Message-State: AOAM531b5pW3PaZRlA+aFRVEDh4iMVx5VqbJuoMYvQzJq26qaDqqY48S
+ HzD3J2KyEFSYsRLvRSErFOs=
+X-Google-Smtp-Source: ABdhPJyOhme5qUfZevS8RC9F18U/FPgBqIYRoIDGKeosFcVMtglGCAA54ZKrJMb8jJniDtWRjFN2jQ==
+X-Received: by 2002:a05:6000:6:: with SMTP id h6mr6683622wrx.112.1602254836234; 
+ Fri, 09 Oct 2020 07:47:16 -0700 (PDT)
+Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id j101sm13294001wrj.9.2020.10.09.07.47.15
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
  Fri, 09 Oct 2020 07:47:15 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id f12sm11832373wmf.26.2020.10.09.07.47.14
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 09 Oct 2020 07:47:14 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH] target/arm: Fix SMLAD incorrect setting of Q bit
-Date: Fri,  9 Oct 2020 15:47:12 +0100
-Message-Id: <20201009144712.11187-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+Subject: Re: [PATCH v2 4/5] target/mips: Refactor helpers for fp comparison
+ instructions
+To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ qemu-devel@nongnu.org
+References: <1602103041-32017-1-git-send-email-aleksandar.qemu.devel@gmail.com>
+ <1602103041-32017-5-git-send-email-aleksandar.qemu.devel@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <7da26134-7e26-457a-c48e-877e66309793@amsat.org>
+Date: Fri, 9 Oct 2020 16:47:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::336;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x336.google.com
+In-Reply-To: <1602103041-32017-5-git-send-email-aleksandar.qemu.devel@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-Spam_score_int: -19
+X-Spam_score: -2.0
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.208,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -98,118 +108,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org, aleksandar.rikalo@syrmia.com,
+ hpoussin@reactos.org, chenhc@lemote.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The SMLAD instruction is supposed to:
- * signed multiply Rn[15:0] * Rm[15:0]
- * signed multiply Rn[31:16] * Rm[31:16]
- * perform a signed addition of the products and Ra
- * set Rd to the low 32 bits of the theoretical
-   infinite-precision result
- * set the Q flag if the sign-extension of Rd
-   would differ from the infinite-precision result
-   (ie on overflow)
+Hi Aleksandar,
 
-Our current implementation doesn't quite do this, though: it performs
-an addition of the products setting Q on overflow, and then it adds
-Ra, again possibly setting Q.  This sometimes incorrectly sets Q when
-the architecturally mandated only-check-for-overflow-once algorithm
-does not. For instance:
- r1 = 0x80008000; r2 = 0x80008000; r3 = 0xffffffff
- smlad r0, r1, r2, r3
-This is (-32768 * -32768) + (-32768 * -32768) - 1
+On 10/7/20 10:37 PM, Aleksandar Markovic wrote:
+> This change causes slighlty better performance of emulation of fp
+> comparison instructions via better compiler optimization of refactored
+> code. The functionality is otherwise unchanged.
+> 
+> Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> ---
+>   target/mips/fpu_helper.c | 56 +++++++++++++++++++++++++++---------------------
+>   1 file changed, 32 insertions(+), 24 deletions(-)
+> 
+[...]
 
-The products are both 0x4000_0000, so when added together as 32-bit
-signed numbers they overflow (and QEMU sets Q), but because the
-addition of Ra == -1 brings the total back down to 0x7fff_ffff
-there is no overflow for the complete operation and setting Q is
-incorrect.
+>   /*
+> @@ -2080,12 +2088,12 @@ uint64_t helper_r6_cmp_d_ ## op(CPUMIPSState *env, uint64_t fdt0,   \
+>   {                                                                   \
+>       uint64_t c;                                                     \
+>       c = cond;                                                       \
+> -    update_fcr31(env, GETPC());                                     \
+>       if (c) {                                                        \
+>           return -1;                                                  \
+>       } else {                                                        \
+>           return 0;                                                   \
+>       }                                                               \
+> +    update_fcr31(env, GETPC());                                     \
 
-Fix this edge case by resorting to 64-bit arithmetic for the
-case where we need to add three values together.
+Isn't it now never called (dead code)?
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/translate.c | 58 ++++++++++++++++++++++++++++++++++--------
- 1 file changed, 48 insertions(+), 10 deletions(-)
+>   }
+>   
+>   /*
+> @@ -2175,12 +2183,12 @@ uint32_t helper_r6_cmp_s_ ## op(CPUMIPSState *env, uint32_t fst0,   \
+>   {                                                                   \
+>       uint64_t c;                                                     \
+>       c = cond;                                                       \
+> -    update_fcr31(env, GETPC());                                     \
+>       if (c) {                                                        \
+>           return -1;                                                  \
+>       } else {                                                        \
+>           return 0;                                                   \
+>       }                                                               \
+> +    update_fcr31(env, GETPC());                                     \
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index d34c1d351a6..d8729e42c48 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -7401,21 +7401,59 @@ static bool op_smlad(DisasContext *s, arg_rrrr *a, bool m_swap, bool sub)
-     gen_smul_dual(t1, t2);
- 
-     if (sub) {
--        /* This subtraction cannot overflow. */
-+        /*
-+         * This subtraction cannot overflow, so we can do a simple
-+         * 32-bit subtraction and then a possible 32-bit saturating
-+         * addition of Ra.
-+         */
-         tcg_gen_sub_i32(t1, t1, t2);
-+        tcg_temp_free_i32(t2);
-+
-+        if (a->ra != 15) {
-+            t2 = load_reg(s, a->ra);
-+            gen_helper_add_setq(t1, cpu_env, t1, t2);
-+            tcg_temp_free_i32(t2);
-+        }
-+    } else if (a->ra == 15) {
-+        /* Single saturation-checking addition */
-+        gen_helper_add_setq(t1, cpu_env, t1, t2);
-+        tcg_temp_free_i32(t2);
-     } else {
-         /*
--         * This addition cannot overflow 32 bits; however it may
--         * overflow considered as a signed operation, in which case
--         * we must set the Q flag.
-+         * We need to add the products and Ra together and then
-+         * determine whether the final result overflowed. Doing
-+         * this as two separate add-and-check-overflow steps incorrectly
-+         * sets Q for cases like (-32768 * -32768) + (-32768 * -32768) + -1.
-+         * Do all the arithmetic at 64-bits and then check for overflow.
-          */
--        gen_helper_add_setq(t1, cpu_env, t1, t2);
--    }
--    tcg_temp_free_i32(t2);
-+        TCGv_i64 p64, q64;
-+        TCGv_i32 t3, qf, one;
- 
--    if (a->ra != 15) {
--        t2 = load_reg(s, a->ra);
--        gen_helper_add_setq(t1, cpu_env, t1, t2);
-+        p64 = tcg_temp_new_i64();
-+        q64 = tcg_temp_new_i64();
-+        tcg_gen_ext_i32_i64(p64, t1);
-+        tcg_gen_ext_i32_i64(q64, t2);
-+        tcg_gen_add_i64(p64, p64, q64);
-+        load_reg_var(s, t2, a->ra);
-+        tcg_gen_ext_i32_i64(q64, t2);
-+        tcg_gen_add_i64(p64, p64, q64);
-+        tcg_temp_free_i64(q64);
-+
-+        tcg_gen_extr_i64_i32(t1, t2, p64);
-+        tcg_temp_free_i64(p64);
-+        /*
-+         * t1 is the low half of the result which goes into Rd.
-+         * We have overflow and must set Q if the high half (t2)
-+         * is different from the sign-extension of t1.
-+         */
-+        t3 = tcg_temp_new_i32();
-+        tcg_gen_sari_i32(t3, t1, 31);
-+        qf = load_cpu_field(QF);
-+        one = tcg_const_i32(1);
-+        tcg_gen_movcond_i32(TCG_COND_NE, qf, t2, t3, one, qf);
-+        store_cpu_field(qf, QF);
-+        tcg_temp_free_i32(one);
-+        tcg_temp_free_i32(t3);
-         tcg_temp_free_i32(t2);
-     }
-     store_reg(s, a->rd, t1);
--- 
-2.20.1
+Ditto.
 
+>   }
+>   
+>   /*
+> 
 
