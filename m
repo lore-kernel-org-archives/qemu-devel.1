@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44CBAC433E7
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:33:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00733C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:34:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C83102227F
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:33:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 96C912227F
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:34:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MQWWHToO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C83102227F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MD70R9xZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96C912227F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQvKr-0001o0-T4
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:33:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34768)
+	id 1kQvLL-0002t0-Mx
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:34:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34334)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv4W-0004O2-ON
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22947)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv45-0003su-3v
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54470)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv4O-0003LB-Sb
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:44 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv40-0003Ew-Ng
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602260196;
+ s=mimecast20190719; t=1602260171;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=IsDKDkgExvu7y3hn9COPAwhXOGkQ3b8Eei+wplqK5i8=;
- b=MQWWHToOdnjLPLrlvAS4tSiz9f9leEBOlbcBSXKJ1mYKvCB50FDwgUAgbX4bdmtSbDlQfQ
- z7Y+o6mSfEi2Ua3TbX97cfJvczP6sCcvd9jpDcE0VqcOCIpfqzg8MPUcTqM6tmsVFU0X3D
- xO7HapYnbSzWrw9kxjS6yM8VsI5jtN0=
+ bh=SPfnjfrOlLsUE7jHCe08cK+cSvcFh3jpGCbJzLC8hew=;
+ b=MD70R9xZshGsm+k5sSiKGF/f2a6xTJMD12rCFigiwc9YJYYrTXl/P8mYnyk/IPV66w7UgO
+ vcgE8tGMl+VfENSy5WzAkAaBGVpkt7jGPNc1h5kgpBXaXaFnC4+o1+FXzfiIzR9ZE1ZV8l
+ tPM1tlOg/Fis4cDx/nfwQOZVeAyGlIQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-587-iB7XsAPMMP2jyc9C3hMNWA-1; Fri, 09 Oct 2020 12:16:34 -0400
-X-MC-Unique: iB7XsAPMMP2jyc9C3hMNWA-1
+ us-mta-421-Tc3txzENOqCkchfqRh-LpA-1; Fri, 09 Oct 2020 12:16:07 -0400
+X-MC-Unique: Tc3txzENOqCkchfqRh-LpA-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 57673100746C;
- Fri,  9 Oct 2020 16:16:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C26B680401F;
+ Fri,  9 Oct 2020 16:16:06 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-112-203.rdu2.redhat.com [10.10.112.203])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9444E19936;
- Fri,  9 Oct 2020 16:16:32 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E4FC01A925;
+ Fri,  9 Oct 2020 16:16:05 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 27/36] qapi/gen.py: add type hint annotations
-Date: Fri,  9 Oct 2020 12:15:49 -0400
-Message-Id: <20201009161558.107041-28-jsnow@redhat.com>
+Subject: [PATCH v6 04/36] qapi: move generator entrypoint into package
+Date: Fri,  9 Oct 2020 12:15:26 -0400
+Message-Id: <20201009161558.107041-5-jsnow@redhat.com>
 In-Reply-To: <20201009161558.107041-1-jsnow@redhat.com>
 References: <20201009161558.107041-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -100,289 +100,230 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Annotations do not change runtime behavior.
-This commit *only* adds annotations.
+As part of delinting and adding type hints to the QAPI generator, it's
+helpful for the entrypoint to be part of the package, only leaving a
+very tiny entrypoint shim outside of the package.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Tested-by: Cleber Rosa <crosa@redhat.com>
 ---
- scripts/qapi/gen.py | 104 ++++++++++++++++++++++++--------------------
- 1 file changed, 57 insertions(+), 47 deletions(-)
+ scripts/qapi-gen.py  | 94 +++----------------------------------------
+ scripts/qapi/main.py | 95 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 101 insertions(+), 88 deletions(-)
+ create mode 100644 scripts/qapi/main.py
 
-diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
-index 2c305c4f82c..6b1007a0351 100644
---- a/scripts/qapi/gen.py
-+++ b/scripts/qapi/gen.py
-@@ -15,7 +15,13 @@
- import errno
- import os
- import re
+diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
+index 054554ed846..f3518d29a54 100644
+--- a/scripts/qapi-gen.py
++++ b/scripts/qapi-gen.py
+@@ -4,98 +4,16 @@
+ # See the COPYING file in the top-level directory.
+ 
+ """
+-QAPI Generator
++QAPI code generation execution shim.
+ 
+-This is the main entry point for generating C code from the QAPI schema.
++This standalone script exists primarily to facilitate the running of the QAPI
++code generator without needing to install the python module to the current
++execution environment.
+ """
+ 
+-import argparse
+-import re
+ import sys
 -from typing import Optional
-+from typing import (
-+    Dict,
-+    Iterator,
-+    List,
-+    Optional,
-+    Tuple,
-+)
- 
- from .common import (
-     c_fname,
-@@ -27,31 +33,31 @@
-     mcgen,
- )
- from .schema import QAPISchemaObjectType, QAPISchemaVisitor
-+from .source import QAPISourceInfo
- 
- 
- class QAPIGen:
 -
--    def __init__(self, fname):
-+    def __init__(self, fname: Optional[str]):
-         self.fname = fname
-         self._preamble = ''
-         self._body = ''
- 
--    def preamble_add(self, text):
-+    def preamble_add(self, text: str) -> None:
-         self._preamble += text
- 
--    def add(self, text):
-+    def add(self, text: str) -> None:
-         self._body += text
- 
--    def get_content(self):
-+    def get_content(self) -> str:
-         return self._top() + self._preamble + self._body + self._bottom()
- 
--    def _top(self):
-+    def _top(self) -> str:
-         return ''
- 
--    def _bottom(self):
-+    def _bottom(self) -> str:
-         return ''
- 
--    def write(self, output_dir):
-+    def write(self, output_dir: str) -> None:
-         # Include paths starting with ../ are used to reuse modules of the main
-         # schema in specialised schemas. Don't overwrite the files that are
-         # already generated for the main schema.
-@@ -76,7 +82,7 @@ def write(self, output_dir):
-         f.close()
- 
- 
--def _wrap_ifcond(ifcond, before, after):
-+def _wrap_ifcond(ifcond: List[str], before: str, after: str) -> str:
-     if before == after:
-         return after   # suppress empty #if ... #endif
- 
-@@ -116,40 +122,38 @@ def build_params(arg_type: Optional[QAPISchemaObjectType],
- 
- 
- class QAPIGenCCode(QAPIGen):
+-from qapi.commands import gen_commands
+-from qapi.error import QAPIError
+-from qapi.events import gen_events
+-from qapi.introspect import gen_introspect
+-from qapi.schema import QAPISchema
+-from qapi.types import gen_types
+-from qapi.visit import gen_visit
 -
--    def __init__(self, fname):
-+    def __init__(self, fname: Optional[str]):
-         super().__init__(fname)
--        self._start_if = None
-+        self._start_if: Optional[Tuple[List[str], str, str]] = None
- 
--    def start_if(self, ifcond):
-+    def start_if(self, ifcond: List[str]) -> None:
-         assert self._start_if is None
-         self._start_if = (ifcond, self._body, self._preamble)
- 
--    def end_if(self):
-+    def end_if(self) -> None:
-         assert self._start_if
-         self._wrap_ifcond()
-         self._start_if = None
- 
--    def _wrap_ifcond(self):
-+    def _wrap_ifcond(self) -> None:
-         self._body = _wrap_ifcond(self._start_if[0],
-                                   self._start_if[1], self._body)
-         self._preamble = _wrap_ifcond(self._start_if[0],
-                                       self._start_if[2], self._preamble)
- 
--    def get_content(self):
-+    def get_content(self) -> str:
-         assert self._start_if is None
-         return super().get_content()
- 
- 
- class QAPIGenC(QAPIGenCCode):
 -
--    def __init__(self, fname, blurb, pydoc):
-+    def __init__(self, fname: str, blurb: str, pydoc: str):
-         super().__init__(fname)
-         self._blurb = blurb
-         self._copyright = '\n * '.join(re.findall(r'^Copyright .*', pydoc,
-                                                   re.MULTILINE))
- 
--    def _top(self):
-+    def _top(self) -> str:
-         return mcgen('''
- /* AUTOMATICALLY GENERATED, DO NOT MODIFY */
- 
-@@ -165,7 +169,7 @@ def _top(self):
- ''',
-                      blurb=self._blurb, copyright=self._copyright)
- 
--    def _bottom(self):
-+    def _bottom(self) -> str:
-         return mcgen('''
- 
- /* Dummy declaration to prevent empty .o file */
-@@ -175,16 +179,15 @@ def _bottom(self):
- 
- 
- class QAPIGenH(QAPIGenC):
+-def invalid_char(prefix: str) -> Optional[str]:
+-    match = re.match(r'([A-Za-z_.-][A-Za-z0-9_.-]*)?', prefix)
+-    if match.end() != len(prefix):
+-        return prefix[match.end()]
+-    return None
 -
--    def _top(self):
-+    def _top(self) -> str:
-         return super()._top() + guardstart(self.fname)
- 
--    def _bottom(self):
-+    def _bottom(self) -> str:
-         return guardend(self.fname)
- 
- 
- @contextmanager
--def ifcontext(ifcond, *args):
-+def ifcontext(ifcond: List[str], *args: QAPIGenCCode) -> Iterator[None]:
-     """
-     A with-statement context manager that wraps with `start_if()` / `end_if()`.
- 
-@@ -212,8 +215,11 @@ def ifcontext(ifcond, *args):
- 
- 
- class QAPISchemaMonolithicCVisitor(QAPISchemaVisitor):
 -
--    def __init__(self, prefix, what, blurb, pydoc):
-+    def __init__(self,
-+                 prefix: str,
-+                 what: str,
-+                 blurb: str,
-+                 pydoc: str):
-         self._prefix = prefix
-         self._what = what
-         self._genc = QAPIGenC(self._prefix + self._what + '.c',
-@@ -221,38 +227,42 @@ def __init__(self, prefix, what, blurb, pydoc):
-         self._genh = QAPIGenH(self._prefix + self._what + '.h',
-                               blurb, pydoc)
- 
--    def write(self, output_dir):
-+    def write(self, output_dir: str) -> None:
-         self._genc.write(output_dir)
-         self._genh.write(output_dir)
- 
- 
- class QAPISchemaModularCVisitor(QAPISchemaVisitor):
+-def generate(schema_file: str,
+-             output_dir: str,
+-             prefix: str,
+-             unmask: bool = False,
+-             builtins: bool = False) -> None:
+-    """
+-    Generate C code for the given schema into the target directory.
 -
--    def __init__(self, prefix, what, user_blurb, builtin_blurb, pydoc):
-+    def __init__(self,
-+                 prefix: str,
-+                 what: str,
-+                 user_blurb: str,
-+                 builtin_blurb: Optional[str],
-+                 pydoc: str):
-         self._prefix = prefix
-         self._what = what
-         self._user_blurb = user_blurb
-         self._builtin_blurb = builtin_blurb
-         self._pydoc = pydoc
--        self._genc = None
--        self._genh = None
--        self._module = {}
--        self._main_module = None
-+        self._genc: Optional[QAPIGenC] = None
-+        self._genh: Optional[QAPIGenH] = None
-+        self._module: Dict[Optional[str], Tuple[QAPIGenC, QAPIGenH]] = {}
-+        self._main_module: Optional[str] = None
+-    :param schema_file: The primary QAPI schema file.
+-    :param output_dir: The output directory to store generated code.
+-    :param prefix: Optional C-code prefix for symbol names.
+-    :param unmask: Expose non-ABI names through introspection?
+-    :param builtins: Generate code for built-in types?
+-
+-    :raise QAPIError: On failures.
+-    """
+-    assert invalid_char(prefix) is None
+-
+-    schema = QAPISchema(schema_file)
+-    gen_types(schema, output_dir, prefix, builtins)
+-    gen_visit(schema, output_dir, prefix, builtins)
+-    gen_commands(schema, output_dir, prefix)
+-    gen_events(schema, output_dir, prefix)
+-    gen_introspect(schema, output_dir, prefix, unmask)
+-
+-
+-def main() -> int:
+-    """
+-    gapi-gen executable entry point.
+-    Expects arguments via sys.argv, see --help for details.
+-
+-    :return: int, 0 on success, 1 on failure.
+-    """
+-    parser = argparse.ArgumentParser(
+-        description='Generate code from a QAPI schema')
+-    parser.add_argument('-b', '--builtins', action='store_true',
+-                        help="generate code for built-in types")
+-    parser.add_argument('-o', '--output-dir', action='store',
+-                        default='',
+-                        help="write output to directory OUTPUT_DIR")
+-    parser.add_argument('-p', '--prefix', action='store',
+-                        default='',
+-                        help="prefix for symbols")
+-    parser.add_argument('-u', '--unmask-non-abi-names', action='store_true',
+-                        dest='unmask',
+-                        help="expose non-ABI names in introspection")
+-    parser.add_argument('schema', action='store')
+-    args = parser.parse_args()
+-
+-    funny_char = invalid_char(args.prefix)
+-    if funny_char:
+-        msg = f"funny character '{funny_char}' in argument of --prefix"
+-        print(f"{sys.argv[0]}: {msg}", file=sys.stderr)
+-        return 1
+-
+-    try:
+-        generate(args.schema,
+-                 output_dir=args.output_dir,
+-                 prefix=args.prefix,
+-                 unmask=args.unmask,
+-                 builtins=args.builtins)
+-    except QAPIError as err:
+-        print(f"{sys.argv[0]}: {str(err)}", file=sys.stderr)
+-        return 1
+-    return 0
  
-     @staticmethod
--    def _is_user_module(name):
-+    def _is_user_module(name: Optional[str]) -> bool:
-         return bool(name and not name.startswith('./'))
++from qapi import main
  
-     @staticmethod
--    def _is_builtin_module(name):
-+    def _is_builtin_module(name: Optional[str]) -> bool:
-         return not name
- 
--    def _module_dirname(self, what, name):
-+    def _module_dirname(self, what: str, name: Optional[str]) -> str:
-         if self._is_user_module(name):
-             return os.path.dirname(name)
-         return ''
- 
--    def _module_basename(self, what, name):
-+    def _module_basename(self, what: str, name: Optional[str]) -> str:
-         ret = '' if self._is_builtin_module(name) else self._prefix
-         if self._is_user_module(name):
-             basename = os.path.basename(name)
-@@ -264,27 +274,27 @@ def _module_basename(self, what, name):
-             ret += re.sub(r'-', '-' + name + '-', what)
-         return ret
- 
--    def _module_filename(self, what, name):
-+    def _module_filename(self, what: str, name: Optional[str]) -> str:
-         return os.path.join(self._module_dirname(what, name),
-                             self._module_basename(what, name))
- 
--    def _add_module(self, name, blurb):
-+    def _add_module(self, name: Optional[str], blurb: str) -> None:
-         basename = self._module_filename(self._what, name)
-         genc = QAPIGenC(basename + '.c', blurb, self._pydoc)
-         genh = QAPIGenH(basename + '.h', blurb, self._pydoc)
-         self._module[name] = (genc, genh)
-         self._genc, self._genh = self._module[name]
- 
--    def _add_user_module(self, name, blurb):
-+    def _add_user_module(self, name: str, blurb: str) -> None:
-         assert self._is_user_module(name)
-         if self._main_module is None:
-             self._main_module = name
-         self._add_module(name, blurb)
- 
--    def _add_system_module(self, name, blurb):
-+    def _add_system_module(self, name: Optional[str], blurb: str) -> None:
-         self._add_module(name and './' + name, blurb)
- 
--    def write(self, output_dir, opt_builtins=False):
-+    def write(self, output_dir: str, opt_builtins: bool = False) -> None:
-         for name in self._module:
-             if self._is_builtin_module(name) and not opt_builtins:
-                 continue
-@@ -292,13 +302,13 @@ def write(self, output_dir, opt_builtins=False):
-             genc.write(output_dir)
-             genh.write(output_dir)
- 
--    def _begin_system_module(self, name):
-+    def _begin_system_module(self, name: None) -> None:
-         pass
- 
--    def _begin_user_module(self, name):
-+    def _begin_user_module(self, name: str) -> None:
-         pass
- 
--    def visit_module(self, name):
-+    def visit_module(self, name: Optional[str]) -> None:
-         if name is None:
-             if self._builtin_blurb:
-                 self._add_system_module(None, self._builtin_blurb)
-@@ -312,7 +322,7 @@ def visit_module(self, name):
-             self._add_user_module(name, self._user_blurb)
-             self._begin_user_module(name)
- 
--    def visit_include(self, name, info):
-+    def visit_include(self, name: str, info: QAPISourceInfo) -> None:
-         relname = os.path.relpath(self._module_filename(self._what, name),
-                                   os.path.dirname(self._genh.fname))
-         self._genh.preamble_add(mcgen('''
+ if __name__ == '__main__':
+-    sys.exit(main())
++    sys.exit(main.main())
+diff --git a/scripts/qapi/main.py b/scripts/qapi/main.py
+new file mode 100644
+index 00000000000..f3003065d8e
+--- /dev/null
++++ b/scripts/qapi/main.py
+@@ -0,0 +1,95 @@
++# This work is licensed under the terms of the GNU GPL, version 2 or later.
++# See the COPYING file in the top-level directory.
++
++"""
++QAPI Generator
++
++This is the main entry point for generating C code from the QAPI schema.
++"""
++
++import argparse
++import re
++import sys
++from typing import Optional
++
++from qapi.commands import gen_commands
++from qapi.error import QAPIError
++from qapi.events import gen_events
++from qapi.introspect import gen_introspect
++from qapi.schema import QAPISchema
++from qapi.types import gen_types
++from qapi.visit import gen_visit
++
++
++def invalid_char(prefix: str) -> Optional[str]:
++    match = re.match(r'([A-Za-z_.-][A-Za-z0-9_.-]*)?', prefix)
++    if match.end() != len(prefix):
++        return prefix[match.end()]
++    return None
++
++
++def generate(schema_file: str,
++             output_dir: str,
++             prefix: str,
++             unmask: bool = False,
++             builtins: bool = False) -> None:
++    """
++    Generate C code for the given schema into the target directory.
++
++    :param schema_file: The primary QAPI schema file.
++    :param output_dir: The output directory to store generated code.
++    :param prefix: Optional C-code prefix for symbol names.
++    :param unmask: Expose non-ABI names through introspection?
++    :param builtins: Generate code for built-in types?
++
++    :raise QAPIError: On failures.
++    """
++    assert invalid_char(prefix) is None
++
++    schema = QAPISchema(schema_file)
++    gen_types(schema, output_dir, prefix, builtins)
++    gen_visit(schema, output_dir, prefix, builtins)
++    gen_commands(schema, output_dir, prefix)
++    gen_events(schema, output_dir, prefix)
++    gen_introspect(schema, output_dir, prefix, unmask)
++
++
++def main() -> int:
++    """
++    gapi-gen executable entry point.
++    Expects arguments via sys.argv, see --help for details.
++
++    :return: int, 0 on success, 1 on failure.
++    """
++    parser = argparse.ArgumentParser(
++        description='Generate code from a QAPI schema')
++    parser.add_argument('-b', '--builtins', action='store_true',
++                        help="generate code for built-in types")
++    parser.add_argument('-o', '--output-dir', action='store',
++                        default='',
++                        help="write output to directory OUTPUT_DIR")
++    parser.add_argument('-p', '--prefix', action='store',
++                        default='',
++                        help="prefix for symbols")
++    parser.add_argument('-u', '--unmask-non-abi-names', action='store_true',
++                        dest='unmask',
++                        help="expose non-ABI names in introspection")
++    parser.add_argument('schema', action='store')
++    args = parser.parse_args()
++
++    funny_char = invalid_char(args.prefix)
++    if funny_char:
++        msg = f"funny character '{funny_char}' in argument of --prefix"
++        print(f"{sys.argv[0]}: {msg}", file=sys.stderr)
++        return 1
++
++    try:
++        generate(args.schema,
++                 output_dir=args.output_dir,
++                 prefix=args.prefix,
++                 unmask=args.unmask,
++                 builtins=args.builtins)
++    except QAPIError as err:
++        print(f"{sys.argv[0]}: {str(err)}", file=sys.stderr)
++        return 1
++    return 0
 -- 
 2.26.2
 
