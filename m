@@ -2,117 +2,94 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98B0CC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 17:16:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66DFBC433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 17:16:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 115C722258
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 17:16:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED66B22258
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 17:16:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gCFqQCrn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 115C722258
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QxJ8VjkO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED66B22258
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQw0d-0006hU-2i
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 13:16:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47354)
+	id 1kQw0k-0006z6-Rl
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 13:16:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46682)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kQvuo-0008TU-S7
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 13:10:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40230)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kQvum-0001dz-2j
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 13:10:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602263441;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Yrm5HRoA1y/1AV68xMyVfIJD89zVqjfTna6ivmKxDak=;
- b=gCFqQCrn/0mmJqj5z7+jSFGOwzysyDEokb6lBmI+mss5fu2eSl8nrTP1Iqa7VajvcyA6pE
- VMNPtYICoDfby4EX7HuxfDuEiVnR44algCBC2z49TEmVE3zs56dnWcVaHUBjd8DjloDrXo
- ct60mRM2jJpCMvCJMKtuYYP4FNypXQU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-129-v6TkpX79PpqN3zOwpkUSvg-1; Fri, 09 Oct 2020 13:10:38 -0400
-X-MC-Unique: v6TkpX79PpqN3zOwpkUSvg-1
-Received: by mail-wm1-f72.google.com with SMTP id o198so21261wme.8
- for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 10:10:38 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kQvs4-0004am-Ri
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 13:07:56 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40736)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kQvs1-0001Je-1Q
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 13:07:56 -0400
+Received: by mail-wr1-x444.google.com with SMTP id h5so977613wrv.7
+ for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 10:07:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=ZdPHbQWRDkMxBC6O5/k+6hitBUPm7MDCOKjfSyNLevM=;
+ b=QxJ8VjkOoFEw2blUOaL6YrmJYKFr72+rBo+ePvs8Q+7ts+IZdW24CKmosMAaP+DIzp
+ 13qs66HVHwI3w348BC+87IO2Q9kwrog6OuO6O2F5WwRhI3ULVNUWBcHjpD9qffBwsC2A
+ GySUQP0ArfaaCZEyRP23tIxRANgrNCLF1PAKWXcLN2VdbauTMSupSJzDc68JE61dDrZ3
+ XXNjrMIPWRlEMJ3wLLBoN6HElc+M2UtyVufb83/F0MGb3siQXOFUk0IQXN+4XQ5ttIVg
+ Dkq3KUduwiCR14ZIr8lpZ33m+IS1tPnkYBaP6JwOdrZY3KvPM8gKR1cA16IuxlzMAdly
+ zlMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Yrm5HRoA1y/1AV68xMyVfIJD89zVqjfTna6ivmKxDak=;
- b=lS8yIOAU6pXQx2U/tNtbOr0bMDTIEVqXHNPsvSHe/LtDZVb9vMXKUhTSu5ZOG9YwZD
- Gqlzhzra/MB3ObJrZJuB/slk/MxN73G6NaZ9126Eoq6xNg30XuYT+IJiITYcqROKKclk
- XH1qypgy41Vt+T9rhk76GhCZj1z07H2lcoHs/F6Z9aFW78pZRxvsEkmkd4v7AljwTx3G
- 5Lu2ulhOdRtV8j+HvdmjQDYOYu0Jr3eARfa9+JoV4DLi8ghD1bCu/lkLnl0Ka90deMVp
- ZmlCmAzhPp1QBNrXzZR5ruzN5KbYuhRv5vSLwVngcezRCZ8A0UhOOpRhpaRp35/h6Qky
- +I2Q==
-X-Gm-Message-State: AOAM530qmOWWwH7KsY+otF+0W+nDRsIlwc0l9y/WFy3ZagDOTNqP+7rU
- WQZGndUrYNBubPjmLtrQEYi4KYuQR6lRMJ6r3/fB7K2gV4NSGgespJR7El9oShGD0H4MvMp6/7U
- P3HKT+r9+JfODb4Y=
-X-Received: by 2002:a1c:e1d7:: with SMTP id y206mr110341wmg.48.1602263437318; 
- Fri, 09 Oct 2020 10:10:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzBtRCGvCaCKva5MxMNohsQ/HmMwXPOuaWK/mdUZISDYj0IMXL1n9qdGp1BD/SXBUTylB/ruw==
-X-Received: by 2002:a1c:e1d7:: with SMTP id y206mr110318wmg.48.1602263437136; 
- Fri, 09 Oct 2020 10:10:37 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:cee1:4797:6958:7698?
- ([2001:b07:6468:f312:cee1:4797:6958:7698])
- by smtp.gmail.com with ESMTPSA id a199sm13091426wmd.8.2020.10.09.10.10.35
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 09 Oct 2020 10:10:36 -0700 (PDT)
-Subject: Re: does make check now require TCG? Or is it a parallelism issue?
-To: Claudio Fontana <cfontana@suse.de>
-References: <11ef73ff-4178-b3e8-2e49-44ff014a13ed@suse.de>
- <569520f6-adf6-6212-9625-a184bf499e24@redhat.com>
- <d21dff22-90b1-4769-0948-6bc37eaeb885@linaro.org>
- <6fe91a5a-c136-9af3-c48a-97ccdca7a543@suse.de>
- <3c527b0f-afa1-4b86-4fa5-9acca2a296bd@linaro.org>
- <CABgObfYWK2E8PsSFOcHpuA2vuA3HWgvtuLbrtQCWA=9=r07=5w@mail.gmail.com>
- <a1694fe3-9bc8-df93-345f-29f0de37b923@suse.de>
- <8cedd3e4-dc6a-30ee-fd71-f4776aa8c953@redhat.com>
- <48641901-68e7-7e34-5046-31eea3967701@suse.de>
- <eba000db-c0d1-8474-15cc-6fa6e864bb88@redhat.com>
- <41cce7d1-ed3e-46ff-aaee-98ded342f6a2@suse.de>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f4fd629b-3f19-3cd0-f15f-94ee81060f08@redhat.com>
-Date: Fri, 9 Oct 2020 19:10:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=ZdPHbQWRDkMxBC6O5/k+6hitBUPm7MDCOKjfSyNLevM=;
+ b=TAPBTAG25JWh8MG0hP3VqD22tC7OV8VcD5rXmRTd0Twu2PKsQ12PFu1cllWeUZDV9p
+ is3CW0jY+gZYNjUXF14yYEhZgAupo75i/UQRtIgoyUZG8bwj0i+QJmsUrsrJvTajzTu7
+ siiyIzZoRaVz9PL+XLPHDB33tsaIax69YQ0kyhPunoII0Wu98YdkRPq79RYXPmEMqE+Y
+ qO3uqniy3k6eU11DA3RA8xkdnvNzeGx5tALlmIErN+6KD8L/c0rfja3qzEQGUrlVA4hZ
+ A6CRQq7W9EuPg7WW2qTpMNtCndM+lbfE3ZI9Rp69b14SbFn5BEaW0mczsaT5YtHFrQIv
+ Zb8g==
+X-Gm-Message-State: AOAM531C6k1SOF188KFt358ZC6FR7RgRawi2A0I40Z29LXaBS5JNRq4X
+ 9HQ8bh/ZdAaR9LWSc71vx/y0Fj5iKn/b4Q==
+X-Google-Smtp-Source: ABdhPJzBTG8S2iDQv3fYepAE31HOUZQZmfqUfnAmzKqE2VuZs4KUujdBtI985biN7gAxGTvEVk0wAA==
+X-Received: by 2002:a5d:5449:: with SMTP id w9mr17032286wrv.182.1602263271620; 
+ Fri, 09 Oct 2020 10:07:51 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id n9sm12345629wrq.72.2020.10.09.10.07.43
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 09 Oct 2020 10:07:45 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 57A231FF8F;
+ Fri,  9 Oct 2020 18:07:43 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH 3/4] device_tree: add qemu_fdt_setprop_string_array helper
+Date: Fri,  9 Oct 2020 18:07:41 +0100
+Message-Id: <20201009170742.23695-4-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201009170742.23695-1-alex.bennee@linaro.org>
+References: <20201009170742.23695-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <41cce7d1-ed3e-46ff-aaee-98ded342f6a2@suse.de>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:34:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -22
-X-Spam_score: -2.3
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.208, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -126,26 +103,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Alex Bennee <alex.bennee@linaro.org>, qemu-devel <qemu-devel@nongnu.org>
+Cc: julien@xen.org, masami.hiramatsu@linaro.org, andre.przywara@arm.com,
+ stefano.stabellini@linaro.org, takahiro.akashi@linaro.org,
+ Alistair Francis <alistair.francis@wdc.com>,
+ David Gibson <david@gibson.dropbear.id.au>, stefano.stabellini@xilinx.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ stratos-dev@op-lists.linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/10/20 15:32, Claudio Fontana wrote:
->>   QTEST_QEMU_IMG=./qemu-img \
->>     G_TEST_DBUS_DAEMON=/home/pbonzini/work/upstream/qemu/tests/dbus-vmstate-daemon.sh \
->>     QTEST_QEMU_BINARY=./qemu-system-x86_64 \
->>     tests/qtest/bios-tables-test --tap -k
->>
->> Paolo
->>
-> Hi Paolo,
-> 
-> I now just found out that bios-tables-test actually was segfaulting
+A string array in device tree is simply a series of \0 terminated
+strings next to each other. As libfdt doesn't support that directly
+we need to build it ourselves.
 
-Yes, that's what "too few tests run" usually means.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ include/sysemu/device_tree.h | 17 +++++++++++++++++
+ device_tree.c                | 26 ++++++++++++++++++++++++++
+ 2 files changed, 43 insertions(+)
 
-Paolo
+diff --git a/include/sysemu/device_tree.h b/include/sysemu/device_tree.h
+index 982c89345f..8a2fe55622 100644
+--- a/include/sysemu/device_tree.h
++++ b/include/sysemu/device_tree.h
+@@ -70,6 +70,23 @@ int qemu_fdt_setprop_u64(void *fdt, const char *node_path,
+                          const char *property, uint64_t val);
+ int qemu_fdt_setprop_string(void *fdt, const char *node_path,
+                             const char *property, const char *string);
++
++/**
++ * qemu_fdt_setprop_string_array: set a string array property
++ *
++ * @fdt: pointer to the dt blob
++ * @name: node name
++ * @prop: property array
++ * @array: pointer to an array of string pointers
++ * @len: length of array
++ *
++ * assigns a string array to a property. This function converts and
++ * array of strings to a sequential string with \0 separators before
++ * setting the property.
++ */
++int qemu_fdt_setprop_string_array(void *fdt, const char *node_path,
++                                  const char *prop, char **array, int len);
++
+ int qemu_fdt_setprop_phandle(void *fdt, const char *node_path,
+                              const char *property,
+                              const char *target_node_path);
+diff --git a/device_tree.c b/device_tree.c
+index b335dae707..a19873316a 100644
+--- a/device_tree.c
++++ b/device_tree.c
+@@ -21,6 +21,7 @@
+ #include "qemu/error-report.h"
+ #include "qemu/option.h"
+ #include "qemu/bswap.h"
++#include "qemu/cutils.h"
+ #include "sysemu/device_tree.h"
+ #include "sysemu/sysemu.h"
+ #include "hw/loader.h"
+@@ -397,6 +398,31 @@ int qemu_fdt_setprop_string(void *fdt, const char *node_path,
+     return r;
+ }
+ 
++/*
++ * libfdt doesn't allow us to add string arrays directly but they are
++ * test a series of null terminated strings with a length. We build
++ * the string up here so we can calculate the final length.
++ */
++int qemu_fdt_setprop_string_array(void *fdt, const char *node_path, const char *prop,
++                                  char **array, int len)
++{
++    int ret, i, total_len = 0;
++    char *str, *p;
++    for (i = 0; i < len; i++) {
++        total_len += strlen(array[i]) + 1;
++    }
++    p = str = g_malloc0(total_len);
++    for (i = 0; i < len; i++) {
++        int len = strlen(array[i]) + 1;
++        pstrcpy(p, len, array[i]);
++        p += len;
++    }
++
++    ret = qemu_fdt_setprop(fdt, node_path, prop, str, total_len);
++    g_free(str);
++    return ret;
++}
++
+ const void *qemu_fdt_getprop(void *fdt, const char *node_path,
+                              const char *property, int *lenp, Error **errp)
+ {
+-- 
+2.20.1
 
 
