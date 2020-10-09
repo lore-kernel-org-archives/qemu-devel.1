@@ -2,95 +2,85 @@ Return-Path: <SRS0=T5iq=DQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81D58C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:34:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14C82C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:34:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 221052227F
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:34:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9B7002227F
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 16:34:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SChqv4Uw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 221052227F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H7TO3reQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B7002227F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQvLS-000395-60
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:34:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38394)
+	id 1kQvLZ-0003US-Nb
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 12:34:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34588)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kQvJO-0000Ok-0X
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:32:06 -0400
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:41226)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kQvJM-0005BS-2X
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:32:05 -0400
-Received: by mail-wr1-x42c.google.com with SMTP id w5so10933337wrp.8
- for <qemu-devel@nongnu.org>; Fri, 09 Oct 2020 09:32:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=gsDouCBVlFBVfNRF7cV6v+NhB9KLpFTT2Y32SQbVexw=;
- b=SChqv4UwGUYj1LkQtqcG6GnuvcJ8Ed31k4JLg9wsleaTElhqE6I5N6VhbWaaxtpVSJ
- TFOI+yh8ctd3fOzNB975zvZSQELLInpeL3I6Y3gE7tHcPQ+cm5kD3HlV9Elnsv7h0DRH
- XhjR5t0ndGq1H7CrStSPkUz95x3+EA6JkOLjPzDe7rXWIGf/c0bERA8UkFG0gfwogJ9W
- cm0npoqQZRzJGeWlFpIefj98iNRBqx12J2KZT5qQm91/fZkYVF5T8rtaeRIvOPhjO7Qa
- JqPBUGoBffGtjdXr+4xbG0qRrlL3PY4vxCklL7RnVduukav8Kgy4Xim1b3fEL0WDldAr
- 8quw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=gsDouCBVlFBVfNRF7cV6v+NhB9KLpFTT2Y32SQbVexw=;
- b=XGpDPWn8t8R8zMVy4EEJ1h/OuEmVO0VLnekL3QIzn+VCaTFYD+ri0WGH2TmA57Ng8a
- lQ+BZkh+jnmVXODia0QUIVFLeDYZq7kQL3Kkph8l9NI8rkPiK6G7NBAyvl5QDGSWn8p7
- MUeF9ViWVEjUULnh7Fcew7QmzPig9KOlHyzn3lzzVweWWdSmen/xXwejzPHVCaScHjcE
- xOnuLMUGB8l9KZjhW5YLQziC+9y5lFJowc5b1bPmvJXJYYhEWeKZegLcHYGnBjJbhl03
- KlUxXtC2l13bprAv32eyTZPRzWn+j+JOfPtVhny+0m1B3MDCSbTCtB6Hfqtgzmqs5+G9
- tdBg==
-X-Gm-Message-State: AOAM530/VnHEyDRZvj3gJ4HH5g3uV9VR47vrIlhgTx7/fw3iRPY6w/fk
- Z1+OTgB7s6LwlUlladwALJmzrQ==
-X-Google-Smtp-Source: ABdhPJzQke/kmJgz/0dI00cbbBm0nSRBJd0TGDBTPMEAe90iDspLlwXuOZKSgY4Pf0EgtQPWvxLkhg==
-X-Received: by 2002:adf:d849:: with SMTP id k9mr7030565wrl.332.1602261122728; 
- Fri, 09 Oct 2020 09:32:02 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id n65sm12922807wmb.12.2020.10.09.09.31.50
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 09 Oct 2020 09:31:53 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id CAFA81FF96;
- Fri,  9 Oct 2020 17:31:47 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Subject: [PULL 08/22] contrib/gitdm: Add more individual contributors
-Date: Fri,  9 Oct 2020 17:31:33 +0100
-Message-Id: <20201009163147.28512-9-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201009163147.28512-1-alex.bennee@linaro.org>
-References: <20201009163147.28512-1-alex.bennee@linaro.org>
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv4L-0004DU-AR
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58710)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kQv4G-0003I3-OL
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 12:16:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602260186;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=rWIbXdxRs3lE+1KS0JUCPqOLY9xCWHxaIGU8gRTTZLo=;
+ b=H7TO3reQihn3poAy+VGR9B1vxMOGaSKCVO6h3btETtzjhVmr2MYygOIav6wz31T43ZZgF7
+ 5lxFf39yaFG7gxFtw5GSorR6jWDnhLxDqUIFuBraBAIt8xCnEeuf18YjS90fXz5cxPvZiI
+ zMV2CcRCk/WPTIHFl6CoBrf8fz+261M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-51-hWHlvYSJPe6bRMt9Bp5DSQ-1; Fri, 09 Oct 2020 12:16:24 -0400
+X-MC-Unique: hWHlvYSJPe6bRMt9Bp5DSQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8103A18829E4;
+ Fri,  9 Oct 2020 16:16:23 +0000 (UTC)
+Received: from scv.redhat.com (ovpn-112-203.rdu2.redhat.com [10.10.112.203])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5D6AF1A92A;
+ Fri,  9 Oct 2020 16:16:22 +0000 (UTC)
+From: John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6 17/36] qapi/common.py: move build_params into gen.py
+Date: Fri,  9 Oct 2020 12:15:39 -0400
+Message-Id: <20201009161558.107041-18-jsnow@redhat.com>
+In-Reply-To: <20201009161558.107041-1-jsnow@redhat.com>
+References: <20201009161558.107041-1-jsnow@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42c.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 02:34:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,51 +93,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Weil <sw@weilnetz.de>, Helge Deller <deller@gmx.de>,
- =?UTF-8?q?Volker=20R=C3=BCmelin?= <vr_qemu@t-online.de>, qemu-devel@nongnu.org,
- Finn Thain <fthain@telegraphics.com.au>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Niek Linnenbank <nieklinnenbank@gmail.com>,
- Paul Zimmerman <pauldzim@gmail.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- David Carlier <devnexen@gmail.com>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, John Snow <jsnow@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Including it in common.py creates a circular import dependency; schema
+relies on common, but common.build_params requires a type annotation
+from schema. To type this properly, it needs to be moved outside the
+cycle.
 
-These individual contributors have a number of contributions,
-add them to the 'individual' group map.
+Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
+---
+ scripts/qapi/commands.py |  9 +++++++--
+ scripts/qapi/common.py   | 23 -----------------------
+ scripts/qapi/events.py   |  9 ++-------
+ scripts/qapi/gen.py      | 29 +++++++++++++++++++++++++++--
+ 4 files changed, 36 insertions(+), 34 deletions(-)
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Acked-by: Helge Deller <deller@gmx.de>
-Acked-by: Stefan Weil <sw@weilnetz.de>
-Acked-by: Niek Linnenbank <nieklinnenbank@gmail.com>
-Acked-by: David Carlier <devnexen@gmail.com>
-Acked-by: Paul Zimmerman <pauldzim@gmail.com>
-Acked-by: Volker Rümelin <vr_qemu@t-online.de>
-Acked-by: Finn Thain <fthain@telegraphics.com.au>
-Message-Id: <20201006160653.2391972-3-f4bug@amsat.org>
-Message-Id: <20201007160038.26953-9-alex.bennee@linaro.org>
-
-diff --git a/contrib/gitdm/group-map-individuals b/contrib/gitdm/group-map-individuals
-index cf8a2ce367..641169fa63 100644
---- a/contrib/gitdm/group-map-individuals
-+++ b/contrib/gitdm/group-map-individuals
-@@ -16,3 +16,10 @@ aurelien@aurel32.net
- balaton@eik.bme.hu
- e.emanuelegiuseppe@gmail.com
- andrew.smirnov@gmail.com
-+sw@weilnetz.de
-+deller@gmx.de
-+fthain@telegraphics.com.au
-+vr_qemu@t-online.de
-+nieklinnenbank@gmail.com
-+devnexen@gmail.com
-+pauldzim@gmail.com
+diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
+index cde0c1e7770..88ba11c40e1 100644
+--- a/scripts/qapi/commands.py
++++ b/scripts/qapi/commands.py
+@@ -13,8 +13,13 @@
+ See the COPYING file in the top-level directory.
+ """
+ 
+-from .common import build_params, c_name, mcgen
+-from .gen import QAPIGenCCode, QAPISchemaModularCVisitor, ifcontext
++from .common import c_name, mcgen
++from .gen import (
++    QAPIGenCCode,
++    QAPISchemaModularCVisitor,
++    build_params,
++    ifcontext,
++)
+ 
+ 
+ def gen_command_decl(name, arg_type, boxed, ret_type):
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 669e3829b34..11b86beeabe 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -210,26 +210,3 @@ def gen_endif(ifcond: Sequence[str]) -> str:
+ #endif /* %(cond)s */
+ ''', cond=ifc)
+     return ret
+-
+-
+-def build_params(arg_type,
+-                 boxed: bool,
+-                 extra: Optional[str] = None) -> str:
+-    ret = ''
+-    sep = ''
+-    if boxed:
+-        assert arg_type
+-        ret += '%s arg' % arg_type.c_param_type()
+-        sep = ', '
+-    elif arg_type:
+-        assert not arg_type.variants
+-        for memb in arg_type.members:
+-            ret += sep
+-            sep = ', '
+-            if memb.optional:
+-                ret += 'bool has_%s, ' % c_name(memb.name)
+-            ret += '%s %s' % (memb.type.c_param_type(),
+-                              c_name(memb.name))
+-    if extra:
+-        ret += sep + extra
+-    return ret if ret else 'void'
+diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
+index 6b3afa14d72..f840a62ed92 100644
+--- a/scripts/qapi/events.py
++++ b/scripts/qapi/events.py
+@@ -12,13 +12,8 @@
+ See the COPYING file in the top-level directory.
+ """
+ 
+-from .common import (
+-    build_params,
+-    c_enum_const,
+-    c_name,
+-    mcgen,
+-)
+-from .gen import QAPISchemaModularCVisitor, ifcontext
++from .common import c_enum_const, c_name, mcgen
++from .gen import QAPISchemaModularCVisitor, build_params, ifcontext
+ from .schema import QAPISchemaEnumMember
+ from .types import gen_enum, gen_enum_lookup
+ 
+diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
+index 1fed712b43b..fff0c0acb6d 100644
+--- a/scripts/qapi/gen.py
++++ b/scripts/qapi/gen.py
+@@ -2,7 +2,7 @@
+ #
+ # QAPI code generation
+ #
+-# Copyright (c) 2018-2019 Red Hat Inc.
++# Copyright (c) 2015-2019 Red Hat Inc.
+ #
+ # Authors:
+ #  Markus Armbruster <armbru@redhat.com>
+@@ -15,16 +15,18 @@
+ import errno
+ import os
+ import re
++from typing import Optional
+ 
+ from .common import (
+     c_fname,
++    c_name,
+     gen_endif,
+     gen_if,
+     guardend,
+     guardstart,
+     mcgen,
+ )
+-from .schema import QAPISchemaVisitor
++from .schema import QAPISchemaObjectType, QAPISchemaVisitor
+ 
+ 
+ class QAPIGen:
+@@ -90,6 +92,29 @@ def _wrap_ifcond(ifcond, before, after):
+     return out
+ 
+ 
++def build_params(arg_type: Optional[QAPISchemaObjectType],
++                 boxed: bool,
++                 extra: Optional[str] = None) -> str:
++    ret = ''
++    sep = ''
++    if boxed:
++        assert arg_type
++        ret += '%s arg' % arg_type.c_param_type()
++        sep = ', '
++    elif arg_type:
++        assert not arg_type.variants
++        for memb in arg_type.members:
++            ret += sep
++            sep = ', '
++            if memb.optional:
++                ret += 'bool has_%s, ' % c_name(memb.name)
++            ret += '%s %s' % (memb.type.c_param_type(),
++                              c_name(memb.name))
++    if extra:
++        ret += sep + extra
++    return ret if ret else 'void'
++
++
+ class QAPIGenCCode(QAPIGen):
+ 
+     def __init__(self, fname):
 -- 
-2.20.1
+2.26.2
 
 
