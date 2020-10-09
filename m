@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DE78C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 12:38:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A34BC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 12:39:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 974F322284
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 12:38:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0EE3622284
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Oct 2020 12:39:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OA4/QSBM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 974F322284
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UaAhQQ33"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EE3622284
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kQrfV-000307-Hy
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 08:38:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38756)
+	id 1kQrgY-0004R1-2T
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 08:39:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38680)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
- id 1kQrN7-0000mT-JL
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 08:19:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22252)
+ id 1kQrMv-0000Ex-7V
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 08:19:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50815)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
- id 1kQrN5-00080d-MD
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 08:19:41 -0400
+ id 1kQrMo-0007yc-PN
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 08:19:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602245979;
+ s=mimecast20190719; t=1602245962;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xztyG79L4WZz3/XfQmASCFgqS3tqfERWok+izO0A6ew=;
- b=OA4/QSBMefMJzxTrMvxHNClHs7C+LJLC9gj2Nm20497U1ijZVgis30qwkuBbRF7gMH5sYU
- BrkwDdJ08qXovEPdFFOrpwxLxdyvFxMtCyO/cQGIc3hvxvYl0Bs6OJIAzC52HR1256glgy
- Lj+dflUOpBTDsekm8wktASP/1I5UVDg=
+ bh=0JZHbOlTqt3A5jWQdh+w6TWh01jeQl9kVh7EGIr7CVA=;
+ b=UaAhQQ33xsvSzIUCZFjQrcz3z7MOFy+VM2OHBGNZ7kWbmFb/vLKpW19ZBGnU7JJMsyYz2A
+ aqMDbzqlkeT10GZ9buOyc9E0EosQ7oXisr5+sn/u2XzeeiPeWyswJsiZkuN57F2Ia8xM+R
+ f6omV7KmKqL/ypLIOcGqpqlmnqlKi0o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-21-QjN_jCw4MdywH_9blJZ2nQ-1; Fri, 09 Oct 2020 08:19:37 -0400
-X-MC-Unique: QjN_jCw4MdywH_9blJZ2nQ-1
+ us-mta-443-KCtTAco-OUS9t1De0u-CZw-1; Fri, 09 Oct 2020 08:19:19 -0400
+X-MC-Unique: KCtTAco-OUS9t1De0u-CZw-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 67FA98C2C4A
- for <qemu-devel@nongnu.org>; Fri,  9 Oct 2020 12:19:36 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1607CAFD03
+ for <qemu-devel@nongnu.org>; Fri,  9 Oct 2020 12:19:19 +0000 (UTC)
 Received: from vitty.brq.redhat.com (unknown [10.40.195.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1B11F5C1BB;
- Fri,  9 Oct 2020 12:19:31 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 67BE05C1BB;
+ Fri,  9 Oct 2020 12:19:17 +0000 (UTC)
 From: Vitaly Kuznetsov <vkuznets@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH RFC v3 22/23] i386: expand Hyper-V features during CPU feature
- expansion time
-Date: Fri,  9 Oct 2020 14:18:41 +0200
-Message-Id: <20201009121842.1938010-23-vkuznets@redhat.com>
+Subject: [PATCH RFC v3 16/23] i386: split hyperv_handle_properties() into
+ hyperv_expand_features()/hyperv_fill_cpuids()
+Date: Fri,  9 Oct 2020 14:18:35 +0200
+Message-Id: <20201009121842.1938010-17-vkuznets@redhat.com>
 In-Reply-To: <20201009121842.1938010-1-vkuznets@redhat.com>
 References: <20201009121842.1938010-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -103,101 +103,79 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-To make Hyper-V features appear in e.g. QMP query-cpu-model-expansion we
-need to expand and set the corresponding CPUID leaves early. Modify
-x86_cpu_get_supported_feature_word() to call newly intoduced Hyper-V
-specific kvm_hv_get_supported_cpuid() instead of
-kvm_arch_get_supported_cpuid(). We can't use kvm_arch_get_supported_cpuid()
-as Hyper-V specific CPUID leaves intersect with KVM's.
-
-Note, early expansion will only happen when KVM supports system wide
-KVM_GET_SUPPORTED_HV_CPUID ioctl (KVM_CAP_SYS_HYPERV_CPUID).
+The intention is to call hyperv_expand_features() early, before vCPUs
+are created and use the acquired data later when we set guest visible
+CPUID data.
 
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- target/i386/cpu.c      |  4 ++++
- target/i386/kvm-stub.c |  5 +++++
- target/i386/kvm.c      | 15 ++++++++++++---
- target/i386/kvm_i386.h |  1 +
- 4 files changed, 22 insertions(+), 3 deletions(-)
+ target/i386/kvm.c | 34 ++++++++++++++++++++++++----------
+ 1 file changed, 24 insertions(+), 10 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index bfa3f5515aff..55706c8050fe 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -6347,6 +6347,10 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
-     if (env->cpuid_xlevel2 == UINT32_MAX) {
-         env->cpuid_xlevel2 = env->cpuid_min_xlevel2;
-     }
-+
-+    if (kvm_enabled()) {
-+        kvm_hyperv_expand_features(cpu, errp);
-+    }
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index cfb5ced003f6..8c846f80a25f 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1185,16 +1185,15 @@ static uint32_t hv_build_cpuid_leaf(CPUState *cs, uint32_t func, int reg)
  }
  
  /*
-diff --git a/target/i386/kvm-stub.c b/target/i386/kvm-stub.c
-index 872ef7df4c88..4abb5afa1168 100644
---- a/target/i386/kvm-stub.c
-+++ b/target/i386/kvm-stub.c
-@@ -44,3 +44,8 @@ bool kvm_hv_vpindex_settable(void)
- {
-     return false;
- }
-+
-+void kvm_hyperv_expand_features(X86CPU *cpu, Error **errp)
-+{
-+    return;
-+}
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 9191c5f18af5..da620f576725 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1215,13 +1215,22 @@ static uint32_t hv_build_cpuid_leaf(CPUState *cs, uint32_t func, int reg)
-  * of 'hv_passthrough' mode and fills the environment with all supported
-  * Hyper-V features.
+- * Fill in Hyper-V CPUIDs. Returns the number of entries filled in cpuid_ent in
+- * case of success, errno < 0 in case of failure and 0 when no Hyper-V
+- * extentions are enabled.
++ * Expand Hyper-V CPU features. In partucular, check that all the requested
++ * features are supported by the host and the sanity of the configuration
++ * (that all the required dependencies are included). Also, this takes care
++ * of 'hv_passthrough' mode and fills the environment with all supported
++ * Hyper-V features.
   */
--static void hyperv_expand_features(CPUState *cs, Error **errp)
-+void kvm_hyperv_expand_features(X86CPU *cpu, Error **errp)
+-static int hyperv_handle_properties(CPUState *cs,
+-                                    struct kvm_cpuid_entry2 *cpuid_ent)
++static int hyperv_expand_features(CPUState *cs)
  {
--    X86CPU *cpu = X86_CPU(cs);
-+    CPUState *cs = CPU(cpu);
+     X86CPU *cpu = X86_CPU(cs);
+-    struct kvm_cpuid_entry2 *c;
+-    uint32_t cpuid_i = 0;
+     int r;
  
      if (!hyperv_enabled(cpu))
-         return;
+@@ -1292,6 +1291,19 @@ static int hyperv_handle_properties(CPUState *cs,
+         return -ENOSYS;
+     }
  
-+    /*
-+     * When kvm_hyperv_expand_features is called at CPU feature expansion
-+     * time per-CPU kvm_state is not available yet so we can only proceed
-+     * when KVM_CAP_SYS_HYPERV_CPUID is supported.
-+     */
-+    if (!cs->kvm_state &&
-+        !kvm_check_extension(kvm_state, KVM_CAP_SYS_HYPERV_CPUID))
-+        return;
++    return 0;
++}
 +
-     if (cpu->hyperv_passthrough) {
-         cpu->hyperv_vendor_id[0] =
-             hv_cpuid_get_host(cs, HV_CPUID_VENDOR_AND_MAX_FUNCTIONS, R_EBX);
-@@ -1554,7 +1563,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
++/*
++ * Fill in Hyper-V CPUIDs. Returns the number of entries filled in cpuid_ent.
++ */
++static int hyperv_fill_cpuids(CPUState *cs,
++                              struct kvm_cpuid_entry2 *cpuid_ent)
++{
++    X86CPU *cpu = X86_CPU(cs);
++    struct kvm_cpuid_entry2 *c;
++    uint32_t cpuid_i = 0;
++
+     c = &cpuid_ent[cpuid_i++];
+     c->function = HV_CPUID_VENDOR_AND_MAX_FUNCTIONS;
+     c->eax = hyperv_feat_enabled(cpu, HYPERV_FEAT_EVMCS) ?
+@@ -1499,11 +1511,13 @@ int kvm_arch_init_vcpu(CPUState *cs)
      env->apic_bus_freq = KVM_APIC_BUS_FREQUENCY;
  
      /* Paravirtualization CPUIDs */
--    hyperv_expand_features(cs, &local_err);
-+    kvm_hyperv_expand_features(cpu, &local_err);
-     if (local_err) {
-         error_report_err(local_err);
-         return -ENOSYS;
-diff --git a/target/i386/kvm_i386.h b/target/i386/kvm_i386.h
-index 0fce4e51d2d6..38af4a967968 100644
---- a/target/i386/kvm_i386.h
-+++ b/target/i386/kvm_i386.h
-@@ -48,5 +48,6 @@ bool kvm_has_x2apic_api(void);
- bool kvm_has_waitpkg(void);
- 
- bool kvm_hv_vpindex_settable(void);
-+void kvm_hyperv_expand_features(X86CPU *cpu, Error **errp);
- 
- #endif
+-    r = hyperv_handle_properties(cs, cpuid_data.entries);
++    r = hyperv_expand_features(cs);
+     if (r < 0) {
+         return r;
+-    } else if (r > 0) {
+-        cpuid_i = r;
++    }
++
++    if (hyperv_enabled(cpu)) {
++        cpuid_i = hyperv_fill_cpuids(cs, cpuid_data.entries);
+         kvm_base = KVM_CPUID_SIGNATURE_NEXT;
+         has_msr_hv_hypercall = true;
+     }
 -- 
 2.25.4
 
