@@ -7,72 +7,71 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAFC5C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 17:29:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 404A0C433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 17:32:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C5592245C
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 17:29:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C2B2C2227E
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 17:32:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XVcaN6s1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C5592245C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VNZIODbJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2B2C2227E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRIg7-0002Kf-U1
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 13:29:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55056)
+	id 1kRIjR-0005SL-U5
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 13:32:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54988)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRIdg-0000cK-A3
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 13:26:36 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44955)
+ id 1kRIdZ-0000Qs-Ga
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 13:26:29 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42069)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRIde-0003rX-P1
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 13:26:35 -0400
-Received: by mail-wr1-x443.google.com with SMTP id t9so13659164wrq.11
- for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 10:26:34 -0700 (PDT)
+ id 1kRIdX-0003qj-WD
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 13:26:29 -0400
+Received: by mail-wr1-x444.google.com with SMTP id e18so13666902wrw.9
+ for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 10:26:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=yECX+EErgKEGGyu+fq5dcK6AG/+Tqf8z/yJst+0jRiM=;
- b=XVcaN6s1ekbIoxMOzRyexjdBVNgQqUDmrZGilTjRJ9csuAZ9xZW/97j4xjaS0fPc7y
- U4XDyEsosyQ/GFp/M8GPu0JUh7xSHtCuQm1gmTYw51RLV3QIhxAx7eYdqxCu4p02i7Kl
- UujcpIyQojYPoMqwt9y1vrsx2sWd5avmXhhKVXr5K9b1ASRPRY87SgU4HykMkgAFP8CT
- r+PTgBZiDDJ27BWeQRA33+NBYhGpDvwTG1gTLczgXZZBTc07g3Ia3oTsC3tbCX0ZoFN9
- AQaOmXDMB148gWobRg/qOUZEz0hEorN/EihdKz7Dy/DElz6uVw5Ww/0Eq4xvfb6fYR6c
- Hvtw==
+ bh=MCMj0TR+Fl9dY8Kl27uG0iFSZwgVew5RPBCHaa3rL38=;
+ b=VNZIODbJL37JdFqCpr8kQ4CBc8EulYHr0VJqZx/+Orbb5nKbOzCXCSSo5SB0+FF8kZ
+ DnMXv1pEC1DNxu3foBY+noVBDKvyYSdJUOLYqddyKwRkeU/NDFF3nCdbh8uuJY6lK/6J
+ dJx6VTVZ/N7qtjHogWgQ6psBGWpq81OHQ67UVR3iHo0BzhsNqzezDmqFm/7V/HtYmrsq
+ SLmtS/nTXTbWl9jdXDeB3hLY+gKiUHKf2DpZfj1jPMSh5sH9IpIklriETN0+Q9a//ubL
+ viJpNFEgJDbo7sWmjTafCQssG3sIGs5npE3smZJRztLKTv3qS8ZYEC7TAtgD/3ItfCh/
+ oigQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=yECX+EErgKEGGyu+fq5dcK6AG/+Tqf8z/yJst+0jRiM=;
- b=My4PdVjYjgD/2xyWZ23/Vv/BR6b0bkuHEsyJ1H2gOUj8DjGxwSKeNWgyU80pXtO5rV
- 87YGtE76hRz/iPOuEbwmpqesMF/ntII73Yk3ojWCUjEHtZjtzw2k2sPofF7iOfjffY6z
- hfp0LHIHVJFvx4GW3xAGTxQfqiiGkvWdJquPJZGMyFjzoyLVKriybsC4HUyxfn8mjhSh
- xLnbk/dSEfoO/g9aWZHgOJXhHM0T/bv+WGBYagGOxgm0fRN2a6oCPDMjUNmTeI5+gpdt
- nqiSOvPYUg4Ismz2OPGui9k41nBFmlCQuQomzwm9nX46dEQrIgq6G0QarBgq1/QSV0it
- U5JA==
-X-Gm-Message-State: AOAM533iluqaUqVV3TscbgGt74VmhtWlQOk89FK9SaX3yMqs0sxbzbXA
- /mPyAebIjriQGXK1C9vtxXvczC5UTGY=
-X-Google-Smtp-Source: ABdhPJzoT0ZoFIh4H6Sd9ODIjjxJZT/88YaHsrSpwIwGmsy/ytZJMmpUw7RDUumapV0As97c9Qf9LQ==
-X-Received: by 2002:a5d:558e:: with SMTP id i14mr22144049wrv.40.1602350793216; 
- Sat, 10 Oct 2020 10:26:33 -0700 (PDT)
+ bh=MCMj0TR+Fl9dY8Kl27uG0iFSZwgVew5RPBCHaa3rL38=;
+ b=BpAmybVLDcqfwZkzdviBhda+2ZnzNrTqLn0TInZe//j18XXgROeXnm6WM/aFnLeS6y
+ 8rxKZETYV45HNkeZ2+3YLQDZpPtnuDd5IS60xVAbjzxt4JRCBooT2RE63pPuILUJT0ZD
+ HpJVcmNVXHwDmY0SVmvDhv/ybN3hwU68muhFkEdY/2F7XPbtwzBWAjWSnJYnUby7E7cQ
+ NWWk1E1vldBRUMnKMPM7m5miNgf6CK7LZQujbBj8G/LAzzhD8ptiEunGnhnIJJik+F4k
+ /AYc7yKxMxr/ewN03gmq+jNpltmhuIqlhuyiX3W7H/052EEoiGElhooFXf4vp1KY0O4B
+ 81Ow==
+X-Gm-Message-State: AOAM532bXnlR5i/VVHpSBVaUIT6/YwOSpSwKUvNJ9o2bzsILXMCPI8M1
+ WUr8WEcouwv6beH9C4Gu/FE2aPH6W0s=
+X-Google-Smtp-Source: ABdhPJz4lAvTPNnGvkCrGFLKN7Vg2JsNstR2Yc01E+EHwOft1i1t+TkkN39/E911C82DJ7yNtbgn8w==
+X-Received: by 2002:a5d:4d10:: with SMTP id z16mr1004043wrt.360.1602350786429; 
+ Sat, 10 Oct 2020 10:26:26 -0700 (PDT)
 Received: from localhost.localdomain
  (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id i11sm16786068wre.32.2020.10.10.10.26.32
+ by smtp.gmail.com with ESMTPSA id i11sm16786068wre.32.2020.10.10.10.26.24
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 10 Oct 2020 10:26:32 -0700 (PDT)
+ Sat, 10 Oct 2020 10:26:25 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 09/20] target/mips/cpu: Calculate the CP0 timer period
- using the CPU frequency
-Date: Sat, 10 Oct 2020 19:26:06 +0200
-Message-Id: <20201010172617.3079633-10-f4bug@amsat.org>
+Subject: [PATCH v2 04/20] hw/core/clock: add the clock_new helper function
+Date: Sat, 10 Oct 2020 19:26:01 +0200
+Message-Id: <20201010172617.3079633-5-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201010172617.3079633-1-f4bug@amsat.org>
 References: <20201010172617.3079633-1-f4bug@amsat.org>
@@ -80,8 +79,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -117,35 +116,76 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The CP0 timer period is a function of the CPU frequency.
-Start using the default values, which will be replaced by
-properties in the next commits.
+From: Luc Michel <luc@lmichel.fr>
 
+This function creates a clock and parents it to another object with a given
+name. It calls clock_setup_canonical_path before returning the new
+clock.
+
+This function is useful to create clocks in devices when one doesn't
+want to expose it at the qdev level (as an input or an output).
+
+Suggested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Luc Michel <luc@lmichel.fr>
+Message-Id: <20201010135759.437903-4-luc@lmichel.fr>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- target/mips/cpu.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/hw/clock.h | 13 +++++++++++++
+ hw/core/clock.c    | 15 +++++++++++++++
+ 2 files changed, 28 insertions(+)
 
-diff --git a/target/mips/cpu.c b/target/mips/cpu.c
-index 84b727fefa8..46188139b7b 100644
---- a/target/mips/cpu.c
-+++ b/target/mips/cpu.c
-@@ -144,13 +144,13 @@ static void mips_cpu_disas_set_info(CPUState *s, disassemble_info *info)
+diff --git a/include/hw/clock.h b/include/hw/clock.h
+index d357594df99..cbc5e6ced1e 100644
+--- a/include/hw/clock.h
++++ b/include/hw/clock.h
+@@ -90,6 +90,19 @@ extern const VMStateDescription vmstate_clock;
   */
- #define CPU_FREQ_HZ_DEFAULT     200000000
- #define CP0_COUNT_RATE_DEFAULT  2
--#define TIMER_PERIOD_DEFAULT    10  /* 1 / (CPU_FREQ_HZ / CP0_COUNT_RATE) */
+ void clock_setup_canonical_path(Clock *clk);
  
- static void mips_cp0_period_set(MIPSCPU *cpu)
- {
-     CPUMIPSState *env = &cpu->env;
- 
--    env->cp0_count_ns = TIMER_PERIOD_DEFAULT;
-+    env->cp0_count_ns = muldiv64(NANOSECONDS_PER_SECOND, CP0_COUNT_RATE_DEFAULT,
-+                                 CPU_FREQ_HZ_DEFAULT);
++/**
++ * clock_new:
++ * @parent: the clock parent
++ * @name: the clock object name
++ *
++ * Helper function to create a new clock and parent it to @parent. There is no
++ * need to call clock_setup_canonical_path on the returned clock as it is done
++ * by this function.
++ *
++ * @return the newly created clock
++ */
++Clock *clock_new(Object *parent, const char *name);
++
+ /**
+  * clock_set_callback:
+  * @clk: the clock to register the callback into
+diff --git a/hw/core/clock.c b/hw/core/clock.c
+index 7066282f7b9..f866717a835 100644
+--- a/hw/core/clock.c
++++ b/hw/core/clock.c
+@@ -23,6 +23,21 @@ void clock_setup_canonical_path(Clock *clk)
+     clk->canonical_path = object_get_canonical_path(OBJECT(clk));
  }
  
- static void mips_cpu_realizefn(DeviceState *dev, Error **errp)
++Clock *clock_new(Object *parent, const char *name)
++{
++    Object *obj;
++    Clock *clk;
++
++    obj = object_new(TYPE_CLOCK);
++    object_property_add_child(parent, name, obj);
++    object_unref(obj);
++
++    clk = CLOCK(obj);
++    clock_setup_canonical_path(clk);
++
++    return clk;
++}
++
+ void clock_set_callback(Clock *clk, ClockCallback *cb, void *opaque)
+ {
+     clk->callback = cb;
 -- 
 2.26.2
 
