@@ -2,86 +2,82 @@ Return-Path: <SRS0=BZbV=DR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 571C1C433E7
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 960B6C433DF
 	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 17:28:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8A4C2245C
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 17:28:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1799B2245D
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 17:28:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iI1HoX+Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8A4C2245C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VVrifjyQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1799B2245D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRIfZ-0001v8-PG
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 13:28:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54940)
+	id 1kRIfa-0001wc-4L
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 13:28:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54948)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRIdV-0000Ki-62
+ id 1kRIdV-0000Kq-Dj
  for qemu-devel@nongnu.org; Sat, 10 Oct 2020 13:26:25 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:32919)
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:53890)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRIdT-0003q3-N3
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 13:26:24 -0400
-Received: by mail-wr1-x430.google.com with SMTP id b8so460572wrn.0
+ id 1kRIdT-0003q1-GO
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 13:26:25 -0400
+Received: by mail-wm1-x336.google.com with SMTP id f21so12873693wml.3
  for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 10:26:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=gETh5/Gck0bTQVP31ZR4AiV0ecmQtPxoBf6GwvczWOs=;
- b=iI1HoX+YZZdHeu9yNUFeeX/+y0NDPSiOXplkKT3YYlRqP8BM/oJ7Nupak3enQioODa
- aOFVPw0RR1lKe4G50Qj44zIJnAVYzRqc4SkTcI8QL65BP5qzwxV3tuKK4fLUa8+10+ph
- VpbrM9e19vHtJFoUu6eGZIE16CWrlcQuJocJ+Gg245B7HhZzH6W46X7ky5B1JZsQ/h1m
- /ngTjCVFtQb7Le4ZGtn4RMyaLaNeb95Do0sVg0MfMeHcvZi0i/9I+j68k9eJVB+ThEfQ
- 5DEPq0w+zZt1VMNQjnwgPv2UxEgX1cc3Y8WWEBZdob3xGSrdh0Q8EW0xJ8m5jGHZDush
- Ttlg==
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=1GpPJZ9w2q7wdq5ROEZ1R6FoK2rk5jTQejf4wl8xDy0=;
+ b=VVrifjyQZ5rFdf9UVYE54ad2VpsIftP3c5UogKXk6YKbrndUpMfUrCwuOsagdrGbqs
+ CGlSORsP4f3OSHO5YCe+Qi3IjyGEjLaypm2JfxZfhniAxqQ107SrDEkXkPvedCq6Jdsx
+ GbG6N3RLVkkiX/oFDCgRCjFwsFzExFk5+Y5wQ4qdWuZhMJG42tD+ewT5Cz7/LkD3cGgU
+ 2YPgMwdFUhJJ/nf2QiWjfCNHIYP1/99trAVVZu0Uo/eDFdS9S6wokQN9aMPUcBkvKfFp
+ 4bNQtvpvSQAfcQCh3wXjfYuMqCdaQK3xMImqfI0j8cQm7v5kph0c3MTnziefGoKh5vDi
+ H5Fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=gETh5/Gck0bTQVP31ZR4AiV0ecmQtPxoBf6GwvczWOs=;
- b=MBf0cSeyKLhjyctMptOLY8u301juLnYVHIk29swsr7b2eOMatX8NW+sH++4QBZP1Ld
- 2kXoYqG4Ce3CMbU9FBiBrs97BNqdGNWiHKnQimlpRpjZqHjKQSFXsRCscTJjxpgkxPv4
- 27C+owTu5vq8uQBBtZ0SapwD1CRVFPAms1+d90hdBQ4NVApRdgUHL9jB2k2QzQxFv+ae
- XlyCWNMp62SkwO/qfRdnIDc60zvpwvyOtF6Br5gKPyltkbLdhOS80ypiiHc9nmxrLoS+
- NY3N0n3NY48//IQ6LafUEPfRS11HWPY04t/naFEfZ//wuU7QxsUlt0hrmWGNN/32Xupd
- 7Dzw==
-X-Gm-Message-State: AOAM533MjJIfWhqfogdKP7pPdEG51e5JGo6UvJehsNTJtk24Km9F8k/F
- fJOTwPdr7JN5TlJH+jnfIVK/4Hej/EE=
-X-Google-Smtp-Source: ABdhPJwKhmFKDk4ukX2yk58h4kOzGiduNDVAXZx1ib6Re0lZQFj3f/YfHiM5o8cKnVhFgLvyrpAa6Q==
-X-Received: by 2002:adf:bacc:: with SMTP id w12mr11547986wrg.66.1602350782061; 
- Sat, 10 Oct 2020 10:26:22 -0700 (PDT)
+ :mime-version:content-transfer-encoding;
+ bh=1GpPJZ9w2q7wdq5ROEZ1R6FoK2rk5jTQejf4wl8xDy0=;
+ b=ZukoeqieyAk00GwUfc+3GHOh4jKZW7crXRWoPQ0HiVCkFUX+gIYJ3y3HnlOACAUZwz
+ eMp6azhIIbZXZE6wCN9fa+ejfIYZtRtbwcdmrkJo3tZ2hIaJDPctgkqaKRDyQS6WLcbi
+ ZIE+dmvpb6UahYwGlo6Uzl7YW5axze28Pl6598rZwuXCz11pSq7L9brRO0fjoBAhS3MK
+ 1RK+2c786XwlUbbUjy9FF9kJ/hU2rCEDIsCJtFp995Pv3teUNTyWUC9Y+4oxlg7gbsXF
+ lazDil8EUaYpnYQPCeiVwHdmNfVnck5N0s3nJSJLVlRaPHIPFok/HJd91C++wcOuGWAW
+ nyXw==
+X-Gm-Message-State: AOAM5309IiVgE23syY+4pC4wZWecg+W6Dc1GOPZ3rpe8t4zgCqr37IGc
+ wNvWIDBn1ogJxA0E77xcwPOxA9gK1/4=
+X-Google-Smtp-Source: ABdhPJyf/dWFYjpPxCTFXJ/HUtDexXI3sKmXB0iV4bJAMoC6IaawWgyB152zn7cCau8wB9oTo9F12g==
+X-Received: by 2002:a7b:c0c8:: with SMTP id s8mr3404302wmh.78.1602350780814;
+ Sat, 10 Oct 2020 10:26:20 -0700 (PDT)
 Received: from localhost.localdomain
  (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id i11sm16786068wre.32.2020.10.10.10.26.20
+ by smtp.gmail.com with ESMTPSA id i11sm16786068wre.32.2020.10.10.10.26.18
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 10 Oct 2020 10:26:21 -0700 (PDT)
+ Sat, 10 Oct 2020 10:26:19 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 01/20] util/cutils: Introduce freq_to_str() to display
- Hertz units
-Date: Sat, 10 Oct 2020 19:25:58 +0200
-Message-Id: <20201010172617.3079633-2-f4bug@amsat.org>
+Subject: [PATCH v2 00/20] hw/mips: Set CPU frequency
+Date: Sat, 10 Oct 2020 19:25:57 +0200
+Message-Id: <20201010172617.3079633-1-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201010172617.3079633-1-f4bug@amsat.org>
-References: <20201010172617.3079633-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::430;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x430.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::336;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x336.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -111,73 +107,96 @@ Cc: Damien Hedde <damien.hedde@greensocs.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
  Paolo Bonzini <pbonzini@redhat.com>, Huacai Chen <chenhc@lemote.com>,
- Alistair Francis <alistair.francis@wdc.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Introduce freq_to_str() to convert frequency values in human
-friendly units using the SI units for Hertz.
+All the MIPS cores emulated by QEMU provides the Coproc#0
+'Count' register which can be used as a free running timer.
 
-Suggested-by: Luc Michel <luc@lmichel.fr>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Luc Michel <luc@lmichel.fr>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- include/qemu/cutils.h | 12 ++++++++++++
- util/cutils.c         | 14 ++++++++++++++
- 2 files changed, 26 insertions(+)
+Since it's introduction in 2005 this timer uses a fixed
+frequency of 100 MHz (for a CPU freq of 200 MHz).
+While this is not an issue with Linux guests, it makes
+some firmwares behave incorrectly.
 
-diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
-index 3a86ec0321e..4bbf4834ea5 100644
---- a/include/qemu/cutils.h
-+++ b/include/qemu/cutils.h
-@@ -158,6 +158,18 @@ int qemu_strtosz_metric(const char *nptr, const char **end, uint64_t *result);
- 
- char *size_to_str(uint64_t val);
- 
-+/**
-+ * freq_to_str:
-+ * @freq_hz: frequency to stringify
-+ *
-+ * Return human readable string for frequency @freq_hz.
-+ * Use SI units like KHz, MHz, and so forth.
-+ *
-+ * The caller is responsible for releasing the value returned
-+ * with g_free() after use.
-+ */
-+char *freq_to_str(uint64_t freq_hz);
-+
- /* used to print char* safely */
- #define STR_OR_NULL(str) ((str) ? (str) : "null")
- 
-diff --git a/util/cutils.c b/util/cutils.c
-index 8da34e04b0b..be4e43a9eff 100644
---- a/util/cutils.c
-+++ b/util/cutils.c
-@@ -885,6 +885,20 @@ char *size_to_str(uint64_t val)
-     return g_strdup_printf("%0.3g %sB", (double)val / div, suffixes[i]);
- }
- 
-+char *freq_to_str(uint64_t freq_hz)
-+{
-+    static const char *const suffixes[] = { "", "K", "M", "G", "T", "P", "E" };
-+    double freq = freq_hz;
-+    size_t idx = 0;
-+
-+    while (freq >= 1000.0 && idx < ARRAY_SIZE(suffixes)) {
-+        freq /= 1000.0;
-+        idx++;
-+    }
-+
-+    return g_strdup_printf("%0.3g %sHz", freq, suffixes[idx]);
-+}
-+
- int qemu_pstrcmp0(const char **str1, const char **str2)
- {
-     return g_strcmp0(*str1, *str2);
+The Clock API allow propagating clocks. It is particularly
+useful when hardware dynamicly changes clock frequencies.
+
+To be able to model such MIPS hardware, we need to refactor
+the MIPS hardware code to handle clocks.
+
+This series is organized as follow:
+
+1/ qdev/clock patches already reviewed but not merged
+
+2/ refactor the CP0 timer period to allow dynamic changes
+
+3/ MIPS CPU get an optional input clock
+
+4/ set correct CPU frequencies to all boards
+
+I used a MIPSsim test suggested by Thomas.
+The test is available on the list:
+https://mid.mail-archive.com/20200928171539.788309-17-f4bug@amsat.org
+
+Possible follow up:
+- QOM'ify the GIC
+- let the GIC handle dynamic clock changes
+
+Missing review: patches 6-20
+
+Regards,
+
+Phil.
+
+Luc Michel (1):
+  hw/core/clock: add the clock_new helper function
+
+Philippe Mathieu-Daudé (19):
+  util/cutils: Introduce freq_to_str() to display Hertz units
+  qdev-monitor: Display frequencies scaled to SI unit
+  hw/qdev-clock: Display error hint when clock is missing from device
+  target/mips: Move cpu_mips_get_random() with CP0 helpers
+  target/mips/cp0_timer: Explicit unit in variable name
+  target/mips/cp0_timer: Document TIMER_PERIOD origin
+  target/mips: Move cp0_count_ns to CPUMIPSState
+  target/mips/cpu: Calculate the CP0 timer period using the CPU
+    frequency
+  target/mips/cpu: Make cp0_count_rate a property
+  target/mips/cpu: Allow the CPU to use dynamic frequencies
+  hw/mips/r4k: Explicit CPU frequency is 200 MHz
+  hw/mips/fuloong2e: Set CPU frequency to 533 MHz
+  hw/mips/mipssim: Correct CPU frequency
+  hw/mips/jazz: Correct CPU frequencies
+  hw/mips/cps: Expose input clock and connect it to CPU cores
+  hw/mips/boston: Set CPU frequency to 1 GHz
+  hw/mips/malta: Set CPU frequency to 320 MHz
+  hw/mips/cps: Do not allow use without input clock
+  target/mips/cpu: Display warning when CPU is used without input clock
+
+ include/hw/clock.h       | 13 ++++++++++
+ include/hw/mips/cps.h    |  2 ++
+ include/qemu/cutils.h    | 12 ++++++++++
+ target/mips/cpu.h        | 14 +++++++++++
+ target/mips/internal.h   |  2 +-
+ hw/core/clock.c          | 15 ++++++++++++
+ hw/core/qdev-clock.c     | 11 +++++++++
+ hw/mips/boston.c         | 13 ++++++++++
+ hw/mips/cps.c            |  8 +++++++
+ hw/mips/fuloong2e.c      |  8 ++++++-
+ hw/mips/jazz.c           | 16 ++++++++++++-
+ hw/mips/malta.c          | 20 +++++++++++++---
+ hw/mips/mipssim.c        | 12 +++++++++-
+ hw/mips/r4k.c            |  8 ++++++-
+ qdev-monitor.c           |  8 ++++---
+ target/mips/cp0_helper.c | 25 ++++++++++++++++++++
+ target/mips/cp0_timer.c  | 51 ++++++++++------------------------------
+ target/mips/cpu.c        | 40 ++++++++++++++++++++++++++++++-
+ util/cutils.c            | 14 +++++++++++
+ 19 files changed, 242 insertions(+), 50 deletions(-)
+
 -- 
 2.26.2
 
