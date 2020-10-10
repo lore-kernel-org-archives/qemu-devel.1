@@ -2,93 +2,100 @@ Return-Path: <SRS0=BZbV=DR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C7AFC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 16:23:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84FCDC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 16:32:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB6F3223BD
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 16:23:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB6F3223BD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id EB6AB223C7
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 16:32:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e7JuDLH1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB6AB223C7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRHeV-0004vk-Qu
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 12:23:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45810)
+	id 1kRHnY-0007ap-Qh
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 12:32:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47576)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1kRHdd-0004UV-Qi; Sat, 10 Oct 2020 12:22:29 -0400
-Received: from mga05.intel.com ([192.55.52.43]:64260)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1kRHdb-0005Zm-8t; Sat, 10 Oct 2020 12:22:29 -0400
-IronPort-SDR: y60BstR+gyVhrVACtB6QzsWKOT9Yw9bNaV9aAmwEbFCtUhlEDD57TdJlrDHC2aXQmnGm14lfYT
- 8FhE7iUmy2Xw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9770"; a="250286057"
-X-IronPort-AV: E=Sophos;i="5.77,359,1596524400"; d="scan'208";a="250286057"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 10 Oct 2020 09:22:21 -0700
-IronPort-SDR: PogaIxRRd1ze8U2UPT3Li/AgkLUQTnoxLaOcuDsdJqYUMO2viw3NCijno82VOrR7LLsFcl1AYQ
- uGvX/OYnqNug==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.77,359,1596524400"; d="scan'208";a="520122762"
-Received: from fmsmsx605.amr.corp.intel.com ([10.18.126.85])
- by fmsmga005.fm.intel.com with ESMTP; 10 Oct 2020 09:22:21 -0700
-Received: from shsmsx603.ccr.corp.intel.com (10.109.6.143) by
- fmsmsx605.amr.corp.intel.com (10.18.126.85) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Sat, 10 Oct 2020 09:22:20 -0700
-Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
- SHSMSX603.ccr.corp.intel.com (10.109.6.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Sun, 11 Oct 2020 00:22:18 +0800
-Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
- SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
- Sun, 11 Oct 2020 00:22:18 +0800
-From: "Zhang, Chen" <chen.zhang@intel.com>
-To: Pan Nengyuan <pannengyuan@huawei.com>, Li Qiang <liq3ea@gmail.com>
-Subject: RE: [PATCH] net/filter-rewriter: destroy g_hash_table in
- colo_rewriter_cleanup
-Thread-Topic: [PATCH] net/filter-rewriter: destroy g_hash_table in
- colo_rewriter_cleanup
-Thread-Index: AQHWgoxAN7Z5W4Oo6kad3S1TmqXujalYsCSAgDesHgCAAOC18A==
-Date: Sat, 10 Oct 2020 16:22:18 +0000
-Message-ID: <b2e6f80cf0f04b39a7ebeb96a572fe7c@intel.com>
-References: <20200904134908.1396-1-pannengyuan@huawei.com>
- <CAKXe6SJL8Y2frr1-d06=Ovoo=45+kJSGM2vhDGFeJf4YuUfN4A@mail.gmail.com>
- <e327c596-08bf-655b-5b2b-aaeb4fcbdb2e@huawei.com>
-In-Reply-To: <e327c596-08bf-655b-5b2b-aaeb4fcbdb2e@huawei.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.5.1.3
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.36]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kRHmS-00074D-9a
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 12:31:36 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34681)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kRHmP-0006bs-3H
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 12:31:35 -0400
+Received: by mail-wr1-x444.google.com with SMTP id i1so7446759wro.1
+ for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 09:31:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=1VCDzKo6H+iv98OOiwsju5sUnsCpI2InauTA5DZcxSw=;
+ b=e7JuDLH1WWOZTYUyupeZwbEtqyS6h8zVR1b9TlrECq9IgS1bKB3++AOhYI/cyP6zHU
+ eOxsoVRfZNygFXvtjf4p6ZmeXbwIoLEQZpTJQIDxJ0pL8JBMee2p/vd/VoeVxeAuqZwI
+ xzJgrnbLT4XSOwmuL0IHH3GUmb3eoBZF7cHXkpuLOGHv1se5LvrbLJPP01lFx8vKoyFd
+ g0dRn4ngRoYQdmP7h3kXhUKN7v93Ocxsg8/GuV0Vp9j0I47Nu2GT5OASDVo9faCSq2Od
+ 56vZ7hktKbXPxdNACVXAgi8em6Hx9FGgC2x8Q2GE2j8e4HPJGFZoU9Kz1ZoMtrnpPagw
+ 8Otw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=1VCDzKo6H+iv98OOiwsju5sUnsCpI2InauTA5DZcxSw=;
+ b=d65Vyvrb+vFLO1fSkDBmivMhBrrzCU832ZTDfsJhB3VVbuJwBDFDweXvkjjxgBBWPv
+ WxUlJrJTuDmtYwzQeYIxfnnbHWLy+eisl9Kcidzlunf2gq2hNCFGSb39HebSyXGWwK1L
+ rWiyc14ChuY7N2G2NqC7UiADuai/nfwbiRfIgmcNNJYK9q8lrR0lvBOrM+kEsxOsmDHS
+ ZVPuApuXP+Hp2yXGskIVtu2zQDIJH3IP/c6hng8tiIS7mZtce7+t0l8Rih573Fk9H7lZ
+ 3Txh79MENs76V0/09dfOH0A0uWtst7bVEV8+kQ5nOCztDDhDCLgqQsbJF9XiJbVeE9Av
+ pVwA==
+X-Gm-Message-State: AOAM530QrDSv2St/FhKE0za6QCoGyxNhHj0VCmcFKL2u/QDrXD8gol40
+ ITEl1h3XEedSnxU4CiM0Uo8=
+X-Google-Smtp-Source: ABdhPJyoZ69O63DFFzXPH0DrG4bJPFcRdBqv1kM0NgfgZ5aG/4xJoWgznEfdD7ZIPtzMIBFGtuDOjQ==
+X-Received: by 2002:adf:e445:: with SMTP id t5mr19953294wrm.387.1602347491163; 
+ Sat, 10 Oct 2020 09:31:31 -0700 (PDT)
+Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id p21sm16725513wmc.28.2020.10.10.09.31.29
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 10 Oct 2020 09:31:30 -0700 (PDT)
+Subject: Re: [PATCH v2 1/3] util/cutils: Introduce freq_to_str() to display
+ Hertz units
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <20201001164322.1585392-1-f4bug@amsat.org>
+ <20201001164322.1585392-2-f4bug@amsat.org>
+ <20201001184238.GI3717385@habkost.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <2d771247-fda7-80e9-6603-e7bd940c37ba@amsat.org>
+Date: Sat, 10 Oct 2020 18:31:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Received-SPF: pass client-ip=192.55.52.43; envelope-from=chen.zhang@intel.com;
- helo=mga05.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/10 12:22:21
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20201001184238.GI3717385@habkost.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -19
+X-Spam_score: -2.0
+X-Spam_bar: --
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-0.207,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,42 +108,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>,
- "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
- Jason Wang <jasowang@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
- Qemu Developers <qemu-devel@nongnu.org>, Chen Qun <kuhn.chenqun@huawei.com>
+Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Havard Skinnemoen <hskinnemoen@google.com>, qemu-devel@nongnu.org,
+ Tyrone Ting <kfting@nuvoton.com>, Alistair Francis <alistair.francis@wdc.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Luc Michel <luc@lmichel.fr>,
+ Damien Hedde <damien.hedde@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SSBhbHJlYWR5IHF1ZXVlZCB0aGlzIHBhdGNoIHRvIENPTE8gcHJveHkgdHJlZSwgdGhlbiBJIHdp
-bGwgc2VuZCBhIHNlcmllcyB0byBKYXNvbi4NCg0KVGhhbmtzDQpDaGVuDQoNCj4gLS0tLS1Pcmln
-aW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGFuIE5lbmd5dWFuIDxwYW5uZW5neXVhbkBodWF3
-ZWkuY29tPg0KPiBTZW50OiBTYXR1cmRheSwgT2N0b2JlciAxMCwgMjAyMCA2OjU1IFBNDQo+IFRv
-OiBMaSBRaWFuZyA8bGlxM2VhQGdtYWlsLmNvbT4NCj4gQ2M6IFFlbXUgRGV2ZWxvcGVycyA8cWVt
-dS1kZXZlbEBub25nbnUub3JnPjsgWmhhbmcsIENoZW4NCj4gPGNoZW4uemhhbmdAaW50ZWwuY29t
-PjsgSmFzb24gV2FuZyA8amFzb3dhbmdAcmVkaGF0LmNvbT47DQo+IHpoYW5naGFpbGlhbmcgPHpo
-YW5nLnpoYW5naGFpbGlhbmdAaHVhd2VpLmNvbT47IENoZW4gUXVuDQo+IDxrdWhuLmNoZW5xdW5A
-aHVhd2VpLmNvbT47IHFlbXUtdHJpdmlhbEBub25nbnUub3JnOyBMYXVyZW50IFZpdmllcg0KPiA8
-bGF1cmVudEB2aXZpZXIuZXU+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0hdIG5ldC9maWx0ZXItcmV3
-cml0ZXI6IGRlc3Ryb3kgZ19oYXNoX3RhYmxlIGluDQo+IGNvbG9fcmV3cml0ZXJfY2xlYW51cA0K
-PiANCj4gcGluZyENCj4gDQo+IE1heWJlIG1pc3NlZCB0byBxdWV1ZT8NCj4gDQo+IE9uIDIwMjAv
-OS81IDg6NDQsIExpIFFpYW5nIHdyb3RlOg0KPiA+IFBhbiBOZW5neXVhbiA8cGFubmVuZ3l1YW5A
-aHVhd2VpLmNvbT4g5LqOMjAyMOW5tDnmnIg05pel5ZGo5LqUIOS4iw0KPiDljYgzOjIz5YaZ6YGT
-77yaDQo+ID4+DQo+ID4+IHMtPmNvbm5lY3Rpb25fdHJhY2tfdGFibGUgZm9yZ290IHRvIGRlc3Ry
-b3kgaW4gY29sb19yZXdyaXRlcl9jbGVhbnVwLiBGaXgNCj4gaXQuDQo+ID4+DQo+ID4+IFJlcG9y
-dGVkLWJ5OiBFdWxlciBSb2JvdCA8ZXVsZXIucm9ib3RAaHVhd2VpLmNvbT4NCj4gPj4gU2lnbmVk
-LW9mZi1ieTogUGFuIE5lbmd5dWFuIDxwYW5uZW5neXVhbkBodWF3ZWkuY29tPg0KPiA+DQo+ID4g
-UmV2aWV3ZWQtYnk6IExpIFFpYW5nIDxsaXEzZWFAZ21haWwuY29tPg0KPiA+DQo+ID4+IC0tLQ0K
-PiA+PiAgbmV0L2ZpbHRlci1yZXdyaXRlci5jIHwgMiArKw0KPiA+PiAgMSBmaWxlIGNoYW5nZWQs
-IDIgaW5zZXJ0aW9ucygrKQ0KPiA+Pg0KPiA+PiBkaWZmIC0tZ2l0IGEvbmV0L2ZpbHRlci1yZXdy
-aXRlci5jIGIvbmV0L2ZpbHRlci1yZXdyaXRlci5jIGluZGV4DQo+ID4+IDFhYWFkMTAxYjYuLjlm
-ZjM2NmQ0NGYgMTAwNjQ0DQo+ID4+IC0tLSBhL25ldC9maWx0ZXItcmV3cml0ZXIuYw0KPiA+PiAr
-KysgYi9uZXQvZmlsdGVyLXJld3JpdGVyLmMNCj4gPj4gQEAgLTM3Niw2ICszNzYsOCBAQCBzdGF0
-aWMgdm9pZCBjb2xvX3Jld3JpdGVyX2NsZWFudXAoTmV0RmlsdGVyU3RhdGUNCj4gKm5mKQ0KPiA+
-PiAgICAgICAgICBmaWx0ZXJfcmV3cml0ZXJfZmx1c2gobmYpOw0KPiA+PiAgICAgICAgICBnX2Zy
-ZWUocy0+aW5jb21pbmdfcXVldWUpOw0KPiA+PiAgICAgIH0NCj4gPj4gKw0KPiA+PiArICAgIGdf
-aGFzaF90YWJsZV9kZXN0cm95KHMtPmNvbm5lY3Rpb25fdHJhY2tfdGFibGUpOw0KPiA+PiAgfQ0K
-PiA+Pg0KPiA+PiAgc3RhdGljIHZvaWQgY29sb19yZXdyaXRlcl9zZXR1cChOZXRGaWx0ZXJTdGF0
-ZSAqbmYsIEVycm9yICoqZXJycCkNCj4gPj4gLS0NCj4gPj4gMi4xOC4yDQo+ID4+DQo+ID4+DQo=
+On 10/1/20 8:42 PM, Eduardo Habkost wrote:
+> On Thu, Oct 01, 2020 at 06:43:20PM +0200, Philippe Mathieu-Daudé wrote:
+>> Introduce freq_to_str() to convert frequency values in human
+>> friendly units using the SI units for Hertz.
+>>
+>> Suggested-by: Luc Michel <luc@lmichel.fr>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>   include/qemu/cutils.h | 12 ++++++++++++
+>>   util/cutils.c         | 14 ++++++++++++++
+>>   2 files changed, 26 insertions(+)
+>>
+>> diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
+>> index 3a86ec0321..4bbf4834ea 100644
+>> --- a/include/qemu/cutils.h
+>> +++ b/include/qemu/cutils.h
+>> @@ -158,6 +158,18 @@ int qemu_strtosz_metric(const char *nptr, const char **end, uint64_t *result);
+>>   
+>>   char *size_to_str(uint64_t val);
+>>   
+>> +/**
+>> + * freq_to_str:
+>> + * @freq_hz: frequency to stringify
+>> + *
+>> + * Return human readable string for frequency @freq_hz.
+>> + * Use SI units like KHz, MHz, and so forth.
+>> + *
+>> + * The caller is responsible for releasing the value returned
+>> + * with g_free() after use.
+>> + */
+>> +char *freq_to_str(uint64_t freq_hz);
+>> +
+>>   /* used to print char* safely */
+>>   #define STR_OR_NULL(str) ((str) ? (str) : "null")
+>>   
+>> diff --git a/util/cutils.c b/util/cutils.c
+>> index 8da34e04b0..be4e43a9ef 100644
+>> --- a/util/cutils.c
+>> +++ b/util/cutils.c
+>> @@ -885,6 +885,20 @@ char *size_to_str(uint64_t val)
+>>       return g_strdup_printf("%0.3g %sB", (double)val / div, suffixes[i]);
+>>   }
+>>   
+>> +char *freq_to_str(uint64_t freq_hz)
+>> +{
+>> +    static const char *const suffixes[] = { "", "K", "M", "G", "T", "P", "E" };
+>> +    double freq = freq_hz;
+>> +    size_t idx = 0;
+>> +
+>> +    while (freq >= 1000.0 && idx < ARRAY_SIZE(suffixes)) {
+>> +        freq /= 1000.0;
+>> +        idx++;
+>> +    }
+>> +
+>> +    return g_strdup_printf("%0.3g %sHz", freq, suffixes[idx]);
+> 
+> The only thing protecting this from out of bounds array access is
+> the fact that UINT64_MAX is smaller than 1000E.  I wonder if this
+> causes a Coverity warning.
+
+Aren't we protected by the "idx < ARRAY_SIZE(suffixes)" check?
+
+> 
+>> +}
+>> +
+>>   int qemu_pstrcmp0(const char **str1, const char **str2)
+>>   {
+>>       return g_strcmp0(*str1, *str2);
+>> -- 
+>> 2.26.2
+>>
+> 
 
