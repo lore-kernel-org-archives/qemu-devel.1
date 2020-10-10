@@ -2,99 +2,92 @@ Return-Path: <SRS0=BZbV=DR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDB6FC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 13:08:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9D63C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 13:09:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38E62221E9
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 13:08:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 45B5D221E9
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 13:09:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BCg+uiGN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38E62221E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lmichel.fr header.i=@lmichel.fr header.b="JauB8c5e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45B5D221E9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=lmichel.fr
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kREcI-0002zd-1C
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 09:08:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60778)
+	id 1kREd0-000448-9y
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 09:09:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60878)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kREbM-0002ZH-8b
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 09:07:56 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34561)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kREbK-00077c-3D
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 09:07:55 -0400
-Received: by mail-wr1-x441.google.com with SMTP id i1so6955963wro.1
- for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 06:07:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=ojw3jnrel0MTzqZ0CI+5WgbdJGKvh/ZGWOOOnA36nQ4=;
- b=BCg+uiGNok7Dq/D6N5Helw1qFN8cKEjQya7nDDVzroZbgeg/mfLIVeTG86k1Nkp76k
- XR6YAjmIo6OWFcwjUu/XSu+zW0xpuPOwfR62WYVOtpvtKGWmAEUbb7YUJsdNJDytZRyA
- Ku/CsSaPnS3VYaN8EfHlrJ0PWgqmj6fevA3evBUo1xdzpdjUh27FDavcJ2UTa7tFwbzw
- lXY2c5CaPbnbqgi3m5/1191WFoF2WXJX9bz0SVXGOnF8yni6RV1oxQK4jT/wxC2aRScg
- oXRC7a/G9HRiqiLJrV8hPEB7omYCcdsYYm8dtfmPrFC7zhVkkdQHY7FnxSvJQo/sRPn8
- D9DA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ojw3jnrel0MTzqZ0CI+5WgbdJGKvh/ZGWOOOnA36nQ4=;
- b=sylIHNznL6j/RBOeBURleVvIo3XooVMBQznm9IKH/SxdTA7s0THNEFYPeRfGDgU8h5
- dR0W8Ccob3jnzzilkN8XxpIrc0dxQgLi/Yan5eraUqHNPXc6qpk2pH+l2I37tvClFs2Q
- nRD9/wIKViVrydsEwckUM2OUbNQAVze8/+MhxTzP7D+3qsyDVI3pw9c2OosKwfrIPDU1
- nskt/DooCAzdAfadDZzziSEBFnjLht7/skLdN6AigB3AuwdiwNBWY178N9lyEIEaUux+
- uZ96nWIT2D1yFtqFs7iWQMSZTsa6trUA2IVGoE/yXyInZGN4Q4GZ+nI1QjH8J+oAPc6S
- eEcg==
-X-Gm-Message-State: AOAM533S1nLZydqndz9aAuEsTd4muliOqzLt5R/2MyeXUVpa96WNUax+
- jKymq8r09ULoDdmcAEQ1oPk=
-X-Google-Smtp-Source: ABdhPJzJ8OPQI3AHW33xm7zsEhS6g0OKhP1BzfT/zjVfUsakeKTDBO8OiN52t4zoH+TFV1Gw6wEdAQ==
-X-Received: by 2002:a5d:51ca:: with SMTP id n10mr19974154wrv.222.1602335272443; 
- Sat, 10 Oct 2020 06:07:52 -0700 (PDT)
-Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
- [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id t4sm11836460wra.75.2020.10.10.06.07.51
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 10 Oct 2020 06:07:51 -0700 (PDT)
-Subject: Re: [PATCH V13 6/9] target/mips: Add loongson-ext lsdc2 group of
- instructions
-To: Huacai Chen <zltjiangshi@gmail.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-References: <1602059975-10115-1-git-send-email-chenhc@lemote.com>
- <1602059975-10115-7-git-send-email-chenhc@lemote.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ae0f1019-91a5-f31e-4337-3be1d021a50e@amsat.org>
-Date: Sat, 10 Oct 2020 15:07:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <luc@lmichel.fr>)
+ id 1kREcE-00036R-US; Sat, 10 Oct 2020 09:08:50 -0400
+Received: from pharaoh.lmichel.fr ([149.202.28.74]:41904)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <luc@lmichel.fr>)
+ id 1kREcA-00079i-5n; Sat, 10 Oct 2020 09:08:50 -0400
+Received: from localhost (sekoia-pc.home.lmichel.fr [192.168.61.100])
+ by pharaoh.lmichel.fr (Postfix) with ESMTPSA id D8CC2C6011D;
+ Sat, 10 Oct 2020 13:08:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr; s=pharaoh; 
+ t=1602335322;
+ h=from:from:sender:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Jazt9/639w3DEeOI8gAmyV0yKv6DDoDESl64N57weGY=;
+ b=JauB8c5eTJDOq8YSd7YrWYVpQIKIDGOzqiKjoREQ1s2NReMjfSCU69rmEolYMluJBIRHPN
+ NTkCzJKwN29LGyJC/V2OVSnT98zvMswSa1F9ORY4C0K0Ci0BuT0iaKqbTz/zckouPhewsF
+ 4NHsDzBRE0FmWRb5DxWBdw7LgNoY9AhM31H3/ICoK5iSLkxTuoJGRb2eswjytk2twNDQiJ
+ gJ6o18gzBjjdj3h0K0tifIGa10g1DOzat/EF3WOyhOMFu78fhduR5P6gc/IctL1IAPIB9Y
+ 9gKHQHxCRi7u5OzWgeTpoyh+UpCjL8i5RYL3cACw4W7BfPM7MCf/7T/UHh1P2w==
+Date: Sat, 10 Oct 2020 15:09:43 +0200
+From: Luc Michel <luc@lmichel.fr>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v2 11/15] hw/misc/bcm2835_cprman: implement clock mux
+ behaviour
+Message-ID: <20201010130943.6qkmhkb2gwbr6ajx@sekoia-pc.home.lmichel.fr>
+References: <20201005195612.1999165-1-luc@lmichel.fr>
+ <20201005195612.1999165-12-luc@lmichel.fr>
+ <d304e1f9-a1ea-17a1-e830-8be1f7671a53@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <1602059975-10115-7-git-send-email-chenhc@lemote.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -19
-X-Spam_score: -2.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d304e1f9-a1ea-17a1-e830-8be1f7671a53@amsat.org>
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr;
+ s=pharaoh; t=1602335323;
+ h=from:from:sender:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Jazt9/639w3DEeOI8gAmyV0yKv6DDoDESl64N57weGY=;
+ b=ja8RhR5gUyebZ6nn80phQXiO+i8xpUxjyT44k1qcJKYuGQnDY65CjofUuc32ONJW5GJay6
+ gGMu2UX0nM0MsscxD4CRPFIsVgNU/NHT0K0zpYmVS+3mM3Vu7h5tCpDak/puXhVjU833sq
+ uJ8m+hyAPXCi7uJ4+uuJOcCp0j/8HWW1WtOqPYBB71MRwWsIEKc1OI5phjxZhV7z63thxO
+ pJaSTPIb0kvf92i/LsvkjID9lDTE/P+5ZnFglunpcGvH0iG6s9dwyKfrmjNFYJcEkMU9jw
+ CME+lOKY1aIM64j9BrNyny7dJtqRa5xDJSw3fnp5AB9KUaD71jnSDc8ZOizcVw==
+ARC-Seal: i=1; s=pharaoh; d=lmichel.fr; t=1602335323; a=rsa-sha256; cv=none;
+ b=dFA/zmfwxSgJOtIFNoRHsQ4wOaQBNCPoVozxcWCLcjbj5rlA1keO5Xo1O4zY0vwho0X0101CQh5v9kjcxUtYneuh36irJ8mnHr4dTrlTUTGagjqhwBBHhX1NFVd1vqHGU3irAzPsS6S+IVp5/FPn25hXy//Q9TAQ8f9TkOj5uDR2rNzoVRGjOGifVKwZv9/bjN9AgeJheZrT98YI4OWvAH5TDlorqXc/RQ416Ji8zscnO8rO8sxRWe82t9U+DL7flQLoTEe2IWY4UtAJzCKOp29z+8NXqbhq8EtKOrX66+xNIFwmRlmt+LeKJppUBxBpDKkUMo4Yq+gH8U1jJcQCbg==
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=sekoia smtp.mailfrom=luc@lmichel.fr
+Received-SPF: pass client-ip=149.202.28.74; envelope-from=luc@lmichel.fr;
+ helo=pharaoh.lmichel.fr
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/10 07:32:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-0.207,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -108,259 +101,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Huacai Chen <chenhuacai@gmail.com>, qemu-devel@nongnu.org,
- Huacai Chen <chenhc@lemote.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Paul Zimmerman <pauldzim@gmail.com>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org,
+ Havard Skinnemoen <hskinnemoen@google.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/7/20 10:39 AM, Huacai Chen wrote:
-> From: Jiaxun Yang <jiaxun.yang@flygoat.com>
+On 11:04 Tue 06 Oct     , Philippe Mathieu-Daudé wrote:
+> On 10/5/20 9:56 PM, Luc Michel wrote:
+> > A clock mux can be configured to select one of its 10 sources through
+> > the CM_CTL register. It also embeds yet another clock divider, composed
+> > of an integer part and a fractional part. The number of bits of each
+> > part is mux dependent.
+> > 
+> > Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> > Signed-off-by: Luc Michel <luc@lmichel.fr>
+> > ---
+> >  hw/misc/bcm2835_cprman.c | 44 +++++++++++++++++++++++++++++++++++++++-
+> >  1 file changed, 43 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/hw/misc/bcm2835_cprman.c b/hw/misc/bcm2835_cprman.c
+> > index a470ce2026..7d59423367 100644
+> > --- a/hw/misc/bcm2835_cprman.c
+> > +++ b/hw/misc/bcm2835_cprman.c
+> > @@ -229,19 +229,61 @@ static const TypeInfo cprman_pll_channel_info = {
+> >  };
+> >  
+> >  
+> >  /* clock mux */
+> >  
+> > +static bool clock_mux_is_enabled(CprmanClockMuxState *mux)
+> > +{
+> > +    return FIELD_EX32(*mux->reg_cm, CM_CLOCKx_CTL, ENABLE);
+> > +}
+> > +
+> >  static void clock_mux_update(CprmanClockMuxState *mux)
+> >  {
+> > -    clock_update(mux->out, 0);
+> > +    uint64_t freq;
+> > +    uint32_t div, src = FIELD_EX32(*mux->reg_cm, CM_CLOCKx_CTL, SRC);
+> > +    bool enabled = clock_mux_is_enabled(mux);
+> > +
+> > +    *mux->reg_cm = FIELD_DP32(*mux->reg_cm, CM_CLOCKx_CTL, BUSY, enabled);
+> > +
+> > +    if (!enabled) {
+> > +        clock_update(mux->out, 0);
+> > +        return;
+> > +    }
+> > +
+> > +    freq = clock_get_hz(mux->srcs[src]);
+> > +
+> > +    if (mux->int_bits == 0 && mux->frac_bits == 0) {
+> > +        clock_update_hz(mux->out, freq);
+> > +        return;
+> > +    }
+> > +
+> > +    /*
+> > +     * The divider has an integer and a fractional part. The size of each part
+> > +     * varies with the muxes (int_bits and frac_bits). Both parts are
+> > +     * concatenated, with the integer part always starting at bit 12.
+> > +     */
+> > +    div = mux->reg_cm[1] >> (R_CM_CLOCKx_DIV_FRAC_LENGTH - mux->frac_bits);
+> > +    div &= (1 << (mux->int_bits + mux->frac_bits)) - 1;
 > 
-> LDC2/SDC2 opcodes have been rewritten as "load & store with offset"
-> group of instructions by loongson-ext ASE.
+> I understand the description as:
 > 
-> This patch add implementation of these instructions:
-> gslbx: load 1 bytes to GPR
-> gslhx: load 2 bytes to GPR
-> gslwx: load 4 bytes to GPR
-> gsldx: load 8 bytes to GPR
-> gslwxc1: load 4 bytes to FPR
-> gsldxc1: load 8 bytes to FPR
-> gssbx: store 1 bytes from GPR
-> gsshx: store 2 bytes from GPR
-> gsswx: store 4 bytes from GPR
-> gssdx: store 8 bytes from GPR
-> gsswxc1: store 4 bytes from FPR
-> gssdxc1: store 8 bytes from FPR
+>                    0
+>                   [     12-bit    ][     12-bit    ][   reserved...   ]
+>  CM_CLOCKx_DIV    [      FRAC     ][      INT      ][                 ]
+>                   [         <frac>][<int>          ][                 ]
+>                             ^^^^^^^^^^^^^
+Yes, this is correct :)
+
 > 
-> Details of Loongson-EXT is here:
-> https://github.com/FlyGoat/loongson-insn/blob/master/loongson-ext.md
+> What about:
 > 
-> Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+>        div = extract32(mux->reg_cm[1],
+>                        R_CM_CLOCKx_DIV_FRAC_LENGTH - mux->frac_bits,
+>                        mux->frac_bits, mux->int_bits);
+Yes good idea, with s/,/+/ here -------^
 
-If this patch is from Jiaxun, Huacai's S-o-b should come *after*.
-
-> ---
->   target/mips/translate.c | 179 ++++++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 179 insertions(+)
 > 
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index 916b57f..4d42cfc 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -484,6 +484,24 @@ enum {
->       OPC_GSSDRC1     = 0x7 | OPC_GSSHFS,
->   };
->   
-> +/* Loongson EXT LDC2/SDC2 opcodes */
-> +#define MASK_LOONGSON_LSDC2(op)           (MASK_OP_MAJOR(op) | (op & 0x7))
-> +
-> +enum {
-> +    OPC_GSLBX      = 0x0 | OPC_LDC2,
-> +    OPC_GSLHX      = 0x1 | OPC_LDC2,
-> +    OPC_GSLWX      = 0x2 | OPC_LDC2,
-> +    OPC_GSLDX      = 0x3 | OPC_LDC2,
-> +    OPC_GSLWXC1    = 0x6 | OPC_LDC2,
-> +    OPC_GSLDXC1    = 0x7 | OPC_LDC2,
-> +    OPC_GSSBX      = 0x0 | OPC_SDC2,
-> +    OPC_GSSHX      = 0x1 | OPC_SDC2,
-> +    OPC_GSSWX      = 0x2 | OPC_SDC2,
-> +    OPC_GSSDX      = 0x3 | OPC_SDC2,
-> +    OPC_GSSWXC1    = 0x6 | OPC_SDC2,
-> +    OPC_GSSDXC1    = 0x7 | OPC_SDC2,
-> +};
-> +
->   /* BSHFL opcodes */
->   #define MASK_BSHFL(op)              (MASK_SPECIAL3(op) | (op & (0x1F << 6)))
->   
-> @@ -6172,6 +6190,165 @@ static void gen_loongson_lswc2(DisasContext *ctx, int rt,
->       tcg_temp_free(t0);
->   }
->   
-> +/* Loongson EXT LDC2/SDC2 */
-> +static void gen_loongson_lsdc2(DisasContext *ctx, int rt,
-> +                                int rs, int rd)
+> Also consider adding the register visual representation if it is
+> correct.
+Sure, I'll add a visual representation for more clarity.
 
-Alignment off (various occurences in this series).
+Thanks!
 
-> +{
-> +    int offset = (int8_t)(ctx->opcode >> 3);
+-- 
+Luc
 
-Please use sextract32() which is easier to read:
-
-        int32_t offset = sextract32(ctx->opcode, 3, 8);
-
-> +    uint32_t opc = MASK_LOONGSON_LSDC2(ctx->opcode);
-> +    TCGv t0, t1;
-> +    TCGv_i32 fp0;
-> +
-> +    /* Pre-conditions */
-> +    switch (opc) {
-> +    case OPC_GSLBX:
-> +    case OPC_GSLHX:
-> +    case OPC_GSLWX:
-> +    case OPC_GSLDX:
-> +        /* prefetch, implement as NOP */
-> +        if (rt == 0) {
-> +            return;
-> +        }
-> +        break;
-> +    case OPC_GSSBX:
-> +    case OPC_GSSHX:
-> +    case OPC_GSSWX:
-> +    case OPC_GSSDX:
-> +        break;
-> +    case OPC_GSLWXC1:
-> +#if defined(TARGET_MIPS64)
-> +    case OPC_GSLDXC1:
-> +#endif
-> +        check_cp1_enabled(ctx);
-> +        /* prefetch, implement as NOP */
-> +        if (rt == 0) {
-> +            return;
-> +        }
-> +        break;
-> +    case OPC_GSSWXC1:
-> +#if defined(TARGET_MIPS64)
-> +    case OPC_GSSDXC1:
-> +#endif
-> +        check_cp1_enabled(ctx);
-> +        break;
-> +    default:
-> +        MIPS_INVAL("loongson_lsdc2");
-> +        generate_exception_end(ctx, EXCP_RI);
-> +        return;
-> +        break;
-> +    }
-> +
-> +    t0 = tcg_temp_new();
-> +
-> +    gen_base_offset_addr(ctx, t0, rs, offset);
-> +    gen_op_addr_add(ctx, t0, cpu_gpr[rd], t0);
-> +
-> +    switch (opc) {
-> +    case OPC_GSLBX:
-> +        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_SB);
-> +        gen_store_gpr(t0, rt);
-> +        break;
-> +    case OPC_GSLHX:
-> +        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TESW |
-> +                            ctx->default_tcg_memop_mask);
-
-Do Loongson EXT plan to support unaligned accesses?
-
-> +        gen_store_gpr(t0, rt);
-> +        break;
-> +    case OPC_GSLWX:
-> +        gen_base_offset_addr(ctx, t0, rs, offset);
-> +        if (rd) {
-> +            gen_op_addr_add(ctx, t0, cpu_gpr[rd], t0);
-> +        }
-> +        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TESL |
-> +                            ctx->default_tcg_memop_mask);
-> +        gen_store_gpr(t0, rt);
-> +        break;
-> +#if defined(TARGET_MIPS64)
-> +    case OPC_GSLDX:
-> +        gen_base_offset_addr(ctx, t0, rs, offset);
-> +        if (rd) {
-> +            gen_op_addr_add(ctx, t0, cpu_gpr[rd], t0);
-> +        }
-> +        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TEQ |
-> +                            ctx->default_tcg_memop_mask);
-> +        gen_store_gpr(t0, rt);
-> +        break;
-> +#endif
-> +    case OPC_GSLWXC1:
-> +        check_cp1_enabled(ctx);
-> +        gen_base_offset_addr(ctx, t0, rs, offset);
-> +        if (rd) {
-> +            gen_op_addr_add(ctx, t0, cpu_gpr[rd], t0);
-> +        }
-> +        fp0 = tcg_temp_new_i32();
-> +        tcg_gen_qemu_ld_i32(fp0, t0, ctx->mem_idx, MO_TESL |
-> +                            ctx->default_tcg_memop_mask);
-> +        gen_store_fpr32(ctx, fp0, rt);
-> +        tcg_temp_free_i32(fp0);
-> +        break;
-> +#if defined(TARGET_MIPS64)
-> +    case OPC_GSLDXC1:
-> +        check_cp1_enabled(ctx);
-> +        gen_base_offset_addr(ctx, t0, rs, offset);
-> +        if (rd) {
-> +            gen_op_addr_add(ctx, t0, cpu_gpr[rd], t0);
-> +        }
-> +        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TEQ |
-> +                            ctx->default_tcg_memop_mask);
-> +        gen_store_fpr64(ctx, t0, rt);
-> +        break;
-> +#endif
-> +    case OPC_GSSBX:
-> +        t1 = tcg_temp_new();
-> +        gen_load_gpr(t1, rt);
-> +        tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx, MO_SB);
-> +        tcg_temp_free(t1);
-> +        break;
-> +    case OPC_GSSHX:
-> +        t1 = tcg_temp_new();
-> +        gen_load_gpr(t1, rt);
-> +        tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx, MO_TEUW |
-> +                            ctx->default_tcg_memop_mask);
-> +        tcg_temp_free(t1);
-> +        break;
-> +    case OPC_GSSWX:
-> +        t1 = tcg_temp_new();
-> +        gen_load_gpr(t1, rt);
-> +        tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx, MO_TEUL |
-> +                            ctx->default_tcg_memop_mask);
-> +        tcg_temp_free(t1);
-> +        break;
-> +#if defined(TARGET_MIPS64)
-> +    case OPC_GSSDX:
-> +        t1 = tcg_temp_new();
-> +        gen_load_gpr(t1, rt);
-> +        tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx, MO_TEQ |
-> +                            ctx->default_tcg_memop_mask);
-> +        tcg_temp_free(t1);
-> +        break;
-> +#endif
-> +    case OPC_GSSWXC1:
-> +        fp0 = tcg_temp_new_i32();
-> +        gen_load_fpr32(ctx, fp0, rt);
-> +        tcg_gen_qemu_st_i32(fp0, t0, ctx->mem_idx, MO_TEUL |
-> +                            ctx->default_tcg_memop_mask);
-> +        tcg_temp_free_i32(fp0);
-> +        break;
-> +#if defined(TARGET_MIPS64)
-> +    case OPC_GSSDXC1:
-> +        t1 = tcg_temp_new();
-> +        gen_load_fpr64(ctx, t1, rt);
-> +        tcg_gen_qemu_st_i64(t1, t0, ctx->mem_idx, MO_TEQ |
-> +                            ctx->default_tcg_memop_mask);
-> +        tcg_temp_free(t1);
-> +        break;
-> +#endif
-> +    default:
-> +        break;
-> +    }
-> +
-> +    tcg_temp_free(t0);
-> +}
-> +
->   /* Traps */
->   static void gen_trap(DisasContext *ctx, uint32_t opc,
->                        int rs, int rt, int16_t imm)
-> @@ -31055,6 +31232,8 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
->                   /* OPC_JIC, OPC_JIALC */
->                   gen_compute_compact_branch(ctx, op, 0, rt, imm);
->               }
-> +        } else if (ctx->insn_flags & ASE_LEXT) {
-> +            gen_loongson_lsdc2(ctx, rt, rs, rd);
->           } else {
->               /* OPC_LWC2, OPC_SWC2 */
->               /* COP2: Not implemented. */
 > 
+> > +
+> > +    if (!div) {
+> > +        clock_update(mux->out, 0);
+> > +    }
+> > +
+> > +    freq = muldiv64(freq, 1 << mux->frac_bits, div);
+> > +
+> > +    clock_update_hz(mux->out, freq);
+> >  }
+> >  
+> >  static void clock_mux_src_update(void *opaque)
+> >  {
+> >      CprmanClockMuxState **backref = opaque;
+> >      CprmanClockMuxState *s = *backref;
+> > +    CprmanClockMuxSource src = backref - s->backref;
+> > +
+> > +    if (FIELD_EX32(*s->reg_cm, CM_CLOCKx_CTL, SRC) != src) {
+> > +        return;
+> > +    }
+> >  
+> >      clock_mux_update(s);
+> >  }
+> >  
+> >  static void clock_mux_init(Object *obj)
+> > 
+
+-- 
 
