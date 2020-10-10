@@ -2,97 +2,93 @@ Return-Path: <SRS0=BZbV=DR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA3D6C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 16:19:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C7AFC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 16:23:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49CD7223BD
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 16:19:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bORYwRCu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49CD7223BD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id BB6F3223BD
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 16:23:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB6F3223BD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRHaq-00032k-77
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 12:19:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45272)
+	id 1kRHeV-0004vk-Qu
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 12:23:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45810)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRHa3-0002VW-Dc; Sat, 10 Oct 2020 12:18:47 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:52845)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRHa1-0004za-Iv; Sat, 10 Oct 2020 12:18:47 -0400
-Received: by mail-wm1-x343.google.com with SMTP id e23so5745989wme.2;
- Sat, 10 Oct 2020 09:18:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=+hvGFuDvUtedq7zWw96MNl1ebw89wkfO3uQKU7C/lSI=;
- b=bORYwRCupTfWuRdHzWk/cgQpRDPKYXTUqQQALQ3f4r+XJwM9/yUCAH6secNiNKVaZJ
- X1NM5juSSw6i/lrY7OjgGObIcDwmKYC8FKIwpcgRfso6mZw++DVzDsSNtmsSRIg7ZeJX
- SpZaIXo28khI32qq4jDFuQ0iqNbPDPZlBVTuz+sbxRpt4YUnL17f7mP9VZ+fF0VTdr6T
- 1AaJbLa+HUcmNaqhav0z69xNRwnrCc9fWuV1RCaehLgcBAEJ2QFaD7zJrihqkuxmkUP7
- 9aCiwRWs7Uy6jpBtNtW4TqUmSTHpNw4gfqmTsJ0wGa+wTCdAvbbXmtaEmMgSMIovrcyd
- DXkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=+hvGFuDvUtedq7zWw96MNl1ebw89wkfO3uQKU7C/lSI=;
- b=mrSM5R7TIKXw5v3FUrwbueXYnctr5dfin2aT1Fg0fzTCfWZK+e9jaIx1SXjqwOuVJ6
- u5N01CwkuvQiG/DtSojR8BxLIhX/j1GGtXauMgB2Ngx571Ag8xrEcslf1ZP3JDZCRLpy
- BijxiEuEAcqztNhuc641/e4z5yU6FmGpfGNSRm7dvgRtVpw8c3P2No+ubZhcxjl/YvSo
- j3t3mKaExQaAa0Naa+aO5xKQPQSxEbTq96/xbzkS5RPxreOKB+rzTGdISpotPcqk4RSz
- hxnrqhrJ8NlZqJQwABOsVlkdMzn2874pnEMOWyigeADq4SgTKgnjZ7BUi/ZpUe+STlmj
- Pmnw==
-X-Gm-Message-State: AOAM530AAIS3VD6vUWStSbR19KuBykAscVASr+qs2Cjqcr/I2+DyoqmN
- VCYeoQWeD6/TzkXZ7fUppxk=
-X-Google-Smtp-Source: ABdhPJxlBeld7v7vEGwr02TRdac+p4jk8+3eZQzimfxpvm+3XBW3xl2HJaJU05+4b8u9aoNMEOYB/g==
-X-Received: by 2002:a1c:ded7:: with SMTP id v206mr3173802wmg.183.1602346723628; 
- Sat, 10 Oct 2020 09:18:43 -0700 (PDT)
-Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
- [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id u2sm17599134wre.7.2020.10.10.09.18.41
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 10 Oct 2020 09:18:42 -0700 (PDT)
-Subject: Re: [PATCH v3 13/15] hw/misc/bcm2835_cprman: add sane reset values to
- the registers
-To: Luc Michel <luc@lmichel.fr>, qemu-devel@nongnu.org
-References: <20201010135759.437903-1-luc@lmichel.fr>
- <20201010135759.437903-14-luc@lmichel.fr>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <48280560-3642-5367-a46e-53548e77c748@amsat.org>
-Date: Sat, 10 Oct 2020 18:18:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
-MIME-Version: 1.0
-In-Reply-To: <20201010135759.437903-14-luc@lmichel.fr>
-Content-Type: text/plain; charset=utf-8; format=flowed
+ (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
+ id 1kRHdd-0004UV-Qi; Sat, 10 Oct 2020 12:22:29 -0400
+Received: from mga05.intel.com ([192.55.52.43]:64260)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
+ id 1kRHdb-0005Zm-8t; Sat, 10 Oct 2020 12:22:29 -0400
+IronPort-SDR: y60BstR+gyVhrVACtB6QzsWKOT9Yw9bNaV9aAmwEbFCtUhlEDD57TdJlrDHC2aXQmnGm14lfYT
+ 8FhE7iUmy2Xw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9770"; a="250286057"
+X-IronPort-AV: E=Sophos;i="5.77,359,1596524400"; d="scan'208";a="250286057"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+ by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 10 Oct 2020 09:22:21 -0700
+IronPort-SDR: PogaIxRRd1ze8U2UPT3Li/AgkLUQTnoxLaOcuDsdJqYUMO2viw3NCijno82VOrR7LLsFcl1AYQ
+ uGvX/OYnqNug==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.77,359,1596524400"; d="scan'208";a="520122762"
+Received: from fmsmsx605.amr.corp.intel.com ([10.18.126.85])
+ by fmsmga005.fm.intel.com with ESMTP; 10 Oct 2020 09:22:21 -0700
+Received: from shsmsx603.ccr.corp.intel.com (10.109.6.143) by
+ fmsmsx605.amr.corp.intel.com (10.18.126.85) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Sat, 10 Oct 2020 09:22:20 -0700
+Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
+ SHSMSX603.ccr.corp.intel.com (10.109.6.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Sun, 11 Oct 2020 00:22:18 +0800
+Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
+ SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
+ Sun, 11 Oct 2020 00:22:18 +0800
+From: "Zhang, Chen" <chen.zhang@intel.com>
+To: Pan Nengyuan <pannengyuan@huawei.com>, Li Qiang <liq3ea@gmail.com>
+Subject: RE: [PATCH] net/filter-rewriter: destroy g_hash_table in
+ colo_rewriter_cleanup
+Thread-Topic: [PATCH] net/filter-rewriter: destroy g_hash_table in
+ colo_rewriter_cleanup
+Thread-Index: AQHWgoxAN7Z5W4Oo6kad3S1TmqXujalYsCSAgDesHgCAAOC18A==
+Date: Sat, 10 Oct 2020 16:22:18 +0000
+Message-ID: <b2e6f80cf0f04b39a7ebeb96a572fe7c@intel.com>
+References: <20200904134908.1396-1-pannengyuan@huawei.com>
+ <CAKXe6SJL8Y2frr1-d06=Ovoo=45+kJSGM2vhDGFeJf4YuUfN4A@mail.gmail.com>
+ <e327c596-08bf-655b-5b2b-aaeb4fcbdb2e@huawei.com>
+In-Reply-To: <e327c596-08bf-655b-5b2b-aaeb4fcbdb2e@huawei.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -19
-X-Spam_score: -2.0
-X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-0.207,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.5.1.3
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.36]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Received-SPF: pass client-ip=192.55.52.43; envelope-from=chen.zhang@intel.com;
+ helo=mga05.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/10 12:22:21
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,207 +101,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Havard Skinnemoen <hskinnemoen@google.com>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Paul Zimmerman <pauldzim@gmail.com>,
- Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org
+Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ Jason Wang <jasowang@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
+ Qemu Developers <qemu-devel@nongnu.org>, Chen Qun <kuhn.chenqun@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/10/20 3:57 PM, Luc Michel wrote:
-> Those reset values have been extracted from a Raspberry Pi 3 model B
-> v1.2, using the 2020-08-20 version of raspios. The dump was done using
-> the debugfs interface of the CPRMAN driver in Linux (under
-> '/sys/kernel/debug/clk'). Each exposed clock tree stage (PLLs, channels
-> and muxes) can be observed by reading the 'regdump' file (e.g.
-> 'plla/regdump').
-> 
-> Those values are set by the Raspberry Pi firmware at boot time (Linux
-> expects them to be set when it boots up).
-> 
-> Some stages are not exposed by the Linux driver (e.g. the PLL B). For
-> those, the reset values are unknown and left to 0 which implies a
-> disabled output.
-> 
-> Once booted in QEMU, the final clock tree is very similar to the one
-> visible on real hardware. The differences come from some unimplemented
-> devices for which the driver simply disable the corresponding clock.
-> 
-> Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Signed-off-by: Luc Michel <luc@lmichel.fr>
-> ---
->   include/hw/misc/bcm2835_cprman_internals.h | 269 +++++++++++++++++++++
->   hw/misc/bcm2835_cprman.c                   |  31 +++
->   2 files changed, 300 insertions(+)
-> 
-> diff --git a/include/hw/misc/bcm2835_cprman_internals.h b/include/hw/misc/bcm2835_cprman_internals.h
-> index a6e799075f..339759b307 100644
-> --- a/include/hw/misc/bcm2835_cprman_internals.h
-> +++ b/include/hw/misc/bcm2835_cprman_internals.h
-> @@ -745,6 +745,275 @@ static inline void set_clock_mux_init_info(BCM2835CprmanState *s,
->       mux->reg_div = &s->regs[CLOCK_MUX_INIT_INFO[id].cm_offset + 1];
->       mux->int_bits = CLOCK_MUX_INIT_INFO[id].int_bits;
->       mux->frac_bits = CLOCK_MUX_INIT_INFO[id].frac_bits;
->   }
->   
-> +
-> +/*
-> + * Object reset info
-> + * Those values have been dumped from a Raspberry Pi 3 Model B v1.2 using the
-> + * clk debugfs interface in Linux.
-> + */
-> +typedef struct PLLResetInfo {
-> +    uint32_t cm;
-> +    uint32_t a2w_ctrl;
-> +    uint32_t a2w_ana[4];
-> +    uint32_t a2w_frac;
-> +} PLLResetInfo;
-> +
-> +static const PLLResetInfo PLL_RESET_INFO[] = {
-> +    [CPRMAN_PLLA] = {
-> +        .cm = 0x0000008a,
-> +        .a2w_ctrl = 0x0002103a,
-> +        .a2w_frac = 0x00098000,
-> +        .a2w_ana = { 0x00000000, 0x00144000, 0x00000000, 0x00000100 }
-> +    },
-> +
-> +    [CPRMAN_PLLC] = {
-> +        .cm = 0x00000228,
-> +        .a2w_ctrl = 0x0002103e,
-> +        .a2w_frac = 0x00080000,
-> +        .a2w_ana = { 0x00000000, 0x00144000, 0x00000000, 0x00000100 }
-> +    },
-> +
-> +    [CPRMAN_PLLD] = {
-> +        .cm = 0x0000020a,
-> +        .a2w_ctrl = 0x00021034,
-> +        .a2w_frac = 0x00015556,
-> +        .a2w_ana = { 0x00000000, 0x00144000, 0x00000000, 0x00000100 }
-> +    },
-> +
-> +    [CPRMAN_PLLH] = {
-> +        .cm = 0x00000000,
-> +        .a2w_ctrl = 0x0002102d,
-> +        .a2w_frac = 0x00000000,
-> +        .a2w_ana = { 0x00900000, 0x0000000c, 0x00000000, 0x00000000 }
-> +    },
-> +
-> +    [CPRMAN_PLLB] = {
-> +        /* unknown */
-> +        .cm = 0x00000000,
-> +        .a2w_ctrl = 0x00000000,
-> +        .a2w_frac = 0x00000000,
-> +        .a2w_ana = { 0x00000000, 0x00000000, 0x00000000, 0x00000000 }
-> +    }
-> +};
-> +
-> +typedef struct PLLChannelResetInfo {
-> +    /*
-> +     * Even though a PLL channel has a CM register, it shares it with its
-> +     * parent PLL. The parent already takes care of the reset value.
-> +     */
-> +    uint32_t a2w_ctrl;
-> +} PLLChannelResetInfo;
-> +
-> +static const PLLChannelResetInfo PLL_CHANNEL_RESET_INFO[] = {
-> +    [CPRMAN_PLLA_CHANNEL_DSI0] = { .a2w_ctrl = 0x00000100 },
-> +    [CPRMAN_PLLA_CHANNEL_CORE] = { .a2w_ctrl = 0x00000003 },
-> +    [CPRMAN_PLLA_CHANNEL_PER] = { .a2w_ctrl = 0x00000000 }, /* unknown */
-> +    [CPRMAN_PLLA_CHANNEL_CCP2] = { .a2w_ctrl = 0x00000100 },
-> +
-> +    [CPRMAN_PLLC_CHANNEL_CORE2] = { .a2w_ctrl = 0x00000100 },
-> +    [CPRMAN_PLLC_CHANNEL_CORE1] = { .a2w_ctrl = 0x00000100 },
-> +    [CPRMAN_PLLC_CHANNEL_PER] = { .a2w_ctrl = 0x00000002 },
-> +    [CPRMAN_PLLC_CHANNEL_CORE0] = { .a2w_ctrl = 0x00000002 },
-> +
-> +    [CPRMAN_PLLD_CHANNEL_DSI0] = { .a2w_ctrl = 0x00000100 },
-> +    [CPRMAN_PLLD_CHANNEL_CORE] = { .a2w_ctrl = 0x00000004 },
-> +    [CPRMAN_PLLD_CHANNEL_PER] = { .a2w_ctrl = 0x00000004 },
-> +    [CPRMAN_PLLD_CHANNEL_DSI1] = { .a2w_ctrl = 0x00000100 },
-> +
-> +    [CPRMAN_PLLH_CHANNEL_AUX] = { .a2w_ctrl = 0x00000004 },
-> +    [CPRMAN_PLLH_CHANNEL_RCAL] = { .a2w_ctrl = 0x00000000 },
-> +    [CPRMAN_PLLH_CHANNEL_PIX] = { .a2w_ctrl = 0x00000000 },
-> +
-> +    [CPRMAN_PLLB_CHANNEL_ARM] = { .a2w_ctrl = 0x00000000 }, /* unknown */
-> +};
-> +
-> +typedef struct ClockMuxResetInfo {
-> +    uint32_t cm_ctl;
-> +    uint32_t cm_div;
-> +} ClockMuxResetInfo;
-> +
-> +static const ClockMuxResetInfo CLOCK_MUX_RESET_INFO[] = {
-> +    [CPRMAN_CLOCK_GNRIC] = {
-> +        .cm_ctl = 0, /* unknown */
-> +        .cm_div = 0
-> +    },
-> +
-[...]
-> +};
-> +
->   #endif
-> diff --git a/hw/misc/bcm2835_cprman.c b/hw/misc/bcm2835_cprman.c
-> index 7a7401963d..7e415a017c 100644
-> --- a/hw/misc/bcm2835_cprman.c
-> +++ b/hw/misc/bcm2835_cprman.c
-> @@ -51,10 +51,21 @@
->   #include "hw/misc/bcm2835_cprman_internals.h"
->   #include "trace.h"
->   
->   /* PLL */
->   
-> +static void pll_reset(DeviceState *dev)
-> +{
-> +    CprmanPllState *s = CPRMAN_PLL(dev);
-> +    const PLLResetInfo *info = &PLL_RESET_INFO[s->id];
-
-Hmm so we overwrite various values from PLL_INIT_INFO.
-> +
-> +    *s->reg_cm = info->cm;
-> +    *s->reg_a2w_ctrl = info->a2w_ctrl;
-> +    memcpy(s->reg_a2w_ana, info->a2w_ana, sizeof(info->a2w_ana));
-> +    *s->reg_a2w_frac = info->a2w_frac;
-
-set_pll_init_info() can be simplified as:
-
-     pll->id = id;
-     pll->prediv_mask = PLL_INIT_INFO[id].prediv_mask;
-
-Or directly in cprman_init():
-
-     &s->plls[i]->id = i;
-     &s->plls[i]->prediv_mask = PLL_INIT_INFO[i].prediv_mask;
-
-And the rest directly implemented in pll_reset().
-
-Maybe not, but having pll_reset() added in patch #8/15
-"bcm2835_cprman: add a PLL channel skeleton implementation"
-would make this patch review easier ;)
-
-> +}
-> +
->   static bool pll_is_locked(const CprmanPllState *pll)
->   {
->       return !FIELD_EX32(*pll->reg_a2w_ctrl, A2W_PLLx_CTRL, PWRDN)
->           && !FIELD_EX32(*pll->reg_cm, CM_PLLx, ANARST);
->   }
-> @@ -121,10 +132,11 @@ static const VMStateDescription pll_vmstate = {
->   
->   static void pll_class_init(ObjectClass *klass, void *data)
->   {
->       DeviceClass *dc = DEVICE_CLASS(klass);
->   
-> +    dc->reset = pll_reset;
->       dc->vmsd = &pll_vmstate;
->   }
-[...]
-Similarly, implement clock_mux_reset() in patch #10/15
-"bcm2835_cprman: add a clock mux skeleton implementation".
-
-Regards,
-
-Phil.
+SSBhbHJlYWR5IHF1ZXVlZCB0aGlzIHBhdGNoIHRvIENPTE8gcHJveHkgdHJlZSwgdGhlbiBJIHdp
+bGwgc2VuZCBhIHNlcmllcyB0byBKYXNvbi4NCg0KVGhhbmtzDQpDaGVuDQoNCj4gLS0tLS1Pcmln
+aW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGFuIE5lbmd5dWFuIDxwYW5uZW5neXVhbkBodWF3
+ZWkuY29tPg0KPiBTZW50OiBTYXR1cmRheSwgT2N0b2JlciAxMCwgMjAyMCA2OjU1IFBNDQo+IFRv
+OiBMaSBRaWFuZyA8bGlxM2VhQGdtYWlsLmNvbT4NCj4gQ2M6IFFlbXUgRGV2ZWxvcGVycyA8cWVt
+dS1kZXZlbEBub25nbnUub3JnPjsgWmhhbmcsIENoZW4NCj4gPGNoZW4uemhhbmdAaW50ZWwuY29t
+PjsgSmFzb24gV2FuZyA8amFzb3dhbmdAcmVkaGF0LmNvbT47DQo+IHpoYW5naGFpbGlhbmcgPHpo
+YW5nLnpoYW5naGFpbGlhbmdAaHVhd2VpLmNvbT47IENoZW4gUXVuDQo+IDxrdWhuLmNoZW5xdW5A
+aHVhd2VpLmNvbT47IHFlbXUtdHJpdmlhbEBub25nbnUub3JnOyBMYXVyZW50IFZpdmllcg0KPiA8
+bGF1cmVudEB2aXZpZXIuZXU+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0hdIG5ldC9maWx0ZXItcmV3
+cml0ZXI6IGRlc3Ryb3kgZ19oYXNoX3RhYmxlIGluDQo+IGNvbG9fcmV3cml0ZXJfY2xlYW51cA0K
+PiANCj4gcGluZyENCj4gDQo+IE1heWJlIG1pc3NlZCB0byBxdWV1ZT8NCj4gDQo+IE9uIDIwMjAv
+OS81IDg6NDQsIExpIFFpYW5nIHdyb3RlOg0KPiA+IFBhbiBOZW5neXVhbiA8cGFubmVuZ3l1YW5A
+aHVhd2VpLmNvbT4g5LqOMjAyMOW5tDnmnIg05pel5ZGo5LqUIOS4iw0KPiDljYgzOjIz5YaZ6YGT
+77yaDQo+ID4+DQo+ID4+IHMtPmNvbm5lY3Rpb25fdHJhY2tfdGFibGUgZm9yZ290IHRvIGRlc3Ry
+b3kgaW4gY29sb19yZXdyaXRlcl9jbGVhbnVwLiBGaXgNCj4gaXQuDQo+ID4+DQo+ID4+IFJlcG9y
+dGVkLWJ5OiBFdWxlciBSb2JvdCA8ZXVsZXIucm9ib3RAaHVhd2VpLmNvbT4NCj4gPj4gU2lnbmVk
+LW9mZi1ieTogUGFuIE5lbmd5dWFuIDxwYW5uZW5neXVhbkBodWF3ZWkuY29tPg0KPiA+DQo+ID4g
+UmV2aWV3ZWQtYnk6IExpIFFpYW5nIDxsaXEzZWFAZ21haWwuY29tPg0KPiA+DQo+ID4+IC0tLQ0K
+PiA+PiAgbmV0L2ZpbHRlci1yZXdyaXRlci5jIHwgMiArKw0KPiA+PiAgMSBmaWxlIGNoYW5nZWQs
+IDIgaW5zZXJ0aW9ucygrKQ0KPiA+Pg0KPiA+PiBkaWZmIC0tZ2l0IGEvbmV0L2ZpbHRlci1yZXdy
+aXRlci5jIGIvbmV0L2ZpbHRlci1yZXdyaXRlci5jIGluZGV4DQo+ID4+IDFhYWFkMTAxYjYuLjlm
+ZjM2NmQ0NGYgMTAwNjQ0DQo+ID4+IC0tLSBhL25ldC9maWx0ZXItcmV3cml0ZXIuYw0KPiA+PiAr
+KysgYi9uZXQvZmlsdGVyLXJld3JpdGVyLmMNCj4gPj4gQEAgLTM3Niw2ICszNzYsOCBAQCBzdGF0
+aWMgdm9pZCBjb2xvX3Jld3JpdGVyX2NsZWFudXAoTmV0RmlsdGVyU3RhdGUNCj4gKm5mKQ0KPiA+
+PiAgICAgICAgICBmaWx0ZXJfcmV3cml0ZXJfZmx1c2gobmYpOw0KPiA+PiAgICAgICAgICBnX2Zy
+ZWUocy0+aW5jb21pbmdfcXVldWUpOw0KPiA+PiAgICAgIH0NCj4gPj4gKw0KPiA+PiArICAgIGdf
+aGFzaF90YWJsZV9kZXN0cm95KHMtPmNvbm5lY3Rpb25fdHJhY2tfdGFibGUpOw0KPiA+PiAgfQ0K
+PiA+Pg0KPiA+PiAgc3RhdGljIHZvaWQgY29sb19yZXdyaXRlcl9zZXR1cChOZXRGaWx0ZXJTdGF0
+ZSAqbmYsIEVycm9yICoqZXJycCkNCj4gPj4gLS0NCj4gPj4gMi4xOC4yDQo+ID4+DQo+ID4+DQo=
 
