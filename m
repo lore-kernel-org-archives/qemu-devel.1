@@ -2,67 +2,67 @@ Return-Path: <SRS0=BZbV=DR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,WEIRD_QUOTING autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E38C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:02:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07129C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:03:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 217A5207C4
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:02:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9AFEB207C4
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:03:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iJrYeMtq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 217A5207C4
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CaSAEQdq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AFEB207C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kR9pY-00015k-8C
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 04:02:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41142)
+	id 1kR9qN-00022i-OL
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 04:03:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41222)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kR9lK-00047p-Ar
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:57:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23943)
+ id 1kR9lO-0004If-AT
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:57:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27344)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kR9lG-0006gi-2g
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:57:53 -0400
+ id 1kR9lJ-0006hw-Df
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:57:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602316669;
+ s=mimecast20190719; t=1602316672;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=aQvkge0tNZd5H2eAWDkXPTFRir9tCSRBEj2P2UjR8r8=;
- b=iJrYeMtqDNVwz30y6rrrDKXOc5wLQuVo71chSUuR1XwwQWwuqqiltM390Ju/tu/JrToIck
- zVJj/1BzxWun4vcsw/U7L8q1shTq+jfv5K9R/3sw/3gbNaGXw9LGLClo5CRgnzulo5LTMC
- jjgLEefVda5vUN17+kXPqMlKsrAENvQ=
+ bh=K3LXVZ6KMWOK4xQ4FlrQkIzFIzfkyJlH2adOkOKEJm4=;
+ b=CaSAEQdqbeu6ctWPOoBiE5zruT899hcaNmDk9OVw9+ikyPtFqMB//R0kMN0Pj7tTXwO6l1
+ kSYh/5BraIgSAGpa442zN/opb+FChd3ZUkDZ/Ym01FemZNgmvuI1r2lf1k693Ycx/fLgmh
+ NGBVln8eHyB7+Z5aLYVhV6vVA8FxqZI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-113-OZ39FIlEPc-052B2jQci8Q-1; Sat, 10 Oct 2020 03:57:47 -0400
-X-MC-Unique: OZ39FIlEPc-052B2jQci8Q-1
+ us-mta-264-H0icSZqgNQCCIid7at6hYg-1; Sat, 10 Oct 2020 03:57:50 -0400
+X-MC-Unique: H0icSZqgNQCCIid7at6hYg-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6F958030D0
- for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 07:57:46 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 764BC3FE7
+ for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 07:57:47 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6650F6EF4F;
- Sat, 10 Oct 2020 07:57:46 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4585A6EF6E
+ for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 07:57:47 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 16/39] docs/devel/qtest: Include protocol spec in document
-Date: Sat, 10 Oct 2020 03:57:16 -0400
-Message-Id: <20201010075739.951385-17-pbonzini@redhat.com>
+Subject: [PULL 18/39] qtest: unify extra_qtest_srcs and extra_qtest_deps
+Date: Sat, 10 Oct 2020 03:57:18 -0400
+Message-Id: <20201010075739.951385-19-pbonzini@redhat.com>
 In-Reply-To: <20201010075739.951385-1-pbonzini@redhat.com>
 References: <20201010075739.951385-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -73,18 +73,17 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/10 02:57:53
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/10 03:36:24
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- WEIRD_QUOTING=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,242 +96,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eduardo Habkost <ehabkost@redhat.com>
+Currently the extra sources and extra dependencies of qtests are held
+in two separate dictionaries.  Use the same trick as tests/meson.build
+to combine them into one.  This will make it easier to update the
+documentation for unit tests and qtests.
 
-Include the QTest Protocol doc string in docs/devel/qtest.rst,
-after converting it to use Sphinx syntax.
-
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Acked-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20201005205228.697463-3-ehabkost@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- docs/devel/qtest.rst | 12 ++++++--
- softmmu/qtest.c      | 71 +++++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 73 insertions(+), 10 deletions(-)
+ tests/qtest/meson.build | 55 +++++++++++++++++++----------------------
+ 1 file changed, 26 insertions(+), 29 deletions(-)
 
-diff --git a/docs/devel/qtest.rst b/docs/devel/qtest.rst
-index 86dec84a0b..3bf9ebee7f 100644
---- a/docs/devel/qtest.rst
-+++ b/docs/devel/qtest.rst
-@@ -4,8 +4,8 @@ QTest Device Emulation Testing Framework
+diff --git a/tests/qtest/meson.build b/tests/qtest/meson.build
+index 0f32ca0895..28bafc02a2 100644
+--- a/tests/qtest/meson.build
++++ b/tests/qtest/meson.build
+@@ -193,35 +193,25 @@ qos_test_ss.add(
+ qos_test_ss.add(when: 'CONFIG_VIRTFS', if_true: files('virtio-9p-test.c'))
+ qos_test_ss.add(when: 'CONFIG_VHOST_USER', if_true: files('vhost-user-test.c'))
  
- QTest is a device emulation testing framework.  It can be very useful to test
- device models; it could also control certain aspects of QEMU (such as virtual
--clock stepping), with a special purpose "qtest" protocol.  Refer to the
--documentation in ``qtest.c`` for more details of the protocol.
-+clock stepping), with a special purpose "qtest" protocol.  Refer to
-+:ref:`qtest-protocol` for more details of the protocol.
- 
- QTest cases can be executed with
- 
-@@ -56,3 +56,11 @@ from the output of
- 
- which you can run manually.
- 
+-extra_qtest_deps = {
+-  'bios-tables-test': [io],
+-  'ivshmem-test': [rt],
+-  'qos-test': [chardev, io],
+-  'tpm-crb-swtpm-test': [io],
+-  'tpm-crb-test': [io],
+-  'tpm-tis-swtpm-test': [io],
+-  'tpm-tis-test': [io],
+-  'tpm-tis-device-swtpm-test': [io],
+-  'tpm-tis-device-test': [io],
+-}
+-extra_qtest_srcs = {
+-  'bios-tables-test': files('boot-sector.c', 'acpi-utils.c', 'tpm-emu.c'),
+-  'pxe-test': files('boot-sector.c'),
++tpmemu_files = ['tpm-emu.c', 'tpm-util.c', 'tpm-tests.c']
 +
-+.. _qtest-protocol:
-+
-+QTest Protocol
-+--------------
-+
-+.. kernel-doc:: softmmu/qtest.c
-+   :doc: QTest Protocol
-diff --git a/softmmu/qtest.c b/softmmu/qtest.c
-index 0d43cf8883..2c6e8dc858 100644
---- a/softmmu/qtest.c
-+++ b/softmmu/qtest.c
-@@ -49,92 +49,139 @@ static void *qtest_server_send_opaque;
- #define FMT_timeval "%ld.%06ld"
++qtests = {
++  'bios-tables-test': [io, 'boot-sector.c', 'acpi-utils.c', 'tpm-emu.c'],
+   'cdrom-test': files('boot-sector.c'),
+-  'migration-test': files('migration-helpers.c'),
+-  'ivshmem-test': files('../../contrib/ivshmem-server/ivshmem-server.c'),
+   'dbus-vmstate-test': files('migration-helpers.c') + dbus_vmstate1,
++  'ivshmem-test': [rt, '../../contrib/ivshmem-server/ivshmem-server.c'],
++  'migration-test': files('migration-helpers.c'),
++  'pxe-test': files('boot-sector.c'),
++  'qos-test': [chardev, io, qos_test_ss.apply(config_host, strict: false).sources()],
++  'tpm-crb-swtpm-test': [io, tpmemu_files],
++  'tpm-crb-test': [io, tpmemu_files],
++  'tpm-tis-swtpm-test': [io, tpmemu_files, 'tpm-tis-util.c'],
++  'tpm-tis-test': [io, tpmemu_files, 'tpm-tis-util.c'],
++  'tpm-tis-device-swtpm-test': [io, tpmemu_files, 'tpm-tis-util.c'],
++  'tpm-tis-device-test': [io, tpmemu_files, 'tpm-tis-util.c'],
+   'vmgenid-test': files('boot-sector.c', 'acpi-utils.c'),
+-  'tpm-crb-swtpm-test': files('tpm-emu.c', 'tpm-util.c', 'tpm-tests.c'),
+-  'tpm-crb-test': files('tpm-emu.c', 'tpm-util.c', 'tpm-tests.c'),
+-  'tpm-tis-device-swtpm-test': files('tpm-emu.c', 'tpm-util.c', 'tpm-tis-util.c', 'tpm-tests.c'),
+-  'tpm-tis-device-test': files('tpm-emu.c', 'tpm-util.c', 'tpm-tis-util.c', 'tpm-tests.c'),
+-  'tpm-tis-swtpm-test': files('tpm-emu.c', 'tpm-util.c', 'tpm-tis-util.c', 'tpm-tests.c'),
+-  'tpm-tis-test': files('tpm-emu.c', 'tpm-util.c', 'tpm-tis-util.c', 'tpm-tests.c'),
+-  'qos-test': qos_test_ss.apply(config_host, strict: false).sources()
+ }
  
- /**
-- * QTest Protocol
-+ * DOC: QTest Protocol
-  *
-  * Line based protocol, request/response based.  Server can send async messages
-  * so clients should always handle many async messages before the response
-  * comes in.
-  *
-  * Valid requests
-+ * ^^^^^^^^^^^^^^
-  *
-  * Clock management:
-+ * """""""""""""""""
-  *
-  * The qtest client is completely in charge of the QEMU_CLOCK_VIRTUAL.  qtest commands
-  * let you adjust the value of the clock (monotonically).  All the commands
-  * return the current value of the clock in nanoseconds.
-  *
-+ * .. code-block:: none
-+ *
-  *  > clock_step
-  *  < OK VALUE
-  *
-- *     Advance the clock to the next deadline.  Useful when waiting for
-- *     asynchronous events.
-+ * Advance the clock to the next deadline.  Useful when waiting for
-+ * asynchronous events.
-+ *
-+ * .. code-block:: none
-  *
-  *  > clock_step NS
-  *  < OK VALUE
-  *
-- *     Advance the clock by NS nanoseconds.
-+ * Advance the clock by NS nanoseconds.
-+ *
-+ * .. code-block:: none
-  *
-  *  > clock_set NS
-  *  < OK VALUE
-  *
-- *     Advance the clock to NS nanoseconds (do nothing if it's already past).
-+ * Advance the clock to NS nanoseconds (do nothing if it's already past).
-  *
-  * PIO and memory access:
-+ * """"""""""""""""""""""
-+ *
-+ * .. code-block:: none
-  *
-  *  > outb ADDR VALUE
-  *  < OK
-  *
-+ * .. code-block:: none
-+ *
-  *  > outw ADDR VALUE
-  *  < OK
-  *
-+ * .. code-block:: none
-+ *
-  *  > outl ADDR VALUE
-  *  < OK
-  *
-+ * .. code-block:: none
-+ *
-  *  > inb ADDR
-  *  < OK VALUE
-  *
-+ * .. code-block:: none
-+ *
-  *  > inw ADDR
-  *  < OK VALUE
-  *
-+ * .. code-block:: none
-+ *
-  *  > inl ADDR
-  *  < OK VALUE
-  *
-+ * .. code-block:: none
-+ *
-  *  > writeb ADDR VALUE
-  *  < OK
-  *
-+ * .. code-block:: none
-+ *
-  *  > writew ADDR VALUE
-  *  < OK
-  *
-+ * .. code-block:: none
-+ *
-  *  > writel ADDR VALUE
-  *  < OK
-  *
-+ * .. code-block:: none
-+ *
-  *  > writeq ADDR VALUE
-  *  < OK
-  *
-+ * .. code-block:: none
-+ *
-  *  > readb ADDR
-  *  < OK VALUE
-  *
-+ * .. code-block:: none
-+ *
-  *  > readw ADDR
-  *  < OK VALUE
-  *
-+ * .. code-block:: none
-+ *
-  *  > readl ADDR
-  *  < OK VALUE
-  *
-+ * .. code-block:: none
-+ *
-  *  > readq ADDR
-  *  < OK VALUE
-  *
-+ * .. code-block:: none
-+ *
-  *  > read ADDR SIZE
-  *  < OK DATA
-  *
-+ * .. code-block:: none
-+ *
-  *  > write ADDR SIZE DATA
-  *  < OK
-  *
-+ * .. code-block:: none
-+ *
-  *  > b64read ADDR SIZE
-  *  < OK B64_DATA
-  *
-+ * .. code-block:: none
-+ *
-  *  > b64write ADDR SIZE B64_DATA
-  *  < OK
-  *
-+ * .. code-block:: none
-+ *
-  *  > memset ADDR SIZE VALUE
-  *  < OK
-  *
-@@ -149,16 +196,21 @@ static void *qtest_server_send_opaque;
-  * If the sizes do not match, the data will be truncated.
-  *
-  * IRQ management:
-+ * """""""""""""""
-+ *
-+ * .. code-block:: none
-  *
-  *  > irq_intercept_in QOM-PATH
-  *  < OK
-  *
-+ * .. code-block:: none
-+ *
-  *  > irq_intercept_out QOM-PATH
-  *  < OK
-  *
-  * Attach to the gpio-in (resp. gpio-out) pins exported by the device at
-  * QOM-PATH.  When the pin is triggered, one of the following async messages
-- * will be printed to the qtest stream:
-+ * will be printed to the qtest stream::
-  *
-  *  IRQ raise NUM
-  *  IRQ lower NUM
-@@ -168,12 +220,15 @@ static void *qtest_server_send_opaque;
-  * NUM=0 even though it is remapped to GSI 2).
-  *
-  * Setting interrupt level:
-+ * """"""""""""""""""""""""
-+ *
-+ * .. code-block:: none
-  *
-  *  > set_irq_in QOM-PATH NAME NUM LEVEL
-  *  < OK
-  *
-- *  where NAME is the name of the irq/gpio list, NUM is an IRQ number and
-- *  LEVEL is an signed integer IRQ level.
-+ * where NAME is the name of the irq/gpio list, NUM is an IRQ number and
-+ * LEVEL is an signed integer IRQ level.
-  *
-  * Forcibly set the given interrupt pin to the given level.
-  *
+-
+ qtest_executables = {}
+ foreach dir : target_dirs
+   if not dir.endswith('-softmmu')
+@@ -230,7 +220,7 @@ foreach dir : target_dirs
+ 
+   target_base = dir.split('-')[0]
+   qtest_emulator = emulators['qemu-system-' + target_base]
+-  qtests = get_variable('qtests_' + target_base, []) + qtests_generic
++  target_qtests = get_variable('qtests_' + target_base, []) + qtests_generic
+ 
+   test_deps = []
+   qtest_env = environment()
+@@ -241,14 +231,21 @@ foreach dir : target_dirs
+   qtest_env.set('G_TEST_DBUS_DAEMON', meson.source_root() / 'tests/dbus-vmstate-daemon.sh')
+   qtest_env.set('QTEST_QEMU_BINARY', './qemu-system-' + target_base)
+   
+-  foreach test : qtests
++  foreach test : target_qtests
+     # Executables are shared across targets, declare them only the first time we
+     # encounter them
+     if not qtest_executables.has_key(test)
++      src = [test + '.c']
++      deps = [qemuutil, qos]
++      if test in qtests
++        # use a sourceset to quickly separate sources and deps
++        test_ss = ss.source_set()
++        test_ss.add(qtests[test])
++        src += test_ss.all_sources()
++        deps += test_ss.all_dependencies()
++      endif
+       qtest_executables += {
+-        test: executable(test,
+-                         files(test + '.c') + extra_qtest_srcs.get(test, []),
+-                         dependencies: [qemuutil, qos] + extra_qtest_deps.get(test, []))
++        test: executable(test, src, dependencies: deps)
+       }
+     endif
+     # FIXME: missing dependency on the emulator binary and qemu-img
 -- 
 2.26.2
 
