@@ -2,88 +2,63 @@ Return-Path: <SRS0=BZbV=DR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCCEDC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:25:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA746C433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:26:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51622207C4
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:25:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W2G4Xvr2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51622207C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 55F6B207C4
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:26:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55F6B207C4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRACU-0000UL-C7
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 04:25:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41396)
+	id 1kRACZ-0000mI-GW
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 04:26:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42778)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kR9lX-0004da-9s
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:58:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38151)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kR9lU-0006lS-IQ
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:58:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602316683;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=d3v5cQxcIySqlSBjEcok3n/xI8fAKEf5zkOQbUOR8KU=;
- b=W2G4Xvr2KZTwSp1s0sTvxT15t8ryCJ7Smwl1j5Nf+oKIC6eN2Ymy8Jy6IqktGyYa8y49QH
- mH0UVMK//dHodnwfmS3R+Tn9mVpmZJw1mzuBI6O2wVpdjpJEtoDujENaEueamTuMH9lHpb
- 7c1Zsw5gk0HrEZhThl3DFjNmEqflvVg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-461-l6ByCBQkObe9vvt8-pVkmQ-1; Sat, 10 Oct 2020 03:58:01 -0400
-X-MC-Unique: l6ByCBQkObe9vvt8-pVkmQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9810A8030D0
- for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 07:58:00 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 671781002393
- for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 07:58:00 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 33/39] scsi: switch to bus->check_address
-Date: Sat, 10 Oct 2020 03:57:33 -0400
-Message-Id: <20201010075739.951385-34-pbonzini@redhat.com>
-In-Reply-To: <20201010075739.951385-1-pbonzini@redhat.com>
-References: <20201010075739.951385-1-pbonzini@redhat.com>
+ (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
+ id 1kR9u9-0000Zg-Le; Sat, 10 Oct 2020 04:07:01 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:50078 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
+ id 1kR9u7-0007nd-Iy; Sat, 10 Oct 2020 04:07:01 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 397B85DEFBE87D393B27;
+ Sat, 10 Oct 2020 16:06:42 +0800 (CST)
+Received: from huawei.com (10.174.185.47) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Sat, 10 Oct 2020
+ 16:06:35 +0800
+From: Yifei Jiang <jiangyifei@huawei.com>
+To: <qemu-devel@nongnu.org>, <qemu-riscv@nongnu.org>
+Subject: [PATCH V2 2/5] target/riscv: Add PMP state description
+Date: Sat, 10 Oct 2020 16:06:20 +0800
+Message-ID: <20201010080623.768-3-jiangyifei@huawei.com>
+X-Mailer: git-send-email 2.26.2.windows.1
+In-Reply-To: <20201010080623.768-1-jiangyifei@huawei.com>
+References: <20201010080623.768-1-jiangyifei@huawei.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/10 02:57:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.174.185.47]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.35; envelope-from=jiangyifei@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/10 04:06:42
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,203 +71,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: zhang.zhanghailiang@huawei.com, sagark@eecs.berkeley.edu,
+ kbastian@mail.uni-paderborn.de, victor.zhangxiaofeng@huawei.com,
+ richard.henderson@linaro.org, Yifei Jiang <jiangyifei@huawei.com>,
+ Alistair.Francis@wdc.com, yinyipeng1@huawei.com, palmer@dabbelt.com,
+ wu.wubin@huawei.com, dengkai1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20201006123904.610658-6-mlevitsk@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/scsi/scsi-bus.c | 122 ++++++++++++++++++++++++++++-----------------
- 1 file changed, 75 insertions(+), 47 deletions(-)
+In the case of supporting PMP feature, add PMP state description
+to vmstate_riscv_cpu.
 
-diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index 4cf1f404b4..4ab9811cd8 100644
---- a/hw/scsi/scsi-bus.c
-+++ b/hw/scsi/scsi-bus.c
-@@ -22,33 +22,6 @@ static void scsi_req_dequeue(SCSIRequest *req);
- static uint8_t *scsi_target_alloc_buf(SCSIRequest *req, size_t len);
- static void scsi_target_free_buf(SCSIRequest *req);
+'vmstate_pmp_addr' and 'num_rules' could be regenerated by
+pmp_update_rule(). But there exists the problem of updating
+num_rules repeatedly in pmp_update_rule(). So here extracts
+pmp_update_rule_addr() and pmp_update_rule_nums() to update
+'vmstate_pmp_addr' and 'num_rules' respectively.
+
+Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
+Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
+---
+ target/riscv/machine.c | 50 ++++++++++++++++++++++++++++++++++++++++++
+ target/riscv/pmp.c     | 29 ++++++++++++++----------
+ target/riscv/pmp.h     |  2 ++
+ 3 files changed, 70 insertions(+), 11 deletions(-)
+
+diff --git a/target/riscv/machine.c b/target/riscv/machine.c
+index af2828a80a..8fffd2db3f 100644
+--- a/target/riscv/machine.c
++++ b/target/riscv/machine.c
+@@ -22,6 +22,52 @@
+ #include "sysemu/kvm.h"
+ #include "migration/cpu.h"
  
--static Property scsi_props[] = {
--    DEFINE_PROP_UINT32("channel", SCSIDevice, channel, 0),
--    DEFINE_PROP_UINT32("scsi-id", SCSIDevice, id, -1),
--    DEFINE_PROP_UINT32("lun", SCSIDevice, lun, -1),
--    DEFINE_PROP_END_OF_LIST(),
--};
--
--static void scsi_bus_class_init(ObjectClass *klass, void *data)
--{
--    BusClass *k = BUS_CLASS(klass);
--    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
--
--    k->get_dev_path = scsibus_get_dev_path;
--    k->get_fw_dev_path = scsibus_get_fw_dev_path;
--    hc->unplug = qdev_simple_device_unplug_cb;
--}
--
--static const TypeInfo scsi_bus_info = {
--    .name = TYPE_SCSI_BUS,
--    .parent = TYPE_BUS,
--    .instance_size = sizeof(SCSIBus),
--    .class_init = scsi_bus_class_init,
--    .interfaces = (InterfaceInfo[]) {
--        { TYPE_HOTPLUG_HANDLER },
--        { }
--    }
--};
- static int next_scsi_bus;
- 
- static void scsi_device_realize(SCSIDevice *s, Error **errp)
-@@ -160,35 +133,68 @@ static void scsi_dma_restart_cb(void *opaque, int running, RunState state)
++static bool pmp_needed(void *opaque)
++{
++    RISCVCPU *cpu = opaque;
++    CPURISCVState *env = &cpu->env;
++
++    return riscv_feature(env, RISCV_FEATURE_PMP);
++}
++
++static int pmp_post_load(void *opaque, int version_id)
++{
++    RISCVCPU *cpu = opaque;
++    CPURISCVState *env = &cpu->env;
++    int i;
++
++    for (i = 0; i < MAX_RISCV_PMPS; i++) {
++        pmp_update_rule_addr(env, i);
++    }
++    pmp_update_rule_nums(env);
++
++    return 0;
++}
++
++static const VMStateDescription vmstate_pmp_entry = {
++    .name = "cpu/pmp/entry",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINTTL(addr_reg, pmp_entry_t),
++        VMSTATE_UINT8(cfg_reg, pmp_entry_t),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static const VMStateDescription vmstate_pmp = {
++    .name = "cpu/pmp",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = pmp_needed,
++    .post_load = pmp_post_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_STRUCT_ARRAY(env.pmp_state.pmp, RISCVCPU, MAX_RISCV_PMPS,
++                             0, vmstate_pmp_entry, pmp_entry_t),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ const VMStateDescription vmstate_riscv_cpu = {
+     .name = "cpu",
+     .version_id = 1,
+@@ -73,5 +119,9 @@ const VMStateDescription vmstate_riscv_cpu = {
+         VMSTATE_UINTTL(env.mstatush, RISCVCPU),
+ #endif
+         VMSTATE_END_OF_LIST()
++    },
++    .subsections = (const VMStateDescription * []) {
++        &vmstate_pmp,
++        NULL
+     }
+ };
+diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
+index c394e867f8..2eda8e1e2f 100644
+--- a/target/riscv/pmp.c
++++ b/target/riscv/pmp.c
+@@ -136,18 +136,8 @@ static void pmp_decode_napot(target_ulong a, target_ulong *sa, target_ulong *ea)
      }
  }
  
--static void scsi_qdev_realize(DeviceState *qdev, Error **errp)
-+static bool scsi_bus_is_address_free(SCSIBus *bus,
-+				     int channel, int target, int lun,
-+				     SCSIDevice **p_dev)
+-
+-/* Convert cfg/addr reg values here into simple 'sa' --> start address and 'ea'
+- *   end address values.
+- *   This function is called relatively infrequently whereas the check that
+- *   an address is within a pmp rule is called often, so optimise that one
+- */
+-static void pmp_update_rule(CPURISCVState *env, uint32_t pmp_index)
++void pmp_update_rule_addr(CPURISCVState *env, uint32_t pmp_index)
+ {
+-    int i;
+-
+-    env->pmp_state.num_rules = 0;
+-
+     uint8_t this_cfg = env->pmp_state.pmp[pmp_index].cfg_reg;
+     target_ulong this_addr = env->pmp_state.pmp[pmp_index].addr_reg;
+     target_ulong prev_addr = 0u;
+@@ -186,7 +176,13 @@ static void pmp_update_rule(CPURISCVState *env, uint32_t pmp_index)
+ 
+     env->pmp_state.addr[pmp_index].sa = sa;
+     env->pmp_state.addr[pmp_index].ea = ea;
++}
+ 
++void pmp_update_rule_nums(CPURISCVState *env)
 +{
-+    SCSIDevice *d = scsi_device_find(bus, channel, target, lun);
-+    if (d && d->lun == lun) {
-+        if (p_dev) {
-+            *p_dev = d;
-+        }
-+        return false;
-+    }
-+    if (p_dev) {
-+        *p_dev = NULL;
-+    }
-+    return true;
++    int i;
++
++    env->pmp_state.num_rules = 0;
+     for (i = 0; i < MAX_RISCV_PMPS; i++) {
+         const uint8_t a_field =
+             pmp_get_a_field(env->pmp_state.pmp[i].cfg_reg);
+@@ -196,6 +192,17 @@ static void pmp_update_rule(CPURISCVState *env, uint32_t pmp_index)
+     }
+ }
+ 
++/* Convert cfg/addr reg values here into simple 'sa' --> start address and 'ea'
++ *   end address values.
++ *   This function is called relatively infrequently whereas the check that
++ *   an address is within a pmp rule is called often, so optimise that one
++ */
++static void pmp_update_rule(CPURISCVState *env, uint32_t pmp_index)
++{
++    pmp_update_rule_addr(env, pmp_index);
++    pmp_update_rule_nums(env);
 +}
 +
-+static bool scsi_bus_check_address(BusState *qbus, DeviceState *qdev, Error **errp)
+ static int pmp_is_in_range(CPURISCVState *env, int pmp_index, target_ulong addr)
  {
-     SCSIDevice *dev = SCSI_DEVICE(qdev);
--    SCSIBus *bus = DO_UPCAST(SCSIBus, qbus, dev->qdev.parent_bus);
--    SCSIDevice *d;
--    Error *local_err = NULL;
-+    SCSIBus *bus = SCSI_BUS(qbus);
+     int result = 0;
+diff --git a/target/riscv/pmp.h b/target/riscv/pmp.h
+index 6a8f072871..6c6b4c9bef 100644
+--- a/target/riscv/pmp.h
++++ b/target/riscv/pmp.h
+@@ -62,5 +62,7 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
+     target_ulong size, pmp_priv_t priv, target_ulong mode);
+ bool pmp_is_range_in_tlb(CPURISCVState *env, hwaddr tlb_sa,
+                          target_ulong *tlb_size);
++void pmp_update_rule_addr(CPURISCVState *env, uint32_t pmp_index);
++void pmp_update_rule_nums(CPURISCVState *env);
  
-     if (dev->channel > bus->info->max_channel) {
-         error_setg(errp, "bad scsi channel id: %d", dev->channel);
--        return;
-+        return false;
-     }
-     if (dev->id != -1 && dev->id > bus->info->max_target) {
-         error_setg(errp, "bad scsi device id: %d", dev->id);
--        return;
-+        return false;
-     }
-     if (dev->lun != -1 && dev->lun > bus->info->max_lun) {
-         error_setg(errp, "bad scsi device lun: %d", dev->lun);
--        return;
-+        return false;
-+    }
-+
-+    if (dev->id != -1 && dev->lun != -1) {
-+        SCSIDevice *d;
-+        if (!scsi_bus_is_address_free(bus, dev->channel, dev->id, dev->lun, &d)) {
-+            error_setg(errp, "lun already used by '%s'", d->qdev.id);
-+            return false;
-+        }
-     }
- 
-+    return true;
-+}
-+
-+static void scsi_qdev_realize(DeviceState *qdev, Error **errp)
-+{
-+    SCSIDevice *dev = SCSI_DEVICE(qdev);
-+    SCSIBus *bus = DO_UPCAST(SCSIBus, qbus, dev->qdev.parent_bus);
-+    bool is_free;
-+    Error *local_err = NULL;
-+
-     if (dev->id == -1) {
-         int id = -1;
-         if (dev->lun == -1) {
-             dev->lun = 0;
-         }
-         do {
--            d = scsi_device_find(bus, dev->channel, ++id, dev->lun);
--        } while (d && d->lun == dev->lun && id < bus->info->max_target);
--        if (d && d->lun == dev->lun) {
-+            is_free = scsi_bus_is_address_free(bus, dev->channel, ++id, dev->lun, NULL);
-+        } while (!is_free && id < bus->info->max_target);
-+        if (!is_free) {
-             error_setg(errp, "no free target");
-             return;
-         }
-@@ -196,20 +202,13 @@ static void scsi_qdev_realize(DeviceState *qdev, Error **errp)
-     } else if (dev->lun == -1) {
-         int lun = -1;
-         do {
--            d = scsi_device_find(bus, dev->channel, dev->id, ++lun);
--        } while (d && d->lun == lun && lun < bus->info->max_lun);
--        if (d && d->lun == lun) {
-+            is_free = scsi_bus_is_address_free(bus, dev->channel, dev->id, ++lun, NULL);
-+        } while (!is_free && lun < bus->info->max_lun);
-+        if (!is_free) {
-             error_setg(errp, "no free lun");
-             return;
-         }
-         dev->lun = lun;
--    } else {
--        d = scsi_device_find(bus, dev->channel, dev->id, dev->lun);
--        assert(d);
--        if (d->lun == dev->lun && dev != d) {
--            error_setg(errp, "lun already used by '%s'", d->qdev.id);
--            return;
--        }
-     }
- 
-     QTAILQ_INIT(&dev->requests);
-@@ -1723,6 +1722,13 @@ const VMStateDescription vmstate_scsi_device = {
-     }
- };
- 
-+static Property scsi_props[] = {
-+    DEFINE_PROP_UINT32("channel", SCSIDevice, channel, 0),
-+    DEFINE_PROP_UINT32("scsi-id", SCSIDevice, id, -1),
-+    DEFINE_PROP_UINT32("lun", SCSIDevice, lun, -1),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
- static void scsi_device_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *k = DEVICE_CLASS(klass);
-@@ -1753,6 +1759,28 @@ static const TypeInfo scsi_device_type_info = {
-     .instance_init = scsi_dev_instance_init,
- };
- 
-+static void scsi_bus_class_init(ObjectClass *klass, void *data)
-+{
-+    BusClass *k = BUS_CLASS(klass);
-+    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
-+
-+    k->get_dev_path = scsibus_get_dev_path;
-+    k->get_fw_dev_path = scsibus_get_fw_dev_path;
-+    k->check_address = scsi_bus_check_address;
-+    hc->unplug = qdev_simple_device_unplug_cb;
-+}
-+
-+static const TypeInfo scsi_bus_info = {
-+    .name = TYPE_SCSI_BUS,
-+    .parent = TYPE_BUS,
-+    .instance_size = sizeof(SCSIBus),
-+    .class_init = scsi_bus_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_HOTPLUG_HANDLER },
-+        { }
-+    }
-+};
-+
- static void scsi_register_types(void)
- {
-     type_register_static(&scsi_bus_info);
+ #endif
 -- 
-2.26.2
-
+2.19.1
 
 
