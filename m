@@ -2,94 +2,88 @@ Return-Path: <SRS0=BZbV=DR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76D07C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 11:50:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47EB0C433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 12:50:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 967C422251
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 11:50:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B22142225F
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 12:50:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lmichel.fr header.i=@lmichel.fr header.b="OdzC12zn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 967C422251
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=lmichel.fr
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Zn9Tn0r7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B22142225F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33846 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRDOl-0004Ea-Lz
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 07:50:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50558)
+	id 1kREK1-00057c-PW
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 08:50:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57818)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc@lmichel.fr>)
- id 1kRDNp-0003hB-O7; Sat, 10 Oct 2020 07:49:53 -0400
-Received: from pharaoh.lmichel.fr ([149.202.28.74]:39466)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc@lmichel.fr>)
- id 1kRDNn-0007IX-3y; Sat, 10 Oct 2020 07:49:53 -0400
-Received: from localhost (sekoia-pc.home.lmichel.fr [192.168.61.100])
- by pharaoh.lmichel.fr (Postfix) with ESMTPSA id 0D64FC6011D;
- Sat, 10 Oct 2020 11:49:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr; s=pharaoh; 
- t=1602330587;
- h=from:from:sender:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=21GjTUkOaWEaXIPZ9M/Ys8QapeGMAn1D21inimEaRy4=;
- b=OdzC12zn86IFmhZFnN5p99rSnGvov3mWT1XMTnhq33iSGGa5LodtZA0nlilsisw7fLbpSV
- mD+BGgqa4r68QAT7dTaLOmAwWqvmXrtU0CETGJRDC20nzBPAfZl7l9oiN0X0PcRfXIc7Ct
- WGVBx/R1bLPgSUjoqJUsj6Y84q4vGBloMdvrUhqNsCGxdWPRwdymYCh4k5pYE9LijttvGs
- /rLY0zBW+ccl6WsGn0HPar5o5B+0jr9LcmMzgKIo5Z00qHzyEuVgofZ7daUkpRYFUGsP3H
- jzeuV7vN0Q7c8SI6OjfowC2BgD8n5dOVXrJRbBpDotsZU2c8hxTZcGZ48ufuKQ==
-Date: Sat, 10 Oct 2020 13:50:47 +0200
-From: Luc Michel <luc@lmichel.fr>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v2 10/15] hw/misc/bcm2835_cprman: add a clock mux
- skeleton implementation
-Message-ID: <20201010115047.3aaffhhl5mzi77jc@sekoia-pc.home.lmichel.fr>
-References: <20201005195612.1999165-1-luc@lmichel.fr>
- <20201005195612.1999165-11-luc@lmichel.fr>
- <ea432580-114b-3f85-b4f1-0012bfb008c0@amsat.org>
- <20201010113308.igrxc54fwizo74oh@sekoia-pc.home.lmichel.fr>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kREIy-0004TE-O4
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 08:48:56 -0400
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:35496)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kREIx-00058P-5H
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 08:48:56 -0400
+Received: by mail-ed1-x541.google.com with SMTP id cq12so12221895edb.2
+ for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 05:48:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=B76CCZyfub1/rzmJ2i5V3y2lVks3/V4PSnEy43xna2s=;
+ b=Zn9Tn0r7mrdW+aSa28GAI30iuGnbNVLsmi1jl8ujHexEcv18WT0xlzzOMyPdB9Nzly
+ jA/CqFTRQqYFehd7xv7w2BRJVQFInKY7oaqTHTL2O/2X9XlxUNV9hgaLgrhy7J3i5gh+
+ t0l6KJqBCAyo3cHZja0T7+IEfia5pnuRC1JvdF1TA5mXM+PREBoDpDKMXZW0I7R4h2bF
+ LbMScc/Bb5NdV/OTHFAwspJd4JPms23brCMsFp4doxKkRxWR49/tMmDD9O5JyxMP6NtK
+ y82Fd8MxXWx1fAr9aeMLA5HiEIOQmBikbpZhqBp2BSlmJbi0gopDdLz+MjDx+T0hRUkm
+ pwdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=B76CCZyfub1/rzmJ2i5V3y2lVks3/V4PSnEy43xna2s=;
+ b=Eolcz/okJVrlmgXnUFqL847INXbWGwqOAaux1W/rjJEoc3WHiwKXpTIfRnrFHK9yt2
+ tfJ6STTD9T8TBcH4oP2/qyzoUoeLpgzIVXx8DqydrfmBePZF9w9smWFqFbqLA9NhqrcB
+ EXv/qNpJEuC7JWJfvG0hqJunuKwBniX3X2B2BKZApU1N13TAkKqnp8why5cIdLvigias
+ 1dzvLbDjpS0I9HYz871iEHi+EDEjoWKikZp9Ohm5BoMS8bQ40mPqQKE7K1871XJllEtC
+ EsgQsNxNNHCMq1j2+gfubKbkVRH9/pkKzvjhnR4NLkI/0P4LaVTuzo0KW4PELLVH9epK
+ TnLg==
+X-Gm-Message-State: AOAM5304w9XWrpxPBOfm7+yE9LRgCiaXSgiv3pbA/k29aA61u+I7Ks8/
+ Z6pDYK3WQzPn3YhiZG3ODBDJkkrlQpcxyNrVLv6Rtg==
+X-Google-Smtp-Source: ABdhPJxDeyPTGEA9e+7KqRTlR02g89tSybQm/Mhgif0Y6sJ5p9Lku9lIpLbj4EAMn7SXaj3S3afZB4bWk+jZMlz9BZA=
+X-Received: by 2002:a05:6402:3133:: with SMTP id
+ dd19mr1985123edb.100.1602334132917; 
+ Sat, 10 Oct 2020 05:48:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20201010113308.igrxc54fwizo74oh@sekoia-pc.home.lmichel.fr>
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr;
- s=pharaoh; t=1602330587;
- h=from:from:sender:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=21GjTUkOaWEaXIPZ9M/Ys8QapeGMAn1D21inimEaRy4=;
- b=i9ip0Ea/ltx8sTLJudgePY5qzdcP8qonZB2ehYG45x8Zptyy9Ia5hWZJJexH+xChNjvnAu
- bQn7HKJO7QMrn+ghS451DS9axPPFJ3brXMiPOhnniN6lCNBlZ5Fs0xsg8njMvssqgTmQYt
- 5sLKvpC2s6eUPFMqd8vn9rgWEXKxVgHWcLZ3cm6kZ9vCSyjw3QdOjXDlNP8xicRmPbXCgl
- VbyIs3YRtqxIBpXFmequyg8tvN9CZUqFndYhd26hgZtYq1FQWE1yQqpMOsu6XRI4Fms3tD
- LokFErmqACv/G+ICt5yHntwOPl32kF3da+y2eLki+x+LQkt4PgkXV952P34DzQ==
-ARC-Seal: i=1; s=pharaoh; d=lmichel.fr; t=1602330587; a=rsa-sha256; cv=none;
- b=MbnAlTCwLk5mrDUb8Ahl7qp/qZp0bm7RZhmkShHtyG8mpiNOErHLjaQ1/9U/6K0saulwRGfLgYopejWt+XmhUK3qxxXmn269gjKUrqWZ947WJPXicMzmxFlJKfcUj4XrHkgQlbMnHo6xpAMlAUA2fHXRHJiKUevRbLHeY8YyjkAf24eK8pku93KOQqCW2KXuYJo1bet0kChGk0cMwatTgbNJkOY66Kne8JGsGg5CdeYAC4akIRC225RTeGEX0f8DuzZcSEsdRM2qBkPIJGIeQ6k6JTgALb18FIArNhsH/NWfDZVgABUsiczphaHPTxVf2Ei3Oc4ukvjoldIZIIe7vg==
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=sekoia smtp.mailfrom=luc@lmichel.fr
-Received-SPF: pass client-ip=149.202.28.74; envelope-from=luc@lmichel.fr;
- helo=pharaoh.lmichel.fr
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/10 07:32:09
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+References: <20201009144712.11187-1-peter.maydell@linaro.org>
+ <CAFEAcA8BiQcJJr3hkzTqnFLpYtXf1xbDf+GpgvYnPjJr_FAEUA@mail.gmail.com>
+ <21d142c5-d651-269a-8fbb-d35a743f1945@linaro.org>
+In-Reply-To: <21d142c5-d651-269a-8fbb-d35a743f1945@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 10 Oct 2020 13:48:41 +0100
+Message-ID: <CAFEAcA-+9UQ4RNU+rjmc=Mx4MecTVJd_FniS4Mr0Q_QL57e7hw@mail.gmail.com>
+Subject: Re: [PATCH] target/arm: Fix SMLAD incorrect setting of Q bit
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::541;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x541.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,126 +96,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Paul Zimmerman <pauldzim@gmail.com>,
- Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org,
- Havard Skinnemoen <hskinnemoen@google.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13:33 Sat 10 Oct     , Luc Michel wrote:
-> On 10:40 Tue 06 Oct     , Philippe Mathieu-Daudé wrote:
-> > On 10/5/20 9:56 PM, Luc Michel wrote:
-> > > The clock multiplexers are the last clock stage in the CPRMAN. Each mux
-> > > outputs one clock signal that goes out of the CPRMAN to the SoC
-> > > peripherals.
-> > > 
-> > > Each mux has at most 10 sources. The sources 0 to 3 are common to all
-> > > muxes. They are:
-> > >    0. ground (no clock signal)
-> > >    1. the main oscillator (xosc)
-> > >    2. "test debug 0" clock
-> > >    3. "test debug 1" clock
-> > > 
-> > > Test debug 0 and 1 are actual clock muxes that can be used as sources to
-> > > other muxes (for debug purpose).
-> > > 
-> > > Sources 4 to 9 are mux specific and can be unpopulated (grounded). Those
-> > > sources are fed by the PLL channels outputs.
-> > > 
-> > > One corner case exists for DSI0E and DSI0P muxes. They have their source
-> > > number 4 connected to an intermediate multiplexer that can select
-> > > between PLLA-DSI0 and PLLD-DSI0 channel. This multiplexer is called
-> > > DSI0HSCK and is not a clock mux as such. It is really a simple mux from
-> > > the hardware point of view (see https://elinux.org/The_Undocumented_Pi).
-> > > This mux is not implemented in this commit.
-> > > 
-> > > Note that there is some muxes for which sources are unknown (because of
-> > > a lack of documentation). For those cases all the sources are connected
-> > > to ground in this implementation.
-> > > 
-> > > Each clock mux output is exported by the CPRMAN at the qdev level,
-> > > adding the suffix '-out' to the mux name to form the output clock name.
-> > > (E.g. the 'uart' mux sees its output exported as 'uart-out' at the
-> > > CPRMAN level.)
-> > > 
-> > > Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> > > Signed-off-by: Luc Michel <luc@lmichel.fr>
-> > > ---
-> > >  include/hw/misc/bcm2835_cprman.h           |  84 ++++
-> > >  include/hw/misc/bcm2835_cprman_internals.h | 421 +++++++++++++++++++++
-> > >  hw/misc/bcm2835_cprman.c                   | 150 ++++++++
-> > >  3 files changed, 655 insertions(+)
-> > [...]
-> > 
-> > > +#define FILL_CLOCK_MUX_INIT_INFO(clock_, kind_) \
-> > > +    .cm_offset = R_CM_ ## clock_ ## CTL,        \
-> > > +    FILL_CLOCK_MUX_SRC_MAPPING_INIT_INFO(kind_)
-> > > +
-> > > +static ClockMuxInitInfo CLOCK_MUX_INIT_INFO[] = {
-> > > +    [CPRMAN_CLOCK_GNRIC] = {
-> > > +        .name = "gnric",
-> > > +        FILL_CLOCK_MUX_INIT_INFO(GNRIC, unknown),
-> > > +    },
-> > [...]
-> > 
-> > > +static inline void update_mux_from_cm(BCM2835CprmanState *s, size_t idx)
-> > > +{
-> > > +    size_t i;
-> > > +
-> > > +    for (i = 0; i < CPRMAN_NUM_CLOCK_MUX; i++) {
-> > > +        if ((CLOCK_MUX_INIT_INFO[i].cm_offset == idx) ||
-> > > +            (CLOCK_MUX_INIT_INFO[i].cm_offset == idx + 4)) {
-> > 
-> > Maybe add a /* Matches DIV or CTL */ comment. Anyway
-> > FILL_CLOCK_MUX_INIT_INFO() only uses CTL, not DIV, so
-> > +4 check is not necessary.
-> I'll add a comment to clarify this. The +4 check is indeed necessary.
-> This comes from the fact that for all muxes, CM_CTL and CM_DIV registers are
-> contiguous. So I treat CprmanClockMuxState.reg_cm as a 2 cells array (as
-> I do for PLLs and the A2W_ANA regs). I'll clarify this point in the next
-> re-roll.
-But the +4 is actually on the wrong side of the comparison :) I'll fix
-that.
-> 
-> > 
-> > Otherwise:
-> > Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Thanks!
-> > 
-> > > +            clock_mux_update(&s->clock_muxes[i]);
-> > > +            return;
-> > > +        }
-> > > +    }
-> > > +}
-> > > +
-> > >  #define CASE_PLL_A2W_REGS(pll_) \
-> > >      case R_A2W_ ## pll_ ## _CTRL: \
-> > >      case R_A2W_ ## pll_ ## _ANA0: \
-> > >      case R_A2W_ ## pll_ ## _ANA1: \
-> > >      case R_A2W_ ## pll_ ## _ANA2: \
-> > > @@ -363,10 +438,19 @@ static void cprman_write(void *opaque, hwaddr offset,
-> > >      case R_A2W_PLLH_RCAL:
-> > >      case R_A2W_PLLH_PIX:
-> > >      case R_A2W_PLLB_ARM:
-> > >          update_channel_from_a2w(s, idx);
-> > >          break;
-> > > +
-> > > +    case R_CM_GNRICCTL ... R_CM_SMIDIV:
-> > > +    case R_CM_TCNTCNT ... R_CM_VECDIV:
-> > > +    case R_CM_PULSECTL ... R_CM_PULSEDIV:
-> > > +    case R_CM_SDCCTL ... R_CM_ARMCTL:
-> > > +    case R_CM_AVEOCTL ... R_CM_EMMCDIV:
-> > > +    case R_CM_EMMC2CTL ... R_CM_EMMC2DIV:
-> > > +        update_mux_from_cm(s, idx);
-> > > +        break;
-> > >      }
-> > >  }
-> > [...]
-> 
-> -- 
+On Fri, 9 Oct 2020 at 23:36, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> On 10/9/20 1:48 PM, Peter Maydell wrote:
+> > On Fri, 9 Oct 2020 at 15:47, Peter Maydell <peter.maydell@linaro.org> wrote:
+> >> +        tcg_gen_extr_i64_i32(t1, t2, p64);
+> >
+> > Oh, I forgot to mention, but it looks like extr_i64_i32
+> > isn't documented in tcg/README. Is that because it isn't
+> > really a TCG IR op, or just an omission?
+>
+> Because it's not an IR op.  It's the combo of extrl and extrh.
 
--- 
+We really should figure out somewhere to document the
+interface and operations that frontends can use. (Among
+other important things, extr_i64_i32 is usable generically,
+but extrl/extrh are 64-bit hosts only according to tcg/README,
+so if you trusted the README docs then you'd end up
+trying to synthesize this out of shifts and trunc.)
+
+thanks
+-- PMM
 
