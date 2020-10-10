@@ -2,96 +2,88 @@ Return-Path: <SRS0=BZbV=DR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B04A2C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 20:49:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA62EC433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 20:50:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3826D207FB
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 20:49:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3292F207C4
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 20:50:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dn3QruZ0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3826D207FB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="giZ8f4Lf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3292F207C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRLoC-0006Qq-BJ
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 16:49:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51892)
+	id 1kRLp4-0007dG-8V
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 16:50:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51620)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRLiA-0000NB-Jf
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 16:43:26 -0400
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:40266)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRLi8-0007RD-U6
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 16:43:26 -0400
-Received: by mail-wm1-x335.google.com with SMTP id k18so13263237wmj.5
- for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 13:43:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=gETh5/Gck0bTQVP31ZR4AiV0ecmQtPxoBf6GwvczWOs=;
- b=dn3QruZ0BeBNyJD7SOaGy2t1UJ/cXhGnwfkMltxP/mVqV4wNuHAYc8lIPlK+euxoHD
- 4BBfJ8IxFIk+f+7IKZyQccNDqb5U7NLfznVhWtZ8svJ8tXfYcK77cLa3ma9aK6HCCh72
- t0UU7hv016N8lEO1Ls9JKvX7D5oZLJW58wLiawd3aWufvLOe9/mp+0BhW+Hd3MqQmQmi
- hC4BHdNdkzVTtL3ynCuMjNuIjWDI/cH9nOKfHRoj2VWif8/P+I0PvdR8t8xc6lyGq5Ii
- vFvJ5VxvyWakt3pP/y+0TLPsAA+Ik7kzVgGtXulO7EbUIlO87ERa/4yOa6qfBW0+dwWa
- 2yBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=gETh5/Gck0bTQVP31ZR4AiV0ecmQtPxoBf6GwvczWOs=;
- b=e41NQwh4c5TkvS4mmLlNbIoe/9lsnMUqvpTACmgokhw96L7nf3LlUP4DEZ7sI1Ra+B
- bv9GD8Arhl4TPQVIIWmGw6SP34bfK2N29khlx6g8qTNBuD4qK45/TDYyIa0ZgIhgJKDr
- fX6dSV59N6IjsHU/1mdfAHQNLE0D1HdqP8MQRyWY8rQVEf8EI9btkJubhMJFC4WrzL34
- OlSeI+dH6+c4sGPb2iTBLaJD89Cgl5L3RYuocVkSN1+i60N/bHP/GmoQEGxCppi82G6g
- 75okuP4e4OTL89jOfh6oKRrIr2Q5/mwSC3ZN8Gr3sPcv3MCstwvUQY0tPoOb8/sa0o4a
- dfPQ==
-X-Gm-Message-State: AOAM530gWqVLeyHEgy6YNZeZBv4BC1Y00f11azE55ZFsr5Nqe3v375UG
- S4fyqz6isceoOykH5eGEsWLQjuuIqzo=
-X-Google-Smtp-Source: ABdhPJwONZG/wcNaPy7XJYsbn0kuTCN4JQ/K/BQXQZ3Vj9543IOt8b8KF6DXV2VDfNXS1N5zdqQhZw==
-X-Received: by 2002:a1c:b388:: with SMTP id c130mr3963908wmf.175.1602362603126; 
- Sat, 10 Oct 2020 13:43:23 -0700 (PDT)
-Received: from localhost.localdomain
- (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id 205sm2705471wme.38.2020.10.10.13.43.21
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 10 Oct 2020 13:43:22 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1kRLgt-0007JV-KF
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 16:42:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60353)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1kRLgr-00076W-4K
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 16:42:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602362521;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=R81R33Ib68eNCgLZeHZeBVsKMvrOc3EQF+Kl6MO1nEY=;
+ b=giZ8f4LfAzAtCQXpTbZZc055XsFeDzAIX6Pj2oU/oI+fPlgpsug+f2GCq74qPbVVOEqsY1
+ USewsbYddpGw0mhZx3aAohgAi70bEYclLY+1YkcgiEg9G4AcD0E5KFhPkMJ/sduo9JbM6Y
+ FBGFf6aYFdfkpBUiFXqQUzjPZfDogjw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-454-VEaQBX43M6eA1BGUp6Aspw-1; Sat, 10 Oct 2020 16:42:00 -0400
+X-MC-Unique: VEaQBX43M6eA1BGUp6Aspw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 130B0107ACF8
+ for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 20:41:59 +0000 (UTC)
+Received: from localhost (unknown [10.36.110.19])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 280115C1D7;
+ Sat, 10 Oct 2020 20:41:48 +0000 (UTC)
+From: marcandre.lureau@redhat.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 01/20] util/cutils: Introduce freq_to_str() to display
- Hertz units
-Date: Sat, 10 Oct 2020 22:43:00 +0200
-Message-Id: <20201010204319.3119239-2-f4bug@amsat.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201010204319.3119239-1-f4bug@amsat.org>
-References: <20201010204319.3119239-1-f4bug@amsat.org>
+Subject: [PATCH 3/3] console: make QMP/HMP screendump run in coroutine
+Date: Sun, 11 Oct 2020 00:41:06 +0400
+Message-Id: <20201010204106.1368710-4-marcandre.lureau@redhat.com>
+In-Reply-To: <20201010204106.1368710-1-marcandre.lureau@redhat.com>
+References: <20201010204106.1368710-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=marcandre.lureau@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::335;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x335.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Received-SPF: pass client-ip=63.128.21.124;
+ envelope-from=marcandre.lureau@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/10 16:30:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,82 +96,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>,
- Huacai Chen <zltjiangshi@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, Luc Michel <luc@lmichel.fr>,
- Eduardo Habkost <ehabkost@redhat.com>, Paul Burton <paulburton@kernel.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Huacai Chen <chenhc@lemote.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Introduce freq_to_str() to convert frequency values in human
-friendly units using the SI units for Hertz.
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Suggested-by: Luc Michel <luc@lmichel.fr>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Luc Michel <luc@lmichel.fr>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Thanks to the monitors coroutine support, the screendump handler can
+trigger a graphic_hw_update(), yield and let the main loop run until
+update is done. Then the handler is resumed, and ppm_save() will write
+the screen image to disk in the coroutine context (thus non-blocking).
+
+Potentially, during non-blocking write, some new graphic update could
+happen, and thus the image may have some glitches. Whether that
+behaviour is acceptable is discutable. Allocating new memory may not be
+a good idea, as framebuffers can be quite large. Even then, QEMU may
+become less responsive as it requires paging in etc.
+
+Related to:
+https://bugzilla.redhat.com/show_bug.cgi?id=1230527
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- include/qemu/cutils.h | 12 ++++++++++++
- util/cutils.c         | 14 ++++++++++++++
- 2 files changed, 26 insertions(+)
+ hmp-commands.hx    |  1 +
+ monitor/hmp-cmds.c |  3 ++-
+ qapi/ui.json       |  3 ++-
+ ui/console.c       | 27 ++++++++++++++++++++++++---
+ 4 files changed, 29 insertions(+), 5 deletions(-)
 
-diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
-index 3a86ec0321e..4bbf4834ea5 100644
---- a/include/qemu/cutils.h
-+++ b/include/qemu/cutils.h
-@@ -158,6 +158,18 @@ int qemu_strtosz_metric(const char *nptr, const char **end, uint64_t *result);
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index cd068389de..ff2d7aa8f3 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -254,6 +254,7 @@ ERST
+         .help       = "save screen from head 'head' of display device 'device' "
+                       "into PPM image 'filename'",
+         .cmd        = hmp_screendump,
++        .coroutine  = true,
+     },
  
- char *size_to_str(uint64_t val);
- 
-+/**
-+ * freq_to_str:
-+ * @freq_hz: frequency to stringify
-+ *
-+ * Return human readable string for frequency @freq_hz.
-+ * Use SI units like KHz, MHz, and so forth.
-+ *
-+ * The caller is responsible for releasing the value returned
-+ * with g_free() after use.
-+ */
-+char *freq_to_str(uint64_t freq_hz);
-+
- /* used to print char* safely */
- #define STR_OR_NULL(str) ((str) ? (str) : "null")
- 
-diff --git a/util/cutils.c b/util/cutils.c
-index 8da34e04b0b..be4e43a9eff 100644
---- a/util/cutils.c
-+++ b/util/cutils.c
-@@ -885,6 +885,20 @@ char *size_to_str(uint64_t val)
-     return g_strdup_printf("%0.3g %sB", (double)val / div, suffixes[i]);
+ SRST
+diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+index 9789f4277f..91608bac6d 100644
+--- a/monitor/hmp-cmds.c
++++ b/monitor/hmp-cmds.c
+@@ -1756,7 +1756,8 @@ err_out:
+     goto out;
  }
  
-+char *freq_to_str(uint64_t freq_hz)
+-void hmp_screendump(Monitor *mon, const QDict *qdict)
++void coroutine_fn
++hmp_screendump(Monitor *mon, const QDict *qdict)
+ {
+     const char *filename = qdict_get_str(qdict, "filename");
+     const char *id = qdict_get_try_str(qdict, "device");
+diff --git a/qapi/ui.json b/qapi/ui.json
+index 9d6721037f..6c7b33cb72 100644
+--- a/qapi/ui.json
++++ b/qapi/ui.json
+@@ -98,7 +98,8 @@
+ #
+ ##
+ { 'command': 'screendump',
+-  'data': {'filename': 'str', '*device': 'str', '*head': 'int'} }
++  'data': {'filename': 'str', '*device': 'str', '*head': 'int'},
++  'coroutine': true }
+ 
+ ##
+ # == Spice
+diff --git a/ui/console.c b/ui/console.c
+index a56fe0dd26..0118f70d9a 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -168,6 +168,7 @@ struct QemuConsole {
+     QEMUFIFO out_fifo;
+     uint8_t out_fifo_buf[16];
+     QEMUTimer *kbd_timer;
++    CoQueue dump_queue;
+ 
+     QTAILQ_ENTRY(QemuConsole) next;
+ };
+@@ -263,6 +264,7 @@ static void gui_setup_refresh(DisplayState *ds)
+ 
+ void graphic_hw_update_done(QemuConsole *con)
+ {
++    qemu_co_queue_restart_all(&con->dump_queue);
+ }
+ 
+ void graphic_hw_update(QemuConsole *con)
+@@ -340,8 +342,15 @@ static bool ppm_save(int fd, pixman_image_t *image, Error **errp)
+     return true;
+ }
+ 
+-void qmp_screendump(const char *filename, bool has_device, const char *device,
+-                    bool has_head, int64_t head, Error **errp)
++static void graphic_hw_update_bh(void *con)
 +{
-+    static const char *const suffixes[] = { "", "K", "M", "G", "T", "P", "E" };
-+    double freq = freq_hz;
-+    size_t idx = 0;
-+
-+    while (freq >= 1000.0 && idx < ARRAY_SIZE(suffixes)) {
-+        freq /= 1000.0;
-+        idx++;
-+    }
-+
-+    return g_strdup_printf("%0.3g %sHz", freq, suffixes[idx]);
++    graphic_hw_update(con);
 +}
 +
- int qemu_pstrcmp0(const char **str1, const char **str2)
++/* Safety: coroutine-only, concurrent-coroutine safe, main thread only */
++void coroutine_fn
++qmp_screendump(const char *filename, bool has_device, const char *device,
++               bool has_head, int64_t head, Error **errp)
  {
-     return g_strcmp0(*str1, *str2);
+     g_autoptr(pixman_image_t) image = NULL;
+     QemuConsole *con;
+@@ -366,7 +375,15 @@ void qmp_screendump(const char *filename, bool has_device, const char *device,
+         }
+     }
+ 
+-    graphic_hw_update(con);
++    if (qemu_co_queue_empty(&con->dump_queue)) {
++        /* Defer the update, it will restart the pending coroutines */
++        aio_bh_schedule_oneshot(qemu_get_aio_context(),
++                                graphic_hw_update_bh, con);
++    }
++    qemu_co_queue_wait(&con->dump_queue, NULL);
++
++    /* All pending coroutines are woken up, while BQL taken, no further graphic
++     * update are possible until it is released, take an image ref before that. */
+     surface = qemu_console_surface(con);
+     if (!surface) {
+         error_setg(errp, "no surface");
+@@ -381,6 +398,9 @@ void qmp_screendump(const char *filename, bool has_device, const char *device,
+         return;
+     }
+ 
++    /* The image content could potentially be updated as the coroutine yields
++     * and releases the BQL. It could produce corrupted dump, but it should be
++     * otherwise safe. */
+     if (!ppm_save(fd, image, errp)) {
+         qemu_unlink(filename);
+     }
+@@ -1297,6 +1317,7 @@ static QemuConsole *new_console(DisplayState *ds, console_type_t console_type,
+ 
+     obj = object_new(TYPE_QEMU_CONSOLE);
+     s = QEMU_CONSOLE(obj);
++    qemu_co_queue_init(&s->dump_queue);
+     s->head = head;
+     object_property_add_link(obj, "device", TYPE_DEVICE,
+                              (Object **)&s->device,
 -- 
-2.26.2
+2.28.0
 
 
