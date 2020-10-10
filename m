@@ -2,94 +2,88 @@ Return-Path: <SRS0=BZbV=DR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E4D9C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 20:41:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F239C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 20:44:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B05FA20795
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 20:41:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 871CB207C4
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 20:44:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DsT3sSq4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B05FA20795
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HVH3yD78"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 871CB207C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRLgI-0006Se-Oe
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 16:41:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50890)
+	id 1kRLiu-0000ZX-E3
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 16:44:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51592)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRLcG-0001zg-L9; Sat, 10 Oct 2020 16:37:21 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36018)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRLcE-0006dg-Ur; Sat, 10 Oct 2020 16:37:20 -0400
-Received: by mail-wm1-x341.google.com with SMTP id e2so13274641wme.1;
- Sat, 10 Oct 2020 13:37:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=lr9XWjXVDUSEQoFZSyyozoh2chXy3lHKAs9QRDzRDc8=;
- b=DsT3sSq4ds8A8NxhET9nOPv7HkTLCGhv833G1LL/5aT5bKU3CcMuCohAb0Qo6CyFEy
- B+oTHKeBSanWFJcssx8Ax3bJbIMB1G8xkF1MuUunI6X40BdRWnY7gE1DCgCQAdlIy45m
- qgaAQHw6xVXjDq+Xxq4rkJj6VFsBxUfaOJuGLLo2Fw7xOi3gb6CSEsoyIBhdvuVcqOqf
- IoLCOWrOiRcTlsnNPHjbOloIuGaa3zArYBmbujm3kbw2iX0k6wgRmhhk0N8r9rjfHlJK
- 4vhuea1ZWwL8TonOjtLGcZfUyYRijmi1w2pLiXmUcnIe86dWGjBUzg43pJ31vMKEIGCa
- IQTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=lr9XWjXVDUSEQoFZSyyozoh2chXy3lHKAs9QRDzRDc8=;
- b=a2u7sa4NjYxoNEEAYyvzTXZgBmeNdXBX9z+BEnoFUoqfeiVfP4ocQ1jjf3zOXocZQY
- ykl1/qBlFLUAUgKv8C01OwSIYfTkD3hUs4xBvIvcNyM7jvMCkq88cYhff4rBtS4w/r16
- OWS5ihi3OpY/KeeAPd1mtVQuYkfYr3gehkl9SnzJHA3VY7zTosIA9S6pdbemKvzDnOjc
- C+PpIjoJP0OQ4BgBg3O5/qmtvzEj0D+bqqmziYd4opkFspXQn8xT77wUOuzNcG51xu5c
- D0fF56NMyY41X7Ck/V5czoESulXDpADdADzSLxDAqqbEPkyq/0MuY3cJvNOPhC2lRAWk
- eksg==
-X-Gm-Message-State: AOAM531poVQasVChoJsLob292QAXZWaws6tgLilPQb3uwJAI89o0xdrE
- X2mU4+bOASO4UJEI/RE7ARQ/5xzx7Tg=
-X-Google-Smtp-Source: ABdhPJyPfjyHSwhqMuAeY+VMqUIINApJeRgHsxyzd7TRAJIxlZwb76Vi3IoCHrMAAXWYn/091OjFVw==
-X-Received: by 2002:a1c:4056:: with SMTP id n83mr3953706wma.186.1602362237181; 
- Sat, 10 Oct 2020 13:37:17 -0700 (PDT)
-Received: from localhost.localdomain
- (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id v17sm5661341wru.44.2020.10.10.13.37.15
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 10 Oct 2020 13:37:16 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1kRLgd-0007H9-6b
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 16:41:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60616)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1kRLgb-00075p-6F
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 16:41:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602362508;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=2lZpMa6xjU/KAtKaQQ9+A7orLKgxzHKmxpQRLMy4ubs=;
+ b=HVH3yD78YSKK/jF7KqXghLHY43lR6DFVKIupr2VgkUdu0Qhgud5f4PtMk6N4oich35r52a
+ pk312FolvCyT2BC9NWrksQLSyT88jFMWPJzQvHovuMSB75JX8w+hyKdjbCbGoZ3ksNXlYT
+ eYe1M/4j3v6+HMhhEnQw3TPn0kntPpA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-441-X7aei5ofOamsw0wpOllCHg-1; Sat, 10 Oct 2020 16:41:46 -0400
+X-MC-Unique: X7aei5ofOamsw0wpOllCHg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 91134107AD28
+ for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 20:41:45 +0000 (UTC)
+Received: from localhost (unknown [10.36.110.19])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 564C176665;
+ Sat, 10 Oct 2020 20:41:36 +0000 (UTC)
+From: marcandre.lureau@redhat.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 4/4] hw/arm/bcm2835_peripherals: Correctly wire the
- SYS_timer IRQs
-Date: Sat, 10 Oct 2020 22:37:09 +0200
-Message-Id: <20201010203709.3116542-5-f4bug@amsat.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201010203709.3116542-1-f4bug@amsat.org>
-References: <20201010203709.3116542-1-f4bug@amsat.org>
+Subject: [PATCH 2/3] console: modify ppm_save to take a pixman image ref
+Date: Sun, 11 Oct 2020 00:41:05 +0400
+Message-Id: <20201010204106.1368710-3-marcandre.lureau@redhat.com>
+In-Reply-To: <20201010204106.1368710-1-marcandre.lureau@redhat.com>
+References: <20201010204106.1368710-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=marcandre.lureau@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Received-SPF: pass client-ip=216.205.24.124;
+ envelope-from=marcandre.lureau@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/10 16:41:48
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,52 +96,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Luc Michel <luc@lmichel.fr>,
- Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Paul Zimmerman <pauldzim@gmail.com>, qemu-arm@nongnu.org,
- Luc Michel <luc.michel@greensocs.com>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The SYS_timer is not directly wired to the ARM core, but to the
-SoC (peripheral) interrupt controller.
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Fixes: 0e5bbd74064 ("hw/arm/bcm2835_peripherals: Use the SYS_timer")
-Reviewed-by: Luc Michel <luc.michel@greensocs.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+The function is going to be called from a coroutine, and may yields.
+Let's ensure our image reference doesn't change over time (due to resize
+etc) by keeping a ref.
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- hw/arm/bcm2835_peripherals.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+ ui/console.c    | 15 ++++++++-------
+ ui/trace-events |  2 +-
+ 2 files changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-index 15c5c72e465..48909a43c32 100644
---- a/hw/arm/bcm2835_peripherals.c
-+++ b/hw/arm/bcm2835_peripherals.c
-@@ -171,8 +171,17 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-     memory_region_add_subregion(&s->peri_mr, ST_OFFSET,
-                 sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->systmr), 0));
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->systmr), 0,
--        qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_ARM_IRQ,
--                               INTERRUPT_ARM_TIMER));
-+        qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_GPU_IRQ,
-+                               INTERRUPT_TIMER0));
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->systmr), 1,
-+        qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_GPU_IRQ,
-+                               INTERRUPT_TIMER1));
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->systmr), 2,
-+        qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_GPU_IRQ,
-+                               INTERRUPT_TIMER2));
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->systmr), 3,
-+        qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_GPU_IRQ,
-+                               INTERRUPT_TIMER3));
+diff --git a/ui/console.c b/ui/console.c
+index 54a74c0b16..a56fe0dd26 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -195,7 +195,6 @@ static void dpy_refresh(DisplayState *s);
+ static DisplayState *get_alloc_displaystate(void);
+ static void text_console_update_cursor_timer(void);
+ static void text_console_update_cursor(void *opaque);
+-static bool ppm_save(int fd, DisplaySurface *ds, Error **errp);
  
-     /* UART0 */
-     qdev_prop_set_chr(DEVICE(&s->uart0), "chardev", serial_hd(0));
+ static void gui_update(void *opaque)
+ {
+@@ -311,16 +310,16 @@ void graphic_hw_invalidate(QemuConsole *con)
+     }
+ }
+ 
+-static bool ppm_save(int fd, DisplaySurface *ds, Error **errp)
++static bool ppm_save(int fd, pixman_image_t *image, Error **errp)
+ {
+-    int width = pixman_image_get_width(ds->image);
+-    int height = pixman_image_get_height(ds->image);
++    int width = pixman_image_get_width(image);
++    int height = pixman_image_get_height(image);
+     g_autoptr(Object) ioc = OBJECT(qio_channel_file_new_fd(fd));
+     g_autofree char *header = NULL;
+     g_autoptr(pixman_image_t) linebuf = NULL;
+     int y;
+ 
+-    trace_ppm_save(fd, ds);
++    trace_ppm_save(fd, image);
+ 
+     header = g_strdup_printf("P6\n%d %d\n%d\n", width, height, 255);
+     if (qio_channel_write_all(QIO_CHANNEL(ioc),
+@@ -330,7 +329,7 @@ static bool ppm_save(int fd, DisplaySurface *ds, Error **errp)
+ 
+     linebuf = qemu_pixman_linebuf_create(PIXMAN_BE_r8g8b8, width);
+     for (y = 0; y < height; y++) {
+-        qemu_pixman_linebuf_fill(linebuf, ds->image, width, 0, y);
++        qemu_pixman_linebuf_fill(linebuf, image, width, 0, y);
+         if (qio_channel_write_all(QIO_CHANNEL(ioc),
+                                   (char *)pixman_image_get_data(linebuf),
+                                   pixman_image_get_stride(linebuf), errp) < 0) {
+@@ -344,6 +343,7 @@ static bool ppm_save(int fd, DisplaySurface *ds, Error **errp)
+ void qmp_screendump(const char *filename, bool has_device, const char *device,
+                     bool has_head, int64_t head, Error **errp)
+ {
++    g_autoptr(pixman_image_t) image = NULL;
+     QemuConsole *con;
+     DisplaySurface *surface;
+     int fd;
+@@ -372,6 +372,7 @@ void qmp_screendump(const char *filename, bool has_device, const char *device,
+         error_setg(errp, "no surface");
+         return;
+     }
++    image = pixman_image_ref(surface->image);
+ 
+     fd = qemu_open_old(filename, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0666);
+     if (fd == -1) {
+@@ -380,7 +381,7 @@ void qmp_screendump(const char *filename, bool has_device, const char *device,
+         return;
+     }
+ 
+-    if (!ppm_save(fd, surface, errp)) {
++    if (!ppm_save(fd, image, errp)) {
+         qemu_unlink(filename);
+     }
+ }
+diff --git a/ui/trace-events b/ui/trace-events
+index b7d7270c02..0ffcdb4408 100644
+--- a/ui/trace-events
++++ b/ui/trace-events
+@@ -15,7 +15,7 @@ displaysurface_create_pixman(void *display_surface) "surface=%p"
+ displaysurface_free(void *display_surface) "surface=%p"
+ displaychangelistener_register(void *dcl, const char *name) "%p [ %s ]"
+ displaychangelistener_unregister(void *dcl, const char *name) "%p [ %s ]"
+-ppm_save(int fd, void *display_surface) "fd=%d surface=%p"
++ppm_save(int fd, void *image) "fd=%d image=%p"
+ 
+ # gtk-egl.c
+ # gtk-gl-area.c
 -- 
-2.26.2
+2.28.0
 
 
