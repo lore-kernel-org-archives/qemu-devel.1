@@ -2,88 +2,95 @@ Return-Path: <SRS0=BZbV=DR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54D6DC433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 20:48:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D5FAC433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 20:48:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBD6E207C4
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 20:48:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 92B61207C4
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 20:48:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YPWJN8JC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBD6E207C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZuqtjKpT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92B61207C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRLmY-000472-FM
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 16:48:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51564)
+	id 1kRLmf-0004KV-MG
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 16:48:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51938)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kRLgQ-00072q-4g
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 16:41:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25239)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kRLgO-00075Y-Lf
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 16:41:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602362495;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=jfyUSzLpMg0aVhpMIGqjnBnWhwQ55mwb9u9gWmSSZ1k=;
- b=YPWJN8JCdxWpGHUfICfutBsAPKd+e0HpMXFeT3gbjbTNo6bToX0R7WBAJ1Of0ZrzUz71OJ
- NYxfFx//QjN+wj6UQOK6/8BO+VThoA3Y2XF5scuRkNr5f6qBxg74mt6KhcJF2a5H7JvLok
- Afcfj5Sk8DxA5zd3/Q7jvEwkwjwGs9M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-544-dThHvkfUM-e2UfrXsOEUVA-1; Sat, 10 Oct 2020 16:41:33 -0400
-X-MC-Unique: dThHvkfUM-e2UfrXsOEUVA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A24081868423
- for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 20:41:32 +0000 (UTC)
-Received: from localhost (unknown [10.36.110.19])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5B9C210013C4;
- Sat, 10 Oct 2020 20:41:23 +0000 (UTC)
-From: marcandre.lureau@redhat.com
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kRLiH-0000UK-8n
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 16:43:33 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51424)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kRLiC-0007S0-RD
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 16:43:30 -0400
+Received: by mail-wm1-x342.google.com with SMTP id d81so13302448wmc.1
+ for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 13:43:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=MCMj0TR+Fl9dY8Kl27uG0iFSZwgVew5RPBCHaa3rL38=;
+ b=ZuqtjKpT5MXbZVwy+FCYabCWRL6j3TgGf5uHfwWaDOUujD/i3aHxKCH9SdbSTmCRE7
+ Ldrjq3hdIkTevQpyVltIu4Ik78DmwkNiJmvYyUSmf6qUNz/sNbdPcoVfc1HqrwtlQUi+
+ S5K2387QYUddiFSrOYNZabGxI8eEpmRm8067t6B7LQVe88FIvIWV4s+G9MFbB9+RzsGc
+ vUh52T2qn3xdsmoTxet8kBKxF0QFYOozKtlXeFWFguFyL3pHdnNx2TCUmtXYlzxr8jJW
+ gxJDTb9rBFmRGNYghxQ02OcOoX+jHHGizV0rg0pT2l+dvV7J5UdY4G7emSMi/elejCmy
+ YE9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=MCMj0TR+Fl9dY8Kl27uG0iFSZwgVew5RPBCHaa3rL38=;
+ b=oU6jxzAfv0To5UpAsbOLK5ikRSA6+0LWz1KO5Ki1WjahWuuqy+7jC7YXkSE29/EhP+
+ MwQSBngDRBd3TaYc9mxkAt9OwXMg7mvzC2kTCtvhrFgKnXajHkn909t7PsFhEXDSyk/L
+ a4rttfaTHjA5mfggQ71zeIoRQXTgzZa2eC5HjAT8TOST4GCHv6w7/ylBN07yBHv0Xyql
+ aAJpqca2f7vYPMSvHicBLeTDgWA5XSGBKZ50m7Zn9kS51wvE3JLsE9BjEhSDc9XziBGc
+ Az+yF16uEArCIbirJH0imRshzxSw9MXApMMxqF8c4t6m9U2Br67GUigth00b8tMWJMTQ
+ rsng==
+X-Gm-Message-State: AOAM5333M2tK2T7b3an/KKx8BZ19r7PqCXIiwQo/SMSutywoA3QBN2hv
+ bUjJ1zpnJHEAgv8mPY6q3z5wOR9Tod4=
+X-Google-Smtp-Source: ABdhPJwwKkazENrdC7jgR5WP9EMaZvakRFVl6PX+zsV16ZunlWBU1LR8Hi7WFFbadpmjmkfe72dMGA==
+X-Received: by 2002:a1c:2cc4:: with SMTP id s187mr3910567wms.36.1602362607246; 
+ Sat, 10 Oct 2020 13:43:27 -0700 (PDT)
+Received: from localhost.localdomain
+ (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id 205sm2705471wme.38.2020.10.10.13.43.26
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 10 Oct 2020 13:43:26 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/3] coroutine: let CoQueue wake up outside a coroutine
-Date: Sun, 11 Oct 2020 00:41:04 +0400
-Message-Id: <20201010204106.1368710-2-marcandre.lureau@redhat.com>
-In-Reply-To: <20201010204106.1368710-1-marcandre.lureau@redhat.com>
-References: <20201010204106.1368710-1-marcandre.lureau@redhat.com>
+Subject: [PATCH v3 04/20] hw/core/clock: add the clock_new helper function
+Date: Sat, 10 Oct 2020 22:43:03 +0200
+Message-Id: <20201010204319.3119239-5-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201010204319.3119239-1-f4bug@amsat.org>
+References: <20201010204319.3119239-1-f4bug@amsat.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=marcandre.lureau@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124;
- envelope-from=marcandre.lureau@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/10 16:30:21
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,50 +103,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Damien Hedde <damien.hedde@greensocs.com>,
+ Huacai Chen <zltjiangshi@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, Luc Michel <luc@lmichel.fr>,
+ Eduardo Habkost <ehabkost@redhat.com>, Paul Burton <paulburton@kernel.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Huacai Chen <chenhc@lemote.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+From: Luc Michel <luc@lmichel.fr>
 
-The assert() was added in commit b681a1c73e15 ("block: Repair the
-throttling code."), when the qemu_co_queue_do_restart() function
-required to be running in a coroutine. It was later made unnecessary in
-commit a9d9235567e7 ("coroutine-lock: reschedule coroutine on the
-AioContext it was running on").
+This function creates a clock and parents it to another object with a given
+name. It calls clock_setup_canonical_path before returning the new
+clock.
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+This function is useful to create clocks in devices when one doesn't
+want to expose it at the qdev level (as an input or an output).
+
+Suggested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Luc Michel <luc@lmichel.fr>
+Message-Id: <20201010135759.437903-4-luc@lmichel.fr>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- util/qemu-coroutine-lock.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ include/hw/clock.h | 13 +++++++++++++
+ hw/core/clock.c    | 15 +++++++++++++++
+ 2 files changed, 28 insertions(+)
 
-diff --git a/util/qemu-coroutine-lock.c b/util/qemu-coroutine-lock.c
-index 36927b5f88..5816bf8900 100644
---- a/util/qemu-coroutine-lock.c
-+++ b/util/qemu-coroutine-lock.c
-@@ -85,15 +85,13 @@ static bool qemu_co_queue_do_restart(CoQueue *queue, bool single)
-     return true;
+diff --git a/include/hw/clock.h b/include/hw/clock.h
+index d357594df99..cbc5e6ced1e 100644
+--- a/include/hw/clock.h
++++ b/include/hw/clock.h
+@@ -90,6 +90,19 @@ extern const VMStateDescription vmstate_clock;
+  */
+ void clock_setup_canonical_path(Clock *clk);
+ 
++/**
++ * clock_new:
++ * @parent: the clock parent
++ * @name: the clock object name
++ *
++ * Helper function to create a new clock and parent it to @parent. There is no
++ * need to call clock_setup_canonical_path on the returned clock as it is done
++ * by this function.
++ *
++ * @return the newly created clock
++ */
++Clock *clock_new(Object *parent, const char *name);
++
+ /**
+  * clock_set_callback:
+  * @clk: the clock to register the callback into
+diff --git a/hw/core/clock.c b/hw/core/clock.c
+index 7066282f7b9..f866717a835 100644
+--- a/hw/core/clock.c
++++ b/hw/core/clock.c
+@@ -23,6 +23,21 @@ void clock_setup_canonical_path(Clock *clk)
+     clk->canonical_path = object_get_canonical_path(OBJECT(clk));
  }
  
--bool coroutine_fn qemu_co_queue_next(CoQueue *queue)
-+bool qemu_co_queue_next(CoQueue *queue)
++Clock *clock_new(Object *parent, const char *name)
++{
++    Object *obj;
++    Clock *clk;
++
++    obj = object_new(TYPE_CLOCK);
++    object_property_add_child(parent, name, obj);
++    object_unref(obj);
++
++    clk = CLOCK(obj);
++    clock_setup_canonical_path(clk);
++
++    return clk;
++}
++
+ void clock_set_callback(Clock *clk, ClockCallback *cb, void *opaque)
  {
--    assert(qemu_in_coroutine());
-     return qemu_co_queue_do_restart(queue, true);
- }
- 
--void coroutine_fn qemu_co_queue_restart_all(CoQueue *queue)
-+void qemu_co_queue_restart_all(CoQueue *queue)
- {
--    assert(qemu_in_coroutine());
-     qemu_co_queue_do_restart(queue, false);
- }
- 
+     clk->callback = cb;
 -- 
-2.28.0
+2.26.2
 
 
