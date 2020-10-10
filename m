@@ -4,85 +4,86 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C3ABC433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:07:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E014DC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:08:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDD71207E8
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:07:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 817BD207E8
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:08:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KuWzM4gH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDD71207E8
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WIKrNBFN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 817BD207E8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kR9uN-0000a9-SW
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 04:07:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41302)
+	id 1kR9vB-0002cl-Mg
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 04:08:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41068)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kR9lT-0004Wi-2B
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:58:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50673)
+ id 1kR9lH-00041D-FM
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:57:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49790)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kR9lQ-0006jg-Id
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:58:02 -0400
+ id 1kR9lB-0006fb-VY
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:57:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602316679;
+ s=mimecast20190719; t=1602316665;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=g4tBny8xHG7jaj/fwHAgSPIwRLxsSdPgqy4yBPAchHA=;
- b=KuWzM4gHZxFRJZy7PfJ327IcvrtuYG6Ae0DQmJlf3zB2VwSFlaYshHk/7Lkmwyxk5TR/Vm
- fzpGFKxNXMb4mWESEo8VpHqee63MTmAtjqNNSuRcCBps1Z87uo160DZwXo3UF00CYCGbS1
- SW37sFZ33Lk7k8BHHhP+v3ArEoqsc/g=
+ bh=vC9Xc63+jIBd+MkwETVUsRSra8ZBl2sNjTAEQ+tYSkM=;
+ b=WIKrNBFNPjK0PDbC90PF0q39qmLKmKfO2KHxomaF2J5Mx4TBmdi8JEh8DB/L2Sfl1dRzgy
+ 9wblg37IPVl9YCGdXOxVaKGpdUsPLw+ehBLzc7CAR7c6shiJjEzoMqcpVPYFNPO7EIvgQp
+ 5IRGyx+GP2it9O9/tsE16eCILCGemQg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-120-VdRnNoSQN-6yUAhssm2Zxg-1; Sat, 10 Oct 2020 03:57:56 -0400
-X-MC-Unique: VdRnNoSQN-6yUAhssm2Zxg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-393-po9Ue26RNkuHD74ZZ_f-XQ-1; Sat, 10 Oct 2020 03:57:43 -0400
+X-MC-Unique: po9Ue26RNkuHD74ZZ_f-XQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D3D1A8030D3
- for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 07:57:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ABE09805F06
+ for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 07:57:42 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A10DF60C07
- for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 07:57:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 691315576E;
+ Sat, 10 Oct 2020 07:57:42 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 29/39] qdev: add "check if address free" callback for buses
-Date: Sat, 10 Oct 2020 03:57:29 -0400
-Message-Id: <20201010075739.951385-30-pbonzini@redhat.com>
+Subject: [PULL 07/39] crypto: Move the creation of the library to the main
+ meson.build
+Date: Sat, 10 Oct 2020 03:57:07 -0400
+Message-Id: <20201010075739.951385-8-pbonzini@redhat.com>
 In-Reply-To: <20201010075739.951385-1-pbonzini@redhat.com>
 References: <20201010075739.951385-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/10 03:36:24
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/10 02:57:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,145 +97,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Check if an address is free on the bus before plugging in the
-device.  This makes it possible to do the check without any
-side effects, and to detect the problem early without having
-to do it in the realize callback.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20201006123904.610658-5-mlevitsk@redhat.com>
+Be consistent creating all the libraries in the main meson.build file.
+
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20201006125602.2311423-8-philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/core/qdev.c         | 17 +++++++++++++++--
- hw/net/virtio-net.c    |  2 +-
- hw/sd/core.c           |  3 ++-
- include/hw/qdev-core.h | 13 ++++++++++++-
- 4 files changed, 30 insertions(+), 5 deletions(-)
+ crypto/meson.build | 10 ----------
+ meson.build        | 10 ++++++++++
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 96772a15bd..74db78df36 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -94,13 +94,23 @@ static void bus_add_child(BusState *bus, DeviceState *child)
-                              0);
- }
+diff --git a/crypto/meson.build b/crypto/meson.build
+index f6f5ce1ecd..7f37b5d335 100644
+--- a/crypto/meson.build
++++ b/crypto/meson.build
+@@ -1,4 +1,3 @@
+-crypto_ss = ss.source_set()
+ crypto_ss.add(genh)
+ crypto_ss.add(files(
+   'afsplit.c',
+@@ -52,15 +51,6 @@ if 'CONFIG_GNUTLS' in config_host
+ endif
  
--void qdev_set_parent_bus(DeviceState *dev, BusState *bus)
-+static bool bus_check_address(BusState *bus, DeviceState *child, Error **errp)
-+{
-+    BusClass *bc = BUS_GET_CLASS(bus);
-+    return !bc->check_address || bc->check_address(bus, child, errp);
-+}
+ 
+-crypto_ss = crypto_ss.apply(config_host, strict: false)
+-libcrypto = static_library('crypto', crypto_ss.sources() + genh,
+-                           dependencies: [crypto_ss.dependencies()],
+-                           name_suffix: 'fa',
+-                           build_by_default: false)
+-
+-crypto = declare_dependency(link_whole: libcrypto,
+-                            dependencies: [authz, qom])
+-
+ util_ss.add(files('aes.c'))
+ util_ss.add(files('init.c'))
+ 
+diff --git a/meson.build b/meson.build
+index 28f31e6022..9c199195bf 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1187,6 +1187,7 @@ block_ss = ss.source_set()
+ bsd_user_ss = ss.source_set()
+ chardev_ss = ss.source_set()
+ common_ss = ss.source_set()
++crypto_ss = ss.source_set()
+ io_ss = ss.source_set()
+ linux_user_ss = ss.source_set()
+ qmp_ss = ss.source_set()
+@@ -1452,6 +1453,15 @@ qemu_syms = custom_target('qemu.syms', output: 'qemu.syms',
+ # Library dependencies #
+ ########################
+ 
++crypto_ss = crypto_ss.apply(config_host, strict: false)
++libcrypto = static_library('crypto', crypto_ss.sources() + genh,
++                           dependencies: [crypto_ss.dependencies()],
++                           name_suffix: 'fa',
++                           build_by_default: false)
 +
-+bool qdev_set_parent_bus(DeviceState *dev, BusState *bus, Error **errp)
- {
-     BusState *old_parent_bus = dev->parent_bus;
-     DeviceClass *dc = DEVICE_GET_CLASS(dev);
- 
-     assert(dc->bus_type && object_dynamic_cast(OBJECT(bus), dc->bus_type));
- 
-+    if (!bus_check_address(bus, dev, errp)) {
-+        return false;
-+    }
++crypto = declare_dependency(link_whole: libcrypto,
++                            dependencies: [authz, qom])
 +
-     if (old_parent_bus) {
-         trace_qdev_update_parent_bus(dev, object_get_typename(OBJECT(dev)),
-             old_parent_bus, object_get_typename(OBJECT(old_parent_bus)),
-@@ -126,6 +136,7 @@ void qdev_set_parent_bus(DeviceState *dev, BusState *bus)
-         object_unref(OBJECT(old_parent_bus));
-         object_unref(OBJECT(dev));
-     }
-+    return true;
- }
- 
- DeviceState *qdev_new(const char *name)
-@@ -371,7 +382,9 @@ bool qdev_realize(DeviceState *dev, BusState *bus, Error **errp)
-     assert(!dev->realized && !dev->parent_bus);
- 
-     if (bus) {
--        qdev_set_parent_bus(dev, bus);
-+        if (!qdev_set_parent_bus(dev, bus, errp)) {
-+            return false;
-+        }
-     } else {
-         assert(!DEVICE_GET_CLASS(dev)->bus_type);
-     }
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index a160a9da9c..277289d56e 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -3138,7 +3138,7 @@ static bool failover_replug_primary(VirtIONet *n, Error **errp)
-         error_setg(errp, "virtio_net: couldn't find primary bus");
-         return false;
-     }
--    qdev_set_parent_bus(n->primary_dev, n->primary_bus);
-+    qdev_set_parent_bus(n->primary_dev, n->primary_bus, &error_abort);
-     n->primary_should_be_hidden = false;
-     if (!qemu_opt_set_bool(n->primary_device_opts,
-                            "partially_hotplugged", true, errp)) {
-diff --git a/hw/sd/core.c b/hw/sd/core.c
-index 957d116f1a..08c93b5903 100644
---- a/hw/sd/core.c
-+++ b/hw/sd/core.c
-@@ -23,6 +23,7 @@
- #include "hw/qdev-core.h"
- #include "hw/sd/sd.h"
- #include "qemu/module.h"
-+#include "qapi/error.h"
- #include "trace.h"
- 
- static inline const char *sdbus_name(SDBus *sdbus)
-@@ -240,7 +241,7 @@ void sdbus_reparent_card(SDBus *from, SDBus *to)
-     readonly = sc->get_readonly(card);
- 
-     sdbus_set_inserted(from, false);
--    qdev_set_parent_bus(DEVICE(card), &to->qbus);
-+    qdev_set_parent_bus(DEVICE(card), &to->qbus, &error_abort);
-     sdbus_set_inserted(to, true);
-     sdbus_set_readonly(to, readonly);
- }
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 72064f4dd4..14d476c587 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -210,13 +210,24 @@ struct BusClass {
-     /* FIXME first arg should be BusState */
-     void (*print_dev)(Monitor *mon, DeviceState *dev, int indent);
-     char *(*get_dev_path)(DeviceState *dev);
-+
-     /*
-      * This callback is used to create Open Firmware device path in accordance
-      * with OF spec http://forthworks.com/standards/of1275.pdf. Individual bus
-      * bindings can be found at http://playground.sun.com/1275/bindings/.
-      */
-     char *(*get_fw_dev_path)(DeviceState *dev);
-+
-     void (*reset)(BusState *bus);
-+
-+    /*
-+     * Return whether the device can be added to @bus,
-+     * based on the address that was set (via device properties)
-+     * before realize.  If not, on return @errp contains the
-+     * human-readable error message.
-+     */
-+    bool (*check_address)(BusState *bus, DeviceState *dev, Error **errp);
-+
-     BusRealize realize;
-     BusUnrealize unrealize;
- 
-@@ -788,7 +799,7 @@ const char *qdev_fw_name(DeviceState *dev);
- Object *qdev_get_machine(void);
- 
- /* FIXME: make this a link<> */
--void qdev_set_parent_bus(DeviceState *dev, BusState *bus);
-+bool qdev_set_parent_bus(DeviceState *dev, BusState *bus, Error **errp);
- 
- extern bool qdev_hotplug;
- extern bool qdev_hot_removed;
+ io_ss = io_ss.apply(config_host, strict: false)
+ libio = static_library('io', io_ss.sources() + genh,
+                        dependencies: [io_ss.dependencies()],
 -- 
 2.26.2
 
