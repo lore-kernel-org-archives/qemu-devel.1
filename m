@@ -2,66 +2,89 @@ Return-Path: <SRS0=BZbV=DR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92C91C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 02:28:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C91CC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 02:33:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3B48221FD
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 02:28:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3B48221FD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id EF6CE206D4
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 02:33:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iVkUnxlR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF6CE206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kR4cv-0003qm-1W
-	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 22:28:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58132)
+	id 1kR4hT-00054O-4Q
+	for qemu-devel@archiver.kernel.org; Fri, 09 Oct 2020 22:33:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58520)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cenjiahui@huawei.com>)
- id 1kR4cH-0003QG-Lt
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 22:28:13 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:56276 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cenjiahui@huawei.com>)
- id 1kR4cD-0006Fe-LB
- for qemu-devel@nongnu.org; Fri, 09 Oct 2020 22:28:13 -0400
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id B95E7C8FF0C2127B3177;
- Sat, 10 Oct 2020 10:27:52 +0800 (CST)
-Received: from [10.174.184.155] (10.174.184.155) by
- DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
- 14.3.487.0; Sat, 10 Oct 2020 10:27:45 +0800
-Subject: Re: [RFC PATCH v2 0/8] block-backend: Introduce I/O hang
-To: <qemu-devel@nongnu.org>, <kwolf@redhat.com>
-References: <20200930094606.5323-1-cenjiahui@huawei.com>
-From: cenjiahui <cenjiahui@huawei.com>
-Message-ID: <9bbda2fb-ce27-d8f1-11dd-d7f7889bbbab@huawei.com>
-Date: Sat, 10 Oct 2020 10:27:45 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1kR4gT-0004da-62
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 22:32:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43479)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1kR4gQ-0006fw-Fo
+ for qemu-devel@nongnu.org; Fri, 09 Oct 2020 22:32:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602297148;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=z0+yMqB5qWuc0BoeYtvqmNWdzEX4ZInq9BnlDhYqt00=;
+ b=iVkUnxlRq4YnQwMXU6gysjZAk1SyGpefN3GTQksDL3/q4iu6OPcyXItSPjPfHxU5JSCf3Z
+ xSwgih/lpGVOuoMplTH1DWJTU5vHikybYFxFvoyJDtO2txARXkaQcO19xU9qvDP+D9I8Ea
+ 7lvyv/4hbvtTVm0U3cMT480DQth34Tk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-40-55hpNga7MaCPTcKGrULuZw-1; Fri, 09 Oct 2020 22:32:24 -0400
+X-MC-Unique: 55hpNga7MaCPTcKGrULuZw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71949879514;
+ Sat, 10 Oct 2020 02:32:22 +0000 (UTC)
+Received: from [10.72.13.27] (ovpn-13-27.pek2.redhat.com [10.72.13.27])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4D59260BE2;
+ Sat, 10 Oct 2020 02:32:15 +0000 (UTC)
+Subject: Re: [PATCH v3 2/3] vhost: Use vhost_get_used_size() in
+ vhost_vring_set_addr()
+To: Greg Kurz <groug@kaod.org>, "Michael S. Tsirkin" <mst@redhat.com>
+References: <160171888144.284610.4628526949393013039.stgit@bahia.lan>
+ <160171932300.284610.11846106312938909461.stgit@bahia.lan>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <5fc896c6-e60d-db0b-f7b0-5b6806d70b8e@redhat.com>
+Date: Sat, 10 Oct 2020 10:32:13 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200930094606.5323-1-cenjiahui@huawei.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <160171932300.284610.11846106312938909461.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.184.155]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.35; envelope-from=cenjiahui@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 22:27:53
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.208,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/09 22:04:46
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -22
+X-Spam_score: -2.3
+X-Spam_bar: --
+X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.208, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -74,54 +97,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fangying1@huawei.com, zhang.zhanghailiang@huawei.com, mreitz@redhat.com
+Cc: kvm@vger.kernel.org, netdev@vger.kernel.org, qemu-devel@nongnu.org,
+ Laurent Vivier <laurent@vivier.eu>, virtualization@lists.linux-foundation.org,
+ linux-kernel@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Kevin,
 
-Could you please spend some time reviewing and commenting on this patch series.
+On 2020/10/3 下午6:02, Greg Kurz wrote:
+> The open-coded computation of the used size doesn't take the event
+> into account when the VIRTIO_RING_F_EVENT_IDX feature is present.
+> Fix that by using vhost_get_used_size().
+>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>   drivers/vhost/vhost.c |    3 +--
+>   1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index c3b49975dc28..9d2c225fb518 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -1519,8 +1519,7 @@ static long vhost_vring_set_addr(struct vhost_dev *d,
+>   		/* Also validate log access for used ring if enabled. */
+>   		if ((a.flags & (0x1 << VHOST_VRING_F_LOG)) &&
+>   			!log_access_ok(vq->log_base, a.log_guest_addr,
+> -				sizeof *vq->used +
+> -				vq->num * sizeof *vq->used->ring))
+> +				       vhost_get_used_size(vq, vq->num)))
+>   			return -EINVAL;
+>   	}
+>   
+>
+>
 
-Thanks,
-Jiahui Cen
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-On 2020/9/30 17:45, Jiahui Cen wrote:
-> A VM in the cloud environment may use a virutal disk as the backend storage,
-> and there are usually filesystems on the virtual block device. When backend
-> storage is temporarily down, any I/O issued to the virtual block device will
-> cause an error. For example, an error occurred in ext4 filesystem would make
-> the filesystem readonly. However a cloud backend storage can be soon recovered.
-> For example, an IP-SAN may be down due to network failure and will be online
-> soon after network is recovered. The error in the filesystem may not be
-> recovered unless a device reattach or system restart. So an I/O rehandle is
-> in need to implement a self-healing mechanism.
-> 
-> This patch series propose a feature called I/O hang. It can rehandle AIOs
-> with EIO error without sending error back to guest. From guest's perspective
-> of view it is just like an IO is hanging and not returned. Guest can get
-> back running smoothly when I/O is recovred with this feature enabled.
-> 
-> v1->v2:
-> * Rebase to fix compile problems.
-> * Fix incorrect remove of rehandle list.
-> * Provide rehandle pause interface.
-> 
-> Jiahui Cen (8):
->   block-backend: introduce I/O rehandle info
->   block-backend: rehandle block aios when EIO
->   block-backend: add I/O hang timeout
->   block-backend: add I/O rehandle pause/unpause
->   block-backend: enable I/O hang when timeout is set
->   virtio-blk: pause I/O hang when resetting
->   qemu-option: add I/O hang timeout option
->   qapi: add I/O hang and I/O hang timeout qapi event
-> 
->  block/block-backend.c          | 300 +++++++++++++++++++++++++++++++++
->  blockdev.c                     |  11 ++
->  hw/block/virtio-blk.c          |   8 +
->  include/sysemu/block-backend.h |   5 +
->  qapi/block-core.json           |  26 +++
->  5 files changed, 350 insertions(+)
-> 
+
 
