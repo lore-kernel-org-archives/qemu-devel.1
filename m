@@ -7,71 +7,72 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15199C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 21:00:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AEFAC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 21:02:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A392B207E8
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 21:00:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C1E3A20657
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 21:02:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tgzyldTZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A392B207E8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L2cCiuW1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1E3A20657
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRLyH-0003Wr-Lb
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 17:00:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52106)
+	id 1kRM0X-0005Ve-Vc
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 17:02:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52216)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRLiS-0000pv-Jp
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 16:43:46 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33553)
+ id 1kRLic-0000xF-FE
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 16:43:55 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33556)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRLiP-0007VU-C0
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 16:43:42 -0400
-Received: by mail-wr1-x441.google.com with SMTP id b8so948540wrn.0
- for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 13:43:40 -0700 (PDT)
+ id 1kRLia-0007X0-2K
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 16:43:54 -0400
+Received: by mail-wr1-x444.google.com with SMTP id b8so948772wrn.0
+ for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 13:43:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Ek5SrDH4GE8Do53h6I6t8PT0loCihX0nSv8eh5BL3UU=;
- b=tgzyldTZBrMZ6q4KE0b1fVBtOQB3vg3/zLST3xio/0Da/pwWDWRLGxDAOuUmlnhQWf
- aiAdLyVmqbg0WxzPuy8LnwJyhN+tLAISFb8Gc92Q84CQlbPB8GNkwrsxjXYag1NMkQ1v
- bEwTjzTz0D7cA8MzfwvyRNmtRgHpMHLj08rdnMTxzQG8K8c3NToqUvGycNDh5rQA//un
- ks5dB3GLIjjZOQlkjWrhkXbqL7QdO2V3tRAALckRfnoTem5LrnH4+LkQMYis8H8vBa1J
- A4+GwQKvZlmdAp1qfXU8eEeUrIHH5NWgoiwVumIk9eFvDEpfqToff/T/wzFPyR9iDnRp
- q6ig==
+ bh=HmgC37wCjLUJVnf61J8zdojgJc5xhuHBXkX9blUA1GM=;
+ b=L2cCiuW1gh4KaQIQssXFB0b86mjkC7G5lKUM6vl1IOuEa7RYxGPDx+cp4HqfjrwADi
+ KV72V48Shrst0S1S7+kqekCHaMuxwvGq6MFh1tXKSlpY65ogy/y6vgKXESIvHM+CS8n2
+ L4AbE4wSmOB88hMcXlR5oy0iY7PC8zDxzN/ZHmm/Ej0sKi6CaJZhooujVnzbNN5vpytq
+ lxk44gLaEaHj3eTKH93hLhcxv1eSXPTcun88i269GDJZkdvK1ehCXoCj60cmzggzDmxR
+ HwkLIIMugb88KYYcAxa7JcBu07YkfcavjNfSwoQ4DSeqak2Gv3ttVPYy5/WeMrSFGM1F
+ oVJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=Ek5SrDH4GE8Do53h6I6t8PT0loCihX0nSv8eh5BL3UU=;
- b=To8t7k+DssZrmIi40vnZhfHNyeU2oVspjO+gngZxLzireMJP762J+UIH9Xgmos37BL
- VGqQjiGA1iViQlLUoeddbN5bPg3OsK6B0sY+6x9JJcYOyNPNVyAzm/oJhz0+/BZaf9OO
- qhTWEg019b6I3DTzMAbR0gRK+9XNOsL5SI+PSVXCvBGeauIH7LUnV68zyD7OKDkIrFFV
- qY6Ir5OtAIJWlusBvwSPGa7sxmCfAxM6LIX+skZBPOCUPaN3RfTtN4kXZMqaSB25W/Gp
- 0zmPp07P4ilPrmaPSvb8IY0JL1y/nj+AbTg4A5Hj3oZG8cc7xxHoKzDU5ftkR3lke0Yk
- 3HSg==
-X-Gm-Message-State: AOAM532ROyfHio5Rsdwl02jbHlRTCtIN/Cc5bU0WUV4heY7S/6FC0YuI
- vT/+NF/M3/Td2B3Uvvs89iO8nE9Z+hY=
-X-Google-Smtp-Source: ABdhPJzd3Eocv9z7xJb0SLs+euBqVf8vP41aduHT+MDR5PYrLioCLVgABEwH7AYTyrcUSVcMllXc7g==
-X-Received: by 2002:adf:f7c1:: with SMTP id a1mr15774281wrq.399.1602362619806; 
- Sat, 10 Oct 2020 13:43:39 -0700 (PDT)
+ bh=HmgC37wCjLUJVnf61J8zdojgJc5xhuHBXkX9blUA1GM=;
+ b=kXiI5qUYonzToJo21rXbh54zlrm4S4kw/APbMVYAeRXTppM0p64ioeiXAwzuM/3nuA
+ 8mFwKLNIRPf/cyaBh1ExVSKm6MmzElht2Uc+XpzsRFmXKjhc8u2UudlW3+z8tdNRdUOA
+ jReEIkWw77BRDMKsTIvDuxLFMlUc1i1dh2INCiQAGUSwXebnnUrzL8KkSeuaUwpils6s
+ nBta8Oht1vFL5h7sZE/1Df+zePWF4mY04Em9PHoPh2zW++gAyvvLn03/Nm3B8xLfL5HD
+ MTlQTt7L1zOrc/Jwpms/aknZSPG1b7ywGh28JohUVwkT36IGAWAVwtIs9fMwTziYOs9E
+ tk/w==
+X-Gm-Message-State: AOAM532c2oG44EjNtrYyjd8jGiDjbSgw8i8ug6EWE00EnME/0WyLqFbn
+ 5VXRKWVWSOtPf6EBTvz9K74Ro61wwOs=
+X-Google-Smtp-Source: ABdhPJzrK6R/IBjIkkKex+DEZ6OJEqH8AmIait6xHkDT0ThvG0ifr9pZ7ThXNV+ZwiRz24lX8PHz/g==
+X-Received: by 2002:adf:e6c4:: with SMTP id y4mr21980726wrm.423.1602362629751; 
+ Sat, 10 Oct 2020 13:43:49 -0700 (PDT)
 Received: from localhost.localdomain
  (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id 205sm2705471wme.38.2020.10.10.13.43.38
+ by smtp.gmail.com with ESMTPSA id 205sm2705471wme.38.2020.10.10.13.43.48
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 10 Oct 2020 13:43:39 -0700 (PDT)
+ Sat, 10 Oct 2020 13:43:49 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 13/20] hw/mips/fuloong2e: Set CPU frequency to 533 MHz
-Date: Sat, 10 Oct 2020 22:43:12 +0200
-Message-Id: <20201010204319.3119239-14-f4bug@amsat.org>
+Subject: [PATCH v3 20/20] target/mips/cpu: Display warning when CPU is used
+ without input clock
+Date: Sat, 10 Oct 2020 22:43:19 +0200
+Message-Id: <20201010204319.3119239-21-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201010204319.3119239-1-f4bug@amsat.org>
 References: <20201010204319.3119239-1-f4bug@amsat.org>
@@ -79,8 +80,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -117,45 +118,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The CPU frequency is normally provided by the firmware in the
-"cpuclock" environment variable. The 2E board can handles up
-to 660MHz, but be conservative and take the same value used
-by the Linux kernel: 533 MHz.
+All our QOM users provides an input clock. In order to avoid
+avoid future machines added without clock, display a warning.
+
+User-mode emulation use the CP0 timer with the RDHWR instruction
+(see commit cdfcad788394) so keep using the fixed 200 MHz clock
+without diplaying any warning. Only display it in system-mode
+emulation.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/mips/fuloong2e.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ target/mips/cpu.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/hw/mips/fuloong2e.c b/hw/mips/fuloong2e.c
-index b000ed1d7f7..b25c3df19d0 100644
---- a/hw/mips/fuloong2e.c
-+++ b/hw/mips/fuloong2e.c
-@@ -28,6 +28,7 @@
- #include "hw/isa/superio.h"
- #include "net/net.h"
- #include "hw/boards.h"
-+#include "hw/qdev-clock.h"
- #include "hw/i2c/smbus_eeprom.h"
- #include "hw/block/flash.h"
- #include "hw/mips/mips.h"
-@@ -300,10 +301,15 @@ static void mips_fuloong2e_init(MachineState *machine)
-     I2CBus *smbus;
-     MIPSCPU *cpu;
-     CPUMIPSState *env;
-+    Clock *cpuclk;
-     DeviceState *dev;
+diff --git a/target/mips/cpu.c b/target/mips/cpu.c
+index 3deb0245e7c..60011068e4d 100644
+--- a/target/mips/cpu.c
++++ b/target/mips/cpu.c
+@@ -19,12 +19,14 @@
+  */
  
-     /* init CPUs */
--    cpu = MIPS_CPU(cpu_create(machine->cpu_type));
-+    cpu = MIPS_CPU(object_new(machine->cpu_type));
-+    cpuclk = clock_new(OBJECT(machine), "cpu-refclk");
-+    clock_set_hz(cpuclk, 533080000); /* ~533 MHz */
-+    qdev_connect_clock_in(DEVICE(cpu), "clk-in", cpuclk);
-+    qdev_realize(DEVICE(cpu), NULL, &error_abort);
-     env = &cpu->env;
+ #include "qemu/osdep.h"
++#include "qemu/cutils.h"
+ #include "qapi/error.h"
+ #include "cpu.h"
+ #include "internal.h"
+ #include "kvm_mips.h"
+ #include "qemu/module.h"
+ #include "sysemu/kvm.h"
++#include "sysemu/qtest.h"
+ #include "exec/exec-all.h"
+ #include "hw/qdev-properties.h"
+ #include "hw/qdev-clock.h"
+@@ -157,6 +159,14 @@ static void mips_cpu_realizefn(DeviceState *dev, Error **errp)
+     Error *local_err = NULL;
  
-     qemu_register_reset(main_cpu_reset, cpu);
+     if (!clock_get(cpu->clock)) {
++#ifndef CONFIG_USER_ONLY
++        if (!qtest_enabled()) {
++            g_autofree char *cpu_freq_str = freq_to_str(CPU_FREQ_HZ_DEFAULT);
++
++            warn_report("CPU input clock is not connected to any output clock, "
++                        "using default frequency of %s.", cpu_freq_str);
++        }
++#endif
+         /* Initialize the frequency in case the clock remains unconnected. */
+         clock_set_hz(cpu->clock, CPU_FREQ_HZ_DEFAULT);
+     }
 -- 
 2.26.2
 
