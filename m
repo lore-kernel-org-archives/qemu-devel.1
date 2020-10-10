@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D5FAC433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 20:48:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44509C433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 20:48:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92B61207C4
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 20:48:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C6B8E207C4
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 20:48:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZuqtjKpT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92B61207C4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cAJNcsMz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6B8E207C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRLmf-0004KV-MG
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 16:48:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51938)
+	id 1kRLnF-0005PU-P2
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 16:48:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51992)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRLiH-0000UK-8n
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 16:43:33 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51424)
+ id 1kRLiK-0000d9-E9
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 16:43:36 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43241)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRLiC-0007S0-RD
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 16:43:30 -0400
-Received: by mail-wm1-x342.google.com with SMTP id d81so13302448wmc.1
- for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 13:43:28 -0700 (PDT)
+ id 1kRLiI-0007TD-MY
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 16:43:36 -0400
+Received: by mail-wr1-x443.google.com with SMTP id g12so14148078wrp.10
+ for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 13:43:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=MCMj0TR+Fl9dY8Kl27uG0iFSZwgVew5RPBCHaa3rL38=;
- b=ZuqtjKpT5MXbZVwy+FCYabCWRL6j3TgGf5uHfwWaDOUujD/i3aHxKCH9SdbSTmCRE7
- Ldrjq3hdIkTevQpyVltIu4Ik78DmwkNiJmvYyUSmf6qUNz/sNbdPcoVfc1HqrwtlQUi+
- S5K2387QYUddiFSrOYNZabGxI8eEpmRm8067t6B7LQVe88FIvIWV4s+G9MFbB9+RzsGc
- vUh52T2qn3xdsmoTxet8kBKxF0QFYOozKtlXeFWFguFyL3pHdnNx2TCUmtXYlzxr8jJW
- gxJDTb9rBFmRGNYghxQ02OcOoX+jHHGizV0rg0pT2l+dvV7J5UdY4G7emSMi/elejCmy
- YE9w==
+ bh=nQ7QIUrlrUzF/fqOFrq02YrsK4QXRUJjYFAte9Cpzpg=;
+ b=cAJNcsMz3zuDjPLgFP4IwCfGiy09/y84E8BjvVr/dqvGvy1YRE3I7DxK1hRKsGdoEA
+ CSfbxZEbwwnYoyv7ZcvgVqIvFVtsBeYx3SbjhvDNX3OI7jv8rUetBLnwyCwi9eLTlo7Y
+ rjpkMKuCotmBkqWrZOWoZj3823ulzXmYejZ1XN/nf3oF/OZ0n3oyeR9UoUSXBJbJBOmx
+ /fYKhtF6vmyFnPPu/pzfdOsRmmoegbxHxkX1Myd97hxsjZ1Fqfr/VC3mkN2kg89az8br
+ qGm+VOzB6pd8Zwdg9VVP0/SyDcUt1k6/pzJywiRYiLCQH7/C10Gd4ATxzhx59UZ/8MDF
+ Vh1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=MCMj0TR+Fl9dY8Kl27uG0iFSZwgVew5RPBCHaa3rL38=;
- b=oU6jxzAfv0To5UpAsbOLK5ikRSA6+0LWz1KO5Ki1WjahWuuqy+7jC7YXkSE29/EhP+
- MwQSBngDRBd3TaYc9mxkAt9OwXMg7mvzC2kTCtvhrFgKnXajHkn909t7PsFhEXDSyk/L
- a4rttfaTHjA5mfggQ71zeIoRQXTgzZa2eC5HjAT8TOST4GCHv6w7/ylBN07yBHv0Xyql
- aAJpqca2f7vYPMSvHicBLeTDgWA5XSGBKZ50m7Zn9kS51wvE3JLsE9BjEhSDc9XziBGc
- Az+yF16uEArCIbirJH0imRshzxSw9MXApMMxqF8c4t6m9U2Br67GUigth00b8tMWJMTQ
- rsng==
-X-Gm-Message-State: AOAM5333M2tK2T7b3an/KKx8BZ19r7PqCXIiwQo/SMSutywoA3QBN2hv
- bUjJ1zpnJHEAgv8mPY6q3z5wOR9Tod4=
-X-Google-Smtp-Source: ABdhPJwwKkazENrdC7jgR5WP9EMaZvakRFVl6PX+zsV16ZunlWBU1LR8Hi7WFFbadpmjmkfe72dMGA==
-X-Received: by 2002:a1c:2cc4:: with SMTP id s187mr3910567wms.36.1602362607246; 
- Sat, 10 Oct 2020 13:43:27 -0700 (PDT)
+ bh=nQ7QIUrlrUzF/fqOFrq02YrsK4QXRUJjYFAte9Cpzpg=;
+ b=pJs5EsepGsn7+IRh5B9rwBqh3Z5Jyvz9Z46nsH6kDGYmrGu4O44XHO4k/a5TmIHMDq
+ z0WJh8NzAArCq1x8Cfb8AKYAxxQ0CkcjQ8tbCbM9EDFE8K3iKSFADiYb6vO8pu1Zo7z0
+ kFgJP0XrhkYEpssme5w3wk18Xn/XnLBe5eRjYLZDsK4PKrextrQaJavl2MYuI2zIQ2+x
+ U/qh1pvPjil92kV6496SnsXPztvfoiLwNNpX2FGbL3FD1nBh5iA/ZOx6jukx0vLS5pwF
+ Y2rQdCgOiYHlDoSQfOlRRvUXgRqka6yIuXVU90v/Mqgeyn6CzNrcptIzK17zvY2nmV33
+ BOtw==
+X-Gm-Message-State: AOAM531Z1Z1+Qj4KuUqmIXjrot7dAYoir/LBwpe4HXEOINNaYquIlf+2
+ So88XfRRpnim1SGD9DBSKSMTHZ5ccMQ=
+X-Google-Smtp-Source: ABdhPJyxBNKdPYslU6d6J8oxgaxM8n37D55G0fc5LZetF+vONOAvi8KG9QD7bpy+otJPYyh+6vnUvg==
+X-Received: by 2002:a5d:680a:: with SMTP id w10mr22174651wru.5.1602362613138; 
+ Sat, 10 Oct 2020 13:43:33 -0700 (PDT)
 Received: from localhost.localdomain
  (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id 205sm2705471wme.38.2020.10.10.13.43.26
+ by smtp.gmail.com with ESMTPSA id 205sm2705471wme.38.2020.10.10.13.43.31
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 10 Oct 2020 13:43:26 -0700 (PDT)
+ Sat, 10 Oct 2020 13:43:32 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 04/20] hw/core/clock: add the clock_new helper function
-Date: Sat, 10 Oct 2020 22:43:03 +0200
-Message-Id: <20201010204319.3119239-5-f4bug@amsat.org>
+Subject: [PATCH v3 08/20] target/mips: Move cp0_count_ns to CPUMIPSState
+Date: Sat, 10 Oct 2020 22:43:07 +0200
+Message-Id: <20201010204319.3119239-9-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201010204319.3119239-1-f4bug@amsat.org>
 References: <20201010204319.3119239-1-f4bug@amsat.org>
@@ -79,8 +79,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -117,76 +117,134 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Luc Michel <luc@lmichel.fr>
+Currently the CP0 timer period is fixed at 10 ns, corresponding
+to a fixed CPU frequency of 200 MHz (using half the speed of the
+CPU).
 
-This function creates a clock and parents it to another object with a given
-name. It calls clock_setup_canonical_path before returning the new
-clock.
+In few commits we will be able to use a different CPU frequency.
+In preparation, move the cp0_count_ns variable to CPUMIPSState
+so we can modify it.
 
-This function is useful to create clocks in devices when one doesn't
-want to expose it at the qdev level (as an input or an output).
-
-Suggested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Luc Michel <luc@lmichel.fr>
-Message-Id: <20201010135759.437903-4-luc@lmichel.fr>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/clock.h | 13 +++++++++++++
- hw/core/clock.c    | 15 +++++++++++++++
- 2 files changed, 28 insertions(+)
+ target/mips/cpu.h       |  1 +
+ target/mips/cp0_timer.c | 23 ++++++-----------------
+ target/mips/cpu.c       | 21 +++++++++++++++++++++
+ 3 files changed, 28 insertions(+), 17 deletions(-)
 
-diff --git a/include/hw/clock.h b/include/hw/clock.h
-index d357594df99..cbc5e6ced1e 100644
---- a/include/hw/clock.h
-+++ b/include/hw/clock.h
-@@ -90,6 +90,19 @@ extern const VMStateDescription vmstate_clock;
-  */
- void clock_setup_canonical_path(Clock *clk);
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index 7cf7f5239f7..085a88e9550 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -1145,6 +1145,7 @@ struct CPUMIPSState {
+     struct MIPSITUState *itu;
+     MemoryRegion *itc_tag; /* ITC Configuration Tags */
+     target_ulong exception_base; /* ExceptionBase input to the core */
++    uint64_t cp0_count_ns; /* CP0_Count clock period (in nanoseconds) */
+ };
  
-+/**
-+ * clock_new:
-+ * @parent: the clock parent
-+ * @name: the clock object name
-+ *
-+ * Helper function to create a new clock and parent it to @parent. There is no
-+ * need to call clock_setup_canonical_path on the returned clock as it is done
-+ * by this function.
-+ *
-+ * @return the newly created clock
-+ */
-+Clock *clock_new(Object *parent, const char *name);
-+
  /**
-  * clock_set_callback:
-  * @clk: the clock to register the callback into
-diff --git a/hw/core/clock.c b/hw/core/clock.c
-index 7066282f7b9..f866717a835 100644
---- a/hw/core/clock.c
-+++ b/hw/core/clock.c
-@@ -23,6 +23,21 @@ void clock_setup_canonical_path(Clock *clk)
-     clk->canonical_path = object_get_canonical_path(OBJECT(clk));
+diff --git a/target/mips/cp0_timer.c b/target/mips/cp0_timer.c
+index 6fec5fe0ff7..5ec0d6249e9 100644
+--- a/target/mips/cp0_timer.c
++++ b/target/mips/cp0_timer.c
+@@ -27,18 +27,6 @@
+ #include "sysemu/kvm.h"
+ #include "internal.h"
+ 
+-/*
+- * Since commit 6af0bf9c7c3 this model assumes a CPU clocked at 200MHz
+- * and a CP0 timer running at half the clock of the CPU (cp0_count_rate = 2).
+- *
+- * TIMER_FREQ_HZ = CPU_FREQ_HZ / CP0_COUNT_RATE = 200 MHz / 2 = 100 MHz
+- *
+- * TIMER_PERIOD_NS = 1 / TIMER_FREQ_HZ = 10 ns
+- */
+-#define CPU_FREQ_HZ_DEFAULT     200000000
+-#define CP0_COUNT_RATE_DEFAULT  2
+-#define TIMER_PERIOD            10  /* 1 / (CPU_FREQ_HZ / CP0_COUNT_RATE) */
+-
+ /* MIPS R4K timer */
+ static void cpu_mips_timer_update(CPUMIPSState *env)
+ {
+@@ -47,8 +35,8 @@ static void cpu_mips_timer_update(CPUMIPSState *env)
+ 
+     now_ns = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+     wait = env->CP0_Compare - env->CP0_Count -
+-           (uint32_t)(now_ns / TIMER_PERIOD);
+-    next_ns = now_ns + (uint64_t)wait * TIMER_PERIOD;
++           (uint32_t)(now_ns / env->cp0_count_ns);
++    next_ns = now_ns + (uint64_t)wait * env->cp0_count_ns;
+     timer_mod(env->timer, next_ns);
  }
  
-+Clock *clock_new(Object *parent, const char *name)
+@@ -76,7 +64,7 @@ uint32_t cpu_mips_get_count(CPUMIPSState *env)
+             cpu_mips_timer_expire(env);
+         }
+ 
+-        return env->CP0_Count + (uint32_t)(now_ns / TIMER_PERIOD);
++        return env->CP0_Count + (uint32_t)(now_ns / env->cp0_count_ns);
+     }
+ }
+ 
+@@ -92,7 +80,8 @@ void cpu_mips_store_count(CPUMIPSState *env, uint32_t count)
+     } else {
+         /* Store new count register */
+         env->CP0_Count = count -
+-               (uint32_t)(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) / TIMER_PERIOD);
++               (uint32_t)(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) /
++                          env->cp0_count_ns);
+         /* Update timer timer */
+         cpu_mips_timer_update(env);
+     }
+@@ -119,7 +108,7 @@ void cpu_mips_stop_count(CPUMIPSState *env)
+ {
+     /* Store the current value */
+     env->CP0_Count += (uint32_t)(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) /
+-                                 TIMER_PERIOD);
++                                 env->cp0_count_ns);
+ }
+ 
+ static void mips_timer_cb(void *opaque)
+diff --git a/target/mips/cpu.c b/target/mips/cpu.c
+index e86cd065483..84b727fefa8 100644
+--- a/target/mips/cpu.c
++++ b/target/mips/cpu.c
+@@ -134,6 +134,25 @@ static void mips_cpu_disas_set_info(CPUState *s, disassemble_info *info)
+     }
+ }
+ 
++/*
++ * Since commit 6af0bf9c7c3 this model assumes a CPU clocked at 200MHz
++ * and a CP0 timer running at half the clock of the CPU (cp0_count_rate = 2).
++ *
++ * TIMER_FREQ_HZ = CPU_FREQ_HZ / CP0_COUNT_RATE = 200 MHz / 2 = 100 MHz
++ *
++ * TIMER_PERIOD_NS = 1 / TIMER_FREQ_HZ = 10 ns
++ */
++#define CPU_FREQ_HZ_DEFAULT     200000000
++#define CP0_COUNT_RATE_DEFAULT  2
++#define TIMER_PERIOD_DEFAULT    10  /* 1 / (CPU_FREQ_HZ / CP0_COUNT_RATE) */
++
++static void mips_cp0_period_set(MIPSCPU *cpu)
 +{
-+    Object *obj;
-+    Clock *clk;
++    CPUMIPSState *env = &cpu->env;
 +
-+    obj = object_new(TYPE_CLOCK);
-+    object_property_add_child(parent, name, obj);
-+    object_unref(obj);
-+
-+    clk = CLOCK(obj);
-+    clock_setup_canonical_path(clk);
-+
-+    return clk;
++    env->cp0_count_ns = TIMER_PERIOD_DEFAULT;
 +}
 +
- void clock_set_callback(Clock *clk, ClockCallback *cb, void *opaque)
+ static void mips_cpu_realizefn(DeviceState *dev, Error **errp)
  {
-     clk->callback = cb;
+     CPUState *cs = CPU(dev);
+@@ -141,6 +160,8 @@ static void mips_cpu_realizefn(DeviceState *dev, Error **errp)
+     MIPSCPUClass *mcc = MIPS_CPU_GET_CLASS(dev);
+     Error *local_err = NULL;
+ 
++    mips_cp0_period_set(cpu);
++
+     cpu_exec_realizefn(cs, &local_err);
+     if (local_err != NULL) {
+         error_propagate(errp, local_err);
 -- 
 2.26.2
 
