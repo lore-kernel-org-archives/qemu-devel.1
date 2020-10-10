@@ -2,60 +2,89 @@ Return-Path: <SRS0=BZbV=DR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC0E3C433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:14:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9307FC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:14:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9CF58207CD
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:14:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CF58207CD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2FF7C207CD
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:14:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hoKGQAGR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FF7C207CD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRA13-0002Uv-PL
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 04:14:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42688)
+	id 1kRA1I-0002eF-AP
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 04:14:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41316)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
- id 1kR9tz-00007W-G7; Sat, 10 Oct 2020 04:06:51 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:5214 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
- id 1kR9tx-0007nU-7I; Sat, 10 Oct 2020 04:06:51 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 29E402EAB6008F810988;
- Sat, 10 Oct 2020 16:06:37 +0800 (CST)
-Received: from huawei.com (10.174.185.47) by DGGEMS408-HUB.china.huawei.com
- (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Sat, 10 Oct 2020
- 16:06:26 +0800
-From: Yifei Jiang <jiangyifei@huawei.com>
-To: <qemu-devel@nongnu.org>, <qemu-riscv@nongnu.org>
-Subject: [PATCH V2 0/5] Support RISC-V migration
-Date: Sat, 10 Oct 2020 16:06:18 +0800
-Message-ID: <20201010080623.768-1-jiangyifei@huawei.com>
-X-Mailer: git-send-email 2.26.2.windows.1
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kR9lU-0004Zx-AV
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:58:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49453)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kR9lS-0006jr-Ke
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:58:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602316681;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=CrmoymnzAgikECEklmSg1XDyOEymdcxw7MwzoWGtGiE=;
+ b=hoKGQAGRL5be1F4v/BYah2fDcQAo1at3wJ0o3lC53AQ0aIS1Xb7TU66xaMx9PKWgILB5Dj
+ dLX8nyeu/82m/8aOUaL8iJSV8GPTGgAM29LEN25NNqE65TnS0TbGHBpehaEH+dFMD7fHue
+ 6Lns36M3PSri2CRtJ28JCHK91ZMS2Ls=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-345-tukO5uNsP7akmPqqomDs7w-1; Sat, 10 Oct 2020 03:58:00 -0400
+X-MC-Unique: tukO5uNsP7akmPqqomDs7w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 429CF186DD26
+ for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 07:57:59 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com
+ (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4465C1002C01;
+ Sat, 10 Oct 2020 07:57:56 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 30/39] scsi/scsi_bus: switch search direction in
+ scsi_device_find
+Date: Sat, 10 Oct 2020 03:57:30 -0400
+Message-Id: <20201010075739.951385-31-pbonzini@redhat.com>
+In-Reply-To: <20201010075739.951385-1-pbonzini@redhat.com>
+References: <20201010075739.951385-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain
-X-Originating-IP: [10.174.185.47]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.191;
- envelope-from=jiangyifei@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/10 04:06:37
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/10 02:57:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -68,48 +97,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, sagark@eecs.berkeley.edu,
- kbastian@mail.uni-paderborn.de, victor.zhangxiaofeng@huawei.com,
- richard.henderson@linaro.org, Yifei Jiang <jiangyifei@huawei.com>,
- Alistair.Francis@wdc.com, yinyipeng1@huawei.com, palmer@dabbelt.com,
- wu.wubin@huawei.com, dengkai1@huawei.com
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patches supported RISC-V migration based on tcg accel. And we have
-verified related migration features such as snapshot and live migration.
+From: Maxim Levitsky <mlevitsk@redhat.com>
 
-A few weeks ago, we submitted RFC patches about supporting RISC-V migration
-based on kvm accel: https://www.spinics.net/lists/kvm/msg223605.html.
-And we found that tcg accelerated migration can be supported with a few
-changes. Most of the devices have already implemented the migration
-interface, so, to achieve the tcg accelerated migration, we just need to
-add vmstate of both cpu and sifive_plic.
+This change will allow us to convert the bus children list to RCU,
+while not changing the logic of this function
 
-Changes since v1:
-1. Add license head to target/riscv/machine.c.
-2. Regenerate some state of PMP at post_load hook.
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20200913160259.32145-2-mlevitsk@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/scsi/scsi-bus.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-Yifei Jiang (5):
-  target/riscv: Add basic vmstate description of CPU
-  target/riscv: Add PMP state description
-  target/riscv: Add H extension state description
-  target/riscv: Add V extension state description
-  target/riscv: Add sifive_plic vmstate
-
- hw/intc/sifive_plic.c    |  26 ++++-
- hw/intc/sifive_plic.h    |   1 +
- target/riscv/cpu.c       |   7 --
- target/riscv/cpu.h       |   4 +
- target/riscv/machine.c   | 203 +++++++++++++++++++++++++++++++++++++++
- target/riscv/meson.build |   3 +-
- target/riscv/pmp.c       |  29 +++---
- target/riscv/pmp.h       |   2 +
- 8 files changed, 255 insertions(+), 20 deletions(-)
- create mode 100644 target/riscv/machine.c
-
+diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+index 3284a5d1fb..6b1ed7ae9a 100644
+--- a/hw/scsi/scsi-bus.c
++++ b/hw/scsi/scsi-bus.c
+@@ -1572,7 +1572,7 @@ SCSIDevice *scsi_device_find(SCSIBus *bus, int channel, int id, int lun)
+     BusChild *kid;
+     SCSIDevice *target_dev = NULL;
+ 
+-    QTAILQ_FOREACH_REVERSE(kid, &bus->qbus.children, sibling) {
++    QTAILQ_FOREACH(kid, &bus->qbus.children, sibling) {
+         DeviceState *qdev = kid->child;
+         SCSIDevice *dev = SCSI_DEVICE(qdev);
+ 
+@@ -1580,7 +1580,15 @@ SCSIDevice *scsi_device_find(SCSIBus *bus, int channel, int id, int lun)
+             if (dev->lun == lun) {
+                 return dev;
+             }
+-            target_dev = dev;
++
++            /*
++             * If we don't find exact match (channel/bus/lun),
++             * we will return the first device which matches channel/bus
++             */
++
++            if (!target_dev) {
++                target_dev = dev;
++            }
+         }
+     }
+     return target_dev;
 -- 
-2.19.1
+2.26.2
+
 
 
