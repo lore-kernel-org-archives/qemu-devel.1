@@ -2,63 +2,88 @@ Return-Path: <SRS0=BZbV=DR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D772C433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:16:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E4E7C433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:17:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C18C2207CD
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:16:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C18C2207CD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id C5635207C4
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:17:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q+s8NgPH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5635207C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRA3g-0005sS-St
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 04:16:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42722)
+	id 1kRA3o-00069X-R7
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 04:17:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41362)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
- id 1kR9u0-0000BB-Pf; Sat, 10 Oct 2020 04:06:52 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:50088 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
- id 1kR9tx-0007ne-Hy; Sat, 10 Oct 2020 04:06:52 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 3F9065905E23944C2E87;
- Sat, 10 Oct 2020 16:06:42 +0800 (CST)
-Received: from huawei.com (10.174.185.47) by DGGEMS408-HUB.china.huawei.com
- (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Sat, 10 Oct 2020
- 16:06:33 +0800
-From: Yifei Jiang <jiangyifei@huawei.com>
-To: <qemu-devel@nongnu.org>, <qemu-riscv@nongnu.org>
-Subject: [PATCH V2 1/5] target/riscv: Add basic vmstate description of CPU
-Date: Sat, 10 Oct 2020 16:06:19 +0800
-Message-ID: <20201010080623.768-2-jiangyifei@huawei.com>
-X-Mailer: git-send-email 2.26.2.windows.1
-In-Reply-To: <20201010080623.768-1-jiangyifei@huawei.com>
-References: <20201010080623.768-1-jiangyifei@huawei.com>
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kR9lW-0004d6-5q
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:58:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49400)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kR9lU-0006lK-9Y
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:58:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602316683;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=0X1TnjZlRdHw8tcCNGOF380Ublm92SUhVeJg2HrPl0Y=;
+ b=Q+s8NgPHaADQP37naiEvpc3eZ885paJPS077o1myLuA5+E4Fnqn4+YhcyETajgBSK4CQ0M
+ 8RZHiCUlHmYrk/Y01pA/Si4tZWGpRzOHgCmxhtOtBsdmduwy5fno2EyWUINvnSjh8RC+Ph
+ yDeRMK9AyB0YIiZhqoeKugc/0F6+u+s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-128-ek3mW2nrPPyHZj7zp3gYTg-1; Sat, 10 Oct 2020 03:58:01 -0400
+X-MC-Unique: ek3mW2nrPPyHZj7zp3gYTg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 10E948030CA
+ for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 07:58:01 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com
+ (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B2D851000239;
+ Sat, 10 Oct 2020 07:58:00 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 34/39] device-core: use atomic_set on .realized property
+Date: Sat, 10 Oct 2020 03:57:34 -0400
+Message-Id: <20201010075739.951385-35-pbonzini@redhat.com>
+In-Reply-To: <20201010075739.951385-1-pbonzini@redhat.com>
+References: <20201010075739.951385-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain
-X-Originating-IP: [10.174.185.47]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.35; envelope-from=jiangyifei@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/10 04:06:42
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/10 03:36:24
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,158 +96,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, sagark@eecs.berkeley.edu,
- kbastian@mail.uni-paderborn.de, victor.zhangxiaofeng@huawei.com,
- richard.henderson@linaro.org, Yifei Jiang <jiangyifei@huawei.com>,
- Alistair.Francis@wdc.com, yinyipeng1@huawei.com, palmer@dabbelt.com,
- wu.wubin@huawei.com, dengkai1@huawei.com
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add basic CPU state description to the newly created machine.c
+From: Maxim Levitsky <mlevitsk@redhat.com>
 
-Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
-Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
+Some code might race with placement of new devices on a bus.
+We currently first place a (unrealized) device on the bus
+and then realize it.
+
+As a workaround, users that scan the child device list, can
+check the realized property to see if it is safe to access such a device.
+Use an atomic write here too to aid with this.
+
+A separate discussion is what to do with devices that are unrealized:
+It looks like for this case we only call the hotplug handler's unplug
+callback and its up to it to unrealize the device.
+An atomic operation doesn't cause harm for this code path though.
+
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20200913160259.32145-6-mlevitsk@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <20201006123904.610658-10-mlevitsk@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/riscv/cpu.c       |  7 ----
- target/riscv/cpu.h       |  4 +++
- target/riscv/machine.c   | 77 ++++++++++++++++++++++++++++++++++++++++
- target/riscv/meson.build |  3 +-
- 4 files changed, 83 insertions(+), 8 deletions(-)
- create mode 100644 target/riscv/machine.c
+ hw/core/qdev.c         | 19 ++++++++++++++++++-
+ include/hw/qdev-core.h |  2 ++
+ 2 files changed, 20 insertions(+), 1 deletion(-)
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 0bbfd7f457..bf396e2916 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -496,13 +496,6 @@ static void riscv_cpu_init(Object *obj)
-     cpu_set_cpustate_pointers(cpu);
- }
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 59e5e710b7..fc4daa36fa 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -946,7 +946,25 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+             }
+        }
  
--#ifndef CONFIG_USER_ONLY
--static const VMStateDescription vmstate_riscv_cpu = {
--    .name = "cpu",
--    .unmigratable = 1,
--};
--#endif
--
- static Property riscv_cpu_properties[] = {
-     DEFINE_PROP_BOOL("i", RISCVCPU, cfg.ext_i, true),
-     DEFINE_PROP_BOOL("e", RISCVCPU, cfg.ext_e, false),
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index de275782e6..8440ea0793 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -311,6 +311,10 @@ extern const char * const riscv_fpr_regnames[];
- extern const char * const riscv_excp_names[];
- extern const char * const riscv_intr_names[];
++       qatomic_store_release(&dev->realized, value);
++
+     } else if (!value && dev->realized) {
++
++        /*
++         * Change the value so that any concurrent users are aware
++         * that the device is going to be unrealized
++         *
++         * TODO: change .realized property to enum that states
++         * each phase of the device realization/unrealization
++         */
++
++        qatomic_set(&dev->realized, value);
++        /*
++         * Ensure that concurrent users see this update prior to
++         * any other changes done by unrealize.
++         */
++        smp_wmb();
++
+         QLIST_FOREACH(bus, &dev->child_bus, sibling) {
+             qbus_unrealize(bus);
+         }
+@@ -961,7 +979,6 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+     }
  
-+#ifndef CONFIG_USER_ONLY
-+extern const VMStateDescription vmstate_riscv_cpu;
-+#endif
-+
- const char *riscv_cpu_get_trap_name(target_ulong cause, bool async);
- void riscv_cpu_do_interrupt(CPUState *cpu);
- int riscv_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, int reg);
-diff --git a/target/riscv/machine.c b/target/riscv/machine.c
-new file mode 100644
-index 0000000000..af2828a80a
---- /dev/null
-+++ b/target/riscv/machine.c
-@@ -0,0 +1,77 @@
-+/*
-+ * RISC-V VMState Description
-+ *
-+ * Copyright (c) 2020 Huawei Technologies Co., Ltd
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "cpu.h"
-+#include "qemu/error-report.h"
-+#include "sysemu/kvm.h"
-+#include "migration/cpu.h"
-+
-+const VMStateDescription vmstate_riscv_cpu = {
-+    .name = "cpu",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINTTL_ARRAY(env.gpr, RISCVCPU, 32),
-+        VMSTATE_UINT64_ARRAY(env.fpr, RISCVCPU, 32),
-+        VMSTATE_UINTTL(env.pc, RISCVCPU),
-+        VMSTATE_UINTTL(env.load_res, RISCVCPU),
-+        VMSTATE_UINTTL(env.load_val, RISCVCPU),
-+        VMSTATE_UINTTL(env.frm, RISCVCPU),
-+        VMSTATE_UINTTL(env.badaddr, RISCVCPU),
-+        VMSTATE_UINTTL(env.guest_phys_fault_addr, RISCVCPU),
-+        VMSTATE_UINTTL(env.priv_ver, RISCVCPU),
-+        VMSTATE_UINTTL(env.vext_ver, RISCVCPU),
-+        VMSTATE_UINTTL(env.misa, RISCVCPU),
-+        VMSTATE_UINTTL(env.misa_mask, RISCVCPU),
-+        VMSTATE_UINT32(env.features, RISCVCPU),
-+        VMSTATE_UINTTL(env.priv, RISCVCPU),
-+        VMSTATE_UINTTL(env.virt, RISCVCPU),
-+        VMSTATE_UINTTL(env.resetvec, RISCVCPU),
-+        VMSTATE_UINTTL(env.mhartid, RISCVCPU),
-+        VMSTATE_UINTTL(env.mstatus, RISCVCPU),
-+        VMSTATE_UINTTL(env.mip, RISCVCPU),
-+        VMSTATE_UINT32(env.miclaim, RISCVCPU),
-+        VMSTATE_UINTTL(env.mie, RISCVCPU),
-+        VMSTATE_UINTTL(env.mideleg, RISCVCPU),
-+        VMSTATE_UINTTL(env.sptbr, RISCVCPU),
-+        VMSTATE_UINTTL(env.satp, RISCVCPU),
-+        VMSTATE_UINTTL(env.sbadaddr, RISCVCPU),
-+        VMSTATE_UINTTL(env.mbadaddr, RISCVCPU),
-+        VMSTATE_UINTTL(env.medeleg, RISCVCPU),
-+        VMSTATE_UINTTL(env.stvec, RISCVCPU),
-+        VMSTATE_UINTTL(env.sepc, RISCVCPU),
-+        VMSTATE_UINTTL(env.scause, RISCVCPU),
-+        VMSTATE_UINTTL(env.mtvec, RISCVCPU),
-+        VMSTATE_UINTTL(env.mepc, RISCVCPU),
-+        VMSTATE_UINTTL(env.mcause, RISCVCPU),
-+        VMSTATE_UINTTL(env.mtval, RISCVCPU),
-+        VMSTATE_UINTTL(env.scounteren, RISCVCPU),
-+        VMSTATE_UINTTL(env.mcounteren, RISCVCPU),
-+        VMSTATE_UINTTL(env.sscratch, RISCVCPU),
-+        VMSTATE_UINTTL(env.mscratch, RISCVCPU),
-+        VMSTATE_UINT64(env.mfromhost, RISCVCPU),
-+        VMSTATE_UINT64(env.mtohost, RISCVCPU),
-+        VMSTATE_UINT64(env.timecmp, RISCVCPU),
-+
-+#ifdef TARGET_RISCV32
-+        VMSTATE_UINTTL(env.mstatush, RISCVCPU),
-+#endif
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-diff --git a/target/riscv/meson.build b/target/riscv/meson.build
-index abd647fea1..14a5c62dac 100644
---- a/target/riscv/meson.build
-+++ b/target/riscv/meson.build
-@@ -27,7 +27,8 @@ riscv_ss.add(files(
- riscv_softmmu_ss = ss.source_set()
- riscv_softmmu_ss.add(files(
-   'pmp.c',
--  'monitor.c'
-+  'monitor.c',
-+  'machine.c'
- ))
+     assert(local_err == NULL);
+-    dev->realized = value;
+     return;
  
- target_arch += {'riscv': riscv_ss}
+ child_realize_fail:
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index 2c6307e3ed..868973319e 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -163,6 +163,8 @@ struct NamedClockList {
+ /**
+  * DeviceState:
+  * @realized: Indicates whether the device has been fully constructed.
++ *            When accessed outsize big qemu lock, must be accessed with
++ *            atomic_load_acquire()
+  * @reset: ResettableState for the device; handled by Resettable interface.
+  *
+  * This structure should not be accessed directly.  We declare it here
 -- 
-2.19.1
+2.26.2
+
 
 
