@@ -7,91 +7,88 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08897C433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 17:39:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E896C433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 17:39:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93BCA22461
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 17:39:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DC9F022461
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 17:39:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OspX0yPr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93BCA22461
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="InzNKlbM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC9F022461
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRIqP-0007fg-Ms
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 13:39:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55246)
+	id 1kRIqa-0007rD-SP
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 13:39:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55758)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRIe1-0000lP-B3
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 13:26:57 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53861)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kRIiX-0005Wu-P2
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 13:31:37 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:37316)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRIdz-0003st-Dl
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 13:26:56 -0400
-Received: by mail-wm1-x343.google.com with SMTP id f21so12874559wml.3
- for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 10:26:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kRIiV-0004Ut-S9
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 13:31:37 -0400
+Received: by mail-oi1-x242.google.com with SMTP id t77so13862889oie.4
+ for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 10:31:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=AzmFEGnohCvn1W440dVAMj47SxdqWOdTt0i8s2oVyM8=;
- b=OspX0yPr7Xj5RvIU/nGUysSoWyPtK1GUzJz4KC82XCDc2iJD5UIUk1FPJBAb5Rv8sT
- LI0kbu1/foPAmnlp+yb0Kn+ifFzoMdX5h/pVB7eIr/E64AsVSo578Yc6RT1fAkkvk1BU
- 2uPKRmP8mxtjMiWuCWlDc8gpkfWuuSjHWhIs24scFJsDPMN851j5wC+ji6HPvuM7KxNA
- dDCpRA+JFk4UQdJe5MSbanfQ7VyDhGNxT+KTaWcu5Jo33k9+CwLkKW8UYM/ha2EDSZGz
- GJaHJlYgbpWuSmLeV8FCZMQW7/p3rT+o1y2ntxqq9cgIr+Kk0FZ1ze/3YeE4QNRIErHQ
- SoNw==
+ bh=tWwxwtj7BMWnBZPqROiASwhlhUSCyv+roj4cQ6E4cUE=;
+ b=InzNKlbMQZ/Sxoe9XugVIF6WWZr6Xh1nhXdSDBBr/OcNwQLo/dks6sIj3Nn4y/kRc1
+ rwfv5jEEfICUiPkT0yblV8qIR4TZ+GbRqZOZtT56ScuUJPDhLf6jFtWf2p3FpyDuJ9Vw
+ YBfaaRlFOuIJ5HUNOkvSFAA7+2MGDhg6tk5TKm6bmdht0fAKF87564XsJN7ab64EgQ4y
+ aaurVi3iyGy+oSVWbP3g0V4qh5eFrwLD/NfQgfOQE3sk4BHZU2Q8b0RyhGgf6Dskmx2/
+ NR8vQio5FUJgcgxj5CNfQlZGRuG3xGMsmkuQmX1NMmkp8aQ9+qiOmjrbu7ThxySBtxNV
+ CIfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=AzmFEGnohCvn1W440dVAMj47SxdqWOdTt0i8s2oVyM8=;
- b=XsXqkfAC9yOzl5ZGs/aKVh0tcS3ikuSqNDLfTbC8g/oFRjR98M/c/S5IFk+UzkIrdf
- a44GLPvfr5nXsVbV27FYI+CltU7nUZ+JaLZwlip0LInWgTCTmLSpajxzv5TXMt9xPrS7
- Pp10PBFtOxguhnC3SStMz48nRZE8yucrnRXmKD/GKhGVfiUnJJjlalHHZdedNb76PPAW
- CwjGgYb6TDW4OenF0ZwkXw1tPVosLqwWgF86A0QpRZUC2UrhqcOysjnDXEP4TiLN3UnX
- sEiiHzKr9wlvQ1felrBXMNf10L+XBgQGY8r2jyFUH0/IXWi+cOlCjkGkcN+c9h9PyQth
- 8nBA==
-X-Gm-Message-State: AOAM533buEfcfaoDs7cllKSt7FHKnxBvPBgIZg9/0xG/JNGAPHO37cuZ
- Su3cT0A2Nq2fFzi7U7W60lDWHB056TU=
-X-Google-Smtp-Source: ABdhPJyXHdUBLGljPFHqIC/kRszrJeCdF+H9u3tgZs/XSnnZUlLzDSuDyB5WB1l/Q+h/lnyDuNVONA==
-X-Received: by 2002:a1c:63c3:: with SMTP id x186mr3652008wmb.66.1602350806437; 
- Sat, 10 Oct 2020 10:26:46 -0700 (PDT)
-Received: from localhost.localdomain
- (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id i11sm16786068wre.32.2020.10.10.10.26.45
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=tWwxwtj7BMWnBZPqROiASwhlhUSCyv+roj4cQ6E4cUE=;
+ b=FPtNMMvrsxSeoZ9Cle5LvVGbYPmejkAccTjAXx8FXIfAnSI5ppzvxyeScR7W1DOEkQ
+ bU3EkS8FpqwurlcFs8M7vKTaZrnioREg8OH7F4rEvwMYw8L68XgX0IkrBUdWLRoK6/aI
+ ldJuGnqrruwcIxivONSMlarhdhR7lJqFEENZ+0+kFrCPll4WL4fv9Hb6oYtq5MBY8CvM
+ LyFTNxv8VVby5FhL3uviNP+KE8NxvBG1wbLzTu10HWGEmJXcHss7DvSaNNHMbJtspyla
+ d1a1Yey5y6fl+MQGmcw4oDflExMOTV69K9U9l6QVK0TwCBEUGPC7ERSPTcxvehEMAhPr
+ JziA==
+X-Gm-Message-State: AOAM531yLUNWkhskhyKT4csEKvrsh0ftho14pSlbmsKur0MXORx85MFa
+ vSZ+gcDI3wLuifVhe07ST1Nn4sHC92HOX9CN
+X-Google-Smtp-Source: ABdhPJy8qYl9AjBMU3X0CXNeIDZCYTDe+OwUvHOYJ40FJkBU34y+FL8eWxBkaT0pqF7T7tMRnIT11g==
+X-Received: by 2002:a05:6808:605:: with SMTP id
+ y5mr6314969oih.172.1602351094268; 
+ Sat, 10 Oct 2020 10:31:34 -0700 (PDT)
+Received: from localhost.localdomain (168.189-204-159.bestelclientes.com.mx.
+ [189.204.159.168])
+ by smtp.gmail.com with ESMTPSA id n185sm7415032oia.28.2020.10.10.10.31.33
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 10 Oct 2020 10:26:45 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ Sat, 10 Oct 2020 10:31:33 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 20/20] target/mips/cpu: Display warning when CPU is used
- without input clock
-Date: Sat, 10 Oct 2020 19:26:17 +0200
-Message-Id: <20201010172617.3079633-21-f4bug@amsat.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201010172617.3079633-1-f4bug@amsat.org>
-References: <20201010172617.3079633-1-f4bug@amsat.org>
+Subject: [PATCH 1/2] linux-user/microblaze: Implement rt signal frames
+Date: Sat, 10 Oct 2020 12:31:29 -0500
+Message-Id: <20201010173130.99652-2-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20201010173130.99652-1-richard.henderson@linaro.org>
+References: <20201010173130.99652-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
+ envelope-from=richard.henderson@linaro.org; helo=mail-oi1-x242.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,65 +101,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>,
- Huacai Chen <zltjiangshi@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, Luc Michel <luc@lmichel.fr>,
- Paul Burton <paulburton@kernel.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Huacai Chen <chenhc@lemote.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: edgar.iglesias@gmail.com, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-All our QOM users provides an input clock. In order to avoid
-avoid future machines added without clock, display a warning.
+Allows microblaze to pass tests/tcg/multiarch/linux-test.c.
 
-User-mode emulation use the CP0 timer with the RDHWR instruction
-(see commit cdfcad788394) so keep using the fixed 200 MHz clock
-without diplaying any warning. Only display it in system-mode
-emulation.
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/mips/cpu.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ linux-user/microblaze/signal.c | 91 ++++++++++++++++++++++++++++++----
+ 1 file changed, 82 insertions(+), 9 deletions(-)
 
-diff --git a/target/mips/cpu.c b/target/mips/cpu.c
-index 3deb0245e7c..0c801a3a075 100644
---- a/target/mips/cpu.c
-+++ b/target/mips/cpu.c
-@@ -19,12 +19,14 @@
-  */
+diff --git a/linux-user/microblaze/signal.c b/linux-user/microblaze/signal.c
+index b4eeef4673..3d316a22f1 100644
+--- a/linux-user/microblaze/signal.c
++++ b/linux-user/microblaze/signal.c
+@@ -35,9 +35,9 @@ struct target_stack_t {
+ struct target_ucontext {
+     abi_ulong tuc_flags;
+     abi_ulong tuc_link;
+-    struct target_stack_t tuc_stack;
++    target_stack_t tuc_stack;
+     struct target_sigcontext tuc_mcontext;
+-    uint32_t tuc_extramask[TARGET_NSIG_WORDS - 1];
++    target_sigset_t tuc_sigmask;
+ };
  
- #include "qemu/osdep.h"
-+#include "qemu/cutils.h"
- #include "qapi/error.h"
- #include "cpu.h"
- #include "internal.h"
- #include "kvm_mips.h"
- #include "qemu/module.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/qtest.h"
- #include "exec/exec-all.h"
- #include "hw/qdev-properties.h"
- #include "hw/qdev-clock.h"
-@@ -157,6 +159,12 @@ static void mips_cpu_realizefn(DeviceState *dev, Error **errp)
-     Error *local_err = NULL;
+ /* Signal frames. */
+@@ -47,9 +47,9 @@ struct target_signal_frame {
+     uint32_t tramp[2];
+ };
  
-     if (!clock_get(cpu->clock)) {
-+#ifndef CONFIG_USER_ONLY
-+        g_autofree char *cpu_freq_str = freq_to_str(CPU_FREQ_HZ_DEFAULT);
+-struct rt_signal_frame {
+-    siginfo_t info;
+-    ucontext_t uc;
++struct target_rt_sigframe {
++    target_siginfo_t info;
++    struct target_ucontext uc;
+     uint32_t tramp[2];
+ };
+ 
+@@ -200,7 +200,55 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
+                     target_siginfo_t *info,
+                     target_sigset_t *set, CPUMBState *env)
+ {
+-    qemu_log_mask(LOG_UNIMP, "setup_rt_frame: not implemented\n");
++    struct target_rt_sigframe *frame;
++    abi_ulong frame_addr;
 +
-+        warn_report("CPU input clock is not connected to any output clock, "
-+                    "using default frequency of %s.", cpu_freq_str);
-+#endif
-         /* Initialize the frequency in case the clock remains unconnected. */
-         clock_set_hz(cpu->clock, CPU_FREQ_HZ_DEFAULT);
-     }
++    frame_addr = get_sigframe(ka, env, sizeof *frame);
++    trace_user_setup_rt_frame(env, frame_addr);
++
++    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
++        force_sigsegv(sig);
++        return;
++    }
++
++    tswap_siginfo(&frame->info, info);
++
++    __put_user(0, &frame->uc.tuc_flags);
++    __put_user(0, &frame->uc.tuc_link);
++
++    target_save_altstack(&frame->uc.tuc_stack, env);
++    setup_sigcontext(&frame->uc.tuc_mcontext, env);
++
++    for (int i = 0; i < TARGET_NSIG_WORDS; i++) {
++        __put_user(set->sig[i], &frame->uc.tuc_sigmask.sig[i]);
++    }
++
++    /* Kernel does not use SA_RESTORER. */
++
++    /* addi r12, r0, __NR_sigreturn */
++    __put_user(0x31800000U | TARGET_NR_rt_sigreturn, frame->tramp + 0);
++    /* brki r14, 0x8 */
++    __put_user(0xb9cc0008U, frame->tramp + 1);
++
++    /*
++     * Return from sighandler will jump to the tramp.
++     * Negative 8 offset because return is rtsd r15, 8
++     */
++    env->regs[15] =
++        frame_addr + offsetof(struct target_rt_sigframe, tramp) - 8;
++
++    /* Set up registers for signal handler */
++    env->regs[1] = frame_addr;
++
++    /* Signal handler args: */
++    env->regs[5] = sig;
++    env->regs[6] = frame_addr + offsetof(struct target_rt_sigframe, info);
++    env->regs[7] = frame_addr + offsetof(struct target_rt_sigframe, uc);
++
++    /* Offset to handle microblaze rtid r14, 0 */
++    env->pc = (unsigned long)ka->_sa_handler;
++
++    unlock_user_struct(frame, frame_addr, 1);
+ }
+ 
+ long do_sigreturn(CPUMBState *env)
+@@ -239,7 +287,32 @@ badframe:
+ 
+ long do_rt_sigreturn(CPUMBState *env)
+ {
+-    trace_user_do_rt_sigreturn(env, 0);
+-    qemu_log_mask(LOG_UNIMP, "do_rt_sigreturn: not implemented\n");
+-    return -TARGET_ENOSYS;
++    struct target_rt_sigframe *frame = NULL;
++    abi_ulong frame_addr = env->regs[1];
++    sigset_t set;
++
++    trace_user_do_rt_sigreturn(env, frame_addr);
++
++    if  (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1)) {
++        goto badframe;
++    }
++
++    target_to_host_sigset(&set, &frame->uc.tuc_sigmask);
++    set_sigmask(&set);
++
++    restore_sigcontext(&frame->uc.tuc_mcontext, env);
++
++    if (do_sigaltstack(frame_addr +
++                       offsetof(struct target_rt_sigframe, uc.tuc_stack),
++                       0, get_sp_from_cpustate(env)) == -EFAULT) {
++        goto badframe;
++    }
++
++    unlock_user_struct(frame, frame_addr, 0);
++    return -TARGET_QEMU_ESIGRETURN;
++
++ badframe:
++    unlock_user_struct(frame, frame_addr, 0);
++    force_sig(TARGET_SIGSEGV);
++    return -TARGET_QEMU_ESIGRETURN;
+ }
 -- 
-2.26.2
+2.25.1
 
 
