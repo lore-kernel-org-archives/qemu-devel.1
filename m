@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7723C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 20:57:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56A3FC433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 20:58:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 536BF20575
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 20:57:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DCF8F207C4
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 20:58:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s2LL2ZXS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 536BF20575
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FlVRXuiz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCF8F207C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRLvt-0007p7-FE
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 16:57:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52068)
+	id 1kRLwQ-0000Oy-Tm
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 16:58:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51964)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRLiO-0000lV-GM
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 16:43:40 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36248)
+ id 1kRLiI-0000Y3-M6
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 16:43:34 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38799)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRLiM-0007UP-TS
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 16:43:40 -0400
-Received: by mail-wr1-x441.google.com with SMTP id x7so5567203wrl.3
- for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 13:43:38 -0700 (PDT)
+ id 1kRLiG-0007SO-W6
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 16:43:34 -0400
+Received: by mail-wr1-x443.google.com with SMTP id n18so14170966wrs.5
+ for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 13:43:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=GJs+vUPbnbBqVHsKvcVatNykiV7Rg7UUaqvKVc5FZic=;
- b=s2LL2ZXSOX6F4bXPGexisBmZPJ3k8Sr3e2Gqakl2QDk6oLoCWFs0Lyz8HkaXWJKf2j
- Mqbj4hU78NgTTfNsqWu077fQ0q5Wp7ckx/mT3xZ9pwrJGvbuuQfbC/SNkSa7PtnMZqFW
- mi+8LktY6V8Po1h0Pfv/mr32NpayXt3PPNSW5QV23lA+guszeatWXfb0mi6QgYqUOCr6
- Otgjcn7qGKGIYftbcbTGX7d4utKgGpRH92gliwKPEeM0QBKbI94fTvUnGm/BOvHlC3Ge
- iqYLNX4YtxNSNlYd09NbI6mgLiBiWz2QiqNZ6CKxyjaXZoqVVsyU0pTLqljudyI2x6ku
- 8iBQ==
+ bh=w+Ww+Tb9ux5DYpk7DL28NdlwI2XqYxB/b3zmX73nSUY=;
+ b=FlVRXuizJUUcngPgMygPqNNIiMkDBJpEpBQUHUeDjynyhxd4hHIDqkCb+iQVpjclpH
+ r4hCRKu+yNCoRfZOzoBw27jqvquM7g/rjzq8IV4iQ4HiKIgTnUkdlNXAMRL8cYkEFvqK
+ u1WpcFKFitjva5l0KVxj8zUvSzQNimk/gdZbV8ejQNBDWZ26KnpLPdVD9Af+NNGFYLlx
+ 2bjbNa49Djy5qPHpsg4xLY/HtrL4GngrQVYqLQecJRsbvEpSHX3IyAONnDXL1qElKSqo
+ SnAZJULWxYgJMsiznnmVj0rPfOY9nJp4z6KaTgleZLSbuSX9OV/hyGXv31qpC7DTylv5
+ wt9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=GJs+vUPbnbBqVHsKvcVatNykiV7Rg7UUaqvKVc5FZic=;
- b=o6HHlBaFlkFK1zHESrcBCoHr2q6LNL2a4jRlyAGcgTPLjCiDbv/OJ7+0zyijMoS3vY
- kQNMY8r+PrgYBIqYFqATf4EJXkWvbqKqaA8t5OFvntJtQxL+RB2PfjIvqu1hQMnm6CUj
- 8h98S3sureO1Rk6uPQ1rRYl7/sLwTu9AnIxSXnCn1tVUWyGEQM/OtOTjyoQgqlb95axi
- Br/sSCgc2T0Wp1yLcq+E9k6cLicJEXveyKHQXg3A0GAlJmCfyCrtjStT8kdGXBGAkL/o
- 0RRNvmCmzhRZaxMRJADF+aikPB0Mf+rmMooGsTjDEbIgCrbEK7lW+PrtmxeQroMtedN9
- 1b1w==
-X-Gm-Message-State: AOAM532NjX08oegsOVcptKkqwvoiperXkgwgjj3V9J0YIzvi66yRekiW
- GzTab+/JEW65pkmaz0zaCjQB1ksLopo=
-X-Google-Smtp-Source: ABdhPJxbbwiuB788sbpn/3sl2yf2mLvv4GbL7Y9t1aXNvPwMB/Q6/twkA0Icla0EvRHL1yuptkiWkQ==
-X-Received: by 2002:adf:94c6:: with SMTP id 64mr133352wrr.8.1602362617070;
- Sat, 10 Oct 2020 13:43:37 -0700 (PDT)
+ bh=w+Ww+Tb9ux5DYpk7DL28NdlwI2XqYxB/b3zmX73nSUY=;
+ b=PLSN7QLRW/wVyzM4MEoxi+ZrcXejZtbbZ2f+5sBHwI3jMY0mJ6bkFWY7dwzTcYiJfy
+ YtCwfzrFFsOCFMeyh3QbIy+JWJQ2DyR5e0nwqDJaxhQ2vcQc5+PrGTp+wUsmwt5yU7QP
+ geTgX0DrtHUXAtfhGRaLRDCdCXscuPfz3Sn+M/EJUzAxV8K7izJq4LIHmyFCXPycWvWl
+ 9e2ivIwIAfT5XROwSG3S5QxaeRNUdUZZ7E5Hh1OqH4f6Xlxfr+OPvcOUEBFO8JWN7M51
+ qnnL0QwRevMSNt3n2imIpsUqa1M7oxh2JfvOZucy+Pg1Bt6gi9g1bDuEjER9OpKr2zSY
+ dQpw==
+X-Gm-Message-State: AOAM532TjTcPwD0FFucIMa6pxqkxZlwwCgrGAmRpb2fywSgBWCacmlZn
+ qxe2TmVcaHhVP17yPDkxVm6YI2CiBIw=
+X-Google-Smtp-Source: ABdhPJw8RcEG6mhL7apDRzkuwHDkHPjLk4pcpAAQA/cfcKZf7yFAQ6zKwvLreIHrZXbS20Nmb+bsqg==
+X-Received: by 2002:adf:f50e:: with SMTP id q14mr15085634wro.56.1602362609037; 
+ Sat, 10 Oct 2020 13:43:29 -0700 (PDT)
 Received: from localhost.localdomain
  (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id 205sm2705471wme.38.2020.10.10.13.43.35
+ by smtp.gmail.com with ESMTPSA id 205sm2705471wme.38.2020.10.10.13.43.27
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 10 Oct 2020 13:43:36 -0700 (PDT)
+ Sat, 10 Oct 2020 13:43:28 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 11/20] target/mips/cpu: Allow the CPU to use dynamic
- frequencies
-Date: Sat, 10 Oct 2020 22:43:10 +0200
-Message-Id: <20201010204319.3119239-12-f4bug@amsat.org>
+Subject: [PATCH v3 05/20] target/mips: Move cpu_mips_get_random() with CP0
+ helpers
+Date: Sat, 10 Oct 2020 22:43:04 +0200
+Message-Id: <20201010204319.3119239-6-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201010204319.3119239-1-f4bug@amsat.org>
 References: <20201010204319.3119239-1-f4bug@amsat.org>
@@ -80,8 +80,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -109,6 +109,7 @@ Cc: Damien Hedde <damien.hedde@greensocs.com>,
  Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, Luc Michel <luc@lmichel.fr>,
  Eduardo Habkost <ehabkost@redhat.com>, Paul Burton <paulburton@kernel.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
  =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
  =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>, Huacai Chen <chenhc@lemote.com>,
@@ -118,89 +119,112 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use the Clock API and let the CPU object have an input clock.
+The get_random() helper uses the CP0_Wired register, which is
+unrelated to the CP0_Count register use as timer.
+Commit e16fe40c872 ("Move the MIPS CPU timer in a separate file")
+incorrectly moved this get_random() helper with timer specific
+code. Move it back to generic CP0 helpers.
 
-If no clock is connected, keep using the default frequency of
-200 MHz used since the introduction of the 'r4k' machine in
-commit 6af0bf9c7c3.
-
+Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- target/mips/cpu.h |  4 ++++
- target/mips/cpu.c | 10 ++++++++--
- 2 files changed, 12 insertions(+), 2 deletions(-)
+ target/mips/internal.h   |  2 +-
+ target/mips/cp0_helper.c | 25 +++++++++++++++++++++++++
+ target/mips/cp0_timer.c  | 25 -------------------------
+ 3 files changed, 26 insertions(+), 26 deletions(-)
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index baeceb892ef..062a4ba6225 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -4,6 +4,7 @@
- #include "cpu-qom.h"
- #include "exec/cpu-defs.h"
- #include "fpu/softfloat-types.h"
-+#include "hw/clock.h"
- #include "mips-defs.h"
+diff --git a/target/mips/internal.h b/target/mips/internal.h
+index 7f159a9230c..087cabaa6d4 100644
+--- a/target/mips/internal.h
++++ b/target/mips/internal.h
+@@ -144,6 +144,7 @@ void r4k_helper_tlbr(CPUMIPSState *env);
+ void r4k_helper_tlbinv(CPUMIPSState *env);
+ void r4k_helper_tlbinvf(CPUMIPSState *env);
+ void r4k_invalidate_tlb(CPUMIPSState *env, int idx, int use_extra);
++uint32_t cpu_mips_get_random(CPUMIPSState *env);
  
- #define TCG_GUEST_DEFAULT_MO (0)
-@@ -1151,6 +1152,8 @@ struct CPUMIPSState {
- /**
-  * MIPSCPU:
-  * @env: #CPUMIPSState
-+ * @clock: this CPU input clock (may be connected
-+ *         to an output clock from another device).
-  * @cp0_count_rate: rate at which the coprocessor 0 counter increments
-  *
-  * A MIPS CPU.
-@@ -1160,6 +1163,7 @@ struct MIPSCPU {
-     CPUState parent_obj;
-     /*< public >*/
+ void mips_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
+                                     vaddr addr, unsigned size,
+@@ -209,7 +210,6 @@ void cpu_state_reset(CPUMIPSState *s);
+ void cpu_mips_realize_env(CPUMIPSState *env);
  
-+    Clock *clock;
-     CPUNegativeOffsetState neg;
-     CPUMIPSState env;
-     /*
-diff --git a/target/mips/cpu.c b/target/mips/cpu.c
-index 461edfe22b7..3deb0245e7c 100644
---- a/target/mips/cpu.c
-+++ b/target/mips/cpu.c
-@@ -27,6 +27,7 @@
- #include "sysemu/kvm.h"
- #include "exec/exec-all.h"
- #include "hw/qdev-properties.h"
-+#include "hw/qdev-clock.h"
- 
- static void mips_cpu_set_pc(CPUState *cs, vaddr value)
- {
-@@ -144,8 +145,8 @@ static void mips_cp0_period_set(MIPSCPU *cpu)
- {
-     CPUMIPSState *env = &cpu->env;
- 
--    env->cp0_count_ns = muldiv64(NANOSECONDS_PER_SECOND, cpu->cp0_count_rate,
--                                 CPU_FREQ_HZ_DEFAULT);
-+    env->cp0_count_ns = cpu->cp0_count_rate
-+                        * clock_get_ns(MIPS_CPU(cpu)->clock);
+ /* cp0_timer.c */
+-uint32_t cpu_mips_get_random(CPUMIPSState *env);
+ uint32_t cpu_mips_get_count(CPUMIPSState *env);
+ void cpu_mips_store_count(CPUMIPSState *env, uint32_t value);
+ void cpu_mips_store_compare(CPUMIPSState *env, uint32_t value);
+diff --git a/target/mips/cp0_helper.c b/target/mips/cp0_helper.c
+index de64add038b..12143ac55b9 100644
+--- a/target/mips/cp0_helper.c
++++ b/target/mips/cp0_helper.c
+@@ -203,6 +203,31 @@ static void sync_c0_entryhi(CPUMIPSState *cpu, int tc)
+     *tcst |= asid;
  }
  
- static void mips_cpu_realizefn(DeviceState *dev, Error **errp)
-@@ -155,6 +156,10 @@ static void mips_cpu_realizefn(DeviceState *dev, Error **errp)
-     MIPSCPUClass *mcc = MIPS_CPU_GET_CLASS(dev);
-     Error *local_err = NULL;
- 
-+    if (!clock_get(cpu->clock)) {
-+        /* Initialize the frequency in case the clock remains unconnected. */
-+        clock_set_hz(cpu->clock, CPU_FREQ_HZ_DEFAULT);
++/* XXX: do not use a global */
++uint32_t cpu_mips_get_random(CPUMIPSState *env)
++{
++    static uint32_t seed = 1;
++    static uint32_t prev_idx;
++    uint32_t idx;
++    uint32_t nb_rand_tlb = env->tlb->nb_tlb - env->CP0_Wired;
++
++    if (nb_rand_tlb == 1) {
++        return env->tlb->nb_tlb - 1;
 +    }
-     mips_cp0_period_set(cpu);
++
++    /* Don't return same value twice, so get another value */
++    do {
++        /*
++         * Use a simple algorithm of Linear Congruential Generator
++         * from ISO/IEC 9899 standard.
++         */
++        seed = 1103515245 * seed + 12345;
++        idx = (seed >> 16) % nb_rand_tlb + env->CP0_Wired;
++    } while (idx == prev_idx);
++    prev_idx = idx;
++    return idx;
++}
++
+ /* CP0 helpers */
+ target_ulong helper_mfc0_mvpcontrol(CPUMIPSState *env)
+ {
+diff --git a/target/mips/cp0_timer.c b/target/mips/cp0_timer.c
+index bd7efb152dd..9c38e9da1c8 100644
+--- a/target/mips/cp0_timer.c
++++ b/target/mips/cp0_timer.c
+@@ -29,31 +29,6 @@
  
-     cpu_exec_realizefn(cs, &local_err);
-@@ -178,6 +183,7 @@ static void mips_cpu_initfn(Object *obj)
-     MIPSCPUClass *mcc = MIPS_CPU_GET_CLASS(obj);
+ #define TIMER_PERIOD 10 /* 10 ns period for 100 Mhz frequency */
  
-     cpu_set_cpustate_pointers(cpu);
-+    cpu->clock = qdev_init_clock_in(DEVICE(obj), "clk-in", NULL, cpu);
-     env->cpu_model = mcc->cpu_def;
- }
- 
+-/* XXX: do not use a global */
+-uint32_t cpu_mips_get_random(CPUMIPSState *env)
+-{
+-    static uint32_t seed = 1;
+-    static uint32_t prev_idx = 0;
+-    uint32_t idx;
+-    uint32_t nb_rand_tlb = env->tlb->nb_tlb - env->CP0_Wired;
+-
+-    if (nb_rand_tlb == 1) {
+-        return env->tlb->nb_tlb - 1;
+-    }
+-
+-    /* Don't return same value twice, so get another value */
+-    do {
+-        /*
+-         * Use a simple algorithm of Linear Congruential Generator
+-         * from ISO/IEC 9899 standard.
+-         */
+-        seed = 1103515245 * seed + 12345;
+-        idx = (seed >> 16) % nb_rand_tlb + env->CP0_Wired;
+-    } while (idx == prev_idx);
+-    prev_idx = idx;
+-    return idx;
+-}
+-
+ /* MIPS R4K timer */
+ static void cpu_mips_timer_update(CPUMIPSState *env)
+ {
 -- 
 2.26.2
 
