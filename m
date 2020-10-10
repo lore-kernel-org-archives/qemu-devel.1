@@ -7,47 +7,48 @@ X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0172C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 10:55:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68528C433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 10:58:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 424B9221E9
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 10:55:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 424B9221E9
+	by mail.kernel.org (Postfix) with ESMTPS id D024920691
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 10:58:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D024920691
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRCXM-0001il-E3
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 06:55:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43538)
+	id 1kRCZj-0003UE-Rl
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 06:58:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43748)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pannengyuan@huawei.com>)
- id 1kRCWV-00014R-Vz; Sat, 10 Oct 2020 06:54:48 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:59908 helo=huawei.com)
+ id 1kRCXc-0002AC-GV; Sat, 10 Oct 2020 06:55:56 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:60932 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pannengyuan@huawei.com>)
- id 1kRCWS-0001i4-JC; Sat, 10 Oct 2020 06:54:47 -0400
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 66CB8A35E6F38AB23562;
- Sat, 10 Oct 2020 18:54:39 +0800 (CST)
+ id 1kRCXa-00028P-Iu; Sat, 10 Oct 2020 06:55:56 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 1ABBBCC9A2DAC52E3DCC;
+ Sat, 10 Oct 2020 18:55:52 +0800 (CST)
 Received: from [10.174.178.98] (10.174.178.98) by
- DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.487.0; Sat, 10 Oct 2020 18:54:33 +0800
-Subject: Re: [PATCH] net/filter-rewriter: destroy g_hash_table in
- colo_rewriter_cleanup
-To: Li Qiang <liq3ea@gmail.com>
-References: <20200904134908.1396-1-pannengyuan@huawei.com>
- <CAKXe6SJL8Y2frr1-d06=Ovoo=45+kJSGM2vhDGFeJf4YuUfN4A@mail.gmail.com>
+ DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
+ 14.3.487.0; Sat, 10 Oct 2020 18:55:42 +0800
+Subject: Re: [PATCH] target/i386/cpu: add return value verification and ignore
+ Error objects
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ <qemu-devel@nongnu.org>
+References: <20200904134529.1317-1-pannengyuan@huawei.com>
+ <10efea6a-b3a8-3e37-47d1-640f5a9ef9c9@redhat.com>
 From: Pan Nengyuan <pannengyuan@huawei.com>
-Message-ID: <e327c596-08bf-655b-5b2b-aaeb4fcbdb2e@huawei.com>
-Date: Sat, 10 Oct 2020 18:54:32 +0800
+Message-ID: <b2643f32-cdcd-cf87-68d7-ebfabcbf3ca6@huawei.com>
+Date: Sat, 10 Oct 2020 18:55:41 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <CAKXe6SJL8Y2frr1-d06=Ovoo=45+kJSGM2vhDGFeJf4YuUfN4A@mail.gmail.com>
+In-Reply-To: <10efea6a-b3a8-3e37-47d1-640f5a9ef9c9@redhat.com>
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-Originating-IP: [10.174.178.98]
@@ -74,10 +75,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, qemu-trivial@nongnu.org,
- Jason Wang <jasowang@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>,
- Laurent Vivier <laurent@vivier.eu>, Zhang Chen <chen.zhang@intel.com>,
- Chen Qun <kuhn.chenqun@huawei.com>
+Cc: zhang.zhanghailiang@huawei.com, qemu-trivial@nongnu.org, Laurent
+ Vivier <laurent@vivier.eu>, ehabkost@redhat.com, pbonzini@redhat.com,
+ kuhn.chenqun@huawei.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -86,35 +86,94 @@ ping!
 
 Maybe missed to queue?
 
-On 2020/9/5 8:44, Li Qiang wrote:
-> Pan Nengyuan <pannengyuan@huawei.com> 于2020年9月4日周五 下午3:23写道：
+On 2020/9/4 21:20, Philippe Mathieu-Daudé wrote:
+> On 9/4/20 3:45 PM, Pan Nengyuan wrote:
+>> 'err' is unnecessary in x86_cpu_class_check_missing_features(), we can change x86_cpu_expand_features()
+>> to return true on success, false on failure, then pass NULL here to remove it.
 >>
->> s->connection_track_table forgot to destroy in colo_rewriter_cleanup. Fix it.
->>
->> Reported-by: Euler Robot <euler.robot@huawei.com>
 >> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+>> Suggested-by: Markus Armbruster <armbru@redhat.com>
 > 
-> Reviewed-by: Li Qiang <liq3ea@gmail.com>
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > 
 >> ---
->>  net/filter-rewriter.c | 2 ++
->>  1 file changed, 2 insertions(+)
+>>  target/i386/cpu.c | 15 +++++++--------
+>>  1 file changed, 7 insertions(+), 8 deletions(-)
 >>
->> diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
->> index 1aaad101b6..9ff366d44f 100644
->> --- a/net/filter-rewriter.c
->> +++ b/net/filter-rewriter.c
->> @@ -376,6 +376,8 @@ static void colo_rewriter_cleanup(NetFilterState *nf)
->>          filter_rewriter_flush(nf);
->>          g_free(s->incoming_queue);
+>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>> index 49d8958528..c3d3766133 100644
+>> --- a/target/i386/cpu.c
+>> +++ b/target/i386/cpu.c
+>> @@ -4883,7 +4883,7 @@ static void x86_cpu_parse_featurestr(const char *typename, char *features,
+>>      }
+>>  }
+>>  
+>> -static void x86_cpu_expand_features(X86CPU *cpu, Error **errp);
+>> +static bool x86_cpu_expand_features(X86CPU *cpu, Error **errp);
+>>  static void x86_cpu_filter_features(X86CPU *cpu, bool verbose);
+>>  
+>>  /* Build a list with the name of all features on a feature word array */
+>> @@ -4925,7 +4925,6 @@ static void x86_cpu_class_check_missing_features(X86CPUClass *xcc,
+>>                                                   strList **missing_feats)
+>>  {
+>>      X86CPU *xc;
+>> -    Error *err = NULL;
+>>      strList **next = missing_feats;
+>>  
+>>      if (xcc->host_cpuid_required && !accel_uses_host_cpuid()) {
+>> @@ -4937,8 +4936,7 @@ static void x86_cpu_class_check_missing_features(X86CPUClass *xcc,
+>>  
+>>      xc = X86_CPU(object_new_with_class(OBJECT_CLASS(xcc)));
+>>  
+>> -    x86_cpu_expand_features(xc, &err);
+>> -    if (err) {
+>> +    if (!x86_cpu_expand_features(xc, NULL)) {
+>>          /* Errors at x86_cpu_expand_features should never happen,
+>>           * but in case it does, just report the model as not
+>>           * runnable at all using the "type" property.
+>> @@ -4947,7 +4945,6 @@ static void x86_cpu_class_check_missing_features(X86CPUClass *xcc,
+>>          new->value = g_strdup("type");
+>>          *next = new;
+>>          next = &new->next;
+>> -        error_free(err);
+>>      }
+>>  
+>>      x86_cpu_filter_features(xc, false);
+>> @@ -6426,7 +6423,7 @@ static void x86_cpu_enable_xsave_components(X86CPU *cpu)
+>>  /* Expand CPU configuration data, based on configured features
+>>   * and host/accelerator capabilities when appropriate.
+>>   */
+>> -static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+>> +static bool x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+>>  {
+>>      CPUX86State *env = &cpu->env;
+>>      FeatureWord w;
+>> @@ -6436,14 +6433,14 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+>>      for (l = plus_features; l; l = l->next) {
+>>          const char *prop = l->data;
+>>          if (!object_property_set_bool(OBJECT(cpu), prop, true, errp)) {
+>> -            return;
+>> +            return false;
+>>          }
+>>      }
+>>  
+>>      for (l = minus_features; l; l = l->next) {
+>>          const char *prop = l->data;
+>>          if (!object_property_set_bool(OBJECT(cpu), prop, false, errp)) {
+>> -            return;
+>> +            return false;
+>>          }
+>>      }
+>>  
+>> @@ -6540,6 +6537,8 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+>>      if (env->cpuid_xlevel2 == UINT32_MAX) {
+>>          env->cpuid_xlevel2 = env->cpuid_min_xlevel2;
 >>      }
 >> +
->> +    g_hash_table_destroy(s->connection_track_table);
+>> +    return true;
 >>  }
+>>  
+>>  /*
 >>
->>  static void colo_rewriter_setup(NetFilterState *nf, Error **errp)
->> --
->> 2.18.2
->>
->>
+> 
 
