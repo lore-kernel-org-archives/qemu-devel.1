@@ -2,77 +2,77 @@ Return-Path: <SRS0=BZbV=DR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8783EC433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 10:11:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E62D3C433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 10:12:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DF172076E
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 10:11:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8213F204EC
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 10:12:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hI9f9q9S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DF172076E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cPnXDVRB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8213F204EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRBqs-0005EP-By
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 06:11:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60658)
+	id 1kRBrS-0006ab-Me
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 06:12:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60698)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kRBb4-0007xM-9P
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 05:55:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44133)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kRBb6-00081y-Ah
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 05:55:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52312)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kRBas-0002ih-DB
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 05:55:25 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kRBas-0002je-PH
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 05:55:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602323713;
+ s=mimecast20190719; t=1602323714;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=a2pkeL5Tbaz0M55VjxZIA8sto8qXIqnJnORl1/d3JHE=;
- b=hI9f9q9SACtyEv4ai30/ioR3DS3bWe+1zXGn2dTOLMYZ/BU6LgNOJkhFu8AtCVW5elCzKw
- gXZIyP8KGIwQSPzZeOhJp50Yg7hbN+VHYe6SdvVJpFqEqdcDjRD8T1OmH6zapDIpzzhkjb
- sEn3tuP59SLInjKojedmwOLPe+jjdKE=
+ bh=5FivPmRSCa3buT0MfFx2zihcMnybxq0Gm7UBVzns6Oo=;
+ b=cPnXDVRBf3iIaurioJbc0BJEKlGU58EkrI33rMUpiCim8e2qN+fdTnqdMD41ppIdtUCdvh
+ bws5lgRrtAW8Xxb8dBn8TIfLdA9YMABunoRmcYsbG1O/hu8bz1CdBJsQwG66QKHEha76rO
+ /rEEA2YFZ1ECMYDCAnopaNNCq8TBRms=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-530-YrZy88FQMqWXqtpYr3S3hA-1; Sat, 10 Oct 2020 05:55:10 -0400
-X-MC-Unique: YrZy88FQMqWXqtpYr3S3hA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-164-AMdjGAHtOsaNppNIBZ545A-1; Sat, 10 Oct 2020 05:55:11 -0400
+X-MC-Unique: AMdjGAHtOsaNppNIBZ545A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E32E21005E75;
- Sat, 10 Oct 2020 09:55:09 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 83B291868424;
+ Sat, 10 Oct 2020 09:55:10 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
  [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B48D876660;
- Sat, 10 Oct 2020 09:55:09 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 298DC27BB3;
+ Sat, 10 Oct 2020 09:55:10 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id EB03711275C2; Sat, 10 Oct 2020 11:55:04 +0200 (CEST)
+ id 0827C11275D7; Sat, 10 Oct 2020 11:55:05 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 25/34] qapi/gen: Make _is_user_module() return bool
-Date: Sat, 10 Oct 2020 11:54:55 +0200
-Message-Id: <20201010095504.796182-26-armbru@redhat.com>
+Subject: [PULL 30/34] qapi/types.py: add type hint annotations
+Date: Sat, 10 Oct 2020 11:55:00 +0200
+Message-Id: <20201010095504.796182-31-armbru@redhat.com>
 In-Reply-To: <20201010095504.796182-1-armbru@redhat.com>
 References: <20201010095504.796182-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/10 03:36:24
@@ -96,44 +96,272 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: peter.maydell@linaro.org, John Snow <jsnow@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: John Snow <jsnow@redhat.com>
 
-_is_user_module() returns thruth values.  The next commit wants it to
-return bool.  Make it so.
+Annotations do not change runtime behavior.
+This commit *only* adds annotations.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20201009161558.107041-27-jsnow@redhat.com>
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Message-Id: <20201009161558.107041-33-jsnow@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-[Commit message rewritten]
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi/gen.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/qapi/mypy.ini |  5 ---
+ scripts/qapi/types.py | 86 ++++++++++++++++++++++++++++++++-----------
+ 2 files changed, 64 insertions(+), 27 deletions(-)
 
-diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
-index fff0c0acb6..2c305c4f82 100644
---- a/scripts/qapi/gen.py
-+++ b/scripts/qapi/gen.py
-@@ -241,7 +241,7 @@ class QAPISchemaModularCVisitor(QAPISchemaVisitor):
+diff --git a/scripts/qapi/mypy.ini b/scripts/qapi/mypy.ini
+index c6960ff2db..83f1981355 100644
+--- a/scripts/qapi/mypy.ini
++++ b/scripts/qapi/mypy.ini
+@@ -29,11 +29,6 @@ disallow_untyped_defs = False
+ disallow_incomplete_defs = False
+ check_untyped_defs = False
  
-     @staticmethod
-     def _is_user_module(name):
--        return name and not name.startswith('./')
-+        return bool(name and not name.startswith('./'))
+-[mypy-qapi.types]
+-disallow_untyped_defs = False
+-disallow_incomplete_defs = False
+-check_untyped_defs = False
+-
+ [mypy-qapi.visit]
+ disallow_untyped_defs = False
+ disallow_incomplete_defs = False
+diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
+index 53b47f9e58..766822feb3 100644
+--- a/scripts/qapi/types.py
++++ b/scripts/qapi/types.py
+@@ -13,6 +13,8 @@ This work is licensed under the terms of the GNU GPL, version 2.
+ # See the COPYING file in the top-level directory.
+ """
  
-     @staticmethod
-     def _is_builtin_module(name):
++from typing import List, Optional
++
+ from .common import (
+     c_enum_const,
+     c_name,
+@@ -21,7 +23,16 @@ from .common import (
+     mcgen,
+ )
+ from .gen import QAPISchemaModularCVisitor, ifcontext
+-from .schema import QAPISchemaEnumMember, QAPISchemaObjectType
++from .schema import (
++    QAPISchema,
++    QAPISchemaEnumMember,
++    QAPISchemaFeature,
++    QAPISchemaObjectType,
++    QAPISchemaObjectTypeMember,
++    QAPISchemaType,
++    QAPISchemaVariants,
++)
++from .source import QAPISourceInfo
+ 
+ 
+ # variants must be emitted before their container; track what has already
+@@ -29,7 +40,9 @@ from .schema import QAPISchemaEnumMember, QAPISchemaObjectType
+ objects_seen = set()
+ 
+ 
+-def gen_enum_lookup(name, members, prefix=None):
++def gen_enum_lookup(name: str,
++                    members: List[QAPISchemaEnumMember],
++                    prefix: Optional[str] = None) -> str:
+     ret = mcgen('''
+ 
+ const QEnumLookup %(c_name)s_lookup = {
+@@ -54,7 +67,9 @@ const QEnumLookup %(c_name)s_lookup = {
+     return ret
+ 
+ 
+-def gen_enum(name, members, prefix=None):
++def gen_enum(name: str,
++             members: List[QAPISchemaEnumMember],
++             prefix: Optional[str] = None) -> str:
+     # append automatically generated _MAX value
+     enum_members = members + [QAPISchemaEnumMember('_MAX', None)]
+ 
+@@ -88,7 +103,7 @@ extern const QEnumLookup %(c_name)s_lookup;
+     return ret
+ 
+ 
+-def gen_fwd_object_or_array(name):
++def gen_fwd_object_or_array(name: str) -> str:
+     return mcgen('''
+ 
+ typedef struct %(c_name)s %(c_name)s;
+@@ -96,7 +111,7 @@ typedef struct %(c_name)s %(c_name)s;
+                  c_name=c_name(name))
+ 
+ 
+-def gen_array(name, element_type):
++def gen_array(name: str, element_type: QAPISchemaType) -> str:
+     return mcgen('''
+ 
+ struct %(c_name)s {
+@@ -107,7 +122,7 @@ struct %(c_name)s {
+                  c_name=c_name(name), c_type=element_type.c_type())
+ 
+ 
+-def gen_struct_members(members):
++def gen_struct_members(members: List[QAPISchemaObjectTypeMember]) -> str:
+     ret = ''
+     for memb in members:
+         ret += gen_if(memb.ifcond)
+@@ -124,7 +139,10 @@ def gen_struct_members(members):
+     return ret
+ 
+ 
+-def gen_object(name, ifcond, base, members, variants):
++def gen_object(name: str, ifcond: List[str],
++               base: Optional[QAPISchemaObjectType],
++               members: List[QAPISchemaObjectTypeMember],
++               variants: Optional[QAPISchemaVariants]) -> str:
+     if name in objects_seen:
+         return ''
+     objects_seen.add(name)
+@@ -178,7 +196,7 @@ struct %(c_name)s {
+     return ret
+ 
+ 
+-def gen_upcast(name, base):
++def gen_upcast(name: str, base: QAPISchemaObjectType) -> str:
+     # C makes const-correctness ugly.  We have to cast away const to let
+     # this function work for both const and non-const obj.
+     return mcgen('''
+@@ -191,7 +209,7 @@ static inline %(base)s *qapi_%(c_name)s_base(const %(c_name)s *obj)
+                  c_name=c_name(name), base=base.c_name())
+ 
+ 
+-def gen_variants(variants):
++def gen_variants(variants: QAPISchemaVariants) -> str:
+     ret = mcgen('''
+     union { /* union tag is @%(c_name)s */
+ ''',
+@@ -215,7 +233,7 @@ def gen_variants(variants):
+     return ret
+ 
+ 
+-def gen_type_cleanup_decl(name):
++def gen_type_cleanup_decl(name: str) -> str:
+     ret = mcgen('''
+ 
+ void qapi_free_%(c_name)s(%(c_name)s *obj);
+@@ -225,7 +243,7 @@ G_DEFINE_AUTOPTR_CLEANUP_FUNC(%(c_name)s, qapi_free_%(c_name)s)
+     return ret
+ 
+ 
+-def gen_type_cleanup(name):
++def gen_type_cleanup(name: str) -> str:
+     ret = mcgen('''
+ 
+ void qapi_free_%(c_name)s(%(c_name)s *obj)
+@@ -247,12 +265,12 @@ void qapi_free_%(c_name)s(%(c_name)s *obj)
+ 
+ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVisitor):
+ 
+-    def __init__(self, prefix):
++    def __init__(self, prefix: str):
+         super().__init__(
+             prefix, 'qapi-types', ' * Schema-defined QAPI types',
+             ' * Built-in QAPI types', __doc__)
+ 
+-    def _begin_system_module(self, name):
++    def _begin_system_module(self, name: None) -> None:
+         self._genc.preamble_add(mcgen('''
+ #include "qemu/osdep.h"
+ #include "qapi/dealloc-visitor.h"
+@@ -263,7 +281,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVisitor):
+ #include "qapi/util.h"
+ '''))
+ 
+-    def _begin_user_module(self, name):
++    def _begin_user_module(self, name: str) -> None:
+         types = self._module_basename('qapi-types', name)
+         visit = self._module_basename('qapi-visit', name)
+         self._genc.preamble_add(mcgen('''
+@@ -277,27 +295,43 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVisitor):
+ #include "qapi/qapi-builtin-types.h"
+ '''))
+ 
+-    def visit_begin(self, schema):
++    def visit_begin(self, schema: QAPISchema) -> None:
+         # gen_object() is recursive, ensure it doesn't visit the empty type
+         objects_seen.add(schema.the_empty_object_type.name)
+ 
+-    def _gen_type_cleanup(self, name):
++    def _gen_type_cleanup(self, name: str) -> None:
+         self._genh.add(gen_type_cleanup_decl(name))
+         self._genc.add(gen_type_cleanup(name))
+ 
+-    def visit_enum_type(self, name, info, ifcond, features, members, prefix):
++    def visit_enum_type(self,
++                        name: str,
++                        info: Optional[QAPISourceInfo],
++                        ifcond: List[str],
++                        features: List[QAPISchemaFeature],
++                        members: List[QAPISchemaEnumMember],
++                        prefix: Optional[str]) -> None:
+         with ifcontext(ifcond, self._genh, self._genc):
+             self._genh.preamble_add(gen_enum(name, members, prefix))
+             self._genc.add(gen_enum_lookup(name, members, prefix))
+ 
+-    def visit_array_type(self, name, info, ifcond, element_type):
++    def visit_array_type(self,
++                         name: str,
++                         info: Optional[QAPISourceInfo],
++                         ifcond: List[str],
++                         element_type: QAPISchemaType) -> None:
+         with ifcontext(ifcond, self._genh, self._genc):
+             self._genh.preamble_add(gen_fwd_object_or_array(name))
+             self._genh.add(gen_array(name, element_type))
+             self._gen_type_cleanup(name)
+ 
+-    def visit_object_type(self, name, info, ifcond, features,
+-                          base, members, variants):
++    def visit_object_type(self,
++                          name: str,
++                          info: Optional[QAPISourceInfo],
++                          ifcond: List[str],
++                          features: List[QAPISchemaFeature],
++                          base: Optional[QAPISchemaObjectType],
++                          members: List[QAPISchemaObjectTypeMember],
++                          variants: Optional[QAPISchemaVariants]) -> None:
+         # Nothing to do for the special empty builtin
+         if name == 'q_empty':
+             return
+@@ -313,7 +347,12 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVisitor):
+                 # implicit types won't be directly allocated/freed
+                 self._gen_type_cleanup(name)
+ 
+-    def visit_alternate_type(self, name, info, ifcond, features, variants):
++    def visit_alternate_type(self,
++                             name: str,
++                             info: QAPISourceInfo,
++                             ifcond: List[str],
++                             features: List[QAPISchemaFeature],
++                             variants: QAPISchemaVariants) -> None:
+         with ifcontext(ifcond, self._genh):
+             self._genh.preamble_add(gen_fwd_object_or_array(name))
+         self._genh.add(gen_object(name, ifcond, None,
+@@ -322,7 +361,10 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVisitor):
+             self._gen_type_cleanup(name)
+ 
+ 
+-def gen_types(schema, output_dir, prefix, opt_builtins):
++def gen_types(schema: QAPISchema,
++              output_dir: str,
++              prefix: str,
++              opt_builtins: bool) -> None:
+     vis = QAPISchemaGenTypeVisitor(prefix)
+     schema.visit(vis)
+     vis.write(output_dir, opt_builtins)
 -- 
 2.26.2
 
