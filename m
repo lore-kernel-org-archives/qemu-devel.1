@@ -2,89 +2,120 @@ Return-Path: <SRS0=BZbV=DR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E85FC433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 14:46:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6896BC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 14:58:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D8262226B
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 14:46:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BQxapqb1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D8262226B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8654D222EB
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 14:58:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8654D222EB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=outlook.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRG92-0004fN-5X
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 10:46:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52096)
+	id 1kRGK7-0000Pd-DC
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 10:58:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56388)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <a.tarasenko@gmail.com>)
- id 1kRG7i-00046e-Mk
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 10:45:26 -0400
-Received: from mail-qk1-x72f.google.com ([2607:f8b0:4864:20::72f]:37893)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <a.tarasenko@gmail.com>)
- id 1kRG7g-00020B-1r
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 10:45:26 -0400
-Received: by mail-qk1-x72f.google.com with SMTP id f21so807428qko.5
- for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 07:45:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=hPYZBmGaNPjwXtRHAD5o/az0iviVR2gj1ckI364wzrE=;
- b=BQxapqb1Fh2QyQ6DSuY1b3vk6HGftbWXNDkryeOak2M9fxr1aFNUVY8mWqcvaOS0zM
- ZloZS1eyI3WNEFFygW1mG18IOXktjyW1m4XfTEl8yJ0JFC9PFXX504ss1g4xYuYks6fL
- UO2TGlCjtgQvPHBXyT7nviTL1VG/5U6JHwXGHnYGV69gwOUhgyeXnjP5feG3NX2ckTAs
- oJRo6MOpVmkT+ACdsiZuArVyitgigSM7+K10bvcIlWYn7svNV6crPsKudCg6MmTqp0Wq
- HItr9jLd3FRWxuSOlx2S1OpbOAXjgpo1VNr5hAheIaDfA9zZqYJWO8g+gP3rfcWuh4uT
- Z3FA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=hPYZBmGaNPjwXtRHAD5o/az0iviVR2gj1ckI364wzrE=;
- b=cuxBLKXjKylOspMjdzoN7p+3nvu9KPCgWy4GzBWHBtkkAPZ+8Gkqv38dopTHyoqb7y
- kcYkH0iZY06REZP5QfgntI5IdCwUbPYuqQgBf3LIJFd47I0BWI9Pco7h9ClxNTR6/jin
- nIJ3tIMDcoH/tk520VvAAy4DlNkDlCFlMIfXEdjDSEb4Xes0fgNPAM8SgY3mXKARJYdq
- dXOw73jD/Q6s03J0BgVHNdenoCdYlG4M/TXXZe2NhjaW0gmj066az8/dWqM24J4bxLXa
- wZQ/BboHVpMvHPRS3rNxG1yaH0i8EUbzDYRuZMf8lcMeoXG/LgiUMdRtDnleWu9gIkQk
- Z4rg==
-X-Gm-Message-State: AOAM5304q4DCvfsp4x5PXau23T7pnhLbJbnZABx66Wb4JYhwi0YHwJnH
- LcZvgP/0XRB6TolaJGio1FBvGpnVwjY0676jGhZPidzzCvg=
-X-Google-Smtp-Source: ABdhPJxyajpEN5bn7oqK3dGEvjLGioyuHqOp4NaPzUUA1qjLknS8senFHj68JoR9sJyOpdVLdnId7aVrMWB6KIHzkZQ=
-X-Received: by 2002:a05:620a:a84:: with SMTP id
- v4mr992008qkg.486.1602341122385; 
- Sat, 10 Oct 2020 07:45:22 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <heecheol.yang@outlook.com>)
+ id 1kRGJM-00087m-7M
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 10:57:28 -0400
+Received: from mail-bn8nam12olkn2064.outbound.protection.outlook.com
+ ([40.92.21.64]:24416 helo=NAM12-BN8-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <heecheol.yang@outlook.com>)
+ id 1kRGJI-0003hq-1R
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 10:57:27 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WpYzbpbBV2R9txu42CtMl0F8vjzM24iNczeR3ViAAcOOZsPEgbMWJhSUMLyAcsFDf5cIkm443wr7zqrS7uaOb+HPw4IX41tUrCOU4woO1McVymaujdusqFmG4MkviYyZC27Gesl/d7tGqj2BxTpest78QMhl/oXXjI5Jq07kaYlG9CdFax9kO8HuB96Y4ooA0ir0McvTcj29uVVDM7PJBSNb6xKDP2Rdv21rtpfbwfrP/esye8GTOs1VSbl6WmfGHhk1GuUXrUxrJVA63ImyODLfTrto1oPxRRxQ3S9Er/o/tDpKgaEIEnaOYcRoXUOR8l7TJ1tdj+M0rsZEsFnCFA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0BHSL++clY26ZljRKkGlHHbNotnsmb9REPI4KMP9E70=;
+ b=f1CceAKXQn4ACTCt8TZAVZ6yi6I9zyyXWMHZdpP0rb3icsPKkGJSVnHCZAuZ6RM2Jdvg2K+bYEqUfgMbheG033Qe4tQ4K2zliq+JAlwallejhZgB+zFVGBl+SCyDlm6DFlWZHaNVa/2VO3ms7TD/3rnQEdXfOn2cSkMilv7AzKrrHUShMq6nIHxuGL8aRbCSgiqlWcpyuFhCTyqEYsuE4XJ8U6L71zt0pijJUb7nnjYLrTBy0MOsuZK8YfG5c2lWST3qnsIIDG0shjvGr+in6dhPLEsWI8oaQrFYh5rn4bUiC/KCawGLlwrQJH4vGuBtOHq+TDNYClzyXkqr1LIMWg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0BHSL++clY26ZljRKkGlHHbNotnsmb9REPI4KMP9E70=;
+ b=awcJveRLKHWLIo4M0uLbtZmxArRg4VI1zdWflSVd1od+mg7EMyPd8sOSBaOrlnKl6NiBLxh5u+sFKphdHzeeFeB3W0LU8Y94MUnAVhTF1UVHKP26cJcWguo+9FhLQGEkWH4yzIzBLdl5MFEQBvCE3s3UnmSjWNTkcBCzeTG+wDG6ZogFHTwEN4Xr53PzxPvHRBY7OB5zBLDQs6y4EVlGTXRuZtmz63dWMS2gRsLqD7Ff1zQkoA4k1uBmtJE4E9v+bqR4lf+Q2I4aq8Bp6aDZRyX93/DcjnR84P7Nt6Kh/XZDyTinYpfmGigSoNqsF3rwJ5SK0i9V066e978NkPiaQQ==
+Received: from BN8NAM12FT013.eop-nam12.prod.protection.outlook.com
+ (2a01:111:e400:fc66::43) by
+ BN8NAM12HT083.eop-nam12.prod.protection.outlook.com (2a01:111:e400:fc66::478)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.11; Sat, 10 Oct
+ 2020 14:34:06 +0000
+Received: from DM6PR16MB2473.namprd16.prod.outlook.com
+ (2a01:111:e400:fc66::4f) by BN8NAM12FT013.mail.protection.outlook.com
+ (2a01:111:e400:fc66::227) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.11 via Frontend
+ Transport; Sat, 10 Oct 2020 14:34:06 +0000
+X-IncomingTopHeaderMarker: OriginalChecksum:F0C0AA87B6C54672D40C52173845018B49ADC4841A7B8121807CC4C1E0B6254A;
+ UpperCasedChecksum:81EAD7110CECC8B4F1E7DD597C08E5A30FA0B1CC86D17CED806D1A7698F9175C;
+ SizeAsReceived:7345; Count:44
+Received: from DM6PR16MB2473.namprd16.prod.outlook.com
+ ([fe80::ec2c:246a:b4d4:48b1]) by DM6PR16MB2473.namprd16.prod.outlook.com
+ ([fe80::ec2c:246a:b4d4:48b1%3]) with mapi id 15.20.3455.027; Sat, 10 Oct 2020
+ 14:34:06 +0000
+From: Heecheol Yang <heecheol.yang@outlook.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v5] hw/avr: Add limited support for avr gpio registers
+Date: Sat, 10 Oct 2020 14:33:42 +0000
+Message-ID: <DM6PR16MB247368DBD3447ABECDD795D7E6090@DM6PR16MB2473.namprd16.prod.outlook.com>
+X-Mailer: git-send-email 2.17.1
+Content-Type: text/plain
+X-TMN: [G+9pBkOqZYstVJd7jUy96NsUBWn9vgmN]
+X-ClientProxiedBy: SLXP216CA0037.KORP216.PROD.OUTLOOK.COM
+ (2603:1096:100:4::23) To DM6PR16MB2473.namprd16.prod.outlook.com
+ (2603:10b6:5:6e::28)
+X-Microsoft-Original-Message-ID: <20201010143342.2903390-1-heecheol.yang@outlook.com>
 MIME-Version: 1.0
-References: <20200803222049.2967aeda.hc981@poolhem.se>
- <20200919194712.1ddd62cf.hc94@poolhem.se>
-In-Reply-To: <20200919194712.1ddd62cf.hc94@poolhem.se>
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Sat, 10 Oct 2020 17:44:57 +0300
-Message-ID: <CAAM0arOsdhkJoEoXuPRA=Z_dnjJ3EQMuSuJLuDg0Vm=2yvfwFQ@mail.gmail.com>
-Subject: Re: Ping2: [PATCH v2] Emulate dip switch language layout settings on
- SUN keyboard
-To: Henrik Carlqvist <hc94@poolhem.se>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Content-Type: multipart/alternative; boundary="00000000000068ac2e05b1521daa"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::72f;
- envelope-from=a.tarasenko@gmail.com; helo=mail-qk1-x72f.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost.localdomain (121.168.203.43) by
+ SLXP216CA0037.KORP216.PROD.OUTLOOK.COM (2603:1096:100:4::23) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3455.21 via Frontend Transport; Sat, 10 Oct 2020 14:34:03 +0000
+X-MS-PublicTrafficType: Email
+X-IncomingHeaderCount: 44
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-Correlation-Id: 10667188-f6ed-4087-81d1-08d86d2989da
+X-MS-Exchange-SLBlob-MailProps: pt8ZUcDWjMWoJ7n2SSdxym/EHACs7cvLNI+tjFqiIMvWMYcUwWZJAhy4/LiQy3zydZDXc2uFKychH4HTBgRIA7ELLjj4LP83JAhplqrQnRZy+3NU12JtNTWizvYpKBfwXoAPmpAx5iXkymHWl7B8BTwJQZ+eV2cz+QHmOEeywAY1L4QoPJKee953JM86y/xJMilxG0pZWsLFV/tU9Mjb31haCo+shCiI74GEMgs/L2XNsmLBD05qFvMcNoYgP+dHEQjaxK3bcHEAoU2mCkXKj6c6rBAhKG7knQ7PztYdWRYgZ0NNflZEDoYHak2fZioa1KrwYx5+NGJ1AdMMZjPDuHx80BksznkbzGofKJibrygJK/MKCgB+KZvvxmVCE/u/PfiEkmrJclr9cz3gXcYRjCZEkEL7ykVrbZ5Ix7iLTy3IW5hAHX9Wb5TKjTqGCBJOIgIUfC/2Ahn17I9V13Av5SG85kvfpCGIzgK9OCk3UPJbQ/9JTINBQRn5RqN9ogT4BxJKeeiRe7OBeNv2So6LkAL5NV+ywhckgGPFtx3fqlDXdQs5OwOddUgvYpIy1H6KnpPF17rtgnHouZouBcD2PHL04Ka4EJh7niAh6DNRD7BdMSz/Yps2lSVi8a7zYpEJu04lF+jHC7Fk1OM3AyDgpFpjPZfSOsfctP8v/vvT50LajJpS23Bv25x/bP0RZ5sFL/1sPeMWQJBWm1xH199XeSuHTIcu2E4iK/55IbanFK+CEZcx8VCylbdoRXqZEuEFvogUPlZgkj14aFUOZF2aI9CEH2spzmz3O/GqQYKLrOCF6dM9v1/U0W+jyEWW1fI7yO9SvRGwi6jvPUtaVCCbT75Jc6irRsBOOBBX8X/t9SmVLuQ6FXbKajF0y6J5BGdFMLLhuVCMVZO0M76lbKkZyQVrWSICN27cnn94qnvwZzoKqJrygA0tf6rZk+U8DGUr
+X-MS-TrafficTypeDiagnostic: BN8NAM12HT083:
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Wxzo3ZncK4yTI9eSefu/N4VmxXcTLH2jdYs5azljgl0hMzlRaCqhE1XnmU2DZamtW7rC01Mx2cSP7HszWSbFqCEmPQD2aqpu4/zAlktA4SMBXqRyLMCDpn8TUJA8GIcV0w80stDeHhATnVcNhBqDQJzXq9PdFe62mqr+g0PkMRD6HC0GhByAvKkgJ/4YQ1+LPuxp4yxBLQaKx0zwYHI48Yop6ikMpCUbgtoCi6SSSJR0FOIwnoYxULjhJQTLG7NK
+X-MS-Exchange-AntiSpam-MessageData: /FIRwYGxVpR+j3IUlq2ZnVyQLxYtfwcW1p+e3oS0C58to3sSON+2C44alqL3gfy2HCg0lsimGzztS9XP/+8hQOeIDmGLNGoor7x2zQeKHUDrgCWfnopWZsCpBcXVnWmbC4CbYlEFbAc763vTTFK5yg==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 10667188-f6ed-4087-81d1-08d86d2989da
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Oct 2020 14:34:06.3171 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM12FT013.eop-nam12.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: Internet
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8NAM12HT083
+X-MS-Exchange-Transport-Forked: True
+X-OriginatorOrg: outlook.com
+Received-SPF: pass client-ip=40.92.21.64;
+ envelope-from=heecheol.yang@outlook.com;
+ helo=NAM12-BN8-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/10 10:57:21
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,496 +129,307 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, hc981@poolhem.se
+Cc: Sarah Harris <S.E.Harris@kent.ac.uk>, Michael Rolnik <mrolnik@gmail.com>,
+ Heecheol Yang <heecheol.yang@outlook.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000068ac2e05b1521daa
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Add some of these features for AVR GPIO:
 
-Hi Mark,
+  - GPIO I/O : PORTx registers
+  - Data Direction : DDRx registers
+  - DDRx toggling : PINx registers
 
-could you please pick it up?
+Following things are not supported yet:
+  - MCUR registers
 
-Regards,
-Artyom
+Signed-off-by: Heecheol Yang <heecheol.yang@outlook.com>
+---
+ hw/avr/Kconfig             |   1 +
+ hw/avr/atmega.c            |   7 +-
+ hw/avr/atmega.h            |   2 +
+ hw/gpio/Kconfig            |   3 +
+ hw/gpio/avr_gpio.c         | 136 +++++++++++++++++++++++++++++++++++++
+ hw/gpio/meson.build        |   2 +
+ include/hw/gpio/avr_gpio.h |  53 +++++++++++++++
+ 7 files changed, 202 insertions(+), 2 deletions(-)
+ create mode 100644 hw/gpio/avr_gpio.c
+ create mode 100644 include/hw/gpio/avr_gpio.h
 
-=D1=81=D0=B1, 19 =D1=81=D0=B5=D0=BD=D1=82. 2020 =D0=B3., 20:47 Henrik Carlq=
-vist <hc94@poolhem.se>:
+diff --git a/hw/avr/Kconfig b/hw/avr/Kconfig
+index d31298c3cc..16a57ced11 100644
+--- a/hw/avr/Kconfig
++++ b/hw/avr/Kconfig
+@@ -3,6 +3,7 @@ config AVR_ATMEGA_MCU
+     select AVR_TIMER16
+     select AVR_USART
+     select AVR_POWER
++    select AVR_GPIO
+ 
+ config ARDUINO
+     select AVR_ATMEGA_MCU
+diff --git a/hw/avr/atmega.c b/hw/avr/atmega.c
+index 44c6afebbb..ad942028fd 100644
+--- a/hw/avr/atmega.c
++++ b/hw/avr/atmega.c
+@@ -283,8 +283,11 @@ static void atmega_realize(DeviceState *dev, Error **errp)
+             continue;
+         }
+         devname = g_strdup_printf("atmega-gpio-%c", 'a' + (char)i);
+-        create_unimplemented_device(devname,
+-                                    OFFSET_DATA + mc->dev[idx].addr, 3);
++        object_initialize_child(OBJECT(dev), devname, &s->gpio[i],
++                                TYPE_AVR_GPIO);
++        sysbus_realize(SYS_BUS_DEVICE(&s->gpio[i]), &error_abort);
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpio[i]), 0,
++            OFFSET_DATA + mc->dev[idx].addr);
+         g_free(devname);
+     }
+ 
+diff --git a/hw/avr/atmega.h b/hw/avr/atmega.h
+index a99ee15c7e..e2289d5744 100644
+--- a/hw/avr/atmega.h
++++ b/hw/avr/atmega.h
+@@ -13,6 +13,7 @@
+ 
+ #include "hw/char/avr_usart.h"
+ #include "hw/timer/avr_timer16.h"
++#include "hw/gpio/avr_gpio.h"
+ #include "hw/misc/avr_power.h"
+ #include "target/avr/cpu.h"
+ #include "qom/object.h"
+@@ -44,6 +45,7 @@ struct AtmegaMcuState {
+     DeviceState *io;
+     AVRMaskState pwr[POWER_MAX];
+     AVRUsartState usart[USART_MAX];
++    AVRGPIOState gpio[GPIO_MAX];
+     AVRTimer16State timer[TIMER_MAX];
+     uint64_t xtal_freq_hz;
+ };
+diff --git a/hw/gpio/Kconfig b/hw/gpio/Kconfig
+index b6fdaa2586..1752d0ce56 100644
+--- a/hw/gpio/Kconfig
++++ b/hw/gpio/Kconfig
+@@ -10,3 +10,6 @@ config GPIO_KEY
+ 
+ config SIFIVE_GPIO
+     bool
++
++config AVR_GPIO
++    bool
+diff --git a/hw/gpio/avr_gpio.c b/hw/gpio/avr_gpio.c
+new file mode 100644
+index 0000000000..29e799670d
+--- /dev/null
++++ b/hw/gpio/avr_gpio.c
+@@ -0,0 +1,136 @@
++/*
++ * AVR processors GPIO registers emulation.
++ *
++ * Copyright (C) 2020 Heecheol Yang <heecheol.yang@outlook.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 or
++ * (at your option) version 3 of the License.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "qemu/module.h"
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "hw/sysbus.h"
++#include "hw/irq.h"
++#include "hw/gpio/avr_gpio.h"
++#include "hw/qdev-properties.h"
++
++static void avr_gpio_reset(DeviceState *dev)
++{
++    AVRGPIOState *gpio = AVR_GPIO(dev);
++    gpio->reg.pin = 0u;
++    gpio->reg.ddr = 0u;
++    gpio->reg.port = 0u;
++}
++
++static void avr_gpio_write_port(AVRGPIOState *s, uint64_t value)
++{
++    uint8_t pin;
++    uint8_t cur_port_val = s->reg.port;
++    uint8_t cur_ddr_val = s->reg.ddr;
++
++    for (pin = 0u; pin < 8u ; pin++) {
++        uint8_t cur_port_pin_val = cur_port_val & 0x01u;
++        uint8_t cur_ddr_pin_val = cur_ddr_val & 0x01u;
++        uint8_t new_port_pin_val = value & 0x01u;
++
++        if (cur_ddr_pin_val && (cur_port_pin_val != new_port_pin_val)) {
++            qemu_set_irq(s->out[pin], new_port_pin_val);
++        }
++        cur_port_val >>= 1u;
++        cur_ddr_val >>= 1u;
++        value >>= 1u;
++    }
++    s->reg.port = value & s->reg.ddr;
++}
++static uint64_t avr_gpio_read(void *opaque, hwaddr offset, unsigned int size)
++{
++    AVRGPIOState *s = (AVRGPIOState *)opaque;
++    switch (offset) {
++    case GPIO_PIN:
++        return s->reg.pin;
++    case GPIO_DDR:
++        return s->reg.ddr;
++    case GPIO_PORT:
++        return s->reg.port;
++    default:
++        g_assert_not_reached();
++        break;
++    }
++    return 0;
++}
++
++static void avr_gpio_write(void *opaque, hwaddr offset, uint64_t value,
++                                unsigned int size)
++{
++    AVRGPIOState *s = (AVRGPIOState *)opaque;
++    value = value & 0xF;
++    switch (offset) {
++    case GPIO_PIN:
++        s->reg.pin = value;
++        s->reg.port ^= s->reg.pin;
++        break;
++    case GPIO_DDR:
++        s->reg.ddr = value;
++        break;
++    case GPIO_PORT:
++        avr_gpio_write_port(s, value);
++        break;
++    default:
++        g_assert_not_reached();
++        break;
++    }
++}
++
++static const MemoryRegionOps avr_gpio_ops = {
++    .read = avr_gpio_read,
++    .write = avr_gpio_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++};
++
++static void avr_gpio_init(Object *obj)
++{
++    AVRGPIOState *s = AVR_GPIO(obj);
++    qdev_init_gpio_out(DEVICE(obj), s->out, ARRAY_SIZE(s->out));
++    memory_region_init_io(&s->mmio, obj, &avr_gpio_ops, s, TYPE_AVR_GPIO, 3);
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
++}
++static void avr_gpio_realize(DeviceState *dev, Error **errp)
++{
++    /* Do nothing currently */
++}
++
++
++static void avr_gpio_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->reset = avr_gpio_reset;
++    dc->realize = avr_gpio_realize;
++}
++
++static const TypeInfo avr_gpio_info = {
++    .name          = TYPE_AVR_GPIO,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(AVRGPIOState),
++    .instance_init = avr_gpio_init,
++    .class_init    = avr_gpio_class_init,
++};
++
++static void avr_gpio_register_types(void)
++{
++    type_register_static(&avr_gpio_info);
++}
++
++type_init(avr_gpio_register_types)
+diff --git a/hw/gpio/meson.build b/hw/gpio/meson.build
+index 86cae9a0f3..258bd5dcfc 100644
+--- a/hw/gpio/meson.build
++++ b/hw/gpio/meson.build
+@@ -11,3 +11,5 @@ softmmu_ss.add(when: 'CONFIG_OMAP', if_true: files('omap_gpio.c'))
+ softmmu_ss.add(when: 'CONFIG_RASPI', if_true: files('bcm2835_gpio.c'))
+ softmmu_ss.add(when: 'CONFIG_ASPEED_SOC', if_true: files('aspeed_gpio.c'))
+ softmmu_ss.add(when: 'CONFIG_SIFIVE_GPIO', if_true: files('sifive_gpio.c'))
++
++softmmu_ss.add(when: 'CONFIG_AVR_GPIO', if_true: files('avr_gpio.c'))
+diff --git a/include/hw/gpio/avr_gpio.h b/include/hw/gpio/avr_gpio.h
+new file mode 100644
+index 0000000000..498a7275f0
+--- /dev/null
++++ b/include/hw/gpio/avr_gpio.h
+@@ -0,0 +1,53 @@
++/*
++ * AVR processors GPIO registers definition.
++ *
++ * Copyright (C) 2020 Heecheol Yang <heecheol.yang@outlook.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 or
++ * (at your option) version 3 of the License.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef AVR_GPIO_H
++#define AVR_GPIO_H
++
++#include "hw/sysbus.h"
++#include "qom/object.h"
++
++/* Offsets of registers. */
++#define GPIO_PIN   0x00
++#define GPIO_DDR   0x01
++#define GPIO_PORT  0x02
++
++#define TYPE_AVR_GPIO "avr-gpio"
++OBJECT_DECLARE_SIMPLE_TYPE(AVRGPIOState, AVR_GPIO)
++#define AVR_GPIO_COUNT 8
++
++struct AVRGPIOState {
++    /*< private >*/
++    SysBusDevice parent_obj;
++
++    /*< public >*/
++    MemoryRegion mmio;
++
++    struct {
++        uint8_t pin;
++        uint8_t ddr;
++        uint8_t port;
++    } reg;
++
++    /* PORTx data changed IRQs */
++    qemu_irq out[8u];
++
++};
++
++#endif /* AVR_GPIO_H */
+-- 
+2.17.1
 
-> Just wanted to check that my patch hasn't been forgotten... I was hoping
-> that
-> it would make it into some branch in git.
->
-> Do you want me to do any more changes to the patch or the description?
->
-> Best regards Henrik
->
-> On Mon, 3 Aug 2020 22:20:49 +0200
-> Henrik Carlqvist <hc981@poolhem.se> wrote:
->
-> > This is my second attempt to contribute a patch which makes the -k swit=
-ch
-> > useful for sparc emulation as its value is used to emulate the dip swit=
-ch
-> > in a SUN keyboard for language layout setting.
-> >
-> > Unfortunately my glib version is too old to compile later versions of
-> qemu
-> > so even though this patch is made from latest git I have only been able
-> to
-> > test it myself with qemu version 4.1.1. I think and hope that this patc=
-h
-> > will compile and work also with the latest version of git as it only
-> affects
-> > one file and there hasn't been much changes to that file since tested
-> > version 4.1.1.
-> >
-> > Best regards Henrik
-> >
-> > From e302b02dec32c28297ed20d852c5fba2c1682f5a Mon Sep 17 00:00:00 2001
-> > From: Henrik Carlqvist <hc1245@poolhem.se>
-> > Date: Mon, 3 Aug 2020 22:11:55 +0200
-> > Subject: [PATCH] Emulating sun keyboard language layout dip switches,
-> taking
-> >  the value for the dip switches from the "-k" option to qemu.
-> >
-> > SUN Type 4, 5 and 5c keyboards have dip switches to choose the language
-> > layout of the keyboard. Solaris makes an ioctl to query the value of th=
-e
-> > dipswitches and uses that value to select keyboard layout. Also the SUN
-> > bios like the one in the file ss5.bin uses this value to support at lea=
-st
-> > some keyboard layouts. However, the OpenBIOS provided with qemu is
-> > hardcoded to always use an US keyboard layout.
-> >
-> > Before this patch, qemu allways gave dip switch value 0x21 (US keyboard=
-),
-> > this patch uses the command line switch "-k" (keyboard layout) to selec=
-t
-> > dip switch value. A table is used to lookup values from arguments like:
-> >
-> > -k fr
-> > -k es
-> >
-> > But the patch also accepts numeric dip switch values directly to the -k
-> > switch:
-> >
-> > -k 0x2b
-> > -k 43
-> >
-> > Both values above are the same and select swedish keyboard as explained
-> in
-> > table 3-15 at
-> > https://docs.oracle.com/cd/E19683-01/806-6642/new-43/index.html
-> >
-> > Unless you want to do a full Solaris installation but happen to have
-> > access to a bios file, the easiest way to test that the patch works is
-> to:
-> >
-> > qemu-system-sparc -k sv -bios /path/to/ss5.bin
-> >
-> > If you already happen to have a Solaris installation in a qemu disk ima=
-ge
-> > file you can easily try different keyboard layouts after this patch is
-> > applied.
-> >
-> > Signed-off-by: Henrik Carlqvist <hc1245@poolhem.se>
-> > ---
-> >  hw/char/escc.c | 74
-> > +++++++++++++++++++++++++++++++++++++++++++++++++++++++++- 1 file
-> changed,
-> > 73 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/hw/char/escc.c b/hw/char/escc.c
-> > index 7d16ee8688..7287056b5f 100644
-> > --- a/hw/char/escc.c
-> > +++ b/hw/char/escc.c
-> > @@ -30,6 +30,8 @@
-> >  #include "qemu/module.h"
-> >  #include "hw/char/escc.h"
-> >  #include "ui/console.h"
-> > +#include "sysemu/sysemu.h"
-> > +#include "qemu/cutils.h"
-> >  #include "trace.h"
-> >
-> >  /*
-> > @@ -175,6 +177,7 @@
-> >  #define R_MISC1I 14
-> >  #define R_EXTINT 15
-> >
-> > +static unsigned char sun_keyboard_layout_dip_switch(void);
-> >  static void handle_kbd_command(ESCCChannelState *s, int val);
-> >  static int serial_can_receive(void *opaque);
-> >  static void serial_receive_byte(ESCCChannelState *s, int ch);
-> > @@ -730,6 +733,75 @@ static QemuInputHandler sunkbd_handler =3D {
-> >      .event =3D sunkbd_handle_event,
-> >  };
-> >
-> > +static unsigned char sun_keyboard_layout_dip_switch(void)
-> > +{
-> > +    /* Return the value of the dip-switches in a SUN Type 5 keyboard *=
-/
-> > +    static unsigned char ret =3D 0xff;
-> > +
-> > +    if ((ret =3D=3D 0xff) && keyboard_layout) {
-> > +        int i;
-> > +        struct layout_values {
-> > +            const char *lang;
-> > +            unsigned char dip;
-> > +        } languages[] =3D
-> > +    /* Dip values from table 3-16 Layouts for Type 4, 5, and 5c
-> Keyboards
-> > */+            {
-> > +                {"en-us", 0x21}, /* U.S.A. (US5.kt) */
-> > +                                 /* 0x22 is some other US
-> (US_UNIX5.kt)*/
-> > +                {"fr",    0x23}, /* France (France5.kt) */
-> > +                {"da",    0x24}, /* Denmark (Denmark5.kt) */
-> > +                {"de",    0x25}, /* Germany (Germany5.kt) */
-> > +                {"it",    0x26}, /* Italy (Italy5.kt) */
-> > +                {"nl",    0x27}, /* The Netherlands (Netherland5.kt) *=
-/
-> > +                {"no",    0x28}, /* Norway (Norway.kt) */
-> > +                {"pt",    0x29}, /* Portugal (Portugal5.kt) */
-> > +                {"es",    0x2a}, /* Spain (Spain5.kt) */
-> > +                {"sv",    0x2b}, /* Sweden (Sweden5.kt) */
-> > +                {"fr-ch", 0x2c}, /* Switzerland/French (Switzer_Fr5.kt=
-)
-> */
-> > +                {"de-ch", 0x2d}, /* Switzerland/German (Switzer_Ge5.kt=
-)
-> */
-> > +                {"en-gb", 0x2e}, /* Great Britain (UK5.kt) */
-> > +                {"ko",    0x2f}, /* Korea (Korea5.kt) */
-> > +                {"tw",    0x30}, /* Taiwan (Taiwan5.kt) */
-> > +                {"ja",    0x31}, /* Japan (Japan5.kt) */
-> > +                {"fr-ca", 0x32}, /* Canada/French (Canada_Fr5.kt) */
-> > +                {"hu",    0x33}, /* Hungary (Hungary5.kt) */
-> > +                {"pl",    0x34}, /* Poland (Poland5.kt) */
-> > +                {"cz",    0x35}, /* Czech (Czech5.kt) */
-> > +                {"ru",    0x36}, /* Russia (Russia5.kt) */
-> > +                {"lv",    0x37}, /* Latvia (Latvia5.kt) */
-> > +                {"tr",    0x38}, /* Turkey-Q5 (TurkeyQ5.kt) */
-> > +                {"gr",    0x39}, /* Greece (Greece5.kt) */
-> > +                {"ar",    0x3a}, /* Arabic (Arabic5.kt) */
-> > +                {"lt",    0x3b}, /* Lithuania (Lithuania5.kt) */
-> > +                {"nl-be", 0x3c}, /* Belgium (Belgian5.kt) */
-> > +                {"be",    0x3c}, /* Belgium (Belgian5.kt) */
-> > +            };
-> > +
-> > +        for (i =3D 0;
-> > +             i < sizeof(languages) / sizeof(struct layout_values);
-> > +             i++) {
-> > +            if (!strcmp(keyboard_layout, languages[i].lang)) {
-> > +                ret =3D languages[i].dip;
-> > +                return ret;
-> > +            }
-> > +        }
-> > +        /* Found no known language code */
-> > +
-> > +        if ((keyboard_layout[0] >=3D '0') && (keyboard_layout[0] <=3D =
-'9'))
-> {
-> > +            unsigned int tmp;
-> > +            /* As a fallback we also accept numeric dip switch value *=
-/
-> > +            if (!qemu_strtoui(keyboard_layout, NULL, 0, &tmp)) {
-> > +                ret =3D (unsigned char)tmp;
-> > +            }
-> > +        }
-> > +    }
-> > +    if (ret =3D=3D 0xff) {
-> > +        /* Final fallback if keyboard_layout was not set or recognized
-> */
-> > +        ret =3D 0x21; /* en-us layout */
-> > +    }
-> > +    return ret;
-> > +}
-> > +
-> >  static void handle_kbd_command(ESCCChannelState *s, int val)
-> >  {
-> >      trace_escc_kbd_command(val);
-> > @@ -751,7 +823,7 @@ static void handle_kbd_command(ESCCChannelState *s,
-> int
-> > val)     case 0xf:
-> >          clear_queue(s);
-> >          put_queue(s, 0xfe);
-> > -        put_queue(s, 0x21); /*  en-us layout */
-> > +        put_queue(s, sun_keyboard_layout_dip_switch());
-> >          break;
-> >      default:
-> >          break;
-> > --
-> > 2.14.5
->
-
---00000000000068ac2e05b1521daa
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"auto">Hi Mark,<div dir=3D"auto"><br></div><div dir=3D"auto">cou=
-ld you please pick it up?</div><div dir=3D"auto"><br></div><div dir=3D"auto=
-">Regards,</div><div dir=3D"auto">Artyom</div></div><br><div class=3D"gmail=
-_quote"><div dir=3D"ltr" class=3D"gmail_attr">=D1=81=D0=B1, 19 =D1=81=D0=B5=
-=D0=BD=D1=82. 2020 =D0=B3., 20:47 Henrik Carlqvist &lt;<a href=3D"mailto:hc=
-94@poolhem.se">hc94@poolhem.se</a>&gt;:<br></div><blockquote class=3D"gmail=
-_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:=
-1ex">Just wanted to check that my patch hasn&#39;t been forgotten... I was =
-hoping that<br>
-it would make it into some branch in git.<br>
-<br>
-Do you want me to do any more changes to the patch or the description?<br>
-<br>
-Best regards Henrik<br>
-<br>
-On Mon, 3 Aug 2020 22:20:49 +0200<br>
-Henrik Carlqvist &lt;<a href=3D"mailto:hc981@poolhem.se" target=3D"_blank" =
-rel=3D"noreferrer">hc981@poolhem.se</a>&gt; wrote:<br>
-<br>
-&gt; This is my second attempt to contribute a patch which makes the -k swi=
-tch<br>
-&gt; useful for sparc emulation as its value is used to emulate the dip swi=
-tch<br>
-&gt; in a SUN keyboard for language layout setting.<br>
-&gt; <br>
-&gt; Unfortunately my glib version is too old to compile later versions of =
-qemu<br>
-&gt; so even though this patch is made from latest git I have only been abl=
-e to<br>
-&gt; test it myself with qemu version 4.1.1. I think and hope that this pat=
-ch<br>
-&gt; will compile and work also with the latest version of git as it only a=
-ffects<br>
-&gt; one file and there hasn&#39;t been much changes to that file since tes=
-ted<br>
-&gt; version 4.1.1.<br>
-&gt; <br>
-&gt; Best regards Henrik<br>
-&gt; <br>
-&gt; From e302b02dec32c28297ed20d852c5fba2c1682f5a Mon Sep 17 00:00:00 2001=
-<br>
-&gt; From: Henrik Carlqvist &lt;<a href=3D"mailto:hc1245@poolhem.se" target=
-=3D"_blank" rel=3D"noreferrer">hc1245@poolhem.se</a>&gt;<br>
-&gt; Date: Mon, 3 Aug 2020 22:11:55 +0200<br>
-&gt; Subject: [PATCH] Emulating sun keyboard language layout dip switches, =
-taking<br>
-&gt;=C2=A0 the value for the dip switches from the &quot;-k&quot; option to=
- qemu.<br>
-&gt; <br>
-&gt; SUN Type 4, 5 and 5c keyboards have dip switches to choose the languag=
-e<br>
-&gt; layout of the keyboard. Solaris makes an ioctl to query the value of t=
-he<br>
-&gt; dipswitches and uses that value to select keyboard layout. Also the SU=
-N<br>
-&gt; bios like the one in the file ss5.bin uses this value to support at le=
-ast<br>
-&gt; some keyboard layouts. However, the OpenBIOS provided with qemu is<br>
-&gt; hardcoded to always use an US keyboard layout.<br>
-&gt; <br>
-&gt; Before this patch, qemu allways gave dip switch value 0x21 (US keyboar=
-d),<br>
-&gt; this patch uses the command line switch &quot;-k&quot; (keyboard layou=
-t) to select<br>
-&gt; dip switch value. A table is used to lookup values from arguments like=
-:<br>
-&gt; <br>
-&gt; -k fr<br>
-&gt; -k es<br>
-&gt; <br>
-&gt; But the patch also accepts numeric dip switch values directly to the -=
-k<br>
-&gt; switch:<br>
-&gt; <br>
-&gt; -k 0x2b<br>
-&gt; -k 43<br>
-&gt; <br>
-&gt; Both values above are the same and select swedish keyboard as explaine=
-d in<br>
-&gt; table 3-15 at<br>
-&gt; <a href=3D"https://docs.oracle.com/cd/E19683-01/806-6642/new-43/index.=
-html" rel=3D"noreferrer noreferrer" target=3D"_blank">https://docs.oracle.c=
-om/cd/E19683-01/806-6642/new-43/index.html</a><br>
-&gt; <br>
-&gt; Unless you want to do a full Solaris installation but happen to have<b=
-r>
-&gt; access to a bios file, the easiest way to test that the patch works is=
- to:<br>
-&gt; <br>
-&gt; qemu-system-sparc -k sv -bios /path/to/ss5.bin<br>
-&gt; <br>
-&gt; If you already happen to have a Solaris installation in a qemu disk im=
-age<br>
-&gt; file you can easily try different keyboard layouts after this patch is=
-<br>
-&gt; applied.<br>
-&gt; <br>
-&gt; Signed-off-by: Henrik Carlqvist &lt;<a href=3D"mailto:hc1245@poolhem.s=
-e" target=3D"_blank" rel=3D"noreferrer">hc1245@poolhem.se</a>&gt;<br>
-&gt; ---<br>
-&gt;=C2=A0 hw/char/escc.c | 74<br>
-&gt; +++++++++++++++++++++++++++++++++++++++++++++++++++++++++- 1 file chan=
-ged,<br>
-&gt; 73 insertions(+), 1 deletion(-)<br>
-&gt; <br>
-&gt; diff --git a/hw/char/escc.c b/hw/char/escc.c<br>
-&gt; index 7d16ee8688..7287056b5f 100644<br>
-&gt; --- a/hw/char/escc.c<br>
-&gt; +++ b/hw/char/escc.c<br>
-&gt; @@ -30,6 +30,8 @@<br>
-&gt;=C2=A0 #include &quot;qemu/module.h&quot;<br>
-&gt;=C2=A0 #include &quot;hw/char/escc.h&quot;<br>
-&gt;=C2=A0 #include &quot;ui/console.h&quot;<br>
-&gt; +#include &quot;sysemu/sysemu.h&quot;<br>
-&gt; +#include &quot;qemu/cutils.h&quot;<br>
-&gt;=C2=A0 #include &quot;trace.h&quot;<br>
-&gt;=C2=A0 <br>
-&gt;=C2=A0 /*<br>
-&gt; @@ -175,6 +177,7 @@<br>
-&gt;=C2=A0 #define R_MISC1I 14<br>
-&gt;=C2=A0 #define R_EXTINT 15<br>
-&gt;=C2=A0 <br>
-&gt; +static unsigned char sun_keyboard_layout_dip_switch(void);<br>
-&gt;=C2=A0 static void handle_kbd_command(ESCCChannelState *s, int val);<br=
->
-&gt;=C2=A0 static int serial_can_receive(void *opaque);<br>
-&gt;=C2=A0 static void serial_receive_byte(ESCCChannelState *s, int ch);<br=
->
-&gt; @@ -730,6 +733,75 @@ static QemuInputHandler sunkbd_handler =3D {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 .event =3D sunkbd_handle_event,<br>
-&gt;=C2=A0 };<br>
-&gt;=C2=A0 <br>
-&gt; +static unsigned char sun_keyboard_layout_dip_switch(void)<br>
-&gt; +{<br>
-&gt; +=C2=A0 =C2=A0 /* Return the value of the dip-switches in a SUN Type 5=
- keyboard */<br>
-&gt; +=C2=A0 =C2=A0 static unsigned char ret =3D 0xff;<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 if ((ret =3D=3D 0xff) &amp;&amp; keyboard_layout) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 int i;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct layout_values {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 const char *lang;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 unsigned char dip;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 } languages[] =3D<br>
-&gt; +=C2=A0 =C2=A0 /* Dip values from table 3-16 Layouts for Type 4, 5, an=
-d 5c Keyboards<br>
-&gt; */+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;en-us&=
-quot;, 0x21}, /* U.S.A. (US5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* 0x22 is some other US (=
-US_UNIX5.kt)*/<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;fr&quo=
-t;,=C2=A0 =C2=A0 0x23}, /* France (France5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;da&quo=
-t;,=C2=A0 =C2=A0 0x24}, /* Denmark (Denmark5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;de&quo=
-t;,=C2=A0 =C2=A0 0x25}, /* Germany (Germany5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;it&quo=
-t;,=C2=A0 =C2=A0 0x26}, /* Italy (Italy5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;nl&quo=
-t;,=C2=A0 =C2=A0 0x27}, /* The Netherlands (Netherland5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;no&quo=
-t;,=C2=A0 =C2=A0 0x28}, /* Norway (Norway.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;pt&quo=
-t;,=C2=A0 =C2=A0 0x29}, /* Portugal (Portugal5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;es&quo=
-t;,=C2=A0 =C2=A0 0x2a}, /* Spain (Spain5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;sv&quo=
-t;,=C2=A0 =C2=A0 0x2b}, /* Sweden (Sweden5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;fr-ch&=
-quot;, 0x2c}, /* Switzerland/French (Switzer_Fr5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;de-ch&=
-quot;, 0x2d}, /* Switzerland/German (Switzer_Ge5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;en-gb&=
-quot;, 0x2e}, /* Great Britain (UK5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;ko&quo=
-t;,=C2=A0 =C2=A0 0x2f}, /* Korea (Korea5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;tw&quo=
-t;,=C2=A0 =C2=A0 0x30}, /* Taiwan (Taiwan5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;ja&quo=
-t;,=C2=A0 =C2=A0 0x31}, /* Japan (Japan5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;fr-ca&=
-quot;, 0x32}, /* Canada/French (Canada_Fr5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;hu&quo=
-t;,=C2=A0 =C2=A0 0x33}, /* Hungary (Hungary5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;pl&quo=
-t;,=C2=A0 =C2=A0 0x34}, /* Poland (Poland5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;cz&quo=
-t;,=C2=A0 =C2=A0 0x35}, /* Czech (Czech5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;ru&quo=
-t;,=C2=A0 =C2=A0 0x36}, /* Russia (Russia5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;lv&quo=
-t;,=C2=A0 =C2=A0 0x37}, /* Latvia (Latvia5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;tr&quo=
-t;,=C2=A0 =C2=A0 0x38}, /* Turkey-Q5 (TurkeyQ5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;gr&quo=
-t;,=C2=A0 =C2=A0 0x39}, /* Greece (Greece5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;ar&quo=
-t;,=C2=A0 =C2=A0 0x3a}, /* Arabic (Arabic5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;lt&quo=
-t;,=C2=A0 =C2=A0 0x3b}, /* Lithuania (Lithuania5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;nl-be&=
-quot;, 0x3c}, /* Belgium (Belgian5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 {&quot;be&quo=
-t;,=C2=A0 =C2=A0 0x3c}, /* Belgium (Belgian5.kt) */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 };<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 for (i =3D 0;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0i &lt; sizeof(languag=
-es) / sizeof(struct layout_values);<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0i++) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!strcmp(keyboard_layout=
-, languages[i].lang)) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ret =3D langu=
-ages[i].dip;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return ret;<b=
-r>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* Found no known language code */<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if ((keyboard_layout[0] &gt;=3D &#39;0&#3=
-9;) &amp;&amp; (keyboard_layout[0] &lt;=3D &#39;9&#39;)) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 unsigned int tmp;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* As a fallback we also ac=
-cept numeric dip switch value */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!qemu_strtoui(keyboard_=
-layout, NULL, 0, &amp;tmp)) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ret =3D (unsi=
-gned char)tmp;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-&gt; +=C2=A0 =C2=A0 }<br>
-&gt; +=C2=A0 =C2=A0 if (ret =3D=3D 0xff) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* Final fallback if keyboard_layout was =
-not set or recognized */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 ret =3D 0x21; /* en-us layout */<br>
-&gt; +=C2=A0 =C2=A0 }<br>
-&gt; +=C2=A0 =C2=A0 return ret;<br>
-&gt; +}<br>
-&gt; +<br>
-&gt;=C2=A0 static void handle_kbd_command(ESCCChannelState *s, int val)<br>
-&gt;=C2=A0 {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 trace_escc_kbd_command(val);<br>
-&gt; @@ -751,7 +823,7 @@ static void handle_kbd_command(ESCCChannelState *s=
-, int<br>
-&gt; val)=C2=A0 =C2=A0 =C2=A0case 0xf:<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 clear_queue(s);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 put_queue(s, 0xfe);<br>
-&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 put_queue(s, 0x21); /*=C2=A0 en-us layout=
- */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 put_queue(s, sun_keyboard_layout_dip_swit=
-ch());<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 default:<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; -- <br>
-&gt; 2.14.5<br>
-</blockquote></div>
-
---00000000000068ac2e05b1521daa--
 
