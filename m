@@ -7,67 +7,66 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0428AC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:04:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FDD3C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:05:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96E84207CD
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:04:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C4A03207E8
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:05:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AKQ8Qo+n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96E84207CD
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CDQDguxr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4A03207E8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kR9s2-0004Wx-Ki
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 04:04:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41166)
+	id 1kR9sT-0005QU-UN
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 04:05:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41244)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kR9lL-0004AL-AZ
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:57:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33073)
+ id 1kR9lO-0004KA-Rs
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:57:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31816)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kR9lH-0006hB-7T
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:57:54 -0400
+ id 1kR9lM-0006ih-SC
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:57:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602316670;
+ s=mimecast20190719; t=1602316676;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ap5B3O2G0s264ofaD39BatliuZQ27lLQn7/XxTv7jqk=;
- b=AKQ8Qo+nUceCSmUhFT0477EPZnueI57P9iPssRRkFXlJjF0OMdaapTyEz9C4TgHMUr04vQ
- 5YA9iwCBUZa+8IXrnA3PB8u8RWQCBPWXvOgdH64TZXeI0vnWMVlo8aTD+9khFKBg3W3q++
- XiLYkcobC/z9WSFV1tFCfhWSuCGKDLc=
+ bh=WSybe/F61UcKWf9cKwsuGQfmd1CuQH+qTGEvPZqxSsI=;
+ b=CDQDguxrzIbLr9xKpGEjotKbF8+86cyGkh0Akq1RFPLHj12hgzCW4q/+OW70NY76IaUtMf
+ 8WREPg3w0kPgiN9B/fHLKqQ/J8Rfiljd6e4p0D9J3LshrdvaR+WvXg4CphqL0uZwMMdZps
+ QAFdi4/1s3Eeqiol4Oo/plnphjs1qUU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-13-O-kut3bJNmO4g76ua3Rbew-1; Sat, 10 Oct 2020 03:57:48 -0400
-X-MC-Unique: O-kut3bJNmO4g76ua3Rbew-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-225-XqUTHjn6NSyBfjm_iqhvAg-1; Sat, 10 Oct 2020 03:57:54 -0400
+X-MC-Unique: XqUTHjn6NSyBfjm_iqhvAg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C281C1005E6C
- for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 07:57:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0ADA3FE8
+ for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 07:57:53 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 90FB56EF4F
- for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 07:57:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5E78560C07;
+ Sat, 10 Oct 2020 07:57:53 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 19/39] docs/devel: update instruction on how to add new unit
- tests
-Date: Sat, 10 Oct 2020 03:57:19 -0400
-Message-Id: <20201010075739.951385-20-pbonzini@redhat.com>
+Subject: [PULL 23/39] qtest: Reintroduce qtest_qmp_receive
+Date: Sat, 10 Oct 2020 03:57:23 -0400
+Message-Id: <20201010075739.951385-24-pbonzini@redhat.com>
 In-Reply-To: <20201010075739.951385-1-pbonzini@redhat.com>
 References: <20201010075739.951385-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -97,87 +96,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Maxim Levitsky <mlevitsk@redhat.com>
+
+The new qtest_qmp_receive buffers all the received qmp events, allowing
+qtest_qmp_eventwait_ref to return them.
+
+This is intended to solve the race in regard to ordering of qmp events
+vs qmp responses, as soon as the callers start using the new interface.
+
+In addition to that, define qtest_qmp_event_ref a function which only scans
+the buffer that qtest_qmp_receive stores the events to.
+
+This is intended for callers that are only interested in events that were
+received during the last call to the qtest_qmp_receive.
+
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Message-Id: <20201006123904.610658-3-mlevitsk@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- docs/devel/qtest.rst   | 30 +++++++++++++++++++++---------
- docs/devel/testing.rst | 19 ++++++++++---------
- 2 files changed, 31 insertions(+), 18 deletions(-)
+ tests/qtest/libqos/libqtest.h | 23 ++++++++++++++++
+ tests/qtest/libqtest.c        | 49 ++++++++++++++++++++++++++++++++++-
+ 2 files changed, 71 insertions(+), 1 deletion(-)
 
-diff --git a/docs/devel/qtest.rst b/docs/devel/qtest.rst
-index 075fe5f7d5..97c5a75626 100644
---- a/docs/devel/qtest.rst
-+++ b/docs/devel/qtest.rst
-@@ -33,15 +33,27 @@ Steps to add a new QTest case are:
- 2. Write the test code with the glib and libqtest/libqos API. See also existing
-    tests and the library headers for reference.
+diff --git a/tests/qtest/libqos/libqtest.h b/tests/qtest/libqos/libqtest.h
+index 9b3f99b322..a2e3961792 100644
+--- a/tests/qtest/libqos/libqtest.h
++++ b/tests/qtest/libqos/libqtest.h
+@@ -198,6 +198,16 @@ void qtest_qmp_vsend(QTestState *s, const char *fmt, va_list ap)
+  */
+ QDict *qtest_qmp_receive_dict(QTestState *s);
  
--3. Register the new test in ``tests/qtest/Makefile.include``. Add the test
--   executable name to an appropriate ``check-qtest-*-y`` variable. For example:
--
--   ``check-qtest-generic-y = tests/qtest/foo-test$(EXESUF)``
--
--4. Add object dependencies of the executable in the Makefile, including the
--   test source file(s) and other interesting objects. For example:
--
--   ``tests/qtest/foo-test$(EXESUF): tests/qtest/foo-test.o $(libqos-obj-y)``
-+3. Register the new test in ``tests/qtest/meson.build``. Add the test
-+   executable name to an appropriate ``qtests_*`` variable. There is
-+   one variable per architecture, plus ``qtests_generic`` for tests
-+   that can be run for all architectures.  For example::
++/**
++ * qtest_qmp_receive:
++ * @s: #QTestState instance to operate on.
++ *
++ * Reads a QMP message from QEMU and returns the response.
++ * Buffers all the events received meanwhile, until a
++ * call to qtest_qmp_eventwait
++ */
++QDict *qtest_qmp_receive(QTestState *s);
 +
-+     qtests_generic = [
-+       ...
-+       'foo-test',
-+       ...
-+     ]
-+
-+4. If the test has more than one source file or needs to be linked with any
-+   dependency other than ``qemuutil`` and ``qos``, list them in the ``qtests``
-+   dictionary.  For example a test that needs to use the ``QIO`` library
-+   will have an entry like::
-+
-+     {
-+       ...
-+       'foo-test': [io],
-+       ...
-+     }
+ /**
+  * qtest_qmp_eventwait:
+  * @s: #QTestState instance to operate on.
+@@ -217,6 +227,19 @@ void qtest_qmp_eventwait(QTestState *s, const char *event);
+  */
+ QDict *qtest_qmp_eventwait_ref(QTestState *s, const char *event);
  
- Debugging a QTest failure is slightly harder than the unit test because the
- tests look up QEMU program names in the environment variables, such as
-diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-index a171494b4e..cecee6eaa1 100644
---- a/docs/devel/testing.rst
-+++ b/docs/devel/testing.rst
-@@ -41,15 +41,16 @@ add a new unit test:
-    test. The test code should be organized with the glib testing framework.
-    Copying and modifying an existing test is usually a good idea.
- 
--3. Add the test to ``tests/Makefile.include``. First, name the unit test
--   program and add it to ``$(check-unit-y)``; then add a rule to build the
--   executable.  For example:
--
--.. code::
--
--  check-unit-y += tests/foo-test$(EXESUF)
--  tests/foo-test$(EXESUF): tests/foo-test.o $(test-util-obj-y)
--  ...
-+3. Add the test to ``tests/meson.build``. The unit tests are listed in a
-+   dictionary called ``tests``.  The values are any additional sources and
-+   dependencies to be linked with the test.  For a simple test whose source
-+   is in ``tests/foo-test.c``, it is enough to add an entry like::
++/**
++ * qtest_qmp_event_ref:
++ * @s: #QTestState instance to operate on.
++ * @s: #event event to return.
++ *
++ * Removes non-matching events from the buffer that was set by
++ * qtest_qmp_receive, until an event bearing the given name is found,
++ * and returns it.
++ * If no event matches, clears the buffer and returns NULL.
++ *
++ */
++QDict *qtest_qmp_event_ref(QTestState *s, const char *event);
 +
-+     {
-+       ...
-+       'foo-test': [],
-+       ...
-+     }
+ /**
+  * qtest_qmp_receive_success:
+  * @s: #QTestState instance to operate on
+diff --git a/tests/qtest/libqtest.c b/tests/qtest/libqtest.c
+index dadc465825..d4c49a52ff 100644
+--- a/tests/qtest/libqtest.c
++++ b/tests/qtest/libqtest.c
+@@ -63,6 +63,7 @@ struct QTestState
+     bool irq_level[MAX_IRQ];
+     GString *rx;
+     QTestTransportOps ops;
++    GList *pending_events;
+ };
  
- Since unit tests don't require environment variables, the simplest way to debug
- a unit test failure is often directly invoking it or even running it under
+ static GHookList abrt_hooks;
+@@ -279,6 +280,7 @@ QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
+ 
+     g_test_message("starting QEMU: %s", command);
+ 
++    s->pending_events = NULL;
+     s->wstatus = 0;
+     s->expected_status = 0;
+     s->qemu_pid = fork();
+@@ -386,6 +388,13 @@ void qtest_quit(QTestState *s)
+     close(s->fd);
+     close(s->qmp_fd);
+     g_string_free(s->rx, true);
++
++    for (GList *it = s->pending_events; it != NULL; it = it->next) {
++        qobject_unref((QDict *)it->data);
++    }
++
++    g_list_free(s->pending_events);
++
+     g_free(s);
+ }
+ 
+@@ -603,6 +612,19 @@ QDict *qmp_fd_receive(int fd)
+     return qmp.response;
+ }
+ 
++QDict *qtest_qmp_receive(QTestState *s)
++{
++    while (true) {
++        QDict *response = qtest_qmp_receive_dict(s);
++
++        if (!qdict_get_try_str(response, "event")) {
++            return response;
++        }
++        /* Stash the event for a later consumption */
++        s->pending_events = g_list_prepend(s->pending_events, response);
++    }
++}
++
+ QDict *qtest_qmp_receive_dict(QTestState *s)
+ {
+     return qmp_fd_receive(s->qmp_fd);
+@@ -771,10 +793,34 @@ void qtest_qmp_send_raw(QTestState *s, const char *fmt, ...)
+     va_end(ap);
+ }
+ 
+-QDict *qtest_qmp_eventwait_ref(QTestState *s, const char *event)
++QDict *qtest_qmp_event_ref(QTestState *s, const char *event)
+ {
++    GList *next = NULL;
+     QDict *response;
+ 
++    for (GList *it = s->pending_events; it != NULL; it = next) {
++
++        next = it->next;
++        response = (QDict *)it->data;
++
++        s->pending_events = g_list_remove_link(s->pending_events, it);
++
++        if (!strcmp(qdict_get_str(response, "event"), event)) {
++            return response;
++        }
++        qobject_unref(response);
++    }
++    return NULL;
++}
++
++QDict *qtest_qmp_eventwait_ref(QTestState *s, const char *event)
++{
++    QDict *response = qtest_qmp_event_ref(s, event);
++
++    if (response) {
++        return response;
++    }
++
+     for (;;) {
+         response = qtest_qmp_receive_dict(s);
+         if ((qdict_haskey(response, "event")) &&
+@@ -1403,6 +1449,7 @@ QTestState *qtest_inproc_init(QTestState **s, bool log, const char* arch,
+ {
+     QTestState *qts;
+     qts = g_new0(QTestState, 1);
++    qts->pending_events = NULL;
+     *s = qts; /* Expose qts early on, since the query endianness relies on it */
+     qts->wstatus = 0;
+     for (int i = 0; i < MAX_IRQ; i++) {
 -- 
 2.26.2
 
