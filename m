@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFA31C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 10:09:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FD03C433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 10:09:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FB142076E
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 10:09:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D0B02076E
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 10:09:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F0GO1oEJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FB142076E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TCcOoJ87"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D0B02076E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRBog-0001cC-Fg
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 06:09:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60660)
+	id 1kRBoh-0001hI-7T
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 06:09:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60622)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kRBb4-0007xe-D4
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 05:55:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32103)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kRBb2-0007tA-Ug
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 05:55:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26674)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kRBas-0002jM-E1
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 05:55:26 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kRBas-0002ir-Bx
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 05:55:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1602323713;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=teg6YPy7SrpS5RyPeZGsvswgMTo2zeFLl1yT8V/nYvs=;
- b=F0GO1oEJqvJfuD9HWfCcz65qKnaNS+FI3GC0ZKwf7eX3OA4y67rp1/YoCz9OjfnKSY7YwO
- meTWtokohi44pbm3uDqNXdU9PsELNUnzMtek9CCcv82mazguJ9gOxO7FJWeph5g8T+WrKg
- adFgb3OUFntoZ6flqY4At49slst/LpA=
+ bh=5IMU/5TekK8iNjCr/V/NVwjQCPdve+f7g0idPU0XfUU=;
+ b=TCcOoJ87TavkkA+m+pYXNHLD3p/PwooKKwyne4jU9Aed/DCF2J23OjjvVYO/emectH4qhl
+ ZiS9cviWM2kELf1oTO1rULzByqHhB3lIn8gROFb9bcUS7OR845B5XIGDIyNHWazW4RMYbU
+ fsvQXRsYK1wETle040ej5ZNfBRHKkr8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-154-B_pus3--NkKv4pscs-G4Fg-1; Sat, 10 Oct 2020 05:55:11 -0400
-X-MC-Unique: B_pus3--NkKv4pscs-G4Fg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-144-Q8xOceREP8qEUPk5aPxaTg-1; Sat, 10 Oct 2020 05:55:10 -0400
+X-MC-Unique: Q8xOceREP8qEUPk5aPxaTg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4CBED805F0D;
- Sat, 10 Oct 2020 09:55:10 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C7D63802B74;
+ Sat, 10 Oct 2020 09:55:09 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
  [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1D40C672C6;
- Sat, 10 Oct 2020 09:55:10 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9356A1001281;
+ Sat, 10 Oct 2020 09:55:09 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 043CE11275D0; Sat, 10 Oct 2020 11:55:05 +0200 (CEST)
+ id DAE031129953; Sat, 10 Oct 2020 11:55:04 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 29/34] qapi/gen.py: delint with pylint
-Date: Sat, 10 Oct 2020 11:54:59 +0200
-Message-Id: <20201010095504.796182-30-armbru@redhat.com>
+Subject: [PULL 20/34] qapi/events.py: Move comments into docstrings
+Date: Sat, 10 Oct 2020 11:54:50 +0200
+Message-Id: <20201010095504.796182-21-armbru@redhat.com>
 In-Reply-To: <20201010095504.796182-1-armbru@redhat.com>
 References: <20201010095504.796182-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -104,62 +104,36 @@ Sender: "Qemu-devel"
 
 From: John Snow <jsnow@redhat.com>
 
-'fp' and 'fd' are self-evident in context, add them to the list of OK
-names.
-
-_top and _bottom also need to stay standard methods because some users
-override the method and need to use `self`. Tell pylint to shush.
+Clarify them while we're here.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: Cleber Rosa <crosa@redhat.com>
-Message-Id: <20201009161558.107041-32-jsnow@redhat.com>
+Message-Id: <20201009161558.107041-21-jsnow@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi/gen.py   | 2 ++
- scripts/qapi/pylintrc | 5 +++--
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ scripts/qapi/events.py | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
-index 670c21e210..b40f18eee3 100644
---- a/scripts/qapi/gen.py
-+++ b/scripts/qapi/gen.py
-@@ -51,9 +51,11 @@ class QAPIGen:
-         return self._top() + self._preamble + self._body + self._bottom()
+diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
+index 57e0939e96..599f3d1f56 100644
+--- a/scripts/qapi/events.py
++++ b/scripts/qapi/events.py
+@@ -44,8 +44,12 @@ def gen_event_send_decl(name: str,
+                  proto=build_event_send_proto(name, arg_type, boxed))
  
-     def _top(self) -> str:
-+        # pylint: disable=no-self-use
-         return ''
  
-     def _bottom(self) -> str:
-+        # pylint: disable=no-self-use
-         return ''
- 
-     def write(self, output_dir: str) -> None:
-diff --git a/scripts/qapi/pylintrc b/scripts/qapi/pylintrc
-index d840b15031..8badcb11cd 100644
---- a/scripts/qapi/pylintrc
-+++ b/scripts/qapi/pylintrc
-@@ -4,7 +4,6 @@
- # The regex matches against base names, not paths.
- ignore-patterns=error.py,
-                 expr.py,
--                gen.py,
-                 parser.py,
-                 schema.py,
-                 types.py,
-@@ -45,7 +44,9 @@ good-names=i,
-            k,
-            ex,
-            Run,
--           _
-+           _,
-+           fp,  # fp = open(...)
-+           fd,  # fd = os.open(...)
- 
- [VARIABLES]
- 
+-# Declare and initialize an object 'qapi' using parameters from build_params()
+ def gen_param_var(typ: QAPISchemaObjectType) -> str:
++    """
++    Generate a struct variable holding the event parameters.
++
++    Initialize it with the function arguments defined in `gen_event_send`.
++    """
+     assert not typ.variants
+     ret = mcgen('''
+     %(c_name)s param = {
 -- 
 2.26.2
 
