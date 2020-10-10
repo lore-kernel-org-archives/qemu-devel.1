@@ -2,72 +2,71 @@ Return-Path: <SRS0=BZbV=DR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5301EC433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:21:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D44F7C433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:22:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA271207C4
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:21:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33E73207C4
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:22:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q27/TSfi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA271207C4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OlpK63E0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33E73207C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRA7s-0003VF-3i
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 04:21:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41278)
+	id 1kRA8m-0004GT-2D
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 04:22:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41428)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kR9lQ-0004Pt-Hc
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:58:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30892)
+ id 1kR9lb-0004fE-Ud
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:58:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40277)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kR9lO-0006jB-GL
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:58:00 -0400
+ id 1kR9lZ-0006mN-Tn
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:58:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602316677;
+ s=mimecast20190719; t=1602316688;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2QR+l/N8Obv+SdC/2ljxqyyDY0N4TRXJQixylW9KYaw=;
- b=Q27/TSfiTZzWSE7gvEQHi6xPdbJVXwZLndSTtQBDyzxS/1xOy61Y1wMi+r6Nn/kc7/4RU4
- nKM8i3jEqlJsfyoFl16r3IA1ZnXjY0ME00g951tj9pDOrEcJgChTbdnRwP6r8ls3B9t6V9
- UYIDKTRlkmPzHlUJIopgNAWYIiQ40UI=
+ bh=U0UUOtrq1fQ0NSBTSHvIDAywl8g3kvLSProVYS7MmD4=;
+ b=OlpK63E0ELBabMvdEnrmUxBqDrWRND9I5HeT+bEjZ2N5ejOYVEP2fPTTf0UFV4CC6PoBIZ
+ /0PQ2T3Iyw/xsP/LDQdHEeaxdil4gPODoTdlkdE9i/v5AasXiibGy3dEFJZXGOAabh2Z2i
+ pemkoOemjjD3hXr8ghXmToW0CF7prCs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-287-6XwVd9JnOBiGCnv4uY_0RQ-1; Sat, 10 Oct 2020 03:57:56 -0400
-X-MC-Unique: 6XwVd9JnOBiGCnv4uY_0RQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-223-RcjmjQ9FN4WpZ2Y6d2kr0w-1; Sat, 10 Oct 2020 03:58:06 -0400
+X-MC-Unique: RcjmjQ9FN4WpZ2Y6d2kr0w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 257D1107B470
- for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 07:57:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6AA381005E61
+ for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 07:58:05 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D3B0F60C07;
- Sat, 10 Oct 2020 07:57:54 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 15F6D10021AA;
+ Sat, 10 Oct 2020 07:58:05 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 27/39] qtest: check that drives are really appearing and
- disappearing
-Date: Sat, 10 Oct 2020 03:57:27 -0400
-Message-Id: <20201010075739.951385-28-pbonzini@redhat.com>
+Subject: [PULL 38/39] scsi/scsi_bus: fix races in REPORT LUNS
+Date: Sat, 10 Oct 2020 03:57:38 -0400
+Message-Id: <20201010075739.951385-39-pbonzini@redhat.com>
 In-Reply-To: <20201010075739.951385-1-pbonzini@redhat.com>
 References: <20201010075739.951385-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -97,83 +96,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Do not just trust the HMP commands to create and delete the drive, use
-query-block to check that this is actually the case.
+From: Maxim Levitsky <mlevitsk@redhat.com>
 
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Currently scsi_target_emulate_report_luns iterates over the child device list
+twice, and there is no guarantee that this list is the same in both iterations.
+
+The reason for iterating twice is that the first iteration calculates
+how much memory to allocate.  However if we use a dynamic array we can
+avoid iterating twice, and therefore we avoid this race.
+
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1866707
+
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20200913160259.32145-10-mlevitsk@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <20201006123904.610658-14-mlevitsk@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/qtest/drive_del-test.c | 32 +++++++++++++++++++++++++++++++-
- 1 file changed, 31 insertions(+), 1 deletion(-)
+ hw/scsi/scsi-bus.c | 68 ++++++++++++++++++++++------------------------
+ 1 file changed, 33 insertions(+), 35 deletions(-)
 
-diff --git a/tests/qtest/drive_del-test.c b/tests/qtest/drive_del-test.c
-index 9d20a1ed8b..ff772b3671 100644
---- a/tests/qtest/drive_del-test.c
-+++ b/tests/qtest/drive_del-test.c
-@@ -14,20 +14,49 @@
- #include "libqos/libqtest.h"
- #include "libqos/virtio.h"
- #include "qapi/qmp/qdict.h"
-+#include "qapi/qmp/qlist.h"
-+
-+static bool has_drive(QTestState *qts)
-+{
-+    QDict *response;
-+    QList *ret;
-+    QListEntry *entry;
-+    bool found;
-+
-+    response = qtest_qmp(qts, "{'execute': 'query-block'}");
-+    g_assert(response && qdict_haskey(response, "return"));
-+    ret = qdict_get_qlist(response, "return");
-+
-+    found = false;
-+    QLIST_FOREACH_ENTRY(ret, entry) {
-+        QDict *entry_dict = qobject_to(QDict, entry->value);
-+        if (!strcmp(qdict_get_str(entry_dict, "device"), "drive0")) {
-+            found = true;
-+            break;
-+        }
-+    }
-+
-+    qobject_unref(response);
-+    return found;
-+}
- 
- static void drive_add(QTestState *qts)
+diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+index eda8cb7e70..b901e701f0 100644
+--- a/hw/scsi/scsi-bus.c
++++ b/hw/scsi/scsi-bus.c
+@@ -438,19 +438,23 @@ struct SCSITargetReq {
+ static void store_lun(uint8_t *outbuf, int lun)
  {
-     char *resp = qtest_hmp(qts, "drive_add 0 if=none,id=drive0");
- 
-     g_assert_cmpstr(resp, ==, "OK\r\n");
-+    g_assert(has_drive(qts));
-     g_free(resp);
+     if (lun < 256) {
++        /* Simple logical unit addressing method*/
++        outbuf[0] = 0;
+         outbuf[1] = lun;
+-        return;
++    } else {
++        /* Flat space addressing method */
++        outbuf[0] = 0x40 | (lun >> 8);
++        outbuf[1] = (lun & 255);
+     }
+-    outbuf[1] = (lun & 255);
+-    outbuf[0] = (lun >> 8) | 0x40;
  }
  
- static void drive_del(QTestState *qts)
+ static bool scsi_target_emulate_report_luns(SCSITargetReq *r)
  {
--    char *resp = qtest_hmp(qts, "drive_del drive0");
-+    char *resp;
+     BusChild *kid;
+-    int i, len, n;
+     int channel, id;
+-    bool found_lun0;
++    uint8_t tmp[8] = {0};
++    int len = 0;
++    GByteArray *buf;
  
-+    g_assert(has_drive(qts));
-+    resp = qtest_hmp(qts, "drive_del drive0");
-     g_assert_cmpstr(resp, ==, "");
-+    g_assert(!has_drive(qts));
-     g_free(resp);
+     if (r->req.cmd.xfer < 16) {
+         return false;
+@@ -458,46 +462,40 @@ static bool scsi_target_emulate_report_luns(SCSITargetReq *r)
+     if (r->req.cmd.buf[2] > 2) {
+         return false;
+     }
++
++    /* reserve space for 63 LUNs*/
++    buf = g_byte_array_sized_new(512);
++
+     channel = r->req.dev->channel;
+     id = r->req.dev->id;
+-    found_lun0 = false;
+-    n = 0;
+ 
+-    RCU_READ_LOCK_GUARD();
++    /* add size (will be updated later to correct value */
++    g_byte_array_append(buf, tmp, 8);
++    len += 8;
+ 
+-    QTAILQ_FOREACH_RCU(kid, &r->req.bus->qbus.children, sibling) {
+-        DeviceState *qdev = kid->child;
+-        SCSIDevice *dev = SCSI_DEVICE(qdev);
++    /* add LUN0 */
++    g_byte_array_append(buf, tmp, 8);
++    len += 8;
+ 
+-        if (dev->channel == channel && dev->id == id) {
+-            if (dev->lun == 0) {
+-                found_lun0 = true;
++    WITH_RCU_READ_LOCK_GUARD() {
++        QTAILQ_FOREACH_RCU(kid, &r->req.bus->qbus.children, sibling) {
++            DeviceState *qdev = kid->child;
++            SCSIDevice *dev = SCSI_DEVICE(qdev);
++
++            if (dev->channel == channel && dev->id == id && dev->lun != 0) {
++                store_lun(tmp, dev->lun);
++                g_byte_array_append(buf, tmp, 8);
++                len += 8;
+             }
+-            n += 8;
+         }
+     }
+-    if (!found_lun0) {
+-        n += 8;
+-    }
+-
+-    scsi_target_alloc_buf(&r->req, n + 8);
+-
+-    len = MIN(n + 8, r->req.cmd.xfer & ~7);
+-    memset(r->buf, 0, len);
+-    stl_be_p(&r->buf[0], n);
+-    i = found_lun0 ? 8 : 16;
+-    QTAILQ_FOREACH_RCU(kid, &r->req.bus->qbus.children, sibling) {
+-        DeviceState *qdev = kid->child;
+-        SCSIDevice *dev = SCSI_DEVICE(qdev);
+ 
+-        if (dev->channel == channel && dev->id == id) {
+-            store_lun(&r->buf[i], dev->lun);
+-            i += 8;
+-        }
+-    }
++    r->buf_len = len;
++    r->buf = g_byte_array_free(buf, FALSE);
++    r->len = MIN(len, r->req.cmd.xfer & ~7);
+ 
+-    assert(i == n + 8);
+-    r->len = len;
++    /* store the LUN list length */
++    stl_be_p(&r->buf[0], len - 8);
+     return true;
  }
  
-@@ -130,6 +159,7 @@ static void test_drive_del_device_del(void)
-      */
-     drive_del(qts);
-     device_del(qts);
-+    g_assert(!has_drive(qts));
- 
-     qtest_quit(qts);
- }
 -- 
 2.26.2
 
