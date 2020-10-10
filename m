@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 404A0C433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 17:32:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 664A7C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 17:32:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2B2C2227E
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 17:32:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A2E52227E
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 17:32:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VNZIODbJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2B2C2227E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YxY18DeN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A2E52227E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42510 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRIjR-0005SL-U5
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 13:32:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54988)
+	id 1kRIjS-0005TR-Og
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 13:32:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54964)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRIdZ-0000Qs-Ga
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 13:26:29 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42069)
+ id 1kRIdW-0000L3-OS
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 13:26:26 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52512)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRIdX-0003qj-WD
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 13:26:29 -0400
-Received: by mail-wr1-x444.google.com with SMTP id e18so13666902wrw.9
- for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 10:26:27 -0700 (PDT)
+ id 1kRIdV-0003qD-3e
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 13:26:26 -0400
+Received: by mail-wm1-x341.google.com with SMTP id e23so5862594wme.2
+ for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 10:26:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=MCMj0TR+Fl9dY8Kl27uG0iFSZwgVew5RPBCHaa3rL38=;
- b=VNZIODbJL37JdFqCpr8kQ4CBc8EulYHr0VJqZx/+Orbb5nKbOzCXCSSo5SB0+FF8kZ
- DnMXv1pEC1DNxu3foBY+noVBDKvyYSdJUOLYqddyKwRkeU/NDFF3nCdbh8uuJY6lK/6J
- dJx6VTVZ/N7qtjHogWgQ6psBGWpq81OHQ67UVR3iHo0BzhsNqzezDmqFm/7V/HtYmrsq
- SLmtS/nTXTbWl9jdXDeB3hLY+gKiUHKf2DpZfj1jPMSh5sH9IpIklriETN0+Q9a//ubL
- viJpNFEgJDbo7sWmjTafCQssG3sIGs5npE3smZJRztLKTv3qS8ZYEC7TAtgD/3ItfCh/
- oigQ==
+ bh=PwcUcNfmDXAXz3ZdCfHv1ZWyP4lS5DeJuKN8TDRFEM0=;
+ b=YxY18DeNnYphjJN08LdP4vD11Hqv0wBT99crsSbj7pox1gHolSw5StCK+5um6v72fM
+ 0o5JFxmSlxOGMXTbHgi3bFOhF/K6tmoqlVGU94/hYuKlin+kE4as/7PIRoyyH5YvpDCA
+ tq76hBnpyRUfTbtcY3j16zrMRB/W34zrD29mrR6mKvaqaDQDWJ1BDwBNMlvh043fLPA2
+ Q+6oc8k8HuFi5JwJEc8av9clvKJv/6o+wgjqFWdrNxghP5qH0eK/EIIohwzplfBHHuDq
+ 8GyZbdMK5r5Ry3bSEkT7jjPSs1Rr5Zt7E6v+1mOMIh9sXfrysuokVPrPfiieVLuvw1aj
+ KfTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=MCMj0TR+Fl9dY8Kl27uG0iFSZwgVew5RPBCHaa3rL38=;
- b=BpAmybVLDcqfwZkzdviBhda+2ZnzNrTqLn0TInZe//j18XXgROeXnm6WM/aFnLeS6y
- 8rxKZETYV45HNkeZ2+3YLQDZpPtnuDd5IS60xVAbjzxt4JRCBooT2RE63pPuILUJT0ZD
- HpJVcmNVXHwDmY0SVmvDhv/ybN3hwU68muhFkEdY/2F7XPbtwzBWAjWSnJYnUby7E7cQ
- NWWk1E1vldBRUMnKMPM7m5miNgf6CK7LZQujbBj8G/LAzzhD8ptiEunGnhnIJJik+F4k
- /AYc7yKxMxr/ewN03gmq+jNpltmhuIqlhuyiX3W7H/052EEoiGElhooFXf4vp1KY0O4B
- 81Ow==
-X-Gm-Message-State: AOAM532bXnlR5i/VVHpSBVaUIT6/YwOSpSwKUvNJ9o2bzsILXMCPI8M1
- WUr8WEcouwv6beH9C4Gu/FE2aPH6W0s=
-X-Google-Smtp-Source: ABdhPJz4lAvTPNnGvkCrGFLKN7Vg2JsNstR2Yc01E+EHwOft1i1t+TkkN39/E911C82DJ7yNtbgn8w==
-X-Received: by 2002:a5d:4d10:: with SMTP id z16mr1004043wrt.360.1602350786429; 
- Sat, 10 Oct 2020 10:26:26 -0700 (PDT)
+ bh=PwcUcNfmDXAXz3ZdCfHv1ZWyP4lS5DeJuKN8TDRFEM0=;
+ b=CilSFx1+oaQPaierZzwK/pQlEmiz1ZKIMFpD2+1/BYMi8nLyr8fJ6N3dccVkD5uD3W
+ /fvyTgHe7pb5bHe9lBeN50rfeSiW0cBzVaCPVUyi7vC1HerwRfN410DyOjPqgnO+cv6+
+ NS+x0S3jd9bcTEwRCfsSGKIiQ/1YCpBHhyn1hPS8kvwYqSO87WfweOiwN7jyWSm8g5Y3
+ skv44kfgiV+H/FPkDSBmlPMAlpdm02/U0ijVhlmsIh6UOs7MiPZ8+S8pk8zGfpQjWvo/
+ nTfXr/zrFb0SNyxyhubjPWbIPO1iLHgDGtjoDFiDuE8LVmlNgCEgIVANRWZiDfXlwFiM
+ qlMA==
+X-Gm-Message-State: AOAM533Bp1RDExu3SUCku37oxJIRCK7oVZtnNjKMld+xZPvjH6bPfcO0
+ lN84VfCI61ZeEBT0tiDr0m9OtaMkR7M=
+X-Google-Smtp-Source: ABdhPJyGcuOeHJiyPmmICuteYtWQrWGzYsWTWQ36xcxa0ucu+AQnw2sm+dRw0AjQv5MhLsOe2CqS6g==
+X-Received: by 2002:a1c:c28a:: with SMTP id s132mr3435280wmf.67.1602350783424; 
+ Sat, 10 Oct 2020 10:26:23 -0700 (PDT)
 Received: from localhost.localdomain
  (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id i11sm16786068wre.32.2020.10.10.10.26.24
+ by smtp.gmail.com with ESMTPSA id i11sm16786068wre.32.2020.10.10.10.26.22
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 10 Oct 2020 10:26:25 -0700 (PDT)
+ Sat, 10 Oct 2020 10:26:22 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 04/20] hw/core/clock: add the clock_new helper function
-Date: Sat, 10 Oct 2020 19:26:01 +0200
-Message-Id: <20201010172617.3079633-5-f4bug@amsat.org>
+Subject: [PATCH v2 02/20] qdev-monitor: Display frequencies scaled to SI unit
+Date: Sat, 10 Oct 2020 19:25:59 +0200
+Message-Id: <20201010172617.3079633-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201010172617.3079633-1-f4bug@amsat.org>
 References: <20201010172617.3079633-1-f4bug@amsat.org>
@@ -79,8 +79,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -110,82 +110,61 @@ Cc: Damien Hedde <damien.hedde@greensocs.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
  Paolo Bonzini <pbonzini@redhat.com>, Huacai Chen <chenhc@lemote.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Luc Michel <luc@lmichel.fr>
+Since commit 9f2ff99c7f2 ("qdev-monitor: print the device's clock
+with info qtree") we can display the clock frequencies in the
+monitor. Use the recently introduced freq_to_str() to display
+the frequencies using the closest SI unit (human friendlier).
 
-This function creates a clock and parents it to another object with a given
-name. It calls clock_setup_canonical_path before returning the new
-clock.
+Before:
 
-This function is useful to create clocks in devices when one doesn't
-want to expose it at the qdev level (as an input or an output).
+  (qemu) info qtree
+  [...]
+  dev: xilinx,zynq_slcr, id ""
+    clock-in "ps_clk" freq_hz=3.333333e+07
+    mmio 00000000f8000000/0000000000001000
 
-Suggested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Luc Michel <luc@lmichel.fr>
-Message-Id: <20201010135759.437903-4-luc@lmichel.fr>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+After:
+
+  dev: xilinx,zynq_slcr, id ""
+    clock-in "ps_clk" freq_hz=33.3 MHz
+    mmio 00000000f8000000/0000000000001000
+
+Reviewed-by: Luc Michel <luc@lmichel.fr>
+Reviewed-by: Damien Hedde <damien.hedde@greensocs.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/clock.h | 13 +++++++++++++
- hw/core/clock.c    | 15 +++++++++++++++
- 2 files changed, 28 insertions(+)
+ qdev-monitor.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/include/hw/clock.h b/include/hw/clock.h
-index d357594df99..cbc5e6ced1e 100644
---- a/include/hw/clock.h
-+++ b/include/hw/clock.h
-@@ -90,6 +90,19 @@ extern const VMStateDescription vmstate_clock;
-  */
- void clock_setup_canonical_path(Clock *clk);
- 
-+/**
-+ * clock_new:
-+ * @parent: the clock parent
-+ * @name: the clock object name
-+ *
-+ * Helper function to create a new clock and parent it to @parent. There is no
-+ * need to call clock_setup_canonical_path on the returned clock as it is done
-+ * by this function.
-+ *
-+ * @return the newly created clock
-+ */
-+Clock *clock_new(Object *parent, const char *name);
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index e9b7228480d..a0301cfca81 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -747,11 +747,13 @@ static void qdev_print(Monitor *mon, DeviceState *dev, int indent)
+         }
+     }
+     QLIST_FOREACH(ncl, &dev->clocks, node) {
+-        qdev_printf("clock-%s%s \"%s\" freq_hz=%e\n",
++        g_autofree char *freq = NULL;
 +
- /**
-  * clock_set_callback:
-  * @clk: the clock to register the callback into
-diff --git a/hw/core/clock.c b/hw/core/clock.c
-index 7066282f7b9..f866717a835 100644
---- a/hw/core/clock.c
-+++ b/hw/core/clock.c
-@@ -23,6 +23,21 @@ void clock_setup_canonical_path(Clock *clk)
-     clk->canonical_path = object_get_canonical_path(OBJECT(clk));
- }
- 
-+Clock *clock_new(Object *parent, const char *name)
-+{
-+    Object *obj;
-+    Clock *clk;
-+
-+    obj = object_new(TYPE_CLOCK);
-+    object_property_add_child(parent, name, obj);
-+    object_unref(obj);
-+
-+    clk = CLOCK(obj);
-+    clock_setup_canonical_path(clk);
-+
-+    return clk;
-+}
-+
- void clock_set_callback(Clock *clk, ClockCallback *cb, void *opaque)
- {
-     clk->callback = cb;
++        freq = freq_to_str(clock_get_hz(ncl->clock));
++        qdev_printf("clock-%s%s \"%s\" freq_hz=%s\n",
+                     ncl->output ? "out" : "in",
+                     ncl->alias ? " (alias)" : "",
+-                    ncl->name,
+-                    CLOCK_PERIOD_TO_HZ(1.0 * clock_get(ncl->clock)));
++                    ncl->name, freq);
+     }
+     class = object_get_class(OBJECT(dev));
+     do {
 -- 
 2.26.2
 
