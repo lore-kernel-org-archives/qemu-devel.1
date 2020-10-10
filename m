@@ -2,76 +2,77 @@ Return-Path: <SRS0=BZbV=DR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F98BC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 20:56:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 953A3C433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 20:56:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4A6B207C4
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 20:56:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1569E207C4
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 20:56:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OOmNf+rC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4A6B207C4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tDItqzi+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1569E207C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRLuh-0006SD-P8
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 16:56:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52168)
+	id 1kRLuu-0006iA-VW
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 16:56:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52170)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRLia-0000sM-8Q
+ id 1kRLia-0000sQ-8p
  for qemu-devel@nongnu.org; Sat, 10 Oct 2020 16:43:52 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39039)
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:33441)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRLiU-0007WG-C1
+ id 1kRLiU-0007WS-Cc
  for qemu-devel@nongnu.org; Sat, 10 Oct 2020 16:43:47 -0400
-Received: by mail-wm1-x341.google.com with SMTP id d3so13267541wma.4
- for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 13:43:43 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id z22so11264504wmi.0
+ for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 13:43:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=0r12VoVMUTuY3t4zO68E4z3Dus4xytIOTYR5/hVgU8s=;
- b=OOmNf+rCJsuY+oq6W29mMirFbIEhjXNPoadgfx2xZYsCkRPnoich8ikQFilhLEHyN3
- jFdsNfI/v3EFTG/rSCKIjxQFPjKsnkrWyCjUyPIEN7jfp+Xv3iY3wdSGw+rAiQLsx3L/
- 0m5uelrWaTSWq3djm6f9qLKfnytoJfKcCaXZDRYD6ubg/lDFF4rqpJ1s1eKp4EJt22Zg
- Zf10ZTkxDS3FgmhYEqfBVwDHou23eG+I1Jtrj6CUscx6o1Q7LFqObF8lntiosgUlcJIp
- TyBEmOxQKKWz3d3yL8tMv/8/P0UDun7fzJCg+bWI5uuqc+NVU6xSUzT8UI/RPAeDXgUn
- SseA==
+ bh=ctIQLLW1NZgbCK7+6hoccFr7568Qu3bl/1p5Xwlr1Ic=;
+ b=tDItqzi+wPveELUj41A3mnXNitrGm8FN/ffYq/Xp0u/VH0xXLm5OKqhLlTv5jTJndj
+ /BCnzXXBfE2kr4BCfXQDolGeYlP7Dpwre3D7j51PR4p9lNyUAHdxSBK1yz3W+buC+7zk
+ PrTYyUubixwhvWOolhb8+y15WCW0Gkd0qpzAJ9CYvpxkfiJx3Z4gpjuBsjG7hMbiZkR8
+ ElkWGG1hoVpgg/lCzUR2H7Eyaaf8eo+hB350QUKW6NwCj2/s2y8VS2kfFpoqTe6bMSYR
+ dfpFfqQdoJcKsxnVdQvCmyuKpCYQJaVs9wRlF5276pUnCI5Qp0QX5ADK7jriVUXdcOoz
+ lBuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=0r12VoVMUTuY3t4zO68E4z3Dus4xytIOTYR5/hVgU8s=;
- b=oFrjdRBuNQal8YzRHFn7Hlu7zjjuO3dtXD+IeFrKxBSZWRYQJM3EploIa/+idgxFsc
- NvhURvlVBEokI8LZHUJhSLi2/iAK6Z3S0EDcZtEcSl+u/p3ODxfZb6ja1pgU3KSgtedQ
- 7MynJIGbNT3bxbTta0HvlOXr+sgcKJyRO0JyAOU7YwsJze8U7xBQAL82socU9yEGgUW3
- Sj0a8oE1fFLDGN1ke1cwoyZd2iDMzbh5DN/QxkWK9mN7AFyGy9l7ZgEJ1JE2q2sgVQDf
- 1eEXiwKFnqF0Q+NmDxyyDOzu2Q0Rer8HDu0qdwAWrqd9IQssgJ4gCoFt/16C/tqLdM9h
- 644w==
-X-Gm-Message-State: AOAM533QWY66A9tE7ByONwCZxXfKq0Gal8InTtXM2YzPkqsjdrQqQqgL
- JhvTaLvCX+TufNYqnNKxWH+imywYY/w=
-X-Google-Smtp-Source: ABdhPJxKRQc9S/7ZR4utn9z55DkplkzkYAI90A8n47/cv+NT0DAgKje7aYoYZ/BXTZkkfrFgvDzmVQ==
-X-Received: by 2002:a1c:ed01:: with SMTP id l1mr4238892wmh.152.1602362622384; 
- Sat, 10 Oct 2020 13:43:42 -0700 (PDT)
+ bh=ctIQLLW1NZgbCK7+6hoccFr7568Qu3bl/1p5Xwlr1Ic=;
+ b=gKgOqhPNolwYUIkZx1p4EK6hK67ai8rfPL3eAOEpnVHokYNRFY4LMcpUWvbjY01Moy
+ LJ9ZpAxB9scWkJW5B5GfOgNuKJuXBtcbn9QTQijJKqTac1cUD3Gr8IRL8Od7M3EWgRVb
+ 6DIOYZM8f0TeCVfOkx4N/tyOfYhxAfRmvEHonyGLtFOJGORh8PNYDAL9bb5GsG5QCjsO
+ wxbQbagUsa9JRIbb6RXCEBBMqDICih3APd4DOUKVhJeCZ6i/q4H8D1WSUUIQzM6dsc6N
+ YtpNsh57CFpMYMZKu+S7jymvaq8I6hoEhjXAwi0xTMln5KIZzmQizh/LEHwAFwf+HVpj
+ JgxQ==
+X-Gm-Message-State: AOAM530CnMG3Svp/xe8Bxle9xxi9JGaXmGe8T8nCrWcgri9XcOwOWGrl
+ xOj9E/jG3zu6Pys0NER9c93Vqjv7sy8=
+X-Google-Smtp-Source: ABdhPJzRwynQDks/MLMvw+sHPH3Vr+5IXy9IL0G8cqpFsPPn1hDmZKbhg7zJYpbVeYoY6WYAoSS/7g==
+X-Received: by 2002:a1c:5401:: with SMTP id i1mr3936604wmb.124.1602362623887; 
+ Sat, 10 Oct 2020 13:43:43 -0700 (PDT)
 Received: from localhost.localdomain
  (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id 205sm2705471wme.38.2020.10.10.13.43.41
+ by smtp.gmail.com with ESMTPSA id 205sm2705471wme.38.2020.10.10.13.43.42
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 10 Oct 2020 13:43:41 -0700 (PDT)
+ Sat, 10 Oct 2020 13:43:43 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 15/20] hw/mips/jazz: Correct CPU frequencies
-Date: Sat, 10 Oct 2020 22:43:14 +0200
-Message-Id: <20201010204319.3119239-16-f4bug@amsat.org>
+Subject: [PATCH v3 16/20] hw/mips/cps: Expose input clock and connect it to
+ CPU cores
+Date: Sat, 10 Oct 2020 22:43:15 +0200
+Message-Id: <20201010204319.3119239-17-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201010204319.3119239-1-f4bug@amsat.org>
 References: <20201010204319.3119239-1-f4bug@amsat.org>
@@ -79,8 +80,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::335;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x335.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -117,62 +118,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Magnum 4000PC CPU runs at 100 MHz, and the Acer PICA-61
-CPU at ~134 MHz.
+Expose a qdev input clock named 'clk-in', and connect it to each
+core to forward-propagate the clock.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/mips/jazz.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+ include/hw/mips/cps.h | 2 ++
+ hw/mips/cps.c         | 3 +++
+ 2 files changed, 5 insertions(+)
 
-diff --git a/hw/mips/jazz.c b/hw/mips/jazz.c
-index 47723093b63..e56e36cf3f7 100644
---- a/hw/mips/jazz.c
-+++ b/hw/mips/jazz.c
-@@ -45,6 +45,7 @@
- #include "hw/audio/pcspk.h"
- #include "hw/input/i8042.h"
+diff --git a/include/hw/mips/cps.h b/include/hw/mips/cps.h
+index 9e35a881366..859a8d4a674 100644
+--- a/include/hw/mips/cps.h
++++ b/include/hw/mips/cps.h
+@@ -21,6 +21,7 @@
+ #define MIPS_CPS_H
+ 
  #include "hw/sysbus.h"
++#include "hw/clock.h"
+ #include "hw/misc/mips_cmgcr.h"
+ #include "hw/intc/mips_gic.h"
+ #include "hw/misc/mips_cpc.h"
+@@ -43,6 +44,7 @@ struct MIPSCPSState {
+     MIPSGICState gic;
+     MIPSCPCState cpc;
+     MIPSITUState itu;
++    Clock *clock;
+ };
+ 
+ qemu_irq get_cps_irq(MIPSCPSState *cps, int pin_number);
+diff --git a/hw/mips/cps.c b/hw/mips/cps.c
+index 23c0f87e41a..915655b91e0 100644
+--- a/hw/mips/cps.c
++++ b/hw/mips/cps.c
+@@ -22,6 +22,7 @@
+ #include "qemu/module.h"
+ #include "hw/mips/cps.h"
+ #include "hw/mips/mips.h"
 +#include "hw/qdev-clock.h"
- #include "exec/address-spaces.h"
- #include "sysemu/qtest.h"
- #include "sysemu/reset.h"
-@@ -145,6 +146,7 @@ static void mips_jazz_init(MachineState *machine,
-     MIPSCPU *cpu;
-     CPUClass *cc;
-     CPUMIPSState *env;
-+    Clock *cpuclk;
-     qemu_irq *i8259;
-     rc4030_dma *dmas;
-     IOMMUMemoryRegion *rc4030_dma_mr;
-@@ -163,6 +165,13 @@ static void mips_jazz_init(MachineState *machine,
-     MemoryRegion *bios2 = g_new(MemoryRegion, 1);
-     SysBusESPState *sysbus_esp;
-     ESPState *esp;
-+    static const struct {
-+        unsigned freq_hz;
-+        unsigned pll_mult;
-+    } ext_clk[] = {
-+        [JAZZ_MAGNUM] = {50000000, 2},
-+        [JAZZ_PICA61] = {33333333, 4},
-+    };
+ #include "hw/qdev-properties.h"
+ #include "hw/mips/cpudevs.h"
+ #include "sysemu/kvm.h"
+@@ -38,6 +39,7 @@ static void mips_cps_init(Object *obj)
+     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+     MIPSCPSState *s = MIPS_CPS(obj);
  
-     if (machine->ram_size > 256 * MiB) {
-         error_report("RAM size more than 256Mb is not supported");
-@@ -170,7 +179,12 @@ static void mips_jazz_init(MachineState *machine,
-     }
++    s->clock = qdev_init_clock_in(DEVICE(obj), "clk-in", NULL, NULL);
+     /*
+      * Cover entire address space as there do not seem to be any
+      * constraints for the base address of CPC and GIC.
+@@ -80,6 +82,7 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
+                                       errp)) {
+             return;
+         }
++        qdev_connect_clock_in(DEVICE(cpu), "clk-in", s->clock);
  
-     /* init CPUs */
--    cpu = MIPS_CPU(cpu_create(machine->cpu_type));
-+    cpu = MIPS_CPU(object_new(machine->cpu_type));
-+    cpuclk = clock_new(OBJECT(machine), "cpu-refclk");
-+    clock_set_hz(cpuclk,
-+                 ext_clk[jazz_model].freq_hz * ext_clk[jazz_model].pll_mult);
-+    qdev_connect_clock_in(DEVICE(cpu), "clk-in", cpuclk);
-+    qdev_realize(DEVICE(cpu), NULL, &error_abort);
-     env = &cpu->env;
-     qemu_register_reset(main_cpu_reset, cpu);
- 
+         if (!qdev_realize_and_unref(DEVICE(cpu), NULL, errp)) {
+             return;
 -- 
 2.26.2
 
