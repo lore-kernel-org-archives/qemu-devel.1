@@ -2,87 +2,96 @@ Return-Path: <SRS0=BZbV=DR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2CCEC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 17:45:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E02AC433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 18:50:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2669B22470
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 17:45:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 391C0223BD
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 18:50:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lT3XxFmi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2669B22470
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QYKG9rg9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 391C0223BD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRIw4-0004SE-2L
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 13:45:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55746)
+	id 1kRJx5-0004yG-1g
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 14:50:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36080)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kRIiW-0005Ut-Q7
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 13:31:36 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39756)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kRJvl-0004Wt-DD
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 14:49:21 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40906)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kRIiU-0004Up-P8
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 13:31:36 -0400
-Received: by mail-ot1-x344.google.com with SMTP id f10so11976011otb.6
- for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 10:31:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=hV5hJblGW3p/EPj5E1miRqBG8FtRIYgD4mxvFmMBiy0=;
- b=lT3XxFmigGWOa+Z3otl6RzuGLE9Yx477yqWYpozLOW+2vHootJiamRtSsEtvHJAAtv
- Xmhf6MWxoVxbKUPQkEytU1n+YcxmmPOwOR/i/VyTEH6cqc2f05p03562TppE0skPPSff
- UtNxzXw/V9nYZtW3sK+5+06ScxNZNdPJMYYPWpCMeqFKTBXe5AMDjxL5Pky3RSfg6xAE
- ROojw5+CmSK7y9QyT+dgQer2J63pveoB2UJ1ChQB3PAu4HZ+hrZ/m6HqNr7ySvTMYdiz
- Smr8U9Q0LcCFHb+o3yW9MH5NCA/P9yipXWdRqKC83W1AM5Pp+GqRAwNR0Ru4RM/zZ9TR
- mhEw==
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kRJvj-0003Ut-4z
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 14:49:21 -0400
+Received: by mail-wr1-x444.google.com with SMTP id h5so3813762wrv.7
+ for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 11:49:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=2vSQ7frWl0kRwMGz4S9XEuABv70sAfdq5CMkewFe560=;
+ b=QYKG9rg9+hCxQb1hT1YfFvmdQyfYEyqQ/3FSQpuZb9xoTbT/v7rVXQB/cOFjD7DHO0
+ 21b6eIenWTH5NMhMyEFwk6t1I4J58yKaB/oWl269DWhBo0k9SY4CuKrNVAlcKvC5vzbu
+ ozzKPITWzr75E89qnGOBw0Ua+C+TlBpI0HSAy7/+WQiffMJCzCJ4CXOMpwOT9s4t3Bu9
+ QtRNbTYJHJu34iCtGo5oR1AbAQgnDkCOs0YvnemOs7gqYFQJhaus8tYqR/30Z+TtjBwr
+ MQiq9rM2U8Ire3aYhCCF2R+/BwVfXF2i8Annc8kjDpy7GFRMhzvXEVDu+vx4aMv/iG8n
+ 15dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=hV5hJblGW3p/EPj5E1miRqBG8FtRIYgD4mxvFmMBiy0=;
- b=LwdyPLBt+DrbytyeB50gpzF5N1WM5QWO8Y7Pqboko6JdM6w4KdYIcOR71zWuRreJFk
- 9QgZibwpVs/jV8B62k6GilmPcZDSoVB41GHxZcP0SGb4A+6keOXRcH10pnbucNuqShHU
- ybCoP8st1Y682clpTdHj4cTWRbJ4s6zW6L+vqOoT63oGqH67necTdU+KpOOUA+KD5FfH
- 09NGBA37R1P4fIrH7a6KVrqVKc9nMGOqZk8+bNq7Le9Lrh3g/8aEfodkN+poVjJI1M29
- UbBpmInOl7xQipB71zSkLlnB+ZIzg+8pmFmOgcZlQLhz7GgvcQudIVi4sZumV6j2oxRe
- h8kg==
-X-Gm-Message-State: AOAM530B/44yschu7hcGxih8TQagp06kiziIpIO03XApP6LVeQmR0Z8+
- bEYVVRR1trrDuektOar+gw4do4NWpBbuHzal
-X-Google-Smtp-Source: ABdhPJzjauxz0OjyCmufk6J8mcqCzNyGYd+29V1s+wsRU8aLu6n4b4RkVimuHCmXoaEdPgd3BtIGMA==
-X-Received: by 2002:a9d:7387:: with SMTP id j7mr7067560otk.18.1602351092877;
- Sat, 10 Oct 2020 10:31:32 -0700 (PDT)
-Received: from localhost.localdomain (168.189-204-159.bestelclientes.com.mx.
- [189.204.159.168])
- by smtp.gmail.com with ESMTPSA id n185sm7415032oia.28.2020.10.10.10.31.31
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 10 Oct 2020 10:31:32 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
+ bh=2vSQ7frWl0kRwMGz4S9XEuABv70sAfdq5CMkewFe560=;
+ b=SGIHKfLAJr+eJTr++GwgUuYq3Mob42KXQIQAjYVlb/q+42BCDVKbXD9jMuJGR+Ct+o
+ YOAG5xm1HuM0Qwzawe8+bb1WQ4Sc/D5yt9RP3qPFf/Me5LnkK398pKPTJgH+/2qHlOYS
+ UHpVTcvG/FqSSAesrV3jVDjwjU1LpSQ/wCTr0vLEhRVDzdvJ/Mw+bwG2t8dv5Gh9LxkL
+ qfz0O1D/0bsd34Ss8Y03gzk9UDkyFtt5VOJGENINRDfscSimf0zLVa4w+QRuWtfWcFve
+ mdfsakRR5CP7BJj2Eig1QQF2jhojoRUOvqzU+s1frt4iI1M/ItLjowHbhXkpLXkNEHU8
+ NxPQ==
+X-Gm-Message-State: AOAM532ySqERcWMLUhHlFO8CM+9QWWzCqwgSwY3pvXw3Hv1O4UCL9RnZ
+ myshmELDw1lNnXoHPYgHSI4=
+X-Google-Smtp-Source: ABdhPJwntYp56fy9aoThNphGX4WtH6VUsPBPhfDrHJK+HyJKzWxx0Pt/rqqW/Yi5VoQ1EbxPcEL6pg==
+X-Received: by 2002:adf:cc88:: with SMTP id p8mr22860543wrj.201.1602355757559; 
+ Sat, 10 Oct 2020 11:49:17 -0700 (PDT)
+Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id j13sm17966922wru.86.2020.10.10.11.49.14
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 10 Oct 2020 11:49:16 -0700 (PDT)
+Subject: Re: [PATCH v2 18/20] hw/mips/malta: Set CPU frequency to 320 MHz
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/2] linux-user/microblaze: update signal handling
-Date: Sat, 10 Oct 2020 12:31:28 -0500
-Message-Id: <20201010173130.99652-1-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
+References: <20201010172617.3079633-1-f4bug@amsat.org>
+ <20201010172617.3079633-19-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <2b2e8f70-a0a8-7408-3d7e-1661de3d8d49@amsat.org>
+Date: Sat, 10 Oct 2020 20:49:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
+In-Reply-To: <20201010172617.3079633-19-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
- envelope-from=richard.henderson@linaro.org; helo=mail-ot1-x344.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-Spam_score_int: -19
+X-Spam_score: -2.0
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-0.207,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -97,28 +106,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: edgar.iglesias@gmail.com, laurent@vivier.eu
+Cc: Damien Hedde <damien.hedde@greensocs.com>,
+ Huacai Chen <zltjiangshi@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, Luc Michel <luc@lmichel.fr>,
+ Paul Burton <paulburton@kernel.org>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Huacai Chen <chenhc@lemote.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The linux microblaze port only implements rt signal handing,
-not the old style.  This allows our linux-test to pass for mb,
-if you have a cross-compiler available for the build.
+On 10/10/20 7:26 PM, Philippe Mathieu-Daudé wrote:
+> The CoreLV card with ID 0x420's CPU clocked at 320 MHz. Create
+> a 'cpuclk' output clock and connect it to the CPU input clock.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>   hw/mips/malta.c | 20 +++++++++++++++++---
+>   1 file changed, 17 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/mips/malta.c b/hw/mips/malta.c
+> index 4019c9dc1a8..c1e8fceeea7 100644
+> --- a/hw/mips/malta.c
+> +++ b/hw/mips/malta.c
+> @@ -57,6 +57,7 @@
+>   #include "sysemu/kvm.h"
+>   #include "hw/semihosting/semihost.h"
+>   #include "hw/mips/cps.h"
+> +#include "hw/qdev-clock.h"
+>   
+>   #define ENVP_ADDR           0x80002000l
+>   #define ENVP_NB_ENTRIES     16
+> @@ -94,6 +95,7 @@ OBJECT_DECLARE_SIMPLE_TYPE(MaltaState, MIPS_MALTA)
+>   struct MaltaState {
+>       SysBusDevice parent_obj;
+>   
+> +    Clock *cpuclk;
+>       MIPSCPSState cps;
+>       qemu_irq i8259[ISA_NUM_IRQS];
+>   };
+> @@ -1159,7 +1161,7 @@ static void main_cpu_reset(void *opaque)
+>       }
+>   }
+>   
+> -static void create_cpu_without_cps(MachineState *ms,
+> +static void create_cpu_without_cps(MachineState *ms, MaltaState *s,
+>                                      qemu_irq *cbus_irq, qemu_irq *i8259_irq)
+>   {
+>       CPUMIPSState *env;
+> @@ -1167,7 +1169,9 @@ static void create_cpu_without_cps(MachineState *ms,
+>       int i;
+>   
+>       for (i = 0; i < ms->smp.cpus; i++) {
+> -        cpu = MIPS_CPU(cpu_create(ms->cpu_type));
+> +        cpu = MIPS_CPU(object_new(ms->cpu_type));
+> +        qdev_connect_clock_in(DEVICE(cpu), "clk", s->cpuclk);
 
+I forgot to rename this "clk-in" :(
 
-r~
-
-
-Richard Henderson (2):
-  linux-user/microblaze: Implement rt signal frames
-  linux-user/microblaze: Remove non-rt signal frames
-
- linux-user/microblaze/target_signal.h |   1 -
- linux-user/microblaze/signal.c        | 186 ++++++++++++--------------
- 2 files changed, 83 insertions(+), 104 deletions(-)
-
--- 
-2.25.1
-
+> +        qdev_realize(DEVICE(cpu), NULL, &error_abort);
+>   
+>           /* Init internal devices */
+>           cpu_mips_irq_init_cpu(cpu);
+> @@ -1189,6 +1193,7 @@ static void create_cps(MachineState *ms, MaltaState *s,
+>                               &error_fatal);
+>       object_property_set_int(OBJECT(&s->cps), "num-vp", ms->smp.cpus,
+>                               &error_fatal);
+> +    qdev_connect_clock_in(DEVICE(&s->cps), "clk", s->cpuclk);
+>       sysbus_realize(SYS_BUS_DEVICE(&s->cps), &error_fatal);
+>   
+>       sysbus_mmio_map_overlap(SYS_BUS_DEVICE(&s->cps), 0, 0, 1);
+> @@ -1203,7 +1208,7 @@ static void mips_create_cpu(MachineState *ms, MaltaState *s,
+>       if ((ms->smp.cpus > 1) && cpu_supports_cps_smp(ms->cpu_type)) {
+>           create_cps(ms, s, cbus_irq, i8259_irq);
+>       } else {
+> -        create_cpu_without_cps(ms, cbus_irq, i8259_irq);
+> +        create_cpu_without_cps(ms, s, cbus_irq, i8259_irq);
+>       }
+>   }
+>   
+> @@ -1421,10 +1426,19 @@ void mips_malta_init(MachineState *machine)
+>       pci_vga_init(pci_bus);
+>   }
+>   
+> +static void mips_malta_instance_init(Object *obj)
+> +{
+> +    MaltaState *s = MIPS_MALTA(obj);
+> +
+> +    s->cpuclk = qdev_init_clock_out(DEVICE(obj), "cpuclk-out");
+> +    clock_set_hz(s->cpuclk, 320000000); /* 320 MHz */
+> +}
+> +
+>   static const TypeInfo mips_malta_device = {
+>       .name          = TYPE_MIPS_MALTA,
+>       .parent        = TYPE_SYS_BUS_DEVICE,
+>       .instance_size = sizeof(MaltaState),
+> +    .instance_init = mips_malta_instance_init,
+>   };
+>   
+>   static void mips_malta_machine_init(MachineClass *mc)
+> 
 
