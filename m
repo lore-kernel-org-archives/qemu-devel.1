@@ -7,82 +7,82 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B3F9C433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 16:06:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA3D6C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 16:19:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D07C5223AE
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 16:06:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 49CD7223BD
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 16:19:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bs2Br57V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D07C5223AE
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bORYwRCu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49CD7223BD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRHON-00079H-Nv
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 12:06:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42490)
+	id 1kRHaq-00032k-77
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 12:19:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45272)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRHMs-0006BC-SM; Sat, 10 Oct 2020 12:05:11 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37729)
+ id 1kRHa3-0002VW-Dc; Sat, 10 Oct 2020 12:18:47 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:52845)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRHMm-0003Pz-60; Sat, 10 Oct 2020 12:05:10 -0400
-Received: by mail-wr1-x441.google.com with SMTP id h7so13541043wre.4;
- Sat, 10 Oct 2020 09:05:03 -0700 (PDT)
+ id 1kRHa1-0004za-Iv; Sat, 10 Oct 2020 12:18:47 -0400
+Received: by mail-wm1-x343.google.com with SMTP id e23so5745989wme.2;
+ Sat, 10 Oct 2020 09:18:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=2nPSaaA7Q+BjY2bKgyV9Pi4kxitgPgXj7hKiSMzaH1w=;
- b=bs2Br57VE46RSP0TFTr+fsE8CfwzYKiZ2sppjyEmqTLSMZ9wsxADDGLb+cxszJHebM
- JEyJHVT9URKnhyGid/yFnALpExG5FVWm+5qJojRlPxBFXSiBENuDDz605Z24jJQVoNSf
- GJmzezij0lEhfu2Ht6Qj+9Fk5jfid5+DvmvEeBxrvNNpiwhg/dDMOaT1rG3uRwTB6ZYD
- S4u+aetXsb9yMUQnGySGQlZhzhPkCAfCDgeKHcsQoP8JJvJGcIP0S2Jd70PEfypCN39V
- 51oGD7I8eDFxcfkdAjefkEU+9X0dORdeM9+EasRV++7uJ3Td5SYcLdmex3V8GFq05s2x
- RsJg==
+ bh=+hvGFuDvUtedq7zWw96MNl1ebw89wkfO3uQKU7C/lSI=;
+ b=bORYwRCupTfWuRdHzWk/cgQpRDPKYXTUqQQALQ3f4r+XJwM9/yUCAH6secNiNKVaZJ
+ X1NM5juSSw6i/lrY7OjgGObIcDwmKYC8FKIwpcgRfso6mZw++DVzDsSNtmsSRIg7ZeJX
+ SpZaIXo28khI32qq4jDFuQ0iqNbPDPZlBVTuz+sbxRpt4YUnL17f7mP9VZ+fF0VTdr6T
+ 1AaJbLa+HUcmNaqhav0z69xNRwnrCc9fWuV1RCaehLgcBAEJ2QFaD7zJrihqkuxmkUP7
+ 9aCiwRWs7Uy6jpBtNtW4TqUmSTHpNw4gfqmTsJ0wGa+wTCdAvbbXmtaEmMgSMIovrcyd
+ DXkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=2nPSaaA7Q+BjY2bKgyV9Pi4kxitgPgXj7hKiSMzaH1w=;
- b=oi5ouJqWMTueINjUz4tqnJEARrBLcOK3ZNxVKs2JWVgM2RLLn7WTsK3qQ8Qy/SPSTC
- Ww++7rbS/RpL5v0UxMtjKycaI0lQt0dTd6D6xzHP7fSnxD69ZJBuPUZCeKAJ+Xgm9KCw
- k4/9TQpk/YsILJcw0zWnPu4rKrN2K6ccGvmMMRgsFlbq84DMVsVVCUNnymqfjJ3AC/DH
- qiQZCUCYa7SY01Q0A+RushzyJAXXTGQJtExnXYdGKBNYVmiThTd67thu9mnKxzhtfIry
- SGddZqx2MVTBKBpZMuX5L0RFJjYYObDovvBneU+awfKqd0oYZuxzjEZVJh5lQenR2LMS
- FP8g==
-X-Gm-Message-State: AOAM531dY2OSUieZEV7RsGBvvALfpxg4+ewyD1faRMtdL4UnaeFl+Rbo
- DX/g/NQKvDI8oMGvO8Ss4yo=
-X-Google-Smtp-Source: ABdhPJzW9pBVSX3HVkLwHz9Uf1goZnZH04oLGe6G9a+DsaHBom61HoeOk2P+xBBzSfkwUFllFxP39w==
-X-Received: by 2002:adf:a70b:: with SMTP id c11mr14827502wrd.257.1602345902172; 
- Sat, 10 Oct 2020 09:05:02 -0700 (PDT)
+ bh=+hvGFuDvUtedq7zWw96MNl1ebw89wkfO3uQKU7C/lSI=;
+ b=mrSM5R7TIKXw5v3FUrwbueXYnctr5dfin2aT1Fg0fzTCfWZK+e9jaIx1SXjqwOuVJ6
+ u5N01CwkuvQiG/DtSojR8BxLIhX/j1GGtXauMgB2Ngx571Ag8xrEcslf1ZP3JDZCRLpy
+ BijxiEuEAcqztNhuc641/e4z5yU6FmGpfGNSRm7dvgRtVpw8c3P2No+ubZhcxjl/YvSo
+ j3t3mKaExQaAa0Naa+aO5xKQPQSxEbTq96/xbzkS5RPxreOKB+rzTGdISpotPcqk4RSz
+ hxnrqhrJ8NlZqJQwABOsVlkdMzn2874pnEMOWyigeADq4SgTKgnjZ7BUi/ZpUe+STlmj
+ Pmnw==
+X-Gm-Message-State: AOAM530AAIS3VD6vUWStSbR19KuBykAscVASr+qs2Cjqcr/I2+DyoqmN
+ VCYeoQWeD6/TzkXZ7fUppxk=
+X-Google-Smtp-Source: ABdhPJxlBeld7v7vEGwr02TRdac+p4jk8+3eZQzimfxpvm+3XBW3xl2HJaJU05+4b8u9aoNMEOYB/g==
+X-Received: by 2002:a1c:ded7:: with SMTP id v206mr3173802wmg.183.1602346723628; 
+ Sat, 10 Oct 2020 09:18:43 -0700 (PDT)
 Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
  [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id n2sm16200807wma.29.2020.10.10.09.05.00
+ by smtp.gmail.com with ESMTPSA id u2sm17599134wre.7.2020.10.10.09.18.41
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 10 Oct 2020 09:05:01 -0700 (PDT)
-Subject: Re: [PATCH v3 08/15] hw/misc/bcm2835_cprman: add a PLL channel
- skeleton implementation
+ Sat, 10 Oct 2020 09:18:42 -0700 (PDT)
+Subject: Re: [PATCH v3 13/15] hw/misc/bcm2835_cprman: add sane reset values to
+ the registers
 To: Luc Michel <luc@lmichel.fr>, qemu-devel@nongnu.org
 References: <20201010135759.437903-1-luc@lmichel.fr>
- <20201010135759.437903-9-luc@lmichel.fr>
+ <20201010135759.437903-14-luc@lmichel.fr>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e6e2341a-6ccc-b1cc-6e25-b3d57e1cae6d@amsat.org>
-Date: Sat, 10 Oct 2020 18:05:00 +0200
+Message-ID: <48280560-3642-5367-a46e-53548e77c748@amsat.org>
+Date: Sat, 10 Oct 2020 18:18:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201010135759.437903-9-luc@lmichel.fr>
+In-Reply-To: <20201010135759.437903-14-luc@lmichel.fr>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -19
@@ -115,231 +115,197 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 10/10/20 3:57 PM, Luc Michel wrote:
-> PLLs are composed of multiple channels. Each channel outputs one clock
-> signal. They are modeled as one device taking the PLL generated clock as
-> input, and outputting a new clock.
+> Those reset values have been extracted from a Raspberry Pi 3 model B
+> v1.2, using the 2020-08-20 version of raspios. The dump was done using
+> the debugfs interface of the CPRMAN driver in Linux (under
+> '/sys/kernel/debug/clk'). Each exposed clock tree stage (PLLs, channels
+> and muxes) can be observed by reading the 'regdump' file (e.g.
+> 'plla/regdump').
 > 
-> A channel shares the CM register with its parent PLL, and has its own
-> A2W_CTRL register. A write to the CM register will trigger an update of
-> the PLL and all its channels, while a write to an A2W_CTRL channel
-> register will update the required channel only.
+> Those values are set by the Raspberry Pi firmware at boot time (Linux
+> expects them to be set when it boots up).
 > 
-> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Some stages are not exposed by the Linux driver (e.g. the PLL B). For
+> those, the reset values are unknown and left to 0 which implies a
+> disabled output.
+> 
+> Once booted in QEMU, the final clock tree is very similar to the one
+> visible on real hardware. The differences come from some unimplemented
+> devices for which the driver simply disable the corresponding clock.
+> 
 > Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > Signed-off-by: Luc Michel <luc@lmichel.fr>
 > ---
->   include/hw/misc/bcm2835_cprman.h           |  44 ++++++
->   include/hw/misc/bcm2835_cprman_internals.h | 146 +++++++++++++++++++
->   hw/misc/bcm2835_cprman.c                   | 155 +++++++++++++++++++--
->   3 files changed, 337 insertions(+), 8 deletions(-)
-[...]
-
+>   include/hw/misc/bcm2835_cprman_internals.h | 269 +++++++++++++++++++++
+>   hw/misc/bcm2835_cprman.c                   |  31 +++
+>   2 files changed, 300 insertions(+)
+> 
 > diff --git a/include/hw/misc/bcm2835_cprman_internals.h b/include/hw/misc/bcm2835_cprman_internals.h
-> index 7aa46c6e18..7409ddb024 100644
+> index a6e799075f..339759b307 100644
 > --- a/include/hw/misc/bcm2835_cprman_internals.h
 > +++ b/include/hw/misc/bcm2835_cprman_internals.h
-> @@ -11,13 +11,16 @@
->   
->   #include "hw/registerfields.h"
->   #include "hw/misc/bcm2835_cprman.h"
->   
->   #define TYPE_CPRMAN_PLL "bcm2835-cprman-pll"
-> +#define TYPE_CPRMAN_PLL_CHANNEL "bcm2835-cprman-pll-channel"
->   
->   DECLARE_INSTANCE_CHECKER(CprmanPllState, CPRMAN_PLL,
->                            TYPE_CPRMAN_PLL)
-> +DECLARE_INSTANCE_CHECKER(CprmanPllChannelState, CPRMAN_PLL_CHANNEL,
-> +                         TYPE_CPRMAN_PLL_CHANNEL)
->   
->   /* Register map */
->   
->   /* PLLs */
->   REG32(CM_PLLA, 0x104)
-> @@ -98,10 +101,35 @@ REG32(A2W_PLLA_FRAC, 0x1200)
->   REG32(A2W_PLLC_FRAC, 0x1220)
->   REG32(A2W_PLLD_FRAC, 0x1240)
->   REG32(A2W_PLLH_FRAC, 0x1260)
->   REG32(A2W_PLLB_FRAC, 0x12e0)
->   
-> +/* PLL channels */
-> +REG32(A2W_PLLA_DSI0, 0x1300)
-> +    FIELD(A2W_PLLx_CHANNELy, DIV, 0, 8)
-> +    FIELD(A2W_PLLx_CHANNELy, DISABLE, 8, 1)
-> +REG32(A2W_PLLA_CORE, 0x1400)
-> +REG32(A2W_PLLA_PER, 0x1500)
-> +REG32(A2W_PLLA_CCP2, 0x1600)
-> +
-> +REG32(A2W_PLLC_CORE2, 0x1320)
-> +REG32(A2W_PLLC_CORE1, 0x1420)
-> +REG32(A2W_PLLC_PER, 0x1520)
-> +REG32(A2W_PLLC_CORE0, 0x1620)
-> +
-> +REG32(A2W_PLLD_DSI0, 0x1340)
-> +REG32(A2W_PLLD_CORE, 0x1440)
-> +REG32(A2W_PLLD_PER, 0x1540)
-> +REG32(A2W_PLLD_DSI1, 0x1640)
-> +
-> +REG32(A2W_PLLH_AUX, 0x1360)
-> +REG32(A2W_PLLH_RCAL, 0x1460)
-> +REG32(A2W_PLLH_PIX, 0x1560)
-> +REG32(A2W_PLLH_STS, 0x1660)
-> +
-> +REG32(A2W_PLLB_ARM, 0x13e0)
-> +
->   /* misc registers */
->   REG32(CM_LOCK, 0x114)
->       FIELD(CM_LOCK, FLOCKH, 12, 1)
->       FIELD(CM_LOCK, FLOCKD, 11, 1)
->       FIELD(CM_LOCK, FLOCKC, 10, 1)
-> @@ -171,6 +199,124 @@ static inline void set_pll_init_info(BCM2835CprmanState *s,
->       pll->reg_a2w_ana = &s->regs[PLL_INIT_INFO[id].a2w_ana_offset];
->       pll->prediv_mask = PLL_INIT_INFO[id].prediv_mask;
->       pll->reg_a2w_frac = &s->regs[PLL_INIT_INFO[id].a2w_frac_offset];
+> @@ -745,6 +745,275 @@ static inline void set_clock_mux_init_info(BCM2835CprmanState *s,
+>       mux->reg_div = &s->regs[CLOCK_MUX_INIT_INFO[id].cm_offset + 1];
+>       mux->int_bits = CLOCK_MUX_INIT_INFO[id].int_bits;
+>       mux->frac_bits = CLOCK_MUX_INIT_INFO[id].frac_bits;
 >   }
 >   
 > +
-> +/* PLL channel init info */
-> +typedef struct PLLChannelInitInfo {
-> +    const char *name;
-> +    CprmanPll parent;
-> +    size_t cm_offset;
-> +    uint32_t cm_hold_mask;
-> +    uint32_t cm_load_mask;
-> +    size_t a2w_ctrl_offset;
-> +    unsigned int fixed_divider;
-> +} PLLChannelInitInfo;
+> +/*
+> + * Object reset info
+> + * Those values have been dumped from a Raspberry Pi 3 Model B v1.2 using the
+> + * clk debugfs interface in Linux.
+> + */
+> +typedef struct PLLResetInfo {
+> +    uint32_t cm;
+> +    uint32_t a2w_ctrl;
+> +    uint32_t a2w_ana[4];
+> +    uint32_t a2w_frac;
+> +} PLLResetInfo;
 > +
-> +#define FILL_PLL_CHANNEL_INIT_INFO_common(pll_, channel_)            \
-> +    .parent = CPRMAN_ ## pll_,                                       \
-> +    .cm_offset = R_CM_ ## pll_,                                      \
-> +    .cm_load_mask = R_CM_ ## pll_ ## _ ## LOAD ## channel_ ## _MASK, \
-> +    .a2w_ctrl_offset = R_A2W_ ## pll_ ## _ ## channel_
-> +
-> +#define FILL_PLL_CHANNEL_INIT_INFO(pll_, channel_)                   \
-> +    FILL_PLL_CHANNEL_INIT_INFO_common(pll_, channel_),               \
-> +    .cm_hold_mask = R_CM_ ## pll_ ## _ ## HOLD ## channel_ ## _MASK, \
-> +    .fixed_divider = 1
-> +
-> +#define FILL_PLL_CHANNEL_INIT_INFO_nohold(pll_, channel_) \
-> +    FILL_PLL_CHANNEL_INIT_INFO_common(pll_, channel_),    \
-> +    .cm_hold_mask = 0
-> +
-> +static PLLChannelInitInfo PLL_CHANNEL_INIT_INFO[] = {
-
-Hmm I missed this static definition in an header.
-As it is local and only include once, I'd prefer match the
-rest of the source tree style and name it .c.inc:
-
--- >8 --
-diff --git a/hw/misc/bcm2835_cprman.c b/hw/misc/bcm2835_cprman.c
-index 7e415a017c9..9d4c0ee6c73 100644
---- a/hw/misc/bcm2835_cprman.c
-+++ b/hw/misc/bcm2835_cprman.c
-@@ -48,7 +48,7 @@
-  #include "migration/vmstate.h"
-  #include "hw/qdev-properties.h"
-  #include "hw/misc/bcm2835_cprman.h"
--#include "hw/misc/bcm2835_cprman_internals.h"
-+#include "bcm2835_cprman_internals.c.inc"
-  #include "trace.h"
-
-  /* PLL */
-diff --git a/include/hw/misc/bcm2835_cprman_internals.h 
-b/hw/misc/bcm2835_cprman_internals.c.inc
-similarity index 100%
-rename from include/hw/misc/bcm2835_cprman_internals.h
-rename to hw/misc/bcm2835_cprman_internals.c.inc
----
-> +    [CPRMAN_PLLA_CHANNEL_DSI0] = {
-> +        .name = "plla-dsi0",
-> +        FILL_PLL_CHANNEL_INIT_INFO(PLLA, DSI0),
-> +    },
-> +    [CPRMAN_PLLA_CHANNEL_CORE] = {
-> +        .name = "plla-core",
-> +        FILL_PLL_CHANNEL_INIT_INFO(PLLA, CORE),
-> +    },
-> +    [CPRMAN_PLLA_CHANNEL_PER] = {
-> +        .name = "plla-per",
-> +        FILL_PLL_CHANNEL_INIT_INFO(PLLA, PER),
-> +    },
-> +    [CPRMAN_PLLA_CHANNEL_CCP2] = {
-> +        .name = "plla-ccp2",
-> +        FILL_PLL_CHANNEL_INIT_INFO(PLLA, CCP2),
+> +static const PLLResetInfo PLL_RESET_INFO[] = {
+> +    [CPRMAN_PLLA] = {
+> +        .cm = 0x0000008a,
+> +        .a2w_ctrl = 0x0002103a,
+> +        .a2w_frac = 0x00098000,
+> +        .a2w_ana = { 0x00000000, 0x00144000, 0x00000000, 0x00000100 }
 > +    },
 > +
-> +    [CPRMAN_PLLC_CHANNEL_CORE2] = {
-> +        .name = "pllc-core2",
-> +        FILL_PLL_CHANNEL_INIT_INFO(PLLC, CORE2),
-> +    },
-> +    [CPRMAN_PLLC_CHANNEL_CORE1] = {
-> +        .name = "pllc-core1",
-> +        FILL_PLL_CHANNEL_INIT_INFO(PLLC, CORE1),
-> +    },
-> +    [CPRMAN_PLLC_CHANNEL_PER] = {
-> +        .name = "pllc-per",
-> +        FILL_PLL_CHANNEL_INIT_INFO(PLLC, PER),
-> +    },
-> +    [CPRMAN_PLLC_CHANNEL_CORE0] = {
-> +        .name = "pllc-core0",
-> +        FILL_PLL_CHANNEL_INIT_INFO(PLLC, CORE0),
+> +    [CPRMAN_PLLC] = {
+> +        .cm = 0x00000228,
+> +        .a2w_ctrl = 0x0002103e,
+> +        .a2w_frac = 0x00080000,
+> +        .a2w_ana = { 0x00000000, 0x00144000, 0x00000000, 0x00000100 }
 > +    },
 > +
-> +    [CPRMAN_PLLD_CHANNEL_DSI0] = {
-> +        .name = "plld-dsi0",
-> +        FILL_PLL_CHANNEL_INIT_INFO(PLLD, DSI0),
-> +    },
-> +    [CPRMAN_PLLD_CHANNEL_CORE] = {
-> +        .name = "plld-core",
-> +        FILL_PLL_CHANNEL_INIT_INFO(PLLD, CORE),
-> +    },
-> +    [CPRMAN_PLLD_CHANNEL_PER] = {
-> +        .name = "plld-per",
-> +        FILL_PLL_CHANNEL_INIT_INFO(PLLD, PER),
-> +    },
-> +    [CPRMAN_PLLD_CHANNEL_DSI1] = {
-> +        .name = "plld-dsi1",
-> +        FILL_PLL_CHANNEL_INIT_INFO(PLLD, DSI1),
+> +    [CPRMAN_PLLD] = {
+> +        .cm = 0x0000020a,
+> +        .a2w_ctrl = 0x00021034,
+> +        .a2w_frac = 0x00015556,
+> +        .a2w_ana = { 0x00000000, 0x00144000, 0x00000000, 0x00000100 }
 > +    },
 > +
-> +    [CPRMAN_PLLH_CHANNEL_AUX] = {
-> +        .name = "pllh-aux",
-> +        .fixed_divider = 1,
-> +        FILL_PLL_CHANNEL_INIT_INFO_nohold(PLLH, AUX),
-> +    },
-> +    [CPRMAN_PLLH_CHANNEL_RCAL] = {
-> +        .name = "pllh-rcal",
-> +        .fixed_divider = 10,
-> +        FILL_PLL_CHANNEL_INIT_INFO_nohold(PLLH, RCAL),
-> +    },
-> +    [CPRMAN_PLLH_CHANNEL_PIX] = {
-> +        .name = "pllh-pix",
-> +        .fixed_divider = 10,
-> +        FILL_PLL_CHANNEL_INIT_INFO_nohold(PLLH, PIX),
+> +    [CPRMAN_PLLH] = {
+> +        .cm = 0x00000000,
+> +        .a2w_ctrl = 0x0002102d,
+> +        .a2w_frac = 0x00000000,
+> +        .a2w_ana = { 0x00900000, 0x0000000c, 0x00000000, 0x00000000 }
 > +    },
 > +
-> +    [CPRMAN_PLLB_CHANNEL_ARM] = {
-> +        .name = "pllb-arm",
-> +        FILL_PLL_CHANNEL_INIT_INFO(PLLB, ARM),
-> +    },
+> +    [CPRMAN_PLLB] = {
+> +        /* unknown */
+> +        .cm = 0x00000000,
+> +        .a2w_ctrl = 0x00000000,
+> +        .a2w_frac = 0x00000000,
+> +        .a2w_ana = { 0x00000000, 0x00000000, 0x00000000, 0x00000000 }
+> +    }
 > +};
 > +
-> +#undef FILL_PLL_CHANNEL_INIT_INFO_nohold
-> +#undef FILL_PLL_CHANNEL_INIT_INFO
-> +#undef FILL_PLL_CHANNEL_INIT_INFO_common
+> +typedef struct PLLChannelResetInfo {
+> +    /*
+> +     * Even though a PLL channel has a CM register, it shares it with its
+> +     * parent PLL. The parent already takes care of the reset value.
+> +     */
+> +    uint32_t a2w_ctrl;
+> +} PLLChannelResetInfo;
 > +
-> +static inline void set_pll_channel_init_info(BCM2835CprmanState *s,
-> +                                             CprmanPllChannelState *channel,
-> +                                             CprmanPllChannel id)
-> +{
-> +    channel->id = id;
-> +    channel->parent = PLL_CHANNEL_INIT_INFO[id].parent;
-> +    channel->reg_cm = &s->regs[PLL_CHANNEL_INIT_INFO[id].cm_offset];
-> +    channel->hold_mask = PLL_CHANNEL_INIT_INFO[id].cm_hold_mask;
-> +    channel->load_mask = PLL_CHANNEL_INIT_INFO[id].cm_load_mask;
-> +    channel->reg_a2w_ctrl = &s->regs[PLL_CHANNEL_INIT_INFO[id].a2w_ctrl_offset];
-> +    channel->fixed_divider = PLL_CHANNEL_INIT_INFO[id].fixed_divider;
-> +}
+> +static const PLLChannelResetInfo PLL_CHANNEL_RESET_INFO[] = {
+> +    [CPRMAN_PLLA_CHANNEL_DSI0] = { .a2w_ctrl = 0x00000100 },
+> +    [CPRMAN_PLLA_CHANNEL_CORE] = { .a2w_ctrl = 0x00000003 },
+> +    [CPRMAN_PLLA_CHANNEL_PER] = { .a2w_ctrl = 0x00000000 }, /* unknown */
+> +    [CPRMAN_PLLA_CHANNEL_CCP2] = { .a2w_ctrl = 0x00000100 },
+> +
+> +    [CPRMAN_PLLC_CHANNEL_CORE2] = { .a2w_ctrl = 0x00000100 },
+> +    [CPRMAN_PLLC_CHANNEL_CORE1] = { .a2w_ctrl = 0x00000100 },
+> +    [CPRMAN_PLLC_CHANNEL_PER] = { .a2w_ctrl = 0x00000002 },
+> +    [CPRMAN_PLLC_CHANNEL_CORE0] = { .a2w_ctrl = 0x00000002 },
+> +
+> +    [CPRMAN_PLLD_CHANNEL_DSI0] = { .a2w_ctrl = 0x00000100 },
+> +    [CPRMAN_PLLD_CHANNEL_CORE] = { .a2w_ctrl = 0x00000004 },
+> +    [CPRMAN_PLLD_CHANNEL_PER] = { .a2w_ctrl = 0x00000004 },
+> +    [CPRMAN_PLLD_CHANNEL_DSI1] = { .a2w_ctrl = 0x00000100 },
+> +
+> +    [CPRMAN_PLLH_CHANNEL_AUX] = { .a2w_ctrl = 0x00000004 },
+> +    [CPRMAN_PLLH_CHANNEL_RCAL] = { .a2w_ctrl = 0x00000000 },
+> +    [CPRMAN_PLLH_CHANNEL_PIX] = { .a2w_ctrl = 0x00000000 },
+> +
+> +    [CPRMAN_PLLB_CHANNEL_ARM] = { .a2w_ctrl = 0x00000000 }, /* unknown */
+> +};
+> +
+> +typedef struct ClockMuxResetInfo {
+> +    uint32_t cm_ctl;
+> +    uint32_t cm_div;
+> +} ClockMuxResetInfo;
+> +
+> +static const ClockMuxResetInfo CLOCK_MUX_RESET_INFO[] = {
+> +    [CPRMAN_CLOCK_GNRIC] = {
+> +        .cm_ctl = 0, /* unknown */
+> +        .cm_div = 0
+> +    },
+> +
+[...]
+> +};
 > +
 >   #endif
+> diff --git a/hw/misc/bcm2835_cprman.c b/hw/misc/bcm2835_cprman.c
+> index 7a7401963d..7e415a017c 100644
+> --- a/hw/misc/bcm2835_cprman.c
+> +++ b/hw/misc/bcm2835_cprman.c
+> @@ -51,10 +51,21 @@
+>   #include "hw/misc/bcm2835_cprman_internals.h"
+>   #include "trace.h"
+>   
+>   /* PLL */
+>   
+> +static void pll_reset(DeviceState *dev)
+> +{
+> +    CprmanPllState *s = CPRMAN_PLL(dev);
+> +    const PLLResetInfo *info = &PLL_RESET_INFO[s->id];
+
+Hmm so we overwrite various values from PLL_INIT_INFO.
+> +
+> +    *s->reg_cm = info->cm;
+> +    *s->reg_a2w_ctrl = info->a2w_ctrl;
+> +    memcpy(s->reg_a2w_ana, info->a2w_ana, sizeof(info->a2w_ana));
+> +    *s->reg_a2w_frac = info->a2w_frac;
+
+set_pll_init_info() can be simplified as:
+
+     pll->id = id;
+     pll->prediv_mask = PLL_INIT_INFO[id].prediv_mask;
+
+Or directly in cprman_init():
+
+     &s->plls[i]->id = i;
+     &s->plls[i]->prediv_mask = PLL_INIT_INFO[i].prediv_mask;
+
+And the rest directly implemented in pll_reset().
+
+Maybe not, but having pll_reset() added in patch #8/15
+"bcm2835_cprman: add a PLL channel skeleton implementation"
+would make this patch review easier ;)
+
+> +}
+> +
+>   static bool pll_is_locked(const CprmanPllState *pll)
+>   {
+>       return !FIELD_EX32(*pll->reg_a2w_ctrl, A2W_PLLx_CTRL, PWRDN)
+>           && !FIELD_EX32(*pll->reg_cm, CM_PLLx, ANARST);
+>   }
+> @@ -121,10 +132,11 @@ static const VMStateDescription pll_vmstate = {
+>   
+>   static void pll_class_init(ObjectClass *klass, void *data)
+>   {
+>       DeviceClass *dc = DEVICE_CLASS(klass);
+>   
+> +    dc->reset = pll_reset;
+>       dc->vmsd = &pll_vmstate;
+>   }
 [...]
+Similarly, implement clock_mux_reset() in patch #10/15
+"bcm2835_cprman: add a clock mux skeleton implementation".
+
+Regards,
+
+Phil.
 
