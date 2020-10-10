@@ -7,34 +7,34 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACBABC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 14:06:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBA6FC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 14:07:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4733E22283
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 14:06:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 743F322284
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 14:07:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lmichel.fr header.i=@lmichel.fr header.b="FCXcW2HP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4733E22283
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lmichel.fr header.i=@lmichel.fr header.b="hShqiR5y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 743F322284
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=lmichel.fr
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRFW2-0005hj-6m
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 10:06:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40720)
+	id 1kRFWY-0006LD-Jv
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 10:07:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40722)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luc@lmichel.fr>)
- id 1kRFNM-0001uG-IG; Sat, 10 Oct 2020 09:57:32 -0400
-Received: from pharaoh.lmichel.fr ([149.202.28.74]:43618)
+ id 1kRFNM-0001uo-Oj; Sat, 10 Oct 2020 09:57:32 -0400
+Received: from pharaoh.lmichel.fr ([149.202.28.74]:43620)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luc@lmichel.fr>)
- id 1kRFNK-0004K6-Lk; Sat, 10 Oct 2020 09:57:32 -0400
+ id 1kRFNK-0004KF-Qp; Sat, 10 Oct 2020 09:57:32 -0400
 Received: from sekoia-pc.home.lmichel.fr (sekoia-pc.home.lmichel.fr
  [192.168.61.100])
- by pharaoh.lmichel.fr (Postfix) with ESMTPS id 85E50C603DB;
+ by pharaoh.lmichel.fr (Postfix) with ESMTPS id BBC75C6041D;
  Sat, 10 Oct 2020 13:57:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr; s=pharaoh; 
  t=1602338224;
@@ -43,18 +43,17 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr; s=pharaoh;
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=MOTPkXjvC2zXyPDpTmjJaf2TrTkZXbIsOjedNDmg/rk=;
- b=FCXcW2HPG1yj2RzwiuY/fAD8oswAAAspJiOBgCOK1E3Y1WiSgMTtYN+XCAA46Ds8WgujGY
- 3/g2DX2v4GCfLE2HYYFsxoGOD7Rv0kCiuPGWLH8aGX65LX40waKiUBWd20fiDgZuPJLNTJ
- Cz8+fAIjrAf0hdltxnHXzTKmxCuKNgurbPJg+2SxQ/ZZ2Nu0AxFmZZxh4g/dK/fHraG/xS
- +9y03q4IXxxgOnORfBDl4kDyI3NwLJHiLUMAf5ZyzAu+hPdWtt1dRRU3Zt4Mk39wf8f+cE
- E2JgoRKp3ZMVfgB3w0MvCEXQQLoqu97A5RjnswQawUnv/8+l5d6oVEifKqZZ5w==
+ bh=JOcrHBo1jCCV2hHTLBCYiLIpeFKC44mDRpVy2DOXJo0=;
+ b=hShqiR5yzsRDOUcA98E6fOIbziu3sgLPTblZOUM8hWWdoqlFOItny/5l1fOe71Cgyk1f6e
+ 6IPZCylFSIK8XklqwkYKTVPUuppf9F9XpVpidXtLsmPvE4SOgYjEuCaczflB1lqOhxPdmQ
+ C+6f+ZitOfdtLOz7RRlVttrhHgbkFzTwQ4MNJv2/rybwLBsNuXe9UdmXPbuCHLedpggPdp
+ P7GzpZwXAJqKJftl4Vjhp5SNH57GNiqcIug95cBno5kRbLK6I55n+k37w05uBLvmxZSxUL
+ 4lvPuvq8Etcz8azO9ctN1jRpWOFdgJRL7cLNpqtuD3D7MENd3RhGBxM6ksROww==
 From: Luc Michel <luc@lmichel.fr>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 09/15] hw/misc/bcm2835_cprman: implement PLL channels
- behaviour
-Date: Sat, 10 Oct 2020 15:57:53 +0200
-Message-Id: <20201010135759.437903-10-luc@lmichel.fr>
+Subject: [PATCH v3 11/15] hw/misc/bcm2835_cprman: implement clock mux behaviour
+Date: Sat, 10 Oct 2020 15:57:55 +0200
+Message-Id: <20201010135759.437903-12-luc@lmichel.fr>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201010135759.437903-1-luc@lmichel.fr>
 References: <20201010135759.437903-1-luc@lmichel.fr>
@@ -68,14 +67,14 @@ ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr;
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=MOTPkXjvC2zXyPDpTmjJaf2TrTkZXbIsOjedNDmg/rk=;
- b=LW3r/xN7jAeMaUNNC/Y0ElFKO8hOxRxlTNmQFQyWOBqdsAKZ4ap+7H7/4l5gcKkKMPU9Fj
- 5DW5D1d8et4m7cgQCC7wp69jkcunw2POwQfDhnT65jxLboR1uSaT6iFu7D36gjJ2Qe3OOL
- ZCiLKtmASEFBA73wvkqssAbHbk2oZ9hP9ENP71GhsCaQf0WDqfqLs8yrxSrECI8XbsBGXU
- Zx4DyrdkIZKFtrwbHKLM1LVW4Th/FsAy3xGcL46TFGIt/JJxPiEaNjeSmVDqEyyWpFaThg
- ALZcDujbNC1x5IfvT3k0FSL3T3duPcv5JgKkyttQcgV9H5bQJW0DeheQm3uB1g==
+ bh=JOcrHBo1jCCV2hHTLBCYiLIpeFKC44mDRpVy2DOXJo0=;
+ b=QCHVdhXBfms/qj/S3fez9+ThpOCJQPQapD0ype880qal7AmJGPou2f/15dBUXPX98eAoWd
+ YCH+6n048R2sTVA5odp7DPQIk9ENt+7NW23ekw089Zs9qawYA+X4iCC5qU/ZrOhzr95MNJ
+ JXbhUbvjhgw3aEK5kdlFrDnX6zY2G//c6VnaPPSe0wb46oHn6H7twdXafXN/7eTFmUTYKj
+ iRbzCHZZwHmzH21+zgIsOBmUt9olPIsRbGTPJ473Sh2JHGRWChRHQXLKxfAUjmM72sr2nK
+ TnEm1NPX3kvvKjnvmQi29qxpH+KP0/l/KyQ+2dFpsQtVE85QqRNNzZkkjYkZwQ==
 ARC-Seal: i=1; s=pharaoh; d=lmichel.fr; t=1602338224; a=rsa-sha256; cv=none;
- b=g4DYgU3Ygp4aBc7m86oIDi4xMJ1WjM+Zcm87tdOs5YNpJ7Q1ywjeZTgrhQhGhI02LUZ/3Ew9Q06uzpDuq4Wov/+vfCoGJhc7IvW+lX+N3076/8p7F2TdGrV0YbFByl3isj/oHVqw6BQnuhEBK4ARKj4jLgxso3xy/eydpqUWgTKtT4bhmBnLiRRcZ78QBn2Hs5VyL6FsZcKTXz0i/A9KSPBlzjv23lRniBWQfWzdpQUt/pztQ412fAs3uzPKSnvbaWPCESFLoiLWMc0TYvaafyHhN3/fx0oCcLydjUAoZqBRdanDg/JsRiBWSqvOAhIwV3V7JJHicM2/pSz7knHNTQ==
+ b=cDu2GJs5GOTuD76mPJ6uetySPL7obyave0SiuShI3PGB4cKlE+hQtCb87i4a5xBPqqwhoy1NZOcAOrDvuku2nfKFpvgBn3CsSXmkcJcfDMymTXeDhTMwqXzCtWHX16zclUf67VRlOfRX0LQ1CmU50JT33FO1xHLgJGkjTiX77MrUFmJZdPT27rgF/6FRnWiLuznLkoNGduFXGXEWS0Ojb8Rm7YQLbsuL3tGqU329Lu7+3hNol0Jt7TbJfsBQBozu+YKGxsrbPpR/vg60eXrR0eYO8lEZH0ioVg3ZNQCqwSm54pmeVo4ikwzdVYVJHOAYQTA+u47HSoVqTTkr8spK/A==
 ARC-Authentication-Results: i=1;
 	pharaoh.lmichel.fr
 Received-SPF: pass client-ip=149.202.28.74; envelope-from=luc@lmichel.fr;
@@ -110,67 +109,93 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A PLL channel is able to further divide the generated PLL frequency.
-The divider is given in the CTRL_A2W register. Some channels have an
-additional fixed divider which is always applied to the signal.
+A clock mux can be configured to select one of its 10 sources through
+the CM_CTL register. It also embeds yet another clock divider, composed
+of an integer part and a fractional part. The number of bits of each
+part is mux dependent.
 
 Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Luc Michel <luc@lmichel.fr>
 ---
- hw/misc/bcm2835_cprman.c | 33 ++++++++++++++++++++++++++++++++-
- 1 file changed, 32 insertions(+), 1 deletion(-)
+ hw/misc/bcm2835_cprman.c | 53 +++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 52 insertions(+), 1 deletion(-)
 
 diff --git a/hw/misc/bcm2835_cprman.c b/hw/misc/bcm2835_cprman.c
-index 12fa78181b..71c1d7b9e7 100644
+index b22170f3bc..919a55aa23 100644
 --- a/hw/misc/bcm2835_cprman.c
 +++ b/hw/misc/bcm2835_cprman.c
-@@ -132,13 +132,44 @@ static const TypeInfo cprman_pll_info = {
+@@ -229,19 +229,70 @@ static const TypeInfo cprman_pll_channel_info = {
  };
  
  
- /* PLL channel */
+ /* clock mux */
  
-+static bool pll_channel_is_enabled(CprmanPllChannelState *channel)
++static bool clock_mux_is_enabled(CprmanClockMuxState *mux)
 +{
-+    /*
-+     * XXX I'm not sure of the purpose of the LOAD field. The Linux driver does
-+     * not set it when enabling the channel, but does clear it when disabling
-+     * it.
-+     */
-+    return !FIELD_EX32(*channel->reg_a2w_ctrl, A2W_PLLx_CHANNELy, DISABLE)
-+        && !(*channel->reg_cm & channel->hold_mask);
++    return FIELD_EX32(*mux->reg_ctl, CM_CLOCKx_CTL, ENABLE);
 +}
 +
- static void pll_channel_update(CprmanPllChannelState *channel)
+ static void clock_mux_update(CprmanClockMuxState *mux)
  {
--    clock_update(channel->out, 0);
-+    uint64_t freq, div;
+-    clock_update(mux->out, 0);
++    uint64_t freq;
++    uint32_t div, src = FIELD_EX32(*mux->reg_ctl, CM_CLOCKx_CTL, SRC);
++    bool enabled = clock_mux_is_enabled(mux);
 +
-+    if (!pll_channel_is_enabled(channel)) {
-+        clock_update(channel->out, 0);
++    *mux->reg_ctl = FIELD_DP32(*mux->reg_ctl, CM_CLOCKx_CTL, BUSY, enabled);
++
++    if (!enabled) {
++        clock_update(mux->out, 0);
 +        return;
 +    }
 +
-+    div = FIELD_EX32(*channel->reg_a2w_ctrl, A2W_PLLx_CHANNELy, DIV);
++    freq = clock_get_hz(mux->srcs[src]);
 +
-+    if (!div) {
-+        /*
-+         * It seems that when the divider value is 0, it is considered as
-+         * being maximum by the hardware (see the Linux driver).
-+         */
-+        div = R_A2W_PLLx_CHANNELy_DIV_MASK;
++    if (mux->int_bits == 0 && mux->frac_bits == 0) {
++        clock_update_hz(mux->out, freq);
++        return;
 +    }
 +
-+    /* Some channels have an additional fixed divider */
-+    freq = clock_get_hz(channel->pll_in) / (div * channel->fixed_divider);
++    /*
++     * The divider has an integer and a fractional part. The size of each part
++     * varies with the muxes (int_bits and frac_bits). Both parts are
++     * concatenated, with the integer part always starting at bit 12.
++     *
++     *         31          12 11          0
++     *        ------------------------------
++     * CM_DIV |      |  int  |  frac  |    |
++     *        ------------------------------
++     *                <-----> <------>
++     *                int_bits frac_bits
++     */
++    div = extract32(*mux->reg_div,
++                    R_CM_CLOCKx_DIV_FRAC_LENGTH - mux->frac_bits,
++                    mux->int_bits + mux->frac_bits);
 +
-+    clock_update_hz(channel->out, freq);
++    if (!div) {
++        clock_update(mux->out, 0);
++        return;
++    }
++
++    freq = muldiv64(freq, 1 << mux->frac_bits, div);
++
++    clock_update_hz(mux->out, freq);
  }
  
- /* Update a PLL and all its channels */
- static void pll_update_all_channels(BCM2835CprmanState *s,
-                                     CprmanPllState *pll)
+ static void clock_mux_src_update(void *opaque)
+ {
+     CprmanClockMuxState **backref = opaque;
+     CprmanClockMuxState *s = *backref;
++    CprmanClockMuxSource src = backref - s->backref;
++
++    if (FIELD_EX32(*s->reg_ctl, CM_CLOCKx_CTL, SRC) != src) {
++        return;
++    }
+ 
+     clock_mux_update(s);
+ }
+ 
+ static void clock_mux_init(Object *obj)
 -- 
 2.28.0
 
