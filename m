@@ -7,73 +7,72 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E014DC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:08:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 945C5C433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:08:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 817BD207E8
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:08:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33CF2207E8
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 08:08:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WIKrNBFN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 817BD207E8
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wk3gvkGF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33CF2207E8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kR9vB-0002cl-Mg
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 04:08:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41068)
+	id 1kR9vK-0002vX-Mw
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 04:08:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41122)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kR9lH-00041D-FM
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:57:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49790)
+ id 1kR9lJ-00046E-Km
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:57:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23941)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kR9lB-0006fb-VY
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:57:51 -0400
+ id 1kR9lF-0006gN-Jk
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 03:57:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602316665;
+ s=mimecast20190719; t=1602316668;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=vC9Xc63+jIBd+MkwETVUsRSra8ZBl2sNjTAEQ+tYSkM=;
- b=WIKrNBFNPjK0PDbC90PF0q39qmLKmKfO2KHxomaF2J5Mx4TBmdi8JEh8DB/L2Sfl1dRzgy
- 9wblg37IPVl9YCGdXOxVaKGpdUsPLw+ehBLzc7CAR7c6shiJjEzoMqcpVPYFNPO7EIvgQp
- 5IRGyx+GP2it9O9/tsE16eCILCGemQg=
+ bh=OFZIkXFOAgybJAPH2U4fM+2A0t74nWu4tXE43Va7XeI=;
+ b=Wk3gvkGFm1rbDWdCA7/zSkUtgJLChb+hHfyvTQo/9bIuF/Rb1kosO3uToS3BnczLa2Ya/D
+ I61a20HOeGfdbWaOE4hRo4slaH3jYJoPGEkEEdPXPvReHs3aSvhNSQogVA4L+EvMykOvBH
+ E6hlejvWM2vqeBkI2mX60R/oSLhJ3SM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-393-po9Ue26RNkuHD74ZZ_f-XQ-1; Sat, 10 Oct 2020 03:57:43 -0400
-X-MC-Unique: po9Ue26RNkuHD74ZZ_f-XQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-457-X7SbjfZqMnyTG2KI6_yx4g-1; Sat, 10 Oct 2020 03:57:46 -0400
+X-MC-Unique: X7SbjfZqMnyTG2KI6_yx4g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ABE09805F06
- for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 07:57:42 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68AD88030CA;
+ Sat, 10 Oct 2020 07:57:45 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 691315576E;
- Sat, 10 Oct 2020 07:57:42 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 290236EF4F;
+ Sat, 10 Oct 2020 07:57:45 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 07/39] crypto: Move the creation of the library to the main
- meson.build
-Date: Sat, 10 Oct 2020 03:57:07 -0400
-Message-Id: <20201010075739.951385-8-pbonzini@redhat.com>
+Subject: [PULL 13/39] qom: fix objects with improper parent type
+Date: Sat, 10 Oct 2020 03:57:13 -0400
+Message-Id: <20201010075739.951385-14-pbonzini@redhat.com>
 In-Reply-To: <20201010075739.951385-1-pbonzini@redhat.com>
 References: <20201010075739.951385-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/10 02:57:53
@@ -97,77 +96,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Sergey Nizovtsev <snizovtsev@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+Some objects accidentally inherit ObjectClass instead of Object.
+They compile silently but may crash after downcasting.
 
-Be consistent creating all the libraries in the main meson.build file.
+In this patch, we introduce a coccinelle script to find broken
+declarations and fix them manually with proper base type.
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20201006125602.2311423-8-philmd@redhat.com>
+Signed-off-by: Sergey Nizovtsev <snizovtsev@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- crypto/meson.build | 10 ----------
- meson.build        | 10 ++++++++++
- 2 files changed, 10 insertions(+), 10 deletions(-)
+ MAINTAINERS                              |  1 +
+ include/hw/acpi/vmgenid.h                |  2 +-
+ include/hw/misc/vmcoreinfo.h             |  2 +-
+ include/net/can_host.h                   |  2 +-
+ scripts/coccinelle/qom-parent-type.cocci | 26 ++++++++++++++++++++++++
+ 5 files changed, 30 insertions(+), 3 deletions(-)
+ create mode 100644 scripts/coccinelle/qom-parent-type.cocci
 
-diff --git a/crypto/meson.build b/crypto/meson.build
-index f6f5ce1ecd..7f37b5d335 100644
---- a/crypto/meson.build
-+++ b/crypto/meson.build
-@@ -1,4 +1,3 @@
--crypto_ss = ss.source_set()
- crypto_ss.add(genh)
- crypto_ss.add(files(
-   'afsplit.c',
-@@ -52,15 +51,6 @@ if 'CONFIG_GNUTLS' in config_host
- endif
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 7ef459a33c..fcb2c03c2b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2462,6 +2462,7 @@ F: include/monitor/qdev.h
+ F: include/qom/
+ F: qapi/qom.json
+ F: qapi/qdev.json
++F: scripts/coccinelle/qom-parent-type.cocci
+ F: softmmu/qdev-monitor.c
+ F: qom/
+ F: tests/check-qom-interface.c
+diff --git a/include/hw/acpi/vmgenid.h b/include/hw/acpi/vmgenid.h
+index d50fbacb8e..cb4ad37fc5 100644
+--- a/include/hw/acpi/vmgenid.h
++++ b/include/hw/acpi/vmgenid.h
+@@ -19,7 +19,7 @@
+ OBJECT_DECLARE_SIMPLE_TYPE(VmGenIdState, VMGENID)
  
+ struct VmGenIdState {
+-    DeviceClass parent_obj;
++    DeviceState parent_obj;
+     QemuUUID guid;                /* The 128-bit GUID seen by the guest */
+     uint8_t vmgenid_addr_le[8];   /* Address of the GUID (little-endian) */
+ };
+diff --git a/include/hw/misc/vmcoreinfo.h b/include/hw/misc/vmcoreinfo.h
+index ebada6617a..0b7b55d400 100644
+--- a/include/hw/misc/vmcoreinfo.h
++++ b/include/hw/misc/vmcoreinfo.h
+@@ -24,7 +24,7 @@ DECLARE_INSTANCE_CHECKER(VMCoreInfoState, VMCOREINFO,
+ typedef struct fw_cfg_vmcoreinfo FWCfgVMCoreInfo;
  
--crypto_ss = crypto_ss.apply(config_host, strict: false)
--libcrypto = static_library('crypto', crypto_ss.sources() + genh,
--                           dependencies: [crypto_ss.dependencies()],
--                           name_suffix: 'fa',
--                           build_by_default: false)
--
--crypto = declare_dependency(link_whole: libcrypto,
--                            dependencies: [authz, qom])
--
- util_ss.add(files('aes.c'))
- util_ss.add(files('init.c'))
+ struct VMCoreInfoState {
+-    DeviceClass parent_obj;
++    DeviceState parent_obj;
  
-diff --git a/meson.build b/meson.build
-index 28f31e6022..9c199195bf 100644
---- a/meson.build
-+++ b/meson.build
-@@ -1187,6 +1187,7 @@ block_ss = ss.source_set()
- bsd_user_ss = ss.source_set()
- chardev_ss = ss.source_set()
- common_ss = ss.source_set()
-+crypto_ss = ss.source_set()
- io_ss = ss.source_set()
- linux_user_ss = ss.source_set()
- qmp_ss = ss.source_set()
-@@ -1452,6 +1453,15 @@ qemu_syms = custom_target('qemu.syms', output: 'qemu.syms',
- # Library dependencies #
- ########################
+     bool has_vmcoreinfo;
+     FWCfgVMCoreInfo vmcoreinfo;
+diff --git a/include/net/can_host.h b/include/net/can_host.h
+index 4e3ce3f954..caab71bdda 100644
+--- a/include/net/can_host.h
++++ b/include/net/can_host.h
+@@ -35,7 +35,7 @@
+ OBJECT_DECLARE_TYPE(CanHostState, CanHostClass, CAN_HOST)
  
-+crypto_ss = crypto_ss.apply(config_host, strict: false)
-+libcrypto = static_library('crypto', crypto_ss.sources() + genh,
-+                           dependencies: [crypto_ss.dependencies()],
-+                           name_suffix: 'fa',
-+                           build_by_default: false)
+ struct CanHostState {
+-    ObjectClass oc;
++    Object oc;
+ 
+     CanBusState *bus;
+     CanBusClientState bus_client;
+diff --git a/scripts/coccinelle/qom-parent-type.cocci b/scripts/coccinelle/qom-parent-type.cocci
+new file mode 100644
+index 0000000000..9afb3edd97
+--- /dev/null
++++ b/scripts/coccinelle/qom-parent-type.cocci
+@@ -0,0 +1,26 @@
++// Highlight object declarations that don't look like object class but
++// accidentally inherit from it.
 +
-+crypto = declare_dependency(link_whole: libcrypto,
-+                            dependencies: [authz, qom])
++@match@
++identifier obj_t, fld;
++type parent_t =~ ".*Class$";
++@@
++struct obj_t {
++    parent_t fld;
++    ...
++};
 +
- io_ss = io_ss.apply(config_host, strict: false)
- libio = static_library('io', io_ss.sources() + genh,
-                        dependencies: [io_ss.dependencies()],
++@script:python filter depends on match@
++obj_t << match.obj_t;
++@@
++is_class_obj = obj_t.endswith('Class')
++cocci.include_match(not is_class_obj)
++
++@replacement depends on filter@
++identifier match.obj_t, match.fld;
++type match.parent_t;
++@@
++struct obj_t {
++*   parent_t fld;
++    ...
++};
 -- 
 2.26.2
 
