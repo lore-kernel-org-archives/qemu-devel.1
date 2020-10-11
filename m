@@ -2,45 +2,48 @@ Return-Path: <SRS0=+Fwv=DS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D1D5C433E7
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:40:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 165F0C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:41:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18DB12083B
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:40:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18DB12083B
+	by mail.kernel.org (Postfix) with ESMTPS id A59A62083B
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:41:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A59A62083B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRbaY-0008AI-87
-	for qemu-devel@archiver.kernel.org; Sun, 11 Oct 2020 09:40:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51408)
+	id 1kRbau-0000FL-Mm
+	for qemu-devel@archiver.kernel.org; Sun, 11 Oct 2020 09:41:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51464)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
- id 1kRXv3-000186-Mc; Sun, 11 Oct 2020 05:45:33 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:5170 helo=huawei.com)
+ id 1kRXvE-0001At-5n; Sun, 11 Oct 2020 05:45:44 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:5176 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
- id 1kRXv1-0007P0-1b; Sun, 11 Oct 2020 05:45:33 -0400
+ id 1kRXv6-0007SU-1r; Sun, 11 Oct 2020 05:45:42 -0400
 Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 79F3994EFF560202831A;
- Sun, 11 Oct 2020 17:45:12 +0800 (CST)
+ by Forcepoint Email with ESMTP id 88AD24EECD58D3342D8C;
+ Sun, 11 Oct 2020 17:45:17 +0800 (CST)
 Received: from huawei.com (10.175.124.27) by DGGEMS413-HUB.china.huawei.com
  (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Sun, 11 Oct 2020
- 17:45:02 +0800
+ 17:45:07 +0800
 From: Bihong Yu <yubihong@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
-Subject: [PATCH v1 0/8] Fix some style problems in migration
-Date: Sun, 11 Oct 2020 18:17:01 +0800
-Message-ID: <1602411429-12043-1-git-send-email-yubihong@huawei.com>
+Subject: [PATCH v1 8/8] migration: Delete redundant spaces
+Date: Sun, 11 Oct 2020 18:17:09 +0800
+Message-ID: <1602411429-12043-9-git-send-email-yubihong@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1602411429-12043-1-git-send-email-yubihong@huawei.com>
+References: <1602411429-12043-1-git-send-email-yubihong@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.175.124.27]
@@ -74,31 +77,26 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Recently I am reading migration related code, find some style problems in
-migration directory while using checkpatch.pl to check migration code. Fix the
-error style problems.
+Signed-off-by:Bihong Yu <yubihong@huawei.com>
+Reviewed-by: Chuan Zheng <zhengchuan@huawei.com>
+Signed-off-by: Bihong Yu <yubihong@huawei.com>
+---
+ migration/rdma.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Bihong Yu (8):
-  migration: Do not use C99 // comments
-  migration: Don't use '#' flag of printf format
-  migration: Add spaces around operator
-  migration: Open brace '{' following struct go on the same line
-  migration: Add braces {} for if statement
-  migration: Do not initialise statics and globals to 0 or NULL
-  migration: Open brace '{' following function declarations go on the
-    next line
-  migration: Delete redundant spaces
-
- migration/block.c        |  4 ++--
- migration/migration.c    |  4 ++--
- migration/migration.h    |  3 +--
- migration/postcopy-ram.c |  2 +-
- migration/ram.c          | 14 ++++++++------
- migration/rdma.c         |  7 ++++---
- migration/savevm.c       |  4 ++--
- migration/vmstate.c      | 10 +++++-----
- 8 files changed, 25 insertions(+), 23 deletions(-)
-
+diff --git a/migration/rdma.c b/migration/rdma.c
+index ca4d315..00eac34 100644
+--- a/migration/rdma.c
++++ b/migration/rdma.c
+@@ -855,7 +855,7 @@ static int qemu_rdma_broken_ipv6_kernel(struct ibv_context *verbs, Error **errp)
+      */
+     if (!verbs) {
+         int num_devices, x;
+-        struct ibv_device ** dev_list = ibv_get_device_list(&num_devices);
++        struct ibv_device **dev_list = ibv_get_device_list(&num_devices);
+         bool roce_found = false;
+         bool ib_found = false;
+ 
 -- 
 1.8.3.1
 
