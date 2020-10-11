@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA9B4C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:48:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26D91C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:49:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32492207FB
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:48:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32492207FB
+	by mail.kernel.org (Postfix) with ESMTPS id B320D207FB
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:49:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B320D207FB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRbi6-0003kk-8f
-	for qemu-devel@archiver.kernel.org; Sun, 11 Oct 2020 09:48:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55300)
+	id 1kRbio-0004qI-Qp
+	for qemu-devel@archiver.kernel.org; Sun, 11 Oct 2020 09:49:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56738)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
- id 1kRYPX-0005RN-Lg; Sun, 11 Oct 2020 06:17:04 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:5221 helo=huawei.com)
+ id 1kRYY3-0000yP-VK; Sun, 11 Oct 2020 06:25:51 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:51950 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
- id 1kRYPV-0002F1-Jr; Sun, 11 Oct 2020 06:17:03 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 5F7601E299D7A5A1C2F5;
- Sun, 11 Oct 2020 18:16:45 +0800 (CST)
-Received: from huawei.com (10.175.124.27) by DGGEMS403-HUB.china.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0; Sun, 11 Oct 2020
- 18:16:38 +0800
+ id 1kRYY1-0003CG-W9; Sun, 11 Oct 2020 06:25:51 -0400
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id CCB34F6EF7D28400F5FE;
+ Sun, 11 Oct 2020 18:25:43 +0800 (CST)
+Received: from huawei.com (10.175.124.27) by DGGEMS410-HUB.china.huawei.com
+ (10.3.19.210) with Microsoft SMTP Server id 14.3.487.0; Sun, 11 Oct 2020
+ 18:25:36 +0800
 From: Bihong Yu <yubihong@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
-Subject: [PATCH v1 5/8] migration: Add braces {} for if statement
-Date: Sun, 11 Oct 2020 18:48:38 +0800
-Message-ID: <1602413321-22252-6-git-send-email-yubihong@huawei.com>
+Subject: [PATCH v1 1/8] migration: Do not use C99 // comments
+Date: Sun, 11 Oct 2020 18:57:36 +0800
+Message-ID: <1602413863-19513-2-git-send-email-yubihong@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1602413321-22252-1-git-send-email-yubihong@huawei.com>
-References: <1602413321-22252-1-git-send-email-yubihong@huawei.com>
+In-Reply-To: <1602413863-19513-1-git-send-email-yubihong@huawei.com>
+References: <1602413863-19513-1-git-send-email-yubihong@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.175.124.27]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.191; envelope-from=yubihong@huawei.com;
+Received-SPF: pass client-ip=45.249.212.32; envelope-from=yubihong@huawei.com;
  helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/11 06:16:45
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/11 06:25:44
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -71,8 +71,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.chen@huawei.com, zhengchuan@huawei.com, wanghao232@huawei.com,
- dgilbert@redhat.com, quintela@redhat.com
+Cc: yubihong@huawei.com, zhengchuan@huawei.com, quintela@redhat.com,
+ dgilbert@redhat.com, alex.chen@huawei.com, wanghao232@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -81,32 +81,36 @@ Signed-off-by:Bihong Yu <yubihong@huawei.com>
 Reviewed-by: Chuan Zheng <zhengchuan@huawei.com>
 Signed-off-by: Bihong Yu <yubihong@huawei.com>
 ---
- migration/ram.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ migration/block.c | 2 +-
+ migration/rdma.c  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 90b277b..12e7296 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -101,14 +101,16 @@ static struct {
+diff --git a/migration/block.c b/migration/block.c
+index 737b649..4b8576b 100644
+--- a/migration/block.c
++++ b/migration/block.c
+@@ -40,7 +40,7 @@
+ #define MAX_IO_BUFFERS 512
+ #define MAX_PARALLEL_IO 16
  
- static void XBZRLE_cache_lock(void)
- {
--    if (migrate_use_xbzrle())
-+    if (migrate_use_xbzrle()) {
-         qemu_mutex_lock(&XBZRLE.lock);
-+    }
- }
+-//#define DEBUG_BLK_MIGRATION
++/* #define DEBUG_BLK_MIGRATION */
  
- static void XBZRLE_cache_unlock(void)
- {
--    if (migrate_use_xbzrle())
-+    if (migrate_use_xbzrle()) {
-         qemu_mutex_unlock(&XBZRLE.lock);
-+    }
- }
+ #ifdef DEBUG_BLK_MIGRATION
+ #define DPRINTF(fmt, ...) \
+diff --git a/migration/rdma.c b/migration/rdma.c
+index 0340841..0eb42b7 100644
+--- a/migration/rdma.c
++++ b/migration/rdma.c
+@@ -1288,7 +1288,7 @@ const char *print_wrid(int wrid)
+  * workload information or LRU information is available, do not attempt to use
+  * this feature except for basic testing.
+  */
+-//#define RDMA_UNREGISTRATION_EXAMPLE
++/* #define RDMA_UNREGISTRATION_EXAMPLE */
  
- /**
+ /*
+  * Perform a non-optimized memory unregistration after every transfer
 -- 
 1.8.3.1
 
