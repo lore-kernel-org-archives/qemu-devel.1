@@ -2,78 +2,77 @@ Return-Path: <SRS0=+Fwv=DS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03D26C433E7
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 16:21:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64C97C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 18:21:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51EF621655
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 16:21:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BCF9A2222A
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 18:21:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OyaFKONl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51EF621655
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c0qyb28C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCF9A2222A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRe6H-0004q8-4u
-	for qemu-devel@archiver.kernel.org; Sun, 11 Oct 2020 12:21:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45428)
+	id 1kRfxx-0008WI-KU
+	for qemu-devel@archiver.kernel.org; Sun, 11 Oct 2020 14:21:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35684)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kRe5Z-0004Oe-Bm
- for qemu-devel@nongnu.org; Sun, 11 Oct 2020 12:20:49 -0400
-Received: from mail-ed1-x529.google.com ([2a00:1450:4864:20::529]:39099)
+ id 1kRfwQ-00084y-5T
+ for qemu-devel@nongnu.org; Sun, 11 Oct 2020 14:19:30 -0400
+Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:45829)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kRe5U-00022m-2n
- for qemu-devel@nongnu.org; Sun, 11 Oct 2020 12:20:48 -0400
-Received: by mail-ed1-x529.google.com with SMTP id t21so14413311eds.6
- for <qemu-devel@nongnu.org>; Sun, 11 Oct 2020 09:20:43 -0700 (PDT)
+ id 1kRfwO-0006oT-7Q
+ for qemu-devel@nongnu.org; Sun, 11 Oct 2020 14:19:29 -0400
+Received: by mail-ej1-x641.google.com with SMTP id dt13so20152116ejb.12
+ for <qemu-devel@nongnu.org>; Sun, 11 Oct 2020 11:19:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=tIPYFz6cXBsjher7bv/C/htL882N8V0WM14qypboGHw=;
- b=OyaFKONlL73JsQe4pWhIOkCo2tuzsWbpWqXw/YXd5aDmM7zQTpRf735EJC690bVBk1
- 0YQCLZtcCKQZwxFpw4CGkQj6bzNLY+Wxvyd/fjnZeX9WIXMWIpgnzuCCV2NuMpsA7YeB
- LMi0MVe1ULzmMB+90WdsozohRoS5DGTe6bkdgxyW494W5DBqLAUxJOnvhS2e+U3nwog9
- QE9p86S8tczg63x57t3bbf7C4YqKoz0a+bxUSuRiE6OWkWX56RFOVpJ8Ht8i10qnWEJv
- 6e6MnuSx09irrBpRDAsWmb2orT3XwknAePcB3eZx7h+6UrD0oGatxx3T93cgoh04KynZ
- z8Eg==
+ :cc; bh=U8afVzLe2PGpoHIk80te0tvm8+J+uAeMy3EH0wjpfiU=;
+ b=c0qyb28CSNJumfFq0UldrR2UYfHH1LKRdCllg+r+OY0e5UqotTXcWCUbXt/aKD34H1
+ QoLjFKdBZm0FN1WUmegc4POlFPFxPQa5aAd9C18OL9fHHhZniBS9B61TkRE//1R3OYMu
+ UzjIACxCE33oskzeMaxh3yXiSKUFdZS6tunxJUpaC4NDwMzsHGVirVgHw8qWVyU9yyOg
+ dfstOm36/vL6yKlUGWhpxKQfw7nTt4MzxSvlqLlTUtq5aTegsE4YZAg0gsUTq+ei5Bcm
+ lSTULRIOI3UDSRrL1E1QY/4AdSe/D95H6++WiPi6uP083XxGMUwT/AXKa+O3wyvdUArM
+ 16xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=tIPYFz6cXBsjher7bv/C/htL882N8V0WM14qypboGHw=;
- b=rSJmD7urACm1w07PTUxZ5eduQHvirKilxmhQQinJWcadVoc80b9awWRAC3czqIU0yW
- zs0wAmtkmTO2h+yRyJhPPH14pIpZpOrR10A0P6etm1A+/ZMzdmrW6/Hq8oYOHzdH4ssW
- lXcF7YYk47p3bfYCTVD0WknIKzJb/SvQqxPhEWTKsSHuR6++qOsijHJ0f6COu2JWPTaV
- rfYEZQ68d+z0Ba9Nh3N9SMz3RkMCMqW2NiOGJfs81ttWMKhfzq+YmLMQg7DiFr602ild
- 3yeYOvvRLDpR6eJeoxLLk8bNj4bu0StEsxOxWtGUEBnar4xCvxefVKwNu2YDGAAKEi2C
- XU2A==
-X-Gm-Message-State: AOAM532fNdzPsLjpcBDBqURsnrRbvpiM/Nsvkj0kWCLru7oIc1yP5Uiy
- 6SJ6p1PVRbOZojZzq+XdCQZJn1z4bXpVbpshx9c0rw==
-X-Google-Smtp-Source: ABdhPJxgVXb37A/xyJjedqL97kTDCSwQG5vbF/Ob4QP/sfgBhmGBigL4n/rQ+QNO/tfk9gePByDsjQa1blt+/koQW84=
-X-Received: by 2002:aa7:c302:: with SMTP id l2mr9938653edq.204.1602433242290; 
- Sun, 11 Oct 2020 09:20:42 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=U8afVzLe2PGpoHIk80te0tvm8+J+uAeMy3EH0wjpfiU=;
+ b=TV5NrF8Hpd84G+rhnY/8ziE5V15cpnXzT2zNNl2+6HXXypMDNmii5wCsBGZGlNnRtD
+ SKV5/PLJDlL64cQb8EBibwjpHUY3thWVxme6Dj2xocvpbD6Y4dC6neWnRE0QlYa2M4kF
+ nqgpduhOnEqPEQOHXeQtw2oldqa6FlthW39lYjWHGubKRjeKrZLawvhSJYJm1bn5gzBn
+ G9ZYsmiElR2RYqLBKXLks+f0jZYilW8pQlzzFwSfELuld92avMZlZJNP6KPl/Qgg6WYf
+ 9rkV7XpIFQOng+6Qvwxzy25GSevs7s0ElQ1CswhAC0TqCmWK1RcaQCKMiFa2D0Vn6S0K
+ jhpA==
+X-Gm-Message-State: AOAM530RTe0KNnZuGAmBm23EQjp5hv2TZ7fF7vfcDVRpXOgCtnagpk9L
+ 0uZbkMymHRKYZfQFQIAPxWfpmgpV0T2uwoMDhurZTw==
+X-Google-Smtp-Source: ABdhPJw8bj7PqBBx7UqoXyJnRpa3gRFwgnfoC4S09bZug/98CvhlQCHRfTwM6iXgTjuJZkzx6BJyL6MJudDVi2TR9ng=
+X-Received: by 2002:a17:906:7254:: with SMTP id
+ n20mr23506543ejk.382.1602440366397; 
+ Sun, 11 Oct 2020 11:19:26 -0700 (PDT)
 MIME-Version: 1.0
-References: <20201009163147.28512-1-alex.bennee@linaro.org>
-In-Reply-To: <20201009163147.28512-1-alex.bennee@linaro.org>
+References: <1602413863-19513-1-git-send-email-yubihong@huawei.com>
+ <1602413863-19513-3-git-send-email-yubihong@huawei.com>
+In-Reply-To: <1602413863-19513-3-git-send-email-yubihong@huawei.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 11 Oct 2020 17:20:31 +0100
-Message-ID: <CAFEAcA-WPUHjgKqUM6tayQWwv9a-AEFCwv-MCzK02uhz-_07-Q@mail.gmail.com>
-Subject: Re: [PULL 00/22] acceptance regressions, testing, gitdm, plugins
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Date: Sun, 11 Oct 2020 19:19:15 +0100
+Message-ID: <CAFEAcA_VGzPsteNKjYkm7PGUn5As5Z+XWLMZq60ph055LqqfrA@mail.gmail.com>
+Subject: Re: [PATCH v1 2/8] migration: Don't use '#' flag of printf format
+To: Bihong Yu <yubihong@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::529;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x529.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::641;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x641.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -95,45 +94,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: alex.chen@huawei.com, Juan Quintela <quintela@redhat.com>,
+ QEMU Trivial <qemu-trivial@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, zhengchuan@huawei.com,
+ wanghao232@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 9 Oct 2020 at 17:31, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
-e:
->
-> The following changes since commit 4a7c0bd9dcb08798c6f82e55b5a3423f7ee669=
-f1:
->
->   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-5.2-20201009=
-' into staging (2020-10-09 15:48:04 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/stsquad/qemu.git tags/pull-various-091020-1
->
-> for you to fetch changes up to e5d402b28f1a325d46b7b0f08d04257f618e6d03:
->
->   tests/acceptance: disable machine_rx_gdbsim on GitLab (2020-10-09 17:27=
-:55 +0100)
->
-> ----------------------------------------------------------------
-> Testing, gitdm and plugin fixes:
->
->   - fix acceptance regressions in MIPS and IDE
->   - speed up cirrus msys2/mingw builds
->   - add genisoimage to more docker images
->   - slew of gitdb updates
->   - fix some windows compile issues for plugins
->   - add V=3D1 to cirrus output
->   - disable rxsim in gitlab CI
+On Sun, 11 Oct 2020 at 14:52, Bihong Yu <yubihong@huawei.com> wrote:
+> @@ -998,7 +998,7 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
+>                     (addr == 100) ? '\n' : '\r');
+>              fflush(stdout);
+>          } else if (!(flags & BLK_MIG_FLAG_EOS)) {
+> -            fprintf(stderr, "Unknown block migration flags: %#x\n", flags);
+> +            fprintf(stderr, "Unknown block migration flags: %0x\n", flags);
 
+This doesn't look right. "%#x" will print a number in hex with a leading '0x'.
+To get the same effect without using "#" you need "0x%x" (that is,
+the format string provides the 0x characters literally).
+What you've written is '%0x", which is a format string where the '0' is
+a request to print with zero padding (which is ignored since there's no
+field width given), so the result is the same as if you'd just said '%x',
+and there is no '0x' in the output.
 
-Applied, thanks.
+$ cat /tmp/zz9.c
+#include <stdio.h>
+int main(void) {
+  printf("%#x\n", 42);
+  printf("%0x\n", 42);
+  printf("0x%x\n", 42);
+  return 0;
+}
+$ gcc -g -Wall -o /tmp/zz9 /tmp/zz9.c
+$ /tmp/zz9
+0x2a
+2a
+0x2a
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
-for any user-visible changes.
+>          default:
+> -            error_report("Unknown combination of migration flags: %#x"
+> +            error_report("Unknown combination of migration flags: %0x"
+>                           " (postcopy mode)", flags);
+>              ret = -EINVAL;
+>              break;
+> @@ -3576,7 +3576,7 @@ static int ram_load_precopy(QEMUFile *f)
+>              if (flags & RAM_SAVE_FLAG_HOOK) {
+>                  ram_control_load_hook(f, RAM_CONTROL_HOOK, NULL);
+>              } else {
+> -                error_report("Unknown combination of migration flags: %#x",
+> +                error_report("Unknown combination of migration flags: %0x",
+>                               flags);
+>                  ret = -EINVAL;
+>              }
 
+These two similarly should be "0x%x".
+
+thanks
 -- PMM
 
