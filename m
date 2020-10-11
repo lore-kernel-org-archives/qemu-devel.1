@@ -2,83 +2,83 @@ Return-Path: <SRS0=+Fwv=DS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA8BAC433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 19:42:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28C6DC433E7
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 19:52:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 347F820790
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 19:42:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5D5E92087D
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 19:52:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qEwwLhXf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 347F820790
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fchLa3yE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D5E92087D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRhEz-0006pv-BH
-	for qemu-devel@archiver.kernel.org; Sun, 11 Oct 2020 15:42:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47264)
+	id 1kRhNw-00052E-7r
+	for qemu-devel@archiver.kernel.org; Sun, 11 Oct 2020 15:52:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49706)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRh5r-0002zd-1q; Sun, 11 Oct 2020 15:33:19 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36977)
+ id 1kRhLX-0002x1-3b; Sun, 11 Oct 2020 15:49:32 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37121)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRh5p-0006vE-Ii; Sun, 11 Oct 2020 15:33:18 -0400
-Received: by mail-wm1-x341.google.com with SMTP id j136so15336054wmj.2;
- Sun, 11 Oct 2020 12:33:16 -0700 (PDT)
+ id 1kRhLT-0000HW-Vr; Sun, 11 Oct 2020 15:49:29 -0400
+Received: by mail-wm1-x343.google.com with SMTP id j136so15371696wmj.2;
+ Sun, 11 Oct 2020 12:49:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ottyxadkfdG6t1j9EHj71mxgUhLG6Ki7NMaGNynZJD0=;
- b=qEwwLhXfmlgPiK25yyOcjxsJ3q6RS8jvY3+SEaEz2+i7iO1P0LlvcWHDK4l3Ri4LPB
- qGpOdydfbM0UerCDmcJ94eviy2yU5Sb2QSx5PCS3a9QmWlP6G4lmErLaesEeYq33Eqk8
- Oq78gsC/3iuwPT39zyXdDhPj8J+50eBMUnUYHnZxrdpgtDRdcFOqnLT2l88GYI1PwJy+
- SAP4Eqycljc26DjboqgJ+oXEl852pxyECm7Fyg1eLe7CaIhjeqiMnkVMGG1AYRdlgKoF
- F75IVc/9m9kzcxiIa8Ts3FWnLnRpJQXeCvUZQBxZFW7R5dbuW5PBhnAz/sjMa4x7qfmq
- 8Ugw==
+ bh=/fQo3DSJb6riAH6KnfckECiEhkMalNL1pPpYvWlbzCc=;
+ b=fchLa3yE6WsO/FZ+TB5rqAIHERo2Wc0kfScuX4Nd1FAJjMJybOer7ydG7VO4fPRhUM
+ byTxfmCYAFwlw73VF3USnknTVXPX77Ml+HloAqCxwp4ZRiFf1eaa6cQVpUE7nHAVewzR
+ 2CICmGkLiY4fFTNAJcbjESHcyfORodUgr0ysfOzyI+XkeKB71lBmGoa6UsH0ozKWU7+Z
+ ba639AW3CwlVdXtlEaaWUuFPcu/31i7bjxPW7ZIPXVpEB0PNcJUXdx9+aJ78uDX3L32M
+ jnTT8a+bBoE2urRl3hVdSj1VuXC0SuWxuyEmpYtRxmRfu8SnnHw4VEPkbpFhWJyU409A
+ 3Z2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=ottyxadkfdG6t1j9EHj71mxgUhLG6Ki7NMaGNynZJD0=;
- b=SrYQeNm6OyekXfDBGNV2Pkyv/cwzBj5qBeJuOScA1MH4w8Fj3LQzU6NOTTO9H0/b42
- bV7Z5lxTUg2oBAFATSXqEghdArJkkFFBz5f5VmqUhrsNtTgnid+Y/OzS8N5661CDNZtc
- It/YIzebLpXtto5Fz97RU5e3miGriH6F9UZFDYKl/YuTf6HSt8LmH11GxSTx57tRhj5Y
- rnL+YR/VEpoEov94ZkF7ga+ykZU8C7NUo45rJ0if+84+Ha/4Ft8mBIq6/JIBNO+SKk2A
- bZpzO3L6hgkT1wiANXTtHkjNnTVRQb8N1QnBuUi1ofRdkEHqD7e+p40d2OQSRRQxPpHo
- Kwsg==
-X-Gm-Message-State: AOAM532V76eorRPsVoc1VmdUPOJBzZw+eoY9KYZJNy9reUoW5rwrEk04
- T9vZk9XmDvYh1wqwy5HCs8MfTJgXEHM=
-X-Google-Smtp-Source: ABdhPJxwCHk9ZmaUKr7CkbYZxWaEQIWMZ6rAQBHwbNpxGejuErNgC8kytvS3q5p8QQv7R4bsOtQhNQ==
-X-Received: by 2002:a1c:3b8a:: with SMTP id i132mr7793744wma.178.1602444795066; 
- Sun, 11 Oct 2020 12:33:15 -0700 (PDT)
+ bh=/fQo3DSJb6riAH6KnfckECiEhkMalNL1pPpYvWlbzCc=;
+ b=isYmbhHzWSYxS4hT958WWAU7uDJiGNgjZj+Xdwe3CdR2pkGGeKQP2188p7Akm4lcja
+ 8kfGs6qSHu1QYBwRldey8IiGm9yxzBKnF7xufbvmFK/hcQW6sLiS3ao0TpniBkVxSLe2
+ KQ3kjunsWd4Ll2jHfCqMWxgWZEGADgsEroPoKFZmTHClH6sxiLlaeibzMdTZDXdZeL6s
+ CXs1/2YeAXmYGHqlfcpcivNaEWa7dm8EuRi0S6XNF75kIC/SOIzdMd9ePJ4yqloM5n+E
+ vnXSKXN3FpfCzn5YBqSebm0G4TnRS+h80RbYZdk+F/1vwVTY772sMOiQvtRKonmDsJoc
+ Whrw==
+X-Gm-Message-State: AOAM532tXmVnhlFE+LtI71o3O+KJMHUjgB4LZddeZFqKt+nARvZ8uQtC
+ v8OX2d9DZf4aty8sM/J781qjc+jFcac=
+X-Google-Smtp-Source: ABdhPJz6A99BRgIPa/1KR4ERdM5WL50IzAC2V7BytlJ8nFXrdYBkI/cd6vxwEbPTmcgpngPy+W2cgw==
+X-Received: by 2002:a1c:9949:: with SMTP id b70mr7946954wme.116.1602445765529; 
+ Sun, 11 Oct 2020 12:49:25 -0700 (PDT)
 Received: from localhost.localdomain
  (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id 88sm22673596wrl.76.2020.10.11.12.33.13
+ by smtp.gmail.com with ESMTPSA id n9sm22111984wrq.72.2020.10.11.12.49.24
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 11 Oct 2020 12:33:14 -0700 (PDT)
+ Sun, 11 Oct 2020 12:49:24 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 08/10] hw/isa: Add the ISA_IRQ_NET_DEFAULT definition
-Date: Sun, 11 Oct 2020 21:32:27 +0200
-Message-Id: <20201011193229.3210774-9-f4bug@amsat.org>
+Subject: [PATCH 1/4] hw: Replace magic value by PCI_NUM_PINS definition
+Date: Sun, 11 Oct 2020 21:49:15 +0200
+Message-Id: <20201011194918.3219195-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201011193229.3210774-1-f4bug@amsat.org>
-References: <20201011193229.3210774-1-f4bug@amsat.org>
+In-Reply-To: <20201011194918.3219195-1-f4bug@amsat.org>
+References: <20201011194918.3219195-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -101,60 +101,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-block@nongnu.org,
- Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-trivial@nongnu.org,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Corey Minyard <minyard@acm.org>, Paolo Bonzini <pbonzini@redhat.com>,
- John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Kevin Wolf <kwolf@redhat.com>,
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
+ Thomas Huth <thuth@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Max Reitz <mreitz@redhat.com>, qemu-ppc@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, qemu-arm@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The network devices use IRQ #9 by default. Add this
-default definition to the IsaIrqNumber enum.
-
-Avoid magic values in the code, replace them by the
-newly introduced definition.
+Use self-explicit PCI_NUM_PINS definition instead of magic value.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/isa/isa.h | 1 +
- hw/net/ne2000-isa.c  | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ hw/arm/virt.c           | 4 ++--
+ hw/mips/gt64xxx_pci.c   | 2 +-
+ hw/pci-host/versatile.c | 6 +++---
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/include/hw/isa/isa.h b/include/hw/isa/isa.h
-index 9f78ff11246..11166592246 100644
---- a/include/hw/isa/isa.h
-+++ b/include/hw/isa/isa.h
-@@ -15,6 +15,7 @@ enum IsaIrqNumber {
-     ISA_IRQ_FDC_DEFAULT =  6,
-     ISA_IRQ_PAR_DEFAULT =  7,
-     ISA_IRQ_RTC_DEFAULT =  8,
-+    ISA_IRQ_NET_DEFAULT =  9,
-     ISA_NUM_IRQS        = 16
- };
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index e465a988d68..ddad9621f79 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1117,11 +1117,11 @@ static void create_pcie_irq_map(const VirtMachineState *vms,
+                                 int first_irq, const char *nodename)
+ {
+     int devfn, pin;
+-    uint32_t full_irq_map[4 * 4 * 10] = { 0 };
++    uint32_t full_irq_map[4 * PCI_NUM_PINS * 10] = { 0 };
+     uint32_t *irq_map = full_irq_map;
  
-diff --git a/hw/net/ne2000-isa.c b/hw/net/ne2000-isa.c
-index dd6f6e34d3c..e31e86c14af 100644
---- a/hw/net/ne2000-isa.c
-+++ b/hw/net/ne2000-isa.c
-@@ -80,7 +80,7 @@ static void isa_ne2000_realizefn(DeviceState *dev, Error **errp)
+     for (devfn = 0; devfn <= 0x18; devfn += 0x8) {
+-        for (pin = 0; pin < 4; pin++) {
++        for (pin = 0; pin < PCI_NUM_PINS; pin++) {
+             int irq_type = GIC_FDT_IRQ_TYPE_SPI;
+             int irq_nr = first_irq + ((pin + PCI_SLOT(devfn)) % PCI_NUM_PINS);
+             int irq_level = GIC_FDT_IRQ_FLAGS_LEVEL_HI;
+diff --git a/hw/mips/gt64xxx_pci.c b/hw/mips/gt64xxx_pci.c
+index e091bc4ed55..ff1a35755f6 100644
+--- a/hw/mips/gt64xxx_pci.c
++++ b/hw/mips/gt64xxx_pci.c
+@@ -1018,7 +1018,7 @@ static void gt64120_pci_set_irq(void *opaque, int irq_num, int level)
+     if (pic_irq < 16) {
+         /* The pic level is the logical OR of all the PCI irqs mapped to it. */
+         pic_level = 0;
+-        for (i = 0; i < 4; i++) {
++        for (i = 0; i < PCI_NUM_PINS; i++) {
+             if (pic_irq == piix4_dev->config[PIIX_PIRQCA + i]) {
+                 pic_level |= pci_irq_levels[i];
+             }
+diff --git a/hw/pci-host/versatile.c b/hw/pci-host/versatile.c
+index 3553277f941..b4951023f4e 100644
+--- a/hw/pci-host/versatile.c
++++ b/hw/pci-host/versatile.c
+@@ -75,7 +75,7 @@ enum {
+ struct PCIVPBState {
+     PCIHostState parent_obj;
  
- static Property ne2000_isa_properties[] = {
-     DEFINE_PROP_UINT32("iobase", ISANE2000State, iobase, 0x300),
--    DEFINE_PROP_UINT32("irq",   ISANE2000State, isairq, 9),
-+    DEFINE_PROP_UINT32("irq", ISANE2000State, isairq, ISA_IRQ_NET_DEFAULT),
-     DEFINE_NIC_PROPERTIES(ISANE2000State, ne2000.c),
-     DEFINE_PROP_END_OF_LIST(),
- };
+-    qemu_irq irq[4];
++    qemu_irq irq[PCI_NUM_PINS];
+     MemoryRegion controlregs;
+     MemoryRegion mem_config;
+     MemoryRegion mem_config2;
+@@ -412,7 +412,7 @@ static void pci_vpb_realize(DeviceState *dev, Error **errp)
+ 
+     object_initialize(&s->pci_dev, sizeof(s->pci_dev), TYPE_VERSATILE_PCI_HOST);
+ 
+-    for (i = 0; i < 4; i++) {
++    for (i = 0; i < PCI_NUM_PINS; i++) {
+         sysbus_init_irq(sbd, &s->irq[i]);
+     }
+ 
+@@ -422,7 +422,7 @@ static void pci_vpb_realize(DeviceState *dev, Error **errp)
+         mapfn = pci_vpb_map_irq;
+     }
+ 
+-    pci_bus_irqs(&s->pci_bus, pci_vpb_set_irq, mapfn, s->irq, 4);
++    pci_bus_irqs(&s->pci_bus, pci_vpb_set_irq, mapfn, s->irq, PCI_NUM_PINS);
+ 
+     /* Our memory regions are:
+      * 0 : our control registers
 -- 
 2.26.2
 
