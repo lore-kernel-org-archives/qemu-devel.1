@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F90C433E7
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:41:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28A98C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:42:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DB1F207FB
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:41:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DB1F207FB
+	by mail.kernel.org (Postfix) with ESMTPS id A7B38207FB
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:42:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7B38207FB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRbbj-0001fP-Aj
-	for qemu-devel@archiver.kernel.org; Sun, 11 Oct 2020 09:41:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51420)
+	id 1kRbca-0003Ii-RC
+	for qemu-devel@archiver.kernel.org; Sun, 11 Oct 2020 09:42:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51466)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
- id 1kRXv5-00019i-VB; Sun, 11 Oct 2020 05:45:36 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:5169 helo=huawei.com)
+ id 1kRXvF-0001B5-To; Sun, 11 Oct 2020 05:45:46 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:5174 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
- id 1kRXv1-0007P1-Pa; Sun, 11 Oct 2020 05:45:35 -0400
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 7E54E2BF15CC7CE11937;
+ id 1kRXv6-0007SD-0P; Sun, 11 Oct 2020 05:45:44 -0400
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id A99115D73DC16BA43095;
  Sun, 11 Oct 2020 17:45:12 +0800 (CST)
 Received: from huawei.com (10.175.124.27) by DGGEMS413-HUB.china.huawei.com
  (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Sun, 11 Oct 2020
  17:45:03 +0800
 From: Bihong Yu <yubihong@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
-Subject: [PATCH v1 2/8] migration: Don't use '#' flag of printf format
-Date: Sun, 11 Oct 2020 18:17:03 +0800
-Message-ID: <1602411429-12043-3-git-send-email-yubihong@huawei.com>
+Subject: [PATCH v1 1/8] migration: Do not use C99 // comments
+Date: Sun, 11 Oct 2020 18:17:02 +0800
+Message-ID: <1602411429-12043-2-git-send-email-yubihong@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1602411429-12043-1-git-send-email-yubihong@huawei.com>
 References: <1602411429-12043-1-git-send-email-yubihong@huawei.com>
@@ -82,44 +82,35 @@ Reviewed-by: Chuan Zheng <zhengchuan@huawei.com>
 Signed-off-by: Bihong Yu <yubihong@huawei.com>
 ---
  migration/block.c | 2 +-
- migration/ram.c   | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ migration/rdma.c  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/migration/block.c b/migration/block.c
-index 4b8576b..399dfb8 100644
+index 737b649..4b8576b 100644
 --- a/migration/block.c
 +++ b/migration/block.c
-@@ -998,7 +998,7 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
-                    (addr == 100) ? '\n' : '\r');
-             fflush(stdout);
-         } else if (!(flags & BLK_MIG_FLAG_EOS)) {
--            fprintf(stderr, "Unknown block migration flags: %#x\n", flags);
-+            fprintf(stderr, "Unknown block migration flags: %0x\n", flags);
-             return -EINVAL;
-         }
-         ret = qemu_file_get_error(f);
-diff --git a/migration/ram.c b/migration/ram.c
-index 433489d..59bdd15 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -3298,7 +3298,7 @@ static int ram_load_postcopy(QEMUFile *f)
-             multifd_recv_sync_main();
-             break;
-         default:
--            error_report("Unknown combination of migration flags: %#x"
-+            error_report("Unknown combination of migration flags: %0x"
-                          " (postcopy mode)", flags);
-             ret = -EINVAL;
-             break;
-@@ -3576,7 +3576,7 @@ static int ram_load_precopy(QEMUFile *f)
-             if (flags & RAM_SAVE_FLAG_HOOK) {
-                 ram_control_load_hook(f, RAM_CONTROL_HOOK, NULL);
-             } else {
--                error_report("Unknown combination of migration flags: %#x",
-+                error_report("Unknown combination of migration flags: %0x",
-                              flags);
-                 ret = -EINVAL;
-             }
+@@ -40,7 +40,7 @@
+ #define MAX_IO_BUFFERS 512
+ #define MAX_PARALLEL_IO 16
+ 
+-//#define DEBUG_BLK_MIGRATION
++/* #define DEBUG_BLK_MIGRATION */
+ 
+ #ifdef DEBUG_BLK_MIGRATION
+ #define DPRINTF(fmt, ...) \
+diff --git a/migration/rdma.c b/migration/rdma.c
+index 0340841..0eb42b7 100644
+--- a/migration/rdma.c
++++ b/migration/rdma.c
+@@ -1288,7 +1288,7 @@ const char *print_wrid(int wrid)
+  * workload information or LRU information is available, do not attempt to use
+  * this feature except for basic testing.
+  */
+-//#define RDMA_UNREGISTRATION_EXAMPLE
++/* #define RDMA_UNREGISTRATION_EXAMPLE */
+ 
+ /*
+  * Perform a non-optimized memory unregistration after every transfer
 -- 
 1.8.3.1
 
