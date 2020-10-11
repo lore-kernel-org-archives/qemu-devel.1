@@ -7,51 +7,51 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38987C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:43:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B1F1C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:44:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E276A207FB
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:43:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E276A207FB
+	by mail.kernel.org (Postfix) with ESMTPS id 20DA7207FB
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:44:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20DA7207FB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRbdU-0005JP-Vf
-	for qemu-devel@archiver.kernel.org; Sun, 11 Oct 2020 09:43:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51470)
+	id 1kRbeU-0006lD-AK
+	for qemu-devel@archiver.kernel.org; Sun, 11 Oct 2020 09:44:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55264)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
- id 1kRXvF-0001B6-UW; Sun, 11 Oct 2020 05:45:46 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:5173 helo=huawei.com)
+ id 1kRYPS-0005Qm-RQ; Sun, 11 Oct 2020 06:17:00 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:5215 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
- id 1kRXv7-0007SC-Rz; Sun, 11 Oct 2020 05:45:45 -0400
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 87632C7A3AAD4115DF6E;
- Sun, 11 Oct 2020 17:45:12 +0800 (CST)
-Received: from huawei.com (10.175.124.27) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Sun, 11 Oct 2020
- 17:45:04 +0800
+ id 1kRYPM-0002Dw-GJ; Sun, 11 Oct 2020 06:16:58 -0400
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 35D5ED4502AAD23BD250;
+ Sun, 11 Oct 2020 18:16:45 +0800 (CST)
+Received: from huawei.com (10.175.124.27) by DGGEMS403-HUB.china.huawei.com
+ (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0; Sun, 11 Oct 2020
+ 18:16:37 +0800
 From: Bihong Yu <yubihong@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
 Subject: [PATCH v1 4/8] migration: Open brace '{' following struct go on the
  same line
-Date: Sun, 11 Oct 2020 18:17:05 +0800
-Message-ID: <1602411429-12043-5-git-send-email-yubihong@huawei.com>
+Date: Sun, 11 Oct 2020 18:48:37 +0800
+Message-ID: <1602413321-22252-5-git-send-email-yubihong@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1602411429-12043-1-git-send-email-yubihong@huawei.com>
-References: <1602411429-12043-1-git-send-email-yubihong@huawei.com>
+In-Reply-To: <1602413321-22252-1-git-send-email-yubihong@huawei.com>
+References: <1602413321-22252-1-git-send-email-yubihong@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.175.124.27]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.190; envelope-from=yubihong@huawei.com;
+Received-SPF: pass client-ip=45.249.212.191; envelope-from=yubihong@huawei.com;
  helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/11 05:45:13
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/11 06:16:45
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -60,7 +60,7 @@ X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
  RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
-X-Mailman-Approved-At: Sun, 11 Oct 2020 09:36:15 -0400
+X-Mailman-Approved-At: Sun, 11 Oct 2020 09:36:17 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
