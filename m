@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78BC6C433E7
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 20:41:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36C21C433E7
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 20:44:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E07F207FB
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 20:41:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D58A20578
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 20:44:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ri/CRzxZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E07F207FB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XCPIuZoI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D58A20578
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRi9o-0000rn-3V
-	for qemu-devel@archiver.kernel.org; Sun, 11 Oct 2020 16:41:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57456)
+	id 1kRiCG-0003U1-H4
+	for qemu-devel@archiver.kernel.org; Sun, 11 Oct 2020 16:44:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57576)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kRi4w-00017H-La
- for qemu-devel@nongnu.org; Sun, 11 Oct 2020 16:36:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50385)
+ id 1kRi5R-0001oZ-9E
+ for qemu-devel@nongnu.org; Sun, 11 Oct 2020 16:36:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32448)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kRi4s-0005UK-GC
- for qemu-devel@nongnu.org; Sun, 11 Oct 2020 16:36:26 -0400
+ id 1kRi5O-0005XF-KA
+ for qemu-devel@nongnu.org; Sun, 11 Oct 2020 16:36:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602448580;
+ s=mimecast20190719; t=1602448613;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=oMGcivtxqfyttrxW+n4YbT+qnoQcOtRjXxzV/2OSLnk=;
- b=Ri/CRzxZoyxrVcz8252OYAOLlwRIYsiVVw4PkoKIhp3+4YbLFO98Wpot6EZarBQlt/LKlh
- v6E2IjQgtMPQnjFiUz7+YPC9gmBnkVyOtjjzzKWSQq35QgLzhe22g/empOhAxNSjDywhnr
- 764iqt1hXkToc8Dzp8RvPkrLQDngbyU=
+ bh=HYWZkMKWHLktsWqLRuW6+7g2bKU6rV7ednfYnjWHwEY=;
+ b=XCPIuZoIn15R/aYGSpqsiiF09wZzIcaLySGz19Gzu12bvjovCfwTF0CqXNPSWkaBSCTc5A
+ +TnufGqGMGstW2HM9V/KbPYbhg5278/KtJB3mBR/ikaU2QOFH19xFdX0+C5xhSFLyC1SgO
+ JeHeIeiFMjkBXjfiSUFAbqXL/7UatC8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-306-o_2hRVGHMz-OOlPLfEgsFA-1; Sun, 11 Oct 2020 16:36:18 -0400
-X-MC-Unique: o_2hRVGHMz-OOlPLfEgsFA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-462-TQEGmjTcPP6s_u58-mq1Hg-1; Sun, 11 Oct 2020 16:36:51 -0400
+X-MC-Unique: TQEGmjTcPP6s_u58-mq1Hg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C77DF804001
- for <qemu-devel@nongnu.org>; Sun, 11 Oct 2020 20:36:17 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7CB1110066FE
+ for <qemu-devel@nongnu.org>; Sun, 11 Oct 2020 20:36:50 +0000 (UTC)
 Received: from localhost (unknown [10.36.110.19])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8C8D67512E;
- Sun, 11 Oct 2020 20:36:15 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4F2B660C05;
+ Sun, 11 Oct 2020 20:36:42 +0000 (UTC)
 From: marcandre.lureau@redhat.com
 To: qemu-devel@nongnu.org
-Subject: [PoCv2 06/15] rust: provide a common crate for QEMU
-Date: Mon, 12 Oct 2020 00:35:04 +0400
-Message-Id: <20201011203513.1621355-7-marcandre.lureau@redhat.com>
+Subject: [PoCv2 09/15] scripts/qapi: add generation of Rust bindings for types
+Date: Mon, 12 Oct 2020 00:35:07 +0400
+Message-Id: <20201011203513.1621355-10-marcandre.lureau@redhat.com>
 In-Reply-To: <20201011203513.1621355-1-marcandre.lureau@redhat.com>
 References: <20201011203513.1621355-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=marcandre.lureau@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -105,607 +105,636 @@ Sender: "Qemu-devel"
 
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-This crates provides common bindings and facilities for QEMU C API
-shared by various projects.
+Generate high-level idiomatic Rust code for the QAPI types, with to/from
+translations for C FFI.
 
-Most importantly, it defines the conversion traits used to convert from
-C to Rust types. Those traits are largely adapted from glib-rs, since
-those have prooven to be very flexible, and should guide us to bind
-further QEMU types such as QOM. If glib-rs becomes a dependency, we
-should consider adopting glib translate traits. For QAPI, we need a
-smaller subset.
+- no conditional support yet
+
+- C FFI types are mapped to higher-level types (char*->String,
+  Foo*->Foo, has_foo/foo->Option<foo> etc)
+
+- C enums are simply aliased
+
+- C structures have corresponding Rust structures
+
+- alternate are represented as Rust enum (TODO: to/from conversion)
+
+- variants A are represented as Rust AEnum enums. A AEnum::kind() method
+  allows to easily get the variant C kind enum value. The translation code
+  also uses a helper enum ACEnum to hold the C pointer variant. There
+  might be better ways to achieve the translation, but that one works
+  for now.
+
+- unions are represented in a similar way as C, as a struct S with a "u"
+  member (since S may have extra 'base' fields). However, the discriminant
+  isn't a member of S, as Rust enum variant don't need that.
+
+- lists are represented as Vec and translated thanks to vec_to/from
+  translate macros
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- Cargo.toml                   |   5 +-
- rust/common/Cargo.toml       |  11 ++
- rust/common/src/error.rs     | 109 ++++++++++++
- rust/common/src/lib.rs       |  10 ++
- rust/common/src/qemu.rs      |  30 ++++
- rust/common/src/sys.rs       |  58 +++++++
- rust/common/src/translate.rs | 309 +++++++++++++++++++++++++++++++++++
- 7 files changed, 531 insertions(+), 1 deletion(-)
- create mode 100644 rust/common/Cargo.toml
- create mode 100644 rust/common/src/error.rs
- create mode 100644 rust/common/src/lib.rs
- create mode 100644 rust/common/src/qemu.rs
- create mode 100644 rust/common/src/sys.rs
- create mode 100644 rust/common/src/translate.rs
+ meson.build              |   1 +
+ scripts/qapi-gen.py      |   2 +
+ scripts/qapi/rs.py       |  78 +++++++
+ scripts/qapi/rs_types.py | 447 +++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 528 insertions(+)
+ create mode 100644 scripts/qapi/rs_types.py
 
-diff --git a/Cargo.toml b/Cargo.toml
-index e69b04200f..26bd083f79 100644
---- a/Cargo.toml
-+++ b/Cargo.toml
-@@ -1,2 +1,5 @@
- [workspace]
--members = ["qga"]
-+members = [
-+  "qga",
-+  "rust/common",
-+]
-diff --git a/rust/common/Cargo.toml b/rust/common/Cargo.toml
+diff --git a/meson.build b/meson.build
+index b6b8330b97..666e38033e 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1149,6 +1149,7 @@ qapi_gen_depends = [ meson.source_root() / 'scripts/qapi/__init__.py',
+                      meson.source_root() / 'scripts/qapi/common.py',
+                      meson.source_root() / 'scripts/qapi/rs.py',
+                      meson.source_root() / 'scripts/qapi/rs_sys.py',
++                     meson.source_root() / 'scripts/qapi/rs_types.py',
+                      meson.source_root() / 'scripts/qapi-gen.py',
+ ]
+ 
+diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
+index 5bfe9c8cd1..556bfe9e7b 100644
+--- a/scripts/qapi-gen.py
++++ b/scripts/qapi-gen.py
+@@ -17,6 +17,7 @@ from qapi.types import gen_types
+ from qapi.visit import gen_visit
+ 
+ from qapi.rs_sys import gen_rs_systypes
++from qapi.rs_types import gen_rs_types
+ 
+ def main(argv):
+     parser = argparse.ArgumentParser(
+@@ -50,6 +51,7 @@ def main(argv):
+ 
+     if args.rust:
+         gen_rs_systypes(schema, args.output_dir, args.prefix, args.builtins)
++        gen_rs_types(schema, args.output_dir, args.prefix, args.builtins)
+     else:
+         gen_types(schema, args.output_dir, args.prefix, args.builtins)
+         gen_visit(schema, args.output_dir, args.prefix, args.builtins)
+diff --git a/scripts/qapi/rs.py b/scripts/qapi/rs.py
+index daa946580b..cab5bb9b72 100644
+--- a/scripts/qapi/rs.py
++++ b/scripts/qapi/rs.py
+@@ -11,6 +11,8 @@ from qapi.common import *
+ from qapi.gen import QAPIGen, QAPISchemaVisitor
+ 
+ 
++rs_lists = set()
++
+ rs_name_trans = str.maketrans('.-', '__')
+ 
+ # Map @name to a valid Rust identifier.
+@@ -42,12 +44,55 @@ def rs_name(name, protect=True):
+     return name
+ 
+ 
++def rs_type(c_type, ns='qapi::', optional=False):
++    vec = False
++    to_rs = {
++        'char': 'i8',
++        'int8_t': 'i8',
++        'uint8_t': 'u8',
++        'int16_t': 'i16',
++        'uint16_t': 'u16',
++        'int32_t': 'i32',
++        'uint32_t': 'u32',
++        'int64_t': 'i64',
++        'uint64_t': 'u64',
++        'double': 'f64',
++        'bool': 'bool',
++        'str': 'String',
++    }
++    if c_type.startswith('const '):
++        c_type = c_type[6:]
++    if c_type.endswith(pointer_suffix):
++        c_type = c_type.rstrip(pointer_suffix).strip()
++        if c_type.endswith('List'):
++            c_type = c_type[:-4]
++            vec = True
++        else:
++            to_rs = {
++                'char': 'String',
++            }
++
++    if c_type in to_rs:
++        ret = to_rs[c_type]
++    else:
++        ret = ns + c_type
++
++    if vec:
++        ret = 'Vec<%s>' % ret
++    if optional:
++        return 'Option<%s>' % ret
++    else:
++        return ret
++
++
+ def rs_ctype_parse(c_type):
+     is_pointer = False
+     if c_type.endswith(pointer_suffix):
+         is_pointer = True
+         c_type = c_type.rstrip(pointer_suffix).strip()
+     is_list = c_type.endswith('List')
++    if is_list:
++        rs_lists.add(c_type)
+     is_const = False
+     if c_type.startswith('const '):
+         is_const = True
+@@ -103,6 +148,39 @@ def to_camel_case(value):
+         return value
+ 
+ 
++def to_qemu_none(c_type, name):
++    (is_pointer, _, is_list, _) = rs_ctype_parse(c_type)
++
++    if is_pointer:
++        if c_type == 'char':
++            return mcgen('''
++    let %(name)s_ = CString::new(%(name)s).unwrap();
++    let %(name)s = %(name)s_.as_ptr();
++''', name=name)
++        elif is_list:
++            return mcgen('''
++    let %(name)s_ = NewPtr(%(name)s).to_qemu_none();
++    let %(name)s = %(name)s_.0.0;
++''', name=name)
++        else:
++            return mcgen('''
++    let %(name)s_ = %(name)s.to_qemu_none();
++    let %(name)s = %(name)s_.0;
++''', name=name)
++    return ''
++
++
++def from_qemu(var_name, c_type, full=False):
++    (is_pointer, _, is_list, _) = rs_ctype_parse(c_type)
++    ptr = '{} as *{} _'.format(var_name, 'mut' if full else 'const')
++    if is_list:
++        ptr = 'NewPtr({})'.format(ptr)
++    if is_pointer:
++        return 'from_qemu_{}({})'.format('full' if full else 'none', ptr)
++    else:
++        return var_name
++
++
+ class QAPIGenRs(QAPIGen):
+ 
+     def __init__(self, fname):
+diff --git a/scripts/qapi/rs_types.py b/scripts/qapi/rs_types.py
 new file mode 100644
-index 0000000000..f0584dcc83
+index 0000000000..3a7d8914c8
 --- /dev/null
-+++ b/rust/common/Cargo.toml
-@@ -0,0 +1,11 @@
-+[package]
-+name = "common"
-+version = "0.1.0"
-+edition = "2018"
-+license = "GPLv2"
++++ b/scripts/qapi/rs_types.py
+@@ -0,0 +1,447 @@
++# This work is licensed under the terms of the GNU GPL, version 2.
++# See the COPYING file in the top-level directory.
++"""
++QAPI Rust types generator
++"""
 +
-+[dependencies]
-+libc = "^0.2.76"
++from qapi.common import *
++from qapi.rs import *
 +
-+[target."cfg(unix)".dependencies]
-+nix = "^0.18.0"
-diff --git a/rust/common/src/error.rs b/rust/common/src/error.rs
-new file mode 100644
-index 0000000000..b89f788833
---- /dev/null
-+++ b/rust/common/src/error.rs
-@@ -0,0 +1,109 @@
-+use std::{self, ffi, fmt, io, ptr};
 +
-+use crate::translate::*;
-+use crate::{qemu, sys};
++objects_seen = set()
 +
-+/// Common error type for QEMU and related projects.
-+#[derive(Debug)]
-+pub enum Error {
-+    FailedAt(String, &'static str, u32),
-+    Io(io::Error),
-+    #[cfg(unix)]
-+    Nix(nix::Error),
-+}
 +
-+/// Alias for a `Result` with the error type for QEMU.
-+pub type Result<T> = std::result::Result<T, Error>;
++def gen_rs_variants_enum_kind(name, kind_arms):
++    return mcgen('''
 +
-+impl Error {
-+    fn message(&self) -> String {
-+        use Error::*;
++impl %(rs_name)sEnum {
++    pub fn kind(&self) -> %(rs_name)sKind {
 +        match self {
-+            FailedAt(msg, _, _) => msg.into(),
-+            Io(io) => format!("IO error: {}", io),
-+            #[cfg(unix)]
-+            Nix(nix) => format!("Nix error: {}", nix),
-+        }
-+    }
-+
-+    fn location(&self) -> Option<(&'static str, u32)> {
-+        use Error::*;
-+        match self {
-+            FailedAt(_, file, line) => Some((file, *line)),
-+            Io(_) => None,
-+            #[cfg(unix)]
-+            Nix(_) => None,
++            %(kind_arms)s
 +        }
 +    }
 +}
++''', rs_name=rs_name(name), kind_arms=kind_arms)
 +
-+impl fmt::Display for Error {
-+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-+        use Error::*;
++
++def gen_rs_variants_to_qemu(name, variants):
++    ret = mcgen('''
++
++pub enum %(rs_name)sCEnum<'a> {
++''', rs_name=rs_name(name))
++
++    none_arms = ''
++    full_arms = ''
++    for var in variants.variants:
++        var_name = to_camel_case(rs_name(var.name, False))
++        type_name = var.type.name
++        if type_name == 'q_empty':
++            continue
++        if type_name.endswith('-wrapper'):
++            type_name = type_name[6:-8]
++        ret += mcgen('''
++    %(var_name)s(<%(rs_type)s as ToQemuPtr<'a, *mut %(rs_systype)s>>::Storage),
++''', var_name=var_name, rs_type=rs_type(type_name, ''), rs_systype=rs_systype(type_name))
++        none_arms += mcgen('''
++             %(rs_name)sEnum::%(var_name)s(v) => {
++                 let stash_ = v.to_qemu_none();
++                 (stash_.0 as *mut std::ffi::c_void, %(rs_name)sCEnum::%(var_name)s(stash_.1))
++             },
++''', rs_name=rs_name(name), var_name=var_name)
++        full_arms += mcgen('''
++             %(rs_name)sEnum::%(var_name)s(v) => {
++                 let ptr = v.to_qemu_full();
++                 ptr as *mut std::ffi::c_void
++             },
++''', rs_name=rs_name(name), var_name=var_name)
++
++    ret += mcgen('''
++}
++
++impl QemuPtrDefault for %(rs_name)sEnum {
++    type QemuType = *mut std::ffi::c_void;
++}
++
++impl<'a> ToQemuPtr<'a, *mut std::ffi::c_void> for %(rs_name)sEnum {
++    type Storage = %(rs_name)sCEnum<'a>;
++
++    #[inline]
++    fn to_qemu_none(&'a self) -> Stash<'a, *mut std::ffi::c_void, %(rs_name)sEnum> {
++        let (ptr_, cenum_) = match self {
++             %(none_arms)s
++        };
++
++        Stash(ptr_, cenum_)
++    }
++
++    #[inline]
++    fn to_qemu_full(&self) -> *mut std::ffi::c_void {
 +        match self {
-+            FailedAt(msg, file, line) => write!(f, "{} ({}:{})", msg, file, line),
-+            _ => write!(f, "{}", self.message()),
++            %(full_arms)s
 +        }
 +    }
 +}
++''', rs_name=rs_name(name), none_arms=none_arms, full_arms=full_arms)
++    return ret
 +
-+impl From<io::Error> for Error {
-+    fn from(val: io::Error) -> Self {
-+        Error::Io(val)
-+    }
++
++def gen_rs_variants(name, variants):
++    ret = mcgen('''
++
++#[derive(Clone,Debug)]
++pub enum %(rs_name)sEnum {
++''', rs_name=rs_name(name))
++
++    kind_arms = ''
++    for var in variants.variants:
++        if var.ifcond:
++            raise NotImplementedError("ifcond are not implemented")
++        type_name = var.type.name
++        var_name = to_camel_case(rs_name(var.name, False))
++        if type_name == 'q_empty':
++            continue
++        if type_name.endswith('-wrapper'):
++            type_name = type_name[6:-8] # remove q_obj*-wrapper
++        kind_arms += mcgen('''
++        Self::%(var_name)s(_) => { %(rs_name)sKind::%(var_name)s },
++''', var_name=var_name, rs_name=rs_name(name))
++        ret += mcgen('''
++    %(var_name)s(%(rs_type)s),
++''', var_name=var_name, rs_type=rs_type(type_name, ''))
++
++    ret += mcgen('''
++}
++''')
++
++    ret += gen_rs_variants_enum_kind(name, kind_arms)
++    ret += gen_rs_variants_to_qemu(name, variants)
++    # TODO FromQemu
++    return ret
++
++
++def gen_rs_object_to_qemu(name, base, members, variants):
++    storage = []
++    stash = []
++    sys_memb = []
++    memb_none = ''
++    memb_full = ''
++    for memb in members:
++        memb_name = rs_name(memb.name)
++        c_type = memb.type.c_type()
++        (is_pointer, _, is_list, _) = rs_ctype_parse(c_type)
++        if is_pointer:
++            t = rs_type(memb.type.c_type(), optional=memb.optional, ns='')
++            p = rs_systype(memb.type.c_type(), list_as_newp=True)
++            s = "Stash<'a, %s, %s>" % (p, t)
++            storage.append(s)
++        if memb.optional:
++            has_memb_name = 'has_%s' % rs_name(memb.name, protect=False)
++            sys_memb.append(has_memb_name)
++            has_memb = mcgen('''
++    let %(has_memb_name)s = self.%(memb_name)s.is_some();
++''', memb_name=memb_name, has_memb_name=has_memb_name)
++            memb_none += has_memb
++            memb_full += has_memb
++
++        if is_pointer:
++            stash_name = '{}_stash_'.format(memb_name)
++            stash.append(stash_name)
++            var = 'NewPtr({})'.format(memb_name) if is_list else memb_name
++            memb_none += mcgen('''
++    let %(stash_name)s = self.%(memb_name)s.to_qemu_none();
++    let %(var)s = %(stash_name)s.0;
++''', stash_name=stash_name, memb_name=memb_name, var=var)
++            memb_full += mcgen('''
++    let %(var)s = self.%(memb_name)s.to_qemu_full();
++''', memb_name=memb_name, var=var)
++        else:
++            unwrap = ''
++            if memb.optional:
++                unwrap = '.unwrap_or_default()'
++            memb = mcgen('''
++    let %(memb_name)s = self.%(memb_name)s%(unwrap)s;
++''', memb_name=memb_name, unwrap=unwrap)
++            memb_none += memb
++            memb_full += memb
++
++        sys_memb.append(memb_name)
++
++    if variants:
++        tag_name = rs_name(variants.tag_member.name)
++        sys_memb.append(tag_name)
++        sys_memb.append('u')
++        p = '*mut std::ffi::c_void'
++        s = "Stash<'a, %s, %sEnum>" % (p, name)
++        storage.append(s)
++        tag = mcgen('''
++    let %(tag_name)s = self.u.kind();
++''', sys=rs_systype(name), tag_name=tag_name)
++        memb_none += tag
++        memb_full += tag
++        arms = ''
++        for var in variants.variants:
++            if var.type.name == 'q_empty':
++                continue
++            arms += mcgen('%(rs_name)sEnum::%(kind_name)s(_) => qapi_sys::%(rs_name)sUnion { %(var_name)s: %(var_type)s { data: u_ptr_ as *mut _ } },',
++                          rs_name=rs_name(name), kind_name=to_camel_case(var.name), var_name=rs_name(var.name), var_type=rs_systype(var.type.c_name()))
++        memb_none += mcgen('''
++    let u_stash_ = self.u.to_qemu_none();
++    let u_ptr_ = u_stash_.0;
++    let u = match self.u {
++        %(arms)s
++    };
++''', arms=arms)
++        stash.append('u_stash_')
++        memb_full += mcgen('''
++    let u_ptr_ = self.u.to_qemu_full();
++    let u = match self.u {
++        %(arms)s
++    };
++''', arms=arms)
++
++    return mcgen('''
++
++impl QemuPtrDefault for %(rs_name)s {
++    type QemuType = *mut qapi_sys::%(rs_name)s;
 +}
 +
-+#[cfg(unix)]
-+impl From<nix::Error> for Error {
-+    fn from(val: nix::Error) -> Self {
-+        Error::Nix(val)
-+    }
-+}
++impl<'a> ToQemuPtr<'a, *mut qapi_sys::%(rs_name)s> for %(rs_name)s {
++    type Storage = (Box<qapi_sys::%(rs_name)s>, %(storage)s);
 +
-+impl QemuPtrDefault for Error {
-+    type QemuType = *mut sys::Error;
-+}
++    #[inline]
++    fn to_qemu_none(&'a self) -> Stash<'a, *mut qapi_sys::%(rs_name)s, %(rs_name)s> {
++        %(memb_none)s
++        let mut box_ = Box::new(qapi_sys::%(rs_name)s { %(sys_memb)s });
 +
-+impl<'a> ToQemuPtr<'a, *mut sys::Error> for Error {
-+    type Storage = qemu::CError;
-+
-+    fn to_qemu_none(&'a self) -> Stash<'a, *mut sys::Error, Self> {
-+        let err = self.to_qemu_full();
-+
-+        Stash(err, unsafe { from_qemu_full(err) })
++        Stash(&mut *box_, (box_, %(stash)s))
 +    }
 +
-+    fn to_qemu_full(&self) -> *mut sys::Error {
-+        let cmsg =
-+            ffi::CString::new(self.message()).expect("ToQemuPtr<Error>: unexpected '\0' character");
-+        let mut csrc = ffi::CString::new("").unwrap();
-+        let (src, line) = self.location().map_or((ptr::null(), 0 as i32), |loc| {
-+            csrc = ffi::CString::new(loc.0).expect("ToQemuPtr<Error>:: unexpected '\0' character");
-+            (csrc.as_ptr() as *const libc::c_char, loc.1 as i32)
-+        });
-+        let func = ptr::null();
-+
-+        let mut err: *mut sys::Error = ptr::null_mut();
++    #[inline]
++    fn to_qemu_full(&self) -> *mut qapi_sys::%(rs_name)s {
 +        unsafe {
-+            sys::error_setg_internal(
-+                &mut err as *mut *mut _,
-+                src,
-+                line,
-+                func,
-+                cmsg.as_ptr() as *const libc::c_char,
-+            );
-+            err
++            %(memb_full)s
++            let ptr = sys::g_malloc0(std::mem::size_of::<*const %(rs_name)s>()) as *mut _;
++            *ptr = qapi_sys::%(rs_name)s { %(sys_memb)s };
++            ptr
 +        }
 +    }
 +}
++''',
++                 rs_name=rs_name(name), storage=', '.join(storage),
++                 sys_memb=', '.join(sys_memb), memb_none=memb_none, memb_full=memb_full, stash=', '.join(stash))
 +
-+/// Convenience macro to build a `Error::FailedAt` error.
-+///
-+/// (this error type can be nicely converted to a QEMU `sys::Error`)
-+#[allow(unused_macros)]
-+#[macro_export]
-+macro_rules! err {
-+    ($err:expr) => {
-+        Err(Error::FailedAt($err.into(), file!(), line!()))
-+    };
++
++def gen_rs_object_from_qemu(name, base, members, variants):
++    memb_names = []
++    if base:
++        memb_names.extend([rs_name(memb.name) for memb in base.members])
++    memb_names.extend([rs_name(memb.name) for memb in members])
++
++    ret = mcgen('''
 +}
-diff --git a/rust/common/src/lib.rs b/rust/common/src/lib.rs
-new file mode 100644
-index 0000000000..2632a2b92b
---- /dev/null
-+++ b/rust/common/src/lib.rs
-@@ -0,0 +1,10 @@
-+mod error;
-+pub use error::*;
 +
-+mod qemu;
-+pub use qemu::*;
-+
-+mod translate;
-+pub use translate::*;
-+
-+pub mod sys;
-diff --git a/rust/common/src/qemu.rs b/rust/common/src/qemu.rs
-new file mode 100644
-index 0000000000..e1e47d3623
---- /dev/null
-+++ b/rust/common/src/qemu.rs
-@@ -0,0 +1,30 @@
-+use std::{ffi::CStr, ptr, str};
-+
-+use crate::{sys, translate};
-+
-+/// A type representing an owned C QEMU Error.
-+pub struct CError(ptr::NonNull<sys::Error>);
-+
-+impl translate::FromQemuPtrFull<*mut sys::Error> for CError {
-+    unsafe fn from_qemu_full(ptr: *mut sys::Error) -> Self {
-+        assert!(!ptr.is_null());
-+        Self(ptr::NonNull::new_unchecked(ptr))
++impl FromQemuPtrFull<*mut qapi_sys::%(rs_name)s> for %(rs_name)s {
++    unsafe fn from_qemu_full(sys: *mut qapi_sys::%(rs_name)s) -> Self {
++        let ret = from_qemu_none(sys as *const _);
++        qapi_sys::qapi_free_%(rs_name)s(sys);
++        ret
 +    }
 +}
 +
-+impl CError {
-+    pub fn pretty(&self) -> &str {
-+        unsafe {
-+            let pretty = sys::error_get_pretty(self.0.as_ptr());
-+            let bytes = CStr::from_ptr(pretty).to_bytes();
-+            str::from_utf8(bytes)
-+                .unwrap_or_else(|err| str::from_utf8(&bytes[..err.valid_up_to()]).unwrap())
-+        }
-+    }
-+}
++impl FromQemuPtrNone<*const qapi_sys::%(rs_name)s> for %(rs_name)s {
++    unsafe fn from_qemu_none(sys: *const qapi_sys::%(rs_name)s) -> Self {
++        let sys = & *sys;
++''', rs_name=rs_name(name))
 +
-+impl Drop for CError {
-+    fn drop(&mut self) {
-+        unsafe { sys::error_free(self.0.as_ptr()) }
-+    }
-+}
-diff --git a/rust/common/src/sys.rs b/rust/common/src/sys.rs
-new file mode 100644
-index 0000000000..de37144860
---- /dev/null
-+++ b/rust/common/src/sys.rs
-@@ -0,0 +1,58 @@
-+//! Bindings to the raw low-level C API commonly provided by QEMU projects.
-+//!
-+//! Manual bindings to C API availabe when linking QEMU projects.
-+//! It includes minimal glib allocation functions too, since it's the default
-+//! allocator used by QEMU, and we don't depend on glib-rs crate yet).
-+//!
-+//! Higher-level Rust-friendly bindings are provided by different modules.
-+
-+use libc::{c_char, c_void, size_t};
-+
-+extern "C" {
-+    pub fn g_malloc0(n_bytes: size_t) -> *mut c_void;
-+    pub fn g_free(ptr: *mut c_void);
-+    pub fn g_strndup(str: *const c_char, n: size_t) -> *mut c_char;
-+}
-+
-+#[repr(C)]
-+pub struct QObject(c_void);
-+
-+impl ::std::fmt::Debug for QObject {
-+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-+        f.debug_struct(&format!("QObject @ {:?}", self as *const _))
-+            .finish()
-+    }
-+}
-+
-+#[repr(C)]
-+pub struct QNull(c_void);
-+
-+impl ::std::fmt::Debug for QNull {
-+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-+        f.debug_struct(&format!("QNull @ {:?}", self as *const _))
-+            .finish()
-+    }
-+}
-+
-+#[repr(C)]
-+pub struct Error(c_void);
-+
-+impl ::std::fmt::Debug for Error {
-+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-+        f.debug_struct(&format!("Error @ {:?}", self as *const _))
-+            .finish()
-+    }
-+}
-+
-+extern "C" {
-+    pub fn error_setg_internal(
-+        errp: *mut *mut Error,
-+        src: *const c_char,
-+        line: i32,
-+        func: *const c_char,
-+        fmt: *const c_char,
-+        ...
-+    );
-+    pub fn error_get_pretty(err: *const Error) -> *const c_char;
-+    pub fn error_free(err: *mut Error);
-+}
-diff --git a/rust/common/src/translate.rs b/rust/common/src/translate.rs
-new file mode 100644
-index 0000000000..3be6e91987
---- /dev/null
-+++ b/rust/common/src/translate.rs
-@@ -0,0 +1,309 @@
-+// largely adapted from glib-rs
-+// we don't depend on glib-rs as this brings a lot more code that we may not need
-+// and also because there are issues with the conversion traits for our sys::*mut.
-+use libc::{c_char, size_t};
-+use std::ffi::{CStr, CString};
-+use std::ptr;
-+
-+use crate::sys;
-+
-+/// A pointer.
-+pub trait Ptr: Copy + 'static {
-+    fn is_null(&self) -> bool;
-+    fn from<X>(ptr: *mut X) -> Self;
-+    fn to<X>(self) -> *mut X;
-+}
-+
-+impl<T: 'static> Ptr for *const T {
-+    #[inline]
-+    fn is_null(&self) -> bool {
-+        (*self).is_null()
-+    }
-+
-+    #[inline]
-+    fn from<X>(ptr: *mut X) -> *const T {
-+        ptr as *const T
-+    }
-+
-+    #[inline]
-+    fn to<X>(self) -> *mut X {
-+        self as *mut X
-+    }
-+}
-+
-+impl<T: 'static> Ptr for *mut T {
-+    #[inline]
-+    fn is_null(&self) -> bool {
-+        (*self).is_null()
-+    }
-+
-+    #[inline]
-+    fn from<X>(ptr: *mut X) -> *mut T {
-+        ptr as *mut T
-+    }
-+
-+    #[inline]
-+    fn to<X>(self) -> *mut X {
-+        self as *mut X
-+    }
-+}
-+
-+/// Macro for NewPtr.
-+///
-+/// A macro to declare a newtype for pointers, to workaround that *T are not
-+/// defined in our binding crates, and allow foreign traits implementations.
-+/// (this is used by qapi-gen bindings)
-+#[allow(unused_macros)]
-+#[macro_export]
-+macro_rules! new_ptr {
-+    () => {
-+        #[derive(Copy, Clone)]
-+        pub struct NewPtr<P: Ptr>(pub P);
-+
-+        impl<P: Ptr> Ptr for NewPtr<P> {
-+            #[inline]
-+            fn is_null(&self) -> bool {
-+                self.0.is_null()
++    for memb in members:
++        memb_name = rs_name(memb.name)
++        val = from_qemu('sys.' + memb_name, memb.type.c_type())
++        if memb.optional:
++            val = mcgen('''{
++            if sys.has_%(memb_name)s {
++                Some(%(val)s)
++            } else {
++                None
 +            }
++}''', memb_name=rs_name(memb.name, protect=False), val=val)
 +
-+            #[inline]
-+            fn from<X>(ptr: *mut X) -> Self {
-+                NewPtr(P::from(ptr))
-+            }
++        ret += mcgen('''
++        let %(memb_name)s = %(val)s;
++''', memb_name=memb_name, val=val)
 +
-+            #[inline]
-+            fn to<X>(self) -> *mut X {
-+                self.0.to()
-+            }
++    if variants:
++        arms = ''
++        for variant in variants.tag_member.type.member_names():
++            arms += mcgen('''
++            %(enum)s::%(variant)s => { %(rs_name)sEnum::%(variant)s(from_qemu_none(sys.u.%(memb)s.data as *const _)) },
++''', enum=variants.tag_member.type.name, memb=rs_name(variant),
++                          variant=to_camel_case(variant), rs_name=rs_name(name))
++        ret += mcgen('''
++        let u = match sys.%(tag)s {
++            %(arms)s
++            _ => panic!("Variant with invalid tag"),
++        };
++''', tag=rs_name(variants.tag_member.name), arms=arms)
++        memb_names.append('u')
++
++    ret += mcgen('''
++            Self { %(memb_names)s }
 +        }
-+    };
 +}
++''', rs_name=rs_name(name), memb_names=', '.join(memb_names))
++    return ret
 +
-+/// Provides the default pointer type to be used in some container conversions.
-+///
-+/// It's `*mut c_char` for `String`, `*mut sys::GuestInfo` for `GuestInfo`...
-+pub trait QemuPtrDefault {
-+    type QemuType: Ptr;
++
++def gen_struct_members(members):
++    ret = ''
++    for memb in members:
++        if memb.ifcond:
++            raise NotImplementedError("ifcond are not implemented")
++        rsname = rs_name(memb.name)
++        ret += mcgen('''
++    pub %(rs_name)s: %(rs_type)s,
++''',
++                     rs_type=rs_type(memb.type.c_type(), '', optional=memb.optional), rs_name=rsname)
++    return ret
++
++
++def gen_rs_object(name, base, members, variants):
++    if name in objects_seen:
++        return ''
++
++    if variants:
++        members = [m for m in members if m.name != variants.tag_member.name]
++
++    ret = ''
++    objects_seen.add(name)
++
++    if variants:
++        ret += gen_rs_variants(name, variants)
++
++    ret += mcgen('''
++
++#[derive(Clone, Debug)]
++pub struct %(rs_name)s {
++''',
++                 rs_name=rs_name(name))
++
++    if base:
++        if not base.is_implicit():
++            ret += mcgen('''
++    // Members inherited:
++''',
++                         c_name=base.c_name())
++        ret += gen_struct_members(base.members)
++        if not base.is_implicit():
++            ret += mcgen('''
++    // Own members:
++''')
++
++    ret += gen_struct_members(members)
++
++    if variants:
++        ret += mcgen('''
++    pub u: %(rs_type)sEnum,
++''', rs_type=name)
++
++    ret += gen_rs_object_from_qemu(name, base, members, variants)
++    ret += gen_rs_object_to_qemu(name, base, members, variants)
++    return ret
++
++
++def gen_rs_alternate(name, variants):
++    if name in objects_seen:
++        return ''
++
++    ret = ''
++    objects_seen.add(name)
++
++    ret += mcgen('''
++
++#[derive(Clone,Debug)]
++pub enum %(rs_name)s {
++''',
++                 rs_name=rs_name(name))
++
++    for var in variants.variants:
++        if var.ifcond:
++            raise NotImplementedError("ifcond are not implemented")
++        if var.type.name == 'q_empty':
++            continue
++        ret += mcgen('''
++        %(mem_name)s(%(rs_type)s),
++''',
++                     rs_type=rs_type(var.type.c_unboxed_type(), ''),
++                     mem_name=to_camel_case(rs_name(var.name)))
++    ret += mcgen('''
 +}
++''')
++    # TODO: add to/from conversion
++    return ret
 +
-+impl QemuPtrDefault for String {
-+    type QemuType = *mut c_char;
-+}
 +
-+pub struct Stash<'a, P: Copy, T: ?Sized + ToQemuPtr<'a, P>>(
-+    pub P,
-+    pub <T as ToQemuPtr<'a, P>>::Storage,
-+);
++def gen_rs_enum(name):
++        return mcgen('''
 +
-+/// Translate to a pointer.
-+pub trait ToQemuPtr<'a, P: Copy> {
-+    type Storage;
++pub type %(rs_name)s = qapi_sys::%(rs_name)s;
++''', rs_name=rs_name(name))
 +
-+    /// The pointer in the `Stash` is only valid for the lifetime of the `Stash`.
-+    fn to_qemu_none(&'a self) -> Stash<'a, P, Self>;
 +
-+    /// Transfer the ownership to the ffi.
-+    fn to_qemu_full(&self) -> P {
-+        unimplemented!();
-+    }
-+}
++class QAPISchemaGenRsTypeVisitor(QAPISchemaRsVisitor):
 +
-+impl<'a, P: Ptr, T: ToQemuPtr<'a, P>> ToQemuPtr<'a, P> for Option<T> {
-+    type Storage = Option<<T as ToQemuPtr<'a, P>>::Storage>;
++    def __init__(self, prefix):
++        super().__init__(prefix, 'qapi-types')
 +
-+    #[inline]
-+    fn to_qemu_none(&'a self) -> Stash<'a, P, Option<T>> {
-+        self.as_ref()
-+            .map_or(Stash(Ptr::from::<()>(ptr::null_mut()), None), |s| {
-+                let s = s.to_qemu_none();
-+                Stash(s.0, Some(s.1))
-+            })
-+    }
++    def visit_begin(self, schema):
++        # gen_object() is recursive, ensure it doesn't visit the empty type
++        objects_seen.add(schema.the_empty_object_type.name)
++        self._gen.preamble_add(
++            mcgen('''
++// generated by qapi-gen, DO NOT EDIT
 +
-+    #[inline]
-+    fn to_qemu_full(&self) -> P {
-+        self.as_ref()
-+            .map_or(Ptr::from::<()>(ptr::null_mut()), ToQemuPtr::to_qemu_full)
-+    }
-+}
++use crate::qapi_sys;
 +
-+impl<'a> ToQemuPtr<'a, *mut c_char> for String {
-+    type Storage = CString;
++'''))
 +
-+    #[inline]
-+    fn to_qemu_none(&self) -> Stash<'a, *mut c_char, String> {
-+        let tmp = CString::new(&self[..])
-+            .expect("String::ToQemuPtr<*mut c_char>: unexpected '\0' character");
-+        Stash(tmp.as_ptr() as *mut c_char, tmp)
-+    }
++    def visit_end(self):
++        for name in rs_lists:
++            self._gen.add(mcgen('''
 +
-+    #[inline]
-+    fn to_qemu_full(&self) -> *mut c_char {
-+        unsafe { sys::g_strndup(self.as_ptr() as *const c_char, self.len() as size_t) }
-+    }
-+}
++vec_from_qemu!(%(rs)s, %(sys)s, qapi_free_%(sys)s);
++vec_to_qemu!(%(rs)s, %(sys)s);
++''', sys=name, rs=name[:-4]))
 +
-+/// Translate from a pointer type, without taking ownership.
-+pub trait FromQemuPtrNone<P: Ptr>: Sized {
-+    /// # Safety
-+    ///
-+    /// `ptr` must be a valid pointer. It is not referenced after the call.
-+    unsafe fn from_qemu_none(ptr: P) -> Self;
-+}
++    def visit_command(self, name, info, ifcond, features,
++                      arg_type, ret_type, gen, success_response, boxed,
++                      allow_oob, allow_preconfig, coroutine):
++        if ifcond:
++            raise NotImplementedError("ifcond are not implemented")
++        if not gen:
++            return
++        # call from_qemu() to eventually register a list
++        if ret_type:
++            from_qemu('', ret_type.c_type())
 +
-+/// Translate from a pointer type, taking ownership.
-+pub trait FromQemuPtrFull<P: Ptr>: Sized {
-+    /// # Safety
-+    ///
-+    /// `ptr` must be a valid pointer. Ownership is transferred.
-+    unsafe fn from_qemu_full(ptr: P) -> Self;
-+}
++    def visit_object_type(self, name, info, ifcond, features,
++                          base, members, variants):
++        if ifcond:
++            raise NotImplementedError("ifcond are not implemented")
++        if name.startswith('q_'):
++            return
++        self._gen.add(gen_rs_object(name, base, members, variants))
 +
-+/// See [`FromQemuPtrNone`](trait.FromQemuPtrNone.html).
-+#[inline]
-+#[allow(clippy::missing_safety_doc)]
-+pub unsafe fn from_qemu_none<P: Ptr, T: FromQemuPtrNone<P>>(ptr: P) -> T {
-+    FromQemuPtrNone::from_qemu_none(ptr)
-+}
++    def visit_enum_type(self, name, info, ifcond, features, members, prefix):
++        if ifcond:
++            raise NotImplementedError("ifcond are not implemented")
++        self._gen.add(gen_rs_enum(name))
 +
-+/// See [`FromQemuPtrFull`](trait.FromQemuPtrFull.html).
-+#[inline]
-+#[allow(clippy::missing_safety_doc)]
-+pub unsafe fn from_qemu_full<P: Ptr, T: FromQemuPtrFull<P>>(ptr: P) -> T {
-+    FromQemuPtrFull::from_qemu_full(ptr)
-+}
++    def visit_alternate_type(self, name, info, ifcond, features, variants):
++        if ifcond:
++            raise NotImplementedError("ifcond are not implemented")
++        self._gen.add(gen_rs_alternate(name, variants))
 +
-+impl<P: Ptr, T: FromQemuPtrNone<P>> FromQemuPtrNone<P> for Option<T> {
-+    #[inline]
-+    unsafe fn from_qemu_none(ptr: P) -> Option<T> {
-+        if ptr.is_null() {
-+            None
-+        } else {
-+            Some(from_qemu_none(ptr))
-+        }
-+    }
-+}
 +
-+impl<P: Ptr, T: FromQemuPtrFull<P>> FromQemuPtrFull<P> for Option<T> {
-+    #[inline]
-+    unsafe fn from_qemu_full(ptr: P) -> Option<T> {
-+        if ptr.is_null() {
-+            None
-+        } else {
-+            Some(from_qemu_full(ptr))
-+        }
-+    }
-+}
-+
-+impl FromQemuPtrNone<*const c_char> for String {
-+    #[inline]
-+    unsafe fn from_qemu_none(ptr: *const c_char) -> Self {
-+        assert!(!ptr.is_null());
-+        String::from_utf8_lossy(CStr::from_ptr(ptr).to_bytes()).into_owned()
-+    }
-+}
-+
-+impl FromQemuPtrFull<*mut c_char> for String {
-+    #[inline]
-+    unsafe fn from_qemu_full(ptr: *mut c_char) -> Self {
-+        let res = from_qemu_none(ptr as *const _);
-+        sys::g_free(ptr as *mut _);
-+        res
-+    }
-+}
-+
-+/// A macro to help the implementation of `Vec<T> -> P` translations.
-+#[allow(unused_macros)]
-+#[macro_export]
-+macro_rules! vec_to_qemu {
-+    ($rs:ident, $sys:ident) => {
-+        #[allow(non_camel_case_types)]
-+        pub struct $sys(*mut qapi_sys::$sys);
-+
-+        impl Drop for $sys {
-+            fn drop(&mut self) {
-+                let mut list = self.0;
-+                unsafe {
-+                    while !list.is_null() {
-+                        let next = (*list).next;
-+                        Box::from_raw(list);
-+                        list = next;
-+                    }
-+                }
-+            }
-+        }
-+
-+        impl<'a> ToQemuPtr<'a, NewPtr<*mut qapi_sys::$sys>> for Vec<$rs> {
-+            type Storage = (
-+                Option<$sys>,
-+                Vec<Stash<'a, <$rs as QemuPtrDefault>::QemuType, $rs>>,
-+            );
-+
-+            #[inline]
-+            fn to_qemu_none(&self) -> Stash<NewPtr<*mut qapi_sys::$sys>, Self> {
-+                let stash_vec: Vec<_> = self.iter().rev().map(ToQemuPtr::to_qemu_none).collect();
-+                let mut list: *mut qapi_sys::$sys = std::ptr::null_mut();
-+                for stash in &stash_vec {
-+                    let b = Box::new(qapi_sys::$sys {
-+                        next: list,
-+                        value: Ptr::to(stash.0),
-+                    });
-+                    list = Box::into_raw(b);
-+                }
-+                Stash(NewPtr(list), (Some($sys(list)), stash_vec))
-+            }
-+
-+            #[inline]
-+            fn to_qemu_full(&self) -> NewPtr<*mut qapi_sys::$sys> {
-+                let v: Vec<_> = self.iter().rev().map(ToQemuPtr::to_qemu_full).collect();
-+                let mut list: *mut qapi_sys::$sys = std::ptr::null_mut();
-+                unsafe {
-+                    for val in v {
-+                        let l = sys::g_malloc0(std::mem::size_of::<qapi_sys::$sys>())
-+                            as *mut qapi_sys::$sys;
-+                        (*l).next = list;
-+                        (*l).value = val;
-+                        list = l;
-+                    }
-+                }
-+                NewPtr(list)
-+            }
-+        }
-+    };
-+}
-+
-+/// A macro to help the implementation of `P -> Vec<T>` translations.
-+#[allow(unused_macros)]
-+#[macro_export]
-+macro_rules! vec_from_qemu {
-+    ($rs:ident, $sys:ident, $free_sys:ident) => {
-+        impl FromQemuPtrFull<NewPtr<*mut qapi_sys::$sys>> for Vec<$rs> {
-+            #[inline]
-+            unsafe fn from_qemu_full(sys: NewPtr<*mut qapi_sys::$sys>) -> Self {
-+                let ret = from_qemu_none(NewPtr(sys.0 as *const _));
-+                qapi_sys::$free_sys(sys.0);
-+                ret
-+            }
-+        }
-+
-+        impl FromQemuPtrNone<NewPtr<*const qapi_sys::$sys>> for Vec<$rs> {
-+            #[inline]
-+            unsafe fn from_qemu_none(sys: NewPtr<*const qapi_sys::$sys>) -> Self {
-+                let mut ret = vec![];
-+                let mut it = sys.0;
-+                while !it.is_null() {
-+                    let e = &*it;
-+                    ret.push(from_qemu_none(e.value as *const _));
-+                    it = e.next;
-+                }
-+                ret
-+            }
-+        }
-+
-+        impl From<NewPtr<*mut qapi_sys::$sys>> for *mut qapi_sys::$sys {
-+            fn from(p: NewPtr<*mut qapi_sys::$sys>) -> Self {
-+                p.0
-+            }
-+        }
-+    };
-+}
++def gen_rs_types(schema, output_dir, prefix, opt_builtins):
++    vis = QAPISchemaGenRsTypeVisitor(prefix)
++    schema.visit(vis)
++    vis.write(output_dir)
 -- 
 2.28.0
 
