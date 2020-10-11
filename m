@@ -1,131 +1,88 @@
-Return-Path: <SRS0=BZbV=DR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=+Fwv=DS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13A5BC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 23:36:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F28B6C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 01:57:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 623AA2078D
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Oct 2020 23:36:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 623AA2078D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name
+	by mail.kernel.org (Postfix) with ESMTPS id 45A8A206D4
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 01:57:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OXB02dAd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45A8A206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kROPq-0002o4-HL
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 19:36:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45060)
+	id 1kRQcA-0005DZ-Al
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 21:57:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60150)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mail@maciej.szmigiero.name>)
- id 1kROOk-0002HN-T0
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 19:35:34 -0400
-Received: from vps-vb.mhejs.net ([37.28.154.113]:42878)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mail@maciej.szmigiero.name>)
- id 1kROOi-0007g5-CH
- for qemu-devel@nongnu.org; Sat, 10 Oct 2020 19:35:34 -0400
-Received: from MUA
- by vps-vb.mhejs.net with esmtps (TLS1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
- (Exim 4.93.0.4) (envelope-from <mail@maciej.szmigiero.name>)
- id 1kROOX-0006a3-Hi; Sun, 11 Oct 2020 01:35:21 +0200
-Subject: Re: [PATCH] pc-dimm: remove unnecessary get_vmstate_memory_region()
- method
-From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-References: <9476ea5c7dc758b9b083a232eeb8d9b380b5e138.1600556464.git.maciej.szmigiero@oracle.com>
-Autocrypt: addr=mail@maciej.szmigiero.name; prefer-encrypt=mutual; keydata=
- mQINBFpGusUBEADXUMM2t7y9sHhI79+2QUnDdpauIBjZDukPZArwD+sDlx5P+jxaZ13XjUQc
- 6oJdk+jpvKiyzlbKqlDtw/Y2Ob24tg1g/zvkHn8AVUwX+ZWWewSZ0vcwp7u/LvA+w2nJbIL1
- N0/QUUdmxfkWTHhNqgkNX5hEmYqhwUPozFR0zblfD/6+XFR7VM9yT0fZPLqYLNOmGfqAXlxY
- m8nWmi+lxkd/PYqQQwOq6GQwxjRFEvSc09m/YPYo9hxh7a6s8hAP88YOf2PD8oBB1r5E7KGb
- Fv10Qss4CU/3zaiyRTExWwOJnTQdzSbtnM3S8/ZO/sL0FY/b4VLtlZzERAraxHdnPn8GgxYk
- oPtAqoyf52RkCabL9dsXPWYQjkwG8WEUPScHDy8Uoo6imQujshG23A99iPuXcWc/5ld9mIo/
- Ee7kN50MOXwS4vCJSv0cMkVhh77CmGUv5++E/rPcbXPLTPeRVy6SHgdDhIj7elmx2Lgo0cyh
- uyxyBKSuzPvb61nh5EKAGL7kPqflNw7LJkInzHqKHDNu57rVuCHEx4yxcKNB4pdE2SgyPxs9
- 9W7Cz0q2Hd7Yu8GOXvMfQfrBiEV4q4PzidUtV6sLqVq0RMK7LEi0RiZpthwxz0IUFwRw2KS/
- 9Kgs9LmOXYimodrV0pMxpVqcyTepmDSoWzyXNP2NL1+GuQtaTQARAQABtDBNYWNpZWogUy4g
- U3ptaWdpZXJvIDxtYWlsQG1hY2llai5zem1pZ2llcm8ubmFtZT6JAlQEEwEIAD4CGwMFCwkI
- BwIGFQoJCAsCBBYCAwECHgECF4AWIQRyeg1N257Z9gOb7O+Ef143kM4JdwUCX1U2uQUJBYUi
- 9AAKCRCEf143kM4JdziwEACuQEX30NTz0bXZSHgiH2kCHBJwmomuc5umZr+yYp9NAmbnpRq5
- CFItYUFPHNddCYIny5MAor2BFySsNH6uEobCJgtaQBkFkZtMoHSRMuktbcXDte3+MvOLuVGe
- R7VJpAK5bKD9PIiswyHsfWCEypQUC5mS4t1KKrfSrX5YUGjD/iAJ45/bVqZ6e+tFxuam7xkb
- Wxg8DfdHjhUkNUWP5Ig6mpZkZziAim87Dq/EjvRGGVnA/SLFbvt5V04oRxAUL9NlrI52SUlD
- LCRtgBe4YbU7jojYFWvBRQOyxvo1H3mKHffekhw/v6Ysm4EDm2QCHHOD4484T+pLuxSXBsgK
- mYC3Rs92jinZ6JX/RgoTS5rqMXlSY8LxV580LHvDQtSG7lr7haZIh8xjjtVA32F8dn1dNbv2
- mjLkG5q0T3ImvMbWZ21GC2Lq/88t9x/WEtoqA2ul9z0qNslqXXQZRlna8pvZZH8YBtsFmNU0
- Nget6ehgs8BBplyVncyili/sho+QMjHRqQzqSQ25NM1gnJpfUc41yxSc7puZsK+fLEticBuo
- qLX0+GkwJuu6pavVD2Fnx/93eirKH6pIB+VoAL+jl5nYMn0AJdYnmKV3hdhaFjpKNqRIjtTz
- fsYVBqiyzWLBLTm2lD/Y+yB1AjXdLDi6wm9/stVRv2LYlp/wRzo8IjK9kLkBjQRaRrtSAQwA
- 1c8skXiNYGgitv7X8osxlkOGiqvy1WVV6jJsv068W6irDhVETSB6lSc7Qozk9podxjlrae9b
- vqfaJxsWhuwQjd+QKAvklWiLqw4dll2R3+aanBcRJcdZ9iw0T63ctD26xz84Wm7HIVhGOKsS
- yHHWJv2CVHjfD9ppxs62XuQNNb3vP3i7LEto9zT1Zwt6TKsJy5kWSjfRr+2eoSi0LIzBFaGN
- D8UOP8FdpS7MEkqUQPMI17E+02+5XCLh33yXgHFVyWUxChqL2r8y57iXBYE/9XF3j4+58oTD
- ne/3ef+6dwZGyqyP1C34vWoh/IBq2Ld4cKWhzOUXlqKJno0V6pR0UgnIJN7SchdZy5jd0Mrq
- yEI5k7fcQHJxLK6wvoQv3mogZok4ddLRJdADifE4+OMyKwzjLXtmjqNtW1iLGc/JjMXQxRi0
- ksC8iTXgOjY0f7G4iMkgZkBfd1zqfS+5DfcGdxgpM0m9EZ1mhERRR80U6C+ZZ5VzXga2bj0o
- ZSumgODJABEBAAGJA/IEGAEIACYCGwIWIQRyeg1N257Z9gOb7O+Ef143kM4JdwUCX1U21wUJ
- BYUihQHAwPQgBBkBCAAdFiEE4ndqq6COJv9aG0oJUrHW6VHQzgcFAlpGu1IACgkQUrHW6VHQ
- zgdztQv+PRhCVQ7KUuQMEvMaH+rc1GIaHT6Igbvn77bEG1Kd39jX3lJDdyZXrVqxFylLu64r
- +9kHeCslM+Uq/fUM94od7cXGkvCW7ST1MUGQ3g+/rAf88F5l+KjUzLShw2sxElP+sjGQGQ4z
- Llve5MarGtV4TH6dJlDXZTtxwHotHZDiA2bUeJYLlMAggwLM/rBS9xfytMNuFk8U0THR/TVw
- vu3VymjdOjJnSecFyu9iRskRXc8LA9JxqDbfmETePg1dPehxiwgMvdi3WdYk4BB1wMl0MdnU
- 2Ea3AdjU3nX+Uc/npPMvDuzai9ZA7/tVG1RaQhIElL85+A5Tb2Wzl0IoO1kTafkaQNBOStEe
- O1fhLSz5/3Dt+dOOqxp7VuwSHqEXb3jc6WgnwZiimF8vvGzE2PNBAuIAwGItY2fkpGblbmmN
- b/qYZEjdbVNjfJXyVyez//QoiUrQk2sC9nNL7zYTEMocuJFN90a2158h5ve1qBT0jpUx69Ok
- yR8/DxnAEmj04WSoCRCEf143kM4JdxxLEACMadWNW6oiyuyhECwi/Z39Q/Z+xyX42qEEDwTJ
- KLMz/1Nt8BUX9Egc5gE2iLd5lseYa9XiUsABAjdO9AZUANS750oVnP8W6DVIFt8OnsvCIEx9
- 2ei3KEiCRdCfmFLdpq2eEWEq3LSf3hqftny0YYwYBpT2frqlcxucC6vR3tOh5cgSULZFo+8s
- TTVqPRfHuvQiNnq/JCJcZ3WLH3RtD8EDnUJwpkuV16hsNA36nKvf0PCr/DvHQc7wwV6R1qwj
- 2+/WXTsf1rA2OEIGnXRHGNDZ2bHbSi1uUle6BDowHsjWU00L9G2ULJBjnR9pGB26ydbYSqB+
- 0tj79jTvfvbWpzm8ia1XjBu29ACTFF9LzjDmTilduWERxRgERLeicIoTaZxXrOEAi+9hDIbV
- 8TymwcDtmY6jKRw0eC4WHiB2eDL+1wlZBWv6yt62YZfJRisD/XN8hG3msnZozrXvMBeeEoUN
- 4HhqjGMYlkCKxbWSzHBirXg/x6lpt/MIKaLJUm2+1wF9qPAfB/oce0sYTdgiK8Eh6QaJX+D7
- ehVJsVNM5vDB6bvIasIOaVnv3pswxuLjnXFPMKLTp+66jakHla5D54GEp7vDU45ByJIgXcGK
- fszOtslOsZGXtD1YXyQJOm2psB24Q35+jXlVL1eV2rH2sZ71O68v+PyfuT9XYvAsvCBjs7kB
- jQRaRrwiAQwAxnVmJqeP9VUTISps+WbyYFYlMFfIurl7tzK74bc67KUBp+PHuDP9p4ZcJUGC
- 3UZJP85/GlUVdE1NairYWEJQUB7bpogTuzMI825QXIB9z842HwWfP2RW5eDtJMeujzJeFaUp
- meTG9snzaYxYN3r0TDKj5dZwSIThIMQpsmhH2zylkT0jH7kBPxb8IkCQ1c6wgKITwoHFjTIO
- 0B75U7bBNSDpXUaUDvd6T3xd1Fz57ujAvKHrZfWtaNSGwLmUYQAcFvrKDGPB5Z3ggkiTtkmW
- 3OCQbnIxGJJw/+HefYhB5/kCcpKUQ2RYcYgCZ0/WcES1xU5dnNe4i0a5gsOFSOYCpNCfTHtt
- VxKxZZTQ/rxjXwTuToXmTI4Nehn96t25DHZ0t9L9UEJ0yxH2y8Av4rtf75K2yAXFZa8dHnQg
- CkyjA/gs0ujGwD+Gs7dYQxP4i+rLhwBWD3mawJxLxY0vGwkG7k7npqanlsWlATHpOdqBMUiA
- R22hs02FikAoiXNgWTy7ABEBAAGJAjwEGAEIACYCGwwWIQRyeg1N257Z9gOb7O+Ef143kM4J
- dwUCX1U23wUJBYUhtQAKCRCEf143kM4JdyxVD/9tvrc8KUA0ciwd/3b+YVSJV+wEaHDuDx7a
- Ukuul38oZKZcEDcBNLcgL0F0l98CT/Qysh34xVVcsU9TjNrA0JkHkSwdM+IbF1ebfubIo9Rz
- blY8OHoAHck2/0iyDgjhyj/tXfxasAdfmBzxtNKCH5pKAyCKnDR0LvdknNZNvJsrIJiu9gHl
- 680YjsxLMoa3t8/scC5jyM0qGr7RxtWKhSQ6IT3ROUR7VwfvJSkdNITU7zW5lh95xRsCVF5G
- xVR/i/mXwWum5GCHv/WN0pHhCiOHntaxTjWBsLOv5q0kpSFK2O9FSu4lUfgmvSMShkMnoqeI
- snSaTF5ELnqq9lBXNh+MGFY4paJisq7hZS3o7GEO6ta8efGHwM9ddIz94jKzlwCPh/A4rj1c
- G6eo1umaMVJ0Wn6T3L1feYfr7y+xRlH3crGhwbdZQt5lOcwu9ZdO0+hriAUk86Yq3tIeallL
- LdcyH5K8EdOYKFvrGbqY+4mnzfXmWQAhfzST+oZnAWzyLbZbCyGM1W9xtbJsfNFt/1N6X/C9
- kknYzrxwFCsCsMBiwJCrbE2ZQqjnpOOhxvwoiSdrf47mvA8UVAnh+OAO8VjSFZm43eO67gi9
- tR6M/RH/mMP+UNjpYpI/JBRpTYiCRID0oY2gh/SQgoSBRAivY8qaLFE56Dq8SLj65JMaGMWL Sg==
-Message-ID: <fe32e5ea-eaa4-a6fc-509d-be1a25c48962@maciej.szmigiero.name>
-Date: Sun, 11 Oct 2020 01:35:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
+ id 1kRQbF-0004Se-9l; Sat, 10 Oct 2020 21:56:37 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41538)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
+ id 1kRQbD-0004Sh-J7; Sat, 10 Oct 2020 21:56:36 -0400
+Received: by mail-ot1-x342.google.com with SMTP id q21so12584570ota.8;
+ Sat, 10 Oct 2020 18:56:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=iafPvEnAsyoEe4Ey2SSoAVShKbsoVPNle8hYe14TBV4=;
+ b=OXB02dAdZIBTl+KrKmhVSLISLfzH0o8fLIIa7ThYZzQGNC9BPHZKkJS9tOEheZlZhn
+ Nk3ZKSC+p881FErg8g3GlehIDx71JaPhZupjhx5TKJN/gHrEkxjboqnySgo/ee7FiaJJ
+ A5qQ8+QARSc2n6dxE7fEvcCNvIqIECxzj6bdH3lCBoIKMHLYQN9YAcsU1hPyLAzjzmOI
+ 5QzJLSddWFSaX3Col5amAfm40K6Ysc7ZU7ozsrn/lRSgwo/AtSLwCUUo7PA/LZyXF0Os
+ Ci7gkTmi1aSZ8Cv43ByhUMrqQ768C0JtxNyomAcmd5H9GgFYYxM8DuytCdxCFkhUkZws
+ 257A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=iafPvEnAsyoEe4Ey2SSoAVShKbsoVPNle8hYe14TBV4=;
+ b=JueJJ33jUeOcFAvsSzYuyUOgBybHbiTPopHadpp5FIiWzOcCjODR6/jmdpirC2gB7Q
+ 8GxQK4T5eDnCjFK9r8vUX2QOZFauMAyKHRAJquNZsKU6VkEFTjNKYfQhozPL8vzHal0a
+ cvF+qFX9OXsmA31p/SC0yPPBgF5NJ7NeQbH5Rs6TL+ovlmObqAt8uCt8Nzdy5/JyYpaG
+ +Wiapk7CJ+X+nnGM1ADlv6WNQ7KVeS3PcmFVH4kLz+VqMbwwXnPuwzq0FLJzUBUBXs6W
+ Y8fbDWDgAMBxFDj2JxM7krbIIot3CxuvPdlijMlNWoJ8aZIKzmpVOAj+mKiavel+Xepf
+ U5oQ==
+X-Gm-Message-State: AOAM533Rbft2tOf8zeZMQwnErIqd0AluPFiRgHmqfyjRJIzpaISWdBAK
+ mFScdG4VDB1UpkccRrAE92pk/e6oseNot6PEfcU=
+X-Google-Smtp-Source: ABdhPJxkVrr/7++zNogbmBXafpoSSBO5maPk7oU2TXT65H3qOdsLZRPavxdebY1sDpMId4gfYGSGcOAHT0X6CzjxUwo=
+X-Received: by 2002:a9d:1a2:: with SMTP id e31mr10721565ote.181.1602381393235; 
+ Sat, 10 Oct 2020 18:56:33 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <9476ea5c7dc758b9b083a232eeb8d9b380b5e138.1600556464.git.maciej.szmigiero@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=37.28.154.113;
- envelope-from=mail@maciej.szmigiero.name; helo=vps-vb.mhejs.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/10 19:35:23
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+References: <20201010110730.1575180-1-kuhn.chenqun@huawei.com>
+In-Reply-To: <20201010110730.1575180-1-kuhn.chenqun@huawei.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Sun, 11 Oct 2020 09:55:57 +0800
+Message-ID: <CAKXe6SJWZ+ek-MefzJzDH=H=N90B67i5pV7CybA2maYq9Euk5w@mail.gmail.com>
+Subject: Re: [PATCH] migration/block-dirty-bitmap: fix uninitialized variable
+ warning
+To: Chen Qun <kuhn.chenqun@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
+ envelope-from=liq3ea@gmail.com; helo=mail-ot1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.207,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -138,24 +95,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, vsementsov@virtuozzo.com,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, qemu-trivial@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, ganqixin@huawei.com,
+ Euler Robot <euler.robot@huawei.com>, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20.09.2020 15:25, Maciej S. Szmigiero wrote:
-> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
-> 
-> The get_vmstate_memory_region() method from PCDIMMDeviceClass is only
-> ever called from this class and is never overridden, so it can be converted
-> into an ordinary function.
-> 
-> Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+Chen Qun <kuhn.chenqun@huawei.com> =E4=BA=8E2020=E5=B9=B410=E6=9C=8810=E6=
+=97=A5=E5=91=A8=E5=85=AD =E4=B8=8B=E5=8D=887:08=E5=86=99=E9=81=93=EF=BC=9A
+>
+> This if statement judgment is redundant and it will cause a warning:
+>
+> migration/block-dirty-bitmap.c:1090:13: warning: =E2=80=98bitmap_name=E2=
+=80=99 may be used
+>  uninitialized in this function [-Wmaybe-uninitialized]
+>              g_strlcpy(s->bitmap_name, bitmap_name, sizeof(s->bitmap_name=
+));
+>              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
+~~
+>
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
 
-Just to be clear: this patch is a separate submission from the hv-balloon
-driver effort, not really connected with it.
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
 
-That's why it wasn't a part of that driver patch series.
-
-Maciej
+> ---
+>  migration/block-dirty-bitmap.c | 2 --
+>  1 file changed, 2 deletions(-)
+>
+> diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitma=
+p.c
+> index 5bef793ac0..e09ea4f22b 100644
+> --- a/migration/block-dirty-bitmap.c
+> +++ b/migration/block-dirty-bitmap.c
+> @@ -1084,9 +1084,7 @@ static int dirty_bitmap_load_header(QEMUFile *f, DB=
+MLoadState *s,
+>              } else {
+>                  bitmap_name =3D s->bitmap_alias;
+>              }
+> -        }
+>
+> -        if (!s->cancelled) {
+>              g_strlcpy(s->bitmap_name, bitmap_name, sizeof(s->bitmap_name=
+));
+>              s->bitmap =3D bdrv_find_dirty_bitmap(s->bs, s->bitmap_name);
+>
+> --
+> 2.23.0
+>
+>
 
