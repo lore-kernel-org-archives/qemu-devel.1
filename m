@@ -2,87 +2,64 @@ Return-Path: <SRS0=+Fwv=DS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DBE4C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:34:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77A3FC433E7
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:38:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D1F6207FB
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:34:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SCl84hDm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D1F6207FB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 16192207F7
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:38:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16192207F7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRbUr-00082l-DP
-	for qemu-devel@archiver.kernel.org; Sun, 11 Oct 2020 09:34:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38226)
+	id 1kRbY2-0002Yh-W7
+	for qemu-devel@archiver.kernel.org; Sun, 11 Oct 2020 09:38:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51398)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kRbUH-0007cD-AC
- for qemu-devel@nongnu.org; Sun, 11 Oct 2020 09:34:10 -0400
-Received: from mail-ej1-x635.google.com ([2a00:1450:4864:20::635]:43886)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kRbUF-0007mm-7E
- for qemu-devel@nongnu.org; Sun, 11 Oct 2020 09:34:08 -0400
-Received: by mail-ej1-x635.google.com with SMTP id md26so19544366ejb.10
- for <qemu-devel@nongnu.org>; Sun, 11 Oct 2020 06:34:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=fUw6sfy3NN3Uxsa2VSGJUyvzB2NC6uB9NDYf3NwixBM=;
- b=SCl84hDmWAYuQahS+P0LTQmc4JViMTFwXREoXJvTg7jLq9r4zQk38iKByCN7GWIdSX
- 0JFS8WBglaL/DLQZCwzM0ihnNaz24+r5o8VI6YEr56Gmmt2Ayz1E9gNxizFX/OJGqlat
- Vhul20UsIgB5BZYapyPwMio7iaoirMWhMWOe8o8Gf1WjrkVDRpgHvwDgpqgQtAFY7C0u
- 3ljCqWmsvqdWJGq0qWptRWQjfBhdaYiW/IQMMLpFp9KS0/eJoGrhzYpiBossGDMzYg6Z
- 1o2+MG2OCzl6HPU4NwTDX2BBeN+2bLR8FGdIDVvm4QFm02VKeEv0vASX8uE3o3NzVZkM
- Gnvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=fUw6sfy3NN3Uxsa2VSGJUyvzB2NC6uB9NDYf3NwixBM=;
- b=BzkoWPNNEB/u3Re/D/04qdZthE/V1f9QUAdXk3jdGnF1skauazJ0t5ha/elYxFTYtU
- +Iiq11qQt9xPlLpNUPOUf5hRx1t9G23tPCxuM8s6tZEGvW1/1kHflKxDtAsM5oiCKfn4
- Sfmcu0Cmo1yWmX3VPBlQnTQIupi+HLdJOiYL5GW6Ikg9FhzDW1jl6hGqCK/fX3g3QL/Y
- 6Uc5Mbw5S463VHxo50u63v++iGwER0EIzoA2h+UM+JoQf+PpYeo9KRJ4WoL9oOTrVUbM
- Cs0Mk9SFGOzzHVFIM4zf4Ru2RbLHseNLhEo7Y4RTq8uWt9QJSkLQQj8IdXPEevJLtMij
- f++g==
-X-Gm-Message-State: AOAM530wD+nBrdzpCnyxJfb4PLdfVRW3dtB4N5PBtfjPgSsIMEDQuMsf
- fz9dglyjpeHIKwIx5mDt5s8sJpyWt/SMjnQbFD0kKw==
-X-Google-Smtp-Source: ABdhPJxrGSNacdDndE+Etu8LnbGiF1AKUm3WzjeIM0Bi89r9Elo40yzqXx+aTQYXxghNj04hTv9gbSCQfsV5CdAvVHI=
-X-Received: by 2002:a17:907:4365:: with SMTP id
- nd5mr24233206ejb.56.1602423244414; 
- Sun, 11 Oct 2020 06:34:04 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
+ id 1kRXv2-00017O-Uf; Sun, 11 Oct 2020 05:45:33 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:5172 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
+ id 1kRXv0-0007P2-BI; Sun, 11 Oct 2020 05:45:32 -0400
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 829E2A07CF3BCD9EF999;
+ Sun, 11 Oct 2020 17:45:12 +0800 (CST)
+Received: from huawei.com (10.175.124.27) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Sun, 11 Oct 2020
+ 17:45:04 +0800
+From: Bihong Yu <yubihong@huawei.com>
+To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
+Subject: [PATCH v1 3/8] migration: Add spaces around operator
+Date: Sun, 11 Oct 2020 18:17:04 +0800
+Message-ID: <1602411429-12043-4-git-send-email-yubihong@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1602411429-12043-1-git-send-email-yubihong@huawei.com>
+References: <1602411429-12043-1-git-send-email-yubihong@huawei.com>
 MIME-Version: 1.0
-References: <20201009200720.1169904-1-eblake@redhat.com>
-In-Reply-To: <20201009200720.1169904-1-eblake@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 11 Oct 2020 14:33:52 +0100
-Message-ID: <CAFEAcA9QsVbR18f5itBNAwEe936zoUhLF=b=VH_BtkUD3b7zeg@mail.gmail.com>
-Subject: Re: [PULL v3 0/8] NBD patches through 2020-10-08
-To: Eric Blake <eblake@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::635;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x635.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain
+X-Originating-IP: [10.175.124.27]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.190; envelope-from=yubihong@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/11 05:45:13
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
+X-Mailman-Approved-At: Sun, 11 Oct 2020 09:36:15 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,41 +71,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: alex.chen@huawei.com, zhengchuan@huawei.com, wanghao232@huawei.com,
+ dgilbert@redhat.com, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 9 Oct 2020 at 21:15, Eric Blake <eblake@redhat.com> wrote:
->
-> The following changes since commit 4a7c0bd9dcb08798c6f82e55b5a3423f7ee669f1:
->
->   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-5.2-20201009' into staging (2020-10-09 15:48:04 +0100)
->
-> are available in the Git repository at:
->
->   https://repo.or.cz/qemu/ericb.git tags/pull-nbd-2020-10-08-v3
->
-> for you to fetch changes up to ebd57062a1957307a175a810441af87259d7dbe9:
->
->   nbd: Simplify meta-context parsing (2020-10-09 15:05:08 -0500)
->
-> v2: fix BSD build
-> v3: fix mingw build (only the affected patch resent)
->
-> ----------------------------------------------------------------
-> nbd patches for 2020-10-08
->
-> - silence compilation warnings
-> - more fixes to prevent reconnect hangs
-> - improve 'qemu-nbd' termination behavior
-> - cleaner NBD protocol compliance on string handling
->
+Signed-off-by:Bihong Yu <yubihong@huawei.com>
+Reviewed-by: Chuan Zheng <zhengchuan@huawei.com>
+Signed-off-by: Bihong Yu <yubihong@huawei.com>
+---
+ migration/migration.c    |  4 ++--
+ migration/postcopy-ram.c |  2 +-
+ migration/ram.c          |  2 +-
+ migration/savevm.c       |  2 +-
+ migration/vmstate.c      | 10 +++++-----
+ 5 files changed, 10 insertions(+), 10 deletions(-)
 
-Applied, thanks.
+diff --git a/migration/migration.c b/migration/migration.c
+index 0575ecb..e050f57 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -2478,8 +2478,8 @@ static void migrate_handle_rp_req_pages(MigrationState *ms, const char* rbname,
+      * Since we currently insist on matching page sizes, just sanity check
+      * we're being asked for whole host pages.
+      */
+-    if (start & (our_host_ps-1) ||
+-       (len & (our_host_ps-1))) {
++    if (start & (our_host_ps - 1) ||
++       (len & (our_host_ps - 1))) {
+         error_report("%s: Misaligned page request, start: " RAM_ADDR_FMT
+                      " len: %zd", __func__, start, len);
+         mark_source_rp_bad(ms);
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index 0a2f88a8..eea92bb 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -403,7 +403,7 @@ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
+                      strerror(errno));
+         goto out;
+     }
+-    g_assert(((size_t)testarea & (pagesize-1)) == 0);
++    g_assert(((size_t)testarea & (pagesize - 1)) == 0);
+ 
+     reg_struct.range.start = (uintptr_t)testarea;
+     reg_struct.range.len = pagesize;
+diff --git a/migration/ram.c b/migration/ram.c
+index 59bdd15..90b277b 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -1563,7 +1563,7 @@ int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len)
+         rs->last_req_rb = ramblock;
+     }
+     trace_ram_save_queue_pages(ramblock->idstr, start, len);
+-    if (start+len > ramblock->used_length) {
++    if (start + len > ramblock->used_length) {
+         error_report("%s request overrun start=" RAM_ADDR_FMT " len="
+                      RAM_ADDR_FMT " blocklen=" RAM_ADDR_FMT,
+                      __func__, start, len, ramblock->used_length);
+diff --git a/migration/savevm.c b/migration/savevm.c
+index d2e141f..9e95df1 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -521,7 +521,7 @@ static const VMStateDescription vmstate_configuration = {
+         VMSTATE_VBUFFER_ALLOC_UINT32(name, SaveState, 0, NULL, len),
+         VMSTATE_END_OF_LIST()
+     },
+-    .subsections = (const VMStateDescription*[]) {
++    .subsections = (const VMStateDescription * []) {
+         &vmstate_target_page_bits,
+         &vmstate_capabilites,
+         &vmstate_uuid,
+diff --git a/migration/vmstate.c b/migration/vmstate.c
+index bafa890..e9d2aef 100644
+--- a/migration/vmstate.c
++++ b/migration/vmstate.c
+@@ -32,13 +32,13 @@ static int vmstate_n_elems(void *opaque, const VMStateField *field)
+     if (field->flags & VMS_ARRAY) {
+         n_elems = field->num;
+     } else if (field->flags & VMS_VARRAY_INT32) {
+-        n_elems = *(int32_t *)(opaque+field->num_offset);
++        n_elems = *(int32_t *)(opaque + field->num_offset);
+     } else if (field->flags & VMS_VARRAY_UINT32) {
+-        n_elems = *(uint32_t *)(opaque+field->num_offset);
++        n_elems = *(uint32_t *)(opaque + field->num_offset);
+     } else if (field->flags & VMS_VARRAY_UINT16) {
+-        n_elems = *(uint16_t *)(opaque+field->num_offset);
++        n_elems = *(uint16_t *)(opaque + field->num_offset);
+     } else if (field->flags & VMS_VARRAY_UINT8) {
+-        n_elems = *(uint8_t *)(opaque+field->num_offset);
++        n_elems = *(uint8_t *)(opaque + field->num_offset);
+     }
+ 
+     if (field->flags & VMS_MULTIPLY_ELEMENTS) {
+@@ -54,7 +54,7 @@ static int vmstate_size(void *opaque, const VMStateField *field)
+     int size = field->size;
+ 
+     if (field->flags & VMS_VBUFFER) {
+-        size = *(int32_t *)(opaque+field->size_offset);
++        size = *(int32_t *)(opaque + field->size_offset);
+         if (field->flags & VMS_MULTIPLY) {
+             size *= field->size;
+         }
+-- 
+1.8.3.1
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
-for any user-visible changes.
-
--- PMM
 
