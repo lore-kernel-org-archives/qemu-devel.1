@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 165F0C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:41:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F90C433E7
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:41:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A59A62083B
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:41:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A59A62083B
+	by mail.kernel.org (Postfix) with ESMTPS id 3DB1F207FB
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:41:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DB1F207FB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRbau-0000FL-Mm
-	for qemu-devel@archiver.kernel.org; Sun, 11 Oct 2020 09:41:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51464)
+	id 1kRbbj-0001fP-Aj
+	for qemu-devel@archiver.kernel.org; Sun, 11 Oct 2020 09:41:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51420)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
- id 1kRXvE-0001At-5n; Sun, 11 Oct 2020 05:45:44 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:5176 helo=huawei.com)
+ id 1kRXv5-00019i-VB; Sun, 11 Oct 2020 05:45:36 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:5169 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
- id 1kRXv6-0007SU-1r; Sun, 11 Oct 2020 05:45:42 -0400
+ id 1kRXv1-0007P1-Pa; Sun, 11 Oct 2020 05:45:35 -0400
 Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 88AD24EECD58D3342D8C;
- Sun, 11 Oct 2020 17:45:17 +0800 (CST)
+ by Forcepoint Email with ESMTP id 7E54E2BF15CC7CE11937;
+ Sun, 11 Oct 2020 17:45:12 +0800 (CST)
 Received: from huawei.com (10.175.124.27) by DGGEMS413-HUB.china.huawei.com
  (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Sun, 11 Oct 2020
- 17:45:07 +0800
+ 17:45:03 +0800
 From: Bihong Yu <yubihong@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
-Subject: [PATCH v1 8/8] migration: Delete redundant spaces
-Date: Sun, 11 Oct 2020 18:17:09 +0800
-Message-ID: <1602411429-12043-9-git-send-email-yubihong@huawei.com>
+Subject: [PATCH v1 2/8] migration: Don't use '#' flag of printf format
+Date: Sun, 11 Oct 2020 18:17:03 +0800
+Message-ID: <1602411429-12043-3-git-send-email-yubihong@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1602411429-12043-1-git-send-email-yubihong@huawei.com>
 References: <1602411429-12043-1-git-send-email-yubihong@huawei.com>
@@ -81,22 +81,45 @@ Signed-off-by:Bihong Yu <yubihong@huawei.com>
 Reviewed-by: Chuan Zheng <zhengchuan@huawei.com>
 Signed-off-by: Bihong Yu <yubihong@huawei.com>
 ---
- migration/rdma.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ migration/block.c | 2 +-
+ migration/ram.c   | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/migration/rdma.c b/migration/rdma.c
-index ca4d315..00eac34 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -855,7 +855,7 @@ static int qemu_rdma_broken_ipv6_kernel(struct ibv_context *verbs, Error **errp)
-      */
-     if (!verbs) {
-         int num_devices, x;
--        struct ibv_device ** dev_list = ibv_get_device_list(&num_devices);
-+        struct ibv_device **dev_list = ibv_get_device_list(&num_devices);
-         bool roce_found = false;
-         bool ib_found = false;
- 
+diff --git a/migration/block.c b/migration/block.c
+index 4b8576b..399dfb8 100644
+--- a/migration/block.c
++++ b/migration/block.c
+@@ -998,7 +998,7 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
+                    (addr == 100) ? '\n' : '\r');
+             fflush(stdout);
+         } else if (!(flags & BLK_MIG_FLAG_EOS)) {
+-            fprintf(stderr, "Unknown block migration flags: %#x\n", flags);
++            fprintf(stderr, "Unknown block migration flags: %0x\n", flags);
+             return -EINVAL;
+         }
+         ret = qemu_file_get_error(f);
+diff --git a/migration/ram.c b/migration/ram.c
+index 433489d..59bdd15 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -3298,7 +3298,7 @@ static int ram_load_postcopy(QEMUFile *f)
+             multifd_recv_sync_main();
+             break;
+         default:
+-            error_report("Unknown combination of migration flags: %#x"
++            error_report("Unknown combination of migration flags: %0x"
+                          " (postcopy mode)", flags);
+             ret = -EINVAL;
+             break;
+@@ -3576,7 +3576,7 @@ static int ram_load_precopy(QEMUFile *f)
+             if (flags & RAM_SAVE_FLAG_HOOK) {
+                 ram_control_load_hook(f, RAM_CONTROL_HOOK, NULL);
+             } else {
+-                error_report("Unknown combination of migration flags: %#x",
++                error_report("Unknown combination of migration flags: %0x",
+                              flags);
+                 ret = -EINVAL;
+             }
 -- 
 1.8.3.1
 
