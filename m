@@ -7,41 +7,40 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2852C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:54:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42199C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:56:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05F9C208C7
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:54:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05F9C208C7
+	by mail.kernel.org (Postfix) with ESMTPS id DCFBC208C7
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 13:56:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCFBC208C7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRbo2-0001fj-Mn
-	for qemu-devel@archiver.kernel.org; Sun, 11 Oct 2020 09:54:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56848)
+	id 1kRbph-0003mb-1f
+	for qemu-devel@archiver.kernel.org; Sun, 11 Oct 2020 09:56:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56894)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
- id 1kRYYA-00011C-43; Sun, 11 Oct 2020 06:25:58 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:52134 helo=huawei.com)
+ id 1kRYYC-00013M-Bm; Sun, 11 Oct 2020 06:26:00 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:52168 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
- id 1kRYY8-0003IG-3h; Sun, 11 Oct 2020 06:25:57 -0400
+ id 1kRYYA-0003Ji-Eg; Sun, 11 Oct 2020 06:26:00 -0400
 Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id E76ACD955EE26CB46FB0;
+ by Forcepoint Email with ESMTP id EF935A9660D1AEBE83CC;
  Sun, 11 Oct 2020 18:25:48 +0800 (CST)
 Received: from huawei.com (10.175.124.27) by DGGEMS410-HUB.china.huawei.com
  (10.3.19.210) with Microsoft SMTP Server id 14.3.487.0; Sun, 11 Oct 2020
- 18:25:38 +0800
+ 18:25:39 +0800
 From: Bihong Yu <yubihong@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
-Subject: [PATCH v1 4/8] migration: Open brace '{' following struct go on the
- same line
-Date: Sun, 11 Oct 2020 18:57:39 +0800
-Message-ID: <1602413863-19513-5-git-send-email-yubihong@huawei.com>
+Subject: [PATCH v1 5/8] migration: Add braces {} for if statement
+Date: Sun, 11 Oct 2020 18:57:40 +0800
+Message-ID: <1602413863-19513-6-git-send-email-yubihong@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1602413863-19513-1-git-send-email-yubihong@huawei.com>
 References: <1602413863-19513-1-git-send-email-yubihong@huawei.com>
@@ -60,7 +59,7 @@ X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
  RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
-X-Mailman-Approved-At: Sun, 11 Oct 2020 09:36:19 -0400
+X-Mailman-Approved-At: Sun, 11 Oct 2020 09:36:21 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,23 +81,32 @@ Signed-off-by:Bihong Yu <yubihong@huawei.com>
 Reviewed-by: Chuan Zheng <zhengchuan@huawei.com>
 Signed-off-by: Bihong Yu <yubihong@huawei.com>
 ---
- migration/migration.h | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ migration/ram.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/migration/migration.h b/migration/migration.h
-index deb411a..99784b4 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -124,8 +124,7 @@ struct MigrationClass {
-     DeviceClass parent_class;
- };
+diff --git a/migration/ram.c b/migration/ram.c
+index 90b277b..12e7296 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -101,14 +101,16 @@ static struct {
  
--struct MigrationState
--{
-+struct MigrationState {
-     /*< private >*/
-     DeviceState parent_obj;
+ static void XBZRLE_cache_lock(void)
+ {
+-    if (migrate_use_xbzrle())
++    if (migrate_use_xbzrle()) {
+         qemu_mutex_lock(&XBZRLE.lock);
++    }
+ }
  
+ static void XBZRLE_cache_unlock(void)
+ {
+-    if (migrate_use_xbzrle())
++    if (migrate_use_xbzrle()) {
+         qemu_mutex_unlock(&XBZRLE.lock);
++    }
+ }
+ 
+ /**
 -- 
 1.8.3.1
 
