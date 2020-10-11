@@ -5,75 +5,74 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F28B6C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 01:57:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FA49C433E7
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 02:19:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45A8A206D4
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 01:57:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E349F20731
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 02:19:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OXB02dAd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45A8A206D4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TE0pHy3q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E349F20731
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRQcA-0005DZ-Al
-	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 21:57:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60150)
+	id 1kRQx4-0000FS-T8
+	for qemu-devel@archiver.kernel.org; Sat, 10 Oct 2020 22:19:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34698)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
- id 1kRQbF-0004Se-9l; Sat, 10 Oct 2020 21:56:37 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41538)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kRQwW-0008HD-8H
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 22:18:36 -0400
+Received: from mail-ot1-x336.google.com ([2607:f8b0:4864:20::336]:38568)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
- id 1kRQbD-0004Sh-J7; Sat, 10 Oct 2020 21:56:36 -0400
-Received: by mail-ot1-x342.google.com with SMTP id q21so12584570ota.8;
- Sat, 10 Oct 2020 18:56:34 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kRQwU-0006jD-9I
+ for qemu-devel@nongnu.org; Sat, 10 Oct 2020 22:18:35 -0400
+Received: by mail-ot1-x336.google.com with SMTP id i12so12648382ota.5
+ for <qemu-devel@nongnu.org>; Sat, 10 Oct 2020 19:18:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=iafPvEnAsyoEe4Ey2SSoAVShKbsoVPNle8hYe14TBV4=;
- b=OXB02dAdZIBTl+KrKmhVSLISLfzH0o8fLIIa7ThYZzQGNC9BPHZKkJS9tOEheZlZhn
- Nk3ZKSC+p881FErg8g3GlehIDx71JaPhZupjhx5TKJN/gHrEkxjboqnySgo/ee7FiaJJ
- A5qQ8+QARSc2n6dxE7fEvcCNvIqIECxzj6bdH3lCBoIKMHLYQN9YAcsU1hPyLAzjzmOI
- 5QzJLSddWFSaX3Col5amAfm40K6Ysc7ZU7ozsrn/lRSgwo/AtSLwCUUo7PA/LZyXF0Os
- Ci7gkTmi1aSZ8Cv43ByhUMrqQ768C0JtxNyomAcmd5H9GgFYYxM8DuytCdxCFkhUkZws
- 257A==
+ bh=X2MojMWifwNabScR2H/536Be4Oh/znpRJCyjLvWLyB0=;
+ b=TE0pHy3qEUK+NWmZdBF5PmJTR4MifUq5K61XPtk7St0AiOlPO7DlpL7s4oqR3+pYdF
+ t0Fnb2iPVPOHDn/N/NRGxEgY8zwsaOuxXGoEQzXbPm6F1MAF0sJffmTCBwTjfmxFEi1+
+ 49olfJBEXWrU3JZi6YNon9EsZYlubw/ENP8DAaWAjNjUMYpjcUKnZd4a1+vaP2d1Zcaa
+ H2uaPwQ6RnI8/lp5f9WGDmqjj4FfjUJv5udTdJZfbDpPSqb/BJa6RmfThl6EQouBWz3x
+ AxyMoUiS/qyFUtwQTb6N+P1Q1al52TDzSo9ZoycARr2KaoIsVAk2W7DSyX5LzllvQrq2
+ QDPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=iafPvEnAsyoEe4Ey2SSoAVShKbsoVPNle8hYe14TBV4=;
- b=JueJJ33jUeOcFAvsSzYuyUOgBybHbiTPopHadpp5FIiWzOcCjODR6/jmdpirC2gB7Q
- 8GxQK4T5eDnCjFK9r8vUX2QOZFauMAyKHRAJquNZsKU6VkEFTjNKYfQhozPL8vzHal0a
- cvF+qFX9OXsmA31p/SC0yPPBgF5NJ7NeQbH5Rs6TL+ovlmObqAt8uCt8Nzdy5/JyYpaG
- +Wiapk7CJ+X+nnGM1ADlv6WNQ7KVeS3PcmFVH4kLz+VqMbwwXnPuwzq0FLJzUBUBXs6W
- Y8fbDWDgAMBxFDj2JxM7krbIIot3CxuvPdlijMlNWoJ8aZIKzmpVOAj+mKiavel+Xepf
- U5oQ==
-X-Gm-Message-State: AOAM533Rbft2tOf8zeZMQwnErIqd0AluPFiRgHmqfyjRJIzpaISWdBAK
- mFScdG4VDB1UpkccRrAE92pk/e6oseNot6PEfcU=
-X-Google-Smtp-Source: ABdhPJxkVrr/7++zNogbmBXafpoSSBO5maPk7oU2TXT65H3qOdsLZRPavxdebY1sDpMId4gfYGSGcOAHT0X6CzjxUwo=
-X-Received: by 2002:a9d:1a2:: with SMTP id e31mr10721565ote.181.1602381393235; 
- Sat, 10 Oct 2020 18:56:33 -0700 (PDT)
+ bh=X2MojMWifwNabScR2H/536Be4Oh/znpRJCyjLvWLyB0=;
+ b=jjGOSprkS3so5CZXHAUJuMI6Evhnb4dYAGzea0zqD9TJJIhxH2WGEG1NJvcNOti/96
+ GTvldODqGm9yzehPK0XXD8ledFTLLEgO2kqYWhfVrcBxfKZZ3Jw0yDfMR99+qZK4C1vp
+ C5D0n6JnwZdEaTGZ4S83RNXQrhP9KbB/yhBdAEbNfQgza1YyrITEFImdLJIpeEaci/S5
+ dyu8sbS/hChrFVbCnMFEF5J9EVnh3aWsxnqE+dsKt8u0oQie65Ywyo0OOBu2W+ar2Ts2
+ 5TUS+bzHaFOb+9vZK1IGZ5xxKLXpSDf3boegKkM+1zMm3xzyOI9vqA45iBoibg/5U/RV
+ SG6w==
+X-Gm-Message-State: AOAM531y0NsYoLVRw2eKnnEVKhhVSvNkRb+tZFRp8OfYAhI4WXCfkcUT
+ vxG5iRyaJ7zo8jOmFzfq4tpFI/JzUtSwmbhMwSs=
+X-Google-Smtp-Source: ABdhPJw2ylYtTurz7/BBNeqzaHxCoNHmLEP7lPg4e+hhTce14oXtokBYT+uiiwAkT9HXEYXuY6nCe+9o/nTvFB862wY=
+X-Received: by 2002:a9d:1a2:: with SMTP id e31mr10761895ote.181.1602382712828; 
+ Sat, 10 Oct 2020 19:18:32 -0700 (PDT)
 MIME-Version: 1.0
-References: <20201010110730.1575180-1-kuhn.chenqun@huawei.com>
-In-Reply-To: <20201010110730.1575180-1-kuhn.chenqun@huawei.com>
+References: <20200904134529.1317-1-pannengyuan@huawei.com>
+In-Reply-To: <20200904134529.1317-1-pannengyuan@huawei.com>
 From: Li Qiang <liq3ea@gmail.com>
-Date: Sun, 11 Oct 2020 09:55:57 +0800
-Message-ID: <CAKXe6SJWZ+ek-MefzJzDH=H=N90B67i5pV7CybA2maYq9Euk5w@mail.gmail.com>
-Subject: Re: [PATCH] migration/block-dirty-bitmap: fix uninitialized variable
- warning
-To: Chen Qun <kuhn.chenqun@huawei.com>
+Date: Sun, 11 Oct 2020 10:17:56 +0800
+Message-ID: <CAKXe6S+Y1FDyWX=onEu7GBiFGwGo+7iUs4B7s-er9QRZEKV_3A@mail.gmail.com>
+Subject: Re: [PATCH] target/i386/cpu: add return value verification and ignore
+ Error objects
+To: Pan Nengyuan <pannengyuan@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
- envelope-from=liq3ea@gmail.com; helo=mail-ot1-x342.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::336;
+ envelope-from=liq3ea@gmail.com; helo=mail-ot1-x336.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -95,58 +94,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, vsementsov@virtuozzo.com,
- zhanghailiang <zhang.zhanghailiang@huawei.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, qemu-trivial@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, ganqixin@huawei.com,
- Euler Robot <euler.robot@huawei.com>, Max Reitz <mreitz@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ Qemu Developers <qemu-devel@nongnu.org>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Chen Qun <kuhn.chenqun@huawei.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Chen Qun <kuhn.chenqun@huawei.com> =E4=BA=8E2020=E5=B9=B410=E6=9C=8810=E6=
-=97=A5=E5=91=A8=E5=85=AD =E4=B8=8B=E5=8D=887:08=E5=86=99=E9=81=93=EF=BC=9A
+Pan Nengyuan <pannengyuan@huawei.com> =E4=BA=8E2020=E5=B9=B49=E6=9C=884=E6=
+=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=883:19=E5=86=99=E9=81=93=EF=BC=9A
 >
-> This if statement judgment is redundant and it will cause a warning:
+> 'err' is unnecessary in x86_cpu_class_check_missing_features(), we can ch=
+ange x86_cpu_expand_features()
+> to return true on success, false on failure, then pass NULL here to remov=
+e it.
 >
-> migration/block-dirty-bitmap.c:1090:13: warning: =E2=80=98bitmap_name=E2=
-=80=99 may be used
->  uninitialized in this function [-Wmaybe-uninitialized]
->              g_strlcpy(s->bitmap_name, bitmap_name, sizeof(s->bitmap_name=
-));
->              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~
->
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+> Suggested-by: Markus Armbruster <armbru@redhat.com>
 
 Reviewed-by: Li Qiang <liq3ea@gmail.com>
 
+
 > ---
->  migration/block-dirty-bitmap.c | 2 --
->  1 file changed, 2 deletions(-)
+>  target/i386/cpu.c | 15 +++++++--------
+>  1 file changed, 7 insertions(+), 8 deletions(-)
 >
-> diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitma=
-p.c
-> index 5bef793ac0..e09ea4f22b 100644
-> --- a/migration/block-dirty-bitmap.c
-> +++ b/migration/block-dirty-bitmap.c
-> @@ -1084,9 +1084,7 @@ static int dirty_bitmap_load_header(QEMUFile *f, DB=
-MLoadState *s,
->              } else {
->                  bitmap_name =3D s->bitmap_alias;
->              }
-> -        }
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 49d8958528..c3d3766133 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -4883,7 +4883,7 @@ static void x86_cpu_parse_featurestr(const char *ty=
+pename, char *features,
+>      }
+>  }
 >
-> -        if (!s->cancelled) {
->              g_strlcpy(s->bitmap_name, bitmap_name, sizeof(s->bitmap_name=
-));
->              s->bitmap =3D bdrv_find_dirty_bitmap(s->bs, s->bitmap_name);
+> -static void x86_cpu_expand_features(X86CPU *cpu, Error **errp);
+> +static bool x86_cpu_expand_features(X86CPU *cpu, Error **errp);
+>  static void x86_cpu_filter_features(X86CPU *cpu, bool verbose);
 >
+>  /* Build a list with the name of all features on a feature word array */
+> @@ -4925,7 +4925,6 @@ static void x86_cpu_class_check_missing_features(X8=
+6CPUClass *xcc,
+>                                                   strList **missing_feats=
+)
+>  {
+>      X86CPU *xc;
+> -    Error *err =3D NULL;
+>      strList **next =3D missing_feats;
+>
+>      if (xcc->host_cpuid_required && !accel_uses_host_cpuid()) {
+> @@ -4937,8 +4936,7 @@ static void x86_cpu_class_check_missing_features(X8=
+6CPUClass *xcc,
+>
+>      xc =3D X86_CPU(object_new_with_class(OBJECT_CLASS(xcc)));
+>
+> -    x86_cpu_expand_features(xc, &err);
+> -    if (err) {
+> +    if (!x86_cpu_expand_features(xc, NULL)) {
+>          /* Errors at x86_cpu_expand_features should never happen,
+>           * but in case it does, just report the model as not
+>           * runnable at all using the "type" property.
+> @@ -4947,7 +4945,6 @@ static void x86_cpu_class_check_missing_features(X8=
+6CPUClass *xcc,
+>          new->value =3D g_strdup("type");
+>          *next =3D new;
+>          next =3D &new->next;
+> -        error_free(err);
+>      }
+>
+>      x86_cpu_filter_features(xc, false);
+> @@ -6426,7 +6423,7 @@ static void x86_cpu_enable_xsave_components(X86CPU =
+*cpu)
+>  /* Expand CPU configuration data, based on configured features
+>   * and host/accelerator capabilities when appropriate.
+>   */
+> -static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+> +static bool x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+>  {
+>      CPUX86State *env =3D &cpu->env;
+>      FeatureWord w;
+> @@ -6436,14 +6433,14 @@ static void x86_cpu_expand_features(X86CPU *cpu, =
+Error **errp)
+>      for (l =3D plus_features; l; l =3D l->next) {
+>          const char *prop =3D l->data;
+>          if (!object_property_set_bool(OBJECT(cpu), prop, true, errp)) {
+> -            return;
+> +            return false;
+>          }
+>      }
+>
+>      for (l =3D minus_features; l; l =3D l->next) {
+>          const char *prop =3D l->data;
+>          if (!object_property_set_bool(OBJECT(cpu), prop, false, errp)) {
+> -            return;
+> +            return false;
+>          }
+>      }
+>
+> @@ -6540,6 +6537,8 @@ static void x86_cpu_expand_features(X86CPU *cpu, Er=
+ror **errp)
+>      if (env->cpuid_xlevel2 =3D=3D UINT32_MAX) {
+>          env->cpuid_xlevel2 =3D env->cpuid_min_xlevel2;
+>      }
+> +
+> +    return true;
+>  }
+>
+>  /*
 > --
-> 2.23.0
+> 2.18.2
 >
 >
 
