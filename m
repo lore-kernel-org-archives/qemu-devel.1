@@ -2,74 +2,74 @@ Return-Path: <SRS0=+Fwv=DS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC3E0C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 19:40:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAFC3C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 19:41:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 424B52083B
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 19:40:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 74E882083B
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 19:41:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uz+5gg1w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 424B52083B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hmnrpmtD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74E882083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRhCr-0003cc-6P
-	for qemu-devel@archiver.kernel.org; Sun, 11 Oct 2020 15:40:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47108)
+	id 1kRhDL-0004hc-KT
+	for qemu-devel@archiver.kernel.org; Sun, 11 Oct 2020 15:41:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47294)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRh5R-0002WT-Hn; Sun, 11 Oct 2020 15:32:53 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46776)
+ id 1kRh61-0003Pj-B4; Sun, 11 Oct 2020 15:33:29 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:36705)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRh5Q-0006rS-1y; Sun, 11 Oct 2020 15:32:53 -0400
-Received: by mail-wr1-x441.google.com with SMTP id n6so16270999wrm.13;
- Sun, 11 Oct 2020 12:32:50 -0700 (PDT)
+ id 1kRh5z-0006wf-PH; Sun, 11 Oct 2020 15:33:29 -0400
+Received: by mail-wm1-x344.google.com with SMTP id e2so15335472wme.1;
+ Sun, 11 Oct 2020 12:33:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=0jpaxMymalQzJe7nkt3fK37nWgDJARQE9RMKxlzHDKI=;
- b=uz+5gg1wHDtPr/S5ORv4Td1PAh5DSIAfCQWuFHeFFoQsmiwviFwUO9X+mxPY4AcYvY
- dhEklevtq1PXGH+HkTxJ3yLLf65URD5rG/8a9FTAiShuYX4A5SYs+Zpqy8/3fNWflOhW
- fFtuldLo4fTV2TxhVgyaoxqkIYIocYWAKRKzwdax30CpjGi1oRo3ojqEFiby0OlDJjZr
- KtFy4Kq9WsGkvJUD6QfCL643E3hjiQvlQJ/121uiF/CEdiDItNOXUMYwBoE4wAv803Zo
- txC9m71bcSEWbXa3lSSaSve+AU8z6U8MKvjtXyToez1LfPTD3pMY9McEdi+ujrY0blKX
- yO6w==
+ bh=gejAdYQY/teMYz2RHH6Mc87RW7QIZIz1gQu9dTLuxMg=;
+ b=hmnrpmtDQ1h8IpxAsATjEWAyJt6HnVV89VQFF+cY0RjjXVPeqTXZY5Dcl5X0//qDDW
+ LzpQBwowdPn6+AWsK3f1NGZk2BSFOXibGnIfFb7HBKfjcjOkGq6g/0s8RLM0asrI0Oc8
+ eYO8mD+QSdXE2ODsKW7bviGCec1fBcNf2vr4SWN62Hzoc5/3fT/UprYLBV9odC74hGeV
+ 7r9ZsIJMdl7y0+fgVTyfCrdAE6qLA9VGXOurdDeSxKj1zbQhEVd6sZuV+Zm3T/nzgp52
+ Ik1RYh79Qf69uCIMokB1jqFiPJvkleq3LshytFsuYSBf7tI8vBGOx+C25Lc1Dw35dLHJ
+ MysA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=0jpaxMymalQzJe7nkt3fK37nWgDJARQE9RMKxlzHDKI=;
- b=lwZkdqlCkKQvUYkBOFoNkhyrMy3CxiLF1oVrjkYKiY+hGY1f5ecfmGHpLvCKlavv3a
- RIB66SyhtLZRNuFl1C3p5YrEUOTxdl7qyYqI9Git4//tL3fVyhd78Kn7P75ZMFO+t10B
- +6u/E/O5ul8jxtNuFgkFeYoGIRq7YLTbRjYF6RzmoDPzkWCuRgLQxINm3VmA8VlXJlq2
- f6v4wMKCo7VJc71IYuif3YPXAz6ekZgJN+n0fJJyVVRQ8ixPCdeq8h34IKC5KLJW0nl/
- gyITn2IntvPylUSvSP1JOYGSV9W+zdej2ShVG3L1berSLV31zuLjg7ZP9D3EKTR7+CG2
- XkFA==
-X-Gm-Message-State: AOAM533QC5mXLAp03cN8Po7owt82QAuQVfYE4RtOcKU1mruoHdSXz2Ca
- jB2fDkky7px+Y/hXnbZDqnG85kqhm/k=
-X-Google-Smtp-Source: ABdhPJzhnI81QO4NuG8+dCiW+MMDXBui58TatPQ8g+Lc44KzsdSlLSS4QaC7ExFGWP3IQSy0YyDHJQ==
-X-Received: by 2002:adf:bacc:: with SMTP id w12mr16965624wrg.66.1602444769499; 
- Sun, 11 Oct 2020 12:32:49 -0700 (PDT)
+ bh=gejAdYQY/teMYz2RHH6Mc87RW7QIZIz1gQu9dTLuxMg=;
+ b=t2tOtZhtt8GpgsyPIHTQscPmL3vLeqotZznakyRLRCYZ5fK3fo7nVfx5FaazDFJkIG
+ /SGCnpKC9VKxR4MjczJW41RMyNVB9wrK60OwKH0Bzx4fMFdtH9uiNja1hejmGYLNbqAR
+ wFl/NFig/Eaacl4h5pTz8bZB0uMuyuX4iadQzvvWJ785afrSKJ+v87U+BMsFA1D0d8ne
+ 3lZP/OyTP1QYp/VLX+t1ByTl+G80RPs3tGup8asDHUPYGQEGdqIKjQpT2jv8Ey5tx+gJ
+ 3Z4oK5GpLImMo7PqfP4Dhs/mx2eU/uP8EIPNNLDHI6XKw+kGGDCdSALjMtvNIJ2C04r2
+ pfEw==
+X-Gm-Message-State: AOAM531LLcgpRdwcROvEtab8My5PtjL/x4Ha7TBOsZ6zIUkHg3dzBJNZ
+ hXFPwebWA4L78CJnQ2XPQxpkwF8k2SA=
+X-Google-Smtp-Source: ABdhPJxBLeYlan/olq39IXZxlC37Oueo1eu0SAO7/jy1Ukn3zHUcPt1OS23XOGWG1GLsYM74q0ne2g==
+X-Received: by 2002:a7b:ce11:: with SMTP id m17mr7686924wmc.8.1602444805250;
+ Sun, 11 Oct 2020 12:33:25 -0700 (PDT)
 Received: from localhost.localdomain
  (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id a81sm23030618wmf.32.2020.10.11.12.32.47
+ by smtp.gmail.com with ESMTPSA id i14sm20536215wml.24.2020.10.11.12.33.23
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 11 Oct 2020 12:32:48 -0700 (PDT)
+ Sun, 11 Oct 2020 12:33:24 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 03/10] hw/isa: Add the ISA_IRQ_SER_DEFAULT definition
-Date: Sun, 11 Oct 2020 21:32:22 +0200
-Message-Id: <20201011193229.3210774-4-f4bug@amsat.org>
+Subject: [PATCH 10/10] hw/isa: Add the ISA_IRQ_IDE_DEFAULT definition
+Date: Sun, 11 Oct 2020 21:32:29 +0200
+Message-Id: <20201011193229.3210774-11-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201011193229.3210774-1-f4bug@amsat.org>
 References: <20201011193229.3210774-1-f4bug@amsat.org>
@@ -77,8 +77,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -118,7 +118,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The first serial port uses IRQ #4 by default. Add this
+The IDE controller uses IRQ #14 by default. Add this
 default definition to the IsaIrqNumber enum.
 
 Avoid magic values in the code, replace them by the
@@ -127,34 +127,34 @@ newly introduced definition.
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
  include/hw/isa/isa.h | 1 +
- hw/sparc64/sun4u.c   | 2 +-
+ hw/ide/isa.c         | 2 +-
  2 files changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/include/hw/isa/isa.h b/include/hw/isa/isa.h
-index e139b88c992..519296d5823 100644
+index 43cdc3c47b6..05622ee11e2 100644
 --- a/include/hw/isa/isa.h
 +++ b/include/hw/isa/isa.h
-@@ -10,6 +10,7 @@
- 
- enum IsaIrqNumber {
-     ISA_IRQ_KBD_DEFAULT =  1,
-+    ISA_IRQ_SER_DEFAULT =  4,
+@@ -17,6 +17,7 @@ enum IsaIrqNumber {
+     ISA_IRQ_RTC_DEFAULT =  8,
+     ISA_IRQ_NET_DEFAULT =  9,
+     ISA_IRQ_MOU_DEFAULT = 12,
++    ISA_IRQ_IDE_DEFAULT = 14,
      ISA_NUM_IRQS        = 16
  };
  
-diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index d4c39490cd9..6e42467d5cc 100644
---- a/hw/sparc64/sun4u.c
-+++ b/hw/sparc64/sun4u.c
-@@ -619,7 +619,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
-         qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_KBD_IRQ));
-     qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 12,
-         qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_MSE_IRQ));
--    qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 4,
-+    qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", ISA_IRQ_SER_DEFAULT,
-         qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_SER_IRQ));
+diff --git a/hw/ide/isa.c b/hw/ide/isa.c
+index 6bc19de2265..2412d568937 100644
+--- a/hw/ide/isa.c
++++ b/hw/ide/isa.c
+@@ -108,7 +108,7 @@ ISADevice *isa_ide_init(ISABus *bus, int iobase, int iobase2, int isairq,
+ static Property isa_ide_properties[] = {
+     DEFINE_PROP_UINT32("iobase",  ISAIDEState, iobase,  0x1f0),
+     DEFINE_PROP_UINT32("iobase2", ISAIDEState, iobase2, 0x3f6),
+-    DEFINE_PROP_UINT32("irq",    ISAIDEState, isairq,  14),
++    DEFINE_PROP_UINT32("irq", ISAIDEState, isairq, ISA_IRQ_IDE_DEFAULT),
+     DEFINE_PROP_END_OF_LIST(),
+ };
  
-     switch (vga_interface_type) {
 -- 
 2.26.2
 
