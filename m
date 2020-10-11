@@ -7,69 +7,70 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 421FDC433E7
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 582A0C433DF
 	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 19:37:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE37D2083B
+	by mail.kernel.org (Postfix) with ESMTPS id 0313D2145D
 	for <qemu-devel@archiver.kernel.org>; Sun, 11 Oct 2020 19:37:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="glKKe2Me"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE37D2083B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mC1slaEe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0313D2145D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRhA3-0000wx-UK
-	for qemu-devel@archiver.kernel.org; Sun, 11 Oct 2020 15:37:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47278)
+	id 1kRhA4-0000vb-12
+	for qemu-devel@archiver.kernel.org; Sun, 11 Oct 2020 15:37:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47192)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRh5w-0003CF-4K; Sun, 11 Oct 2020 15:33:24 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44569)
+ id 1kRh5g-0002l5-Rj; Sun, 11 Oct 2020 15:33:10 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53618)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRh5u-0006w8-Jd; Sun, 11 Oct 2020 15:33:23 -0400
-Received: by mail-wr1-x441.google.com with SMTP id t9so16558142wrq.11;
- Sun, 11 Oct 2020 12:33:21 -0700 (PDT)
+ id 1kRh5f-0006sl-B5; Sun, 11 Oct 2020 15:33:08 -0400
+Received: by mail-wm1-x341.google.com with SMTP id f21so15212466wml.3;
+ Sun, 11 Oct 2020 12:33:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=76wJgIrqTSi0DDRrVUiOHwWarPfXaZKRh0PO2TH3Udg=;
- b=glKKe2MexCos8D4mlixBOKwOdTUN6RsBj1DiGhj3sc3TpL0PkRI2uq5EjQlyvJmlae
- GvVDZ+GpYX5iCitruMHihden4WKXVDfnzaesPSu/g45rxInn3hIQyLttEipiSCPO6beZ
- Rka9pIp9eni2aQCBduBCn9bnIkxH1U4CxO8GPLoVcMcj0Z3spMiLZkDVjJkhWuaLYzVR
- iIKGjsTW1Gn4/fYVTJ6/njhBtjGANDnhSa5LGV8or1Zs+gsEez9b8vKfA336eleFnG6F
- zO9PeT6SeIdQ477zmubsj1gBY4YmQvviCgU5qSg8N7GLmtZ5Mh27nxlPCtD6p712Psr9
- klww==
+ bh=T47fdn4RxOEr/33O8p4c1fGY3UD39OWzHlO0HGQUKaU=;
+ b=mC1slaEerXeh3/utyzoo5ACyMyf3Uyzu0ByT32VzXV0ZAGOzsxTHm59fCAreGa37sB
+ s9sy5HEqF+6m5iiyTUz1BchC6JRy7vrxUJ/VV+CB6hjMekOdQd1Vua2HlbTO9lzdhLjy
+ BzNKy6oZ67uRWx+nHvKq0YeJP+lMte3UNFHQE/pW9rbUH90pblr83VgFvVkgQbnycvlG
+ x8KQVx/pwjPO75dQ0MjwTQjqeDWrSMMmRDMPZL1MhFXGYpyzxBvTG3xQvk0ifLluGF8R
+ 5tmJ+eqt0zVF83s3mukbRsCKIFN4pA//5wi7REfSH7FiWyAI+5Bzw7H6Xyih1AM7Mzhz
+ bU4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=76wJgIrqTSi0DDRrVUiOHwWarPfXaZKRh0PO2TH3Udg=;
- b=OrWZgDto75eVOU9weg/fP7+0q5xcdi9/No49gqWUSdPGnOAuLAsE41FFmDNgrWuBOr
- f5lq+INPlStclfevTXoc/CPyX2iOdzVkkZ39YcPwd5rW3Gg23+kw4ITFuu+MFb4KWHRz
- JmdEkFcIgCczX2RQCwwVwYhXa85fxzJCDd+rkX7DEEvqI7QNOidXl6tFkpjZcRL5LVkx
- IZzMAC9KZ85Kx5muDfAgQGCZ0uyayc5ITq1LJOCs/wrNDL7u92TKKNq5EBdgIuh774R1
- 5hk+DXk15ngylhHM6HrUL8hx30a4qUM8Co+on389Zy+qNHSH4VyNeYDs0SUBzP0TW5bF
- PmSA==
-X-Gm-Message-State: AOAM533zi39oB8KfW/Y/Vk8DXwn30s2rTSQW8ff8766LTd10hNB4yBOu
- VQp19HQHaYbPyCMc85z0szXrqlT5a8A=
-X-Google-Smtp-Source: ABdhPJzO9f2oN+VJQaGJdLE0ijcw7BO3YppTUBTPgvef2k2DlR+3vVWdWVgaMP9no0LDs/RazXUMQA==
-X-Received: by 2002:adf:f78d:: with SMTP id q13mr877669wrp.258.1602444800147; 
- Sun, 11 Oct 2020 12:33:20 -0700 (PDT)
+ bh=T47fdn4RxOEr/33O8p4c1fGY3UD39OWzHlO0HGQUKaU=;
+ b=LxGct3xMQLpiBWnQdCZRXoMxMCcaAlJh8139VLLGB8XlB0y4Pi0k0174J3/yF0NsSP
+ dA2bIi5PbzDqBg/uqtJwh4L4FzwifTRO7YoMFNJYgkx2oGyGGARlnQhMFn869QkylDO0
+ o+8QIqSr5K7kr8qlEMpYH2FpiXUA3oZ0WE/fI85yarMs7CkuX7ZiXUBck33rR/3kXex4
+ HeoEslCTiS9zzVBbIlk0ypYuEcFEHcdADV473Q3JfhCmMzBBXGJtS4V4TL9i8Un9l9ye
+ IZgR5bwubQ6Dj/vqPVxzGSRk2LmqmnjhO2X7R3UnYMBBQncSEzTSdrK310vElKMw3bXP
+ Nd3A==
+X-Gm-Message-State: AOAM531jW06n5yRZp1NcBRXnUWVS0jAbnUpVq9vfUylsU8eWzmDIneBQ
+ ZHU8C2Y2nJxINykStz1MXnM8G7F9tzo=
+X-Google-Smtp-Source: ABdhPJz2DOe4Z1/29V0nxb/owBp2f0xdwN7f8+GhaG+tphVo+1QSQfP243Li5kkzVC/ofYRDjbJtlg==
+X-Received: by 2002:a05:600c:210f:: with SMTP id
+ u15mr8170317wml.53.1602444785001; 
+ Sun, 11 Oct 2020 12:33:05 -0700 (PDT)
 Received: from localhost.localdomain
  (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id t5sm21663725wrb.21.2020.10.11.12.33.18
+ by smtp.gmail.com with ESMTPSA id n2sm21770729wrt.82.2020.10.11.12.33.03
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 11 Oct 2020 12:33:19 -0700 (PDT)
+ Sun, 11 Oct 2020 12:33:04 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 09/10] hw/isa: Add the ISA_IRQ_MOU_DEFAULT definition
-Date: Sun, 11 Oct 2020 21:32:28 +0200
-Message-Id: <20201011193229.3210774-10-f4bug@amsat.org>
+Subject: [PATCH 06/10] hw/isa: Add the ISA_IRQ_PAR_DEFAULT definition
+Date: Sun, 11 Oct 2020 21:32:25 +0200
+Message-Id: <20201011193229.3210774-7-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201011193229.3210774-1-f4bug@amsat.org>
 References: <20201011193229.3210774-1-f4bug@amsat.org>
@@ -77,8 +78,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -118,7 +119,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The PS2 mouse uses IRQ #12 by default. Add this
+The parallel port uses IRQ #7 by default. Add this
 default definition to the IsaIrqNumber enum.
 
 Avoid magic values in the code, replace them by the
@@ -127,48 +128,48 @@ newly introduced definition.
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
  include/hw/isa/isa.h | 1 +
- hw/input/pckbd.c     | 2 +-
+ hw/char/parallel.c   | 2 +-
  hw/sparc64/sun4u.c   | 2 +-
  3 files changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/include/hw/isa/isa.h b/include/hw/isa/isa.h
-index 11166592246..43cdc3c47b6 100644
+index 214a6730598..081fa446152 100644
 --- a/include/hw/isa/isa.h
 +++ b/include/hw/isa/isa.h
-@@ -16,6 +16,7 @@ enum IsaIrqNumber {
-     ISA_IRQ_PAR_DEFAULT =  7,
-     ISA_IRQ_RTC_DEFAULT =  8,
-     ISA_IRQ_NET_DEFAULT =  9,
-+    ISA_IRQ_MOU_DEFAULT = 12,
+@@ -13,6 +13,7 @@ enum IsaIrqNumber {
+     ISA_IRQ_SER_DEFAULT =  4,
+     ISA_IRQ_TPM_DEFAULT =  5,
+     ISA_IRQ_FDC_DEFAULT =  6,
++    ISA_IRQ_PAR_DEFAULT =  7,
      ISA_NUM_IRQS        = 16
  };
  
-diff --git a/hw/input/pckbd.c b/hw/input/pckbd.c
-index dde85ba6c68..140c992b03b 100644
---- a/hw/input/pckbd.c
-+++ b/hw/input/pckbd.c
-@@ -577,7 +577,7 @@ static void i8042_build_aml(ISADevice *isadev, Aml *scope)
-     aml_append(kbd, aml_name_decl("_CRS", crs));
- 
-     crs = aml_resource_template();
--    aml_append(crs, aml_irq_no_flags(12));
-+    aml_append(crs, aml_irq_no_flags(ISA_IRQ_MOU_DEFAULT));
- 
-     mou = aml_device("MOU");
-     aml_append(mou, aml_name_decl("_HID", aml_eisaid("PNP0F13")));
+diff --git a/hw/char/parallel.c b/hw/char/parallel.c
+index 8b418abf719..9e0d80ec0d0 100644
+--- a/hw/char/parallel.c
++++ b/hw/char/parallel.c
+@@ -636,7 +636,7 @@ bool parallel_mm_init(MemoryRegion *address_space,
+ static Property parallel_isa_properties[] = {
+     DEFINE_PROP_UINT32("index", ISAParallelState, index,   -1),
+     DEFINE_PROP_UINT32("iobase", ISAParallelState, iobase,  -1),
+-    DEFINE_PROP_UINT32("irq",   ISAParallelState, isairq,  7),
++    DEFINE_PROP_UINT32("irq",   ISAParallelState, isairq,  ISA_IRQ_PAR_DEFAULT),
+     DEFINE_PROP_CHR("chardev",  ISAParallelState, state.chr),
+     DEFINE_PROP_END_OF_LIST(),
+ };
 diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index c5b3e838ac2..ddd51c7cbbe 100644
+index 458dc215e6f..c5b3e838ac2 100644
 --- a/hw/sparc64/sun4u.c
 +++ b/hw/sparc64/sun4u.c
-@@ -617,7 +617,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+@@ -611,7 +611,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+     pci_realize_and_unref(ebus, pci_busA, &error_fatal);
+ 
+     /* Wire up "well-known" ISA IRQs to PBM legacy obio IRQs */
+-    qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 7,
++    qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", ISA_IRQ_PAR_DEFAULT,
+         qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_LPT_IRQ));
+     qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", ISA_IRQ_FDC_DEFAULT,
          qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_FDD_IRQ));
-     qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", ISA_IRQ_KBD_DEFAULT,
-         qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_KBD_IRQ));
--    qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 12,
-+    qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", ISA_IRQ_MOU_DEFAULT,
-         qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_MSE_IRQ));
-     qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", ISA_IRQ_SER_DEFAULT,
-         qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_SER_IRQ));
 -- 
 2.26.2
 
