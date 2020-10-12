@@ -2,91 +2,89 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0752C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 13:14:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D011C433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 13:22:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C4372076E
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 13:14:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 946CD20714
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 13:22:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J+9Dp5JT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C4372076E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Klg4jDOF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 946CD20714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52070 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRxeW-0002dI-Sm
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 09:14:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41872)
+	id 1kRxmE-0006Q7-GM
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 09:22:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44706)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kRxdt-0002Dg-9P
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 09:13:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40447)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kRxdq-00047P-MX
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 09:13:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602508410;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/XNpELREyj6MI6aevIoKYijDttFLy/e9RFTCBYuA0ns=;
- b=J+9Dp5JTrUlWtGF0opSxZwiOkYFpKQKwcGp1WBhyybvIKFGOGVQujBO1E8kHNLb2lG8zen
- QVhUz84KgRbTeoS/M5MtKD6UpzCzjy+PrVrC26oXvokJULnOA9ftyfLoNT5PNGJuz8/xFq
- HNTYzJoI1dT+y3LZG8tPNNCS9FixY/Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-587-XZoqCvVSPpCyGGFKth6t2w-1; Mon, 12 Oct 2020 09:13:28 -0400
-X-MC-Unique: XZoqCvVSPpCyGGFKth6t2w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B71257051;
- Mon, 12 Oct 2020 13:13:27 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-114-60.ams2.redhat.com [10.36.114.60])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 12EED2C31E;
- Mon, 12 Oct 2020 13:13:25 +0000 (UTC)
-Subject: Re: [PATCH] tests/migration: Allow longer timeouts
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
- qemu-devel@nongnu.org, lvivier@redhat.com, alex.bennee@linaro.org
-References: <20201008160330.130431-1-dgilbert@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b2ca5be3-fa96-4ecd-32bc-26a2d27554bd@redhat.com>
-Date: Mon, 12 Oct 2020 15:13:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kRxkV-0004jA-Ug; Mon, 12 Oct 2020 09:20:24 -0400
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:50927)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kRxkT-0005Fg-M4; Mon, 12 Oct 2020 09:20:23 -0400
+Received: by mail-wm1-x32b.google.com with SMTP id 13so17168482wmf.0;
+ Mon, 12 Oct 2020 06:20:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=05RfNurGaAHkRWlZ1YYxqFf0MRZv8h15YxydMsNWKx0=;
+ b=Klg4jDOF3uxhIMfMszwhjX7wIHESa2ulFQff3ybFJU3mJTr5mYM7RjMDR1UBVHRmnp
+ NihX4egubF86I+6z15EypOXG8z5cOs5INzwh7askzE8ep2cA4rDMuZAiStwkM0EFW2D7
+ lOAy1KgFvuDSHHOOrGYKof9c8fLpxa3bgjPYAroQggz0HUf2Fk+QGv7M5V07fxW9nhgk
+ VEg2FBGhIzav4KJgIuHcTlfTFnX1VSt6gwu6VJBa8PUVvOx+3RmyGgG78cGOP3HP1Dg4
+ arcwkhNjxqqa8XGj2kou4rjosW+Mh7yvmcS41redFtig/y6kAxzZqXERrhHJFkrvIJ0R
+ P7jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=05RfNurGaAHkRWlZ1YYxqFf0MRZv8h15YxydMsNWKx0=;
+ b=N/BZGHjkIdlKTd4dGBrC/lK9jBid/BylZMy3gVxRG8s9dYg18Ozpv575LbPbxH2teA
+ OJ7pr0EZ9Qur9eX83yAsutNSmxo+OilJ/VfQKCQ918D8+AZTyt6UDwdKof3Rb7zH5/tp
+ jHOPOV3V1VDFxoIrJvLhLio+5HQcLzQlBog3xWBhtKuhobr9O4gXmSH9HxXPiUD8fPJT
+ +typjIpbJxt6sLb6suIYfW17FdpYkKapUbCapnvvn1gKHBSGBtZmvvPeUIASAYsbZBAs
+ w9fOU/i74qsCK/ngHU00ZY/IZX2XOYOn4BsqW+XwCKM0AA+yEOqFfxHmuAaUFDvvDImV
+ k1ig==
+X-Gm-Message-State: AOAM530hPiE0MBDL8gklviyA76dDGxXVcHpE+lrAWcmUPePTh76NWXZw
+ rwYzIbrgJyKNaylB9zJXaqLGrO2hUF8=
+X-Google-Smtp-Source: ABdhPJyPjK5SPgZGW0RVJvWov+OEKINCn+dqa4NeDtPCL87xbnFf1uu/v2aQisHcaefNfgmEBiO61w==
+X-Received: by 2002:a1c:1983:: with SMTP id 125mr10768239wmz.29.1602508819174; 
+ Mon, 12 Oct 2020 06:20:19 -0700 (PDT)
+Received: from localhost.localdomain
+ (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id t6sm28092754wre.30.2020.10.12.06.20.17
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 12 Oct 2020 06:20:18 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 0/5] hw: Replace some magic by definitions
+Date: Mon, 12 Oct 2020 15:20:11 +0200
+Message-Id: <20201012132017.3423954-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <20201008160330.130431-1-dgilbert@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/11 23:52:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::32b;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32b.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,50 +97,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: quintela@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, qemu-arm@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08/10/2020 18.03, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> In travis, with gcov and gprof we're seeing timeouts; hopefully fix
-> this by increasing the test timeouts a bit, but for xbzrle ensure it
-> really does get a couple of cycles through to test the cache.
-> 
-> I think the problem in travis is we have about 2 host CPU threads,
-> in the test we have at least 3:
->    a) The vCPU thread (100% flat out)
->    b) The source migration thread
->    c) The destination migration thread
-> 
-> if (b) & (c) are slow for any reason - gcov+gperf or a slow host -
-> then they're sharing one host CPU thread so limit the migration
-> bandwidth.
-> 
-> Tested on my laptop with:
->    taskset -c 0,1 ./tests/qtest/migration-test -p /x86_64/migration
-> 
-> Reported-by: Alex Bennée <alex.bennee@linaro.org>
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  tests/qtest/migration-test.c | 21 +++++++++++----------
->  1 file changed, 11 insertions(+), 10 deletions(-)
-
-This seems to fix the gcov/gprof test indeed:
-
- https://travis-ci.com/github/huth/qemu/jobs/398270396
-
-Thus:
-
-Tested-by: Thomas Huth <thuth@redhat.com>
-
-I'm also queuing this to my qtest-next branch (in case you don't plan a
-migration pull request within the next days):
-
- https://gitlab.com/huth/qemu/-/commits/qtest-next/
-
- Thomas
-
+A bunch of trivial cleanups, replacing magic=0D
+values by definitions to make the code easier=0D
+to review.=0D
+=0D
+Since v1:=0D
+- Addressed Peter review comment on versatile PCI controller=0D
+- Added Thomas R-b tag=0D
+=0D
+Expected to be merged via qemu-trivial@.=0D
+=0D
+Regards,=0D
+=0D
+Phil.=0D
+=0D
+Philippe Mathieu-Daud=C3=A9 (5):=0D
+  hw: Replace magic value by PCI_NUM_PINS definition=0D
+  hw/pci-host/pam: Use ARRAY_SIZE() instead of magic value=0D
+  hw/pci-host/versatile: Add the MEMORY_WINDOW_COUNT definition=0D
+  hw/pci-host/versatile: Add the PCI_BAR_COUNT definition=0D
+  tests/qtest: Replace magic value by NANOSECONDS_PER_SECOND definition=0D
+=0D
+ hw/arm/virt.c           |  4 ++--=0D
+ hw/mips/gt64xxx_pci.c   |  2 +-=0D
+ hw/pci-host/pam.c       |  2 +-=0D
+ hw/pci-host/versatile.c | 46 ++++++++++++++++++++++-------------------=0D
+ tests/qtest/rtc-test.c  |  2 +-=0D
+ 5 files changed, 30 insertions(+), 26 deletions(-)=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
 
