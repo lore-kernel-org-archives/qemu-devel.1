@@ -7,70 +7,69 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D6E6C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 07:21:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B8EFC433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 07:21:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A18C720790
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 07:21:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F02FC20790
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 07:21:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e/LyL0de"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A18C720790
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DwBYrj4i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F02FC20790
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRs8t-0005ub-Ml
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 03:21:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38444)
+	id 1kRs8v-0005zU-Ui
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 03:21:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38456)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRs77-0004JY-Nj; Mon, 12 Oct 2020 03:19:21 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:50237)
+ id 1kRs7C-0004Oo-0r; Mon, 12 Oct 2020 03:19:26 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39843)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRs76-0007kf-66; Mon, 12 Oct 2020 03:19:21 -0400
-Received: by mail-wm1-x341.google.com with SMTP id 13so16257243wmf.0;
- Mon, 12 Oct 2020 00:19:18 -0700 (PDT)
+ id 1kRs7A-0007kz-Hl; Mon, 12 Oct 2020 03:19:25 -0400
+Received: by mail-wm1-x341.google.com with SMTP id d3so16472564wma.4;
+ Mon, 12 Oct 2020 00:19:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=prE09q32YD42ye5PeFp5wgpW0hirQThD2Ei+DC4S6LM=;
- b=e/LyL0deoDjKJ5DmtoHS2Tl8PTMDBMjgD4tbM8Y1MGo6wVAYsDZnQmk1I3W2R5VLbe
- VwrLQHBotPCBVLHMeNwgtOLM0C47DGnNHKiVbiq3M55b00yd8kySvPyuXOMGe4Qx5NP5
- 6tCATx4KCo7SvZdb0uXL8pTnV29QhSFULyX9wlshb1lWXGLgmNW7u2Q1nq/4v8Aatpbl
- knlMysnqhrJFGA9gI9E7DvXg6zQsvh21dAfsgwEZqSQTCtWXBSCLYxsVf1A8s82FS2Co
- QUtynV96f3qR5KW0kPKlgSOzz4bCGSzSAo1CPQ1n5BB56pADSu1NL6Z6gvFlURJtnsp7
- 4oUQ==
+ bh=g0zIvNiiPuD3jbI/3K2hr7asrKbop6KgBlLoFr6P7Cg=;
+ b=DwBYrj4iarsfdZqAG0JGjOLQAX2Ct2Jedc91riWUKh16WbCtwv/z55Y0GLKCD1c18w
+ dyEpaNhTxdPBvN7X1N/kOojjvz8Ai2dI/DZM66kSxUKNRF68O2mGDdct5BUfB5/3i+2C
+ mdYTuK0DN7F4YkmvEvAuNrTbXBjUfM1A9B2puRYBilGQZ5Q0Wwn50M+l3+hqMNPbmi3c
+ OLvju6TioFIz50uiRJbJROstlepTcC4SbM7nC8zcjLUW9mgXQQGXbTZFQvoiVuw84nWq
+ L98gQexhecOWDYMCqXDfOOOAPRKYGqF4lqK7DC08RTbP6j76aUCeEUkPohNpCwOTKRI9
+ RlMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=prE09q32YD42ye5PeFp5wgpW0hirQThD2Ei+DC4S6LM=;
- b=N6JUzLKU1rsTiUcUshC+5nuBZyD7QkN4E1MmmYpufBCz7+bdZLxBPBewW+wsJHNGzf
- VOW2M5kSquOeeb/Z5UjIFYfYu4lc4ymTqiRAGclkgPgTRvlbKTgkhOwMUiwQcygVX4e6
- dJQdYW4+aUoYDaB0BNd8eLLrR/hC1iWBEX2dexK9cQBsMKwI9i7sJmEr6TC3FG2pPClX
- 4gSw0kNMTsKQUMt4NSPYfyy208fAth0q5xlUJPstofNFXTYVQdSDRoSIj4jx9eVjSnG1
- vTjTrqRfLpH4cn2/5vfX2apuuIF5TjJwD+mtQpZeBp9FZXwpJOcgF+aHQBlwXJG/CZ9c
- S9ag==
-X-Gm-Message-State: AOAM530KzO4fJlo2nq5jOvCI15uLs4E0mD2oUZ4YunqUgI0QYxKG1s17
- w8GELeEJao2DLgmIBTL6b+Hdpx3O28s=
-X-Google-Smtp-Source: ABdhPJy61sTR4ko9asU1VmmS8JjOErOGh2Q9ze45Be5RN1ru14PYI68qUpvioV5DZUa5xQVcXoaAvg==
-X-Received: by 2002:a1c:4d05:: with SMTP id o5mr9216349wmh.94.1602487157626;
- Mon, 12 Oct 2020 00:19:17 -0700 (PDT)
+ bh=g0zIvNiiPuD3jbI/3K2hr7asrKbop6KgBlLoFr6P7Cg=;
+ b=ClVGr6XN1VEEsJ2ro5U83YpSGADACxO87ixgopvnlTnLtt5iLpQ3G7VHa64mqgCG1O
+ 4+CxBXPXsobXWvyx1InqSQCdctYpmCiiZxyBjaztwJzeOtt3M/re2xiIF/QCzPDzwizy
+ FE2wUStsXaBF4H/Y/j2W9WiWUTXDaoy682QgYx/xnhN5Fis3uNPcvAt7KfGHaplLIIBr
+ 0w6v72KEYedUmQ99uXZJw1kQowwpMQtpRp78tN8CW80sVw1H1bjKcyJlbmepLosqSpAq
+ eRmxumKoZnLeqvt3P/G2eIFo4D7EIy+z3TWQDcGmYsSbwFfgGhAsG8g3aX4WzodEptRV
+ bI1A==
+X-Gm-Message-State: AOAM531FcxG0JgxVwWtUolN5QdlbUh3EJlsAtN/F8N4vEo4P1NKRHfNi
+ yGEkjIeXXZO9UfS5Pm+KxfjvjqPdWCM=
+X-Google-Smtp-Source: ABdhPJyWpKeDDs5xuL5WPEYWcVXnqyp7ftM5jKJeFNQ6BFviUDbMc8+oaVFFWlf6URDxRnoJuKvBDA==
+X-Received: by 2002:a1c:e3c6:: with SMTP id a189mr9224253wmh.167.1602487162785; 
+ Mon, 12 Oct 2020 00:19:22 -0700 (PDT)
 Received: from localhost.localdomain
  (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id 205sm8020285wme.38.2020.10.12.00.19.16
+ by smtp.gmail.com with ESMTPSA id w5sm22605270wmg.42.2020.10.12.00.19.21
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 12 Oct 2020 00:19:17 -0700 (PDT)
+ Mon, 12 Oct 2020 00:19:22 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 2/4] hw/pci-host/prep: Remove legacy PReP machine temporary
- workaround
-Date: Mon, 12 Oct 2020 09:19:04 +0200
-Message-Id: <20201012071906.3301481-3-f4bug@amsat.org>
+Subject: [PATCH 3/4] hw/pci-host/prep: Fix PCI swizzling in map_irq()
+Date: Mon, 12 Oct 2020 09:19:05 +0200
+Message-Id: <20201012071906.3301481-4-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201012071906.3301481-1-f4bug@amsat.org>
 References: <20201012071906.3301481-1-f4bug@amsat.org>
@@ -102,81 +101,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Thomas Huth <thuth@redhat.com>, Jocelyn Mayer <l_indien@magic.fr>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Julian Seward <julian@valgrind.org>, qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The legacy PReP machine has been removed in commit b2ce76a0730
-("hw/ppc/prep: Remove the deprecated "prep" machine and the
-OpenHackware BIOS"). This temporary workaround is no more
-required, remove it.
+In commit a01d8cadadf we changed the number of IRQs to 4 but
+forgot to update the map_irq() function. Do it now.
 
+Fixes: a01d8cadadf ("Fix memory corruption ... in PreP emulation")
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/pci-host/prep.c | 32 +++++++++++---------------------
- 1 file changed, 11 insertions(+), 21 deletions(-)
+Cc: Jocelyn Mayer <l_indien@magic.fr>
+Cc: Julian Seward <julian@valgrind.org>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/pci-host/prep.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
-index 80dfb67da43..064593d1e52 100644
+index 064593d1e52..2224135fedb 100644
 --- a/hw/pci-host/prep.c
 +++ b/hw/pci-host/prep.c
-@@ -75,7 +75,6 @@ struct PRePPCIState {
-     RavenPCIState pci_dev;
+@@ -195,7 +195,7 @@ static const MemoryRegionOps raven_io_ops = {
  
-     int contiguous_map;
--    bool is_legacy_prep;
- };
+ static int raven_map_irq(PCIDevice *pci_dev, int irq_num)
+ {
+-    return (irq_num + (pci_dev->devfn >> 3)) & 1;
++    return (irq_num + (pci_dev->devfn >> 3)) & 3;
+ }
  
- #define BIOS_SIZE (1 * MiB)
-@@ -229,24 +228,18 @@ static void raven_pcihost_realizefn(DeviceState *d, Error **errp)
-     MemoryRegion *address_space_mem = get_system_memory();
-     int i;
- 
--    if (s->is_legacy_prep) {
--        for (i = 0; i < PCI_NUM_PINS; i++) {
--            sysbus_init_irq(dev, &s->pci_irqs[i]);
--        }
--    } else {
--        /*
--         * According to PReP specification section 6.1.6 "System Interrupt
--         * Assignments", all PCI interrupts are routed via IRQ 15
--         */
--        s->or_irq = OR_IRQ(object_new(TYPE_OR_IRQ));
--        object_property_set_int(OBJECT(s->or_irq), "num-lines", PCI_NUM_PINS,
--                                &error_fatal);
--        qdev_realize(DEVICE(s->or_irq), NULL, &error_fatal);
--        sysbus_init_irq(dev, &s->or_irq->out_irq);
-+    /*
-+     * According to PReP specification section 6.1.6 "System Interrupt
-+     * Assignments", all PCI interrupts are routed via IRQ 15.
-+     */
-+    s->or_irq = OR_IRQ(object_new(TYPE_OR_IRQ));
-+    object_property_set_int(OBJECT(s->or_irq), "num-lines", PCI_NUM_PINS,
-+                            &error_fatal);
-+    qdev_realize(DEVICE(s->or_irq), NULL, &error_fatal);
-+    sysbus_init_irq(dev, &s->or_irq->out_irq);
- 
--        for (i = 0; i < PCI_NUM_PINS; i++) {
--            s->pci_irqs[i] = qdev_get_gpio_in(DEVICE(s->or_irq), i);
--        }
-+    for (i = 0; i < PCI_NUM_PINS; i++) {
-+        s->pci_irqs[i] = qdev_get_gpio_in(DEVICE(s->or_irq), i);
-     }
- 
-     qdev_init_gpio_in(d, raven_change_gpio, 1);
-@@ -403,9 +396,6 @@ static Property raven_pcihost_properties[] = {
-     DEFINE_PROP_UINT32("elf-machine", PREPPCIState, pci_dev.elf_machine,
-                        EM_NONE),
-     DEFINE_PROP_STRING("bios-name", PREPPCIState, pci_dev.bios_name),
--    /* Temporary workaround until legacy prep machine is removed */
--    DEFINE_PROP_BOOL("is-legacy-prep", PREPPCIState, is_legacy_prep,
--                     false),
-     DEFINE_PROP_END_OF_LIST()
- };
- 
+ static void raven_set_irq(void *opaque, int irq_num, int level)
 -- 
 2.26.2
 
