@@ -2,81 +2,83 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CB94C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 23:40:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 898ABC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 23:40:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1EE42076D
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 23:40:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A5C32076D
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 23:40:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qH2Y/MhB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1EE42076D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OL0L5eQG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A5C32076D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kS7QG-0004Ma-KR
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 19:40:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46596)
+	id 1kS7QN-0004Z7-6y
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 19:40:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46622)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kS7OG-0002rA-IW; Mon, 12 Oct 2020 19:38:04 -0400
-Received: from mail-pl1-x635.google.com ([2607:f8b0:4864:20::635]:37236)
+ id 1kS7OM-0002yH-Ji; Mon, 12 Oct 2020 19:38:10 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:38979)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kS7OE-00072r-KB; Mon, 12 Oct 2020 19:38:04 -0400
-Received: by mail-pl1-x635.google.com with SMTP id o8so9602745pll.4;
- Mon, 12 Oct 2020 16:38:01 -0700 (PDT)
+ id 1kS7OK-00073I-M6; Mon, 12 Oct 2020 19:38:10 -0400
+Received: by mail-pf1-x442.google.com with SMTP id n14so15239376pff.6;
+ Mon, 12 Oct 2020 16:38:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=B7IjE2xUJ+z4Uoif5FJHL1Lc3PIu0CWe7/RpAKb+qHo=;
- b=qH2Y/MhB34dp1Fo9uC1mrybE7ZzSNXqKBZecLvVSPOzmYyhORAkdMjItgQxoF2bZ+u
- oSsdxYGc/b/OR7jl7L6m2lKEzrst3pMPyYh9pBsvCBLl8hh6swFmo0mL5epYxC4hj1bU
- Moh2X8sPUiOnxtJTS88isazMGjWGhSrD22jCOgnSLJDjquKU2h9cklpZOJ4YbA14ols4
- 08II4RgYN7a19vkIYV1LQTYNKHPWwf+5rKrX7DZnA9EhU9W91QzNq2xVXYIh7wss0UgH
- /nHnDj9UZ24VL1VoxSailsQpp9jEGb3tg0QmKtM02gHOaacEAsHoV53pCZHkpr4n2j/g
- wgvQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=RCiwtCbp232Z/M6MRS2ljqmJJBXyJVJiELXNvh6qszk=;
+ b=OL0L5eQGJ6rvuey/xogh3eQQNsHyY3lLk+4/KvAcAz4SfDTiYsJqB2vczyftIEp5l5
+ lpkGlLq4XBbv1JIzSM9fil6bVCOTPNnOWmkyVNjQUZOheiSZHnuUMN6XqWXp8Ul8gQdJ
+ e70ddGTRB9mkpYXdXaQ/IisMOF7lrG8Eng/8UzkLua6m6aN6IQje6cOlhhayAYEfj6Xd
+ o2hUmOJlAr6H1sPQnH0gt0fDmRFItEc1tFR9lE0XH4ADI7tpbd4cZi8jbOFyHyZNHYjo
+ Idoj+yXlbVt9Vvt74ROYsUcLjPpc9HDmoLDiCYiT/0KnPb2/j7CEnCEaT5sGVFQTySGi
+ oAHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=B7IjE2xUJ+z4Uoif5FJHL1Lc3PIu0CWe7/RpAKb+qHo=;
- b=e09sL64bzrRMvd3h2s5XPrqiRm4To7uVeGm+cweRSO1Pr3q1auedNZMx51mpuhaKBo
- SAy4UW5QQQw9csR7yYuHNJOHb28dQyWuLEfJSk8+QMTIu3eqVmD/JFmPCn+sThVBsgeA
- l5mEM34ElYVes6e2zTVgi8clncFUceHJGfAaRmJHORAQSKbtgsz+gRYTD/AZacirsH1i
- s97mt8iuHOVFzx+s1tDWZJew0e1u2u3CymVIhRhr1Odp42sjcuiMsIdX2tNT/JQm6k7b
- U0fRzk64j3BDwsloZ3DBqTTWiMTSvo2h8qmt3SKARedwjD9kLniqWV17OMVuEaAg6Muz
- OSaQ==
-X-Gm-Message-State: AOAM530xZcmPROjh8KUNZZvNgMJm6Yodny0vKhwsA/GkD4exHRU2mxEJ
- Hfy53zbwz+vOAP9Pt3ppV1CtjKcIT+dgkA==
-X-Google-Smtp-Source: ABdhPJxQwg9AVQplS8vxfwGBJime9nqBqCNBlKRoYt0LOSlUlCBBStgJTmL+JwsCfJGhm4wzQfcPkw==
-X-Received: by 2002:a17:902:6ac7:b029:d3:9c6b:9311 with SMTP id
- i7-20020a1709026ac7b02900d39c6b9311mr25156393plt.0.1602545879749; 
- Mon, 12 Oct 2020 16:37:59 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=RCiwtCbp232Z/M6MRS2ljqmJJBXyJVJiELXNvh6qszk=;
+ b=lAi9s27T0Yw5x0iJMVeMnrvok0ucgDJH7dPE/uvPLzp/BeKFOh0s/PGeC2VK8p8HUP
+ ANOdj++gza7n5iRvJrZar2BkrEjcF7e7qtFF7dsrdeQPqYYXs6tJ7qyQ7YBTjF8r4Mlf
+ x/wPkBZlPDFxDIgTQ9xO02+Jfdv0x93YL9Grod5C6tW+dv9JqydshVTm6fg2dUM/KQvH
+ nz95wT716N8FXohUaYyXRpmG4o7COCq7L4qvLcL+Y+ymxZhBpVuI1IvA10OLbt/sAgJt
+ LbAHPWQVqGwuEItq7xzMxDHDQOqsqg+tfNIJGyJSSKY8mPiY/HKhrzsUV3068lZFqcFf
+ Ni8w==
+X-Gm-Message-State: AOAM532iCQkVSSSyNmGcvj3/89wC5MRrlShRL3wQ68tsFv7sI4ifauiZ
+ jibfv+XjIejrdhgfVZq6fiyQHza4oS1LuA==
+X-Google-Smtp-Source: ABdhPJxJVu0P6bXjsMjNtBNsoLyTrGKWC9QAp8bvNI8d7odPoKdWTRjsRoUrPcLj+9FOvS3+57kOfw==
+X-Received: by 2002:aa7:955b:0:b029:152:883a:9a93 with SMTP id
+ w27-20020aa7955b0000b0290152883a9a93mr25157722pfq.25.1602545886598; 
+ Mon, 12 Oct 2020 16:38:06 -0700 (PDT)
 Received: from localhost.localdomain ([103.94.185.75])
  by smtp.googlemail.com with ESMTPSA id
- x12sm21975783pfr.156.2020.10.12.16.37.56
+ x12sm21975783pfr.156.2020.10.12.16.38.03
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 12 Oct 2020 16:37:58 -0700 (PDT)
+ Mon, 12 Oct 2020 16:38:05 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 0/4] Improve cirrus msys2
-Date: Tue, 13 Oct 2020 07:37:36 +0800
-Message-Id: <20201012233740.190-1-luoyonggang@gmail.com>
+Subject: [PATCH v7 2/4] gitignore: ignore a bit more
+Date: Tue, 13 Oct 2020 07:37:38 +0800
+Message-Id: <20201012233740.190-3-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20201012233740.190-1-luoyonggang@gmail.com>
+References: <20201012233740.190-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::635;
- envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x635.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,59 +109,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fixes the broken msys2/mingw ci and speed it up.=0D
-=0D
-V6-V7=0D
-* cirrus: Enable doc build on msys2/mingw=0D
-* docs: Fixes build docs on msys2/mingw=0D
-* gitignore: ignore a bit more=0D
-* scripts: Convert qemu-version.sh to qemu-version.py=0D
-=0D
-V5-V6=0D
-Remove the university mirror, the main repo are back.=0D
-rename to setup_script.=0D
-Add fixes for msys2/mingw rST document fixes=0D
-=0D
-V4-V5=0D
-Now the cache are usefull by using 7zip to archive msys64=0D
-Saved about 18min, compare=0D
-https://cirrus-ci.com/task/5093551157542912=0D
-https://cirrus-ci.com/task/6177196538593280=0D
-=0D
-V3-V4=0D
-Using cirrus cache to speed up msys2 ci instead of downloading archive file=
-=0D
-=0D
-V2-V3=0D
-Add one more patch:=0D
-cirrus: msys2/mingw speed is up, add excluded target back=0D
-Do not build sphinx on windows, that's failing=0D
-set the number of parallel count to fixed number 8=0D
-=0D
-V1-V2=0D
-Resolve the cirrus conflict=0D
-=0D
-Yonggang Luo (4):=0D
-  scripts: Convert qemu-version.sh to qemu-version.py=0D
-  gitignore: ignore a bit more=0D
-  docs: Fixes build docs on msys2/mingw=0D
-  cirrus: Enable doc build on msys2/mingw=0D
-=0D
- .cirrus.yml                   |  6 +++++-=0D
- .gitignore                    |  4 +++-=0D
- docs/conf.py                  |  2 +-=0D
- docs/sphinx/kerneldoc.py      |  2 +-=0D
- meson.build                   |  2 +-=0D
- scripts/qemu-version.py       | 37 +++++++++++++++++++++++++++++++++++=0D
- scripts/qemu-version.sh       | 25 -----------------------=0D
- scripts/rst-sanitize.py       | 21 ++++++++++++++++++++=0D
- tests/qapi-schema/meson.build |  5 +++--=0D
- 9 files changed, 72 insertions(+), 32 deletions(-)=0D
- create mode 100644 scripts/qemu-version.py=0D
- delete mode 100755 scripts/qemu-version.sh=0D
- create mode 100644 scripts/rst-sanitize.py=0D
-=0D
--- =0D
-2.28.0.windows.1=0D
-=0D
+Enable the creating multiple build directory at the source root.
+Ignore /meson/ and /roms/ for better search experience.
+
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+---
+ .gitignore | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/.gitignore b/.gitignore
+index b32bca1315..f78ee9f297 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,5 +1,5 @@
+ /GNUmakefile
+-/build/
++/build*/
+ *.pyc
+ .sdk
+ .stgit-*
+@@ -10,3 +10,5 @@ TAGS
+ *~
+ *.ast_raw
+ *.depend_raw
++/meson/
++/roms/**/*
+-- 
+2.28.0.windows.1
+
 
