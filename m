@@ -2,47 +2,47 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 174EFC433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 17:49:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3D90C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 17:50:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C18202073A
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 17:49:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C18202073A
+	by mail.kernel.org (Postfix) with ESMTPS id 6A2DD2073A
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 17:50:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A2DD2073A
 Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kS1wb-0003IK-Uj
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 13:49:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59118)
+	id 1kS1yC-0004e6-IJ
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 13:50:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59268)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kS1uz-0001tJ-LF; Mon, 12 Oct 2020 13:47:29 -0400
-Received: from relay.sw.ru ([185.231.240.75]:33202 helo=relay3.sw.ru)
+ id 1kS1vm-0002fC-IF; Mon, 12 Oct 2020 13:48:18 -0400
+Received: from relay.sw.ru ([185.231.240.75]:33448 helo=relay3.sw.ru)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kS1uy-0007e7-0E; Mon, 12 Oct 2020 13:47:29 -0400
+ id 1kS1vk-0007go-Sz; Mon, 12 Oct 2020 13:48:18 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay3.sw.ru with esmtp (Exim 4.94)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kS1u1-0047iC-IW; Mon, 12 Oct 2020 20:46:29 +0300
+ id 1kS1un-0047iC-N9; Mon, 12 Oct 2020 20:47:17 +0300
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, fam@euphon.net,
  stefanha@redhat.com, armbru@redhat.com, jsnow@redhat.com,
  libvir-list@redhat.com, eblake@redhat.com, den@openvz.org,
  vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
-Subject: [PATCH v11 04/13] copy-on-read: pass overlay base node name to COR
+Subject: [PATCH v11 05/13] copy-on-read: limit COR operations to base in COR
  driver
-Date: Mon, 12 Oct 2020 20:43:16 +0300
-Message-Id: <1602524605-481160-5-git-send-email-andrey.shinkevich@virtuozzo.com>
+Date: Mon, 12 Oct 2020 20:43:17 +0300
+Message-Id: <1602524605-481160-6-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1602524605-481160-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1602524605-481160-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -73,64 +73,67 @@ Sender: "Qemu-devel"
 Reply-to: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 From: Andrey Shinkevich via <qemu-devel@nongnu.org>
 
-We are going to use the COR-filter for a block-stream job.
-To limit COR operations by the base node in the backing chain during
-stream job, pass the name of overlay base node to the copy-on-read
-driver as base node itself may change due to possible concurrent jobs.
-The rest of the functionality will be implemented in the patch that
-follows.
+Limit COR operations by the base node in the backing chain when the
+overlay base node name is given. It will be useful for a block stream
+job when the COR-filter is applied. The overlay base node is passed as
+the base itself may change due to concurrent commit jobs on the same
+backing chain.
 
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- block/copy-on-read.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ block/copy-on-read.c | 39 +++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 37 insertions(+), 2 deletions(-)
 
 diff --git a/block/copy-on-read.c b/block/copy-on-read.c
-index bcccf0f..c578b1b 100644
+index c578b1b..dfbd6ad 100644
 --- a/block/copy-on-read.c
 +++ b/block/copy-on-read.c
-@@ -24,19 +24,24 @@
- #include "block/block_int.h"
- #include "qemu/module.h"
- #include "qapi/error.h"
-+#include "qapi/qmp/qerror.h"
- #include "qapi/qmp/qdict.h"
- #include "block/copy-on-read.h"
- 
- 
- typedef struct BDRVStateCOR {
-     bool active;
-+    BlockDriverState *base_overlay;
- } BDRVStateCOR;
- 
- 
- static int cor_open(BlockDriverState *bs, QDict *options, int flags,
-                     Error **errp)
+@@ -122,8 +122,43 @@ static int coroutine_fn cor_co_preadv_part(BlockDriverState *bs,
+                                            size_t qiov_offset,
+                                            int flags)
  {
-+    BlockDriverState *base_overlay = NULL;
-     BDRVStateCOR *state = bs->opaque;
-+    /* We need the base overlay node rather than the base itself */
-+    const char *base_overlay_node = qdict_get_try_str(options, "base");
- 
-     bs->file = bdrv_open_child(NULL, options, "file", bs, &child_of_bds,
-                                BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY,
-@@ -52,7 +57,16 @@ static int cor_open(BlockDriverState *bs, QDict *options, int flags,
-         ((BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_NO_FALLBACK) &
-             bs->file->bs->supported_zero_flags);
- 
-+    if (base_overlay_node) {
-+        qdict_del(options, "base");
-+        base_overlay = bdrv_lookup_bs(NULL, base_overlay_node, errp);
-+        if (!base_overlay) {
-+            error_setg(errp, QERR_BASE_NOT_FOUND, base_overlay_node);
-+            return -EINVAL;
-+        }
+-    return bdrv_co_preadv_part(bs->file, offset, bytes, qiov, qiov_offset,
+-                               flags | BDRV_REQ_COPY_ON_READ);
++    int64_t n = 0;
++    int64_t size = offset + bytes;
++    int local_flags;
++    int ret;
++    BDRVStateCOR *state = bs->opaque;
++
++    if (!state->base_overlay) {
++        return bdrv_co_preadv_part(bs->file, offset, bytes, qiov, qiov_offset,
++                                   flags | BDRV_REQ_COPY_ON_READ);
 +    }
-     state->active = true;
-+    state->base_overlay = base_overlay;
++
++    while (offset < size) {
++        local_flags = flags;
++
++        /* In case of failure, try to copy-on-read anyway */
++        ret = bdrv_is_allocated(bs->file->bs, offset, bytes, &n);
++        if (!ret) {
++            ret = bdrv_is_allocated_above(bdrv_cow_bs(bs->file->bs),
++                                          state->base_overlay, true, offset,
++                                          n, &n);
++            if (ret) {
++                local_flags |= BDRV_REQ_COPY_ON_READ;
++            }
++        }
++
++        ret = bdrv_co_preadv_part(bs->file, offset, n, qiov, qiov_offset,
++                                  local_flags);
++        if (ret < 0) {
++            return ret;
++        }
++
++        offset += n;
++        qiov_offset += n;
++        bytes -= n;
++    }
++
++    return 0;
+ }
  
-     /*
-      * We don't need to call bdrv_child_refresh_perms() now as the permissions
+ 
 -- 
 1.8.3.1
 
