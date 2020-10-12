@@ -2,118 +2,67 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4736C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 11:11:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09AE5C433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 11:13:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FFDB2076E
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 11:11:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ql8MKAv2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FFDB2076E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4F4042076E
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 11:13:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F4042076E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRvjf-0007do-WC
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 07:11:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35052)
+	id 1kRvm1-0000fe-Du
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 07:13:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35610)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kRviW-0006hR-FA
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 07:10:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39401)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kRviU-0003sz-S5
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 07:10:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602501009;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=62XZAi3VhkH78CxFoYSzl1E7Gz28bTG1EphD9ksuyJs=;
- b=Ql8MKAv2SVQS+1A5tcojq5en0I1O2R+nbJ5d6fWjY4zZJ7mblpaE22KfljAaXCvaSx/OOo
- 4fCvjynq0NtfWfXVtsXN+Ie+QbBhN9jfGKetOpNCRBeMdYk5mXyni4aXN28pHiBGcUnbxX
- p8enrEobfDFQhnOpiO/0EBk+hUmo9nI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-429-UXn5dEZfMDa-K8vbfI0oDg-1; Mon, 12 Oct 2020 07:10:06 -0400
-X-MC-Unique: UXn5dEZfMDa-K8vbfI0oDg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5D13879517;
- Mon, 12 Oct 2020 11:10:04 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.193.240])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D9ED10013BD;
- Mon, 12 Oct 2020 11:10:01 +0000 (UTC)
-Subject: Re: [PATCH 1/3] block: push error reporting into bdrv_all_*_snapshot
- functions
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20201008174803.2696619-1-philmd@redhat.com>
- <20201008174803.2696619-2-philmd@redhat.com>
- <8f2e2439-4100-a64d-b52e-c03d439cb743@redhat.com>
- <7a77479f-5ce5-d89a-bee1-02bd2a521495@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <f68d175a-68f0-3d6a-78d0-8a5981a9d983@redhat.com>
-Date: Mon, 12 Oct 2020 13:09:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <chenjiajun8@huawei.com>)
+ id 1kRvkt-00008Z-Ds
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 07:12:39 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:5222 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <chenjiajun8@huawei.com>)
+ id 1kRvkr-0004GN-7i
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 07:12:39 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 692DE3448C71E8E6274B;
+ Mon, 12 Oct 2020 19:12:18 +0800 (CST)
+Received: from [10.174.186.113] (10.174.186.113) by
+ DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
+ 14.3.487.0; Mon, 12 Oct 2020 19:12:11 +0800
+Subject: Re: [PATCH] vhost-user: add separate memslot counter for vhost-user
+To: Raphael Norwitz <raphael.s.norwitz@gmail.com>
+References: <20200928131731.69684-1-chenjiajun8@huawei.com>
+ <CAFubqFs1Vac2xQspDBF5M1oxCH0O9jEhjPj5g0CD6RSHrqwEiQ@mail.gmail.com>
+From: chenjiajun <chenjiajun8@huawei.com>
+Message-ID: <1125cff0-29da-3f3d-5f6f-490f485418fe@huawei.com>
+Date: Mon, 12 Oct 2020 19:12:10 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <7a77479f-5ce5-d89a-bee1-02bd2a521495@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/11 23:52:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+In-Reply-To: <CAFubqFs1Vac2xQspDBF5M1oxCH0O9jEhjPj5g0CD6RSHrqwEiQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.186.113]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.191;
+ envelope-from=chenjiajun8@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 07:12:20
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -126,97 +75,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: zhang.zhanghailiang@huawei.com, "Michael S. Tsirkin" <mst@redhat.com>,
+ jasowang@redhat.com, QEMU <qemu-devel@nongnu.org>, xiexiangyou@huawei.com,
+ imammedo@redhat.com,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12.10.20 12:16, Philippe Mathieu-Daudé wrote:
-> On 10/12/20 12:07 PM, Max Reitz wrote:
->> On 08.10.20 19:48, Philippe Mathieu-Daudé wrote:
->>> From: Daniel P. Berrangé <berrange@redhat.com>
->>>
->>> The bdrv_all_*_snapshot functions return a BlockDriverState pointer
->>> for the invalid backend, which the callers then use to report an
->>> error message. In some cases multiple callers are reporting the
->>> same error message, but with slightly different text. In the future
->>> there will be more error scenarios for some of these methods, which
->>> will benefit from fine grained error message reporting. So it is
->>> helpful to push error reporting down a level.
->>>
->>> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
->>> ---
->>>   include/block/snapshot.h       | 14 +++----
->>>   block/monitor/block-hmp-cmds.c |  7 ++--
->>>   block/snapshot.c               | 77 +++++++++++++++++-----------------
->>>   migration/savevm.c             | 37 +++++-----------
->>>   monitor/hmp-cmds.c             |  7 +---
->>>   replay/replay-debugging.c      |  4 +-
->>>   tests/qemu-iotests/267.out     | 10 ++---
->>>   7 files changed, 67 insertions(+), 89 deletions(-)
->>
->> Looks good overall to me, but for some reason this patch pulls in the
->> @ok and @ret variables from the top scope of all concerned functions
->> into the inner scopes of the BDS loops, and drops their initialization.
->>   That’s wrong, because we only call the respective snapshotting
->> functions on some BDSs, so the return value stays uninitialized for all
->> other BDSs:
-> 
-> Indeed, thanks for catching that.
-> 
-> [...]
->>>   int bdrv_all_create_snapshot(QEMUSnapshotInfo *sn,
->>>                                BlockDriverState *vm_state_bs,
->>>                                uint64_t vm_state_size,
->>> -                             BlockDriverState **first_bad_bs)
->>> +                             Error **errp)
->>>   {
->>> -    int err = 0;
->>>       BlockDriverState *bs;
->>>       BdrvNextIterator it;
->>>         for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
->>>           AioContext *ctx = bdrv_get_aio_context(bs);
->>> +        int ret;
->>
->> And one final time.
->>
->> Max
->>
->>>           aio_context_acquire(ctx);
->>>           if (bs == vm_state_bs) {
->>>               sn->vm_state_size = vm_state_size;
->>> -            err = bdrv_snapshot_create(bs, sn);
->>> +            ret = bdrv_snapshot_create(bs, sn);
->>>           } else if (bdrv_all_snapshots_includes_bs(bs)) {
->>>               sn->vm_state_size = 0;
->>> -            err = bdrv_snapshot_create(bs, sn);
->>> +            ret = bdrv_snapshot_create(bs, sn);
-> 
-> This one is not needed.
 
-Why not?  Is bdrv_all_snapshots_includes_bs(bs) guaranteed to be true?
-(I don’t see any a plain “else” branch, or where ret would be set
-outside of these two “if” blocks.)
 
-Max
-
->>>           }
->>>           aio_context_release(ctx);
->>> -        if (err < 0) {
->>> +        if (ret < 0) {
->>> +            error_setg(errp, "Could not create snapshot '%s' on '%s'",
->>> +                       sn->name, bdrv_get_device_or_node_name(bs));
->>>               bdrv_next_cleanup(&it);
->>> -            goto fail;
->>> +            return -1;
->>>           }
->>>       }
+On 2020/10/2 10:05, Raphael Norwitz wrote:
+> On Mon, Sep 28, 2020 at 9:17 AM Jiajun Chen <chenjiajun8@huawei.com> wrote:
+>>
+>> Used_memslots is equal to dev->mem->nregions now, it is true for
+>> vhost kernel, but not for vhost user, which uses the memory regions
+>> that have file descriptor. In fact, not all of the memory regions
+>> have file descriptor.
+>> It is usefully in some scenarios, e.g. used_memslots is 8, and only
+>> 5 memory slots can be used by vhost user, it is failed to hot plug
+>> a new memory RAM because vhost_has_free_slot just returned false,
+>> but we can hot plug it safely in fact.
+>>
+>> --
+>> ChangeList:
+>> v3:
+>> -make used_memslots a member of struct vhost_dev instead of a global static value
+>>
+>> v2:
+>> -eliminating useless used_memslots_exceeded variable and used_memslots_is_exceeded() API
+>>
+>> v1:
+>> -vhost-user: add separate memslot counter for vhost-user
+>>
+>> Signed-off-by: Jiajun Chen <chenjiajun8@huawei.com>
+>> Signed-off-by: Jianjay Zhou <jianjay.zhou@huawei.com>
+> 
+> I'm happy with this from a vhost/vhost-user perspective. vhost-backend
+> change looks good too. I'm a little confused by what's going on with
+> net/vhost-user.c.
+> 
+>> ---
+>>  hw/virtio/vhost-backend.c         | 12 ++++++++++
+>>  hw/virtio/vhost-user.c            | 25 +++++++++++++++++++++
+>>  hw/virtio/vhost.c                 | 37 +++++++++++++++++++++++--------
+>>  include/hw/virtio/vhost-backend.h |  5 +++++
+>>  include/hw/virtio/vhost.h         |  1 +
+>>  net/vhost-user.c                  |  7 ++++++
+>>  6 files changed, 78 insertions(+), 9 deletions(-)
 >>
 > 
-
+>> diff --git a/net/vhost-user.c b/net/vhost-user.c
+>> index 17532daaf3..7e93955537 100644
+>> --- a/net/vhost-user.c
+>> +++ b/net/vhost-user.c
+>> @@ -20,6 +20,7 @@
+>>  #include "qemu/error-report.h"
+>>  #include "qemu/option.h"
+>>  #include "trace.h"
+>> +#include "include/hw/virtio/vhost.h"
+>>
+>>  typedef struct NetVhostUserState {
+>>      NetClientState nc;
+>> @@ -347,6 +348,12 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
+>>          qemu_chr_fe_set_handlers(&s->chr, NULL, NULL,
+>>                                   net_vhost_user_event, NULL, nc0->name, NULL,
+>>                                   true);
+> 
+> Can you elaborate on this check here? What does it have to do with
+> fixing memslots accounting? Maybe it should be in a separate change?
+> 
+When the number of virtual machine memslots exceeds the upper limit of the back-end support,
+QEMU main thread may enters an endless loop and cannot process other requests.
+And number of memslots will not automatically decrease, so add a check here to exit from loop
+in this scenario. For the newly started virtual machine, boot fails; for the hot plug network card,
+hot plug fails.
+>> +
+>> +        if (!vhost_has_free_slot()) {
+>> +            error_report("used memslots exceeded the backend limit, quit "
+>> +                         "loop");
+>> +            goto err;
+>> +        }
+>>      } while (!s->started);
+>>
+>>      assert(s->vhost_net);
+>> --
+>> 2.27.0.dirty
+>>
+> .
+> 
 
