@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B999C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:47:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E7E1C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:47:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A08522076E
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:47:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7EDCE2076E
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:47:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jvkUIDRC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A08522076E
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZDjU0n6i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EDCE2076E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kS02b-00068Y-M4
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 11:47:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56830)
+	id 1kS02y-0006Oy-JZ
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 11:47:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57308)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kRzqK-0006yV-9m
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:34:32 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44178)
+ id 1kRzqs-0007Pc-0g
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:35:06 -0400
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:33558)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kRzqI-0007JV-Dt
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:34:32 -0400
-Received: by mail-wr1-x441.google.com with SMTP id t9so19675048wrq.11
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 08:34:29 -0700 (PDT)
+ id 1kRzqe-0007Md-H7
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:35:05 -0400
+Received: by mail-wm1-x331.google.com with SMTP id z22so14006563wmi.0
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 08:34:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=xCPWjLYyI6z3WFhhXaeYUbi5QZIddcoWl6SEfIfuuFs=;
- b=jvkUIDRClN9EIrNy2RSdtWRPqcJKUB35LA78DZJ65CbJFay23p7wAmAtvMRKkwVIpq
- j0+GyMO3ekHx2NzlGH+Hu9wWt9FXxGLOUkDTVSKRJa0NV/JNJ9ggidTuULb8wMRJ1PPT
- 8eJ07v5t77Q1eUb58VmOQX+TU6wbNttw1+v5rer4GpwhucVMJ8ppyh7oqaDwHEQQwvSa
- vyOaQVcjZeJsj9ggOBzoUk6D+QaRVIuPWHun2LKlWMnRvw0wfedq0OK5F85MgWPP7xMi
- T7iUDyv0Lo5qbZklcQQuOjlmBAkxZeNcK4t24SC0U7TEOGkq85EDlnUvHflXkC96g78r
- q4eg==
+ bh=bcorSBZXkBkW1mp/hqFvB6M1vX2DnTHEzjvxS98edmI=;
+ b=ZDjU0n6i8Sv1A44uNzJhuxDJVq2BVk4udSxqhvl38awFaZoQFo49xDBI0z8zLTtfQt
+ LQ6k1qQTN4JRVdqAgUSWWAfmzbFbyANL2abgbjAtpiy8UVkAq2pOPRtTPRWw4TEFOoEJ
+ FkyazT/T0Z2vcrSrdOh0Ti2kMjtWCEwdkt/5mIWxWF+RQWMbS7g6suApGiBJgUYWv4h0
+ S+unk0M6QB240smfCTD8tYSKA3KNRycPE9gRzDLErqiAJBaISOEByXo/M0i9bwivwFad
+ kDut0U/eQAM70gRgiSH+Abg6eXxs9LM2HhcH80BIvqcBI/i7tm7/3JXeb8wm8kwMxA/0
+ PsjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=xCPWjLYyI6z3WFhhXaeYUbi5QZIddcoWl6SEfIfuuFs=;
- b=QdEFd5QiXCQFU50kDamTGDLNWXokoxTqJ9Hkbl2Z86TmxfItOBOyWvi9JqBVNO+Zoz
- ogCOEVtDFz/DoPt9YRc0R8Bl+rH839loBKyC6Qs0RWxjBzLCwuwVr1aSZM7BgJcEQSeF
- Y/uk3eN7FqG0x2X6XFEAq8rZjjJP7MhWNVeJFZapL615IZjNt4VBasNPMdLWdazQy3gd
- qZ3Re2yzADyGxGxScO3r37Q3aRKiVVgh7K5a9guIiLtyRLi6RegVU8SJ1fU7Vq/y5vR5
- bz3HSDBxJbxqcTw+08W5/7bSNQSbDjbeJWqqfTxVsV2MK3YR7CABi/ZYCxqWEsiNx0f4
- UmFg==
-X-Gm-Message-State: AOAM532f85ZdGYCu8HDTvAsRRczvHIyAv3/SRZDxwA4/5C5JV4XpVxtL
- eBeQVUPFpDqPzsRcL3trapsvWQ==
-X-Google-Smtp-Source: ABdhPJw3rY3457BdxkO9G6YrxPMZWwl0qoCALdW6L3/dAggIH2iCcdauht8QaOmIHyjCkS2KNOMngQ==
-X-Received: by 2002:adf:f841:: with SMTP id d1mr20555398wrq.297.1602516869112; 
- Mon, 12 Oct 2020 08:34:29 -0700 (PDT)
+ bh=bcorSBZXkBkW1mp/hqFvB6M1vX2DnTHEzjvxS98edmI=;
+ b=TAPJOwKDyabD/ZeQH4GpjabS05cs0E7SSQ1B0HI2KQ5JNW4F//kVtXxXUseimRLSJD
+ hBx3yqklel0heenmQEsD9/DEZi9/TSOGyZ4aVFJIG0LOfZLrM9/X3RbMsM/At8i53qP9
+ /NjAyZ72kqMM16FFdCvn6B6KLYYgriAvuIskN/Ho6rOQ7od0THXeXXvBgiDKadB9pMNf
+ kSPvO3vCpL8I3vVoIBtpoWN54M+LpiXVgLX3uMCRKHzlTx0SWN6Tw+ymC4va2C7ZOner
+ nC1JmVVvvDg3g2FGEGKfQ0avTmX4FxXyNG8CQ96c21bCK97PUPZqEDqLFM+wj/B+VYpW
+ TJWg==
+X-Gm-Message-State: AOAM531FZ7gcw9lB5KnPWXj8TZn+zD6tsiJQJ7EtkbU0caQRTlWTxd/d
+ JVwBW+eWtVrB397gm7syHNJA3Q==
+X-Google-Smtp-Source: ABdhPJzf3rOV7uHyZM6nT5NqjjgblvI3Zg+lxN3Na0WG5ggzqEirZo40jt9IqR56Pp0n1yDSdILtWQ==
+X-Received: by 2002:a1c:e256:: with SMTP id z83mr10909949wmg.37.1602516881543; 
+ Mon, 12 Oct 2020 08:34:41 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id y10sm19675284wrq.73.2020.10.12.08.34.27
+ by smtp.gmail.com with ESMTPSA id y10sm19675284wrq.73.2020.10.12.08.34.40
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 12 Oct 2020 08:34:28 -0700 (PDT)
+ Mon, 12 Oct 2020 08:34:40 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH] hw/intc/arm_gicv3_cpuif: Don't copy CPU's maintenance
- interrupt
-Date: Mon, 12 Oct 2020 16:33:39 +0100
-Message-Id: <20201012153408.9747-17-peter.maydell@linaro.org>
+Subject: [PATCH for-5.1] qapi/machine.json: Fix missing newline in doc comment
+Date: Mon, 12 Oct 2020 16:33:50 +0100
+Message-Id: <20201012153408.9747-28-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201012153408.9747-1-peter.maydell@linaro.org>
 References: <20201012153408.9747-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x441.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::331;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x331.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -88,7 +87,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,81 +105,37 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In gicv3_init_cpuif() we copy the ARMCPU gicv3_maintenance_interrupt
-into the GICv3CPUState struct's maintenance_irq field.  This will
-only work if the board happens to have already wired up the CPU
-maintenance IRQ before the GIC was realized.  Unfortunately this is
-not the case for the 'virt' board, and so the value that gets copied
-is NULL (since a qemu_irq is really a pointer to an IRQState struct
-under the hood).  The effect is that the CPU interface code never
-actually raises the maintenance in2Dterrupt line.
+In commit 176d2cda0dee9f4 we added the @die-id field
+to the CpuInstanceProperties struct, but in the process
+accidentally removed the newline between the doc-comment
+lines for @core-id and @thread-id.
 
-Instead, since the GICv3CPUState has a pointer to the CPUState, make
-the dereference at the point where we want to raise the interrupt, to
-avoid an implicit requirement on board code to wire things up in a
-particular order.
+Put the newline back in; this fixes a misformatting in the
+generated HTML QMP reference manual.
 
-Reported-by: Jose Martins <josemartins90@gmail.com>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
+Not very important but I've suggested for-5.1 as it's a safe
+docs fix. You can see the misrendered doc at
+https://www.qemu.org/docs/master/interop/qemu-qmp-ref.html#index-CpuInstanceProperties
 
-QEMU's implementation here is a bit odd because we've put all the
-logic into the "GIC" device where in real hardware it's split between
-a GIC device and the CPU interface part in the CPU.  If we had
-arranged it in that way then we wouldn't have this odd bit of code
-where the GIC device needs to raise an IRQ line that belongs to the
-CPU.
+ qapi/machine.json | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Not sure why we've never noticed this bug previously with KVM as a
-guest, you'd think we'd have spotted "maintenance interrupts just
-don't work"...
----
- include/hw/intc/arm_gicv3_common.h | 1 -
- hw/intc/arm_gicv3_cpuif.c          | 5 ++---
- 2 files changed, 2 insertions(+), 4 deletions(-)
-
-diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
-index 0331b0ffdb8..91491a2f664 100644
---- a/include/hw/intc/arm_gicv3_common.h
-+++ b/include/hw/intc/arm_gicv3_common.h
-@@ -153,7 +153,6 @@ struct GICv3CPUState {
-     qemu_irq parent_fiq;
-     qemu_irq parent_virq;
-     qemu_irq parent_vfiq;
--    qemu_irq maintenance_irq;
- 
-     /* Redistributor */
-     uint32_t level;                  /* Current IRQ level */
-diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
-index 08e000e33c6..43ef1d7a840 100644
---- a/hw/intc/arm_gicv3_cpuif.c
-+++ b/hw/intc/arm_gicv3_cpuif.c
-@@ -399,6 +399,7 @@ static void gicv3_cpuif_virt_update(GICv3CPUState *cs)
-     int irqlevel = 0;
-     int fiqlevel = 0;
-     int maintlevel = 0;
-+    ARMCPU *cpu = ARM_CPU(cs->cpu);
- 
-     idx = hppvi_index(cs);
-     trace_gicv3_cpuif_virt_update(gicv3_redist_affid(cs), idx);
-@@ -424,7 +425,7 @@ static void gicv3_cpuif_virt_update(GICv3CPUState *cs)
- 
-     qemu_set_irq(cs->parent_vfiq, fiqlevel);
-     qemu_set_irq(cs->parent_virq, irqlevel);
--    qemu_set_irq(cs->maintenance_irq, maintlevel);
-+    qemu_set_irq(cpu->gicv3_maintenance_interrupt, maintlevel);
- }
- 
- static uint64_t icv_ap_read(CPUARMState *env, const ARMCPRegInfo *ri)
-@@ -2624,8 +2625,6 @@ void gicv3_init_cpuif(GICv3State *s)
-             && cpu->gic_num_lrs) {
-             int j;
- 
--            cs->maintenance_irq = cpu->gicv3_maintenance_interrupt;
--
-             cs->num_list_regs = cpu->gic_num_lrs;
-             cs->vpribits = cpu->gic_vpribits;
-             cs->vprebits = cpu->gic_vprebits;
+diff --git a/qapi/machine.json b/qapi/machine.json
+index f59144023ca..daede5ab149 100644
+--- a/qapi/machine.json
++++ b/qapi/machine.json
+@@ -825,7 +825,8 @@
+ # @node-id: NUMA node ID the CPU belongs to
+ # @socket-id: socket number within node/board the CPU belongs to
+ # @die-id: die number within node/board the CPU belongs to (Since 4.1)
+-# @core-id: core number within die the CPU belongs to# @thread-id: thread number within core the CPU belongs to
++# @core-id: core number within die the CPU belongs to
++# @thread-id: thread number within core the CPU belongs to
+ #
+ # Note: currently there are 5 properties that could be present
+ #       but management should be prepared to pass through other
 -- 
 2.20.1
 
