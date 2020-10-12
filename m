@@ -2,87 +2,88 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F957C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 08:08:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B608C43457
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 08:13:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9AE33206F4
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 08:08:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DC88020757
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 08:13:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IwbT+GU1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AE33206F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ObB7lQWy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC88020757
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRst0-0007QH-Iy
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 04:08:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46548)
+	id 1kRsxC-0000fK-On
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 04:13:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47622)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <maxim.uvarov@linaro.org>)
- id 1kRssE-0006qr-V5
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 04:08:02 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:41576)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <maxim.uvarov@linaro.org>)
- id 1kRssC-0004pO-Vp
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 04:08:02 -0400
-Received: by mail-pl1-x642.google.com with SMTP id w11so420695pll.8
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 01:07:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=BWDQO5aPrAfLfnQelq3/3NNlBK1si0DmmIdvr2r8kNg=;
- b=IwbT+GU1M44w/A02IZ6ldAQqSgsFDaNcgaQY5Er+GH0cfF8buW3/uVhsgiozAXh1PO
- FBW3arADSVJguipvFIYs/c+sl2A7/zw8x0IKG/S79AY005INvpAw7vii+rFIXnBUfTvh
- CDJgqFdOcMtBY7LldLEsptDn97K2ScIgoUtz/MzaKqW0nJFRpGxZOUv0aPNe9y5oGQ28
- ZP/3kqiCqMtwSmuCUcOECcOlQy1UX5+8QHxCx7LP68lWC9PQrvEgvoGC4XuaV6ZRRdLG
- VXL+HzmaiQalU5Jh0SHEg/OLMcPybRUYpYFmV6sYGkw/xQ6zwyPczKQ/KesEAoQQn10q
- y5dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=BWDQO5aPrAfLfnQelq3/3NNlBK1si0DmmIdvr2r8kNg=;
- b=I7Wqc4070s8KRtEqlBQlW0iML8o+H5lAPy1sTOLE+ts3tZKNnKAVz9YAtLCGfi12CQ
- tGIDGU5+K8g7rCpwWvtrkz56iERFU0IcM8jJRweNsAvoIZep824i8znbLsg1r/kdag1w
- FxBns2gvWe2XW8jblRMF5jVc+tV76yx7yritvo+2aKRb54ZUimgVBKz23GMUt/v3wPOG
- SdDMD8YFaIA1kBpnVfaUjdmu1hVS1GrbpQ1XmrWrYwq2NVH1SS41+tU6Pj7nL8rKZsij
- iV8xgZJNzcAOdqROdjG9UbfOa/7s5L8zxntOIV2kksGwBSRy4CN+aphjNy0d8sd9m7o5
- dz3w==
-X-Gm-Message-State: AOAM531Of/49Mumt7YDiQdC3lZfrNImFarve+bcdSjN5Q3cQP8uc67r+
- 2j1mBgxglOdwsHGVEEwpPCSSQq+aYCzEMvmSgNvZjQ==
-X-Google-Smtp-Source: ABdhPJyUACD1vHMjM3m/Lg7DVTi3LJRhJU1utEcgNtAa+eLsbDe94MtBXaVCCdr883IjG7pdLs3AGbobtsHflV3Sk+E=
-X-Received: by 2002:a17:902:b595:b029:d4:db82:4403 with SMTP id
- a21-20020a170902b595b02900d4db824403mr4334605pls.49.1602490078807; Mon, 12
- Oct 2020 01:07:58 -0700 (PDT)
-MIME-Version: 1.0
-References: <74151CBD-4750-4E68-9127-21076C019036@getmailspring.com>
- <CAFEAcA9cZPgaHGuCs0J20YJ48V2eXHFFRsb9a56xFULjtFtn3g@mail.gmail.com>
-In-Reply-To: <CAFEAcA9cZPgaHGuCs0J20YJ48V2eXHFFRsb9a56xFULjtFtn3g@mail.gmail.com>
-From: Maxim Uvarov <maxim.uvarov@linaro.org>
-Date: Mon, 12 Oct 2020 11:07:48 +0300
-Message-ID: <CAD8XO3bE3PTrZjxHVWE3_7Dif_WXySSnQTU=kf_yekFrgf4J3g@mail.gmail.com>
-Subject: Re: Re%3A [PATCH v4 1%2F2] hw%2Fwatchdog%3A Implement SBSA watchdog
- device&In-Reply-To=<CAD8XO3YmTC7fzxttg%3DQLMpJbg7uLogatxN7q7vf-iGZjyQLjjQ%40mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kRswR-0000Db-IT
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 04:12:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51336)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kRswO-0005WV-ON
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 04:12:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602490338;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=dCXtuhFzMk/Ks2rIKxt04ykuNvrepl9tHbIsmGRGBxU=;
+ b=ObB7lQWyx9JnV2eaGeFi1W3CCaZfQIRpmtEnRjWNEDWC5JnJcHBBA6giQbAzXWzQiqCZa4
+ xNcMOnI4YoJQ78XfYmEVr9UvpNl6eobt9Gj/apVujsG26zy1OFPBELjM9AIPq/uV6zZmJz
+ 9cgDQo68vjREa1K+R4JH/SUTAr5rmrw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-413-syaVSAXxMUux9FQKSBBAIg-1; Mon, 12 Oct 2020 04:12:16 -0400
+X-MC-Unique: syaVSAXxMUux9FQKSBBAIg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B2CF5802B48;
+ Mon, 12 Oct 2020 08:12:15 +0000 (UTC)
+Received: from work-vm (ovpn-113-244.ams2.redhat.com [10.36.113.244])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A40535C22A;
+ Mon, 12 Oct 2020 08:12:08 +0000 (UTC)
+Date: Mon, 12 Oct 2020 09:12:06 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
- envelope-from=maxim.uvarov@linaro.org; helo=mail-pl1-x642.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Subject: Re: [PULL 00/10] migration queue
+Message-ID: <20201012081206.GA2837@work-vm>
+References: <20201008191046.272549-1-dgilbert@redhat.com>
+ <CAFEAcA-U2BjAne57Zn7c4_J97NAZSYzzy6r59iVeGmtgfD3APg@mail.gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-U2BjAne57Zn7c4_J97NAZSYzzy6r59iVeGmtgfD3APg@mail.gmail.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/11 23:52:29
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,42 +96,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Shashi Mallela <shashi.mallela@linaro.org>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Juan Quintela <quintela@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>,
+ zhengchuan@huawei.com, Stefan Hajnoczi <stefanha@redhat.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> +static uint64_t sbsa_gwdt_rread(void *opaque, hwaddr addr, unsigned int size)
-> +{
-> +    uint32_t ret;
-> +
-> +    if (addr == SBSA_GWDT_WRR) {
-> +        /* watch refresh read has no effect and returns 0 */
-> +        ret = 0;
-> +    } else {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "bad address in refresh frame read :"
-> +
-
-Then it has to be  uint32_t ret = 0;
-
-On Fri, 9 Oct 2020 at 20:51, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> On Fri, 9 Oct 2020 at 18:30, Shashi Mallela <shashi.mallela@linaro.org> wrote:
+* Peter Maydell (peter.maydell@linaro.org) wrote:
+> On Thu, 8 Oct 2020 at 20:13, Dr. David Alan Gilbert (git)
+> <dgilbert@redhat.com> wrote:
 > >
-> > The value being returned here is 0 (initialized to 0 at the beginning of read function).
-> > I have seen similar practices being followed in other qemu implementations like for example bcm2835_dma_read() in qemu/hw/dma/bcm2835_dma.c,a9_scu_read() in qemu/hw/misc/a9scu.c.
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > >
-> > Please confirm if you would still like to add specific value like 0xdeadbeef for bad read offset.
->
-> Judging by the subject line you've mangled the headers on this
-> email so I'm not sure exactly what this was a reply to,
-> but in general QEMU doesn't do that kind of "return
-> specific marker values for bad register offsets". We
-> typically log it with a qemu_log_mask(LOG_GUEST_ERROR) and
-> return 0 (unless the h/w does something else).
->
+> > The following changes since commit e64cf4d569f6461d6b9072e00d6e78d0ab8bd4a7:
+> >
+> >   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20201008' into staging (2020-10-08 17:18:46 +0100)
+> >
+> > are available in the Git repository at:
+> >
+> >   git://github.com/dagrh/qemu.git tags/pull-migration-20201008a
+> >
+> > for you to fetch changes up to ee02b58c82749adb486ef2ae7efdc8e05b093cfd:
+> >
+> >   migration/dirtyrate: present dirty rate only when querying the rate has completed (2020-10-08 19:57:00 +0100)
+> >
+> > ----------------------------------------------------------------
+> > Migration and virtiofs pull 2020-10-08
+> >
+> > v2 (from yesterdays)
+> >   Updated types in comparison to fix mingw build
+> >   rebased
+> >
+> > -
+> > Migration:
+> >   Dirtyrate measurement API cleanup
+> >   Postcopy recovery fixes
+> >
+> > Virtiofsd:
+> >   Missing qemu_init_exec_dir call
+> >   Support for setting the group on socket creation
+> >   Stop a gcc warning
+> >   Avoid tempdir in sandboxing
+> 
+> This seems to hang in 'make check' trying to run
+> tests/qtest/migration-test on s390x and ppc, ie
+> the big-endian hosts.
+
+OK, I'll give it a try.
+
+Dave
+
 > thanks
 > -- PMM
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
