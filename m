@@ -2,94 +2,119 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E33BEC433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 07:23:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0753C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 07:25:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7307A20790
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 07:23:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 25DF020790
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 07:25:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g44jfOtb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7307A20790
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZH/GiPnA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25DF020790
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRsBP-0000BX-FM
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 03:23:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38492)
+	id 1kRsD7-00020q-Ml
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 03:25:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38988)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRs7H-0004a9-GY; Mon, 12 Oct 2020 03:19:33 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:50241)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRs7F-0007lb-Mx; Mon, 12 Oct 2020 03:19:31 -0400
-Received: by mail-wm1-x343.google.com with SMTP id 13so16257606wmf.0;
- Mon, 12 Oct 2020 00:19:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=tYzLZREDW3URWnaaoeiBhAsMJbb0gBuvk98LmQJHEME=;
- b=g44jfOtbICWhW1cQLpon96c5oRq//ayVBkUGbrdQv7Xd8M2pGx/81inIxbtDgslH4k
- K4ll3BnIHR8yKR8urqr+c7gxi3d02cZSsZ+ZWCt/al1bYCSqeI/+LyFIFlDiu8D34NGB
- EnOuBx8dMlOuQ+cPYVq877lGpoCd0rKY3IpjdwUs+514RnjCN8MxAZGMNEPy8Lva12iT
- piznBd2SogTagK8G+E2LH6Yu5RM4jTpokKF7ZCSWt57md/iVNTLNcrPXDLBuRgft6UXD
- FwEiVgWEPUmRKNTh7cLOrSa17ePnzbS5FGsSXZ8rL56lJ6M1cSTvJftgYtfHS57aL0fe
- l1yA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=tYzLZREDW3URWnaaoeiBhAsMJbb0gBuvk98LmQJHEME=;
- b=oxcLgNO7GqeaWch+D0i6gMNQ/1oNnPg4FGhZ5gSYtkmH5Uzn24Qi8VccsYlLyYkny4
- g6rDO7VwrCist1Xp4WynRLh/aRTdhN61jhtjzAVfjEm/jt2lpzG099JnlYRypC/VqX/P
- dGauEvu8LUAyvawQ5LFOdNdsH5WgExFqNj4IeLSiKw3Uxpa57mo1T49QLcUAIpeCIBgD
- 9F74ythKb4ftXz4THMB1ztiWcrFsVDGqTAoCTcgBwXpPPEg7mlu15g9fwKV/wr7Olt74
- VyFAZ3EZxDW6exJVj/q4JtYUSeLh0ctDGgCtq8DxoDxgHjXSisJVMPZbYPW10rp5TwYM
- yeKQ==
-X-Gm-Message-State: AOAM5325ltPEW0ZIcG98fkvZWRDFBW0y4IxnvBoLHS0myPZSaw2M6c40
- Q0KkYypRBOzndzM0OidqsmsfUMfd9TQ=
-X-Google-Smtp-Source: ABdhPJz7QzODVMJn47gP9WoE8gqwMTzg967ajncO3RgmPm8Z10lIZcbvOIbUYRDsqV2LT7ctKjWyxQ==
-X-Received: by 2002:a1c:81ce:: with SMTP id c197mr9475886wmd.111.1602487167478; 
- Mon, 12 Oct 2020 00:19:27 -0700 (PDT)
-Received: from localhost.localdomain
- (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id q4sm23298709wru.65.2020.10.12.00.19.26
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 12 Oct 2020 00:19:26 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 4/4] docs/system/target-ppc.rst: Update PReP historical
- information
-Date: Mon, 12 Oct 2020 09:19:06 +0200
-Message-Id: <20201012071906.3301481-5-f4bug@amsat.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201012071906.3301481-1-f4bug@amsat.org>
-References: <20201012071906.3301481-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kRsAV-0007iG-3t
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 03:22:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22231)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kRsAP-00089v-HH
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 03:22:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602487363;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=tt3UUWell3QFwPX1hW/d+EUaBj/+RtQU+l2uV56Tn5M=;
+ b=ZH/GiPnAc8f2shewuXm9DtR349+EIqQsNOD2q4XZp6+VnKqs/Kd0sGqNKziG0J+TQPGX0b
+ /KZItEcE1ehs8EIs+4qbs3mb4TDgZudzHk8QHPi7uhdZ/eaUX+E7JRELOKyWG8x5iBmyLV
+ NlQKzpxfOfZH+SwXXJv6Bp4XW+3JWBo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-354-4P1rfSskMP6ENlCqqDVuGA-1; Mon, 12 Oct 2020 03:22:37 -0400
+X-MC-Unique: 4P1rfSskMP6ENlCqqDVuGA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D801D57052;
+ Mon, 12 Oct 2020 07:22:35 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.193.240])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2925C5C22B;
+ Mon, 12 Oct 2020 07:22:33 +0000 (UTC)
+Subject: Re: Which qemu change corresponds to RedHat bug 1655408
+To: Jakob Bohm <jb-gnumlists@wisemo.com>
+References: <2d9c8525-470f-a4e5-5d71-895046e2d782@wisemo.com>
+ <653b9595-ae60-181a-2975-2e351ade9788@redhat.com>
+ <43072820-c04f-b706-4b37-2d2e37e8499f@wisemo.com>
+ <0c76d4c9-a203-8bc3-e367-b198efe819d9@redhat.com>
+ <7d9328d2-69b6-5bb4-405d-5756e14688ec@wisemo.com>
+ <81886f9a-91b1-a398-b5a1-44be5bcf6eb3@redhat.com>
+ <829eb784-76ce-7638-1380-4f718b059f92@wisemo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <a559a19b-f02d-214b-18b7-d7af5b06a251@redhat.com>
+Date: Mon, 12 Oct 2020 09:22:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <829eb784-76ce-7638-1380-4f718b059f92@wisemo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 02:58:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1,
+ RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,55 +127,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jocelyn Mayer <l_indien@magic.fr>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: John Snow <jsnow@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
+ qemu-discuss@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Link Jocelyn Mayer's web page from the Wayback Machine,
-and correct the PReP acronym.
+On 10.10.20 00:54, Jakob Bohm wrote:
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-Cc: Jocelyn Mayer <l_indien@magic.fr>
----
- docs/system/target-ppc.rst | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+[...]
 
-diff --git a/docs/system/target-ppc.rst b/docs/system/target-ppc.rst
-index a2f04c533c2..1f57966771d 100644
---- a/docs/system/target-ppc.rst
-+++ b/docs/system/target-ppc.rst
-@@ -3,7 +3,7 @@
- PowerPC System emulator
- -----------------------
- 
--Use the executable ``qemu-system-ppc`` to simulate a complete 40P (PREP)
-+Use the executable ``qemu-system-ppc`` to simulate a complete 40P (PReP)
- or PowerMac PowerPC system.
- 
- QEMU emulates the following PowerMac peripherals:
-@@ -20,7 +20,7 @@ QEMU emulates the following PowerMac peripherals:
- 
- -  VIA-CUDA with ADB keyboard and mouse.
- 
--QEMU emulates the following 40P (PREP) peripherals:
-+QEMU emulates the following 40P (PReP) peripherals:
- 
- -  PCI Bridge
- 
-@@ -43,5 +43,5 @@ the g3beige and mac99 PowerMac and the 40p machines. OpenBIOS is a free
- (GPL v2) portable firmware implementation. The goal is to implement a
- 100% IEEE 1275-1994 (referred to as Open Firmware) compliant firmware.
- 
--More information is available at
--http://perso.magic.fr/l_indien/qemu-ppc/.
-+Archived historical information is available at
-+https://web.archive.org/web/20051212135300/http://perso.magic.fr/l_indien/qemu-ppc/.
--- 
-2.26.2
+> Theoretically, locking on a raw file needs to be protocol-compatible
+> with loop-mounting the same raw file, so if the loop driver doesn't
+> probe those magic byte offsets to prevent out-of-order block writes,
+> then there is little point for the qemu raw driver to do so.
+> 
+> This applies to both the loop driver in the host kernel and the loop
+> driver on any other machine with file share access to the sane image
+> file.
+
+The file access locks aren’t meant to prevent arbitrary other programs
+from accessing those specific few bytes, but to prevent concurrently
+running qemu processes from accessing the image.  That’s why qemu
+doesn’t lock the whole image file, but only a small and very specific
+set of bytes.
+
+The problem we originally faced was that some people would run qemu-img
+to modify qcow2 images while a VM was running, leading to metadata
+corruption and thus data loss.  This is the main reason the locks were
+introduced.  However, the problem isn’t limited to qcow2 images.  Even
+for raw images, we generally have to prevent e.g. concurrent writes to
+the image (from other VMs that might want to use that image) because the
+guest won’t be able to deal with that.  Hence why we take locks even on
+non-qcow2 images.
+
+> As for upgrading, I will try newer kernels packaged for the Debian
+> version used, once the current large batch job has completed, but I
+> doubt it will make much difference given the principles I just stated.
+
+I’m not sure whether I understood your paragraphs above wrong, but I
+don’t see how they explain why the bug would appear (i.e., why qemu
+would fail taking the file lock).  It only seems to explain why it seems
+superfluous for qemu to take locks when the loop driver will be the only
+concurrent user of the image (presumably because the loop driver just
+doesn’t take any locks; which means that qemu should be able to).
+
+Max
 
 
