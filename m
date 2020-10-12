@@ -2,91 +2,92 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58369C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 06:50:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66B26C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 07:00:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2B66206B5
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 06:50:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C64A820735
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 07:00:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XAXkIhB3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2B66206B5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TVJPQjC6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C64A820735
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRrfY-0003wn-Gi
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 02:50:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60622)
+	id 1kRrp9-0006gB-Oa
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 03:00:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33792)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kRreg-0003GN-6K
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 02:49:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28196)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kRrnB-0005D5-C8
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 02:58:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23893)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kRree-0004HJ-5t
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 02:49:57 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kRrn9-0005Cv-Ns
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 02:58:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602485395;
+ s=mimecast20190719; t=1602485921;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8+zd0PE6T2aczaUdNrh8pOUCwaJ9bS6ZmfN4Ku0UJ9Y=;
- b=XAXkIhB3Yq0hSEnh/86hSgsh1zCRFmPFx2473mZPkaGP3v0yJrkimqHjRfnI7a/2zVstV3
- eciZpOhgbyHnBkiV8I6A0IjdglcrLKEQLcBHJqhCDtb075cluXN4VlNghFN2BUa4k2pbSu
- iiE4yOQgqFkf3TtqLp/POL1k2NN9ZrA=
+ bh=in4vP4P4euyhUmh7MBEkfRMo9+vEy+KLt+Y2qxkJRGE=;
+ b=TVJPQjC6ncPKycfgyfj7jfF0wOQOKs4c6AZ73rPa0GBGrF4NuYfhGWrNpSPNZjc0D3dHYJ
+ dAYrbuFkfK171QXNuaYTB/rXJKGRSwChg4MeMxr/QKciNKyGpECyTYwtVkmNUMNUkUrR+q
+ pf426kuZfiucPW3bW3suvrXrEwefX58=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-25-0aQ1k338OhmSZsPRKWMigg-1; Mon, 12 Oct 2020 02:49:53 -0400
-X-MC-Unique: 0aQ1k338OhmSZsPRKWMigg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-236-KUhBwydHNiWAXwqOISXQqw-1; Mon, 12 Oct 2020 02:58:40 -0400
+X-MC-Unique: KUhBwydHNiWAXwqOISXQqw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4AAFF107ACF8;
- Mon, 12 Oct 2020 06:49:52 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
- [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C718D19C78;
- Mon, 12 Oct 2020 06:49:51 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id A81CF17538; Mon, 12 Oct 2020 08:49:50 +0200 (CEST)
-Date: Mon, 12 Oct 2020 08:49:50 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Subject: Re: [PATCH v6 0/4] Fixes curses on msys2/mingw
-Message-ID: <20201012064950.rbudmzrcbtub6a6i@sirius.home.kraxel.org>
-References: <20201001173230.829-1-luoyonggang@gmail.com>
- <89710921-1d64-14fd-f8ce-05ee58f412c5@redhat.com>
- <20201002124744.whdgh4xtmvifi72y@sirius.home.kraxel.org>
- <20201002153801.GL2338114@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A159A107ACF8;
+ Mon, 12 Oct 2020 06:58:38 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-113-22.ams2.redhat.com [10.36.113.22])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5D8825578D;
+ Mon, 12 Oct 2020 06:58:28 +0000 (UTC)
+Subject: Re: [PATCH 4/4] tests/qtest: Replace magic value by
+ NANOSECONDS_PER_SECOND definition
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20201011194918.3219195-1-f4bug@amsat.org>
+ <20201011194918.3219195-5-f4bug@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <7067de64-2a42-07f5-a864-74d7524bee5f@redhat.com>
+Date: Mon, 12 Oct 2020 08:58:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20201002153801.GL2338114@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20201011194918.3219195-5-f4bug@amsat.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/11 23:52:29
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 02:58:41
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1,
+ RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,62 +100,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>, Yonggang Luo <luoyonggang@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, qemu-arm@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 02, 2020 at 04:38:01PM +0100, Daniel P. Berrangé wrote:
-> On Fri, Oct 02, 2020 at 02:47:44PM +0200, Gerd Hoffmann wrote:
-> > On Thu, Oct 01, 2020 at 07:39:33PM +0200, Paolo Bonzini wrote:
-> > > On 01/10/20 19:32, Yonggang Luo wrote:
-> > > > And also convert related configure script to meson.
-> > > > V5-V6
-> > > > Dropping configure: Fixes ncursesw detection under msys2/mingw by convert the=
-> > > > m to meson first.
-> > > > That need the meson 0.56 upstream to fixes the curses detection.
-> > > > Add
-> > > > * configure: fixes indent of $meson setup
-> > > > 
-> > > > Yonggang Luo (4):
-> > > >   configure: fixes indent of $meson setup
-> > > >   curses: Fixes compiler error that complain don't have langinfo.h on
-> > > >     msys2/mingw
-> > > >   curses: Fixes curses compiling errors.
-> > > >   win32: Simplify gmtime_r detection not depends on if  _POSIX_C_SOURCE
-> > > >     are defined on msys2/mingw
-> > > > 
-> > > >  configure                 | 42 ++++-----------------------------------
-> > > >  include/sysemu/os-win32.h |  4 ++--
-> > > >  ui/curses.c               | 14 ++++++-------
-> > > >  util/oslib-win32.c        |  4 ++--
-> > > >  4 files changed, 15 insertions(+), 49 deletions(-)
-> > > > 
-> > > > --=20
-> > > > 2.28.0.windows.1
-> > > > 
-> > > > 
-> > > 
-> > > Looks good (though there is no conversion to meson yet in this version).
-> > > 
-> > > Not trivial, but perhaps Gerd can take it?
-> > 
-> > Sure, series looks good.
-> > 
-> > Can't finish this today due to -ENOTIME and I'm offline next week so
-> > this has to wait a bit in the UI patch queue ...
+On 11/10/2020 21.49, Philippe Mathieu-Daudé wrote:
+> Use self-explicit NANOSECONDS_PER_SECOND definition instead
+> of a magic value.
 > 
-> Patch 2 needs more work I think, as its missing the corresponding
-> configure change.
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  tests/qtest/rtc-test.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tests/qtest/rtc-test.c b/tests/qtest/rtc-test.c
+> index c7af34f6b1b..402ce2c6090 100644
+> --- a/tests/qtest/rtc-test.c
+> +++ b/tests/qtest/rtc-test.c
+> @@ -292,7 +292,7 @@ static void alarm_time(void)
+>              break;
+>          }
+>  
+> -        clock_step(1000000000);
+> +        clock_step(NANOSECONDS_PER_SECOND);
+>      }
+>  
+>      g_assert(get_irq(RTC_ISA_IRQ));
+> 
 
-Also the series must be adapted to latest master, auto-rebase didn't work ...
-
-take care,
-  Gerd
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
