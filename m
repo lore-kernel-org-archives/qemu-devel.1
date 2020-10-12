@@ -7,63 +7,64 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B18C7C43467
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 11:48:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D25AC433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 11:50:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46F6B215A4
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 11:48:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B06D7208D5
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 11:50:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OXSB1xd0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46F6B215A4
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eYEUahmf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B06D7208D5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRwJv-0004xO-BL
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 07:48:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42736)
+	id 1kRwLA-0006F8-PT
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 07:50:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42766)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kRwG4-0000bD-PA
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 07:44:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26369)
+ id 1kRwG7-0000cz-SV
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 07:44:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43561)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kRwFy-0008Ac-12
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 07:44:50 -0400
+ id 1kRwG2-0008B0-EG
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 07:44:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602503084;
+ s=mimecast20190719; t=1602503087;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=BJR6SWX9PO2YeU8RnGbYoAO1TtPIctVvTm8T9SR/Fy4=;
- b=OXSB1xd06Wa/WvWgoVTOMBb6B0bCYLdO0f8wMjCQ2YOOk/DNXtMwF+JoNY18xezA3hXO5c
- bWnxb9WLMORYVpm5fMOhCUqEshVEKnUBBeiNiTpMBbmsaLdwaISKn68wkHFZQNFAPktcg6
- 4yF1cVf0d3oYy635sZYNl0qsqv+Kkt8=
+ bh=U0f7a6Fc7A+7mZcGUG5Hm7ANHiCXaOvgGvgfUjI3+ow=;
+ b=eYEUahmf0T+BX6KhS1r5DqHlJnnqGYm+gLPrjYAx9szzCiRo09Md0FCp9ZxrQMN+0FuxIR
+ s6Cjb6+4Y9vyNOOPvR/FiHFwht8i5jrf/jNMM71VSHBq6h5i+2bVvQfF3NEpHW7vlI/0Bl
+ uqmqys692ApQiyrMlANrQP6Q8iJPac4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-207-kWV_VpIGOyO8y9q6sPc2FA-1; Mon, 12 Oct 2020 07:44:42 -0400
-X-MC-Unique: kWV_VpIGOyO8y9q6sPc2FA-1
+ us-mta-336-tLfwMwT5NkCzlaumZQHK5Q-1; Mon, 12 Oct 2020 07:44:45 -0400
+X-MC-Unique: tLfwMwT5NkCzlaumZQHK5Q-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E735564088;
- Mon, 12 Oct 2020 11:44:40 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E8DD64083;
+ Mon, 12 Oct 2020 11:44:44 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-113-244.ams2.redhat.com
  [10.36.113.244])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8FD5446;
- Mon, 12 Oct 2020 11:44:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E624319C78;
+ Mon, 12 Oct 2020 11:44:42 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, alex.bennee@linaro.org, zhengchuan@huawei.com,
  stefanha@redhat.com, peterx@redhat.com
-Subject: [PULL 3/6] virtiofsd: Call qemu_init_exec_dir
-Date: Mon, 12 Oct 2020 12:44:22 +0100
-Message-Id: <20201012114425.104765-4-dgilbert@redhat.com>
+Subject: [PULL 5/6] migration/dirtyrate: record start_time and calc_time while
+ at the measuring state
+Date: Mon, 12 Oct 2020 12:44:24 +0100
+Message-Id: <20201012114425.104765-6-dgilbert@redhat.com>
 In-Reply-To: <20201012114425.104765-1-dgilbert@redhat.com>
 References: <20201012114425.104765-1-dgilbert@redhat.com>
 MIME-Version: 1.0
@@ -72,18 +73,18 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/11 23:52:29
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 02:58:41
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,36 +103,70 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Chuan Zheng <zhengchuan@huawei.com>
 
-Since fcb4f59c879 qemu_get_local_state_pathname relies on the
-init_exec_dir, and virtiofsd asserts because we never set it.
-Set it.
+Querying could include both the start-time and the calc-time while at the measuring
+state, allowing a caller to determine when they should expect to come back looking
+for a result.
 
-Reported-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <20201002124015.44820-1-dgilbert@redhat.com>
-Tested-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
+Message-Id: <1601350938-128320-2-git-send-email-zhengchuan@huawei.com>
+Reviewed-by: David Edmondson <david.edmondson@oracle.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tools/virtiofsd/passthrough_ll.c | 2 ++
- 1 file changed, 2 insertions(+)
+ migration/dirtyrate.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
-index 36ad46e0c0..477e6ee0b5 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -2839,6 +2839,8 @@ int main(int argc, char *argv[])
-     /* Don't mask creation mode, kernel already did that */
-     umask(0);
+diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+index 68577ef250..40e41e793e 100644
+--- a/migration/dirtyrate.c
++++ b/migration/dirtyrate.c
+@@ -83,14 +83,14 @@ static struct DirtyRateInfo *query_dirty_rate_info(void)
+     return info;
+ }
  
-+    qemu_init_exec_dir(argv[0]);
+-static void reset_dirtyrate_stat(void)
++static void init_dirtyrate_stat(int64_t start_time, int64_t calc_time)
+ {
+     DirtyStat.total_dirty_samples = 0;
+     DirtyStat.total_sample_count = 0;
+     DirtyStat.total_block_mem_MB = 0;
+     DirtyStat.dirty_rate = -1;
+-    DirtyStat.start_time = 0;
+-    DirtyStat.calc_time = 0;
++    DirtyStat.start_time = start_time;
++    DirtyStat.calc_time = calc_time;
+ }
+ 
+ static void update_dirtyrate_stat(struct RamblockDirtyInfo *info)
+@@ -335,7 +335,6 @@ static void calculate_dirtyrate(struct DirtyRateConfig config)
+     int64_t initial_time;
+ 
+     rcu_register_thread();
+-    reset_dirtyrate_stat();
+     rcu_read_lock();
+     initial_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+     if (!record_ramblock_hash_info(&block_dinfo, config, &block_count)) {
+@@ -365,6 +364,8 @@ void *get_dirtyrate_thread(void *arg)
+ {
+     struct DirtyRateConfig config = *(struct DirtyRateConfig *)arg;
+     int ret;
++    int64_t start_time;
++    int64_t calc_time;
+ 
+     ret = dirtyrate_set_state(&CalculatingState, DIRTY_RATE_STATUS_UNSTARTED,
+                               DIRTY_RATE_STATUS_MEASURING);
+@@ -373,6 +374,10 @@ void *get_dirtyrate_thread(void *arg)
+         return NULL;
+     }
+ 
++    start_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME) / 1000;
++    calc_time = config.sample_period_seconds;
++    init_dirtyrate_stat(start_time, calc_time);
 +
-     pthread_mutex_init(&lo.mutex, NULL);
-     lo.inodes = g_hash_table_new(lo_key_hash, lo_key_equal);
-     lo.root.fd = -1;
+     calculate_dirtyrate(config);
+ 
+     ret = dirtyrate_set_state(&CalculatingState, DIRTY_RATE_STATUS_MEASURING,
 -- 
 2.28.0
 
