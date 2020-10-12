@@ -2,43 +2,40 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09D11C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:16:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C502C433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:18:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 725E320878
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:16:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 725E320878
+	by mail.kernel.org (Postfix) with ESMTPS id B76512076D
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:18:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B76512076D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRzZ6-0000tR-5L
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 11:16:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52276)
+	id 1kRzab-00021d-Ox
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 11:18:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52632)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kRzYI-0000Ig-DS; Mon, 12 Oct 2020 11:15:56 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:48941)
+ id 1kRzZe-0001Tf-8b; Mon, 12 Oct 2020 11:17:18 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:35113)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kRzYD-00053A-EW; Mon, 12 Oct 2020 11:15:54 -0400
+ id 1kRzZa-0005F2-Jw; Mon, 12 Oct 2020 11:17:17 -0400
 Received: from [192.168.100.1] ([82.252.141.186]) by mrelayeu.kundenserver.de
- (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1M6VNX-1kYrAN1oUL-006vG8; Mon, 12 Oct 2020 17:15:42 +0200
-Subject: Re: [PATCH] mingw: Fix builds on f33 mingw
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20201008174359.157627-1-dgilbert@redhat.com>
- <7f8ffa77-cc95-b121-0da8-269d37c52830@redhat.com>
- <fa6c8769-b1d7-cd75-2c2e-d8bc74ebe51e@vivier.eu>
- <CAFEAcA9T-81tXcM1A0b-y-_ZkC_0sqJ8cQuEvDkfbobXJQr70Q@mail.gmail.com>
+ (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1Moex5-1k8Yuq0HYv-00p50D; Mon, 12 Oct 2020 17:17:09 +0200
+Subject: Re: [PATCH v2] mingw: fix error __USE_MINGW_ANSI_STDIO redefined
+To: marcandre.lureau@redhat.com, qemu-devel@nongnu.org
+References: <20201008165953.884599-1-marcandre.lureau@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -82,35 +79,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <286fd85f-7a0e-faed-cec0-1ecb6605b4e3@vivier.eu>
-Date: Mon, 12 Oct 2020 17:15:39 +0200
+Message-ID: <65366aa1-f521-0980-ed63-0fa3daaf6449@vivier.eu>
+Date: Mon, 12 Oct 2020 17:17:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9T-81tXcM1A0b-y-_ZkC_0sqJ8cQuEvDkfbobXJQr70Q@mail.gmail.com>
+In-Reply-To: <20201008165953.884599-1-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:SdLQBrDkl3sfwOtcOp1BK3wa9UG0YaKjK7qhSngh71/9yR1FSee
- sZgeILXpSwkyyxgvMTewwtVXv/I6VMaGxT6m3v9TQo56VLhQOjgmoJKvtE8+P1Dut1QEAu6
- lGAtao/o42U1yF90iK0X5K6s5hKeDqzCOTCl0/w8Tk9bGVcLEEXtzNyQF0Y1rEcUGN2gt+3
- OfmYQnn7mPVzR2syPKUZQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:uA/0cMjuxl4=:6EyW8JwiEsYbJBZbzajQG6
- oqn8XijJN4j7LP+Bp4Pjv/33QFG2rCxNtPREAGVz/L4a832rN7Njlc0cli4K0un5YybO4vVhr
- EK7dLKEqjSSKUxD8ukcFmfRfp2g839u0rXBcT1mNlm+VVTUGyWWIrLeeg3rsNNDkKlp+kthmx
- X83CInVcaDTKhBSI2SHGcciA8/Y+5i+tovXX8f3p8gq5Ag6GZ1D3Y1+ayqi9CcsyP3pUi8+x3
- Ubv3CPjMe7l1BurVTaXldFXHcvGtamcCviTiGMebPcrxgSPjPrP3UQJAcMX9+6NkgOkGC1VBO
- ZPIX2qf1zZcd80rt2ruUzuZn6MhnuycKaW2f4d+cQM+h4Q359QmDeevgSWEiQKPkmIZP8Dczu
- wGy57sCLQenNAaUxLKpTY2ZAyz8idHU05xZfCobTFurRpdAw7QJJSWmjctm+4Brt652qPHbrS
- PhJ6yvLDcCh5P/H3CYrpDeBCQ+bsJ6ahyxE+wjw09PQ0E7qjtXHf3zGRfo+5xJ/bQDu4kf1I/
- XYrZAQfsUXvpaf+WFkNSoLeY03nUxQ6OEYsoV3HT/Hher0SSqQDDFLHDx5ouaWPHqB258/nxu
- p3jycrRgoKP/9wjpGpg4tuOqIqSmLIHCDykZJVNITpwzQbEZILqxlXfcvJ2rX13CIYr6thaK6
- c7Glw3uACEbHnBtt61TU0R8rHm0uHdudIfAE8xSrxt9YVOHbDJu3WTzWBw+v4gZ0iL4ri965Z
- GYoa2FicBev++pvQJvBJdSXi7bhcjZMl5umXud7ou/64l9TjcXUs6Y+7bIrDGFqzXD+dyOVoe
- TTsRGIWUDhkHJV0QraR3YkdgeSTELXlKyShnGo2UCTKVzAivipTa4MVssZtAMxz2B6/JjKt
-Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:6UWMvaDFa5rrMed7xRfVYBLwSzJm98Nd8R16mBeuB5moU4Je5aR
+ TLPepjnnpWlpVqBWSJGqGWQdabk67RlCpAO4/xa/0ertMG70rz5E7OoyEZuB0J9GL8HkWEe
+ ms8x1FlSwKyfoDC1JLTr8BKimduc12LBiaiBn+x0cNSjsmQC7s2KTUbXgyWUwx/Or05gcFX
+ dFTK5g3Mi3wb87NRfDIKg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:pxqfSUoJtpY=:aqVjE99HcwIc/mI/WjgzSq
+ xAHRKzbqmKV2ji3OjT5S5zW5VIiMA139FYcfHnnjugM55Sfnj/5X3ifj12Gk5B1FAYVatXIwp
+ eCZbVrlYz0kHBemXj7o2FKUFwuyBKtJD+nsj2Po5dbcRVSGeOJc2U8yQbaGZey2NcI7P8dCYR
+ dmFs0yvpeEiMDkxQpDTqkqV3auRgn07INH7ProeL319gsw1Vcxt/8vRoC3HM3OasSKC+YtW26
+ KTY1KozGv9BSvCZqzOxzA22C4oh35PbC4TOpp/XBa1AF8MqXKFXDhvCEPTo0b1NGJ1FjTWkH5
+ 48ir2wrHQb6kctt056SGgzL3YFfLbTaE+PNXbMLnCrCn3JxTelaF9jQxNFkOgsQDWgqivfCy+
+ POxWAPs7iyib91D+SFzoSf7HDHqk0vusKPv/zL4uM5vF31ivvjgEXuesr1sLfiY0aIUM7Iv/2
+ RC49UklbWs4pFUWbpc+G4poP6KSVSfPSzkMYMptAWi2Ml5p9Wlm+WZcWLMpAsGIse96T3IHxW
+ yZbAPPzb7CVmqa3Jm0eLUrLVWLDPd5e6kGCzGUA+DFym1gY7lBqbGscz2GB7Tduyp022Nmyvq
+ TfThS9hQ7KvuUga1AHl/GW9pyBIwJ32K0ggu7lO7iERHo7fss88m+dBXOAQQ8luESJU4Pbi0l
+ 7IbUFEW7G3ew50LZS5heqPkhNfPXiejwkF+sxzLDP/iWkB4WNrC4n8tpuOHrlDBgNvUdjQY14
+ e98wD9R0cicQWwTe6b9Tmud3hY9TbR+NmsD2DHOCQDSYAGHPkLKae6QkL9bO9PERWu/YAJy8+
+ Dbp9u3sr4A3w0PUPQmWsqOw1DSIa592lulr2EV59aPQyQE3r1peK9hDJwDoAQcpwqLL+bcz
+Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 10:12:41
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 10:20:48
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -130,82 +127,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Thomas Huth <thuth@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert \(git\)" <dgilbert@redhat.com>,
- Juan Quintela <quintela@redhat.com>
+Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>, sw@weilnetz.de,
+ armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 12/10/2020 à 17:05, Peter Maydell a écrit :
-> On Mon, 12 Oct 2020 at 15:39, Laurent Vivier <laurent@vivier.eu> wrote:
->>
->> Le 08/10/2020 à 19:46, Thomas Huth a écrit :
->>> On 08/10/2020 19.43, Dr. David Alan Gilbert (git) wrote:
->>>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->>>>
->>>> Fedora 33's mingw moans about:
->>>>
->>>> In file included from ../tests/test-bitmap.c:12:
->>>> /home/dgilbert/git/migpull/include/qemu/osdep.h:76: error: "__USE_MINGW_ANSI_STDIO" redefined [-Werror]
->>>>    76 | #define __USE_MINGW_ANSI_STDIO 1
->>>>       |
->>>>
->>>> the fix is to make sure osdep.h is the first include - which is our
->>>> rule anyway; but one we broke in a couple of places.
->>>>
->>>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->>>> ---
->>>>  migration/dirtyrate.c | 2 +-
->>>>  tests/test-bitmap.c   | 2 +-
->>>>  2 files changed, 2 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
->>>> index ab9e1301f6..42b71e771e 100644
->>>> --- a/migration/dirtyrate.c
->>>> +++ b/migration/dirtyrate.c
->>>> @@ -10,8 +10,8 @@
->>>>   * See the COPYING file in the top-level directory.
->>>>   */
->>>>
->>>> -#include <zlib.h>
->>>>  #include "qemu/osdep.h"
->>>> +#include <zlib.h>
->>>>  #include "qapi/error.h"
->>>>  #include "cpu.h"
->>>>  #include "qemu/config-file.h"
->>>> diff --git a/tests/test-bitmap.c b/tests/test-bitmap.c
->>>> index 2f5b71458a..c3c9d79667 100644
->>>> --- a/tests/test-bitmap.c
->>>> +++ b/tests/test-bitmap.c
->>>> @@ -8,8 +8,8 @@
->>>>   * Author: Peter Xu <peterx@redhat.com>
->>>>   */
->>>>
->>>> -#include <stdlib.h>
->>>>  #include "qemu/osdep.h"
->>>> +#include <stdlib.h>
->>>>  #include "qemu/bitmap.h"
->>>>
->>>>  #define BMAP_SIZE  1024
->>>>
->>>
->>> Reviewed-by: Thomas Huth <thuth@redhat.com>
->>>
->>>
->>
->> Applied to my trivial-patches branch.
+Le 08/10/2020 à 18:59, marcandre.lureau@redhat.com a écrit :
+> From: Marc-André Lureau <marcandre.lureau@redhat.com>
 > 
-> This is the wrong version of this patch -- can you take
-> Marc-André's instead, please?
+> Always put osdep.h first, and remove redundant stdlib.h include.
+> 
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+> ---
+>  migration/dirtyrate.c | 3 ++-
+>  tests/test-bitmap.c   | 1 -
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+> index 68577ef250..47f761e67a 100644
+> --- a/migration/dirtyrate.c
+> +++ b/migration/dirtyrate.c
+> @@ -10,8 +10,9 @@
+>   * See the COPYING file in the top-level directory.
+>   */
+>  
+> -#include <zlib.h>
+>  #include "qemu/osdep.h"
+> +
+> +#include <zlib.h>
+>  #include "qapi/error.h"
+>  #include "cpu.h"
+>  #include "qemu/config-file.h"
+> diff --git a/tests/test-bitmap.c b/tests/test-bitmap.c
+> index 2f5b71458a..8db4f67883 100644
+> --- a/tests/test-bitmap.c
+> +++ b/tests/test-bitmap.c
+> @@ -8,7 +8,6 @@
+>   * Author: Peter Xu <peterx@redhat.com>
+>   */
+>  
+> -#include <stdlib.h>
+>  #include "qemu/osdep.h"
+>  #include "qemu/bitmap.h"
+>  
+> 
 
-Yes, queueing instead:
-
-"[PATCH v2] mingw: fix error __USE_MINGW_ANSI_STDIO redefined"
+Applied to my trivial-patches branch.
 
 Thanks,
 Laurent
-
 
 
