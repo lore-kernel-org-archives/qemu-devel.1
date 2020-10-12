@@ -2,92 +2,120 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA0BDC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 16:04:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1241C433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 16:04:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 079C520797
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 16:04:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BD18A20797
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 16:04:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UaSav1qT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 079C520797
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fOH62LzG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD18A20797
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40936 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kS0JO-0005AT-3v
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 12:04:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58090)
+	id 1kS0JZ-0005XO-T1
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 12:04:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34606)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kRzti-0003gD-9A
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:38:02 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36631)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kRzta-0007lu-DE
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:38:01 -0400
-Received: by mail-wm1-x342.google.com with SMTP id e2so17980740wme.1
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 08:37:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=pVy88bjQ6oUom6zlEL/l8GFHzZ3l3YhMBHhw5mIWpLU=;
- b=UaSav1qT/HF9VDXaf7GvktosHSLrfpM5XL+7ocwJoJ6W/6T0siB7ag0zifJ/3bnvJM
- oAcYheet78yFETeTDYtaWXI02K+jWMHTzPKzKL4IcICDflysRfz67XeuCx4k6CLi19dd
- /nwhqq2pTCtflxRWoc2hakUxWOz3YvliKcCmNktT3slVtgAWV2edPQjEeSCimBPwr8HA
- 2vsteglTKaQKdKbM1WBv0v/PllACDdZ9rQr/59YADuAy6Y5mvIFhzhQvPt55IpFcc5b4
- 9RWvp/lsi+SYqppMyPHsu3paOhxOMWCYEze4QbS4nNh6IggUEkvYuSVX150n9bWQMkKS
- uaRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=pVy88bjQ6oUom6zlEL/l8GFHzZ3l3YhMBHhw5mIWpLU=;
- b=naPIOpIYZAvU5h5OC5ZCeyZZo3lHmsSx/zmdel5qEsdAyW+4qUA2291AUUXHEZsFfx
- LI9Gv4Xiu6i9ncTpdwbnu9IsyV6kVl1pddrNuMUx71qdhlEv6CZOtTcvvYeawENcERMW
- ymzs/1pbrYmUuRPBJJd9Olwk0ZEYW/POnp5GIh10cTCMrB5RyBw75SqMT2lgs4mhlHNV
- 1bV+Isexali6Muu0ThIPBZIT7R+JcBo9kQk4uBxrGn4NQ+6K5puC0ejDg3Ur6tdlTU2c
- c0d839xnVENI0O7Dl2Ef9kSvoMfchm3sCTlW/GANgaezy6bKfh5UnDHeXc7YVoDZT5TL
- 9g1w==
-X-Gm-Message-State: AOAM531SOSkoQvMDncjZJB/bnymT3H82KIwfmGS/8Qvxnz+6AtGGgniw
- oew+wg4I5KYtWcZE5lCqxQA0Ig==
-X-Google-Smtp-Source: ABdhPJwQa0GzV+Pt+sSH2vIoYurYdWY/bhKwBzBJRBmWcT9qSb8+KVEk7LUcNe/c0nTrrMUIfGVtNQ==
-X-Received: by 2002:a1c:4d05:: with SMTP id o5mr11028771wmh.94.1602517073036; 
- Mon, 12 Oct 2020 08:37:53 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id y66sm7095961wmd.14.2020.10.12.08.37.52
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 12 Oct 2020 08:37:52 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH 04/10] target/arm: Make the t32 insn[25:23]=111 group
- non-overlapping
-Date: Mon, 12 Oct 2020 16:37:40 +0100
-Message-Id: <20201012153746.9996-5-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201012153746.9996-1-peter.maydell@linaro.org>
-References: <20201012153746.9996-1-peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <jejb@linux.ibm.com>)
+ id 1kS0Fo-0000dg-No
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 12:00:54 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36816)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jejb@linux.ibm.com>)
+ id 1kS0Fl-000290-7Y
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 12:00:52 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 09CFhYQw070607; Mon, 12 Oct 2020 12:00:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=message-id : subject :
+ from : reply-to : to : cc : date : in-reply-to : references : content-type
+ : mime-version : content-transfer-encoding; s=pp1;
+ bh=dlevNp7prWjoPz1wdzKzVm8+WIOdAlEU5ieXCTTS+Es=;
+ b=fOH62LzGEekIwVg7c0dUGtDeI8FG3xoAj4fElBXySBkNnJy7V1mh0mVmjm/D1FZu75lJ
+ WqylpcqdDdZ9hfNG0AnCGMav5EBMLFptfmg2GEUsLaBNtd9Fcp9pNZCOkrjyyhcj5qsf
+ N2WzbUZl02yVQEL74E0FzuiORb7/tRtRuBnYFAaEue53DbfUEl5kxOJdSBVhRU42vus6
+ bDhzq4jfdzrpDbs2sikj7jRZGQ6IdlXgAso0deNuxGli5IYP31JBkJSS7uaTK/FnnVhk
+ c4VzVYKpkCGNfvyTxW/nQliEbdt5oIuAwJior+QRtnLL1VF1ELx5rj+4PNx7e5JZF2Lh Pw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 344t1mghpx-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 12 Oct 2020 12:00:43 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09CFkGRQ091376;
+ Mon, 12 Oct 2020 12:00:42 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.11])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 344t1mghp8-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 12 Oct 2020 12:00:42 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+ by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09CFllAj028008;
+ Mon, 12 Oct 2020 16:00:41 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com
+ (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+ by ppma03dal.us.ibm.com with ESMTP id 3434k8d14q-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 12 Oct 2020 16:00:41 +0000
+Received: from b03ledav004.gho.boulder.ibm.com
+ (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+ by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 09CG0Z9g32702972
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 12 Oct 2020 16:00:35 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4457578064;
+ Mon, 12 Oct 2020 16:00:40 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id BD2617806D;
+ Mon, 12 Oct 2020 16:00:38 +0000 (GMT)
+Received: from jarvis (unknown [9.85.148.2])
+ by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Mon, 12 Oct 2020 16:00:38 +0000 (GMT)
+Message-ID: <b6137b4997b0729e576bc6c0c5476960d1992115.camel@linux.ibm.com>
+Subject: Re: [PATCH v3] SEV: QMP support for Inject-Launch-Secret
+From: James Bottomley <jejb@linux.ibm.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Tobin Feldman-Fitzthum
+ <tobin@linux.ibm.com>
+Date: Mon, 12 Oct 2020 09:00:37 -0700
+In-Reply-To: <20201012155718.GH6677@work-vm>
+References: <20200706215451.59179-1-tobin@linux.vnet.ibm.com>
+ <20200921190800.GA32491@work-vm>
+ <b7faab72e909b709797e6098ec894c72@linux.vnet.ibm.com>
+ <20201012155718.GH6677@work-vm>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.34.4 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-10-12_12:2020-10-12,
+ 2020-10-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 phishscore=0
+ priorityscore=1501 adultscore=0 lowpriorityscore=0 impostorscore=0
+ mlxscore=0 malwarescore=0 spamscore=0 clxscore=1011 suspectscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2010120124
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=jejb@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 12:00:45
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,90 +129,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>
+Reply-To: jejb@linux.ibm.com
+Cc: thomas.lendacky@amd.com, brijesh.singh@amd.com, tobin@ibm.com,
+ qemu-devel@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The t32 decode has a group which represents a set of insns
-which overlap with B_cond_thumb because they have [25:23]=111
-(which is an invalid condition code field for the branch insn).
-This group is currently defined using the {} overlap-OK syntax,
-but it is almost entirely non-overlapping patterns. Switch
-it over to use a non-overlapping group.
+On Mon, 2020-10-12 at 16:57 +0100, Dr. David Alan Gilbert wrote:
+> * Tobin Feldman-Fitzthum (tobin@linux.ibm.com) wrote:
+> > On 2020-09-21 15:16, Dr. David Alan Gilbert wrote:
+> > > * Tobin Feldman-Fitzthum (tobin@linux.vnet.ibm.com) wrote:
+> > > > AMD SEV allows a guest owner to inject a secret blob
+> > > > into the memory of a virtual machine. The secret is
+> > > > encrypted with the SEV Transport Encryption Key and
+> > > > integrity is guaranteed with the Transport Integrity
+> > > > Key. Although QEMU faciliates the injection of the
+> > > > launch secret, it cannot access the secret.
+> > > > 
+> > > > Signed-off-by: Tobin Feldman-Fitzthum <tobin@linux.vnet.ibm.com
+> > > > >
+> > > 
+> > > Hi Tobin,
+> > >   Did the ovmf stuff for agreeing the GUID for automating this
+> > > ever happen?
+> > > 
+> > OVMF patches have not been upstreamed yet. I think we are planning
+> > to do that relatively soon.
+> 
+> So as we're getting to the end of another qemu dev cycle; do we aim
+> to get this one in by itself, or to wait for the GUID?
 
-For this to be valid syntactically, CPS must move into the same
-overlapping-group as the hint insns (CPS vs hints was the
-only actual use of the overlap facility for the group).
+Since they're independent of each other, I'd say get this one in now if
+it's acceptable.  The GUID will come as a discoverable way of setting
+the GPA, but this patch at least gives people a way to play with SEV
+secret injection.  I'm also reworking the OVMF GUID patch to tack on to
+the reset vector GUID that just went upstream, so it will be a few more
+weeks yet before we have it all integrated with the -ES patch set.
 
-The non-overlapping subgroup for CLREX/DSB/DMB/ISB/SB is no longer
-necessary and so we can remove it (promoting those insns to
-be members of the parent group).
+James
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-Just a minor bit of tidying that I did while I was trying to
-work out whether the v8.1M loop/branch insns needed to go in
-this group. (As it turns out, they don't.)
----
- target/arm/t32.decode | 26 ++++++++++++--------------
- 1 file changed, 12 insertions(+), 14 deletions(-)
-
-diff --git a/target/arm/t32.decode b/target/arm/t32.decode
-index d8454bd814e..7d5e000e82c 100644
---- a/target/arm/t32.decode
-+++ b/target/arm/t32.decode
-@@ -296,8 +296,8 @@ CLZ              1111 1010 1011 ---- 1111 .... 1000 ....      @rdm
- {
-   # Group insn[25:23] = 111, which is cond=111x for the branch below,
-   # or unconditional, which would be illegal for the branch.
--  {
--    # Hints
-+  [
-+    # Hints, and CPS
-     {
-       YIELD      1111 0011 1010 1111 1000 0000 0000 0001
-       WFE        1111 0011 1010 1111 1000 0000 0000 0010
-@@ -310,20 +310,18 @@ CLZ              1111 1010 1011 ---- 1111 .... 1000 ....      @rdm
-       # The canonical nop ends in 0000 0000, but the whole rest
-       # of the space is "reserved hint, behaves as nop".
-       NOP        1111 0011 1010 1111 1000 0000 ---- ----
-+
-+      # If imod == '00' && M == '0' then SEE "Hint instructions", above.
-+      CPS        1111 0011 1010 1111 1000 0 imod:2 M:1 A:1 I:1 F:1 mode:5 \
-+                 &cps
-     }
- 
--    # If imod == '00' && M == '0' then SEE "Hint instructions", above.
--    CPS          1111 0011 1010 1111 1000 0 imod:2 M:1 A:1 I:1 F:1 mode:5 \
--                 &cps
--
-     # Miscellaneous control
--    [
--      CLREX      1111 0011 1011 1111 1000 1111 0010 1111
--      DSB        1111 0011 1011 1111 1000 1111 0100 ----
--      DMB        1111 0011 1011 1111 1000 1111 0101 ----
--      ISB        1111 0011 1011 1111 1000 1111 0110 ----
--      SB         1111 0011 1011 1111 1000 1111 0111 0000
--    ]
-+    CLREX        1111 0011 1011 1111 1000 1111 0010 1111
-+    DSB          1111 0011 1011 1111 1000 1111 0100 ----
-+    DMB          1111 0011 1011 1111 1000 1111 0101 ----
-+    ISB          1111 0011 1011 1111 1000 1111 0110 ----
-+    SB           1111 0011 1011 1111 1000 1111 0111 0000
- 
-     # Note that the v7m insn overlaps both the normal and banked insn.
-     {
-@@ -351,7 +349,7 @@ CLZ              1111 1010 1011 ---- 1111 .... 1000 ....      @rdm
-     HVC          1111 0111 1110 ....  1000 .... .... ....     \
-                  &i imm=%imm16_16_0
-     UDF          1111 0111 1111 ----  1010 ---- ---- ----
--  }
-+  ]
-   B_cond_thumb   1111 0. cond:4 ...... 10.0 ............      &ci imm=%imm21
- }
- 
--- 
-2.20.1
 
 
