@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFEFCC433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:46:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20CD2C43457
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:47:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B43A2074F
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:46:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8411620708
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:47:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SpDWc4vz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B43A2074F
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OsqNSIss"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8411620708
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kS4i5-0002uM-JR
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 16:46:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38274)
+	id 1kS4jQ-0004pz-Ff
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 16:47:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38104)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kS4WN-0002pO-MN
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:34:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24758)
+ id 1kS4WE-0002lJ-DL
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:34:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39556)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kS4WH-0002hf-R8
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:34:14 -0400
+ id 1kS4WA-0002fZ-SZ
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:34:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602534848;
+ s=mimecast20190719; t=1602534842;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=g4tBny8xHG7jaj/fwHAgSPIwRLxsSdPgqy4yBPAchHA=;
- b=SpDWc4vzK5rlB6730BpFzhr5xPFKsqFWRWMKNaJwsIyw+pwb31YrdaeBFMtPTiXd3cmz+v
- t074IDXchiSC3Cwm0dvD+n08ySuYpcBf9snAyM8cM8wdRjdOmvwK1xPybBJT8lMs3ASfx0
- QMP4biJSP3TMGGoc6E+JOZmgA6gIvwU=
+ bh=GXPn5xUii74xjS11lNjd9K5XsnfvPdvjfLKTDJanCHw=;
+ b=OsqNSIssZoNjnXm2KLR3qDLziaSxyjuiAh+Ql0/fw4HT5XoALejnbF5EWsTcdHhTTa8Ne2
+ 4jK/Qzl+ZfPk9/rWOCT2rCazIgMTMXXSkXgAm6urEFNWy+/SjplMRkJfYmlDzGWYhPFPnE
+ kF7D4TasCGS3LWvFdIq4qDwq3bmxvYg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-67-tTjuIcfbPmmczvchCfZy4g-1; Mon, 12 Oct 2020 16:34:06 -0400
-X-MC-Unique: tTjuIcfbPmmczvchCfZy4g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-53-pyW3W_7pNSiq1RSjIGZyvw-1; Mon, 12 Oct 2020 16:34:00 -0400
+X-MC-Unique: pyW3W_7pNSiq1RSjIGZyvw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A155F87952C
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 20:33:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93A0918BA2B3
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 20:33:50 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6E5826EF59
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 20:33:57 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4F0655D9CD
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 20:33:50 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 28/38] qdev: add "check if address free" callback for buses
-Date: Mon, 12 Oct 2020 16:33:33 -0400
-Message-Id: <20201012203343.1105018-29-pbonzini@redhat.com>
+Subject: [PULL 12/38] exec: split out non-softmmu-specific parts
+Date: Mon, 12 Oct 2020 16:33:17 -0400
+Message-Id: <20201012203343.1105018-13-pbonzini@redhat.com>
 In-Reply-To: <20201012203343.1105018-1-pbonzini@redhat.com>
 References: <20201012203343.1105018-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -100,141 +100,1145 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Check if an address is free on the bus before plugging in the
-device.  This makes it possible to do the check without any
-side effects, and to detect the problem early without having
-to do it in the realize callback.
+Over the years, most parts of exec.c that were not specific to softmmu
+have been moved to accel/tcg; what's left is mostly the low-level part
+of the memory API, which includes RAMBlock and AddressSpaceDispatch.
+However exec.c also hosts 4-500 lines of code for the target specific
+parts of the CPU QOM object, plus a few functions for user-mode
+emulation that do not have a better place (they are not TCG-specific so
+accel/tcg/user-exec.c is not a good place either).
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20201006123904.610658-5-mlevitsk@redhat.com>
+Move these parts to a new file, so that exec.c can be moved to
+softmmu/physmem.c.
+
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/core/qdev.c         | 17 +++++++++++++++--
- hw/net/virtio-net.c    |  2 +-
- hw/sd/core.c           |  3 ++-
- include/hw/qdev-core.h | 13 ++++++++++++-
- 4 files changed, 30 insertions(+), 5 deletions(-)
+ MAINTAINERS                 |   4 +-
+ cpu.c                       | 452 +++++++++++++++++++++++++++++++++++
+ include/exec/cpu-common.h   |   3 +
+ meson.build                 |   2 +-
+ softmmu/meson.build         |   3 +-
+ exec.c => softmmu/physmem.c | 454 +-----------------------------------
+ 6 files changed, 467 insertions(+), 451 deletions(-)
+ create mode 100644 cpu.c
+ rename exec.c => softmmu/physmem.c (91%)
 
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 96772a15bd..74db78df36 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -94,13 +94,23 @@ static void bus_add_child(BusState *bus, DeviceState *child)
-                              0);
- }
+diff --git a/MAINTAINERS b/MAINTAINERS
+index dda54f000d..7ef459a33c 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -117,7 +117,6 @@ R: Paolo Bonzini <pbonzini@redhat.com>
+ S: Maintained
+ F: softmmu/cpus.c
+ F: cpus-common.c
+-F: exec.c
+ F: accel/tcg/
+ F: accel/stubs/tcg-stub.c
+ F: scripts/decodetree.py
+@@ -1525,6 +1524,7 @@ Machine core
+ M: Eduardo Habkost <ehabkost@redhat.com>
+ M: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+ S: Supported
++F: cpu.c
+ F: hw/core/cpu.c
+ F: hw/core/machine-qmp-cmds.c
+ F: hw/core/machine.c
+@@ -2284,8 +2284,8 @@ F: include/exec/ramblock.h
+ F: softmmu/dma-helpers.c
+ F: softmmu/ioport.c
+ F: softmmu/memory.c
++F: softmmu/physmem.c
+ F: include/exec/memory-internal.h
+-F: exec.c
+ F: scripts/coccinelle/memory-region-housekeeping.cocci
  
--void qdev_set_parent_bus(DeviceState *dev, BusState *bus)
-+static bool bus_check_address(BusState *bus, DeviceState *child, Error **errp)
+ SPICE
+diff --git a/cpu.c b/cpu.c
+new file mode 100644
+index 0000000000..0be5dcb6f3
+--- /dev/null
++++ b/cpu.c
+@@ -0,0 +1,452 @@
++/*
++ * Target-specific parts of the CPU object
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "qapi/error.h"
++
++#include "exec/target_page.h"
++#include "hw/qdev-core.h"
++#include "hw/qdev-properties.h"
++#include "qemu/error-report.h"
++#include "migration/vmstate.h"
++#ifdef CONFIG_USER_ONLY
++#include "qemu.h"
++#else
++#include "exec/address-spaces.h"
++#endif
++#include "sysemu/tcg.h"
++#include "sysemu/kvm.h"
++#include "sysemu/replay.h"
++#include "translate-all.h"
++#include "exec/log.h"
++
++uintptr_t qemu_host_page_size;
++intptr_t qemu_host_page_mask;
++
++#ifndef CONFIG_USER_ONLY
++static int cpu_common_post_load(void *opaque, int version_id)
 +{
-+    BusClass *bc = BUS_GET_CLASS(bus);
-+    return !bc->check_address || bc->check_address(bus, child, errp);
++    CPUState *cpu = opaque;
++
++    /* 0x01 was CPU_INTERRUPT_EXIT. This line can be removed when the
++       version_id is increased. */
++    cpu->interrupt_request &= ~0x01;
++    tlb_flush(cpu);
++
++    /* loadvm has just updated the content of RAM, bypassing the
++     * usual mechanisms that ensure we flush TBs for writes to
++     * memory we've translated code from. So we must flush all TBs,
++     * which will now be stale.
++     */
++    tb_flush(cpu);
++
++    return 0;
 +}
 +
-+bool qdev_set_parent_bus(DeviceState *dev, BusState *bus, Error **errp)
- {
-     BusState *old_parent_bus = dev->parent_bus;
-     DeviceClass *dc = DEVICE_GET_CLASS(dev);
- 
-     assert(dc->bus_type && object_dynamic_cast(OBJECT(bus), dc->bus_type));
- 
-+    if (!bus_check_address(bus, dev, errp)) {
-+        return false;
++static int cpu_common_pre_load(void *opaque)
++{
++    CPUState *cpu = opaque;
++
++    cpu->exception_index = -1;
++
++    return 0;
++}
++
++static bool cpu_common_exception_index_needed(void *opaque)
++{
++    CPUState *cpu = opaque;
++
++    return tcg_enabled() && cpu->exception_index != -1;
++}
++
++static const VMStateDescription vmstate_cpu_common_exception_index = {
++    .name = "cpu_common/exception_index",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = cpu_common_exception_index_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_INT32(exception_index, CPUState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static bool cpu_common_crash_occurred_needed(void *opaque)
++{
++    CPUState *cpu = opaque;
++
++    return cpu->crash_occurred;
++}
++
++static const VMStateDescription vmstate_cpu_common_crash_occurred = {
++    .name = "cpu_common/crash_occurred",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = cpu_common_crash_occurred_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_BOOL(crash_occurred, CPUState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++const VMStateDescription vmstate_cpu_common = {
++    .name = "cpu_common",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .pre_load = cpu_common_pre_load,
++    .post_load = cpu_common_post_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(halted, CPUState),
++        VMSTATE_UINT32(interrupt_request, CPUState),
++        VMSTATE_END_OF_LIST()
++    },
++    .subsections = (const VMStateDescription*[]) {
++        &vmstate_cpu_common_exception_index,
++        &vmstate_cpu_common_crash_occurred,
++        NULL
++    }
++};
++#endif
++
++void cpu_exec_unrealizefn(CPUState *cpu)
++{
++    CPUClass *cc = CPU_GET_CLASS(cpu);
++
++    tlb_destroy(cpu);
++    cpu_list_remove(cpu);
++
++#ifdef CONFIG_USER_ONLY
++    assert(cc->vmsd == NULL);
++#else
++    if (cc->vmsd != NULL) {
++        vmstate_unregister(NULL, cc->vmsd, cpu);
++    }
++    if (qdev_get_vmsd(DEVICE(cpu)) == NULL) {
++        vmstate_unregister(NULL, &vmstate_cpu_common, cpu);
++    }
++    tcg_iommu_free_notifier_list(cpu);
++#endif
++}
++
++Property cpu_common_props[] = {
++#ifndef CONFIG_USER_ONLY
++    /* Create a memory property for softmmu CPU object,
++     * so users can wire up its memory. (This can't go in hw/core/cpu.c
++     * because that file is compiled only once for both user-mode
++     * and system builds.) The default if no link is set up is to use
++     * the system address space.
++     */
++    DEFINE_PROP_LINK("memory", CPUState, memory, TYPE_MEMORY_REGION,
++                     MemoryRegion *),
++#endif
++    DEFINE_PROP_BOOL("start-powered-off", CPUState, start_powered_off, false),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++void cpu_exec_initfn(CPUState *cpu)
++{
++    cpu->as = NULL;
++    cpu->num_ases = 0;
++
++#ifndef CONFIG_USER_ONLY
++    cpu->thread_id = qemu_get_thread_id();
++    cpu->memory = get_system_memory();
++    object_ref(OBJECT(cpu->memory));
++#endif
++}
++
++void cpu_exec_realizefn(CPUState *cpu, Error **errp)
++{
++    CPUClass *cc = CPU_GET_CLASS(cpu);
++    static bool tcg_target_initialized;
++
++    cpu_list_add(cpu);
++
++    if (tcg_enabled() && !tcg_target_initialized) {
++        tcg_target_initialized = true;
++        cc->tcg_initialize();
++    }
++    tlb_init(cpu);
++
++    qemu_plugin_vcpu_init_hook(cpu);
++
++#ifdef CONFIG_USER_ONLY
++    assert(cc->vmsd == NULL);
++#else /* !CONFIG_USER_ONLY */
++    if (qdev_get_vmsd(DEVICE(cpu)) == NULL) {
++        vmstate_register(NULL, cpu->cpu_index, &vmstate_cpu_common, cpu);
++    }
++    if (cc->vmsd != NULL) {
++        vmstate_register(NULL, cpu->cpu_index, cc->vmsd, cpu);
 +    }
 +
-     if (old_parent_bus) {
-         trace_qdev_update_parent_bus(dev, object_get_typename(OBJECT(dev)),
-             old_parent_bus, object_get_typename(OBJECT(old_parent_bus)),
-@@ -126,6 +136,7 @@ void qdev_set_parent_bus(DeviceState *dev, BusState *bus)
-         object_unref(OBJECT(old_parent_bus));
-         object_unref(OBJECT(dev));
-     }
-+    return true;
- }
- 
- DeviceState *qdev_new(const char *name)
-@@ -371,7 +382,9 @@ bool qdev_realize(DeviceState *dev, BusState *bus, Error **errp)
-     assert(!dev->realized && !dev->parent_bus);
- 
-     if (bus) {
--        qdev_set_parent_bus(dev, bus);
-+        if (!qdev_set_parent_bus(dev, bus, errp)) {
-+            return false;
-+        }
-     } else {
-         assert(!DEVICE_GET_CLASS(dev)->bus_type);
-     }
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index a160a9da9c..277289d56e 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -3138,7 +3138,7 @@ static bool failover_replug_primary(VirtIONet *n, Error **errp)
-         error_setg(errp, "virtio_net: couldn't find primary bus");
-         return false;
-     }
--    qdev_set_parent_bus(n->primary_dev, n->primary_bus);
-+    qdev_set_parent_bus(n->primary_dev, n->primary_bus, &error_abort);
-     n->primary_should_be_hidden = false;
-     if (!qemu_opt_set_bool(n->primary_device_opts,
-                            "partially_hotplugged", true, errp)) {
-diff --git a/hw/sd/core.c b/hw/sd/core.c
-index 957d116f1a..08c93b5903 100644
---- a/hw/sd/core.c
-+++ b/hw/sd/core.c
-@@ -23,6 +23,7 @@
- #include "hw/qdev-core.h"
- #include "hw/sd/sd.h"
- #include "qemu/module.h"
-+#include "qapi/error.h"
- #include "trace.h"
- 
- static inline const char *sdbus_name(SDBus *sdbus)
-@@ -240,7 +241,7 @@ void sdbus_reparent_card(SDBus *from, SDBus *to)
-     readonly = sc->get_readonly(card);
- 
-     sdbus_set_inserted(from, false);
--    qdev_set_parent_bus(DEVICE(card), &to->qbus);
-+    qdev_set_parent_bus(DEVICE(card), &to->qbus, &error_abort);
-     sdbus_set_inserted(to, true);
-     sdbus_set_readonly(to, readonly);
- }
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 72064f4dd4..14d476c587 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -210,13 +210,24 @@ struct BusClass {
-     /* FIXME first arg should be BusState */
-     void (*print_dev)(Monitor *mon, DeviceState *dev, int indent);
-     char *(*get_dev_path)(DeviceState *dev);
++    tcg_iommu_init_notifier_list(cpu);
++#endif
++}
 +
-     /*
-      * This callback is used to create Open Firmware device path in accordance
-      * with OF spec http://forthworks.com/standards/of1275.pdf. Individual bus
-      * bindings can be found at http://playground.sun.com/1275/bindings/.
-      */
-     char *(*get_fw_dev_path)(DeviceState *dev);
++const char *parse_cpu_option(const char *cpu_option)
++{
++    ObjectClass *oc;
++    CPUClass *cc;
++    gchar **model_pieces;
++    const char *cpu_type;
 +
-     void (*reset)(BusState *bus);
++    model_pieces = g_strsplit(cpu_option, ",", 2);
++    if (!model_pieces[0]) {
++        error_report("-cpu option cannot be empty");
++        exit(1);
++    }
 +
++    oc = cpu_class_by_name(CPU_RESOLVING_TYPE, model_pieces[0]);
++    if (oc == NULL) {
++        error_report("unable to find CPU model '%s'", model_pieces[0]);
++        g_strfreev(model_pieces);
++        exit(EXIT_FAILURE);
++    }
++
++    cpu_type = object_class_get_name(oc);
++    cc = CPU_CLASS(oc);
++    cc->parse_features(cpu_type, model_pieces[1], &error_fatal);
++    g_strfreev(model_pieces);
++    return cpu_type;
++}
++
++#if defined(CONFIG_USER_ONLY)
++void tb_invalidate_phys_addr(target_ulong addr)
++{
++    mmap_lock();
++    tb_invalidate_phys_page_range(addr, addr + 1);
++    mmap_unlock();
++}
++
++static void breakpoint_invalidate(CPUState *cpu, target_ulong pc)
++{
++    tb_invalidate_phys_addr(pc);
++}
++#else
++void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr, MemTxAttrs attrs)
++{
++    ram_addr_t ram_addr;
++    MemoryRegion *mr;
++    hwaddr l = 1;
++
++    if (!tcg_enabled()) {
++        return;
++    }
++
++    RCU_READ_LOCK_GUARD();
++    mr = address_space_translate(as, addr, &addr, &l, false, attrs);
++    if (!(memory_region_is_ram(mr)
++          || memory_region_is_romd(mr))) {
++        return;
++    }
++    ram_addr = memory_region_get_ram_addr(mr) + addr;
++    tb_invalidate_phys_page_range(ram_addr, ram_addr + 1);
++}
++
++static void breakpoint_invalidate(CPUState *cpu, target_ulong pc)
++{
 +    /*
-+     * Return whether the device can be added to @bus,
-+     * based on the address that was set (via device properties)
-+     * before realize.  If not, on return @errp contains the
-+     * human-readable error message.
++     * There may not be a virtual to physical translation for the pc
++     * right now, but there may exist cached TB for this pc.
++     * Flush the whole TB cache to force re-translation of such TBs.
++     * This is heavyweight, but we're debugging anyway.
 +     */
-+    bool (*check_address)(BusState *bus, DeviceState *dev, Error **errp);
++    tb_flush(cpu);
++}
++#endif
 +
-     BusRealize realize;
-     BusUnrealize unrealize;
++/* Add a breakpoint.  */
++int cpu_breakpoint_insert(CPUState *cpu, vaddr pc, int flags,
++                          CPUBreakpoint **breakpoint)
++{
++    CPUBreakpoint *bp;
++
++    bp = g_malloc(sizeof(*bp));
++
++    bp->pc = pc;
++    bp->flags = flags;
++
++    /* keep all GDB-injected breakpoints in front */
++    if (flags & BP_GDB) {
++        QTAILQ_INSERT_HEAD(&cpu->breakpoints, bp, entry);
++    } else {
++        QTAILQ_INSERT_TAIL(&cpu->breakpoints, bp, entry);
++    }
++
++    breakpoint_invalidate(cpu, pc);
++
++    if (breakpoint) {
++        *breakpoint = bp;
++    }
++    return 0;
++}
++
++/* Remove a specific breakpoint.  */
++int cpu_breakpoint_remove(CPUState *cpu, vaddr pc, int flags)
++{
++    CPUBreakpoint *bp;
++
++    QTAILQ_FOREACH(bp, &cpu->breakpoints, entry) {
++        if (bp->pc == pc && bp->flags == flags) {
++            cpu_breakpoint_remove_by_ref(cpu, bp);
++            return 0;
++        }
++    }
++    return -ENOENT;
++}
++
++/* Remove a specific breakpoint by reference.  */
++void cpu_breakpoint_remove_by_ref(CPUState *cpu, CPUBreakpoint *breakpoint)
++{
++    QTAILQ_REMOVE(&cpu->breakpoints, breakpoint, entry);
++
++    breakpoint_invalidate(cpu, breakpoint->pc);
++
++    g_free(breakpoint);
++}
++
++/* Remove all matching breakpoints. */
++void cpu_breakpoint_remove_all(CPUState *cpu, int mask)
++{
++    CPUBreakpoint *bp, *next;
++
++    QTAILQ_FOREACH_SAFE(bp, &cpu->breakpoints, entry, next) {
++        if (bp->flags & mask) {
++            cpu_breakpoint_remove_by_ref(cpu, bp);
++        }
++    }
++}
++
++/* enable or disable single step mode. EXCP_DEBUG is returned by the
++   CPU loop after each instruction */
++void cpu_single_step(CPUState *cpu, int enabled)
++{
++    if (cpu->singlestep_enabled != enabled) {
++        cpu->singlestep_enabled = enabled;
++        if (kvm_enabled()) {
++            kvm_update_guest_debug(cpu, 0);
++        } else {
++            /* must flush all the translated code to avoid inconsistencies */
++            /* XXX: only flush what is necessary */
++            tb_flush(cpu);
++        }
++    }
++}
++
++void cpu_abort(CPUState *cpu, const char *fmt, ...)
++{
++    va_list ap;
++    va_list ap2;
++
++    va_start(ap, fmt);
++    va_copy(ap2, ap);
++    fprintf(stderr, "qemu: fatal: ");
++    vfprintf(stderr, fmt, ap);
++    fprintf(stderr, "\n");
++    cpu_dump_state(cpu, stderr, CPU_DUMP_FPU | CPU_DUMP_CCOP);
++    if (qemu_log_separate()) {
++        FILE *logfile = qemu_log_lock();
++        qemu_log("qemu: fatal: ");
++        qemu_log_vprintf(fmt, ap2);
++        qemu_log("\n");
++        log_cpu_state(cpu, CPU_DUMP_FPU | CPU_DUMP_CCOP);
++        qemu_log_flush();
++        qemu_log_unlock(logfile);
++        qemu_log_close();
++    }
++    va_end(ap2);
++    va_end(ap);
++    replay_finish();
++#if defined(CONFIG_USER_ONLY)
++    {
++        struct sigaction act;
++        sigfillset(&act.sa_mask);
++        act.sa_handler = SIG_DFL;
++        act.sa_flags = 0;
++        sigaction(SIGABRT, &act, NULL);
++    }
++#endif
++    abort();
++}
++
++/* physical memory access (slow version, mainly for debug) */
++#if defined(CONFIG_USER_ONLY)
++int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
++                        void *ptr, target_ulong len, bool is_write)
++{
++    int flags;
++    target_ulong l, page;
++    void * p;
++    uint8_t *buf = ptr;
++
++    while (len > 0) {
++        page = addr & TARGET_PAGE_MASK;
++        l = (page + TARGET_PAGE_SIZE) - addr;
++        if (l > len)
++            l = len;
++        flags = page_get_flags(page);
++        if (!(flags & PAGE_VALID))
++            return -1;
++        if (is_write) {
++            if (!(flags & PAGE_WRITE))
++                return -1;
++            /* XXX: this code should not depend on lock_user */
++            if (!(p = lock_user(VERIFY_WRITE, addr, l, 0)))
++                return -1;
++            memcpy(p, buf, l);
++            unlock_user(p, addr, l);
++        } else {
++            if (!(flags & PAGE_READ))
++                return -1;
++            /* XXX: this code should not depend on lock_user */
++            if (!(p = lock_user(VERIFY_READ, addr, l, 1)))
++                return -1;
++            memcpy(buf, p, l);
++            unlock_user(p, addr, 0);
++        }
++        len -= l;
++        buf += l;
++        addr += l;
++    }
++    return 0;
++}
++#endif
++
++bool target_words_bigendian(void)
++{
++#if defined(TARGET_WORDS_BIGENDIAN)
++    return true;
++#else
++    return false;
++#endif
++}
++
++void page_size_init(void)
++{
++    /* NOTE: we can always suppose that qemu_host_page_size >=
++       TARGET_PAGE_SIZE */
++    if (qemu_host_page_size == 0) {
++        qemu_host_page_size = qemu_real_host_page_size;
++    }
++    if (qemu_host_page_size < TARGET_PAGE_SIZE) {
++        qemu_host_page_size = TARGET_PAGE_SIZE;
++    }
++    qemu_host_page_mask = -(intptr_t)qemu_host_page_size;
++}
+diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+index d5e285d2b5..19805ed6db 100644
+--- a/include/exec/cpu-common.h
++++ b/include/exec/cpu-common.h
+@@ -14,6 +14,9 @@ void cpu_list_unlock(void);
  
-@@ -788,7 +799,7 @@ const char *qdev_fw_name(DeviceState *dev);
- Object *qdev_get_machine(void);
+ void tcg_flush_softmmu_tlb(CPUState *cs);
  
- /* FIXME: make this a link<> */
--void qdev_set_parent_bus(DeviceState *dev, BusState *bus);
-+bool qdev_set_parent_bus(DeviceState *dev, BusState *bus, Error **errp);
++void tcg_iommu_init_notifier_list(CPUState *cpu);
++void tcg_iommu_free_notifier_list(CPUState *cpu);
++
+ #if !defined(CONFIG_USER_ONLY)
  
- extern bool qdev_hotplug;
- extern bool qdev_hot_removed;
+ enum device_endian {
+diff --git a/meson.build b/meson.build
+index a280e4cf21..26230614ba 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1372,7 +1372,7 @@ common_ss.add(files('cpus-common.c'))
+ subdir('softmmu')
+ 
+ common_ss.add(capstone)
+-specific_ss.add(files('disas.c', 'exec.c', 'gdbstub.c'), capstone, libpmem, libdaxctl)
++specific_ss.add(files('cpu.c', 'disas.c', 'gdbstub.c'), capstone)
+ specific_ss.add(files('exec-vary.c'))
+ specific_ss.add(when: 'CONFIG_TCG', if_true: files(
+   'fpu/softfloat.c',
+diff --git a/softmmu/meson.build b/softmmu/meson.build
+index 862ab24878..8f7210b4f0 100644
+--- a/softmmu/meson.build
++++ b/softmmu/meson.build
+@@ -3,6 +3,7 @@ specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: [files(
+   'balloon.c',
+   'cpus.c',
+   'cpu-throttle.c',
++  'physmem.c',
+   'ioport.c',
+   'memory.c',
+   'memory_mapping.c',
+@@ -19,7 +20,7 @@ softmmu_ss.add(files(
+   'bootdevice.c',
+   'dma-helpers.c',
+   'qdev-monitor.c',
+-), sdl)
++), sdl, libpmem, libdaxctl)
+ 
+ softmmu_ss.add(when: 'CONFIG_TPM', if_true: files('tpm.c'))
+ softmmu_ss.add(when: 'CONFIG_SECCOMP', if_true: [files('qemu-seccomp.c'), seccomp])
+diff --git a/exec.c b/softmmu/physmem.c
+similarity index 91%
+rename from exec.c
+rename to softmmu/physmem.c
+index bca441f7fd..e319fb2a1e 100644
+--- a/exec.c
++++ b/softmmu/physmem.c
+@@ -1,5 +1,5 @@
+ /*
+- *  Virtual page mapping
++ * RAM allocation and memory access
+  *
+  *  Copyright (c) 2003 Fabrice Bellard
+  *
+@@ -28,10 +28,8 @@
+ #include "tcg/tcg.h"
+ #include "hw/qdev-core.h"
+ #include "hw/qdev-properties.h"
+-#if !defined(CONFIG_USER_ONLY)
+ #include "hw/boards.h"
+ #include "hw/xen/xen.h"
+-#endif
+ #include "sysemu/kvm.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/tcg.h"
+@@ -40,9 +38,6 @@
+ #include "qemu/config-file.h"
+ #include "qemu/error-report.h"
+ #include "qemu/qemu-print.h"
+-#if defined(CONFIG_USER_ONLY)
+-#include "qemu.h"
+-#else /* !CONFIG_USER_ONLY */
+ #include "exec/memory.h"
+ #include "exec/ioport.h"
+ #include "sysemu/dma.h"
+@@ -56,7 +51,6 @@
+ #include <linux/falloc.h>
+ #endif
+ 
+-#endif
+ #include "qemu/rcu_queue.h"
+ #include "qemu/main-loop.h"
+ #include "translate-all.h"
+@@ -83,7 +77,6 @@
+ 
+ //#define DEBUG_SUBPAGE
+ 
+-#if !defined(CONFIG_USER_ONLY)
+ /* ram_list is read under rcu_read_lock()/rcu_read_unlock().  Writes
+  * are protected by the ramlist lock.
+  */
+@@ -96,12 +89,6 @@ AddressSpace address_space_io;
+ AddressSpace address_space_memory;
+ 
+ static MemoryRegion io_mem_unassigned;
+-#endif
+-
+-uintptr_t qemu_host_page_size;
+-intptr_t qemu_host_page_mask;
+-
+-#if !defined(CONFIG_USER_ONLY)
+ 
+ typedef struct PhysPageEntry PhysPageEntry;
+ 
+@@ -179,10 +166,6 @@ struct DirtyBitmapSnapshot {
+     unsigned long dirty[];
+ };
+ 
+-#endif
+-
+-#if !defined(CONFIG_USER_ONLY)
+-
+ static void phys_map_node_reserve(PhysPageMap *map, unsigned nodes)
+ {
+     static unsigned alloc_hint = 16;
+@@ -661,7 +644,7 @@ static void tcg_register_iommu_notifier(CPUState *cpu,
+     }
+ }
+ 
+-static void tcg_iommu_free_notifier_list(CPUState *cpu)
++void tcg_iommu_free_notifier_list(CPUState *cpu)
+ {
+     /* Destroy the CPU's notifier list */
+     int i;
+@@ -675,6 +658,11 @@ static void tcg_iommu_free_notifier_list(CPUState *cpu)
+     g_array_free(cpu->iommu_notifiers, true);
+ }
+ 
++void tcg_iommu_init_notifier_list(CPUState *cpu)
++{
++    cpu->iommu_notifiers = g_array_new(false, true, sizeof(TCGIOMMUNotifier *));
++}
++
+ /* Called from RCU critical section */
+ MemoryRegionSection *
+ address_space_translate_for_iotlb(CPUState *cpu, int asidx, hwaddr addr,
+@@ -732,91 +720,6 @@ address_space_translate_for_iotlb(CPUState *cpu, int asidx, hwaddr addr,
+ translate_fail:
+     return &d->map.sections[PHYS_SECTION_UNASSIGNED];
+ }
+-#endif
+-
+-#if !defined(CONFIG_USER_ONLY)
+-
+-static int cpu_common_post_load(void *opaque, int version_id)
+-{
+-    CPUState *cpu = opaque;
+-
+-    /* 0x01 was CPU_INTERRUPT_EXIT. This line can be removed when the
+-       version_id is increased. */
+-    cpu->interrupt_request &= ~0x01;
+-    tlb_flush(cpu);
+-
+-    /* loadvm has just updated the content of RAM, bypassing the
+-     * usual mechanisms that ensure we flush TBs for writes to
+-     * memory we've translated code from. So we must flush all TBs,
+-     * which will now be stale.
+-     */
+-    tb_flush(cpu);
+-
+-    return 0;
+-}
+-
+-static int cpu_common_pre_load(void *opaque)
+-{
+-    CPUState *cpu = opaque;
+-
+-    cpu->exception_index = -1;
+-
+-    return 0;
+-}
+-
+-static bool cpu_common_exception_index_needed(void *opaque)
+-{
+-    CPUState *cpu = opaque;
+-
+-    return tcg_enabled() && cpu->exception_index != -1;
+-}
+-
+-static const VMStateDescription vmstate_cpu_common_exception_index = {
+-    .name = "cpu_common/exception_index",
+-    .version_id = 1,
+-    .minimum_version_id = 1,
+-    .needed = cpu_common_exception_index_needed,
+-    .fields = (VMStateField[]) {
+-        VMSTATE_INT32(exception_index, CPUState),
+-        VMSTATE_END_OF_LIST()
+-    }
+-};
+-
+-static bool cpu_common_crash_occurred_needed(void *opaque)
+-{
+-    CPUState *cpu = opaque;
+-
+-    return cpu->crash_occurred;
+-}
+-
+-static const VMStateDescription vmstate_cpu_common_crash_occurred = {
+-    .name = "cpu_common/crash_occurred",
+-    .version_id = 1,
+-    .minimum_version_id = 1,
+-    .needed = cpu_common_crash_occurred_needed,
+-    .fields = (VMStateField[]) {
+-        VMSTATE_BOOL(crash_occurred, CPUState),
+-        VMSTATE_END_OF_LIST()
+-    }
+-};
+-
+-const VMStateDescription vmstate_cpu_common = {
+-    .name = "cpu_common",
+-    .version_id = 1,
+-    .minimum_version_id = 1,
+-    .pre_load = cpu_common_pre_load,
+-    .post_load = cpu_common_post_load,
+-    .fields = (VMStateField[]) {
+-        VMSTATE_UINT32(halted, CPUState),
+-        VMSTATE_UINT32(interrupt_request, CPUState),
+-        VMSTATE_END_OF_LIST()
+-    },
+-    .subsections = (const VMStateDescription*[]) {
+-        &vmstate_cpu_common_exception_index,
+-        &vmstate_cpu_common_crash_occurred,
+-        NULL
+-    }
+-};
+ 
+ void cpu_address_space_init(CPUState *cpu, int asidx,
+                             const char *prefix, MemoryRegion *mr)
+@@ -860,155 +763,7 @@ AddressSpace *cpu_get_address_space(CPUState *cpu, int asidx)
+     /* Return the AddressSpace corresponding to the specified index */
+     return cpu->cpu_ases[asidx].as;
+ }
+-#endif
+-
+-void cpu_exec_unrealizefn(CPUState *cpu)
+-{
+-    CPUClass *cc = CPU_GET_CLASS(cpu);
+-
+-    tlb_destroy(cpu);
+-    cpu_list_remove(cpu);
+-
+-    if (cc->vmsd != NULL) {
+-        vmstate_unregister(NULL, cc->vmsd, cpu);
+-    }
+-    if (qdev_get_vmsd(DEVICE(cpu)) == NULL) {
+-        vmstate_unregister(NULL, &vmstate_cpu_common, cpu);
+-    }
+-#ifndef CONFIG_USER_ONLY
+-    tcg_iommu_free_notifier_list(cpu);
+-#endif
+-}
+-
+-Property cpu_common_props[] = {
+-#ifndef CONFIG_USER_ONLY
+-    /* Create a memory property for softmmu CPU object,
+-     * so users can wire up its memory. (This can't go in hw/core/cpu.c
+-     * because that file is compiled only once for both user-mode
+-     * and system builds.) The default if no link is set up is to use
+-     * the system address space.
+-     */
+-    DEFINE_PROP_LINK("memory", CPUState, memory, TYPE_MEMORY_REGION,
+-                     MemoryRegion *),
+-#endif
+-    DEFINE_PROP_BOOL("start-powered-off", CPUState, start_powered_off, false),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+-void cpu_exec_initfn(CPUState *cpu)
+-{
+-    cpu->as = NULL;
+-    cpu->num_ases = 0;
+-
+-#ifndef CONFIG_USER_ONLY
+-    cpu->thread_id = qemu_get_thread_id();
+-    cpu->memory = system_memory;
+-    object_ref(OBJECT(cpu->memory));
+-#endif
+-}
+-
+-void cpu_exec_realizefn(CPUState *cpu, Error **errp)
+-{
+-    CPUClass *cc = CPU_GET_CLASS(cpu);
+-    static bool tcg_target_initialized;
+-
+-    cpu_list_add(cpu);
+-
+-    if (tcg_enabled() && !tcg_target_initialized) {
+-        tcg_target_initialized = true;
+-        cc->tcg_initialize();
+-    }
+-    tlb_init(cpu);
+-
+-    qemu_plugin_vcpu_init_hook(cpu);
+-
+-#ifdef CONFIG_USER_ONLY
+-    assert(cc->vmsd == NULL);
+-#else /* !CONFIG_USER_ONLY */
+-    if (qdev_get_vmsd(DEVICE(cpu)) == NULL) {
+-        vmstate_register(NULL, cpu->cpu_index, &vmstate_cpu_common, cpu);
+-    }
+-    if (cc->vmsd != NULL) {
+-        vmstate_register(NULL, cpu->cpu_index, cc->vmsd, cpu);
+-    }
+-
+-    cpu->iommu_notifiers = g_array_new(false, true, sizeof(TCGIOMMUNotifier *));
+-#endif
+-}
+-
+-const char *parse_cpu_option(const char *cpu_option)
+-{
+-    ObjectClass *oc;
+-    CPUClass *cc;
+-    gchar **model_pieces;
+-    const char *cpu_type;
+-
+-    model_pieces = g_strsplit(cpu_option, ",", 2);
+-    if (!model_pieces[0]) {
+-        error_report("-cpu option cannot be empty");
+-        exit(1);
+-    }
+-
+-    oc = cpu_class_by_name(CPU_RESOLVING_TYPE, model_pieces[0]);
+-    if (oc == NULL) {
+-        error_report("unable to find CPU model '%s'", model_pieces[0]);
+-        g_strfreev(model_pieces);
+-        exit(EXIT_FAILURE);
+-    }
+-
+-    cpu_type = object_class_get_name(oc);
+-    cc = CPU_CLASS(oc);
+-    cc->parse_features(cpu_type, model_pieces[1], &error_fatal);
+-    g_strfreev(model_pieces);
+-    return cpu_type;
+-}
+-
+-#if defined(CONFIG_USER_ONLY)
+-void tb_invalidate_phys_addr(target_ulong addr)
+-{
+-    mmap_lock();
+-    tb_invalidate_phys_page_range(addr, addr + 1);
+-    mmap_unlock();
+-}
+-
+-static void breakpoint_invalidate(CPUState *cpu, target_ulong pc)
+-{
+-    tb_invalidate_phys_addr(pc);
+-}
+-#else
+-void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr, MemTxAttrs attrs)
+-{
+-    ram_addr_t ram_addr;
+-    MemoryRegion *mr;
+-    hwaddr l = 1;
+-
+-    if (!tcg_enabled()) {
+-        return;
+-    }
+-
+-    RCU_READ_LOCK_GUARD();
+-    mr = address_space_translate(as, addr, &addr, &l, false, attrs);
+-    if (!(memory_region_is_ram(mr)
+-          || memory_region_is_romd(mr))) {
+-        return;
+-    }
+-    ram_addr = memory_region_get_ram_addr(mr) + addr;
+-    tb_invalidate_phys_page_range(ram_addr, ram_addr + 1);
+-}
+ 
+-static void breakpoint_invalidate(CPUState *cpu, target_ulong pc)
+-{
+-    /*
+-     * There may not be a virtual to physical translation for the pc
+-     * right now, but there may exist cached TB for this pc.
+-     * Flush the whole TB cache to force re-translation of such TBs.
+-     * This is heavyweight, but we're debugging anyway.
+-     */
+-    tb_flush(cpu);
+-}
+-#endif
+-
+-#ifndef CONFIG_USER_ONLY
+ /* Add a watchpoint.  */
+ int cpu_watchpoint_insert(CPUState *cpu, vaddr addr, vaddr len,
+                           int flags, CPUWatchpoint **watchpoint)
+@@ -1117,123 +872,7 @@ int cpu_watchpoint_address_matches(CPUState *cpu, vaddr addr, vaddr len)
+     }
+     return ret;
+ }
+-#endif /* !CONFIG_USER_ONLY */
+-
+-/* Add a breakpoint.  */
+-int cpu_breakpoint_insert(CPUState *cpu, vaddr pc, int flags,
+-                          CPUBreakpoint **breakpoint)
+-{
+-    CPUBreakpoint *bp;
+-
+-    bp = g_malloc(sizeof(*bp));
+-
+-    bp->pc = pc;
+-    bp->flags = flags;
+-
+-    /* keep all GDB-injected breakpoints in front */
+-    if (flags & BP_GDB) {
+-        QTAILQ_INSERT_HEAD(&cpu->breakpoints, bp, entry);
+-    } else {
+-        QTAILQ_INSERT_TAIL(&cpu->breakpoints, bp, entry);
+-    }
+-
+-    breakpoint_invalidate(cpu, pc);
+-
+-    if (breakpoint) {
+-        *breakpoint = bp;
+-    }
+-    return 0;
+-}
+-
+-/* Remove a specific breakpoint.  */
+-int cpu_breakpoint_remove(CPUState *cpu, vaddr pc, int flags)
+-{
+-    CPUBreakpoint *bp;
+-
+-    QTAILQ_FOREACH(bp, &cpu->breakpoints, entry) {
+-        if (bp->pc == pc && bp->flags == flags) {
+-            cpu_breakpoint_remove_by_ref(cpu, bp);
+-            return 0;
+-        }
+-    }
+-    return -ENOENT;
+-}
+ 
+-/* Remove a specific breakpoint by reference.  */
+-void cpu_breakpoint_remove_by_ref(CPUState *cpu, CPUBreakpoint *breakpoint)
+-{
+-    QTAILQ_REMOVE(&cpu->breakpoints, breakpoint, entry);
+-
+-    breakpoint_invalidate(cpu, breakpoint->pc);
+-
+-    g_free(breakpoint);
+-}
+-
+-/* Remove all matching breakpoints. */
+-void cpu_breakpoint_remove_all(CPUState *cpu, int mask)
+-{
+-    CPUBreakpoint *bp, *next;
+-
+-    QTAILQ_FOREACH_SAFE(bp, &cpu->breakpoints, entry, next) {
+-        if (bp->flags & mask) {
+-            cpu_breakpoint_remove_by_ref(cpu, bp);
+-        }
+-    }
+-}
+-
+-/* enable or disable single step mode. EXCP_DEBUG is returned by the
+-   CPU loop after each instruction */
+-void cpu_single_step(CPUState *cpu, int enabled)
+-{
+-    if (cpu->singlestep_enabled != enabled) {
+-        cpu->singlestep_enabled = enabled;
+-        if (kvm_enabled()) {
+-            kvm_update_guest_debug(cpu, 0);
+-        } else {
+-            /* must flush all the translated code to avoid inconsistencies */
+-            /* XXX: only flush what is necessary */
+-            tb_flush(cpu);
+-        }
+-    }
+-}
+-
+-void cpu_abort(CPUState *cpu, const char *fmt, ...)
+-{
+-    va_list ap;
+-    va_list ap2;
+-
+-    va_start(ap, fmt);
+-    va_copy(ap2, ap);
+-    fprintf(stderr, "qemu: fatal: ");
+-    vfprintf(stderr, fmt, ap);
+-    fprintf(stderr, "\n");
+-    cpu_dump_state(cpu, stderr, CPU_DUMP_FPU | CPU_DUMP_CCOP);
+-    if (qemu_log_separate()) {
+-        FILE *logfile = qemu_log_lock();
+-        qemu_log("qemu: fatal: ");
+-        qemu_log_vprintf(fmt, ap2);
+-        qemu_log("\n");
+-        log_cpu_state(cpu, CPU_DUMP_FPU | CPU_DUMP_CCOP);
+-        qemu_log_flush();
+-        qemu_log_unlock(logfile);
+-        qemu_log_close();
+-    }
+-    va_end(ap2);
+-    va_end(ap);
+-    replay_finish();
+-#if defined(CONFIG_USER_ONLY)
+-    {
+-        struct sigaction act;
+-        sigfillset(&act.sa_mask);
+-        act.sa_handler = SIG_DFL;
+-        act.sa_flags = 0;
+-        sigaction(SIGABRT, &act, NULL);
+-    }
+-#endif
+-    abort();
+-}
+-
+-#if !defined(CONFIG_USER_ONLY)
+ /* Called from RCU critical section */
+ static RAMBlock *qemu_get_ram_block(ram_addr_t addr)
+ {
+@@ -1420,9 +1059,6 @@ hwaddr memory_region_section_get_iotlb(CPUState *cpu,
+     AddressSpaceDispatch *d = flatview_to_dispatch(section->fv);
+     return section - d->map.sections;
+ }
+-#endif /* defined(CONFIG_USER_ONLY) */
+-
+-#if !defined(CONFIG_USER_ONLY)
+ 
+ static int subpage_register(subpage_t *mmio, uint32_t start, uint32_t end,
+                             uint16_t section);
+@@ -3023,52 +2659,6 @@ MemoryRegion *get_system_io(void)
+     return system_io;
+ }
+ 
+-#endif /* !defined(CONFIG_USER_ONLY) */
+-
+-/* physical memory access (slow version, mainly for debug) */
+-#if defined(CONFIG_USER_ONLY)
+-int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
+-                        void *ptr, target_ulong len, bool is_write)
+-{
+-    int flags;
+-    target_ulong l, page;
+-    void * p;
+-    uint8_t *buf = ptr;
+-
+-    while (len > 0) {
+-        page = addr & TARGET_PAGE_MASK;
+-        l = (page + TARGET_PAGE_SIZE) - addr;
+-        if (l > len)
+-            l = len;
+-        flags = page_get_flags(page);
+-        if (!(flags & PAGE_VALID))
+-            return -1;
+-        if (is_write) {
+-            if (!(flags & PAGE_WRITE))
+-                return -1;
+-            /* XXX: this code should not depend on lock_user */
+-            if (!(p = lock_user(VERIFY_WRITE, addr, l, 0)))
+-                return -1;
+-            memcpy(p, buf, l);
+-            unlock_user(p, addr, l);
+-        } else {
+-            if (!(flags & PAGE_READ))
+-                return -1;
+-            /* XXX: this code should not depend on lock_user */
+-            if (!(p = lock_user(VERIFY_READ, addr, l, 1)))
+-                return -1;
+-            memcpy(buf, p, l);
+-            unlock_user(p, addr, 0);
+-        }
+-        len -= l;
+-        buf += l;
+-        addr += l;
+-    }
+-    return 0;
+-}
+-
+-#else
+-
+ static void invalidate_and_set_dirty(MemoryRegion *mr, hwaddr addr,
+                                      hwaddr length)
+ {
+@@ -3857,18 +3447,7 @@ int qemu_target_page_bits_min(void)
+ {
+     return TARGET_PAGE_BITS_MIN;
+ }
+-#endif
+-
+-bool target_words_bigendian(void)
+-{
+-#if defined(TARGET_WORDS_BIGENDIAN)
+-    return true;
+-#else
+-    return false;
+-#endif
+-}
+ 
+-#ifndef CONFIG_USER_ONLY
+ bool cpu_physical_memory_is_io(hwaddr phys_addr)
+ {
+     MemoryRegion*mr;
+@@ -3998,23 +3577,6 @@ bool ramblock_is_pmem(RAMBlock *rb)
+     return rb->flags & RAM_PMEM;
+ }
+ 
+-#endif
+-
+-void page_size_init(void)
+-{
+-    /* NOTE: we can always suppose that qemu_host_page_size >=
+-       TARGET_PAGE_SIZE */
+-    if (qemu_host_page_size == 0) {
+-        qemu_host_page_size = qemu_real_host_page_size;
+-    }
+-    if (qemu_host_page_size < TARGET_PAGE_SIZE) {
+-        qemu_host_page_size = TARGET_PAGE_SIZE;
+-    }
+-    qemu_host_page_mask = -(intptr_t)qemu_host_page_size;
+-}
+-
+-#if !defined(CONFIG_USER_ONLY)
+-
+ static void mtree_print_phys_entries(int start, int end, int skip, int ptr)
+ {
+     if (start == end - 1) {
+@@ -4147,5 +3709,3 @@ bool ram_block_discard_is_required(void)
+ {
+     return qatomic_read(&ram_block_discard_disabled) < 0;
+ }
+-
+-#endif
 -- 
 2.26.2
 
