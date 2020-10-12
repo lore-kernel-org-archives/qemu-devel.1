@@ -2,90 +2,97 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4DC4C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:01:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CA08C433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:03:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C55520838
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:01:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BF5C720838
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:03:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eSc11Mqr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C55520838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L9PW5eAp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF5C720838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33752 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRzK8-0008NN-3v
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 11:01:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46334)
+	id 1kRzMV-0001xH-K8
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 11:03:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47872)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kRzGd-0005NG-6V
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 10:57:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39205)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kRzGb-0002Ts-Ci
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 10:57:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602514656;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UoQVhh1GBa37hTY7zvk3btIIkUgMm/QHkZmkaHDhutk=;
- b=eSc11Mqrp3mk3WEQlSMaZpm7X264iHoRcUAF6Ay+whP9ShBGa6tfy6QzqCZ+6QaGpRF+o7
- mtW1EzhiH1gqw7rWv5tizy0/dBE9KciaYGqeBszwWe5JIsR4G06afhj0qYTjq8MUt0cGB2
- acy5MFC7vhVn+/8mQFkYSi+7Lx21K3Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-197-CLSut8eGPJiqVCLt4CG3UA-1; Mon, 12 Oct 2020 10:57:33 -0400
-X-MC-Unique: CLSut8eGPJiqVCLt4CG3UA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7B52CF982;
- Mon, 12 Oct 2020 14:57:21 +0000 (UTC)
-Received: from [10.10.117.231] (ovpn-117-231.rdu2.redhat.com [10.10.117.231])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 14B535D99B;
- Mon, 12 Oct 2020 14:57:20 +0000 (UTC)
-Subject: Re: [PATCH v6 03/36] qapi-gen: Separate arg-parsing from generation
-To: Markus Armbruster <armbru@redhat.com>
-References: <20201009161558.107041-1-jsnow@redhat.com>
- <20201009161558.107041-4-jsnow@redhat.com>
- <87y2kfcnuo.fsf@dusky.pond.sub.org>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <93202490-23fa-af72-85f4-75325e84f655@redhat.com>
-Date: Mon, 12 Oct 2020 10:57:20 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kRzLa-0001UR-Li
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:02:46 -0400
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:38506)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kRzLU-00039y-6k
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:02:46 -0400
+Received: by mail-wm1-x32d.google.com with SMTP id b127so5030480wmb.3
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 08:02:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=hMvicMth6nuEewym2Bmi+3VKdDekbWVdIFUZXBZmDN4=;
+ b=L9PW5eAp/w2HOXtFXqMc0d3LTJdnSQWeNBRryfI4dzU30gw9m1+k+mEiYwPpx6WgIA
+ 1q2RjXBnVlGbPHOep67mruU94H0fPYs4N8YhHEfZUQTbKpupJaUjJ0YBE4vq1a1WWKoY
+ 2jqKrK68Ua1sZuBq7v3TAZfpkZWJDmC2EMxDM4VmXyO2VBv2LZTLNl+ySb9kMlc8bxcn
+ /o9wrUeMNYG0annTtw/Bq3Ot94JywkfkikkGWeoJr3cKtnf39K6awEt8YW93BOwvYo7G
+ U1SQyZYq8r7yR8SJxkD6RfmC6Zo/Q8RVjnVsjPgp2aQp/eQJxQH4oUwsqXCMCGWzJAri
+ oKlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=hMvicMth6nuEewym2Bmi+3VKdDekbWVdIFUZXBZmDN4=;
+ b=F/A3Ivh9s7wtm0ys2pCf/KRycaOjy9KHQOwJaJ1KC4yXnsoeKARdtX5vhvcl0/42tm
+ XPYFIdk3of9MBzj4+ax0XTpe44UBKilAEBjNENg3YwHxjL3Pd7skfDpChye/rMJ1qvh9
+ 6DC22wYuKvonNxJDpDquSyKpx9IlibymwaP8t9E9tUb4PL2RfeGY6ERkA80r+KmlnfoO
+ U0eeMEClXb5OBvDbMh9E0spVWNulLKa6MMif+CXMkRuj8Exnn0vGJJkdt+RDxYNH895J
+ Y/e0QfPeyH5jH0MlohdIeDPyVE6RATiQXiWX+sjIjmQwR1EBj8JI4fkk5Y4q+LqGHi6A
+ 60Tg==
+X-Gm-Message-State: AOAM530tNPErhxnQHBNrUUe44+r1lF19QxFwwT6JARL16vXdw5l0yK1f
+ IuP5tUxaq+dkexWEyXhASwcGsA==
+X-Google-Smtp-Source: ABdhPJyqL0e3t9Zr4Y+x3sb/m+k+M9HJLjEmZjnWalhoVqHyv/HfHOxNRXWvHnKC73ZoyzSKOag3bg==
+X-Received: by 2002:a1c:7514:: with SMTP id o20mr10885482wmc.76.1602514956801; 
+ Mon, 12 Oct 2020 08:02:36 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id z191sm23515402wme.40.2020.10.12.08.02.35
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 12 Oct 2020 08:02:35 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 8E77E1FF7E;
+ Mon, 12 Oct 2020 16:02:34 +0100 (BST)
+References: <20201009063432.303441-1-armbru@redhat.com>
+ <20201009063432.303441-10-armbru@redhat.com> <87zh4rzpot.fsf@linaro.org>
+ <20201012112506.GC7777@merkur.fritz.box>
+ <99cc6bd1-58fd-af29-0b41-3f3e5043cc3a@amsat.org>
+ <20201012124743.GD7777@merkur.fritz.box>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PULL 09/14] qmp: Move dispatcher to a coroutine
+In-reply-to: <20201012124743.GD7777@merkur.fritz.box>
+Date: Mon, 12 Oct 2020 16:02:34 +0100
+Message-ID: <87r1q3zdv9.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <87y2kfcnuo.fsf@dusky.pond.sub.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/11 23:52:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::32d;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32d.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,85 +106,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Pavel Dovgalyuk <dovgaluk@ispras.ru>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/9/20 1:26 PM, Markus Armbruster wrote:
-> John Snow <jsnow@redhat.com> writes:
-> 
->> This is a minor re-work of the entrypoint script. It isolates a
-> 
-> <pedantic>entrypoint is not a word</>  ;-P
-> 
 
-I'm not entirely sure why a German is complaining about the birth of a 
-new and beautiful compound noun.
+Kevin Wolf <kwolf@redhat.com> writes:
 
-(I started to make sure I wrote it out as two words, but missed a spot. 
-Too late now, unless you fixed it already.)
+> Am 12.10.2020 um 13:53 hat Philippe Mathieu-Daud=C3=A9 geschrieben:
+>> On 10/12/20 1:25 PM, Kevin Wolf wrote:
+>> > Am 12.10.2020 um 12:47 hat Alex Benn=C3=A9e geschrieben:
+>> > >=20
+>> > > Markus Armbruster <armbru@redhat.com> writes:
+>> > >=20
+>> > > > From: Kevin Wolf <kwolf@redhat.com>
+>> > > >=20
+>> > > > This moves the QMP dispatcher to a coroutine and runs all QMP comm=
+and
+>> > > > handlers that declare 'coroutine': true in coroutine context so th=
+ey
+>> > > > can avoid blocking the main loop while doing I/O or waiting for ot=
+her
+>> > > > events.
+>> > >=20
+>> > > This subtly changes the replay behaviour leading to a hang in:
+>> > >=20
+>> > >    10:55:18 [alex.bennee@hackbox2:~/l/q/b/bisect] (625581c2=E2=80=A6=
+)|=E2=9C=9A1(+1/-1) + ./tests/venv/bin/avocado run tests/acceptance/replay_=
+kernel.py:ReplayKernel.test_arm_virt
+>> > >    Fetching asset from tests/acceptance/replay_kernel.py:ReplayKerne=
+l.test_arm_virt
+>> > >    JOB ID     : ec11fd2544f06e6c0d421f16afa757b49f7ed734
+>> > >    JOB LOG    : /home/alex.bennee/avocado/job-results/job-2020-10-12=
+T11.40-ec11fd2/job.log
+>> > >     (1/1) tests/acceptance/replay_kernel.py:ReplayKernel.test_arm_vi=
+rt: ERROR: Could not perform graceful shutdown (26.27 s)
+>> > >    RESULTS    : PASS 0 | ERROR 1 | FAIL 0 | SKIP 0 | WARN 0 | INTERR=
+UPT 0 | CANCEL 0
+>> > >    JOB TIME   : 27.77 s
+>> > >=20
+>> > > Looking at the log:
+>> > >=20
+>> > >    2020-10-12 11:40:31,426 __init__         L0085 DEBUG| [    3.8874=
+11] rtc-pl031 9010000.pl031: setting system clock to 2020-10-12 10:40:31 UT=
+C (1602499231)
+>> > >    2020-10-12 11:40:31,428 __init__         L0085 DEBUG| [    3.8874=
+31] sr_init: No PMIC hook to init smartreflex
+>> > >    2020-10-12 11:40:31,447 __init__         L0085 DEBUG| [    3.8971=
+93] uart-pl011 9000000.pl011: no DMA platform data
+>> > >    2020-10-12 11:40:31,460 __init__         L0085 DEBUG| [    3.8972=
+42] md: Waiting for all devices to be available before autodetect
+>> > >    2020-10-12 11:40:31,462 __init__         L0085 DEBUG| [    3.8972=
+59] md: If you don't use raid, use raid=3Dnoautodetect
+>> > >    2020-10-12 11:40:31,475 __init__         L0085 DEBUG| [    3.8978=
+19] md: Autodetecting RAID arrays.
+>> > >    2020-10-12 11:40:31,476 __init__         L0085 DEBUG| [    3.8978=
+32] md: autorun ...
+>> > >    2020-10-12 11:40:31,477 __init__         L0085 DEBUG| [    3.8978=
+42] md: ... autorun DONE.
+>> > >    2020-10-12 11:40:31,483 __init__         L0085 DEBUG| [    3.8979=
+62] VFS: Cannot open root device "(null)" or unknown-block(0,0): error -6
+>> > >    2020-10-12 11:40:31,483 qmp              L0245 DEBUG| >>> {'execu=
+te': 'quit'}
+>> > >    2020-10-12 11:40:31,495 qmp              L0145 DEBUG| <<< {'times=
+tamp': {'seconds': 1602499231, 'microseconds': 493379}, 'event': 'SHUTDOWN'=
+, 'data': {'guest': True, 'reason': 'guest-reset'}}
+>> > >    2020-10-12 11:40:31,733 machine          L0325 WARNI| qemu receiv=
+ed signal 6; command: "./qemu-system-arm -display none -vga none -chardev s=
+ocket,id=3Dmon,path=3D/var/tmp/tmpzls53khe/qemu-8487-monitor.sock -mon char=
+dev=3Dmon,mode=3Dcontrol -machine virt -chardev socket,id=3Dconsole,path=3D=
+/var/tmp/tmpzls53khe/qemu-8487-console.sock,server,nowait -serial chardev:c=
+onsole -icount shift=3D1,rr=3Drecord,rrfile=3D/var/tmp/avocado_n00stdrf/avo=
+cado_job_aw60qdul/1-tests_acceptance_replay_kernel.py_ReplayKernel.test_arm=
+_virt/replay.bin -kernel /home/alex.bennee/avocado/data/cache/by_location/6=
+2750ce9e069e69e6a7ff04ff54c382ee660b92a/vmlinuz -append printk.time=3D1 pan=
+ic=3D-1 console=3DttyAMA0 -net none -no-reboot"
+>> >=20
+>> > This looks like a crash (SIGABRT) rather than a hang. Do you have a
+>> > stack trace for the crashed process?
+>>=20
+>> No crash, exit(0):
+>
+> Why does the log say "qemu received signal 6" then?
+>
+>> VFS: Cannot open root device "(null)" or unknown-block(0,0): error -6
+>
+> Alex has this error in the logs before this commit, so I assume this is
+> expected. All of the following is then probably expected, too, because
+> it follows directly from this error:
+>
+>> Please append a correct "root=3D" boot option; here are the available
+>> partitions:
+>> Kernel panic - not syncing: VFS: Unable to mount root fs on
+>> unknown-block(0,0)
+>> CPU: 0 PID: 1 Comm: swapper/0 Not tainted 4.18.16-300.fc29.armv7hl #1
+>> Hardware name: Generic DT based system
+>> [<c0313f7c>] (unwind_backtrace) from [<c030dc64>] (show_stack+0x20/0x24)
+>> [<c030dc64>] (show_stack) from [<c0b50ec4>] (dump_stack+0x88/0xa8)
+>> [<c0b50ec4>] (dump_stack) from [<c03592f8>] (panic+0xd4/0x26c)
+>> [<c03592f8>] (panic) from [<c110183c>] (mount_block_root+0x250/0x2ec)
+>> [<c110183c>] (mount_block_root) from [<c1101950>] (mount_root+0x78/0x90)
+>> [<c1101950>] (mount_root) from [<c1101ac4>] (prepare_namespace+0x15c/0x1=
+9c)
+>> [<c1101ac4>] (prepare_namespace) from [<c11012e8>]
+>> (kernel_init_freeable+0x2c0/0x370)
+>> [<c11012e8>] (kernel_init_freeable) from [<c0b63914>]
+>> (kernel_init+0x18/0x128)
+>> [<c0b63914>] (kernel_init) from [<c03010e8>] (ret_from_fork+0x14/0x2c)
+>> Exception stack(0xc790bfb0 to 0xc790bff8)
+>> bfa0:                                     00000000 00000000 00000000
+>> 00000000
+>> bfc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+>> 00000000
+>> bfe0: 00000000 00000000 00000000 00000000 00000013 00000000
+>>=20
+>> -> PSCI call
+>>    -> QEMU_PSCI_0_2_FN_SYSTEM_RESET
+>>       -> SHUTDOWN_CAUSE_GUEST_RESET
+>>          -> exit(0)
 
->> generate() method from the actual command-line mechanism.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
->> Reviewed-by: Cleber Rosa <crosa@redhat.com>
->> Tested-by: Cleber Rosa <crosa@redhat.com>
->> ---
->>   scripts/qapi-gen.py | 89 ++++++++++++++++++++++++++++++++++-----------
->>   1 file changed, 67 insertions(+), 22 deletions(-)
->>
->> diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
->> index 541e8c1f55d..054554ed846 100644
->> --- a/scripts/qapi-gen.py
->> +++ b/scripts/qapi-gen.py
->> @@ -1,30 +1,77 @@
->>   #!/usr/bin/env python3
->> -# QAPI generator
->> -#
->> +
->>   # This work is licensed under the terms of the GNU GPL, version 2 or later.
->>   # See the COPYING file in the top-level directory.
->>   
->> +"""
->> +QAPI Generator
->> +
->> +This is the main entry point for generating C code from the QAPI schema.
->> +"""
->>   
->>   import argparse
->>   import re
->>   import sys
->> +from typing import Optional
->>   
->>   from qapi.commands import gen_commands
->> +from qapi.error import QAPIError
->>   from qapi.events import gen_events
->>   from qapi.introspect import gen_introspect
->> -from qapi.schema import QAPIError, QAPISchema
->> +from qapi.schema import QAPISchema
->>   from qapi.types import gen_types
->>   from qapi.visit import gen_visit
->>   
->>   
->> -def main(argv):
->> +def invalid_char(prefix: str) -> Optional[str]:
-> 
-> Naming is hard...  invalid_char() makes sense because it returns the
-> invalid character.  The name's a tad generic, though.  Would
-> first_invalid_prefix_char() be easier to understand?
-> 
+Yes - the test is recording the kernel up until the point it gives up.
 
-Sounds like an improvement to me. I guess that should be in a follow-up now.
+> Hm... So you're saying that the test sends a 'quit' QMP command, but
+> before it could be processed, the guest causes QEMU to exit, so the test
+> will never receive a reply to its request?
+>
+> If commit 9ce44e2ce2 changes anything about this, it seems to me that it
+> would be that more QMP commands are processed during monitor_cleanup()
+> because it doesn't just delete the dispatcher BH, but waits until it's
+> not busy any more.
+>
+> Looking at this code again, however, the order in monitor_cleanup() is
+> probably wrong. We should first shut down the dispatcher (which may
+> still be using Monitor objects) and then destroy the monitors. This
+> could possibly explain a crash, but probably not wrong results with a
+> successful shutdown.
 
->> +    match = re.match(r'([A-Za-z_.-][A-Za-z0-9_.-]*)?', prefix)
->> +    if match.end() != len(prefix):
->> +        return prefix[match.end()]
->> +    return None
-> [...]
-> 
+I suspect this is a race between QEMU shutting down because the guest
+shut it down and the acceptance test trying to shut things down via QMP.
+I think the proper fix is either to:
 
+  - s/panic=3D-1/panic=3D0/ in the command line (and probably drop --no-reb=
+oot)
+
+which would let the acceptance test cleanly shutdown via QMP. Or:
+
+  - modify the test to declare that qemu will shutdown itself and
+    therefor no "quit" needs to be sent
+
+WDYT?
+
+--=20
+Alex Benn=C3=A9e
 
