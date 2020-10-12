@@ -2,126 +2,67 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FC5DC43457
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 05:49:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63894C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 05:50:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2832C2078E
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 05:49:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B640E2078E
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 05:50:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mymailcheap.com header.i=@mymailcheap.com header.b="WB0WFRHD";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=flygoat.com header.i=@flygoat.com header.b="BB8xAV9H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2832C2078E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=flygoat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="C3H/Kjkn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B640E2078E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRqi8-0005nQ-7y
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 01:49:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46268)
+	id 1kRqj0-0006kq-NJ
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 01:50:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46324)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jiaxun.yang@flygoat.com>)
- id 1kRqhT-00054L-7w
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 01:48:47 -0400
-Received: from relay3.mymailcheap.com ([217.182.119.157]:60443)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1kRqiB-000606-SH; Mon, 12 Oct 2020 01:49:31 -0400
+Received: from ozlabs.org ([203.11.71.1]:33673)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jiaxun.yang@flygoat.com>)
- id 1kRqhQ-000758-L7
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 01:48:46 -0400
-Received: from filter2.mymailcheap.com (filter2.mymailcheap.com
- [91.134.140.82])
- by relay3.mymailcheap.com (Postfix) with ESMTPS id 639FA3F207;
- Mon, 12 Oct 2020 07:48:42 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by filter2.mymailcheap.com (Postfix) with ESMTP id 383892A7E2;
- Mon, 12 Oct 2020 07:48:42 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mymailcheap.com;
- s=default; t=1602481722;
- bh=Uhx9p1Sm89naQbySRw8yZXI6dbRTIpF11SBrXNJQXm8=;
- h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
- b=WB0WFRHDgESzMIGSS93RQdzVbFwQxU2DsBEzKBOWrGsNOYWROFvzvjroXfK3/woCQ
- D5+2PkER6V+YgYg0INr2iHyAYF1+sUOSaoUPKuBnRgmdhEyRVOscvy2e5v4XnGGA95
- A2T/Fh83Jfj3+eUiUs3meSfGiQY2Ch7o3hDZTFeY=
-X-Virus-Scanned: Debian amavisd-new at filter2.mymailcheap.com
-Received: from filter2.mymailcheap.com ([127.0.0.1])
- by localhost (filter2.mymailcheap.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ypLH9AjMe7Nz; Mon, 12 Oct 2020 07:48:40 +0200 (CEST)
-Received: from mail20.mymailcheap.com (mail20.mymailcheap.com [51.83.111.147])
- (using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by filter2.mymailcheap.com (Postfix) with ESMTPS;
- Mon, 12 Oct 2020 07:48:40 +0200 (CEST)
-Received: from [148.251.23.173] (ml.mymailcheap.com [148.251.23.173])
- by mail20.mymailcheap.com (Postfix) with ESMTP id 621B341029;
- Mon, 12 Oct 2020 05:48:40 +0000 (UTC)
-Authentication-Results: mail20.mymailcheap.com; dkim=pass (1024-bit key;
- unprotected) header.d=flygoat.com header.i=@flygoat.com header.b="BB8xAV9H"; 
- dkim-atps=neutral
-AI-Spam-Status: Not processed
-Received: from [0.0.0.0] (li1197-90.members.linode.com [45.79.98.90])
- (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
- key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
- (No client certificate requested)
- by mail20.mymailcheap.com (Postfix) with ESMTPSA id 71EDC41029;
- Mon, 12 Oct 2020 05:48:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=flygoat.com;
- s=default; t=1602481716;
- bh=Uhx9p1Sm89naQbySRw8yZXI6dbRTIpF11SBrXNJQXm8=;
- h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
- b=BB8xAV9H8Y/wiSRGzq9Ht1lGltomnfdHoQwGAdo37MEPmzXzUqG6CXDi3dzoOMpBO
- YcTOVQvKvyRBY+ft9QM4FdLhpHUcq/X3C7x7RRaVahtwNLNd0vKFKvP65H05ERszP8
- KacADTrOB3YHq+KwpA5psOtLRVoP7mUXL9pxZ8ME=
-Subject: Re: [PATCH v3 09/20] target/mips/cpu: Calculate the CP0 timer period
- using the CPU frequency
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20201010204319.3119239-1-f4bug@amsat.org>
- <20201010204319.3119239-10-f4bug@amsat.org>
-From: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Message-ID: <b170f46b-cd29-1822-17bf-d725e61cf714@flygoat.com>
-Date: Mon, 12 Oct 2020 13:48:25 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1kRqi8-0007Ix-PR; Mon, 12 Oct 2020 01:49:31 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4C8nn04GKKz9sT6; Mon, 12 Oct 2020 16:49:24 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1602481764;
+ bh=5myDoT9glAj6UIQl/rhiWg36DL4weyBKQNx5WXxr/44=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=C3H/Kjkn7nz+f2bicfCqvKL0Nks0AGD1K2SxU26O+BH9CSfSPX4UWoWu9KEElrMcw
+ pKXBMnnrqcBZ84O9COeyhjbNQfKPWfWOMhoZ9o0ThR93wJ92JWuoUwLfJNSqBB+B+P
+ a4QkhopqRN1TBY50ltNvJKLQoW+E5bryXzbGxvI4=
+Date: Mon, 12 Oct 2020 16:38:46 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH v2 0/6] spapr/xive: Activate StoreEOI in P10 compat guests
+Message-ID: <20201012053846.GE4787@yekko.fritz.box>
+References: <20201005165147.526426-1-clg@kaod.org>
+ <20201009002326.GB1025389@yekko.fritz.box>
+ <5a3af480-8e84-ddb8-e40e-e3050f6c2978@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <20201010204319.3119239-10-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Rspamd-Queue-Id: 621B341029
-X-Spamd-Result: default: False [-0.10 / 10.00]; RCVD_VIA_SMTP_AUTH(0.00)[];
- ARC_NA(0.00)[]; R_DKIM_ALLOW(0.00)[flygoat.com:s=default];
- HFILTER_HELO_BAREIP(3.00)[148.251.23.173,1];
- FROM_HAS_DN(0.00)[]; TO_DN_SOME(0.00)[];
- FREEMAIL_ENVRCPT(0.00)[gmail.com];
- TO_MATCH_ENVRCPT_ALL(0.00)[]; MIME_GOOD(-0.10)[text/plain];
- R_SPF_SOFTFAIL(0.00)[~all]; ML_SERVERS(-3.10)[148.251.23.173];
- DKIM_TRACE(0.00)[flygoat.com:+];
- DMARC_POLICY_ALLOW(0.00)[flygoat.com,none];
- RCPT_COUNT_TWELVE(0.00)[15];
- DMARC_POLICY_ALLOW_WITH_FAILURES(0.00)[];
- RCVD_NO_TLS_LAST(0.10)[]; FROM_EQ_ENVFROM(0.00)[];
- MIME_TRACE(0.00)[0:+];
- ASN(0.00)[asn:24940, ipnet:148.251.0.0/16, country:DE];
- FREEMAIL_CC(0.00)[linaro.org,gmail.com,greensocs.com,kernel.org,lmichel.fr,syrmia.com,lemote.com,twiddle.net,redhat.com,reactos.org,aurel32.net];
- MID_RHS_MATCH_FROM(0.00)[]; RCVD_COUNT_TWO(0.00)[2]
-X-Rspamd-Server: mail20.mymailcheap.com
-Received-SPF: pass client-ip=217.182.119.157;
- envelope-from=jiaxun.yang@flygoat.com; helo=relay3.mymailcheap.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 01:48:42
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="KdquIMZPjGJQvRdI"
+Content-Disposition: inline
+In-Reply-To: <5a3af480-8e84-ddb8-e40e-e3050f6c2978@kaod.org>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 01:33:58
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -134,31 +75,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>,
- Huacai Chen <zltjiangshi@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, Luc Michel <luc@lmichel.fr>,
- Eduardo Habkost <ehabkost@redhat.com>, Paul Burton <paulburton@kernel.org>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Huacai Chen <chenhc@lemote.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: Gustavo Romero <gromero@linux.ibm.com>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+--KdquIMZPjGJQvRdI
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-在 2020/10/11 上午4:43, Philippe Mathieu-Daudé 写道:
-> The CP0 timer period is a function of the CPU frequency.
-> Start using the default values, which will be replaced by
-> properties in the next commits.
->
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> ---
-[...]
-Thanks
+On Fri, Oct 09, 2020 at 07:57:32AM +0200, C=E9dric Le Goater wrote:
+> On 10/9/20 2:23 AM, David Gibson wrote:
+> > On Mon, Oct 05, 2020 at 06:51:41PM +0200, C=E9dric Le Goater wrote:
+> >> Hello,
+> >>
+> >> When an interrupt has been handled, the OS notifies the interrupt
+> >> controller with an EOI sequence. On the XIVE interrupt controller
+> >> (POWER9 and POWER10), this can be done with a load or a store
+> >> operation on the ESB interrupt management page of the interrupt. The
+> >> StoreEOI operation has less latency and improves interrupt handling
+> >> performance but it was deactivated during the POWER9 DD2.0 time-frame
+> >> because of ordering issues. POWER9 systems use the LoadEOI instead.
+> >> POWER10 has fixed the issue with a special load command which enforces
+> >> Load-after-Store ordering and StoreEOI can be safely used.
+> >=20
+> > Do you mean that ordering is *always* enforced on P10?  Or it's a
+> > special form of load that has the ordering?
+>=20
+> It's a special form of load that has the ordering, only on available=20
+> on P10. It's a no-op on P9.
 
-- Jiaxun
+no-op as in the load will have regular semantics, or as in the whole
+load won't do anything?
+
+I assume this meanse XIVE code needs to be updated to use that special
+load for all accesses to XIVE registers...=20
+
+> Linux commit b1f9be9392f0 ("powerpc/xive: Enforce load-after-store =20
+> ordering when StoreEOI is active") introduced the Load-after-Store=20
+> ordering offset and P10 support was added in the same 5.8 release.
+
+=2E. which I guess this does?
+
+> This is why StoreEOI should be advertised on P10 compat kernels only.=20
+> I would have preferred to introduce some extra CAS bits. that would=20
+> have been cleaner than mix the two.
+
+Ok.
+
+> The basic requirement is to advertise StoreEOI when the CPU compat
+> allows it. I have used the capabilities to toggle the feature on/off.
+> It seemed a clean way to cover all the extra needs :=20
+>=20
+>  - switch it off on P10 if needed
+>  - switch it on on P9 for tests
+
+Ok, seems reasonable
+
+> > Also, weirdly, despite the series being addressed to me, only some of
+> > the patches ended up in my inbox, rather than the list folder :/.
+>=20
+>=20
+> Yes. I have received a few ot these :=20
+> =20
+> The original message was received at Mon, 5 Oct 2020 12:51:56 -0400
+> from m0098419.ppops.net [127.0.0.1]
+>=20
+>    ----- The following addresses had permanent fatal errors -----
+> <david@gibson.dropbear.id.au>
+
+Drat, I guess ozlabs.org fell off the net for a while.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--KdquIMZPjGJQvRdI
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl+D6+UACgkQbDjKyiDZ
+s5L8rBAA1jUJoHK/udp5MMWNfZ8SztIMFgni7muInfQ5eHvl3ZW0rmCgqPYxTR35
+Hgsc3gMwgVmWuBLEMXrkUhIuP+q5PDDUPKxkjsNFS3tdoKyU7KBMxJ9FVQAWGptx
+k21lBxRt6ORJrYUysmEuNJp4DW5RIxwLXe1i/UzMC+cmx58Ca3L4AD8/8nYjwnVM
+DzhFw9RZ0L7NfH+dKOoN4TqVADLdSPW+t46TsGXBr6OzYouH+I2fbrvQvaCEXodS
+EbEUZglW9sMFDaVOlqxLBI3WM483Q7F6KG6DE2KKJ6MnNHVkIkhrqo67Dq2OoCzS
+T2QXpdBdKsJ1oc3ztmBR8XEaiObUAYdxKKNL/RLzp4pqU7bE2oh0D9728h1EXLrI
+JoPx7dJ9ojEaZB8z2QuuFJGs3RG6LbHkfPajK7JP5xeNo1A8DHfyxtWeGAhlKQhO
+CBs+aujpsUevpHxBaO1DJ0kH7DcLF6kuzmYEvdBIr2zSM4VILrEqcj5D9JJgXryk
+WsBFCjbAzgU4530akOviIkwE/4foYaXNbaBIIX3mhV2g8VD2nsr7Q+C8OqFAp827
+oIiPyGGNVOTm9prnQKI903d7ZjyhUHtejk3O+6ydYcFKxh3G9SzZ2+84Lj9TjJjM
+JFAPokNFE5SKmvRxIiHu7trT9xgw0C/YUqnFm4zAT2j7Tw7eWJ8=
+=vnGP
+-----END PGP SIGNATURE-----
+
+--KdquIMZPjGJQvRdI--
 
