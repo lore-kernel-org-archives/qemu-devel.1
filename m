@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE9B7C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:45:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B999C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:47:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F15920714
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:45:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A08522076E
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:47:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oopoGJUo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F15920714
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jvkUIDRC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A08522076E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kS01B-0004Ps-51
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 11:45:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56700)
+	id 1kS02b-00068Y-M4
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 11:47:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56830)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kRzqF-0006nO-NE
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:34:27 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37132)
+ id 1kRzqK-0006yV-9m
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:34:32 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44178)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kRzqD-0007Hw-LR
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:34:27 -0400
-Received: by mail-wr1-x441.google.com with SMTP id h7so19713016wre.4
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 08:34:25 -0700 (PDT)
+ id 1kRzqI-0007JV-Dt
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:34:32 -0400
+Received: by mail-wr1-x441.google.com with SMTP id t9so19675048wrq.11
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 08:34:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ZKtxYGps5VFXsStAbHuqacbKwp4q81OIlKsuS5wAl+8=;
- b=oopoGJUogC2SBAD0Fi+W7FkzqzSSo9fjMTFE3Li6I97azXcT8zr1SrPfoks+jqXoDX
- PF7vTkXgH/A7LTBYszojVWbJWKSGXNsDGV/e+9rB2GhfFBUA+xalI/o8zaGpzADwayyN
- lIVHQX3i5Os+2V6G/xiR5ka8Fa37X81BTjpTSRhYjPM72YxFepUGUKEcLXVPcjxAO1i2
- l+TxgbU7Jso+jWrn1NjOh97E7ebywvQ06MSCVbIsIjpvZt+hfrrPa5Xq/EwLvXzNoPia
- S9lXmIzztY3Ah0B8SnxRriHyzxpAYBZ2G4ER4LZ3QPOD768Iypn4eAIx508fhJfBX0wB
- GHRg==
+ bh=xCPWjLYyI6z3WFhhXaeYUbi5QZIddcoWl6SEfIfuuFs=;
+ b=jvkUIDRClN9EIrNy2RSdtWRPqcJKUB35LA78DZJ65CbJFay23p7wAmAtvMRKkwVIpq
+ j0+GyMO3ekHx2NzlGH+Hu9wWt9FXxGLOUkDTVSKRJa0NV/JNJ9ggidTuULb8wMRJ1PPT
+ 8eJ07v5t77Q1eUb58VmOQX+TU6wbNttw1+v5rer4GpwhucVMJ8ppyh7oqaDwHEQQwvSa
+ vyOaQVcjZeJsj9ggOBzoUk6D+QaRVIuPWHun2LKlWMnRvw0wfedq0OK5F85MgWPP7xMi
+ T7iUDyv0Lo5qbZklcQQuOjlmBAkxZeNcK4t24SC0U7TEOGkq85EDlnUvHflXkC96g78r
+ q4eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ZKtxYGps5VFXsStAbHuqacbKwp4q81OIlKsuS5wAl+8=;
- b=LMVbRjbW2Cjk7m+y49lG1PpPowJdNM8TIrxR+pxJ9+XVl3GoamI7v65ExKevoXLWww
- pcsEICs9VJipp8FyPls0vVKpB6TgMhueXHKYjhgCFXplOog1GjvC8ko0dSwRaLtG1O1E
- xhhu3Wr/zIda5lop/MsJqIepn5HxQgJ/n3TK8ULJv45AjvIK3gSPIJcVBok1wldfUWsM
- tsXzx3Mk7y4EWGBRVWgBZhqqNrBbQcD64rBUBp5+oD5IHO3/MawOM4+SCaMIs851GCmx
- juDP+Lj0b+qsLE9NBZzBEPy4ik7u0MOBtZd3KW/pWe1tscyondcE3I3V6WLfKmFkdbQC
- GqOw==
-X-Gm-Message-State: AOAM532Tb1q5VWMBPnXfaZDs/4w1naiS3UtB58pdkmvJj5jvg1DgNbus
- oY5idJnI1917LlcINUgowMLyFg==
-X-Google-Smtp-Source: ABdhPJzw2FwStK+RZVyRtbPSabQMAXiLF4P+rmpyd+6Cyb6eLU3hIfIvx0qISb8DtHc2EfJjTsolHA==
-X-Received: by 2002:adf:82e5:: with SMTP id 92mr29435427wrc.192.1602516864360; 
- Mon, 12 Oct 2020 08:34:24 -0700 (PDT)
+ bh=xCPWjLYyI6z3WFhhXaeYUbi5QZIddcoWl6SEfIfuuFs=;
+ b=QdEFd5QiXCQFU50kDamTGDLNWXokoxTqJ9Hkbl2Z86TmxfItOBOyWvi9JqBVNO+Zoz
+ ogCOEVtDFz/DoPt9YRc0R8Bl+rH839loBKyC6Qs0RWxjBzLCwuwVr1aSZM7BgJcEQSeF
+ Y/uk3eN7FqG0x2X6XFEAq8rZjjJP7MhWNVeJFZapL615IZjNt4VBasNPMdLWdazQy3gd
+ qZ3Re2yzADyGxGxScO3r37Q3aRKiVVgh7K5a9guIiLtyRLi6RegVU8SJ1fU7Vq/y5vR5
+ bz3HSDBxJbxqcTw+08W5/7bSNQSbDjbeJWqqfTxVsV2MK3YR7CABi/ZYCxqWEsiNx0f4
+ UmFg==
+X-Gm-Message-State: AOAM532f85ZdGYCu8HDTvAsRRczvHIyAv3/SRZDxwA4/5C5JV4XpVxtL
+ eBeQVUPFpDqPzsRcL3trapsvWQ==
+X-Google-Smtp-Source: ABdhPJw3rY3457BdxkO9G6YrxPMZWwl0qoCALdW6L3/dAggIH2iCcdauht8QaOmIHyjCkS2KNOMngQ==
+X-Received: by 2002:adf:f841:: with SMTP id d1mr20555398wrq.297.1602516869112; 
+ Mon, 12 Oct 2020 08:34:29 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id y10sm19675284wrq.73.2020.10.12.08.34.23
+ by smtp.gmail.com with ESMTPSA id y10sm19675284wrq.73.2020.10.12.08.34.27
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 12 Oct 2020 08:34:23 -0700 (PDT)
+ Mon, 12 Oct 2020 08:34:28 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH for-5.1] hw/arm/netduino2,
- netduinoplus2: Set system_clock_scale
-Date: Mon, 12 Oct 2020 16:33:35 +0100
-Message-Id: <20201012153408.9747-13-peter.maydell@linaro.org>
+Subject: [PATCH] hw/intc/arm_gicv3_cpuif: Don't copy CPU's maintenance
+ interrupt
+Date: Mon, 12 Oct 2020 16:33:39 +0100
+Message-Id: <20201012153408.9747-17-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201012153408.9747-1-peter.maydell@linaro.org>
 References: <20201012153408.9747-1-peter.maydell@linaro.org>
@@ -106,74 +106,81 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The netduino2 and netduinoplus2 boards forgot to set the system_clock_scale
-global, which meant that if guest code used the systick timer in "use
-the processor clock" mode it would hang because time never advances.
+In gicv3_init_cpuif() we copy the ARMCPU gicv3_maintenance_interrupt
+into the GICv3CPUState struct's maintenance_irq field.  This will
+only work if the board happens to have already wired up the CPU
+maintenance IRQ before the GIC was realized.  Unfortunately this is
+not the case for the 'virt' board, and so the value that gets copied
+is NULL (since a qemu_irq is really a pointer to an IRQState struct
+under the hood).  The effect is that the CPU interface code never
+actually raises the maintenance in2Dterrupt line.
 
-Set the global to match the documented CPU clock speed of these boards.
-Judging by the data sheet this is slightly simplistic because the
-SoC allows configuration of the SYSCLK source and frequency via the
-RCC (reset and clock control) module, but we don't model that.
+Instead, since the GICv3CPUState has a pointer to the CPUState, make
+the dereference at the point where we want to raise the interrupt, to
+avoid an implicit requirement on board code to wire things up in a
+particular order.
 
-Fixes: https://bugs.launchpad.net/qemu/+bug/1876187
+Reported-by: Jose Martins <josemartins90@gmail.com>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
-NB: tested with "make check" only...
 
- hw/arm/netduino2.c     | 10 ++++++++++
- hw/arm/netduinoplus2.c | 10 ++++++++++
- 2 files changed, 20 insertions(+)
+QEMU's implementation here is a bit odd because we've put all the
+logic into the "GIC" device where in real hardware it's split between
+a GIC device and the CPU interface part in the CPU.  If we had
+arranged it in that way then we wouldn't have this odd bit of code
+where the GIC device needs to raise an IRQ line that belongs to the
+CPU.
 
-diff --git a/hw/arm/netduino2.c b/hw/arm/netduino2.c
-index 79e19392b56..8f103341443 100644
---- a/hw/arm/netduino2.c
-+++ b/hw/arm/netduino2.c
-@@ -30,10 +30,20 @@
- #include "hw/arm/stm32f205_soc.h"
- #include "hw/arm/boot.h"
+Not sure why we've never noticed this bug previously with KVM as a
+guest, you'd think we'd have spotted "maintenance interrupts just
+don't work"...
+---
+ include/hw/intc/arm_gicv3_common.h | 1 -
+ hw/intc/arm_gicv3_cpuif.c          | 5 ++---
+ 2 files changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
+index 0331b0ffdb8..91491a2f664 100644
+--- a/include/hw/intc/arm_gicv3_common.h
++++ b/include/hw/intc/arm_gicv3_common.h
+@@ -153,7 +153,6 @@ struct GICv3CPUState {
+     qemu_irq parent_fiq;
+     qemu_irq parent_virq;
+     qemu_irq parent_vfiq;
+-    qemu_irq maintenance_irq;
  
-+/* Main SYSCLK frequency in Hz (120MHz) */
-+#define SYSCLK_FRQ 120000000ULL
-+
- static void netduino2_init(MachineState *machine)
- {
-     DeviceState *dev;
+     /* Redistributor */
+     uint32_t level;                  /* Current IRQ level */
+diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
+index 08e000e33c6..43ef1d7a840 100644
+--- a/hw/intc/arm_gicv3_cpuif.c
++++ b/hw/intc/arm_gicv3_cpuif.c
+@@ -399,6 +399,7 @@ static void gicv3_cpuif_virt_update(GICv3CPUState *cs)
+     int irqlevel = 0;
+     int fiqlevel = 0;
+     int maintlevel = 0;
++    ARMCPU *cpu = ARM_CPU(cs->cpu);
  
-+    /*
-+     * TODO: ideally we would model the SoC RCC and let it handle
-+     * system_clock_scale, including its ability to define different
-+     * possible SYSCLK sources.
-+     */
-+    system_clock_scale = NANOSECONDS_PER_SECOND / SYSCLK_FRQ;
-+
-     dev = qdev_new(TYPE_STM32F205_SOC);
-     qdev_prop_set_string(dev, "cpu-type", ARM_CPU_TYPE_NAME("cortex-m3"));
-     sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
-diff --git a/hw/arm/netduinoplus2.c b/hw/arm/netduinoplus2.c
-index 958d21dd9f9..68abd3ec69d 100644
---- a/hw/arm/netduinoplus2.c
-+++ b/hw/arm/netduinoplus2.c
-@@ -30,10 +30,20 @@
- #include "hw/arm/stm32f405_soc.h"
- #include "hw/arm/boot.h"
+     idx = hppvi_index(cs);
+     trace_gicv3_cpuif_virt_update(gicv3_redist_affid(cs), idx);
+@@ -424,7 +425,7 @@ static void gicv3_cpuif_virt_update(GICv3CPUState *cs)
  
-+/* Main SYSCLK frequency in Hz (168MHz) */
-+#define SYSCLK_FRQ 168000000ULL
-+
- static void netduinoplus2_init(MachineState *machine)
- {
-     DeviceState *dev;
+     qemu_set_irq(cs->parent_vfiq, fiqlevel);
+     qemu_set_irq(cs->parent_virq, irqlevel);
+-    qemu_set_irq(cs->maintenance_irq, maintlevel);
++    qemu_set_irq(cpu->gicv3_maintenance_interrupt, maintlevel);
+ }
  
-+    /*
-+     * TODO: ideally we would model the SoC RCC and let it handle
-+     * system_clock_scale, including its ability to define different
-+     * possible SYSCLK sources.
-+     */
-+    system_clock_scale = NANOSECONDS_PER_SECOND / SYSCLK_FRQ;
-+
-     dev = qdev_new(TYPE_STM32F405_SOC);
-     qdev_prop_set_string(dev, "cpu-type", ARM_CPU_TYPE_NAME("cortex-m4"));
-     sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
+ static uint64_t icv_ap_read(CPUARMState *env, const ARMCPRegInfo *ri)
+@@ -2624,8 +2625,6 @@ void gicv3_init_cpuif(GICv3State *s)
+             && cpu->gic_num_lrs) {
+             int j;
+ 
+-            cs->maintenance_irq = cpu->gicv3_maintenance_interrupt;
+-
+             cs->num_list_regs = cpu->gic_num_lrs;
+             cs->vpribits = cpu->gic_vpribits;
+             cs->vprebits = cpu->gic_vprebits;
 -- 
 2.20.1
 
