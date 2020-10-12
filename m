@@ -2,67 +2,67 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54CC9C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:50:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4681DC433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:52:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3CDC2078E
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:50:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE1BB2078E
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:52:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DYB/SGOk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3CDC2078E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OKaIDeIl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE1BB2078E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kS4mG-0008PN-Qv
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 16:50:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38430)
+	id 1kS4na-0001UN-Nr
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 16:52:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38352)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kS4WV-0002wz-4O
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:34:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:31223)
+ id 1kS4WR-0002rc-E9
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:34:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60146)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kS4WO-0002jK-90
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:34:22 -0400
+ id 1kS4WM-0002iq-5Z
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:34:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602534854;
+ s=mimecast20190719; t=1602534852;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pW3I7+8Fr03yk/X+Wk7CJwUrSBzdKsHrG85hgVxf070=;
- b=DYB/SGOkv+6D3VHJO4On9j3nllmjmffljiqP+Y36ewBjcpuxi3qwwJVguP94KkMJO/YBSh
- XLfiYaD/236ga+lsp0l7IN9V8JJ22jERnkElCJz6kpILLaGjcXe7MOITq7z1TtnOMV1jdz
- LhFrwwqh3OMv8Cw2WsQKVBvj2MiMJmg=
+ bh=amCd8MPJ5JbVAyhyBDOKUGF3E7N6O6LgOOnFLyzDDJI=;
+ b=OKaIDeIlit3UbBzwSoTJrS5C6mgR8GOwsRmUCIU1RU3eZTDH6rH2spIGdXAdpTiaSMYy3p
+ VjzVbtGufkY9l71LFbss/GfNGzj4OIAY72OD54r+YhhCEWyLlWR0qvXg/wiif2DJffUBpi
+ JIbdqwe9Z92yjMds83AXMfL1sed2RLQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-254-kdwtCmT9PY6bY-Zzxo7yrA-1; Mon, 12 Oct 2020 16:34:12 -0400
-X-MC-Unique: kdwtCmT9PY6bY-Zzxo7yrA-1
+ us-mta-19-EFTn3PNuMdCVwHisPWh0uA-1; Mon, 12 Oct 2020 16:34:11 -0400
+X-MC-Unique: EFTn3PNuMdCVwHisPWh0uA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43D30890EAC;
- Mon, 12 Oct 2020 20:34:02 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2EFC5D68A3
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 20:34:03 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C08AA6EF59;
- Mon, 12 Oct 2020 20:34:01 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E6B796EF59
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 20:34:02 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 36/38] virtio-scsi: use scsi_device_get
-Date: Mon, 12 Oct 2020 16:33:41 -0400
-Message-Id: <20201012203343.1105018-37-pbonzini@redhat.com>
+Subject: [PULL 38/38] meson: identify more sections of meson.build
+Date: Mon, 12 Oct 2020 16:33:43 -0400
+Message-Id: <20201012203343.1105018-39-pbonzini@redhat.com>
 In-Reply-To: <20201012203343.1105018-1-pbonzini@redhat.com>
 References: <20201012203343.1105018-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -73,16 +73,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 16:33:53
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/11 23:52:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,119 +96,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Maxim Levitsky <mlevitsk@redhat.com>
+Add more headers that clarify code organization.
 
-This will help us to avoid the scsi device disappearing
-after we took a reference to it.
-
-It doesn't by itself forbid case when we try to access
-an unrealized device
-
-Suggested-by: Stefan Hajnoczi <stefanha@gmail.com>
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20200913160259.32145-9-mlevitsk@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20201006123904.610658-13-mlevitsk@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/virtio-scsi.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
+ meson.build | 36 +++++++++++++++++++++++++-----------
+ 1 file changed, 25 insertions(+), 11 deletions(-)
 
-diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-index 971afbb217..3db9a8aae9 100644
---- a/hw/scsi/virtio-scsi.c
-+++ b/hw/scsi/virtio-scsi.c
-@@ -33,7 +33,7 @@ static inline int virtio_scsi_get_lun(uint8_t *lun)
-     return ((lun[2] << 8) | lun[3]) & 0x3FFF;
+diff --git a/meson.build b/meson.build
+index 0c676af194..652c37cceb 100644
+--- a/meson.build
++++ b/meson.build
+@@ -614,7 +614,9 @@ if not has_malloc_trim and get_option('malloc_trim').enabled()
+   endif
+ endif
+ 
+-# Create config-host.h
++#################
++# config-host.h #
++#################
+ 
+ config_host_data.set('CONFIG_COCOA', cocoa.found())
+ config_host_data.set('CONFIG_LIBUDEV', libudev.found())
+@@ -660,6 +662,10 @@ foreach k, v: config_host
+   endif
+ endforeach
+ 
++########################
++# Target configuration #
++########################
++
+ minikconf = find_program('scripts/minikconf.py')
+ config_all = {}
+ config_all_devices = {}
+@@ -866,7 +872,9 @@ config_all += {
+   'CONFIG_ALL': true,
  }
  
--static inline SCSIDevice *virtio_scsi_device_find(VirtIOSCSI *s, uint8_t *lun)
-+static inline SCSIDevice *virtio_scsi_device_get(VirtIOSCSI *s, uint8_t *lun)
- {
-     if (lun[0] != 1) {
-         return NULL;
-@@ -41,7 +41,7 @@ static inline SCSIDevice *virtio_scsi_device_find(VirtIOSCSI *s, uint8_t *lun)
-     if (lun[2] != 0 && !(lun[2] >= 0x40 && lun[2] < 0x80)) {
-         return NULL;
-     }
--    return scsi_device_find(&s->bus, 0, lun[1], virtio_scsi_get_lun(lun));
-+    return scsi_device_get(&s->bus, 0, lun[1], virtio_scsi_get_lun(lun));
- }
+-# Submodules
++##############
++# Submodules #
++##############
  
- void virtio_scsi_init_req(VirtIOSCSI *s, VirtQueue *vq, VirtIOSCSIReq *req)
-@@ -256,7 +256,7 @@ static inline void virtio_scsi_ctx_check(VirtIOSCSI *s, SCSIDevice *d)
-  *  case of async cancellation. */
- static int virtio_scsi_do_tmf(VirtIOSCSI *s, VirtIOSCSIReq *req)
- {
--    SCSIDevice *d = virtio_scsi_device_find(s, req->req.tmf.lun);
-+    SCSIDevice *d = virtio_scsi_device_get(s, req->req.tmf.lun);
-     SCSIRequest *r, *next;
-     BusChild *kid;
-     int target;
-@@ -370,10 +370,10 @@ static int virtio_scsi_do_tmf(VirtIOSCSI *s, VirtIOSCSIReq *req)
+ capstone = not_found
+ capstone_opt = get_option('capstone')
+@@ -1105,9 +1113,11 @@ config_host_data.set('CONFIG_CAPSTONE', capstone.found())
+ config_host_data.set('CONFIG_FDT', fdt.found())
+ config_host_data.set('CONFIG_SLIRP', slirp.found())
  
-         rcu_read_lock();
-         QTAILQ_FOREACH_RCU(kid, &s->bus.qbus.children, sibling) {
--             d = SCSI_DEVICE(kid->child);
--             if (d->channel == 0 && d->id == target) {
--                qdev_reset_all(&d->qdev);
--             }
-+            SCSIDevice *d1 = SCSI_DEVICE(kid->child);
-+            if (d1->channel == 0 && d1->id == target) {
-+                qdev_reset_all(&d1->qdev);
-+            }
-         }
-         rcu_read_unlock();
+-genh += configure_file(output: 'config-host.h', configuration: config_host_data)
++#####################
++# Generated sources #
++#####################
  
-@@ -386,14 +386,17 @@ static int virtio_scsi_do_tmf(VirtIOSCSI *s, VirtIOSCSIReq *req)
-         break;
-     }
+-# Generators
++genh += configure_file(output: 'config-host.h', configuration: config_host_data)
  
-+    object_unref(OBJECT(d));
-     return ret;
+ hxtool = find_program('scripts/hxtool')
+ shaderinclude = find_program('scripts/shaderinclude.pl')
+@@ -1182,7 +1192,9 @@ sphinx_extn_depends = [ meson.source_root() / 'docs/sphinx/depfile.py',
+                         meson.source_root() / 'docs/sphinx/qmp_lexer.py',
+                         qapi_gen_depends ]
  
- incorrect_lun:
-     req->resp.tmf.response = VIRTIO_SCSI_S_INCORRECT_LUN;
-+    object_unref(OBJECT(d));
-     return ret;
+-# Collect sourcesets.
++###################
++# Collect sources #
++###################
  
- fail:
-     req->resp.tmf.response = VIRTIO_SCSI_S_BAD_TARGET;
-+    object_unref(OBJECT(d));
-     return ret;
- }
+ authz_ss = ss.source_set()
+ blockdev_ss = ss.source_set()
+@@ -1320,8 +1332,6 @@ if enable_modules
+   modulecommon = declare_dependency(link_whole: libmodulecommon, compile_args: '-DBUILD_DSO')
+ endif
  
-@@ -564,7 +567,7 @@ static int virtio_scsi_handle_cmd_req_prepare(VirtIOSCSI *s, VirtIOSCSIReq *req)
-         }
-     }
+-# Build targets from sourcesets
+-
+ stub_ss = stub_ss.apply(config_all, strict: false)
  
--    d = virtio_scsi_device_find(s, req->req.cmd.lun);
-+    d = virtio_scsi_device_get(s, req->req.cmd.lun);
-     if (!d) {
-         req->resp.cmd.response = VIRTIO_SCSI_S_BAD_TARGET;
-         virtio_scsi_complete_cmd_req(req);
-@@ -580,10 +583,12 @@ static int virtio_scsi_handle_cmd_req_prepare(VirtIOSCSI *s, VirtIOSCSIReq *req)
-             req->sreq->cmd.xfer > req->qsgl.size)) {
-         req->resp.cmd.response = VIRTIO_SCSI_S_OVERRUN;
-         virtio_scsi_complete_cmd_req(req);
-+        object_unref(OBJECT(d));
-         return -ENOBUFS;
-     }
-     scsi_req_ref(req->sreq);
-     blk_io_plug(d->conf.blk);
-+    object_unref(OBJECT(d));
-     return 0;
- }
+ util_ss.add_all(trace_ss)
+@@ -1409,6 +1419,10 @@ specific_ss.add_all(when: 'CONFIG_LINUX_USER', if_true: linux_user_ss)
+ subdir('tests/qtest/libqos')
+ subdir('tests/qtest/fuzz')
  
++########################
++# Library dependencies #
++########################
++
+ block_mods = []
+ softmmu_mods = []
+ foreach d, list : modules
+@@ -1443,10 +1457,6 @@ qemu_syms = custom_target('qemu.syms', output: 'qemu.syms',
+                              capture: true,
+                              command: [undefsym, nm, '@INPUT@'])
+ 
+-########################
+-# Library dependencies #
+-########################
+-
+ qom_ss = qom_ss.apply(config_host, strict: false)
+ libqom = static_library('qom', qom_ss.sources() + genh,
+                         dependencies: [qom_ss.dependencies()],
+@@ -1797,6 +1807,10 @@ if host_machine.system() == 'windows'
+   alias_target('installer', nsis)
+ endif
+ 
++#########################
++# Configuration summary #
++#########################
++
+ summary_info = {}
+ summary_info += {'Install prefix':    config_host['prefix']}
+ summary_info += {'BIOS directory':    config_host['qemu_datadir']}
 -- 
 2.26.2
-
 
 
