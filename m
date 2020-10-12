@@ -2,83 +2,81 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4948EC433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 16:01:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 384A6C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 16:02:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5BE12074A
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 16:01:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C1C422074A
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 16:02:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="exgSCy6T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5BE12074A
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="abJFFijJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1C422074A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58494 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kS0Gl-0000qI-P6
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 12:01:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57984)
+	id 1kS0Gx-0001Dc-NN
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 12:02:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58030)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kRztf-0003ab-LD
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:37:59 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51907)
+ id 1kRztg-0003d1-LY
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:38:00 -0400
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:42820)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kRztY-0007lS-4n
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:37:59 -0400
-Received: by mail-wm1-x341.google.com with SMTP id d81so17522725wmc.1
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 08:37:51 -0700 (PDT)
+ id 1kRztW-0007ku-9q
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:38:00 -0400
+Received: by mail-wr1-x42c.google.com with SMTP id e18so19682303wrw.9
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 08:37:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=73sxXQONcqBgzHuOsaIz5hu+3BY6+pw52N6WyKkQfZo=;
- b=exgSCy6TBYKs+2u6PmauhdJ/pAV+QrSf2WLOJjFOA913gOLmL4t0hjV+pGDqFu59Kd
- shf6GEjbd5Xl9baMOMbtewoojWiuyQ1lZCErfoS3kXKtI3bWXD0olSbRYV1TsabJX/7q
- /JuIkVjG6Wj0oH+m7Hk+KEq52DO13lKiXQ3MhV9kMny4wRJLcVNJKKEYWo7aMIIHMgKm
- segKFQ8AK/ZTWrMvOWZZ5NaPOdnIwXzrtWxUQK93fM2sNdnX5MQk2hpbZi2DEOOt3eTq
- hyuH9Qv3WwK2VwWEQ+vSoTrHi/uqU8HHczSgqEPivdBX+3weH2MjPpKUR4hMhd334SB3
- 9R6w==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=xP7RYtiStIWwohnsCkXsA5s/UDVdCQBRgpCwB9l5Xb0=;
+ b=abJFFijJW9RLhCr7A6Uo/HaFEtqhjwDlKOR8miTvYsT7Vr0NCtOSHMyvcED3sBm84N
+ y5ghhpI9ftafjkklGUjSehXAFPcz2VB7R7EvsEwO7qiiV7Bii9jxQ6sI4nj4Vkbv9cIm
+ erQgdbZQmRITCK0+YTfIw3+V8y36NNoCt5h6XBUWJet8ui+2dAzOywXjWJPb2/QoRnVS
+ M7jW2YYBjra+Rt+r256E1SazFaQcjjTGhE0qXivLWRzvAUxmaX6E0GHNrKKW9ejf0ph2
+ gzEITM7xiFXEZPrAR25VXcW7+d8Rz2U4J0iDjBSwEXLD2jdEHn/MoZ6R0inROeYIdb53
+ 3Xxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=73sxXQONcqBgzHuOsaIz5hu+3BY6+pw52N6WyKkQfZo=;
- b=iBnKR604NRohEYj6AkWjhObOmjd68x5p1w1bFNsZb78CfjJ9EYqwJr5mVHejiiKeC/
- CCfi8gCIh/kohLIpji4MLt23jH+IZyHya2Mh3gm+yS548hr79cM7KOFniNZ6jiY1EZVh
- BpxBIP5pgJUDuTLpuyzg6lmnT/ctMfO599pm0xeFK7u/GX/q5fRR+l9iQ/RlNApSvYUl
- tqxcv9YhX+gDA9XrCWBkDw0Yl3pkNn5ZSrmzYIaUpeojpLGR15Y4GCeCzzcj2ySXcaUE
- Xzo5MuhZZzNqHHbCNWYGINlB5SPDEF56cQ+d1nBNFLFfMoWAu79Hxj1Ah5+saAEtLDTz
- jXpw==
-X-Gm-Message-State: AOAM5336GovaUJOtiCA705XHhhdmk5Sl7rxf/87NsFX9OTuOBVh81B4z
- jhChRXurwVfbEx81kHQiqmgySw==
-X-Google-Smtp-Source: ABdhPJy4LPQpvrsnt5RCAZ9vHcRDudF9jd0mi6uJSyVW1oujaQiAGY70CcWC3vHFoJMgAPKgVLa9yQ==
-X-Received: by 2002:a1c:1f89:: with SMTP id f131mr11867963wmf.10.1602517070880; 
- Mon, 12 Oct 2020 08:37:50 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=xP7RYtiStIWwohnsCkXsA5s/UDVdCQBRgpCwB9l5Xb0=;
+ b=RUNQ7y0L3Yr/y+q6eeyIwik4sW4TfL5uLrfp0SeJShbrEnJw1yeZ0pcfZiPBzxaAfz
+ K8olyw5/rA9h06OVXysHBkiiByVw6ftVJk5yzzXpp23qpeG1l/9M3lDSV9GSKEb0Gcbm
+ 100BvHwTlVSnCZuplYsOGG6Ma6i9GdmIbVw/UWiFBFgMj+OVnk55/J6mUQWIokCPgTAY
+ UBjTyngwRZEW3JAf7Tll2KklCUIe9M4IcSQfHIiYm4Xgm1cAJpDPBvgMZl7ndOe1uYMb
+ XJBWwmSOS+QwR+oIwhSbisLO5LjzyxvTjVwsmAOWm0XoBeIQZIwWvzALY+5Nf5PTSATe
+ /S7g==
+X-Gm-Message-State: AOAM530Al12OZW2qqzfQX1uf1d0Q77QRwEE3a2RcTAQQq5sfF8LzXTQY
+ ukO66VC95yry/30dgR3hNbM5jw==
+X-Google-Smtp-Source: ABdhPJxWCtDbvvuUD6kgTD4LssnVNdBeMVmyH7yHOiQlrbT3c2leMcJ74r9115BlxrlcEITPnW97Iw==
+X-Received: by 2002:a5d:678d:: with SMTP id v13mr19131862wru.148.1602517068713; 
+ Mon, 12 Oct 2020 08:37:48 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id y66sm7095961wmd.14.2020.10.12.08.37.49
+ by smtp.gmail.com with ESMTPSA id y66sm7095961wmd.14.2020.10.12.08.37.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 12 Oct 2020 08:37:50 -0700 (PDT)
+ Mon, 12 Oct 2020 08:37:48 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH 02/10] target/arm: Implement v8.1M NOCP handling
-Date: Mon, 12 Oct 2020 16:37:38 +0100
-Message-Id: <20201012153746.9996-3-peter.maydell@linaro.org>
+Subject: [PATCH 00/10] target/arm: Various v8.1M minor features
+Date: Mon, 12 Oct 2020 16:37:36 +0100
+Message-Id: <20201012153746.9996-1-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201012153746.9996-1-peter.maydell@linaro.org>
-References: <20201012153746.9996-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x341.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42c.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,108 +103,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From v8.1M, disabled-coprocessor handling changes slightly:
- * coprocessors 8, 9, 14 and 15 are also governed by the
-   cp10 enable bit, like cp11
- * an extra range of instruction patterns is considered
-   to be inside the coprocessor space
+This patchseries implements various minor v8.1M new features,
+notably the branch-future and low-overhead-loop extensions.
 
-We previously marked these up with TODO comments; implement the
-correct behaviour.
+(None of this will get enabled until we have enough to implement
+a CPU model which has v8.1M, which will be the Cortex-M55, but
+as usual we can get stuff into the tree gradually.)
 
-Unfortunately there is no ID register field which indicates this
-behaviour.  We could in theory test an unrelated ID register which
-indicates guaranteed-to-be-in-v8.1M behaviour like ID_ISAR0.CmpBranch
->= 3 (low-overhead-loops), but it seems better to simply define a new
-ARM_FEATURE_V8_1M feature flag and use it for this and other
-new-in-v8.1M behaviour that isn't identifiable from the ID registers.
+Patch 1 is a decodetree fix suggested by Richard that is
+necessary to avoid wrong-decode of the changes to t32.decode
+by later patches.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/cpu.h               |  1 +
- target/arm/m-nocp.decode       | 10 ++++++----
- target/arm/translate-vfp.c.inc | 17 +++++++++++++++--
- 3 files changed, 22 insertions(+), 6 deletions(-)
+(Apologies for the accidental mailbombing of the list with
+stale patches due to a mangled command line on my first attempt
+at sending this :-(  )
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index cfff1b5c8fe..74392fa0295 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1985,6 +1985,7 @@ enum arm_features {
-     ARM_FEATURE_VBAR, /* has cp15 VBAR */
-     ARM_FEATURE_M_SECURITY, /* M profile Security Extension */
-     ARM_FEATURE_M_MAIN, /* M profile Main Extension */
-+    ARM_FEATURE_V8_1M, /* M profile extras only in v8.1M and later */
- };
- 
- static inline int arm_feature(CPUARMState *env, int feature)
-diff --git a/target/arm/m-nocp.decode b/target/arm/m-nocp.decode
-index 7182d7d1217..28c8ac6b94c 100644
---- a/target/arm/m-nocp.decode
-+++ b/target/arm/m-nocp.decode
-@@ -29,14 +29,16 @@
- # If the coprocessor is not present or disabled then we will generate
- # the NOCP exception; otherwise we let the insn through to the main decode.
- 
-+&nocp cp
-+
- {
-   # Special cases which do not take an early NOCP: VLLDM and VLSTM
-   VLLDM_VLSTM  1110 1100 001 l:1 rn:4 0000 1010 0000 0000
-   # TODO: VSCCLRM (new in v8.1M) is similar:
-   #VSCCLRM      1110 1100 1-01 1111 ---- 1011 ---- ---0
- 
--  NOCP         111- 1110 ---- ---- ---- cp:4 ---- ----
--  NOCP         111- 110- ---- ---- ---- cp:4 ---- ----
--  # TODO: From v8.1M onwards we will also want this range to NOCP
--  #NOCP_8_1     111- 1111 ---- ---- ---- ---- ---- ---- cp=10
-+  NOCP         111- 1110 ---- ---- ---- cp:4 ---- ---- &nocp
-+  NOCP         111- 110- ---- ---- ---- cp:4 ---- ---- &nocp
-+  # From v8.1M onwards this range will also NOCP:
-+  NOCP_8_1     111- 1111 ---- ---- ---- ---- ---- ---- &nocp cp=10
- }
-diff --git a/target/arm/translate-vfp.c.inc b/target/arm/translate-vfp.c.inc
-index 28e0dba5f14..cc9ffb95887 100644
---- a/target/arm/translate-vfp.c.inc
-+++ b/target/arm/translate-vfp.c.inc
-@@ -3459,7 +3459,7 @@ static bool trans_VLLDM_VLSTM(DisasContext *s, arg_VLLDM_VLSTM *a)
-     return true;
- }
- 
--static bool trans_NOCP(DisasContext *s, arg_NOCP *a)
-+static bool trans_NOCP(DisasContext *s, arg_nocp *a)
- {
-     /*
-      * Handle M-profile early check for disabled coprocessor:
-@@ -3472,7 +3472,11 @@ static bool trans_NOCP(DisasContext *s, arg_NOCP *a)
-     if (a->cp == 11) {
-         a->cp = 10;
-     }
--    /* TODO: in v8.1M cp 8, 9, 14, 15 also are governed by the cp10 enable */
-+    if (arm_dc_feature(s, ARM_FEATURE_V8_1M) &&
-+        (a->cp == 8 || a->cp == 9 || a->cp == 14 || a->cp == 15)) {
-+        /* in v8.1M cp 8, 9, 14, 15 also are governed by the cp10 enable */
-+        a->cp = 10;
-+    }
- 
-     if (a->cp != 10) {
-         gen_exception_insn(s, s->pc_curr, EXCP_NOCP,
-@@ -3489,6 +3493,15 @@ static bool trans_NOCP(DisasContext *s, arg_NOCP *a)
-     return false;
- }
- 
-+static bool trans_NOCP_8_1(DisasContext *s, arg_nocp *a)
-+{
-+    /* This range needs a coprocessor check for v8.1M and later only */
-+    if (!arm_dc_feature(s, ARM_FEATURE_V8_1M)) {
-+        return false;
-+    }
-+    return trans_NOCP(s, a);
-+}
-+
- static bool trans_VINS(DisasContext *s, arg_VINS *a)
- {
-     TCGv_i32 rd, rm;
+thanks
+-- PMM
+
+Peter Maydell (10):
+  decodetree: Fix codegen for non-overlapping group inside overlapping
+    group
+  target/arm: Implement v8.1M NOCP handling
+  target/arm: Implement v8.1M conditional-select insns
+  target/arm: Make the t32 insn[25:23]=111 group non-overlapping
+  target/arm: Don't allow BLX imm for M-profile
+  target/arm: Implement v8.1M branch-future insns (as NOPs)
+  target/arm: Implement v8.1M low-overhead-loop instructions
+  target/arm: Fix has_vfp/has_neon ID reg squashing for M-profile
+  target/arm: Implement FPSCR.LTPSIZE for M-profile LOB extension
+  target/arm: Fix writing to FPSCR.FZ16 on M-profile
+
+ target/arm/cpu.h               |   7 ++
+ target/arm/m-nocp.decode       |  10 ++-
+ target/arm/t32.decode          |  50 +++++++----
+ target/arm/cpu.c               |  34 ++++---
+ target/arm/translate.c         | 157 +++++++++++++++++++++++++++++++++
+ target/arm/vfp_helper.c        |  30 +++++--
+ scripts/decodetree.py          |   2 +-
+ target/arm/translate-vfp.c.inc |  17 +++-
+ 8 files changed, 268 insertions(+), 39 deletions(-)
+
 -- 
 2.20.1
 
