@@ -2,68 +2,67 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0001BC43457
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:50:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54CC9C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:50:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75E3120790
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:50:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C3CDC2078E
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:50:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PiSU+NDq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75E3120790
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DYB/SGOk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3CDC2078E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kS4mF-0008Np-Iy
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 16:50:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38208)
+	id 1kS4mG-0008PN-Qv
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 16:50:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38430)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kS4WK-0002o2-2L
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:34:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22347)
+ id 1kS4WV-0002wz-4O
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:34:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:31223)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kS4WG-0002hD-HW
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:34:09 -0400
+ id 1kS4WO-0002jK-90
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:34:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602534847;
+ s=mimecast20190719; t=1602534854;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wE4xYngsHjpqAQke6cOySjcfqIG9xco+FEa43LMMRDo=;
- b=PiSU+NDqiF4ZFySn+8C457Y8LK0xm1Ch+6ZzW5azWY+/mHzRJ3QZYZ/JqNjwdiLUZ611Fn
- CuvL7/CpUfS5/gFPEL8LQnw+iGT7W5IDXx7RghRxKThf869zR3mRL85DTn/dGpKgn8JtoM
- TyAt/s9khqCg2J/+wXDGlX3NXb2rank=
+ bh=pW3I7+8Fr03yk/X+Wk7CJwUrSBzdKsHrG85hgVxf070=;
+ b=DYB/SGOkv+6D3VHJO4On9j3nllmjmffljiqP+Y36ewBjcpuxi3qwwJVguP94KkMJO/YBSh
+ XLfiYaD/236ga+lsp0l7IN9V8JJ22jERnkElCJz6kpILLaGjcXe7MOITq7z1TtnOMV1jdz
+ LhFrwwqh3OMv8Cw2WsQKVBvj2MiMJmg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-7-NAmNwhLYNi2fMhRTIVWppw-1; Mon, 12 Oct 2020 16:34:05 -0400
-X-MC-Unique: NAmNwhLYNi2fMhRTIVWppw-1
+ us-mta-254-kdwtCmT9PY6bY-Zzxo7yrA-1; Mon, 12 Oct 2020 16:34:12 -0400
+X-MC-Unique: kdwtCmT9PY6bY-Zzxo7yrA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 120209CC33
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 20:33:56 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43D30890EAC;
+ Mon, 12 Oct 2020 20:34:02 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D33836EF59
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 20:33:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C08AA6EF59;
+ Mon, 12 Oct 2020 20:34:01 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 24/38] device-plug-test: use qtest_qmp to send the device_del
- command
-Date: Mon, 12 Oct 2020 16:33:29 -0400
-Message-Id: <20201012203343.1105018-25-pbonzini@redhat.com>
+Subject: [PULL 36/38] virtio-scsi: use scsi_device_get
+Date: Mon, 12 Oct 2020 16:33:41 -0400
+Message-Id: <20201012203343.1105018-37-pbonzini@redhat.com>
 In-Reply-To: <20201012203343.1105018-1-pbonzini@redhat.com>
 References: <20201012203343.1105018-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -74,16 +73,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/11 23:52:29
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 16:33:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,103 +96,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Simplify the code now that events are buffered.  There is no need
-anymore to separate sending the command and retrieving the response.
+From: Maxim Levitsky <mlevitsk@redhat.com>
 
+This will help us to avoid the scsi device disappearing
+after we took a reference to it.
+
+It doesn't by itself forbid case when we try to access
+an unrealized device
+
+Suggested-by: Stefan Hajnoczi <stefanha@gmail.com>
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20200913160259.32145-9-mlevitsk@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <20201006123904.610658-13-mlevitsk@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/qtest/device-plug-test.c | 32 +++++++++-----------------------
- 1 file changed, 9 insertions(+), 23 deletions(-)
+ hw/scsi/virtio-scsi.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
-diff --git a/tests/qtest/device-plug-test.c b/tests/qtest/device-plug-test.c
-index a2247856be..559d47727a 100644
---- a/tests/qtest/device-plug-test.c
-+++ b/tests/qtest/device-plug-test.c
-@@ -15,26 +15,17 @@
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qstring.h"
- 
--static void device_del_start(QTestState *qtest, const char *id)
-+static void device_del(QTestState *qtest, const char *id)
- {
--    qtest_qmp_send(qtest,
--                   "{'execute': 'device_del', 'arguments': { 'id': %s } }", id);
--}
-+    QDict *resp;
- 
--static void device_del_finish(QTestState *qtest)
--{
--    QDict *resp = qtest_qmp_receive_dict(qtest);
-+    resp = qtest_qmp(qtest,
-+                     "{'execute': 'device_del', 'arguments': { 'id': %s } }", id);
- 
-     g_assert(qdict_haskey(resp, "return"));
-     qobject_unref(resp);
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index 971afbb217..3db9a8aae9 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -33,7 +33,7 @@ static inline int virtio_scsi_get_lun(uint8_t *lun)
+     return ((lun[2] << 8) | lun[3]) & 0x3FFF;
  }
  
--static void device_del_request(QTestState *qtest, const char *id)
--{
--    device_del_start(qtest, id);
--    device_del_finish(qtest);
--}
--
- static void system_reset(QTestState *qtest)
+-static inline SCSIDevice *virtio_scsi_device_find(VirtIOSCSI *s, uint8_t *lun)
++static inline SCSIDevice *virtio_scsi_device_get(VirtIOSCSI *s, uint8_t *lun)
  {
-     QDict *resp;
-@@ -79,7 +70,7 @@ static void test_pci_unplug_request(void)
-      * be processed. However during system reset, the removal will be
-      * handled, removing the device.
-      */
--    device_del_request(qtest, "dev0");
-+    device_del(qtest, "dev0");
-     system_reset(qtest);
-     wait_device_deleted_event(qtest, "dev0");
- 
-@@ -90,13 +81,8 @@ static void test_ccw_unplug(void)
- {
-     QTestState *qtest = qtest_initf("-device virtio-balloon-ccw,id=dev0");
- 
--    /*
--     * The DEVICE_DELETED events will be sent before the command
--     * completes.
--     */
--    device_del_start(qtest, "dev0");
-+    device_del(qtest, "dev0");
-     wait_device_deleted_event(qtest, "dev0");
--    device_del_finish(qtest);
- 
-     qtest_quit(qtest);
+     if (lun[0] != 1) {
+         return NULL;
+@@ -41,7 +41,7 @@ static inline SCSIDevice *virtio_scsi_device_find(VirtIOSCSI *s, uint8_t *lun)
+     if (lun[2] != 0 && !(lun[2] >= 0x40 && lun[2] < 0x80)) {
+         return NULL;
+     }
+-    return scsi_device_find(&s->bus, 0, lun[1], virtio_scsi_get_lun(lun));
++    return scsi_device_get(&s->bus, 0, lun[1], virtio_scsi_get_lun(lun));
  }
-@@ -109,7 +95,7 @@ static void test_spapr_cpu_unplug_request(void)
-                         "-device power9_v2.0-spapr-cpu-core,core-id=1,id=dev0");
  
-     /* similar to test_pci_unplug_request */
--    device_del_request(qtest, "dev0");
-+    device_del(qtest, "dev0");
-     system_reset(qtest);
-     wait_device_deleted_event(qtest, "dev0");
+ void virtio_scsi_init_req(VirtIOSCSI *s, VirtQueue *vq, VirtIOSCSIReq *req)
+@@ -256,7 +256,7 @@ static inline void virtio_scsi_ctx_check(VirtIOSCSI *s, SCSIDevice *d)
+  *  case of async cancellation. */
+ static int virtio_scsi_do_tmf(VirtIOSCSI *s, VirtIOSCSIReq *req)
+ {
+-    SCSIDevice *d = virtio_scsi_device_find(s, req->req.tmf.lun);
++    SCSIDevice *d = virtio_scsi_device_get(s, req->req.tmf.lun);
+     SCSIRequest *r, *next;
+     BusChild *kid;
+     int target;
+@@ -370,10 +370,10 @@ static int virtio_scsi_do_tmf(VirtIOSCSI *s, VirtIOSCSIReq *req)
  
-@@ -125,7 +111,7 @@ static void test_spapr_memory_unplug_request(void)
-                         "-device pc-dimm,id=dev0,memdev=mem0");
+         rcu_read_lock();
+         QTAILQ_FOREACH_RCU(kid, &s->bus.qbus.children, sibling) {
+-             d = SCSI_DEVICE(kid->child);
+-             if (d->channel == 0 && d->id == target) {
+-                qdev_reset_all(&d->qdev);
+-             }
++            SCSIDevice *d1 = SCSI_DEVICE(kid->child);
++            if (d1->channel == 0 && d1->id == target) {
++                qdev_reset_all(&d1->qdev);
++            }
+         }
+         rcu_read_unlock();
  
-     /* similar to test_pci_unplug_request */
--    device_del_request(qtest, "dev0");
-+    device_del(qtest, "dev0");
-     system_reset(qtest);
-     wait_device_deleted_event(qtest, "dev0");
+@@ -386,14 +386,17 @@ static int virtio_scsi_do_tmf(VirtIOSCSI *s, VirtIOSCSIReq *req)
+         break;
+     }
  
-@@ -139,7 +125,7 @@ static void test_spapr_phb_unplug_request(void)
-     qtest = qtest_initf("-device spapr-pci-host-bridge,index=1,id=dev0");
++    object_unref(OBJECT(d));
+     return ret;
  
-     /* similar to test_pci_unplug_request */
--    device_del_request(qtest, "dev0");
-+    device_del(qtest, "dev0");
-     system_reset(qtest);
-     wait_device_deleted_event(qtest, "dev0");
+ incorrect_lun:
+     req->resp.tmf.response = VIRTIO_SCSI_S_INCORRECT_LUN;
++    object_unref(OBJECT(d));
+     return ret;
+ 
+ fail:
+     req->resp.tmf.response = VIRTIO_SCSI_S_BAD_TARGET;
++    object_unref(OBJECT(d));
+     return ret;
+ }
+ 
+@@ -564,7 +567,7 @@ static int virtio_scsi_handle_cmd_req_prepare(VirtIOSCSI *s, VirtIOSCSIReq *req)
+         }
+     }
+ 
+-    d = virtio_scsi_device_find(s, req->req.cmd.lun);
++    d = virtio_scsi_device_get(s, req->req.cmd.lun);
+     if (!d) {
+         req->resp.cmd.response = VIRTIO_SCSI_S_BAD_TARGET;
+         virtio_scsi_complete_cmd_req(req);
+@@ -580,10 +583,12 @@ static int virtio_scsi_handle_cmd_req_prepare(VirtIOSCSI *s, VirtIOSCSIReq *req)
+             req->sreq->cmd.xfer > req->qsgl.size)) {
+         req->resp.cmd.response = VIRTIO_SCSI_S_OVERRUN;
+         virtio_scsi_complete_cmd_req(req);
++        object_unref(OBJECT(d));
+         return -ENOBUFS;
+     }
+     scsi_req_ref(req->sreq);
+     blk_io_plug(d->conf.blk);
++    object_unref(OBJECT(d));
+     return 0;
+ }
  
 -- 
 2.26.2
