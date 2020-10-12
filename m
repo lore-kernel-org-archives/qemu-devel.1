@@ -2,46 +2,46 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9557C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 17:47:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25DA8C433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 17:48:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70F5C206CB
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 17:47:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70F5C206CB
+	by mail.kernel.org (Postfix) with ESMTPS id 7F2902073A
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 17:48:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F2902073A
 Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kS1uY-0000pq-FL
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 13:47:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58492)
+	id 1kS1vX-0001rU-Fj
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 13:48:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58914)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kS1sf-0007eD-O9; Mon, 12 Oct 2020 13:45:05 -0400
-Received: from relay.sw.ru ([185.231.240.75]:60716 helo=relay3.sw.ru)
+ id 1kS1uF-0000ke-5Y; Mon, 12 Oct 2020 13:46:43 -0400
+Received: from relay.sw.ru ([185.231.240.75]:32958 helo=relay3.sw.ru)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kS1sd-0007EC-U9; Mon, 12 Oct 2020 13:45:05 -0400
+ id 1kS1uB-0007ZN-NP; Mon, 12 Oct 2020 13:46:42 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay3.sw.ru with esmtp (Exim 4.94)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kS1rh-0047iC-Pu; Mon, 12 Oct 2020 20:44:05 +0300
+ id 1kS1tF-0047iC-K6; Mon, 12 Oct 2020 20:45:41 +0300
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, fam@euphon.net,
  stefanha@redhat.com, armbru@redhat.com, jsnow@redhat.com,
  libvir-list@redhat.com, eblake@redhat.com, den@openvz.org,
  vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
-Subject: [PATCH v11 01/13] copy-on-read: Support preadv/pwritev_part functions
-Date: Mon, 12 Oct 2020 20:43:13 +0300
-Message-Id: <1602524605-481160-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v11 03/13] qapi: add filter-node-name to block-stream
+Date: Mon, 12 Oct 2020 20:43:15 +0300
+Message-Id: <1602524605-481160-4-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1602524605-481160-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1602524605-481160-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -72,69 +72,120 @@ Sender: "Qemu-devel"
 Reply-to: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 From: Andrey Shinkevich via <qemu-devel@nongnu.org>
 
-Add support for the recently introduced functions
-bdrv_co_preadv_part()
-and
-bdrv_co_pwritev_part()
-to the COR-filter driver.
+Provide the possibility to pass the 'filter-node-name' parameter to the
+block-stream job as it is done for the commit block job.
 
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/copy-on-read.c | 28 ++++++++++++++++------------
- 1 file changed, 16 insertions(+), 12 deletions(-)
+ block/monitor/block-hmp-cmds.c | 4 ++--
+ block/stream.c                 | 4 +++-
+ blockdev.c                     | 4 +++-
+ include/block/block_int.h      | 7 ++++++-
+ qapi/block-core.json           | 6 ++++++
+ 5 files changed, 20 insertions(+), 5 deletions(-)
 
-diff --git a/block/copy-on-read.c b/block/copy-on-read.c
-index 2816e61..cb03e0f 100644
---- a/block/copy-on-read.c
-+++ b/block/copy-on-read.c
-@@ -74,21 +74,25 @@ static int64_t cor_getlength(BlockDriverState *bs)
+diff --git a/block/monitor/block-hmp-cmds.c b/block/monitor/block-hmp-cmds.c
+index 4d3db5e..4e66775 100644
+--- a/block/monitor/block-hmp-cmds.c
++++ b/block/monitor/block-hmp-cmds.c
+@@ -507,8 +507,8 @@ void hmp_block_stream(Monitor *mon, const QDict *qdict)
+ 
+     qmp_block_stream(true, device, device, base != NULL, base, false, NULL,
+                      false, NULL, qdict_haskey(qdict, "speed"), speed, true,
+-                     BLOCKDEV_ON_ERROR_REPORT, false, false, false, false,
+-                     &error);
++                     BLOCKDEV_ON_ERROR_REPORT, false, NULL, false, false, false,
++                     false, &error);
+ 
+     hmp_handle_error(mon, error);
  }
- 
- 
--static int coroutine_fn cor_co_preadv(BlockDriverState *bs,
--                                      uint64_t offset, uint64_t bytes,
--                                      QEMUIOVector *qiov, int flags)
-+static int coroutine_fn cor_co_preadv_part(BlockDriverState *bs,
-+                                           uint64_t offset, uint64_t bytes,
-+                                           QEMUIOVector *qiov,
-+                                           size_t qiov_offset,
-+                                           int flags)
+diff --git a/block/stream.c b/block/stream.c
+index 8ce6729..e0540ee 100644
+--- a/block/stream.c
++++ b/block/stream.c
+@@ -221,7 +221,9 @@ static const BlockJobDriver stream_job_driver = {
+ void stream_start(const char *job_id, BlockDriverState *bs,
+                   BlockDriverState *base, const char *backing_file_str,
+                   int creation_flags, int64_t speed,
+-                  BlockdevOnError on_error, Error **errp)
++                  BlockdevOnError on_error,
++                  const char *filter_node_name,
++                  Error **errp)
  {
--    return bdrv_co_preadv(bs->file, offset, bytes, qiov,
--                          flags | BDRV_REQ_COPY_ON_READ);
-+    return bdrv_co_preadv_part(bs->file, offset, bytes, qiov, qiov_offset,
-+                               flags | BDRV_REQ_COPY_ON_READ);
- }
+     StreamBlockJob *s;
+     BlockDriverState *iter;
+diff --git a/blockdev.c b/blockdev.c
+index bebd3ba..d719c47 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -2489,6 +2489,7 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
+                       bool has_backing_file, const char *backing_file,
+                       bool has_speed, int64_t speed,
+                       bool has_on_error, BlockdevOnError on_error,
++                      bool has_filter_node_name, const char *filter_node_name,
+                       bool has_auto_finalize, bool auto_finalize,
+                       bool has_auto_dismiss, bool auto_dismiss,
+                       Error **errp)
+@@ -2571,7 +2572,8 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
+     }
  
+     stream_start(has_job_id ? job_id : NULL, bs, base_bs, base_name,
+-                 job_flags, has_speed ? speed : 0, on_error, &local_err);
++                 job_flags, has_speed ? speed : 0, on_error,
++                 filter_node_name, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         goto out;
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 38cad9d..f782737 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -1134,6 +1134,9 @@ int is_windows_drive(const char *filename);
+  *                  See @BlockJobCreateFlags
+  * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
+  * @on_error: The action to take upon error.
++ * @filter_node_name: The node name that should be assigned to the filter
++ * driver that the commit job inserts into the graph above @bs. NULL means
++ * that a node name should be autogenerated.
+  * @errp: Error object.
+  *
+  * Start a streaming operation on @bs.  Clusters that are unallocated
+@@ -1146,7 +1149,9 @@ int is_windows_drive(const char *filename);
+ void stream_start(const char *job_id, BlockDriverState *bs,
+                   BlockDriverState *base, const char *backing_file_str,
+                   int creation_flags, int64_t speed,
+-                  BlockdevOnError on_error, Error **errp);
++                  BlockdevOnError on_error,
++                  const char *filter_node_name,
++                  Error **errp);
  
--static int coroutine_fn cor_co_pwritev(BlockDriverState *bs,
--                                       uint64_t offset, uint64_t bytes,
--                                       QEMUIOVector *qiov, int flags)
-+static int coroutine_fn cor_co_pwritev_part(BlockDriverState *bs,
-+                                            uint64_t offset,
-+                                            uint64_t bytes,
-+                                            QEMUIOVector *qiov,
-+                                            size_t qiov_offset, int flags)
- {
--
--    return bdrv_co_pwritev(bs->file, offset, bytes, qiov, flags);
-+    return bdrv_co_pwritev_part(bs->file, offset, bytes, qiov, qiov_offset,
-+                                flags);
- }
+ /**
+  * commit_start:
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 3c16f1e..32fb097 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2533,6 +2533,11 @@
+ #            'stop' and 'enospc' can only be used if the block device
+ #            supports io-status (see BlockInfo).  Since 1.3.
+ #
++# @filter-node-name: the node name that should be assigned to the
++#                    filter driver that the stream job inserts into the graph
++#                    above @device. If this option is not given, a node name is
++#                    autogenerated. (Since: 5.2)
++#
+ # @auto-finalize: When false, this job will wait in a PENDING state after it has
+ #                 finished its work, waiting for @block-job-finalize before
+ #                 making any block graph changes.
+@@ -2563,6 +2568,7 @@
+   'data': { '*job-id': 'str', 'device': 'str', '*base': 'str',
+             '*base-node': 'str', '*backing-file': 'str', '*speed': 'int',
+             '*on-error': 'BlockdevOnError',
++            '*filter-node-name': 'str',
+             '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
  
- 
-@@ -137,8 +141,8 @@ static BlockDriver bdrv_copy_on_read = {
- 
-     .bdrv_getlength                     = cor_getlength,
- 
--    .bdrv_co_preadv                     = cor_co_preadv,
--    .bdrv_co_pwritev                    = cor_co_pwritev,
-+    .bdrv_co_preadv_part                = cor_co_preadv_part,
-+    .bdrv_co_pwritev_part               = cor_co_pwritev_part,
-     .bdrv_co_pwrite_zeroes              = cor_co_pwrite_zeroes,
-     .bdrv_co_pdiscard                   = cor_co_pdiscard,
-     .bdrv_co_pwritev_compressed         = cor_co_pwritev_compressed,
+ ##
 -- 
 1.8.3.1
 
