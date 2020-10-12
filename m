@@ -2,74 +2,62 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2890C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:25:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7571FC433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:25:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54EFA2074F
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:25:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54EFA2074F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 035AE2074F
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:25:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 035AE2074F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kS4OE-0007sc-Cc
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 16:25:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35058)
+	id 1kS4OJ-00082u-3C
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 16:25:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35082)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1kS4NR-0006sA-89; Mon, 12 Oct 2020 16:25:01 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:46841)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kS4NW-00070C-Cs
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:25:06 -0400
+Received: from mx2.suse.de ([195.135.220.15]:54754)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1kS4NP-0001Kw-5j; Mon, 12 Oct 2020 16:25:00 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.109.146.173])
- by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 7E55764E867D;
- Mon, 12 Oct 2020 22:24:55 +0200 (CEST)
-Received: from kaod.org (37.59.142.105) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Mon, 12 Oct
- 2020 22:24:54 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-105G0068884dd26-cfac-440c-9282-1c09ebc94eac,
- 830CACE26F9FD03FB18D3405BC9B9D6A151429CC) smtp.auth=groug@kaod.org
-Date: Mon, 12 Oct 2020 22:24:53 +0200
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH 4/4] spapr: Make spapr_cpu_core_unrealize() idempotent
-Message-ID: <20201012222453.054dbbf8@bahia.lan>
-In-Reply-To: <160251600753.796881.11787439223917154767.stgit@bahia.lan>
-References: <160251562222.796881.8197386060416409319.stgit@bahia.lan>
- <160251600753.796881.11787439223917154767.stgit@bahia.lan>
-X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kS4NU-0001Lu-Lg
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:25:06 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+ by mx2.suse.de (Postfix) with ESMTP id 809DDAFF9;
+ Mon, 12 Oct 2020 20:25:03 +0000 (UTC)
+Subject: Re: [PATCH 2/2] accel: Add xen CpusAccel using dummy-cpu
+To: Jason Andryuk <jandryuk@gmail.com>, qemu-devel@nongnu.org
+References: <20201012200725.64137-1-jandryuk@gmail.com>
+ <20201012200725.64137-3-jandryuk@gmail.com>
+From: Claudio Fontana <cfontana@suse.de>
+Message-ID: <cafc34c0-0bcd-d138-d46d-ac2c0d5ba2fb@suse.de>
+Date: Mon, 12 Oct 2020 22:25:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+In-Reply-To: <20201012200725.64137-3-jandryuk@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.105]
-X-ClientProxiedBy: DAG3EX2.mxp5.local (172.16.2.22) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: 574e15e8-89a2-4d1b-9b24-85b1545b11b2
-X-Ovh-Tracer-Id: 13517272808485067229
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrheejgdduheduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfhisehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefuddtieejjeevheekieeltefgleetkeetheettdeifeffvefhffelffdtfeeljeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-Received-SPF: pass client-ip=178.32.125.2; envelope-from=groug@kaod.org;
- helo=smtpout1.mo529.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 16:24:55
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 01:21:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,77 +70,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: Anthony Perard <anthony.perard@citrix.com>,
+ "open list:X86 Xen CPUs" <xen-devel@lists.xenproject.org>,
+ Stefano Stabellini <sstabellini@kernel.org>, Paul Durrant <paul@xen.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 12 Oct 2020 17:20:07 +0200
-Greg Kurz <groug@kaod.org> wrote:
-
-> spapr_cpu_core_realize() has an err_unrealize label which partially
-> duplicates the code of spapr_cpu_core_realize().
+On 10/12/20 10:07 PM, Jason Andryuk wrote:
+> Xen was broken by commit 1583a3898853 ("cpus: extract out qtest-specific
+> code to accel/qtest").  Xen relied on qemu_init_vcpu() calling
+> qemu_dummy_start_vcpu() in the default case, but that was replaced by
+> g_assert_not_reached().
 > 
-> Let's make spapr_cpu_core_unrealize() idempotent and call it instead.
-> The registration and unregistration of the reset handler are moved
-> around to simplify the code even more.
+> Add a minimal "CpusAccel" for xen using the dummy-cpu implementation
+> used by qtest.
 > 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Jason Andryuk <jandryuk@gmail.com>
 > ---
-
-Hmmm... this one need some more care because spapr_unrealize_vcpu()
-because isn't idempotent. Please ignore it.
-
->  hw/ppc/spapr_cpu_core.c |   21 +++++++++------------
->  1 file changed, 9 insertions(+), 12 deletions(-)
+>  accel/dummy/meson.build |  1 +
+>  accel/xen/xen-all.c     | 10 ++++++++++
+>  2 files changed, 11 insertions(+)
 > 
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index cffd74f542ba..e3fd81eb9741 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -227,11 +227,13 @@ static void spapr_cpu_core_unrealize(DeviceState *dev)
->      CPUCore *cc = CPU_CORE(dev);
->      int i;
+> diff --git a/accel/dummy/meson.build b/accel/dummy/meson.build
+> index 5fbe27de90..cdff0ba746 100644
+> --- a/accel/dummy/meson.build
+> +++ b/accel/dummy/meson.build
+> @@ -4,3 +4,4 @@ dummy_ss.add(files(
+>  ))
 >  
-> -    qemu_unregister_reset(spapr_cpu_core_reset_handler, sc);
-> -
->      for (i = 0; i < cc->nr_threads; i++) {
-> -        spapr_unrealize_vcpu(sc->threads[i], sc);
-> +        if (sc->threads[i]) {
-> +            spapr_unrealize_vcpu(sc->threads[i], sc);
-> +        }
->      }
+>  specific_ss.add_all(when: ['CONFIG_SOFTMMU', 'CONFIG_POSIX'], if_true: dummy_ss)
+> +specific_ss.add_all(when: ['CONFIG_XEN'], if_true: dummy_ss)
+> diff --git a/accel/xen/xen-all.c b/accel/xen/xen-all.c
+> index 60b971d0a8..2d243c58d4 100644
+> --- a/accel/xen/xen-all.c
+> +++ b/accel/xen/xen-all.c
+> @@ -16,12 +16,15 @@
+>  #include "hw/xen/xen_pt.h"
+>  #include "chardev/char.h"
+>  #include "sysemu/accel.h"
+> +#include "sysemu/cpus.h"
+>  #include "sysemu/xen.h"
+>  #include "sysemu/runstate.h"
+>  #include "migration/misc.h"
+>  #include "migration/global_state.h"
+>  #include "hw/boards.h"
+>  
+> +#include "accel/dummy/dummy-cpus.h"
+
+it seems this should be in includes/sysemu/accel.h or so.
+
 > +
-> +    qemu_unregister_reset(spapr_cpu_core_reset_handler, sc);
+>  //#define DEBUG_XEN
+>  
+>  #ifdef DEBUG_XEN
+> @@ -153,6 +156,10 @@ static void xen_setup_post(MachineState *ms, AccelState *accel)
+>      }
 >  }
 >  
->  static bool spapr_realize_vcpu(PowerPCCPU *cpu, SpaprMachineState *spapr,
-> @@ -326,19 +328,14 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
->          }
->      }
->  
-> +    qemu_register_reset(spapr_cpu_core_reset_handler, sc);
+> +const CpusAccel xen_cpus = {
+> +    .create_vcpu_thread = dummy_start_vcpu_thread,
+> +};
 > +
->      for (j = 0; j < cc->nr_threads; j++) {
->          if (!spapr_realize_vcpu(sc->threads[j], spapr, sc, errp)) {
-> -            goto err_unrealize;
-> +            spapr_cpu_core_unrealize(dev);
-> +            return;
->          }
->      }
-> -
-> -    qemu_register_reset(spapr_cpu_core_reset_handler, sc);
-> -    return;
-> -
-> -err_unrealize:
-> -    while (--j >= 0) {
-> -        spapr_unrealize_vcpu(sc->threads[j], sc);
-> -    }
+>  static int xen_init(MachineState *ms)
+>  {
+>      MachineClass *mc = MACHINE_GET_CLASS(ms);
+> @@ -180,6 +187,9 @@ static int xen_init(MachineState *ms)
+>       * opt out of system RAM being allocated by generic code
+>       */
+>      mc->default_ram_id = NULL;
+> +
+> +    cpus_register_accel(&xen_cpus);
+> +
+>      return 0;
 >  }
 >  
->  static Property spapr_cpu_core_properties[] = {
-> 
-> 
 > 
 
+Ciao,
+
+Claudio
 
