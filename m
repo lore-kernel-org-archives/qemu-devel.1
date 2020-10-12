@@ -2,47 +2,47 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3D90C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 17:50:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 959D8C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 17:51:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A2DD2073A
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 17:50:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A2DD2073A
+	by mail.kernel.org (Postfix) with ESMTPS id 30FA92074F
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 17:51:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30FA92074F
 Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kS1yC-0004e6-IJ
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 13:50:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59268)
+	id 1kS1z9-0006Jr-Bh
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 13:51:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59544)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kS1vm-0002fC-IF; Mon, 12 Oct 2020 13:48:18 -0400
-Received: from relay.sw.ru ([185.231.240.75]:33448 helo=relay3.sw.ru)
+ id 1kS1xK-0004TV-5M; Mon, 12 Oct 2020 13:49:54 -0400
+Received: from relay.sw.ru ([185.231.240.75]:33944 helo=relay3.sw.ru)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kS1vk-0007go-Sz; Mon, 12 Oct 2020 13:48:18 -0400
+ id 1kS1xI-0007pE-LV; Mon, 12 Oct 2020 13:49:53 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay3.sw.ru with esmtp (Exim 4.94)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kS1un-0047iC-N9; Mon, 12 Oct 2020 20:47:17 +0300
+ id 1kS1wL-0047iC-Tv; Mon, 12 Oct 2020 20:48:53 +0300
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, fam@euphon.net,
  stefanha@redhat.com, armbru@redhat.com, jsnow@redhat.com,
  libvir-list@redhat.com, eblake@redhat.com, den@openvz.org,
  vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
-Subject: [PATCH v11 05/13] copy-on-read: limit COR operations to base in COR
- driver
-Date: Mon, 12 Oct 2020 20:43:17 +0300
-Message-Id: <1602524605-481160-6-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v11 07/13] block: include supported_read_flags into BDS
+ structure
+Date: Mon, 12 Oct 2020 20:43:19 +0300
+Message-Id: <1602524605-481160-8-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1602524605-481160-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1602524605-481160-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -73,67 +73,30 @@ Sender: "Qemu-devel"
 Reply-to: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 From: Andrey Shinkevich via <qemu-devel@nongnu.org>
 
-Limit COR operations by the base node in the backing chain when the
-overlay base node name is given. It will be useful for a block stream
-job when the COR-filter is applied. The overlay base node is passed as
-the base itself may change due to concurrent commit jobs on the same
-backing chain.
+Add the new member supported_read_flags to BlockDriverState structure.
+It will control the BDRV_REQ_PREFETCH flag set for copy-on-read
+operations.
 
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- block/copy-on-read.c | 39 +++++++++++++++++++++++++++++++++++++--
- 1 file changed, 37 insertions(+), 2 deletions(-)
+ include/block/block_int.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/block/copy-on-read.c b/block/copy-on-read.c
-index c578b1b..dfbd6ad 100644
---- a/block/copy-on-read.c
-+++ b/block/copy-on-read.c
-@@ -122,8 +122,43 @@ static int coroutine_fn cor_co_preadv_part(BlockDriverState *bs,
-                                            size_t qiov_offset,
-                                            int flags)
- {
--    return bdrv_co_preadv_part(bs->file, offset, bytes, qiov, qiov_offset,
--                               flags | BDRV_REQ_COPY_ON_READ);
-+    int64_t n = 0;
-+    int64_t size = offset + bytes;
-+    int local_flags;
-+    int ret;
-+    BDRVStateCOR *state = bs->opaque;
-+
-+    if (!state->base_overlay) {
-+        return bdrv_co_preadv_part(bs->file, offset, bytes, qiov, qiov_offset,
-+                                   flags | BDRV_REQ_COPY_ON_READ);
-+    }
-+
-+    while (offset < size) {
-+        local_flags = flags;
-+
-+        /* In case of failure, try to copy-on-read anyway */
-+        ret = bdrv_is_allocated(bs->file->bs, offset, bytes, &n);
-+        if (!ret) {
-+            ret = bdrv_is_allocated_above(bdrv_cow_bs(bs->file->bs),
-+                                          state->base_overlay, true, offset,
-+                                          n, &n);
-+            if (ret) {
-+                local_flags |= BDRV_REQ_COPY_ON_READ;
-+            }
-+        }
-+
-+        ret = bdrv_co_preadv_part(bs->file, offset, n, qiov, qiov_offset,
-+                                  local_flags);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+
-+        offset += n;
-+        qiov_offset += n;
-+        bytes -= n;
-+    }
-+
-+    return 0;
- }
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index f782737..a142867 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -873,6 +873,10 @@ struct BlockDriverState {
+     /* I/O Limits */
+     BlockLimits bl;
  
- 
++    /*
++     * Flags honored during pread (so far: BDRV_REQ_PREFETCH)
++     */
++    unsigned int supported_read_flags;
+     /* Flags honored during pwrite (so far: BDRV_REQ_FUA,
+      * BDRV_REQ_WRITE_UNCHANGED).
+      * If a driver does not support BDRV_REQ_WRITE_UNCHANGED, those
 -- 
 1.8.3.1
 
