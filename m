@@ -2,79 +2,100 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8B79C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 11:59:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E23D5C433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 12:00:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66EFB214D8
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 11:59:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 221EA214D8
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 12:00:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i/KBkio+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66EFB214D8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KZ7Ke6eF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 221EA214D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRwUT-0008NI-Dr
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 07:59:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42740)
+	id 1kRwUu-0000LR-4V
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 08:00:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45964)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kRwG4-0000bb-Qs
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 07:44:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38244)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kRwRa-0005Ch-Fp
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 07:56:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21295)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kRwFx-0008AS-Uk
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 07:44:52 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kRwRX-0001Zh-Hr
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 07:56:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602503082;
+ s=mimecast20190719; t=1602503801;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=MIs8GSYndujj/IUhzFBYJYVlEAHzu8gUjnP34Xj8hpI=;
- b=i/KBkio+AUhJ1ClyXn6ygmtqJZPRjPfdcet12xlmFNAeRfWrXcvvyv5vNXirOxtwzzrA3L
- vBYF6M65OSQo/7TId3FxZqz7JOoBrizz+g1/bJKYHYZhE4xuVdRF/d7WbLQnhjnnlI+sZu
- PMm3CSCzJRtwylx5qrflh4RKIE8Eldk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-154-uEvCkDEIPB6Pv8stL71KtA-1; Mon, 12 Oct 2020 07:44:40 -0400
-X-MC-Unique: uEvCkDEIPB6Pv8stL71KtA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44D4285C706;
- Mon, 12 Oct 2020 11:44:39 +0000 (UTC)
-Received: from dgilbert-t580.localhost (ovpn-113-244.ams2.redhat.com
- [10.36.113.244])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E3D6119C78;
- Mon, 12 Oct 2020 11:44:37 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org, alex.bennee@linaro.org, zhengchuan@huawei.com,
- stefanha@redhat.com, peterx@redhat.com
-Subject: [PULL 2/6] tools/virtiofsd: add support for --socket-group
-Date: Mon, 12 Oct 2020 12:44:21 +0100
-Message-Id: <20201012114425.104765-3-dgilbert@redhat.com>
-In-Reply-To: <20201012114425.104765-1-dgilbert@redhat.com>
-References: <20201012114425.104765-1-dgilbert@redhat.com>
+ bh=CCOdXx7s3ES2hWpWD+QMm5uBsRrkZg+6eEanX5GHuU4=;
+ b=KZ7Ke6eFr4HqbUSzothUlIAogo0pzktBkkxbo0gpkVaZmpA4bR8CELOsOTBXFDgGJa/s1g
+ OT9H9rZ8YylkL9LqACCMRlg0qILg5SeJX6VdDmwfPgbSf7thfi+eNLY4cQAZg2Idz+SXDf
+ JjTzsOBxP1QEnJuaH9FBNV370GjMIc4=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-316-UCFR7dyUN2COCu-4Hl-q4A-1; Mon, 12 Oct 2020 07:56:40 -0400
+X-MC-Unique: UCFR7dyUN2COCu-4Hl-q4A-1
+Received: by mail-wr1-f71.google.com with SMTP id u15so9244857wrn.4
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 04:56:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=CCOdXx7s3ES2hWpWD+QMm5uBsRrkZg+6eEanX5GHuU4=;
+ b=hTabynQosC1tvjAsPnwFkbC8qONsasg+kUqE+x48weNUYco1LMSQ4KJ1Btm5oYtRc/
+ fOoQXzj48KksmYbjg3vpmstuGvU2mXpYSuevO6u/OEFOejB8GUwSl6VrT3XveFipQQba
+ BaOeNodmGAYPyCJl4zxDBPHAul8SdyMbPsTJXBfWLHwkZIR8X2FSM09veiaq91bQedGD
+ CQjkjFnarbe/1M0nyANrAh9sIhm+MBFPVw/HIEWPl5cqzgYhEZA/mxLu05W+o6ZtiPe8
+ 7GQPgFvHs533hlvyRqPJHb85/n6jy0HA6JB/ZmTRCe5G6r22acfh3/Kkoc8onbLve4HP
+ syHA==
+X-Gm-Message-State: AOAM533Fdl6UDSyypEGkSEX9MtB/cdpjO88MnV3xtK0ZepttGUno0VRO
+ tZQpzqzMAlfIABZzPfNmjxTx34HQpQPNZa249y+O6w3tgwGQ1DABrnOYcnWTiRLViwDgwAe2HW8
+ Bm3uCtJXTZm7D6LM=
+X-Received: by 2002:a1c:9949:: with SMTP id b70mr10758637wme.116.1602503798770; 
+ Mon, 12 Oct 2020 04:56:38 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyFLlrEa/0CdoVPjxP0ayZKjCGFqheu/edY9GWs+voS6FqFZaj17VdZXnERs71Yh52e1j7tAQ==
+X-Received: by 2002:a1c:9949:: with SMTP id b70mr10758616wme.116.1602503798503; 
+ Mon, 12 Oct 2020 04:56:38 -0700 (PDT)
+Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id t124sm24332751wmg.31.2020.10.12.04.56.37
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 12 Oct 2020 04:56:37 -0700 (PDT)
+Subject: Re: [PATCH 1/3] block: push error reporting into bdrv_all_*_snapshot
+ functions
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+References: <20201008174803.2696619-1-philmd@redhat.com>
+ <20201008174803.2696619-2-philmd@redhat.com>
+ <8f2e2439-4100-a64d-b52e-c03d439cb743@redhat.com>
+ <7a77479f-5ce5-d89a-bee1-02bd2a521495@redhat.com>
+ <f68d175a-68f0-3d6a-78d0-8a5981a9d983@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <881be4dc-22f9-f841-816e-c7e57c336ffa@redhat.com>
+Date: Mon, 12 Oct 2020 13:56:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <f68d175a-68f0-3d6a-78d0-8a5981a9d983@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 02:58:41
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -83,8 +104,9 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,129 +119,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: quintela@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alex Bennée <alex.bennee@linaro.org>
+On 10/12/20 1:09 PM, Max Reitz wrote:
+> On 12.10.20 12:16, Philippe Mathieu-Daudé wrote:
+>> On 10/12/20 12:07 PM, Max Reitz wrote:
+>>> On 08.10.20 19:48, Philippe Mathieu-Daudé wrote:
+>>>> From: Daniel P. Berrangé <berrange@redhat.com>
+>>>>
+>>>> The bdrv_all_*_snapshot functions return a BlockDriverState pointer
+>>>> for the invalid backend, which the callers then use to report an
+>>>> error message. In some cases multiple callers are reporting the
+>>>> same error message, but with slightly different text. In the future
+>>>> there will be more error scenarios for some of these methods, which
+>>>> will benefit from fine grained error message reporting. So it is
+>>>> helpful to push error reporting down a level.
+>>>>
+>>>> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+>>>> ---
+>>>>    include/block/snapshot.h       | 14 +++----
+>>>>    block/monitor/block-hmp-cmds.c |  7 ++--
+>>>>    block/snapshot.c               | 77 +++++++++++++++++-----------------
+>>>>    migration/savevm.c             | 37 +++++-----------
+>>>>    monitor/hmp-cmds.c             |  7 +---
+>>>>    replay/replay-debugging.c      |  4 +-
+>>>>    tests/qemu-iotests/267.out     | 10 ++---
+>>>>    7 files changed, 67 insertions(+), 89 deletions(-)
+>>>
+>>> Looks good overall to me, but for some reason this patch pulls in the
+>>> @ok and @ret variables from the top scope of all concerned functions
+>>> into the inner scopes of the BDS loops, and drops their initialization.
+>>>    That’s wrong, because we only call the respective snapshotting
+>>> functions on some BDSs, so the return value stays uninitialized for all
+>>> other BDSs:
+>>
+>> Indeed, thanks for catching that.
+>>
+>> [...]
+>>>>    int bdrv_all_create_snapshot(QEMUSnapshotInfo *sn,
+>>>>                                 BlockDriverState *vm_state_bs,
+>>>>                                 uint64_t vm_state_size,
+>>>> -                             BlockDriverState **first_bad_bs)
+>>>> +                             Error **errp)
+>>>>    {
+>>>> -    int err = 0;
+>>>>        BlockDriverState *bs;
+>>>>        BdrvNextIterator it;
+>>>>          for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+>>>>            AioContext *ctx = bdrv_get_aio_context(bs);
+>>>> +        int ret;
+>>>
+>>> And one final time.
+>>>
+>>> Max
+>>>
+>>>>            aio_context_acquire(ctx);
+>>>>            if (bs == vm_state_bs) {
+>>>>                sn->vm_state_size = vm_state_size;
+>>>> -            err = bdrv_snapshot_create(bs, sn);
+>>>> +            ret = bdrv_snapshot_create(bs, sn);
+>>>>            } else if (bdrv_all_snapshots_includes_bs(bs)) {
+>>>>                sn->vm_state_size = 0;
+>>>> -            err = bdrv_snapshot_create(bs, sn);
+>>>> +            ret = bdrv_snapshot_create(bs, sn);
+>>
+>> This one is not needed.
+> 
+> Why not?  Is bdrv_all_snapshots_includes_bs(bs) guaranteed to be true?
+> (I don’t see any a plain “else” branch, or where ret would be set
+> outside of these two “if” blocks.)
 
-If you like running QEMU as a normal user (very common for TCG runs)
-but you have to run virtiofsd as a root user you run into connection
-problems. Adding support for an optional --socket-group allows the
-users to keep using the command line.
+Oops, I misread the 'else' branch, you are right again :)
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
-Message-Id: <20200925125147.26943-2-alex.bennee@linaro.org>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-  dgilbert: Split long line
----
- docs/tools/virtiofsd.rst        |  4 ++++
- tools/virtiofsd/fuse_i.h        |  1 +
- tools/virtiofsd/fuse_lowlevel.c |  6 ++++++
- tools/virtiofsd/fuse_virtio.c   | 21 +++++++++++++++++++--
- 4 files changed, 30 insertions(+), 2 deletions(-)
-
-diff --git a/docs/tools/virtiofsd.rst b/docs/tools/virtiofsd.rst
-index ae02938a95..7ecee49834 100644
---- a/docs/tools/virtiofsd.rst
-+++ b/docs/tools/virtiofsd.rst
-@@ -87,6 +87,10 @@ Options
- 
-   Listen on vhost-user UNIX domain socket at PATH.
- 
-+.. option:: --socket-group=GROUP
-+
-+  Set the vhost-user UNIX domain socket gid to GROUP.
-+
- .. option:: --fd=FDNUM
- 
-   Accept connections from vhost-user UNIX domain socket file descriptor FDNUM.
-diff --git a/tools/virtiofsd/fuse_i.h b/tools/virtiofsd/fuse_i.h
-index 1240828208..492e002181 100644
---- a/tools/virtiofsd/fuse_i.h
-+++ b/tools/virtiofsd/fuse_i.h
-@@ -68,6 +68,7 @@ struct fuse_session {
-     size_t bufsize;
-     int error;
-     char *vu_socket_path;
-+    char *vu_socket_group;
-     int   vu_listen_fd;
-     int   vu_socketfd;
-     struct fv_VuDev *virtio_dev;
-diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowlevel.c
-index 2dd36ec03b..4d1ba2925d 100644
---- a/tools/virtiofsd/fuse_lowlevel.c
-+++ b/tools/virtiofsd/fuse_lowlevel.c
-@@ -2523,6 +2523,7 @@ static const struct fuse_opt fuse_ll_opts[] = {
-     LL_OPTION("--debug", debug, 1),
-     LL_OPTION("allow_root", deny_others, 1),
-     LL_OPTION("--socket-path=%s", vu_socket_path, 0),
-+    LL_OPTION("--socket-group=%s", vu_socket_group, 0),
-     LL_OPTION("--fd=%d", vu_listen_fd, 0),
-     LL_OPTION("--thread-pool-size=%d", thread_pool_size, 0),
-     FUSE_OPT_END
-@@ -2630,6 +2631,11 @@ struct fuse_session *fuse_session_new(struct fuse_args *args,
-                  "fuse: --socket-path and --fd cannot be given together\n");
-         goto out4;
-     }
-+    if (se->vu_socket_group && !se->vu_socket_path) {
-+        fuse_log(FUSE_LOG_ERR,
-+                 "fuse: --socket-group can only be used with --socket-path\n");
-+        goto out4;
-+    }
- 
-     se->bufsize = FUSE_MAX_MAX_PAGES * getpagesize() + FUSE_BUFFER_HEADER_SIZE;
- 
-diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
-index d5c8e98253..89f537f79b 100644
---- a/tools/virtiofsd/fuse_virtio.c
-+++ b/tools/virtiofsd/fuse_virtio.c
-@@ -31,6 +31,8 @@
- #include <sys/socket.h>
- #include <sys/types.h>
- #include <sys/un.h>
-+#include <sys/types.h>
-+#include <grp.h>
- #include <unistd.h>
- 
- #include "contrib/libvhost-user/libvhost-user.h"
-@@ -924,15 +926,30 @@ static int fv_create_listen_socket(struct fuse_session *se)
- 
-     /*
-      * Unfortunately bind doesn't let you set the mask on the socket,
--     * so set umask to 077 and restore it later.
-+     * so set umask appropriately and restore it later.
-      */
--    old_umask = umask(0077);
-+    if (se->vu_socket_group) {
-+        old_umask = umask(S_IROTH | S_IWOTH | S_IXOTH);
-+    } else {
-+        old_umask = umask(S_IRGRP | S_IWGRP | S_IXGRP |
-+                          S_IROTH | S_IWOTH | S_IXOTH);
-+    }
-     if (bind(listen_sock, (struct sockaddr *)&un, addr_len) == -1) {
-         fuse_log(FUSE_LOG_ERR, "vhost socket bind: %m\n");
-         close(listen_sock);
-         umask(old_umask);
-         return -1;
-     }
-+    if (se->vu_socket_group) {
-+        struct group *g = getgrnam(se->vu_socket_group);
-+        if (g) {
-+            if (!chown(se->vu_socket_path, -1, g->gr_gid)) {
-+                fuse_log(FUSE_LOG_WARNING,
-+                         "vhost socket failed to set group to %s (%d)\n",
-+                         se->vu_socket_group, g->gr_gid);
-+            }
-+        }
-+    }
-     umask(old_umask);
- 
-     if (listen(listen_sock, 1) == -1) {
--- 
-2.28.0
+> 
+> Max
+> 
+>>>>            }
+>>>>            aio_context_release(ctx);
+>>>> -        if (err < 0) {
+>>>> +        if (ret < 0) {
+>>>> +            error_setg(errp, "Could not create snapshot '%s' on '%s'",
+>>>> +                       sn->name, bdrv_get_device_or_node_name(bs));
+>>>>                bdrv_next_cleanup(&it);
+>>>> -            goto fail;
+>>>> +            return -1;
+>>>>            }
+>>>>        }
+>>>
+>>
+> 
 
 
