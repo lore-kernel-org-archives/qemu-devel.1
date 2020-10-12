@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C39ECC433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 10:10:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F32CC433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 10:11:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 352BC20776
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 10:10:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 83F5820776
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 10:11:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A6YxX7ES"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 352BC20776
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nSzzEjhP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83F5820776
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRun0-00078X-7Y
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 06:10:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46484)
+	id 1kRunm-0008Ga-GF
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 06:11:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46326)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRucR-0002JD-J7
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 05:59:51 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52242)
+ id 1kRubw-0001Ky-4t
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 05:59:20 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:35136)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRucQ-0002vr-3y
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 05:59:51 -0400
-Received: by mail-wm1-x342.google.com with SMTP id e23so9626360wme.2
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 02:59:49 -0700 (PDT)
+ id 1kRubu-0002s9-O7
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 05:59:19 -0400
+Received: by mail-wm1-x342.google.com with SMTP id q5so16936662wmq.0
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 02:59:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=SeH+Hehlck8m/GFTKOCzWoLDNRcm+8wSSlkI3BiVy4c=;
- b=A6YxX7ESw+gclZM/z8xR/asoA5OhwTWI7qG9sHW82+U+zrn+80rr9Ojqi1KyutO/wV
- DKMzOMOe4mk/zKsDWZTqTGNnJpDuTklMCndJsehdG5T3fO7pEix9b+N82xVZonxtQ9xC
- /8rUraUjzMuxamC+aVEnN+eP+8SX5sDvkcZ5eRFJfZ5SqN+c75VB1LHteR+bujaN2eND
- THnYakbZKi7AjQHMxR1Xypuj+fPe966DpwKkl8RLlKzVCy57lNijj7DWTawzvkemddJs
- TtXtfCoFbzXXbtqvXf+XapljUz77IbvQEsFTypGTXcYCI8gE8ru/BHnh0DsrYgVkK/Lu
- 7Zjg==
+ bh=apVjxDybnUJ2U2TEJYATAtdpZBtLB//EdpC/ZilWuQE=;
+ b=nSzzEjhPctxe9QsUSyqylr7c3tpctrzNtfBHM9Pl8ydyfDKJ7yqCQgLnG24ISj/M9f
+ 9NtU4O9rbbUJkGBSkmchUcaGv5MPWSkh/eIxAyvueoRE+5UafBAIiCiuydWk5cpRXR1g
+ XZjKMtLjppFinH7IhTfoCAPN67fKeq2XkPGye6IFHhC9cUAjaj/HgarABM34r3eWbF2+
+ haOPKgv+cJaizCQdHM0eeJQkPjKWlMG0eNat1+kj2kkC+eRZcXOdpjZQw4Kpy386HF0p
+ 0QfbVkZi0Pek6KHC7tlMIYU+1OtHVKj3DAOmWxYZe0m6I3vhk990OaaEb/nunv5jLbn9
+ PQ9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=SeH+Hehlck8m/GFTKOCzWoLDNRcm+8wSSlkI3BiVy4c=;
- b=qBijqOOBH80gnYPurFFiK8U35g+9/yqxpzyq7N+iAXJGdQHOkDI7a/zYJp9OoLbDAT
- DOFHiSP9nOgrl7WfrfA7gEk4D+FlLHmFYf2nVUeVTYCZNntqM9mcibKQZ89QAjTPgFR+
- /BP3fgcTsdHXwmu2EqUMwUmjARn6Zcdp6G8HT3voX0o+yW3nlp5DAoATQkJRUCV8Fu1I
- vw6wGfkrgzhDJ3CrpVPrRv+g8JoLXHvoEVx/+GZxRU+AW/2uL0+yJ1jsBLpBKLLvjscJ
- EsndNBqFTZuVWHG3m8yizXLvDxHdmp69Ikdkio5l9lDUQAlcPtYdFrtQ0MeKU5axQTmq
- U8pg==
-X-Gm-Message-State: AOAM532GWKdZeqyYObNCkx7qVmJZFLLDTYzEQUpmrKOuNo+AFHsVkrf/
- kTeJarHtgwmPyLMrn6dZe4vZCpKI1wo=
-X-Google-Smtp-Source: ABdhPJyowOAjINWJ2GAVaThUvGccTMgBtWglz0jRIzrT8RnVW4rhSmEwB5shZxmTfQ+NnX3FFnEerg==
-X-Received: by 2002:a7b:ca42:: with SMTP id m2mr10430939wml.145.1602496788576; 
- Mon, 12 Oct 2020 02:59:48 -0700 (PDT)
+ bh=apVjxDybnUJ2U2TEJYATAtdpZBtLB//EdpC/ZilWuQE=;
+ b=ED0yJm3/m1ODZGJGIl8mjb9/eYRvnwm2BPlIUcj5Zu+3YDHDFLQmYWVBWdRUGv95xS
+ vBMcZ1wk3761/vLuoZ8tfhPkXDiXlgjSvEG81GG61I8+Epl9vA2W0b4Gfv73CKtsKgIQ
+ hGCdWqyhE5uJ5FCcA3P/r+GDAXfHiHglkHsORZcaLmhfstTrd/VUPwxCI20qdtZCza1H
+ HNk5wkbazBUSQMp4C9hJ+bVDCv2CD9ANb6+dl4Qoy2243KgzmEgyzdhH6q91GyORKnpT
+ Nm/6AVp2XCFP3NvgV16d88UOzEGJsY2tHreGgc8N4gov9rPlKUSomS2UX0w3JXhEcW+p
+ V/pw==
+X-Gm-Message-State: AOAM532r/F8g19ZWZqRGlu1kbqWzSU8lP6UHk/alb2hOQTbYJh4YZS1G
+ iSCrRk9IeTxfAEgVJwhWKkR3PFE99UQ=
+X-Google-Smtp-Source: ABdhPJxOaL+rCn+r5vVaBXVGmBBsLcYnWRpV8tN0xohvr7XSTDNWMyuI9Xkz3/7IRZIvqnndZAi03w==
+X-Received: by 2002:a1c:9c4b:: with SMTP id f72mr10020738wme.188.1602496757016; 
+ Mon, 12 Oct 2020 02:59:17 -0700 (PDT)
 Received: from localhost.localdomain
  (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id u15sm23953845wrm.77.2020.10.12.02.59.47
+ by smtp.gmail.com with ESMTPSA id a199sm23646142wmd.8.2020.10.12.02.59.15
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 12 Oct 2020 02:59:47 -0700 (PDT)
+ Mon, 12 Oct 2020 02:59:16 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 20/21] hw/mips/cps: Do not allow use without input clock
-Date: Mon, 12 Oct 2020 11:58:03 +0200
-Message-Id: <20201012095804.3335117-21-f4bug@amsat.org>
+Subject: [PATCH v4 14/21] hw/mips/fuloong2e: Set CPU frequency to 533 MHz
+Date: Mon, 12 Oct 2020 11:57:57 +0200
+Message-Id: <20201012095804.3335117-15-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201012095804.3335117-1-f4bug@amsat.org>
 References: <20201012095804.3335117-1-f4bug@amsat.org>
@@ -117,30 +117,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now than all QOM users provides the input clock, do not allow
-using a CPS without input clock connected.
+The CPU frequency is normally provided by the firmware in the
+"cpuclock" environment variable. The 2E board can handles up
+to 660MHz, but be conservative and take the same value used
+by the Linux kernel: 533 MHz.
 
+Reviewed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/mips/cps.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ hw/mips/fuloong2e.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/hw/mips/cps.c b/hw/mips/cps.c
-index af7b58c4bdd..c624821315a 100644
---- a/hw/mips/cps.c
-+++ b/hw/mips/cps.c
-@@ -74,6 +74,11 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
-     bool itu_present = false;
-     bool saar_present = false;
+diff --git a/hw/mips/fuloong2e.c b/hw/mips/fuloong2e.c
+index b000ed1d7f7..b8234f61083 100644
+--- a/hw/mips/fuloong2e.c
++++ b/hw/mips/fuloong2e.c
+@@ -23,6 +23,7 @@
+ #include "qemu/units.h"
+ #include "qapi/error.h"
+ #include "cpu.h"
++#include "hw/clock.h"
+ #include "hw/intc/i8259.h"
+ #include "hw/dma/i8257.h"
+ #include "hw/isa/superio.h"
+@@ -298,12 +299,16 @@ static void mips_fuloong2e_init(MachineState *machine)
+     PCIBus *pci_bus;
+     ISABus *isa_bus;
+     I2CBus *smbus;
++    Clock *cpuclk;
+     MIPSCPU *cpu;
+     CPUMIPSState *env;
+     DeviceState *dev;
  
-+    if (!clock_get(s->clock)) {
-+        error_setg(errp, "CPS input clock is not connected to an output clock");
-+        return;
-+    }
++    cpuclk = clock_new(OBJECT(machine), "cpu-refclk");
++    clock_set_hz(cpuclk, 533080000); /* ~533 MHz */
 +
-     for (i = 0; i < s->num_vp; i++) {
-         cpu = MIPS_CPU(object_new(s->cpu_type));
+     /* init CPUs */
+-    cpu = MIPS_CPU(cpu_create(machine->cpu_type));
++    cpu = mips_cpu_create_with_clock(machine->cpu_type, cpuclk);
+     env = &cpu->env;
  
+     qemu_register_reset(main_cpu_reset, cpu);
 -- 
 2.26.2
 
