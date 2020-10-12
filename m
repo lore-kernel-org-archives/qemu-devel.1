@@ -4,81 +4,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CBF4C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 16:02:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5B03C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 16:04:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5E0C2074A
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 16:02:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D0612076C
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 16:04:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oHHzeoBV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5E0C2074A
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TuAH7i1O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D0612076C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kS0H0-0001J0-LR
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 12:02:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58062)
+	id 1kS0JF-0004nw-3G
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 12:04:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58098)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kRzth-0003eP-Ea
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:38:01 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37173)
+ id 1kRzti-0003gh-Pu
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:38:02 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35338)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kRztZ-0007le-8g
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:38:01 -0400
-Received: by mail-wr1-x444.google.com with SMTP id h7so19725826wre.4
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 08:37:52 -0700 (PDT)
+ id 1kRztf-0007m4-Bg
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:38:02 -0400
+Received: by mail-wr1-x442.google.com with SMTP id n15so19718084wrq.2
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 08:37:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=+Umu4egodx5sV5t4RrajGKZ+finJTlLjjG3K3DjBGHw=;
- b=oHHzeoBV6pWWnUhrUB6FQqWoC3FfjZ+znbu9NgWwx/S2Tb93kiRZSgVJSkGAFStBDQ
- BuXxmhJCm30jJb7wXkxk5um3y4TSnYzymzhgzhtPwvopgB4cNDd1WZm/8ymaW/OfooA/
- u9aPKRId7odG/luRVoOW/AvVgaoobqrtNO0M7/DoSX9VQM6V7V9dkp4353Kt6K7WcyQL
- Y5dNhdbm5OWGJeh61eVx0uzat6YCjXVyZC8GXeI3rED8cpR7WWqWt0X6U2Z8mWbMmhYA
- 0kJBgbvZxAxfSB6wp7MnfMmGTt07uBMe7PYYDf9W2l+6asEnmQMmV9pMgpt8mfdSJ563
- 26Xw==
+ bh=WGIKi5XPkewNmleyCkypYY54M4r98inEKdT2tfEXL/0=;
+ b=TuAH7i1OAguRSfZl7FwM4jqebo4oN1y474tB9WPZLLndOHpeBnzxAN7AdzrMJss4qy
+ wtZqwvH1YKdk9TJd3d1+fKX3v/z+/ghmbViE38Uxj39GgdNluU1jX5hZhyCStpqLPss2
+ tAhuweaAIgiscXv/y51GHcQZjhpx1ManRflBHoBOBhKMelI+SdGRV5gWEfU2a5Ns4gs2
+ VROVmEjD/3fw45vBGf3BvtgNCcXYpASfnA6zmSoxKX2p06d6Wnk636Z3Lb9sOslftn4N
+ BFo4N59jAy4hFBgRLi0Kj9g6BqjxmtzwW/03kN+faYDDv2cxGfN8qQ4ypkbzklpn8Qne
+ NVMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=+Umu4egodx5sV5t4RrajGKZ+finJTlLjjG3K3DjBGHw=;
- b=XL59lp/cdHa8stQ+Yz+Ja2a/A9fTYImdKU/v40DZ9yzX0r2zLn8g/ZOlb1UzIfwsBL
- IvnCiVTWeXyX6FQ2p3g8+isxf92lPk6oG4d5VlCHRSjTTeBtoO92yI/Q3/jUwFvRkdwJ
- mI4sopJOSVc49lusi90Zb2can/VIoZCUBwYuuEYfzHpgqYf2KvkeGxLWNPMROG2OYQmm
- YlZ1HgRs3XCTNzETq3uEikqhWXOoozBSBrzQqtnmuzFLMEPf5iP2xg0p2ZnVI6SJhF2u
- t6oQsW4cezaKtFHqqo7B87rY1DM9SX8Nq7/uQ7VMIS9wUSw+h1Z2pHasNkcuJFfJtAiH
- GAvw==
-X-Gm-Message-State: AOAM530zZ1i6Y99qIhkYlmVcl+TsmVfE/hJ5BhS7m/JFW+KIGST0GQ9g
- 1y6THRQmXYkvUiH+3gKgjdxgrA==
-X-Google-Smtp-Source: ABdhPJwzVOsTtPivXQrUIZKbBSEM2erYgG67mu+RivDJtcX6MpRIBVjF4XYtK/eyqTm1VvgkBiEvAw==
-X-Received: by 2002:a5d:554b:: with SMTP id g11mr30811881wrw.370.1602517071926; 
- Mon, 12 Oct 2020 08:37:51 -0700 (PDT)
+ bh=WGIKi5XPkewNmleyCkypYY54M4r98inEKdT2tfEXL/0=;
+ b=r8wHIatH1kLsq8z56sTjiowIm0c2Yqg7KRvDejx1U1Wt2UdHpcktK3nLQaa+m4nX7O
+ 2RfLava6GVWgNS5aSgVvSi2/giuU30Vq06EwK5ByERVpmDlQrf6qw8LX2c3b7WKz4p09
+ 0wzs1eHAvbN/n5e0udicZDRPj6HAsF0DBwMjKyfNtzBLJ2hUwW7L0LZvm+kSoDJW246n
+ Pk01OhSty6CWRyob93DsOu/OpNZHoq2UIgxD5a4+ui+G/oP7oKFndeqtEJSq2Npx32RH
+ RW+2xZCeEF+PgtVjjMO9iqBWj4GciTLFbeVGYbiNVIAUhr7lqSCPeFcO9d6QZHV5NIHA
+ Fm9g==
+X-Gm-Message-State: AOAM533Ct+XF5XP/kJIz0pn91WkmGnIQz0bfDA7IX9ADFjUvAYfN2aXq
+ FqE4IEyrTEBf5ic6/tzXub8iXRT8S+iMDpgO
+X-Google-Smtp-Source: ABdhPJzh23Ql7c4Zbq9AXnX4Img9g8YrKyVVnLZP3CtpJbuKpM2ZouTEJ1o4fEaCCZjuXSmyjA287g==
+X-Received: by 2002:a5d:6a51:: with SMTP id t17mr14303446wrw.80.1602517074090; 
+ Mon, 12 Oct 2020 08:37:54 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id y66sm7095961wmd.14.2020.10.12.08.37.50
+ by smtp.gmail.com with ESMTPSA id y66sm7095961wmd.14.2020.10.12.08.37.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 12 Oct 2020 08:37:51 -0700 (PDT)
+ Mon, 12 Oct 2020 08:37:53 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH 03/10] target/arm: Implement v8.1M conditional-select insns
-Date: Mon, 12 Oct 2020 16:37:39 +0100
-Message-Id: <20201012153746.9996-4-peter.maydell@linaro.org>
+Subject: [PATCH 05/10] target/arm: Don't allow BLX imm for M-profile
+Date: Mon, 12 Oct 2020 16:37:41 +0100
+Message-Id: <20201012153746.9996-6-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201012153746.9996-1-peter.maydell@linaro.org>
 References: <20201012153746.9996-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -87,7 +87,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,100 +105,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v8.1M brings four new insns to M-profile:
- * CSEL  : Rd = cond ? Rn : Rm
- * CSINC : Rd = cond ? Rn : Rm+1
- * CSINV : Rd = cond ? Rn : ~Rm
- * CSNEG : Rd = cond ? Rn : -Rm
+The BLX immediate insn in the Thumb encoding always performs
+a switch from Thumb to Arm state. This would be totally useless
+in M-profile which has no Arm decoder, and so the instruction
+does not exist at all there. Make the encoding UNDEF for M-profile.
 
-Implement these.
+(This part of the encoding space is used for the branch-future
+and low-overhead-loop insns in v8.1M.)
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/t32.decode  |  3 +++
- target/arm/translate.c | 55 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 58 insertions(+)
+ target/arm/translate.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/target/arm/t32.decode b/target/arm/t32.decode
-index 7069d821fde..d8454bd814e 100644
---- a/target/arm/t32.decode
-+++ b/target/arm/t32.decode
-@@ -90,6 +90,9 @@ SBC_rrri         1110101 1011 . .... 0 ... .... .... ....     @s_rrr_shi
- }
- RSB_rrri         1110101 1110 . .... 0 ... .... .... ....     @s_rrr_shi
- 
-+# v8.1M CSEL and friends
-+CSEL             1110101 0010 1 rn:4 10 op:2 rd:4 fcond:4 rm:4
-+
- # Data-processing (register-shifted register)
- 
- MOV_rxrr         1111 1010 0 shty:2 s:1 rm:4 1111 rd:4 0000 rs:4 \
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index d34c1d351a6..a7923a31b56 100644
+index a7923a31b56..0c35efb1014 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -8224,6 +8224,61 @@ static bool trans_IT(DisasContext *s, arg_IT *a)
-     return true;
- }
+@@ -7880,6 +7880,14 @@ static bool trans_BLX_i(DisasContext *s, arg_BLX_i *a)
+ {
+     TCGv_i32 tmp;
  
-+/* v8.1M CSEL/CSINC/CSNEG/CSINV */
-+static bool trans_CSEL(DisasContext *s, arg_CSEL *a)
-+{
-+    TCGv_i32 rn, rm, zero;
-+    DisasCompare c;
-+
-+    if (!arm_dc_feature(s, ARM_FEATURE_V8_1M)) {
++    /*
++     * BLX <imm> would be useless on M-profile; the encoding space
++     * is used for other insns from v8.1M onward, and UNDEFs before that.
++     */
++    if (arm_dc_feature(s, ARM_FEATURE_M)) {
 +        return false;
 +    }
 +
-+    if (a->rd == 13 || a->rd == 15 || a->rn == 13 || a->fcond >= 14) {
-+        /* CONSTRAINED UNPREDICTABLE: we choose to UNDEF */
-+        return false;
-+    }
-+
-+    /* In this insn input reg fields of 0b1111 mean "zero", not "PC" */
-+    if (a->rn == 15) {
-+        rn = tcg_const_i32(0);
-+    } else {
-+        rn = load_reg(s, a->rn);
-+    }
-+    if (a->rm == 15) {
-+        rm = tcg_const_i32(0);
-+    } else {
-+        rm = load_reg(s, a->rm);
-+    }
-+
-+    switch (a->op) {
-+    case 0: /* CSEL */
-+        break;
-+    case 1: /* CSINC */
-+        tcg_gen_addi_i32(rm, rm, 1);
-+        break;
-+    case 2: /* CSINV */
-+        tcg_gen_not_i32(rm, rm);
-+        break;
-+    case 3: /* CSNEG */
-+        tcg_gen_neg_i32(rm, rm);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    arm_test_cc(&c, a->fcond);
-+    zero = tcg_const_i32(0);
-+    tcg_gen_movcond_i32(c.cond, rn, c.value, zero, rn, rm);
-+    arm_free_cc(&c);
-+    tcg_temp_free_i32(zero);
-+
-+    store_reg(s, a->rd, rn);
-+    tcg_temp_free_i32(rm);
-+
-+    return true;
-+}
-+
- /*
-  * Legacy decoder.
-  */
+     /* For A32, ARM_FEATURE_V5 is checked near the start of the uncond block. */
+     if (s->thumb && (a->imm & 2)) {
+         return false;
 -- 
 2.20.1
 
