@@ -2,93 +2,89 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6577C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 13:27:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63ED4C433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 13:33:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07475204EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 13:27:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BE565221FC
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 13:33:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qc0XApVd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07475204EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mk6DRkti"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE565221FC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRxrl-0004gF-3e
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 09:27:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44816)
+	id 1kRxxV-0007iE-RD
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 09:33:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48084)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRxkj-00052n-EJ; Mon, 12 Oct 2020 09:20:37 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42121)
+ (Exim 4.90_1) (envelope-from <eafanasova@gmail.com>)
+ id 1kRxwr-00073k-DL; Mon, 12 Oct 2020 09:33:09 -0400
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:46311)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRxkh-0005Mk-TM; Mon, 12 Oct 2020 09:20:37 -0400
-Received: by mail-wr1-x443.google.com with SMTP id e18so19153803wrw.9;
- Mon, 12 Oct 2020 06:20:35 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <eafanasova@gmail.com>)
+ id 1kRxwp-0006y5-5T; Mon, 12 Oct 2020 09:33:09 -0400
+Received: by mail-lf1-x142.google.com with SMTP id v6so2721755lfa.13;
+ Mon, 12 Oct 2020 06:33:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=5dF+jf9n1DnItLemKMZxZtmjBoHnSoohLjejZPCpzDM=;
- b=Qc0XApVdKVP/lVruFXWfJNtjQXfReFRvr1+4yT68YiQ4PXMXy2VS+Tms8DIHpnd7WY
- 3IxqXaVf8NHprI9vBRJwHLg/Ir7knP79xD4PqkjT375/jOfMORusBYzhrZZ5RosRb+QD
- U1SphhdEAsKVfyQdrEqQwYq4OgE0gntIEj6LK1eh4k7kNb5hfU7CyJ6pK2RZ1Iyw+ZIw
- nBGoGO1Ccz+zkGeAo4+vjit+Ec6fFMWX+VWPe5vtNK/oSSBjXyxB2CXWnIIBww7AUabB
- MEfKFTTjlMGn3LsS/v5F1YP0iobEE2UXTGxcQwYK8w7IDDqVUMyWngLVYsE84ipnaVNG
- K2eA==
+ h=message-id:subject:from:to:cc:date:user-agent:mime-version
+ :content-transfer-encoding;
+ bh=5K086FO462wmszI+hBM+jjP61a7FY2AqPedu6W0K3fI=;
+ b=mk6DRktiMVqPBvLK/39/hJE3RYmk2BvBzIpcfAeOFdyBKLPD8U7nCSRswRYaKR2bgS
+ nYTz/vdpdoIPLR2G/XUzUCYUlgTp+vI+5lCyKC2jZ6MxmR4LmwdGbGI07UKX3Tb7JfKQ
+ tZs7uP8VydTFYzkPr9GSlmTVQtkroXMpYi/XGfsDeWJFiEJ+q2/O3aOmCR538qWQDHTR
+ d7XwHTANH5Ypz0HCXC6rMTL6jGJviff+jvjdm8Vn9SNQ9CsHIQLbcfFLCBX6YWlKEims
+ evtTD8UrRecGrq5gruy3st98jRoO6MPHYfgSUrf00VsWxwtv0CJc2NgIomJj1prTu4P4
+ Aubw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=5dF+jf9n1DnItLemKMZxZtmjBoHnSoohLjejZPCpzDM=;
- b=NJics+O9X/4QF6KwH8cxZIYsWbRPldNDEnk5inU1O7SZJWk/URC/uRms70vBcgGThn
- U2GB1HZOnQghsGmM4jt2DC51ysG3Y4/I7axDb3u1iYVU1xZT1iAOz+L/QGlSdfIWQOAq
- 1TkPtJ25xtCCEP5viPRLPy/KWvz7GuNe7vduhiYxy834RH9nAA5egEzmVj+7z+dshh2O
- svzK/fQ2fpuIF9ZpSCuT5q/MFeTpSdqM0LTwGWOhPa9LQszPy+sOM4Yvywv1Ix8srw0Z
- 6pVHNdiQUuI90FsimNPSh2um5m6bmQIh3s0UqgPWcATZ7mc+EbjW1CVTQZTjYgc0CDTA
- lg0Q==
-X-Gm-Message-State: AOAM533ucadIHpPW+k+UDDesxUMDlKU/XWVK3RyOEJdk4wgNBP8y+dL3
- jYE1DAh0Qw4ZAXGqo9QK7aWLgW6sm50=
-X-Google-Smtp-Source: ABdhPJzuFfvT/aPXYbIwkUmlO0JDvtpdvDqrzOh3HrkhUhj3xmpcGd7J1NLZmPOoeJ2TBhNxXM61pg==
-X-Received: by 2002:a5d:6744:: with SMTP id l4mr30409135wrw.18.1602508833958; 
- Mon, 12 Oct 2020 06:20:33 -0700 (PDT)
-Received: from localhost.localdomain
- (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id t83sm13254247wmf.39.2020.10.12.06.20.32
+ h=x-gm-message-state:message-id:subject:from:to:cc:date:user-agent
+ :mime-version:content-transfer-encoding;
+ bh=5K086FO462wmszI+hBM+jjP61a7FY2AqPedu6W0K3fI=;
+ b=ionXQI2xBFw9/gwHoKb5rPLDYdwusva5OIsJeFajk+cfUKQBxA0wq1j8Cd5WxEiW7Y
+ WXFso7ZfzNikUY+JU3JCi5PVBL36Urry1Ajg0IspBQQFPHVAe/uqf1Yyr1YAP0R3Dvs4
+ Pe1P1hLvonxEgWNulv96qvKQO449YAdc3CHS8UR+HbN4WFApoXMhH38vnsu8Zf/3mnlT
+ PEwiDc7lNmKMib19ufpp86astxpShokjLb3LZPwSVCG7HJzKLNpCh2jJDlbg4fIQVO2G
+ 1h6LlQy4DbZB7br4it/RhHcgqhXDKwSUa7ehBnnbpqlOCfv0SFN9ZDx01awnmQLTq4Nk
+ UpUg==
+X-Gm-Message-State: AOAM533ccmNNIV4zdWF/JT4eXnpAnEEKkL+4UnGSwKG7YU5ZS0FcX9mx
+ bY0inBJ4RukK8sXdbX4DZvI=
+X-Google-Smtp-Source: ABdhPJyCuXcSyBcsvbr8oEpDz/K0d7EXfIb4Oy/iB1H0DBAjnuGSa/S59VaEKHpwk/DbDDr+9SgLdg==
+X-Received: by 2002:a19:fc1c:: with SMTP id a28mr8888921lfi.517.1602509584142; 
+ Mon, 12 Oct 2020 06:33:04 -0700 (PDT)
+Received: from [192.168.167.128] (37-145-186-126.broadband.corbina.ru.
+ [37.145.186.126])
+ by smtp.gmail.com with ESMTPSA id h17sm3284021lfj.188.2020.10.12.06.33.01
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 12 Oct 2020 06:20:33 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 3/5] hw/pci-host/versatile: Add the MEMORY_WINDOW_COUNT
- definition
-Date: Mon, 12 Oct 2020 15:20:14 +0200
-Message-Id: <20201012132017.3423954-4-f4bug@amsat.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201012132017.3423954-1-f4bug@amsat.org>
-References: <20201012132017.3423954-1-f4bug@amsat.org>
+ Mon, 12 Oct 2020 06:33:03 -0700 (PDT)
+Message-ID: <ea41618a040224242fced25fc3d09d3b1f75a06a.camel@gmail.com>
+Subject: [PATCH] hw/scsi: remove dead code
+From: Elena Afanasova <eafanasova@gmail.com>
+To: hare@suse.com, pbonzini@redhat.com, fam@euphon.net, qemu-block@nongnu.org
+Date: Mon, 12 Oct 2020 06:32:42 -0700
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.4-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::142;
+ envelope-from=eafanasova@gmail.com; helo=mail-lf1-x142.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,115 +97,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, qemu-arm@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Note from Peter Maydell:
+Since MEGASAS_MAX_SGE is defined to be 128 the following if statement can be removed.
+Spotted by PVS-Studio.
 
- The versatile/realview PCI controller has:
-   * three memory windows in the system address space
-     - those are represented by the pci_mem_window[] array
-     - mem_win_size[] holds the size of each window
-       (which is fixed but varies between the different
-       implementations of this controller on different boards)
-     - the device IMAPn registers allow the guest to
-       configure the mapping from "a CPU access to an
-       address in window n" to "a PCI address on the PCI bus,
-       and our imap[] array holds those register values
-
-Use self-explicit MEMORY_WINDOW_COUNT definition instead of
-a magic value.
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Elena Afanasova <eafanasova@gmail.com>
 ---
- hw/pci-host/versatile.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+ hw/scsi/megasas.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/hw/pci-host/versatile.c b/hw/pci-host/versatile.c
-index b4951023f4e..61465bbbb65 100644
---- a/hw/pci-host/versatile.c
-+++ b/hw/pci-host/versatile.c
-@@ -72,6 +72,8 @@ enum {
-     PCI_VPB_IRQMAP_FORCE_OK,
- };
- 
-+#define MEMORY_WINDOW_COUNT 3
-+
- struct PCIVPBState {
-     PCIHostState parent_obj;
- 
-@@ -86,17 +88,17 @@ struct PCIVPBState {
-      * The offsets into pci_mem_space are controlled by the imap registers.
-      */
-     MemoryRegion pci_io_window;
--    MemoryRegion pci_mem_window[3];
-+    MemoryRegion pci_mem_window[MEMORY_WINDOW_COUNT];
-     PCIBus pci_bus;
-     PCIDevice pci_dev;
- 
-     /* Constant for life of device: */
-     int realview;
--    uint32_t mem_win_size[3];
-+    uint32_t mem_win_size[MEMORY_WINDOW_COUNT];
-     uint8_t irq_mapping_prop;
- 
-     /* Variable state: */
--    uint32_t imap[3];
-+    uint32_t imap[MEMORY_WINDOW_COUNT];
-     uint32_t smap[3];
-     uint32_t selfid;
-     uint32_t flags;
-@@ -130,7 +132,7 @@ static void pci_vpb_update_all_windows(PCIVPBState *s)
-     /* Update all alias windows based on the current register state */
-     int i;
- 
--    for (i = 0; i < 3; i++) {
-+    for (i = 0; i < MEMORY_WINDOW_COUNT; i++) {
-         pci_vpb_update_window(s, i);
+diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+index e24c12d7ee..6dcaad55fa 100644
+--- a/hw/scsi/megasas.c
++++ b/hw/scsi/megasas.c
+@@ -2393,8 +2393,6 @@ static void megasas_scsi_realize(PCIDevice *dev, Error **errp)
      }
- }
-@@ -148,7 +150,7 @@ static const VMStateDescription pci_vpb_vmstate = {
-     .minimum_version_id = 1,
-     .post_load = pci_vpb_post_load,
-     .fields = (VMStateField[]) {
--        VMSTATE_UINT32_ARRAY(imap, PCIVPBState, 3),
-+        VMSTATE_UINT32_ARRAY(imap, PCIVPBState, MEMORY_WINDOW_COUNT),
-         VMSTATE_UINT32_ARRAY(smap, PCIVPBState, 3),
-         VMSTATE_UINT32(selfid, PCIVPBState),
-         VMSTATE_UINT32(flags, PCIVPBState),
-@@ -370,10 +372,11 @@ static void pci_vpb_set_irq(void *opaque, int irq_num, int level)
- static void pci_vpb_reset(DeviceState *d)
- {
-     PCIVPBState *s = PCI_VPB(d);
-+    int i;
- 
--    s->imap[0] = 0;
--    s->imap[1] = 0;
--    s->imap[2] = 0;
-+    for (i = 0; i < MEMORY_WINDOW_COUNT; i++) {
-+        s->imap[i] = 0;
-+    }
-     s->smap[0] = 0;
-     s->smap[1] = 0;
-     s->smap[2] = 0;
-@@ -453,7 +456,7 @@ static void pci_vpb_realize(DeviceState *dev, Error **errp)
-      * PCI memory space. The sizes vary from board to board; the base
-      * offsets are guest controllable via the IMAP registers.
-      */
--    for (i = 0; i < 3; i++) {
-+    for (i = 0; i < MEMORY_WINDOW_COUNT; i++) {
-         memory_region_init_alias(&s->pci_mem_window[i], OBJECT(s), "pci-vbp-window",
-                                  &s->pci_mem_space, 0, s->mem_win_size[i]);
-         sysbus_init_mmio(sbd, &s->pci_mem_window[i]);
+     if (s->fw_sge >= MEGASAS_MAX_SGE - MFI_PASS_FRAME_SIZE) {
+         s->fw_sge = MEGASAS_MAX_SGE - MFI_PASS_FRAME_SIZE;
+-    } else if (s->fw_sge >= 128 - MFI_PASS_FRAME_SIZE) {
+-        s->fw_sge = 128 - MFI_PASS_FRAME_SIZE;
+     } else {
+         s->fw_sge = 64 - MFI_PASS_FRAME_SIZE;
+     }
 -- 
-2.26.2
+2.25.1
+
 
 
