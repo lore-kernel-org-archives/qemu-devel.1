@@ -7,83 +7,84 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D618C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 08:20:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3569DC433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 08:35:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E40C208FE
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 08:20:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8C4F520714
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 08:35:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ANoYbZyD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E40C208FE
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tdb0yc+z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C4F520714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRt4i-0004Fl-Vt
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 04:20:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49430)
+	id 1kRtJB-0000dI-C5
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 04:35:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53304)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRt36-0003JM-Vk; Mon, 12 Oct 2020 04:19:20 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43835)
+ id 1kRtIF-00005F-Kp
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 04:34:55 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40845)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRt33-0006IB-Tl; Mon, 12 Oct 2020 04:19:16 -0400
-Received: by mail-wr1-x441.google.com with SMTP id g12so18060703wrp.10;
- Mon, 12 Oct 2020 01:19:12 -0700 (PDT)
+ id 1kRtID-0008HB-Nq
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 04:34:55 -0400
+Received: by mail-wm1-x344.google.com with SMTP id k18so16682280wmj.5
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 01:34:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=TBVtEIOPaf3BKOl2HmBXMs84E8Ai4CEarpJhljrr4RI=;
- b=ANoYbZyDgg/2oSOqUlCCTcW4xDapBS/DHQLwVN6bIgqheiNmLx8H0vrhISh2fRIaGQ
- k26bs9i3+0IuEHwfnLKjgCPb1/2JDc8jejbni1mNE0hLiNMCKLxLJbiSHc3SevMAcMmz
- GUeYkc8mn7NmneeymDdp5vqudC1ZxdYEIwkLHthBxBIxNvBiJJ63qkHEKGd+bBPQV2i6
- K1EX7emazCo+gGCyHXLANJJu3fH7lVyJ9mPhZHXpYovN8iY3bdsJG7pWPRhArOPpGS0w
- jyvgLLG17hMSLr5jDHM+YDDFLXDbaEXmWS35QJU4FiIgcyR9lirzgPQ3RTYDUDXMp684
- OZDw==
+ bh=3XX/4EeXgZcsnPUFe6urrwG6ANl754l/e2KyLGmas9A=;
+ b=Tdb0yc+zrWFbaEfC9WwlHsXrx3WFoYUiQVN44w/f/rqeUe6e1XIcLmFdLXUH16Vq54
+ SMsc4PHZdUotouL4geLtmqnarUwWkqxo6yDotgz5oyif37fUrl5jkiU11z+gUOrTVqgl
+ TrdUFqnAsQNvbtFaI6AXJpXGnsdS28c92Ig6PGfuw5CSUl6nmicRmlUGQvBfcsn+Ixcn
+ 5P5eVfSpuk1PV68hAgC3nZabkE1L/ev+R9ks45017TCBa8Qk9Nqdki0nKJIhMQk21EEd
+ sb+PiZEVDQcaWB1mFH16RCsGC2GcQ80BomiAWpjQ9FK9UEmkPACEUwrE7TRWQHgm5YV3
+ ld3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=TBVtEIOPaf3BKOl2HmBXMs84E8Ai4CEarpJhljrr4RI=;
- b=XQ5SMVkq39flAgVQq1igpC3kL3MRBdOOvpLTUC+Wbvlmjwlzq3twWIv/3eveA1+UTw
- LqQy5BpWRO5BJRJ6zzrF3TvFGHESRzfv1d2oUxbUwLlr2EnevP6J80isU//J86ptpOeg
- E7yEH4qISYIKrQXM0mYMqfnOfpmgQggQdUmHiP69fkvMXy4B9rn7vDAI80lLrk4GffUH
- mRMMy17LJkKT15ktWkZf4dCE7iWEPAMjiicaMYjj7HJDu1qtLkh/SLPp3WoPcFx1Bv/v
- kT9E5/FGsSo8XYk/yH5peZcjmg4s8jQ526Bg8xeYHZduBaS1FveelMHNjyEE98VnV3b7
- dSQQ==
-X-Gm-Message-State: AOAM533L+fPtovafAwIpBRAJpVxKAwma7To0gV00kOY1KWfGNGJHXT3d
- 8cD9ZV0kR2/pNjd/WJX/uDYJE6SdWdE=
-X-Google-Smtp-Source: ABdhPJxEqgx3fyzAfPkN7NoTtFQOapn1JChdA5kPpXxBRGewMjjpDILxOdJ4hdRX8VCW+My4NAnVrA==
-X-Received: by 2002:a5d:69c2:: with SMTP id s2mr28233141wrw.389.1602490751284; 
- Mon, 12 Oct 2020 01:19:11 -0700 (PDT)
+ bh=3XX/4EeXgZcsnPUFe6urrwG6ANl754l/e2KyLGmas9A=;
+ b=j1H6vQAwEglMz5eLkKi1Pz2ah3syNkoiJGFDsxh1GzI5vmbWYLiqJjULIS86TkEFRb
+ utSueqe8N2pMcA8dpe2ipnVr9vvRcSiun8zs0h+fFI8/AbR0kDuZEJ5IV6c8ftwG0Vda
+ pfEOh8vJJBN+zO7esvbRnJM31cBUUWiDMuOxSAWXZ9kawUqr7jKmVH0/47DzRDB2WMM5
+ fbxsgR70WCGyr5ns3j1G4pjBImbK7ldcrLTEaVZp2/hxj76+D99kaZ6u7TEHiwjYP00T
+ FDKFgiHxkZs1e2E1e+2ML0KTDDwN+8lPjad6Dy7GeubxVVf3eevjfSkdaUE04IPkX+QT
+ HaxQ==
+X-Gm-Message-State: AOAM530f2pXmM6aQFcF9pl7ZGuLibt7CGG1bFQIAwFg4Oy/Uk9sj3+n2
+ lNK4/XH0EmyGKHDExxdkLAo=
+X-Google-Smtp-Source: ABdhPJwz7PKhBgJJFLIifBGqsx3k73ZYYyLITRIZLUTRSKx8MwbpSERVZJPkDTzRAVVfTU4YPuBZvg==
+X-Received: by 2002:a1c:b40b:: with SMTP id d11mr9604438wmf.152.1602491690691; 
+ Mon, 12 Oct 2020 01:34:50 -0700 (PDT)
 Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
  [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id q4sm23503822wru.65.2020.10.12.01.19.10
+ by smtp.gmail.com with ESMTPSA id e7sm24852053wrm.6.2020.10.12.01.34.48
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 12 Oct 2020 01:19:10 -0700 (PDT)
-Subject: Re: [PATCH 2/4] hw/pci-host/prep: Remove legacy PReP machine
- temporary workaround
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-References: <20201012071906.3301481-1-f4bug@amsat.org>
- <20201012071906.3301481-3-f4bug@amsat.org>
- <4822e2ff-95a1-ce6e-574d-ae980c2c8abc@redhat.com>
+ Mon, 12 Oct 2020 01:34:49 -0700 (PDT)
+Subject: Re: [PATCH v3 12/20] hw/mips/r4k: Explicit CPU frequency is 200 MHz
+To: chen huacai <zltjiangshi@gmail.com>
+References: <20201010204319.3119239-1-f4bug@amsat.org>
+ <20201010204319.3119239-13-f4bug@amsat.org>
+ <CABDp7Voq177fvHUJRXqrYtH2etqnKNmhYeVOZAForw=6oY5sTg@mail.gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6af814b6-b452-895f-dd8e-d46631e83361@amsat.org>
-Date: Mon, 12 Oct 2020 10:19:10 +0200
+Message-ID: <2c0fde77-4618-d5c2-3281-56ed706a9d2d@amsat.org>
+Date: Mon, 12 Oct 2020 10:34:48 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <4822e2ff-95a1-ce6e-574d-ae980c2c8abc@redhat.com>
+In-Reply-To: <CABDp7Voq177fvHUJRXqrYtH2etqnKNmhYeVOZAForw=6oY5sTg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -106,93 +107,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Cc: Damien Hedde <damien.hedde@greensocs.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, Luc Michel <luc@lmichel.fr>,
+ Eduardo Habkost <ehabkost@redhat.com>, Paul Burton <paulburton@kernel.org>,
+ Igor Mammedov <imammedo@redhat.com>, qemu-level <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Huacai Chen <chenhc@lemote.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/12/20 9:28 AM, Thomas Huth wrote:
-> On 12/10/2020 09.19, Philippe Mathieu-Daudé wrote:
->> The legacy PReP machine has been removed in commit b2ce76a0730
->> ("hw/ppc/prep: Remove the deprecated "prep" machine and the
->> OpenHackware BIOS"). This temporary workaround is no more
->> required, remove it.
+Hi Huacai,
+
+On 10/11/20 5:52 AM, chen huacai wrote:
+> Hi, Philippe,
+> 
+> On Sun, Oct 11, 2020 at 4:43 AM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>
+>> Since its introduction in commit 6af0bf9c7c3,
+>> the 'r4k' machine runs at 200 MHz.
 >>
 >> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 >> ---
->>   hw/pci-host/prep.c | 32 +++++++++++---------------------
->>   1 file changed, 11 insertions(+), 21 deletions(-)
+>>   hw/mips/r4k.c | 8 +++++++-
+>>   1 file changed, 7 insertions(+), 1 deletion(-)
 >>
->> diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
->> index 80dfb67da43..064593d1e52 100644
->> --- a/hw/pci-host/prep.c
->> +++ b/hw/pci-host/prep.c
->> @@ -75,7 +75,6 @@ struct PRePPCIState {
->>       RavenPCIState pci_dev;
->>   
->>       int contiguous_map;
->> -    bool is_legacy_prep;
->>   };
->>   
->>   #define BIOS_SIZE (1 * MiB)
->> @@ -229,24 +228,18 @@ static void raven_pcihost_realizefn(DeviceState *d, Error **errp)
->>       MemoryRegion *address_space_mem = get_system_memory();
+>> diff --git a/hw/mips/r4k.c b/hw/mips/r4k.c
+>> index 3487013a4a1..e64687b505a 100644
+>> --- a/hw/mips/r4k.c
+>> +++ b/hw/mips/r4k.c
+>> @@ -37,6 +37,7 @@
+>>   #include "sysemu/reset.h"
+>>   #include "sysemu/runstate.h"
+>>   #include "qemu/error-report.h"
+>> +#include "hw/qdev-clock.h"
+>>
+>>   #define MAX_IDE_BUS 2
+>>
+>> @@ -184,6 +185,7 @@ void mips_r4k_init(MachineState *machine)
+>>       int bios_size;
+>>       MIPSCPU *cpu;
+>>       CPUMIPSState *env;
+>> +    Clock *cpuclk;
+>>       ResetData *reset_info;
 >>       int i;
->>   
->> -    if (s->is_legacy_prep) {
->> -        for (i = 0; i < PCI_NUM_PINS; i++) {
->> -            sysbus_init_irq(dev, &s->pci_irqs[i]);
->> -        }
->> -    } else {
->> -        /*
->> -         * According to PReP specification section 6.1.6 "System Interrupt
->> -         * Assignments", all PCI interrupts are routed via IRQ 15
->> -         */
->> -        s->or_irq = OR_IRQ(object_new(TYPE_OR_IRQ));
->> -        object_property_set_int(OBJECT(s->or_irq), "num-lines", PCI_NUM_PINS,
->> -                                &error_fatal);
->> -        qdev_realize(DEVICE(s->or_irq), NULL, &error_fatal);
->> -        sysbus_init_irq(dev, &s->or_irq->out_irq);
->> +    /*
->> +     * According to PReP specification section 6.1.6 "System Interrupt
->> +     * Assignments", all PCI interrupts are routed via IRQ 15.
->> +     */
-> 
-> Since you're changing the indentation of these lines anyway, I think you
-> could also simply squash patch 1 into this one here (just a matter of taste,
-> though).
+>>       qemu_irq *i8259;
+>> @@ -193,7 +195,11 @@ void mips_r4k_init(MachineState *machine)
+>>       int be;
+>>
+>>       /* init CPUs */
+>> -    cpu = MIPS_CPU(cpu_create(machine->cpu_type));
+>> +    cpu = MIPS_CPU(object_new(machine->cpu_type));
+>> +    cpuclk = clock_new(OBJECT(machine), "cpu-refclk");
+>> +    clock_set_hz(cpuclk, 200000000); /* 200 MHz */
+>> +    qdev_connect_clock_in(DEVICE(cpu), "clk-in", cpuclk);
+>> +    qdev_realize(DEVICE(cpu), NULL, &error_abort);
+ >
+> Can we add a new parameter to cpu_create() and set the freq in the core code?
 
-Then the diff is not trivial to review :/
+Adding a new parameter seems a good idea.
+
+Both maintainers of the core code are reluctant to add
+a CPU clock to the core code, see:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg747589.html
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg747612.html
+Which is why I restricted that to the MIPS CPUs.
+
+On ARM, Damien started to use clocks on the Zynq SoC (merged):
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg694604.html
+Luc is working on adding a clock manager to the Broadcom SoC:
+https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg02840.html
+
+I also started converting one UART devices:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg727972.html
+
+So IMO the core code will soon require this. Maybe we will add it
+during the next development window.
+
+Meanwhile I can add a mips_cpu_create_with_clock() in preparation
+of cpu_create_with_clock().
 
 > 
->> +    s->or_irq = OR_IRQ(object_new(TYPE_OR_IRQ));
->> +    object_property_set_int(OBJECT(s->or_irq), "num-lines", PCI_NUM_PINS,
->> +                            &error_fatal);
->> +    qdev_realize(DEVICE(s->or_irq), NULL, &error_fatal);
->> +    sysbus_init_irq(dev, &s->or_irq->out_irq);
->>   
->> -        for (i = 0; i < PCI_NUM_PINS; i++) {
->> -            s->pci_irqs[i] = qdev_get_gpio_in(DEVICE(s->or_irq), i);
->> -        }
->> +    for (i = 0; i < PCI_NUM_PINS; i++) {
->> +        s->pci_irqs[i] = qdev_get_gpio_in(DEVICE(s->or_irq), i);
->>       }
->>   
->>       qdev_init_gpio_in(d, raven_change_gpio, 1);
->> @@ -403,9 +396,6 @@ static Property raven_pcihost_properties[] = {
->>       DEFINE_PROP_UINT32("elf-machine", PREPPCIState, pci_dev.elf_machine,
->>                          EM_NONE),
->>       DEFINE_PROP_STRING("bios-name", PREPPCIState, pci_dev.bios_name),
->> -    /* Temporary workaround until legacy prep machine is removed */
->> -    DEFINE_PROP_BOOL("is-legacy-prep", PREPPCIState, is_legacy_prep,
->> -                     false),
->>       DEFINE_PROP_END_OF_LIST()
->>   };
->>   
+> Huacai
+>>       env = &cpu->env;
+>>
+>>       reset_info = g_malloc0(sizeof(ResetData));
+>> --
+>> 2.26.2
 >>
 > 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-
-Thanks!
+> 
 
