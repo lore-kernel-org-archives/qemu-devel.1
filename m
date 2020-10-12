@@ -2,77 +2,78 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 166A4C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:44:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63C53C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:44:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9333F2074F
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:44:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 073B32074F
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:44:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eg+a8oL0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9333F2074F
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GiA//YMF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 073B32074F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kS4gQ-0001EE-MM
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 16:44:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38010)
+	id 1kS4gV-0001Nu-3K
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 16:44:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38304)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kS4WA-0002hB-2E
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:34:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48723)
+ id 1kS4WO-0002qc-JF
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:34:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22198)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kS4W8-0002ew-5k
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:34:01 -0400
+ id 1kS4WH-0002hM-Qq
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:34:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602534839;
+ s=mimecast20190719; t=1602534848;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=D1HuS/ldYTqaXHMm2IQ3F6xjU2L7PLXN0yN5kW8hLwA=;
- b=Eg+a8oL0ANrOiylzuRsJm9ENqouWE9kupHXeDy/sUXeSORIH5rgobuI9wqi+Ww6kIRvFxU
- PGD4EJ3gsJFfkkruaW+QSkK+x3QeifSCZDOBlgw3r8+soxkKv7y1Cg6kZYpylP17MzklcS
- 7QrOWpfZApymrot12FcpJqGV6iqlzrE=
+ bh=rbVG4DCuEDWzDiXDYNvwhJxe/7Y+qx/Ev1vBLntDwWc=;
+ b=GiA//YMFYWuaiHCXNzzxoJ1m2WyXBNzFw/YrfPSPtXds/m+bzmOvt1LLDRGTKNiOGQ409C
+ TVbEygU5rpVZ/GiqWGs+JVm6mkV22aU/dmfrVOPRWW6K+s6R6FCyj77QQoD4vc1+RM44lK
+ tNBDjtHoIxIjFNZcvgkREaHpMG3SxEc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-78-SL_FxWQCPEiGCuc59sZoGg-1; Mon, 12 Oct 2020 16:33:57 -0400
-X-MC-Unique: SL_FxWQCPEiGCuc59sZoGg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-72-l5H4ln0MM9exGrym9bYDsg-1; Mon, 12 Oct 2020 16:34:06 -0400
+X-MC-Unique: l5H4ln0MM9exGrym9bYDsg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D3AEA18A8237
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 20:33:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 58075101D5E7
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 20:33:55 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 70E1F5D9CD;
- Mon, 12 Oct 2020 20:33:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 14E626EF59;
+ Mon, 12 Oct 2020 20:33:55 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 10/38] hw/nvram: Always register FW_CFG_DATA_GENERATOR_INTERFACE
-Date: Mon, 12 Oct 2020 16:33:15 -0400
-Message-Id: <20201012203343.1105018-11-pbonzini@redhat.com>
+Subject: [PULL 22/38] qtest: Reintroduce qtest_qmp_receive with QMP event
+ buffering
+Date: Mon, 12 Oct 2020 16:33:27 -0400
+Message-Id: <20201012203343.1105018-23-pbonzini@redhat.com>
 In-Reply-To: <20201012203343.1105018-1-pbonzini@redhat.com>
 References: <20201012203343.1105018-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 16:33:53
@@ -96,127 +97,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
 
-While the FW_CFG_DATA_GENERATOR_INTERFACE is only consumed
-by a device only available using system-mode (fw_cfg), it is
-implemented by a crypto component (tls-cipher-suites) which
-is always available when crypto is used.
+The new qtest_qmp_receive buffers all the received qmp events, allowing
+qtest_qmp_eventwait_ref to return them.
 
-Commit 69699f3055 introduced the following error in the
-qemu-storage-daemon binary:
+This is intended to solve the race in regard to ordering of qmp events
+vs qmp responses, as soon as the callers start using the new interface.
 
-  $ echo -e \
-    '{"execute": "qmp_capabilities"}\r\n{"execute": "qom-list-types"}\r\n{"execute": "quit"}\r\n' \
-    | storage-daemon/qemu-storage-daemon --chardev stdio,id=qmp0  --monitor qmp0
-  {"QMP": {"version": {"qemu": {"micro": 50, "minor": 1, "major": 5}, "package": ""}, "capabilities": ["oob"]}}
-  {"return": {}}
-  missing interface 'fw_cfg-data-generator' for object 'tls-creds'
-  Aborted (core dumped)
+In addition to that, define qtest_qmp_event_ref a function which only scans
+the buffer that qtest_qmp_receive stores the events to.  This is intended
+for callers that are only interested in events that were received during
+the last call to the qtest_qmp_receive.
 
-Since QOM dependencies are resolved at runtime, this issue
-could not be triggered at linktime, and we don't have test
-running the qemu-storage-daemon binary.
-
-Fix by always registering the QOM interface.
-
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Fixes: 69699f3055 ("crypto/tls-cipher-suites: Produce fw_cfg consumable blob")
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20201006111909.2302081-2-philmd@redhat.com>
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Message-Id: <20201006123904.610658-3-mlevitsk@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- MAINTAINERS                 |  2 +-
- hw/nvram/fw_cfg-interface.c | 23 +++++++++++++++++++++++
- hw/nvram/fw_cfg.c           |  7 -------
- hw/nvram/meson.build        |  3 +++
- 4 files changed, 27 insertions(+), 8 deletions(-)
- create mode 100644 hw/nvram/fw_cfg-interface.c
+ tests/qtest/libqos/libqtest.h | 23 ++++++++++++++++
+ tests/qtest/libqtest.c        | 49 ++++++++++++++++++++++++++++++++++-
+ 2 files changed, 71 insertions(+), 1 deletion(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e9d85cc873..8d50b96c33 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2055,7 +2055,7 @@ R: Laszlo Ersek <lersek@redhat.com>
- R: Gerd Hoffmann <kraxel@redhat.com>
- S: Supported
- F: docs/specs/fw_cfg.txt
--F: hw/nvram/fw_cfg.c
-+F: hw/nvram/fw_cfg*.c
- F: stubs/fw_cfg.c
- F: include/hw/nvram/fw_cfg.h
- F: include/standard-headers/linux/qemu_fw_cfg.h
-diff --git a/hw/nvram/fw_cfg-interface.c b/hw/nvram/fw_cfg-interface.c
-new file mode 100644
-index 0000000000..0e93feeae5
---- /dev/null
-+++ b/hw/nvram/fw_cfg-interface.c
-@@ -0,0 +1,23 @@
-+/*
-+ * QEMU Firmware configuration device emulation (QOM interfaces)
+diff --git a/tests/qtest/libqos/libqtest.h b/tests/qtest/libqos/libqtest.h
+index 9b3f99b322..b7a776068c 100644
+--- a/tests/qtest/libqos/libqtest.h
++++ b/tests/qtest/libqos/libqtest.h
+@@ -198,6 +198,16 @@ void qtest_qmp_vsend(QTestState *s, const char *fmt, va_list ap)
+  */
+ QDict *qtest_qmp_receive_dict(QTestState *s);
+ 
++/**
++ * qtest_qmp_receive:
++ * @s: #QTestState instance to operate on.
 + *
-+ * Copyright 2020 Red Hat, Inc.
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
++ * Reads a QMP message from QEMU and returns the response.
++ * Buffers all the events received meanwhile, until a
++ * call to qtest_qmp_eventwait
 + */
++QDict *qtest_qmp_receive(QTestState *s);
 +
-+#include "qemu/osdep.h"
-+#include "hw/nvram/fw_cfg.h"
+ /**
+  * qtest_qmp_eventwait:
+  * @s: #QTestState instance to operate on.
+@@ -217,6 +227,19 @@ void qtest_qmp_eventwait(QTestState *s, const char *event);
+  */
+ QDict *qtest_qmp_eventwait_ref(QTestState *s, const char *event);
+ 
++/**
++ * qtest_qmp_event_ref:
++ * @s: #QTestState instance to operate on.
++ * @event: event to return.
++ *
++ * Removes non-matching events from the buffer that was set by
++ * qtest_qmp_receive, until an event bearing the given name is found,
++ * and returns it.
++ * If no event matches, clears the buffer and returns NULL.
++ *
++ */
++QDict *qtest_qmp_event_ref(QTestState *s, const char *event);
 +
-+static const TypeInfo fw_cfg_data_generator_interface_info = {
-+    .parent = TYPE_INTERFACE,
-+    .name = TYPE_FW_CFG_DATA_GENERATOR_INTERFACE,
-+    .class_size = sizeof(FWCfgDataGeneratorClass),
-+};
-+
-+static void fw_cfg_register_interfaces(void)
-+{
-+    type_register_static(&fw_cfg_data_generator_interface_info);
-+}
-+
-+type_init(fw_cfg_register_interfaces)
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index 0e95d057fd..08539a1aab 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -1360,18 +1360,11 @@ static const TypeInfo fw_cfg_mem_info = {
-     .class_init    = fw_cfg_mem_class_init,
+ /**
+  * qtest_qmp_receive_success:
+  * @s: #QTestState instance to operate on
+diff --git a/tests/qtest/libqtest.c b/tests/qtest/libqtest.c
+index dadc465825..d4c49a52ff 100644
+--- a/tests/qtest/libqtest.c
++++ b/tests/qtest/libqtest.c
+@@ -63,6 +63,7 @@ struct QTestState
+     bool irq_level[MAX_IRQ];
+     GString *rx;
+     QTestTransportOps ops;
++    GList *pending_events;
  };
  
--static const TypeInfo fw_cfg_data_generator_interface_info = {
--    .parent = TYPE_INTERFACE,
--    .name = TYPE_FW_CFG_DATA_GENERATOR_INTERFACE,
--    .class_size = sizeof(FWCfgDataGeneratorClass),
--};
--
- static void fw_cfg_register_types(void)
- {
-     type_register_static(&fw_cfg_info);
-     type_register_static(&fw_cfg_io_info);
-     type_register_static(&fw_cfg_mem_info);
--    type_register_static(&fw_cfg_data_generator_interface_info);
+ static GHookList abrt_hooks;
+@@ -279,6 +280,7 @@ QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
+ 
+     g_test_message("starting QEMU: %s", command);
+ 
++    s->pending_events = NULL;
+     s->wstatus = 0;
+     s->expected_status = 0;
+     s->qemu_pid = fork();
+@@ -386,6 +388,13 @@ void qtest_quit(QTestState *s)
+     close(s->fd);
+     close(s->qmp_fd);
+     g_string_free(s->rx, true);
++
++    for (GList *it = s->pending_events; it != NULL; it = it->next) {
++        qobject_unref((QDict *)it->data);
++    }
++
++    g_list_free(s->pending_events);
++
+     g_free(s);
  }
  
- type_init(fw_cfg_register_types)
-diff --git a/hw/nvram/meson.build b/hw/nvram/meson.build
-index 1f2ed013b2..fd2951a860 100644
---- a/hw/nvram/meson.build
-+++ b/hw/nvram/meson.build
-@@ -1,3 +1,6 @@
-+# QOM interfaces must be available anytime QOM is used.
-+qom_ss.add(files('fw_cfg-interface.c'))
+@@ -603,6 +612,19 @@ QDict *qmp_fd_receive(int fd)
+     return qmp.response;
+ }
+ 
++QDict *qtest_qmp_receive(QTestState *s)
++{
++    while (true) {
++        QDict *response = qtest_qmp_receive_dict(s);
 +
- softmmu_ss.add(files('fw_cfg.c'))
- softmmu_ss.add(when: 'CONFIG_CHRP_NVRAM', if_true: files('chrp_nvram.c'))
- softmmu_ss.add(when: 'CONFIG_DS1225Y', if_true: files('ds1225y.c'))
++        if (!qdict_get_try_str(response, "event")) {
++            return response;
++        }
++        /* Stash the event for a later consumption */
++        s->pending_events = g_list_prepend(s->pending_events, response);
++    }
++}
++
+ QDict *qtest_qmp_receive_dict(QTestState *s)
+ {
+     return qmp_fd_receive(s->qmp_fd);
+@@ -771,10 +793,34 @@ void qtest_qmp_send_raw(QTestState *s, const char *fmt, ...)
+     va_end(ap);
+ }
+ 
+-QDict *qtest_qmp_eventwait_ref(QTestState *s, const char *event)
++QDict *qtest_qmp_event_ref(QTestState *s, const char *event)
+ {
++    GList *next = NULL;
+     QDict *response;
+ 
++    for (GList *it = s->pending_events; it != NULL; it = next) {
++
++        next = it->next;
++        response = (QDict *)it->data;
++
++        s->pending_events = g_list_remove_link(s->pending_events, it);
++
++        if (!strcmp(qdict_get_str(response, "event"), event)) {
++            return response;
++        }
++        qobject_unref(response);
++    }
++    return NULL;
++}
++
++QDict *qtest_qmp_eventwait_ref(QTestState *s, const char *event)
++{
++    QDict *response = qtest_qmp_event_ref(s, event);
++
++    if (response) {
++        return response;
++    }
++
+     for (;;) {
+         response = qtest_qmp_receive_dict(s);
+         if ((qdict_haskey(response, "event")) &&
+@@ -1403,6 +1449,7 @@ QTestState *qtest_inproc_init(QTestState **s, bool log, const char* arch,
+ {
+     QTestState *qts;
+     qts = g_new0(QTestState, 1);
++    qts->pending_events = NULL;
+     *s = qts; /* Expose qts early on, since the query endianness relies on it */
+     qts->wstatus = 0;
+     for (int i = 0; i < MAX_IRQ; i++) {
 -- 
 2.26.2
 
