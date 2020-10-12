@@ -2,67 +2,68 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AB5EC433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:54:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00450C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:55:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11F8D2078E
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:54:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F8F120790
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:55:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dz/vNf/w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11F8D2078E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b4SBtpqI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F8F120790
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kS4q4-0004vx-2t
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 16:54:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38482)
+	id 1kS4rA-00070A-IU
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 16:55:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38308)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kS4WZ-0002yR-0A
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:34:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35515)
+ id 1kS4WP-0002qi-CZ
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:34:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33194)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kS4WO-0002j4-A9
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:34:26 -0400
+ id 1kS4WK-0002iE-Hi
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:34:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602534853;
+ s=mimecast20190719; t=1602534851;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=d3v5cQxcIySqlSBjEcok3n/xI8fAKEf5zkOQbUOR8KU=;
- b=dz/vNf/wrF//rHyaLqlMfA2PBZRsNDV5iRCVAOArm9+9E1crYTpYJwGxKeO/MXhebKEy9N
- rZ65AlfJ8IUVlyE03WyBSRYwe2DThWEeaCpdUYPiPOC31bZ7nrb3TWgqtOztJc9AVgY+w1
- +IAw3Mz/zyIm9yB8yKzOCMEIVs551jA=
+ bh=CrmoymnzAgikECEklmSg1XDyOEymdcxw7MwzoWGtGiE=;
+ b=b4SBtpqIMmnWdB9rESv5hvCWTgV3KFpGSPUFKq20UEUjjxCwQFiLGaBp6GLvpGRChfTOzL
+ yuua5XS3pHTRcCN6bUT5zGA1KBeS1CZdJwiT4/KJY5Qksr2IIh405WJ+f3U6jyTYglWDII
+ KdYaySaHBI63qlYUhX76dDXnXdsEvkM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-154-b2Bo_tHFPlaRb49CIPklYA-1; Mon, 12 Oct 2020 16:34:10 -0400
-X-MC-Unique: b2Bo_tHFPlaRb49CIPklYA-1
+ us-mta-145-ehp6x1u8MOqSQtb9vUC8uw-1; Mon, 12 Oct 2020 16:34:10 -0400
+X-MC-Unique: ehp6x1u8MOqSQtb9vUC8uw-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0ADC21029D22
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 20:34:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D73B8B5E5C
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 20:33:58 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BF83673660
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 20:33:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BD04073662;
+ Mon, 12 Oct 2020 20:33:57 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 32/38] scsi: switch to bus->check_address
-Date: Mon, 12 Oct 2020 16:33:37 -0400
-Message-Id: <20201012203343.1105018-33-pbonzini@redhat.com>
+Subject: [PULL 29/38] scsi/scsi_bus: switch search direction in
+ scsi_device_find
+Date: Mon, 12 Oct 2020 16:33:34 -0400
+Message-Id: <20201012203343.1105018-30-pbonzini@redhat.com>
 In-Reply-To: <20201012203343.1105018-1-pbonzini@redhat.com>
 References: <20201012203343.1105018-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -73,16 +74,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 16:33:53
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/11 23:52:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,201 +97,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20201006123904.610658-6-mlevitsk@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
+
+This change will allow us to convert the bus children list to RCU,
+while not changing the logic of this function
+
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20200913160259.32145-2-mlevitsk@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/scsi-bus.c | 122 ++++++++++++++++++++++++++++-----------------
- 1 file changed, 75 insertions(+), 47 deletions(-)
+ hw/scsi/scsi-bus.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index 4cf1f404b4..4ab9811cd8 100644
+index 3284a5d1fb..6b1ed7ae9a 100644
 --- a/hw/scsi/scsi-bus.c
 +++ b/hw/scsi/scsi-bus.c
-@@ -22,33 +22,6 @@ static void scsi_req_dequeue(SCSIRequest *req);
- static uint8_t *scsi_target_alloc_buf(SCSIRequest *req, size_t len);
- static void scsi_target_free_buf(SCSIRequest *req);
+@@ -1572,7 +1572,7 @@ SCSIDevice *scsi_device_find(SCSIBus *bus, int channel, int id, int lun)
+     BusChild *kid;
+     SCSIDevice *target_dev = NULL;
  
--static Property scsi_props[] = {
--    DEFINE_PROP_UINT32("channel", SCSIDevice, channel, 0),
--    DEFINE_PROP_UINT32("scsi-id", SCSIDevice, id, -1),
--    DEFINE_PROP_UINT32("lun", SCSIDevice, lun, -1),
--    DEFINE_PROP_END_OF_LIST(),
--};
--
--static void scsi_bus_class_init(ObjectClass *klass, void *data)
--{
--    BusClass *k = BUS_CLASS(klass);
--    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
--
--    k->get_dev_path = scsibus_get_dev_path;
--    k->get_fw_dev_path = scsibus_get_fw_dev_path;
--    hc->unplug = qdev_simple_device_unplug_cb;
--}
--
--static const TypeInfo scsi_bus_info = {
--    .name = TYPE_SCSI_BUS,
--    .parent = TYPE_BUS,
--    .instance_size = sizeof(SCSIBus),
--    .class_init = scsi_bus_class_init,
--    .interfaces = (InterfaceInfo[]) {
--        { TYPE_HOTPLUG_HANDLER },
--        { }
--    }
--};
- static int next_scsi_bus;
+-    QTAILQ_FOREACH_REVERSE(kid, &bus->qbus.children, sibling) {
++    QTAILQ_FOREACH(kid, &bus->qbus.children, sibling) {
+         DeviceState *qdev = kid->child;
+         SCSIDevice *dev = SCSI_DEVICE(qdev);
  
- static void scsi_device_realize(SCSIDevice *s, Error **errp)
-@@ -160,35 +133,68 @@ static void scsi_dma_restart_cb(void *opaque, int running, RunState state)
-     }
- }
- 
--static void scsi_qdev_realize(DeviceState *qdev, Error **errp)
-+static bool scsi_bus_is_address_free(SCSIBus *bus,
-+				     int channel, int target, int lun,
-+				     SCSIDevice **p_dev)
-+{
-+    SCSIDevice *d = scsi_device_find(bus, channel, target, lun);
-+    if (d && d->lun == lun) {
-+        if (p_dev) {
-+            *p_dev = d;
-+        }
-+        return false;
-+    }
-+    if (p_dev) {
-+        *p_dev = NULL;
-+    }
-+    return true;
-+}
+@@ -1580,7 +1580,15 @@ SCSIDevice *scsi_device_find(SCSIBus *bus, int channel, int id, int lun)
+             if (dev->lun == lun) {
+                 return dev;
+             }
+-            target_dev = dev;
 +
-+static bool scsi_bus_check_address(BusState *qbus, DeviceState *qdev, Error **errp)
- {
-     SCSIDevice *dev = SCSI_DEVICE(qdev);
--    SCSIBus *bus = DO_UPCAST(SCSIBus, qbus, dev->qdev.parent_bus);
--    SCSIDevice *d;
--    Error *local_err = NULL;
-+    SCSIBus *bus = SCSI_BUS(qbus);
- 
-     if (dev->channel > bus->info->max_channel) {
-         error_setg(errp, "bad scsi channel id: %d", dev->channel);
--        return;
-+        return false;
-     }
-     if (dev->id != -1 && dev->id > bus->info->max_target) {
-         error_setg(errp, "bad scsi device id: %d", dev->id);
--        return;
-+        return false;
-     }
-     if (dev->lun != -1 && dev->lun > bus->info->max_lun) {
-         error_setg(errp, "bad scsi device lun: %d", dev->lun);
--        return;
-+        return false;
-+    }
++            /*
++             * If we don't find exact match (channel/bus/lun),
++             * we will return the first device which matches channel/bus
++             */
 +
-+    if (dev->id != -1 && dev->lun != -1) {
-+        SCSIDevice *d;
-+        if (!scsi_bus_is_address_free(bus, dev->channel, dev->id, dev->lun, &d)) {
-+            error_setg(errp, "lun already used by '%s'", d->qdev.id);
-+            return false;
-+        }
-     }
- 
-+    return true;
-+}
-+
-+static void scsi_qdev_realize(DeviceState *qdev, Error **errp)
-+{
-+    SCSIDevice *dev = SCSI_DEVICE(qdev);
-+    SCSIBus *bus = DO_UPCAST(SCSIBus, qbus, dev->qdev.parent_bus);
-+    bool is_free;
-+    Error *local_err = NULL;
-+
-     if (dev->id == -1) {
-         int id = -1;
-         if (dev->lun == -1) {
-             dev->lun = 0;
++            if (!target_dev) {
++                target_dev = dev;
++            }
          }
-         do {
--            d = scsi_device_find(bus, dev->channel, ++id, dev->lun);
--        } while (d && d->lun == dev->lun && id < bus->info->max_target);
--        if (d && d->lun == dev->lun) {
-+            is_free = scsi_bus_is_address_free(bus, dev->channel, ++id, dev->lun, NULL);
-+        } while (!is_free && id < bus->info->max_target);
-+        if (!is_free) {
-             error_setg(errp, "no free target");
-             return;
-         }
-@@ -196,20 +202,13 @@ static void scsi_qdev_realize(DeviceState *qdev, Error **errp)
-     } else if (dev->lun == -1) {
-         int lun = -1;
-         do {
--            d = scsi_device_find(bus, dev->channel, dev->id, ++lun);
--        } while (d && d->lun == lun && lun < bus->info->max_lun);
--        if (d && d->lun == lun) {
-+            is_free = scsi_bus_is_address_free(bus, dev->channel, dev->id, ++lun, NULL);
-+        } while (!is_free && lun < bus->info->max_lun);
-+        if (!is_free) {
-             error_setg(errp, "no free lun");
-             return;
-         }
-         dev->lun = lun;
--    } else {
--        d = scsi_device_find(bus, dev->channel, dev->id, dev->lun);
--        assert(d);
--        if (d->lun == dev->lun && dev != d) {
--            error_setg(errp, "lun already used by '%s'", d->qdev.id);
--            return;
--        }
      }
- 
-     QTAILQ_INIT(&dev->requests);
-@@ -1723,6 +1722,13 @@ const VMStateDescription vmstate_scsi_device = {
-     }
- };
- 
-+static Property scsi_props[] = {
-+    DEFINE_PROP_UINT32("channel", SCSIDevice, channel, 0),
-+    DEFINE_PROP_UINT32("scsi-id", SCSIDevice, id, -1),
-+    DEFINE_PROP_UINT32("lun", SCSIDevice, lun, -1),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
- static void scsi_device_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *k = DEVICE_CLASS(klass);
-@@ -1753,6 +1759,28 @@ static const TypeInfo scsi_device_type_info = {
-     .instance_init = scsi_dev_instance_init,
- };
- 
-+static void scsi_bus_class_init(ObjectClass *klass, void *data)
-+{
-+    BusClass *k = BUS_CLASS(klass);
-+    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
-+
-+    k->get_dev_path = scsibus_get_dev_path;
-+    k->get_fw_dev_path = scsibus_get_fw_dev_path;
-+    k->check_address = scsi_bus_check_address;
-+    hc->unplug = qdev_simple_device_unplug_cb;
-+}
-+
-+static const TypeInfo scsi_bus_info = {
-+    .name = TYPE_SCSI_BUS,
-+    .parent = TYPE_BUS,
-+    .instance_size = sizeof(SCSIBus),
-+    .class_init = scsi_bus_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_HOTPLUG_HANDLER },
-+        { }
-+    }
-+};
-+
- static void scsi_register_types(void)
- {
-     type_register_static(&scsi_bus_info);
+     return target_dev;
 -- 
 2.26.2
 
