@@ -2,87 +2,105 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FBFCC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 09:53:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0C90C43457
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 09:54:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E408520776
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 09:53:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E408520776
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 3923520776
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 09:54:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JKRXysxs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3923520776
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51646 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRuWj-0006rV-TG
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 05:53:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44340)
+	id 1kRuWm-0006v6-0G
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 05:54:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44672)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kRuTr-0004cO-Mv
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 05:50:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42724)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kRuVX-0005lU-OO
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 05:52:43 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:50724)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kRuTo-0001y7-I1
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 05:50:59 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kRuTm-0003tC-AR
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 09:50:54 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 2246F2E8118
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 09:50:54 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kRuVV-000250-1h
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 05:52:42 -0400
+Received: by mail-wm1-x343.google.com with SMTP id 13so16640918wmf.0
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 02:52:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=7itYNF9rtSSREjE7Irl9Vri1on7EUKnhDbaMUV+FlSo=;
+ b=JKRXysxs0hhY0PMEp8hChap3sSxuIGeY7gpjfq7/l41Scs5vWfgH1ur0CvPcN4d0fN
+ CTcf9UlDMKRTcujLsnwwFrM2sUJ2CW6Ti3Ru7UwAxhVIsADdVnsyMdlVk5itZsq+WQK9
+ Z2Ce9ADTh/NbfoBWaYDIE63EPqglxyVoAWgmKwDgyN2nsNff7wiEAMb847cpUt1AG2Dz
+ zibWOqCub52V5+TvudL0jPIlkfr2jAQUp8FUfuQGfxzLg38rEglI3/vBHrTdo1iFtm46
+ hHl+ljHxwEyjAA8QB95D7T3Sv5T+dq/RnnbT1UEPO4a1eljB2bkCIVTr6Q9gBhQ55DEY
+ jRBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=7itYNF9rtSSREjE7Irl9Vri1on7EUKnhDbaMUV+FlSo=;
+ b=tdWTzwyC3J6/3czgeI659+beOzWqZ4f2agskXA3cgwu8+0xQJ4rl1ivJZx0OuLqGkk
+ j7Mq/oGBRStMUzzxOMSxA3TJzRt5oOuLpWxsMPfvMsXwZ1+TuOyMoPZeJKF7sqnF2VCa
+ c0uiEqDg0bc1vl602gtXp+mabv6EbDv/nF41MjrzH3ziiYrC3LVaUV7aYeYtThuzzffP
+ gh//u+2Vya5ySsQplDg759Nj8uPLPZXyvMVdX/tL0BP7P9+47GRh372U4Ji1wg+aT3aq
+ fynABa4EFEZtwKYnc6+Dc7KigNiBhmPtXRPgo42+/aztngflFv/NN7JPLXdTAkK8YYFo
+ XH0Q==
+X-Gm-Message-State: AOAM532gVW/FR9jhPTods2KRLEFDEH5NM0B/Lm2njmq5ASaeZ0AmfANc
+ 3t06JMkg1rX2WIQzqr3OqKU=
+X-Google-Smtp-Source: ABdhPJxxDoCVwayAoPGj4y7hcwm9bs2p1HBvGB6mrfqB/1eqezHQJU95BkevOirpCq1ub0UsuVxn7A==
+X-Received: by 2002:a05:600c:258:: with SMTP id
+ 24mr9792556wmj.167.1602496359409; 
+ Mon, 12 Oct 2020 02:52:39 -0700 (PDT)
+Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id t6sm27352219wre.30.2020.10.12.02.52.38
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 12 Oct 2020 02:52:38 -0700 (PDT)
+Subject: Re: [PATCH 3/5] MAINTAINERS: Downgrade status of MIPS Boston to "Odd
+ Fixes"
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20201009165208.2905569-1-f4bug@amsat.org>
+ <20201009165208.2905569-4-f4bug@amsat.org>
+ <945e6bbe-51a3-6bf6-8387-e2acf0901738@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <32c3ca4a-8127-8d6e-8ab1-7c36c1d773cd@amsat.org>
+Date: Mon, 12 Oct 2020 11:52:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 12 Oct 2020 09:44:51 -0000
-From: =?utf-8?q?=C5=81ukasz_Zemczak?= <1849644@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Fix Released; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
- component=main; status=Fix Released; importance=Low;
- assignee=None; 
-X-Launchpad-Bug-Tags: verification-done verification-done-focal
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: berrange janitor laurent-vivier npes87184 paelzer
- racb samuel-t sil2100 ubuntu-sru-bot
-X-Launchpad-Bug-Reporter: Samuel (samuel-t)
-X-Launchpad-Bug-Modifier: =?utf-8?q?=C5=81ukasz_Zemczak_=28sil2100=29?=
-References: <157191258679.29920.9268940625941119092.malonedeb@soybean.canonical.com>
-Message-Id: <160249589201.2447.1398838603370479971.malone@soybean.canonical.com>
-Subject: [Bug 1849644] Update Released
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="781851f4dc11c93bc506eb54e6a0d35c919a1ce6"; Instance="production"
-X-Launchpad-Hash: fe1ccc794d75cf36c938394661387dd668f2cb86
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 05:21:18
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -66
-X-Spam_score: -6.7
-X-Spam_bar: ------
-X-Spam_report: (-6.7 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <945e6bbe-51a3-6bf6-8387-e2acf0901738@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -91,109 +109,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1849644 <1849644@bugs.launchpad.net>
+Cc: Chen Huacai <zltjiangshi@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Paul Burton <paulburton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The verification of the Stable Release Update for qemu has completed
-successfully and the package is now being released to -updates.
-Subsequently, the Ubuntu Stable Release Updates Team is being
-unsubscribed and will not receive messages about this bug report.  In
-the event that you encounter a regression using the package from
--updates please report a new bug using ubuntu-bug and tag the bug report
-regression-update so we can easily find any regressions.
+On 10/12/20 9:40 AM, Thomas Huth wrote:
+> On 09/10/2020 18.52, Philippe Mathieu-Daudé wrote:
+>> Paul's Wavecomp email has been bouncing for months. He told us
+>> he "no longer has access to modern MIPS CPUs or Boston hardware,
+>> and wouldn't currently have time to spend on them if he did." [1]
+>> but "perhaps that might change in the future." [2].
+>> Be fair and downgrade the status of the Boston board to "Odd Fixes"
+>> (has a maintainer but they don't have time to do much other).
+> 
+> When I read this patch description ("email bouncing"), I wondered why you
+> did not also update Paul's email address here. Then I saw that you're doing
+> this in the next patch. So I'd recommend to either scratch the first
+> sentence of your patch description here, or to merge the two patches.
 
--- =
+I don't want to scratch it here because this justifies the downgrade.
+I'll merge with the next, hoping nobody will complain these are
+unrelated changes and has to be split =)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1849644
-
-Title:
-  QEMU VNC websocket proxy requires non-standard 'binary' subprotocol
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Focal:
-  Fix Released
-
-Bug description:
-  [Impact]
-
-   * The exact details of the protocol/subprotocal was slightly unclear
-     between the projects. So qemu ended up insisting on "binary" being
-     used but newer noVNC clients no more used it.
-
-   * Qemu got fixed in 5.0 to be more tolerant and accept an empty sub-
-     protocol as well. This SRU backports that fix to Focal.
-
-  [Test Case]
-
-   * Without the fix the following will "Failed to connect", but with
-  the fix it will work.
-
-  $ sudo apt install qemu-system-x86
-  # will only boot into a failing bootloader, but that is enough
-  $ qemu-system-x86_64 -vnc :0,websocket
-  # We need version 1.2 or later, so use the snap
-  $ snap install novnc
-  $ novnc --vnc localhost:5700
-  Connect browser to http://<IP>:6080/vnc.html
-  Click "Connect"
-
-   * Cross check with an older noVNC (e.g. the one in Focal) if the =
-
-     connectivity still works on those as well
-
-     - Reminders when switching between the noVNC implementations
-       - always refresh the browser with all clear ctrl+alt+f5
-       - start/stop the snapped one via snap.novnc.novncsvc.service
-
-  [Regression Potential]
-
-   * This is exclusive to the functionality of noVNC, so regressions would =
-
-     have to be expected in there. The tests try to exercise the basics, but
-     e.g. Openstack would be a major product using =
-
-
-  [Other Info]
-   =
-
-   * The noVNC in Focal itself does not yet have the offending change, but
-     we want the qemu in focal to be connecteable from ~any type of client
-
-
-  ---
-
-
-  =
-
-  When running a machine using "-vnc" and the "websocket" option QEMU seems=
- to require the subprotocol called 'binary'. This subprotocol does not exis=
-t in the WebSocket specification. In fact it has never existed in the spec,=
- in one of the very early drafts of WebSockets it was briefly mentioned but=
- it never made it to a final version.
-
-  When the WebSocket server requires a non-standard subprotocol any
-  WebSocket client that works correctly won't be able to connect.
-
-  One example of such a client is noVNC, it tells the server that it
-  doesn't want to use any subprotocol. QEMU's WebSocket proxy doesn't
-  let noVNC connect. If noVNC is modified to ask for 'binary' it will
-  work, this is, however, incorrect behavior.
-
-  Looking at the code in "io/channel-websock.c" it seems it's quite
-  hard-coded to binary:
-
-  Look at line 58 and 433 here:
-  https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dio/channel-websock.c
-
-  This code has to be made more dynamic, and shouldn't require binary.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1849644/+subscriptions
+> 
+>   Thomas
+> 
+>> [1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg718739.html
+>> [1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg728605.html
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>   MAINTAINERS | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index 2de5943e388..782743b7ef0 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -1163,7 +1163,7 @@ F: hw/intc/loongson_liointc.c
+>>   Boston
+>>   M: Paul Burton <pburton@wavecomp.com>
+>>   R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+>> -S: Maintained
+>> +S: Odd Fixes
+>>   F: hw/core/loader-fit.c
+>>   F: hw/mips/boston.c
+>>   F: hw/pci-host/xilinx-pcie.c
+>>
+> 
+> 
 
