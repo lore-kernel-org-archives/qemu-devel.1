@@ -2,92 +2,71 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 384B1C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 16:09:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42B29C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 16:09:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9FCD720797
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 16:09:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FYE+9Ecv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FCD720797
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id CE0AC20797
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 16:09:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE0AC20797
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kS0Ni-0003KE-Iz
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 12:09:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58160)
+	id 1kS0OG-0004Mt-U4
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 12:09:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59906)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kRztm-0003kr-Rn
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:38:07 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33318)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kRztf-0007mg-Hl
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:38:06 -0400
-Received: by mail-wr1-x442.google.com with SMTP id b8so6479284wrn.0
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 08:37:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=xt8K6d2MSfZD0aUx3007ahLfcJglQMjANJEKAe+3790=;
- b=FYE+9Ecvyaoe9jzyxtZsaIzYUKdFehhxLQhRlKWZo3PdXiNEH6joJiRvM4Kr06kFSj
- VnyWPc7y1HssryWF9Pw1v4yZlqOKvgWg7cijQO5vvvJEPYOfw83Ng1mnGqE/d8Q0sdLv
- drgrc2eCGo1tLId4USPRk5e0Oq/Z2FsCKUGslXnaVxDzaaKlTYhf1+mYJ+zkT7PxGlPB
- nnsL/+Mqp6AWqxGpSjRMMXb94z9xeKMIqIhlV+ETMMCdnPVf8Quxz5BuWcWIQsu4iDTA
- tgaatqkUs6r9S94kmaqN643cWHFcYmfS3oVoiRiDuPTR1Ws76WL7YOr5pKZB+9DAjNBN
- 3N/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=xt8K6d2MSfZD0aUx3007ahLfcJglQMjANJEKAe+3790=;
- b=FFdA5l+AlYJFjhC7zRTtFZd/sY0TIz9iUuiTZ6JAMcjZtAYCc+M+1NZdBH5TEb7CKI
- T/R8ZwIgOli0q+JgyF5hALcN2LJTt7v7LGmKvAzzTiockCN5hxkEFXAuY69GTkDrtkVa
- 04ETt5RxyHg/S0WlbaD85Xg6D2/8dfiiz+3Et2XWJKG0Qndh/54JMChtIoQMK6akcZPX
- 3yOj88cpWhpvwotG8Zpu/73kJgHanCorkeKRyTe/mSGVx8EfgGrHSfA7Tf+sCH64SuAC
- BklTEWBm6swh1pRiS8lcYtJlrcZWG+kE+E69g+ijj+bu+rWjtGlIS7AYFIa80QEXXtBb
- JoYQ==
-X-Gm-Message-State: AOAM531gXED8zzMhSH5QMd/l99rtLt9eG88owqgHm04avTpxeTPGXstt
- OxC16ztlCkxqvAlVue28DTwh5A==
-X-Google-Smtp-Source: ABdhPJwvDTiuOmwVXrZHDZlDncjXyM10grRVSwA7Q3/oI3pj2RrycaudQYcqfEGi9g1IDCH6lWaF3Q==
-X-Received: by 2002:adf:fa0e:: with SMTP id m14mr29112212wrr.134.1602517078193; 
- Mon, 12 Oct 2020 08:37:58 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id y66sm7095961wmd.14.2020.10.12.08.37.57
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 12 Oct 2020 08:37:57 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH 09/10] target/arm: Implement FPSCR.LTPSIZE for M-profile LOB
- extension
-Date: Mon, 12 Oct 2020 16:37:45 +0100
-Message-Id: <20201012153746.9996-10-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201012153746.9996-1-peter.maydell@linaro.org>
-References: <20201012153746.9996-1-peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kS01F-0005BY-Uj; Mon, 12 Oct 2020 11:45:50 -0400
+Resent-Date: Mon, 12 Oct 2020 11:45:49 -0400
+Resent-Message-Id: <E1kS01F-0005BY-Uj@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21318)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kS01D-0000Ia-79; Mon, 12 Oct 2020 11:45:49 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1602517538; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=UgGbukkUR/wPfH3MzH0MrRTdzVHItqjSM63KgpsGWuzSfs4gpIprLd7bxLmN5MZNGWnBydO/S3M1buLTCkTWOaErnr2iFpo4xgSD0BWBnoRugPqqrQkYpHmRGmlPBe3R4oBjw20xV79XdRdxeghc5CJMC4bhjSXUUJPH+o0ZsG4=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1602517538;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=PQ8yhp4woezLcxoQtPoIMtAa2Sr9dgUSvEI1e5BHmic=; 
+ b=ChBSW0YXoVifVUY+KAUCETrVj/Jtoi6H1oz+UxqzyiHLNYZclm0aFMytGlEcEgcMuvK/5r1tPoWypMpVjFjXSAlkeK4Hx98zMfiKgi5Ygoctg8uKgRBqwzweYVmqnt+ZrsSIbrGwGRb10Sg93SpHZuWgc81bfCJuwyZneBJrDm0=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1602517537003574.3528256154505;
+ Mon, 12 Oct 2020 08:45:37 -0700 (PDT)
+Subject: Re: [PATCH for-5.1] docs/system/arm/virt: Document mte machine option
+Message-ID: <160251753567.18344.11052124400267344488@66eaa9a8a123>
+In-Reply-To: <20201012153408.9747-10-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: peter.maydell@linaro.org
+Date: Mon, 12 Oct 2020 08:45:37 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 11:45:43
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,96 +80,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, richard.henderson@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If the M-profile low-overhead-branch extension is implemented, FPSCR
-bits [18:16] are a new field LTPSIZE.  If MVE is not implemented
-(currently always true for us) then this field always reads as 4 and
-ignores writes.
-
-These bits used to be the vector-length field for the old
-short-vector extension, so we need to take care that they
-are not misinterpreted as setting vec_len.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/cpu.c        |  5 +++++
- target/arm/vfp_helper.c | 25 +++++++++++++++++++++----
- 2 files changed, 26 insertions(+), 4 deletions(-)
-
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 186ee621a65..baae826f94f 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -255,6 +255,11 @@ static void arm_cpu_reset(DeviceState *dev)
-         uint8_t *rom;
-         uint32_t vecbase;
- 
-+        if (cpu_isar_feature(aa32_lob, cpu)) {
-+            /* LTPSIZE is constant 4 if MVE not implemented */
-+            env->vfp.xregs[ARM_VFP_FPSCR] |= 4 << 16;
-+        }
-+
-         if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
-             env->v7m.secure = true;
-         } else {
-diff --git a/target/arm/vfp_helper.c b/target/arm/vfp_helper.c
-index 5666393ef79..350150adbf1 100644
---- a/target/arm/vfp_helper.c
-+++ b/target/arm/vfp_helper.c
-@@ -189,8 +189,10 @@ uint32_t vfp_get_fpscr(CPUARMState *env)
- 
- void HELPER(vfp_set_fpscr)(CPUARMState *env, uint32_t val)
- {
-+    ARMCPU *cpu = env_archcpu(env);
-+
-     /* When ARMv8.2-FP16 is not supported, FZ16 is RES0.  */
--    if (!cpu_isar_feature(any_fp16, env_archcpu(env))) {
-+    if (!cpu_isar_feature(any_fp16, cpu)) {
-         val &= ~FPCR_FZ16;
-     }
- 
-@@ -198,8 +200,14 @@ void HELPER(vfp_set_fpscr)(CPUARMState *env, uint32_t val)
-         /*
-          * M profile FPSCR is RES0 for the QC, STRIDE, FZ16, LEN bits
-          * and also for the trapped-exception-handling bits IxE.
-+         * From v8.1M with the low-overhead-loop extension bits
-+         * [18:16] are used for LTPSIZE and (since we don't implement
-+         * MVE) always read as 4 and ignore writes.
-          */
-         val &= 0xf7c0009f;
-+        if (cpu_isar_feature(aa32_lob, cpu)) {
-+            val |= 4 << 16;
-+        }
-     }
- 
-     vfp_set_fpscr_to_host(env, val);
-@@ -212,9 +220,18 @@ void HELPER(vfp_set_fpscr)(CPUARMState *env, uint32_t val)
-      * (which are stored in fp_status), and the other RES0 bits
-      * in between, then we clear all of the low 16 bits.
-      */
--    env->vfp.xregs[ARM_VFP_FPSCR] = val & 0xf7c80000;
--    env->vfp.vec_len = (val >> 16) & 7;
--    env->vfp.vec_stride = (val >> 20) & 3;
-+    if (cpu_isar_feature(aa32_lob, cpu)) {
-+        /*
-+         * M-profile low-overhead-loop extension: [18:16] are LTPSIZE
-+         * and we keep them in vfp.xregs[].
-+         */
-+        env->vfp.xregs[ARM_VFP_FPSCR] = val & 0xf7cf0000;
-+    } else {
-+        /* Those bits might be the old-style short vector length/stride */
-+        env->vfp.xregs[ARM_VFP_FPSCR] = val & 0xf7c80000;
-+        env->vfp.vec_len = (val >> 16) & 7;
-+        env->vfp.vec_stride = (val >> 20) & 3;
-+    }
- 
-     /*
-      * The bit we set within fpscr_q is arbitrary; the register as a
--- 
-2.20.1
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMTAxMjE1MzQwOC45NzQ3
+LTEwLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
+byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
+b3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMjAxMDEyMTUzNDA4
+Ljk3NDctMTAtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnClN1YmplY3Q6IFtQQVRDSCBmb3ItNS4x
+XSBkb2NzL3N5c3RlbS9hcm0vdmlydDogRG9jdW1lbnQgbXRlIG1hY2hpbmUgb3B0aW9uCgo9PT0g
+VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9k
+ZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
+IGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3
+ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3
+LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMjAxMDEyMTUzNDA4
+Ljk3NDctMTAtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAyMDEwMTIxNTM0
+MDguOTc0Ny0xMC1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJh
+bmNoICd0ZXN0JwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KY2hlY2twYXRjaC5wbDogbm8gcmV2aXNp
+b25zIHJldHVybmVkIGZvciByZXZsaXN0ICcxJwo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
+bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAyNTUKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0
+Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAxMDEyMTUzNDA4Ljk3NDctMTAtcGV0ZXIubWF5
+ZGVsbEBsaW5hcm8ub3JnL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1h
+aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9y
+Zy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNv
+bQ==
 
