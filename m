@@ -2,89 +2,92 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43393C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 16:13:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EBC9C433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 16:18:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92064206CB
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 16:13:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8E6F720776
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 16:18:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ckqiyMor"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92064206CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oic/7g82"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E6F720776
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kS0SP-00026d-Nu
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 12:13:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33826)
+	id 1kS0Wy-0007if-L6
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 12:18:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35636)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kS0Cb-0003sn-Kj
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:57:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48208)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kS0CX-0001eM-Mu
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:57:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602518248;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=oLHk+RgpWnKCpfC9aPJ9XkSaSX1YVQ8Fe44MpkH5FWI=;
- b=ckqiyMorsUBByllfefak5bx/uTczq16oOsFQMMGsi5lkWTRYD9bt/v3lOMvjNTXhofHeQn
- bpaUB3QO9C1lEamViPlO8xluYoJgEezq27It1V1aivwN+2Xpb2g1ouuSU+z78umE96k9Vk
- svxi9Q4qoaevVKc39Kd+V7FpmYgw5Q8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-482--dk8b4f0P8esv2syPrnr_w-1; Mon, 12 Oct 2020 11:57:24 -0400
-X-MC-Unique: -dk8b4f0P8esv2syPrnr_w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 11E77801FD5;
- Mon, 12 Oct 2020 15:57:23 +0000 (UTC)
-Received: from work-vm (ovpn-113-244.ams2.redhat.com [10.36.113.244])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 34C6C19C78;
- Mon, 12 Oct 2020 15:57:21 +0000 (UTC)
-Date: Mon, 12 Oct 2020 16:57:18 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Tobin Feldman-Fitzthum <tobin@linux.ibm.com>
-Subject: Re: [PATCH v3] SEV: QMP support for Inject-Launch-Secret
-Message-ID: <20201012155718.GH6677@work-vm>
-References: <20200706215451.59179-1-tobin@linux.vnet.ibm.com>
- <20200921190800.GA32491@work-vm>
- <b7faab72e909b709797e6098ec894c72@linux.vnet.ibm.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kS0Jw-0006Q5-NF
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 12:05:08 -0400
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:52023)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kS0Jv-0002Sy-51
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 12:05:08 -0400
+Received: by mail-wm1-x32a.google.com with SMTP id d81so17596007wmc.1
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 09:05:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=5RjKW9cZZrgD/YoK0SgXEa7vWbpGc042rPJwJZwUOzg=;
+ b=Oic/7g82tUQ8imuaw+kkvmCFebcH8gP/+RZW97SYxOs6mQkDHcZu7KCzAATpFPoFJX
+ y/XcMLQnxeYonitI8nefa8nYocVB8kktBDQTpdJgpvKS+e0sXo/kuOf2Fl699KSjfL38
+ al6hqtrHfWgbOzJqjo64mRgc0kDwFM/y+61TEF1dNIxcLhkQ1W+g3ca6IRU3iaPPXPda
+ 6v8Hm5bX3h5OwH4YcowDYXifCjzW5o3KEYRdZp9GeL+veG027nYNHkM2w5ADAkyVjj45
+ nDhPXLNs9Yvmv2N8b2LyCqozezfG3gBekVnYAdgPga4lmrsO0iSlI78lo5HZsb6Uh1Hj
+ qjZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=5RjKW9cZZrgD/YoK0SgXEa7vWbpGc042rPJwJZwUOzg=;
+ b=H+avo42s5K0P+hcEMK75eFA+jfLl0bfMFQzp20Inf+Rf5i0idQSi6haLhWerK3Ch7S
+ pJ/iCQGgpscJLZhTM4P+WU2vQjIjoG+z/xZ6FEppks1zkxMUCrX/9CaKjV7f3xbk8gCo
+ XXbo4QtfbzsI1eUHWSYTbWzrYOpX/HAXu6cyqaK5TR/RkWZwExd1dJ69rrUGtK08mV9L
+ U9TUjlSwWpyem4twNh8GJPi3eEEc+siYj3TaxOuwAzFIf2hkEcU5i3H4wnD38Yt7oIx0
+ krblljjZgD/baC9Ctaop2Ra+AfWAoxQsjdrFljeSq623cT5z02oaAZ4ghNSH9Z0tyQuy
+ K45w==
+X-Gm-Message-State: AOAM533310tX9o0OGJ/qB/c2oHnUlc02UNr1m4koFHaXRAlzPSPshPX/
+ WHbWKeno1sFJZBfqqH2JykT1xn9ypuY=
+X-Google-Smtp-Source: ABdhPJwR2WW/3OoC150ygBGqvfo2UDZICmgK3Uioe6GNVsLsTSTy+yTCmF0zbHf8J4T8z94q9YJb8g==
+X-Received: by 2002:a1c:2186:: with SMTP id
+ h128mr11191648wmh.113.1602518705452; 
+ Mon, 12 Oct 2020 09:05:05 -0700 (PDT)
+Received: from localhost.localdomain
+ (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id c9sm16096576wrs.66.2020.10.12.09.05.04
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 12 Oct 2020 09:05:04 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/2] hw/mips/malta: Minor housekeeping in mips_malta_init()
+Date: Mon, 12 Oct 2020 18:05:01 +0200
+Message-Id: <20201012160503.3472140-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <b7faab72e909b709797e6098ec894c72@linux.vnet.ibm.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 02:58:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::32a;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32a.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,290 +100,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thomas.lendacky@amd.com, brijesh.singh@amd.com, jejb@linux.ibm.com,
- tobin@ibm.com, qemu-devel@nongnu.org, pbonzini@redhat.com
+Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Tobin Feldman-Fitzthum (tobin@linux.ibm.com) wrote:
-> On 2020-09-21 15:16, Dr. David Alan Gilbert wrote:
-> > * Tobin Feldman-Fitzthum (tobin@linux.vnet.ibm.com) wrote:
-> > > AMD SEV allows a guest owner to inject a secret blob
-> > > into the memory of a virtual machine. The secret is
-> > > encrypted with the SEV Transport Encryption Key and
-> > > integrity is guaranteed with the Transport Integrity
-> > > Key. Although QEMU faciliates the injection of the
-> > > launch secret, it cannot access the secret.
-> > > 
-> > > Signed-off-by: Tobin Feldman-Fitzthum <tobin@linux.vnet.ibm.com>
-> > 
-> > Hi Tobin,
-> >   Did the ovmf stuff for agreeing the GUID for automating this ever
-> > happen?
-> > 
-> OVMF patches have not been upstreamed yet. I think we are planning
-> to do that relatively soon.
-
-So as we're getting to the end of another qemu dev cycle; do we aim
-to get this one in by itself, or to wait for the GUID?
-
-Dave
-
-> -Tobin
-> > Dave
-> > 
-> > > ---
-> > >  include/monitor/monitor.h |  3 ++
-> > >  include/sysemu/sev.h      |  2 ++
-> > >  monitor/misc.c            |  8 ++---
-> > >  qapi/misc-target.json     | 18 +++++++++++
-> > >  target/i386/monitor.c     |  9 ++++++
-> > >  target/i386/sev-stub.c    |  5 +++
-> > >  target/i386/sev.c         | 66
-> > > +++++++++++++++++++++++++++++++++++++++
-> > >  target/i386/trace-events  |  1 +
-> > >  8 files changed, 108 insertions(+), 4 deletions(-)
-> > > 
-> > > diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
-> > > index 1018d754a6..bf049c5b00 100644
-> > > --- a/include/monitor/monitor.h
-> > > +++ b/include/monitor/monitor.h
-> > > @@ -4,6 +4,7 @@
-> > >  #include "block/block.h"
-> > >  #include "qapi/qapi-types-misc.h"
-> > >  #include "qemu/readline.h"
-> > > +#include "include/exec/hwaddr.h"
-> > > 
-> > >  extern __thread Monitor *cur_mon;
-> > >  typedef struct MonitorHMP MonitorHMP;
-> > > @@ -36,6 +37,8 @@ void monitor_flush(Monitor *mon);
-> > >  int monitor_set_cpu(int cpu_index);
-> > >  int monitor_get_cpu_index(void);
-> > > 
-> > > +void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, uint64_t size,
-> > > Error **errp);
-> > > +
-> > >  void monitor_read_command(MonitorHMP *mon, int show_prompt);
-> > >  int monitor_read_password(MonitorHMP *mon, ReadLineFunc
-> > > *readline_func,
-> > >                            void *opaque);
-> > > diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
-> > > index 98c1ec8d38..b279b293e8 100644
-> > > --- a/include/sysemu/sev.h
-> > > +++ b/include/sysemu/sev.h
-> > > @@ -18,4 +18,6 @@
-> > > 
-> > >  void *sev_guest_init(const char *id);
-> > >  int sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len);
-> > > +int sev_inject_launch_secret(const char *hdr, const char *secret,
-> > > +                             uint64_t gpa);
-> > >  #endif
-> > > diff --git a/monitor/misc.c b/monitor/misc.c
-> > > index 89bb970b00..b9ec8ba410 100644
-> > > --- a/monitor/misc.c
-> > > +++ b/monitor/misc.c
-> > > @@ -674,10 +674,10 @@ static void hmp_physical_memory_dump(Monitor
-> > > *mon, const QDict *qdict)
-> > >      memory_dump(mon, count, format, size, addr, 1);
-> > >  }
-> > > 
-> > > -static void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, Error **errp)
-> > > +void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, uint64_t size,
-> > > Error **errp)
-> > >  {
-> > >      MemoryRegionSection mrs = memory_region_find(get_system_memory(),
-> > > -                                                 addr, 1);
-> > > +                                                 addr, size);
-> > > 
-> > >      if (!mrs.mr) {
-> > >          error_setg(errp, "No memory is mapped at address 0x%"
-> > > HWADDR_PRIx, addr);
-> > > @@ -701,7 +701,7 @@ static void hmp_gpa2hva(Monitor *mon, const
-> > > QDict *qdict)
-> > >      MemoryRegion *mr = NULL;
-> > >      void *ptr;
-> > > 
-> > > -    ptr = gpa2hva(&mr, addr, &local_err);
-> > > +    ptr = gpa2hva(&mr, addr, 1, &local_err);
-> > >      if (local_err) {
-> > >          error_report_err(local_err);
-> > >          return;
-> > > @@ -777,7 +777,7 @@ static void hmp_gpa2hpa(Monitor *mon, const
-> > > QDict *qdict)
-> > >      void *ptr;
-> > >      uint64_t physaddr;
-> > > 
-> > > -    ptr = gpa2hva(&mr, addr, &local_err);
-> > > +    ptr = gpa2hva(&mr, addr, 1, &local_err);
-> > >      if (local_err) {
-> > >          error_report_err(local_err);
-> > >          return;
-> > > diff --git a/qapi/misc-target.json b/qapi/misc-target.json
-> > > index dee3b45930..d145f916b3 100644
-> > > --- a/qapi/misc-target.json
-> > > +++ b/qapi/misc-target.json
-> > > @@ -200,6 +200,24 @@
-> > >  { 'command': 'query-sev-capabilities', 'returns': 'SevCapability',
-> > >    'if': 'defined(TARGET_I386)' }
-> > > 
-> > > +##
-> > > +# @sev-inject-launch-secret:
-> > > +#
-> > > +# This command injects a secret blob into memory of SEV guest.
-> > > +#
-> > > +# @packet-header: the launch secret packet header encoded in base64
-> > > +#
-> > > +# @secret: the launch secret data to be injected encoded in base64
-> > > +#
-> > > +# @gpa: the guest physical address where secret will be injected.
-> > > +#
-> > > +# Since: 5.1
-> > > +#
-> > > +##
-> > > +{ 'command': 'sev-inject-launch-secret',
-> > > +  'data': { 'packet-header': 'str', 'secret': 'str', 'gpa':
-> > > 'uint64' },
-> > > +  'if': 'defined(TARGET_I386)' }
-> > > +
-> > >  ##
-> > >  # @dump-skeys:
-> > >  #
-> > > diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-> > > index 27ebfa3ad2..42bcfe6dc0 100644
-> > > --- a/target/i386/monitor.c
-> > > +++ b/target/i386/monitor.c
-> > > @@ -736,3 +736,12 @@ SevCapability *qmp_query_sev_capabilities(Error
-> > > **errp)
-> > > 
-> > >      return data;
-> > >  }
-> > > +
-> > > +void qmp_sev_inject_launch_secret(const char *packet_hdr,
-> > > +                                  const char *secret, uint64_t gpa,
-> > > +                                  Error **errp)
-> > > +{
-> > > +    if (sev_inject_launch_secret(packet_hdr, secret, gpa) != 0) {
-> > > +        error_setg(errp, "SEV inject secret failed");
-> > > +    }
-> > > +}
-> > > diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
-> > > index e5ee13309c..fed4588185 100644
-> > > --- a/target/i386/sev-stub.c
-> > > +++ b/target/i386/sev-stub.c
-> > > @@ -48,3 +48,8 @@ SevCapability *sev_get_capabilities(void)
-> > >  {
-> > >      return NULL;
-> > >  }
-> > > +int sev_inject_launch_secret(const char *hdr, const char *secret,
-> > > +                             uint64_t gpa)
-> > > +{
-> > > +    return 1;
-> > > +}
-> > > diff --git a/target/i386/sev.c b/target/i386/sev.c
-> > > index d273174ad3..cbeb8f2e02 100644
-> > > --- a/target/i386/sev.c
-> > > +++ b/target/i386/sev.c
-> > > @@ -28,6 +28,8 @@
-> > >  #include "sysemu/runstate.h"
-> > >  #include "trace.h"
-> > >  #include "migration/blocker.h"
-> > > +#include "exec/address-spaces.h"
-> > > +#include "monitor/monitor.h"
-> > > 
-> > >  #define TYPE_SEV_GUEST "sev-guest"
-> > >  #define SEV_GUEST(obj)                                          \
-> > > @@ -769,6 +771,70 @@ sev_encrypt_data(void *handle, uint8_t *ptr,
-> > > uint64_t len)
-> > >      return 0;
-> > >  }
-> > > 
-> > > +int sev_inject_launch_secret(const char *packet_hdr,
-> > > +                             const char *secret, uint64_t gpa)
-> > > +{
-> > > +    struct kvm_sev_launch_secret input;
-> > > +    guchar *data = NULL, *hdr = NULL;
-> > > +    int error, ret = 1;
-> > > +    void *hva;
-> > > +    gsize hdr_sz = 0, data_sz = 0;
-> > > +    Error *local_err = NULL;
-> > > +    MemoryRegion *mr = NULL;
-> > > +
-> > > +    /* secret can be inject only in this state */
-> > > +    if (!sev_check_state(sev_guest, SEV_STATE_LAUNCH_SECRET)) {
-> > > +        error_report("SEV: Not in correct state. (LSECRET) %x",
-> > > +                     sev_guest->state);
-> > > +        return 1;
-> > > +    }
-> > > +
-> > > +    hdr = g_base64_decode(packet_hdr, &hdr_sz);
-> > > +    if (!hdr || !hdr_sz) {
-> > > +        error_report("SEV: Failed to decode sequence header");
-> > > +        return 1;
-> > > +    }
-> > > +
-> > > +    data = g_base64_decode(secret, &data_sz);
-> > > +    if (!data || !data_sz) {
-> > > +        error_report("SEV: Failed to decode data");
-> > > +        goto err;
-> > > +    }
-> > > +
-> > > +    hva = gpa2hva(&mr, gpa, data_sz, &local_err);
-> > > +    if (!hva) {
-> > > +        error_report("SEV: Failed to calculate guest address.");
-> > > +        goto err;
-> > > +    }
-> > > +
-> > > +    input.hdr_uaddr = (uint64_t)(unsigned long)hdr;
-> > > +    input.hdr_len = hdr_sz;
-> > > +
-> > > +    input.trans_uaddr = (uint64_t)(unsigned long)data;
-> > > +    input.trans_len = data_sz;
-> > > +
-> > > +    input.guest_uaddr = (uint64_t)(unsigned long)hva;
-> > > +    input.guest_len = data_sz;
-> > > +
-> > > +    trace_kvm_sev_launch_secret(gpa, input.guest_uaddr,
-> > > +                                input.trans_uaddr, input.trans_len);
-> > > +
-> > > +    ret = sev_ioctl(sev_guest->sev_fd, KVM_SEV_LAUNCH_SECRET,
-> > > +                    &input, &error);
-> > > +    if (ret) {
-> > > +        error_report("SEV: failed to inject secret ret=%d
-> > > fw_error=%d '%s'",
-> > > +                     ret, error, fw_error_to_str(error));
-> > > +        goto err;
-> > > +    }
-> > > +
-> > > +    ret = 0;
-> > > +
-> > > +err:
-> > > +    g_free(data);
-> > > +    g_free(hdr);
-> > > +    return ret;
-> > > +}
-> > > +
-> > >  static void
-> > >  sev_register_types(void)
-> > >  {
-> > > diff --git a/target/i386/trace-events b/target/i386/trace-events
-> > > index 789c700d4a..9f299e94a2 100644
-> > > --- a/target/i386/trace-events
-> > > +++ b/target/i386/trace-events
-> > > @@ -15,3 +15,4 @@ kvm_sev_launch_start(int policy, void *session,
-> > > void *pdh) "policy 0x%x session
-> > >  kvm_sev_launch_update_data(void *addr, uint64_t len) "addr %p len
-> > > 0x%" PRIu64
-> > >  kvm_sev_launch_measurement(const char *value) "data %s"
-> > >  kvm_sev_launch_finish(void) ""
-> > > +kvm_sev_launch_secret(uint64_t hpa, uint64_t hva, uint64_t secret,
-> > > int len) "hpa 0x%" PRIx64 " hva 0x%" PRIx64 " data 0x%" PRIx64 " len
-> > > %d"
-> > > --
-> > > 2.20.1 (Apple Git-117)
-> > > 
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+Move some code around to make this big function=0D
+easier to review.=0D
+=0D
+Philippe Mathieu-Daud=C3=A9 (2):=0D
+  hw/mips/malta: Move gt64120 related code together=0D
+  hw/mips/malta: Use clearer qdev style=0D
+=0D
+ hw/mips/malta.c | 21 ++++++++++-----------=0D
+ 1 file changed, 10 insertions(+), 11 deletions(-)=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
 
