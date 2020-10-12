@@ -4,81 +4,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22207C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:39:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66581C433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:42:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0A442087D
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:39:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 110D420575
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:42:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aAVbgCg7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0A442087D
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tPyAQW57"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 110D420575
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRzut-0004sx-QD
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 11:39:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56526)
+	id 1kRzyE-0008EO-2L
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 11:42:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56584)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kRzqA-0006ZX-7x
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:34:22 -0400
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:43197)
+ id 1kRzqC-0006f8-AL
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:34:24 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35289)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kRzq8-0007G7-3j
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:34:21 -0400
-Received: by mail-wr1-x434.google.com with SMTP id g12so19669654wrp.10
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 08:34:19 -0700 (PDT)
+ id 1kRzqA-0007Gj-8s
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:34:23 -0400
+Received: by mail-wr1-x443.google.com with SMTP id n15so19704866wrq.2
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 08:34:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=1jOZnrxRTG3Vn0Y7sOS02Z9FyMYbuYQPu1NRLX+duSw=;
- b=aAVbgCg7ymYaysAV0+xZzfgRqAaSq1bwnaWSwioOXyCfZiNVpbJgNcRp4nIXDrf1RG
- zBSReKxmV+RB+GedK1vI2c493F4PObKrRh2eUg1LNZ2f61hCrRNzZthICmd/d4HzpRYx
- fX+hJYqVk3xZFl9sO6ODbtMl2NNb16x1hO1/6DsILrTUfyQZrnKA/P2dGyN4jp6zc3dC
- gUV7JbmmOlsMGJUV4H9YcQ0fNpiq1dFvrQ55/FZjH13mEJw3/SSI9uhIMZhNb7O7Tk8S
- 76Wbn8TK/cX4+rQ0L/aXJrKLIi+GA0GVdBmnkxCCRZ/iQmNDhnoKphIKGrP+jpmqC1tS
- 2xww==
+ bh=6I9SMKjr6PmWwGXVMVs+FgMWnXt/xrUHEYtD8jIqzQE=;
+ b=tPyAQW57KsDRbOr93Mg6m8QsfI33jkUUv749yVbo4mOsNQZk2Qznr1ltL3peF3Ntl5
+ Xhmr/+0qAovF/bCSxj8O3xW4+93hCaIr9EMucxd5Qm5zyqsTPXO0tyq19cR/nZE4d88/
+ YL7yxQbg2lh3GDU6RTzu4dTQGgX7Y3kYYi878YTrO0DzRDcUjm6VAsdkyth1nX7hgqzp
+ hWooGB4VPq3Mi7/+P4ljKrFxWL4PiNDk2ls11WBXd9s7C69b2XaHnAiAApUXV3kpj4DK
+ CYnqfqCwgfrQ50USmaIYB+mAOEf1KpV2xMtHznTlwJ8u7eXGfsEJVUfFAi8x9PyCQo2m
+ 000A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=1jOZnrxRTG3Vn0Y7sOS02Z9FyMYbuYQPu1NRLX+duSw=;
- b=qwBnZek1kgu9ndQ1Bd0GEH/U7Xtb2pHy0ZG6QrSF4CV1uVLsDPL1KvwI3KFq8jR5N9
- tdx9Dr80MVaHLz6+GqswAPdZbW2cIBiW4vH9M3JyWYp1io4JXjn4USJufvGhxFyCVi+E
- B51ssvS3N1j9Te+EdV9e3pU3KCKWI3QwTF3a1WsBQcd+a680z5nQsoGWQdbb5EcWwx/m
- cteR+n+lfYpsvP/pIohpMRYX8We8Sn7crqmTQsBsRbMPJE4jPKKkZAI+PbXW8QGxxwx8
- r7kSyMZgBTZdE4+H+ibZu1h3Z9/j3x+TxG8CGQvOA4DGkYKR78jAG2zcmtd2C4vXkcoz
- BsOA==
-X-Gm-Message-State: AOAM533BquDsvsvMgP2vBg31uWFeOXhIO/lrhX64YwWtQaBtJ4gh00+O
- 2izM3ATW0XtOj4ZiOrghStxAIg==
-X-Google-Smtp-Source: ABdhPJwkInOr6OW5iVS1NcpZTG2rCI2SkDmbgMKDNivA/JXyShS9XCMoT4FkXDt12saXAXomoKvyWQ==
-X-Received: by 2002:adf:bbc6:: with SMTP id z6mr30663849wrg.298.1602516858701; 
- Mon, 12 Oct 2020 08:34:18 -0700 (PDT)
+ bh=6I9SMKjr6PmWwGXVMVs+FgMWnXt/xrUHEYtD8jIqzQE=;
+ b=TYpsi2K/9uLN8Rg5RQIDbsc2G60k1MuYWmNNs82h9SGAvbdnUTJe7ZehM+kAKUvAMv
+ JhjRVDVJVK+lsuLOL2O0PSOjT/FcX0iTzShZveBvPIqdBqSc5XbZMFMcy8bxgriHEl3E
+ 0cuXW2rZWab3aU0aP9n4RLHvnfhL2F9yRuY32vUVD2WiHJIlSH69ZHTRhGWtpEZ2fhe3
+ cAqcNwq5KyZs/JCJ04q1Wlvw5JUH2xDcYqryBJ6qlGrNzVH0YOBYEnf5QTx6KrzV2rWA
+ cibh5kfuFFTy/0OLKIDUJrHUj567zN+Ol0lLPyFmcAL8SkU2dktFopm3zZuJpZYEhzSf
+ R/aA==
+X-Gm-Message-State: AOAM5329Kn9NoZbmoLoBVb4Cn6gPzfw+/b3yZU+9n0Fv/5Xky73JkG1V
+ duug/Mi3ucEBvIJbxwrUs14zrA==
+X-Google-Smtp-Source: ABdhPJyEuLaQAnvdMH232RUPJGtHHUkRxkgX+mzDC0IqM8610mOM4pBgZEBeAoFXfWZZDzhmrwN5jA==
+X-Received: by 2002:adf:f043:: with SMTP id t3mr18402943wro.234.1602516860825; 
+ Mon, 12 Oct 2020 08:34:20 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id y10sm19675284wrq.73.2020.10.12.08.34.17
+ by smtp.gmail.com with ESMTPSA id y10sm19675284wrq.73.2020.10.12.08.34.19
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 12 Oct 2020 08:34:18 -0700 (PDT)
+ Mon, 12 Oct 2020 08:34:20 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH] configure: Test that gio libs from pkg-config work
-Date: Mon, 12 Oct 2020 16:33:30 +0100
-Message-Id: <20201012153408.9747-8-peter.maydell@linaro.org>
+Subject: [PATCH for-5.1] docs/system/arm/virt: Document mte machine option
+Date: Mon, 12 Oct 2020 16:33:32 +0100
+Message-Id: <20201012153408.9747-10-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201012153408.9747-1-peter.maydell@linaro.org>
 References: <20201012153408.9747-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::434;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x434.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -87,7 +87,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,56 +105,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On some hosts (eg Ubuntu Bionic) pkg-config returns a set of
-libraries for gio-2.0 which don't actually work when compiling
-statically. (Specifically, the returned library string includes
--lmount, but not -lblkid which -lmount depends upon, so linking
-fails due to missing symbols.)
-
-Check that the libraries work, and don't enable gio if they don't,
-in the same way we do for gnutls.
+Commit 6a0b7505f1fd6769c which added documentation of the virt board
+crossed in the post with commit 6f4e1405b91da0d0 which added a new
+'mte' machine option. Update the docs to include the new option.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
-I wanted a statically-linked system emulation binary (which, yes,
-I know is not really something we support :-)). I got one with
-suitably liberal use of --disable-foo configure options, and
-this was the only thing I couldn't work around that way.
-The patch is needed because there's no --disable-gio. I suppose
-we could add that instead (or as well)...
-Possibly meson offers a nicer way to do this, but this was
-simple and gnutls is doing the check this way already.
----
- configure | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ docs/system/arm/virt.rst | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/configure b/configure
-index e8e8e984f24..cd79227d763 100755
---- a/configure
-+++ b/configure
-@@ -3762,13 +3762,21 @@ if test "$static" = yes && test "$mingw32" = yes; then
- fi
+diff --git a/docs/system/arm/virt.rst b/docs/system/arm/virt.rst
+index 6621ab7205d..32dc5eb22ee 100644
+--- a/docs/system/arm/virt.rst
++++ b/docs/system/arm/virt.rst
+@@ -79,6 +79,10 @@ virtualization
+   Set ``on``/``off`` to enable/disable emulating a guest CPU which implements the
+   Arm Virtualization Extensions. The default is ``off``.
  
- if $pkg_config --atleast-version=$glib_req_ver gio-2.0; then
--    gio=yes
-     gio_cflags=$($pkg_config --cflags gio-2.0)
-     gio_libs=$($pkg_config --libs gio-2.0)
-     gdbus_codegen=$($pkg_config --variable=gdbus_codegen gio-2.0)
-     if [ ! -x "$gdbus_codegen" ]; then
-         gdbus_codegen=
-     fi
-+    # Check that the libraries actually work -- Ubuntu 18.04 ships
-+    # with pkg-config --static --libs data for gio-2.0 that is missing
-+    # -lblkid and will give a link error.
-+    write_c_skeleton
-+    if compile_prog "" "gio_libs" ; then
-+        gio=yes
-+    else
-+        gio=no
-+    fi
- else
-     gio=no
- fi
++mte
++  Set ``on``/``off`` to enable/disable emulating a guest CPU which implements the
++  Arm Memory Tagging Extensions. The default is ``off``.
++
+ highmem
+   Set ``on``/``off`` to enable/disable placing devices and RAM in physical
+   address space above 32 bits. The default is ``on`` for machine types
 -- 
 2.20.1
 
