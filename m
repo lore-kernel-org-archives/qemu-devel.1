@@ -2,91 +2,102 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEE2CC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 12:54:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DBC0C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 12:55:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46C0D21BE5
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 12:54:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EDF8321BE5
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 12:55:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UdBxpfLp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46C0D21BE5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y7/Hgayk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDF8321BE5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49284 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50270 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRxLR-0000G7-AM
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 08:54:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34710)
+	id 1kRxM1-0000gi-Ux
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 08:55:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33540)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRxH8-0002BN-Jt; Mon, 12 Oct 2020 08:50:02 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35264)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRxH6-0000i5-Jl; Mon, 12 Oct 2020 08:50:02 -0400
-Received: by mail-wr1-x441.google.com with SMTP id n15so19063539wrq.2;
- Mon, 12 Oct 2020 05:49:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=iFs6emz6fGf+xQlicgZNk8cNGLeirUVE2ipQ9bTFfcw=;
- b=UdBxpfLpqcO6gsLuw7AjHeCoUN8MkW98il5/42IOG8OPQpTPw8M4R/zwcv0ZMeIj4e
- UY6UpJj2+3Yaisp18iYaF8gNl15rjMiT4ZRxMP7W5DKJxebai7SMZsoSnGxKXFIWCbwb
- +KlAd73sf3jhMCXSiUnYDHjCJcOGBVvG2jM505n2EpC4UC1PSC7cqTmKFdIPDsjPU9tc
- Hg10BIV0sogdIgHsehM1krukocI28DV/tpUv48aFQfo3DoriMhcMThlebTGuvwYCJH8m
- 3TNQU+vjR+1+k2I9eanneHzOj5L67XqAmLq+f39pQkiHU66ttOlEqrwYYFqvXAb/gZOU
- rFOw==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kRxCx-0005n2-1D
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 08:45:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41934)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kRxCu-0000Ac-PQ
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 08:45:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602506740;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=9wGxJZcsEOLAGSmgs7p8pt5WGBHmly5siKydoVe/oZE=;
+ b=Y7/HgaykXGJaGQG1ddlXdHHOTOYd1wURQ8nb8ZWa64+1Rx459M+bMwX7wddfBvNj9qjxS0
+ Nd4g8YhzGiqJl1gR4ZxzdoQRDBc+hcXr+4kjoBSHj/HFJLgm/53tHu/4vO1Jkl+62wXf48
+ ZdMH6nEJ9Jveq//6sLWsQNxuZS8qO+Q=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-579-fwcS_nsyNWOHGOu-Miv66w-1; Mon, 12 Oct 2020 08:45:38 -0400
+X-MC-Unique: fwcS_nsyNWOHGOu-Miv66w-1
+Received: by mail-wr1-f70.google.com with SMTP id 47so9255106wrc.19
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 05:45:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=iFs6emz6fGf+xQlicgZNk8cNGLeirUVE2ipQ9bTFfcw=;
- b=HZaz0icJV+eJ8DN54P7eP30amZLruPwdR46o+/YMBROgHH89JcxaQyC8d3TbLMDFLI
- GJNI2wXZsRUum71LltU3IA3NBpC++w2BRs/9dADkczS1PNs6qeRoi8NnFwhAXtMOYjEc
- bOjlqjNeeBSEjm74v3n9LRPL5F7glxxdrjCPgY6lf7rSBwpeLD24jv03330xEEKwVVuc
- 7jFY/neMAIgGYn0OfWcBQV7UInmUW5TniKKDsgfdI2OQc5JhEsMA3hSE73e0lArTUjpK
- KJ3v3nG6iFNe6fRMhETAk8v21G2mu+Lv5JiALm2/iHF5ffqBZEVqQ9u1BlxGQyt8Vqfa
- omhA==
-X-Gm-Message-State: AOAM530Dz9z0KIff1JFLQgjDyoK9JWZhX6FbqZidSbm+UXx6MVjffY1B
- BTjVp7tD9LrjNle0TQS7Jm3lsV6Qh20=
-X-Google-Smtp-Source: ABdhPJzkPqUkQ1uXLcrzZi6wJc+XcPTs1T76h+i/YCMijhTTitA50sxHBC+r+WLOjkynRu1NOTrjUQ==
-X-Received: by 2002:adf:a551:: with SMTP id j17mr30236535wrb.217.1602506997537; 
- Mon, 12 Oct 2020 05:49:57 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=9wGxJZcsEOLAGSmgs7p8pt5WGBHmly5siKydoVe/oZE=;
+ b=LV+yyIHfBFTaXJ9BgJagMr7z2D9XbwAjxpZIDoHoEHND6YZ5qCqhDlK5wyijCMw39I
+ J5Ht49wDIqVfbHO/QJCWHED/4d086BnPYjgW2ciVMuZYoWKHeDQ7mGA1/tdCfk77DMa8
+ boQ5G8P8zp9y249cjWsN+sis0quUNiy2P055tDw0UGzvmi0LCpQLQLjljH0qf+014RuV
+ QXly+/77Lee1MtNea94jFKLHtBVdMQkZmP7RTDodBSvScPaIn0lnXyI3A4RoHRW7rcgu
+ MJeNvctn44N+Qvk5vuzdzJJy4a4l5SupKkH1M/wBlJJGWbOh+ZfkR+c+AL1uq8PVBRBR
+ nPRA==
+X-Gm-Message-State: AOAM530/G/egoKso5hpfnh725CqXtb8+NiJwjtjiBfFZt0xvB6k4Tpja
+ 6mwVQTQnVRsnqUd1ptPckaQQNMUWm2kUuovWlYBfE5AAxORj6RYzgA1+QWaubhT6+I4tCfX3WBf
+ 7dC4WvdChtWNgxIk=
+X-Received: by 2002:adf:dccc:: with SMTP id x12mr30544388wrm.241.1602506737184; 
+ Mon, 12 Oct 2020 05:45:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwGju9pLDMIkjylp5prt4ukBOzX2jmiDpK+NGjR15EPrzwXN0JDbAFCeWH5hcu15IBYdHhmBg==
+X-Received: by 2002:adf:dccc:: with SMTP id x12mr30544349wrm.241.1602506736967; 
+ Mon, 12 Oct 2020 05:45:36 -0700 (PDT)
 Received: from localhost.localdomain
  (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id p21sm23516472wmc.28.2020.10.12.05.49.56
+ by smtp.gmail.com with ESMTPSA id s185sm22765462wmf.3.2020.10.12.05.45.35
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 12 Oct 2020 05:49:56 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org,
-	Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v2 0/3] hw/ssi: Rename SSI 'slave' as 'peripheral'
-Date: Mon, 12 Oct 2020 14:49:52 +0200
-Message-Id: <20201012124955.3409127-1-f4bug@amsat.org>
+ Mon, 12 Oct 2020 05:45:36 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 5/5] hw: Use the PCI_DEVFN() macro from 'hw/pci/pci.h'
+Date: Mon, 12 Oct 2020 14:45:06 +0200
+Message-Id: <20201012124506.3406909-6-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201012124506.3406909-1-philmd@redhat.com>
+References: <20201012124506.3406909-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/11 23:52:29
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,52 +110,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-block@nongnu.org, Andrew Jeffery <andrew@aj.id.au>,
- Alistair Francis <alistair@alistair23.me>,
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paul Durrant <paul@xen.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Huacai Chen <chenhc@lemote.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-trivial@nongnu.org,
+ Helge Deller <deller@gmx.de>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-arm@nongnu.org,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Richard Henderson <rth@twiddle.net>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Max Reitz <mreitz@redhat.com>, qemu-trivial@nongnu.org, qemu-arm@nongnu.org,
- Joel Stanley <joel@jms.id.au>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+ qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since v1:=0D
-- Fixed patch #1 subject (Kevin)=0D
-=0D
-In order to use inclusive terminology, rename SSI 'slave' as=0D
-'peripheral', following the resolution Paolo pointed in [*]:=0D
-https://www.oshwa.org/a-resolution-to-redefine-spi-signal-names/=0D
-=0D
-Candidate to be merged via the ARM or Trivial trees.=0D
-=0D
-[*] https://www.mail-archive.com/qemu-devel@nongnu.org/msg739108.html=0D
-=0D
-Philippe Mathieu-Daud=C3=A9 (3):=0D
-  hw/ssi/aspeed_smc: Rename 'max_slaves' variable as 'max_peripherals'=0D
-  hw/ssi: Update coding style to make checkpatch.pl happy=0D
-  hw/ssi: Rename SSI 'slave' as 'peripheral'=0D
-=0D
- include/hw/misc/max111x.h   |  2 +-=0D
- include/hw/ssi/aspeed_smc.h |  2 +-=0D
- include/hw/ssi/ssi.h        | 56 +++++++++++++++++++------------------=0D
- hw/arm/spitz.c              | 32 ++++++++++-----------=0D
- hw/arm/stellaris.c          |  4 +--=0D
- hw/arm/tosa.c               | 12 ++++----=0D
- hw/arm/z2.c                 | 14 +++++-----=0D
- hw/block/m25p80.c           | 14 +++++-----=0D
- hw/display/ads7846.c        | 12 ++++----=0D
- hw/display/ssd0323.c        | 12 ++++----=0D
- hw/misc/max111x.c           | 18 ++++++------=0D
- hw/sd/ssi-sd.c              | 12 ++++----=0D
- hw/ssi/aspeed_smc.c         | 53 ++++++++++++++++++-----------------=0D
- hw/ssi/pl022.c              |  2 +-=0D
- hw/ssi/ssi.c                | 48 +++++++++++++++----------------=0D
- hw/ssi/xilinx_spips.c       |  7 +++--=0D
- 16 files changed, 152 insertions(+), 148 deletions(-)=0D
-=0D
--- =0D
-2.26.2=0D
-=0D
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+We already have a generic PCI_DEVFN() macro in "hw/pci/pci.h"
+to pack the PCI slot/function identifiers, use it.
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/arm/virt.c          | 3 ++-
+ hw/pci-host/uninorth.c | 6 ++----
+ 2 files changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index e465a988d68..f601ef0798c 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1144,7 +1144,8 @@ static void create_pcie_irq_map(const VirtMachineState *vms,
+                      full_irq_map, sizeof(full_irq_map));
+ 
+     qemu_fdt_setprop_cells(vms->fdt, nodename, "interrupt-map-mask",
+-                           0x1800, 0, 0, /* devfn (PCI_SLOT(3)) */
++                           cpu_to_be16(PCI_DEVFN(3, 0)), /* Slot 3 */
++                           0, 0,
+                            0x7           /* PCI irq */);
+ }
+ 
+diff --git a/hw/pci-host/uninorth.c b/hw/pci-host/uninorth.c
+index c21de0ab805..f73d452bdce 100644
+--- a/hw/pci-host/uninorth.c
++++ b/hw/pci-host/uninorth.c
+@@ -70,10 +70,8 @@ static uint32_t unin_get_config_reg(uint32_t reg, uint32_t addr)
+         /* ... and then convert them to x86 format */
+         /* config pointer */
+         retval = (reg & (0xff - 7)) | (addr & 7);
+-        /* slot */
+-        retval |= slot << 11;
+-        /* fn */
+-        retval |= func << 8;
++        /* slot, fn */
++        retval |= PCI_DEVFN(slot, func) << 8;
+     }
+ 
+     trace_unin_get_config_reg(reg, addr, retval);
+-- 
+2.26.2
+
 
