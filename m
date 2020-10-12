@@ -2,91 +2,118 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 514B7C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 14:08:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1CD9C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 14:14:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82F072076E
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 14:08:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="ahM3ChV+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82F072076E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
+	by mail.kernel.org (Postfix) with ESMTPS id 6AF132076E
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 14:14:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AF132076E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRyUl-0006ol-Ff
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 10:08:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57990)
+	id 1kRyaS-0001GP-FS
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 10:14:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59994)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kRyU1-0006NK-CG
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 10:07:25 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:35858)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kRyTy-0003Qt-Vn
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 10:07:25 -0400
-Received: by mail-pg1-x544.google.com with SMTP id x16so14376942pgj.3
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 07:07:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
- h=content-transfer-encoding:from:mime-version:subject:date:message-id
- :references:cc:in-reply-to:to;
- bh=QKGMKM9HyYc1eVD4XveDOx+OrGTCjt83H9U0dkUB2Ko=;
- b=ahM3ChV+GSEplzOZPSOpiTQzn5h2pgdVAyhpZ5jA8YlWbk4Hma6nJ7iQvb8oHpO/8p
- X/L4OLMZM/zeM/wLh0EnA04d+o5MTPZ4K5+BORqu40zznG5Q2o0dcT0eyDDYSJqG0C65
- qHzbO9y0zkEZsDwK8OhJ5FLjP7MrZoomXBC+ZeL3g5e8Cmne7UeND0T8xknTBhk/DAj2
- +QPiF1H8LzUV3UJexo8W8x2oVfTHfQECN3Q40xgfm2MgG0lC8eotzoCbLR0i8oAu/a52
- qx1eepBbQA7r7ytPMkq4O5ibGEngiIFwWYP2MtSYzlVGwYo6urGj3euojO+YROPjeHt0
- 6iuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:content-transfer-encoding:from:mime-version
- :subject:date:message-id:references:cc:in-reply-to:to;
- bh=QKGMKM9HyYc1eVD4XveDOx+OrGTCjt83H9U0dkUB2Ko=;
- b=BGJSGtBJM7vw4wC/GgTkTwL5JdvX2/YPueYCryN5cRE8onKS9Fc8e56phtk7nDF0Xd
- 3MjN1ePN89fkaKUpovjJ8BUJKEbQX9RDmVmmWtCaaTyTpXp4+UsfxATexqTjEcDWYo0/
- gLj2X+Ck4q45sSS3AF89jBfKiH9F/CdK3VoWm3hgUqQtSzzQKM2DR5aZl+yNlJ3UYuKm
- 82o9rQCFLCLYnv3DpqzblqqXZSBPnbTguQgqK/NetfA+rw/V4tuTglyt9jJ07YiAl7V3
- ojRnVXxXG3x57mio77RcHCRMItxa7s82yF5im1PcGl8dJy0U9+cp6eys/zWhakBo4qLL
- IoQA==
-X-Gm-Message-State: AOAM530162A/ouuf9OT2gg7rwbVXRZglKhVNFlRj70G8IR2qpYuXY3mA
- 4/9pQI9ZdVLWMBpUky666sfqSg==
-X-Google-Smtp-Source: ABdhPJyQl6VZ8/UlsLaajW5OYKUjiK6pt6rRFgmhjnZ+nZQeK31vyUIF/KY9SJCUptyTOvRmffvYxQ==
-X-Received: by 2002:a62:7cd4:0:b029:152:b3e8:c59f with SMTP id
- x203-20020a627cd40000b0290152b3e8c59fmr23026737pfc.2.1602511639301; 
- Mon, 12 Oct 2020 07:07:19 -0700 (PDT)
-Received: from [192.168.1.4] ([203.163.234.171])
- by smtp.gmail.com with ESMTPSA id u27sm19510774pgm.60.2020.10.12.07.07.15
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 12 Oct 2020 07:07:16 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1kRyZD-0000SX-39; Mon, 12 Oct 2020 10:12:47 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:52621)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1kRyZA-0004Hk-Gq; Mon, 12 Oct 2020 10:12:46 -0400
+Received: from [192.168.100.1] ([82.252.141.186]) by mrelayeu.kundenserver.de
+ (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1N1wdj-1kLhCG1ujh-012EJx; Mon, 12 Oct 2020 16:12:37 +0200
+Subject: Re: [PATCH] tests/test-char: Use a proper fallthrough comment
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20201002171343.283426-1-thuth@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <88c25a6d-49fd-efc1-b335-012d4b4ec9ca@vivier.eu>
+Date: Mon, 12 Oct 2020 16:12:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
+MIME-Version: 1.0
+In-Reply-To: <20201002171343.283426-1-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From: Ani Sinha <ani@anisinha.ca>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH v5] Add a comment in bios-tables-test.c to clarify the
- reason behind approach
-Date: Mon, 12 Oct 2020 19:37:14 +0530
-Message-Id: <105B94CB-1345-49FB-B296-F5236E448BC3@anisinha.ca>
-References: <20200929142501.1057-1-ani@anisinha.ca>
-In-Reply-To: <20200929142501.1057-1-ani@anisinha.ca>
-To: mst@redhat.com, qemu-devel@nongnu.org
-X-Mailer: iPad Mail (18A393)
-Received-SPF: none client-ip=2607:f8b0:4864:20::544;
- envelope-from=ani@anisinha.ca; helo=mail-pg1-x544.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:KJQnHIPqTrKh9jW4fltsOsyhxtqmC4sYRwLF1mLaJvDtGALT7iD
+ huGkiw5Czj1hgjjY6VmwNUxbQdJTHq4cvl05qFexFEzOAC5JNdFpvsnSPLzwj4Whkg0bjxc
+ MJYJsqmYmZIlq9e2V3r4uA/o0pU0fnl93nEj+3mQxBKuXRrXS7eh7xzIedybhRlgjcFgZTl
+ bm1GjAnC4KUFnvetzIXNg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:NUFcNsF+IbA=:18KBogUyN0oB/PYloDpcjM
+ qeLq+qRD9hW8tbdq4e3A/eFTaaSre/0PXIl+0YGEIRsWqFUBXZ2v+/OsYkk9y3CV5SD0m6HFT
+ tgh/yL09zoTCzPGkvzUloTRZJHVyaO8CfkQA+3ijOFtH51ldYILwjQGaiGXhhYn8rEtZRMNo+
+ OafWDBvJMqozMdi+oABshYsFiRcEdBsKIYOPTV1WSjWBo6+BfsWr7I9qSwv/juJ79u30tfw/3
+ Rmp2F/+4zQ5rh23iWtsCjLLgZp053RCCuYhWvJJnYo1KTBXe8+2LupdOZDB1dTf9kamDPZA0j
+ b/d4fy8CKYLa0RI566v2zqI8IrbMha/o/EfaAcpFRSrHmmHXZjG5R/hJyR6/hoybnmRM3+znU
+ imS1T/C0DLdvUrbwFbBD2ByQ/OSM8oGEpTWulNyLEcYXvhCHuAWK25WobhHD7eNNENHzmuyJL
+ MnZgaH9KwiuK3iHN6Pb1AuUbvg63H/GoSwtn7GEzmX0HXWlMVK2L4a5YdqAq/E5RoYI3ZqP4E
+ fwuRC6IMmtxlWh3yhDHsOSHcaGBy9Yr2c7zmOXl6TBxjCmp1060q7/UA/IGjPS39QF66bpDmj
+ k2QwXttmr8vfM5ItqThfisVF/OlLxyvcNkh0cScSNP2aEQrQk7alYVxtd6jNYYr2UakcHrhtY
+ 743W1h4kGfT3TCRShl3qwF1Dvx0c/W+1m21cXwkDVihSt2sQ6zoTTad1fd6m5V8kJddlIgtG7
+ qDYV+usVCXbVvgR+vyO23+17mxl7JRDwv1YXj3I6LoQKbhHo9r5sxDARY8cE8NF/p6O7I74gH
+ Q/cZREHLxjxHnbX3Ot2btY+su82/xdv03yoDzjBOSWeKjdzoauQBUOmDfcRO2GS6O3DM3d2
+Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 10:12:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,73 +127,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-trivial@nongnu.org,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Request to queue this patch with the next pull.=20
-
-> On Sep 29, 2020, at 7:55 PM, Ani Sinha <ani@anisinha.ca> wrote:
->=20
-> =EF=BB=BFA comment is added in bios-tables-test.c that explains the reason=
-ing
-> behind the process of updating the ACPI table blobs when new tests are add=
-ed
-> or old tests are modified or code is committed that affect tests. The
-> explanation would help future contributors follow the correct process when=
-
-> making code changes that affect ACPI tables.
->=20
-> Signed-off-by: Ani Sinha <ani@anisinha.ca>
-> Acked-by: Igor Mammedov <imammedo@redhat.com>
+Le 02/10/2020 à 19:13, Thomas Huth a écrit :
+> For being able to compile with -Werror=implicit-fallthrough we need
+> to use comments that the compiler recognizes. Use "fallthrough" instead
+> of "no break" here.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
-> tests/qtest/bios-tables-test.c | 7 ++++++-
-> 1 file changed, 6 insertions(+), 1 deletion(-)
->=20
-> changelog:
-> v5: incorporated suggestion from eric.
-> v4: more updates as per Igor's suggestion. Dropped some comment lines. add=
-ed
->    ack'd by line.
-> v3: review feedback incorporared and actual comment in the code reworded.
-> v2: cosmetic - commit log reworded.
->=20
-> diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test=
-.c
-> index 3c09b844f9..fc7aaaf82c 100644
-> --- a/tests/qtest/bios-tables-test.c
-> +++ b/tests/qtest/bios-tables-test.c
-> @@ -11,7 +11,7 @@
->  */
->=20
-> /*
-> - * How to add or update the tests:
-> + * How to add or update the tests or commit changes that affect ACPI tabl=
-es:
->  * Contributor:
->  * 1. add empty files for new tables, if any, under tests/data/acpi
->  * 2. list any changed files in tests/qtest/bios-tables-test-allowed-diff.=
-h
-> @@ -38,6 +38,11 @@
->  *      $(SRC_PATH)/tests/data/acpi/rebuild-expected-aml.sh
->  * 6. Now commit any changes to the expected binary, include diff from ste=
-p 4
->  *    in commit log.
-> + *    Expected binary updates needs to be a separate patch from the code t=
-hat
-> + *    introduces changes to ACPI tables. It lets the maintainer drop
-> + *    and regenerate binary updates in case of merge conflicts. Further, a=
- code
-> + *    change is easily reviewable but a binary blob is not (without doing=
- a
-> + *    disassembly).
->  * 7. Before sending patches to the list (Contributor)
->  *    or before doing a pull request (Maintainer), make sure
->  *    tests/qtest/bios-tables-test-allowed-diff.h is empty - this will ens=
-ure
-> --=20
-> 2.17.1
->=20
+>  tests/test-char.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tests/test-char.c b/tests/test-char.c
+> index d35cc839bc..9196e566e9 100644
+> --- a/tests/test-char.c
+> +++ b/tests/test-char.c
+> @@ -70,7 +70,7 @@ static void fe_event(void *opaque, QEMUChrEvent event)
+>              h->openclose_mismatch = true;
+>          }
+>          h->is_open = new_open_state;
+> -        /* no break */
+> +        /* fallthrough */
+>      default:
+>          quit = true;
+>          break;
+> 
+
+Applied to my trivial-patches branch.
+
+Thanks,
+Laurent
+
 
