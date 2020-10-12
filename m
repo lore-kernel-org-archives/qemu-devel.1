@@ -5,99 +5,91 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DBC0C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 12:55:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D6FFC433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 12:57:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDF8321BE5
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 12:55:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA06321BE5
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 12:57:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y7/Hgayk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDF8321BE5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q8EcFetF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA06321BE5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRxM1-0000gi-Ux
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 08:55:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33540)
+	id 1kRxO7-0003Wh-Ox
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 08:57:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34744)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kRxCx-0005n2-1D
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 08:45:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41934)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kRxCu-0000Ac-PQ
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 08:45:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602506740;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9wGxJZcsEOLAGSmgs7p8pt5WGBHmly5siKydoVe/oZE=;
- b=Y7/HgaykXGJaGQG1ddlXdHHOTOYd1wURQ8nb8ZWa64+1Rx459M+bMwX7wddfBvNj9qjxS0
- Nd4g8YhzGiqJl1gR4ZxzdoQRDBc+hcXr+4kjoBSHj/HFJLgm/53tHu/4vO1Jkl+62wXf48
- ZdMH6nEJ9Jveq//6sLWsQNxuZS8qO+Q=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-579-fwcS_nsyNWOHGOu-Miv66w-1; Mon, 12 Oct 2020 08:45:38 -0400
-X-MC-Unique: fwcS_nsyNWOHGOu-Miv66w-1
-Received: by mail-wr1-f70.google.com with SMTP id 47so9255106wrc.19
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 05:45:38 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kRxHE-0002Pj-Ft; Mon, 12 Oct 2020 08:50:08 -0400
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:39598)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kRxHC-0000ja-9W; Mon, 12 Oct 2020 08:50:08 -0400
+Received: by mail-wr1-x42f.google.com with SMTP id y12so13677247wrp.6;
+ Mon, 12 Oct 2020 05:50:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=0250QExOVe/In99QEQ0PDIduK5kaNaCaVSYuG7OqEpA=;
+ b=q8EcFetFUA/6owF2hzRE1q/FIcv+wvTA0nNhutJSsUMUNzWq3/U4DYLdYmTq2h85zk
+ 5SvkW3R8ZMZ/DembbLiD57C0neCIOLYae0qt/A1wxc3F0TBDoX1JUr8J3e2z+FA5GGdS
+ A3MBU0N8aW6L07Aiu1o0kandiugME6fpfWOUhWK5abXW6JoiRQUwmFysGmaawui6zRL1
+ plHOl2aId3ynn8/93nFi0SPumYe+3JuQL3GuA1W/HCIBs3Ra+gBonLURiIICes7a4o0C
+ ytvraLfn0WZ+KEWn36htgjKUq1tag9/uFHX3o9GrWJlPX+XsvoXyMkItVRxII6zcrg26
+ IZMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=9wGxJZcsEOLAGSmgs7p8pt5WGBHmly5siKydoVe/oZE=;
- b=LV+yyIHfBFTaXJ9BgJagMr7z2D9XbwAjxpZIDoHoEHND6YZ5qCqhDlK5wyijCMw39I
- J5Ht49wDIqVfbHO/QJCWHED/4d086BnPYjgW2ciVMuZYoWKHeDQ7mGA1/tdCfk77DMa8
- boQ5G8P8zp9y249cjWsN+sis0quUNiy2P055tDw0UGzvmi0LCpQLQLjljH0qf+014RuV
- QXly+/77Lee1MtNea94jFKLHtBVdMQkZmP7RTDodBSvScPaIn0lnXyI3A4RoHRW7rcgu
- MJeNvctn44N+Qvk5vuzdzJJy4a4l5SupKkH1M/wBlJJGWbOh+ZfkR+c+AL1uq8PVBRBR
- nPRA==
-X-Gm-Message-State: AOAM530/G/egoKso5hpfnh725CqXtb8+NiJwjtjiBfFZt0xvB6k4Tpja
- 6mwVQTQnVRsnqUd1ptPckaQQNMUWm2kUuovWlYBfE5AAxORj6RYzgA1+QWaubhT6+I4tCfX3WBf
- 7dC4WvdChtWNgxIk=
-X-Received: by 2002:adf:dccc:: with SMTP id x12mr30544388wrm.241.1602506737184; 
- Mon, 12 Oct 2020 05:45:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwGju9pLDMIkjylp5prt4ukBOzX2jmiDpK+NGjR15EPrzwXN0JDbAFCeWH5hcu15IBYdHhmBg==
-X-Received: by 2002:adf:dccc:: with SMTP id x12mr30544349wrm.241.1602506736967; 
- Mon, 12 Oct 2020 05:45:36 -0700 (PDT)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=0250QExOVe/In99QEQ0PDIduK5kaNaCaVSYuG7OqEpA=;
+ b=dQq1DR56dxlXLxscng/mWcSbKvHJsPrdvNKu0w23QK8MXB2fMOh0BGUfsQ7/qQ2mJW
+ eIenLW7rlw/FQ7B067crR2CCLOPb8fl3KsZMToqULEZH/BeVJaiGvOuVeueeQpuYj0ID
+ ckHSlzjCKnFOWYnDiByiGq/6Ffvchrt7KwzU6w3hhW74DbBOZUXC2JRSSEwtqZRvuMcy
+ xsscZJfRGbXe570CbZKeR25TDUJGOj7WyOy+2jGHHknhdbTUJ3JNE8AXzsYaWyRpL23d
+ 38dkK3NihBMqei62tz/aCsRcM0GaFmlIjmrk55/ZS9++NXSAvXKnJcqtDpEUktINPwJN
+ zdVA==
+X-Gm-Message-State: AOAM532MtWN44OKLOQd+fev2sviS6pomoXQXGLY7TLF8R4ZEF7SLXAH+
+ sXuhFaeJ+7e6/pTlYQH7hDFdYDufR6w=
+X-Google-Smtp-Source: ABdhPJyta/0zKFTg2tzo8TewXqG3uDAwC7h0B+PUzzDwhoBS06NWtBnYb1DPYKbDIpta9jRHU1bpRQ==
+X-Received: by 2002:adf:dcc7:: with SMTP id x7mr30520480wrm.203.1602507002486; 
+ Mon, 12 Oct 2020 05:50:02 -0700 (PDT)
 Received: from localhost.localdomain
  (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id s185sm22765462wmf.3.2020.10.12.05.45.35
+ by smtp.gmail.com with ESMTPSA id o3sm21486631wru.15.2020.10.12.05.50.01
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 12 Oct 2020 05:45:36 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 5/5] hw: Use the PCI_DEVFN() macro from 'hw/pci/pci.h'
-Date: Mon, 12 Oct 2020 14:45:06 +0200
-Message-Id: <20201012124506.3406909-6-philmd@redhat.com>
+ Mon, 12 Oct 2020 05:50:01 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org,
+	Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH v2 1/3] hw/ssi/aspeed_smc: Rename 'max_slaves' variable as
+ 'max_peripherals'
+Date: Mon, 12 Oct 2020 14:49:53 +0200
+Message-Id: <20201012124955.3409127-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201012124506.3406909-1-philmd@redhat.com>
-References: <20201012124506.3406909-1-philmd@redhat.com>
+In-Reply-To: <20201012124955.3409127-1-f4bug@amsat.org>
+References: <20201012124955.3409127-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/11 23:52:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::42f;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x42f.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,67 +102,264 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paul Durrant <paul@xen.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Huacai Chen <chenhc@lemote.com>, Stefano Stabellini <sstabellini@kernel.org>,
- Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-trivial@nongnu.org,
- Helge Deller <deller@gmx.de>, "Michael S. Tsirkin" <mst@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- David Gibson <david@gibson.dropbear.id.au>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-arm@nongnu.org,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Richard Henderson <rth@twiddle.net>,
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
+ Andrew Jeffery <andrew@aj.id.au>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+ Max Reitz <mreitz@redhat.com>, qemu-trivial@nongnu.org, qemu-arm@nongnu.org,
+ Joel Stanley <joel@jms.id.au>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-We already have a generic PCI_DEVFN() macro in "hw/pci/pci.h"
-to pack the PCI slot/function identifiers, use it.
+In order to use inclusive terminology, rename max_slaves
+as max_peripherals.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Patch generated using:
+
+  $ sed -i s/slave/peripheral/ \
+        hw/ssi/aspeed_smc.c include/hw/ssi/aspeed_smc.h
+
+One line in aspeed_smc_read() has been manually tweaked
+to pass checkpatch.
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/arm/virt.c          | 3 ++-
- hw/pci-host/uninorth.c | 6 ++----
- 2 files changed, 4 insertions(+), 5 deletions(-)
+ include/hw/ssi/aspeed_smc.h |  2 +-
+ hw/ssi/aspeed_smc.c         | 53 +++++++++++++++++++------------------
+ 2 files changed, 28 insertions(+), 27 deletions(-)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index e465a988d68..f601ef0798c 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1144,7 +1144,8 @@ static void create_pcie_irq_map(const VirtMachineState *vms,
-                      full_irq_map, sizeof(full_irq_map));
+diff --git a/include/hw/ssi/aspeed_smc.h b/include/hw/ssi/aspeed_smc.h
+index 3dd354b52ec..16c03fe64f3 100644
+--- a/include/hw/ssi/aspeed_smc.h
++++ b/include/hw/ssi/aspeed_smc.h
+@@ -43,7 +43,7 @@ typedef struct AspeedSMCController {
+     uint8_t r_timings;
+     uint8_t nregs_timings;
+     uint8_t conf_enable_w0;
+-    uint8_t max_slaves;
++    uint8_t max_peripherals;
+     const AspeedSegments *segments;
+     hwaddr flash_window_base;
+     uint32_t flash_window_size;
+diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
+index 795784e5f36..2780cac71d2 100644
+--- a/hw/ssi/aspeed_smc.c
++++ b/hw/ssi/aspeed_smc.c
+@@ -181,7 +181,7 @@
+ #define SNOOP_START       0x0
  
-     qemu_fdt_setprop_cells(vms->fdt, nodename, "interrupt-map-mask",
--                           0x1800, 0, 0, /* devfn (PCI_SLOT(3)) */
-+                           cpu_to_be16(PCI_DEVFN(3, 0)), /* Slot 3 */
-+                           0, 0,
-                            0x7           /* PCI irq */);
- }
+ /*
+- * Default segments mapping addresses and size for each slave per
++ * Default segments mapping addresses and size for each peripheral per
+  * controller. These can be changed when board is initialized with the
+  * Segment Address Registers.
+  */
+@@ -259,7 +259,7 @@ static const AspeedSMCController controllers[] = {
+         .r_timings         = R_TIMINGS,
+         .nregs_timings     = 1,
+         .conf_enable_w0    = CONF_ENABLE_W0,
+-        .max_slaves        = 1,
++        .max_peripherals   = 1,
+         .segments          = aspeed_segments_legacy,
+         .flash_window_base = ASPEED_SOC_SMC_FLASH_BASE,
+         .flash_window_size = 0x6000000,
+@@ -275,7 +275,7 @@ static const AspeedSMCController controllers[] = {
+         .r_timings         = R_TIMINGS,
+         .nregs_timings     = 1,
+         .conf_enable_w0    = CONF_ENABLE_W0,
+-        .max_slaves        = 5,
++        .max_peripherals   = 5,
+         .segments          = aspeed_segments_fmc,
+         .flash_window_base = ASPEED_SOC_FMC_FLASH_BASE,
+         .flash_window_size = 0x10000000,
+@@ -293,7 +293,7 @@ static const AspeedSMCController controllers[] = {
+         .r_timings         = R_SPI_TIMINGS,
+         .nregs_timings     = 1,
+         .conf_enable_w0    = SPI_CONF_ENABLE_W0,
+-        .max_slaves        = 1,
++        .max_peripherals   = 1,
+         .segments          = aspeed_segments_spi,
+         .flash_window_base = ASPEED_SOC_SPI_FLASH_BASE,
+         .flash_window_size = 0x10000000,
+@@ -309,7 +309,7 @@ static const AspeedSMCController controllers[] = {
+         .r_timings         = R_TIMINGS,
+         .nregs_timings     = 1,
+         .conf_enable_w0    = CONF_ENABLE_W0,
+-        .max_slaves        = 3,
++        .max_peripherals   = 3,
+         .segments          = aspeed_segments_ast2500_fmc,
+         .flash_window_base = ASPEED_SOC_FMC_FLASH_BASE,
+         .flash_window_size = 0x10000000,
+@@ -327,7 +327,7 @@ static const AspeedSMCController controllers[] = {
+         .r_timings         = R_TIMINGS,
+         .nregs_timings     = 1,
+         .conf_enable_w0    = CONF_ENABLE_W0,
+-        .max_slaves        = 2,
++        .max_peripherals   = 2,
+         .segments          = aspeed_segments_ast2500_spi1,
+         .flash_window_base = ASPEED_SOC_SPI_FLASH_BASE,
+         .flash_window_size = 0x8000000,
+@@ -343,7 +343,7 @@ static const AspeedSMCController controllers[] = {
+         .r_timings         = R_TIMINGS,
+         .nregs_timings     = 1,
+         .conf_enable_w0    = CONF_ENABLE_W0,
+-        .max_slaves        = 2,
++        .max_peripherals   = 2,
+         .segments          = aspeed_segments_ast2500_spi2,
+         .flash_window_base = ASPEED_SOC_SPI2_FLASH_BASE,
+         .flash_window_size = 0x8000000,
+@@ -359,7 +359,7 @@ static const AspeedSMCController controllers[] = {
+         .r_timings         = R_TIMINGS,
+         .nregs_timings     = 1,
+         .conf_enable_w0    = CONF_ENABLE_W0,
+-        .max_slaves        = 3,
++        .max_peripherals   = 3,
+         .segments          = aspeed_segments_ast2600_fmc,
+         .flash_window_base = ASPEED26_SOC_FMC_FLASH_BASE,
+         .flash_window_size = 0x10000000,
+@@ -377,7 +377,7 @@ static const AspeedSMCController controllers[] = {
+         .r_timings         = R_TIMINGS,
+         .nregs_timings     = 2,
+         .conf_enable_w0    = CONF_ENABLE_W0,
+-        .max_slaves        = 2,
++        .max_peripherals   = 2,
+         .segments          = aspeed_segments_ast2600_spi1,
+         .flash_window_base = ASPEED26_SOC_SPI_FLASH_BASE,
+         .flash_window_size = 0x10000000,
+@@ -395,7 +395,7 @@ static const AspeedSMCController controllers[] = {
+         .r_timings         = R_TIMINGS,
+         .nregs_timings     = 3,
+         .conf_enable_w0    = CONF_ENABLE_W0,
+-        .max_slaves        = 3,
++        .max_peripherals   = 3,
+         .segments          = aspeed_segments_ast2600_spi2,
+         .flash_window_base = ASPEED26_SOC_SPI2_FLASH_BASE,
+         .flash_window_size = 0x10000000,
+@@ -410,7 +410,7 @@ static const AspeedSMCController controllers[] = {
  
-diff --git a/hw/pci-host/uninorth.c b/hw/pci-host/uninorth.c
-index c21de0ab805..f73d452bdce 100644
---- a/hw/pci-host/uninorth.c
-+++ b/hw/pci-host/uninorth.c
-@@ -70,10 +70,8 @@ static uint32_t unin_get_config_reg(uint32_t reg, uint32_t addr)
-         /* ... and then convert them to x86 format */
-         /* config pointer */
-         retval = (reg & (0xff - 7)) | (addr & 7);
--        /* slot */
--        retval |= slot << 11;
--        /* fn */
--        retval |= func << 8;
-+        /* slot, fn */
-+        retval |= PCI_DEVFN(slot, func) << 8;
+ /*
+  * The Segment Registers of the AST2400 and AST2500 have a 8MB
+- * unit. The address range of a flash SPI slave is encoded with
++ * unit. The address range of a flash SPI peripheral is encoded with
+  * absolute addresses which should be part of the overall controller
+  * window.
+  */
+@@ -432,7 +432,7 @@ static void aspeed_smc_reg_to_segment(const AspeedSMCState *s,
+ 
+ /*
+  * The Segment Registers of the AST2600 have a 1MB unit. The address
+- * range of a flash SPI slave is encoded with offsets in the overall
++ * range of a flash SPI peripheral is encoded with offsets in the overall
+  * controller window. The previous SoC AST2400 and AST2500 used
+  * absolute addresses. Only bits [27:20] are relevant and the end
+  * address is an upper bound limit.
+@@ -476,7 +476,7 @@ static bool aspeed_smc_flash_overlap(const AspeedSMCState *s,
+     AspeedSegments seg;
+     int i;
+ 
+-    for (i = 0; i < s->ctrl->max_slaves; i++) {
++    for (i = 0; i < s->ctrl->max_peripherals; i++) {
+         if (i == cs) {
+             continue;
+         }
+@@ -537,7 +537,7 @@ static void aspeed_smc_flash_set_segment(AspeedSMCState *s, int cs,
+      */
+     if ((s->ctrl->segments == aspeed_segments_ast2500_spi1 ||
+          s->ctrl->segments == aspeed_segments_ast2500_spi2) &&
+-        cs == s->ctrl->max_slaves &&
++        cs == s->ctrl->max_peripherals &&
+         seg.addr + seg.size != s->ctrl->segments[cs].addr +
+         s->ctrl->segments[cs].size) {
+         qemu_log_mask(LOG_GUEST_ERROR,
+@@ -941,14 +941,14 @@ static void aspeed_smc_reset(DeviceState *d)
+ 
+     memset(s->regs, 0, sizeof s->regs);
+ 
+-    /* Unselect all slaves */
++    /* Unselect all peripherals */
+     for (i = 0; i < s->num_cs; ++i) {
+         s->regs[s->r_ctrl0 + i] |= CTRL_CE_STOP_ACTIVE;
+         qemu_set_irq(s->cs_lines[i], true);
      }
  
-     trace_unin_get_config_reg(reg, addr, retval);
+     /* setup the default segment register values and regions for all */
+-    for (i = 0; i < s->ctrl->max_slaves; ++i) {
++    for (i = 0; i < s->ctrl->max_peripherals; ++i) {
+         aspeed_smc_flash_set_segment_region(s, i,
+                     s->ctrl->segment_to_reg(s, &s->ctrl->segments[i]));
+     }
+@@ -995,8 +995,9 @@ static uint64_t aspeed_smc_read(void *opaque, hwaddr addr, unsigned int size)
+         (s->ctrl->has_dma && addr == R_DMA_DRAM_ADDR) ||
+         (s->ctrl->has_dma && addr == R_DMA_LEN) ||
+         (s->ctrl->has_dma && addr == R_DMA_CHECKSUM) ||
+-        (addr >= R_SEG_ADDR0 && addr < R_SEG_ADDR0 + s->ctrl->max_slaves) ||
+-        (addr >= s->r_ctrl0 && addr < s->r_ctrl0 + s->ctrl->max_slaves)) {
++        (addr >= R_SEG_ADDR0 &&
++         addr < R_SEG_ADDR0 + s->ctrl->max_peripherals) ||
++        (addr >= s->r_ctrl0 && addr < s->r_ctrl0 + s->ctrl->max_peripherals)) {
+ 
+         trace_aspeed_smc_read(addr, size, s->regs[addr]);
+ 
+@@ -1270,7 +1271,7 @@ static void aspeed_smc_write(void *opaque, hwaddr addr, uint64_t data,
+         int cs = addr - s->r_ctrl0;
+         aspeed_smc_flash_update_ctrl(&s->flashes[cs], value);
+     } else if (addr >= R_SEG_ADDR0 &&
+-               addr < R_SEG_ADDR0 + s->ctrl->max_slaves) {
++               addr < R_SEG_ADDR0 + s->ctrl->max_peripherals) {
+         int cs = addr - R_SEG_ADDR0;
+ 
+         if (value != s->regs[R_SEG_ADDR0 + cs]) {
+@@ -1341,10 +1342,10 @@ static void aspeed_smc_realize(DeviceState *dev, Error **errp)
+     s->conf_enable_w0 = s->ctrl->conf_enable_w0;
+ 
+     /* Enforce some real HW limits */
+-    if (s->num_cs > s->ctrl->max_slaves) {
++    if (s->num_cs > s->ctrl->max_peripherals) {
+         qemu_log_mask(LOG_GUEST_ERROR, "%s: num_cs cannot exceed: %d\n",
+-                      __func__, s->ctrl->max_slaves);
+-        s->num_cs = s->ctrl->max_slaves;
++                      __func__, s->ctrl->max_peripherals);
++        s->num_cs = s->ctrl->max_peripherals;
+     }
+ 
+     /* DMA irq. Keep it first for the initialization in the SoC */
+@@ -1352,7 +1353,7 @@ static void aspeed_smc_realize(DeviceState *dev, Error **errp)
+ 
+     s->spi = ssi_create_bus(dev, "spi");
+ 
+-    /* Setup cs_lines for slaves */
++    /* Setup cs_lines for peripherals */
+     s->cs_lines = g_new0(qemu_irq, s->num_cs);
+ 
+     for (i = 0; i < s->num_cs; ++i) {
+@@ -1376,16 +1377,16 @@ static void aspeed_smc_realize(DeviceState *dev, Error **errp)
+                           s->ctrl->flash_window_size);
+     sysbus_init_mmio(sbd, &s->mmio_flash);
+ 
+-    s->flashes = g_new0(AspeedSMCFlash, s->ctrl->max_slaves);
++    s->flashes = g_new0(AspeedSMCFlash, s->ctrl->max_peripherals);
+ 
+     /*
+-     * Let's create a sub memory region for each possible slave. All
++     * Let's create a sub memory region for each possible peripheral. All
+      * have a configurable memory segment in the overall flash mapping
+      * window of the controller but, there is not necessarily a flash
+      * module behind to handle the memory accesses. This depends on
+      * the board configuration.
+      */
+-    for (i = 0; i < s->ctrl->max_slaves; ++i) {
++    for (i = 0; i < s->ctrl->max_peripherals; ++i) {
+         AspeedSMCFlash *fl = &s->flashes[i];
+ 
+         snprintf(name, sizeof(name), "%s.%d", s->ctrl->name, i);
 -- 
 2.26.2
 
