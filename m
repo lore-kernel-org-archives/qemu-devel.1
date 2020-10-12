@@ -2,46 +2,47 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46A37C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 17:51:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B73EC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 17:52:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F259B2073A
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 17:51:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F259B2073A
+	by mail.kernel.org (Postfix) with ESMTPS id B6EE12074F
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 17:52:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6EE12074F
 Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kS1zC-0006Mf-6A
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 13:51:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59404)
+	id 1kS1zY-0006wl-JK
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 13:52:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59708)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kS1wb-0003ja-P6; Mon, 12 Oct 2020 13:49:09 -0400
-Received: from relay.sw.ru ([185.231.240.75]:33690 helo=relay3.sw.ru)
+ id 1kS1y5-0005Di-OT; Mon, 12 Oct 2020 13:50:41 -0400
+Received: from relay.sw.ru ([185.231.240.75]:34164 helo=relay3.sw.ru)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kS1wW-0007kf-9o; Mon, 12 Oct 2020 13:49:09 -0400
+ id 1kS1y4-0007z9-5y; Mon, 12 Oct 2020 13:50:41 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay3.sw.ru with esmtp (Exim 4.94)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kS1vZ-0047iC-PS; Mon, 12 Oct 2020 20:48:05 +0300
+ id 1kS1x7-0047iC-U4; Mon, 12 Oct 2020 20:49:41 +0300
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, fam@euphon.net,
  stefanha@redhat.com, armbru@redhat.com, jsnow@redhat.com,
  libvir-list@redhat.com, eblake@redhat.com, den@openvz.org,
  vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
-Subject: [PATCH v11 06/13] block: modify the comment for BDRV_REQ_PREFETCH flag
-Date: Mon, 12 Oct 2020 20:43:18 +0300
-Message-Id: <1602524605-481160-7-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v11 08/13] copy-on-read: add support for BDRV_REQ_PREFETCH to
+ COR-filter
+Date: Mon, 12 Oct 2020 20:43:20 +0300
+Message-Id: <1602524605-481160-9-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1602524605-481160-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1602524605-481160-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -72,33 +73,26 @@ Sender: "Qemu-devel"
 Reply-to: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 From: Andrey Shinkevich via <qemu-devel@nongnu.org>
 
-Modify the comment for the flag BDRV_REQ_PREFETCH as we are going to
-use it alone and pass it to the COR-filter driver for further
-processing.
+Add support for the BDRV_REQ_PREFETCH flag to the supported_write_flags
+of the COR-filter.
 
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- include/block/block.h | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ block/copy-on-read.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index 981ab5b..2b7efd1 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -71,9 +71,10 @@ typedef enum {
-     BDRV_REQ_NO_FALLBACK        = 0x100,
+diff --git a/block/copy-on-read.c b/block/copy-on-read.c
+index dfbd6ad..b136895 100644
+--- a/block/copy-on-read.c
++++ b/block/copy-on-read.c
+@@ -50,6 +50,7 @@ static int cor_open(BlockDriverState *bs, QDict *options, int flags,
+         return -EINVAL;
+     }
  
-     /*
--     * BDRV_REQ_PREFETCH may be used only together with BDRV_REQ_COPY_ON_READ
--     * on read request and means that caller doesn't really need data to be
--     * written to qiov parameter which may be NULL.
-+     * BDRV_REQ_PREFETCH may be used together with the BDRV_REQ_COPY_ON_READ
-+     * flag or when the COR-filter applied to read operations and means that
-+     * caller doesn't really need data to be written to qiov parameter which
-+     * may be NULL.
-      */
-     BDRV_REQ_PREFETCH  = 0x200,
-     /* Mask of valid flags */
++    bs->supported_read_flags = BDRV_REQ_PREFETCH;
+     bs->supported_write_flags = BDRV_REQ_WRITE_UNCHANGED |
+         (BDRV_REQ_FUA & bs->file->bs->supported_write_flags);
+ 
 -- 
 1.8.3.1
 
