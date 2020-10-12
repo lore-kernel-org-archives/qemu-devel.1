@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7CB3C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:49:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B21BC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:50:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CD742076E
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:49:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B0D192076E
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:50:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F0P5DqSR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CD742076E
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ugsig8zp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0D192076E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kS050-0001py-It
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 11:49:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56734)
+	id 1kS05x-0003BO-PD
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 11:50:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57160)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kRzqG-0006qa-OC
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:34:28 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46363)
+ id 1kRzqg-0007BO-S8
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:34:56 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39093)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kRzqE-0007IN-R7
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:34:28 -0400
-Received: by mail-wr1-x441.google.com with SMTP id n6so19391282wrm.13
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 08:34:26 -0700 (PDT)
+ id 1kRzqR-0007Lb-Bq
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:34:52 -0400
+Received: by mail-wr1-x442.google.com with SMTP id y12so14320746wrp.6
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 08:34:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=NE3BHoZcVo5rUaArzOLXnKqyeyPe9cLG2NZvnHPubpg=;
- b=F0P5DqSRbWzz8LAZgY3uK7HBoazadBF6IlWYEaqn1g0simBrisdG45SWpVgDBnrJYD
- W6rwu6CQCGPbENBwQu9NGBUnFrtValWsVAss410TC9hJrS+1y6bMG1VaYrY7co18lvy7
- jXjy/wZnKlg0J5MaAg/MvYhuQ3eOjxSSYKD7a6+a6U2EjYufIpGZ7CeIDa4RbyScd1ry
- wFF3v5mMRGow0DdJVctXs087rluuEwFeJiMqMrbvJLqKjStuhc4CuWGwseRWwk+lmz7H
- yC7n8wkKaJiyJ2PMpcOM61FPUkdM2FXadGDQe1yZfoVA9+QNoRGX8iOj+nQFVvp6iCPl
- Z9ig==
+ bh=2ZOYJQFgwtkRMUbE80VKve55fsHkUx0xDSOrENJ6dJU=;
+ b=ugsig8zpC0Qx+KkGOBRBlUNonfjfYMyA7gA5Jc3AdMBV/ins+/IP15NmtVWDhFaoj8
+ 9Ih+F4xShgRP8g3vyGIRx1APoaUM00QiQnvwPRbSNap5a/owy5IviEeRJoUr/1F/7l/M
+ b+E4b/HX2tfEdgAklY9iIsimd6uJtWp8oUpu7uail11Vi6RATSWnvut1Y4Y9EXFXv9/z
+ tgpfvV+bjkU2a7LR4cHUJvteOvqSWSUm81xHAuA7S8gG4CDCjEFOahnnhTPJ+hpkJer+
+ UqUBUvXjtmVr+Wozf0Fpq9f4umI4GEedDkmzhK8V76aaHsYc6+Q8bzleAEcgepzizY12
+ /vmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=NE3BHoZcVo5rUaArzOLXnKqyeyPe9cLG2NZvnHPubpg=;
- b=gNzpN/75b5cD8lxdIYw28TQZgtTOOHF/dEBQjlKxjFLLvJe8P2DFXynt0VsiBj7szO
- Ae9MQEWeShqJKrBiQRL2BiI865vA1guTpUKHRxJzmSgE2bb+JLhAu4F38/j6J2fAbNsy
- K83IvDJcoYw0/krf+7kHA73yuTYabIVcuJFmsHzNux3IXLrZnZiRHoE/0IQcb2rR0OXK
- KTjZ6UWAhfy7BuLitIilfBXOcOZEqHrUDfNjlsx8HE2iAZkHdj7KwLWWOceTb+hfHJaY
- FY81impLaTKnd1N5X1x+i7xmuJ/elOiscO3ID+tLenBn2g6lHqJnAw+qa9SJcijiHHCf
- AcHA==
-X-Gm-Message-State: AOAM531OOeSb51y6RAAGnS3HjzY9tvxefVmqERXJBLjWzWPUFpFsD7+n
- XOPN0hSGQPyuWDzZwONDF0yUfAPcm+3KetF2
-X-Google-Smtp-Source: ABdhPJygOpxOuyh0+ui0t3KAejL6l1An+uv8bVDY8/G5lKdL68i7ANWu5zyWx6XZvLVpJ4QCS5MXtw==
-X-Received: by 2002:adf:e38f:: with SMTP id e15mr30571623wrm.294.1602516865536; 
- Mon, 12 Oct 2020 08:34:25 -0700 (PDT)
+ bh=2ZOYJQFgwtkRMUbE80VKve55fsHkUx0xDSOrENJ6dJU=;
+ b=NfX+u526EkXW9LCRLvcu3MUBO4qvZRHR7L3WXEWWI0zMOpfDeFYPGChoCDEzE6xhKJ
+ LpBOgV8LnXBzcw1nfje3yLGFuHYHthYzR3BEJTHTe+2N3NmoTHgp6i1W0B4Q25FympG1
+ 7Ed45zq0Jn1RS10LyzCMh5jOLquZrQRwUS/qkUkJCAU6TTuMISFXGFXfA4GFSKz9Hhm+
+ 8viQtne05BTfA/qXnYXp2dSRVJWAzNoL0+ln5PTzXr52sXkm1oFCrPmdqbN4g/HtmM7T
+ Yc2aNykW43wCwtG6wd4ImsNBxyMK995h7WzvgePQ3/QbNUoskZUFF2eKMNn0w3qsVtOA
+ jHfA==
+X-Gm-Message-State: AOAM530hR+co4EabXZ/vN/AQN8Cw1Voe6FTM30e9ut9eEpHr06obWqob
+ WDOG8rPn8wq9UFQfqEyBsWj0EqlkOQoEg9Vf
+X-Google-Smtp-Source: ABdhPJxZm6nnn0K48lVEgiUOdZmwQiTJ0RP/8c3cPgDbRk09d+UNt0geOYKLeCGxNb/9WWn9Y4n09Q==
+X-Received: by 2002:a5d:6642:: with SMTP id f2mr30396139wrw.374.1602516876795; 
+ Mon, 12 Oct 2020 08:34:36 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id y10sm19675284wrq.73.2020.10.12.08.34.24
+ by smtp.gmail.com with ESMTPSA id y10sm19675284wrq.73.2020.10.12.08.34.35
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 12 Oct 2020 08:34:24 -0700 (PDT)
+ Mon, 12 Oct 2020 08:34:36 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH for-5.1] hw/arm/nrf51_soc: Set system_clock_scale
-Date: Mon, 12 Oct 2020 16:33:36 +0100
-Message-Id: <20201012153408.9747-14-peter.maydell@linaro.org>
+Subject: [PATCH] meson.build: Don't look for libudev for static builds
+Date: Mon, 12 Oct 2020 16:33:46 +0100
+Message-Id: <20201012153408.9747-24-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201012153408.9747-1-peter.maydell@linaro.org>
 References: <20201012153408.9747-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x441.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -87,7 +87,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,48 +105,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The nrf51 SoC model wasn't setting the system_clock_scale
-global.which meant that if guest code used the systick timer in "use
-the processor clock" mode it would hang because time never advances.
+commit f01496a314d916 moved the logic for detecting libudev from
+configure to meson.build, but in the process it dropped the condition
+that meant we only ask pkg-config about libudev for a non-static
+build.
 
-Set the global to match the documented CPU clock speed for this SoC.
+This breaks static builds of the system emulators on at least Ubuntu
+18.04.4, because on that host there is no static libudev but
+pkg-config still claims it exists.
 
-This SoC in fact doesn't have a SysTick timer (which is the only thing
-currently that cares about the system_clock_scale), because it's
-a configurable option in the Cortex-M0. However our Cortex-M0 and
-thus our nrf51 and our micro:bit board do provide a SysTick, so
-we ought to provide a functional one rather than a broken one.
+Reinstate the logic that we had in the configure check.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
-Tested with 'make check'/'make check-acceptance' only.
+We could certainly do something cleverer here, but basic "convert
+from configure to meson" should in general not also be changing the
+detection logic IMHO.  We can make the logic smarter as a follow-on
+patch if desired.
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- hw/arm/nrf51_soc.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
-index 45e6cc97d70..e15981e019f 100644
---- a/hw/arm/nrf51_soc.c
-+++ b/hw/arm/nrf51_soc.c
-@@ -32,6 +32,9 @@
- 
- #define BASE_TO_IRQ(base) ((base >> 12) & 0x1F)
- 
-+/* HCLK (the main CPU clock) on this SoC is always 16MHz */
-+#define HCLK_FRQ 16000000
-+
- static uint64_t clock_read(void *opaque, hwaddr addr, unsigned int size)
- {
-     qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " [%u]\n",
-@@ -65,6 +68,8 @@ static void nrf51_soc_realize(DeviceState *dev_soc, Error **errp)
-         return;
-     }
- 
-+    system_clock_scale = NANOSECONDS_PER_SECOND / HCLK_FRQ;
-+
-     object_property_set_link(OBJECT(&s->cpu), "memory", OBJECT(&s->container),
-                              &error_abort);
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->cpu), errp)) {
+diff --git a/meson.build b/meson.build
+index 3161c1f037a..07da66e1d81 100644
+--- a/meson.build
++++ b/meson.build
+@@ -271,7 +271,7 @@ if 'CONFIG_CURL' in config_host
+                             link_args: config_host['CURL_LIBS'].split())
+ endif
+ libudev = not_found
+-if targetos == 'linux' and (have_system or have_tools)
++if targetos == 'linux' and (have_system or have_tools) and not enable_static
+   libudev = dependency('libudev',
+                        required: get_option('mpath').enabled(),
+                        static: enable_static)
 -- 
 2.20.1
 
