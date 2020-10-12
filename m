@@ -2,42 +2,41 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79B05C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 14:46:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 888E6C433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 14:46:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03AE620776
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 14:46:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03AE620776
+	by mail.kernel.org (Postfix) with ESMTPS id F1BA220776
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 14:46:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1BA220776
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRz67-0004ZO-41
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 10:46:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39766)
+	id 1kRz6B-0004hm-21
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 10:46:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38960)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kRz07-00065m-6W; Mon, 12 Oct 2020 10:40:36 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:57281)
+ id 1kRyyC-00041o-7z; Mon, 12 Oct 2020 10:38:36 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:48011)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kRz03-000898-Jt; Mon, 12 Oct 2020 10:40:34 -0400
+ id 1kRyy9-0007is-3n; Mon, 12 Oct 2020 10:38:35 -0400
 Received: from [192.168.100.1] ([82.252.141.186]) by mrelayeu.kundenserver.de
  (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MZCKd-1kwyFa0EgD-00V96h; Mon, 12 Oct 2020 16:40:23 +0200
-Subject: Re: [PATCH 2/2] goldfish_rtc: change MemoryRegionOps endianness to
- DEVICE_NATIVE_ENDIAN
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-References: <20201009113843.60995-1-lvivier@redhat.com>
- <20201009113843.60995-2-lvivier@redhat.com>
+ 1MD9CZ-1kb1Va33Td-009605; Mon, 12 Oct 2020 16:38:27 +0200
+Subject: Re: [PATCH] block/blkdebug: fix memory leak
+To: Elena Afanasova <eafanasova@gmail.com>, kwolf@redhat.com,
+ mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <1e903f928eb3da332cc95e2a6f87243bd9fe66e4.camel@gmail.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,35 +80,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <83c853ce-dba5-b62f-434b-e14013f94f59@vivier.eu>
-Date: Mon, 12 Oct 2020 16:40:21 +0200
+Message-ID: <d1eb7b56-cbfe-9a96-f7f5-95bea795b96a@vivier.eu>
+Date: Mon, 12 Oct 2020 16:38:26 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20201009113843.60995-2-lvivier@redhat.com>
+In-Reply-To: <1e903f928eb3da332cc95e2a6f87243bd9fe66e4.camel@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:SaoGKjnPV6bcjzjKJz7/ZDr1BFmHWehpIiSLnV23740L3MHkOlp
- VwoxQ6GfyVwu4y2d5rClkBZniAgGxKoSOpTrzKgxq+C8gHMp9f2yoa+6fk1en9O9UmcSbUI
- jRniSnC5iGWD3oTLhXdsj7VJIoXu7vCswZ6ScZkr1jheyNXycVqDsxi1Ulz4BzyMUviZ5cS
- bFnA/TWcIMEG8RJdlk4oA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:zRrn/opVhAM=:CZjw5sySBBw75RTkIpAUSU
- QelDEoDTiJoMr+rhBsbxtEyCYjDVNSAyav3RXpIQTIdog650x8zNSAP+VbaTbbe4iZ+1+iHKF
- IMpVvLyENPW+ZEZpLCrajsIr+HKTPDobdCm2weXv5V1wAeoZBhmM4sbs4dDSfYek/54yDm37p
- aHNlR/r9H59J6HY/sUuFa+RL/F5yPe4vsUinrgNu9GVgXODOaUtk/NtgulxbqltR1tC2fUZlt
- u0uI+mc4R+RSfKe8CVGEujT5NjDYC5AzAJh9VLI0a9IRebPp6wbCkMeVomnf3yu8s9X9WWooL
- TNpPOr5XQx28oNGT/jjhm0s/jE69zNiNhhL75i3lP+e3SkGHoP/nWlMR0XhjQn/QCX12mhZUo
- zyp0bVBRdD2/KRGNy9Oi8Uhv7Zu9wKqV1ToOl6g5cJoHoJkiNN0YZsAr5TS0bxA+ZIQoh96lZ
- q4Q96TQ2Bjm/zsXxUS/GEx+jRItB/nICm3KhyeBK8ykRBpBtSWIXgvxWRliAX/775b/eKIlBH
- JZlHYWVxQfyoL7gMbbn4uCWgRF+ClreplWCgwXfWuW7L+iYdBpEMVPafrsXFQ1gu9EQ+kii7b
- FSgqXdW29AACKLbd+yL26r3X+77FOlrf1latt67+Gqk7jHTztuvIrI07s6o6Odnys5ZtKWEmj
- ph1R1PQCkhzlYnzyj18xE477HQQnyR1t6sOKkwqp4fBm0gFKVwMzkLOxMYlzUSBtaa15N794l
- OmERcpwdAr1ZwGbxn9oQJkAzoAX181bp+kG/VjK8kSJcBg0Hp2Vz0LA8fIXlh5vc2hdE4WVJo
- yAMhkbVnozTWHqCohdzXzo+ueH9J970bjQMEJGs/6P7pBQPlsNnaopmPis06AOD0nNqRDJR
-Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:y8nG3MOecPuxNQwCxsxrb2zPgEUYunT60gMIPv0RdeMf+2JShko
+ uYIH6WXZnA0H0Q6woSg2JYjaaOgaD4QijFULxkOAJGtn4O3MIbWQ5/PruhVGC2KSY3eGNpn
+ vNeWjoTPi31Xi0rWFRGXX2mcdhHL4N4pIq+d1hOiC2X/wegazF2Gob8Ez6W44lERatZY7PZ
+ KnRtrk+5EACJqUskzVcIA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ZBiOEF2/QCs=:qyqxMIxupldjGaL7uAMJO+
+ Nm3WwTsAH3ngXC8MDAdsSyhHTMkzWmyFSHya7I8sC3vG+mmMuSZ0wJLANTjq3xM5SvuJKWh8K
+ PZvRlPgxp6KSUgHIJSwERD52ljc21SNFezU2HZtNtUuqLQC2WpSor2WrReH9ayaNpO/75/L31
+ ZafGFoB+b8AWSnYthHeyWS9FxQMjR++hIr7IQcpj92EhBRw0wANpJyBhyuFFcSmrFQx1TPVDA
+ lmO/9LFL4DPsqG8d9wzV6nMqzk3iJmegrJQdYYk5rYOXZLW0r8wYN4N9dvNzJflZABW3SPRRs
+ lylork31qukWdDAPsmeQ8HlEIwq7piHI1/dQK0TO2+E5Bx+ETQymyhzHT6zvRwj5DM2SQ/WZ2
+ 88yHP4W8JzmGDCDtaDZBhH+AGH0hbZhV6vTJnoIwwWC/3Pqd0mzsRbCCo3tYc/UjQmlgV8JkT
+ kjG//KsAO23H/CKBIK+CnORsosLOD1AgbQV9n+L6i7vQTHLuBcnt7ZgmV9gsJxcG1gWFUZOiy
+ uaUFywVZUt+D3RqmesHpNrgBvRhdKFh/SxwCVv3ZO/UHWRY+UKrbMeWkc1zb9DTEbQfmZR/x8
+ uxnwWPekEKS8OgE/3Yu3quf3twXQsLR1JVVb/ifffYPp8EYxgMibY/ElXJf00vsuS1cAJV5oi
+ WwLgSEX3xvE97TwqT+QhKk5D5yxij5DZwEx1zkj/XOVosijzDoJ3Se2QGnbrDiK8HMhJ1Awrt
+ OmKk43patda0Own8Oy2ZBj8A8Ll0FE7Cr4q7SClwr3Dl78kZq2sMfHni73hjJr5QEPLjhEik3
+ 8EUHyNqQ9HdjhpZEaDMbvwpwNd/ZCdwTTDIG8+mFYWeReoZewPRxxzNMbQ08cVCNs+hijwk
+Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 10:40:29
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 10:20:48
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -129,48 +128,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-trivial@nongnu.org, Anup.Patel@wdc.com,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-trivial@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 09/10/2020 à 13:38, Laurent Vivier a écrit :
-> The doc [1] doesn't define the endianness, but the kernel driver
-> uses readl() to access the registers, so we can guess it depends
-> on the architecture endianness.
+Le 09/10/2020 à 21:09, Elena Afanasova a écrit :
+> Spotted by PVS-Studio
 > 
-> As riscv architecture endianness is little it might not change anything
-> for it.
-> 
-> Moreover, android implementation uses DEVICE_NATIVE_ENDIAN [2]
-> 
-> [1] https://android.googlesource.com/platform/external/qemu/+/master/docs/GOLDFISH-VIRTUAL-HARDWARE.TXT
-> [2] https://android.googlesource.com/platform/external/qemu/+/refs/heads/emu-master-dev/hw/timer/goldfish_timer.c#177
-> 
-> Fixes: 9a5b40b84279 ("hw: rtc: Add Goldfish RTC device")
-> Cc: Anup.Patel@wdc.com
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> Signed-off-by: Elena Afanasova <eafanasova@gmail.com>
 > ---
->  hw/rtc/goldfish_rtc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  block/blkdebug.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/hw/rtc/goldfish_rtc.c b/hw/rtc/goldfish_rtc.c
-> index 6ddd45cce039..0f4e8185a796 100644
-> --- a/hw/rtc/goldfish_rtc.c
-> +++ b/hw/rtc/goldfish_rtc.c
-> @@ -217,7 +217,7 @@ static int goldfish_rtc_post_load(void *opaque, int version_id)
->  static const MemoryRegionOps goldfish_rtc_ops = {
->      .read = goldfish_rtc_read,
->      .write = goldfish_rtc_write,
-> -    .endianness = DEVICE_LITTLE_ENDIAN,
-> +    .endianness = DEVICE_NATIVE_ENDIAN,
->      .valid = {
->          .min_access_size = 4,
->          .max_access_size = 4
+> diff --git a/block/blkdebug.c b/block/blkdebug.c
+> index eecbf3e5c4..54da719dd1 100644
+> --- a/block/blkdebug.c
+> +++ b/block/blkdebug.c
+> @@ -215,6 +215,7 @@ static int add_rule(void *opaque, QemuOpts *opts, Error **errp)
+>                                   BLKDEBUG_IO_TYPE__MAX, &local_error);
+>          if (local_error) {
+>              error_propagate(errp, local_error);
+> +            g_free(rule);
+>              return -1;
+>          }
+>          if (iotype != BLKDEBUG_IO_TYPE__MAX) {
 > 
 
 Applied to my trivial-patches branch.
