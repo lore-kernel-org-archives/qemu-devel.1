@@ -2,89 +2,96 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 936CCC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 12:03:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A5AEC433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 12:04:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0ACF021655
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 12:03:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9FB4021655
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 12:04:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dWNZ/s5n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ACF021655
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YOI07ySw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FB4021655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRwYB-0003kT-Tr
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 08:03:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42778)
+	id 1kRwZ7-00059i-Ks
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 08:04:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47142)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kRwG9-0000fR-FZ
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 07:44:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55865)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kRwG0-0008Aj-Jz
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 07:44:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602503085;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xiPfig7jG9VC0GE1wxVAHcnqkY098QwCgL+T1oBSk+E=;
- b=dWNZ/s5nzC0De+ynLfUQ2rSXW7KQ87nxr98gNhumgz4ffi9rkMFT6nTAkYuxxJ13qYZw5e
- baP82LLGu7wjt8c3/dTy/TWHHLXI9gq6nNomrSBf2hNzR4Wns/ow0OSvOLSOIsTFz7tgf4
- j6X0rZa3kGjbntBNaH5tHItFyBrxxeM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-389-vU5ZkUdvMZGnZJmaLLUBYg-1; Mon, 12 Oct 2020 07:44:43 -0400
-X-MC-Unique: vU5ZkUdvMZGnZJmaLLUBYg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B06818A8221;
- Mon, 12 Oct 2020 11:44:42 +0000 (UTC)
-Received: from dgilbert-t580.localhost (ovpn-113-244.ams2.redhat.com
- [10.36.113.244])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4210519C78;
- Mon, 12 Oct 2020 11:44:41 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org, alex.bennee@linaro.org, zhengchuan@huawei.com,
- stefanha@redhat.com, peterx@redhat.com
-Subject: [PULL 4/6] virtiofsd: avoid /proc/self/fd tempdir
-Date: Mon, 12 Oct 2020 12:44:23 +0100
-Message-Id: <20201012114425.104765-5-dgilbert@redhat.com>
-In-Reply-To: <20201012114425.104765-1-dgilbert@redhat.com>
-References: <20201012114425.104765-1-dgilbert@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kRwWQ-0002Pn-4N; Mon, 12 Oct 2020 08:01:46 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51768)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kRwWO-0002B1-8L; Mon, 12 Oct 2020 08:01:45 -0400
+Received: by mail-wm1-x344.google.com with SMTP id d81so16949988wmc.1;
+ Mon, 12 Oct 2020 05:01:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=6QR6d3zy6MQYEcou36efqNc5AUNkJxoiFHbV+BKd1Po=;
+ b=YOI07ySwa7DI8kdf81y4igq4U8/uzmL7mjI6o5bN9pWNYzxNo0HZMSjVF7OFxd2Z2i
+ yhCmvBEkH8GrQ4xj0dudTDXgxFpxemBMed9EsKkXZrbSQ3IiHZn0XsU9jnj2c4md48qM
+ 31VCmjOTbitVFRuAtXt4qdlDAqTWD4giWHKlHq931+KIdBkhME+9HYdR9RAnu96DGBQ8
+ zdv0h1KbuAs69ApZcff5VImLW8b03yMQWMFrn4/v2fKV+psdvhTPhpe3/SzhBVYqGmjJ
+ hkjc+BM1MwqY5rzp5Wu7Y0jEQ4+v7ks3BffYnzdVrlR28t4E/t5XqWzsWZsZRJi6VM63
+ 2w9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=6QR6d3zy6MQYEcou36efqNc5AUNkJxoiFHbV+BKd1Po=;
+ b=k/r7TV/N5L89pMPwK7Igw5L2QHTxBZeA9mbHLc/KrDfoTkx44H43owJ6u/iI09wsAx
+ RCn686ikkYHBvOLiLJpQtwyScxZ978fYpIbjbCXJPKPFUu7f0Bhfw1c2hvxTEXU9SQbO
+ 6LvpJmV8Jw8MBc+K2i3iEmMI0DBXmIztnp/ku9g0F+3P6O1s4XMBYpRnrfBFm5eCme1C
+ npVb5mW5doQgjDnd9lnDdyBBMdDvrtWliAN+sUL+lrkU0rqtereWlqitOj46spnxXgHU
+ cGXfuQ7+98gtK4DAa+Ga086w7MMVTXwZt52p2vtQsE5cRRy8tb2GXlr1gqglK6MM+nbc
+ wPXA==
+X-Gm-Message-State: AOAM533z2ZU25ExFW5AXSY0Sf+ztvpm+ZwNSKlOuXTOg5D/Rrr/CitPI
+ 8fOR8bwC2iws4qodnKLNuKU=
+X-Google-Smtp-Source: ABdhPJx3MEDik0kDKsrZr6M8ZDpNQVmBQi/3NjuV8wAK+5TNTBRONR5GilE0L5ZUL+z0PjAo+5Kqjw==
+X-Received: by 2002:a1c:cc07:: with SMTP id h7mr11040150wmb.55.1602504102203; 
+ Mon, 12 Oct 2020 05:01:42 -0700 (PDT)
+Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id j5sm19194458wrx.88.2020.10.12.05.01.41
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 12 Oct 2020 05:01:41 -0700 (PDT)
+Subject: Re: [PATCH] hw/pci-host/grackle: Verify PIC link is properly set
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
+References: <20201011190332.3189611-1-f4bug@amsat.org>
+ <85549ebe-6644-3c45-0e56-e4d5c509ea80@ilande.co.uk>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <16a5dc5f-0ae9-b513-3579-6839a2db6cc6@amsat.org>
+Date: Mon, 12 Oct 2020 14:01:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <85549ebe-6644-3c45-0e56-e4d5c509ea80@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/11 23:52:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,128 +104,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: quintela@redhat.com
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+On 10/12/20 11:23 AM, Mark Cave-Ayland wrote:
+> On 11/10/2020 20:03, Philippe Mathieu-Daudé wrote:
+> 
+>> The Grackle PCI host model expects the interrupt controller
+>> being set, but does not verify it is present. Add a check to
+>> help developers using this model.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>   hw/pci-host/grackle.c | 4 ++++
+>>   1 file changed, 4 insertions(+)
+>>
+>> diff --git a/hw/pci-host/grackle.c b/hw/pci-host/grackle.c
+>> index 57c29b20afb..20361d215ca 100644
+>> --- a/hw/pci-host/grackle.c
+>> +++ b/hw/pci-host/grackle.c
+>> @@ -76,6 +76,10 @@ static void grackle_realize(DeviceState *dev, Error **errp)
+>>       GrackleState *s = GRACKLE_PCI_HOST_BRIDGE(dev);
+>>       PCIHostState *phb = PCI_HOST_BRIDGE(dev);
+>>   
+>> +    if (!s->pic) {
+>> +        error_setg(errp, TYPE_GRACKLE_PCI_HOST_BRIDGE ": 'pic' link not set");
+>> +        return;
+>> +    }
+>>       phb->bus = pci_register_root_bus(dev, NULL,
+>>                                        pci_grackle_set_irq,
+>>                                        pci_grackle_map_irq,
+> 
+> Reviewing this now, my feeling is that both grackle and uninorth are doing the wrong
+> thing here by passing in a link to the PIC - certainly if I had written this more
+> recently than I originally did, I would simply use qdev_init_gpio_out() for the IRQ
+> lines and do the wiring during machine init.
+> 
+> I've got a few other things to look at first, but I'll post a patchset later which I
+> think will improve this for both Mac machines.
 
-In order to prevent /proc/self/fd escapes a temporary directory is
-created where /proc/self/fd is bind-mounted. This doesn't work on
-read-only file systems.
+Awesome, thanks!
 
-Avoid the temporary directory by bind-mounting /proc/self/fd over /proc.
-This does not affect other processes since we remounted / with MS_REC |
-MS_SLAVE. /proc must exist and virtiofsd does not use it so it's safe to
-do this.
-
-Path traversal can be tested with the following function:
-
-  static void test_proc_fd_escape(struct lo_data *lo)
-  {
-      int fd;
-      int level = 0;
-      ino_t last_ino = 0;
-
-      fd = lo->proc_self_fd;
-      for (;;) {
-          struct stat st;
-
-          if (fstat(fd, &st) != 0) {
-              perror("fstat");
-              return;
-          }
-          if (last_ino && st.st_ino == last_ino) {
-              fprintf(stderr, "inode number unchanged, stopping\n");
-              return;
-          }
-          last_ino = st.st_ino;
-
-          fprintf(stderr, "Level %d dev %lu ino %lu\n", level,
-                  (unsigned long)st.st_dev,
-                  (unsigned long)last_ino);
-          fd = openat(fd, "..", O_PATH | O_DIRECTORY | O_NOFOLLOW);
-          level++;
-      }
-  }
-
-Before and after this patch only Level 0 is displayed. Without
-/proc/self/fd bind-mount protection it is possible to traverse parent
-directories.
-
-Fixes: 397ae982f4df4 ("virtiofsd: jail lo->proc_self_fd")
-Cc: Miklos Szeredi <mszeredi@redhat.com>
-Cc: Jens Freimann <jfreimann@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20201006095826.59813-1-stefanha@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Tested-by: Jens Freimann <jfreimann@redhat.com>
-Reviewed-by: Jens Freimann <jfreimann@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- tools/virtiofsd/passthrough_ll.c | 34 +++++++++++---------------------
- 1 file changed, 11 insertions(+), 23 deletions(-)
-
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
-index 477e6ee0b5..ff53df4451 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -2393,8 +2393,6 @@ static void setup_wait_parent_capabilities(void)
- static void setup_namespaces(struct lo_data *lo, struct fuse_session *se)
- {
-     pid_t child;
--    char template[] = "virtiofsd-XXXXXX";
--    char *tmpdir;
- 
-     /*
-      * Create a new pid namespace for *child* processes.  We'll have to
-@@ -2458,33 +2456,23 @@ static void setup_namespaces(struct lo_data *lo, struct fuse_session *se)
-         exit(1);
-     }
- 
--    tmpdir = mkdtemp(template);
--    if (!tmpdir) {
--        fuse_log(FUSE_LOG_ERR, "tmpdir(%s): %m\n", template);
--        exit(1);
--    }
--
--    if (mount("/proc/self/fd", tmpdir, NULL, MS_BIND, NULL) < 0) {
--        fuse_log(FUSE_LOG_ERR, "mount(/proc/self/fd, %s, MS_BIND): %m\n",
--                 tmpdir);
-+    /*
-+     * We only need /proc/self/fd. Prevent ".." from accessing parent
-+     * directories of /proc/self/fd by bind-mounting it over /proc. Since / was
-+     * previously remounted with MS_REC | MS_SLAVE this mount change only
-+     * affects our process.
-+     */
-+    if (mount("/proc/self/fd", "/proc", NULL, MS_BIND, NULL) < 0) {
-+        fuse_log(FUSE_LOG_ERR, "mount(/proc/self/fd, MS_BIND): %m\n");
-         exit(1);
-     }
- 
--    /* Now we can get our /proc/self/fd directory file descriptor */
--    lo->proc_self_fd = open(tmpdir, O_PATH);
-+    /* Get the /proc (actually /proc/self/fd, see above) file descriptor */
-+    lo->proc_self_fd = open("/proc", O_PATH);
-     if (lo->proc_self_fd == -1) {
--        fuse_log(FUSE_LOG_ERR, "open(%s, O_PATH): %m\n", tmpdir);
-+        fuse_log(FUSE_LOG_ERR, "open(/proc, O_PATH): %m\n");
-         exit(1);
-     }
--
--    if (umount2(tmpdir, MNT_DETACH) < 0) {
--        fuse_log(FUSE_LOG_ERR, "umount2(%s, MNT_DETACH): %m\n", tmpdir);
--        exit(1);
--    }
--
--    if (rmdir(tmpdir) < 0) {
--        fuse_log(FUSE_LOG_ERR, "rmdir(%s): %m\n", tmpdir);
--    }
- }
- 
- /*
--- 
-2.28.0
-
+> 
+> 
+> ATB,
+> 
+> Mark.
+> 
 
