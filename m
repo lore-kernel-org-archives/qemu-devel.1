@@ -2,88 +2,89 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAC2DC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:59:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 580C8C43467
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 21:00:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D3AA20797
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:59:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E163220790
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 21:00:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FEXu8mAe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D3AA20797
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ecyqeaXg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E163220790
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kS4vF-0003Pi-DY
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 16:59:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38338)
+	id 1kS4vK-0003aa-Me
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 17:00:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39602)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kS4WQ-0002r6-5k
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:34:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46582)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kS4WJ-0002hw-RJ
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:34:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602534849;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=8+wGKMwjxuEs2rRePBsjKFu7OkMgD+aNVYBUv/e2vlU=;
- b=FEXu8mAe+uEW/UYYiE/3srpDaG8HYt9jpUoTmPuPn+Hgf7kVyVW5Ve2h22SW757PPvEout
- 1Mokk+IFxRjEFsBeIF67veKqRpCpAQop5kjF3BHet+Dw7gPLJsTEPQ26cA3WnMX4pfZAld
- 0bMS3palIx89PeCz4j4OFzJNsOzk4sE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-28-7TCpsPKrPHutiK8yEJU7Qw-1; Mon, 12 Oct 2020 16:34:06 -0400
-X-MC-Unique: 7TCpsPKrPHutiK8yEJU7Qw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B7CEA1019648
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 20:33:55 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 745916EF7E;
- Mon, 12 Oct 2020 20:33:55 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 23/38] qtest: remove qtest_qmp_receive_success
-Date: Mon, 12 Oct 2020 16:33:28 -0400
-Message-Id: <20201012203343.1105018-24-pbonzini@redhat.com>
-In-Reply-To: <20201012203343.1105018-1-pbonzini@redhat.com>
-References: <20201012203343.1105018-1-pbonzini@redhat.com>
+ (Exim 4.90_1) (envelope-from <jandryuk@gmail.com>)
+ id 1kS4cz-0004fA-PL
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:41:06 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:40773)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <jandryuk@gmail.com>)
+ id 1kS4cs-0003d5-5Y
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:41:05 -0400
+Received: by mail-lj1-x241.google.com with SMTP id f21so18154844ljh.7
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 13:40:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=6ftMiYdWCTtdk34xLW8mEN0AbZBeQdlhBsW7+2yks58=;
+ b=ecyqeaXgj/e0i3EQrIWMhM386lxtY73BLRInntmrQZpjR5Ovn7q2KQEJ8aMz8YHvPZ
+ tIkjXEEfF8YgCmZE1gdjZJH3fvY1BIpN8hcj8VK1CNHwR++xIao8CrF3RaKE+vW5xT7P
+ Ve2863W+Fbx1mwrSJPmHxxHXHRLbS4TodZuwZLjGwrBDBEcoBvxydRiuobMnbDU7jLom
+ RkWpMm3CjRBF8tLSYb38HWSnkEAGb0rN96I7eUzYofc/G5dLgYyC+FtERAvsExc/LyyP
+ Xt5TLnyCN2jqKz5pxvpCDGUqcZixXQsIoH24KstURjPAnOW9necVv3RxxifW4ws52naP
+ cgjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=6ftMiYdWCTtdk34xLW8mEN0AbZBeQdlhBsW7+2yks58=;
+ b=eZhrKOiEN/KEcwhH8QTrrY+Rhrut9+GoTJ2PtdsN3v5EDMRz8l9LEePgUDYMFfG/BW
+ r6St1Uas5A8Nx/MEHRcuxQ76oiM4R12e+evl9AD/5kCBkISrQec4poVVJfwFMi+S+ni0
+ GVLQb2DfZNuU2FO14QQVg97ipBNIhdqfc3zjKF0qxoavDBEeOIF8T1D4gznkfnMXswdO
+ 3bYsaFNEbLzd5hJk5hQAvj9aASfoZgVqXrSGrlsqckOXRBIA/wN4USwLYRcWIzsAZdPJ
+ gDY+KJRDxhlZGeJs6MZoo5ZZSpea/WTCOVlH9FD3S8YEbYEEnSgZAXiHwgyCrRKZZves
+ RUZw==
+X-Gm-Message-State: AOAM532nJjUlwoFQU/RKX5ILmmFjvwfBGFKjDm96kQjCBzs7p6i5vOSH
+ yvTRiIbMjWCC8JUqLMUhyRbrAtrhl2EyrIbWy+o=
+X-Google-Smtp-Source: ABdhPJz7KUaoSQKDk+MYwDmByy4F39JZ/ax9jd7ZMO7rParp5ePfJ9ImKtP0il8rkqwmX1dHcip2FxxIq/6HumWWdgk=
+X-Received: by 2002:a2e:9ccd:: with SMTP id g13mr2058189ljj.127.1602535256304; 
+ Mon, 12 Oct 2020 13:40:56 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 16:33:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20201012200725.64137-1-jandryuk@gmail.com>
+ <20201012200725.64137-2-jandryuk@gmail.com>
+ <f29b58c7-62c5-ad10-91c8-47598759c876@suse.de>
+In-Reply-To: <f29b58c7-62c5-ad10-91c8-47598759c876@suse.de>
+From: Jason Andryuk <jandryuk@gmail.com>
+Date: Mon, 12 Oct 2020 16:40:44 -0400
+Message-ID: <CAKf6xpuyr818af9ucB-vpL9JXtmsATJaP--UWRgTjRku_G82mQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] accel: move qtest CpusAccel functions to a common
+ location
+To: Claudio Fontana <cfontana@suse.de>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::241;
+ envelope-from=jandryuk@gmail.com; helo=mail-lj1-x241.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,201 +97,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Maxim Levitsky <mlevitsk@redhat.com>
+On Mon, Oct 12, 2020 at 4:23 PM Claudio Fontana <cfontana@suse.de> wrote:
+>
+> On 10/12/20 10:07 PM, Jason Andryuk wrote:
+> > Move and rename accel/qtest/qtest-cpu.* files to accel/dummy/ so they
+> > can be re-used by Xen.
+> >
+> > Signed-off-by: Jason Andryuk <jandryuk@gmail.com>
+> > ---
+> >  .../qtest-cpus.c => dummy/dummy-cpus.c}       | 22 +++++--------------
+> >  .../qtest-cpus.h => dummy/dummy-cpus.h}       | 10 ++++-----
+> >  accel/dummy/meson.build                       |  6 +++++
+> >  accel/meson.build                             |  1 +
+> >  accel/qtest/meson.build                       |  1 -
+> >  accel/qtest/qtest.c                           |  7 +++++-
+> >  6 files changed, 23 insertions(+), 24 deletions(-)
+> >  rename accel/{qtest/qtest-cpus.c => dummy/dummy-cpus.c} (76%)
+> >  rename accel/{qtest/qtest-cpus.h => dummy/dummy-cpus.h} (59%)
+> >  create mode 100644 accel/dummy/meson.build
+> >
+> > diff --git a/accel/qtest/qtest-cpus.c b/accel/dummy/dummy-cpus.c
+> > similarity index 76%
+> > rename from accel/qtest/qtest-cpus.c
+> > rename to accel/dummy/dummy-cpus.c
+> > index 7c5399ed9d..efade99f03 100644
+> > --- a/accel/qtest/qtest-cpus.c
+> > +++ b/accel/dummy/dummy-cpus.c
+> > @@ -1,5 +1,5 @@
+> >  /*
+> > - * QTest accelerator code
+> > + * Dummy cpu thread code
+> >   *
+> >   * Copyright IBM, Corp. 2011
+> >   *
+> > @@ -13,21 +13,14 @@
+> >
+> >  #include "qemu/osdep.h"
+> >  #include "qemu/rcu.h"
+> > -#include "qapi/error.h"
+> > -#include "qemu/module.h"
+> > -#include "qemu/option.h"
+> > -#include "qemu/config-file.h"
+> > -#include "sysemu/accel.h"
+> > -#include "sysemu/qtest.h"
+> >  #include "sysemu/cpus.h"
+> > -#include "sysemu/cpu-timers.h"
+> >  #include "qemu/guest-random.h"
+> >  #include "qemu/main-loop.h"
+> >  #include "hw/core/cpu.h"
+> >
+> > -#include "qtest-cpus.h"
+> > +#include "dummy-cpus.h"
+> >
+> > -static void *qtest_cpu_thread_fn(void *arg)
+> > +static void *dummy_cpu_thread_fn(void *arg)
+> >  {
+> >  #ifdef _WIN32
+> >      error_report("qtest is not supported under Windows");
+>
+> I wonder if this should be changed to "dummy cpu thread is not supported under Windows".
+>
+> Does not matter probably.
 
-The purpose of qtest_qmp_receive_success was mostly to process events
-that arrived between the issueing of a command and the "return"
-line from QMP.  This is now handled by the buffering of events
-that libqtest performs automatically.
+I left it since I was just moving the file.  But...
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- tests/qtest/libqos/libqtest.h   | 17 -----------
- tests/qtest/libqtest.c          | 53 ++++-----------------------------
- tests/qtest/migration-helpers.c | 25 ++++++++++++----
- 3 files changed, 25 insertions(+), 70 deletions(-)
+> > diff --git a/accel/dummy/meson.build b/accel/dummy/meson.build
+> > new file mode 100644
+> > index 0000000000..5fbe27de90
+> > --- /dev/null
+> > +++ b/accel/dummy/meson.build
+> > @@ -0,0 +1,6 @@
+> > +dummy_ss = ss.source_set()
+> > +dummy_ss.add(files(
+> > +  'dummy-cpus.c',
+> > +))
+> > +
+> > +specific_ss.add_all(when: ['CONFIG_SOFTMMU', 'CONFIG_POSIX'], if_true: dummy_ss)
 
-diff --git a/tests/qtest/libqos/libqtest.h b/tests/qtest/libqos/libqtest.h
-index b7a776068c..5c959f1853 100644
---- a/tests/qtest/libqos/libqtest.h
-+++ b/tests/qtest/libqos/libqtest.h
-@@ -240,23 +240,6 @@ QDict *qtest_qmp_eventwait_ref(QTestState *s, const char *event);
-  */
- QDict *qtest_qmp_event_ref(QTestState *s, const char *event);
- 
--/**
-- * qtest_qmp_receive_success:
-- * @s: #QTestState instance to operate on
-- * @event_cb: Event callback
-- * @opaque: Argument for @event_cb
-- *
-- * Poll QMP messages until a command success response is received.
-- * If @event_cb, call it for each event received, passing @opaque,
-- * the event's name and data.
-- * Return the success response's "return" member.
-- */
--QDict *qtest_qmp_receive_success(QTestState *s,
--                                 void (*event_cb)(void *opaque,
--                                                  const char *name,
--                                                  QDict *data),
--                                 void *opaque);
--
- /**
-  * qtest_hmp:
-  * @s: #QTestState instance to operate on.
-diff --git a/tests/qtest/libqtest.c b/tests/qtest/libqtest.c
-index d4c49a52ff..baac667b8d 100644
---- a/tests/qtest/libqtest.c
-+++ b/tests/qtest/libqtest.c
-@@ -1291,35 +1291,6 @@ void qtest_cb_for_every_machine(void (*cb)(const char *machine),
-     qobject_unref(response);
- }
- 
--QDict *qtest_qmp_receive_success(QTestState *s,
--                                 void (*event_cb)(void *opaque,
--                                                  const char *event,
--                                                  QDict *data),
--                                 void *opaque)
--{
--    QDict *response, *ret, *data;
--    const char *event;
--
--    for (;;) {
--        response = qtest_qmp_receive_dict(s);
--        g_assert(!qdict_haskey(response, "error"));
--        ret = qdict_get_qdict(response, "return");
--        if (ret) {
--            break;
--        }
--        event = qdict_get_str(response, "event");
--        data = qdict_get_qdict(response, "data");
--        if (event_cb) {
--            event_cb(opaque, event, data);
--        }
--        qobject_unref(response);
--    }
--
--    qobject_ref(ret);
--    qobject_unref(response);
--    return ret;
--}
--
- /*
-  * Generic hot-plugging test via the device_add QMP commands.
-  */
-@@ -1355,13 +1326,6 @@ void qtest_qmp_device_add(QTestState *qts, const char *driver, const char *id,
-     qobject_unref(args);
- }
- 
--static void device_deleted_cb(void *opaque, const char *name, QDict *data)
--{
--    bool *got_event = opaque;
--
--    g_assert_cmpstr(name, ==, "DEVICE_DELETED");
--    *got_event = true;
--}
- 
- /*
-  * Generic hot-unplugging test via the device_del QMP command.
-@@ -1378,24 +1342,17 @@ static void device_deleted_cb(void *opaque, const char *name, QDict *data)
-  * and this one:
-  *
-  * {"return": {}}
-- *
-- * But the order of arrival may vary - so we've got to detect both.
-  */
- void qtest_qmp_device_del(QTestState *qts, const char *id)
- {
--    bool got_event = false;
-     QDict *rsp;
- 
--    qtest_qmp_send(qts, "{'execute': 'device_del', 'arguments': {'id': %s}}",
--                   id);
--    rsp = qtest_qmp_receive_success(qts, device_deleted_cb, &got_event);
-+    rsp = qtest_qmp(qts, "{'execute': 'device_del', 'arguments': {'id': %s}}",
-+                    id);
-+
-+    g_assert(qdict_haskey(rsp, "return"));
-     qobject_unref(rsp);
--    if (!got_event) {
--        rsp = qtest_qmp_receive_dict(qts);
--        g_assert_cmpstr(qdict_get_try_str(rsp, "event"),
--                        ==, "DEVICE_DELETED");
--        qobject_unref(rsp);
--    }
-+    qtest_qmp_eventwait(qts, "DEVICE_DELETED");
- }
- 
- bool qmp_rsp_is_err(QDict *rsp)
-diff --git a/tests/qtest/migration-helpers.c b/tests/qtest/migration-helpers.c
-index 516093b39a..b799dbafb7 100644
---- a/tests/qtest/migration-helpers.c
-+++ b/tests/qtest/migration-helpers.c
-@@ -17,10 +17,12 @@
- 
- bool got_stop;
- 
--static void stop_cb(void *opaque, const char *name, QDict *data)
-+static void check_stop_event(QTestState *who)
- {
--    if (!strcmp(name, "STOP")) {
-+    QDict *event = qtest_qmp_event_ref(who, "STOP");
-+    if (event) {
-         got_stop = true;
-+        qobject_unref(event);
-     }
- }
- 
-@@ -30,12 +32,19 @@ static void stop_cb(void *opaque, const char *name, QDict *data)
- QDict *wait_command_fd(QTestState *who, int fd, const char *command, ...)
- {
-     va_list ap;
-+    QDict *resp;
- 
-     va_start(ap, command);
-     qtest_qmp_vsend_fds(who, &fd, 1, command, ap);
-     va_end(ap);
- 
--    return qtest_qmp_receive_success(who, stop_cb, NULL);
-+    resp = qtest_qmp_receive(who);
-+    check_stop_event(who);
-+
-+    g_assert(!qdict_haskey(resp, "error"));
-+    g_assert(qdict_haskey(resp, "return"));
-+
-+    return qdict_get_qdict(resp, "return");
- }
- 
- /*
-@@ -44,12 +53,18 @@ QDict *wait_command_fd(QTestState *who, int fd, const char *command, ...)
- QDict *wait_command(QTestState *who, const char *command, ...)
- {
-     va_list ap;
-+    QDict *resp;
- 
-     va_start(ap, command);
--    qtest_qmp_vsend(who, command, ap);
-+    resp = qtest_vqmp(who, command, ap);
-     va_end(ap);
- 
--    return qtest_qmp_receive_success(who, stop_cb, NULL);
-+    check_stop_event(who);
-+
-+    g_assert(!qdict_haskey(resp, "error"));
-+    g_assert(qdict_haskey(resp, "return"));
-+
-+    return qdict_get_qdict(resp, "return");
- }
- 
- /*
--- 
-2.26.2
+...  I don't really know meson, but this file is guarded by
+CONFIG_POSIX?  If that's true, then this ifdef can just go away.
 
-
+Regards,
+Jason
 
