@@ -2,78 +2,77 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-14.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83B63C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:37:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E3D5C433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:37:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2B182072D
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:37:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A927208D5
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:37:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eCFR8CMh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2B182072D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A4dox/fP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A927208D5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kS4Zn-0007kC-OM
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 16:37:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37952)
+	id 1kS4Zu-0007rt-0y
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 16:37:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38074)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kS4W6-0002aA-HX
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:33:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41179)
+ id 1kS4WD-0002l9-7m
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:34:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23793)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kS4W4-0002eI-TT
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:33:58 -0400
+ id 1kS4WB-0002fk-AF
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:34:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602534836;
+ s=mimecast20190719; t=1602534842;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PCCnsWNbL+KCVorOLSUvOky8MZiWqJDfjxk/Gaew6NQ=;
- b=eCFR8CMhPc3IviSTgoDU43sfnykbfipwtP3zu8vqeOU+/QHM0psmfDxtYbUmbNIYJ7pZxv
- I3TbXR4W4YGwOw1IrTt+ODo8f62YN0FN9GxGb08b2gslJycXgw5Wmu3f/+0vHDFGdTn72S
- Fpxz5L65TySp47I8KP1u9x23+09EkAQ=
+ bh=HqtkvJn/koXtv1XWNJBim3+2Iy6z8DCvQCk2D5rEgi0=;
+ b=A4dox/fPqwCpmBTUT+jVM1Wdfad0OPCmhHkDEHegcS9R/RfsiQ2R/QJ645kOmv7kP/xoMj
+ Xj2fQZ81shr/KhNQ2XOm4aXBCCaxXcAg4m/jv81Mf/CHWrNyWTIp6J+WuRGIPQaXKUycL6
+ WYREv3xB3MTYX8iHINLHp8UsGI4+cLw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-421-T-wdXZcwM7qcKfgHOKOcpA-1; Mon, 12 Oct 2020 16:33:53 -0400
-X-MC-Unique: T-wdXZcwM7qcKfgHOKOcpA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-5-DPihSqHiPVekkB27sxFp3w-1; Mon, 12 Oct 2020 16:33:59 -0400
+X-MC-Unique: DPihSqHiPVekkB27sxFp3w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 39B448BAF87
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 20:33:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3296C8B8D1E
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 20:33:50 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BDA6427CDD;
- Mon, 12 Oct 2020 20:33:46 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EF5A85D9CD
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 20:33:49 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 05/38] migration: Move the creation of the library to the main
- meson.build
-Date: Mon, 12 Oct 2020 16:33:10 -0400
-Message-Id: <20201012203343.1105018-6-pbonzini@redhat.com>
+Subject: [PULL 11/38] softmmu: move more files to softmmu/
+Date: Mon, 12 Oct 2020 16:33:16 -0400
+Message-Id: <20201012203343.1105018-12-pbonzini@redhat.com>
 In-Reply-To: <20201012203343.1105018-1-pbonzini@redhat.com>
 References: <20201012203343.1105018-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/11 23:52:29
@@ -97,61 +96,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+Keep most softmmu_ss files into the system-emulation-specific
+directory.
 
-Be consistent creating all the libraries in the main meson.build file.
-
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20201006125602.2311423-6-philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- meson.build           | 7 +++++++
- migration/meson.build | 8 +-------
- 2 files changed, 8 insertions(+), 7 deletions(-)
+ MAINTAINERS                              |  9 +++++----
+ meson.build                              | 10 ----------
+ bootdevice.c => softmmu/bootdevice.c     |  0
+ device_tree.c => softmmu/device_tree.c   |  0
+ dma-helpers.c => softmmu/dma-helpers.c   |  0
+ softmmu/meson.build                      | 10 ++++++++++
+ qdev-monitor.c => softmmu/qdev-monitor.c |  0
+ qemu-seccomp.c => softmmu/qemu-seccomp.c |  0
+ tpm.c => softmmu/tpm.c                   |  0
+ 9 files changed, 15 insertions(+), 14 deletions(-)
+ rename bootdevice.c => softmmu/bootdevice.c (100%)
+ rename device_tree.c => softmmu/device_tree.c (100%)
+ rename dma-helpers.c => softmmu/dma-helpers.c (100%)
+ rename qdev-monitor.c => softmmu/qdev-monitor.c (100%)
+ rename qemu-seccomp.c => softmmu/qemu-seccomp.c (100%)
+ rename tpm.c => softmmu/tpm.c (100%)
 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 8d50b96c33..dda54f000d 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2235,7 +2235,7 @@ Device Tree
+ M: Alistair Francis <alistair.francis@wdc.com>
+ R: David Gibson <david@gibson.dropbear.id.au>
+ S: Maintained
+-F: device_tree.c
++F: softmmu/device_tree.c
+ F: include/sysemu/device_tree.h
+ 
+ Dump
+@@ -2281,6 +2281,7 @@ F: include/exec/memop.h
+ F: include/exec/memory.h
+ F: include/exec/ram_addr.h
+ F: include/exec/ramblock.h
++F: softmmu/dma-helpers.c
+ F: softmmu/ioport.c
+ F: softmmu/memory.c
+ F: include/exec/memory-internal.h
+@@ -2461,7 +2462,7 @@ F: include/monitor/qdev.h
+ F: include/qom/
+ F: qapi/qom.json
+ F: qapi/qdev.json
+-F: qdev-monitor.c
++F: softmmu/qdev-monitor.c
+ F: qom/
+ F: tests/check-qom-interface.c
+ F: tests/check-qom-proplist.c
+@@ -2591,7 +2592,7 @@ F: docs/interop/dbus-vmstate.rst
+ Seccomp
+ M: Eduardo Otubo <otubo@redhat.com>
+ S: Supported
+-F: qemu-seccomp.c
++F: softmmu/qemu-seccomp.c
+ F: include/sysemu/seccomp.h
+ 
+ Cryptography
+@@ -2957,7 +2958,7 @@ T: git https://github.com/stefanha/qemu.git block
+ Bootdevice
+ M: Gonglei <arei.gonglei@huawei.com>
+ S: Maintained
+-F: bootdevice.c
++F: softmmu/bootdevice.c
+ 
+ Quorum
+ M: Alberto Garcia <berto@igalia.com>
 diff --git a/meson.build b/meson.build
-index 39fc074977..dce48d8304 100644
+index f4ef3b83f3..a280e4cf21 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -1451,6 +1451,13 @@ qemu_syms = custom_target('qemu.syms', output: 'qemu.syms',
- # Library dependencies #
- ########################
- 
-+libmigration = static_library('migration', sources: migration_files + genh,
-+                              name_suffix: 'fa',
-+                              build_by_default: false)
-+migration = declare_dependency(link_with: libmigration,
-+                               dependencies: [zlib, qom, io])
-+softmmu_ss.add(migration)
-+
- block_ss = block_ss.apply(config_host, strict: false)
- libblock = static_library('block', block_ss.sources() + genh,
-                           dependencies: block_ss.dependencies(),
-diff --git a/migration/meson.build b/migration/meson.build
-index b5b71c8060..980e37865c 100644
---- a/migration/meson.build
-+++ b/migration/meson.build
-@@ -8,13 +8,7 @@ migration_files = files(
-   'qemu-file.c',
-   'qjson.c',
- )
+@@ -1365,17 +1365,7 @@ blockdev_ss.add(files(
+ # os-win32.c does not
+ blockdev_ss.add(when: 'CONFIG_POSIX', if_true: files('os-posix.c'))
+ softmmu_ss.add(when: 'CONFIG_WIN32', if_true: [files('os-win32.c')])
 -
--libmigration = static_library('migration', sources: migration_files + genh,
--                              name_suffix: 'fa',
--                              build_by_default: false)
--migration = declare_dependency(link_with: libmigration,
--                               dependencies: [zlib, qom, io])
--softmmu_ss.add(migration)
-+softmmu_ss.add(migration_files)
+ softmmu_ss.add_all(blockdev_ss)
+-softmmu_ss.add(files(
+-  'bootdevice.c',
+-  'dma-helpers.c',
+-  'qdev-monitor.c',
+-), sdl)
+-
+-softmmu_ss.add(when: 'CONFIG_TPM', if_true: files('tpm.c'))
+-softmmu_ss.add(when: 'CONFIG_SECCOMP', if_true: [files('qemu-seccomp.c'), seccomp])
+-softmmu_ss.add(when: fdt, if_true: files('device_tree.c'))
  
- softmmu_ss.add(files(
-   'block-dirty-bitmap.c',
+ common_ss.add(files('cpus-common.c'))
+ 
+diff --git a/bootdevice.c b/softmmu/bootdevice.c
+similarity index 100%
+rename from bootdevice.c
+rename to softmmu/bootdevice.c
+diff --git a/device_tree.c b/softmmu/device_tree.c
+similarity index 100%
+rename from device_tree.c
+rename to softmmu/device_tree.c
+diff --git a/dma-helpers.c b/softmmu/dma-helpers.c
+similarity index 100%
+rename from dma-helpers.c
+rename to softmmu/dma-helpers.c
+diff --git a/softmmu/meson.build b/softmmu/meson.build
+index 36c96e7b15..862ab24878 100644
+--- a/softmmu/meson.build
++++ b/softmmu/meson.build
+@@ -14,3 +14,13 @@ specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: [files(
+ specific_ss.add(when: ['CONFIG_SOFTMMU', 'CONFIG_TCG'], if_true: [files(
+   'icount.c'
+ )])
++
++softmmu_ss.add(files(
++  'bootdevice.c',
++  'dma-helpers.c',
++  'qdev-monitor.c',
++), sdl)
++
++softmmu_ss.add(when: 'CONFIG_TPM', if_true: files('tpm.c'))
++softmmu_ss.add(when: 'CONFIG_SECCOMP', if_true: [files('qemu-seccomp.c'), seccomp])
++softmmu_ss.add(when: fdt, if_true: files('device_tree.c'))
+diff --git a/qdev-monitor.c b/softmmu/qdev-monitor.c
+similarity index 100%
+rename from qdev-monitor.c
+rename to softmmu/qdev-monitor.c
+diff --git a/qemu-seccomp.c b/softmmu/qemu-seccomp.c
+similarity index 100%
+rename from qemu-seccomp.c
+rename to softmmu/qemu-seccomp.c
+diff --git a/tpm.c b/softmmu/tpm.c
+similarity index 100%
+rename from tpm.c
+rename to softmmu/tpm.c
 -- 
 2.26.2
 
