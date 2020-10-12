@@ -2,89 +2,96 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8DF1C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 10:14:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 166FDC433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 10:16:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58A2920679
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 10:14:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8FDC220679
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 10:16:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ck1iOD0t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58A2920679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rDtx6M+N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FDC220679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRuqc-0003zT-Bb
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 06:14:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46634)
+	id 1kRus8-0005Bd-Gd
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 06:16:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46422)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kRucq-0002Zr-K0
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 06:00:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45988)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kRucn-0002zU-Mz
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 06:00:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602496812;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=HW5gyyKX4LTvRJZLCrqy56CrfvS2R9nbz3OBBLJXvyE=;
- b=ck1iOD0tZbgjL29J04tfxRKnjr+NJbEl466mR/1IdBEkx7s9Lg8w0yUf7AksJhdJX0QeDB
- YOaofMtqSpOsHYbwmFN4FETZlcoHA1cagk56mBSIFf19euiOS5WZvcSUMzeT7V3+vfKK9Y
- ihgFXomvtzGsBFF9eFmaY0CyXeEWwZY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-227-VMooic3dMNqbpQBNOzAB0g-1; Mon, 12 Oct 2020 06:00:10 -0400
-X-MC-Unique: VMooic3dMNqbpQBNOzAB0g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 902E11800D42;
- Mon, 12 Oct 2020 10:00:09 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-113-22.ams2.redhat.com [10.36.113.22])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 66E8A6CE4D;
- Mon, 12 Oct 2020 10:00:00 +0000 (UTC)
-Subject: Re: [PATCH] gitlab-ci.yml: Only run one test-case per fuzzer
-To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
-References: <20201002143524.56930-1-alxndr@bu.edu>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <cb9bd32a-adc4-4c9d-7863-3e6fa565bb7e@redhat.com>
-Date: Mon, 12 Oct 2020 12:00:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kRucC-0001kg-Af
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 05:59:36 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54489)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kRucA-0002uX-OI
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 05:59:36 -0400
+Received: by mail-wm1-x341.google.com with SMTP id p15so16630146wmi.4
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 02:59:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=aGuMhEybmPvVnTdSYOtH7MX85+5QscNdHJrgVgiAwF4=;
+ b=rDtx6M+NBWpWawh/Tru88CRfgfT9rdLKSyT+mr6cioarHtaZwcLGY3pvl1lF219/2d
+ AvksOE5LOOVifLfHiO5blAIYwvIFS3tTh8DLfBXHmLxTNc5ZuGSVruLdVjypdjDWqSWT
+ MdDJsQCeEGqcPhTw6SMoSfKG0R7FTYhjlkd+nFlp9u6XCRi7hpZFzRtYlhU2RuIzhwLp
+ e+vABOu0SQonzlitjVzLxSZw7RajB9BgNZKm92QDwJojLSE41jup1pAaZhD8A/puXWch
+ 9bd1OIY6t0+jgB4UCbL/DLNt6SAJ34enc3x3xcLCX6CVGGG2mEFPnezDKdHCzc0fC8rX
+ 2BlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=aGuMhEybmPvVnTdSYOtH7MX85+5QscNdHJrgVgiAwF4=;
+ b=g5NHxA4Lk1w8ot0ZXlJSdPBuEOkTTYOLkrMdklLmLJdoiKvBRkY3fvb6rMDEtEyzzJ
+ F2JkpS6BgrMh3xs0p26hgCGBWMiG21ILFV6a+L/tKZ5r+l/LDXhXRCuSrQN7Dm1S/7d1
+ gGk9kuz2OJw5NsJNNfIvSfGU6P/ur3LDjvdTF1Iq0mtQKEdJAWjZOGaKzBLFEAdpgv3x
+ ZOECXS/Du6DRBNOlugd8CeoogOtyLm5EF3i5JT0Vwj8WyxDDQ9TwBAdn/bbYC9YudgVg
+ L/7LRaVipQBe+eDetHEkzyuMXa3zaHqrXlF5yI+dLSF/RgXMIwa6HuCao4vi4Wibnk1l
+ bKHg==
+X-Gm-Message-State: AOAM531ngRlHxVPlKIH851EgOcsjIcnM0qYNzgrd6SrAnQgPVx8cXCze
+ l+0POvSyHnDzdxSiDtZSxBhrddSqXXU=
+X-Google-Smtp-Source: ABdhPJw6Wjlk+bACzI5Qve0koO9tViV/K80SgFNZXBfrlQlDLUFB3KNzbwjfMKn8ftIipajKJ+UJow==
+X-Received: by 2002:a1c:2108:: with SMTP id h8mr10048664wmh.63.1602496773274; 
+ Mon, 12 Oct 2020 02:59:33 -0700 (PDT)
+Received: from localhost.localdomain
+ (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id y14sm21695105wma.48.2020.10.12.02.59.31
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 12 Oct 2020 02:59:32 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 17/21] hw/mips/cps: Expose input clock and connect it to
+ CPU cores
+Date: Mon, 12 Oct 2020 11:58:00 +0200
+Message-Id: <20201012095804.3335117-18-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201012095804.3335117-1-f4bug@amsat.org>
+References: <20201012095804.3335117-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20201002143524.56930-1-alxndr@bu.edu>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/11 23:52:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01,
- RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,46 +104,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: Damien Hedde <damien.hedde@greensocs.com>,
+ Huacai Chen <zltjiangshi@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, Luc Michel <luc@lmichel.fr>,
+ Eduardo Habkost <ehabkost@redhat.com>, Paul Burton <paulburton@kernel.org>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Huacai Chen <chenhc@lemote.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/10/2020 16.35, Alexander Bulekov wrote:
-> With 1000 runs, there is a non-negligible chance that the fuzzer can
-> trigger a crash. With this CI job, we care about catching build/runtime
-> issues in the core fuzzing code. Actual device fuzzing takes place on
-> oss-fuzz. For these purposes, only running one input should be
-> sufficient.
-> 
-> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
-> Suggested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  .gitlab-ci.yml | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-> index a51c89554f..075c15d45c 100644
-> --- a/.gitlab-ci.yml
-> +++ b/.gitlab-ci.yml
-> @@ -303,7 +303,7 @@ build-oss-fuzz:
->                        | grep -v slirp); do
->          grep "LLVMFuzzerTestOneInput" ${fuzzer} > /dev/null 2>&1 || continue ;
->          echo Testing ${fuzzer} ... ;
-> -        "${fuzzer}" -runs=1000 -seed=1 || exit 1 ;
-> +        "${fuzzer}" -runs=1 -seed=1 || exit 1 ;
->        done
->      # Unrelated to fuzzer: run some tests with -fsanitize=address
->      - cd build-oss-fuzz && make check-qtest-i386 check-unit
+Expose a qdev input clock named 'clk-in', and connect it to each
+core to forward-propagate the clock.
 
-Thanks, queued to:
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ include/hw/mips/cps.h | 2 ++
+ hw/mips/cps.c         | 4 ++++
+ 2 files changed, 6 insertions(+)
 
- https://gitlab.com/huth/qemu/-/commits/qtest-next/
-
- Thomas
-
+diff --git a/include/hw/mips/cps.h b/include/hw/mips/cps.h
+index 9e35a881366..859a8d4a674 100644
+--- a/include/hw/mips/cps.h
++++ b/include/hw/mips/cps.h
+@@ -21,6 +21,7 @@
+ #define MIPS_CPS_H
+ 
+ #include "hw/sysbus.h"
++#include "hw/clock.h"
+ #include "hw/misc/mips_cmgcr.h"
+ #include "hw/intc/mips_gic.h"
+ #include "hw/misc/mips_cpc.h"
+@@ -43,6 +44,7 @@ struct MIPSCPSState {
+     MIPSGICState gic;
+     MIPSCPCState cpc;
+     MIPSITUState itu;
++    Clock *clock;
+ };
+ 
+ qemu_irq get_cps_irq(MIPSCPSState *cps, int pin_number);
+diff --git a/hw/mips/cps.c b/hw/mips/cps.c
+index 23c0f87e41a..af7b58c4bdd 100644
+--- a/hw/mips/cps.c
++++ b/hw/mips/cps.c
+@@ -22,6 +22,7 @@
+ #include "qemu/module.h"
+ #include "hw/mips/cps.h"
+ #include "hw/mips/mips.h"
++#include "hw/qdev-clock.h"
+ #include "hw/qdev-properties.h"
+ #include "hw/mips/cpudevs.h"
+ #include "sysemu/kvm.h"
+@@ -38,6 +39,7 @@ static void mips_cps_init(Object *obj)
+     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+     MIPSCPSState *s = MIPS_CPS(obj);
+ 
++    s->clock = qdev_init_clock_in(DEVICE(obj), "clk-in", NULL, NULL);
+     /*
+      * Cover entire address space as there do not seem to be any
+      * constraints for the base address of CPC and GIC.
+@@ -80,6 +82,8 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
+                                       errp)) {
+             return;
+         }
++        /* All cores use the same clock tree */
++        qdev_connect_clock_in(DEVICE(cpu), "clk-in", s->clock);
+ 
+         if (!qdev_realize_and_unref(DEVICE(cpu), NULL, errp)) {
+             return;
+-- 
+2.26.2
 
 
