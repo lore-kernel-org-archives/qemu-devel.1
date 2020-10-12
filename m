@@ -7,69 +7,70 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E6B8C43457
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 13:22:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CFA3C43467
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 13:22:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8005A206C1
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 13:22:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BD6522072C
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 13:22:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KquxXBaZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8005A206C1
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NzEihUgm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD6522072C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRxmU-000724-AC
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 09:22:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44870)
+	id 1kRxmw-0007ik-R8
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 09:22:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44918)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRxko-0005Ha-J7; Mon, 12 Oct 2020 09:20:42 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36405)
+ id 1kRxkt-0005St-50; Mon, 12 Oct 2020 09:20:47 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41652)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kRxkm-0005O3-PY; Mon, 12 Oct 2020 09:20:42 -0400
-Received: by mail-wr1-x444.google.com with SMTP id x7so10566425wrl.3;
- Mon, 12 Oct 2020 06:20:39 -0700 (PDT)
+ id 1kRxkr-0005P7-NU; Mon, 12 Oct 2020 09:20:46 -0400
+Received: by mail-wr1-x444.google.com with SMTP id s9so7073654wro.8;
+ Mon, 12 Oct 2020 06:20:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=l+niQmlVPcXRSqM5Ozit1idIBmWDMllkBN++LzkycMM=;
- b=KquxXBaZJQJsjqHeRh8a8xfg9wMBDetm89hSuTHIaLujbk5En1t8u4oVSh9nEdiDQG
- hxUYwnFsozlNAu5TsD3F4cZ1EyqF/llaHAgE8625xciRSPPAtOPJPf5AVEywKTj77cxB
- V1E2nsPJGIB59I6S1wP9PYzsIi4oXzFo07Mxz5N1Fi+jVPUpbDHi7tlm8uinscJ2A/DF
- UcYZ+A6QGwA2rM8QdT9Ox1x/SoSHVUOYl7vz8plRAswq1TIN2mSNilravqoy6/khQOrg
- aao3Zk4hKMeUCiUZr1xOg+nM6Dx1iMKIcTA1DKPmt1Jfs9coZm2V0Tsq1F//4z/p0EYn
- PAPQ==
+ bh=S+qJmTO5tJK+xMnKaeXjrUuhIrSEH6LdhmvHFkUYTME=;
+ b=NzEihUgmUX90wUWF8yPl3KUdmgxbrrsxWFlwmP01b5/BkqfCq8hq7WOA3Lvb8dzhV5
+ za57HvFyPDuaKgajcR6oUSZZkCPHmZe19fH762COV58rtDh4Jzuw36FGmSSacc7QJK1I
+ Te+v3sqLptPFly/u060MHQUZjYS0Lxod77ymSbx1Bpv8QULfXMv25RDDEjLbbuw5KKke
+ 2fU/qarmB4O9H2aK9GFIz+icXuXF2OFIfPB0zfHosd0CmbqO4LftlwWlACreJnMIGGkr
+ ZO1z6lu0vyypGjR36kT7jqZsXik6RfZA/kAaWiFj81D7x9/LM4xoXuunay7ik5athDfx
+ tSyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=l+niQmlVPcXRSqM5Ozit1idIBmWDMllkBN++LzkycMM=;
- b=do7e5D23YQeOrPegmRA14BUJnoJQXEg5c2ZYVE1fDcjk91EG2pUCLMeBIlSCjtaLs2
- 5/q0ex/3UtLa3n43FkkZhmWJPFZlflIxzuMOqTpItKBQ5iKvTOm/4Yd/CAsOnatdMAqS
- SWGx7z/awqSw9UMGuA9Bbp5RPtxO0ufeJ7WMEHLL9noaPCJwxwF+mIsSY9rjCWsGa00w
- dW7qwEmchdRDFbTiNZmzkDFYFdkYWomeKuJD+bJcnINYzk6ByOkdudlNrH7SfX8Nz9Z/
- 7awxWwPo3uCR/oZDHQAgWBRkyJi95cb3d/+CfSD77Xabfw5vpSk1N2X3Rclqv2wCwUIS
- eaow==
-X-Gm-Message-State: AOAM531AYGJW0xbugLllveEoqF1bG6JBDV+K8Cl9IzkxKR2gvPNXqUR1
- 5oxwVYiVXOyX5jrpWHL1vKYe8p92Cs4=
-X-Google-Smtp-Source: ABdhPJzQSYeVVj/X0YNkvfLUTK7SSwanonoWkoxrFBU+Bj3edBw7P93YQdbzh8xmcy18e4e27Fj+6Q==
-X-Received: by 2002:adf:e4c9:: with SMTP id v9mr29257193wrm.375.1602508838768; 
- Mon, 12 Oct 2020 06:20:38 -0700 (PDT)
+ bh=S+qJmTO5tJK+xMnKaeXjrUuhIrSEH6LdhmvHFkUYTME=;
+ b=S1yvEEEZud7unqHQ2l0ZEcTfxgShnNif+Txjikjv3nRONv1dKlr0DCSoEyRjAPYeWj
+ GI6ihdmuoXNW9/eHg/D2zU3kasZSpHVRVOTxcl6LuMSp7hC7iFfJdfFKtyyxIYmMQAGd
+ jDNDdyeB/0861FLg9we4oS6+If2uWZwkX6EoirVZvZg9fggnoKdESJ/P469iu1T+JUDd
+ Cu3qQqAOnp/DBJ5nMlYLA3WiW9/kWiA5kbSOUTdNsiC/fp3sD6wKaTzH54l6CpuYXvW7
+ O42tSOprFYuNb8RlqFptj4Yn3dUpoAJ977XbHxsd036z9Z+/ZExffNNCW7KQ2ZBlQC0q
+ IbXg==
+X-Gm-Message-State: AOAM533ty6V+r/12DrFuSSIFWB6M/OyPbkMlspnCMWUUWFi1nwH2xPZU
+ 6MeTYd7LFYUI6Yqp76hj9TJ4yH4eqpU=
+X-Google-Smtp-Source: ABdhPJxGw8nKoBf1Vz8InNroMZ38P9rTS1LCT/KEDodfanlwQgbVkZ20zwoBh17DCknoLjWkm5yVGw==
+X-Received: by 2002:a5d:568a:: with SMTP id f10mr29542247wrv.30.1602508843929; 
+ Mon, 12 Oct 2020 06:20:43 -0700 (PDT)
 Received: from localhost.localdomain
  (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id i9sm23447543wma.47.2020.10.12.06.20.37
+ by smtp.gmail.com with ESMTPSA id z11sm24584887wrh.70.2020.10.12.06.20.42
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 12 Oct 2020 06:20:38 -0700 (PDT)
+ Mon, 12 Oct 2020 06:20:43 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 4/5] hw/pci-host/versatile: Add the PCI_BAR_COUNT definition
-Date: Mon, 12 Oct 2020 15:20:15 +0200
-Message-Id: <20201012132017.3423954-5-f4bug@amsat.org>
+Subject: [PATCH v2 5/5] tests/qtest: Replace magic value by
+ NANOSECONDS_PER_SECOND definition
+Date: Mon, 12 Oct 2020 15:20:16 +0200
+Message-Id: <20201012132017.3423954-6-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201012132017.3423954-1-f4bug@amsat.org>
 References: <20201012132017.3423954-1-f4bug@amsat.org>
@@ -111,93 +112,28 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Note from Peter Maydell:
+Use self-explicit NANOSECONDS_PER_SECOND definition instead
+of a magic value.
 
- The versatile/realview PCI controller has:
-   * three PCI BARs which represent memory windows on the
-       PCI bus which bus-master PCI devices can use to
-       write back into the system address space
-     - the device SMAPn registers allow the guest to configure
-       the mapping from "a bus-master access to an address
-       on the PCI bus wherever the guest mapped BAR n"
-       to "a system address", and the smap[] array holds
-       those register values
-
-Use self-explicit PCI_BAR_COUNT definition instead of a magic
-value, and rename some misnamed variables indexing the smap[]
-array from 'win' to 'bar'.
-
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/pci-host/versatile.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+ tests/qtest/rtc-test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/pci-host/versatile.c b/hw/pci-host/versatile.c
-index 61465bbbb65..f5846b803c0 100644
---- a/hw/pci-host/versatile.c
-+++ b/hw/pci-host/versatile.c
-@@ -73,6 +73,7 @@ enum {
- };
+diff --git a/tests/qtest/rtc-test.c b/tests/qtest/rtc-test.c
+index c7af34f6b1b..402ce2c6090 100644
+--- a/tests/qtest/rtc-test.c
++++ b/tests/qtest/rtc-test.c
+@@ -292,7 +292,7 @@ static void alarm_time(void)
+             break;
+         }
  
- #define MEMORY_WINDOW_COUNT 3
-+#define PCI_BAR_COUNT 3
+-        clock_step(1000000000);
++        clock_step(NANOSECONDS_PER_SECOND);
+     }
  
- struct PCIVPBState {
-     PCIHostState parent_obj;
-@@ -99,7 +100,7 @@ struct PCIVPBState {
- 
-     /* Variable state: */
-     uint32_t imap[MEMORY_WINDOW_COUNT];
--    uint32_t smap[3];
-+    uint32_t smap[PCI_BAR_COUNT];
-     uint32_t selfid;
-     uint32_t flags;
-     uint8_t irq_mapping;
-@@ -151,7 +152,7 @@ static const VMStateDescription pci_vpb_vmstate = {
-     .post_load = pci_vpb_post_load,
-     .fields = (VMStateField[]) {
-         VMSTATE_UINT32_ARRAY(imap, PCIVPBState, MEMORY_WINDOW_COUNT),
--        VMSTATE_UINT32_ARRAY(smap, PCIVPBState, 3),
-+        VMSTATE_UINT32_ARRAY(smap, PCIVPBState, PCI_BAR_COUNT),
-         VMSTATE_UINT32(selfid, PCIVPBState),
-         VMSTATE_UINT32(flags, PCIVPBState),
-         VMSTATE_UINT8(irq_mapping, PCIVPBState),
-@@ -203,8 +204,8 @@ static void pci_vpb_reg_write(void *opaque, hwaddr addr,
-     case PCI_SMAP1:
-     case PCI_SMAP2:
-     {
--        int win = (addr - PCI_SMAP0) >> 2;
--        s->smap[win] = val;
-+        int bar = (addr - PCI_SMAP0) >> 2;
-+        s->smap[bar] = val;
-         break;
-     }
-     default:
-@@ -235,8 +236,8 @@ static uint64_t pci_vpb_reg_read(void *opaque, hwaddr addr,
-     case PCI_SMAP1:
-     case PCI_SMAP2:
-     {
--        int win = (addr - PCI_SMAP0) >> 2;
--        return s->smap[win];
-+        int bar = (addr - PCI_SMAP0) >> 2;
-+        return s->smap[bar];
-     }
-     default:
-         qemu_log_mask(LOG_GUEST_ERROR,
-@@ -377,9 +378,9 @@ static void pci_vpb_reset(DeviceState *d)
-     for (i = 0; i < MEMORY_WINDOW_COUNT; i++) {
-         s->imap[i] = 0;
-     }
--    s->smap[0] = 0;
--    s->smap[1] = 0;
--    s->smap[2] = 0;
-+    for (i = 0; i < PCI_BAR_COUNT; i++) {
-+        s->smap[i] = 0;
-+    }
-     s->selfid = 0;
-     s->flags = 0;
-     s->irq_mapping = s->irq_mapping_prop;
+     g_assert(get_irq(RTC_ISA_IRQ));
 -- 
 2.26.2
 
