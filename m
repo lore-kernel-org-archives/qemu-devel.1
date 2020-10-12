@@ -4,81 +4,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F83BC433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:54:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87B1EC43467
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:55:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3550020735
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:54:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 279CA20735
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:55:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YSrlsBno"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3550020735
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZRWPdAHd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 279CA20735
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36848 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kS09X-0000Dy-CK
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 11:54:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57260)
+	id 1kS0A8-0000vE-7E
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 11:55:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57042)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kRzqq-0007LX-7x
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:35:04 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:40793)
+ id 1kRzqW-00077w-8m
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:34:45 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33279)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kRzqe-0007NU-D8
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:35:03 -0400
-Received: by mail-wm1-x342.google.com with SMTP id k18so17961294wmj.5
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 08:34:46 -0700 (PDT)
+ id 1kRzqP-0007LP-NW
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:34:43 -0400
+Received: by mail-wr1-x441.google.com with SMTP id b8so6466671wrn.0
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 08:34:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Y1ekWK8CJLvHrVxfCc2kYGCDX3fGw6jKhM4D+UOMVQU=;
- b=YSrlsBnoQCz/hCGSqfuYdXKXQhZ80JQPJ4j/lDZO+r7fA8pu9fNnuzbEY1wyT/7zTI
- QCU0qnRZmG64mcm98xhV04Hkw8DVouadiIE10n6+m238GqtUBxpeoqWS8HHhtJF4wrn0
- kNBoyZj++YUv7m3S6h7HSzxjUHhA4yZ1iG69g3sb3wkw/M49RAS6jehxazLP2p+t9Sv/
- V8MvxuxrOWoHxHNxSfDZDP+Td7yc2v+714iZkgEpa8W/seVaWX356rYfU93xgpLOF3Ai
- eQu06ZqEWcJ0R9mXix/14P52wwSkmmCh8SR6zNHpASRWF2+M6x6Tqz5bud66x2RkXQL7
- 6nFQ==
+ bh=8TBzzcsFazlljQPoOpAMIzgSdLt0n2ByqDt37jz37+s=;
+ b=ZRWPdAHdzc/6fQHO0yzTekefMHKG/JP0Xi/r25u08bNmzCsp1LIV5eClFWn2f17t3C
+ 5rH13LqBNy98d/YMjAQTdsDRha0qRLuYDNsDDmg92+sCfreT0kTf5b3x2htculz3Hu6s
+ ORASrol6NKu0TdM4CVQKBkC7oNZpVxkLw5hGslDphqK87PvhAgfTwDWG/hytBozJn1I4
+ XGbCJtZi9W6qNd+913G9j+nauFp5JtqZ1eFSNpRPbLxGeX+g+z9UpGMN8DZMpPqzH7hT
+ 9Ld2Z11gtwjnqVELW9N2ktxT3UzPwhXGYdGXbb9vjNi8o2pMCa96DdtMhhfez2PltHWt
+ q7IA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Y1ekWK8CJLvHrVxfCc2kYGCDX3fGw6jKhM4D+UOMVQU=;
- b=b77jMKC2ucyBdMhb2CRYtd1cHGzLUnziZEGeXpxb+fMujI3qtxDZzKoV1BjJzIdUDh
- cNBrPIsi0MKJkg4psDdWiUU4BkdoH9uutnqb2me6Dc6j4yagMlg75gGSoLG6ACL6PI35
- 6SzMRC9UzCof0/L8VwFKGwuUcHF3LFehl2XjiqwfQhyKBlduMntW73p9dayTUmhKdQ2X
- O0R8i5naWwMZYx1nEfP7Zcn8q3T6a9uSKjAB8M3QPJqdz03PgWurziZzAzJzjA5DrCrf
- k/M82LYBZwqSnbWnL3Iao0OtIY71XI1i/hWuYxR8DH2uTi1Hg6m7BkOYyXWW9J96QeMY
- JoaQ==
-X-Gm-Message-State: AOAM533rG5UOIvr9uOx9BQPsbyAZ0k8TFYlTavpBqMsQJhsdLMP89j/A
- hpTMvMvmnD8i89yUrbyXB/f28w==
-X-Google-Smtp-Source: ABdhPJxojrk73BbaSQUuBxPDXxPMXwA4r3go3bXwSx1oHzOrS9uy+qgdLtNFDy+WCsiG8/+yWP20Ug==
-X-Received: by 2002:a1c:a541:: with SMTP id o62mr11362675wme.90.1602516885118; 
- Mon, 12 Oct 2020 08:34:45 -0700 (PDT)
+ bh=8TBzzcsFazlljQPoOpAMIzgSdLt0n2ByqDt37jz37+s=;
+ b=joPvvdYVp4lbA6b96zNul5mzqgRHJF5H6izlohDLHUSj8lGaJnaDAF7H3zP5HUN+rM
+ v6ZsZnx/43QwMl7HQU8CNhTOvb/WfeuNGxmKH9mF0n8cM+xf/7RcEPFkIy7SNWEtenxj
+ /ndDVqmNZsdgHJg0C2xtvOYqnZvGOXTqpckjINK0BPegiJjbAJjTgPnZ/L2kBIN/7Qq5
+ TH7bnk2Vy5zqwuPnnUUmqJ1mI9rnDn6Hq2U1Xz9psyeKZ9Rh4Q0ReKXMmlH4Vr+xwLmp
+ Gsjsj2BSArNsgPHVDlWMNGLXcFtrZZ0yKv4uepxdiiUBkVVEoV6pbQbyFBmK1pA1r/yJ
+ DeHA==
+X-Gm-Message-State: AOAM530x/IS8x78V5ANOSA3O/Ji3S8F2bR0RzxtfE3xFWxSrc9rkk3aT
+ d++u4BFRTMITuOdUqMBi3tIeaA==
+X-Google-Smtp-Source: ABdhPJy1iL7KieLJvbDa1q82uGKZYDnSVmyjYZr4cnlQZbZtC6Gi2U2LsXq3ibwEihbJKfpWKznFTg==
+X-Received: by 2002:a5d:40c3:: with SMTP id b3mr33527868wrq.157.1602516875795; 
+ Mon, 12 Oct 2020 08:34:35 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id y10sm19675284wrq.73.2020.10.12.08.34.44
+ by smtp.gmail.com with ESMTPSA id y10sm19675284wrq.73.2020.10.12.08.34.35
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 12 Oct 2020 08:34:44 -0700 (PDT)
+ Mon, 12 Oct 2020 08:34:35 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH] target/arm: Delete unused VFP_DREG macros
-Date: Mon, 12 Oct 2020 16:33:53 +0100
-Message-Id: <20201012153408.9747-31-peter.maydell@linaro.org>
+Subject: [PATCH] linux-user/arm/signal.c: Drop TARGET_CONFIG_CPU_32
+Date: Mon, 12 Oct 2020 16:33:45 +0100
+Message-Id: <20201012153408.9747-23-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201012153408.9747-1-peter.maydell@linaro.org>
 References: <20201012153408.9747-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x342.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,41 +105,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As part of the Neon decodetree conversion we removed all
-the uses of the VFP_DREG macros, but forgot to remove the
-macro definitions. Do so now.
+The Arm signal-handling code has some parts ifdeffed with a
+TARGET_CONFIG_CPU_32, which is always defined. This is a leftover
+from when this code's structure was based on the Linux kernel
+signal handling code, where it was intended to support 26-bit
+Arm CPUs. The kernel dropped its CONFIG_CPU_32 in kernel commit
+4da8b8208eded0ba21e3 in 2009.
+
+QEMU has never had 26-bit CPU support and is unlikely to ever
+add it; we certainly aren't going to support 26-bit Linux
+binaries via linux-user mode. The ifdef is just unhelpful
+noise, so remove it entirely.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate.c | 15 ---------------
- 1 file changed, 15 deletions(-)
+Based-on: <20200518142801.20503-1-peter.maydell@linaro.org>
+("[PATCH v2] target/arm: Allow user-mode code to write CPSR.E via MSR")
+to avoid a textual conflict.
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index c39a929b938..27bf6cd8b51 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -2471,21 +2471,6 @@ static int disas_dsp_insn(DisasContext *s, uint32_t insn)
-     return 1;
- }
+ linux-user/arm/signal.c | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/linux-user/arm/signal.c b/linux-user/arm/signal.c
+index 698985a647e..f21d1535e4d 100644
+--- a/linux-user/arm/signal.c
++++ b/linux-user/arm/signal.c
+@@ -126,8 +126,6 @@ struct rt_sigframe_v2
+     abi_ulong retcode[4];
+ };
  
--#define VFP_REG_SHR(x, n) (((n) > 0) ? (x) >> (n) : (x) << -(n))
--#define VFP_DREG(reg, insn, bigbit, smallbit) do { \
--    if (dc_isar_feature(aa32_simd_r32, s)) { \
--        reg = (((insn) >> (bigbit)) & 0x0f) \
--              | (((insn) >> ((smallbit) - 4)) & 0x10); \
--    } else { \
--        if (insn & (1 << (smallbit))) \
--            return 1; \
--        reg = ((insn) >> (bigbit)) & 0x0f; \
--    }} while (0)
+-#define TARGET_CONFIG_CPU_32 1
 -
--#define VFP_DREG_D(reg, insn) VFP_DREG(reg, insn, 12, 22)
--#define VFP_DREG_N(reg, insn) VFP_DREG(reg, insn, 16,  7)
--#define VFP_DREG_M(reg, insn) VFP_DREG(reg, insn,  0,  5)
--
- static inline bool use_goto_tb(DisasContext *s, target_ulong dest)
- {
- #ifndef CONFIG_USER_ONLY
+ /*
+  * For ARM syscalls, we encode the syscall number into the instruction.
+  */
+@@ -187,9 +185,7 @@ setup_sigcontext(struct target_sigcontext *sc, /*struct _fpstate *fpstate,*/
+     __put_user(env->regs[13], &sc->arm_sp);
+     __put_user(env->regs[14], &sc->arm_lr);
+     __put_user(env->regs[15], &sc->arm_pc);
+-#ifdef TARGET_CONFIG_CPU_32
+     __put_user(cpsr_read(env), &sc->arm_cpsr);
+-#endif
+ 
+     __put_user(/* current->thread.trap_no */ 0, &sc->trap_no);
+     __put_user(/* current->thread.error_code */ 0, &sc->error_code);
+@@ -549,11 +545,9 @@ restore_sigcontext(CPUARMState *env, struct target_sigcontext *sc)
+     __get_user(env->regs[13], &sc->arm_sp);
+     __get_user(env->regs[14], &sc->arm_lr);
+     __get_user(env->regs[15], &sc->arm_pc);
+-#ifdef TARGET_CONFIG_CPU_32
+     __get_user(cpsr, &sc->arm_cpsr);
+     cpsr_write(env, cpsr, CPSR_USER | CPSR_EXEC, CPSRWriteByInstr);
+     arm_rebuild_hflags(env);
+-#endif
+ 
+     err |= !valid_user_regs(env);
+ 
 -- 
 2.20.1
 
