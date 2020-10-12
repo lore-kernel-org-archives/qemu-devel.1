@@ -2,90 +2,109 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66B26C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 07:00:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43DBEC433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 07:03:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C64A820735
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 07:00:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 97A742076E
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 07:03:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TVJPQjC6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C64A820735
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VXaEWyRG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97A742076E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRrp9-0006gB-Oa
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 03:00:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33792)
+	id 1kRrs5-0000Q9-Ku
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 03:03:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34108)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kRrnB-0005D5-C8
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 02:58:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23893)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kRroB-0006M3-3o
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 02:59:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25113)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kRrn9-0005Cv-Ns
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 02:58:45 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kRro9-0005LN-By
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 02:59:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602485921;
+ s=mimecast20190719; t=1602485984;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=in4vP4P4euyhUmh7MBEkfRMo9+vEy+KLt+Y2qxkJRGE=;
- b=TVJPQjC6ncPKycfgyfj7jfF0wOQOKs4c6AZ73rPa0GBGrF4NuYfhGWrNpSPNZjc0D3dHYJ
- dAYrbuFkfK171QXNuaYTB/rXJKGRSwChg4MeMxr/QKciNKyGpECyTYwtVkmNUMNUkUrR+q
- pf426kuZfiucPW3bW3suvrXrEwefX58=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-236-KUhBwydHNiWAXwqOISXQqw-1; Mon, 12 Oct 2020 02:58:40 -0400
-X-MC-Unique: KUhBwydHNiWAXwqOISXQqw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A159A107ACF8;
- Mon, 12 Oct 2020 06:58:38 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-113-22.ams2.redhat.com [10.36.113.22])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5D8825578D;
- Mon, 12 Oct 2020 06:58:28 +0000 (UTC)
-Subject: Re: [PATCH 4/4] tests/qtest: Replace magic value by
- NANOSECONDS_PER_SECOND definition
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20201011194918.3219195-1-f4bug@amsat.org>
- <20201011194918.3219195-5-f4bug@amsat.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <7067de64-2a42-07f5-a864-74d7524bee5f@redhat.com>
-Date: Mon, 12 Oct 2020 08:58:27 +0200
+ bh=I++R4X2Q1WCH93mG3gULM0jHEmeH69K6Agxz4RH/n2E=;
+ b=VXaEWyRGmb/nP7tF9/PZgRothGWgv1FZruO0rYZX87qQQFDYg58lKhmh72K68a/rRELCxM
+ cZPX6B0B1MPjyJL9uCXnqiUijiCnYEiZ4u9NI+KHDXfNRb8ffmSAU6eslTtQZfvkdiyOzS
+ kCyyn2py+1nBvXI59FRtWQh6oeLrB5k=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-489-hAlYR8k5O0KpZqYg9KPflw-1; Mon, 12 Oct 2020 02:59:42 -0400
+X-MC-Unique: hAlYR8k5O0KpZqYg9KPflw-1
+Received: by mail-wm1-f71.google.com with SMTP id p17so4890966wmi.7
+ for <qemu-devel@nongnu.org>; Sun, 11 Oct 2020 23:59:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=I++R4X2Q1WCH93mG3gULM0jHEmeH69K6Agxz4RH/n2E=;
+ b=K3zOH3/UAau12vEYHD11PwnN0J7omG5PhhgrL4UObeNyrVIsQahWLId0N76D64Lua0
+ 7EQfDrzxwlr6gtkQfdT6S1nBinUzkaE5KgEL3yEiSaybvGtllLMbV/mKMLqaA+2uKpyM
+ Bh8mmZ+sflydC6XADMf/lvFH7LMymHy5JuBJCI53pILbl1HrwoNzO36QyQDxDehQ7Od0
+ nbSJju7d5L54KVVZhHVPffuRj3KgWaCTafg/smBMvrx9z30SGxoFzZLAELtbsl9eWjCZ
+ M++FhWwetAbWohROj3hgpEwZFXSlWUqPV4B4oZdmgg4d4RykcTpYsEaGs2EqQtKD1jnq
+ ql2Q==
+X-Gm-Message-State: AOAM532ScrmKeQf6se8+y5nRXP7a4up1vprg2qVDAfwxAtDwq+gYk7dw
+ VcJxZB5nQYzKjZKr/kYB+7V6xMfCsEOegQYAo7u/sUddDi8JJEYpF2T3Av7Q97U9wVwKIear/6L
+ 5eYmhPtuBIRc52S4=
+X-Received: by 2002:a1c:3bd4:: with SMTP id i203mr9140739wma.28.1602485981010; 
+ Sun, 11 Oct 2020 23:59:41 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxzmkNhxt0VVCQ5ySvmemOIMlJ0gHL7oGANqZwTV/67QAbjrhfLh9WgXEBvHCtgz9VVvDsXKg==
+X-Received: by 2002:a1c:3bd4:: with SMTP id i203mr9140725wma.28.1602485980790; 
+ Sun, 11 Oct 2020 23:59:40 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:7ffb:1107:73ba:dbcf?
+ ([2001:b07:6468:f312:7ffb:1107:73ba:dbcf])
+ by smtp.gmail.com with ESMTPSA id u15sm21457907wml.21.2020.10.11.23.59.39
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sun, 11 Oct 2020 23:59:40 -0700 (PDT)
+Subject: Re: [PATCH v3 05/16] fuzz: Declare DMA Read callback function
+To: Alexander Bulekov <alxndr@bu.edu>
+References: <20200921022506.873303-1-alxndr@bu.edu>
+ <20200921022506.873303-6-alxndr@bu.edu>
+ <6ed304a0-38ee-1013-7d85-7b0ae0e7c4d2@redhat.com>
+ <20201011154524.wvq2vsff7eig27c4@mozz.bu.edu>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2bc8a9b9-49c1-58cb-4696-fd83f7e3257f@redhat.com>
+Date: Mon, 12 Oct 2020 08:59:43 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20201011194918.3219195-5-f4bug@amsat.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20201011154524.wvq2vsff7eig27c4@mozz.bu.edu>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 02:58:41
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/11 23:52:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01,
  RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -100,40 +119,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, qemu-arm@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: darren.kenny@oracle.com, bsd@redhat.com, philmd@redhat.com,
+ qemu-devel@nongnu.org, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/10/2020 21.49, Philippe Mathieu-Daudé wrote:
-> Use self-explicit NANOSECONDS_PER_SECOND definition instead
-> of a magic value.
+On 11/10/20 17:45, Alexander Bulekov wrote:
+> On 201008 0939, Paolo Bonzini wrote:
+>> On 21/09/20 04:24, Alexander Bulekov wrote:
+>>> This patch declares the fuzz_dma_read_cb function and uses the
+>>> preprocessor and linker(weak symbols) to handle these cases:
+>>>
+>>> When we build softmmu/all with --enable-fuzzing, there should be no
+>>> strong symbol defined for fuzz_dma_read_cb, and we link against a weak
+>>> stub function.
+>>>
+>>> When we build softmmu/fuzz with --enable-fuzzing, we link against the
+>>> strong symbol in general_fuzz.c
+>>>
+>>> When we build softmmu/all without --enable-fuzzing, fuzz_dma_read_cb is
+>>> an empty, inlined function. As long as we don't call any other functions
+>>> when building the arguments, there should be no overhead.
+>>
+>> Can you move the weak function somewhere in tests/qtest/fuzz instead?
+>> Then you don't need an #ifdef because you can add it to specific_fuzz_ss.
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  tests/qtest/rtc-test.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tests/qtest/rtc-test.c b/tests/qtest/rtc-test.c
-> index c7af34f6b1b..402ce2c6090 100644
-> --- a/tests/qtest/rtc-test.c
-> +++ b/tests/qtest/rtc-test.c
-> @@ -292,7 +292,7 @@ static void alarm_time(void)
->              break;
->          }
->  
-> -        clock_step(1000000000);
-> +        clock_step(NANOSECONDS_PER_SECOND);
->      }
->  
->      g_assert(get_irq(RTC_ISA_IRQ));
-> 
+> If I understand correctly, specific_fuzz_ss is only used to build
+> qemu-fuzz targets. The goal here was to support building qemu-system
+> with --enable-fuzzing (ie CONFIG_FUZZ=y), where specific_fuzz isn't
+> used. If its too ugly, we could make a stub file under tests/qtest/fuzz
+> and add it to specific_ss when: 'CONFIG_FUZZ'.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+You're right.
+
+Paolo
 
 
