@@ -7,62 +7,63 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23413C433E7
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC1D7C43457
 	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:35:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A489B208D5
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:35:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 45C36208D5
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 20:35:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DlF9khm6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A489B208D5
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GTx2FD0O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45C36208D5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kS4Xp-0004MP-M7
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 16:35:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37916)
+	id 1kS4Xq-0004OW-2F
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 16:35:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37920)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kS4W4-0002Ww-CK
+ id 1kS4W4-0002X5-II
  for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:33:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35109)
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53208)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kS4W1-0002dQ-CT
+ id 1kS4W2-0002dh-7v
  for qemu-devel@nongnu.org; Mon, 12 Oct 2020 16:33:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602534832;
+ s=mimecast20190719; t=1602534833;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=DBXJrxt+d6juijlwn3wVqFYkpP1dAUNgqa1x1tfKP3s=;
- b=DlF9khm6oVbev1XMtYaq1cqIbT0AHsBBuy6mUA/fa8cosyXiLutvLBPnMwz+cI8GJ6+i8U
- AaTo2XwPPijVhjiAQLH1ZLmrxWofGzHEDCdLtL8TGomt7iIGAP2okD+v4k6GvSMy7/ejPo
- NSeyFNUKaGqaOeJawMpym6iXRySChTM=
+ bh=5R+gswwk9pqu8qfgJlosoWUp3BaOfh6EjuzpbtMe93Q=;
+ b=GTx2FD0OxLIvLk5vRKjDUIfKK6mlA1KV8VVITQ7kbYk7gLWRYykh0qMnbbHAtsP4o6iNhG
+ 4OLYo/lplugb3PjXqHvMjFlVsUEKylLJWPvO66M33bqeq+++sFPUx5CAv9swR/61SUzXG7
+ Ajmgl34IZHZxMQn45YwpINC+WqRwcUY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-593-1-oKT3adOiq1cFt85xMu9Q-1; Mon, 12 Oct 2020 16:33:49 -0400
-X-MC-Unique: 1-oKT3adOiq1cFt85xMu9Q-1
+ us-mta-153-Ny7BqqE6O8CyVmGEyMZOZA-1; Mon, 12 Oct 2020 16:33:52 -0400
+X-MC-Unique: Ny7BqqE6O8CyVmGEyMZOZA-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 257DF8A6372
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 20:33:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4506D80B72B
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 20:33:46 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 006692854A;
- Mon, 12 Oct 2020 20:33:43 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C1BD527CC4;
+ Mon, 12 Oct 2020 20:33:45 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 01/38] meson.build: Add comments to clarify code organization
-Date: Mon, 12 Oct 2020 16:33:06 -0400
-Message-Id: <20201012203343.1105018-2-pbonzini@redhat.com>
+Subject: [PULL 03/38] hw/core: Move the creation of the library to the main
+ meson.build
+Date: Mon, 12 Oct 2020 16:33:08 -0400
+Message-Id: <20201012203343.1105018-4-pbonzini@redhat.com>
 In-Reply-To: <20201012203343.1105018-1-pbonzini@redhat.com>
 References: <20201012203343.1105018-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -103,39 +104,51 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
+Be consistent creating all the libraries in the main meson.build file.
+
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20201006125602.2311423-2-philmd@redhat.com>
+Message-Id: <20201006125602.2311423-4-philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- meson.build | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ hw/core/meson.build | 6 ------
+ meson.build         | 6 ++++++
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
+diff --git a/hw/core/meson.build b/hw/core/meson.build
+index fc91f98075..4a744f3b5e 100644
+--- a/hw/core/meson.build
++++ b/hw/core/meson.build
+@@ -14,12 +14,6 @@ hwcore_files = files(
+   'qdev-clock.c',
+ )
+ 
+-libhwcore = static_library('hwcore', sources: hwcore_files + genh,
+-                           name_suffix: 'fa',
+-                           build_by_default: false)
+-hwcore = declare_dependency(link_whole: libhwcore)
+-common_ss.add(hwcore)
+-
+ common_ss.add(files('cpu.c'))
+ common_ss.add(when: 'CONFIG_FITLOADER', if_true: files('loader-fit.c'))
+ common_ss.add(when: 'CONFIG_GENERIC_LOADER', if_true: files('generic-loader.c'))
 diff --git a/meson.build b/meson.build
-index 17c89c87c6..68eaf8ce2f 100644
+index adcfb494a8..6c760b4163 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -1446,6 +1446,10 @@ qemu_syms = custom_target('qemu.syms', output: 'qemu.syms',
-                              capture: true,
-                              command: [undefsym, nm, '@INPUT@'])
- 
-+########################
-+# Library dependencies #
-+########################
-+
- block_ss = block_ss.apply(config_host, strict: false)
- libblock = static_library('block', block_ss.sources() + genh,
-                           dependencies: block_ss.dependencies(),
-@@ -1465,6 +1469,10 @@ libqmp = static_library('qmp', qmp_ss.sources() + genh,
+@@ -1469,6 +1469,12 @@ libqmp = static_library('qmp', qmp_ss.sources() + genh,
  
  qmp = declare_dependency(link_whole: [libqmp])
  
-+###########
-+# Targets #
-+###########
++libhwcore = static_library('hwcore', sources: hwcore_files + genh,
++                           name_suffix: 'fa',
++                           build_by_default: false)
++hwcore = declare_dependency(link_whole: libhwcore)
++common_ss.add(hwcore)
 +
- foreach m : block_mods + softmmu_mods
-   shared_module(m.name(),
-                 name_prefix: '',
+ ###########
+ # Targets #
+ ###########
 -- 
 2.26.2
 
