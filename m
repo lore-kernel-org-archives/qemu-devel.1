@@ -2,68 +2,87 @@ Return-Path: <SRS0=wjGh=DT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD3A8C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 07:42:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F957C433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 08:08:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EF23206B2
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 07:42:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9AE33206F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 08:08:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="jugCMihL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EF23206B2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IwbT+GU1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AE33206F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kRsTS-0001BO-E0
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 03:42:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42406)
+	id 1kRst0-0007QH-Iy
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 04:08:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46548)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kRsSX-0000E0-FK; Mon, 12 Oct 2020 03:41:29 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:44669)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kRsST-000209-T2; Mon, 12 Oct 2020 03:41:28 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4C8rG6622Qz9sTr; Mon, 12 Oct 2020 18:41:18 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1602488478;
- bh=d4GOCpslPD5j4JXhla1D+Q7gmXBSbbRBm6tveHxJm58=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=jugCMihL03ZQtBrwkLeSaQrxWVwzG7pCiuIYnkfAbX64eSWpzsV8GaK+r6TE9MjJJ
- rWawQa094mPIxQns48Hr5WkEAC83NGUv6XwkkHsYk8mMbk2wK4OhhwQy7Fy9+h3RKZ
- gJ5hexVAhWxxsT7aTt4wkJvrJXK132jzJ7JBOnEk=
-Date: Mon, 12 Oct 2020 17:54:36 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [PATCH] hw/pci-host/grackle: Verify PIC link is properly set
-Message-ID: <20201012065436.GB71119@yekko.fritz.box>
-References: <20201011190332.3189611-1-f4bug@amsat.org>
- <20201011223446.GA4787@yekko.fritz.box>
- <369509c1-2e90-13cf-8845-892e754516d1@amsat.org>
+ (Exim 4.90_1) (envelope-from <maxim.uvarov@linaro.org>)
+ id 1kRssE-0006qr-V5
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 04:08:02 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:41576)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <maxim.uvarov@linaro.org>)
+ id 1kRssC-0004pO-Vp
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 04:08:02 -0400
+Received: by mail-pl1-x642.google.com with SMTP id w11so420695pll.8
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 01:07:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=BWDQO5aPrAfLfnQelq3/3NNlBK1si0DmmIdvr2r8kNg=;
+ b=IwbT+GU1M44w/A02IZ6ldAQqSgsFDaNcgaQY5Er+GH0cfF8buW3/uVhsgiozAXh1PO
+ FBW3arADSVJguipvFIYs/c+sl2A7/zw8x0IKG/S79AY005INvpAw7vii+rFIXnBUfTvh
+ CDJgqFdOcMtBY7LldLEsptDn97K2ScIgoUtz/MzaKqW0nJFRpGxZOUv0aPNe9y5oGQ28
+ ZP/3kqiCqMtwSmuCUcOECcOlQy1UX5+8QHxCx7LP68lWC9PQrvEgvoGC4XuaV6ZRRdLG
+ VXL+HzmaiQalU5Jh0SHEg/OLMcPybRUYpYFmV6sYGkw/xQ6zwyPczKQ/KesEAoQQn10q
+ y5dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=BWDQO5aPrAfLfnQelq3/3NNlBK1si0DmmIdvr2r8kNg=;
+ b=I7Wqc4070s8KRtEqlBQlW0iML8o+H5lAPy1sTOLE+ts3tZKNnKAVz9YAtLCGfi12CQ
+ tGIDGU5+K8g7rCpwWvtrkz56iERFU0IcM8jJRweNsAvoIZep824i8znbLsg1r/kdag1w
+ FxBns2gvWe2XW8jblRMF5jVc+tV76yx7yritvo+2aKRb54ZUimgVBKz23GMUt/v3wPOG
+ SdDMD8YFaIA1kBpnVfaUjdmu1hVS1GrbpQ1XmrWrYwq2NVH1SS41+tU6Pj7nL8rKZsij
+ iV8xgZJNzcAOdqROdjG9UbfOa/7s5L8zxntOIV2kksGwBSRy4CN+aphjNy0d8sd9m7o5
+ dz3w==
+X-Gm-Message-State: AOAM531Of/49Mumt7YDiQdC3lZfrNImFarve+bcdSjN5Q3cQP8uc67r+
+ 2j1mBgxglOdwsHGVEEwpPCSSQq+aYCzEMvmSgNvZjQ==
+X-Google-Smtp-Source: ABdhPJyUACD1vHMjM3m/Lg7DVTi3LJRhJU1utEcgNtAa+eLsbDe94MtBXaVCCdr883IjG7pdLs3AGbobtsHflV3Sk+E=
+X-Received: by 2002:a17:902:b595:b029:d4:db82:4403 with SMTP id
+ a21-20020a170902b595b02900d4db824403mr4334605pls.49.1602490078807; Mon, 12
+ Oct 2020 01:07:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="MW5yreqqjyrRcusr"
-Content-Disposition: inline
-In-Reply-To: <369509c1-2e90-13cf-8845-892e754516d1@amsat.org>
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
+References: <74151CBD-4750-4E68-9127-21076C019036@getmailspring.com>
+ <CAFEAcA9cZPgaHGuCs0J20YJ48V2eXHFFRsb9a56xFULjtFtn3g@mail.gmail.com>
+In-Reply-To: <CAFEAcA9cZPgaHGuCs0J20YJ48V2eXHFFRsb9a56xFULjtFtn3g@mail.gmail.com>
+From: Maxim Uvarov <maxim.uvarov@linaro.org>
+Date: Mon, 12 Oct 2020 11:07:48 +0300
+Message-ID: <CAD8XO3bE3PTrZjxHVWE3_7Dif_WXySSnQTU=kf_yekFrgf4J3g@mail.gmail.com>
+Subject: Re: Re%3A [PATCH v4 1%2F2] hw%2Fwatchdog%3A Implement SBSA watchdog
+ device&In-Reply-To=<CAD8XO3YmTC7fzxttg%3DQLMpJbg7uLogatxN7q7vf-iGZjyQLjjQ%40mail.gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=maxim.uvarov@linaro.org; helo=mail-pl1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,91 +95,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- qemu-devel@nongnu.org
+Cc: Shashi Mallela <shashi.mallela@linaro.org>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+> +static uint64_t sbsa_gwdt_rread(void *opaque, hwaddr addr, unsigned int size)
+> +{
+> +    uint32_t ret;
+> +
+> +    if (addr == SBSA_GWDT_WRR) {
+> +        /* watch refresh read has no effect and returns 0 */
+> +        ret = 0;
+> +    } else {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "bad address in refresh frame read :"
+> +
 
---MW5yreqqjyrRcusr
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Then it has to be  uint32_t ret = 0;
 
-On Mon, Oct 12, 2020 at 08:21:41AM +0200, Philippe Mathieu-Daud=E9 wrote:
-> On 10/12/20 12:34 AM, David Gibson wrote:
-> > On Sun, Oct 11, 2020 at 09:03:32PM +0200, Philippe Mathieu-Daud=E9 wrot=
-e:
-> > > The Grackle PCI host model expects the interrupt controller
-> > > being set, but does not verify it is present. Add a check to
-> > > help developers using this model.
-> >=20
-> > I don't think thaqt's very likely, but, sure, applied to ppc-for-5.2
->=20
-> Do you want I correct the description as:
-> "The Grackle PCI host model expects the interrupt controller
-> being set, but does not verify it is present.
-> A developer basing its implementation on the Grackle model
-> might hit this problem. Add a check to help future developers
-> using this model as reference."?
-
-No, it's fine.  All I was saying is that the chances of anyone using
-Grackle in future seem very low to me.
-
-
->=20
-> >=20
-> > >=20
-> > > Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> > > ---
-> > >   hw/pci-host/grackle.c | 4 ++++
-> > >   1 file changed, 4 insertions(+)
-> > >=20
-> > > diff --git a/hw/pci-host/grackle.c b/hw/pci-host/grackle.c
-> > > index 57c29b20afb..20361d215ca 100644
-> > > --- a/hw/pci-host/grackle.c
-> > > +++ b/hw/pci-host/grackle.c
-> > > @@ -76,6 +76,10 @@ static void grackle_realize(DeviceState *dev, Erro=
-r **errp)
-> > >       GrackleState *s =3D GRACKLE_PCI_HOST_BRIDGE(dev);
-> > >       PCIHostState *phb =3D PCI_HOST_BRIDGE(dev);
-> > > +    if (!s->pic) {
-> > > +        error_setg(errp, TYPE_GRACKLE_PCI_HOST_BRIDGE ": 'pic' link =
-not set");
-> > > +        return;
-> > > +    }
-> > >       phb->bus =3D pci_register_root_bus(dev, NULL,
-> > >                                        pci_grackle_set_irq,
-> > >                                        pci_grackle_map_irq,
-> >=20
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---MW5yreqqjyrRcusr
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl+D/acACgkQbDjKyiDZ
-s5JQ9w//ag/3Ch9d98i0BPpoZPDdwu7iAyp/6zJxslagtqJtyWGA1WkpWtEu+lm5
-XbIztWXRfJdpHNkxpIJIoAmb7ex8fbsOm+OArAt8IOe9WilqUbyGWlV+JyYVn3oe
-cWM8HSUyUM0Gk2rwAiCn/sI07jRiLkeipGbP/LgtuAWiEDG4meyEnUsI/lzvxj73
-Q3x61NUwLpAyoCS5tzQ93kGWqV+oJNHMQjqUcr1KFq154/hvLyR8xvw7YQUDlxqT
-My3/iWxkglJ+2RE6ZzL3Ft0I+LxNWxM8/LCzIOtE/2zltWBdzsb9IsXpnpLzOGyI
-fJCMYnD77wrIgz1HqoIZzKgZgxLFX05R26HJ8+g6JcEog4iZjxjEidabNlG68I+6
-GRjRUm71H3/qvuymTc65Na9u1aM52TdV4ILD4iwVDQszBqOThO3mBoSisBAdSlWg
-XN8Ug9iqz3jSJaP+/ONFjB8Rpn/OvX4jo79xXdjDCQHkCDY5xb2w7FpnTRD+mVPg
-rRJjkcVXBwMFuyXJiKbVtjANjAvTwg+iYYiccb8eMvOadjQFABhOsS06+sW/TiVA
-rFNwLgc9AZ8ppxe2tWNPJ6NsfKBaV01ODsxtTdbvdFHQayPlLt5PMlpiYAwV7Rxw
-6orBnLQ9T82i9tAcxOdnOwVFacb8lg7CFl455DwTamTU6xHbCnc=
-=QS3+
------END PGP SIGNATURE-----
-
---MW5yreqqjyrRcusr--
+On Fri, 9 Oct 2020 at 20:51, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Fri, 9 Oct 2020 at 18:30, Shashi Mallela <shashi.mallela@linaro.org> wrote:
+> >
+> > The value being returned here is 0 (initialized to 0 at the beginning of read function).
+> > I have seen similar practices being followed in other qemu implementations like for example bcm2835_dma_read() in qemu/hw/dma/bcm2835_dma.c,a9_scu_read() in qemu/hw/misc/a9scu.c.
+> >
+> > Please confirm if you would still like to add specific value like 0xdeadbeef for bad read offset.
+>
+> Judging by the subject line you've mangled the headers on this
+> email so I'm not sure exactly what this was a reply to,
+> but in general QEMU doesn't do that kind of "return
+> specific marker values for bad register offsets". We
+> typically log it with a qemu_log_mask(LOG_GUEST_ERROR) and
+> return 0 (unless the h/w does something else).
+>
+> thanks
+> -- PMM
 
