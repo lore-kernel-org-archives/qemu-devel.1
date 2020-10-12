@@ -4,82 +4,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F105C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:53:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F83BC433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:54:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27A2520735
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:53:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3550020735
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Oct 2020 15:54:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iYSLRaPq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27A2520735
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YSrlsBno"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3550020735
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kS090-0007z5-5a
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 11:53:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56880)
+	id 1kS09X-0000Dy-CK
+	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 11:54:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57260)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kRzqM-00072B-63
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:34:37 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55853)
+ id 1kRzqq-0007LX-7x
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:35:04 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:40793)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kRzqK-0007KB-CR
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:34:33 -0400
-Received: by mail-wm1-x343.google.com with SMTP id a72so6921543wme.5
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 08:34:31 -0700 (PDT)
+ id 1kRzqe-0007NU-D8
+ for qemu-devel@nongnu.org; Mon, 12 Oct 2020 11:35:03 -0400
+Received: by mail-wm1-x342.google.com with SMTP id k18so17961294wmj.5
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 08:34:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=+rL5y+LPIlyoU3TM7H1gns6WWZrHXRx5K1wFTm/QiuM=;
- b=iYSLRaPqYYm55PYEe2u/gTksh2DYtlQokYWvM4HiWEY591jCkZjXlvE9Mz6wVNvzdj
- V7qOhCBqCi/pArufM/CE7v2jlImzg0wx76ZOQacNHpTAnJ0IBnhz9uC7sYU/GGebLldo
- e0U3FfKg4ytb0CxgMN/hzId/Y41ZdOCl9g3kUV9OKgtUmDBP1KjXuTgGcKHSf6YljeyT
- vU8p6NTtoHbUpBYKl8ighOGm7ygULVeUPcdqyFhRbEEFUxCcd4CFOFJbWbeIyB4V7xUJ
- f7Qh1svo9X+M8jEY+XB7ucnTrVmhfEgEWP2RLVUexTHUU0UnDAQEriJptvFGpt+GRcI4
- D5Ew==
+ bh=Y1ekWK8CJLvHrVxfCc2kYGCDX3fGw6jKhM4D+UOMVQU=;
+ b=YSrlsBnoQCz/hCGSqfuYdXKXQhZ80JQPJ4j/lDZO+r7fA8pu9fNnuzbEY1wyT/7zTI
+ QCU0qnRZmG64mcm98xhV04Hkw8DVouadiIE10n6+m238GqtUBxpeoqWS8HHhtJF4wrn0
+ kNBoyZj++YUv7m3S6h7HSzxjUHhA4yZ1iG69g3sb3wkw/M49RAS6jehxazLP2p+t9Sv/
+ V8MvxuxrOWoHxHNxSfDZDP+Td7yc2v+714iZkgEpa8W/seVaWX356rYfU93xgpLOF3Ai
+ eQu06ZqEWcJ0R9mXix/14P52wwSkmmCh8SR6zNHpASRWF2+M6x6Tqz5bud66x2RkXQL7
+ 6nFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=+rL5y+LPIlyoU3TM7H1gns6WWZrHXRx5K1wFTm/QiuM=;
- b=EnzDU+BQjP3PrHRviV8T9Lswwd4bLMN50IOBRF3TPhuURD4AlsCj3o6QYk8ezdZM8+
- bOkajBrZC1RFW9WirpkHtnVbIjmKaGEMZ0YkVeMbtSi1hhdRtMVLRdcayrH8JgFgjjCB
- Cgx1S4UXBDuFwqZmZGohoIFckKedRDWIj/A+8TxAHEOUmii3eCGKZzz6MNtF9xNKhuis
- +BV4xO1+JKeS1wbWzJa3zlF8aCZyoHesEEJUO87BFI+I/REr1SkCAywuD9A++UnWGHwD
- bd3FKrL/L3Aqm8SFyUzJQz0EZtH2YjOc/MOevBi9+G783izpj3YvvFPs9TGh2IO7FXyU
- RZOA==
-X-Gm-Message-State: AOAM533X67DQ7i7QDRgF4ezMhWPipjJSV2YCyH3lgowvWlYWOXIp0on6
- jlE98UmLfvpd+mdhDDFWC+S4aCa5o++MzwVF
-X-Google-Smtp-Source: ABdhPJwF+yWue4chDZSyrgNYqc2uiQYCfPFKmGc7jxqKUcC/k2E33P6KIKyDGKsAKe0EaL4fAyqfTQ==
-X-Received: by 2002:a1c:6457:: with SMTP id y84mr11141811wmb.36.1602516871079; 
- Mon, 12 Oct 2020 08:34:31 -0700 (PDT)
+ bh=Y1ekWK8CJLvHrVxfCc2kYGCDX3fGw6jKhM4D+UOMVQU=;
+ b=b77jMKC2ucyBdMhb2CRYtd1cHGzLUnziZEGeXpxb+fMujI3qtxDZzKoV1BjJzIdUDh
+ cNBrPIsi0MKJkg4psDdWiUU4BkdoH9uutnqb2me6Dc6j4yagMlg75gGSoLG6ACL6PI35
+ 6SzMRC9UzCof0/L8VwFKGwuUcHF3LFehl2XjiqwfQhyKBlduMntW73p9dayTUmhKdQ2X
+ O0R8i5naWwMZYx1nEfP7Zcn8q3T6a9uSKjAB8M3QPJqdz03PgWurziZzAzJzjA5DrCrf
+ k/M82LYBZwqSnbWnL3Iao0OtIY71XI1i/hWuYxR8DH2uTi1Hg6m7BkOYyXWW9J96QeMY
+ JoaQ==
+X-Gm-Message-State: AOAM533rG5UOIvr9uOx9BQPsbyAZ0k8TFYlTavpBqMsQJhsdLMP89j/A
+ hpTMvMvmnD8i89yUrbyXB/f28w==
+X-Google-Smtp-Source: ABdhPJxojrk73BbaSQUuBxPDXxPMXwA4r3go3bXwSx1oHzOrS9uy+qgdLtNFDy+WCsiG8/+yWP20Ug==
+X-Received: by 2002:a1c:a541:: with SMTP id o62mr11362675wme.90.1602516885118; 
+ Mon, 12 Oct 2020 08:34:45 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id y10sm19675284wrq.73.2020.10.12.08.34.30
+ by smtp.gmail.com with ESMTPSA id y10sm19675284wrq.73.2020.10.12.08.34.44
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 12 Oct 2020 08:34:30 -0700 (PDT)
+ Mon, 12 Oct 2020 08:34:44 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH] hw/timer/armv7m_systick: assert that board code set
- system_clock_scale
-Date: Mon, 12 Oct 2020 16:33:41 +0100
-Message-Id: <20201012153408.9747-19-peter.maydell@linaro.org>
+Subject: [PATCH] target/arm: Delete unused VFP_DREG macros
+Date: Mon, 12 Oct 2020 16:33:53 +0100
+Message-Id: <20201012153408.9747-31-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201012153408.9747-1-peter.maydell@linaro.org>
 References: <20201012153408.9747-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x343.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,43 +105,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It is the responsibility of board code for an armv7m system to set
-system_clock_scale appropriately for the CPU speed of the core.
-If it forgets to do this, then QEMU will hang if the guest tries
-to use the systick timer in the "tick at the CPU clock frequency" mode.
-
-We forgot that in a couple of our boards (see commits ce4f70e81ed23c93f,
-e7e5a9595ab1136). Add an assertion in the systick reset method so
-we don't let any new boards in with the same bug.
+As part of the Neon decodetree conversion we removed all
+the uses of the VFP_DREG macros, but forgot to remove the
+macro definitions. Do so now.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
-In the longer term we should make this a clocktree input and
-plumb it through the armv7m container and so on, but for the
-moment this assert() improves the current situation.
----
- hw/timer/armv7m_systick.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ target/arm/translate.c | 15 ---------------
+ 1 file changed, 15 deletions(-)
 
-diff --git a/hw/timer/armv7m_systick.c b/hw/timer/armv7m_systick.c
-index 74c58bcf245..a8cec7eb56b 100644
---- a/hw/timer/armv7m_systick.c
-+++ b/hw/timer/armv7m_systick.c
-@@ -202,6 +202,14 @@ static void systick_reset(DeviceState *dev)
- {
-     SysTickState *s = SYSTICK(dev);
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index c39a929b938..27bf6cd8b51 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -2471,21 +2471,6 @@ static int disas_dsp_insn(DisasContext *s, uint32_t insn)
+     return 1;
+ }
  
-+    /*
-+     * Forgetting to set system_clock_scale is always a board code
-+     * bug. We can't check this earlier because for some boards
-+     * (like stellaris) it is not yet configured at the point where
-+     * the systick device is realized.
-+     */
-+    assert(system_clock_scale != 0);
-+
-     s->control = 0;
-     s->reload = 0;
-     s->tick = 0;
+-#define VFP_REG_SHR(x, n) (((n) > 0) ? (x) >> (n) : (x) << -(n))
+-#define VFP_DREG(reg, insn, bigbit, smallbit) do { \
+-    if (dc_isar_feature(aa32_simd_r32, s)) { \
+-        reg = (((insn) >> (bigbit)) & 0x0f) \
+-              | (((insn) >> ((smallbit) - 4)) & 0x10); \
+-    } else { \
+-        if (insn & (1 << (smallbit))) \
+-            return 1; \
+-        reg = ((insn) >> (bigbit)) & 0x0f; \
+-    }} while (0)
+-
+-#define VFP_DREG_D(reg, insn) VFP_DREG(reg, insn, 12, 22)
+-#define VFP_DREG_N(reg, insn) VFP_DREG(reg, insn, 16,  7)
+-#define VFP_DREG_M(reg, insn) VFP_DREG(reg, insn,  0,  5)
+-
+ static inline bool use_goto_tb(DisasContext *s, target_ulong dest)
+ {
+ #ifndef CONFIG_USER_ONLY
 -- 
 2.20.1
 
