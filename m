@@ -2,71 +2,92 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.2 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,PLING_QUERY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58381C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 05:36:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B46E9C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 05:47:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F9BA208FE
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 05:36:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EF46B20E65
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 05:47:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="oCFtHRve"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F9BA208FE
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SxWu1uo/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF46B20E65
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSCzT-00051O-8h
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 01:36:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48518)
+	id 1kSD9a-0007EZ-0g
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 01:47:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50074)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kSCyh-0004DW-0d; Tue, 13 Oct 2020 01:36:03 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:36245 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kSCye-0006ph-Km; Tue, 13 Oct 2020 01:36:02 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4C9PQy5B5Rz9sTr; Tue, 13 Oct 2020 16:35:54 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1602567354;
- bh=ohphu5M/BSTRL24nVNhXV9XyHODbES+uWCGzWuYevhU=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=oCFtHRveU0mNRz/klp5jXZvQOnbvOGEYe9FNGCfH09QvV1SUGzGI7aI+9wJxoQaiw
- OIXHoQdJnK1MNV+niMZz41+Pd802aozeBibGNhCG8NVSzbgUtDThbJJa4sotNdhSwU
- m/WWUCTGVFlQDxANYl6NYlHX0inLoIMNjPyJgEXA=
-Date: Tue, 13 Oct 2020 16:32:50 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] hw/net: move allocation to the heap due to very large
- stack frame
-Message-ID: <20201013053250.GV71119@yekko.fritz.box>
-References: <8f07132478469b35fb50a4706691e2b56b10a67b.camel@gmail.com>
- <20201010060745.GK1025389@yekko.fritz.box>
- <f505c80b88ee665a62883a69bed9d614f6ba2a66.camel@gmail.com>
- <20201012053001.GD4787@yekko.fritz.box>
- <38d5993e-8a10-0fb1-5263-6531a356fefd@redhat.com>
- <ca54ec71-11b4-70c5-6d48-4e58fb90a545@redhat.com>
+ (Exim 4.90_1) (envelope-from <hiharryharryharry@gmail.com>)
+ id 1kSD8v-0006oK-77
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 01:46:37 -0400
+Received: from mail-lf1-x135.google.com ([2a00:1450:4864:20::135]:40322)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <hiharryharryharry@gmail.com>)
+ id 1kSD8t-0001y6-LS
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 01:46:36 -0400
+Received: by mail-lf1-x135.google.com with SMTP id a9so20751803lfc.7
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 22:46:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=LNEUXpS8N0KH/JdbduSvZxs9jDcwwGBJIJ6K7iSuBN8=;
+ b=SxWu1uo/+GACcMZnKaLVZg0uDlNg80M8Bee4oLpjJtbiJzuXmpqlx8g+1SqAB/M4LR
+ pL3iUpsdNY98/Xxn13Qr7Dl4oi0A/3p3LDw3MRs4iUDCEmztdP7WmSpqxN9yX5VelSm4
+ tit7lgKLWKCFsfXtPz6qc9NnfF1Sl+WcGR7KQ2I8xGp937eCF+XzuBVfKx+lJ9zBGYwr
+ sQOiiHlDtLn7CXbEftcQ/8A7gBJOC5sJ3yACwM+BJ32ucGPIrLCgCJdVjW36K0xCJPlj
+ 9gAt0b/cgbwdPkSw/QuGdgncBibFoVAtEoI+HLo0XDrhxHCL9hRQxRllc4eq6IDX8Yjl
+ j+Ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=LNEUXpS8N0KH/JdbduSvZxs9jDcwwGBJIJ6K7iSuBN8=;
+ b=POBFghh5J/RqAb/9ukZffbo6/BPSVxnATlJ0BG2MN4Fn3cH+D4p4aIlW6Kg4/gcNe7
+ EIm8tzIFQR2EQrOV00qoxk/YAaoTosQJk8Xudt1PDLRTyz3tk+3eWmD0HrtqRbUDn88d
+ xMy4jl7G29VaMXEMN6NDfmurbK9v/eYEurToVToor1/dYDTtOxYSYB+PlQiCc9mqGjIc
+ WFV2qVshouzwi58eByHvhbOIWPKfisVWjk/jLQkfat1gDbOMyu5qtmnAbkXhynaxj4y4
+ KI1JM4Sgv+Jq2TioAI9Cl5n/ff4FxD/y1+02EUOjiewvV0bMUKVjIy4UwRY6saECH4bR
+ Z6SQ==
+X-Gm-Message-State: AOAM531063lQFiTpmA+Gq37pzrMi4TKTKdSbx8E1PVIsJy5nA7FmpnqR
+ eMBih9sNRXgMC2Uf0InZLxY8yPB/rDLAxQVVBZI=
+X-Google-Smtp-Source: ABdhPJxwM5nJX6kyxU50rOQTjgBYavOyJr1SEug0ooYlBiLOXt/qh6akVbf4EmatmjsL5M3XoaemFpCo9LP2kz/ybIs=
+X-Received: by 2002:a19:4bd4:: with SMTP id y203mr3585959lfa.539.1602567993345; 
+ Mon, 12 Oct 2020 22:46:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="dRgc669pgRVB2OqT"
-Content-Disposition: inline
-In-Reply-To: <ca54ec71-11b4-70c5-6d48-4e58fb90a545@redhat.com>
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
+References: <CA+-xGqMd4_58_+QKetjOsubBqrDnaYF+YWE3TC3kEcNGxPiPfg@mail.gmail.com>
+ <47ead258320536d00f9f32891da3810040875aff.camel@redhat.com>
+ <CA+-xGqOm2sWbxR=3W1pWrZNLOt7EE5qiNWxMz=9=gmga15vD2w@mail.gmail.com>
+ <20201012165428.GD26135@linux.intel.com>
+ <CA+-xGqPkkiws0bxrzud_qKs3ZmKN9=AfN=JGephfGc+2rn6ybw@mail.gmail.com>
+ <20201013045245.GA11344@linux.intel.com>
+ <CA+-xGqO4DtUs3-jH+QMPEze2GrXwtNX0z=vVUVak5HOpPKaDxQ@mail.gmail.com>
+In-Reply-To: <CA+-xGqO4DtUs3-jH+QMPEze2GrXwtNX0z=vVUVak5HOpPKaDxQ@mail.gmail.com>
+From: harry harry <hiharryharryharry@gmail.com>
+Date: Tue, 13 Oct 2020 01:46:16 -0400
+Message-ID: <CA+-xGqMMa-DB1SND5MRugusDafjNA9CVw-=OBK7q=CK1impmTQ@mail.gmail.com>
+Subject: Re: Why guest physical addresses are not the same as the
+ corresponding host virtual addresses in QEMU/KVM? Thanks!
+To: Sean Christopherson <sean.j.christopherson@intel.com>
+Content-Type: multipart/alternative; boundary="000000000000f8cba105b186efbe"
+Received-SPF: pass client-ip=2a00:1450:4864:20::135;
+ envelope-from=hiharryharryharry@gmail.com; helo=mail-lf1-x135.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -19
+X-Spam_score: -2.0
+X-Spam_bar: --
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, PLING_QUERY=0.1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,64 +100,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-trivial@nongnu.org,
- jasowang@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- Elena Afanasova <eafanasova@gmail.com>
+Cc: kvm@vger.kernel.org, libvir-list@redhat.com, qemu-devel@nongnu.org,
+ Maxim Levitsky <mlevitsk@redhat.com>, mathieu.tarral@protonmail.com,
+ stefanha@redhat.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+--000000000000f8cba105b186efbe
+Content-Type: text/plain; charset="UTF-8"
 
---dRgc669pgRVB2OqT
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+BTW, I assume the software logic for KVM to find the HPA with a given HVA
+(as you said like below) should be the same as the hardware logic in MMU
+to translate ``GPA -> [extended/nested page tables] -> HPA''.  If this is
+true, I cannot understand how KVM can find a correct HPA with an HVA (e.g.,
+array[0]'s HVA is not 0x0000000000000081 in the last email) that is
+different from its corresponding GPA.
+
+GPA -> [memslots] -> HVA -> [host page tables] -> HPA
+
+--000000000000f8cba105b186efbe
+Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 12, 2020 at 03:45:02PM +0200, Paolo Bonzini wrote:
-> On 12/10/20 12:44, Thomas Huth wrote:
-> > I think this is one of the tasks from:
-> >=20
-> >  https://wiki.qemu.org/Contribute/BiteSizedTasks#Compiler-driven_cleanu=
-ps
-> >=20
-> > It has been added by Paolo in 2016:
-> >=20
-> >  https://wiki.qemu.org/index.php?title=3DContribute/BiteSizedTasks&diff=
-=3D5368&oldid=3D5367
-> >=20
-> > ... so maybe Paolo can comment on the size that has been chosen here...?
->=20
-> I used 16K, mostly because it is a nice round number.  8k is too small
-> due to PATH_MAX-sized variables.  16k seemed to be plenty and triggered
-> in few-enough places that the cleanup is viable.
+<div dir=3D"ltr"><div dir=3D"ltr">BTW, I assume the software logic for KVM =
+to find the HPA with a given HVA (as you said like below) should be the sam=
+e as the hardware logic in MMU to=C2=A0translate ``GPA -&gt; [extended/nest=
+ed page tables] -&gt; HPA&#39;&#39;.=C2=A0
 
-Ok.  Why are large stack frames bad in qemu?
+If this is true, I cannot understand how KVM can=C2=A0find a correct HPA wi=
+th an HVA (e.g., array[0]&#39;s HVA is not 0x0000000000000081 in the last e=
+mail) that is different from its corresponding GPA.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+</div><div dir=3D"ltr"><br></div><div dir=3D"ltr">GPA -&gt; [memslots] -&gt=
+; HVA -&gt; [host page tables] -&gt; HPA<br></div><div dir=3D"ltr"><br></di=
+v><div dir=3D"ltr"><br></div><div></div><div class=3D"gmail_quote"><blockqu=
+ote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px=
+ solid rgb(204,204,204);padding-left:1ex">
+</blockquote></div></div>
 
---dRgc669pgRVB2OqT
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl+FPAAACgkQbDjKyiDZ
-s5IruA/+JK7ojWXQ59ESgaHBg2dDtFwnSvbOTRQQ42kh7pgvfT7lsQ+UfPJMc/Sh
-P5J4GiLBqT456nq0HiUGEY63iHDO1Cs7GzoNOktesvOSXRhN2peCALwfgGLApcnz
-cxXrWfZWnrr+iCp81YHJ5dlzQr+byBx/3AIwGcxWRnQ9G/mmcH6b+w7aNVTsuHpy
-uUhhJrYeKrQ9ZklGhHw4ZgoH7VDB8Sn2Ebu45bJv+mqU+gzQ3mr5aw1nmOj+R0D4
-zm8GtNkG3FnVv7vqj1M4wouOKtrTBXpsf7SRlFlzGiBGOyRYE96x0bWxqLpiql8x
-k/WLBozKZfRYzMKBi1xcEeWmlYLTNN04qVmXltVGgM6YQj4TNiGmre6MGSgyejXy
-EdRaIPrD9l1IfsKuq5UBYpkja/4YSxtJ4X+dK2LbIegmSXw7ZaHtAPmKIZBllgGM
-+WOJ2dsz5a3F51Ue1WriO59W5zcQN/jFEVvzVh/LZyGNdbg1UXpiqxFmdRESRwM8
-hcWtPDLkmM++8fRbV5+44YKvDgOXtXUy04tBAIwl8nCbAKuEwO5jnxSfoNCzcpOY
-Ln28JA7vtu1R9wlI4YiZQjQ2gyKD40uAj0rwbWTWFh/EIlUK/1Tupxunxi+26yuW
-8KdY/0pYKPuGQ7dt1+cHqp/6vjEnTyzrJ3DdlQDoKxuBWtxjPyg=
-=8cXA
------END PGP SIGNATURE-----
-
---dRgc669pgRVB2OqT--
+--000000000000f8cba105b186efbe--
 
