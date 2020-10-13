@@ -2,86 +2,88 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A874C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 19:43:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ED45C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 19:45:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A6FE208D5
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 19:43:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AB56D208D5
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 19:45:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rGBNX7oQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A6FE208D5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fmBVmPKe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB56D208D5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSQCi-0000Xe-Tx
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 15:43:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43854)
+	id 1kSQEl-0002Q4-Gk
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 15:45:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44164)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kSQBp-0008UY-8P; Tue, 13 Oct 2020 15:42:29 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39913)
+ id 1kSQDW-0001U5-7H; Tue, 13 Oct 2020 15:44:14 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35790)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kSQBn-0002bz-Q6; Tue, 13 Oct 2020 15:42:28 -0400
-Received: by mail-wm1-x343.google.com with SMTP id d3so980115wma.4;
- Tue, 13 Oct 2020 12:42:27 -0700 (PDT)
+ id 1kSQDU-0002jL-Pm; Tue, 13 Oct 2020 15:44:13 -0400
+Received: by mail-wr1-x443.google.com with SMTP id n15so810800wrq.2;
+ Tue, 13 Oct 2020 12:44:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:references:from:message-id:date:user-agent
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=zsXmAvnfkQETc8sVboNjaVziLCDUeIESwvOimu3F67Q=;
- b=rGBNX7oQnJMsGnwgubOA6lCWIdXeayBxw0qS3lVS0xeOeMOdFv21TX17Bd3uX8skPN
- IcF4785AYtUURcvNUytus/D7RSxuhykV9k5NEjKndKggcf5LQxebZidOpvam51eKfV8p
- jRQlH6ikdpupjjOb2ngWHuGA8S6S+iItgINfu6T4M+/d/zaLxX0y+crkpvT64o6W3TKx
- +WFOXUsJqZ16fyJ2alLSNgYLJOvd70bF1G1+VY7Jvd/8tZirwjjeJbI8I+EeYF1TEUA4
- CJhS7jqzdb/nF2YQm0ADdrQHFIpHHs6sAXXF0NIx5ayxrN1J9+ArEU/QDXH9tNVI9ShZ
- /Shg==
+ bh=peOSRy93Mv6U4byq/ZpWobOwLNLsQC4CFYx7g0Hz+es=;
+ b=fmBVmPKeQXK7fVDkz8KPDOC2alKPa9qSnuOn1nirfPN7pK5hjiVoNf1uVgHuLSB7SQ
+ e0NkRYu9JYn/Z4U3s53rZMDgdIey1Jp0UJt1ONVwcmEz2QTXynocKLMZeu/SVrZFftXW
+ SRVcquOVEoGh5UFAaBlspkpRBz9+ev9ypzh59BVoYFccu2kGih0A1T2R2xYfxbdl+msP
+ jmZffGi56arFhz2tIphcoUozHLSXQS7n5GRYHoohOgMoGXI2TNr1zcfDg3xa9pPtqCvV
+ q78KfMqy2d6HCDyWPJddW7HALQHBGFRQddEQiIMfejY440WSU5PJSziisiAYKMpxMGcp
+ YhmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:references:from:message-id
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=zsXmAvnfkQETc8sVboNjaVziLCDUeIESwvOimu3F67Q=;
- b=TuqTC82UR9zg3wrK9UktENZOzZqWcYYD0yw3ZL0d03pmdgSzyJCgZt218QcGzxLjr9
- SV8hedBbJ2A1ll0qbftqGnSdBauq7+uvyMSONcGbzLanN2n+ZoyRhiTBxjqnvVTy2R3h
- ZrXDPzZct3GnhXUo52HCMoOsN38kEm/TRgfqLjDPzYZ94fhCBNhiBDtyDa3Edzrnk7ws
- eEmEdiY3dE6WpsU+dO0nv0A93SKIUo1OsX8pz+LarCjwTYpMJRISM56ixVNNnu52XkBl
- SGwWH2vIFBrf5ZMZD7VPfumf8ZFxJWwOSjTqd0VlX1cCTY8gopcMG0QxBMX4/N3GcnHt
- 4HbA==
-X-Gm-Message-State: AOAM533A8dKrO+0yunA9Oy+zl2tEhQu/WShUBDBBgVgDftXZNRWdbZZe
- 3KtwYG5uLMlByRSb5FkEz5deOoDB7/s=
-X-Google-Smtp-Source: ABdhPJyg92VCCOgi1aoXffqAJxLDW22lXZd/vM1RgR//XV4BAosQLJv5R9pMm6L77cgSTJs2QhH0Yw==
-X-Received: by 2002:a1c:e1d7:: with SMTP id y206mr1381687wmg.48.1602618145287; 
- Tue, 13 Oct 2020 12:42:25 -0700 (PDT)
+ bh=peOSRy93Mv6U4byq/ZpWobOwLNLsQC4CFYx7g0Hz+es=;
+ b=W2k2+GFcia0KEHApt2H3KXZ/utRcwEXqKs1koRgGozwxUgHFbSfRzOL75XWHdavAF7
+ XNKcryk9zuuhZTrhkQC3ISw3bN/codjmf/TArgbXujaWoCo8QGTMePWhAUrD16NsSVjm
+ +NEFpshI+ovkdXwy4sQnhjKINzchPwS9uYhTTKwPF/hqhLKCpLarbfkIorSG8h9nZMh3
+ PWFOOK4rNBf+BS07lk2OnfwKN/eqmRuCH7EmPZlcuO5njDEU78nXA5+1AD7Ks7V1dlS2
+ cJENma627Ep9haWLtasQcycQ2tOudD7BgbRfl3RmoqsDNnPn207IFv5jhujEvpSxWBxB
+ VB+w==
+X-Gm-Message-State: AOAM532iq5sLRaIJXtFtqBhUNr6Ff+NdQ9Jff5rzkcCtA50P4SPl1w2N
+ z6yicQd73YpykaYG3vDkmyA=
+X-Google-Smtp-Source: ABdhPJwCHq/qnjE4fn6KFfxUc2cvvbzwA2Twr3oZt70shGiB3v5JC/G5ABnufpx3KDn1UqbIc+Zcwg==
+X-Received: by 2002:adf:ff86:: with SMTP id j6mr1385090wrr.184.1602618250578; 
+ Tue, 13 Oct 2020 12:44:10 -0700 (PDT)
 Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
  [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id h16sm856555wre.87.2020.10.13.12.42.22
+ by smtp.gmail.com with ESMTPSA id x18sm866324wrg.4.2020.10.13.12.44.09
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 13 Oct 2020 12:42:24 -0700 (PDT)
-Subject: Re: [PATCH] target/riscv: Fix implementation of HLVX.WU instruction
-To: Georg Kotheimer <georg.kotheimer@kernkonzept.com>, qemu-devel@nongnu.org, 
- qemu-riscv@nongnu.org
-References: <20201013172223.443645-1-georg.kotheimer@kernkonzept.com>
+ Tue, 13 Oct 2020 12:44:09 -0700 (PDT)
+Subject: Re: [PATCH v7 3/8] mac_oldworld: Drop a variable, use
+ get_system_memory() directly
+To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org
+References: <cover.1593456926.git.balaton@eik.bme.hu>
+ <8ece4381702aa5d5f004616e1818dd9b33dab620.1593456926.git.balaton@eik.bme.hu>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ab7cb33b-e650-2ce8-8b04-f984accb9eb3@amsat.org>
-Date: Tue, 13 Oct 2020 21:42:21 +0200
+Message-ID: <c93fe382-9e68-a1ff-110b-f26a707b1247@amsat.org>
+Date: Tue, 13 Oct 2020 21:44:09 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201013172223.443645-1-georg.kotheimer@kernkonzept.com>
+In-Reply-To: <8ece4381702aa5d5f004616e1818dd9b33dab620.1593456926.git.balaton@eik.bme.hu>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -104,44 +106,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: David Gibson <david@gibson.dropbear.id.au>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Howard Spoelstra <hsp.cat7@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/13/20 7:22 PM, Georg Kotheimer wrote:
-> The HLVX.WU instruction is supposed to read a machine word,
-> but prior to this change it read a byte instead.
+On 6/29/20 8:55 PM, BALATON Zoltan wrote:
+> Half of the occurances already use get_system_memory() directly
+> instead of sysmem variable, convert the two other uses to
+> get_system_memory() too which seems to be more common and drop the
+> variable.
 > 
-
-Fixes: 8c5362acb57 ("target/riscv: Allow generating hlv/hlvx/hsv 
-instructions")
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> Signed-off-by: Georg Kotheimer <georg.kotheimer@kernkonzept.com>
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > ---
->   target/riscv/op_helper.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-> index 9b9ada45a9..3b7bd6ee88 100644
-> --- a/target/riscv/op_helper.c
-> +++ b/target/riscv/op_helper.c
-> @@ -334,12 +334,12 @@ target_ulong helper_hyp_x_load(CPURISCVState *env, target_ulong address,
->           riscv_cpu_set_two_stage_lookup(env, true);
->   
->           switch (memop) {
-> -        case MO_TEUL:
-> -            pte = cpu_ldub_data_ra(env, address, GETPC());
-> -            break;
->           case MO_TEUW:
->               pte = cpu_lduw_data_ra(env, address, GETPC());
->               break;
-> +        case MO_TEUL:
-> +            pte = cpu_ldl_data_ra(env, address, GETPC());
-> +            break;
->           default:
->               g_assert_not_reached();
->           }
-> 
+>   hw/ppc/mac_oldworld.c | 5 ++---
+>   1 file changed, 2 insertions(+), 3 deletions(-)
 
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
