@@ -2,88 +2,77 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.2 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,PLING_QUERY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35A4CC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 04:31:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9707C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 04:54:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A58E20872
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 04:31:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hbSfxJ5C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A58E20872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 498A120872
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 04:54:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 498A120872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSByQ-0003bF-3i
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 00:31:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38758)
+	id 1kSCKH-0006P9-CL
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 00:54:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41976)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hiharryharryharry@gmail.com>)
- id 1kSBxl-00037N-Ac
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 00:31:01 -0400
-Received: from mail-lf1-x12d.google.com ([2a00:1450:4864:20::12d]:37736)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <hiharryharryharry@gmail.com>)
- id 1kSBxj-00014T-LZ
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 00:31:01 -0400
-Received: by mail-lf1-x12d.google.com with SMTP id j30so18235092lfp.4
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 21:30:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=uHznmbCYbnVYecu07LGVp8fB7JwZJ5KDqnd/eEunNDM=;
- b=hbSfxJ5CVGioEMU5n741pcODDKPoNH5SSgkekndiWv1TT4qukDXBS5vlebLXLizLhR
- b4/xZNkOX8GUCTMfRcbFxVTmHfXDintMAv+I0dCZu8x10B0BeVAb1EK6iyIwsKelyB6W
- 49HWvQPmRhTPe7czs0xYGmBuAxhIKguXdm6U/LkmhdQaXYY/6HK690XILw4aD60MQzPP
- 2hX5naXiVNg0y+rLLAeVix/vfEo/6fwcLnJnfLFGi7Q59OdXMtQEC9mfQysKcWYV0z1R
- 6Y+HGXCqylbL01C3ndpfSZsNs6QT594drgNLbt2xh6sWKUtdoaoXvp7rjDZ078WFKoIH
- YX+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=uHznmbCYbnVYecu07LGVp8fB7JwZJ5KDqnd/eEunNDM=;
- b=qIofGZ026SDzEb1KvMi8zmbqbCF1AirOUEJ2Lio/qC53Z6q6FeLKXi7d+29a7riSKA
- DLh7behODpFfdLi/CsC/gooWu8VBhu4h89YPDcoi1ORdWB/VibfWomDhfD5Sl36uOQfH
- Qoe7TJDgI+walDLYFGu/WbHS6tRbx54dIi8kRUFu14W2zIXcAH8Hs70+n8/r91TY/8kY
- m7xtB6/j1VhvVzpD84dqRqxJG3s9lOL9emJLqEUD/DDzAnz5g+BMcva1nKayYWJ8TLxF
- 6Jgyqah3+BCLw9lJFkeHYV+uxkgQ0jHeSOWSq4+41r6lNM2T5+7ltnfEm4c8GhAryX4b
- SGXQ==
-X-Gm-Message-State: AOAM5309f8usMqoT3UfZ3VofFVrjeyRxs+Ox2k0pTT7jdtfowF3EdLWy
- FpnWe7YpC19mLbwrIdl1rdTg8Cbnz4EJLEd0uJM=
-X-Google-Smtp-Source: ABdhPJw5ESgwC0DgMZ9wENbc2k3XxUS8EJuXNnfvWh0zkKlUw6sic73+LBqE6Y3TydBD4veYlUsxLM4tVDHZ9ncz+Gk=
-X-Received: by 2002:a19:c6cc:: with SMTP id w195mr2030275lff.24.1602563456727; 
- Mon, 12 Oct 2020 21:30:56 -0700 (PDT)
-MIME-Version: 1.0
+ (Exim 4.90_1) (envelope-from <sean.j.christopherson@intel.com>)
+ id 1kSCIy-0005Wy-KI
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 00:52:56 -0400
+Received: from mga14.intel.com ([192.55.52.115]:60361)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <sean.j.christopherson@intel.com>)
+ id 1kSCIw-0000Lt-07
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 00:52:56 -0400
+IronPort-SDR: bPFBYna63dBBeZoF+x2Z5QiSeytknHoUYeWZklqrJ9o67VqWV2U35+/QvCclqDeGBt9tVsBMZK
+ +gVDyjMhXqUA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9772"; a="165060406"
+X-IronPort-AV: E=Sophos;i="5.77,369,1596524400"; d="scan'208";a="165060406"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 12 Oct 2020 21:52:47 -0700
+IronPort-SDR: JTyvnc12S1kQiiZJgg4rnYCcYaPtwvgUrkZPyP0bv8wO6HSf5x4alc6NZwBMKoVhy+rMETozEw
+ 1HoTSMgPCsFg==
+X-IronPort-AV: E=Sophos;i="5.77,369,1596524400"; d="scan'208";a="463353306"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com)
+ ([10.54.74.160])
+ by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 12 Oct 2020 21:52:46 -0700
+Date: Mon, 12 Oct 2020 21:52:45 -0700
+From: Sean Christopherson <sean.j.christopherson@intel.com>
+To: harry harry <hiharryharryharry@gmail.com>
+Subject: Re: Why guest physical addresses are not the same as the
+ corresponding host virtual addresses in QEMU/KVM? Thanks!
+Message-ID: <20201013045245.GA11344@linux.intel.com>
 References: <CA+-xGqMd4_58_+QKetjOsubBqrDnaYF+YWE3TC3kEcNGxPiPfg@mail.gmail.com>
  <47ead258320536d00f9f32891da3810040875aff.camel@redhat.com>
  <CA+-xGqOm2sWbxR=3W1pWrZNLOt7EE5qiNWxMz=9=gmga15vD2w@mail.gmail.com>
  <20201012165428.GD26135@linux.intel.com>
-In-Reply-To: <20201012165428.GD26135@linux.intel.com>
-From: harry harry <hiharryharryharry@gmail.com>
-Date: Tue, 13 Oct 2020 00:30:39 -0400
-Message-ID: <CA+-xGqPkkiws0bxrzud_qKs3ZmKN9=AfN=JGephfGc+2rn6ybw@mail.gmail.com>
-Subject: Re: Why guest physical addresses are not the same as the
- corresponding host virtual addresses in QEMU/KVM? Thanks!
-To: Sean Christopherson <sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::12d;
- envelope-from=hiharryharryharry@gmail.com; helo=mail-lf1-x12d.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -19
-X-Spam_score: -2.0
-X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- PLING_QUERY=0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ <CA+-xGqPkkiws0bxrzud_qKs3ZmKN9=AfN=JGephfGc+2rn6ybw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+-xGqPkkiws0bxrzud_qKs3ZmKN9=AfN=JGephfGc+2rn6ybw@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
+Received-SPF: pass client-ip=192.55.52.115;
+ envelope-from=sean.j.christopherson@intel.com; helo=mga14.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 00:52:48
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -67
+X-Spam_score: -6.8
+X-Spam_bar: ------
+X-Spam_report: (-6.8 / 5.0 requ) BAYES_00=-1.9, PLING_QUERY=0.1,
+ RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,36 +93,37 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Sean,
+On Tue, Oct 13, 2020 at 12:30:39AM -0400, harry harry wrote:
+> Hi Sean,
+> 
+> Thank you very much for your thorough explanations. Please see my
+> inline replies as follows. Thanks!
+> 
+> On Mon, Oct 12, 2020 at 12:54 PM Sean Christopherson
+> <sean.j.christopherson@intel.com> wrote:
+> >
+> > No, the guest physical address spaces is not intrinsically tied to the host
+> > virtual address spaces.  The fact that GPAs and HVAs are related in KVM is a
+> > property KVM's architecture.  EPT/NPT has absolutely nothing to do with HVAs.
+> >
+> > As Maxim pointed out, KVM links a guest's physical address space, i.e. GPAs, to
+> > the host's virtual address space, i.e. HVAs, via memslots.  For all intents and
+> > purposes, this is an extra layer of address translation that is purely software
+> > defined.  The memslots allow KVM to retrieve the HPA for a given GPA when
+> > servicing a shadow page fault (a.k.a. EPT violation).
+> >
+> > When EPT is enabled, a shadow page fault due to an unmapped GPA will look like:
+> >
+> >  GVA -> [guest page tables] -> GPA -> EPT Violation VM-Exit
+> >
+> > The above walk of the guest page tables is done in hardware.  KVM then does the
+> > following walks in software to retrieve the desired HPA:
+> >
+> >  GPA -> [memslots] -> HVA -> [host page tables] -> HPA
+> 
+> Do you mean that GPAs are different from their corresponding HVAs when
+> KVM does the walks (as you said above) in software?
 
-Thank you very much for your thorough explanations. Please see my
-inline replies as follows. Thanks!
-
-On Mon, Oct 12, 2020 at 12:54 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> No, the guest physical address spaces is not intrinsically tied to the host
-> virtual address spaces.  The fact that GPAs and HVAs are related in KVM is a
-> property KVM's architecture.  EPT/NPT has absolutely nothing to do with HVAs.
->
-> As Maxim pointed out, KVM links a guest's physical address space, i.e. GPAs, to
-> the host's virtual address space, i.e. HVAs, via memslots.  For all intents and
-> purposes, this is an extra layer of address translation that is purely software
-> defined.  The memslots allow KVM to retrieve the HPA for a given GPA when
-> servicing a shadow page fault (a.k.a. EPT violation).
->
-> When EPT is enabled, a shadow page fault due to an unmapped GPA will look like:
->
->  GVA -> [guest page tables] -> GPA -> EPT Violation VM-Exit
->
-> The above walk of the guest page tables is done in hardware.  KVM then does the
-> following walks in software to retrieve the desired HPA:
->
->  GPA -> [memslots] -> HVA -> [host page tables] -> HPA
-
-Do you mean that GPAs are different from their corresponding HVAs when
-KVM does the walks (as you said above) in software?
-
-Thanks,
-Harry
+What do you mean by "different"?  GPAs and HVAs are two completely different
+address spaces.
 
