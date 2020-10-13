@@ -2,89 +2,87 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3449EC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 15:15:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90A10C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 15:17:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B29D524900
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 15:15:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B29D524900
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=getutm.app
+	by mail.kernel.org (Postfix) with ESMTPS id 1E1E424900
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 15:17:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HiERlVxa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E1E424900
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSM1Q-0005Tw-M7
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 11:15:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51532)
+	id 1kSM3k-0007Rf-7L
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 11:17:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52430)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <osy86dev@gmail.com>)
- id 1kSLzU-0004WF-TN
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 11:13:28 -0400
-Received: from mail-il1-f194.google.com ([209.85.166.194]:42300)
+ (Exim 4.90_1) (envelope-from <shashi.mallela@linaro.org>)
+ id 1kSM2W-00065G-P2
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 11:16:36 -0400
+Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:41446)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <osy86dev@gmail.com>)
- id 1kSLzS-00088W-N3
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 11:13:28 -0400
-Received: by mail-il1-f194.google.com with SMTP id l16so120048ilj.9
- for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 08:13:25 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <shashi.mallela@linaro.org>)
+ id 1kSM2V-0000Ah-1h
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 11:16:36 -0400
+Received: by mail-qk1-x743.google.com with SMTP id b69so100497qkg.8
+ for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 08:16:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id;
+ bh=hre4F+plBD5IZZTCSQVqpoMkNAABnjkZeqwM/SAcEeE=;
+ b=HiERlVxaRhCt2x5ForrpP+fhpHNqOqaVkHF7l3R8/Aj0UqsgG3RHxIukz5cXV4ekDd
+ nb301uMy64A4V0HNEFJELDhb9G+AkA+SAKWiRlhrQ7AyeDxZ8K9chfRfIJEhHoYIuKpN
+ TP1o+RSFJGSUsRNZnmrb5KOGcAADKpl336O6DYlJ25j/KdEwLcjaytJRLVXYqC3gu2MV
+ jHapnSHsKnTjok1fgbRUhN83YAvBFWyvnkTtDjB6rhhfldPLEiLmp1vhFUeDz6qx3IvK
+ 6GF+POqnOpokWTBbJhjbcdUKJ7gFVzZ4Dspbv8Ad7sBNEtQp1Mfn8e1+j9t5N/EDr4BM
+ XmcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=c8sbFAoVKGdbgaQXLpT6TJwGNE2XeXJsa9RBv20hgsE=;
- b=j5MxoLZCmRAjZx7/7M2rrtKGqd9CGLJDRnFjB9TH7EYWw/CXDlaTLu/tVfkXpdD9h2
- uoMHON6WjjkUw4HbJgmNiGB7D2IWW7Xosd8JJtjw+ZYr5siOBrR1JA6e1xzZSijS0VOo
- xcQlIq8zXGeSTxBDTbt083wVqQ7JwjoU7D3JHfGS6txoRfG9bKB+SYO5UOJBpsVinIhf
- S6dUkfI+KU476Ohv5JWMS8lf2rqn2sDX4iJMJkNwHOtK5uVgMXXuTJ5cuQ5F19FcHNNb
- RenL9Dk6qPDPBVW9m+PgXhpnAIxkDNoUIcA3u7hhj+14rjlpYrzFOr5nsAEXzWE4OAkk
- wGXg==
-X-Gm-Message-State: AOAM532o9vhQmIBhNtcEt8mhF4gsq4B3ubwpp+GeM5G0h1yCCdjBF3IQ
- lNXfSFZT8/QEHVkEXcYytIOovD69g3A=
-X-Google-Smtp-Source: ABdhPJwIOpPqaOSbK36HJI8yKBJuifXQmljT6n0OI5F1+M1mAtcJixECBbGfbCHyrKDBiWZkiUWBlQ==
-X-Received: by 2002:a92:dc8f:: with SMTP id c15mr317903iln.293.1602602004750; 
- Tue, 13 Oct 2020 08:13:24 -0700 (PDT)
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com.
- [209.85.166.51])
- by smtp.gmail.com with ESMTPSA id c9sm123932iob.14.2020.10.13.08.13.24
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 13 Oct 2020 08:13:24 -0700 (PDT)
-Received: by mail-io1-f51.google.com with SMTP id d20so22987049iop.10
- for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 08:13:24 -0700 (PDT)
-X-Received: by 2002:a5d:9243:: with SMTP id e3mr20193586iol.193.1602602004018; 
- Tue, 13 Oct 2020 08:13:24 -0700 (PDT)
-MIME-Version: 1.0
-References: <20201012232939.48481-1-j@getutm.app>
- <20201012232939.48481-10-j@getutm.app>
- <a132bc5b-9029-db47-1f38-0dec75029e10@redhat.com>
- <CAFEAcA9D+1g_6gxPLHwgVHbMwW7e=Ana-fM-fJa+jDDSm0gA8g@mail.gmail.com>
-In-Reply-To: <CAFEAcA9D+1g_6gxPLHwgVHbMwW7e=Ana-fM-fJa+jDDSm0gA8g@mail.gmail.com>
-From: Joelle van Dyne <j@getutm.app>
-Date: Tue, 13 Oct 2020 08:13:13 -0700
-X-Gmail-Original-Message-ID: <CA+E+eSC6zD3gopRYRkfwZ0ZpQQPvKNegaEouT4c5-aCSnb8L_w@mail.gmail.com>
-Message-ID: <CA+E+eSC6zD3gopRYRkfwZ0ZpQQPvKNegaEouT4c5-aCSnb8L_w@mail.gmail.com>
-Subject: Re: [PATCH 09/10] tcg: support JIT on Apple Silicon
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=209.85.166.194; envelope-from=osy86dev@gmail.com;
- helo=mail-il1-f194.google.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 11:13:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -13
-X-Spam_score: -1.4
-X-Spam_bar: -
-X-Spam_report: (-1.4 / 5.0 requ) BAYES_00=-1.9,
- FREEMAIL_FORGED_FROMDOMAIN=0.249, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=hre4F+plBD5IZZTCSQVqpoMkNAABnjkZeqwM/SAcEeE=;
+ b=jf7wYibazMgmHe4MGFz21I7/sTfm9C72hzTalfaM6MzANq6aEm5xZ6W59SbKUqE7bV
+ JL0at8xCZMBDWfz6rLyqxORAx6C2bsySMzsxTMx88jVsCYGFOJ4kHhok9MPoRXo0pzqF
+ /yJa2sZG/eckuANbGnubNPWp8N4bPjSrCd7twHlluIQnBe3oji+Dzuj68sVR/stIuadO
+ eKdB0LwhH7hCxEXnzWQYU8jB72EqPib52fUq+l+c/ccr/mxVMN+dEoD0hlpZJxUEbXTr
+ htzjzfUyIuvql5XbwPHH4VE4tTi+A1LoIrbmL36SJ69u+frnm+gMBzIV5e580ZVC+Iv5
+ nf5Q==
+X-Gm-Message-State: AOAM530ljBfsDI7nNDktxxq0f7dW9EdnQSrzBjdCdA8VVJ+Zr0OReIZZ
+ qeL1rEW2Nm4L6j0dTtWylATIAw==
+X-Google-Smtp-Source: ABdhPJyU16gz8Ln5Ajl4wicfBkCCBNByHxCgrdUcCMZdhcwHzm/depWVCWfpu1H6ioZE/it6E/cIqQ==
+X-Received: by 2002:a37:393:: with SMTP id 141mr367809qkd.427.1602602193620;
+ Tue, 13 Oct 2020 08:16:33 -0700 (PDT)
+Received: from master.ht.home ([2607:fea8:e2a0:e950::5917])
+ by smtp.googlemail.com with ESMTPSA id g20sm55604qtq.51.2020.10.13.08.16.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 13 Oct 2020 08:16:32 -0700 (PDT)
+From: Shashi Mallela <shashi.mallela@linaro.org>
+To: peter.maydell@linaro.org,
+	leif@nuviainc.com,
+	rad@semihalf.com
+Subject: [PATCH v5 0/2] Add watchdog support for SbsaQemu
+Date: Tue, 13 Oct 2020 11:16:29 -0400
+Message-Id: <20201013151631.30678-1-shashi.mallela@linaro.org>
+X-Mailer: git-send-email 2.18.4
+Received-SPF: pass client-ip=2607:f8b0:4864:20::743;
+ envelope-from=shashi.mallela@linaro.org; helo=mail-qk1-x743.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,55 +95,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Joelle van Dyne <j@getutm.app>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The APIs link correctly but are NOPs on Intel machines. I think full
-testing would require Apple Silicon or emulation. Is there precedent
-for any other platform/feature that requires hardware specific
-features?
+This patch series adds watchdog timer support for SbsaQemu platform.
 
--j
+The watchdog timer has been implemented first based on the generic
+watchdog timer specifications from ARM BSA v0.9 and then used 
+in the SbsaQemu reference platform
 
-On Tue, Oct 13, 2020 at 7:09 AM Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> On Tue, 13 Oct 2020 at 14:58, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >
-> > On 13/10/20 01:29, Joelle van Dyne wrote:
-> > > From: osy <osy86@users.noreply.github.com>
-> > >
-> > > https://developer.apple.com/documentation/apple_silicon/porting_just-in-time_compilers_to_apple_silicon
-> > >
-> > > For < iOS 14, reverse engineered functions from libsystem_pthread.dylib is
-> > > implemented to handle APRR supported SoCs.
-> > >
-> > > The following rules apply for JIT write protect:
-> > >   * JIT write-protect is enabled before tcg_qemu_tb_exec()
-> > >   * JIT write-protect is disabled after tcg_qemu_tb_exec() returns
-> > >   * JIT write-protect is disabled inside do_tb_phys_invalidate() but if it
-> > >     is called inside of tcg_qemu_tb_exec() then write-protect will be
-> > >     enabled again before returning.
-> > >   * JIT write-protect is disabled by cpu_loop_exit() for interrupt handling.
-> > >   * JIT write-protect is disabled everywhere else.
-> > >
-> > > Signed-off-by: Joelle van Dyne <j@getutm.app>
-> >
-> > Can this be emulated somehow on other platforms (such as Linux) so that
-> > it does not bitrot?
->
-> Some of it is write^execute, which we could test via OpenBSD
-> I think if we updated our VM image not to mount the disk
-> with that protection disabled. Having "generically support
-> w^x" be separate from "iOS specifics" might be useful.
->
-> The apple.com webpage linked above suggests also that we could
-> test some at least of these APIs on our OSX builds if we
-> enable the "hardened runtime" on x86 (though that might also
-> enable other stuff we don't want to deal with? no idea)
->
-> thanks
-> -- PMM
+Changes in v5:
+- updated irq number of gwdt in sbsa-ref since the same
+  is being used by SMMU as per latest master merge
+- addressed review comments
+
+Shashi Mallela (2):
+  hw/watchdog: Implement SBSA watchdog device
+  hw/arm/sbsa-ref: add SBSA watchdog device
+
+ hw/arm/Kconfig                      |   1 +
+ hw/arm/sbsa-ref.c                   |  50 ++++
+ hw/watchdog/Kconfig                 |   4 +
+ hw/watchdog/meson.build             |   1 +
+ hw/watchdog/wdt_sbsa_gwdt.c         | 346 ++++++++++++++++++++++++++++
+ include/hw/watchdog/wdt_sbsa_gwdt.h |  70 ++++++
+ 6 files changed, 472 insertions(+)
+ create mode 100644 hw/watchdog/wdt_sbsa_gwdt.c
+ create mode 100644 include/hw/watchdog/wdt_sbsa_gwdt.h
+
+-- 
+2.18.4
+
 
