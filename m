@@ -2,94 +2,137 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4910CC433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 11:31:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4358CC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 11:33:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45D8D20659
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 11:31:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4829920E65
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 11:33:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cgyNXbsE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45D8D20659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="j/TdhRDC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4829920E65
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSIWr-000264-5v
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 07:31:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39314)
+	id 1kSIZ0-00049q-9v
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 07:33:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39792)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kSIVW-0001YE-PB
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 07:30:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20131)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kSIVL-0002Ct-8p
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 07:30:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602588604;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=STEfBjcmHAB31/rHNu9nB1Y1ZCgfFjr02bdPJi3AY10=;
- b=cgyNXbsE9gGjvX/L7zRjHLviw3N8u7egD4WlXfTB2RphGdc7f8mteWJk0Nk4PEqvgXCNv+
- LitLjFQUx9r3xEcFfVdaglM2UR12ZVmT+Yb3UoDAAKBd2Ca7MeY/vQvtdX4KrikcYcria3
- /ZhFryhqUge+Ey6XgRqbHTXzRL5LPK4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-272-24FZHRGLPjS7A_Uoqkf5AA-1; Tue, 13 Oct 2020 07:29:57 -0400
-X-MC-Unique: 24FZHRGLPjS7A_Uoqkf5AA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1A7F835B8E;
- Tue, 13 Oct 2020 11:29:55 +0000 (UTC)
-Received: from merkur.fritz.box (ovpn-114-201.ams2.redhat.com [10.36.114.201])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CE0696EF78;
- Tue, 13 Oct 2020 11:29:49 +0000 (UTC)
-Date: Tue, 13 Oct 2020 13:29:48 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PULL 09/14] qmp: Move dispatcher to a coroutine
-Message-ID: <20201013112948.GA9674@merkur.fritz.box>
-References: <20201009063432.303441-1-armbru@redhat.com>
- <20201009063432.303441-10-armbru@redhat.com>
- <87zh4rzpot.fsf@linaro.org>
- <20201012112506.GC7777@merkur.fritz.box>
- <99cc6bd1-58fd-af29-0b41-3f3e5043cc3a@amsat.org>
- <20201012124743.GD7777@merkur.fritz.box>
- <87r1q3zdv9.fsf@linaro.org>
- <20201012184919.d4ivnajku6ydewpm@mail.bwidawsk.net>
- <CAP+75-UChQJ_YtUU40ttn=1GwNuYQ7X9xXS+CWg+ZXcLL-jocQ@mail.gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <CAP+75-UChQJ_YtUU40ttn=1GwNuYQ7X9xXS+CWg+ZXcLL-jocQ@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kSIXt-00031B-Ad; Tue, 13 Oct 2020 07:32:45 -0400
+Received: from mail-eopbgr60135.outbound.protection.outlook.com
+ ([40.107.6.135]:8903 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kSIXq-0002cg-8O; Tue, 13 Oct 2020 07:32:44 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OrQoAO+J0VD1aQOAw9ahE7vemX/5aU/ufjrTgJPzMqgonWivs2UkAo1H4mY/yNMIribCUCQlKsJErmqcXVTcqG5VegJfkiGhVgsuo0RJWpFKCQzFWGWG47hNDOxKQvjD6FwIX3yrG3IawUYl1weNtU8BXSiQadijL4sO9a3wuwB0BJTmLpHbvAchlzrsJ4rH7840W3F+S+oHZZQY1kNm/KXz7Fm4L5D/F0UCtRFQ8GJJXSA9UbaU905IJ7MNxrjv8fBUdYWfx8hSixfuNEjt8mEj6I/0fr+r8rYrLaKDxldwnTb/+lpy3W6OTFmvCITvnYUd1uiOROgroEycwXIcVw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=f45eGTI8FvgkMUJ+foXJ4xgL0hwpICBbYC3Gqr4Jh+M=;
+ b=TqyvayCrcQQT9nwT7UTAJnJhG5RKoIo8kfzfB/hLfFDwU061XdwEyoiH4Rqmetnw6qpm9LuK49ZC1dB7bWKfndGojKTHXZNfHssRU0XxvHIOiYYDH9bSOyc4SgHLa8+HnST9DRViHhrwCtOc+tSQT9NAn1juZaM0owZ0OfXLLpCoNxu3owPNrUpSak6ZQrKD30pol4jnUDXT2JWCeDvzSKlykU1+pxh4Hd8o3bCW4GAR040C79GvbVifmG84Swsnl15JxMRGfsBPOzTPyz45XbYfaXR6TKqBtb9wPolon8jfX+WAqEaaFDJbXnXG+ag8AcPqeNYUk+ohyZsHQFxHpA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=f45eGTI8FvgkMUJ+foXJ4xgL0hwpICBbYC3Gqr4Jh+M=;
+ b=j/TdhRDCiCU83htqG/6S88zaZaSf9Dqy5hcFGJxOknI6RLW+UW3MeotEFr+UaKh7LdIlZLILcvSadYYex1a9o9AHCP/XUnzVYDEJxXfWXZgoW0YQXafNu0t8loE4ZQrprzGOeafPgKpOKevCeKAPtPMu0LQQ0CHLAkrJEfMcqu4=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB5031.eurprd08.prod.outlook.com (2603:10a6:20b:ed::12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.20; Tue, 13 Oct
+ 2020 11:32:37 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3455.031; Tue, 13 Oct 2020
+ 11:32:37 +0000
+Subject: Re: [PATCH] migration/block-dirty-bitmap: fix uninitialized variable
+ warning
+To: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>,
+ Laurent Vivier <laurent@vivier.eu>, Li Qiang <liq3ea@gmail.com>
+Cc: Fam Zheng <fam@euphon.net>, ganqixin <ganqixin@huawei.com>,
+ Zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ Juan Quintela <quintela@redhat.com>,
+ "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ Qemu Developers <qemu-devel@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Euler Robot <euler.robot@huawei.com>,
+ Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
+References: <20201010110730.1575180-1-kuhn.chenqun@huawei.com>
+ <2b2bc826-0785-66e2-3515-b98abfac26ca@vivier.eu>
+ <CAKXe6SL8fRN=-iqFEiHeWqZm0F+T+8vkc7qJeUz6izQcZQ2Q-A@mail.gmail.com>
+ <70bc9735-6555-078a-52da-61da6c58f1d3@vivier.eu>
+ <7412CDE03601674DA8197E2EBD8937E83B9B2054@dggemm531-mbx.china.huawei.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <82c0eefd-9227-8d76-e941-343ac78895a7@virtuozzo.com>
+Date: Tue, 13 Oct 2020 14:32:35 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.2
+In-Reply-To: <7412CDE03601674DA8197E2EBD8937E83B9B2054@dggemm531-mbx.china.huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 03:04:27
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Originating-IP: [185.215.60.122]
+X-ClientProxiedBy: AM3PR05CA0141.eurprd05.prod.outlook.com
+ (2603:10a6:207:3::19) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.5] (185.215.60.122) by
+ AM3PR05CA0141.eurprd05.prod.outlook.com (2603:10a6:207:3::19) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3455.23 via Frontend Transport; Tue, 13 Oct 2020 11:32:36 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: ebc57186-c424-4470-5137-08d86f6bafa4
+X-MS-TrafficTypeDiagnostic: AM6PR08MB5031:
+X-Microsoft-Antispam-PRVS: <AM6PR08MB5031A0E28BA406A6CB3F0043C1040@AM6PR08MB5031.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:18;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: BUdn6CBRjLmxXuAuN6jVX8vruWCg44XaIf24m9MIRzZS8FC9FrnHJNyj6mKgbmKL5824BNT55agsK2dbfSyxSanfgaT+72mAXVMN0RimNHaFyhj38D7fazyE0R8EdHWcJfY5mfOzi8mVZJYUgkCm5RvgMYZmBnRkb1TuuzJkL1BPQwY3hndewfxmu7dhoB8UTw9e1vvK0SkmlAdkz3wz1icgIBZcMNylFU5f/kerA1/54NGVwkOwMy7jIJ/Mv0fAk7Of3OVtEfqr8jBc/iM3OtsiWgDZx6bPZNjB3sJbcklOkIaKJtPn5rEHU4gizTakFyg73lxGjS5uIAsaDr1vw0TgxonMGU+sbvyhCmYMbNw9MgniMjblPblj1u+SbGM4oImpz4m+cbFPxxHmlhhjY62qeyy70yuk/8dEas3YxFkihbdjeYhR1nAIN+txjrIP
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(396003)(366004)(39840400004)(346002)(376002)(136003)(83380400001)(66574015)(8676002)(316002)(110136005)(16576012)(54906003)(36756003)(8936002)(66556008)(66946007)(2906002)(66476007)(6486002)(5660300002)(52116002)(956004)(2616005)(86362001)(31696002)(31686004)(7416002)(53546011)(186003)(16526019)(26005)(478600001)(4326008)(14143004)(43740500002)(309714004);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: j7hkmvsKn6WFpgKdYYFZty8BD7THG4ZjJa5NupyGNs5uYtwneM3U+tQD7q9+mX7rF/PhUy3ZYa+eH0jUPmcrXzQHkraNWUKGSfd2FQdG1711mZSsf5G7KAq1gtzxEwZIZlP9XgLB3/xIRumS0OS30YZm7F/YLeCGV6Kc1ZKp2X0rNO3486YDzU86LrkXaG3/b+TTCzADIKPD9SM/LmBoFpC+xz+YsniX1bB6J2sph4uY4q0MMqtQ0YARWNslKNMUS9MyciNBgKX2jqiCb/cF+Ot5OT89MqZ53vTmiVhn/9ug4aL7kbRT4CzCVGI5vbpSOnBZDAavFo11KrdPU63m7I8DrQdgZwyvs7wjltDfOcDC3IDhtUm4lGwJqbreZJP5FFOIMIKXECeB3iIDeLsCwZWYRFCbnTenfLd6jvLB5Om+lqdI/ozIZH6tRcZQXKVSLGFTcxlvKsAB7X7DE/HUep4jgRqbLevDF/7XBs4shalJS0LuRsLZyMW5SamX4OhQDHYFlGzqaxZ395n1e1CgzQ46T3KheGaqZWMdprlve3aLC1X+vXLAHa9+6TUefPGWDHY7z/EQv6l86dmAb1tyO9R3KgeOVa7hnU9dCgS+YR0uYWZsQsjGjjBUb72cQ6rysXwqd4TBoRW5eFfvpCudLA==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ebc57186-c424-4470-5137-08d86f6bafa4
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2020 11:32:37.2696 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: XLS1bENowYwXNqt0Tx48lu3YY6CQvtPyrsjpg5HNY2yFYBSHb6uRyzYxsfkjzrCd2+A5+RCdKICFCZPWcyg3/O6Ghq9DdKwxN1tJckwOcBA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5031
+Received-SPF: pass client-ip=40.107.6.135;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-DB3-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 07:32:38
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,259 +145,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ben Widawsky <ben@bwidawsk.net>, Markus Armbruster <armbru@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Pavel Dovgalyuk <dovgaluk@ispras.ru>,
- Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 13.10.2020 um 09:56 hat Philippe Mathieu-Daudé geschrieben:
-> On Mon, Oct 12, 2020 at 8:57 PM Ben Widawsky <ben@bwidawsk.net> wrote:
-> >
-> > On 20-10-12 16:02:34, Alex Bennée wrote:
-> > >
-> > > Kevin Wolf <kwolf@redhat.com> writes:
-> > >
-> > > > Am 12.10.2020 um 13:53 hat Philippe Mathieu-Daudé geschrieben:
-> > > >> On 10/12/20 1:25 PM, Kevin Wolf wrote:
-> > > >> > Am 12.10.2020 um 12:47 hat Alex Bennée geschrieben:
-> > > >> > >
-> > > >> > > Markus Armbruster <armbru@redhat.com> writes:
-> > > >> > >
-> > > >> > > > From: Kevin Wolf <kwolf@redhat.com>
-> > > >> > > >
-> > > >> > > > This moves the QMP dispatcher to a coroutine and runs all QMP command
-> > > >> > > > handlers that declare 'coroutine': true in coroutine context so they
-> > > >> > > > can avoid blocking the main loop while doing I/O or waiting for other
-> > > >> > > > events.
-> > > >> > >
-> > > >> > > This subtly changes the replay behaviour leading to a hang in:
-> > > >> > >
-> > > >> > >    10:55:18 [alex.bennee@hackbox2:~/l/q/b/bisect] (625581c2…)|✚1(+1/-1) + ./tests/venv/bin/avocado run tests/acceptance/replay_kernel.py:ReplayKernel.test_arm_virt
-> > > >> > >    Fetching asset from tests/acceptance/replay_kernel.py:ReplayKernel.test_arm_virt
-> > > >> > >    JOB ID     : ec11fd2544f06e6c0d421f16afa757b49f7ed734
-> > > >> > >    JOB LOG    : /home/alex.bennee/avocado/job-results/job-2020-10-12T11.40-ec11fd2/job.log
-> > > >> > >     (1/1) tests/acceptance/replay_kernel.py:ReplayKernel.test_arm_virt: ERROR: Could not perform graceful shutdown (26.27 s)
-> > > >> > >    RESULTS    : PASS 0 | ERROR 1 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CANCEL 0
-> > > >> > >    JOB TIME   : 27.77 s
-> > > >> > >
-> > > >> > > Looking at the log:
-> > > >> > >
-> > > >> > >    2020-10-12 11:40:31,426 __init__         L0085 DEBUG| [    3.887411] rtc-pl031 9010000.pl031: setting system clock to 2020-10-12 10:40:31 UTC (1602499231)
-> > > >> > >    2020-10-12 11:40:31,428 __init__         L0085 DEBUG| [    3.887431] sr_init: No PMIC hook to init smartreflex
-> > > >> > >    2020-10-12 11:40:31,447 __init__         L0085 DEBUG| [    3.897193] uart-pl011 9000000.pl011: no DMA platform data
-> > > >> > >    2020-10-12 11:40:31,460 __init__         L0085 DEBUG| [    3.897242] md: Waiting for all devices to be available before autodetect
-> > > >> > >    2020-10-12 11:40:31,462 __init__         L0085 DEBUG| [    3.897259] md: If you don't use raid, use raid=noautodetect
-> > > >> > >    2020-10-12 11:40:31,475 __init__         L0085 DEBUG| [    3.897819] md: Autodetecting RAID arrays.
-> > > >> > >    2020-10-12 11:40:31,476 __init__         L0085 DEBUG| [    3.897832] md: autorun ...
-> > > >> > >    2020-10-12 11:40:31,477 __init__         L0085 DEBUG| [    3.897842] md: ... autorun DONE.
-> > > >> > >    2020-10-12 11:40:31,483 __init__         L0085 DEBUG| [    3.897962] VFS: Cannot open root device "(null)" or unknown-block(0,0): error -6
-> > > >> > >    2020-10-12 11:40:31,483 qmp              L0245 DEBUG| >>> {'execute': 'quit'}
-> > > >> > >    2020-10-12 11:40:31,495 qmp              L0145 DEBUG| <<< {'timestamp': {'seconds': 1602499231, 'microseconds': 493379}, 'event': 'SHUTDOWN', 'data': {'guest': True, 'reason': 'guest-reset'}}
-> > > >> > >    2020-10-12 11:40:31,733 machine          L0325 WARNI| qemu received signal 6; command: "./qemu-system-arm -display none -vga none -chardev socket,id=mon,path=/var/tmp/tmpzls53khe/qemu-8487-monitor.sock -mon chardev=mon,mode=control -machine virt -chardev socket,id=console,path=/var/tmp/tmpzls53khe/qemu-8487-console.sock,server,nowait -serial chardev:console -icount shift=1,rr=record,rrfile=/var/tmp/avocado_n00stdrf/avocado_job_aw60qdul/1-tests_acceptance_replay_kernel.py_ReplayKernel.test_arm_virt/replay.bin -kernel /home/alex.bennee/avocado/data/cache/by_location/62750ce9e069e69e6a7ff04ff54c382ee660b92a/vmlinuz -append printk.time=1 panic=-1 console=ttyAMA0 -net none -no-reboot"
-> > > >> >
-> > > >> > This looks like a crash (SIGABRT) rather than a hang. Do you have a
-> > > >> > stack trace for the crashed process?
-> > > >>
-> > > >> No crash, exit(0):
-> > > >
-> > > > Why does the log say "qemu received signal 6" then?
-> > > >
-> > > >> VFS: Cannot open root device "(null)" or unknown-block(0,0): error -6
-> > > >
-> > > > Alex has this error in the logs before this commit, so I assume this is
-> > > > expected. All of the following is then probably expected, too, because
-> > > > it follows directly from this error:
-> > > >
-> > > >> Please append a correct "root=" boot option; here are the available
-> > > >> partitions:
-> > > >> Kernel panic - not syncing: VFS: Unable to mount root fs on
-> > > >> unknown-block(0,0)
-> > > >> CPU: 0 PID: 1 Comm: swapper/0 Not tainted 4.18.16-300.fc29.armv7hl #1
-> > > >> Hardware name: Generic DT based system
-> > > >> [<c0313f7c>] (unwind_backtrace) from [<c030dc64>] (show_stack+0x20/0x24)
-> > > >> [<c030dc64>] (show_stack) from [<c0b50ec4>] (dump_stack+0x88/0xa8)
-> > > >> [<c0b50ec4>] (dump_stack) from [<c03592f8>] (panic+0xd4/0x26c)
-> > > >> [<c03592f8>] (panic) from [<c110183c>] (mount_block_root+0x250/0x2ec)
-> > > >> [<c110183c>] (mount_block_root) from [<c1101950>] (mount_root+0x78/0x90)
-> > > >> [<c1101950>] (mount_root) from [<c1101ac4>] (prepare_namespace+0x15c/0x19c)
-> > > >> [<c1101ac4>] (prepare_namespace) from [<c11012e8>]
-> > > >> (kernel_init_freeable+0x2c0/0x370)
-> > > >> [<c11012e8>] (kernel_init_freeable) from [<c0b63914>]
-> > > >> (kernel_init+0x18/0x128)
-> > > >> [<c0b63914>] (kernel_init) from [<c03010e8>] (ret_from_fork+0x14/0x2c)
-> > > >> Exception stack(0xc790bfb0 to 0xc790bff8)
-> > > >> bfa0:                                     00000000 00000000 00000000
-> > > >> 00000000
-> > > >> bfc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> > > >> 00000000
-> > > >> bfe0: 00000000 00000000 00000000 00000000 00000013 00000000
-> > > >>
-> > > >> -> PSCI call
-> > > >>    -> QEMU_PSCI_0_2_FN_SYSTEM_RESET
-> > > >>       -> SHUTDOWN_CAUSE_GUEST_RESET
-> > > >>          -> exit(0)
-> > >
-> > > Yes - the test is recording the kernel up until the point it gives up.
-> > >
-> > > > Hm... So you're saying that the test sends a 'quit' QMP command, but
-> > > > before it could be processed, the guest causes QEMU to exit, so the test
-> > > > will never receive a reply to its request?
-> > > >
-> > > > If commit 9ce44e2ce2 changes anything about this, it seems to me that it
-> > > > would be that more QMP commands are processed during monitor_cleanup()
-> > > > because it doesn't just delete the dispatcher BH, but waits until it's
-> > > > not busy any more.
-> > > >
-> > > > Looking at this code again, however, the order in monitor_cleanup() is
-> > > > probably wrong. We should first shut down the dispatcher (which may
-> > > > still be using Monitor objects) and then destroy the monitors. This
-> > > > could possibly explain a crash, but probably not wrong results with a
-> > > > successful shutdown.
-> > >
-> > > I suspect this is a race between QEMU shutting down because the guest
-> > > shut it down and the acceptance test trying to shut things down via QMP.
-> > > I think the proper fix is either to:
-> >
-> > I'm not sure my problem is the same, but I do have the same symptom.
-> >
-> > >
-> > >   - s/panic=-1/panic=0/ in the command line (and probably drop --no-reboot)
-> > >
-> > > which would let the acceptance test cleanly shutdown via QMP.
-> >
-> > I tried this, which works well on some of the platforms which were failing.
-> > -    KERNEL_COMMON_COMMAND_LINE = 'printk.time=1 panic=-1 '
-> > +    KERNEL_COMMON_COMMAND_LINE = 'printk.time=1 panic=-0 '
-> >
-> >      def run_vm(self, kernel_path, kernel_command_line, console_pattern,
-> >                 record, shift, args, replay_path):
-> > @@ -47,8 +47,8 @@ class ReplayKernel(LinuxKernelTest):
-> >                      (shift, mode, replay_path),
-> >                      '-kernel', kernel_path,
-> >                      '-append', kernel_command_line,
-> > -                    '-net', 'none',
-> > -                    '-no-reboot')
-> > +                    '-net', 'none'
-> > +                    )
-> >          if args:
-> >              vm.add_args(*args)
-> >          vm.launch()
-> > @@ -154,7 +154,7 @@ class ReplayKernel(LinuxKernelTest):
-> >          kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
-> >                                 'console=ttyS0,115200 '
-> >                                 'usbcore.nousb '
-> > -                               'panic=-1 noreboot')
-> > +                               'panic=-0')
-> >          console_pattern = 'Boot successful.'
-> >
-> > >
-> > >   - modify the test to declare that qemu will shutdown itself and
-> > >     therefor no "quit" needs to be sent
-> > >
-> > > WDYT?
+13.10.2020 10:49, Chenqun (kuhn) wrote:
+>> -----Original Message-----
+>> From: Laurent Vivier [mailto:laurent@vivier.eu]
+>> Sent: Tuesday, October 13, 2020 3:11 PM
+>> To: Li Qiang <liq3ea@gmail.com>
+>> Cc: Fam Zheng <fam@euphon.net>; ganqixin <ganqixin@huawei.com>;
+>> vsementsov@virtuozzo.com; Zhanghailiang
+>> <zhang.zhanghailiang@huawei.com>; qemu-block@nongnu.org; Juan Quintela
+>> <quintela@redhat.com>; qemu-trivial@nongnu.org; Qemu Developers
+>> <qemu-devel@nongnu.org>; Dr. David Alan Gilbert <dgilbert@redhat.com>;
+>> Stefan Hajnoczi <stefanha@redhat.com>; Euler Robot
+>> <euler.robot@huawei.com>; Chenqun (kuhn) <kuhn.chenqun@huawei.com>;
+>> Max Reitz <mreitz@redhat.com>; John Snow <jsnow@redhat.com>
+>> Subject: Re: [PATCH] migration/block-dirty-bitmap: fix uninitialized variable
+>> warning
+>>
+>> Le 13/10/2020 à 03:34, Li Qiang a écrit :
+>>> Laurent Vivier <laurent@vivier.eu> 于2020年10月12日周一 下午11:33
+>> 写道：
+>>>>
+>>>> Le 10/10/2020 à 13:07, Chen Qun a écrit :
+>>>>> This if statement judgment is redundant and it will cause a warning:
+>>>>>
+>>>>> migration/block-dirty-bitmap.c:1090:13: warning: ‘bitmap_name’ may
+>>>>> be used  uninitialized in this function [-Wmaybe-uninitialized]
+>>>>>               g_strlcpy(s->bitmap_name, bitmap_name,
+>> sizeof(s->bitmap_name));
+>>>>>
+>>>>>
+>> ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>>>>
+>>>>> Reported-by: Euler Robot <euler.robot@huawei.com>
+>>>>> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+>>>>> ---
+>>>>>   migration/block-dirty-bitmap.c | 2 --
+>>>>>   1 file changed, 2 deletions(-)
+>>>>>
+>>>>> diff --git a/migration/block-dirty-bitmap.c
+>>>>> b/migration/block-dirty-bitmap.c index 5bef793ac0..e09ea4f22b 100644
+>>>>> --- a/migration/block-dirty-bitmap.c
+>>>>> +++ b/migration/block-dirty-bitmap.c
+>>>>> @@ -1084,9 +1084,7 @@ static int dirty_bitmap_load_header(QEMUFile
+>> *f, DBMLoadState *s,
+>>>>>               } else {
+>>>>>                   bitmap_name = s->bitmap_alias;
+>>>>>               }
+>>>>> -        }
+>>>>>
+>>>>> -        if (!s->cancelled) {
+>>>>>               g_strlcpy(s->bitmap_name, bitmap_name,
+>> sizeof(s->bitmap_name));
+>>>>>               s->bitmap = bdrv_find_dirty_bitmap(s->bs,
+>>>>> s->bitmap_name);
+>>>>>
+>>>>>
+>>>>
+>>>> I don't think it's correct as "cancel_incoming_locked(s)" can change
+>>>> the value of "s->cancelled".
+>>>>
+>>>
+>>> Hi Laurent,
+>>>
+>>> You're right. So I think this can simply assign 'bitmap_name' to NULL
+>>> to make compiler happy.
+>>
+>> Yes, and adding a comment before the second "if (!s->cancelled) {" to explain
+>> the value can be changed by "cancel_incoming_locked(s)" would avoid to have
+>> this kind of patch posted regularly to the ML.
+>>
+> Hi Laurent,
 > 
-> Can you send it as a formal patch please? :)
+> We give the bitmap_name a default value (s->bitmap_alias) so that we can remove the assignment of the else branch statement.
+> 
+> And then we merge the two if statements("if (!s->cancelled)", "if (bitmap_alias_map)") ,  avoids confusion the two "if (!s->cancelled)".
+> 
+> Thanks,
+> Chen Qun
+> 
+> 
+> The code show as that:
+> @@ -1064,15 +1064,14 @@ static int dirty_bitmap_load_header(QEMUFile *f, DBMLoadState *s,
+>       assert(nothing || s->cancelled || !!alias_map == !!bitmap_alias_map);
+> 
+>       if (s->flags & DIRTY_BITMAP_MIG_FLAG_BITMAP_NAME) {
+> -        const char *bitmap_name;
+> +        const char *bitmap_name = s->bitmap_alias;
+> 
+>           if (!qemu_get_counted_string(f, s->bitmap_alias)) {
+>               error_report("Unable to read bitmap alias string");
+>               return -EINVAL;
+>           }
+> 
+> -        if (!s->cancelled) {
+> -            if (bitmap_alias_map) {
+> +        if (!s->cancelled && bitmap_alias_map) {
+>                   bitmap_name = g_hash_table_lookup(bitmap_alias_map,
+>                                                     s->bitmap_alias);
+>                   if (!bitmap_name) {
+> @@ -1081,9 +1080,6 @@ static int dirty_bitmap_load_header(QEMUFile *f, DBMLoadState *s,
+>                                    s->bs->node_name, s->node_alias);
+>                       cancel_incoming_locked(s);
+>                   }
+> -            } else {
+> -                bitmap_name = s->bitmap_alias;
+> -            }
+>           }
+> 
+>           if (!s->cancelled) {
+> 
 
-Please don't "fix" the test case when the problem is a QEMU bug.
+Sounds good.
 
-
-I reproduced the bug myself now to fill in the missing information and
-this is how it crashes:
-
-(gdb) bt
-#0  0x00007fe541cf4bc5 in raise () at /lib64/libc.so.6
-#1  0x00007fe541cdd8a4 in abort () at /lib64/libc.so.6
-#2  0x000055c24e965327 in error_exit (err=16, msg=0x55c24eead3a0 <__func__.33> "qemu_mutex_destroy") at ../util/qemu-thread-posix.c:37
-#3  0x000055c24e9654c3 in qemu_mutex_destroy (mutex=0x55c25133e0f0) at ../util/qemu-thread-posix.c:70
-#4  0x000055c24e7cfaf1 in monitor_data_destroy_qmp (mon=0x55c25133dfd0) at ../monitor/qmp.c:439
-#5  0x000055c24e7d23bc in monitor_data_destroy (mon=0x55c25133dfd0) at ../monitor/monitor.c:615
-#6  0x000055c24e7d253a in monitor_cleanup () at ../monitor/monitor.c:644
-#7  0x000055c24e6cb002 in qemu_cleanup () at ../softmmu/vl.c:4549
-#8  0x000055c24e0d259b in main (argc=24, argv=0x7ffff66b0d58, envp=0x7ffff66b0e20) at ../softmmu/main.c:51
-
-The reason is that qemu_mutex_destroy(&mon->qmp_queue_lock) is called
-while mon->qmp_queue_lock is still held by the dispatcher coroutine.
-This is fixed by correcting the order in monitor_cleanup() as I had
-already noticed above.
-
-
-For the sake of completeness, this is where the dispatcher coroutine has
-yielded when the process crashes:
-
-(gdb) l *0x000055c24e7cf3da
-0x55c24e7cf3da is in monitor_qmp_dispatcher_co (../monitor/qmp.c:273).
-268              * involves an AIO_WAIT_WHILE().
-269              */
-270             aio_co_schedule(qemu_get_aio_context(), qmp_dispatcher_co);
-271 ===>        qemu_coroutine_yield();
-272
-273             mon = req_obj->mon;
-274             /* qmp_oob_enabled() might change after "qmp_capabilities" */
-275             need_resume = !qmp_oob_enabled(mon) ||
-276                 mon->qmp_requests->length == QMP_REQ_QUEUE_LEN_MAX - 1;
-277             qemu_mutex_unlock(&mon->qmp_queue_lock);
-
-
-Please try the following patch. It fixes the problem for me.
-
-Kevin
-
-
-diff --git a/monitor/monitor.c b/monitor/monitor.c
-index ceffe1a83b..84222cd130 100644
---- a/monitor/monitor.c
-+++ b/monitor/monitor.c
-@@ -632,23 +632,9 @@ void monitor_cleanup(void)
-         iothread_stop(mon_iothread);
-     }
- 
--    /* Flush output buffers and destroy monitors */
--    qemu_mutex_lock(&monitor_lock);
--    monitor_destroyed = true;
--    while (!QTAILQ_EMPTY(&mon_list)) {
--        Monitor *mon = QTAILQ_FIRST(&mon_list);
--        QTAILQ_REMOVE(&mon_list, mon, entry);
--        /* Permit QAPI event emission from character frontend release */
--        qemu_mutex_unlock(&monitor_lock);
--        monitor_flush(mon);
--        monitor_data_destroy(mon);
--        qemu_mutex_lock(&monitor_lock);
--        g_free(mon);
--    }
--    qemu_mutex_unlock(&monitor_lock);
--
-     /*
--     * The dispatcher needs to stop before destroying the I/O thread.
-+     * The dispatcher needs to stop before destroying the monitor and
-+     * the I/O thread.
-      *
-      * We need to poll both qemu_aio_context and iohandler_ctx to make
-      * sure that the dispatcher coroutine keeps making progress and
-@@ -665,6 +651,21 @@ void monitor_cleanup(void)
-                    (aio_poll(iohandler_get_aio_context(), false),
-                     qatomic_mb_read(&qmp_dispatcher_co_busy)));
- 
-+    /* Flush output buffers and destroy monitors */
-+    qemu_mutex_lock(&monitor_lock);
-+    monitor_destroyed = true;
-+    while (!QTAILQ_EMPTY(&mon_list)) {
-+        Monitor *mon = QTAILQ_FIRST(&mon_list);
-+        QTAILQ_REMOVE(&mon_list, mon, entry);
-+        /* Permit QAPI event emission from character frontend release */
-+        qemu_mutex_unlock(&monitor_lock);
-+        monitor_flush(mon);
-+        monitor_data_destroy(mon);
-+        qemu_mutex_lock(&monitor_lock);
-+        g_free(mon);
-+    }
-+    qemu_mutex_unlock(&monitor_lock);
-+
-     if (mon_iothread) {
-         iothread_destroy(mon_iothread);
-         mon_iothread = NULL;
-
+-- 
+Best regards,
+Vladimir
 
