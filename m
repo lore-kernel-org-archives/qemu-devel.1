@@ -2,92 +2,99 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E23E3C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 15:59:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC660C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 16:04:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A8B525229
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 15:59:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 286DD25242
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 16:04:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="amsSr5aV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A8B525229
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JRoYMJZ9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 286DD25242
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSMhs-0004k1-7z
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 11:59:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41382)
+	id 1kSMmn-0001F1-1i
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 12:04:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42802)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kSMgt-0003jM-0i
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 11:58:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28342)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kSMgo-0006rH-IW
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 11:58:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602604692;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=hmV2zkNR/uPsLVS9+fqIr0hpTWhnAiVnNJK9RA3h9YU=;
- b=amsSr5aVSSh7AaBBHwpzKyNF4XKri9MW6Ra++sd4O6ZK1WuTZGSOiBdCC01rxrax36K9Im
- eEJWL3C5o9r6a45Z76QLTj/yKHy9Wn1eZRxgXcWe4m74iaC8jNpJ4Ex7hUEPlfdChMuBqi
- OjogFro1lCD0slokp6AfRJ55BAwCvKs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-222-s7oL4tXmNm-YDGfn6cdDyg-1; Tue, 13 Oct 2020 11:58:03 -0400
-X-MC-Unique: s7oL4tXmNm-YDGfn6cdDyg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D49118A8220;
- Tue, 13 Oct 2020 15:58:02 +0000 (UTC)
-Received: from redhat.com (ovpn-114-78.ams2.redhat.com [10.36.114.78])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 807A619C59;
- Tue, 13 Oct 2020 15:58:00 +0000 (UTC)
-Date: Tue, 13 Oct 2020 16:57:57 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Joelle van Dyne <j@getutm.app>
-Subject: Re: [PATCH 04/10] meson: option to build as shared library
-Message-ID: <20201013155757.GR70612@redhat.com>
-References: <20201012232939.48481-1-j@getutm.app>
- <20201012232939.48481-5-j@getutm.app>
- <20201013075104.GA70612@redhat.com>
- <e27acf2-4dbe-4674-78cc-67aa7b505c54@eik.bme.hu>
- <20201013144625.GP70612@redhat.com>
- <CA+E+eSBu_LOnQ=B+N7vm3H2zkBxey8z_T1V0JpSU8rZND6GRYQ@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kSMlV-0008Ec-UH
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 12:03:06 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:44505)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kSMlT-0007WA-FL
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 12:03:05 -0400
+Received: by mail-pl1-x641.google.com with SMTP id h2so41759pll.11
+ for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 09:03:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:message-id:date:user-agent:mime-version
+ :in-reply-to:content-language:content-transfer-encoding;
+ bh=i+RmpWYdLT9YXqB40aa5IblU2V7Jd0t07I3+IEu06Uo=;
+ b=JRoYMJZ9KPmzR/xMzZy0DqCjX6jv5ggJAODpMeOgNobJUsWbfdH/HNzcyQ+xPlWyGW
+ oaEdrnCW9W/Y8rvzzoEuyvhhyqdnWPUbVKHOcdgoDTaumO4Spsc7EqLxqpsrfTNyZCap
+ ME+hKj86UQB6/Cw9crRnplS+O7QsWjGUFZn4Amd6hEuztcCJbq7+sKuporx8h4x4q9LO
+ cS5DiGeTP2sqQ5pNbNEIvYHlSUMJGnr5QaZsHWT9yVRSa1UX/3ZfXPvCuSgav/DsRRgH
+ ZTRTb5uXlIAKUykygBtuMHzAhK7CO38ApOwEeqFe4oMN4aMkfEzqLoYWp7Zs8nH+4Q8M
+ 58WA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=i+RmpWYdLT9YXqB40aa5IblU2V7Jd0t07I3+IEu06Uo=;
+ b=FmYFg8SBgVW0MmO3HMsahQ1kGDFhTj75aH5AOFbFraW5o8ZJ8XBP1N9ei27mswk61C
+ rBZLfX8eMD5qwuHlJsXjwsI9QObp6j1jhzgTZ48INlbL0U34WuWDo54kw/6XUuxSH+yc
+ QKDDHt6MMWS+NqeIQnhM41xABQfT+fOR0fpH8S1wnGecM3x+LgU7gFXrHQW5P1hy2Brk
+ 6ie1gfYKnQ59ZUqkgz5LVC94Ttz5732EeGNxr7++nOE20Np7cMbmWrrM52J2zI1i4q45
+ cp3x7ICKpVbEPtLbC5eXyCdR5hyau+doRbeanImEU9rZ6cTeNw9tS+ULZV7nlB0GDGRQ
+ +UAA==
+X-Gm-Message-State: AOAM5318eIhmOWpdqsQK09AzfLw4qZw/z+dB6HDNmIDNV//0itB2/S6p
+ d2Zns6Q1I5uYZugE4lS1LQCD0VRIXc31thTv
+X-Google-Smtp-Source: ABdhPJxJhrKyxwSfNbkkuMXy41LJYHSWuPlNM+CN++9yjqGZ7BMtiHyY/G7L53mPz+x8oXUmqe7GTQ==
+X-Received: by 2002:a17:90a:db49:: with SMTP id
+ u9mr398137pjx.119.1602604980788; 
+ Tue, 13 Oct 2020 09:03:00 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id f21sm44164pfk.169.2020.10.13.09.02.59
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 13 Oct 2020 09:02:59 -0700 (PDT)
+Subject: Re: [PATCH 01/10] decodetree: Fix codegen for non-overlapping group
+ inside overlapping group
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20201012153746.9996-1-peter.maydell@linaro.org>
+ <20201012153746.9996-2-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <084c4adc-9c9b-a0db-61ed-6d714e337d28@linaro.org>
+Date: Tue, 13 Oct 2020 09:02:57 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <CA+E+eSBu_LOnQ=B+N7vm3H2zkBxey8z_T1V0JpSU8rZND6GRYQ@mail.gmail.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20201012153746.9996-2-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 03:04:27
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x641.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,50 +107,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Oct 13, 2020 at 08:16:46AM -0700, Joelle van Dyne wrote:
-> I will start a separate conversation of UTM's license compatibility.
+On 10/12/20 8:37 AM, Peter Maydell wrote:
+> Generate a "break" instead, so that decode flow behaves
+> as required for this nested group case.
 > 
-> Regarding the patch, would some sort of warning message in configure
-> (if building as a shared library) regarding the license be wise? Or
-> would it pollute the output logs?
+> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  scripts/decodetree.py | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-I think there's also a more fundamental question of whether this is
-a concept we actually want to support at all.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-IIUC, this shared library just exposes a "qemu_main" method which
-the external app has to jump into. IOW, the "char **argv" parameter
-to qemu_main becomes the ELF library ABI.  Declaring this a shared
-library interface is a non-negligible commitment for QEMU maintainers,
-especially given that there is alot about QMEU's command line parsing
-that maintainers do not like and wish to change.
-
-There is a further question about whether we want to commit to an
-architectural model where  fork() is not something we can use. A
-significant area of development for QEMU right now is around the
-modularization of the device model such that QEMU is no longer a
-single process, but rather a collection of processes, each proc
-responsible for some specific hardware emulation. Thus far all the
-device modularization stuff is strictly optional, but we have the
-freedom to make it mandatory and use it transparently behind the
-scenes. If we declare this shared library model supported in order
-to avoid use of fork, then we're restricting our future options
-wrt device modularization.
-
-So including the license issue, that's three major questionmarks
-around desirability of supporting use of QEMU as a shared library.
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+r~
 
