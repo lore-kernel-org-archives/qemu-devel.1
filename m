@@ -8,76 +8,75 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 776D5C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 15:04:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48AF9C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 15:06:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA3CC248CD
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 15:04:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A1510248D0
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 15:06:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eG1/wyzN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA3CC248CD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qjgrwtUd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1510248D0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSLqz-0008LN-Mw
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 11:04:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48260)
+	id 1kSLsS-00010P-Fr
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 11:06:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48734)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <cupertinomiranda@gmail.com>)
- id 1kSLqI-0007t5-Q7
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 11:03:58 -0400
-Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:39486)
+ id 1kSLrK-0000De-6L
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 11:05:02 -0400
+Received: from mail-yb1-xb2b.google.com ([2607:f8b0:4864:20::b2b]:44785)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <cupertinomiranda@gmail.com>)
- id 1kSLqF-0006ce-O1
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 11:03:58 -0400
-Received: by mail-yb1-xb44.google.com with SMTP id 67so16419270ybt.6
- for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 08:03:53 -0700 (PDT)
+ id 1kSLrH-0006nb-KO
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 11:05:01 -0400
+Received: by mail-yb1-xb2b.google.com with SMTP id h6so16398984ybi.11
+ for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 08:04:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=C1lIxdLSAJNZiDrZrteSbP8Votl5sLNkiRnUCw53idE=;
- b=eG1/wyzNoWVTSYQILLVqLAbA/PweOuNe1MDe0AXPUAOIgM5BTqkFdskH2C+KDvPuBF
- jaqoBmdylvcL/8gb/kY2UDJEgVFqvO/HayNbyfYwJ11vu1SPW8i2VRvtcrbljzCaqznd
- eApAzVJp/rQIEtv9VGqg5L0YW6C5/NroGoME1tuEptdbviqsIWhrl1vP9po0JAPv41QN
- HTNGWNW2oAs53dlKWv2Na7WHqJUR37B9vwueEwP4+6s+2OimBSec2U2E6RQDApJI6pa/
- LEskNWqiJAVnMWCfc2knvkx5FAlzGmkiOMofyN7B9OYY0p7Fml5UyhSPyDdtt4h5equ0
- ef7w==
+ bh=erxsS5E9E7NdHi74fe5oUYMeKvsy8ucI2E8/UYNOQck=;
+ b=qjgrwtUd4KZsOqoT3WKvrtCyLU+AN82Efpf0FTet0+ZtvZZbczfyu4HSxOpLwL7aS9
+ GQmQhbkSm/liS5/OK8U+xXNC+mLmhK3drH2ES7U8i5tr4IocmAwIOiBb78X1EpQmFovV
+ HGZcSyyN16CNmRAYTrFl7/u4AJ7e5pl0Iqlv6qh3ZTm1HyD/97wE4n6utacyyXptaATH
+ vPxDBESK/n8p3XKaNYyDWvQ76Rw+Z2/BTxjr80iJV3eIFZh4o+QRvQD7i84lntjRLRlv
+ YUOBYKzvLxvSqC7sQvJ2929EThJs7ERpFRfvR30G3mVooVTWzjMsbcjG5R7RR3+OOzEH
+ FR7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=C1lIxdLSAJNZiDrZrteSbP8Votl5sLNkiRnUCw53idE=;
- b=oS3cWdOhAoovXbXH5WdPXqrRNaMvT3JamRfcp9iLoG8MXSfk+voifc/dxM/mdzlIED
- YokUvqdFxnaJ2DU9/wvumvADx+mYfyEH/1y/5tsJWY+E2ngKR1J5rdWjF7xRYk1mnvAi
- 98k2UTN8rIANrS3e+OKzOKv8hmOyCtkLxCqHxE5yLO1UWj+InDhSuO9rjZo8fU60uvIf
- xFoEVI7re98O/WM1mjPK1f0znUAJ8CV5BLiRq0yAriVljug0Iv4Hiz6AIPmJBPqJFBRq
- KP23ZyRLmkl9FtKSSwWuuZ0OwDe1pA73sAa5z0Ou8tX5TdbFpe/Ynkzz3c7m8bx8dc6U
- y1kw==
-X-Gm-Message-State: AOAM532t3T81eLNCPImLLP9y4wCsViRckHVr6+0uTTdQZYESPdB9J7KP
- lPDe4gS8bCiuDmK51UcYsef783accil1faTGijg=
-X-Google-Smtp-Source: ABdhPJxctQQrHLm/m6EoHMGbpkIIA3Tqm8uhM3dimzVG6Cp4eYKaxwlc14gcl/+w21Vh5i3BiHwpFUrL9MMk4fkobNA=
-X-Received: by 2002:a05:6902:50e:: with SMTP id
- x14mr341690ybs.273.1602601430798; 
- Tue, 13 Oct 2020 08:03:50 -0700 (PDT)
+ bh=erxsS5E9E7NdHi74fe5oUYMeKvsy8ucI2E8/UYNOQck=;
+ b=eGzsV2SG7IkRyLptedut5FlfByHdgyYfOQ0ay+3553idbDe40GGN24XBuG8yI0+IGZ
+ ynJF2i6ysos5JJbPAU1aJX1yHrkz54HIegh3BlaK9eqBaTeYqmRTyhLUE/EbpbQJisqp
+ yGY9lStgeplhw1R2jrxfCOVV92kXb6/touVwh8BM2LKFGi8RIIMgFnJx7IRspSVzQGiX
+ 4vBFnyiNjqRcUW6tkXgtBy4ZvxPwuRS1bonNjWLHkw7VE8CBNjHLYta0G7YJbnGToF4G
+ lcKgBhyJ26KnjyX2H+bUTOWp/qwjQ+Ae+e9gPRwrdCQJJ+i7ghPJadhLZpdSun/zzIw9
+ 6O2A==
+X-Gm-Message-State: AOAM531DNpu30/gawrPvbgP964e0Rp5LdhPc4jRSPHZulqnj5Cx3ix9w
+ IaJMDYCNIxSPDBAetlAUUB35191VubzCoJtbHs4UVFrWvUA=
+X-Google-Smtp-Source: ABdhPJzeCG7rjfJ9b30iRoCnqI0IFEHxb+Kzy3NnzuoEPYY++/WOecOxPOHgeMMeNfu08eoleVtIH7L2SClvJrhcli0=
+X-Received: by 2002:a25:380c:: with SMTP id f12mr498305yba.32.1602601497991;
+ Tue, 13 Oct 2020 08:04:57 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200930204604.20663-1-cupertinomiranda@gmail.com>
- <20200930204604.20663-2-cupertinomiranda@gmail.com>
- <ec923290-b6a1-00ab-030b-21676a36dae3@amsat.org>
-In-Reply-To: <ec923290-b6a1-00ab-030b-21676a36dae3@amsat.org>
+ <20200930204604.20663-13-cupertinomiranda@gmail.com>
+ <5c3b582c-f596-4866-3bca-da4235ec95fc@amsat.org>
+In-Reply-To: <5c3b582c-f596-4866-3bca-da4235ec95fc@amsat.org>
 From: Cupertino Miranda <cupertinomiranda@gmail.com>
-Date: Tue, 13 Oct 2020 16:03:39 +0100
-Message-ID: <CAHW_PjJwjRqJ7stiOfb15wgUncMOeBoEsDg_GtRzEi6WOW+0Pg@mail.gmail.com>
-Subject: Re: [PATCH 01/14] arc: Add initial core cpu files
+Date: Tue, 13 Oct 2020 16:04:46 +0100
+Message-ID: <CAHW_Pj+LMOB+XQByMxJYdbhk9kyZts8LFf45YEez+0BkuJR42w@mail.gmail.com>
+Subject: Re: [PATCH 12/14] arc: Add Synopsys ARC emulation boards
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b44;
- envelope-from=cupertinomiranda@gmail.com; helo=mail-yb1-xb44.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b2b;
+ envelope-from=cupertinomiranda@gmail.com; helo=mail-yb1-xb2b.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -109,52 +108,75 @@ Sender: "Qemu-devel"
 
 Hi Philippe,
 
-Thank you for your time reviewing our patches.
-My apologies for reacting to it so late. :-(
-
-Once we decided to make this port we noticed that Michael Rolnik had
-submitt a port for ARC700 to QEMU mailinglist.
-As we tested it, we decided to use his directory structure, and for
-that reason the most generic files as well, although significantly
-changing everything else.
-
-As a way to credit him for the initial work, we left his copyright
-header in that file. Maybe that should instead mention him in the
-commits, or in the cover letter instead. Please let me know of the
-proper way.
-
-Regarding "unsigned", some of these variables are used as "auxiliary
-registers" and should at least be 32bit. Some others might perfectly
-well be resized to "unsigned".We will certainly revisit these
-definitions to make sure we use the proper types for the case.
-
-Regards,
-Cupertino
-
-
-
-On Wed, Oct 7, 2020 at 5:09 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
+On Wed, Oct 7, 2020 at 5:31 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
 > wrote:
 >
-> Hi Cupertino,
+> Hi Cupertino, Claudiu,
 >
-> On 9/30/20 10:45 PM, cupertinomiranda@gmail.com wrote:
-> > From: Cupertino Miranda <cmiranda@synopsys.com>
+> On 9/30/20 10:46 PM, cupertinomiranda@gmail.com wrote:
+> > From: Claudiu Zissulescu <claziss@synopsys.com>
 > >
-> > Signed-off-by: Cupertino Miranda <cmiranda@synopsys.com>
+> > Add the Synopsys ARC boards, arc_sim for testing, sim-hs main emulation
+> > board using standard UART and nsim which includes a Synopsys ARC specif=
+ic
+> > UART implementation.
+> >
+> > Signed-off-by: Claudiu Zissulescu <claziss@synopsys.com>
 > > ---
-> ...
+> >  hw/arc/Makefile.objs      |  21 +++
+> >  hw/arc/arc_sim.c          | 143 ++++++++++++++++++++
+> >  hw/arc/arc_uart.c         | 267 ++++++++++++++++++++++++++++++++++++++
+> >  hw/arc/board-hsdk.c       | 107 +++++++++++++++
+> >  hw/arc/boot.c             |  95 ++++++++++++++
+> >  hw/arc/boot.h             |  21 +++
+> >  hw/arc/meson.build        |  13 ++
+> >  hw/arc/nsim.c             |  86 ++++++++++++
+> >  hw/arc/pic_cpu.c          | 111 ++++++++++++++++
+> >  hw/arc/sample.c           |  77 +++++++++++
+> >  hw/arc/sim-hs.c           | 107 +++++++++++++++
+> >  include/hw/arc/arc_uart.h |  43 ++++++
+> >  include/hw/arc/cpudevs.h  |  10 ++
+> >  13 files changed, 1101 insertions(+)
+> >  create mode 100644 hw/arc/Makefile.objs
+> >  create mode 100644 hw/arc/arc_sim.c
+> >  create mode 100644 hw/arc/arc_uart.c
+> >  create mode 100644 hw/arc/board-hsdk.c
+> >  create mode 100644 hw/arc/boot.c
+> >  create mode 100644 hw/arc/boot.h
+> >  create mode 100644 hw/arc/meson.build
+> >  create mode 100644 hw/arc/nsim.c
+> >  create mode 100644 hw/arc/pic_cpu.c
+> >  create mode 100644 hw/arc/sample.c
+> >  create mode 100644 hw/arc/sim-hs.c
+> >  create mode 100644 include/hw/arc/arc_uart.h
+> >  create mode 100644 include/hw/arc/cpudevs.h
 >
-> > diff --git a/target/arc/Makefile.objs b/target/arc/Makefile.objs
+> Please split in various commits:
+>
+> - hw/char/arc_uart
+> - hw/intc/synopsys_pic or something
+> - hw/arc/boot
+> - hw/arc/*sim*
+> - hw/arc/*hsdk*
+>
+> (Also it would simplify differentiating the architectural
+> part of your patches from the hardware ones if you use the
+> target/arc/ prefix in your previous patches).
+
+Got it, will make it happen in the next submission.
+
+>
+> >
+> > diff --git a/hw/arc/Makefile.objs b/hw/arc/Makefile.objs
 > > new file mode 100644
-> > index 0000000000..7b2afd08e4
+> > index 0000000000..28d7766cd9
 > > --- /dev/null
-> > +++ b/target/arc/Makefile.objs
-> > @@ -0,0 +1,34 @@
+> > +++ b/hw/arc/Makefile.objs
+> > @@ -0,0 +1,21 @@
 > > +#
 > > +#  QEMU ARC CPU
 > > +#
-> > +#  Copyright (c) 2020
+> > +#  Copyright (c) 2019
 > > +#
 > > +#  This library is free software; you can redistribute it and/or
 > > +#  modify it under the terms of the GNU Lesser General Public
@@ -168,67 +190,206 @@ On Wed, Oct 7, 2020 at 5:09 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
 > > +#
 > > +#  You should have received a copy of the GNU Lesser General Public
 > > +#  License along with this library; if not, see
-> > +#  <http://www.gnu.org/licenses/lgpl-2.1.html>
+> > +#  http://www.gnu.org/licenses/lgpl-2.1.html
 > > +#
 > > +
-> > +obj-y   +=3D translate.o
-> > +obj-y   +=3D helper.o
-> > +obj-y   +=3D cpu.o
-> > +obj-y   +=3D op_helper.o
-> > +obj-y   +=3D gdbstub.o
-> > +obj-y   +=3D decoder.o
-> > +obj-y   +=3D regs.o
-> > +obj-y   +=3D semfunc.o
-> > +obj-y   +=3D semfunc-helper.o
-> > +obj-y   +=3D mmu.o
-> > +obj-y   +=3D mpu.o
-> > +obj-y   +=3D timer.o
-> > +obj-y   +=3D irq.o
-> > +obj-y   +=3D cache.o
+> > +obj-y   =3D arc_sim.o arc_uart.o sample.o pic_cpu.o boot.o board-hsdk.=
+o sim-hs.o nsim.o
 >
-> We don't use Makefiles anymore, and you already provides meson.build.
+> We don't use Makefile anymore.
+Oups, sorry for that, we had just rebased older code ... need to remove tho=
+se.
+
 >
-> > diff --git a/target/arc/arc-common.h b/target/arc/arc-common.h
+> > diff --git a/hw/arc/arc_sim.c b/hw/arc/arc_sim.c
 > > new file mode 100644
-> > index 0000000000..8013e1d2ed
+> > index 0000000000..8020a03d85
 > > --- /dev/null
-> > +++ b/target/arc/arc-common.h
-> > @@ -0,0 +1,55 @@
+> > +++ b/hw/arc/arc_sim.c
+> > @@ -0,0 +1,143 @@
 > > +/*
-> > + *  Common header file to be used by cpu and disassembler.
-> > + *  Copyright (C) 2017 Free Software Foundation, Inc.
+> > + * This library is free software; you can redistribute it and/or
+> > + * modify it under the terms of the GNU Lesser General Public
+> > + * License as published by the Free Software Foundation; either
+> > + * version 2 of the License, or (at your option) any later version.
 > > + *
-> > + *  You should have received a copy of the GNU General Public License
-> > + *  along with GAS or GDB; see the file COPYING3. If not, write to
-> > + *  the Free Software Foundation, 51 Franklin Street - Fifth Floor, Bo=
-ston,
-> > + *  MA 02110-1301, USA.
+> > + * This library is distributed in the hope that it will be useful,
+> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> > + * Lesser General Public License for more details.
+> > + *
+> > + * You should have received a copy of the GNU Lesser General Public
+> > + * License along with this library; if not, see <http://www.gnu.org/li=
+censes/>.
 > > + */
 > > +
-> > +#ifndef ARC_COMMON_H
-> > +#define ARC_COMMON_H
-> > +
 > > +#include "qemu/osdep.h"
-> ...
+> > +#include "qapi/error.h"
+> > +#include "cpu.h"
+> > +#include "hw/hw.h"
+> > +#include "hw/boards.h"
+> > +#include "elf.h"
+> > +#include "hw/char/serial.h"
+> > +#include "net/net.h"
+> > +#include "hw/loader.h"
+> > +#include "exec/memory.h"
+> > +#include "exec/address-spaces.h"
+> > +#include "sysemu/reset.h"
+> > +#include "sysemu/runstate.h"
+> > +#include "sysemu/sysemu.h"
+> > +#include "hw/sysbus.h"
+> > +#include "hw/arc/cpudevs.h"
+> > +#include "boot.h"
+> > +
+> > +static void arc_sim_net_init(MemoryRegion *address_space,
+> > +                             hwaddr base,
+> > +                             hwaddr descriptors,
+> > +                             qemu_irq irq, NICInfo *nd)
+> > +{
+> > +    DeviceState *dev;
+> > +    SysBusDevice *s;
+> > +
+> > +    dev =3D qdev_new("open_eth");
+> > +    qdev_set_nic_properties(dev, nd);
+> > +    sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
+> > +
+> > +    s =3D SYS_BUS_DEVICE(dev);
+> > +    sysbus_connect_irq(s, 0, irq);
+> > +    memory_region_add_subregion(address_space, base,
+> > +                                sysbus_mmio_get_region(s, 0));
+> > +    memory_region_add_subregion(address_space, descriptors,
+> > +                                sysbus_mmio_get_region(s, 1));
+> > +}
+> > +
+> > +static uint64_t arc_io_read(void *opaque, hwaddr addr, unsigned size)
+> > +{
+> > +    return 0;
+> > +}
+> > +
+> > +static void arc_io_write(void *opaque, hwaddr addr,
+> > +                         uint64_t val, unsigned size)
+> > +{
+> > +    switch (addr) {
+> > +    case 0x08: /* board reset. */
+> > +        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+> > +        break;
+> > +    default:
+> > +        break;
+> > +    }
+> > +}
+> > +
+> > +static const MemoryRegionOps arc_io_ops =3D {
+> > +    .read =3D arc_io_read,
+> > +    .write =3D arc_io_write,
+> > +    .endianness =3D DEVICE_NATIVE_ENDIAN,
+> > +};
+> > +
+> > +static void arc_sim_init(MachineState *machine)
+> > +{
+> > +    static struct arc_boot_info boot_info;
+> > +    unsigned int smp_cpus =3D machine->smp.cpus;
+> > +    ram_addr_t ram_base =3D 0;
+> > +    ram_addr_t ram_size =3D machine->ram_size;
+> > +    ARCCPU *cpu =3D NULL;
+> > +    MemoryRegion *ram, *system_io;
+> > +    int n;
+> > +
+> > +    boot_info.ram_start =3D ram_base;
+> > +    boot_info.ram_size =3D ram_size;
+> > +    boot_info.kernel_filename =3D machine->kernel_filename;
+> > +
+> > +    for (n =3D 0; n < smp_cpus; n++) {
+> > +        cpu =3D ARC_CPU(object_new(machine->cpu_type));
+> > +        if (cpu =3D=3D NULL) {
+> > +            fprintf(stderr, "Unable to find CPU definition!\n");
+> > +            exit(1);
+> > +        }
+> > +
+> > +        /* Set the initial CPU properties. */
+> > +        object_property_set_uint(OBJECT(cpu), "freq_hz", 1000000, &err=
+or_fatal);
+> > +        object_property_set_bool(OBJECT(cpu), "rtc-opt", true, &error_=
+fatal);
+> > +        object_property_set_bool(OBJECT(cpu), "realized", true, &error=
+_fatal);
+> > +
+> > +        /* Initialize internal devices. */
+> > +        cpu_arc_pic_init(cpu);
+> > +        cpu_arc_clock_init(cpu);
+> > +
+> > +        qemu_register_reset(arc_cpu_reset, cpu);
+> > +    }
+> > +
+> > +    ram =3D g_new(MemoryRegion, 1);
+> > +    memory_region_init_ram(ram, NULL, "arc.ram", ram_size, &error_fata=
+l);
+> > +    memory_region_add_subregion(get_system_memory(), ram_base, ram);
+> > +
+> > +    system_io =3D g_new(MemoryRegion, 1);
+> > +    memory_region_init_io(system_io, NULL, &arc_io_ops, NULL, "arc.io"=
+,
+> > +                           1024);
+> > +    memory_region_add_subregion(get_system_memory(), 0xf0000000, syste=
+m_io);
+> > +
+> > +    serial_mm_init(get_system_memory(), 0x90000000, 2, cpu->env.irq[20=
+],
+> > +                   115200, serial_hd(0), DEVICE_NATIVE_ENDIAN);
+> > +
+> > +    if (nd_table[0].used) {
+> > +        arc_sim_net_init(get_system_memory(), 0x92000000,
+> > +                         0x92000400, cpu->env.irq[4], nd_table);
+> > +    }
+> > +
+> > +    arc_load_kernel(cpu, &boot_info);
+> > +}
+> > +
+> > +static void arc_sim_machine_init(MachineClass *mc)
+> > +{
+> > +    mc->desc =3D "ARCxx simulation";
+> > +    mc->init =3D arc_sim_init;
+> > +    mc->max_cpus =3D 1;
+> > +    mc->is_default =3D false;
+> > +    mc->default_cpu_type =3D ARC_CPU_TYPE_NAME("archs");
+> > +}
+> > +
+> > +DEFINE_MACHINE("arc-sim", arc_sim_machine_init)
 >
-> Do not include "qemu/osdep.h" in headers.
+> Can you share the link to the documentation of this simulator please?
+> I couldn't find it on the link you provided in the cover
+> (https://www.synopsys.com/designware-ip/processor-solutions.html)
+> and https://www.synopsys.com/dw/ipdir.php?ds=3Dsim_nSIM doesn't
+> seem relevant.
+The free version of this simulator is in:
+https://www.synopsys.com/cgi-bin/dwarcnsim/req1.cgi
+
+Documentation is packed in that download. I am not aware of any
+location that would contain documentation for this.
+
+In any case, we believe that we will not need any nSIM board, and we
+would like to remove both the nsim board and the ARC UART
+implementation.
+There is no real benefit, as the support for ARC UART is being phased
+out even on nSIM simulator and it does not make sense to include it
+now in QEMU.
+
+We only implemented ARC UART since initially nSIM did not support
+generic UART, and we wanted to execute the same binaries on both nSIM
+and QEMU.
+At this point sim-hs board is doing precisely that. In any case we
+want to rename it to something more meaningful.
+
 >
-> > +/*-*-indent-tabs-mode:nil;tab-width:4;indent-line-function:'insert-tab=
-'-*-*/
-> > +/* vim: set ts=3D4 sw=3D4 et: */
-> > diff --git a/target/arc/cpu-qom.h b/target/arc/cpu-qom.h
+> > diff --git a/hw/arc/sample.c b/hw/arc/sample.c
 > > new file mode 100644
-> > index 0000000000..413b693558
+> > index 0000000000..0ecc11cf15
 > > --- /dev/null
-> > +++ b/target/arc/cpu-qom.h
-> > @@ -0,0 +1,53 @@
+> > +++ b/hw/arc/sample.c
+> > @@ -0,0 +1,77 @@
 > > +/*
 > > + * QEMU ARC CPU
 > > + *
 > > + * Copyright (c) 2016 Michael Rolnik
->
-> ???
->
 > > + *
 > > + * This library is free software; you can redistribute it and/or
 > > + * modify it under the terms of the GNU Lesser General Public
@@ -237,179 +398,78 @@ ston,
 > > + *
 > > + * This library is distributed in the hope that it will be useful,
 > > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-> > + * Lesser General Public License for more details.
-> > + *
-> > + * You should have received a copy of the GNU Lesser General Public
-> > + * License along with this library; if not, see
-> > + * <http://www.gnu.org/licenses/lgpl-2.1.html>
-> > + */
-> > +
-> ...
->
-> > diff --git a/target/arc/cpu.c b/target/arc/cpu.c
-> > new file mode 100644
-> > index 0000000000..bbcb371760
-> > --- /dev/null
-> > +++ b/target/arc/cpu.c
-> > @@ -0,0 +1,468 @@
-> > +/*
-> > + * QEMU ARC CPU
-> > + *
-> > + * Copyright (c) 2020
->
-> (c) Synopsys?
->
-> > + *
-> > + * This library is free software; you can redistribute it and/or
-> > + * modify it under the terms of the GNU Lesser General Public
-> > + * License as published by the Free Software Foundation; either
-> > + * version 2.1 of the License, or (at your option) any later version.
-> > + *
-> > + * This library is distributed in the hope that it will be useful,
-> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 > > + * Lesser General Public License for more details.
 > > + *
 > > + * You should have received a copy of the GNU Lesser General Public
 > > + * License along with this library; if not, see
 > > + * http://www.gnu.org/licenses/lgpl-2.1.html
 > > + */
-> ...
->
-> > +/*-*-indent-tabs-mode:nil;tab-width:4;indent-line-function:'insert-tab=
-'-*-*/
-> > +/* vim: set ts=3D4 sw=3D4 et: */
-> > diff --git a/target/arc/cpu.h b/target/arc/cpu.h
-> > new file mode 100644
-> > index 0000000000..e8446366e5
-> > --- /dev/null
-> > +++ b/target/arc/cpu.h
-> > @@ -0,0 +1,532 @@
-> > + /*
-> > +  * QEMU ARC CPU
-> > +  *
-> > +  * Copyright (c) 2020
->
-> Again.
->
-> > +  *
-> > +  * This library is free software; you can redistribute it and/or
-> > +  * modify it under the terms of the GNU Lesser General Public
-> > +  * License as published by the Free Software Foundation; either
-> > +  * version 2.1 of the License, or (at your option) any later version.
-> > +  *
-> > +  * This library is distributed in the hope that it will be useful,
-> > +  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > +  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-> > +  * Lesser General Public License for more details.
-> > +  *
-> > +  * You should have received a copy of the GNU Lesser General Public
-> > +  * License along with this library; if not, see
-> > +  * <http://www.gnu.org/licenses/lgpl-2.1.html>
-> > +  */
 > > +
-> > +#ifndef CPU_ARC_H
-> > +#define CPU_ARC_H
+> > +#include "qemu/osdep.h"
+> > +#include "qapi/error.h"
+> > +#include "qemu-common.h"
+> > +#include "cpu.h"
+> > +#include "hw/hw.h"
+> > +#include "sysemu/sysemu.h"
+> > +#include "sysemu/qtest.h"
+> > +#include "ui/console.h"
+> > +#include "hw/boards.h"
+> > +#include "hw/loader.h"
+> > +#include "qemu/error-report.h"
+> > +#include "exec/address-spaces.h"
+> > +#include "include/hw/sysbus.h"
 > > +
-> ...
+> > +#define SIZE_RAM 0x00020000
+> > +
+> > +static void sample_init(MachineState *machine)
+> > +{
+> > +    MemoryRegion *ram;
+> > +
+> > +    ARCCPU *cpu_arc ATTRIBUTE_UNUSED;
+> > +
+> > +    ram =3D g_new(MemoryRegion, 1);
+> > +
+> > +    cpu_arc =3D ARC_CPU(cpu_create("archs-" TYPE_ARC_CPU));
+> > +
+> > +    memory_region_init_ram(ram, NULL, "ram", SIZE_RAM, &error_fatal);
+> > +    memory_region_add_subregion(get_system_memory(), PHYS_BASE_RAM, ra=
+m);
+> > +
+> > +    char const *firmware =3D NULL;
+> > +    char const *filename;
+> > +
+> > +    if (machine->firmware) {
+> > +        firmware =3D machine->firmware;
+> > +    }
+> > +
+> > +    filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, firmware);
+> > +    if (!filename) {
+> > +        error_report("Could not find flash image file '%s'", firmware)=
+;
+> > +        exit(1);
+> > +    }
+> > +
+> > +    load_image_targphys(filename, PHYS_BASE_RAM + 0x100, SIZE_RAM);
+> > +}
+> > +
+> > +static void sample_machine_init(MachineClass *mc)
+> > +{
+> > +    mc->desc =3D "ARC sample/example board";
+> > +    mc->init =3D sample_init;
+> > +    mc->is_default =3D false;
+> > +}
+> > +
+> > +DEFINE_MACHINE("sample", sample_machine_init)
 >
-> > +
-> > +/*
-> > + * ArcCPU:
-> > + * @env: #CPUMBState
-> > + *
-> > + * An ARC CPU.
-> > + */
-> > +struct ARCCPU {
-> > +  /*< private >*/
-> > +  CPUState parent_obj;
-> > +
-> > +  /*< public >*/
-> > +
-> > +  /* ARC Configuration Settings. */
-> > +  struct {
-> > +    uint32_t addr_size;
-> > +    bool     aps_feature;
-> > +    bool     byte_order;
-> > +    bool     bitscan_option;
-> > +    uint32_t br_bc_entries;
-> > +    uint32_t br_pt_entries;
-> > +    bool     br_bc_full_tag;
-> > +    uint8_t  br_rs_entries;
-> > +    uint32_t br_bc_tag_size;
-> > +    uint8_t  br_tosq_entries;
-> > +    uint8_t  br_fb_entries;
-> > +    bool     code_density;
-> > +    bool     code_protect;
-> > +    uint8_t  dccm_mem_cycles;
-> > +    bool     dccm_posedge;
-> > +    uint8_t  dccm_mem_bancks;
-> > +    uint8_t  dc_mem_cycles;
-> > +    bool     dc_posedge;
-> > +    bool     dmp_unaligned;
-> > +    bool     ecc_exception;
-> > +    uint32_t external_interrupts;
-> > +    uint8_t  ecc_option;
-> > +    bool     firq_option;
-> > +    bool     fpu_dp_option;
-> > +    bool     fpu_fma_option;
-> > +    bool     fpu_div_option;
-> > +    bool     has_actionpoints;
-> > +    bool     has_fpu;
-> > +    bool     has_interrupts;
-> > +    bool     has_mmu;
-> > +    bool     has_mpu;
-> > +    bool     has_timer_0;
-> > +    bool     has_timer_1;
-> > +    bool     has_pct;
-> > +    bool     has_rtt;
-> > +    bool     has_smart;
-> > +    uint32_t intvbase_preset;
-> > +    uint32_t lpc_size;
-> > +    uint8_t  mpu_num_regions;
-> > +    uint8_t  mpy_option;
-> > +    uint32_t mmu_page_size_sel0;
-> > +    uint32_t mmu_page_size_sel1;
-> > +    uint32_t mmu_pae_enabled;
-> > +    uint32_t ntlb_num_entries;
-> > +    uint32_t num_actionpoints;
-> > +    uint32_t number_of_interrupts;
-> > +    uint32_t number_of_levels;
-> > +    uint32_t pct_counters;
-> > +    uint32_t pct_interrupt;
-> > +    uint32_t pc_size;
-> > +    uint32_t rgf_num_regs;
+> You don't need a "sample" board, you can use the "none" machine instead.
+Ok, will remove.
+
 >
-> Maybe use 'unsigned' for numbers (various uses).
->
-> > +    uint32_t rgf_banked_regs;
-> > +    uint32_t rgf_num_banks;
-> > +    bool     rtc_option;
-> > +    uint32_t rtt_feature_level;
-> > +    bool     stack_checking;
-> > +    bool     swap_option;
-> > +    uint32_t smar_stack_entries;
-> > +    uint32_t smart_implementation;
-> > +    uint32_t stlb_num_entries;
-> > +    uint32_t slc_size;
-> > +    uint32_t slc_line_size;
-> > +    uint32_t slc_ways;
-> > +    uint32_t slc_tag_banks;
-> > +    uint32_t slc_tram_delay;
-> > +    uint32_t slc_dbank_width;
-> > +    uint32_t slc_data_banks;
-> > +    uint32_t slc_dram_delay;
-> > +    bool     slc_mem_bus_width;
-> > +    uint32_t slc_ecc_option;
-> > +    bool     slc_data_halfcycle_steal;
-> > +    bool     slc_data_add_pre_pipeline;
-> > +    bool     uaux_option;
-> > +    uint32_t freq_hz; /* CPU frequency in hz, needed for timers. */
-> > +  } cfg;
-> > +
-> [...]
 > Regards,
 >
 > Phil.
+
+Regards,
+Cupertino
 
