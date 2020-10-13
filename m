@@ -2,119 +2,73 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,RCVD_DOTEDU_SUSP,SIGNED_OFF_BY,
+X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E69E7C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 15:46:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EA76C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 15:52:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE1E6251FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 15:46:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="5poUFB4T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE1E6251FD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	by mail.kernel.org (Postfix) with ESMTPS id 01D7D25215
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 15:52:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01D7D25215
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSMUy-0003px-L3
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 11:46:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37210)
+	id 1kSMbT-0006jh-4b
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 11:52:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39604)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kSMTq-0003Bw-Iz
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 11:44:51 -0400
-Received: from mail-eopbgr760102.outbound.protection.outlook.com
- ([40.107.76.102]:48835 helo=NAM02-CY1-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kSMaN-0005T8-6h
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 11:51:35 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:59037)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kSMTn-00053y-57
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 11:44:49 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=a520d+aj6Oz4MAgTx3jiTiKLobPg4Y6IqSiRP+lv2a2SkPzsTIuMbGJmOkxRwlv7bzHkvbqm0o6LQCR00xaKecuNshg7S5qgV5/k4AzLevSVc6vKz/fm2DE2ZwLfHkAKRrkfHWyF+3PJjaE4wR7C2AMpo2E3i4sgRs6tlFlfhUHF//5MzRwg+IxWXUj6KWajFNffv8TU3GJq7HEJn9UGBBigtuQqQulLIx/wRCyASo730C61aA/QnBRSrGry+3pvePEZe9YeNzLTthHADuGHzg75zsZfHZ6MRLxjGVdqvugwEDZYMWCQJ6vj74fgaceszayrnvfdFRuMXvRCdO/czA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yJD6p0GPoGIE+uGyOXyIxoeviyQ7sgmck0mmxuehZQg=;
- b=iY2hfa0wJt3X2PoRwnW/93XFBZwuZe+UDZZC3021Xm9K68b7Uc82Fp5tKNJ34d7dyOygiVv+vw9UWhXk7AYZG9Rjcr9Qknt0pe2VVyTBy9StwiPRKY6UaVOFSNKbhWnC760dvnm2K4SCr2ib/hB7OrCNAGEHvmpV+0JQT/6BvjyDj9BCUeJzntGDUeWKET4E05xpMSoV8xpGUHtktgJQm+KTdsMjYg2YFwOin4N6qQFmUfPOZ5opnnMhg9Ge2VMDp9UcCnyDdcMsaTojWxzeWBq7wCz+ytv5Ybl0f84vJXZuabL+GzFO8G++2WU3r7buyCVeUrtkhqzOs+zcPciFfQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
- header.d=bu.edu; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yJD6p0GPoGIE+uGyOXyIxoeviyQ7sgmck0mmxuehZQg=;
- b=5poUFB4TEFX+mHFKsY4jy1N4qY49gMeY1xbcpZY4eLmfPquMBeoog+WMEGrgrKBkYVLBXWDmflKdPcTXX9WCIFDjDJQR+MD2NHtMuRIiv03mi9ps4hKztoUbwnKUukJ8guZIVWr2HCI20BWo1bORiaJArfUux9NWVAyxacobx64=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=bu.edu;
-Received: from SN6PR03MB3871.namprd03.prod.outlook.com (2603:10b6:805:6d::32)
- by SN6PR03MB3984.namprd03.prod.outlook.com (2603:10b6:805:78::17)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.21; Tue, 13 Oct
- 2020 15:29:40 +0000
-Received: from SN6PR03MB3871.namprd03.prod.outlook.com
- ([fe80::61ae:93a8:b26c:77b8]) by SN6PR03MB3871.namprd03.prod.outlook.com
- ([fe80::61ae:93a8:b26c:77b8%4]) with mapi id 15.20.3455.031; Tue, 13 Oct 2020
- 15:29:40 +0000
-From: Alexander Bulekov <alxndr@bu.edu>
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kSMaK-00066I-Th
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 11:51:34 -0400
+Received: from localhost.localdomain ([82.252.141.186]) by
+ mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MgzWP-1jyFy92vz3-00hNif; Tue, 13 Oct 2020 17:51:28 +0200
+From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] fuzz: Disable QEMU's signal handlers
-Date: Tue, 13 Oct 2020 11:29:20 -0400
-Message-Id: <20201013152920.448335-1-alxndr@bu.edu>
-X-Mailer: git-send-email 2.28.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [72.93.72.163]
-X-ClientProxiedBy: MN2PR17CA0012.namprd17.prod.outlook.com
- (2603:10b6:208:15e::25) To SN6PR03MB3871.namprd03.prod.outlook.com
- (2603:10b6:805:6d::32)
+Subject: [PATCH 0/4] m68k: add Virtual M68k Machine
+Date: Tue, 13 Oct 2020 17:51:20 +0200
+Message-Id: <20201013155124.451774-1-laurent@vivier.eu>
+X-Mailer: git-send-email 2.26.2
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from stormtrooper.vrmnet (72.93.72.163) by
- MN2PR17CA0012.namprd17.prod.outlook.com (2603:10b6:208:15e::25) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.23 via Frontend
- Transport; Tue, 13 Oct 2020 15:29:39 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 222f7c51-7c4c-4d1a-c4a6-08d86f8ccce6
-X-MS-TrafficTypeDiagnostic: SN6PR03MB3984:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR03MB3984391E3B3B7CBA8E146367BA040@SN6PR03MB3984.namprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5236;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8FNJuBS/fffEKxEovDJxgEnPEDgFcJ56VhgO/DBEaphGuGuI9EhfCnuX3k1HTnktUhE0AYLvg0HookVE+FakjjgSNRzw1K1h1JjTdi8njePr6P/TvMBkTP7y4hvqH8ORasPQTpLgeouiOGg3FIuhUI2HTz02kAL9XPmzu/KOVfifVpCk8xYMVLMX2kTmRh1KVsCxsuDwbAELrN8sPrdhMYmZINJMf+ixp74jjLNX+l/KnmdIGXoMCd7Uz5qoRDaPP2RRbxF2+VEHwNW4UzHMPk1QNOE7zaBUZE1/IrVsHg4hXWmI18CAIlkqUGPuMFpFH9QgrTPWZIXYH/w8MDVOow==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:SN6PR03MB3871.namprd03.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(346002)(396003)(376002)(136003)(366004)(39860400002)(6916009)(36756003)(26005)(86362001)(54906003)(478600001)(6486002)(66946007)(75432002)(2906002)(5660300002)(16526019)(786003)(66556008)(8676002)(8936002)(186003)(956004)(316002)(66476007)(6512007)(2616005)(52116002)(6506007)(1076003)(4326008)(6666004)(83380400001)(4744005);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: IrqEuiKUFnjANv4HRKvzdLAM14UzcIi/CWvMrqho1TaZj4J9ONbZuZXHuA11w2C9zwKMu0flCoLC5fOBkjjDU23orOGU5wDoYCu/j3r4Ns2r0obyEF5o5aSL2NF6pfgMRwwDKYuo5Q2FCYK/C8FtJQzMFNL2Q7QTdzaRUHatLaiEjbjKIviqVqYXeQkuf/CXvLm1hRmueoprxblZd5irrJrctFV0I7hAd/qbUPr79IhdERKTOa6i06sC4DVNVcb7Y+PWI7f60FCUEnDqO0XQogyxSQS2i59s1uPzP0LLFHzNo7dE9oPRVqPOkAQQClaTyVgxLwuBVMGML8nrxtyXR0eWVBpKwWlFxNst9aMZJbCTaefIi6M8MciYFqwqe5ywOB7c+e8vEvDC5oQM4cb5US5546/HPsv82zJeH9CtK0o8huEPEz7IANdyQJkKc93CNozmCOy8yasbWcDPF2WYEGwkBThTRAaFi03OBMvg+WrfwbQ9sa8fByPR7EmjA9YoLseynpjwpNmKbAJWw03sBurDB8NbG90EdgpUCYBL43L6LLJ0Vg9ybQZzCU+MgHu7+dO0GiraB50qTgzkRco9+/frTWAGojudaRGgK+58RCqeru+h+Vebz/AiTPwHBk7nu2cHqbuGv8trh1x8W45EGg==
-X-OriginatorOrg: bu.edu
-X-MS-Exchange-CrossTenant-Network-Message-Id: 222f7c51-7c4c-4d1a-c4a6-08d86f8ccce6
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR03MB3871.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2020 15:29:40.1722 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: d57d32cc-c121-488f-b07b-dfe705680c71
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: e/gNuNiAHdgx8tPmecrKEqkMiKw+NdLcl0du9cz1bZxh5dnxHiih283/yeN/3dwx
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR03MB3984
-Received-SPF: pass client-ip=40.107.76.102; envelope-from=alxndr@bu.edu;
- helo=NAM02-CY1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 11:44:43
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -14
-X-Spam_score: -1.5
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:5maaWEAlVL3+AHNaBhP7/ZUcRZrsdaYknWPuItgwvvqtOR3R750
+ m5fFhfHhieO5G8IbqDx0AJhbGWVKqwmy15onV0EFK9BBb6bkSTmBBvltTqymUs8mJWnTb3V
+ 1TZxrQ7xWbeRY0Jdc8gODWGY4LMia1uF9eL0+Om+cirwEx0nYfsWwlMcO8SckJbUxfr4Aff
+ I6wK6ysI0bS2EVOSYejhw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:xbRCWQOZ3IA=:3xtMdsQlw6b5irYOxzXrP7
+ vMtmJ/g7eSZ9M0l1CCo8LilB1AU4KUIa0vWHgz7H9E8bQ1FB7AzjRctVb7oGIc/LHXRHuSxJT
+ tmt2OLD61+gJLchMubWwIUZ1aj2h0mU5LLPM5mvmtf+J8SXd6o8DAtDdyZx6+sb2Bm6wZJNiz
+ bsljf5OqvCBPIYT6Z8VDS2EPCmMroqTmgQk/hrKDpFHe18W96u7e3+UySHXey/57pWtik2a/h
+ COB7nGYzL0P0PrTdDTNfgK4lVPZpgIuvGK/BAbYefyzUs5jrcMWQQ9WHyD+wr11xTeJf55FQZ
+ YwFQXnEvPs0v+zD5cz0ADSLuEo38qcUK03XsKaHdeGOJ32JJuzizUyU4GmW2ebDHDV4EitfNr
+ OgQDUc7zfDjUv/U7PHJujUNlg8P8w4sT0fIRBIEOv479iTvZm2/lImt3efhdEGlLXR6bwwIbb
+ EKr5+mbhhVSK2bcYgdWn4o3NFNKMg5JfHPQY7khFXInODHoWiJiQS6TxYwX832k2n08faLtKj
+ TNa/QR9sQmq+N17nD6xiPKaJPoj9CAYJM+ztn+KXfAeNkBEcQdma+oonTUE2jXEnLfygVjTdP
+ 5uoU0zIUd64CLOPd6hqJOl+epfXFLD6ZHGAAv+sCn3LMm2WLVXEsaXPnZV6JVzyDipi//ojpp
+ zerYwgdFjshcm2jV3tnTG1eEsw56TgWjPwWiFZoDXPMX0Imo5l9FuW+5JUOmfsiAkKIeCviNl
+ qrUH6FJBCPvlTL9j1IIrzyLbQHsI91SmBm6V5c8nQoEGEBv7M9E3ZcYMNjwrwo9SB9U5HZDjC
+ swmFoDuy32qZe275BSK1tg9+gS/F38oKT16wMH1elipOsMybsB2vPujAadcEorlJZfU89Jv
+Received-SPF: none client-ip=212.227.126.135; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 11:51:29
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, HK_RANDOM_ENVFROM=0.001, HK_RANDOM_FROM=0.44,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -127,44 +81,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Alexander Bulekov <alxndr@bu.edu>, Bandan Das <bsd@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- dimastep@yandex-team.ru
+Cc: Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-With the fuzzer, we never call main_loop_should_exit, since we manually
-call main_loop_wait. This means that the only way to terminate the
-fuzzer is with SIGKILL. Disable the signal handlers, so there are
-reasonable ways to terminate the fuzzer and use atexit() to clean-up
-after the fuzzer.
-
-Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
----
- tests/qtest/fuzz/fuzz.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/tests/qtest/fuzz/fuzz.c b/tests/qtest/fuzz/fuzz.c
-index d926c490c5..eb0070437f 100644
---- a/tests/qtest/fuzz/fuzz.c
-+++ b/tests/qtest/fuzz/fuzz.c
-@@ -217,5 +217,13 @@ int LLVMFuzzerInitialize(int *argc, char ***argv, char ***envp)
-     /* re-enable the rcu atfork, which was previously disabled in qemu_init */
-     rcu_enable_atfork();
- 
-+    /*
-+     * Disable QEMU's signal handlers, since we manually control the main_loop,
-+     * and don't check for main_loop_should_exit
-+     */
-+    signal(SIGINT, SIG_DFL);
-+    signal(SIGHUP, SIG_DFL);
-+    signal(SIGTERM, SIG_DFL);
-+
-     return 0;
- }
--- 
-2.28.0
-
+The Quadra 800 machine is very limited to run linux, it manages=0D
+only 1 GiB of memory and only some specific interfaces.=0D
+=0D
+The Virtual M68k Machine is based on Goldfish interfaces defined by Google=
+=0D
+for Android simulator. It uses Goldfish-rtc (timer and RTC),=0D
+Goldfish-pic (PIC) and Goldfish-tty (for serial port and early tty).=0D
+=0D
+https://android.googlesource.com/platform/external/qemu/+/master/docs/GOLDF=
+IS=3D=0D
+H-VIRTUAL-HARDWARE.TXT=0D
+=0D
+The machine is created with 128 virtio-mmio busses, and they can=0D
+be used to add serial console, GPU, disk, NIC, HID, ...=0D
+=0D
+This series re-use the goldfish-rtc implemented for RISCV, and=0D
+adds the two others based on the goldfish specs, the kernel driver=0D
+and android simulator ones.=0D
+=0D
+The machine can manage up to 3.2 GiB of memory, not because of an hardware=
+=0D
+limitation but because the kernel crashes after this value.=0D
+=0D
+Simply configure qemu with:=0D
+=0D
+    .../configure --target-list=3D3Dm68k-softmmu=0D
+=0D
+To run the machine you need a modified kernel you can find here:=0D
+=0D
+    https://github.com/vivier/linux/tree/m68k-virt=0D
+=0D
+You need to compile the kernel with:=0D
+=0D
+    make virt_defconfig=0D
+    make vmlinux=0D
+=0D
+The disk must be installed using the q800 machine because the debian instal=
+ler=0D
+doesn't want to be used with a kernel that is not the one on the ISO.=0D
+=0D
+And then you can run the machine with something like:=0D
+=0D
+qemu-system-m68k -M virt \=0D
+  -m 3399672K \=0D
+  -chardev stdio,signal=3D3Doff,mux=3D3Don,id=3D3Dchar0 \=0D
+  -mon chardev=3D3Dchar0,mode=3D3Dreadline \=0D
+  -kernel vmlinux \=0D
+  -append "console=3D3Dhvc0 root=3D3D/dev/vda2" \=0D
+  -blockdev node-name=3D3Dsystem,driver=3D3Dfile,filename=3D3Ddebian-10.0.q=
+cow2 \=0D
+  -blockdev node-name=3D3Ddrive0,driver=3D3Dqcow2,file=3D3Dsystem \=0D
+  -device virtio-blk-device,drive=3D3Ddrive0 \=0D
+  -serial chardev:char0 \=0D
+  -device virtio-net-device,netdev=3D3Dhostnet0 \=0D
+  -netdev bridge,id=3D3Dhostnet0,br=3D3Dvirbr0 \=0D
+  -device virtio-rng-device \=0D
+  -device virtio-serial-device \=0D
+  -device virtio-gpu-device \=0D
+  -device virtconsole,chardev=3D3Dchar0 \=0D
+  -device virtio-keyboard-device \=0D
+  -device virtio-mouse-device=0D
+=0D
+if you want to use Goldfish-tty for the console rather than virtconsole, yo=
+u=0D
+can add "console=3D3DttyGF".=0D
+=0D
+To start the debian-installer, you can try by adding:=0D
+=0D
+  -device virtio-scsi-device \=0D
+  -blockdev node-name=3D3Ddebian10,driver=3D3Dfile,filename=3D3Ddebian-10.0=
+.0-m68k-=3D=0D
+NETINST-1.iso \=0D
+  -blockdev node-name=3D3Dcdrom0,driver=3D3Draw,file=3D3Ddebian10 \=0D
+  -device scsi-cd,drive=3D3Dcdrom0 \=0D
+  -initrd installer-m68k/20200315/images/cdrom/initrd.gz=0D
+=0D
+ISO:    https://cdimage.debian.org/cdimage/ports/snapshots/2020-10-12/debia=
+n-=3D=0D
+10.0.0-m68k-NETINST-1.iso=0D
+initrd: https://cdimage.debian.org/cdimage/ports/debian-installer/2020-10-1=
+2/=3D=0D
+m68k/debian-installer-images_20200315_m68k.tar.gz=0D
+=0D
+I think there are some endianness issues with virtio-gpu, because when the=
+=0D
+X server starts I have some errors in the kernel logs:=0D
+=0D
+  vmap allocation for size 3149824 failed: use vmalloc=3D3D<size> to increa=
+se s=3D=0D
+ize=0D
+=0D
+I also tried virtiofsd but there is also an endianness problem and the serv=
+er=0D
+stops.=0D
+=0D
+Have Fun,=0D
+Laurent=0D
+=0D
+PS:=0D
+=0D
+By reading the message to the end you have won the right to download the di=
+sk=3D=0D
+ image=0D
+and the vmlinux.=0D
+=0D
+http://vivier.eu/debian-10.0.qcow2     343 MiB=0D
+http://vivier.eu/vmlinux-virt-m68k     5.2 MiB=0D
+=0D
+Laurent Vivier (4):=0D
+  m68k: import bootinfo headers from linux=0D
+  char: add goldfish-tty=0D
+  intc: add goldfish-pic=0D
+  m68k: add Virtual M68k Machine=0D
+=0D
+ default-configs/devices/m68k-softmmu.mak      |   1 +=0D
+ hw/m68k/bootinfo.h                            |  55 ----=0D
+ include/hw/char/goldfish_tty.h                |  36 +++=0D
+ include/hw/intc/goldfish_pic.h                |  28 ++=0D
+ .../standard-headers/asm-m68k/bootinfo-mac.h  | 120 +++++++=0D
+ .../standard-headers/asm-m68k/bootinfo-virt.h |  17 +=0D
+ include/standard-headers/asm-m68k/bootinfo.h  | 166 ++++++++++=0D
+ hw/char/goldfish_tty.c                        | 265 ++++++++++++++++=0D
+ hw/intc/goldfish_pic.c                        | 178 +++++++++++=0D
+ hw/m68k/q800.c                                |  20 +-=0D
+ hw/m68k/virt.c                                | 296 ++++++++++++++++++=0D
+ MAINTAINERS                                   |  11 +=0D
+ hw/char/Kconfig                               |   3 +=0D
+ hw/char/meson.build                           |   2 +=0D
+ hw/char/trace-events                          |   9 +=0D
+ hw/intc/Kconfig                               |   3 +=0D
+ hw/intc/meson.build                           |   1 +=0D
+ hw/intc/trace-events                          |   8 +=0D
+ hw/m68k/Kconfig                               |   8 +=0D
+ hw/m68k/meson.build                           |   1 +=0D
+ 20 files changed, 1160 insertions(+), 68 deletions(-)=0D
+ create mode 100644 include/hw/char/goldfish_tty.h=0D
+ create mode 100644 include/hw/intc/goldfish_pic.h=0D
+ create mode 100644 include/standard-headers/asm-m68k/bootinfo-mac.h=0D
+ create mode 100644 include/standard-headers/asm-m68k/bootinfo-virt.h=0D
+ create mode 100644 include/standard-headers/asm-m68k/bootinfo.h=0D
+ create mode 100644 hw/char/goldfish_tty.c=0D
+ create mode 100644 hw/intc/goldfish_pic.c=0D
+ create mode 100644 hw/m68k/virt.c=0D
+=0D
+--=3D20=0D
+2.26.2=0D
+=0D
 
